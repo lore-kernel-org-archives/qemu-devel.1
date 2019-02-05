@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44818)
+Received: from eggs.gnu.org ([209.51.188.92]:45967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gr3IX-0004UL-O9
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:10:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gr3Ll-0005lz-Ip
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:13:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gr3IF-0003ZU-Ui
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:10:03 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gr3IF-0003NJ-LQ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:09:51 -0500
-Received: by mail-wm1-x342.google.com with SMTP id d15so4241424wmb.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 08:09:27 -0800 (PST)
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-10-philmd@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190129175403.18017-10-philmd@redhat.com>
-Date: Tue, 05 Feb 2019 16:09:24 +0000
-Message-ID: <87imxy43pn.fsf@zen.linaroharston>
+	(envelope-from <cohuck@redhat.com>) id 1gr3Lj-0005A8-KX
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:13:29 -0500
+Date: Tue, 5 Feb 2019 17:13:09 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190205171309.314b1405.cohuck@redhat.com>
+In-Reply-To: <56301fff-3643-516b-a475-0f39b6221c5f@linux.ibm.com>
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-2-cohuck@redhat.com>
+	<20190130195127.5ff3c849@oc2783563651>
+	<20190131125220.285a4bc8.cohuck@redhat.com>
+	<20190131133455.3097613f@oc2783563651>
+	<20190204163102.33d744d8.cohuck@redhat.com>
+	<20190205125229.56c6e252@oc2783563651>
+	<20190205133540.573902d8.cohuck@redhat.com>
+	<ad60e2d5-f222-da38-41fd-bcbd7c9965a0@linux.ibm.com>
+	<56301fff-3643-516b-a475-0f39b6221c5f@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
- from the ports
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
+On Tue, 5 Feb 2019 10:14:46 -0500
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+> On 02/05/2019 09:48 AM, Eric Farman wrote:
 
-> Various iotests scripts (run via 'make check-block')  use bash
-> specific extentions.  OpenBSD comes with the Korn shell as default.
-> Install bash to be able to run those tests.
+> >>> This patch-series is AFAICT a big improvement over what we have. I wo=
+uld
+> >>> like Farhan confirming that it makes these hick-ups when he used to h=
+it
+> >>> BUSY with another ssch request disappear. If it does (I hope it does)
+> >>> it's definitely a good thing for anybody who wants to use vfio-ccw. =
+=20
+> >>
+> >> Yep. There remains a lot to be done, but it's a first step. =20
+> >=20
+> > s/a first step/an excellent first step/=C2=A0 :)
+> >=20
+> > Can't speak for Farhan, but this makes things somewhat better for me.=20
+> > I'm still getting some periodic errors, but they happen infrequently=20
+> > enough now that debugging them is frustrating.=C2=A0 ;-)
+> >=20
+> >  =C2=A0- Eric
+> >  =20
+>=20
+> I ran the my workloads/tests with the patches and like Eric I notice the=
+=20
+> errors I previously hit less frequently.
 
-Hmmm given we use plain POSIX shell for configure portability is there a
-reason the check-block test scripts use bash? I guess it doesn't get
-picked up as check-block isn't run normally.
-
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/vm/openbsd | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index 6263c8956b..e9c2a3f2c8 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -45,6 +45,8 @@ class OpenBSDVM(basevm.BaseVM):
->          self.wait_ssh()
->          sys.stderr.write("Disabling W^X on the build partition...\n")
->          self.ssh_root_check("sed -E -i 's_(/tmp\ ffs)\ ([^\ ]*)_\\1 \\2,=
-wxallowed_' /etc/fstab")
-> +        sys.stderr.write("Installing bash...\n")
-> +        self.ssh_root_check("PKG_PATH=3Dhttps://ftp.openbsd.org/pub/Open=
-BSD/6.1/packages/amd64 pkg_add bash")
->          self.ssh_root("shutdown -p now")
->          self.wait()
-
-
---
-Alex Benn=C3=A9e
+Great, thanks for testing!
