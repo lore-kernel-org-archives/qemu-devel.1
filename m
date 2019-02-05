@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44932)
+Received: from eggs.gnu.org ([209.51.188.92]:46002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gr0Vo-000336-5V
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:11:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr0Wm-0004L3-GT
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gr0JU-0005SR-09
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:58:56 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  5 Feb 2019 13:58:45 +0100
-Message-Id: <1549371525-29899-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/cpu/cluster: Mark the cpu-cluster device
- with user_creatable = false
+	(envelope-from <peter.maydell@linaro.org>) id 1gr0Wi-00071i-OX
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:12:38 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34639)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr0Wg-0006vf-Rq
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:12:35 -0500
+Received: by mail-ot1-x341.google.com with SMTP id t5so5603111otk.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 05:12:28 -0800 (PST)
+MIME-Version: 1.0
+References: <20190205023937.18245-1-eblake@redhat.com>
+In-Reply-To: <20190205023937.18245-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Feb 2019 13:12:12 +0000
+Message-ID: <CAFEAcA_zxFJWqzD22d2f2Kj3fwQ2jxHu9SoSFojOLVU1bMS0Vg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Avoid non-portable 'test -o/-a'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,37 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc.michel@greensocs.com>, Alistair Francis <alistair.francis@wdc.com>, qemu-trivial@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-The device can not be instantiated by the user and QEMU currently
-aborts when you try to use it:
+On Tue, 5 Feb 2019 at 02:46, Eric Blake <eblake@redhat.com> wrote:
+>
+> POSIX says that it is better to use &&/|| and two separate test
+> invocations than it is to try and use -a and -o (in fact, there
+> are some tests that are inherently ambiguous to parse if the
+> user passes in corner-case input like "(").
+>
+> Since we cannot guarantee which shell runs configure, we cannot
+> rely on -o/-a always following bash's parser rules.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-$ x86_64-softmmu/qemu-system-x86_64 -device cpu-cluster
-qemu-system-x86_64: hw/cpu/cluster.c:73: cpu_cluster_realize:
- Assertion `cbdata.cpu_count > 0' failed.
-Aborted (core dumped)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Since this is an internal device only, mark it with user_creatable = false.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/cpu/cluster.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
-index 25f9070..6f5f037 100644
---- a/hw/cpu/cluster.c
-+++ b/hw/cpu/cluster.c
-@@ -79,6 +79,9 @@ static void cpu_cluster_class_init(ObjectClass *klass, void *data)
- 
-     dc->props = cpu_cluster_properties;
-     dc->realize = cpu_cluster_realize;
-+
-+    /* This is not directly for users, CPU children must be attached by code */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo cpu_cluster_type_info = {
--- 
-1.8.3.1
+thanks
+-- PMM
