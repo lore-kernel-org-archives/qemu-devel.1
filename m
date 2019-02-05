@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35829)
+Received: from eggs.gnu.org ([209.51.188.92]:36027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0002Kb-IJ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:05 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002OA-V7
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GF-0003jk-Va
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34045)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GH-0003nB-P2
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:56145)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GF-0003bQ-IF
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:55 -0500
-Received: by mail-wr1-x434.google.com with SMTP id z15so2671845wrn.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:46 -0800 (PST)
+	id 1gr5GH-0003ZF-Dm
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
+Received: by mail-wm1-x332.google.com with SMTP id y139so4639090wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:42 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+	by smtp.gmail.com with ESMTPSA id p5sm8931665wmh.16.2019.02.05.10.15.31
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 05 Feb 2019 10:15:32 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:27 +0100
-Message-Id: <1549390526-24246-18-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:15 +0100
+Message-Id: <1549390526-24246-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/76] linuxboot_dma: move common functions in a
- new header
+Subject: [Qemu-devel] [PULL 05/76] vhost-user-test: reduce usage of
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,391 +37,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+Whenever the code can run on multiple QTestStates, use them explicitly instead of
+global_qtest.
 
-In order to allow other option roms to use these common
-useful functions and definitions, this patch put them
-in two new C header files called optrom.h and
-optrom_fw_cfg.h. We also add useful out*() in*()
-functions for different size, and new fw_cfg functions
-to use when DMA feature is not available.
-
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543851204-41186-12-git-send-email-pbonzini@redhat.com>
 ---
- pc-bios/optionrom/linuxboot_dma.c | 102 +++++++----------------------------
- pc-bios/optionrom/optrom.h        | 110 ++++++++++++++++++++++++++++++++++++++
- pc-bios/optionrom/optrom_fw_cfg.h |  92 +++++++++++++++++++++++++++++++
- 3 files changed, 221 insertions(+), 83 deletions(-)
- create mode 100644 pc-bios/optionrom/optrom.h
- create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
+ tests/vhost-user-test.c | 38 +++++++++++++++++---------------------
+ 1 file changed, 17 insertions(+), 21 deletions(-)
 
-diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxboot_dma.c
-index f728dc8..cbcf667 100644
---- a/pc-bios/optionrom/linuxboot_dma.c
-+++ b/pc-bios/optionrom/linuxboot_dma.c
-@@ -58,21 +58,13 @@ asm(
- "   jmp load_kernel\n"
- );
- 
--#define BIOS_CFG_DMA_ADDR_HIGH 0x514
--#define BIOS_CFG_DMA_ADDR_LOW  0x518
--
--#define uint64_t unsigned long long
--#define uint32_t unsigned int
--#define uint16_t unsigned short
--
--#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
--
--#define barrier() asm("" : : : "memory")
--
--static inline void outl(uint32_t value, uint16_t port)
--{
--    asm("outl %0, %w1" : : "a"(value), "Nd"(port));
--}
-+/*
-+ * The includes of C headers must be after the asm block to avoid compiler
-+ * errors.
-+ */
-+#include <stdint.h>
-+#include "optrom.h"
-+#include "optrom_fw_cfg.h"
- 
- static inline void set_es(void *addr)
- {
-@@ -80,12 +72,6 @@ static inline void set_es(void *addr)
-     asm("movl %0, %%es" : : "r"(seg));
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index a0da5c3..7d5f234 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -187,12 +187,12 @@ static char *get_qemu_cmd(TestServer *s,
+     }
  }
  
--#ifdef __clang__
--#define ADDR32
--#else
--#define ADDR32 "addr32 "
--#endif
--
- static inline uint16_t readw_es(uint16_t offset)
+-static void init_virtio_dev(TestServer *s, uint32_t features_mask)
++static void init_virtio_dev(QTestState *qts, TestServer *s, uint32_t features_mask)
  {
-     uint16_t val;
-@@ -108,56 +94,6 @@ static inline void writel_es(uint16_t offset, uint32_t val)
-     asm(ADDR32 "movl %0, %%es:(%1)" : : "r"(val), "r"((uint32_t)offset));
+     uint32_t features;
+     int i;
+ 
+-    s->bus = qpci_init_pc(global_qtest, NULL);
++    s->bus = qpci_init_pc(qts, NULL);
+     g_assert_nonnull(s->bus);
+ 
+     s->dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+@@ -203,7 +203,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
+     qvirtio_set_acknowledge(&s->dev->vdev);
+     qvirtio_set_driver(&s->dev->vdev);
+ 
+-    s->alloc = pc_alloc_init(global_qtest);
++    s->alloc = pc_alloc_init(qts);
+ 
+     for (i = 0; i < s->queues * 2; i++) {
+         s->vq[i] = qvirtqueue_setup(&s->dev->vdev, s->alloc, i);
+@@ -265,7 +265,7 @@ static bool wait_for_fds(TestServer *s)
+     return got_region;
  }
  
--static inline uint32_t bswap32(uint32_t x)
--{
--    asm("bswapl %0" : "=r" (x) : "0" (x));
--    return x;
--}
--
--static inline uint64_t bswap64(uint64_t x)
--{
--    asm("bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx" : "=A" (x) : "0" (x));
--    return x;
--}
--
--static inline uint64_t cpu_to_be64(uint64_t x)
--{
--    return bswap64(x);
--}
--
--static inline uint32_t cpu_to_be32(uint32_t x)
--{
--    return bswap32(x);
--}
--
--static inline uint32_t be32_to_cpu(uint32_t x)
--{
--    return bswap32(x);
--}
--
--/* clang is happy to inline this function, and bloats the
-- * ROM.
-- */
--static __attribute__((__noinline__))
--void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
--{
--    struct fw_cfg_dma_access access;
--    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
--                        | FW_CFG_DMA_CTL_READ;
--
--    access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
--    access.length = cpu_to_be32(len);
--    access.control = cpu_to_be32(control);
--
--    barrier();
--
--    outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
--
--    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
--        barrier();
--    }
--}
--
- /* Return top of memory using BIOS function E801. */
- static uint32_t get_e801_addr(void)
+-static void read_guest_mem_server(TestServer *s)
++static void read_guest_mem_server(QTestState *qts, TestServer *s)
  {
-@@ -211,9 +147,9 @@ void load_kernel(void)
-     uint32_t initrd_end_page, max_allowed_page;
-     uint32_t segment_addr, stack_addr;
+     uint8_t *guest_mem;
+     int i, j;
+@@ -293,7 +293,7 @@ static void read_guest_mem_server(TestServer *s)
+         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
  
--    bios_cfg_read_entry(&setup_addr, FW_CFG_SETUP_ADDR, 4);
--    bios_cfg_read_entry(&setup_size, FW_CFG_SETUP_SIZE, 4);
--    bios_cfg_read_entry(setup_addr, FW_CFG_SETUP_DATA, setup_size);
-+    bios_cfg_read_entry_dma(&setup_addr, FW_CFG_SETUP_ADDR, 4);
-+    bios_cfg_read_entry_dma(&setup_size, FW_CFG_SETUP_SIZE, 4);
-+    bios_cfg_read_entry_dma(setup_addr, FW_CFG_SETUP_DATA, setup_size);
+         for (j = 0; j < 1024; j++) {
+-            uint32_t a = readb(s->memory.regions[i].guest_phys_addr + j);
++            uint32_t a = qtest_readb(qts, s->memory.regions[i].guest_phys_addr + j);
+             uint32_t b = guest_mem[j];
  
-     set_es(setup_addr);
+             g_assert_cmpint(a, ==, b);
+@@ -670,13 +670,13 @@ static void test_read_guest_mem(const void *arg)
+     s = qtest_start(qemu_cmd);
+     g_free(qemu_cmd);
  
-@@ -223,8 +159,8 @@ void load_kernel(void)
-         writel_es(0x22c, 0x37ffffff);
+-    init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, server, 1u << VIRTIO_NET_F_MAC);
+ 
+     if (!wait_for_fds(server)) {
+         goto exit;
      }
  
--    bios_cfg_read_entry(&initrd_addr, FW_CFG_INITRD_ADDR, 4);
--    bios_cfg_read_entry(&initrd_size, FW_CFG_INITRD_SIZE, 4);
-+    bios_cfg_read_entry_dma(&initrd_addr, FW_CFG_INITRD_ADDR, 4);
-+    bios_cfg_read_entry_dma(&initrd_size, FW_CFG_INITRD_SIZE, 4);
+-    read_guest_mem_server(server);
++    read_guest_mem_server(global_qtest, server);
  
-     initrd_end_page = ((uint32_t)(initrd_addr + initrd_size) & -4096);
-     max_allowed_page = (readl_es(0x22c) & -4096);
-@@ -239,15 +175,15 @@ void load_kernel(void)
+ exit:
+     uninit_virtio_dev(server);
+@@ -690,7 +690,7 @@ static void test_migrate(void)
+     TestServer *s = test_server_new("src");
+     TestServer *dest = test_server_new("dest");
+     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+-    QTestState *global = global_qtest, *from, *to;
++    QTestState *from, *to;
+     GSource *source;
+     gchar *cmd, *tmp;
+     QDict *rsp;
+@@ -704,7 +704,7 @@ static void test_migrate(void)
+     from = qtest_start(cmd);
+     g_free(cmd);
  
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(from, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
      }
+@@ -717,7 +717,7 @@ static void test_migrate(void)
+     g_free(tmp);
+     to = qtest_init(cmd);
+     g_free(cmd);
+-    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(to, dest, 1u << VIRTIO_NET_F_MAC);
  
--    bios_cfg_read_entry(initrd_addr, FW_CFG_INITRD_DATA, initrd_size);
-+    bios_cfg_read_entry_dma(initrd_addr, FW_CFG_INITRD_DATA, initrd_size);
+     source = g_source_new(&test_migrate_source_funcs,
+                           sizeof(TestMigrateSource));
+@@ -753,12 +753,10 @@ static void test_migrate(void)
+     qobject_unref(rsp);
  
--    bios_cfg_read_entry(&kernel_addr, FW_CFG_KERNEL_ADDR, 4);
--    bios_cfg_read_entry(&kernel_size, FW_CFG_KERNEL_SIZE, 4);
--    bios_cfg_read_entry(kernel_addr, FW_CFG_KERNEL_DATA, kernel_size);
-+    bios_cfg_read_entry_dma(&kernel_addr, FW_CFG_KERNEL_ADDR, 4);
-+    bios_cfg_read_entry_dma(&kernel_size, FW_CFG_KERNEL_SIZE, 4);
-+    bios_cfg_read_entry_dma(kernel_addr, FW_CFG_KERNEL_DATA, kernel_size);
+     qmp_eventwait("STOP");
++    qtest_qmp_eventwait(to, "RESUME");
  
--    bios_cfg_read_entry(&cmdline_addr, FW_CFG_CMDLINE_ADDR, 4);
--    bios_cfg_read_entry(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4);
--    bios_cfg_read_entry(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size);
-+    bios_cfg_read_entry_dma(&cmdline_addr, FW_CFG_CMDLINE_ADDR, 4);
-+    bios_cfg_read_entry_dma(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4);
-+    bios_cfg_read_entry_dma(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size);
+-    global_qtest = to;
+-    qmp_eventwait("RESUME");
+-
+-    g_assert(wait_for_fds(s));
+-    read_guest_mem_server(dest);
++    g_assert(wait_for_fds(dest));
++    read_guest_mem_server(to, dest);
  
-     /* Boot linux */
-     segment_addr = ((uint32_t)setup_addr >> 4);
-diff --git a/pc-bios/optionrom/optrom.h b/pc-bios/optionrom/optrom.h
-new file mode 100644
-index 0000000..3578192
---- /dev/null
-+++ b/pc-bios/optionrom/optrom.h
-@@ -0,0 +1,110 @@
-+/*
-+ * Common Option ROM Functions for C code
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * Copyright (c) 2015-2019 Red Hat Inc.
-+ *   Authors:
-+ *     Marc Marí <marc.mari.barcelo@gmail.com>
-+ *     Richard W.M. Jones <rjones@redhat.com>
-+ *     Stefano Garzarella <sgarzare@redhat.com>
-+ */
-+
-+#ifndef OPTROM_H
-+#define OPTROM_H
-+
-+#include <stdint.h>
-+#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
-+
-+#define barrier() asm("" : : : "memory")
-+
-+#ifdef __clang__
-+#define ADDR32
-+#else
-+#define ADDR32 "addr32 "
-+#endif
-+
-+static inline void outb(uint8_t value, uint16_t port)
-+{
-+    asm volatile("outb %0, %w1" : : "a"(value), "Nd"(port));
-+}
-+
-+static inline void outw(uint16_t value, uint16_t port)
-+{
-+    asm volatile("outw %0, %w1" : : "a"(value), "Nd"(port));
-+}
-+
-+static inline void outl(uint32_t value, uint16_t port)
-+{
-+    asm volatile("outl %0, %w1" : : "a"(value), "Nd"(port));
-+}
-+
-+static inline uint8_t inb(uint16_t port)
-+{
-+    uint8_t value;
-+
-+    asm volatile("inb %w1, %0" : "=a"(value) : "Nd"(port));
-+    return value;
-+}
-+
-+static inline uint16_t inw(uint16_t port)
-+{
-+    uint16_t value;
-+
-+    asm volatile("inw %w1, %0" : "=a"(value) : "Nd"(port));
-+    return value;
-+}
-+
-+static inline uint32_t inl(uint16_t port)
-+{
-+    uint32_t value;
-+
-+    asm volatile("inl %w1, %0" : "=a"(value) : "Nd"(port));
-+    return value;
-+}
-+
-+static inline void insb(uint16_t port, uint8_t *buf, uint32_t len)
-+{
-+    asm volatile("rep insb %%dx, %%es:(%%edi)"
-+                 : "+c"(len), "+D"(buf) : "d"(port) : "memory");
-+}
-+
-+static inline uint32_t bswap32(uint32_t x)
-+{
-+    asm("bswapl %0" : "=r" (x) : "0" (x));
-+    return x;
-+}
-+
-+static inline uint64_t bswap64(uint64_t x)
-+{
-+    asm("bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx" : "=A" (x) : "0" (x));
-+    return x;
-+}
-+
-+static inline uint64_t cpu_to_be64(uint64_t x)
-+{
-+    return bswap64(x);
-+}
-+
-+static inline uint32_t cpu_to_be32(uint32_t x)
-+{
-+    return bswap32(x);
-+}
-+
-+static inline uint32_t be32_to_cpu(uint32_t x)
-+{
-+    return bswap32(x);
-+}
-+
-+#endif /* OPTROM_H */
-diff --git a/pc-bios/optionrom/optrom_fw_cfg.h b/pc-bios/optionrom/optrom_fw_cfg.h
-new file mode 100644
-index 0000000..a3660a5
---- /dev/null
-+++ b/pc-bios/optionrom/optrom_fw_cfg.h
-@@ -0,0 +1,92 @@
-+/*
-+ * Common Option ROM Functions for fw_cfg
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * Copyright (c) 2015-2019 Red Hat Inc.
-+ *   Authors:
-+ *     Marc Marí <marc.mari.barcelo@gmail.com>
-+ *     Richard W.M. Jones <rjones@redhat.com>
-+ *     Stefano Garzarella <sgarzare@redhat.com>
-+ */
-+
-+#ifndef OPTROM_FW_CFG_H
-+#define OPTROM_FW_CFG_H
-+
-+#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
-+
-+#define BIOS_CFG_IOPORT_CFG     0x510
-+#define BIOS_CFG_IOPORT_DATA    0x511
-+#define BIOS_CFG_DMA_ADDR_HIGH  0x514
-+#define BIOS_CFG_DMA_ADDR_LOW   0x518
-+
-+static __attribute__((unused))
-+void bios_cfg_select(uint16_t key)
-+{
-+    outw(key, BIOS_CFG_IOPORT_CFG);
-+}
-+
-+static __attribute__((unused))
-+void bios_cfg_read_entry_io(void *buf, uint16_t entry, uint32_t len)
-+{
-+    bios_cfg_select(entry);
-+    insb(BIOS_CFG_IOPORT_DATA, buf, len);
-+}
-+
-+/*
-+ * clang is happy to inline this function, and bloats the
-+ * ROM.
-+ */
-+static __attribute__((__noinline__)) __attribute__((unused))
-+void bios_cfg_read_entry_dma(void *buf, uint16_t entry, uint32_t len)
-+{
-+    struct fw_cfg_dma_access access;
-+    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
-+                        | FW_CFG_DMA_CTL_READ;
-+
-+    access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
-+    access.length = cpu_to_be32(len);
-+    access.control = cpu_to_be32(control);
-+
-+    barrier();
-+
-+    outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
-+
-+    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
-+        barrier();
-+    }
-+}
-+
-+static __attribute__((unused))
-+void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len,
-+                         uint32_t version)
-+{
-+    if (version & FW_CFG_VERSION_DMA) {
-+        bios_cfg_read_entry_dma(buf, entry, len);
-+    } else {
-+        bios_cfg_read_entry_io(buf, entry, len);
-+    }
-+}
-+
-+static __attribute__((unused))
-+uint32_t bios_cfg_version(void)
-+{
-+    uint32_t version;
-+
-+    bios_cfg_read_entry_io(&version, FW_CFG_ID, sizeof(version));
-+
-+    return version;
-+}
-+
-+#endif /* OPTROM_FW_CFG_H */
+     uninit_virtio_dev(dest);
+     qtest_quit(to);
+@@ -773,8 +771,6 @@ exit:
+     qtest_quit(from);
+     test_server_free(s);
+     g_free(uri);
+-
+-    global_qtest = global;
+ }
+ 
+ static void wait_for_rings_started(TestServer *s, size_t count)
+@@ -831,7 +827,7 @@ static void test_reconnect_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -873,7 +869,7 @@ static void test_connect_fail_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -906,7 +902,7 @@ static void test_flags_mismatch_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -957,7 +953,7 @@ static void test_multiqueue(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, features_mask);
++    init_virtio_dev(global_qtest, s, features_mask);
+ 
+     wait_for_rings_started(s, s->queues * 2);
+ 
 -- 
 1.8.3.1
