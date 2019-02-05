@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35909)
+Received: from eggs.gnu.org ([209.51.188.92]:35904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002Lk-Mq
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002Le-KK
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GG-0003ks-Jz
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GH-0003mN-CB
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44629)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42857)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GG-0003X1-2V
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:56 -0500
-Received: by mail-wr1-x436.google.com with SMTP id v16so2844396wrn.11
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:38 -0800 (PST)
+	id 1gr5GG-0003a9-S9
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q18so4689299wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:44 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:19 +0100
-Message-Id: <1549390526-24246-10-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:25 +0100
+Message-Id: <1549390526-24246-16-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/76] configure: Add a proper check for
- openpty() in libutil
+Subject: [Qemu-devel] [PULL 15/76] pvh: load initrd and expose it through
+ fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +29,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <Liam.Merwick@oracle.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-On Linux (and maybe some BSDs), we require libutil for the openpty()
-function. However, this library is not available on some other systems, so
-we currently use a fragile if-statement in the configure script to check
-whether we need the library or not. Unfortunately, we also hard-coded a
-"-lutil" in the tests/Makefile.include file, so this breaks the build on
-Solaris, for example (see buglink below). To fix the issue, add the "-lutil"
-to "libs_tools" in the configure script instead, then this gets properly
-propagated to the tests, too.
-And while we're at it, also replace the fragile if-statement in the confi-
-gure script with a proper link-check for the availability of this function.
+When initrd is specified, load and expose it to the guest firmware
+through fw_cfg. The firmware will fill the hvm_start_info for the
+kernel.
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1777252
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure              | 12 ++++++++++--
- tests/Makefile.include |  4 ----
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ hw/i386/pc.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/configure b/configure
-index 3d89870..f6a51e0 100755
---- a/configure
-+++ b/configure
-@@ -4612,9 +4612,17 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
-   libs_qga="$libs_qga -lrt"
- fi
- 
--if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
--        "$haiku" != "yes" ; then
-+# Check whether we need to link libutil for openpty()
-+cat > $TMPC << EOF
-+extern int openpty(int *am, int *as, char *name, void *termp, void *winp);
-+int main(void) { return openpty(0, 0, 0, 0, 0); }
-+EOF
-+
-+if ! compile_prog "" "" ; then
-+  if compile_prog "" "-lutil" ; then
-     libs_softmmu="-lutil $libs_softmmu"
-+    libs_tools="-lutil $libs_tools"
-+  fi
- fi
- 
- ##########################################
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 75ad9c0..b39e989 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -798,10 +798,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
- 	rm $(INITRD_WORK_DIR)/init
- 	rmdir $(INITRD_WORK_DIR)
- 
--ifeq ($(CONFIG_POSIX),y)
--LIBS += -lutil
--endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index e39ef5c..5d61557 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1222,25 +1222,45 @@ static void load_linux(PCMachineState *pcms,
+          */
+         if (load_elfboot(kernel_filename, kernel_size,
+                          header, pvh_start_addr, fw_cfg)) {
+-            struct hvm_modlist_entry ramdisk_mod = { 0 };
 -
- # QTest rules
+             fclose(f);
  
- TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+                 strlen(kernel_cmdline) + 1);
+             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
+ 
+-            assert(machine->device_memory != NULL);
+-            ramdisk_mod.paddr = machine->device_memory->base;
+-            ramdisk_mod.size =
+-                memory_region_size(&machine->device_memory->mr);
+-
+-            fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdisk_mod,
+-                             sizeof(ramdisk_mod));
+             fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
+             fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
+                              header, sizeof(header));
+ 
++            /* load initrd */
++            if (initrd_filename) {
++                gsize initrd_size;
++                gchar *initrd_data;
++                GError *gerr = NULL;
++
++                if (!g_file_get_contents(initrd_filename, &initrd_data,
++                            &initrd_size, &gerr)) {
++                    fprintf(stderr, "qemu: error reading initrd %s: %s\n",
++                            initrd_filename, gerr->message);
++                    exit(1);
++                }
++
++                initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
++                if (initrd_size >= initrd_max) {
++                    fprintf(stderr, "qemu: initrd is too large, cannot support."
++                            "(max: %"PRIu32", need %"PRId64")\n",
++                            initrd_max, (uint64_t)initrd_size);
++                    exit(1);
++                }
++
++                initrd_addr = (initrd_max - initrd_size) & ~4095;
++
++                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
++                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
++                fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data,
++                                 initrd_size);
++            }
++
+             return;
+         }
+         /* This looks like a multiboot kernel. If it is, let's stop
 -- 
 1.8.3.1
