@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36026)
+Received: from eggs.gnu.org ([209.51.188.92]:36005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002O9-US
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:07 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002No-HZ
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003oa-Cf
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003nk-1a
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:35490)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GH-0003eH-PY
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id t200so4796957wmt.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:50 -0800 (PST)
+	id 1gr5GH-0003ZD-IS
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
+Received: by mail-wm1-x343.google.com with SMTP id b11so4695097wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:42 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:30 +0100
-Message-Id: <1549390526-24246-21-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:23 +0100
+Message-Id: <1549390526-24246-14-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 20/76] optionrom/pvh: load initrd from fw_cfg
+Subject: [Qemu-devel] [PULL 13/76] pvh: Add x86/HVM direct boot ABI header
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +29,179 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Liam Merwick <Liam.Merwick@oracle.com>
 
-If we found initrd through fw_cfg, we can load it and use the
-first module of hvm_start_info to pass initrd address and size
-to the kernel.
+The x86/HVM direct boot ABI permits Qemu to be able to boot directly
+into the uncompressed Linux kernel binary with minimal firmware involvement.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Based-on: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
+	https://xenbits.xen.org/docs/unstable/misc/pvh.html
+
+This commit adds the header file that defines the start_info struct
+that needs to be populated in order to use this ABI.
+
+The canonical version of start_info.h is in the Xen codebase.
+(like QEMU, the Linux kernel uses a copy as well).
+
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- pc-bios/optionrom/pvh_main.c |  21 +++++++++++++++++++--
- pc-bios/pvh.bin              | Bin 1536 -> 1536 bytes
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ include/hw/xen/start_info.h | 146 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 146 insertions(+)
+ create mode 100644 include/hw/xen/start_info.h
 
-diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
-index 1dcc5c9..a015e1b 100644
---- a/pc-bios/optionrom/pvh_main.c
-+++ b/pc-bios/optionrom/pvh_main.c
-@@ -46,6 +46,7 @@ struct pvh_e820_table {
- struct pvh_e820_table pvh_e820 asm("pvh_e820") __attribute__ ((aligned));
- 
- static struct hvm_start_info start_info;
-+static struct hvm_modlist_entry ramdisk_mod;
- static uint8_t cmdline_buffer[CMDLINE_BUFSIZE];
- 
- 
-@@ -71,8 +72,8 @@ extern void pvh_load_kernel(void) asm("pvh_load_kernel");
- void pvh_load_kernel(void)
- {
-     void *cmdline_addr = &cmdline_buffer;
--    void *kernel_entry;
--    uint32_t cmdline_size, fw_cfg_version = bios_cfg_version();
-+    void *kernel_entry, *initrd_addr;
-+    uint32_t cmdline_size, initrd_size, fw_cfg_version = bios_cfg_version();
- 
-     start_info.magic = XEN_HVM_START_MAGIC_VALUE;
-     start_info.version = 1;
-@@ -110,6 +111,22 @@ void pvh_load_kernel(void)
-                         fw_cfg_version);
-     start_info.cmdline_paddr = (uintptr_t)cmdline_addr;
- 
-+    /* Check if we have the initrd to load */
-+    bios_cfg_read_entry(&initrd_size, FW_CFG_INITRD_SIZE, 4, fw_cfg_version);
-+    if (initrd_size) {
-+        bios_cfg_read_entry(&initrd_addr, FW_CFG_INITRD_ADDR, 4,
-+                            fw_cfg_version);
-+        bios_cfg_read_entry(initrd_addr, FW_CFG_INITRD_DATA, initrd_size,
-+                            fw_cfg_version);
+diff --git a/include/hw/xen/start_info.h b/include/hw/xen/start_info.h
+new file mode 100644
+index 0000000..348779e
+--- /dev/null
++++ b/include/hw/xen/start_info.h
+@@ -0,0 +1,146 @@
++/*
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to
++ * deal in the Software without restriction, including without limitation the
++ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
++ * sell copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++ * DEALINGS IN THE SOFTWARE.
++ *
++ * Copyright (c) 2016, Citrix Systems, Inc.
++ */
 +
-+        ramdisk_mod.paddr = (uintptr_t)initrd_addr;
-+        ramdisk_mod.size = initrd_size;
++#ifndef __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__
++#define __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__
 +
-+        /* The first module is always ramdisk. */
-+        start_info.modlist_paddr = (uintptr_t)&ramdisk_mod;
-+        start_info.nr_modules = 1;
-+    }
++/*
++ * Start of day structure passed to PVH guests and to HVM guests in %ebx.
++ *
++ * NOTE: nothing will be loaded at physical address 0, so a 0 value in any
++ * of the address fields should be treated as not present.
++ *
++ *  0 +----------------+
++ *    | magic          | Contains the magic value XEN_HVM_START_MAGIC_VALUE
++ *    |                | ("xEn3" with the 0x80 bit of the "E" set).
++ *  4 +----------------+
++ *    | version        | Version of this structure. Current version is 1. New
++ *    |                | versions are guaranteed to be backwards-compatible.
++ *  8 +----------------+
++ *    | flags          | SIF_xxx flags.
++ * 12 +----------------+
++ *    | nr_modules     | Number of modules passed to the kernel.
++ * 16 +----------------+
++ *    | modlist_paddr  | Physical address of an array of modules
++ *    |                | (layout of the structure below).
++ * 24 +----------------+
++ *    | cmdline_paddr  | Physical address of the command line,
++ *    |                | a zero-terminated ASCII string.
++ * 32 +----------------+
++ *    | rsdp_paddr     | Physical address of the RSDP ACPI data structure.
++ * 40 +----------------+
++ *    | memmap_paddr   | Physical address of the (optional) memory map. Only
++ *    |                | present in version 1 and newer of the structure.
++ * 48 +----------------+
++ *    | memmap_entries | Number of entries in the memory map table. Only
++ *    |                | present in version 1 and newer of the structure.
++ *    |                | Zero if there is no memory map being provided.
++ * 52 +----------------+
++ *    | reserved       | Version 1 and newer only.
++ * 56 +----------------+
++ *
++ * The layout of each entry in the module structure is the following:
++ *
++ *  0 +----------------+
++ *    | paddr          | Physical address of the module.
++ *  8 +----------------+
++ *    | size           | Size of the module in bytes.
++ * 16 +----------------+
++ *    | cmdline_paddr  | Physical address of the command line,
++ *    |                | a zero-terminated ASCII string.
++ * 24 +----------------+
++ *    | reserved       |
++ * 32 +----------------+
++ *
++ * The layout of each entry in the memory map table is as follows:
++ *
++ *  0 +----------------+
++ *    | addr           | Base address
++ *  8 +----------------+
++ *    | size           | Size of mapping in bytes
++ * 16 +----------------+
++ *    | type           | Type of mapping as defined between the hypervisor
++ *    |                | and guest it's starting. E820_TYPE_xxx, for example.
++ * 20 +----------------|
++ *    | reserved       |
++ * 24 +----------------+
++ *
++ * The address and sizes are always a 64bit little endian unsigned integer.
++ *
++ * NB: Xen on x86 will always try to place all the data below the 4GiB
++ * boundary.
++ *
++ * Version numbers of the hvm_start_info structure have evolved like this:
++ *
++ * Version 0:
++ *
++ * Version 1:   Added the memmap_paddr/memmap_entries fields (plus 4 bytes of
++ *              padding) to the end of the hvm_start_info struct. These new
++ *              fields can be used to pass a memory map to the guest. The
++ *              memory map is optional and so guests that understand version 1
++ *              of the structure must check that memmap_entries is non-zero
++ *              before trying to read the memory map.
++ */
++#define XEN_HVM_START_MAGIC_VALUE 0x336ec578
 +
-     bios_cfg_read_entry(&kernel_entry, FW_CFG_KERNEL_ENTRY, 4, fw_cfg_version);
- 
-     asm volatile("jmp *%1" : : "b"(&start_info), "c"(kernel_entry));
-diff --git a/pc-bios/pvh.bin b/pc-bios/pvh.bin
-index 38a41761014957d50eb55d790b6957888cbeee0a..8033080ada2db4c4613fdc3bb5a69d79c7b0c0ca 100644
-GIT binary patch
-delta 735
-zcmZqRY2cYKndyM&#;Nv<`Y|dZ$5|Uh85k;#<{2MnZ2__v85kHA9sn{HZvYZIPJmb|
-zfW&duHKLQ5nUrMIfhw902-q@k@G+F$J<hrSC<y|`S(k`Tc4U&S-@w4az+ic-T<m2U
-z69Yr<HjpGxgXJ;)wosrzw?N~kpkNn;ZV#5mj{zY;3Y-^99~fR*3^J!vbP15`Eo0c1
-zzzXD<s2q1u0U8F>|Cout)f{N^UIC!Q4iTVG=c}~$y9I%~ogfvxH7Wv~w?60W5Uq#G
-zb^8ECzJtWNSyZ}1R9F_z0NXGJNbcZ<DuU@10jqOS5otY88nQzGD7y<}QQCW$0*+lE
-zt3K!K289;TXpa96n~%su$Hm7U?k!Pcm;iP@C<qup_A@ZNwE6%4fA1DG5F4yu2N#e9
-zax=_C9<XzTprSw{MY?NLz=GW_Dm;r5fc6|`O#zZ102C5goB<ZffeP&asaQM#EH(uy
-zcAT|GlmilnFD)iJGRxEpyomk#|34@!c7fD%et6*v;$wse*j2kg!O{z~>V*bKQ3x<N
-zE|p|Lq(IIGO7Xnlg_tL@3*>Z=Q(yf415}LN%^5^G8scV%O`y;R+Qji<3DDe^<^K@j
-Z2no&!h6hlR%ga4L7i~VsEX~MR4FFIY;aUIy
-
-delta 434
-zcmZqRY2cYKnW;f!<5YV_{Sp<C<E#!M3=9=V^Nf$Px&T>>3=9kl8-R?(1wdj)2Z)sc
-zB#yJ@h)iZ?Qj%c@s%SnSV9UV4$549rIBNn>5(JL3rie^-WRk9*!N9`6V0pM)?4=n{
-zY40|WBv6CpVg5E%pg^}k<ENlt7lm#Qmd1|(Awde97fT-)URn$?r&BZqNcNU7>~;W}
-z(J7;H+(iY*0P26n#NRp{$k;2u3Un37%Fb75@AnA;c{@QWdTUffIzN5R*&&(+mFxBa
-zirfc@b+f2+hp4bDjsV*b10;6{Ko!CC3V_t@289Gro525v%|~RS<Kklv_ij-Gs$@u;
-z0Cpb8iy$ro!^@b-51D1cMPB^<`~N@4rd^^y(asw$-h%iT_JOV01+ui)MMdDn3812v
-j<^TWx2l~|T0E*vVzWMk6|K^V@e2kM=|4(AIW9$F`FOZ8_
-
++/*
++ * C representation of the x86/HVM start info layout.
++ *
++ * The canonical definition of this layout is above, this is just a way to
++ * represent the layout described there using C types.
++ */
++struct hvm_start_info {
++    uint32_t magic;             /* Contains the magic value 0x336ec578       */
++                                /* ("xEn3" with the 0x80 bit of the "E" set).*/
++    uint32_t version;           /* Version of this structure.                */
++    uint32_t flags;             /* SIF_xxx flags.                            */
++    uint32_t nr_modules;        /* Number of modules passed to the kernel.   */
++    uint64_t modlist_paddr;     /* Physical address of an array of           */
++                                /* hvm_modlist_entry.                        */
++    uint64_t cmdline_paddr;     /* Physical address of the command line.     */
++    uint64_t rsdp_paddr;        /* Physical address of the RSDP ACPI data    */
++                                /* structure.                                */
++    uint64_t memmap_paddr;      /* Physical address of an array of           */
++                                /* hvm_memmap_table_entry. Only present in   */
++                                /* version 1 and newer of the structure      */
++    uint32_t memmap_entries;    /* Number of entries in the memmap table.    */
++                                /* Only present in version 1 and newer of    */
++                                /* the structure. Value will be zero if      */
++                                /* there is no memory map being provided.    */
++    uint32_t reserved;
++};
++
++struct hvm_modlist_entry {
++    uint64_t paddr;             /* Physical address of the module.           */
++    uint64_t size;              /* Size of the module in bytes.              */
++    uint64_t cmdline_paddr;     /* Physical address of the command line.     */
++    uint64_t reserved;
++};
++
++struct hvm_memmap_table_entry {
++    uint64_t addr;              /* Base address of the memory region         */
++    uint64_t size;              /* Size of the memory region in bytes        */
++    uint32_t type;              /* Mapping type                              */
++    uint32_t reserved;
++};
++
++#endif /* __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__ */
 -- 
 1.8.3.1
