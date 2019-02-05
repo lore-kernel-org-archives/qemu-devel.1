@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36461)
+Received: from eggs.gnu.org ([209.51.188.92]:36431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Ge-0002dY-QD
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:22 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Ge-0002cb-4h
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gc-00048o-Ou
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gb-00046u-J7
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:20 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:54478)
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5Gc-00044i-DX
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:18 -0500
-Received: by mail-wm1-x333.google.com with SMTP id a62so4680165wmh.4
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:14 -0800 (PST)
+	id 1gr5GZ-0003xT-Fo
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:17 -0500
+Received: by mail-wr1-x436.google.com with SMTP id v16so2845897wrn.11
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:05 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:53 +0100
-Message-Id: <1549390526-24246-44-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:45 +0100
+Message-Id: <1549390526-24246-36-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 43/76] Remove deprecated -enable-hax option
+Subject: [Qemu-devel] [PULL 35/76] unify len and addr type for
+ memory/address APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +29,350 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Stefano Garzarella <sgarzare@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Our command line interface is really quite overcrowded, we should avoid
-duplicated options that do the same thing in just a slightly different
-way. "-accel hax" is shorter and more generic that "-enable-hax", so
-there is really no real usage for the latter option. "-enable-hax" has
-been deprecated since two releases, and nobody complained so far, so
-it's time to remove this now.
+Some address/memory APIs have different type between
+'hwaddr/target_ulong addr' and 'int len'. It is very unsafe, especially
+some APIs will be passed a non-int len by caller which might cause
+overflow quietly.
+Below is an potential overflow case:
+    dma_memory_read(uint32_t len)
+      -> dma_memory_rw(uint32_t len)
+        -> dma_memory_rw_relaxed(uint32_t len)
+          -> address_space_rw(int len) # len overflow
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1544790073-23049-1-git-send-email-thuth@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-deprecated.texi |  5 -----
- qemu-options.hx      | 11 -----------
- vl.c                 |  5 -----
- 3 files changed, 21 deletions(-)
+ exec.c                    | 47 +++++++++++++++++++++++------------------------
+ include/exec/cpu-all.h    |  2 +-
+ include/exec/cpu-common.h |  8 ++++----
+ include/exec/memory.h     | 22 +++++++++++-----------
+ 4 files changed, 39 insertions(+), 40 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 8a6174d..dcf85a9 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -53,11 +53,6 @@ Option @option{-virtioconsole} has been replaced by
- The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
- replacement since it is not needed anymore.
+diff --git a/exec.c b/exec.c
+index 03dd673..5180645 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2851,10 +2851,10 @@ static const MemoryRegionOps watch_mem_ops = {
+ };
  
--@subsection -enable-hax (since 3.0.0)
--
--The @option{-enable-hax} option has been replaced by @option{-accel hax}.
--Both options have been introduced in QEMU version 2.9.0.
--
- @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
+ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+-                                      MemTxAttrs attrs, uint8_t *buf, int len);
++                                 MemTxAttrs attrs, uint8_t *buf, hwaddr len);
+ static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+-                                  const uint8_t *buf, int len);
+-static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
++                                  const uint8_t *buf, hwaddr len);
++static bool flatview_access_valid(FlatView *fv, hwaddr addr, hwaddr len,
+                                   bool is_write, MemTxAttrs attrs);
  
- The 'file' driver for drives is no longer appropriate for character or host
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 521511e..8f34dce 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
- if KVM support is enabled when compiling.
- ETEXI
+ static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
+@@ -3102,10 +3102,10 @@ MemoryRegion *get_system_io(void)
+ /* physical memory access (slow version, mainly for debug) */
+ #if defined(CONFIG_USER_ONLY)
+ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+-                        uint8_t *buf, int len, int is_write)
++                        uint8_t *buf, target_ulong len, int is_write)
+ {
+-    int l, flags;
+-    target_ulong page;
++    int flags;
++    target_ulong l, page;
+     void * p;
  
--DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
--    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
--STEXI
--@item -enable-hax
--@findex -enable-hax
--Enable HAX (Hardware-based Acceleration eXecution) support. This option
--is only available if HAX support is enabled when compiling. HAX is only
--applicable to MAC and Windows platform, and thus does not conflict with
--KVM. This option is deprecated, use @option{-accel hax} instead.
--ETEXI
--
- DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
- DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
-diff --git a/vl.c b/vl.c
-index 9cf0fbe..804fbdb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3655,11 +3655,6 @@ int main(int argc, char **argv, char **envp)
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
-                 break;
--            case QEMU_OPTION_enable_hax:
--                warn_report("Option is deprecated, use '-accel hax' instead");
--                olist = qemu_find_opts("machine");
--                qemu_opts_parse_noisily(olist, "accel=hax", false);
--                break;
-             case QEMU_OPTION_M:
-             case QEMU_OPTION_machine:
-                 olist = qemu_find_opts("machine");
+     while (len > 0) {
+@@ -3231,7 +3231,7 @@ static bool prepare_mmio_access(MemoryRegion *mr)
+ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+                                            MemTxAttrs attrs,
+                                            const uint8_t *buf,
+-                                           int len, hwaddr addr1,
++                                           hwaddr len, hwaddr addr1,
+                                            hwaddr l, MemoryRegion *mr)
+ {
+     uint8_t *ptr;
+@@ -3276,7 +3276,7 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+ 
+ /* Called from RCU critical section.  */
+ static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+-                                  const uint8_t *buf, int len)
++                                  const uint8_t *buf, hwaddr len)
+ {
+     hwaddr l;
+     hwaddr addr1;
+@@ -3294,7 +3294,7 @@ static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+ /* Called within RCU critical section.  */
+ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+                                    MemTxAttrs attrs, uint8_t *buf,
+-                                   int len, hwaddr addr1, hwaddr l,
++                                   hwaddr len, hwaddr addr1, hwaddr l,
+                                    MemoryRegion *mr)
+ {
+     uint8_t *ptr;
+@@ -3337,7 +3337,7 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+ 
+ /* Called from RCU critical section.  */
+ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+-                                 MemTxAttrs attrs, uint8_t *buf, int len)
++                                 MemTxAttrs attrs, uint8_t *buf, hwaddr len)
+ {
+     hwaddr l;
+     hwaddr addr1;
+@@ -3350,7 +3350,7 @@ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+ }
+ 
+ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+-                                    MemTxAttrs attrs, uint8_t *buf, int len)
++                                    MemTxAttrs attrs, uint8_t *buf, hwaddr len)
+ {
+     MemTxResult result = MEMTX_OK;
+     FlatView *fv;
+@@ -3367,7 +3367,7 @@ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+ 
+ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+                                 MemTxAttrs attrs,
+-                                const uint8_t *buf, int len)
++                                const uint8_t *buf, hwaddr len)
+ {
+     MemTxResult result = MEMTX_OK;
+     FlatView *fv;
+@@ -3383,7 +3383,7 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+ }
+ 
+ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
+-                             uint8_t *buf, int len, bool is_write)
++                             uint8_t *buf, hwaddr len, bool is_write)
+ {
+     if (is_write) {
+         return address_space_write(as, addr, attrs, buf, len);
+@@ -3393,7 +3393,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
+ }
+ 
+ void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+-                            int len, int is_write)
++                            hwaddr len, int is_write)
+ {
+     address_space_rw(&address_space_memory, addr, MEMTXATTRS_UNSPECIFIED,
+                      buf, len, is_write);
+@@ -3408,7 +3408,7 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
+                                                            hwaddr addr,
+                                                            MemTxAttrs attrs,
+                                                            const uint8_t *buf,
+-                                                           int len,
++                                                           hwaddr len,
+                                                            enum write_rom_type type)
+ {
+     hwaddr l;
+@@ -3448,13 +3448,13 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
+ /* used for ROM loading : can write in RAM and ROM */
+ MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
+                                     MemTxAttrs attrs,
+-                                    const uint8_t *buf, int len)
++                                    const uint8_t *buf, hwaddr len)
+ {
+     return address_space_write_rom_internal(as, addr, attrs,
+                                             buf, len, WRITE_DATA);
+ }
+ 
+-void cpu_flush_icache_range(hwaddr start, int len)
++void cpu_flush_icache_range(hwaddr start, hwaddr len)
+ {
+     /*
+      * This function should do the same thing as an icache flush that was
+@@ -3557,7 +3557,7 @@ static void cpu_notify_map_clients(void)
+     qemu_mutex_unlock(&map_client_list_lock);
+ }
+ 
+-static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
++static bool flatview_access_valid(FlatView *fv, hwaddr addr, hwaddr len,
+                                   bool is_write, MemTxAttrs attrs)
+ {
+     MemoryRegion *mr;
+@@ -3580,7 +3580,7 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+ }
+ 
+ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+-                                int len, bool is_write,
++                                hwaddr len, bool is_write,
+                                 MemTxAttrs attrs)
+ {
+     FlatView *fv;
+@@ -3833,7 +3833,7 @@ static inline MemoryRegion *address_space_translate_cached(
+  */
+ void
+ address_space_read_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+-                                   void *buf, int len)
++                                   void *buf, hwaddr len)
+ {
+     hwaddr addr1, l;
+     MemoryRegion *mr;
+@@ -3851,7 +3851,7 @@ address_space_read_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+  */
+ void
+ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+-                                    const void *buf, int len)
++                                    const void *buf, hwaddr len)
+ {
+     hwaddr addr1, l;
+     MemoryRegion *mr;
+@@ -3874,11 +3874,10 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+ 
+ /* virtual memory access for debug (includes writing to ROM) */
+ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+-                        uint8_t *buf, int len, int is_write)
++                        uint8_t *buf, target_ulong len, int is_write)
+ {
+-    int l;
+     hwaddr phys_addr;
+-    target_ulong page;
++    target_ulong l, page;
+ 
+     cpu_synchronize_state(cpu);
+     while (len > 0) {
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 117d2fb..b16c9ec 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -367,7 +367,7 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf);
+ #endif /* !CONFIG_USER_ONLY */
+ 
+ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+-                        uint8_t *buf, int len, int is_write);
++                        uint8_t *buf, target_ulong len, int is_write);
+ 
+ int cpu_exec(CPUState *cpu);
+ 
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 2ad2d6d..63ec1f9 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -83,14 +83,14 @@ size_t qemu_ram_pagesize(RAMBlock *block);
+ size_t qemu_ram_pagesize_largest(void);
+ 
+ void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+-                            int len, int is_write);
++                            hwaddr len, int is_write);
+ static inline void cpu_physical_memory_read(hwaddr addr,
+-                                            void *buf, int len)
++                                            void *buf, hwaddr len)
+ {
+     cpu_physical_memory_rw(addr, buf, len, 0);
+ }
+ static inline void cpu_physical_memory_write(hwaddr addr,
+-                                             const void *buf, int len)
++                                             const void *buf, hwaddr len)
+ {
+     cpu_physical_memory_rw(addr, (void *)buf, len, 1);
+ }
+@@ -111,7 +111,7 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr);
+  */
+ void qemu_flush_coalesced_mmio_buffer(void);
+ 
+-void cpu_flush_icache_range(hwaddr start, int len);
++void cpu_flush_icache_range(hwaddr start, hwaddr len);
+ 
+ extern struct MemoryRegion io_mem_rom;
+ extern struct MemoryRegion io_mem_notdirty;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index abe9cc7..1625913 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1791,7 +1791,7 @@ void address_space_destroy(AddressSpace *as);
+  */
+ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+                              MemTxAttrs attrs, uint8_t *buf,
+-                             int len, bool is_write);
++                             hwaddr len, bool is_write);
+ 
+ /**
+  * address_space_write: write to address space.
+@@ -1808,7 +1808,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+  */
+ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+                                 MemTxAttrs attrs,
+-                                const uint8_t *buf, int len);
++                                const uint8_t *buf, hwaddr len);
+ 
+ /**
+  * address_space_write_rom: write to address space, including ROM.
+@@ -1834,7 +1834,7 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+  */
+ MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
+                                     MemTxAttrs attrs,
+-                                    const uint8_t *buf, int len);
++                                    const uint8_t *buf, hwaddr len);
+ 
+ /* address_space_ld*: load from an address space
+  * address_space_st*: store to an address space
+@@ -2035,7 +2035,7 @@ static inline MemoryRegion *address_space_translate(AddressSpace *as,
+  * @is_write: indicates the transfer direction
+  * @attrs: memory attributes
+  */
+-bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len,
++bool address_space_access_valid(AddressSpace *as, hwaddr addr, hwaddr len,
+                                 bool is_write, MemTxAttrs attrs);
+ 
+ /* address_space_map: map a physical memory region into a host virtual address
+@@ -2072,19 +2072,19 @@ void address_space_unmap(AddressSpace *as, void *buffer, hwaddr len,
+ 
+ /* Internal functions, part of the implementation of address_space_read.  */
+ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+-                                    MemTxAttrs attrs, uint8_t *buf, int len);
++                                    MemTxAttrs attrs, uint8_t *buf, hwaddr len);
+ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+                                    MemTxAttrs attrs, uint8_t *buf,
+-                                   int len, hwaddr addr1, hwaddr l,
++                                   hwaddr len, hwaddr addr1, hwaddr l,
+                                    MemoryRegion *mr);
+ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
+ 
+ /* Internal functions, part of the implementation of address_space_read_cached
+  * and address_space_write_cached.  */
+ void address_space_read_cached_slow(MemoryRegionCache *cache,
+-                                    hwaddr addr, void *buf, int len);
++                                    hwaddr addr, void *buf, hwaddr len);
+ void address_space_write_cached_slow(MemoryRegionCache *cache,
+-                                     hwaddr addr, const void *buf, int len);
++                                     hwaddr addr, const void *buf, hwaddr len);
+ 
+ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+ {
+@@ -2112,7 +2112,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+ static inline __attribute__((__always_inline__))
+ MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+                                MemTxAttrs attrs, uint8_t *buf,
+-                               int len)
++                               hwaddr len)
+ {
+     MemTxResult result = MEMTX_OK;
+     hwaddr l, addr1;
+@@ -2151,7 +2151,7 @@ MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+  */
+ static inline void
+ address_space_read_cached(MemoryRegionCache *cache, hwaddr addr,
+-                          void *buf, int len)
++                          void *buf, hwaddr len)
+ {
+     assert(addr < cache->len && len <= cache->len - addr);
+     if (likely(cache->ptr)) {
+@@ -2171,7 +2171,7 @@ address_space_read_cached(MemoryRegionCache *cache, hwaddr addr,
+  */
+ static inline void
+ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+-                           void *buf, int len)
++                           void *buf, hwaddr len)
+ {
+     assert(addr < cache->len && len <= cache->len - addr);
+     if (likely(cache->ptr)) {
 -- 
 1.8.3.1
