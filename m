@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33230)
+Received: from eggs.gnu.org ([209.51.188.92]:33279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44h-0005hg-An
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:57 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44i-0005id-HR
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44f-0005zF-Bw
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:55 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:40536)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44g-000617-D3
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:56 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:40564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gr44f-0005vP-2Z
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:53 -0500
+	id 1gr44g-0005z4-4C
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:54 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Tue,  5 Feb 2019 18:59:11 +0200
-Message-Id: <20190205165927.26599-17-samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 18:59:12 +0200
+Message-Id: <20190205165927.26599-18-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv2 16/32] slirp: do not include qemu headers in
- libslirp.h public API header
+Subject: [Qemu-devel] [PULLv2 17/32] slirp: improve windows headers inclusion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +32,63 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Our API usage requires Vista, set WIN32_LEAN_AND_MEAN to fix a number
+of issues (winsock2.h include order for ex, which is better to include
+first for legacy reasons).
+
+While at it, group redundants #ifndef _WIN32 blocks.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/libslirp.h | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ slirp/slirp.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 679a25422b..02cbec9f8b 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -1,7 +1,17 @@
- #ifndef LIBSLIRP_H
- #define LIBSLIRP_H
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index 8d9d72ca9d..5a830ddcb8 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -3,10 +3,19 @@
 =20
--#include "qemu-common.h"
-+#include <glib.h>
-+#include <stdint.h>
-+#include <stdbool.h>
-+
-+#ifdef _WIN32
-+#include <winsock2.h>
-+#include <in6addr.h>
-+#else
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
+ #ifdef _WIN32
+=20
++/* as defined in sdkddkver.h */
++#ifndef _WIN32_WINNT
++#define _WIN32_WINNT 0x0600 /* Vista */
 +#endif
++/* reduces the number of implicitly included headers */
++#ifndef WIN32_LEAN_AND_MEAN
++#define WIN32_LEAN_AND_MEAN
++#endif
++
+ typedef char *caddr_t;
 =20
- typedef struct Slirp Slirp;
+-# include <windows.h>
+ # include <winsock2.h>
++# include <windows.h>
+ # include <ws2tcpip.h>
+ # include <sys/timeb.h>
+ # include <iphlpapi.h>
+@@ -19,19 +28,10 @@ typedef char *caddr_t;
 =20
+ #ifndef _WIN32
+ #include <sys/uio.h>
+-#endif
+-
+-#ifndef _WIN32
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+-#endif
+-
+-#ifndef _WIN32
+ #include <sys/socket.h>
+-#endif
+-
+-#ifndef _WIN32
+-# include <sys/ioctl.h>
++#include <sys/ioctl.h>
+ #endif
+=20
+ #ifdef __APPLE__
 --=20
 2.20.1
