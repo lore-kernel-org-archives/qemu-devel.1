@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40011)
+Received: from eggs.gnu.org ([209.51.188.92]:42104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr5P1-0001LE-6C
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:25:00 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr5Sv-0004nB-2F
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr5Oz-0002FG-W5
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:24:59 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35123)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr5Oz-0002Ex-OZ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:24:57 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 81so7440522otj.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:24:57 -0800 (PST)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr5St-0005Iy-Rx
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:00 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:34632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gr5St-0005Fz-Gj
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:28:59 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 20:28:19 +0200
+Message-Id: <20190205182848.29887-4-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
+References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Feb 2019 18:24:45 +0000
-Message-ID: <CAFEAcA8SsXDG7+vw63tYDjOvGsL+L5m9P9UhvHuttdS7kSJwdg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULLv2 00/32] More work towards libslirp
+Subject: [Qemu-devel] [PULLv3 03/32] slirp: Don't mark struct ipq or struct
+ ipasfrag as packed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: stefanha@redhat.com, jan.kiszka@siemens.com, Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On Tue, 5 Feb 2019 at 16:59, Samuel Thibault
-<samuel.thibault@ens-lyon.org> wrote:
->
-> The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a356e15=
-9d:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pull-requ=
-est' into staging (2019-02-05 14:01:29 +0000)
->
-> are available in the Git repository at:
->
->   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to cf20be34d44a953c9b52a4d5cf6f4232968e6f3c:
->
->   slirp: API is extern C (2019-02-05 18:56:17 +0200)
->
-> ----------------------------------------------------------------
-> More work towards libslirp
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Fails to build, ppc64, x86-64, aarch32, s390x, etc:
+There is no reason to mark the struct ipq and struct ipasfrag as
+packed: they are naturally aligned anyway, and are not representing
+any on-the-wire packet format.  Indeed they vary in size depending on
+the size of pointers on the host system, because the 'struct qlink'
+members include 'void *' fields.
 
-/home/pm215/qemu/slirp/misc.c: In function =E2=80=98g_spawn_async_with_fds_=
-slirp=E2=80=99:
-/home/pm215/qemu/slirp/misc.c:166:5: error: unknown type name =E2=80=98Qemu=
-GSpawnFds=E2=80=99
-     QemuGSpawnFds setup =3D {
-     ^
-/home/pm215/qemu/slirp/misc.c:167:9: error: field name not in record
-or union initializer
-         .child_setup =3D child_setup,
-         ^
-/home/pm215/qemu/slirp/misc.c:167:9: error: (near initialization for =E2=80=
-=98setup=E2=80=99)
-/home/pm215/qemu/slirp/misc.c:167:9: error: initialization makes
-integer from pointer without a cast [-Werror]
-/home/pm215/qemu/slirp/misc.c:167:9: error: (near initialization for
-=E2=80=98setup=E2=80=99) [-Werror]
-/home/pm215/qemu/slirp/misc.c:168:9: error: field name not in record
-or union initializer
-         .user_data =3D user_data,
-         ^
-/home/pm215/qemu/slirp/misc.c:168:9: error: (near initialization for =E2=80=
-=98setup=E2=80=99)
-/home/pm215/qemu/slirp/misc.c:168:9: error: excess elements in scalar
-initializer [-Werror]
-/home/pm215/qemu/slirp/misc.c:168:9: error: (near initialization for
-=E2=80=98setup=E2=80=99) [-Werror]
-/home/pm215/qemu/slirp/misc.c:169:9: error: field name not in record
-or union initializer
-         .stdin_fd =3D stdin_fd,
-         ^
-/home/pm215/qemu/slirp/misc.c:169:9: error: (near initialization for =E2=80=
-=98setup=E2=80=99)
-/home/pm215/qemu/slirp/misc.c:169:9: error: excess elements in scalar
-initializer [-Werror]
-/home/pm215/qemu/slirp/misc.c:169:9: error: (near initialization for
-=E2=80=98setup=E2=80=99) [-Werror]
-/home/pm215/qemu/slirp/misc.c:170:9: error: field name not in record
-or union initializer
-         .stdout_fd =3D stdout_fd,
-         ^
-/home/pm215/qemu/slirp/misc.c:170:9: error: (near initialization for =E2=80=
-=98setup=E2=80=99)
-/home/pm215/qemu/slirp/misc.c:170:9: error: excess elements in scalar
-initializer [-Werror]
-/home/pm215/qemu/slirp/misc.c:170:9: error: (near initialization for
-=E2=80=98setup=E2=80=99) [-Werror]
-/home/pm215/qemu/slirp/misc.c:171:9: error: field name not in record
-or union initializer
-         .stderr_fd =3D stderr_fd,
-         ^
-/home/pm215/qemu/slirp/misc.c:171:9: error: (near initialization for =E2=80=
-=98setup=E2=80=99)
-/home/pm215/qemu/slirp/misc.c:171:9: error: excess elements in scalar
-initializer [-Werror]
-/home/pm215/qemu/slirp/misc.c:171:9: error: (near initialization for
-=E2=80=98setup=E2=80=99) [-Werror]
-cc1: all warnings being treated as errors
+Dropping the 'packed' annotation fixes clang -Waddress-of-packed-member
+warnings and probably lets the compiler generate better code too.
 
-FreeBSD fails in a slightly different way:
+The only thing we do care about in the layout of the struct is
+that the frag_link matches up with the ipf_link of the struct
+ipasfrag, as documented in the comment on that struct; assert
+at build time that this is the case.
 
-slirp/misc.c:166:5: error: use of undeclared identifier 'QemuGSpawnFds'
-    QemuGSpawnFds setup =3D {
-    ^
-slirp/misc.c:175:51: error: use of undeclared identifier 'setup'
-                         slirp_gspawn_fds_setup, &setup,
-                                                  ^
-2 errors generated.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/ip.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-thanks
--- PMM
+diff --git a/slirp/ip.h b/slirp/ip.h
+index 243b6c8b24..20614f3b53 100644
+--- a/slirp/ip.h
++++ b/slirp/ip.h
+@@ -217,7 +217,7 @@ struct ipq {
+ 	uint8_t	ipq_p;			/* protocol of this fragment */
+ 	uint16_t	ipq_id;			/* sequence id for reassembly */
+ 	struct	in_addr ipq_src,ipq_dst;
+-} QEMU_PACKED;
++};
+=20
+ /*
+  * Ip header, when holding a fragment.
+@@ -227,7 +227,10 @@ struct ipq {
+ struct	ipasfrag {
+ 	struct qlink ipf_link;
+ 	struct ip ipf_ip;
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
++                  offsetof(struct ipasfrag, ipf_link));
+=20
+ #define ipf_off      ipf_ip.ip_off
+ #define ipf_tos      ipf_ip.ip_tos
+--=20
+2.20.1
