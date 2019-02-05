@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48607)
+Received: from eggs.gnu.org ([209.51.188.92]:50380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr4gi-0004S6-MN
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:39:13 -0500
+	(envelope-from <mst@redhat.com>) id 1gr4jH-0006xn-3q
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr4gh-0007jM-Vo
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:39:12 -0500
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:36193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr4gh-0007iH-Pn
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:39:11 -0500
-Received: by mail-ot1-x331.google.com with SMTP id k98so7155077otk.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:39:11 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gr4jG-0000wO-1h
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:41:51 -0500
+Date: Tue, 5 Feb 2019 12:40:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190205124033-mutt-send-email-mst@kernel.org>
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-14-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20190204142638.27021-1-mst@redhat.com>
-	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
-	<20190204205105-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
-	<20190205110518-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190205110518-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Feb 2019 17:38:59 +0000
-Message-ID: <CAFEAcA8-ovqcRvFqRxr0jyqaTebDE5iZ9_C3=cm66RQ3PKRZzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
- features
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190129175403.18017-14-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 13/18] oslib-posix: Ignore
+ fcntl("/dev/null", F_SETFL, O_NONBLOCK) failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, Kamil Rytarowski <kamil@netbsd.org>
 
-On Tue, 5 Feb 2019 at 16:06, Michael S. Tsirkin <mst@redhat.com> wrote:
-> OK I reverted the whole part dealing with vhost-user and reposted.
->
-> I'm sure it's fine now.
+On Tue, Jan 29, 2019 at 06:53:58PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Previous to OpenBSD 6.3 [1], fcntl(F_SETFL) is not permitted on
+> memory devices.
+> Trying this call sets errno to ENODEV ("not a memory device"):
+>=20
+>   19 ENODEV Operation not supported by device.
+>     An attempt was made to apply an inappropriate function to a device,
+>     for example, trying to read a write-only device such as a printer.
+>=20
+> Do not assert fcntl failures in this specific case (errno set to ENODEV=
+)
+> on OpenBSD. This fixes:
+>=20
+>   $ lm32-softmmu/qemu-system-lm32
+>   assertion "f !=3D -1" failed: file "util/oslib-posix.c", line 247, fu=
+nction "qemu_set_nonblock"
+>   Abort trap (core dumped)
+>=20
+> [1] The fix seems https://github.com/openbsd/src/commit/c2a35b387f9d3c
+>   "fcntl(F_SETFL) invokes the FIONBIO and FIOASYNC ioctls internally, s=
+o
+>   the memory devices (/dev/null, /dev/zero, etc) need to permit them."
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Applied, thanks.
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+> ---
+>  util/oslib-posix.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>=20
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 4ce1ba9ca4..2f0f27e6d9 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -244,7 +244,17 @@ void qemu_set_nonblock(int fd)
+>      f =3D fcntl(fd, F_GETFL);
+>      assert(f !=3D -1);
+>      f =3D fcntl(fd, F_SETFL, f | O_NONBLOCK);
+> +#ifdef __OpenBSD__
+> +    if (f =3D=3D -1) {
+> +        /*
+> +         * Previous to OpenBSD 6.3, fcntl(F_SETFL) is not permitted on
+> +         * memory devices and sets errno to ENODEV.
+> +         */
+> +        assert(errno =3D=3D ENODEV);
+> +    }
+> +#else
+>      assert(f !=3D -1);
+> +#endif
+>  }
+> =20
+>  int socket_set_fast_reuse(int fd)
+> --=20
+> 2.20.1
