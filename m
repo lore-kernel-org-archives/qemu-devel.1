@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46433)
+Received: from eggs.gnu.org ([209.51.188.92]:46566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gr4bI-0008F3-Nw
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:33:37 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gr4ba-0008Uf-VP
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:33:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gr4bE-0003u1-LW
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:33:34 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gr4bZ-0004BG-Ss
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:33:54 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  5 Feb 2019 18:32:49 +0100
-Message-Id: <20190205173306.20483-2-eric.auger@redhat.com>
+Date: Tue,  5 Feb 2019 18:32:51 +0100
+Message-Id: <20190205173306.20483-4-eric.auger@redhat.com>
 In-Reply-To: <20190205173306.20483-1-eric.auger@redhat.com>
 References: <20190205173306.20483-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 01/18] update-linux-headers.sh: Copy new
- headers
+Subject: [Qemu-devel] [PATCH v6 03/18] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +25,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Since Linux'es ab66dcc76d "powerpc: generate uapi header and system call
-table files" there are 2 new files: unistd_32.h and unistd_64.h. These
-files content is moved from unistd.h so now we have to copy new files
-as well, just like we already do for other architectures; this does it
-for MIPS as well.
+We introduce an helper to create a memory node.
 
-Also, v5.0-rc2 moved vhost bits around in 4b86713236e4bd
-"vhost: split structs into a separate header file", add those too.
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- scripts/update-linux-headers.sh | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-heade=
-rs.sh
-index 0a964fe240..1cd8bd57be 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -121,11 +121,20 @@ for arch in $ARCHLIST; do
-         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-=
-x86/"
-         cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/st=
-andard-headers/asm-$arch"
-     fi
-+    if [ $arch =3D powerpc ]; then
-+        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-=
-powerpc/"
-+        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-=
-powerpc/"
-+    fi
-+    if [ $arch =3D mips ]; then
-+        cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm=
--mips/"
-+        cp "$tmpdir/include/asm/unistd_n32.h" "$output/linux-headers/asm=
--mips/"
-+        cp "$tmpdir/include/asm/unistd_n64.h" "$output/linux-headers/asm=
--mips/"
-+    fi
- done
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 05762d0fc1..2ef367e15b 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -423,6 +423,36 @@ static void set_kernel_args_old(const struct arm_boo=
+t_info *info,
+     }
+ }
 =20
- rm -rf "$output/linux-headers/linux"
- mkdir -p "$output/linux-headers/linux"
--for header in kvm.h vfio.h vfio_ccw.h vhost.h \
-+for header in kvm.h vfio.h vfio_ccw.h vhost.h vhost_types.h \
-               psci.h psp-sev.h userfaultfd.h; do
-     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
- done
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_ba=
+se,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename =3D NULL;
++    int ret;
++
++    nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, m=
+em_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/reg\n", nodename);
++        goto out;
++    }
++    if (numa_node_id < 0) {
++        goto out;
++    }
++
++    ret =3D qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_no=
+de_id);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
++    }
++
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -502,7 +532,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
+nfo *binfo,
+     void *fdt =3D NULL;
+     int size, rc, n =3D 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -576,35 +605,20 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot=
+_info *binfo,
+         mem_base =3D binfo->loader_start;
+         for (i =3D 0; i < nb_numa_nodes; i++) {
+             mem_len =3D numa_info[i].node_mem;
+-            nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memor=
+y");
+-            rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc =3D fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nod=
+ename,
+-                        i);
+                 goto fail;
+             }
+=20
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base +=3D mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename =3D g_strdup_printf("/memory@%" PRIx64, binfo->loader_s=
+tart);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc =3D fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+=20
+     rc =3D fdt_path_offset(fdt, "/chosen");
 --=20
 2.20.1
