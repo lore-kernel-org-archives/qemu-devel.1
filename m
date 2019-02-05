@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35927)
+Received: from eggs.gnu.org ([209.51.188.92]:35829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GK-0002M6-2g
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:04 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0002Kb-IJ
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003no-2J
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:00 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:50595)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GF-0003jk-Va
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34045)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GH-0003iq-LM
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
-Received: by mail-wm1-x329.google.com with SMTP id z5so4668639wmf.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:55 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-	by smtp.gmail.com with ESMTPSA id p5sm8931665wmh.16.2019.02.05.10.15.53
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 05 Feb 2019 10:15:53 -0800 (PST)
+	id 1gr5GF-0003bQ-IF
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:55 -0500
+Received: by mail-wr1-x434.google.com with SMTP id z15so2671845wrn.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:46 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:35 +0100
-Message-Id: <1549390526-24246-26-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:27 +0100
+Message-Id: <1549390526-24246-18-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 25/76] target-i386: hvf: remove MPX support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 17/76] linuxboot_dma: move common functions in a
+ new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +32,391 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-MPX support is being phased out by Intel and actually I am not sure that
-OS X has ever enabled it in XCR0.  Drop it from the Hypervisor.framework
-acceleration.
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+In order to allow other option roms to use these common
+useful functions and definitions, this patch put them
+in two new C header files called optrom.h and
+optrom_fw_cfg.h. We also add useful out*() in*()
+functions for different size, and new fw_cfg functions
+to use when DMA feature is not available.
+
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 ---
- target/i386/hvf/x86_cpuid.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
+ pc-bios/optionrom/linuxboot_dma.c | 102 +++++++----------------------------
+ pc-bios/optionrom/optrom.h        | 110 ++++++++++++++++++++++++++++++++++++++
+ pc-bios/optionrom/optrom_fw_cfg.h |  92 +++++++++++++++++++++++++++++++
+ 3 files changed, 221 insertions(+), 83 deletions(-)
+ create mode 100644 pc-bios/optionrom/optrom.h
+ create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
 
-diff --git a/target/i386/hvf/x86_cpuid.c b/target/i386/hvf/x86_cpuid.c
-index 9874a46..4d957fe 100644
---- a/target/i386/hvf/x86_cpuid.c
-+++ b/target/i386/hvf/x86_cpuid.c
-@@ -38,16 +38,6 @@ static uint64_t xgetbv(uint32_t xcr)
-     return (((uint64_t)edx) << 32) | eax;
+diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxboot_dma.c
+index f728dc8..cbcf667 100644
+--- a/pc-bios/optionrom/linuxboot_dma.c
++++ b/pc-bios/optionrom/linuxboot_dma.c
+@@ -58,21 +58,13 @@ asm(
+ "   jmp load_kernel\n"
+ );
+ 
+-#define BIOS_CFG_DMA_ADDR_HIGH 0x514
+-#define BIOS_CFG_DMA_ADDR_LOW  0x518
+-
+-#define uint64_t unsigned long long
+-#define uint32_t unsigned int
+-#define uint16_t unsigned short
+-
+-#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
+-
+-#define barrier() asm("" : : : "memory")
+-
+-static inline void outl(uint32_t value, uint16_t port)
+-{
+-    asm("outl %0, %w1" : : "a"(value), "Nd"(port));
+-}
++/*
++ * The includes of C headers must be after the asm block to avoid compiler
++ * errors.
++ */
++#include <stdint.h>
++#include "optrom.h"
++#include "optrom_fw_cfg.h"
+ 
+ static inline void set_es(void *addr)
+ {
+@@ -80,12 +72,6 @@ static inline void set_es(void *addr)
+     asm("movl %0, %%es" : : "r"(seg));
  }
  
--static bool vmx_mpx_supported()
+-#ifdef __clang__
+-#define ADDR32
+-#else
+-#define ADDR32 "addr32 "
+-#endif
+-
+ static inline uint16_t readw_es(uint16_t offset)
+ {
+     uint16_t val;
+@@ -108,56 +94,6 @@ static inline void writel_es(uint16_t offset, uint32_t val)
+     asm(ADDR32 "movl %0, %%es:(%1)" : : "r"(val), "r"((uint32_t)offset));
+ }
+ 
+-static inline uint32_t bswap32(uint32_t x)
 -{
--    uint64_t cap_exit, cap_entry;
--
--    hv_vmx_read_capability(HV_VMX_CAP_ENTRY, &cap_entry);
--    hv_vmx_read_capability(HV_VMX_CAP_EXIT, &cap_exit);
--
--    return ((cap_exit & (1 << 23)) && (cap_entry & (1 << 16)));
+-    asm("bswapl %0" : "=r" (x) : "0" (x));
+-    return x;
 -}
 -
- uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                  int reg)
+-static inline uint64_t bswap64(uint64_t x)
+-{
+-    asm("bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx" : "=A" (x) : "0" (x));
+-    return x;
+-}
+-
+-static inline uint64_t cpu_to_be64(uint64_t x)
+-{
+-    return bswap64(x);
+-}
+-
+-static inline uint32_t cpu_to_be32(uint32_t x)
+-{
+-    return bswap32(x);
+-}
+-
+-static inline uint32_t be32_to_cpu(uint32_t x)
+-{
+-    return bswap32(x);
+-}
+-
+-/* clang is happy to inline this function, and bloats the
+- * ROM.
+- */
+-static __attribute__((__noinline__))
+-void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
+-{
+-    struct fw_cfg_dma_access access;
+-    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
+-                        | FW_CFG_DMA_CTL_READ;
+-
+-    access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
+-    access.length = cpu_to_be32(len);
+-    access.control = cpu_to_be32(control);
+-
+-    barrier();
+-
+-    outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
+-
+-    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
+-        barrier();
+-    }
+-}
+-
+ /* Return top of memory using BIOS function E801. */
+ static uint32_t get_e801_addr(void)
  {
-@@ -92,11 +82,8 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                     CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-                     CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_SHA_NI |
-                     CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL |
--                    CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_MPX;
-+                    CPUID_7_0_EBX_INVPCID;
+@@ -211,9 +147,9 @@ void load_kernel(void)
+     uint32_t initrd_end_page, max_allowed_page;
+     uint32_t segment_addr, stack_addr;
  
--            if (!vmx_mpx_supported()) {
--                ebx &= ~CPUID_7_0_EBX_MPX;
--            }
-             hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-             if (!(cap & CPU_BASED2_INVPCID)) {
-                 ebx &= ~CPUID_7_0_EBX_INVPCID;
-@@ -119,9 +106,6 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                   XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK |
-                                   XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK);
-             eax &= supp_xcr0;
--            if (!vmx_mpx_supported()) {
--                eax &= ~(XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK);
--            }
-         } else if (idx == 1) {
-             hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-             eax &= CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1;
+-    bios_cfg_read_entry(&setup_addr, FW_CFG_SETUP_ADDR, 4);
+-    bios_cfg_read_entry(&setup_size, FW_CFG_SETUP_SIZE, 4);
+-    bios_cfg_read_entry(setup_addr, FW_CFG_SETUP_DATA, setup_size);
++    bios_cfg_read_entry_dma(&setup_addr, FW_CFG_SETUP_ADDR, 4);
++    bios_cfg_read_entry_dma(&setup_size, FW_CFG_SETUP_SIZE, 4);
++    bios_cfg_read_entry_dma(setup_addr, FW_CFG_SETUP_DATA, setup_size);
+ 
+     set_es(setup_addr);
+ 
+@@ -223,8 +159,8 @@ void load_kernel(void)
+         writel_es(0x22c, 0x37ffffff);
+     }
+ 
+-    bios_cfg_read_entry(&initrd_addr, FW_CFG_INITRD_ADDR, 4);
+-    bios_cfg_read_entry(&initrd_size, FW_CFG_INITRD_SIZE, 4);
++    bios_cfg_read_entry_dma(&initrd_addr, FW_CFG_INITRD_ADDR, 4);
++    bios_cfg_read_entry_dma(&initrd_size, FW_CFG_INITRD_SIZE, 4);
+ 
+     initrd_end_page = ((uint32_t)(initrd_addr + initrd_size) & -4096);
+     max_allowed_page = (readl_es(0x22c) & -4096);
+@@ -239,15 +175,15 @@ void load_kernel(void)
+ 
+     }
+ 
+-    bios_cfg_read_entry(initrd_addr, FW_CFG_INITRD_DATA, initrd_size);
++    bios_cfg_read_entry_dma(initrd_addr, FW_CFG_INITRD_DATA, initrd_size);
+ 
+-    bios_cfg_read_entry(&kernel_addr, FW_CFG_KERNEL_ADDR, 4);
+-    bios_cfg_read_entry(&kernel_size, FW_CFG_KERNEL_SIZE, 4);
+-    bios_cfg_read_entry(kernel_addr, FW_CFG_KERNEL_DATA, kernel_size);
++    bios_cfg_read_entry_dma(&kernel_addr, FW_CFG_KERNEL_ADDR, 4);
++    bios_cfg_read_entry_dma(&kernel_size, FW_CFG_KERNEL_SIZE, 4);
++    bios_cfg_read_entry_dma(kernel_addr, FW_CFG_KERNEL_DATA, kernel_size);
+ 
+-    bios_cfg_read_entry(&cmdline_addr, FW_CFG_CMDLINE_ADDR, 4);
+-    bios_cfg_read_entry(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4);
+-    bios_cfg_read_entry(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size);
++    bios_cfg_read_entry_dma(&cmdline_addr, FW_CFG_CMDLINE_ADDR, 4);
++    bios_cfg_read_entry_dma(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4);
++    bios_cfg_read_entry_dma(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size);
+ 
+     /* Boot linux */
+     segment_addr = ((uint32_t)setup_addr >> 4);
+diff --git a/pc-bios/optionrom/optrom.h b/pc-bios/optionrom/optrom.h
+new file mode 100644
+index 0000000..3578192
+--- /dev/null
++++ b/pc-bios/optionrom/optrom.h
+@@ -0,0 +1,110 @@
++/*
++ * Common Option ROM Functions for C code
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * Copyright (c) 2015-2019 Red Hat Inc.
++ *   Authors:
++ *     Marc Marí <marc.mari.barcelo@gmail.com>
++ *     Richard W.M. Jones <rjones@redhat.com>
++ *     Stefano Garzarella <sgarzare@redhat.com>
++ */
++
++#ifndef OPTROM_H
++#define OPTROM_H
++
++#include <stdint.h>
++#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
++
++#define barrier() asm("" : : : "memory")
++
++#ifdef __clang__
++#define ADDR32
++#else
++#define ADDR32 "addr32 "
++#endif
++
++static inline void outb(uint8_t value, uint16_t port)
++{
++    asm volatile("outb %0, %w1" : : "a"(value), "Nd"(port));
++}
++
++static inline void outw(uint16_t value, uint16_t port)
++{
++    asm volatile("outw %0, %w1" : : "a"(value), "Nd"(port));
++}
++
++static inline void outl(uint32_t value, uint16_t port)
++{
++    asm volatile("outl %0, %w1" : : "a"(value), "Nd"(port));
++}
++
++static inline uint8_t inb(uint16_t port)
++{
++    uint8_t value;
++
++    asm volatile("inb %w1, %0" : "=a"(value) : "Nd"(port));
++    return value;
++}
++
++static inline uint16_t inw(uint16_t port)
++{
++    uint16_t value;
++
++    asm volatile("inw %w1, %0" : "=a"(value) : "Nd"(port));
++    return value;
++}
++
++static inline uint32_t inl(uint16_t port)
++{
++    uint32_t value;
++
++    asm volatile("inl %w1, %0" : "=a"(value) : "Nd"(port));
++    return value;
++}
++
++static inline void insb(uint16_t port, uint8_t *buf, uint32_t len)
++{
++    asm volatile("rep insb %%dx, %%es:(%%edi)"
++                 : "+c"(len), "+D"(buf) : "d"(port) : "memory");
++}
++
++static inline uint32_t bswap32(uint32_t x)
++{
++    asm("bswapl %0" : "=r" (x) : "0" (x));
++    return x;
++}
++
++static inline uint64_t bswap64(uint64_t x)
++{
++    asm("bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx" : "=A" (x) : "0" (x));
++    return x;
++}
++
++static inline uint64_t cpu_to_be64(uint64_t x)
++{
++    return bswap64(x);
++}
++
++static inline uint32_t cpu_to_be32(uint32_t x)
++{
++    return bswap32(x);
++}
++
++static inline uint32_t be32_to_cpu(uint32_t x)
++{
++    return bswap32(x);
++}
++
++#endif /* OPTROM_H */
+diff --git a/pc-bios/optionrom/optrom_fw_cfg.h b/pc-bios/optionrom/optrom_fw_cfg.h
+new file mode 100644
+index 0000000..a3660a5
+--- /dev/null
++++ b/pc-bios/optionrom/optrom_fw_cfg.h
+@@ -0,0 +1,92 @@
++/*
++ * Common Option ROM Functions for fw_cfg
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * Copyright (c) 2015-2019 Red Hat Inc.
++ *   Authors:
++ *     Marc Marí <marc.mari.barcelo@gmail.com>
++ *     Richard W.M. Jones <rjones@redhat.com>
++ *     Stefano Garzarella <sgarzare@redhat.com>
++ */
++
++#ifndef OPTROM_FW_CFG_H
++#define OPTROM_FW_CFG_H
++
++#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
++
++#define BIOS_CFG_IOPORT_CFG     0x510
++#define BIOS_CFG_IOPORT_DATA    0x511
++#define BIOS_CFG_DMA_ADDR_HIGH  0x514
++#define BIOS_CFG_DMA_ADDR_LOW   0x518
++
++static __attribute__((unused))
++void bios_cfg_select(uint16_t key)
++{
++    outw(key, BIOS_CFG_IOPORT_CFG);
++}
++
++static __attribute__((unused))
++void bios_cfg_read_entry_io(void *buf, uint16_t entry, uint32_t len)
++{
++    bios_cfg_select(entry);
++    insb(BIOS_CFG_IOPORT_DATA, buf, len);
++}
++
++/*
++ * clang is happy to inline this function, and bloats the
++ * ROM.
++ */
++static __attribute__((__noinline__)) __attribute__((unused))
++void bios_cfg_read_entry_dma(void *buf, uint16_t entry, uint32_t len)
++{
++    struct fw_cfg_dma_access access;
++    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
++                        | FW_CFG_DMA_CTL_READ;
++
++    access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
++    access.length = cpu_to_be32(len);
++    access.control = cpu_to_be32(control);
++
++    barrier();
++
++    outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
++
++    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
++        barrier();
++    }
++}
++
++static __attribute__((unused))
++void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len,
++                         uint32_t version)
++{
++    if (version & FW_CFG_VERSION_DMA) {
++        bios_cfg_read_entry_dma(buf, entry, len);
++    } else {
++        bios_cfg_read_entry_io(buf, entry, len);
++    }
++}
++
++static __attribute__((unused))
++uint32_t bios_cfg_version(void)
++{
++    uint32_t version;
++
++    bios_cfg_read_entry_io(&version, FW_CFG_ID, sizeof(version));
++
++    return version;
++}
++
++#endif /* OPTROM_FW_CFG_H */
 -- 
 1.8.3.1
