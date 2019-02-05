@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53410)
+Received: from eggs.gnu.org ([209.51.188.92]:54767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gqxSM-0000Cc-QP
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:55:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gqxXS-0002XD-5T
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:01:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gqxSM-0005iR-1V
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:55:54 -0500
-References: <20190130155733.32742-1-david@redhat.com>
-	<20190205105526.28cc69e8.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <109b13df-7c53-3f58-c753-81901f6468c6@redhat.com>
-Date: Tue, 5 Feb 2019 10:55:49 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gqxXO-0008W5-1m
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:01:10 -0500
+Date: Tue, 5 Feb 2019 11:00:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190205100039.GC5273@linux.fritz.box>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<87pnsbxsi7.fsf@dusky.pond.sub.org>
+	<20190204094621.GB5855@linux.fritz.box>
+	<87d0o7psz6.fsf@dusky.pond.sub.org>
+	<b448da30-7e0d-98be-d3dc-578fffc55de8@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190205105526.28cc69e8.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] s390x/pci: remaining hot/un)plug
- patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b448da30-7e0d-98be-d3dc-578fffc55de8@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-On 05.02.19 10:55, Cornelia Huck wrote:
-> On Wed, 30 Jan 2019 16:57:27 +0100
-> David Hildenbrand <david@redhat.com> wrote:
+Am 04.02.2019 um 16:36 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 04.02.2019 16:45, Markus Armbruster wrote:
+> > Kevin Wolf <kwolf@redhat.com> writes:
+> > 
+> >> Am 01.02.2019 um 19:39 hat Markus Armbruster geschrieben:
+> >>> Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
+> >>>
+> >>>> In the 'Format specific information' section of the 'qemu-img info'
+> >>>> command output, the supplemental information about existing QCOW2
+> >>>> bitmaps will be shown, such as a bitmap name, flags and granularity:
+> >>>>
+> >>>> image: /vz/vmprivate/VM1/harddisk.hdd
+> >>>> file format: qcow2
+> >>>> virtual size: 64G (68719476736 bytes)
+> >>>> disk size: 3.0M
+> >>>> cluster_size: 1048576
+> >>>> Format specific information:
+> >>>>      compat: 1.1
+> >>>>      lazy refcounts: true
+> >>>>      bitmaps:
+> >>>>          [0]:
+> >>>>              flags:
+> >>>>                  [0]: in-use
+> >>>>                  [1]: auto
+> >>>>              name: back-up1
+> >>>>              unknown flags: 4
+> >>>>              granularity: 65536
+> >>>>          [1]:
+> >>>>              flags:
+> >>>>                  [0]: in-use
+> >>>>                  [1]: auto
+> >>>>              name: back-up2
+> >>>>              unknown flags: 8
+> >>>>              granularity: 65536
+> >>>>      refcount bits: 16
+> >>>>      corrupt: false
+> >>>>
+> >>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> >>>> ---
+> >>> [...]
+> >>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> >>>> index 91685be..271e0df 100644
+> >>>> --- a/qapi/block-core.json
+> >>>> +++ b/qapi/block-core.json
+> >>>> @@ -69,6 +69,8 @@
+> >>>>   # @encrypt: details about encryption parameters; only set if image
+> >>>>   #           is encrypted (since 2.10)
+> >>>>   #
+> >>>> +# @bitmaps: A list of qcow2 bitmap details (since 4.0)
+> >>>> +#
+> >>>>   # Since: 1.7
+> >>>>   ##
+> >>>>   { 'struct': 'ImageInfoSpecificQCow2',
+> >>>> @@ -77,7 +79,8 @@
+> >>>>         '*lazy-refcounts': 'bool',
+> >>>>         '*corrupt': 'bool',
+> >>>>         'refcount-bits': 'int',
+> >>>> -      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
+> >>>> +      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
+> >>>> +      '*bitmaps': ['Qcow2BitmapInfo']
+> >>>>     } }
+> >>>>   
+> >>>>   ##
+> >>>> @@ -454,6 +457,41 @@
+> >>>>              'status': 'DirtyBitmapStatus'} }
+> >>>>   
+> >>>>   ##
+> >>>> +# @Qcow2BitmapInfoFlags:
+> >>>> +#
+> >>>> +# An enumeration of flags that a bitmap can report to the user.
+> >>>> +#
+> >>>> +# @in-use: The bitmap was not saved correctly and may be inconsistent.
+> >>>
+> >>> I doubt the casual reader could guess the meaning from the name.  What
+> >>> about @dirty?
+> >>
+> >> Feels like overloading the word "dirty" in the context of "dirty
+> >> bitmaps". This might easily lead to misinterpretation as "this bitmap
+> >> marks some clusters as dirty" rather than "this bitmap might be
+> >> inconsistent".
+> > 
+> > Call it @possibly-inconsistent then?
+> > 
 > 
->> These are all the patches that are not yet upstream (@Conny you might
->> already picked some, including them for the full picture) and after
->> a good discussion yesterday, including a patch t get rid of the release
->> timer. I ran a couple of sanity tests on this series.
->>
->> #1 and #2 fix hotplugging of PCI bridges.
->> #3 warns when "zpci=off"
->> #4 refactors unplugging
->> #5 get's rid of the release timer
->> #6 processes all unplug requests on reboot
->>
->> @Colin, can you review/ack? Especially Patch #4 is needed for qdev
->> patches already on the list. ("[PATCH RFCv2 0/9] qdev: Hotplug handler
->> chaining + virtio-pmem")
->>
->> David Hildenbrand (6):
->>   s390x/pci: Fix primary bus number for PCI bridges
->>   s390x/pci: Fix hotplugging of PCI bridges
->>   s390x/pci: Warn when adding PCI devices without the 'zpci' feature
->>   s390x/pci: Introduce unplug requests and split unplug handler
->>   s390x/pci: Drop release timer and replace it with a flag
->>   s390x/pci: Unplug remaining requested devices on pcihost reset
->>
->>  hw/s390x/s390-pci-bus.c | 233 ++++++++++++++++++++++++++--------------
->>  hw/s390x/s390-pci-bus.h |   4 +-
->>  2 files changed, 152 insertions(+), 85 deletions(-)
->>
-> 
-> Thanks, applied the remaining patches.
-> 
+> If you run qmp query-block while vm is running, all bitmaps in image will
+> be in use. And in this context, in-use seems more appropriate than
+> possibly-inconsistent. And in-use has less interference with the fact that
+> actual bitmaps now are in-RAM BdrvDirtyBitmap structures which are actually
+> consistent (and also shown by query-block)
 
-Thanks a lot Conny!
+Good point, but then this description isn't correct either:
 
--- 
+    @in-use: The bitmap was not saved correctly and may be inconsistent.
 
-Thanks,
+Maybe what needs to change is the description, not the name?
 
-David / dhildenb
+Kevin
