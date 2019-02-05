@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38824)
+Received: from eggs.gnu.org ([209.51.188.92]:40062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqodv-0005Be-0Y
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:31:15 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gqogV-00066l-AG
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqodt-0006F3-S4
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:31:14 -0500
-Resent-Message-Id: <E1gqodt-0006F3-S4@eggs.gnu.org>
-Message-ID: <154932662894.29184.16166096343310582294@ebba9967afc0>
-In-Reply-To: <20190205001835.25660-1-philmd@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jsnow@redhat.com>) id 1gqogU-0007sB-3R
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:33:55 -0500
+References: <20190205001835.25660-1-philmd@redhat.com>
+	<20190205001835.25660-9-philmd@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e68526b0-be93-ff63-8bda-bb2f3420e14e@redhat.com>
+Date: Mon, 4 Feb 2019 19:33:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 16:30:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] OpenBSD: Block layer fixes (was
- 'Enable qtesting')
+In-Reply-To: <20190205001835.25660-9-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] RFC iotests: Disable 236 and 238 on
+ OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, brad@comstyle.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Brad Smith <brad@comstyle.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTAwMTgzNS4yNTY2
-MC0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNTAwMTgzNS4y
-NTY2MC0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+
+
+On 2/4/19 7:18 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> These tests explode on OpenBSD:
+>=20
+>   $ gmake check-block
+>   [...]
+>   238                [17:16:09] [17:16:09] [failed, exit status 1] - ou=
+tput mismatch (see 238.out.bad)
+>   --- /tmp/qemu-test.VKNS07/tests/qemu-iotests/238.out    Tue Jan 29 17=
+:09:03 2019
+>   +++ /tmp/qemu-test.VKNS07/tests/qemu-iotests/238.out.bad        Tue J=
+an 29 17:16:09 2019
+>   @@ -1,6 +1,14 @@
+>   -{"return": {}}
+>   -{"return": {}}
+>   -{"return": {}}
+>   -{"return": {}}
+>   -{"return": {}}
+>   -{"return": {}}
+>   +Traceback (most recent call last):
+>   +  File "238", line 37, in <module>
+>   +    vm.launch()
+>   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qemu.=
+py", line 295, in launch
+>   +    self._launch()
+>   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qemu.=
+py", line 321, in _launch
+>   +    self._post_launch()
+>   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qemu.=
+py", line 266, in _post_launch
+>   +    self._qmp.accept()
+>   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qmp/q=
+mp.py", line 157, in accept
+>   +    return self.__negotiate_capabilities()
+>   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qmp/q=
+mp.py", line 73, in __negotiate_capabilities
+>   +    raise QMPConnectError
+>   +qmp.qmp.QMPConnectError
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> This might be due to these tests requiring KVM?...
+> Maybe we need a has_kvm argument to iotests.verify_platform()?
+
+Uhhh, 236 shouldn't be doing anything fancy. It does boot a VM, but so
+does 237, 222, 219, 218, 216, ...
+
+I actually don't know what this would be failing. Any chance to look at
+the core dump QEMU is leaving behind?
+
+> ---
+>  tests/qemu-iotests/236 | 1 +
+>  tests/qemu-iotests/238 | 2 ++
+>  2 files changed, 3 insertions(+)
+>=20
+> diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
+> index 79a6381f8e..b98df35ca4 100755
+> --- a/tests/qemu-iotests/236
+> +++ b/tests/qemu-iotests/236
+> @@ -23,6 +23,7 @@ import iotests
+>  from iotests import log
+> =20
+>  iotests.verify_image_format(supported_fmts=3D['generic'])
+> +iotests.verify_platform(unsupported_oses=3D['openbsd']) # FIXME
+>  size =3D 64 * 1024 * 1024
+>  granularity =3D 64 * 1024
+> =20
+> diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+> index f81ee1112f..c62ff9a6dc 100755
+> --- a/tests/qemu-iotests/238
+> +++ b/tests/qemu-iotests/238
+> @@ -23,6 +23,8 @@ import os
+>  import iotests
+>  from iotests import log
+> =20
+> +iotests.verify_platform(unsupported_oses=3D['openbsd']) # FIXME
+> +
+>  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 's=
+cripts'))
+> =20
+>  from qemu import QEMUMachine
+>=20
