@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33759)
+Received: from eggs.gnu.org ([209.51.188.92]:35793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr45A-0006FB-PF
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr4AK-0001nk-If
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44x-0006FO-JM
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:24 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gr44v-00063q-A6
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:11 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Tue,  5 Feb 2019 18:59:26 +0200
-Message-Id: <20190205165927.26599-32-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
-References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gr4AC-0000RQ-HG
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:40 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39435)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr4A8-0000JU-DR
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:34 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t27so4455709wra.6
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:05:17 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id w13sm5583164wmf.5.2019.02.05.09.05.14
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 05 Feb 2019 09:05:15 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  5 Feb 2019 17:04:50 +0000
+Message-Id: <20190205170510.21984-3-peter.maydell@linaro.org>
+In-Reply-To: <20190205170510.21984-1-peter.maydell@linaro.org>
+References: <20190205170510.21984-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv2 31/32] slirp: pass opaque to all callbacks
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 02/22] target/arm: Add PSTATE.BTYPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,395 +33,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This is friendlier for FFI bindings.
+Place this in its own field within ENV, as that will
+make it easier to reset from within TCG generated code.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+With the change to pstate_read/write, exception entry
+and return are automatically handled.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190128223118.5255-3-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- net/slirp.c      | 25 ++++++++++++++++---------
- slirp/dhcpv6.c   |  2 +-
- slirp/if.c       |  2 +-
- slirp/ip6_icmp.c | 15 +++++++++------
- slirp/ip_icmp.c  |  2 +-
- slirp/libslirp.h | 16 ++++++++--------
- slirp/misc.c     |  2 +-
- slirp/slirp.c    | 13 ++++++-------
- slirp/socket.c   |  2 +-
- slirp/tcp_subr.c |  8 ++++----
- slirp/udp.c      |  2 +-
- 11 files changed, 49 insertions(+), 40 deletions(-)
+ target/arm/cpu.h           | 8 ++++++--
+ target/arm/translate-a64.c | 3 +++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index a85e42ff43..7a16d8d615 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -161,44 +161,51 @@ static NetClientInfo net_slirp_info =3D {
-     .cleanup =3D net_slirp_cleanup,
- };
-=20
--static void net_slirp_guest_error(const char *msg)
-+static void net_slirp_guest_error(const char *msg, void *opaque)
- {
-     qemu_log_mask(LOG_GUEST_ERROR, "%s", msg);
- }
-=20
--static int64_t net_slirp_clock_get_ns(void)
-+static int64_t net_slirp_clock_get_ns(void *opaque)
- {
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
- }
-=20
--static void *net_slirp_timer_new(SlirpTimerCb cb, void *opaque)
-+static void *net_slirp_timer_new(SlirpTimerCb cb,
-+                                 void *cb_opaque, void *opaque)
- {
-     return timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-                           SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
--                          cb, opaque);
-+                          cb, cb_opaque);
- }
-=20
--static void net_slirp_timer_free(void *timer)
-+static void net_slirp_timer_free(void *timer, void *opaque)
- {
-     timer_del(timer);
-     timer_free(timer);
- }
-=20
--static void net_slirp_timer_mod(void *timer, int64_t expire_timer)
-+static void net_slirp_timer_mod(void *timer, int64_t expire_timer,
-+                                void *opaque)
- {
-     timer_mod(timer, expire_timer);
- }
-=20
--static void net_slirp_register_poll_fd(int fd)
-+static void net_slirp_register_poll_fd(int fd, void *opaque)
- {
-     qemu_fd_register(fd);
- }
-=20
--static void net_slirp_unregister_poll_fd(int fd)
-+static void net_slirp_unregister_poll_fd(int fd, void *opaque)
- {
-     /* no qemu_fd_unregister */
- }
-=20
-+static void net_slirp_notify(void *opaque)
-+{
-+    qemu_notify_event();
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .send_packet =3D net_slirp_send_packet,
-     .guest_error =3D net_slirp_guest_error,
-@@ -208,7 +215,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_mod =3D net_slirp_timer_mod,
-     .register_poll_fd =3D net_slirp_register_poll_fd,
-     .unregister_poll_fd =3D net_slirp_unregister_poll_fd,
--    .notify =3D qemu_notify_event,
-+    .notify =3D net_slirp_notify,
- };
-=20
- static int slirp_poll_to_gio(int events)
-diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
-index 9ffba38e8f..e655c7d5b1 100644
---- a/slirp/dhcpv6.c
-+++ b/slirp/dhcpv6.c
-@@ -59,7 +59,7 @@ static int dhcpv6_parse_info_request(Slirp *slirp, uint=
-8_t *odata, int olen,
-         int len =3D odata[2] << 8 | odata[3];
-=20
-         if (len + 4 > olen) {
--            slirp->cb->guest_error("Guest sent bad DHCPv6 packet!");
-+            slirp->cb->guest_error("Guest sent bad DHCPv6 packet!", slir=
-p->opaque);
-             return -E2BIG;
-         }
-=20
-diff --git a/slirp/if.c b/slirp/if.c
-index 2ad03b8a79..1830cc396c 100644
---- a/slirp/if.c
-+++ b/slirp/if.c
-@@ -146,7 +146,7 @@ diddit:
-  */
- void if_start(Slirp *slirp)
- {
--    uint64_t now =3D slirp->cb->clock_get_ns();
-+    uint64_t now =3D slirp->cb->clock_get_ns(slirp->opaque);
-     bool from_batchq =3D false;
-     struct mbuf *ifm, *ifm_next, *ifqt;
-=20
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 2a432ebbd4..c1e3d30470 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -14,7 +14,8 @@ static void ra_timer_handler(void *opaque)
-     Slirp *slirp =3D opaque;
-=20
-     slirp->cb->timer_mod(slirp->ra_timer,
--                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
-+        slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS + NDP_Interval=
-,
-+        slirp->opaque);
-     ndp_send_ra(slirp);
- }
-=20
-@@ -24,9 +25,10 @@ void icmp6_init(Slirp *slirp)
-         return;
-     }
-=20
--    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp);
-+    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp, sl=
-irp->opaque);
-     slirp->cb->timer_mod(slirp->ra_timer,
--                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
-+        slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS + NDP_Interval=
-,
-+        slirp->opaque);
- }
-=20
- void icmp6_cleanup(Slirp *slirp)
-@@ -35,7 +37,7 @@ void icmp6_cleanup(Slirp *slirp)
-         return;
-     }
-=20
--    slirp->cb->timer_free(slirp->ra_timer);
-+    slirp->cb->timer_free(slirp->ra_timer, slirp->opaque);
- }
-=20
- static void icmp6_send_echoreply(struct mbuf *m, Slirp *slirp, struct ip=
-6 *ip,
-@@ -334,7 +336,8 @@ static void ndp_input(struct mbuf *m, Slirp *slirp, s=
-truct ip6 *ip,
-=20
-     case ICMP6_NDP_RA:
-         DEBUG_CALL(" type =3D Router Advertisement");
--        slirp->cb->guest_error("Warning: guest sent NDP RA, but shouldn'=
-t");
-+        slirp->cb->guest_error("Warning: guest sent NDP RA, but shouldn'=
-t",
-+                               slirp->opaque);
-         break;
-=20
-     case ICMP6_NDP_NS:
-@@ -368,7 +371,7 @@ static void ndp_input(struct mbuf *m, Slirp *slirp, s=
-truct ip6 *ip,
-     case ICMP6_NDP_REDIRECT:
-         DEBUG_CALL(" type =3D Redirect");
-         slirp->cb->guest_error(
--            "Warning: guest sent NDP REDIRECT, but shouldn't");
-+            "Warning: guest sent NDP REDIRECT, but shouldn't", slirp->op=
-aque);
-         break;
-     }
- }
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 7c5cb75ae5..ce79c0b051 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -113,7 +113,7 @@ static int icmp_send(struct socket *so, struct mbuf *=
-m, int hlen)
-=20
- void icmp_detach(struct socket *so)
- {
--    so->slirp->cb->unregister_poll_fd(so->s);
-+    so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
-     slirp_closesocket(so->s);
-     sofree(so);
- }
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index b5c1b2122b..9b13d8250c 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -40,21 +40,21 @@ typedef struct SlirpCb {
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0c7ea39f1ae..58f99985c24 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -234,6 +234,7 @@ typedef struct CPUARMState {
+      *    semantics as for AArch32, as described in the comments on each field)
+      *  nRW (also known as M[4]) is kept, inverted, in env->aarch64
+      *  DAIF (exception masks) are kept in env->daif
++     *  BTYPE is kept in env->btype
+      *  all other bits are stored in their correct places in env->pstate
       */
-     SlirpWriteCb send_packet;
-     /* Print a message for an error due to guest misbehavior.  */
--    void (*guest_error)(const char *msg);
-+    void (*guest_error)(const char *msg, void *opaque);
-     /* Return the virtual clock value in nanoseconds */
--    int64_t (*clock_get_ns)(void);
-+    int64_t (*clock_get_ns)(void *opaque);
-     /* Create a new timer with the given callback and opaque data */
--    void *(*timer_new)(SlirpTimerCb cb, void *opaque);
-+    void *(*timer_new)(SlirpTimerCb cb, void *cb_opaque, void *opaque);
-     /* Remove and free a timer */
--    void (*timer_free)(void *timer);
-+    void (*timer_free)(void *timer, void *opaque);
-     /* Modify a timer to expire at @expire_time */
--    void (*timer_mod)(void *timer, int64_t expire_time);
-+    void (*timer_mod)(void *timer, int64_t expire_time, void *opaque);
-     /* Register a fd for future polling */
--    void (*register_poll_fd)(int fd);
-+    void (*register_poll_fd)(int fd, void *opaque);
-     /* Unregister a fd */
--    void (*unregister_poll_fd)(int fd);
-+    void (*unregister_poll_fd)(int fd, void *opaque);
-     /* Kick the io-thread, to signal that new events may be processed */
--    void (*notify)(void);
-+    void (*notify)(void *opaque);
- } SlirpCb;
-=20
-=20
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 9c6d294dcf..105ce8086e 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -222,7 +222,7 @@ fork_exec(struct socket *so, const char *ex)
-     opt =3D 1;
-     slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
-;
-     slirp_set_nonblock(so->s);
--    so->slirp->cb->register_poll_fd(so->s);
-+    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
-     return 1;
+     uint32_t pstate;
+@@ -263,6 +264,7 @@ typedef struct CPUARMState {
+     uint32_t GE; /* cpsr[19:16] */
+     uint32_t thumb; /* cpsr[5]. 0 = arm mode, 1 = thumb mode. */
+     uint32_t condexec_bits; /* IT bits.  cpsr[15:10,26:25].  */
++    uint32_t btype;  /* BTI branch type.  spsr[11:10].  */
+     uint64_t daif; /* exception masks, in the bits they are in PSTATE */
+ 
+     uint64_t elr_el[4]; /* AArch64 exception link regs  */
+@@ -1206,6 +1208,7 @@ void pmu_init(ARMCPU *cpu);
+ #define PSTATE_I (1U << 7)
+ #define PSTATE_A (1U << 8)
+ #define PSTATE_D (1U << 9)
++#define PSTATE_BTYPE (3U << 10)
+ #define PSTATE_IL (1U << 20)
+ #define PSTATE_SS (1U << 21)
+ #define PSTATE_V (1U << 28)
+@@ -1214,7 +1217,7 @@ void pmu_init(ARMCPU *cpu);
+ #define PSTATE_N (1U << 31)
+ #define PSTATE_NZCV (PSTATE_N | PSTATE_Z | PSTATE_C | PSTATE_V)
+ #define PSTATE_DAIF (PSTATE_D | PSTATE_A | PSTATE_I | PSTATE_F)
+-#define CACHED_PSTATE_BITS (PSTATE_NZCV | PSTATE_DAIF)
++#define CACHED_PSTATE_BITS (PSTATE_NZCV | PSTATE_DAIF | PSTATE_BTYPE)
+ /* Mode values for AArch64 */
+ #define PSTATE_MODE_EL3h 13
+ #define PSTATE_MODE_EL3t 12
+@@ -1246,7 +1249,7 @@ static inline uint32_t pstate_read(CPUARMState *env)
+     ZF = (env->ZF == 0);
+     return (env->NF & 0x80000000) | (ZF << 30)
+         | (env->CF << 29) | ((env->VF & 0x80000000) >> 3)
+-        | env->pstate | env->daif;
++        | env->pstate | env->daif | (env->btype << 10);
  }
-=20
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 04886d05fd..93b2cd0141 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -289,6 +289,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
-ruct in_addr vnetwork,
-=20
-     slirp_init_once();
-=20
-+    slirp->opaque =3D opaque;
-     slirp->cb =3D callbacks;
-     slirp->grand =3D g_rand_new();
-     slirp->restricted =3D restricted;
-@@ -325,12 +326,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, s=
-truct in_addr vnetwork,
-         translate_dnssearch(slirp, vdnssearch);
-     }
-=20
--    slirp->opaque =3D opaque;
--
- #ifdef WITH_QEMU
-     slirp_state_register(slirp);
- #endif
--
-     return slirp;
+ 
+ static inline void pstate_write(CPUARMState *env, uint32_t val)
+@@ -1256,6 +1259,7 @@ static inline void pstate_write(CPUARMState *env, uint32_t val)
+     env->CF = (val >> 29) & 1;
+     env->VF = (val << 3) & 0x80000000;
+     env->daif = val & PSTATE_DAIF;
++    env->btype = (val >> 10) & 3;
+     env->pstate = val & ~CACHED_PSTATE_BITS;
  }
-=20
-@@ -537,7 +535,7 @@ void slirp_pollfds_poll(Slirp *slirp, int select_erro=
-r,
-     struct socket *so, *so_next;
-     int ret;
-=20
--    curtime =3D slirp->cb->clock_get_ns() / SCALE_MS;
-+    curtime =3D slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS;
-=20
-     /*
-      * See if anything has timed out
-@@ -860,7 +858,8 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-             ifm->resolution_requested =3D true;
-=20
-             /* Expire request and drop outgoing packet after 1 second */
--            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
-000ULL;
-+            ifm->expiration_date =3D
-+                slirp->cb->clock_get_ns(slirp->opaque) + 1000000000ULL;
-         }
-         return 0;
-     } else {
-@@ -886,7 +885,7 @@ static int if_encap6(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-         if (!ifm->resolution_requested) {
-             ndp_send_ns(slirp, ip6h->ip_dst);
-             ifm->resolution_requested =3D true;
--            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
-000ULL;
-+            ifm->expiration_date =3D slirp->cb->clock_get_ns(slirp->opaq=
-ue) + 1000000000ULL;
-         }
-         return 0;
-     } else {
-@@ -961,7 +960,7 @@ int slirp_remove_hostfwd(Slirp *slirp, int is_udp, st=
-ruct in_addr host_addr,
-             getsockname(so->s, (struct sockaddr *)&addr, &addr_len) =3D=3D=
- 0 &&
-             addr.sin_addr.s_addr =3D=3D host_addr.s_addr &&
-             addr.sin_port =3D=3D port) {
--            so->slirp->cb->unregister_poll_fd(so->s);
-+            so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
-             slirp_closesocket(so->s);
-             sofree(so);
-             return 0;
-diff --git a/slirp/socket.c b/slirp/socket.c
-index c896fa6da3..ce1d6ffa1d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -930,6 +930,6 @@ void sotranslate_accept(struct socket *so)
- void sodrop(struct socket *s, int num)
- {
-     if (sbdrop(&s->so_snd, num)) {
--        s->slirp->cb->notify();
-+        s->slirp->cb->notify(s->slirp->opaque);
-     }
- }
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index e35628a892..cda94815f6 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -336,7 +336,7 @@ tcp_close(struct tcpcb *tp)
- 	/* clobber input socket cache if we're closing the cached connection */
- 	if (so =3D=3D slirp->tcp_last_so)
- 		slirp->tcp_last_so =3D &slirp->tcb;
--	so->slirp->cb->unregister_poll_fd(so->s);
-+	so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
- 	slirp_closesocket(so->s);
- 	sbfree(&so->so_rcv);
- 	sbfree(&so->so_snd);
-@@ -413,7 +413,7 @@ int tcp_fconnect(struct socket *so, unsigned short af=
-)
-     struct sockaddr_storage addr;
-=20
-     slirp_set_nonblock(s);
--    so->slirp->cb->register_poll_fd(so->s);
-+    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
-@@ -486,7 +486,7 @@ void tcp_connect(struct socket *inso)
+ 
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index a1997e3ae28..0b94d9455b7 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -163,6 +163,9 @@ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+                 el,
+                 psr & PSTATE_SP ? 'h' : 't');
+ 
++    if (cpu_isar_feature(aa64_bti, cpu)) {
++        cpu_fprintf(f, "  BTYPE=%d", (psr & PSTATE_BTYPE) >> 10);
++    }
+     if (!(flags & CPU_DUMP_FPU)) {
+         cpu_fprintf(f, "\n");
          return;
-     }
-     slirp_set_nonblock(s);
--    so->slirp->cb->register_poll_fd(so->s);
-+    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
-@@ -498,7 +498,7 @@ void tcp_connect(struct socket *inso)
-     /* Close the accept() socket, set right state */
-     if (inso->so_state & SS_FACCEPTONCE) {
-         /* If we only accept once, close the accept() socket */
--        so->slirp->cb->unregister_poll_fd(so->s);
-+        so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
-         slirp_closesocket(so->s);
-=20
-         /* Don't select it yet, even though we have an FD */
-diff --git a/slirp/udp.c b/slirp/udp.c
-index 5baa604b33..29a31e9400 100644
---- a/slirp/udp.c
-+++ b/slirp/udp.c
-@@ -291,7 +291,7 @@ udp_attach(struct socket *so, unsigned short af)
- void
- udp_detach(struct socket *so)
- {
--	so->slirp->cb->unregister_poll_fd(so->s);
-+	so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
- 	slirp_closesocket(so->s);
- 	sofree(so);
- }
---=20
+-- 
 2.20.1
