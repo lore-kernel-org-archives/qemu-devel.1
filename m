@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54439)
+Received: from eggs.gnu.org ([209.51.188.92]:55739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gqzBs-0000Dw-9t
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:47:03 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqzG5-0001VU-6k
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:51:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gqzBq-0007nc-TR
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:46:59 -0500
-Date: Tue, 5 Feb 2019 12:46:49 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA8nSy=gi+CDSi0GoJbdzgM-b=hOv6BdSFj67eb3yijUsA@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.9999.1902051245130.33901@zero.eik.bme.hu>
-References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
-	<CAFEAcA8nSy=gi+CDSi0GoJbdzgM-b=hOv6BdSFj67eb3yijUsA@mail.gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1gqzG4-0001fq-1n
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:51:21 -0500
+Resent-Message-Id: <E1gqzG4-0001fq-1n@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqzG3-0001ek-Pc
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:51:19 -0500
+Message-ID: <154936745223.29184.11490370246397611291@ebba9967afc0>
+In-Reply-To: <20190205112315.23454-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/37] ppc-for-4.0 queue 20190204
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 5 Feb 2019 03:50:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4] scripts: use git archive in
+ archive-source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, spopovyc@redhat.com, qemu-ppc <qemu-ppc@nongnu.org>, =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>
+To: kraxel@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, famz@redhat.com
 
-On Mon, 4 Feb 2019, Peter Maydell wrote:
-> On Mon, 4 Feb 2019 at 09:01, David Gibson <david@gibson.dropbear.id.au> wrote:
->>
->> The following changes since commit b3fc0af1ff5e922d4dd7c875394dbd26dc7313b4:
->>
->>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-02-01 17:58:27 +0000)
->>
->> are available in the Git repository at:
->>
->>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190204
->>
->> for you to fetch changes up to 53adb9d43e1abba187387a51f238e878e934c647:
->>
->>   mmap-alloc: fix hugetlbfs misaligned length in ppc64 (2019-02-04 18:44:20 +1100)
->>
->> ----------------------------------------------------------------
->> ppc patch queue 2019-02-04
->>
->> Here's the next batch of ppc target and spapr related changes.
->> Highlights are:
->>  * A number of endianness handling cleanups from Mark Cave-Ayland
->>  * Updated Mac VGA driver
->>  * Updated SLOF image
->>  * Some XIVE cleanups and small fixes
->>  * ppc4xx cleanups and fixes from BALATON Zoltan
->>
->> There are a few chances not technically in the ppc target code:
->>  * Several MAINTAINERS updates
->>  * Fixes for unmapping of hugepages on power hosts
->>
->> The latter is included because it's primarily of interest for ppc KVM setups.
->>
->
-> Applied, thanks.
->
-> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-> for any user-visible changes.
-
-Can someone with a wiki account please add:
-
-"sam460ex can now have 2GB memory"
-
-Thank you,
-BALATON Zoltan
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTExMjMxNS4yMzQ1
+NC0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNTExMjMxNS4y
+MzQ1NC0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
