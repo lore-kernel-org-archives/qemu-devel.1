@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52341)
+Received: from eggs.gnu.org ([209.51.188.92]:54439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqz27-0006ND-TM
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:36:56 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gqzBs-0000Dw-9t
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:47:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqz27-0000ME-7n
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:36:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gqz26-0000Lq-WC
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:36:55 -0500
-References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9RmsnMTuQU3a4G+Q6=RL9_YOm5Fi-OyVwkX2fTMzvYCA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <014991ae-f48e-4a82-b1d1-2ae3034606cc@redhat.com>
-Date: Tue, 5 Feb 2019 12:27:00 +0100
+	(envelope-from <balaton@eik.bme.hu>) id 1gqzBq-0007nc-TR
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:46:59 -0500
+Date: Tue, 5 Feb 2019 12:46:49 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA8nSy=gi+CDSi0GoJbdzgM-b=hOv6BdSFj67eb3yijUsA@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.9999.1902051245130.33901@zero.eik.bme.hu>
+References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
+	<CAFEAcA8nSy=gi+CDSi0GoJbdzgM-b=hOv6BdSFj67eb3yijUsA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9RmsnMTuQU3a4G+Q6=RL9_YOm5Fi-OyVwkX2fTMzvYCA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/77] Misc patches for 2019-02-04
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/37] ppc-for-4.0 queue 20190204
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +23,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, spopovyc@redhat.com, qemu-ppc <qemu-ppc@nongnu.org>, =?ISO-8859-15?Q?C=E9dric_Le_Goater?= <clg@kaod.org>
 
-On 05/02/19 10:35, Peter Maydell wrote:
-> On Mon, 4 Feb 2019 at 18:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, 4 Feb 2019, Peter Maydell wrote:
+> On Mon, 4 Feb 2019 at 09:01, David Gibson <david@gibson.dropbear.id.au> wrote:
 >>
->> The following changes since commit 773c4a6228fd910556cee2d477ee56c591a30000:
+>> The following changes since commit b3fc0af1ff5e922d4dd7c875394dbd26dc7313b4:
 >>
->>   test-filter-mirror: pass UNIX domain socket through fd (2019-02-04 16:03:20 +0000)
+>>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-02-01 17:58:27 +0000)
 >>
->> are available in the git repository at:
+>> are available in the Git repository at:
 >>
->>   git://github.com/bonzini/qemu.git tags/for-upstream
-> 
-> Hi; my script says:
-> error: remotes/bonzini/tags/for-upstream: cannot verify a non-tag
-> object of type commit.
-> Does not appear to be a signed tag
-> 
-> Did something go wrong at your end?
+>>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190204
+>>
+>> for you to fetch changes up to 53adb9d43e1abba187387a51f238e878e934c647:
+>>
+>>   mmap-alloc: fix hugetlbfs misaligned length in ppc64 (2019-02-04 18:44:20 +1100)
+>>
+>> ----------------------------------------------------------------
+>> ppc patch queue 2019-02-04
+>>
+>> Here's the next batch of ppc target and spapr related changes.
+>> Highlights are:
+>>  * A number of endianness handling cleanups from Mark Cave-Ayland
+>>  * Updated Mac VGA driver
+>>  * Updated SLOF image
+>>  * Some XIVE cleanups and small fixes
+>>  * ppc4xx cleanups and fixes from BALATON Zoltan
+>>
+>> There are a few chances not technically in the ppc target code:
+>>  * Several MAINTAINERS updates
+>>  * Fixes for unmapping of hugepages on power hosts
+>>
+>> The latter is included because it's primarily of interest for ppc KVM setups.
+>>
+>
+> Applied, thanks.
+>
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+> for any user-visible changes.
 
-Hmm this is a first.  Repushed now.
+Can someone with a wiki account please add:
 
-Paolo
+"sam460ex can now have 2GB memory"
+
+Thank you,
+BALATON Zoltan
