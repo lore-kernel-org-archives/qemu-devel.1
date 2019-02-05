@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36681)
+Received: from eggs.gnu.org ([209.51.188.92]:36678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gl-0002kd-Dd
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:31 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gl-0002kb-Ce
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gc-00048T-KY
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gc-00048O-KF
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:27 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:37801)
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:37800)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5Gb-00043y-LW
+	id 1gr5Gb-0003xD-Lq
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:18 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id g67so4751865wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:12 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id g67so4751515wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:05 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+	by smtp.gmail.com with ESMTPSA id p5sm8931665wmh.16.2019.02.05.10.16.01
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 05 Feb 2019 10:16:01 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:51 +0100
-Message-Id: <1549390526-24246-42-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:43 +0100
+Message-Id: <1549390526-24246-34-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 41/76] gdbstub: Fix i386/x86_64 machine
- description and add control registers
+Subject: [Qemu-devel] [PULL 33/76] crypto: finish removing TABs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,1003 +33,1266 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Doug Gale <doug16k@gmail.com>
 
-From: Doug Gale <doug16k@gmail.com>
-
-The machine description we send is being (silently) thrown on the floor
-by GDB and GDB silently uses the default machine description, because
-the xml parse fails on <feature> nested within <feature>.
-Changes to the xml in qemu source code have no effect.
-
-In addition, the default machine description has fs_base, which fails to
-be retrieved, which breaks the whole register window.  Add it and the
-other control registers.
-
-Signed-off-by: Doug Gale <doug16k@gmail.com>
-Message-Id: <20190124040457.2546-1-doug16k@gmail.com>
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure                   |   4 +-
- gdb-xml/i386-32bit-core.xml |  65 --------------
- gdb-xml/i386-32bit-sse.xml  |  52 -----------
- gdb-xml/i386-32bit.xml      | 184 +++++++++++++++++++++++++++++++++++++-
- gdb-xml/i386-64bit-core.xml |  73 ---------------
- gdb-xml/i386-64bit-sse.xml  |  60 -------------
- gdb-xml/i386-64bit.xml      | 210 +++++++++++++++++++++++++++++++++++++++++++-
- target/i386/cpu.c           |   4 +-
- target/i386/gdbstub.c       | 193 +++++++++++++++++++++++++++++++++++++++-
- 9 files changed, 580 insertions(+), 265 deletions(-)
- delete mode 100644 gdb-xml/i386-32bit-core.xml
- delete mode 100644 gdb-xml/i386-32bit-sse.xml
- delete mode 100644 gdb-xml/i386-64bit-core.xml
- delete mode 100644 gdb-xml/i386-64bit-sse.xml
+ crypto/aes.c    | 414 +++++++++++++++++++--------------------
+ crypto/desrfb.c | 594 ++++++++++++++++++++++++++++----------------------------
+ 2 files changed, 504 insertions(+), 504 deletions(-)
 
-diff --git a/configure b/configure
-index 244bc7a..558170c 100755
---- a/configure
-+++ b/configure
-@@ -7137,14 +7137,14 @@ TARGET_ABI_DIR=""
- case "$target_name" in
-   i386)
-     mttcg="yes"
--    gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
-+	gdb_xml_files="i386-32bit.xml"
-     target_compiler=$cross_cc_i386
-     target_compiler_cflags=$cross_cc_ccflags_i386
-   ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-     mttcg="yes"
--    gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
-+	gdb_xml_files="i386-64bit.xml"
-     target_compiler=$cross_cc_x86_64
-   ;;
-   alpha)
-diff --git a/gdb-xml/i386-32bit-core.xml b/gdb-xml/i386-32bit-core.xml
-deleted file mode 100644
-index 7aeeeca..0000000
---- a/gdb-xml/i386-32bit-core.xml
-+++ /dev/null
-@@ -1,65 +0,0 @@
--<?xml version="1.0"?>
--<!-- Copyright (C) 2010-2015 Free Software Foundation, Inc.
--
--     Copying and distribution of this file, with or without modification,
--     are permitted in any medium without royalty provided the copyright
--     notice and this notice are preserved.  -->
--
--<!DOCTYPE feature SYSTEM "gdb-target.dtd">
--<feature name="org.gnu.gdb.i386.core">
--  <flags id="i386_eflags" size="4">
--    <field name="CF" start="0" end="0"/>
--    <field name="" start="1" end="1"/>
--    <field name="PF" start="2" end="2"/>
--    <field name="AF" start="4" end="4"/>
--    <field name="ZF" start="6" end="6"/>
--    <field name="SF" start="7" end="7"/>
--    <field name="TF" start="8" end="8"/>
--    <field name="IF" start="9" end="9"/>
--    <field name="DF" start="10" end="10"/>
--    <field name="OF" start="11" end="11"/>
--    <field name="NT" start="14" end="14"/>
--    <field name="RF" start="16" end="16"/>
--    <field name="VM" start="17" end="17"/>
--    <field name="AC" start="18" end="18"/>
--    <field name="VIF" start="19" end="19"/>
--    <field name="VIP" start="20" end="20"/>
--    <field name="ID" start="21" end="21"/>
--  </flags>
--
--  <reg name="eax" bitsize="32" type="int32"/>
--  <reg name="ecx" bitsize="32" type="int32"/>
--  <reg name="edx" bitsize="32" type="int32"/>
--  <reg name="ebx" bitsize="32" type="int32"/>
--  <reg name="esp" bitsize="32" type="data_ptr"/>
--  <reg name="ebp" bitsize="32" type="data_ptr"/>
--  <reg name="esi" bitsize="32" type="int32"/>
--  <reg name="edi" bitsize="32" type="int32"/>
--
--  <reg name="eip" bitsize="32" type="code_ptr"/>
--  <reg name="eflags" bitsize="32" type="i386_eflags"/>
--  <reg name="cs" bitsize="32" type="int32"/>
--  <reg name="ss" bitsize="32" type="int32"/>
--  <reg name="ds" bitsize="32" type="int32"/>
--  <reg name="es" bitsize="32" type="int32"/>
--  <reg name="fs" bitsize="32" type="int32"/>
--  <reg name="gs" bitsize="32" type="int32"/>
--
--  <reg name="st0" bitsize="80" type="i387_ext"/>
--  <reg name="st1" bitsize="80" type="i387_ext"/>
--  <reg name="st2" bitsize="80" type="i387_ext"/>
--  <reg name="st3" bitsize="80" type="i387_ext"/>
--  <reg name="st4" bitsize="80" type="i387_ext"/>
--  <reg name="st5" bitsize="80" type="i387_ext"/>
--  <reg name="st6" bitsize="80" type="i387_ext"/>
--  <reg name="st7" bitsize="80" type="i387_ext"/>
--
--  <reg name="fctrl" bitsize="32" type="int" group="float"/>
--  <reg name="fstat" bitsize="32" type="int" group="float"/>
--  <reg name="ftag" bitsize="32" type="int" group="float"/>
--  <reg name="fiseg" bitsize="32" type="int" group="float"/>
--  <reg name="fioff" bitsize="32" type="int" group="float"/>
--  <reg name="foseg" bitsize="32" type="int" group="float"/>
--  <reg name="fooff" bitsize="32" type="int" group="float"/>
--  <reg name="fop" bitsize="32" type="int" group="float"/>
--</feature>
-diff --git a/gdb-xml/i386-32bit-sse.xml b/gdb-xml/i386-32bit-sse.xml
-deleted file mode 100644
-index 5767847..0000000
---- a/gdb-xml/i386-32bit-sse.xml
-+++ /dev/null
-@@ -1,52 +0,0 @@
--<?xml version="1.0"?>
--<!-- Copyright (C) 2010-2017 Free Software Foundation, Inc.
--
--     Copying and distribution of this file, with or without modification,
--     are permitted in any medium without royalty provided the copyright
--     notice and this notice are preserved.  -->
--
--<!DOCTYPE feature SYSTEM "gdb-target.dtd">
--<feature name="org.gnu.gdb.i386.32bit.sse">
--  <vector id="v4f" type="ieee_single" count="4"/>
--  <vector id="v2d" type="ieee_double" count="2"/>
--  <vector id="v16i8" type="int8" count="16"/>
--  <vector id="v8i16" type="int16" count="8"/>
--  <vector id="v4i32" type="int32" count="4"/>
--  <vector id="v2i64" type="int64" count="2"/>
--  <union id="vec128">
--    <field name="v4_float" type="v4f"/>
--    <field name="v2_double" type="v2d"/>
--    <field name="v16_int8" type="v16i8"/>
--    <field name="v8_int16" type="v8i16"/>
--    <field name="v4_int32" type="v4i32"/>
--    <field name="v2_int64" type="v2i64"/>
--    <field name="uint128" type="uint128"/>
--  </union>
--  <flags id="i386_mxcsr" size="4">
--    <field name="IE" start="0" end="0"/>
--    <field name="DE" start="1" end="1"/>
--    <field name="ZE" start="2" end="2"/>
--    <field name="OE" start="3" end="3"/>
--    <field name="UE" start="4" end="4"/>
--    <field name="PE" start="5" end="5"/>
--    <field name="DAZ" start="6" end="6"/>
--    <field name="IM" start="7" end="7"/>
--    <field name="DM" start="8" end="8"/>
--    <field name="ZM" start="9" end="9"/>
--    <field name="OM" start="10" end="10"/>
--    <field name="UM" start="11" end="11"/>
--    <field name="PM" start="12" end="12"/>
--    <field name="FZ" start="15" end="15"/>
--  </flags>
--
--  <reg name="xmm0" bitsize="128" type="vec128" regnum="32"/>
--  <reg name="xmm1" bitsize="128" type="vec128"/>
--  <reg name="xmm2" bitsize="128" type="vec128"/>
--  <reg name="xmm3" bitsize="128" type="vec128"/>
--  <reg name="xmm4" bitsize="128" type="vec128"/>
--  <reg name="xmm5" bitsize="128" type="vec128"/>
--  <reg name="xmm6" bitsize="128" type="vec128"/>
--  <reg name="xmm7" bitsize="128" type="vec128"/>
--
--  <reg name="mxcsr" bitsize="32" type="i386_mxcsr" group="vector"/>
--</feature>
-diff --git a/gdb-xml/i386-32bit.xml b/gdb-xml/i386-32bit.xml
-index 956fc7f..872fcea 100644
---- a/gdb-xml/i386-32bit.xml
-+++ b/gdb-xml/i386-32bit.xml
-@@ -8,7 +8,185 @@
- <!-- I386 with SSE -->
+diff --git a/crypto/aes.c b/crypto/aes.c
+index 773d246..86b3092 100644
+--- a/crypto/aes.c
++++ b/crypto/aes.c
+@@ -1059,109 +1059,109 @@ const uint32_t AES_Td4[256] = {
+     0x55555555U, 0x21212121U, 0x0c0c0c0cU, 0x7d7d7d7dU,
+ };
+ static const u32 rcon[] = {
+-	0x01000000, 0x02000000, 0x04000000, 0x08000000,
+-	0x10000000, 0x20000000, 0x40000000, 0x80000000,
+-	0x1B000000, 0x36000000, /* for 128-bit blocks, Rijndael never uses more than 10 rcon values */
++        0x01000000, 0x02000000, 0x04000000, 0x08000000,
++        0x10000000, 0x20000000, 0x40000000, 0x80000000,
++        0x1B000000, 0x36000000, /* for 128-bit blocks, Rijndael never uses more than 10 rcon values */
+ };
  
- <!DOCTYPE target SYSTEM "gdb-target.dtd">
--<feature name="org.gnu.gdb.i386.32bit">
--  <xi:include href="i386-32bit-core.xml"/>
--  <xi:include href="i386-32bit-sse.xml"/>
-+<feature name="org.gnu.gdb.i386.core">
-+  <flags id="i386_eflags" size="4">
-+	<field name="" start="22" end="31"/>
-+	<field name="ID" start="21" end="21"/>
-+	<field name="VIP" start="20" end="20"/>
-+	<field name="VIF" start="19" end="19"/>
-+	<field name="AC" start="18" end="18"/>
-+	<field name="VM" start="17" end="17"/>
-+	<field name="RF" start="16" end="16"/>
-+	<field name="" start="15" end="15"/>
-+	<field name="NT" start="14" end="14"/>
-+	<field name="IOPL" start="12" end="13"/>
-+	<field name="OF" start="11" end="11"/>
-+	<field name="DF" start="10" end="10"/>
-+	<field name="IF" start="9" end="9"/>
-+	<field name="TF" start="8" end="8"/>
-+	<field name="SF" start="7" end="7"/>
-+	<field name="ZF" start="6" end="6"/>
-+	<field name="" start="5" end="5"/>
-+	<field name="AF" start="4" end="4"/>
-+	<field name="" start="3" end="3"/>
-+	<field name="PF" start="2" end="2"/>
-+	<field name="" start="1" end="1"/>
-+	<field name="CF" start="0" end="0"/>
-+  </flags>
-+
-+  <reg name="eax" bitsize="32" type="int32" regnum="0"/>
-+  <reg name="ecx" bitsize="32" type="int32"/>
-+  <reg name="edx" bitsize="32" type="int32"/>
-+  <reg name="ebx" bitsize="32" type="int32"/>
-+  <reg name="esp" bitsize="32" type="data_ptr"/>
-+  <reg name="ebp" bitsize="32" type="data_ptr"/>
-+  <reg name="esi" bitsize="32" type="int32"/>
-+  <reg name="edi" bitsize="32" type="int32"/>
-+
-+  <reg name="eip" bitsize="32" type="code_ptr"/>
-+  <reg name="eflags" bitsize="32" type="i386_eflags"/>
-+
-+  <reg name="cs" bitsize="32" type="int32"/>
-+  <reg name="ss" bitsize="32" type="int32"/>
-+  <reg name="ds" bitsize="32" type="int32"/>
-+  <reg name="es" bitsize="32" type="int32"/>
-+  <reg name="fs" bitsize="32" type="int32"/>
-+  <reg name="gs" bitsize="32" type="int32"/>
-+
-+  <!-- Segment descriptor caches and TLS base MSRs -->
-+
-+  <!--reg name="cs_base" bitsize="32" type="int32"/>
-+  <reg name="ss_base" bitsize="32" type="int32"/>
-+  <reg name="ds_base" bitsize="32" type="int32"/>
-+  <reg name="es_base" bitsize="32" type="int32"/-->
-+  <reg name="fs_base" bitsize="32" type="int32"/>
-+  <reg name="gs_base" bitsize="32" type="int32"/>
-+  <reg name="k_gs_base" bitsize="32" type="int32"/>
-+
-+  <flags id="i386_cr0" size="4">
-+	<field name="PG" start="31" end="31"/>
-+	<field name="CD" start="30" end="30"/>
-+	<field name="NW" start="29" end="29"/>
-+	<field name="AM" start="18" end="18"/>
-+	<field name="WP" start="16" end="16"/>
-+	<field name="NE" start="5" end="5"/>
-+	<field name="ET" start="4" end="4"/>
-+	<field name="TS" start="3" end="3"/>
-+	<field name="EM" start="2" end="2"/>
-+	<field name="MP" start="1" end="1"/>
-+	<field name="PE" start="0" end="0"/>
-+  </flags>
-+
-+  <flags id="i386_cr3" size="4">
-+	<field name="PDBR" start="12" end="31"/>
-+	<!--field name="" start="3" end="11"/>
-+	<field name="WT" start="2" end="2"/>
-+	<field name="CD" start="1" end="1"/>
-+	<field name="" start="0" end="0"/-->
-+	<field name="PCID" start="0" end="11"/>
-+  </flags>
-+
-+  <flags id="i386_cr4" size="4">
-+	<field name="VME" start="0" end="0"/>
-+	<field name="PVI" start="1" end="1"/>
-+	<field name="TSD" start="2" end="2"/>
-+	<field name="DE" start="3" end="3"/>
-+	<field name="PSE" start="4" end="4"/>
-+	<field name="PAE" start="5" end="5"/>
-+	<field name="MCE" start="6" end="6"/>
-+	<field name="PGE" start="7" end="7"/>
-+	<field name="PCE" start="8" end="8"/>
-+	<field name="OSFXSR" start="9" end="9"/>
-+	<field name="OSXMMEXCPT" start="10" end="10"/>
-+	<field name="UMIP" start="11" end="11"/>
-+	<field name="LA57" start="12" end="12"/>
-+	<field name="VMXE" start="13" end="13"/>
-+	<field name="SMXE" start="14" end="14"/>
-+	<field name="FSGSBASE" start="16" end="16"/>
-+	<field name="PCIDE" start="17" end="17"/>
-+	<field name="OSXSAVE" start="18" end="18"/>
-+	<field name="SMEP" start="20" end="20"/>
-+	<field name="SMAP" start="21" end="21"/>
-+	<field name="PKE" start="22" end="22"/>
-+  </flags>
-+
-+  <flags id="i386_efer" size="8">
-+	<field name="TCE" start="15" end="15"/>
-+	<field name="FFXSR" start="14" end="14"/>
-+	<field name="LMSLE" start="13" end="13"/>
-+	<field name="SVME" start="12" end="12"/>
-+	<field name="NXE" start="11" end="11"/>
-+	<field name="LMA" start="10" end="10"/>
-+	<field name="LME" start="8" end="8"/>
-+	<field name="SCE" start="0" end="0"/>
-+  </flags>
-+
-+  <reg name="cr0" bitsize="32" type="i386_cr0"/>
-+  <reg name="cr2" bitsize="32" type="int32"/>
-+  <reg name="cr3" bitsize="32" type="i386_cr3"/>
-+  <reg name="cr4" bitsize="32" type="i386_cr4"/>
-+  <reg name="cr8" bitsize="32" type="int32"/>
-+  <reg name="efer" bitsize="32" type="i386_efer"/>
-+
-+  <reg name="st0" bitsize="80" type="i387_ext"/>
-+  <reg name="st1" bitsize="80" type="i387_ext"/>
-+  <reg name="st2" bitsize="80" type="i387_ext"/>
-+  <reg name="st3" bitsize="80" type="i387_ext"/>
-+  <reg name="st4" bitsize="80" type="i387_ext"/>
-+  <reg name="st5" bitsize="80" type="i387_ext"/>
-+  <reg name="st6" bitsize="80" type="i387_ext"/>
-+  <reg name="st7" bitsize="80" type="i387_ext"/>
-+
-+  <reg name="fctrl" bitsize="32" type="int" group="float"/>
-+  <reg name="fstat" bitsize="32" type="int" group="float"/>
-+  <reg name="ftag" bitsize="32" type="int" group="float"/>
-+  <reg name="fiseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fioff" bitsize="32" type="int" group="float"/>
-+  <reg name="foseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fooff" bitsize="32" type="int" group="float"/>
-+  <reg name="fop" bitsize="32" type="int" group="float"/>
-+<!--/feature>
-+<feature name="org.gnu.gdb.i386.32bit.sse"-->
-+  <vector id="v4f" type="ieee_single" count="4"/>
-+  <vector id="v2d" type="ieee_double" count="2"/>
-+  <vector id="v16i8" type="int8" count="16"/>
-+  <vector id="v8i16" type="int16" count="8"/>
-+  <vector id="v4i32" type="int32" count="4"/>
-+  <vector id="v2i64" type="int64" count="2"/>
-+  <union id="vec128">
-+	<field name="v4_float" type="v4f"/>
-+	<field name="v2_double" type="v2d"/>
-+	<field name="v16_int8" type="v16i8"/>
-+	<field name="v8_int16" type="v8i16"/>
-+	<field name="v4_int32" type="v4i32"/>
-+	<field name="v2_int64" type="v2i64"/>
-+	<field name="uint128" type="uint128"/>
-+  </union>
-+  <flags id="i386_mxcsr" size="4">
-+	<field name="IE" start="0" end="0"/>
-+	<field name="DE" start="1" end="1"/>
-+	<field name="ZE" start="2" end="2"/>
-+	<field name="OE" start="3" end="3"/>
-+	<field name="UE" start="4" end="4"/>
-+	<field name="PE" start="5" end="5"/>
-+	<field name="DAZ" start="6" end="6"/>
-+	<field name="IM" start="7" end="7"/>
-+	<field name="DM" start="8" end="8"/>
-+	<field name="ZM" start="9" end="9"/>
-+	<field name="OM" start="10" end="10"/>
-+	<field name="UM" start="11" end="11"/>
-+	<field name="PM" start="12" end="12"/>
-+	<field name="FZ" start="15" end="15"/>
-+  </flags>
-+
-+  <reg name="xmm0" bitsize="128" type="vec128"/>
-+  <reg name="xmm1" bitsize="128" type="vec128"/>
-+  <reg name="xmm2" bitsize="128" type="vec128"/>
-+  <reg name="xmm3" bitsize="128" type="vec128"/>
-+  <reg name="xmm4" bitsize="128" type="vec128"/>
-+  <reg name="xmm5" bitsize="128" type="vec128"/>
-+  <reg name="xmm6" bitsize="128" type="vec128"/>
-+  <reg name="xmm7" bitsize="128" type="vec128"/>
-+
-+  <reg name="mxcsr" bitsize="32" type="i386_mxcsr" group="vector"/>
- </feature>
-diff --git a/gdb-xml/i386-64bit-core.xml b/gdb-xml/i386-64bit-core.xml
-deleted file mode 100644
-index 5088d84..0000000
---- a/gdb-xml/i386-64bit-core.xml
-+++ /dev/null
-@@ -1,73 +0,0 @@
--<?xml version="1.0"?>
--<!-- Copyright (C) 2010-2015 Free Software Foundation, Inc.
--
--     Copying and distribution of this file, with or without modification,
--     are permitted in any medium without royalty provided the copyright
--     notice and this notice are preserved.  -->
--
--<!DOCTYPE feature SYSTEM "gdb-target.dtd">
--<feature name="org.gnu.gdb.i386.core">
--  <flags id="i386_eflags" size="4">
--    <field name="CF" start="0" end="0"/>
--    <field name="" start="1" end="1"/>
--    <field name="PF" start="2" end="2"/>
--    <field name="AF" start="4" end="4"/>
--    <field name="ZF" start="6" end="6"/>
--    <field name="SF" start="7" end="7"/>
--    <field name="TF" start="8" end="8"/>
--    <field name="IF" start="9" end="9"/>
--    <field name="DF" start="10" end="10"/>
--    <field name="OF" start="11" end="11"/>
--    <field name="NT" start="14" end="14"/>
--    <field name="RF" start="16" end="16"/>
--    <field name="VM" start="17" end="17"/>
--    <field name="AC" start="18" end="18"/>
--    <field name="VIF" start="19" end="19"/>
--    <field name="VIP" start="20" end="20"/>
--    <field name="ID" start="21" end="21"/>
--  </flags>
--
--  <reg name="rax" bitsize="64" type="int64"/>
--  <reg name="rbx" bitsize="64" type="int64"/>
--  <reg name="rcx" bitsize="64" type="int64"/>
--  <reg name="rdx" bitsize="64" type="int64"/>
--  <reg name="rsi" bitsize="64" type="int64"/>
--  <reg name="rdi" bitsize="64" type="int64"/>
--  <reg name="rbp" bitsize="64" type="data_ptr"/>
--  <reg name="rsp" bitsize="64" type="data_ptr"/>
--  <reg name="r8" bitsize="64" type="int64"/>
--  <reg name="r9" bitsize="64" type="int64"/>
--  <reg name="r10" bitsize="64" type="int64"/>
--  <reg name="r11" bitsize="64" type="int64"/>
--  <reg name="r12" bitsize="64" type="int64"/>
--  <reg name="r13" bitsize="64" type="int64"/>
--  <reg name="r14" bitsize="64" type="int64"/>
--  <reg name="r15" bitsize="64" type="int64"/>
--
--  <reg name="rip" bitsize="64" type="code_ptr"/>
--  <reg name="eflags" bitsize="32" type="i386_eflags"/>
--  <reg name="cs" bitsize="32" type="int32"/>
--  <reg name="ss" bitsize="32" type="int32"/>
--  <reg name="ds" bitsize="32" type="int32"/>
--  <reg name="es" bitsize="32" type="int32"/>
--  <reg name="fs" bitsize="32" type="int32"/>
--  <reg name="gs" bitsize="32" type="int32"/>
--
--  <reg name="st0" bitsize="80" type="i387_ext"/>
--  <reg name="st1" bitsize="80" type="i387_ext"/>
--  <reg name="st2" bitsize="80" type="i387_ext"/>
--  <reg name="st3" bitsize="80" type="i387_ext"/>
--  <reg name="st4" bitsize="80" type="i387_ext"/>
--  <reg name="st5" bitsize="80" type="i387_ext"/>
--  <reg name="st6" bitsize="80" type="i387_ext"/>
--  <reg name="st7" bitsize="80" type="i387_ext"/>
--
--  <reg name="fctrl" bitsize="32" type="int" group="float"/>
--  <reg name="fstat" bitsize="32" type="int" group="float"/>
--  <reg name="ftag" bitsize="32" type="int" group="float"/>
--  <reg name="fiseg" bitsize="32" type="int" group="float"/>
--  <reg name="fioff" bitsize="32" type="int" group="float"/>
--  <reg name="foseg" bitsize="32" type="int" group="float"/>
--  <reg name="fooff" bitsize="32" type="int" group="float"/>
--  <reg name="fop" bitsize="32" type="int" group="float"/>
--</feature>
-diff --git a/gdb-xml/i386-64bit-sse.xml b/gdb-xml/i386-64bit-sse.xml
-deleted file mode 100644
-index e86efc9..0000000
---- a/gdb-xml/i386-64bit-sse.xml
-+++ /dev/null
-@@ -1,60 +0,0 @@
--<?xml version="1.0"?>
--<!-- Copyright (C) 2010-2017 Free Software Foundation, Inc.
--
--     Copying and distribution of this file, with or without modification,
--     are permitted in any medium without royalty provided the copyright
--     notice and this notice are preserved.  -->
--
--<!DOCTYPE feature SYSTEM "gdb-target.dtd">
--<feature name="org.gnu.gdb.i386.64bit.sse">
--  <vector id="v4f" type="ieee_single" count="4"/>
--  <vector id="v2d" type="ieee_double" count="2"/>
--  <vector id="v16i8" type="int8" count="16"/>
--  <vector id="v8i16" type="int16" count="8"/>
--  <vector id="v4i32" type="int32" count="4"/>
--  <vector id="v2i64" type="int64" count="2"/>
--  <union id="vec128">
--    <field name="v4_float" type="v4f"/>
--    <field name="v2_double" type="v2d"/>
--    <field name="v16_int8" type="v16i8"/>
--    <field name="v8_int16" type="v8i16"/>
--    <field name="v4_int32" type="v4i32"/>
--    <field name="v2_int64" type="v2i64"/>
--    <field name="uint128" type="uint128"/>
--  </union>
--  <flags id="i386_mxcsr" size="4">
--    <field name="IE" start="0" end="0"/>
--    <field name="DE" start="1" end="1"/>
--    <field name="ZE" start="2" end="2"/>
--    <field name="OE" start="3" end="3"/>
--    <field name="UE" start="4" end="4"/>
--    <field name="PE" start="5" end="5"/>
--    <field name="DAZ" start="6" end="6"/>
--    <field name="IM" start="7" end="7"/>
--    <field name="DM" start="8" end="8"/>
--    <field name="ZM" start="9" end="9"/>
--    <field name="OM" start="10" end="10"/>
--    <field name="UM" start="11" end="11"/>
--    <field name="PM" start="12" end="12"/>
--    <field name="FZ" start="15" end="15"/>
--  </flags>
--
--  <reg name="xmm0" bitsize="128" type="vec128" regnum="40"/>
--  <reg name="xmm1" bitsize="128" type="vec128"/>
--  <reg name="xmm2" bitsize="128" type="vec128"/>
--  <reg name="xmm3" bitsize="128" type="vec128"/>
--  <reg name="xmm4" bitsize="128" type="vec128"/>
--  <reg name="xmm5" bitsize="128" type="vec128"/>
--  <reg name="xmm6" bitsize="128" type="vec128"/>
--  <reg name="xmm7" bitsize="128" type="vec128"/>
--  <reg name="xmm8" bitsize="128" type="vec128"/>
--  <reg name="xmm9" bitsize="128" type="vec128"/>
--  <reg name="xmm10" bitsize="128" type="vec128"/>
--  <reg name="xmm11" bitsize="128" type="vec128"/>
--  <reg name="xmm12" bitsize="128" type="vec128"/>
--  <reg name="xmm13" bitsize="128" type="vec128"/>
--  <reg name="xmm14" bitsize="128" type="vec128"/>
--  <reg name="xmm15" bitsize="128" type="vec128"/>
--
--  <reg name="mxcsr" bitsize="32" type="i386_mxcsr" group="vector"/>
--</feature>
-diff --git a/gdb-xml/i386-64bit.xml b/gdb-xml/i386-64bit.xml
-index 0b2f00c..6d88969 100644
---- a/gdb-xml/i386-64bit.xml
-+++ b/gdb-xml/i386-64bit.xml
-@@ -5,10 +5,212 @@
-      are permitted in any medium without royalty provided the copyright
-      notice and this notice are preserved.  -->
+ /**
+  * Expand the cipher key into the encryption key schedule.
+  */
+ int AES_set_encrypt_key(const unsigned char *userKey, const int bits,
+-			AES_KEY *key) {
++                        AES_KEY *key) {
  
--<!-- I386 64bit -->
-+<!-- x86_64 64bit -->
+-	u32 *rk;
+-	int i = 0;
+-	u32 temp;
++        u32 *rk;
++        int i = 0;
++        u32 temp;
  
- <!DOCTYPE target SYSTEM "gdb-target.dtd">
--<feature name="org.gnu.gdb.i386.64bit">
--  <xi:include href="i386-64bit-core.xml"/>
--  <xi:include href="i386-64bit-sse.xml"/>
-+
-+<feature name="org.gnu.gdb.i386.core">
-+  <flags id="x64_eflags" size="4">
-+	<field name="" start="22" end="31"/>
-+	<field name="ID" start="21" end="21"/>
-+	<field name="VIP" start="20" end="20"/>
-+	<field name="VIF" start="19" end="19"/>
-+	<field name="AC" start="18" end="18"/>
-+	<field name="VM" start="17" end="17"/>
-+	<field name="RF" start="16" end="16"/>
-+	<field name="" start="15" end="15"/>
-+	<field name="NT" start="14" end="14"/>
-+	<field name="IOPL" start="12" end="13"/>
-+	<field name="OF" start="11" end="11"/>
-+	<field name="DF" start="10" end="10"/>
-+	<field name="IF" start="9" end="9"/>
-+	<field name="TF" start="8" end="8"/>
-+	<field name="SF" start="7" end="7"/>
-+	<field name="ZF" start="6" end="6"/>
-+	<field name="" start="5" end="5"/>
-+	<field name="AF" start="4" end="4"/>
-+	<field name="" start="3" end="3"/>
-+	<field name="PF" start="2" end="2"/>
-+	<field name="" start="1" end="1"/>
-+	<field name="CF" start="0" end="0"/>
-+  </flags>
-+
-+  <!-- General registers -->
-+
-+  <reg name="rax" bitsize="64" type="int64" regnum="0"/>
-+  <reg name="rbx" bitsize="64" type="int64"/>
-+  <reg name="rcx" bitsize="64" type="int64"/>
-+  <reg name="rdx" bitsize="64" type="int64"/>
-+  <reg name="rsi" bitsize="64" type="int64"/>
-+  <reg name="rdi" bitsize="64" type="int64"/>
-+  <reg name="rbp" bitsize="64" type="data_ptr"/>
-+  <reg name="rsp" bitsize="64" type="data_ptr"/>
-+  <reg name="r8" bitsize="64" type="int64"/>
-+  <reg name="r9" bitsize="64" type="int64"/>
-+  <reg name="r10" bitsize="64" type="int64"/>
-+  <reg name="r11" bitsize="64" type="int64"/>
-+  <reg name="r12" bitsize="64" type="int64"/>
-+  <reg name="r13" bitsize="64" type="int64"/>
-+  <reg name="r14" bitsize="64" type="int64"/>
-+  <reg name="r15" bitsize="64" type="int64"/>
-+
-+  <reg name="rip" bitsize="64" type="code_ptr"/>
-+  <reg name="eflags" bitsize="32" type="x64_eflags"/>
-+
-+  <!-- Segment registers -->
-+
-+  <reg name="cs" bitsize="32" type="int32"/>
-+  <reg name="ss" bitsize="32" type="int32"/>
-+  <reg name="ds" bitsize="32" type="int32"/>
-+  <reg name="es" bitsize="32" type="int32"/>
-+  <reg name="fs" bitsize="32" type="int32"/>
-+  <reg name="gs" bitsize="32" type="int32"/>
-+
-+  <!-- Segment descriptor caches and TLS base MSRs -->
-+
-+  <!--reg name="cs_base" bitsize="64" type="int64"/>
-+  <reg name="ss_base" bitsize="64" type="int64"/>
-+  <reg name="ds_base" bitsize="64" type="int64"/>
-+  <reg name="es_base" bitsize="64" type="int64"/-->
-+  <reg name="fs_base" bitsize="64" type="int64"/>
-+  <reg name="gs_base" bitsize="64" type="int64"/>
-+  <reg name="k_gs_base" bitsize="64" type="int64"/>
-+
-+  <!-- Control registers -->
-+
-+  <flags id="x64_cr0" size="8">
-+	<field name="PG" start="31" end="31"/>
-+	<field name="CD" start="30" end="30"/>
-+	<field name="NW" start="29" end="29"/>
-+	<field name="AM" start="18" end="18"/>
-+	<field name="WP" start="16" end="16"/>
-+	<field name="NE" start="5" end="5"/>
-+	<field name="ET" start="4" end="4"/>
-+	<field name="TS" start="3" end="3"/>
-+	<field name="EM" start="2" end="2"/>
-+	<field name="MP" start="1" end="1"/>
-+	<field name="PE" start="0" end="0"/>
-+  </flags>
-+
-+  <flags id="x64_cr3" size="8">
-+	<field name="PDBR" start="12" end="63"/>
-+	<!--field name="" start="3" end="11"/>
-+	<field name="WT" start="2" end="2"/>
-+	<field name="CD" start="1" end="1"/>
-+	<field name="" start="0" end="0"/-->
-+	<field name="PCID" start="0" end="11"/>
-+  </flags>
-+
-+  <flags id="x64_cr4" size="8">
-+	<field name="PKE" start="22" end="22"/>
-+	<field name="SMAP" start="21" end="21"/>
-+	<field name="SMEP" start="20" end="20"/>
-+	<field name="OSXSAVE" start="18" end="18"/>
-+	<field name="PCIDE" start="17" end="17"/>
-+	<field name="FSGSBASE" start="16" end="16"/>
-+	<field name="SMXE" start="14" end="14"/>
-+	<field name="VMXE" start="13" end="13"/>
-+	<field name="LA57" start="12" end="12"/>
-+	<field name="UMIP" start="11" end="11"/>
-+	<field name="OSXMMEXCPT" start="10" end="10"/>
-+	<field name="OSFXSR" start="9" end="9"/>
-+	<field name="PCE" start="8" end="8"/>
-+	<field name="PGE" start="7" end="7"/>
-+	<field name="MCE" start="6" end="6"/>
-+	<field name="PAE" start="5" end="5"/>
-+	<field name="PSE" start="4" end="4"/>
-+	<field name="DE" start="3" end="3"/>
-+	<field name="TSD" start="2" end="2"/>
-+	<field name="PVI" start="1" end="1"/>
-+	<field name="VME" start="0" end="0"/>
-+  </flags>
-+
-+  <flags id="x64_efer" size="8">
-+	<field name="TCE" start="15" end="15"/>
-+	<field name="FFXSR" start="14" end="14"/>
-+	<field name="LMSLE" start="13" end="13"/>
-+	<field name="SVME" start="12" end="12"/>
-+	<field name="NXE" start="11" end="11"/>
-+	<field name="LMA" start="10" end="10"/>
-+	<field name="LME" start="8" end="8"/>
-+	<field name="SCE" start="0" end="0"/>
-+  </flags>
-+
-+  <reg name="cr0" bitsize="64" type="x64_cr0"/>
-+  <reg name="cr2" bitsize="64" type="int64"/>
-+  <reg name="cr3" bitsize="64" type="x64_cr3"/>
-+  <reg name="cr4" bitsize="64" type="x64_cr4"/>
-+  <reg name="cr8" bitsize="64" type="int64"/>
-+  <reg name="efer" bitsize="64" type="x64_efer"/>
-+
-+  <!-- x87 FPU -->
-+
-+  <reg name="st0" bitsize="80" type="i387_ext"/>
-+  <reg name="st1" bitsize="80" type="i387_ext"/>
-+  <reg name="st2" bitsize="80" type="i387_ext"/>
-+  <reg name="st3" bitsize="80" type="i387_ext"/>
-+  <reg name="st4" bitsize="80" type="i387_ext"/>
-+  <reg name="st5" bitsize="80" type="i387_ext"/>
-+  <reg name="st6" bitsize="80" type="i387_ext"/>
-+  <reg name="st7" bitsize="80" type="i387_ext"/>
-+
-+  <reg name="fctrl" bitsize="32" type="int" group="float"/>
-+  <reg name="fstat" bitsize="32" type="int" group="float"/>
-+  <reg name="ftag" bitsize="32" type="int" group="float"/>
-+  <reg name="fiseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fioff" bitsize="32" type="int" group="float"/>
-+  <reg name="foseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fooff" bitsize="32" type="int" group="float"/>
-+  <reg name="fop" bitsize="32" type="int" group="float"/>
-+
-+  <vector id="v4f" type="ieee_single" count="4"/>
-+  <vector id="v2d" type="ieee_double" count="2"/>
-+  <vector id="v16i8" type="int8" count="16"/>
-+  <vector id="v8i16" type="int16" count="8"/>
-+  <vector id="v4i32" type="int32" count="4"/>
-+  <vector id="v2i64" type="int64" count="2"/>
-+  <union id="vec128">
-+	<field name="v4_float" type="v4f"/>
-+	<field name="v2_double" type="v2d"/>
-+	<field name="v16_int8" type="v16i8"/>
-+	<field name="v8_int16" type="v8i16"/>
-+	<field name="v4_int32" type="v4i32"/>
-+	<field name="v2_int64" type="v2i64"/>
-+	<field name="uint128" type="uint128"/>
-+  </union>
-+  <flags id="x64_mxcsr" size="4">
-+	<field name="IE" start="0" end="0"/>
-+	<field name="DE" start="1" end="1"/>
-+	<field name="ZE" start="2" end="2"/>
-+	<field name="OE" start="3" end="3"/>
-+	<field name="UE" start="4" end="4"/>
-+	<field name="PE" start="5" end="5"/>
-+	<field name="DAZ" start="6" end="6"/>
-+	<field name="IM" start="7" end="7"/>
-+	<field name="DM" start="8" end="8"/>
-+	<field name="ZM" start="9" end="9"/>
-+	<field name="OM" start="10" end="10"/>
-+	<field name="UM" start="11" end="11"/>
-+	<field name="PM" start="12" end="12"/>
-+	<field name="FZ" start="15" end="15"/>
-+  </flags>
-+
-+  <reg name="xmm0" bitsize="128" type="vec128"/>
-+  <reg name="xmm1" bitsize="128" type="vec128"/>
-+  <reg name="xmm2" bitsize="128" type="vec128"/>
-+  <reg name="xmm3" bitsize="128" type="vec128"/>
-+  <reg name="xmm4" bitsize="128" type="vec128"/>
-+  <reg name="xmm5" bitsize="128" type="vec128"/>
-+  <reg name="xmm6" bitsize="128" type="vec128"/>
-+  <reg name="xmm7" bitsize="128" type="vec128"/>
-+  <reg name="xmm8" bitsize="128" type="vec128"/>
-+  <reg name="xmm9" bitsize="128" type="vec128"/>
-+  <reg name="xmm10" bitsize="128" type="vec128"/>
-+  <reg name="xmm11" bitsize="128" type="vec128"/>
-+  <reg name="xmm12" bitsize="128" type="vec128"/>
-+  <reg name="xmm13" bitsize="128" type="vec128"/>
-+  <reg name="xmm14" bitsize="128" type="vec128"/>
-+  <reg name="xmm15" bitsize="128" type="vec128"/>
-+
-+  <reg name="mxcsr" bitsize="32" type="x64_mxcsr" group="vector"/>
- </feature>
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 6f3b841..b077196 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5870,10 +5870,10 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->gdb_arch_name = x86_gdb_arch_name;
- #ifdef TARGET_X86_64
-     cc->gdb_core_xml_file = "i386-64bit.xml";
--    cc->gdb_num_core_regs = 57;
-+    cc->gdb_num_core_regs = 66;
- #else
-     cc->gdb_core_xml_file = "i386-32bit.xml";
--    cc->gdb_num_core_regs = 41;
-+    cc->gdb_num_core_regs = 50;
- #endif
- #if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
-     cc->debug_excp_handler = breakpoint_handler;
-diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
-index 9b94ab8..1221433 100644
---- a/target/i386/gdbstub.c
-+++ b/target/i386/gdbstub.c
-@@ -32,18 +32,61 @@ static const int gpr_map[16] = {
- #endif
- static const int gpr_map32[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+-	if (!userKey || !key)
+-		return -1;
+-	if (bits != 128 && bits != 192 && bits != 256)
+-		return -2;
++        if (!userKey || !key)
++                return -1;
++        if (bits != 128 && bits != 192 && bits != 256)
++                return -2;
  
-+/*
-+ * Keep these in sync with assignment to
-+ * gdb_num_core_regs in target/i386/cpu.c
-+ * and with the machine description
-+ */
-+
-+/*
-+ * SEG: 6 segments, plus fs_base, gs_base, kernel_gs_base
-+ */
-+
-+/*
-+ * general regs ----->  8 or 16
-+ */
-+#define IDX_NB_IP       1
-+#define IDX_NB_FLAGS    1
-+#define IDX_NB_SEG      (6 + 3)
-+#define IDX_NB_CTL      6
-+#define IDX_NB_FP       16
-+/*
-+ * fpu regs ----------> 8 or 16
-+ */
-+#define IDX_NB_MXCSR    1
-+/*
-+ *          total ----> 8+1+1+9+6+16+8+1=50 or 16+1+1+9+6+16+16+1=66
-+ */
-+
- #define IDX_IP_REG      CPU_NB_REGS
--#define IDX_FLAGS_REG   (IDX_IP_REG + 1)
--#define IDX_SEG_REGS    (IDX_FLAGS_REG + 1)
--#define IDX_FP_REGS     (IDX_SEG_REGS + 6)
--#define IDX_XMM_REGS    (IDX_FP_REGS + 16)
-+#define IDX_FLAGS_REG   (IDX_IP_REG + IDX_NB_IP)
-+#define IDX_SEG_REGS    (IDX_FLAGS_REG + IDX_NB_FLAGS)
-+#define IDX_CTL_REGS    (IDX_SEG_REGS + IDX_NB_SEG)
-+#define IDX_FP_REGS     (IDX_CTL_REGS + IDX_NB_CTL)
-+#define IDX_XMM_REGS    (IDX_FP_REGS + IDX_NB_FP)
- #define IDX_MXCSR_REG   (IDX_XMM_REGS + CPU_NB_REGS)
+-	rk = key->rd_key;
++        rk = key->rd_key;
  
-+#define IDX_CTL_CR0_REG     (IDX_CTL_REGS + 0)
-+#define IDX_CTL_CR2_REG     (IDX_CTL_REGS + 1)
-+#define IDX_CTL_CR3_REG     (IDX_CTL_REGS + 2)
-+#define IDX_CTL_CR4_REG     (IDX_CTL_REGS + 3)
-+#define IDX_CTL_CR8_REG     (IDX_CTL_REGS + 4)
-+#define IDX_CTL_EFER_REG    (IDX_CTL_REGS + 5)
-+
-+#ifdef TARGET_X86_64
-+#define GDB_FORCE_64 1
-+#else
-+#define GDB_FORCE_64 0
-+#endif
-+
-+
- int x86_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+-	if (bits==128)
+-		key->rounds = 10;
+-	else if (bits==192)
+-		key->rounds = 12;
+-	else
+-		key->rounds = 14;
++        if (bits==128)
++                key->rounds = 10;
++        else if (bits==192)
++                key->rounds = 12;
++        else
++                key->rounds = 14;
+ 
+-	rk[0] = GETU32(userKey     );
+-	rk[1] = GETU32(userKey +  4);
+-	rk[2] = GETU32(userKey +  8);
+-	rk[3] = GETU32(userKey + 12);
+-	if (bits == 128) {
+-		while (1) {
+-			temp  = rk[3];
+-			rk[4] = rk[0] ^
++        rk[0] = GETU32(userKey     );
++        rk[1] = GETU32(userKey +  4);
++        rk[2] = GETU32(userKey +  8);
++        rk[3] = GETU32(userKey + 12);
++        if (bits == 128) {
++                while (1) {
++                        temp  = rk[3];
++                        rk[4] = rk[0] ^
+                                 (AES_Te4[(temp >> 16) & 0xff] & 0xff000000) ^
+                                 (AES_Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
+                                 (AES_Te4[(temp      ) & 0xff] & 0x0000ff00) ^
+                                 (AES_Te4[(temp >> 24)       ] & 0x000000ff) ^
+-				rcon[i];
+-			rk[5] = rk[1] ^ rk[4];
+-			rk[6] = rk[2] ^ rk[5];
+-			rk[7] = rk[3] ^ rk[6];
+-			if (++i == 10) {
+-				return 0;
+-			}
+-			rk += 4;
+-		}
+-	}
+-	rk[4] = GETU32(userKey + 16);
+-	rk[5] = GETU32(userKey + 20);
+-	if (bits == 192) {
+-		while (1) {
+-			temp = rk[ 5];
+-			rk[ 6] = rk[ 0] ^
++                                rcon[i];
++                        rk[5] = rk[1] ^ rk[4];
++                        rk[6] = rk[2] ^ rk[5];
++                        rk[7] = rk[3] ^ rk[6];
++                        if (++i == 10) {
++                                return 0;
++                        }
++                        rk += 4;
++                }
++        }
++        rk[4] = GETU32(userKey + 16);
++        rk[5] = GETU32(userKey + 20);
++        if (bits == 192) {
++                while (1) {
++                        temp = rk[ 5];
++                        rk[ 6] = rk[ 0] ^
+                                 (AES_Te4[(temp >> 16) & 0xff] & 0xff000000) ^
+                                 (AES_Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
+                                 (AES_Te4[(temp      ) & 0xff] & 0x0000ff00) ^
+                                 (AES_Te4[(temp >> 24)       ] & 0x000000ff) ^
+-				rcon[i];
+-			rk[ 7] = rk[ 1] ^ rk[ 6];
+-			rk[ 8] = rk[ 2] ^ rk[ 7];
+-			rk[ 9] = rk[ 3] ^ rk[ 8];
+-			if (++i == 8) {
+-				return 0;
+-			}
+-			rk[10] = rk[ 4] ^ rk[ 9];
+-			rk[11] = rk[ 5] ^ rk[10];
+-			rk += 6;
+-		}
+-	}
+-	rk[6] = GETU32(userKey + 24);
+-	rk[7] = GETU32(userKey + 28);
+-	if (bits == 256) {
+-		while (1) {
+-			temp = rk[ 7];
+-			rk[ 8] = rk[ 0] ^
++                                rcon[i];
++                        rk[ 7] = rk[ 1] ^ rk[ 6];
++                        rk[ 8] = rk[ 2] ^ rk[ 7];
++                        rk[ 9] = rk[ 3] ^ rk[ 8];
++                        if (++i == 8) {
++                                return 0;
++                        }
++                        rk[10] = rk[ 4] ^ rk[ 9];
++                        rk[11] = rk[ 5] ^ rk[10];
++                        rk += 6;
++                }
++        }
++        rk[6] = GETU32(userKey + 24);
++        rk[7] = GETU32(userKey + 28);
++        if (bits == 256) {
++                while (1) {
++                        temp = rk[ 7];
++                        rk[ 8] = rk[ 0] ^
+                                 (AES_Te4[(temp >> 16) & 0xff] & 0xff000000) ^
+                                 (AES_Te4[(temp >>  8) & 0xff] & 0x00ff0000) ^
+                                 (AES_Te4[(temp      ) & 0xff] & 0x0000ff00) ^
+                                 (AES_Te4[(temp >> 24)       ] & 0x000000ff) ^
+-				rcon[i];
+-			rk[ 9] = rk[ 1] ^ rk[ 8];
+-			rk[10] = rk[ 2] ^ rk[ 9];
+-			rk[11] = rk[ 3] ^ rk[10];
+-			if (++i == 7) {
+-				return 0;
+-			}
+-			temp = rk[11];
+-			rk[12] = rk[ 4] ^
++                                rcon[i];
++                        rk[ 9] = rk[ 1] ^ rk[ 8];
++                        rk[10] = rk[ 2] ^ rk[ 9];
++                        rk[11] = rk[ 3] ^ rk[10];
++                        if (++i == 7) {
++                                return 0;
++                        }
++                        temp = rk[11];
++                        rk[12] = rk[ 4] ^
+                                 (AES_Te4[(temp >> 24)       ] & 0xff000000) ^
+                                 (AES_Te4[(temp >> 16) & 0xff] & 0x00ff0000) ^
+                                 (AES_Te4[(temp >>  8) & 0xff] & 0x0000ff00) ^
+                                 (AES_Te4[(temp      ) & 0xff] & 0x000000ff);
+-			rk[13] = rk[ 5] ^ rk[12];
+-			rk[14] = rk[ 6] ^ rk[13];
+-			rk[15] = rk[ 7] ^ rk[14];
++                        rk[13] = rk[ 5] ^ rk[12];
++                        rk[14] = rk[ 6] ^ rk[13];
++                        rk[15] = rk[ 7] ^ rk[14];
+ 
+-			rk += 8;
+-		}
+-	}
++                        rk += 8;
++                }
++        }
+         abort();
+ }
+ 
+@@ -1169,51 +1169,51 @@ int AES_set_encrypt_key(const unsigned char *userKey, const int bits,
+  * Expand the cipher key into the decryption key schedule.
+  */
+ int AES_set_decrypt_key(const unsigned char *userKey, const int bits,
+-			 AES_KEY *key) {
++                         AES_KEY *key) {
+ 
+         u32 *rk;
+-	int i, j, status;
+-	u32 temp;
++        int i, j, status;
++        u32 temp;
+ 
+-	/* first, start with an encryption schedule */
+-	status = AES_set_encrypt_key(userKey, bits, key);
+-	if (status < 0)
+-		return status;
++        /* first, start with an encryption schedule */
++        status = AES_set_encrypt_key(userKey, bits, key);
++        if (status < 0)
++                return status;
+ 
+-	rk = key->rd_key;
++        rk = key->rd_key;
+ 
+-	/* invert the order of the round keys: */
+-	for (i = 0, j = 4*(key->rounds); i < j; i += 4, j -= 4) {
+-		temp = rk[i    ]; rk[i    ] = rk[j    ]; rk[j    ] = temp;
+-		temp = rk[i + 1]; rk[i + 1] = rk[j + 1]; rk[j + 1] = temp;
+-		temp = rk[i + 2]; rk[i + 2] = rk[j + 2]; rk[j + 2] = temp;
+-		temp = rk[i + 3]; rk[i + 3] = rk[j + 3]; rk[j + 3] = temp;
+-	}
+-	/* apply the inverse MixColumn transform to all round keys but the first and the last: */
+-	for (i = 1; i < (key->rounds); i++) {
+-		rk += 4;
+-		rk[0] =
++        /* invert the order of the round keys: */
++        for (i = 0, j = 4*(key->rounds); i < j; i += 4, j -= 4) {
++                temp = rk[i    ]; rk[i    ] = rk[j    ]; rk[j    ] = temp;
++                temp = rk[i + 1]; rk[i + 1] = rk[j + 1]; rk[j + 1] = temp;
++                temp = rk[i + 2]; rk[i + 2] = rk[j + 2]; rk[j + 2] = temp;
++                temp = rk[i + 3]; rk[i + 3] = rk[j + 3]; rk[j + 3] = temp;
++        }
++        /* apply the inverse MixColumn transform to all round keys but the first and the last: */
++        for (i = 1; i < (key->rounds); i++) {
++                rk += 4;
++                rk[0] =
+                         AES_Td0[AES_Te4[(rk[0] >> 24)       ] & 0xff] ^
+                         AES_Td1[AES_Te4[(rk[0] >> 16) & 0xff] & 0xff] ^
+                         AES_Td2[AES_Te4[(rk[0] >>  8) & 0xff] & 0xff] ^
+                         AES_Td3[AES_Te4[(rk[0]      ) & 0xff] & 0xff];
+-		rk[1] =
++                rk[1] =
+                         AES_Td0[AES_Te4[(rk[1] >> 24)       ] & 0xff] ^
+                         AES_Td1[AES_Te4[(rk[1] >> 16) & 0xff] & 0xff] ^
+                         AES_Td2[AES_Te4[(rk[1] >>  8) & 0xff] & 0xff] ^
+                         AES_Td3[AES_Te4[(rk[1]      ) & 0xff] & 0xff];
+-		rk[2] =
++                rk[2] =
+                         AES_Td0[AES_Te4[(rk[2] >> 24)       ] & 0xff] ^
+                         AES_Td1[AES_Te4[(rk[2] >> 16) & 0xff] & 0xff] ^
+                         AES_Td2[AES_Te4[(rk[2] >>  8) & 0xff] & 0xff] ^
+                         AES_Td3[AES_Te4[(rk[2]      ) & 0xff] & 0xff];
+-		rk[3] =
++                rk[3] =
+                         AES_Td0[AES_Te4[(rk[3] >> 24)       ] & 0xff] ^
+                         AES_Td1[AES_Te4[(rk[3] >> 16) & 0xff] & 0xff] ^
+                         AES_Td2[AES_Te4[(rk[3] >>  8) & 0xff] & 0xff] ^
+                         AES_Td3[AES_Te4[(rk[3]      ) & 0xff] & 0xff];
+-	}
+-	return 0;
++        }
++        return 0;
+ }
+ 
+ #ifndef AES_ASM
+@@ -1222,67 +1222,67 @@ int AES_set_decrypt_key(const unsigned char *userKey, const int bits,
+  * in and out can overlap
+  */
+ void AES_encrypt(const unsigned char *in, unsigned char *out,
+-		 const AES_KEY *key) {
++                 const AES_KEY *key) {
+ 
+-	const u32 *rk;
+-	u32 s0, s1, s2, s3, t0, t1, t2, t3;
++        const u32 *rk;
++        u32 s0, s1, s2, s3, t0, t1, t2, t3;
+ #ifndef FULL_UNROLL
+-	int r;
++        int r;
+ #endif /* ?FULL_UNROLL */
+ 
+-	assert(in && out && key);
+-	rk = key->rd_key;
++        assert(in && out && key);
++        rk = key->rd_key;
+ 
+-	/*
+-	 * map byte array block to cipher state
+-	 * and add initial round key:
+-	 */
+-	s0 = GETU32(in     ) ^ rk[0];
+-	s1 = GETU32(in +  4) ^ rk[1];
+-	s2 = GETU32(in +  8) ^ rk[2];
+-	s3 = GETU32(in + 12) ^ rk[3];
++        /*
++         * map byte array block to cipher state
++         * and add initial round key:
++         */
++        s0 = GETU32(in     ) ^ rk[0];
++        s1 = GETU32(in +  4) ^ rk[1];
++        s2 = GETU32(in +  8) ^ rk[2];
++        s3 = GETU32(in + 12) ^ rk[3];
+ #ifdef FULL_UNROLL
+-	/* round 1: */
++        /* round 1: */
+         t0 = AES_Te0[s0 >> 24] ^ AES_Te1[(s1 >> 16) & 0xff] ^ AES_Te2[(s2 >>  8) & 0xff] ^ AES_Te3[s3 & 0xff] ^ rk[ 4];
+         t1 = AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[ 5];
+         t2 = AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[ 6];
+         t3 = AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[ 7];
+-	/* round 2: */
++        /* round 2: */
+         s0 = AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[ 8];
+         s1 = AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[ 9];
+         s2 = AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[10];
+         s3 = AES_Te0[t3 >> 24] ^ AES_Te1[(t0 >> 16) & 0xff] ^ AES_Te2[(t1 >>  8) & 0xff] ^ AES_Te3[t2 & 0xff] ^ rk[11];
+-	/* round 3: */
++        /* round 3: */
+         t0 = AES_Te0[s0 >> 24] ^ AES_Te1[(s1 >> 16) & 0xff] ^ AES_Te2[(s2 >>  8) & 0xff] ^ AES_Te3[s3 & 0xff] ^ rk[12];
+         t1 = AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[13];
+         t2 = AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[14];
+         t3 = AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[15];
+-	/* round 4: */
++        /* round 4: */
+         s0 = AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[16];
+         s1 = AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[17];
+         s2 = AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[18];
+         s3 = AES_Te0[t3 >> 24] ^ AES_Te1[(t0 >> 16) & 0xff] ^ AES_Te2[(t1 >>  8) & 0xff] ^ AES_Te3[t2 & 0xff] ^ rk[19];
+-	/* round 5: */
++        /* round 5: */
+         t0 = AES_Te0[s0 >> 24] ^ AES_Te1[(s1 >> 16) & 0xff] ^ AES_Te2[(s2 >>  8) & 0xff] ^ AES_Te3[s3 & 0xff] ^ rk[20];
+         t1 = AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[21];
+         t2 = AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[22];
+         t3 = AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[23];
+-	/* round 6: */
++        /* round 6: */
+         s0 = AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[24];
+         s1 = AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[25];
+         s2 = AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[26];
+         s3 = AES_Te0[t3 >> 24] ^ AES_Te1[(t0 >> 16) & 0xff] ^ AES_Te2[(t1 >>  8) & 0xff] ^ AES_Te3[t2 & 0xff] ^ rk[27];
+-	/* round 7: */
++        /* round 7: */
+         t0 = AES_Te0[s0 >> 24] ^ AES_Te1[(s1 >> 16) & 0xff] ^ AES_Te2[(s2 >>  8) & 0xff] ^ AES_Te3[s3 & 0xff] ^ rk[28];
+         t1 = AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[29];
+         t2 = AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[30];
+         t3 = AES_Te0[s3 >> 24] ^ AES_Te1[(s0 >> 16) & 0xff] ^ AES_Te2[(s1 >>  8) & 0xff] ^ AES_Te3[s2 & 0xff] ^ rk[31];
+-	/* round 8: */
++        /* round 8: */
+         s0 = AES_Te0[t0 >> 24] ^ AES_Te1[(t1 >> 16) & 0xff] ^ AES_Te2[(t2 >>  8) & 0xff] ^ AES_Te3[t3 & 0xff] ^ rk[32];
+         s1 = AES_Te0[t1 >> 24] ^ AES_Te1[(t2 >> 16) & 0xff] ^ AES_Te2[(t3 >>  8) & 0xff] ^ AES_Te3[t0 & 0xff] ^ rk[33];
+         s2 = AES_Te0[t2 >> 24] ^ AES_Te1[(t3 >> 16) & 0xff] ^ AES_Te2[(t0 >>  8) & 0xff] ^ AES_Te3[t1 & 0xff] ^ rk[34];
+         s3 = AES_Te0[t3 >> 24] ^ AES_Te1[(t0 >> 16) & 0xff] ^ AES_Te2[(t1 >>  8) & 0xff] ^ AES_Te3[t2 & 0xff] ^ rk[35];
+-	/* round 9: */
++        /* round 9: */
+         t0 = AES_Te0[s0 >> 24] ^ AES_Te1[(s1 >> 16) & 0xff] ^ AES_Te2[(s2 >>  8) & 0xff] ^ AES_Te3[s3 & 0xff] ^ rk[36];
+         t1 = AES_Te0[s1 >> 24] ^ AES_Te1[(s2 >> 16) & 0xff] ^ AES_Te2[(s3 >>  8) & 0xff] ^ AES_Te3[s0 & 0xff] ^ rk[37];
+         t2 = AES_Te0[s2 >> 24] ^ AES_Te1[(s3 >> 16) & 0xff] ^ AES_Te2[(s0 >>  8) & 0xff] ^ AES_Te3[s1 & 0xff] ^ rk[38];
+@@ -1375,37 +1375,37 @@ void AES_encrypt(const unsigned char *in, unsigned char *out,
+     }
+ #endif /* ?FULL_UNROLL */
+     /*
+-	 * apply last round and
+-	 * map cipher state to byte array block:
+-	 */
+-	s0 =
++         * apply last round and
++         * map cipher state to byte array block:
++         */
++        s0 =
+                 (AES_Te4[(t0 >> 24)       ] & 0xff000000) ^
+                 (AES_Te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Te4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Te4[(t3      ) & 0xff] & 0x000000ff) ^
+-		rk[0];
+-	PUTU32(out     , s0);
+-	s1 =
++                rk[0];
++        PUTU32(out     , s0);
++        s1 =
+                 (AES_Te4[(t1 >> 24)       ] & 0xff000000) ^
+                 (AES_Te4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Te4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Te4[(t0      ) & 0xff] & 0x000000ff) ^
+-		rk[1];
+-	PUTU32(out +  4, s1);
+-	s2 =
++                rk[1];
++        PUTU32(out +  4, s1);
++        s2 =
+                 (AES_Te4[(t2 >> 24)       ] & 0xff000000) ^
+                 (AES_Te4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Te4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Te4[(t1      ) & 0xff] & 0x000000ff) ^
+-		rk[2];
+-	PUTU32(out +  8, s2);
+-	s3 =
++                rk[2];
++        PUTU32(out +  8, s2);
++        s3 =
+                 (AES_Te4[(t3 >> 24)       ] & 0xff000000) ^
+                 (AES_Te4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Te4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Te4[(t2      ) & 0xff] & 0x000000ff) ^
+-		rk[3];
+-	PUTU32(out + 12, s3);
++                rk[3];
++        PUTU32(out + 12, s3);
+ }
+ 
+ /*
+@@ -1413,21 +1413,21 @@ void AES_encrypt(const unsigned char *in, unsigned char *out,
+  * in and out can overlap
+  */
+ void AES_decrypt(const unsigned char *in, unsigned char *out,
+-		 const AES_KEY *key) {
++                 const AES_KEY *key) {
+ 
+-	const u32 *rk;
+-	u32 s0, s1, s2, s3, t0, t1, t2, t3;
++        const u32 *rk;
++        u32 s0, s1, s2, s3, t0, t1, t2, t3;
+ #ifndef FULL_UNROLL
+-	int r;
++        int r;
+ #endif /* ?FULL_UNROLL */
+ 
+-	assert(in && out && key);
+-	rk = key->rd_key;
++        assert(in && out && key);
++        rk = key->rd_key;
+ 
+-	/*
+-	 * map byte array block to cipher state
+-	 * and add initial round key:
+-	 */
++        /*
++         * map byte array block to cipher state
++         * and add initial round key:
++         */
+     s0 = GETU32(in     ) ^ rk[0];
+     s1 = GETU32(in +  4) ^ rk[1];
+     s2 = GETU32(in +  8) ^ rk[2];
+@@ -1502,7 +1502,7 @@ void AES_decrypt(const unsigned char *in, unsigned char *out,
+             t3 = AES_Td0[s3 >> 24] ^ AES_Td1[(s2 >> 16) & 0xff] ^ AES_Td2[(s1 >>  8) & 0xff] ^ AES_Td3[s0 & 0xff] ^ rk[55];
+         }
+     }
+-	rk += key->rounds << 2;
++        rk += key->rounds << 2;
+ #else  /* !FULL_UNROLL */
+     /*
+      * Nr - 1 full rounds:
+@@ -1566,88 +1566,88 @@ void AES_decrypt(const unsigned char *in, unsigned char *out,
+     }
+ #endif /* ?FULL_UNROLL */
+     /*
+-	 * apply last round and
+-	 * map cipher state to byte array block:
+-	 */
+-	s0 =
++         * apply last round and
++         * map cipher state to byte array block:
++         */
++        s0 =
+                 (AES_Td4[(t0 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t1      ) & 0xff] & 0x000000ff) ^
+-		rk[0];
+-	PUTU32(out     , s0);
+-	s1 =
++                rk[0];
++        PUTU32(out     , s0);
++        s1 =
+                 (AES_Td4[(t1 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t2      ) & 0xff] & 0x000000ff) ^
+-		rk[1];
+-	PUTU32(out +  4, s1);
+-	s2 =
++                rk[1];
++        PUTU32(out +  4, s1);
++        s2 =
+                 (AES_Td4[(t2 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t3      ) & 0xff] & 0x000000ff) ^
+-		rk[2];
+-	PUTU32(out +  8, s2);
+-	s3 =
++                rk[2];
++        PUTU32(out +  8, s2);
++        s3 =
+                 (AES_Td4[(t3 >> 24)       ] & 0xff000000) ^
+                 (AES_Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
+                 (AES_Td4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
+                 (AES_Td4[(t0      ) & 0xff] & 0x000000ff) ^
+-		rk[3];
+-	PUTU32(out + 12, s3);
++                rk[3];
++        PUTU32(out + 12, s3);
+ }
+ 
+ #endif /* AES_ASM */
+ 
+ void AES_cbc_encrypt(const unsigned char *in, unsigned char *out,
+-		     const unsigned long length, const AES_KEY *key,
+-		     unsigned char *ivec, const int enc)
++                     const unsigned long length, const AES_KEY *key,
++                     unsigned char *ivec, const int enc)
  {
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
  
-+    uint64_t tpr;
-+
-     /* N.B. GDB can't deal with changes in registers or sizes in the middle
-        of a session. So if we're in 32-bit mode on a 64-bit cpu, still act
-        as if we're on a 64-bit cpu. */
-@@ -105,6 +148,28 @@ int x86_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-         case IDX_SEG_REGS + 5:
-             return gdb_get_reg32(mem_buf, env->segs[R_GS].selector);
+-	unsigned long n;
+-	unsigned long len = length;
+-	unsigned char tmp[AES_BLOCK_SIZE];
++        unsigned long n;
++        unsigned long len = length;
++        unsigned char tmp[AES_BLOCK_SIZE];
  
-+        case IDX_SEG_REGS + 6:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->segs[R_FS].base);
-+            }
-+            return gdb_get_reg32(mem_buf, env->segs[R_FS].base);
-+
-+        case IDX_SEG_REGS + 7:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->segs[R_GS].base);
-+            }
-+            return gdb_get_reg32(mem_buf, env->segs[R_GS].base);
-+
-+        case IDX_SEG_REGS + 8:
-+#ifdef TARGET_X86_64
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->kernelgsbase);
-+            }
-+            return gdb_get_reg32(mem_buf, env->kernelgsbase);
-+#else
-+            return gdb_get_reg32(mem_buf, 0);
-+#endif
-+
-         case IDX_FP_REGS + 8:
-             return gdb_get_reg32(mem_buf, env->fpuc);
-         case IDX_FP_REGS + 9:
-@@ -125,6 +190,47 @@ int x86_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+-	assert(in && out && key && ivec);
++        assert(in && out && key && ivec);
  
-         case IDX_MXCSR_REG:
-             return gdb_get_reg32(mem_buf, env->mxcsr);
-+
-+        case IDX_CTL_CR0_REG:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->cr[0]);
-+            }
-+            return gdb_get_reg32(mem_buf, env->cr[0]);
-+
-+        case IDX_CTL_CR2_REG:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->cr[2]);
-+            }
-+            return gdb_get_reg32(mem_buf, env->cr[2]);
-+
-+        case IDX_CTL_CR3_REG:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->cr[3]);
-+            }
-+            return gdb_get_reg32(mem_buf, env->cr[3]);
-+
-+        case IDX_CTL_CR4_REG:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->cr[4]);
-+            }
-+            return gdb_get_reg32(mem_buf, env->cr[4]);
-+
-+        case IDX_CTL_CR8_REG:
-+#ifdef CONFIG_SOFTMMU
-+            tpr = cpu_get_apic_tpr(cpu->apic_state);
-+#else
-+            tpr = 0;
-+#endif
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, tpr);
-+            }
-+            return gdb_get_reg32(mem_buf, tpr);
-+
-+        case IDX_CTL_EFER_REG:
-+            if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
-+                return gdb_get_reg64(mem_buf, env->efer);
-+            }
-+            return gdb_get_reg32(mem_buf, env->efer);
-         }
-     }
-     return 0;
-@@ -229,6 +335,32 @@ int x86_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         case IDX_SEG_REGS + 5:
-             return x86_cpu_gdb_load_seg(cpu, R_GS, mem_buf);
+-	if (enc) {
+-		while (len >= AES_BLOCK_SIZE) {
+-			for(n=0; n < AES_BLOCK_SIZE; ++n)
+-				tmp[n] = in[n] ^ ivec[n];
+-			AES_encrypt(tmp, out, key);
+-			memcpy(ivec, out, AES_BLOCK_SIZE);
+-			len -= AES_BLOCK_SIZE;
+-			in += AES_BLOCK_SIZE;
+-			out += AES_BLOCK_SIZE;
+-		}
+-		if (len) {
+-			for(n=0; n < len; ++n)
+-				tmp[n] = in[n] ^ ivec[n];
+-			for(n=len; n < AES_BLOCK_SIZE; ++n)
+-				tmp[n] = ivec[n];
+-			AES_encrypt(tmp, tmp, key);
+-			memcpy(out, tmp, AES_BLOCK_SIZE);
+-			memcpy(ivec, tmp, AES_BLOCK_SIZE);
+-		}
+-	} else {
+-		while (len >= AES_BLOCK_SIZE) {
+-			memcpy(tmp, in, AES_BLOCK_SIZE);
+-			AES_decrypt(in, out, key);
+-			for(n=0; n < AES_BLOCK_SIZE; ++n)
+-				out[n] ^= ivec[n];
+-			memcpy(ivec, tmp, AES_BLOCK_SIZE);
+-			len -= AES_BLOCK_SIZE;
+-			in += AES_BLOCK_SIZE;
+-			out += AES_BLOCK_SIZE;
+-		}
+-		if (len) {
+-			memcpy(tmp, in, AES_BLOCK_SIZE);
+-			AES_decrypt(tmp, tmp, key);
+-			for(n=0; n < len; ++n)
+-				out[n] = tmp[n] ^ ivec[n];
+-			memcpy(ivec, tmp, AES_BLOCK_SIZE);
+-		}
+-	}
++        if (enc) {
++                while (len >= AES_BLOCK_SIZE) {
++                        for(n=0; n < AES_BLOCK_SIZE; ++n)
++                                tmp[n] = in[n] ^ ivec[n];
++                        AES_encrypt(tmp, out, key);
++                        memcpy(ivec, out, AES_BLOCK_SIZE);
++                        len -= AES_BLOCK_SIZE;
++                        in += AES_BLOCK_SIZE;
++                        out += AES_BLOCK_SIZE;
++                }
++                if (len) {
++                        for(n=0; n < len; ++n)
++                                tmp[n] = in[n] ^ ivec[n];
++                        for(n=len; n < AES_BLOCK_SIZE; ++n)
++                                tmp[n] = ivec[n];
++                        AES_encrypt(tmp, tmp, key);
++                        memcpy(out, tmp, AES_BLOCK_SIZE);
++                        memcpy(ivec, tmp, AES_BLOCK_SIZE);
++                }
++        } else {
++                while (len >= AES_BLOCK_SIZE) {
++                        memcpy(tmp, in, AES_BLOCK_SIZE);
++                        AES_decrypt(in, out, key);
++                        for(n=0; n < AES_BLOCK_SIZE; ++n)
++                                out[n] ^= ivec[n];
++                        memcpy(ivec, tmp, AES_BLOCK_SIZE);
++                        len -= AES_BLOCK_SIZE;
++                        in += AES_BLOCK_SIZE;
++                        out += AES_BLOCK_SIZE;
++                }
++                if (len) {
++                        memcpy(tmp, in, AES_BLOCK_SIZE);
++                        AES_decrypt(tmp, tmp, key);
++                        for(n=0; n < len; ++n)
++                                out[n] = tmp[n] ^ ivec[n];
++                        memcpy(ivec, tmp, AES_BLOCK_SIZE);
++                }
++        }
+ }
+diff --git a/crypto/desrfb.c b/crypto/desrfb.c
+index ec47dea..3274c36 100644
+--- a/crypto/desrfb.c
++++ b/crypto/desrfb.c
+@@ -37,353 +37,353 @@ static void cookey(unsigned long *);
+ static unsigned long KnL[32] = { 0L };
  
-+        case IDX_SEG_REGS + 6:
-+            if (env->hflags & HF_CS64_MASK) {
-+                env->segs[R_FS].base = ldq_p(mem_buf);
-+                return 8;
-+            }
-+            env->segs[R_FS].base = ldl_p(mem_buf);
-+            return 4;
+ static const unsigned short bytebit[8]	= {
+-	01, 02, 04, 010, 020, 040, 0100, 0200 };
++        01, 02, 04, 010, 020, 040, 0100, 0200 };
+ 
+ static const unsigned long bigbyte[24] = {
+-	0x800000L,	0x400000L,	0x200000L,	0x100000L,
+-	0x80000L,	0x40000L,	0x20000L,	0x10000L,
+-	0x8000L,	0x4000L,	0x2000L,	0x1000L,
+-	0x800L, 	0x400L, 	0x200L, 	0x100L,
+-	0x80L,		0x40L,		0x20L,		0x10L,
+-	0x8L,		0x4L,		0x2L,		0x1L	};
++        0x800000L,	0x400000L,	0x200000L,	0x100000L,
++        0x80000L,	0x40000L,	0x20000L,	0x10000L,
++        0x8000L,	0x4000L,	0x2000L,	0x1000L,
++        0x800L, 	0x400L, 	0x200L, 	0x100L,
++        0x80L,		0x40L,		0x20L,		0x10L,
++        0x8L,		0x4L,		0x2L,		0x1L	};
+ 
+ /* Use the key schedule specified in the Standard (ANSI X3.92-1981). */
+ 
+ static const unsigned char pc1[56] = {
+-	56, 48, 40, 32, 24, 16,  8,	 0, 57, 49, 41, 33, 25, 17,
+-	 9,  1, 58, 50, 42, 34, 26,	18, 10,  2, 59, 51, 43, 35,
+-	62, 54, 46, 38, 30, 22, 14,	 6, 61, 53, 45, 37, 29, 21,
+-	13,  5, 60, 52, 44, 36, 28,	20, 12,  4, 27, 19, 11,  3 };
++        56, 48, 40, 32, 24, 16,  8,	 0, 57, 49, 41, 33, 25, 17,
++         9,  1, 58, 50, 42, 34, 26,	18, 10,  2, 59, 51, 43, 35,
++        62, 54, 46, 38, 30, 22, 14,	 6, 61, 53, 45, 37, 29, 21,
++        13,  5, 60, 52, 44, 36, 28,	20, 12,  4, 27, 19, 11,  3 };
+ 
+ static const unsigned char totrot[16] = {
+-	1,2,4,6,8,10,12,14,15,17,19,21,23,25,27,28 };
++        1,2,4,6,8,10,12,14,15,17,19,21,23,25,27,28 };
+ 
+ static const unsigned char pc2[48] = {
+-	13, 16, 10, 23,  0,  4,  2, 27, 14,  5, 20,  9,
+-	22, 18, 11,  3, 25,  7, 15,  6, 26, 19, 12,  1,
+-	40, 51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47,
+-	43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31 };
++        13, 16, 10, 23,  0,  4,  2, 27, 14,  5, 20,  9,
++        22, 18, 11,  3, 25,  7, 15,  6, 26, 19, 12,  1,
++        40, 51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47,
++        43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31 };
+ 
+ /* Thanks to James Gillogly & Phil Karn! */
+ void deskey(unsigned char *key, int edf)
+ {
+-	register int i, j, l, m, n;
+-	unsigned char pc1m[56], pcr[56];
+-	unsigned long kn[32];
+-
+-	for ( j = 0; j < 56; j++ ) {
+-		l = pc1[j];
+-		m = l & 07;
+-		pc1m[j] = (key[l >> 3] & bytebit[m]) ? 1 : 0;
+-		}
+-	for( i = 0; i < 16; i++ ) {
+-		if( edf == DE1 ) m = (15 - i) << 1;
+-		else m = i << 1;
+-		n = m + 1;
+-		kn[m] = kn[n] = 0L;
+-		for( j = 0; j < 28; j++ ) {
+-			l = j + totrot[i];
+-			if( l < 28 ) pcr[j] = pc1m[l];
+-			else pcr[j] = pc1m[l - 28];
+-			}
+-		for( j = 28; j < 56; j++ ) {
+-		    l = j + totrot[i];
+-		    if( l < 56 ) pcr[j] = pc1m[l];
+-		    else pcr[j] = pc1m[l - 28];
+-		    }
+-		for( j = 0; j < 24; j++ ) {
+-			if( pcr[pc2[j]] ) kn[m] |= bigbyte[j];
+-			if( pcr[pc2[j+24]] ) kn[n] |= bigbyte[j];
+-			}
+-		}
+-	cookey(kn);
+-	return;
+-	}
++        register int i, j, l, m, n;
++        unsigned char pc1m[56], pcr[56];
++        unsigned long kn[32];
 +
-+        case IDX_SEG_REGS + 7:
-+            if (env->hflags & HF_CS64_MASK) {
-+                env->segs[R_GS].base = ldq_p(mem_buf);
-+                return 8;
-+            }
-+            env->segs[R_GS].base = ldl_p(mem_buf);
-+            return 4;
++        for ( j = 0; j < 56; j++ ) {
++                l = pc1[j];
++                m = l & 07;
++                pc1m[j] = (key[l >> 3] & bytebit[m]) ? 1 : 0;
++                }
++        for( i = 0; i < 16; i++ ) {
++                if( edf == DE1 ) m = (15 - i) << 1;
++                else m = i << 1;
++                n = m + 1;
++                kn[m] = kn[n] = 0L;
++                for( j = 0; j < 28; j++ ) {
++                        l = j + totrot[i];
++                        if( l < 28 ) pcr[j] = pc1m[l];
++                        else pcr[j] = pc1m[l - 28];
++                        }
++                for( j = 28; j < 56; j++ ) {
++                    l = j + totrot[i];
++                    if( l < 56 ) pcr[j] = pc1m[l];
++                    else pcr[j] = pc1m[l - 28];
++                    }
++                for( j = 0; j < 24; j++ ) {
++                        if( pcr[pc2[j]] ) kn[m] |= bigbyte[j];
++                        if( pcr[pc2[j+24]] ) kn[n] |= bigbyte[j];
++                        }
++                }
++        cookey(kn);
++        return;
++        }
+ 
+ static void cookey(register unsigned long *raw1)
+ {
+-	register unsigned long *cook, *raw0;
+-	unsigned long dough[32];
+-	register int i;
+-
+-	cook = dough;
+-	for( i = 0; i < 16; i++, raw1++ ) {
+-		raw0 = raw1++;
+-		*cook	 = (*raw0 & 0x00fc0000L) << 6;
+-		*cook	|= (*raw0 & 0x00000fc0L) << 10;
+-		*cook	|= (*raw1 & 0x00fc0000L) >> 10;
+-		*cook++ |= (*raw1 & 0x00000fc0L) >> 6;
+-		*cook	 = (*raw0 & 0x0003f000L) << 12;
+-		*cook	|= (*raw0 & 0x0000003fL) << 16;
+-		*cook	|= (*raw1 & 0x0003f000L) >> 4;
+-		*cook++ |= (*raw1 & 0x0000003fL);
+-		}
+-	usekey(dough);
+-	return;
+-	}
++        register unsigned long *cook, *raw0;
++        unsigned long dough[32];
++        register int i;
 +
-+#ifdef TARGET_X86_64
-+        case IDX_SEG_REGS + 8:
-+            if (env->hflags & HF_CS64_MASK) {
-+                env->kernelgsbase = ldq_p(mem_buf);
-+                return 8;
-+            }
-+            env->kernelgsbase = ldl_p(mem_buf);
-+            return 4;
-+#endif
++        cook = dough;
++        for( i = 0; i < 16; i++, raw1++ ) {
++                raw0 = raw1++;
++                *cook	 = (*raw0 & 0x00fc0000L) << 6;
++                *cook	|= (*raw0 & 0x00000fc0L) << 10;
++                *cook	|= (*raw1 & 0x00fc0000L) >> 10;
++                *cook++ |= (*raw1 & 0x00000fc0L) >> 6;
++                *cook	 = (*raw0 & 0x0003f000L) << 12;
++                *cook	|= (*raw0 & 0x0000003fL) << 16;
++                *cook	|= (*raw1 & 0x0003f000L) >> 4;
++                *cook++ |= (*raw1 & 0x0000003fL);
++                }
++        usekey(dough);
++        return;
++        }
+ 
+ void usekey(register unsigned long *from)
+ {
+-	register unsigned long *to, *endp;
++        register unsigned long *to, *endp;
+ 
+-	to = KnL, endp = &KnL[32];
+-	while( to < endp ) *to++ = *from++;
+-	return;
+-	}
++        to = KnL, endp = &KnL[32];
++        while( to < endp ) *to++ = *from++;
++        return;
++        }
+ 
+ void des(unsigned char *inblock, unsigned char *outblock)
+ {
+-	unsigned long work[2];
++        unsigned long work[2];
+ 
+-	scrunch(inblock, work);
+-	desfunc(work, KnL);
+-	unscrun(work, outblock);
+-	return;
+-	}
++        scrunch(inblock, work);
++        desfunc(work, KnL);
++        unscrun(work, outblock);
++        return;
++        }
+ 
+ static void scrunch(register unsigned char *outof, register unsigned long *into)
+ {
+-	*into	 = (*outof++ & 0xffL) << 24;
+-	*into	|= (*outof++ & 0xffL) << 16;
+-	*into	|= (*outof++ & 0xffL) << 8;
+-	*into++ |= (*outof++ & 0xffL);
+-	*into	 = (*outof++ & 0xffL) << 24;
+-	*into	|= (*outof++ & 0xffL) << 16;
+-	*into	|= (*outof++ & 0xffL) << 8;
+-	*into	|= (*outof   & 0xffL);
+-	return;
+-	}
++        *into	 = (*outof++ & 0xffL) << 24;
++        *into	|= (*outof++ & 0xffL) << 16;
++        *into	|= (*outof++ & 0xffL) << 8;
++        *into++ |= (*outof++ & 0xffL);
++        *into	 = (*outof++ & 0xffL) << 24;
++        *into	|= (*outof++ & 0xffL) << 16;
++        *into	|= (*outof++ & 0xffL) << 8;
++        *into	|= (*outof   & 0xffL);
++        return;
++        }
+ 
+ static void unscrun(register unsigned long *outof, register unsigned char *into)
+ {
+-	*into++ = (unsigned char)((*outof >> 24) & 0xffL);
+-	*into++ = (unsigned char)((*outof >> 16) & 0xffL);
+-	*into++ = (unsigned char)((*outof >>  8) & 0xffL);
+-	*into++ = (unsigned char)(*outof++	 & 0xffL);
+-	*into++ = (unsigned char)((*outof >> 24) & 0xffL);
+-	*into++ = (unsigned char)((*outof >> 16) & 0xffL);
+-	*into++ = (unsigned char)((*outof >>  8) & 0xffL);
+-	*into	=  (unsigned char)(*outof	 & 0xffL);
+-	return;
+-	}
++        *into++ = (unsigned char)((*outof >> 24) & 0xffL);
++        *into++ = (unsigned char)((*outof >> 16) & 0xffL);
++        *into++ = (unsigned char)((*outof >>  8) & 0xffL);
++        *into++ = (unsigned char)(*outof++	 & 0xffL);
++        *into++ = (unsigned char)((*outof >> 24) & 0xffL);
++        *into++ = (unsigned char)((*outof >> 16) & 0xffL);
++        *into++ = (unsigned char)((*outof >>  8) & 0xffL);
++        *into	=  (unsigned char)(*outof	 & 0xffL);
++        return;
++        }
+ 
+ static const unsigned long SP1[64] = {
+-	0x01010400L, 0x00000000L, 0x00010000L, 0x01010404L,
+-	0x01010004L, 0x00010404L, 0x00000004L, 0x00010000L,
+-	0x00000400L, 0x01010400L, 0x01010404L, 0x00000400L,
+-	0x01000404L, 0x01010004L, 0x01000000L, 0x00000004L,
+-	0x00000404L, 0x01000400L, 0x01000400L, 0x00010400L,
+-	0x00010400L, 0x01010000L, 0x01010000L, 0x01000404L,
+-	0x00010004L, 0x01000004L, 0x01000004L, 0x00010004L,
+-	0x00000000L, 0x00000404L, 0x00010404L, 0x01000000L,
+-	0x00010000L, 0x01010404L, 0x00000004L, 0x01010000L,
+-	0x01010400L, 0x01000000L, 0x01000000L, 0x00000400L,
+-	0x01010004L, 0x00010000L, 0x00010400L, 0x01000004L,
+-	0x00000400L, 0x00000004L, 0x01000404L, 0x00010404L,
+-	0x01010404L, 0x00010004L, 0x01010000L, 0x01000404L,
+-	0x01000004L, 0x00000404L, 0x00010404L, 0x01010400L,
+-	0x00000404L, 0x01000400L, 0x01000400L, 0x00000000L,
+-	0x00010004L, 0x00010400L, 0x00000000L, 0x01010004L };
++        0x01010400L, 0x00000000L, 0x00010000L, 0x01010404L,
++        0x01010004L, 0x00010404L, 0x00000004L, 0x00010000L,
++        0x00000400L, 0x01010400L, 0x01010404L, 0x00000400L,
++        0x01000404L, 0x01010004L, 0x01000000L, 0x00000004L,
++        0x00000404L, 0x01000400L, 0x01000400L, 0x00010400L,
++        0x00010400L, 0x01010000L, 0x01010000L, 0x01000404L,
++        0x00010004L, 0x01000004L, 0x01000004L, 0x00010004L,
++        0x00000000L, 0x00000404L, 0x00010404L, 0x01000000L,
++        0x00010000L, 0x01010404L, 0x00000004L, 0x01010000L,
++        0x01010400L, 0x01000000L, 0x01000000L, 0x00000400L,
++        0x01010004L, 0x00010000L, 0x00010400L, 0x01000004L,
++        0x00000400L, 0x00000004L, 0x01000404L, 0x00010404L,
++        0x01010404L, 0x00010004L, 0x01010000L, 0x01000404L,
++        0x01000004L, 0x00000404L, 0x00010404L, 0x01010400L,
++        0x00000404L, 0x01000400L, 0x01000400L, 0x00000000L,
++        0x00010004L, 0x00010400L, 0x00000000L, 0x01010004L };
+ 
+ static const unsigned long SP2[64] = {
+-	0x80108020L, 0x80008000L, 0x00008000L, 0x00108020L,
+-	0x00100000L, 0x00000020L, 0x80100020L, 0x80008020L,
+-	0x80000020L, 0x80108020L, 0x80108000L, 0x80000000L,
+-	0x80008000L, 0x00100000L, 0x00000020L, 0x80100020L,
+-	0x00108000L, 0x00100020L, 0x80008020L, 0x00000000L,
+-	0x80000000L, 0x00008000L, 0x00108020L, 0x80100000L,
+-	0x00100020L, 0x80000020L, 0x00000000L, 0x00108000L,
+-	0x00008020L, 0x80108000L, 0x80100000L, 0x00008020L,
+-	0x00000000L, 0x00108020L, 0x80100020L, 0x00100000L,
+-	0x80008020L, 0x80100000L, 0x80108000L, 0x00008000L,
+-	0x80100000L, 0x80008000L, 0x00000020L, 0x80108020L,
+-	0x00108020L, 0x00000020L, 0x00008000L, 0x80000000L,
+-	0x00008020L, 0x80108000L, 0x00100000L, 0x80000020L,
+-	0x00100020L, 0x80008020L, 0x80000020L, 0x00100020L,
+-	0x00108000L, 0x00000000L, 0x80008000L, 0x00008020L,
+-	0x80000000L, 0x80100020L, 0x80108020L, 0x00108000L };
++        0x80108020L, 0x80008000L, 0x00008000L, 0x00108020L,
++        0x00100000L, 0x00000020L, 0x80100020L, 0x80008020L,
++        0x80000020L, 0x80108020L, 0x80108000L, 0x80000000L,
++        0x80008000L, 0x00100000L, 0x00000020L, 0x80100020L,
++        0x00108000L, 0x00100020L, 0x80008020L, 0x00000000L,
++        0x80000000L, 0x00008000L, 0x00108020L, 0x80100000L,
++        0x00100020L, 0x80000020L, 0x00000000L, 0x00108000L,
++        0x00008020L, 0x80108000L, 0x80100000L, 0x00008020L,
++        0x00000000L, 0x00108020L, 0x80100020L, 0x00100000L,
++        0x80008020L, 0x80100000L, 0x80108000L, 0x00008000L,
++        0x80100000L, 0x80008000L, 0x00000020L, 0x80108020L,
++        0x00108020L, 0x00000020L, 0x00008000L, 0x80000000L,
++        0x00008020L, 0x80108000L, 0x00100000L, 0x80000020L,
++        0x00100020L, 0x80008020L, 0x80000020L, 0x00100020L,
++        0x00108000L, 0x00000000L, 0x80008000L, 0x00008020L,
++        0x80000000L, 0x80100020L, 0x80108020L, 0x00108000L };
+ 
+ static const unsigned long SP3[64] = {
+-	0x00000208L, 0x08020200L, 0x00000000L, 0x08020008L,
+-	0x08000200L, 0x00000000L, 0x00020208L, 0x08000200L,
+-	0x00020008L, 0x08000008L, 0x08000008L, 0x00020000L,
+-	0x08020208L, 0x00020008L, 0x08020000L, 0x00000208L,
+-	0x08000000L, 0x00000008L, 0x08020200L, 0x00000200L,
+-	0x00020200L, 0x08020000L, 0x08020008L, 0x00020208L,
+-	0x08000208L, 0x00020200L, 0x00020000L, 0x08000208L,
+-	0x00000008L, 0x08020208L, 0x00000200L, 0x08000000L,
+-	0x08020200L, 0x08000000L, 0x00020008L, 0x00000208L,
+-	0x00020000L, 0x08020200L, 0x08000200L, 0x00000000L,
+-	0x00000200L, 0x00020008L, 0x08020208L, 0x08000200L,
+-	0x08000008L, 0x00000200L, 0x00000000L, 0x08020008L,
+-	0x08000208L, 0x00020000L, 0x08000000L, 0x08020208L,
+-	0x00000008L, 0x00020208L, 0x00020200L, 0x08000008L,
+-	0x08020000L, 0x08000208L, 0x00000208L, 0x08020000L,
+-	0x00020208L, 0x00000008L, 0x08020008L, 0x00020200L };
++        0x00000208L, 0x08020200L, 0x00000000L, 0x08020008L,
++        0x08000200L, 0x00000000L, 0x00020208L, 0x08000200L,
++        0x00020008L, 0x08000008L, 0x08000008L, 0x00020000L,
++        0x08020208L, 0x00020008L, 0x08020000L, 0x00000208L,
++        0x08000000L, 0x00000008L, 0x08020200L, 0x00000200L,
++        0x00020200L, 0x08020000L, 0x08020008L, 0x00020208L,
++        0x08000208L, 0x00020200L, 0x00020000L, 0x08000208L,
++        0x00000008L, 0x08020208L, 0x00000200L, 0x08000000L,
++        0x08020200L, 0x08000000L, 0x00020008L, 0x00000208L,
++        0x00020000L, 0x08020200L, 0x08000200L, 0x00000000L,
++        0x00000200L, 0x00020008L, 0x08020208L, 0x08000200L,
++        0x08000008L, 0x00000200L, 0x00000000L, 0x08020008L,
++        0x08000208L, 0x00020000L, 0x08000000L, 0x08020208L,
++        0x00000008L, 0x00020208L, 0x00020200L, 0x08000008L,
++        0x08020000L, 0x08000208L, 0x00000208L, 0x08020000L,
++        0x00020208L, 0x00000008L, 0x08020008L, 0x00020200L };
+ 
+ static const unsigned long SP4[64] = {
+-	0x00802001L, 0x00002081L, 0x00002081L, 0x00000080L,
+-	0x00802080L, 0x00800081L, 0x00800001L, 0x00002001L,
+-	0x00000000L, 0x00802000L, 0x00802000L, 0x00802081L,
+-	0x00000081L, 0x00000000L, 0x00800080L, 0x00800001L,
+-	0x00000001L, 0x00002000L, 0x00800000L, 0x00802001L,
+-	0x00000080L, 0x00800000L, 0x00002001L, 0x00002080L,
+-	0x00800081L, 0x00000001L, 0x00002080L, 0x00800080L,
+-	0x00002000L, 0x00802080L, 0x00802081L, 0x00000081L,
+-	0x00800080L, 0x00800001L, 0x00802000L, 0x00802081L,
+-	0x00000081L, 0x00000000L, 0x00000000L, 0x00802000L,
+-	0x00002080L, 0x00800080L, 0x00800081L, 0x00000001L,
+-	0x00802001L, 0x00002081L, 0x00002081L, 0x00000080L,
+-	0x00802081L, 0x00000081L, 0x00000001L, 0x00002000L,
+-	0x00800001L, 0x00002001L, 0x00802080L, 0x00800081L,
+-	0x00002001L, 0x00002080L, 0x00800000L, 0x00802001L,
+-	0x00000080L, 0x00800000L, 0x00002000L, 0x00802080L };
++        0x00802001L, 0x00002081L, 0x00002081L, 0x00000080L,
++        0x00802080L, 0x00800081L, 0x00800001L, 0x00002001L,
++        0x00000000L, 0x00802000L, 0x00802000L, 0x00802081L,
++        0x00000081L, 0x00000000L, 0x00800080L, 0x00800001L,
++        0x00000001L, 0x00002000L, 0x00800000L, 0x00802001L,
++        0x00000080L, 0x00800000L, 0x00002001L, 0x00002080L,
++        0x00800081L, 0x00000001L, 0x00002080L, 0x00800080L,
++        0x00002000L, 0x00802080L, 0x00802081L, 0x00000081L,
++        0x00800080L, 0x00800001L, 0x00802000L, 0x00802081L,
++        0x00000081L, 0x00000000L, 0x00000000L, 0x00802000L,
++        0x00002080L, 0x00800080L, 0x00800081L, 0x00000001L,
++        0x00802001L, 0x00002081L, 0x00002081L, 0x00000080L,
++        0x00802081L, 0x00000081L, 0x00000001L, 0x00002000L,
++        0x00800001L, 0x00002001L, 0x00802080L, 0x00800081L,
++        0x00002001L, 0x00002080L, 0x00800000L, 0x00802001L,
++        0x00000080L, 0x00800000L, 0x00002000L, 0x00802080L };
+ 
+ static const unsigned long SP5[64] = {
+-	0x00000100L, 0x02080100L, 0x02080000L, 0x42000100L,
+-	0x00080000L, 0x00000100L, 0x40000000L, 0x02080000L,
+-	0x40080100L, 0x00080000L, 0x02000100L, 0x40080100L,
+-	0x42000100L, 0x42080000L, 0x00080100L, 0x40000000L,
+-	0x02000000L, 0x40080000L, 0x40080000L, 0x00000000L,
+-	0x40000100L, 0x42080100L, 0x42080100L, 0x02000100L,
+-	0x42080000L, 0x40000100L, 0x00000000L, 0x42000000L,
+-	0x02080100L, 0x02000000L, 0x42000000L, 0x00080100L,
+-	0x00080000L, 0x42000100L, 0x00000100L, 0x02000000L,
+-	0x40000000L, 0x02080000L, 0x42000100L, 0x40080100L,
+-	0x02000100L, 0x40000000L, 0x42080000L, 0x02080100L,
+-	0x40080100L, 0x00000100L, 0x02000000L, 0x42080000L,
+-	0x42080100L, 0x00080100L, 0x42000000L, 0x42080100L,
+-	0x02080000L, 0x00000000L, 0x40080000L, 0x42000000L,
+-	0x00080100L, 0x02000100L, 0x40000100L, 0x00080000L,
+-	0x00000000L, 0x40080000L, 0x02080100L, 0x40000100L };
++        0x00000100L, 0x02080100L, 0x02080000L, 0x42000100L,
++        0x00080000L, 0x00000100L, 0x40000000L, 0x02080000L,
++        0x40080100L, 0x00080000L, 0x02000100L, 0x40080100L,
++        0x42000100L, 0x42080000L, 0x00080100L, 0x40000000L,
++        0x02000000L, 0x40080000L, 0x40080000L, 0x00000000L,
++        0x40000100L, 0x42080100L, 0x42080100L, 0x02000100L,
++        0x42080000L, 0x40000100L, 0x00000000L, 0x42000000L,
++        0x02080100L, 0x02000000L, 0x42000000L, 0x00080100L,
++        0x00080000L, 0x42000100L, 0x00000100L, 0x02000000L,
++        0x40000000L, 0x02080000L, 0x42000100L, 0x40080100L,
++        0x02000100L, 0x40000000L, 0x42080000L, 0x02080100L,
++        0x40080100L, 0x00000100L, 0x02000000L, 0x42080000L,
++        0x42080100L, 0x00080100L, 0x42000000L, 0x42080100L,
++        0x02080000L, 0x00000000L, 0x40080000L, 0x42000000L,
++        0x00080100L, 0x02000100L, 0x40000100L, 0x00080000L,
++        0x00000000L, 0x40080000L, 0x02080100L, 0x40000100L };
+ 
+ static const unsigned long SP6[64] = {
+-	0x20000010L, 0x20400000L, 0x00004000L, 0x20404010L,
+-	0x20400000L, 0x00000010L, 0x20404010L, 0x00400000L,
+-	0x20004000L, 0x00404010L, 0x00400000L, 0x20000010L,
+-	0x00400010L, 0x20004000L, 0x20000000L, 0x00004010L,
+-	0x00000000L, 0x00400010L, 0x20004010L, 0x00004000L,
+-	0x00404000L, 0x20004010L, 0x00000010L, 0x20400010L,
+-	0x20400010L, 0x00000000L, 0x00404010L, 0x20404000L,
+-	0x00004010L, 0x00404000L, 0x20404000L, 0x20000000L,
+-	0x20004000L, 0x00000010L, 0x20400010L, 0x00404000L,
+-	0x20404010L, 0x00400000L, 0x00004010L, 0x20000010L,
+-	0x00400000L, 0x20004000L, 0x20000000L, 0x00004010L,
+-	0x20000010L, 0x20404010L, 0x00404000L, 0x20400000L,
+-	0x00404010L, 0x20404000L, 0x00000000L, 0x20400010L,
+-	0x00000010L, 0x00004000L, 0x20400000L, 0x00404010L,
+-	0x00004000L, 0x00400010L, 0x20004010L, 0x00000000L,
+-	0x20404000L, 0x20000000L, 0x00400010L, 0x20004010L };
++        0x20000010L, 0x20400000L, 0x00004000L, 0x20404010L,
++        0x20400000L, 0x00000010L, 0x20404010L, 0x00400000L,
++        0x20004000L, 0x00404010L, 0x00400000L, 0x20000010L,
++        0x00400010L, 0x20004000L, 0x20000000L, 0x00004010L,
++        0x00000000L, 0x00400010L, 0x20004010L, 0x00004000L,
++        0x00404000L, 0x20004010L, 0x00000010L, 0x20400010L,
++        0x20400010L, 0x00000000L, 0x00404010L, 0x20404000L,
++        0x00004010L, 0x00404000L, 0x20404000L, 0x20000000L,
++        0x20004000L, 0x00000010L, 0x20400010L, 0x00404000L,
++        0x20404010L, 0x00400000L, 0x00004010L, 0x20000010L,
++        0x00400000L, 0x20004000L, 0x20000000L, 0x00004010L,
++        0x20000010L, 0x20404010L, 0x00404000L, 0x20400000L,
++        0x00404010L, 0x20404000L, 0x00000000L, 0x20400010L,
++        0x00000010L, 0x00004000L, 0x20400000L, 0x00404010L,
++        0x00004000L, 0x00400010L, 0x20004010L, 0x00000000L,
++        0x20404000L, 0x20000000L, 0x00400010L, 0x20004010L };
+ 
+ static const unsigned long SP7[64] = {
+-	0x00200000L, 0x04200002L, 0x04000802L, 0x00000000L,
+-	0x00000800L, 0x04000802L, 0x00200802L, 0x04200800L,
+-	0x04200802L, 0x00200000L, 0x00000000L, 0x04000002L,
+-	0x00000002L, 0x04000000L, 0x04200002L, 0x00000802L,
+-	0x04000800L, 0x00200802L, 0x00200002L, 0x04000800L,
+-	0x04000002L, 0x04200000L, 0x04200800L, 0x00200002L,
+-	0x04200000L, 0x00000800L, 0x00000802L, 0x04200802L,
+-	0x00200800L, 0x00000002L, 0x04000000L, 0x00200800L,
+-	0x04000000L, 0x00200800L, 0x00200000L, 0x04000802L,
+-	0x04000802L, 0x04200002L, 0x04200002L, 0x00000002L,
+-	0x00200002L, 0x04000000L, 0x04000800L, 0x00200000L,
+-	0x04200800L, 0x00000802L, 0x00200802L, 0x04200800L,
+-	0x00000802L, 0x04000002L, 0x04200802L, 0x04200000L,
+-	0x00200800L, 0x00000000L, 0x00000002L, 0x04200802L,
+-	0x00000000L, 0x00200802L, 0x04200000L, 0x00000800L,
+-	0x04000002L, 0x04000800L, 0x00000800L, 0x00200002L };
++        0x00200000L, 0x04200002L, 0x04000802L, 0x00000000L,
++        0x00000800L, 0x04000802L, 0x00200802L, 0x04200800L,
++        0x04200802L, 0x00200000L, 0x00000000L, 0x04000002L,
++        0x00000002L, 0x04000000L, 0x04200002L, 0x00000802L,
++        0x04000800L, 0x00200802L, 0x00200002L, 0x04000800L,
++        0x04000002L, 0x04200000L, 0x04200800L, 0x00200002L,
++        0x04200000L, 0x00000800L, 0x00000802L, 0x04200802L,
++        0x00200800L, 0x00000002L, 0x04000000L, 0x00200800L,
++        0x04000000L, 0x00200800L, 0x00200000L, 0x04000802L,
++        0x04000802L, 0x04200002L, 0x04200002L, 0x00000002L,
++        0x00200002L, 0x04000000L, 0x04000800L, 0x00200000L,
++        0x04200800L, 0x00000802L, 0x00200802L, 0x04200800L,
++        0x00000802L, 0x04000002L, 0x04200802L, 0x04200000L,
++        0x00200800L, 0x00000000L, 0x00000002L, 0x04200802L,
++        0x00000000L, 0x00200802L, 0x04200000L, 0x00000800L,
++        0x04000002L, 0x04000800L, 0x00000800L, 0x00200002L };
+ 
+ static const unsigned long SP8[64] = {
+-	0x10001040L, 0x00001000L, 0x00040000L, 0x10041040L,
+-	0x10000000L, 0x10001040L, 0x00000040L, 0x10000000L,
+-	0x00040040L, 0x10040000L, 0x10041040L, 0x00041000L,
+-	0x10041000L, 0x00041040L, 0x00001000L, 0x00000040L,
+-	0x10040000L, 0x10000040L, 0x10001000L, 0x00001040L,
+-	0x00041000L, 0x00040040L, 0x10040040L, 0x10041000L,
+-	0x00001040L, 0x00000000L, 0x00000000L, 0x10040040L,
+-	0x10000040L, 0x10001000L, 0x00041040L, 0x00040000L,
+-	0x00041040L, 0x00040000L, 0x10041000L, 0x00001000L,
+-	0x00000040L, 0x10040040L, 0x00001000L, 0x00041040L,
+-	0x10001000L, 0x00000040L, 0x10000040L, 0x10040000L,
+-	0x10040040L, 0x10000000L, 0x00040000L, 0x10001040L,
+-	0x00000000L, 0x10041040L, 0x00040040L, 0x10000040L,
+-	0x10040000L, 0x10001000L, 0x10001040L, 0x00000000L,
+-	0x10041040L, 0x00041000L, 0x00041000L, 0x00001040L,
+-	0x00001040L, 0x00040040L, 0x10000000L, 0x10041000L };
++        0x10001040L, 0x00001000L, 0x00040000L, 0x10041040L,
++        0x10000000L, 0x10001040L, 0x00000040L, 0x10000000L,
++        0x00040040L, 0x10040000L, 0x10041040L, 0x00041000L,
++        0x10041000L, 0x00041040L, 0x00001000L, 0x00000040L,
++        0x10040000L, 0x10000040L, 0x10001000L, 0x00001040L,
++        0x00041000L, 0x00040040L, 0x10040040L, 0x10041000L,
++        0x00001040L, 0x00000000L, 0x00000000L, 0x10040040L,
++        0x10000040L, 0x10001000L, 0x00041040L, 0x00040000L,
++        0x00041040L, 0x00040000L, 0x10041000L, 0x00001000L,
++        0x00000040L, 0x10040040L, 0x00001000L, 0x00041040L,
++        0x10001000L, 0x00000040L, 0x10000040L, 0x10040000L,
++        0x10040040L, 0x10000000L, 0x00040000L, 0x10001040L,
++        0x00000000L, 0x10041040L, 0x00040040L, 0x10000040L,
++        0x10040000L, 0x10001000L, 0x10001040L, 0x00000000L,
++        0x10041040L, 0x00041000L, 0x00041000L, 0x00001040L,
++        0x00001040L, 0x00040040L, 0x10000000L, 0x10041000L };
+ 
+ static void desfunc(register unsigned long *block, register unsigned long *keys)
+ {
+-	register unsigned long fval, work, right, leftt;
+-	register int round;
+-
+-	leftt = block[0];
+-	right = block[1];
+-	work = ((leftt >> 4) ^ right) & 0x0f0f0f0fL;
+-	right ^= work;
+-	leftt ^= (work << 4);
+-	work = ((leftt >> 16) ^ right) & 0x0000ffffL;
+-	right ^= work;
+-	leftt ^= (work << 16);
+-	work = ((right >> 2) ^ leftt) & 0x33333333L;
+-	leftt ^= work;
+-	right ^= (work << 2);
+-	work = ((right >> 8) ^ leftt) & 0x00ff00ffL;
+-	leftt ^= work;
+-	right ^= (work << 8);
+-	right = ((right << 1) | ((right >> 31) & 1L)) & 0xffffffffL;
+-	work = (leftt ^ right) & 0xaaaaaaaaL;
+-	leftt ^= work;
+-	right ^= work;
+-	leftt = ((leftt << 1) | ((leftt >> 31) & 1L)) & 0xffffffffL;
+-
+-	for( round = 0; round < 8; round++ ) {
+-		work  = (right << 28) | (right >> 4);
+-		work ^= *keys++;
+-		fval  = SP7[ work		 & 0x3fL];
+-		fval |= SP5[(work >>  8) & 0x3fL];
+-		fval |= SP3[(work >> 16) & 0x3fL];
+-		fval |= SP1[(work >> 24) & 0x3fL];
+-		work  = right ^ *keys++;
+-		fval |= SP8[ work		 & 0x3fL];
+-		fval |= SP6[(work >>  8) & 0x3fL];
+-		fval |= SP4[(work >> 16) & 0x3fL];
+-		fval |= SP2[(work >> 24) & 0x3fL];
+-		leftt ^= fval;
+-		work  = (leftt << 28) | (leftt >> 4);
+-		work ^= *keys++;
+-		fval  = SP7[ work		 & 0x3fL];
+-		fval |= SP5[(work >>  8) & 0x3fL];
+-		fval |= SP3[(work >> 16) & 0x3fL];
+-		fval |= SP1[(work >> 24) & 0x3fL];
+-		work  = leftt ^ *keys++;
+-		fval |= SP8[ work		 & 0x3fL];
+-		fval |= SP6[(work >>  8) & 0x3fL];
+-		fval |= SP4[(work >> 16) & 0x3fL];
+-		fval |= SP2[(work >> 24) & 0x3fL];
+-		right ^= fval;
+-		}
+-
+-	right = (right << 31) | (right >> 1);
+-	work = (leftt ^ right) & 0xaaaaaaaaL;
+-	leftt ^= work;
+-	right ^= work;
+-	leftt = (leftt << 31) | (leftt >> 1);
+-	work = ((leftt >> 8) ^ right) & 0x00ff00ffL;
+-	right ^= work;
+-	leftt ^= (work << 8);
+-	work = ((leftt >> 2) ^ right) & 0x33333333L;
+-	right ^= work;
+-	leftt ^= (work << 2);
+-	work = ((right >> 16) ^ leftt) & 0x0000ffffL;
+-	leftt ^= work;
+-	right ^= (work << 16);
+-	work = ((right >> 4) ^ leftt) & 0x0f0f0f0fL;
+-	leftt ^= work;
+-	right ^= (work << 4);
+-	*block++ = right;
+-	*block = leftt;
+-	return;
+-	}
++        register unsigned long fval, work, right, leftt;
++        register int round;
 +
-         case IDX_FP_REGS + 8:
-             cpu_set_fpuc(env, ldl_p(mem_buf));
-             return 4;
-@@ -253,6 +385,59 @@ int x86_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         case IDX_MXCSR_REG:
-             cpu_set_mxcsr(env, ldl_p(mem_buf));
-             return 4;
++        leftt = block[0];
++        right = block[1];
++        work = ((leftt >> 4) ^ right) & 0x0f0f0f0fL;
++        right ^= work;
++        leftt ^= (work << 4);
++        work = ((leftt >> 16) ^ right) & 0x0000ffffL;
++        right ^= work;
++        leftt ^= (work << 16);
++        work = ((right >> 2) ^ leftt) & 0x33333333L;
++        leftt ^= work;
++        right ^= (work << 2);
++        work = ((right >> 8) ^ leftt) & 0x00ff00ffL;
++        leftt ^= work;
++        right ^= (work << 8);
++        right = ((right << 1) | ((right >> 31) & 1L)) & 0xffffffffL;
++        work = (leftt ^ right) & 0xaaaaaaaaL;
++        leftt ^= work;
++        right ^= work;
++        leftt = ((leftt << 1) | ((leftt >> 31) & 1L)) & 0xffffffffL;
 +
-+        case IDX_CTL_CR0_REG:
-+            if (env->hflags & HF_CS64_MASK) {
-+                cpu_x86_update_cr0(env, ldq_p(mem_buf));
-+                return 8;
-+            }
-+            cpu_x86_update_cr0(env, ldl_p(mem_buf));
-+            return 4;
++        for( round = 0; round < 8; round++ ) {
++                work  = (right << 28) | (right >> 4);
++                work ^= *keys++;
++                fval  = SP7[ work		 & 0x3fL];
++                fval |= SP5[(work >>  8) & 0x3fL];
++                fval |= SP3[(work >> 16) & 0x3fL];
++                fval |= SP1[(work >> 24) & 0x3fL];
++                work  = right ^ *keys++;
++                fval |= SP8[ work		 & 0x3fL];
++                fval |= SP6[(work >>  8) & 0x3fL];
++                fval |= SP4[(work >> 16) & 0x3fL];
++                fval |= SP2[(work >> 24) & 0x3fL];
++                leftt ^= fval;
++                work  = (leftt << 28) | (leftt >> 4);
++                work ^= *keys++;
++                fval  = SP7[ work		 & 0x3fL];
++                fval |= SP5[(work >>  8) & 0x3fL];
++                fval |= SP3[(work >> 16) & 0x3fL];
++                fval |= SP1[(work >> 24) & 0x3fL];
++                work  = leftt ^ *keys++;
++                fval |= SP8[ work		 & 0x3fL];
++                fval |= SP6[(work >>  8) & 0x3fL];
++                fval |= SP4[(work >> 16) & 0x3fL];
++                fval |= SP2[(work >> 24) & 0x3fL];
++                right ^= fval;
++                }
 +
-+        case IDX_CTL_CR2_REG:
-+            if (env->hflags & HF_CS64_MASK) {
-+                env->cr[2] = ldq_p(mem_buf);
-+                return 8;
-+            }
-+            env->cr[2] = ldl_p(mem_buf);
-+            return 4;
-+
-+        case IDX_CTL_CR3_REG:
-+            if (env->hflags & HF_CS64_MASK) {
-+                cpu_x86_update_cr3(env, ldq_p(mem_buf));
-+                return 8;
-+            }
-+            cpu_x86_update_cr3(env, ldl_p(mem_buf));
-+            return 4;
-+
-+        case IDX_CTL_CR4_REG:
-+            if (env->hflags & HF_CS64_MASK) {
-+                cpu_x86_update_cr4(env, ldq_p(mem_buf));
-+                return 8;
-+            }
-+            cpu_x86_update_cr4(env, ldl_p(mem_buf));
-+            return 4;
-+
-+        case IDX_CTL_CR8_REG:
-+            if (env->hflags & HF_CS64_MASK) {
-+#ifdef CONFIG_SOFTMMU
-+                cpu_set_apic_tpr(cpu->apic_state, ldq_p(mem_buf));
-+#endif
-+                return 8;
-+            }
-+#ifdef CONFIG_SOFTMMU
-+            cpu_set_apic_tpr(cpu->apic_state, ldl_p(mem_buf));
-+#endif
-+            return 4;
-+
-+        case IDX_CTL_EFER_REG:
-+            if (env->hflags & HF_CS64_MASK) {
-+                cpu_load_efer(env, ldq_p(mem_buf));
-+                return 8;
-+            }
-+            cpu_load_efer(env, ldl_p(mem_buf));
-+            return 4;
-+
-         }
-     }
-     /* Unrecognised register.  */
++        right = (right << 31) | (right >> 1);
++        work = (leftt ^ right) & 0xaaaaaaaaL;
++        leftt ^= work;
++        right ^= work;
++        leftt = (leftt << 31) | (leftt >> 1);
++        work = ((leftt >> 8) ^ right) & 0x00ff00ffL;
++        right ^= work;
++        leftt ^= (work << 8);
++        work = ((leftt >> 2) ^ right) & 0x33333333L;
++        right ^= work;
++        leftt ^= (work << 2);
++        work = ((right >> 16) ^ leftt) & 0x0000ffffL;
++        leftt ^= work;
++        right ^= (work << 16);
++        work = ((right >> 4) ^ leftt) & 0x0f0f0f0fL;
++        leftt ^= work;
++        right ^= (work << 4);
++        *block++ = right;
++        *block = leftt;
++        return;
++        }
+ 
+ /* Validation sets:
+  *
 -- 
 1.8.3.1
