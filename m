@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59612)
+Received: from eggs.gnu.org ([209.51.188.92]:59695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqzaG-0005Gp-RZ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:12:13 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqzaR-0005K8-Fg
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqzYy-0007kb-Qs
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:10:53 -0500
-Date: Tue, 5 Feb 2019 13:10:47 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gqzSD-0001Xa-B6
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:03:59 -0500
+Date: Tue, 5 Feb 2019 13:03:44 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190205131047.32f7c7a1.cohuck@redhat.com>
-In-Reply-To: <55d9fc3d-12ec-9ad7-cdaa-72c5dbb65aca@linux.ibm.com>
+Message-ID: <20190205130344.30b8279f.cohuck@redhat.com>
+In-Reply-To: <9b35717e-8994-cde9-2afe-243ab80c371a@linux.ibm.com>
 References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190130132212.7376-3-cohuck@redhat.com>
-	<55d9fc3d-12ec-9ad7-cdaa-72c5dbb65aca@linux.ibm.com>
+	<20190130132212.7376-2-cohuck@redhat.com>
+	<9b35717e-8994-cde9-2afe-243ab80c371a@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] vfio-ccw: rework ssch state handling
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +28,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Farman <farman@linux.ibm.com>
 Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Mon, 4 Feb 2019 16:29:40 -0500
+On Mon, 4 Feb 2019 14:25:34 -0500
 Eric Farman <farman@linux.ibm.com> wrote:
 
 > On 01/30/2019 08:22 AM, Cornelia Huck wrote:
-> > The flow for processing ssch requests can be improved by splitting
-> > the BUSY state:
+> > When we get a solicited interrupt, the start function may have
+> > been cleared by a csch, but we still have a channel program
+> > structure allocated. Make it safe to call the cp accessors in
+> > any case, so we can call them unconditionally.
 > > 
-> > - CP_PROCESSING: We reject any user space requests while we are in
-> >    the process of translating a channel program and submitting it to
-> >    the hardware. Use -EAGAIN to signal user space that it should
-> >    retry the request.
-> > - CP_PENDING: We have successfully submitted a request with ssch and
-> >    are now expecting an interrupt. As we can't handle more than one
-> >    channel program being processed, reject any further requests with
-> >    -EBUSY. A final interrupt will move us out of this state; this also
-> >    fixes a latent bug where a non-final interrupt might have freed up
-> >    a channel program that still was in progress.
-> >    By making this a separate state, we make it possible to issue a
-> >    halt or a clear while we're still waiting for the final interrupt
-> >    for the ssch (in a follow-on patch).
-> > 
-> > It also makes a lot of sense not to preemptively filter out writes to
-> > the io_region if we're in an incorrect state: the state machine will
-> > handle this correctly.
+> > While at it, also make sure that functions called from other parts
+> > of the code return gracefully if the channel program structure
+> > has not been initialized (even though that is a bug in the caller).
 > > 
 > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > > ---
-> >   drivers/s390/cio/vfio_ccw_drv.c     |  8 ++++++--
-> >   drivers/s390/cio/vfio_ccw_fsm.c     | 19 ++++++++++++++-----
-> >   drivers/s390/cio/vfio_ccw_ops.c     |  2 --
-> >   drivers/s390/cio/vfio_ccw_private.h |  3 ++-
-> >   4 files changed, 22 insertions(+), 10 deletions(-)
+> >   drivers/s390/cio/vfio_ccw_cp.c  | 20 +++++++++++++++++++-
+> >   drivers/s390/cio/vfio_ccw_cp.h  |  2 ++
+> >   drivers/s390/cio/vfio_ccw_fsm.c |  5 +++++
+> >   3 files changed, 26 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> > index ba08fe137c2e..0bc0c38edda7 100644
+> > --- a/drivers/s390/cio/vfio_ccw_cp.c
+> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> > @@ -335,6 +335,7 @@ static void cp_unpin_free(struct channel_program *cp)
+> >   	struct ccwchain *chain, *temp;
+> >   	int i;
+> >   
+> > +	cp->initialized = false;
+> >   	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+> >   		for (i = 0; i < chain->ch_len; i++) {
+> >   			pfn_array_table_unpin_free(chain->ch_pat + i,
+> > @@ -701,6 +702,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+> >   	 */
+> >   	cp->orb.cmd.c64 = 1;
+> >   
+> > +	cp->initialized = true;
+> > +  
+> 
+> Not seen in this hunk, but we call ccwchain_loop_tic() just prior to 
+> this point.  If that returns non-zero, we call cp_unpin_free()[1] (and 
+> set initailized to false), and then fall through to here.  So this is 
+> going to set initialized to true, even though we're taking an error 
+> path.  :-(
 
-> > diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> > index e7c9877c9f1e..b4a141fbd1a8 100644
-> > --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> > +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> > @@ -28,7 +28,6 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
-> >   	sch = private->sch;
-> >   
-> >   	spin_lock_irqsave(sch->lock, flags);
-> > -	private->state = VFIO_CCW_STATE_BUSY;
-> >   
-> >   	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
-> >   	if (!orb) {
-> > @@ -46,6 +45,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
-> >   		 */
-> >   		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
-> >   		ret = 0;
-> > +		private->state = VFIO_CCW_STATE_CP_PENDING;  
+Eek, setting c64 unconditionally threw me off. This needs to check
+for !ret, of course.
+
 > 
-> [1]
+> [1] Wait, why is it calling cp_unpin_free()?  Oh, I had proposed 
+> squashing cp_free() and cp_unpin_free() back in November[2], got an r-b 
+> from Pierre but haven't gotten back to tidy up the series for a v2. 
+> Okay, I'll try to do that again soon.  :-)
+
+:)
+
+> [2] https://patchwork.kernel.org/patch/10675261/
 > 
-> >   		break;
-> >   	case 1:		/* Status pending */
-> >   	case 2:		/* Busy */
-> > @@ -107,6 +107,12 @@ static void fsm_io_busy(struct vfio_ccw_private *private,
-> >   	private->io_region->ret_code = -EBUSY;
+> >   	return ret;
 > >   }
 > >   
-> > +static void fsm_io_retry(struct vfio_ccw_private *private,
-> > +			 enum vfio_ccw_event event)
-> > +{
-> > +	private->io_region->ret_code = -EAGAIN;
-> > +}
-> > +
-> >   static void fsm_disabled_irq(struct vfio_ccw_private *private,
-> >   			     enum vfio_ccw_event event)
+> > @@ -715,7 +718,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+> >    */
+> >   void cp_free(struct channel_program *cp)
 > >   {
-> > @@ -135,8 +141,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >   	struct mdev_device *mdev = private->mdev;
-> >   	char *errstr = "request";
+> > -	cp_unpin_free(cp);
+> > +	if (cp->initialized)
+> > +		cp_unpin_free(cp);
+> >   }
 > >   
-> > -	private->state = VFIO_CCW_STATE_BUSY;
-> > -
-> > +	private->state = VFIO_CCW_STATE_CP_PROCESSING;  
-> 
-> [1]
-> 
-> >   	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+> >   /**
+> > @@ -760,6 +764,10 @@ int cp_prefetch(struct channel_program *cp)
+> >   	struct ccwchain *chain;
+> >   	int len, idx, ret;
 > >   
-> >   	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
-> > @@ -181,7 +186,6 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >   	}
+> > +	/* this is an error in the caller */
+> > +	if (!cp || !cp->initialized)
+> > +		return -EINVAL;
+> > +
+> >   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+> >   		len = chain->ch_len;
+> >   		for (idx = 0; idx < len; idx++) {
+> > @@ -795,6 +803,10 @@ union orb *cp_get_orb(struct channel_program *cp, u32 intparm, u8 lpm)
+> >   	struct ccwchain *chain;
+> >   	struct ccw1 *cpa;
 > >   
-> >   err_out:
-> > -	private->state = VFIO_CCW_STATE_IDLE;  
+> > +	/* this is an error in the caller */
+> > +	if (!cp || !cp->initialized)
+> > +		return NULL;
+> > +
+> >   	orb = &cp->orb;
+> >   
+> >   	orb->cmd.intparm = intparm;
+> > @@ -831,6 +843,9 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+> >   	u32 cpa = scsw->cmd.cpa;
+> >   	u32 ccw_head, ccw_tail;
+> >   
+> > +	if (!cp->initialized)
+> > +		return;
+> > +
+> >   	/*
+> >   	 * LATER:
+> >   	 * For now, only update the cmd.cpa part. We may need to deal with
+> > @@ -869,6 +884,9 @@ bool cp_iova_pinned(struct channel_program *cp, u64 iova)
+> >   	struct ccwchain *chain;
+> >   	int i;
+> >   
+> > +	if (!cp->initialized)  
 > 
-> [1] Revisiting these locations as from an earlier discussion [2]... 
-> These go IDLE->CP_PROCESSING->CP_PENDING if we get a cc=0 on the SSCH, 
-> but we stop in CP_PROCESSING if the SSCH gets a nonzero cc.  Shouldn't 
-> we cleanup and go back to IDLE in this scenario, rather than forcing 
-> userspace to escalate to CSCH/HSCH after some number of retries (via FSM)?
+> So, two of the checks added above look for a nonzero cp pointer prior to 
+> checking initialized, while two don't.  I guess cp can't be NULL, since 
+> it's embedded in the private struct directly and that's only free'd when 
+> we do vfio_ccw_sch_remove() ... But I guess some consistency in how we 
+> look would be nice.
+
+The idea was: In which context is this called? Is there a legitimate
+reason for the caller to pass in an uninitialized cp, or would that
+mean the caller had messed up (and we should not trust cp to be !NULL
+either?)
+
+But you're right, that does look inconsistent. Always checking for
+cp != NULL probably looks least odd, although it is overkill. Opinions?
+
 > 
-> [2] https://patchwork.kernel.org/patch/10773611/#22447997
-
-It does do that (in vfio_ccw_mdev_write), it was not needed here. Or do
-you think doing it here would be more obvious?
-
-> 
-> Besides that, I think this looks good to me.
-
-Thanks!
+> > +		return false;
+> > +
+> >   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+> >   		for (i = 0; i < chain->ch_len; i++)
+> >   			if (pfn_array_table_iova_pinned(chain->ch_pat + i,
