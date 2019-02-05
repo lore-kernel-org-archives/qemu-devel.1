@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33612)
+Received: from eggs.gnu.org ([209.51.188.92]:33716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr450-00064K-4t
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:22 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr454-00069W-VL
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44t-00069G-CT
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:14 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:40580)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44x-0006EV-D3
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:18 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gr44r-000604-3m
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:06 -0500
+	id 1gr44v-00062N-4U
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:00:09 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Tue,  5 Feb 2019 18:59:20 +0200
-Message-Id: <20190205165927.26599-26-samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 18:59:25 +0200
+Message-Id: <20190205165927.26599-31-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv2 25/32] slirp: replace remaining qemu headers
- dependency
+Subject: [Qemu-devel] [PULLv2 30/32] slirp: use polling callbacks,
+ drop glib requirement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,417 +33,366 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Except for the migration code which is gated by WITH_QEMU, only
-include our own headers, so libslirp can be built standalone.
+It would be legitimate to use libslirp without glib. Let's
+add_poll/get_revents pair of callbacks to provide the same
+functionality.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/arp_table.c  |  3 ++-
- slirp/bootp.c      |  1 -
- slirp/cksum.c      |  1 -
- slirp/dhcpv6.c     |  1 -
- slirp/dnssearch.c  |  1 -
- slirp/if.c         |  1 -
- slirp/ip6.h        |  1 +
- slirp/ip6_icmp.c   |  1 -
- slirp/ip6_input.c  |  1 -
- slirp/ip6_output.c |  2 --
- slirp/ip_icmp.c    |  1 -
- slirp/ip_input.c   |  1 -
- slirp/ip_output.c  |  1 -
- slirp/mbuf.c       |  1 -
- slirp/misc.c       |  2 --
- slirp/ncsi.c       |  1 -
- slirp/ndp_table.c  |  2 --
- slirp/sbuf.c       |  1 -
- slirp/slirp.c      |  2 --
- slirp/socket.c     |  2 --
- slirp/tcp_input.c  |  1 -
- slirp/tcp_output.c |  1 -
- slirp/tcp_subr.c   |  1 -
- slirp/tcp_timer.c  |  1 -
- slirp/tftp.c       |  6 ++++--
- slirp/udp.c        |  1 -
- slirp/udp6.c       |  2 --
- slirp/util.h       | 21 +++++++++++++++++++++
- 28 files changed, 28 insertions(+), 33 deletions(-)
+ net/slirp.c      | 72 ++++++++++++++++++++++++++++++++++++++++++++++--
+ slirp/libslirp.h | 17 ++++++++++--
+ slirp/slirp.c    | 72 +++++++++++++++++-------------------------------
+ 3 files changed, 109 insertions(+), 52 deletions(-)
 
-diff --git a/slirp/arp_table.c b/slirp/arp_table.c
-index bf71b984ad..58eafdcfd8 100644
---- a/slirp/arp_table.c
-+++ b/slirp/arp_table.c
-@@ -22,9 +22,10 @@
-  * THE SOFTWARE.
-  */
+diff --git a/net/slirp.c b/net/slirp.c
+index 4d55f64168..a85e42ff43 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -211,6 +211,71 @@ static const SlirpCb slirp_cb =3D {
+     .notify =3D qemu_notify_event,
+ };
 =20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
-+#include <string.h>
++static int slirp_poll_to_gio(int events)
++{
++    int ret =3D 0;
 +
- void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_A=
-LEN])
++    if (events & SLIRP_POLL_IN) {
++        ret |=3D G_IO_IN;
++    }
++    if (events & SLIRP_POLL_OUT) {
++        ret |=3D G_IO_OUT;
++    }
++    if (events & SLIRP_POLL_PRI) {
++        ret |=3D G_IO_PRI;
++    }
++    if (events & SLIRP_POLL_ERR) {
++        ret |=3D G_IO_ERR;
++    }
++    if (events & SLIRP_POLL_HUP) {
++        ret |=3D G_IO_HUP;
++    }
++
++    return ret;
++}
++
++static int net_slirp_add_poll(int fd, int events, void *opaque)
++{
++    GArray *pollfds =3D opaque;
++    GPollFD pfd =3D {
++        .fd =3D fd,
++        .events =3D slirp_poll_to_gio(events),
++    };
++    int idx =3D pollfds->len;
++    g_array_append_val(pollfds, pfd);
++    return idx;
++}
++
++static int slirp_gio_to_poll(int events)
++{
++    int ret =3D 0;
++
++    if (events & G_IO_IN) {
++        ret |=3D SLIRP_POLL_IN;
++    }
++    if (events & G_IO_OUT) {
++        ret |=3D SLIRP_POLL_OUT;
++    }
++    if (events & G_IO_PRI) {
++        ret |=3D SLIRP_POLL_PRI;
++    }
++    if (events & G_IO_ERR) {
++        ret |=3D SLIRP_POLL_ERR;
++    }
++    if (events & G_IO_HUP) {
++        ret |=3D SLIRP_POLL_HUP;
++    }
++
++    return ret;
++}
++
++static int net_slirp_get_revents(int idx, void *opaque)
++{
++    GArray *pollfds =3D opaque;
++
++    return slirp_gio_to_poll(g_array_index(pollfds, GPollFD, idx).revent=
+s);
++}
++
+ static void net_slirp_poll_notify(Notifier *notifier, void *data)
  {
-     const uint32_t broadcast_addr =3D
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 4c9a77eb98..d396849a05 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -21,7 +21,6 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
--#include "qemu/osdep.h"
- #include "slirp.h"
+     MainLoopPoll *poll =3D data;
+@@ -218,12 +283,13 @@ static void net_slirp_poll_notify(Notifier *notifie=
+r, void *data)
 =20
- #if defined(_WIN32)
-diff --git a/slirp/cksum.c b/slirp/cksum.c
-index 84c858fafb..25bfa67348 100644
---- a/slirp/cksum.c
-+++ b/slirp/cksum.c
-@@ -30,7 +30,6 @@
-  * in_cksum.c,v 1.2 1994/08/02 07:48:16 davidg Exp
-  */
+     switch (poll->state) {
+     case MAIN_LOOP_POLL_FILL:
+-        slirp_pollfds_fill(s->slirp, poll->pollfds, &poll->timeout);
++        slirp_pollfds_fill(s->slirp, &poll->timeout,
++                           net_slirp_add_poll, poll->pollfds);
+         break;
+     case MAIN_LOOP_POLL_OK:
+     case MAIN_LOOP_POLL_ERR:
+-        slirp_pollfds_poll(s->slirp, poll->pollfds,
+-                           poll->state =3D=3D MAIN_LOOP_POLL_ERR);
++        slirp_pollfds_poll(s->slirp, poll->state =3D=3D MAIN_LOOP_POLL_E=
+RR,
++                           net_slirp_get_revents, poll->pollfds);
+         break;
+     default:
+         g_assert_not_reached();
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 18d5fb0133..b5c1b2122b 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -1,7 +1,6 @@
+ #ifndef LIBSLIRP_H
+ #define LIBSLIRP_H
 =20
--#include "qemu/osdep.h"
- #include "slirp.h"
+-#include <glib.h>
+ #include <stdint.h>
+ #include <stdbool.h>
+=20
+@@ -15,8 +14,18 @@
+=20
+ typedef struct Slirp Slirp;
+=20
++enum {
++    SLIRP_POLL_IN  =3D 1 << 0,
++    SLIRP_POLL_OUT =3D 1 << 1,
++    SLIRP_POLL_PRI =3D 1 << 2,
++    SLIRP_POLL_ERR =3D 1 << 3,
++    SLIRP_POLL_HUP =3D 1 << 4,
++};
++
+ typedef ssize_t (*SlirpWriteCb)(const void *buf, size_t len, void *opaqu=
+e);
+ typedef void (*SlirpTimerCb)(void *opaque);
++typedef int (*SlirpAddPollCb)(int fd, int events, void *opaque);
++typedef int (*SlirpGetREventsCb)(int idx, void *opaque);
 =20
  /*
-diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
-index e27d9a46f8..9ffba38e8f 100644
---- a/slirp/dhcpv6.c
-+++ b/slirp/dhcpv6.c
-@@ -20,7 +20,6 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
+  * Callbacks from slirp
+@@ -63,9 +72,11 @@ Slirp *slirp_init(int restricted, bool in_enabled, str=
+uct in_addr vnetwork,
+                   void *opaque);
+ void slirp_cleanup(Slirp *slirp);
 =20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "dhcpv6.h"
+-void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds, uint32_t *timeout=
+);
++void slirp_pollfds_fill(Slirp *slirp, uint32_t *timeout,
++                        SlirpAddPollCb add_poll, void *opaque);
 =20
-diff --git a/slirp/dnssearch.c b/slirp/dnssearch.c
-index 8fb563321b..c459cece8d 100644
---- a/slirp/dnssearch.c
-+++ b/slirp/dnssearch.c
-@@ -22,7 +22,6 @@
-  * THE SOFTWARE.
-  */
+-void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds, int select_error)=
+;
++void slirp_pollfds_poll(Slirp *slirp, int select_error,
++                        SlirpGetREventsCb get_revents, void *opaque);
 =20
--#include "qemu/osdep.h"
- #include "slirp.h"
+ void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
 =20
- static const uint8_t RFC3397_OPT_DOMAIN_SEARCH =3D 119;
-diff --git a/slirp/if.c b/slirp/if.c
-index 90b9078687..2ad03b8a79 100644
---- a/slirp/if.c
-+++ b/slirp/if.c
-@@ -5,7 +5,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static void
-diff --git a/slirp/ip6.h b/slirp/ip6.h
-index 5361bd7449..1b3364f960 100644
---- a/slirp/ip6.h
-+++ b/slirp/ip6.h
-@@ -7,6 +7,7 @@
- #define SLIRP_IP6_H
-=20
- #include <glib.h>
-+#include <string.h>
-=20
- #define ALLNODES_MULTICAST  { .s6_addr =3D \
-                             { 0xff, 0x02, 0x00, 0x00,\
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index b3b7e50a31..2a432ebbd4 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -3,7 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip6_icmp.h"
-=20
-diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
-index ab656a0a9d..1b8c003c66 100644
---- a/slirp/ip6_input.c
-+++ b/slirp/ip6_input.c
-@@ -3,7 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip6_icmp.h"
-=20
-diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
-index 52c88ad691..19d1ae7748 100644
---- a/slirp/ip6_output.c
-+++ b/slirp/ip6_output.c
-@@ -3,8 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
-=20
- /* Number of packets queued before we start sending
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 19e247f773..6b6344b776 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -30,7 +30,6 @@
-  * ip_icmp.c,v 1.7 1995/05/30 08:09:42 rgrimes Exp
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/ip_input.c b/slirp/ip_input.c
-index d360620838..774ce662e6 100644
---- a/slirp/ip_input.c
-+++ b/slirp/ip_input.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/ip_output.c b/slirp/ip_output.c
-index db403f04c1..f6ec141df5 100644
---- a/slirp/ip_output.c
-+++ b/slirp/ip_output.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- /* Number of packets queued before we start sending
-diff --git a/slirp/mbuf.c b/slirp/mbuf.c
-index d8d275e0e7..521c02c967 100644
---- a/slirp/mbuf.c
-+++ b/slirp/mbuf.c
-@@ -15,7 +15,6 @@
-  * the flags
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- #define MBUF_THRESH 30
-diff --git a/slirp/misc.c b/slirp/misc.c
-index c2cb536d25..9c6d294dcf 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -5,9 +5,7 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
--#include "libslirp.h"
-=20
- inline void
- insque(void *a, void *b)
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-index 8594382270..327f17543c 100644
---- a/slirp/ncsi.c
-+++ b/slirp/ncsi.c
-@@ -6,7 +6,6 @@
-  * This code is licensed under the GPL version 2 or later. See the
-  * COPYING file in the top-level directory.
-  */
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- #include "ncsi-pkt.h"
-diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
-index b7b73722f7..34ea4fdf1f 100644
---- a/slirp/ndp_table.c
-+++ b/slirp/ndp_table.c
-@@ -3,8 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
-=20
- void ndp_table_add(Slirp *slirp, struct in6_addr ip_addr,
-diff --git a/slirp/sbuf.c b/slirp/sbuf.c
-index c83e4dd8ed..51a9f0cc7d 100644
---- a/slirp/sbuf.c
-+++ b/slirp/sbuf.c
-@@ -5,7 +5,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static void sbappendsb(struct sbuf *sb, struct mbuf *m);
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index ec1f606d72..730b78255c 100644
+index ecbb5c5b6c..04886d05fd 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -21,8 +21,6 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
+@@ -386,7 +386,8 @@ static void slirp_update_timeout(Slirp *slirp, uint32=
+_t *timeout)
+     *timeout =3D t;
+ }
 =20
- #ifdef WITH_QEMU
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 2e8dc22fb6..dea201f5ce 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -5,8 +5,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
- #include "ip_icmp.h"
- #ifdef __sun__
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index 7c1fe18fec..864da7d857 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
-index 6dd1ecf5d9..2b4335eb34 100644
---- a/slirp/tcp_output.c
-+++ b/slirp/tcp_output.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static const u_char  tcp_outflags[TCP_NSTATES] =3D {
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index d8846a33b0..879a7dcd29 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- /* patchable/settable parameters for tcp */
-diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
-index a843e57a2b..703907eb37 100644
---- a/slirp/tcp_timer.c
-+++ b/slirp/tcp_timer.c
-@@ -30,7 +30,6 @@
-  * tcp_timer.c,v 1.2 1994/08/02 07:49:10 davidg Exp
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static struct tcpcb *tcp_timers(register struct tcpcb *tp, int timer);
-diff --git a/slirp/tftp.c b/slirp/tftp.c
-index 5c31886190..2d8f978786 100644
---- a/slirp/tftp.c
-+++ b/slirp/tftp.c
-@@ -22,9 +22,11 @@
-  * THE SOFTWARE.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
--#include "qemu-common.h"
-+
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-=20
- static inline int tftp_session_in_use(struct tftp_session *spt)
+-void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds, uint32_t *timeout=
+)
++void slirp_pollfds_fill(Slirp *slirp, uint32_t *timeout,
++                        SlirpAddPollCb add_poll, void *opaque)
  {
-diff --git a/slirp/udp.c b/slirp/udp.c
-index 3915971b50..ac42be0d8e 100644
---- a/slirp/udp.c
-+++ b/slirp/udp.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
+     struct socket *so, *so_next;
 =20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
+@@ -428,12 +429,8 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfd=
+s, uint32_t *timeout)
+          * Set for reading sockets which are accepting
+          */
+         if (so->so_state & SS_FACCEPTCONN) {
+-            GPollFD pfd =3D {
+-                .fd =3D so->s,
+-                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
+-            };
+-            so->pollfds_idx =3D pollfds->len;
+-            g_array_append_val(pollfds, pfd);
++            so->pollfds_idx =3D add_poll(so->s,
++                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
+;
+             continue;
+         }
 =20
-diff --git a/slirp/udp6.c b/slirp/udp6.c
-index fa531e03c4..be5cba1f54 100644
---- a/slirp/udp6.c
-+++ b/slirp/udp6.c
-@@ -3,8 +3,6 @@
-  * Guillaume Subiron
-  */
+@@ -441,12 +438,8 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfd=
+s, uint32_t *timeout)
+          * Set for writing sockets which are connecting
+          */
+         if (so->so_state & SS_ISFCONNECTING) {
+-            GPollFD pfd =3D {
+-                .fd =3D so->s,
+-                .events =3D G_IO_OUT | G_IO_ERR,
+-            };
+-            so->pollfds_idx =3D pollfds->len;
+-            g_array_append_val(pollfds, pfd);
++            so->pollfds_idx =3D add_poll(so->s,
++                SLIRP_POLL_OUT | SLIRP_POLL_ERR, opaque);
+             continue;
+         }
 =20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
- #include "udp.h"
- #include "dhcpv6.h"
-diff --git a/slirp/util.h b/slirp/util.h
-index ef75804560..4963747aef 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -48,6 +48,27 @@
- # define SLIRP_PACKED __attribute__((packed))
- #endif
+@@ -455,7 +448,7 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds=
+, uint32_t *timeout)
+          * we have something to send
+          */
+         if (CONN_CANFSEND(so) && so->so_rcv.sb_cc) {
+-            events |=3D G_IO_OUT | G_IO_ERR;
++            events |=3D SLIRP_POLL_OUT | SLIRP_POLL_ERR;
+         }
 =20
-+#ifndef DIV_ROUND_UP
-+#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
-+#endif
-+
-+#ifndef container_of
-+#define container_of(ptr, type, member) __extension__ ({    \
-+    void *__mptr =3D (void *)(ptr);               \
-+    ((type *)(__mptr - offsetof(type, member))); })
-+#endif
-+
-+#if defined(_WIN32) /* CONFIG_IOVEC */
-+# if !defined(IOV_MAX) /* XXX: to avoid duplicate with QEMU osdep.h */
-+struct iovec {
-+    void *iov_base;
-+    size_t iov_len;
-+};
-+# endif
-+#else
-+#include <sys/uio.h>
-+#endif
-+
- #define SCALE_MS 1000000
+         /*
+@@ -464,16 +457,12 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollf=
+ds, uint32_t *timeout)
+          */
+         if (CONN_CANFRCV(so) &&
+             (so->so_snd.sb_cc < (so->so_snd.sb_datalen/2))) {
+-            events |=3D G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI;
++            events |=3D SLIRP_POLL_IN | SLIRP_POLL_HUP |
++                      SLIRP_POLL_ERR | SLIRP_POLL_PRI;
+         }
 =20
- #define ETH_ALEN    6
+         if (events) {
+-            GPollFD pfd =3D {
+-                .fd =3D so->s,
+-                .events =3D events,
+-            };
+-            so->pollfds_idx =3D pollfds->len;
+-            g_array_append_val(pollfds, pfd);
++            so->pollfds_idx =3D add_poll(so->s, events, opaque);
+         }
+     }
+=20
+@@ -508,12 +497,8 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfd=
+s, uint32_t *timeout)
+          * (XXX <=3D 4 ?)
+          */
+         if ((so->so_state & SS_ISFCONNECTED) && so->so_queued <=3D 4) {
+-            GPollFD pfd =3D {
+-                .fd =3D so->s,
+-                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
+-            };
+-            so->pollfds_idx =3D pollfds->len;
+-            g_array_append_val(pollfds, pfd);
++            so->pollfds_idx =3D add_poll(so->s,
++                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
+;
+         }
+     }
+=20
+@@ -538,19 +523,16 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollf=
+ds, uint32_t *timeout)
+         }
+=20
+         if (so->so_state & SS_ISFCONNECTED) {
+-            GPollFD pfd =3D {
+-                .fd =3D so->s,
+-                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
+-            };
+-            so->pollfds_idx =3D pollfds->len;
+-            g_array_append_val(pollfds, pfd);
++            so->pollfds_idx =3D add_poll(so->s,
++                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
+;
+         }
+     }
+=20
+     slirp_update_timeout(slirp, timeout);
+ }
+=20
+-void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds, int select_error)
++void slirp_pollfds_poll(Slirp *slirp, int select_error,
++                        SlirpGetREventsCb get_revents, void *opaque)
+ {
+     struct socket *so, *so_next;
+     int ret;
+@@ -587,8 +569,7 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
+, int select_error)
+=20
+             revents =3D 0;
+             if (so->pollfds_idx !=3D -1) {
+-                revents =3D g_array_index(pollfds, GPollFD,
+-                                        so->pollfds_idx).revents;
++                revents =3D get_revents(so->pollfds_idx, opaque);
+             }
+=20
+             if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
+@@ -598,9 +579,9 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
+, int select_error)
+             /*
+              * Check for URG data
+              * This will soread as well, so no need to
+-             * test for G_IO_IN below if this succeeds
++             * test for SLIRP_POLL_IN below if this succeeds
+              */
+-            if (revents & G_IO_PRI) {
++            if (revents & SLIRP_POLL_PRI) {
+                 ret =3D sorecvoob(so);
+                 if (ret < 0) {
+                     /* Socket error might have resulted in the socket be=
+ing
+@@ -611,7 +592,8 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
+, int select_error)
+             /*
+              * Check sockets for reading
+              */
+-            else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
++            else if (revents &
++                     (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR)) =
+{
+                 /*
+                  * Check for incoming connections
+                  */
+@@ -636,7 +618,7 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
+, int select_error)
+              * Check sockets for writing
+              */
+             if (!(so->so_state & SS_NOFDREF) &&
+-                (revents & (G_IO_OUT | G_IO_ERR))) {
++                (revents & (SLIRP_POLL_OUT | SLIRP_POLL_ERR))) {
+                 /*
+                  * Check for non-blocking, still-connecting sockets
+                  */
+@@ -689,12 +671,11 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollf=
+ds, int select_error)
+=20
+             revents =3D 0;
+             if (so->pollfds_idx !=3D -1) {
+-                revents =3D g_array_index(pollfds, GPollFD,
+-                                        so->pollfds_idx).revents;
++                revents =3D get_revents(so->pollfds_idx, opaque);
+             }
+=20
+             if (so->s !=3D -1 &&
+-                (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
++                (revents & (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_=
+ERR))) {
+                 sorecvfrom(so);
+             }
+         }
+@@ -710,12 +691,11 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollf=
+ds, int select_error)
+=20
+             revents =3D 0;
+             if (so->pollfds_idx !=3D -1) {
+-                revents =3D g_array_index(pollfds, GPollFD,
+-                                        so->pollfds_idx).revents;
++                revents =3D get_revents(so->pollfds_idx, opaque);
+             }
+=20
+             if (so->s !=3D -1 &&
+-                (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
++                (revents & (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_=
+ERR))) {
+                 icmp_receive(so);
+             }
+         }
 --=20
 2.20.1
