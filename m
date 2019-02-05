@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52671)
+Received: from eggs.gnu.org ([209.51.188.92]:52741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gqvzR-0000sv-EE
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:21:58 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gqvzV-0000x3-FT
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:22:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gqvzP-0002Mp-BN
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:21:57 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:33840)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gqvzT-0002du-KF
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:22:01 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:33894)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gqvzN-00020M-7M
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:21:55 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gqvzT-0002Y7-3X
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:21:59 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 05 Feb 2019 11:21:47 +0300
-Message-ID: <154935490741.7509.7068818566955459104.stgit@pasha-VirtualBox>
+Date: Tue, 05 Feb 2019 11:21:58 +0300
+Message-ID: <154935491876.7509.3362365927769261001.stgit@pasha-VirtualBox>
 In-Reply-To: <154935478086.7509.4349987292919289245.stgit@pasha-VirtualBox>
 References: <154935478086.7509.4349987292919289245.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v12 22/25] util/qemu-timer: refactor deadline
- calculation for external timers
+Subject: [Qemu-devel] [PATCH v12 24/25] replay: rename step-related
+ variables and functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,200 +30,372 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-icount-based record/replay uses qemu_clock_deadline_ns_all to measure
-the period until vCPU may be interrupted.
-This function takes in account the virtual timers, because they belong
-to the virtual devices that may generate interrupt request or affect
-the virtual machine state.
-However, there are a subset of virtual timers, that are marked with
-'external' flag. These do not change the virtual machine state and
-only based on virtual clock. Calculating the deadling using the external
-timers breaks the determinism, because they do not belong to the replayed
-part of the virtual machine.
-This patch fixes the deadline calculation for this case.
+This patch renames replay_get_current_step() and related variables
+to make these names consistent with hmp/qmp commands.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- cpus.c                    |    9 ++++-----
- include/qemu/timer.h      |    7 +++----
- qtest.c                   |    2 +-
- tests/ptimer-test-stubs.c |    2 +-
- tests/ptimer-test.c       |    4 ++--
- util/qemu-timer.c         |   41 +++++++++++++++++++++++++++++++++--------
- 6 files changed, 44 insertions(+), 21 deletions(-)
+ blockdev.c                |    2 +-
+ include/sysemu/replay.h   |    2 +-
+ migration/savevm.c        |    2 +-
+ replay/replay-debugging.c |   30 ++++++++++++++++--------------
+ replay/replay-events.c    |    4 ++--
+ replay/replay-internal.c  |   10 +++++-----
+ replay/replay-internal.h  |   10 +++++-----
+ replay/replay-snapshot.c  |    6 +++---
+ replay/replay-time.c      |    2 +-
+ replay/replay.c           |   26 +++++++++++++-------------
+ 10 files changed, 48 insertions(+), 46 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 6ef0992971..fb656cefc8 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -550,7 +550,7 @@ void qtest_clock_warp(int64_t dest)
-     assert(qtest_enabled());
-     aio_context = qemu_get_aio_context();
-     while (clock < dest) {
--        int64_t deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        int64_t deadline = virtual_clock_deadline_ns();
-         int64_t warp = qemu_soonest_timeout(dest - clock, deadline);
+diff --git a/blockdev.c b/blockdev.c
+index f5775fdf5a..d6ab78cd51 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1453,7 +1453,7 @@ static void internal_snapshot_prepare(BlkActionState *common,
+     sn->date_nsec = tv.tv_usec * 1000;
+     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     if (replay_mode != REPLAY_MODE_NONE) {
+-        sn->icount = replay_get_current_step();
++        sn->icount = replay_get_current_icount();
+     } else {
+         sn->icount = -1ULL;
+     }
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index b7394a1f5c..057a458463 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -96,7 +96,7 @@ void replay_breakpoint(void);
+ /* Processing the instructions */
  
-         seqlock_write_lock(&timers_state.vm_clock_seqlock,
-@@ -610,7 +610,7 @@ void qemu_start_warp_timer(void)
+ /*! Returns number of executed instructions. */
+-uint64_t replay_get_current_step(void);
++uint64_t replay_get_current_icount(void);
+ /*! Returns number of instructions to execute in replay mode. */
+ int replay_get_instructions(void);
+ /*! Updates instructions counter in replay mode. */
+diff --git a/migration/savevm.c b/migration/savevm.c
+index eea97b4a8f..21cb3adf52 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2511,7 +2511,7 @@ int save_snapshot(const char *name, Error **errp)
+     sn->date_nsec = tv.tv_usec * 1000;
+     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     if (replay_mode != REPLAY_MODE_NONE) {
+-        sn->icount = replay_get_current_step();
++        sn->icount = replay_get_current_icount();
+     } else {
+         sn->icount = -1ULL;
+     }
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index 9bbab5f02b..135957bb63 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -38,7 +38,7 @@ void hmp_info_replay(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon,
+             "%s execution '%s': instruction count = %"PRId64"\n",
+             replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
+-            replay_get_filename(), replay_get_current_step());
++            replay_get_filename(), replay_get_current_icount());
+     }
+ }
  
-     /* We want to use the earliest deadline from ALL vm_clocks */
-     clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
--    deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+    deadline = virtual_clock_deadline_ns();
-     if (deadline < 0) {
-         static bool notified;
-         if (!icount_sleep && !notified) {
-@@ -1355,7 +1355,7 @@ static int64_t tcg_get_icount_limit(void)
-     int64_t deadline;
+@@ -51,7 +51,7 @@ ReplayInfo *qmp_query_replay(Error **errp)
+         retval->filename = g_strdup(replay_get_filename());
+         retval->has_filename = true;
+     }
+-    retval->icount = replay_get_current_step();
++    retval->icount = replay_get_current_icount();
+     return retval;
+ }
  
-     if (replay_mode != REPLAY_MODE_PLAY) {
--        deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        deadline = virtual_clock_deadline_ns();
- 
-         /* Maintain prior (possibly buggy) behaviour where if no deadline
-          * was set (as there is no QEMU_CLOCK_VIRTUAL timer) or it is more than
-@@ -1376,8 +1376,7 @@ static void handle_icount_deadline(void)
+@@ -59,7 +59,7 @@ static void replay_break(uint64_t icount, QEMUTimerCB callback, void *opaque)
  {
-     assert(qemu_in_vcpu_thread());
-     if (use_icount) {
--        int64_t deadline =
--            qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        int64_t deadline = virtual_clock_deadline_ns();
+     assert(replay_mode == REPLAY_MODE_PLAY);
+     assert(replay_mutex_locked());
+-    assert(replay_break_icount >= replay_get_current_step());
++    assert(replay_break_icount >= replay_get_current_icount());
+     assert(callback);
  
-         if (deadline == 0) {
-             /* Wake up other AioContexts.  */
-diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-index a86330c987..cfc77450f2 100644
---- a/include/qemu/timer.h
-+++ b/include/qemu/timer.h
-@@ -176,16 +176,15 @@ bool qemu_clock_expired(QEMUClockType type);
- bool qemu_clock_use_for_deadline(QEMUClockType type);
- 
- /**
-- * qemu_clock_deadline_ns_all:
-- * @type: the clock type
-+ * virtual_clock_deadline_ns:
-  *
-  * Calculate the deadline across all timer lists associated
-- * with a clock (as opposed to just the default one)
-+ * with virtual clock (excluding external timers)
-  * in nanoseconds, or -1 if no timer is set to expire.
-  *
-  * Returns: time until expiry in nanoseconds or -1
-  */
--int64_t qemu_clock_deadline_ns_all(QEMUClockType type);
-+int64_t virtual_clock_deadline_ns(void);
- 
- /**
-  * qemu_clock_get_main_loop_timerlist:
-diff --git a/qtest.c b/qtest.c
-index 60988c8aa2..341190eb71 100644
---- a/qtest.c
-+++ b/qtest.c
-@@ -655,7 +655,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-             int ret = qemu_strtoi64(words[1], NULL, 0, &ns);
-             g_assert(ret == 0);
+     replay_break_icount = icount;
+@@ -94,7 +94,7 @@ static void replay_stop_vm(void *opaque)
+ void qmp_replay_break(int64_t icount, Error **errp)
+ {
+     if (replay_mode == REPLAY_MODE_PLAY) {
+-        if (icount >= replay_get_current_step()) {
++        if (icount >= replay_get_current_icount()) {
+             replay_break(icount, replay_stop_vm, NULL);
          } else {
--            ns = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+            ns = virtual_clock_deadline_ns();
+             error_setg(errp,
+@@ -196,14 +196,14 @@ static void replay_seek(int64_t icount, QEMUTimerCB callback, Error **errp)
+ 
+     snapshot = replay_find_nearest_snapshot(icount, &snapshot_icount);
+     if (snapshot) {
+-        if (icount < replay_get_current_step()
+-            || replay_get_current_step() < snapshot_icount) {
++        if (icount < replay_get_current_icount()
++            || replay_get_current_icount() < snapshot_icount) {
+             vm_stop(RUN_STATE_RESTORE_VM);
+             load_snapshot(snapshot, errp);
          }
-         qtest_clock_warp(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + ns);
-         qtest_send_prefix(chr);
-diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
-index 54b3fd26f6..31b09c88f3 100644
---- a/tests/ptimer-test-stubs.c
-+++ b/tests/ptimer-test-stubs.c
-@@ -88,7 +88,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
-     return ptimer_test_time_ns;
- }
+         g_free(snapshot);
+     }
+-    if (replay_get_current_step() <= icount) {
++    if (replay_get_current_icount() <= icount) {
+         replay_break(icount, callback, NULL);
+         vm_start();
+     } else {
+@@ -242,8 +242,9 @@ bool replay_reverse_step(void)
  
--int64_t qemu_clock_deadline_ns_all(QEMUClockType type)
-+int64_t virtual_clock_deadline_ns(void)
- {
-     QEMUTimerList *timer_list = main_loop_tlg.tl[type];
-     QEMUTimer *t = timer_list->active_timers.next;
-diff --git a/tests/ptimer-test.c b/tests/ptimer-test.c
-index b30aad0737..338a4e0c10 100644
---- a/tests/ptimer-test.c
-+++ b/tests/ptimer-test.c
-@@ -50,13 +50,13 @@ static void ptimer_test_set_qemu_time_ns(int64_t ns)
+     assert(replay_mode == REPLAY_MODE_PLAY);
  
- static void qemu_clock_step(uint64_t ns)
- {
--    int64_t deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+    int64_t deadline = virtual_clock_deadline_ns();
-     int64_t advanced_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + ns;
+-    if (replay_get_current_step() != 0) {
+-        replay_seek(replay_get_current_step() - 1, replay_stop_vm_debug, &err);
++    if (replay_get_current_icount() != 0) {
++        replay_seek(replay_get_current_icount() - 1,
++                    replay_stop_vm_debug, &err);
+         if (err) {
+             error_free(err);
+             return false;
+@@ -283,7 +284,7 @@ static void replay_continue_stop(void *opaque)
+             error_free(err);
+             replay_continue_end();
+         }
+-        replay_last_snapshot = replay_get_current_step();
++        replay_last_snapshot = replay_get_current_icount();
+         return;
+     } else {
+         /* Seek to the very first step */
+@@ -303,15 +304,16 @@ bool replay_reverse_continue(void)
  
-     while (deadline != -1 && deadline <= advanced_time) {
-         ptimer_test_set_qemu_time_ns(deadline);
-         ptimer_test_expire_qemu_timers(deadline, QEMU_CLOCK_VIRTUAL);
--        deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-+        deadline = virtual_clock_deadline_ns();
+     assert(replay_mode == REPLAY_MODE_PLAY);
+ 
+-    if (replay_get_current_step() != 0) {
+-        replay_seek(replay_get_current_step() - 1, replay_continue_stop, &err);
++    if (replay_get_current_icount() != 0) {
++        replay_seek(replay_get_current_icount() - 1,
++                    replay_continue_stop, &err);
+         if (err) {
+             error_free(err);
+             return false;
+         }
+         replay_last_breakpoint = -1LL;
+         replay_is_debugging = true;
+-        replay_last_snapshot = replay_get_current_step();
++        replay_last_snapshot = replay_get_current_icount();
+         return true;
      }
  
-     ptimer_test_set_qemu_time_ns(advanced_time);
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 1cc1b2f2c3..88fbf04469 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -236,6 +236,7 @@ int64_t timerlist_deadline_ns(QEMUTimerList *timer_list)
-         qemu_mutex_unlock(&timer_list->active_timers_lock);
-         return -1;
-     }
-+
-     expire_time = timer_list->active_timers->expire_time;
-     qemu_mutex_unlock(&timer_list->active_timers_lock);
- 
-@@ -248,19 +249,43 @@ int64_t timerlist_deadline_ns(QEMUTimerList *timer_list)
-     return delta;
- }
- 
--/* Calculate the soonest deadline across all timerlists attached
-- * to the clock. This is used for the icount timeout so we
-- * ignore whether or not the clock should be used in deadline
-- * calculations.
-+/*
-+ * Calculate the soonest deadline across all timerlists attached
-+ * to the virtual clock (excluding the external timers that do not affect
-+ * the replayed guest state.
-  */
--int64_t qemu_clock_deadline_ns_all(QEMUClockType type)
-+int64_t virtual_clock_deadline_ns(void)
+@@ -321,5 +323,5 @@ bool replay_reverse_continue(void)
+ void replay_breakpoint(void)
  {
-     int64_t deadline = -1;
-+    int64_t delta;
-+    int64_t expire_time;
-+    QEMUTimer *ts;
-     QEMUTimerList *timer_list;
--    QEMUClock *clock = qemu_clock_ptr(type);
-+    QEMUClock *clock = qemu_clock_ptr(QEMU_CLOCK_VIRTUAL);
-+
-+    if (!clock->enabled) {
-+        return -1;
-+    }
-+
-     QLIST_FOREACH(timer_list, &clock->timerlists, list) {
--        deadline = qemu_soonest_timeout(deadline,
--                                        timerlist_deadline_ns(timer_list));
-+        qemu_mutex_lock(&timer_list->active_timers_lock);
-+        ts = timer_list->active_timers;
-+        /* Skip all external timers */
-+        while (ts && (ts->attributes & QEMU_TIMER_ATTR_EXTERNAL)) {
-+            ts = ts->next;
-+        }
-+        if (!ts) {
-+            qemu_mutex_unlock(&timer_list->active_timers_lock);
-+            continue;
-+        }
-+        expire_time = ts->expire_time;
-+        qemu_mutex_unlock(&timer_list->active_timers_lock);
-+
-+        delta = expire_time - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        if (delta <= 0) {
-+            delta = 0;
-+        }
-+        deadline = qemu_soonest_timeout(deadline, delta);
-     }
-     return deadline;
+     assert(replay_mode == REPLAY_MODE_PLAY);
+-    replay_last_breakpoint = replay_get_current_step();
++    replay_last_breakpoint = replay_get_current_icount();
  }
+diff --git a/replay/replay-events.c b/replay/replay-events.c
+index fc9b08225d..4778eb0ede 100644
+--- a/replay/replay-events.c
++++ b/replay/replay-events.c
+@@ -128,7 +128,7 @@ void replay_add_event(ReplayAsyncEventKind event_kind,
+ void replay_bh_schedule_event(QEMUBH *bh)
+ {
+     if (events_enabled) {
+-        uint64_t id = replay_get_current_step();
++        uint64_t id = replay_get_current_icount();
+         replay_add_event(REPLAY_ASYNC_EVENT_BH, bh, NULL, id);
+     } else {
+         qemu_bh_schedule(bh);
+@@ -139,7 +139,7 @@ void replay_bh_schedule_oneshot_event(AioContext *ctx,
+     QEMUBHFunc *cb, void *opaque)
+ {
+     if (events_enabled) {
+-        uint64_t id = replay_get_current_step();
++        uint64_t id = replay_get_current_icount();
+         replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
+     } else {
+         aio_bh_schedule_oneshot(ctx, cb, opaque);
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index 7e6de03182..b45725dbb1 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -173,7 +173,7 @@ void replay_fetch_data_kind(void)
+         if (!replay_state.has_unread_data) {
+             replay_state.data_kind = replay_get_byte();
+             if (replay_state.data_kind == EVENT_INSTRUCTION) {
+-                replay_state.instructions_count = replay_get_dword();
++                replay_state.instruction_count = replay_get_dword();
+             }
+             replay_check_error();
+             replay_state.has_unread_data = 1;
+@@ -227,9 +227,9 @@ void replay_mutex_unlock(void)
+     }
+ }
+ 
+-void replay_advance_current_step(uint64_t current_step)
++void replay_advance_current_icount(uint64_t current_icount)
+ {
+-    int diff = (int)(current_step - replay_state.current_step);
++    int diff = (int)(current_icount - replay_state.current_icount);
+ 
+     /* Time can only go forward */
+     assert(diff >= 0);
+@@ -237,7 +237,7 @@ void replay_advance_current_step(uint64_t current_step)
+     if (diff > 0) {
+         replay_put_event(EVENT_INSTRUCTION);
+         replay_put_dword(diff);
+-        replay_state.current_step += diff;
++        replay_state.current_icount += diff;
+     }
+ }
+ 
+@@ -246,6 +246,6 @@ void replay_save_instructions(void)
+ {
+     if (replay_file && replay_mode == REPLAY_MODE_RECORD) {
+         g_assert(replay_mutex_locked());
+-        replay_advance_current_step(replay_get_current_step());
++        replay_advance_current_icount(replay_get_current_icount());
+     }
+ }
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index e9786b2377..ba9f374374 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -65,10 +65,10 @@ typedef enum ReplayAsyncEventKind ReplayAsyncEventKind;
+ typedef struct ReplayState {
+     /*! Cached clock values. */
+     int64_t cached_clock[REPLAY_CLOCK_COUNT];
+-    /*! Current step - number of processed instructions and timer events. */
+-    uint64_t current_step;
++    /*! Current icount - number of processed instructions. */
++    uint64_t current_icount;
+     /*! Number of instructions to be executed before other events happen. */
+-    int instructions_count;
++    int instruction_count;
+     /*! Type of the currently executed event. */
+     unsigned int data_kind;
+     /*! Flag which indicates that event is not processed yet. */
+@@ -127,8 +127,8 @@ void replay_finish_event(void);
+     data_kind variable. */
+ void replay_fetch_data_kind(void);
+ 
+-/*! Advance replay_state.current_step to the specified value. */
+-void replay_advance_current_step(uint64_t current_step);
++/*! Advance replay_state.current_icount to the specified value. */
++void replay_advance_current_icount(uint64_t current_icount);
+ /*! Saves queued events (like instructions and sound). */
+ void replay_save_instructions(void);
+ 
+diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+index 16bacc98bc..7619f9b276 100644
+--- a/replay/replay-snapshot.c
++++ b/replay/replay-snapshot.c
+@@ -42,7 +42,7 @@ static int replay_post_load(void *opaque, int version_id)
+     } else if (replay_mode == REPLAY_MODE_RECORD) {
+         /* This is only useful for loading the initial state.
+            Therefore reset all the counters. */
+-        state->instructions_count = 0;
++        state->instruction_count = 0;
+         state->block_request_id = 0;
+     }
+ 
+@@ -57,8 +57,8 @@ static const VMStateDescription vmstate_replay = {
+     .post_load = replay_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_INT64_ARRAY(cached_clock, ReplayState, REPLAY_CLOCK_COUNT),
+-        VMSTATE_UINT64(current_step, ReplayState),
+-        VMSTATE_INT32(instructions_count, ReplayState),
++        VMSTATE_UINT64(current_icount, ReplayState),
++        VMSTATE_INT32(instruction_count, ReplayState),
+         VMSTATE_UINT32(data_kind, ReplayState),
+         VMSTATE_UINT32(has_unread_data, ReplayState),
+         VMSTATE_UINT64(file_offset, ReplayState),
+diff --git a/replay/replay-time.c b/replay/replay-time.c
+index 60f47b73a7..2260b1d00e 100644
+--- a/replay/replay-time.c
++++ b/replay/replay-time.c
+@@ -25,7 +25,7 @@ int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
+      * Due to the caller's locking requirements we get the icount from it
+      * instead of using replay_save_instructions().
+      */
+-    replay_advance_current_step(raw_icount);
++    replay_advance_current_icount(raw_icount);
+     replay_put_event(EVENT_CLOCK + kind);
+     replay_put_qword(clock);
+ 
+diff --git a/replay/replay.c b/replay/replay.c
+index 8f2e17c8cb..11b9c12eb6 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -43,7 +43,7 @@ bool replay_next_event_is(int event)
+     bool res = false;
+ 
+     /* nothing to skip - not all instructions used */
+-    if (replay_state.instructions_count != 0) {
++    if (replay_state.instruction_count != 0) {
+         assert(replay_state.data_kind == EVENT_INSTRUCTION);
+         return event == EVENT_INSTRUCTION;
+     }
+@@ -66,7 +66,7 @@ bool replay_next_event_is(int event)
+     return res;
+ }
+ 
+-uint64_t replay_get_current_step(void)
++uint64_t replay_get_current_icount(void)
+ {
+     return cpu_get_icount_raw();
+ }
+@@ -76,9 +76,9 @@ int replay_get_instructions(void)
+     int res = 0;
+     replay_mutex_lock();
+     if (replay_next_event_is(EVENT_INSTRUCTION)) {
+-        res = replay_state.instructions_count;
++        res = replay_state.instruction_count;
+         if (replay_break_icount != -1LL) {
+-            uint64_t current = replay_get_current_step();
++            uint64_t current = replay_get_current_icount();
+             assert(replay_break_icount >= current);
+             if (current + res > replay_break_icount) {
+                 res = replay_break_icount - current;
+@@ -93,16 +93,16 @@ void replay_account_executed_instructions(void)
+ {
+     if (replay_mode == REPLAY_MODE_PLAY) {
+         g_assert(replay_mutex_locked());
+-        if (replay_state.instructions_count > 0) {
+-            int count = (int)(replay_get_current_step()
+-                              - replay_state.current_step);
++        if (replay_state.instruction_count > 0) {
++            int count = (int)(replay_get_current_icount()
++                              - replay_state.current_icount);
+ 
+             /* Time can only go forward */
+             assert(count >= 0);
+ 
+-            replay_state.instructions_count -= count;
+-            replay_state.current_step += count;
+-            if (replay_state.instructions_count == 0) {
++            replay_state.instruction_count -= count;
++            replay_state.current_icount += count;
++            if (replay_state.instruction_count == 0) {
+                 assert(replay_state.data_kind == EVENT_INSTRUCTION);
+                 replay_finish_event();
+                 /* Wake up iothread. This is required because
+@@ -111,7 +111,7 @@ void replay_account_executed_instructions(void)
+                 qemu_notify_event();
+             }
+             /* Execution reached the break step */
+-            if (replay_break_icount == replay_state.current_step) {
++            if (replay_break_icount == replay_state.current_icount) {
+                 /* Cannot make callback directly from the vCPU thread */
+                 timer_mod_ns(replay_break_timer,
+                     qemu_clock_get_ns(QEMU_CLOCK_REALTIME));
+@@ -290,8 +290,8 @@ static void replay_enable(const char *fname, int mode)
+     replay_mutex_init();
+ 
+     replay_state.data_kind = -1;
+-    replay_state.instructions_count = 0;
+-    replay_state.current_step = 0;
++    replay_state.instruction_count = 0;
++    replay_state.current_icount = 0;
+     replay_state.has_unread_data = 0;
+ 
+     /* skip file header for RECORD and check it for PLAY */
