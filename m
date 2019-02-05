@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49579)
+Received: from eggs.gnu.org ([209.51.188.92]:52341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqysi-0004EQ-AZ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:27:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gqz27-0006ND-TM
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqysg-00008b-Df
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:27:12 -0500
-Resent-Message-Id: <E1gqysg-00008b-Df@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21024)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqysf-0008Rp-Ku
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:27:10 -0500
-Message-ID: <154936601066.29184.887089986278835414@ebba9967afc0>
-In-Reply-To: <20190205112315.23454-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gqz27-0000ME-7n
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:36:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gqz26-0000Lq-WC
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:36:55 -0500
+References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA9RmsnMTuQU3a4G+Q6=RL9_YOm5Fi-OyVwkX2fTMzvYCA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <014991ae-f48e-4a82-b1d1-2ae3034606cc@redhat.com>
+Date: Tue, 5 Feb 2019 12:27:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Feb 2019 03:26:51 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4] scripts: use git archive in
- archive-source
+In-Reply-To: <CAFEAcA9RmsnMTuQU3a4G+Q6=RL9_YOm5Fi-OyVwkX2fTMzvYCA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/77] Misc patches for 2019-02-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, famz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTExMjMxNS4yMzQ1
-NC0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0XSBzY3JpcHRzOiB1c2Ug
-Z2l0IGFyY2hpdmUgaW4gYXJjaGl2ZS1zb3VyY2UKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIw
-MTkwMjA1MTEyMzE1LjIzNDU0LTEta3JheGVsQHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
-MjA1MTEyMzE1LjIzNDU0LTEta3JheGVsQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDIwNTEx
-MjMxNS4yMzQ1NC0xLWtyYXhlbEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKZTkyYWQ1MjliNCBzY3JpcHRzOiB1c2UgZ2l0IGFyY2hpdmUgaW4gYXJjaGl2ZS1zb3Vy
-Y2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzQwOiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjM2OgorXklnaXQg
-c3VibW9kdWxlIGRlaW5pdCAkc3ViX2RlaW5pdCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzcwOiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjU1Ogor
-XkktKikkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3MTogRklM
-RTogc2NyaXB0cy9hcmNoaXZlLXNvdXJjZS5zaDo1NjoKK15JICAgIHN1Yl9kZWluaXQ9IiRzdWJf
-ZGVpbml0ICRzbSIkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3
-MjogRklMRTogc2NyaXB0cy9hcmNoaXZlLXNvdXJjZS5zaDo1NzoKK15JICAgIGdpdCBzdWJtb2R1
-bGUgdXBkYXRlIC0taW5pdCAiJHNtIiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzczOiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjU4OgorXkkgICAg
-dGVzdCAkPyAtbmUgMCAmJiBlcnJvciAiZmFpbGVkIHRvIHVwZGF0ZSBzdWJtb2R1bGUgJHNtIiQK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzc0OiBGSUxFOiBzY3Jp
-cHRzL2FyY2hpdmUtc291cmNlLnNoOjU5OgorXkkgICAgOzskCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NTogRklMRTogc2NyaXB0cy9hcmNoaXZlLXNvdXJjZS5z
-aDo2MDoKK15JKyopJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-NzY6IEZJTEU6IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6NjE6CiteSSAgICBlY2hvICJXQVJO
-SU5HOiBzdWJtb2R1bGUgJHNtIGlzIG91dCBvZiBzeW5jIiQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzc3OiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNo
-OjYyOgorXkkgICAgOzskCgp0b3RhbDogOSBlcnJvcnMsIDAgd2FybmluZ3MsIDYzIGxpbmVzIGNo
-ZWNrZWQKCkNvbW1pdCBlOTJhZDUyOWI0NDQgKHNjcmlwdHM6IHVzZSBnaXQgYXJjaGl2ZSBpbiBh
-cmNoaXZlLXNvdXJjZSkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDUxMTIzMTUuMjM0NTQt
-MS1rcmF4ZWxAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+On 05/02/19 10:35, Peter Maydell wrote:
+> On Mon, 4 Feb 2019 at 18:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The following changes since commit 773c4a6228fd910556cee2d477ee56c591a30000:
+>>
+>>   test-filter-mirror: pass UNIX domain socket through fd (2019-02-04 16:03:20 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream
+> 
+> Hi; my script says:
+> error: remotes/bonzini/tags/for-upstream: cannot verify a non-tag
+> object of type commit.
+> Does not appear to be a signed tag
+> 
+> Did something go wrong at your end?
+
+Hmm this is a first.  Repushed now.
+
+Paolo
