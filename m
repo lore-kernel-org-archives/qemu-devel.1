@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38118)
+Received: from eggs.gnu.org ([209.51.188.92]:40035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gqv2x-00039W-UU
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:21:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1gqvAv-000548-LE
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:29:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gqv2w-0000US-1w
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:21:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44690)
+	(envelope-from <thuth@redhat.com>) id 1gqvAu-0007Im-3u
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:29:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gqv2s-0000TV-CN
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:21:28 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-8-yuval.shaia@oracle.com>
-	<42ba3330-f7ca-b5c5-126f-8dd97e343d51@redhat.com>
-	<20190131200816.GA2838@lap1>
-	<3557b3f3-cec5-fcb1-1527-e613fa446b89@redhat.com>
-	<87ftt8j73b.fsf@dusky.pond.sub.org> <20190203070601.GA2893@lap1>
-	<87va20rmga.fsf@dusky.pond.sub.org> <20190204160735.GB14293@lap1>
-Date: Tue, 05 Feb 2019 08:21:17 +0100
-In-Reply-To: <20190204160735.GB14293@lap1> (Yuval Shaia's message of "Mon, 4
-	Feb 2019 18:07:36 +0200")
-Message-ID: <87y36u8zv6.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 07/10] monitor: Expose pvrdma device
- statistics counters
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gqvAs-00078y-63
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:29:44 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2305081F0C
+	for <qemu-devel@nongnu.org>; Tue,  5 Feb 2019 07:29:40 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  5 Feb 2019 08:29:29 +0100
+Message-Id: <1549351769-19620-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Remove deprecated -no-frame option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,190 +27,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Yuval Shaia <yuval.shaia@oracle.com> writes:
+The -no-frame option has been deprecated with QEMU v2.12. It was only
+useful with SDL1.2 - now that we've removed support for SDL1.2, we
+can certainly remove the -no-frame option, too.
 
-> On Mon, Feb 04, 2019 at 09:23:49AM +0100, Markus Armbruster wrote:
->> Yuval Shaia <yuval.shaia@oracle.com> writes:
->> 
->> > On Fri, Feb 01, 2019 at 08:33:44AM +0100, Markus Armbruster wrote:
->> >> Eric Blake <eblake@redhat.com> writes:
->> >> 
->> >> > On 1/31/19 2:08 PM, Yuval Shaia wrote:
->> >> >> On Thu, Jan 31, 2019 at 07:17:16AM -0600, Eric Blake wrote:
->> >> >>> On 1/31/19 7:08 AM, Yuval Shaia wrote:
->> >> >>>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->> >> >>>> ---
->> >> >>>>  hmp-commands-info.hx | 14 ++++++++++++++
->> >> >>>>  monitor.c            |  6 ++++++
->> >> >>>>  2 files changed, 20 insertions(+)
->> >> >> 
->> >> >> Hi Eric,
->> >> >> 
->> >> >>>
->> >> >>> Commit message should state WHY this is being added as an HMP-only
->> >> >>> command, and does not have a QMP counterpart.  It may be okay if the
->> >> >>> interface is only designed to be useful to developers, but having that
->> >> >>> justification in the git log is important.
->> >> >> 
->> >> >> Thanks for your review.
->> >> >> 
->> >> >> See, i need this interface mainly for development/debug purposes, to help
->> >> >> troubleshot problems and to give insights to what device "is doing".
->> >> >> 
->> >> >> Trace points are great but not effective in high load.
->> >> >> QMP as i see it, and correct me if i'm wrong, is used to report management
->> >> >> events etc and also here, is not effective in high load.
->> >> 
->> >> If QMP is not effective, HMP won't be effective, either.  But I guess
->> >> you mean something else, namely QMP *events* aren't effective, but
->> >> *polling* is.
->> >
->> > Yeah.
->> > I really meant to say "QMP is not effective *choice* for my needs".
->> >
->> >> 
->> >> That's an argument for polling, not an argument for not supporting QMP.
->> >> 
->> >> >> I choose this interface as it is interactive, i.e. whenever i need the info
->> >> >> i trigger 'info pvrdmastats' command from the monitor console.
->> >> >> 
->> >> >> During my research i notice that some devices (or families) have nice user
->> >> >> interface via virsh (blkstat, ifstat, memstat etc). Is it the preferred way
->> >> >> for non-devel/debug purposes?
->> >> 
->> >> Libvirt interfaces like these are built on top of *QMP* interfaces.  If
->> >> a libvirt interface would be useful, that's another argument for
->> >> supporting QMP.
->> >
->> > I was asking in a context of what is the standard way to do it.
->> 
->> You were right to ask it.
->> 
->> >> > Using existing HMP-only debug interfaces as the design you copied is
->> >> > indeed acceptable justification for making yours HMP-only as well.  So
->> >> > now you just need to copy the rationale from this email into your commit
->> >> > message, so it doesn't get lost.
->> >> 
->> >> Yes.  If we conclude HMP-only is okay, then the rationale for it goes
->> >> into your commit message.
->> >> 
->> >> If we conclude we want HMP and QMP, I'll be happy to assist you with
->> >> adapting your patch.
->> >
->> > Thanks!
->> > Well, for now i want only to expose debugging-related info and have no idea
->> > yet what would be the best to expose to end-users via QMP events.
->> > Device statistics for end-users are currently exposed by the device driver
->> > in guest. If in the future we will see that this info is also needed in the
->> > host then i'll revisit it.
->> 
->> For me, there are four cases of the "get information from QEMU to the
->> user":
->> 
->> 1. Information that is of use only for developers
->> 
->>    a. When tracing works, use tracing
->> 
->>    b. When it doesn't, we can consider QMP + HMP command, or HMP command
->>       only.  A QMP command would carry an x- prefix to mark it unstable.
->> 
->> 2. Information that is of use only for human users
->> 
->>    Provide an HMP command.
->> 
->> 3. Information a management application such as libvirt wants to
->>    provide, but not monitor
->> 
->>    The QEMU part is just like for 4a below.  The difference is that the
->>    management application doesn't poll automatically.
->> 
->> 4. Information a management application such as libvirt wants to monitor
->> 
->>    This is not the case here, but I mention it for completeness.
->> 
->>    a. The obvious way to monitor is regular polling via QMP.  Provide a
->>       QMP command to poll.
->> 
->>    b. Another way is tracking a QMP event that reports changes, plus
->>       polling on reconnect.  This is generally more efficient.  Provide
->>       a QMP event tracking changes, and a command to poll.  The event
->>       may have to be rate-limited.
->> 
->>    If the information is also useful for human users, throw in a command
->>    to poll via HMP.
->> 
->> I'm not yet sure tracing doesn't work for your use case.  I replied
->> to your claim it's not effective upthread.  Let's discuss it there.
->
-> We conclude there, and correct me if i misunderstood you, that for
-> 'polling' it make sense to use HMP only.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/sysemu/sysemu.h |  1 -
+ qemu-deprecated.texi    |  6 ------
+ qemu-options.hx         | 11 -----------
+ vl.c                    | 23 +++--------------------
+ 4 files changed, 3 insertions(+), 38 deletions(-)
 
-Not in general; case 3. exists.  But as long as there's no interest in
-plumbing the polling through a management application or debugging
-tools, HMP only is okay.
-
->> >> HMP commands without a QMP equivalent are okay if their functionality
->> >> makes no sense in QMP, or is of use only for human users.
->> >> 
->> >> Example for "makes no sense in QMP": setting the current CPU, because a
->> >> QMP monitor doesn't have a current CPU.
->> >> 
->> >> Examples for "is of use only for human users": HMP command "help", the
->> >> integrated pocket calculator.
->> >> 
->> >> Debugging commands are kind of borderline.  Debugging is commonly a
->> >> human activity, where HMP is just fine.  However, humans create tools to
->> >> assist with their activities, and then QMP is useful.  While I wouldn't
->> >> encourage HMP-only for the debugging use case, I wouldn't veto it.
->> >> 
->> >> "Device statistics" sounds like it should have debugging uses.  But
->> >> statistics often have non-debugging uses as well.  What use cases can
->> >> you imagine for this command?
->> >
->> > One use case from real live example is that this interface helped me to
->> > detect a leak in freeing a context of a resource.
->> 
->> Sounds like you can't think of a use other than debugging.  That means
->> we should think harder about using tracepoints.
->
-> Here is a case where tracepoint cannot help.
-> Consider a counter that counts the number of sent buffers. Now, this
-> counter get increased on every buffer that is sent. Let's assume that we
-> have tracepoint at the function send_buff that prints it. So first just
-> imagine how the trace buffer will look when burst of data is sent. But then
-> on the other, if no data is sent then i will never have the chance to see
-> the counter.
->
-> This is where i left the tracepoints and moved to HMP.
-
-"Tracepoints cannot help" is factually incorrect.  Tracepoints *can*
-count, but it takes a sufficiently sophisticated backend such as DTrace
-or SystemTap.  For an example, check out
-
-    https://sourceware.org/systemtap/examples/#network/netfilter_summary.stp
-
-With a query command, you bake the counting into the code.  You can
-count exactly what the developer thought you'll want to count.
-
-With tracepoints, you can count things the developer has never thought
-of.
-
-Finally, there's efficiency.  Efficiency rarely really matters, but when
-it matters, you better know how to get it.  Tracepoints can be more
-efficient when tracing is off, and DTrace / Systemtap should be
-competitively efficient when tracing is on.
-
-Mind, the above isn't an attempt to shoot down your patch.  It's an
-attempt to correct misconceptions about tracing!  Your patch may be
-useful all the same.
-
-Since your patch's stated purpose is to help with debugging PVRDMA, the
-PVRDMA maintainers (Marcel and you) get to decide whether it's useful
-for debugging PVRDMA.  The HMP maintainer (David) gets to decide whether
-to accept your debugging code into master.  All the QMP maintainer (me)
-gets to decide is whether to demand a QMP command (right now I don't),
-and whether the commit message adequately explains the lack of a QMP
-command (so far it doesn't, but that shouldn't be hard to fix).
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 85877b7..4b5a6b7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -102,7 +102,6 @@ extern const char *keyboard_layout;
+ extern int win2k_install_hack;
+ extern int alt_grab;
+ extern int ctrl_grab;
+-extern int no_frame;
+ extern int smp_cpus;
+ extern unsigned int max_cpus;
+ extern int cursor_hide;
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 9cc20b3..0b508e7 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -37,12 +37,6 @@ would automatically enable USB support on the machine type.
+ If using the new syntax, USB support must be explicitly
+ enabled via the ``-machine usb=on'' argument.
+ 
+-@subsection -no-frame (since 2.12.0)
+-
+-The @code{--no-frame} argument works with SDL 1.2 only. The other user
+-interfaces never implemented this in the first place. So this will be
+-removed together with SDL 1.2 support.
+-
+ @subsection -virtioconsole (since 3.0.0)
+ 
+ Option @option{-virtioconsole} has been replaced by
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 521511e..0180467 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1294,17 +1294,6 @@ mode using a curses/ncurses interface. Nothing is displayed in graphical
+ mode.
+ ETEXI
+ 
+-DEF("no-frame", 0, QEMU_OPTION_no_frame,
+-    "-no-frame       open SDL window without a frame and window decorations\n",
+-    QEMU_ARCH_ALL)
+-STEXI
+-@item -no-frame
+-@findex -no-frame
+-Do not use decorations for SDL windows and start them using the whole
+-available screen space. This makes the using QEMU in a dedicated desktop
+-workspace more convenient.
+-ETEXI
+-
+ DEF("alt-grab", 0, QEMU_OPTION_alt_grab,
+     "-alt-grab       use Ctrl-Alt-Shift to grab mouse (instead of Ctrl-Alt)\n",
+     QEMU_ARCH_ALL)
+diff --git a/vl.c b/vl.c
+index 9cf0fbe..33d226f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -160,7 +160,6 @@ static int rtc_host_datetime_offset = -1; /* valid & used only with
+ QEMUClockType rtc_clock;
+ int vga_interface_type = VGA_NONE;
+ static DisplayOptions dpy;
+-int no_frame;
+ static int num_serial_hds;
+ static Chardev **serial_hds;
+ Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+@@ -2113,18 +2112,7 @@ static void parse_display(const char *p)
+         while (*opts) {
+             const char *nextopt;
+ 
+-            if (strstart(opts, ",frame=", &nextopt)) {
+-                g_printerr("The frame= sdl option is deprecated, and will be\n"
+-                           "removed in a future release.\n");
+-                opts = nextopt;
+-                if (strstart(opts, "on", &nextopt)) {
+-                    no_frame = 0;
+-                } else if (strstart(opts, "off", &nextopt)) {
+-                    no_frame = 1;
+-                } else {
+-                    goto invalid_sdl_args;
+-                }
+-            } else if (strstart(opts, ",alt_grab=", &nextopt)) {
++            if (strstart(opts, ",alt_grab=", &nextopt)) {
+                 opts = nextopt;
+                 if (strstart(opts, "on", &nextopt)) {
+                     alt_grab = 1;
+@@ -3596,11 +3584,6 @@ int main(int argc, char **argv, char **envp)
+                 dpy.has_full_screen = true;
+                 dpy.full_screen = true;
+                 break;
+-            case QEMU_OPTION_no_frame:
+-                g_printerr("The -no-frame switch is deprecated, and will be\n"
+-                           "removed in a future release.\n");
+-                no_frame = 1;
+-                break;
+             case QEMU_OPTION_alt_grab:
+                 alt_grab = 1;
+                 break;
+@@ -4279,8 +4262,8 @@ int main(int argc, char **argv, char **envp)
+         dpy.type = DISPLAY_TYPE_NONE;
+     }
+ 
+-    if ((no_frame || alt_grab || ctrl_grab) && dpy.type != DISPLAY_TYPE_SDL) {
+-        error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
++    if ((alt_grab || ctrl_grab) && dpy.type != DISPLAY_TYPE_SDL) {
++        error_report("-alt-grab and -ctrl-grab are only valid "
+                      "for SDL, ignoring option");
+     }
+     if (dpy.has_window_close &&
+-- 
+1.8.3.1
