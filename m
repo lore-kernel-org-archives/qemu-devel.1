@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36021)
+Received: from eggs.gnu.org ([209.51.188.92]:36032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002O6-SM
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:06 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GM-0002OI-3F
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003oo-GP
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003oi-EN
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42399)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44380)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GH-0003av-SP
+	id 1gr5GH-0003Un-TP
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
-Received: by mail-wr1-x433.google.com with SMTP id q18so4689334wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:45 -0800 (PST)
+Received: by mail-wr1-x441.google.com with SMTP id v16so2844068wrn.11
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:33 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+	by smtp.gmail.com with ESMTPSA id p5sm8931665wmh.16.2019.02.05.10.15.30
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 05 Feb 2019 10:15:31 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:26 +0100
-Message-Id: <1549390526-24246-17-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:14 +0100
+Message-Id: <1549390526-24246-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/76] linuxboot_dma: remove duplicate
- definitions of FW_CFG
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 04/76] vhost-user-test: skip if there is no
+ memory at address 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +37,179 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+The virt machine cannot run the vhost-user qtests because they hardcode
+the presence of memory at address 0.  Report the tests as a skip so that
+they can be converted to use qgraph.
 
-FW_CFG_DMA_CTL_* bits and struct fw_cfg_dma_access are
-defined in the qemu_fw_cfg.h header file already included
-in linuxboot_dma.c, so we can remove the definition of
-BIOS_CFG_DMA_CTL_* and struct FWCfgDmaAccess.
-
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Based-on: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1543851204-41186-11-git-send-email-pbonzini@redhat.com>
 ---
- pc-bios/optionrom/linuxboot_dma.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
+ tests/vhost-user-test.c | 58 ++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 45 insertions(+), 13 deletions(-)
 
-diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxboot_dma.c
-index d856d41..f728dc8 100644
---- a/pc-bios/optionrom/linuxboot_dma.c
-+++ b/pc-bios/optionrom/linuxboot_dma.c
-@@ -58,12 +58,6 @@ asm(
- "   jmp load_kernel\n"
- );
- 
--/* QEMU_CFG_DMA_CONTROL bits */
--#define BIOS_CFG_DMA_CTL_ERROR   0x01
--#define BIOS_CFG_DMA_CTL_READ    0x02
--#define BIOS_CFG_DMA_CTL_SKIP    0x04
--#define BIOS_CFG_DMA_CTL_SELECT  0x08
--
- #define BIOS_CFG_DMA_ADDR_HIGH 0x514
- #define BIOS_CFG_DMA_ADDR_LOW  0x518
- 
-@@ -75,12 +69,6 @@ asm(
- 
- #define barrier() asm("" : : : "memory")
- 
--typedef struct FWCfgDmaAccess {
--    uint32_t control;
--    uint32_t length;
--    uint64_t address;
--} __attribute__((packed)) FWCfgDmaAccess;
--
- static inline void outl(uint32_t value, uint16_t port)
- {
-     asm("outl %0, %w1" : : "a"(value), "Nd"(port));
-@@ -153,9 +141,9 @@ static inline uint32_t be32_to_cpu(uint32_t x)
- static __attribute__((__noinline__))
- void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
- {
--    FWCfgDmaAccess access;
--    uint32_t control = (entry << 16) | BIOS_CFG_DMA_CTL_SELECT
--                        | BIOS_CFG_DMA_CTL_READ;
-+    struct fw_cfg_dma_access access;
-+    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
-+                        | FW_CFG_DMA_CTL_READ;
- 
-     access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
-     access.length = cpu_to_be32(len);
-@@ -165,7 +153,7 @@ void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
- 
-     outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
- 
--    while (be32_to_cpu(access.control) & ~BIOS_CFG_DMA_CTL_ERROR) {
-+    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
-         barrier();
-     }
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index a4f51b5..a0da5c3 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -228,9 +228,11 @@ static void uninit_virtio_dev(TestServer *s)
+     qvirtio_pci_device_free(s->dev);
  }
+ 
+-static void wait_for_fds(TestServer *s)
++static bool wait_for_fds(TestServer *s)
+ {
+     gint64 end_time;
++    bool got_region;
++    int i;
+ 
+     g_mutex_lock(&s->data_mutex);
+ 
+@@ -248,6 +250,19 @@ static void wait_for_fds(TestServer *s)
+     g_assert_cmpint(s->fds_num, ==, s->memory.nregions);
+ 
+     g_mutex_unlock(&s->data_mutex);
++
++    got_region = false;
++    for (i = 0; i < s->memory.nregions; ++i) {
++        VhostUserMemoryRegion *reg = &s->memory.regions[i];
++        if (reg->guest_phys_addr == 0) {
++            got_region = true;
++            break;
++        }
++    }
++    if (!got_region) {
++        g_test_skip("No memory at address 0x0");
++    }
++    return got_region;
+ }
+ 
+ static void read_guest_mem_server(TestServer *s)
+@@ -256,8 +271,6 @@ static void read_guest_mem_server(TestServer *s)
+     int i, j;
+     size_t size;
+ 
+-    wait_for_fds(s);
+-
+     g_mutex_lock(&s->data_mutex);
+ 
+     /* iterate all regions */
+@@ -577,8 +590,6 @@ static void write_guest_mem(TestServer *s, uint32_t seed)
+     int i, j;
+     size_t size;
+ 
+-    wait_for_fds(s);
+-
+     /* iterate all regions */
+     for (i = 0; i < s->fds_num; i++) {
+ 
+@@ -661,8 +672,13 @@ static void test_read_guest_mem(const void *arg)
+ 
+     init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
+ 
++    if (!wait_for_fds(server)) {
++        goto exit;
++    }
++
+     read_guest_mem_server(server);
+ 
++exit:
+     uninit_virtio_dev(server);
+ 
+     qtest_quit(s);
+@@ -689,8 +705,10 @@ static void test_migrate(void)
+     g_free(cmd);
+ 
+     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
+-    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
+-    wait_for_fds(s);
++    if (!wait_for_fds(s)) {
++        goto exit;
++    }
++
+     size = get_log_size(s);
+     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
+ 
+@@ -699,6 +717,7 @@ static void test_migrate(void)
+     g_free(tmp);
+     to = qtest_init(cmd);
+     g_free(cmd);
++    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
+ 
+     source = g_source_new(&test_migrate_source_funcs,
+                           sizeof(TestMigrateSource));
+@@ -738,15 +757,18 @@ static void test_migrate(void)
+     global_qtest = to;
+     qmp_eventwait("RESUME");
+ 
++    g_assert(wait_for_fds(s));
+     read_guest_mem_server(dest);
+ 
+-    uninit_virtio_dev(s);
+     uninit_virtio_dev(dest);
++    qtest_quit(to);
+ 
+     g_source_destroy(source);
+     g_source_unref(source);
+ 
+-    qtest_quit(to);
++exit:
++    uninit_virtio_dev(s);
++
+     test_server_free(dest);
+     qtest_quit(from);
+     test_server_free(s);
+@@ -810,16 +832,20 @@ static void test_reconnect_subprocess(void)
+     g_free(cmd);
+ 
+     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
+-    wait_for_fds(s);
++    if (!wait_for_fds(s)) {
++        goto exit;
++    }
++
+     wait_for_rings_started(s, 2);
+ 
+     /* reconnect */
+     s->fds_num = 0;
+     s->rings = 0;
+     g_idle_add(reconnect_cb, s);
+-    wait_for_fds(s);
++    g_assert(wait_for_fds(s));
+     wait_for_rings_started(s, 2);
+ 
++exit:
+     uninit_virtio_dev(s);
+ 
+     qtest_end();
+@@ -848,9 +874,12 @@ static void test_connect_fail_subprocess(void)
+     g_free(cmd);
+ 
+     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
+-    wait_for_fds(s);
++    if (!wait_for_fds(s)) {
++        goto exit;
++    }
+     wait_for_rings_started(s, 2);
+ 
++exit:
+     uninit_virtio_dev(s);
+ 
+     qtest_end();
+@@ -878,9 +907,12 @@ static void test_flags_mismatch_subprocess(void)
+     g_free(cmd);
+ 
+     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
+-    wait_for_fds(s);
++    if (!wait_for_fds(s)) {
++        goto exit;
++    }
+     wait_for_rings_started(s, 2);
+ 
++exit:
+     uninit_virtio_dev(s);
+ 
+     qtest_end();
 -- 
 1.8.3.1
