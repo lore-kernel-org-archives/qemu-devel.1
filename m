@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56991)
+Received: from eggs.gnu.org ([209.51.188.92]:57908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3u6-0006vp-9x
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:48:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr3xK-0000yt-8X
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:52:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3u5-00025B-27
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:48:58 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 5 Feb 2019 16:48:38 +0000
-Message-ID: <ea7eb92a-7bc1-f12d-905b-daa5a151fa75@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-9-vsementsov@virtuozzo.com>
-	<ac7e2dbf-0399-3b99-5cd5-42597b3027c1@redhat.com>
-In-Reply-To: <ac7e2dbf-0399-3b99-5cd5-42597b3027c1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CD07586BF7C5A643B9505CE02EF91CF9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gr3xI-00036z-2u
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:52:17 -0500
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:46018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr3xG-00034Q-0y
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:52:16 -0500
+Received: by mail-ot1-x332.google.com with SMTP id 32so6755020ota.12
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 08:52:11 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 08/10] block/nbd: add cmdline and qapi
- parameter reconnect-delay
+References: <20190205105758.4230-1-kraxel@redhat.com>
+In-Reply-To: <20190205105758.4230-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Feb 2019 16:51:59 +0000
+Message-ID: <CAFEAcA8K-j4kMspa0THf1e2qzc8nXJxNuHF33rsDUjCeN4My6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/14] Ui 20190205 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MDUuMDEuMjAxOSAxOjI1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiA3LzMxLzE4IDEyOjMwIFBN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gUmVjb25uZWN0IHdpbGwg
-YmUgaW1wbGVtZW50ZWQgaW4gdGhlIGZvbGxvd2luZyBjb21taXQsIHNvIGZvciBub3csDQo+PiBp
-biBzZW1hbnRpY3MgYmVsb3csIGRpc2Nvbm5lY3QgaXRzZWxmIGlzIGEgInNlcmlvdXMgZXJyb3Ii
-Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZz
-ZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBxYXBpL2Jsb2NrLWNvcmUuanNv
-biB8IDEyICsrKysrKysrKysrLQ0KPj4gICBibG9jay9uYmQtY2xpZW50LmggICB8ICAxICsNCj4+
-ICAgYmxvY2svbmJkLWNsaWVudC5jICAgfCAgMSArDQo+PiAgIGJsb2NrL25iZC5jICAgICAgICAg
-IHwgMTYgKysrKysrKysrKysrKysrLQ0KPj4gICA0IGZpbGVzIGNoYW5nZWQsIDI4IGluc2VydGlv
-bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29y
-ZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IGluZGV4IDViOTA4NGEzOTQuLmNmMDM0
-MDJlYzUgMTAwNjQ0DQo+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gKysrIGIvcWFw
-aS9ibG9jay1jb3JlLmpzb24NCj4+IEBAIC0zNTExLDEzICszNTExLDIzIEBADQo+PiAgICMgICAg
-ICAgICAgICAgICAgICB0cmFkaXRpb25hbCAiYmFzZTphbGxvY2F0aW9uIiBibG9jayBzdGF0dXMg
-KHNlZQ0KPj4gICAjICAgICAgICAgICAgICAgICAgTkJEX09QVF9MSVNUX01FVEFfQ09OVEVYVCBp
-biB0aGUgTkJEIHByb3RvY29sKSAoc2luY2UgMy4wKQ0KPj4gICAjDQo+PiArIyBAcmVjb25uZWN0
-LWRlbGF5OiBSZWNvbm5lY3QgZGVsYXkuIE9uIGRpc2Nvbm5lY3QsIG5iZCBjbGllbnQgdHJpZXMg
-dG8gY29ubmVjdA0KPiANCj4gTWF5YmUgJ09uIHVuZXhwZWN0ZWQgZGlzY29ubmVjdCcsIHNpbmNl
-IGludGVudGlvbmFsIGRpc2Nvbm5lY3QgaXMgbm90DQo+IHVuZXhwZWN0ZWQuDQo+IA0KPj4gKyMg
-ICAgICAgICAgICAgICAgICAgYWdhaW4sIHVudGlsIHN1Y2Nlc3Mgb3Igc2VyaW91cyBlcnJvci4g
-RHVyaW5nIGZpcnN0DQo+PiArIyAgICAgICAgICAgICAgICAgICBAcmVjb25uZWN0LWRlbGF5IHNl
-Y29uZHMgb2YgcmVjb25uZWN0aW5nIGxvb3AgYWxsIHJlcXVlc3RzDQo+PiArIyAgICAgICAgICAg
-ICAgICAgICBhcmUgcGF1c2VkIGFuZCBoYXZlIGEgY2hhbmNlIHRvIHJlcnVuLCBpZiBzdWNjZXNz
-ZnVsDQo+PiArIyAgICAgICAgICAgICAgICAgICBjb25uZWN0IG9jY3VyZXMgZHVyaW5nIHRoaXMg
-dGltZS4gQWZ0ZXIgQHJlY29ubmVjdC1kZWxheQ0KPiANCj4gb2NjdXJzDQo+IA0KPj4gKyMgICAg
-ICAgICAgICAgICAgICAgc2Vjb25kcyBhbGwgZGVsYXllZCByZXF1ZXN0cyBhcmUgZmFpbGVkIGFu
-ZCBhbGwgZm9sbG93aW5nDQo+PiArIyAgICAgICAgICAgICAgICAgICByZXF1ZXN0cyB3aWxsIGJl
-IGZhaWxlZCB0byAodW50aWwgc3VjY2Vzc2Z1bGwgcmVjb25uZWN0KS4NCj4gDQo+IHN1Y2Nlc3Nm
-dWwNCj4gDQo+PiArIyAgICAgICAgICAgICAgICAgICBEZWZhdWx0IDMwMCBzZWNvbmRzIChTaW5j
-ZSAzLjEpDQo+IA0KPiBNeSBkZWxheSBpbiByZXZpZXdpbmcgbWVhbnMgdGhpcyBub3cgaGFzIHRv
-IGJlIDQuMC4NCj4gDQo+IEknbSBndWVzc2luZyB0aGF0IGEgZGVsYXkgb2YgMCBtZWFucyBkaXNh
-YmxlIGF1dG8tcmVjb25uZWN0LiAgRnJvbSBhDQo+IGJhY2t3YXJkcy1jb21wYXRpYmlsaXR5IHN0
-YW5kcG9pbnQsIG5vIGF1dG8tcmVjb25uZWN0IGlzIG1vcmUgaW4gbGluZQ0KPiB3aXRoIHdoYXQg
-d2UgcHJldmlvdXNseSBoYWQgLSBidXQgZnJvbSBhIHVzYWJpbGl0eSBzdGFuZHBvaW50LCB0cnlp
-bmcgdG8NCj4gcmVjb25uZWN0IGNhbiBhdm9pZCB0dXJuaW5nIHRyYW5zaWVudCBuZXR3b3JrIGhp
-Y2N1cHMgaW50byBwZXJtYW5lbnQNCj4gbG9zcyBvZiBhIGRldmljZSB0byBFSU8gZXJyb3JzLCBl
-c3BlY2lhbGx5IGlmIHRoZSByZXRyeSB0aW1lb3V0IGlzIGxvbmcNCj4gZW5vdWdoIHRvIGFsbG93
-IGFuIGFkbWluaXN0cmF0b3IgdG8gcmVyb3V0ZSB0aGUgbmV0d29yayB0byBhbg0KPiBhbHRlcm5h
-dGl2ZSBzZXJ2ZXIuICBTbyBJJ20gcHJvYmFibHkgb2theSB3aXRoIHRoZSBkZWZhdWx0IGJlaW5n
-DQo+IG5vbi16ZXJvIC0gYnV0IGl0IERPRVMgbWVhbiB0aGF0IHdoZXJlIHlvdSB1c2VkIHRvIGdl
-dCBpbnN0YW50IEVJTw0KPiBmYWlsdXJlcyB3aGVuIGEgbmV0d29yayBjb25uZWN0aW9uIHdhcyBz
-ZXZlcmVkLCB5b3Ugbm93IGhhdmUgdG8gd2FpdCBmb3INCj4gdGhlIHJlY29ubmVjdCBkZWxheSB0
-byBleHBpcmUsIGFuZCA1IG1pbnV0ZXMgY2FuIGJlIGEgbG9uZyB3YWl0LiAgU2luY2UNCj4gdGhl
-IGxvbmcgZGVsYXkgaXMgZ3Vlc3Qtb2JzZXJ2YWJsZSwgY2FuIHdlIHJ1biBpbnRvIGlzc3VlcyB3
-aGVyZSBhIGd1ZXN0DQo+IHRoYXQgaXMgY3VycmVudGx5IHVzZWQgdG8gaW5zdGFudCBFSU8gYW5k
-IHRvdGFsIGxvc3Mgb2YgdGhlIGRldmljZSBjb3VsZA0KPiBpbnN0ZWFkIGdldCBjb25mdXNlZCBi
-eSBub3QgZ2V0dGluZyBhbnkgcmVzcG9uc2UgZm9yIHVwIHRvIDUgbWludXRlcywNCj4gd2hldGhl
-ciBvciBub3QgdGhhdCByZXNwb25zZSBldmVudHVhbGx5IHR1cm5zIG91dCB0byBiZSBFSU8gb3Ig
-YQ0KPiBzdWNjZXNzZnVsIHJlY292ZXJ5Pw0KDQpIbW0sIGRvIHlvdSBoYXZlIGluIG1pbmQgc3Vj
-aCBzY2VuYXJpb3M/IFdobyBjb3VsZCBrbm93Pw0KDQpJZiB3ZSB1bnN1cmUsIEknbSBPSyB0byBw
-cm9jZWVkIHdpdGggbm8tcmVjb25uZWN0IGJlaGF2aW9yIGJ5IGRlZmF1bHQuIFdlIGNhbg0KY2hh
-bmdlIHRoZSBkZWZhdWx0IGluIGEgc2VwYXJhdGUgcGF0Y2ggbGF0ZXIsIGlmIG5lZWRlZC4NCg0K
-PiANCj4+ICsrKyBiL2Jsb2NrL25iZC5jDQo+PiBAQCAtMzYwLDYgKzM2MCwxOCBAQCBzdGF0aWMg
-UWVtdU9wdHNMaXN0IG5iZF9ydW50aW1lX29wdHMgPSB7DQo+PiAgICAgICAgICAgICAgIC5oZWxw
-ID0gImV4cGVyaW1lbnRhbDogZXhwb3NlIG5hbWVkIGRpcnR5IGJpdG1hcCBpbiBwbGFjZSBvZiAi
-DQo+PiAgICAgICAgICAgICAgICAgICAgICAgImJsb2NrIHN0YXR1cyIsDQo+PiAgICAgICAgICAg
-fSwNCj4+ICsgICAgICAgIHsNCj4+ICsgICAgICAgICAgICAubmFtZSA9ICJyZWNvbm5lY3QtZGVs
-YXkiLA0KPj4gKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLA0KPj4gKyAgICAg
-ICAgICAgIC5oZWxwID0gIlJlY29ubmVjdCBkZWxheS4gT24gZGlzY29ubmVjdCwgbmJkIGNsaWVu
-dCB0cmllcyB0byINCj4+ICsgICAgICAgICAgICAgICAgICAgICJjb25uZWN0IGFnYWluLCB1bnRp
-bCBzdWNjZXNzIG9yIHNlcmlvdXMgZXJyb3IuIER1cmluZyINCj4+ICsgICAgICAgICAgICAgICAg
-ICAgICJmaXJzdCBAcmVjb25uZWN0LWRlbGF5IHNlY29uZHMgb2YgcmVjb25uZWN0aW5nIGxvb3Ag
-YWxsIg0KPj4gKyAgICAgICAgICAgICAgICAgICAgInJlcXVlc3RzIGFyZSBwYXVzZWQgYW5kIGhh
-dmUgYSBjaGFuY2UgdG8gcmVydW4sIGlmIg0KPj4gKyAgICAgICAgICAgICAgICAgICAgInN1Y2Nl
-c3NmdWwgY29ubmVjdCBvY2N1cmVzIGR1cmluZyB0aGlzIHRpbWUuIEFmdGVyIg0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgIkByZWNvbm5lY3QtZGVsYXkgc2Vjb25kcyBhbGwgZGVsYXllZCByZXF1
-ZXN0cyBhcmUgZmFpbGVkIg0KPj4gKyAgICAgICAgICAgICAgICAgICAgImFuZCBhbGwgZm9sbG93
-aW5nIHJlcXVlc3RzIHdpbGwgYmUgZmFpbGVkIHRvICh1bnRpbCINCj4+ICsgICAgICAgICAgICAg
-ICAgICAgICJzdWNjZXNzZnVsbCByZWNvbm5lY3QpLiBEZWZhdWx0IDMwMCBzZWNvbmRzIiwNCj4g
-DQo+IFNhbWUgdHlwb3MgYXMgaW4gcWFwaS4NCj4gDQo+IFRoZSBVSSBhc3BlY3RzIGxvb2sgZmlu
-ZSwgbm93IEkgbmVlZCB0byByZXZpZXcgdGhlIHBhdGNoIHNlcmllcyBmb3IgY29kZQ0KPiBpc3N1
-ZXMgOikNCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Tue, 5 Feb 2019 at 10:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 773c4a6228fd910556cee2d477ee56c591a30000:
+>
+>   test-filter-mirror: pass UNIX domain socket through fd (2019-02-04 16:03:20 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20190205-pull-request
+>
+> for you to fetch changes up to 19c1b9fd3dd5955893c0d3c187a4180313e9a0f1:
+>
+>   keymap: fix keyup mappings (2019-02-05 10:45:44 +0100)
+>
+> ----------------------------------------------------------------
+> ui: add kbd stats tracker.
+> ui: gtk scroll fixes.
+> ui: egl cursor scale fix.
+> ui: more sdl1 cleanup.
+>
+> ----------------------------------------------------------------
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
