@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36041)
+Received: from eggs.gnu.org ([209.51.188.92]:36267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GM-0002Ot-Hq
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:14 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GV-0002W0-Ma
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GH-0003m6-BJ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:02 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:38244)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003pQ-NO
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:11 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43672)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GG-0003cA-QR
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
-Received: by mail-wr1-x432.google.com with SMTP id v13so4716840wrw.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:48 -0800 (PST)
+	id 1gr5GH-0003YM-S7
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
+Received: by mail-wr1-x443.google.com with SMTP id r2so4683820wrv.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:41 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:28 +0100
-Message-Id: <1549390526-24246-19-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:21 +0100
+Message-Id: <1549390526-24246-12-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 18/76] optionrom: add new PVH option rom
+Subject: [Qemu-devel] [PULL 11/76] elf: Add optional function ptr to
+ load_elf() to parse ELF notes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,438 +29,853 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
 
-The new pvh.bin option rom can be used with SeaBIOS to boot
-uncompressed kernel using the x86/HVM direct boot ABI.
+This patch adds an optional function pointer, 'elf_note_fn', to
+load_elf() which causes load_elf() to additionally parse any
+ELF program headers of type PT_NOTE and check to see if the ELF
+Note is of the type specified by the 'translate_opaque' arg.
+If a matching ELF Note is found then the specfied function pointer
+is called to process the ELF note.
 
-pvh.S contains the entry point of the option rom. It runs
-in real mode, loads the e820 table querying the BIOS, and
-then it switches to 32bit protected mode and jumps to the
-pvh_load_kernel() written in pvh_main.c.
-pvh_load_kernel() loads the cmdline and kernel entry_point
-using fw_cfg, then it looks for RSDP, fills the
-hvm_start_info required by x86/HVM ABI, and finally jumps
-to the kernel entry_point.
+Passing a NULL function pointer results in ELF Notes being skipped.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+The first consumer of this functionality is the PVHboot support
+which needs to read the XEN_ELFNOTE_PHYS32_ENTRY ELF Note while
+loading the uncompressed kernel binary in order to discover the
+boot entry address for the x86/HVM direct boot ABI.
+
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitignore                   |   4 +
- Makefile                     |   2 +-
- pc-bios/optionrom/Makefile   |   5 +-
- pc-bios/optionrom/pvh.S      | 200 +++++++++++++++++++++++++++++++++++++++++++
- pc-bios/optionrom/pvh_main.c | 116 +++++++++++++++++++++++++
- pc-bios/pvh.bin              | Bin 0 -> 1536 bytes
- 6 files changed, 325 insertions(+), 2 deletions(-)
- create mode 100644 pc-bios/optionrom/pvh.S
- create mode 100644 pc-bios/optionrom/pvh_main.c
- create mode 100644 pc-bios/pvh.bin
+ hw/alpha/dp264.c               |  4 ++--
+ hw/arm/armv7m.c                |  3 ++-
+ hw/arm/boot.c                  |  2 +-
+ hw/core/generic-loader.c       |  2 +-
+ hw/core/loader.c               | 24 ++++++++++++++++--------
+ hw/cris/boot.c                 |  3 ++-
+ hw/hppa/machine.c              |  6 +++---
+ hw/i386/multiboot.c            |  2 +-
+ hw/lm32/lm32_boards.c          |  6 ++++--
+ hw/lm32/milkymist.c            |  3 ++-
+ hw/m68k/an5206.c               |  2 +-
+ hw/m68k/mcf5208.c              |  2 +-
+ hw/microblaze/boot.c           |  7 ++++---
+ hw/mips/mips_fulong2e.c        |  5 +++--
+ hw/mips/mips_malta.c           |  5 +++--
+ hw/mips/mips_mipssim.c         |  5 +++--
+ hw/mips/mips_r4k.c             |  5 +++--
+ hw/moxie/moxiesim.c            |  2 +-
+ hw/nios2/boot.c                |  7 ++++---
+ hw/openrisc/openrisc_sim.c     |  2 +-
+ hw/pci-host/prep.c             |  2 +-
+ hw/ppc/e500.c                  |  3 ++-
+ hw/ppc/mac_newworld.c          |  5 +++--
+ hw/ppc/mac_oldworld.c          |  5 +++--
+ hw/ppc/ppc440_bamboo.c         |  2 +-
+ hw/ppc/sam460ex.c              |  3 ++-
+ hw/ppc/spapr.c                 |  7 ++++---
+ hw/ppc/virtex_ml507.c          |  2 +-
+ hw/riscv/sifive_e.c            |  2 +-
+ hw/riscv/sifive_u.c            |  2 +-
+ hw/riscv/spike.c               |  2 +-
+ hw/riscv/virt.c                |  2 +-
+ hw/s390x/ipl.c                 |  9 ++++++---
+ hw/sparc/leon3.c               |  3 ++-
+ hw/sparc/sun4m.c               |  6 ++++--
+ hw/sparc64/sun4u.c             |  4 ++--
+ hw/tricore/tricore_testboard.c |  2 +-
+ hw/xtensa/sim.c                | 12 ++++++++----
+ hw/xtensa/xtfpga.c             |  2 +-
+ include/hw/elf_ops.h           |  2 ++
+ include/hw/loader.h            |  9 ++++++++-
+ 41 files changed, 113 insertions(+), 70 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 0430257..321095b 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -103,6 +103,10 @@
- /pc-bios/optionrom/linuxboot_dma.bin
- /pc-bios/optionrom/linuxboot_dma.raw
- /pc-bios/optionrom/linuxboot_dma.img
-+/pc-bios/optionrom/pvh.asm
-+/pc-bios/optionrom/pvh.bin
-+/pc-bios/optionrom/pvh.raw
-+/pc-bios/optionrom/pvh.img
- /pc-bios/optionrom/multiboot.asm
- /pc-bios/optionrom/multiboot.bin
- /pc-bios/optionrom/multiboot.raw
-diff --git a/Makefile b/Makefile
-index 1278a3e..76f6ab4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -673,7 +673,7 @@ efi-e1000.rom efi-eepro100.rom efi-ne2k_pci.rom \
- efi-pcnet.rom efi-rtl8139.rom efi-virtio.rom \
- efi-e1000e.rom efi-vmxnet3.rom \
- bamboo.dtb canyonlands.dtb petalogix-s3adsp1800.dtb petalogix-ml605.dtb \
--multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin \
-+multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin \
- s390-ccw.img s390-netboot.img \
- spapr-rtas.bin slof.bin skiboot.lid \
- palcode-clipper \
-diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
-index a9a9e5e..e33a24d 100644
---- a/pc-bios/optionrom/Makefile
-+++ b/pc-bios/optionrom/Makefile
-@@ -37,7 +37,7 @@ Wa = -Wa,
- ASFLAGS += -32
- QEMU_CFLAGS += $(call cc-c-option, $(QEMU_CFLAGS), $(Wa)-32)
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index dd62f2a..0347eb8 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -114,7 +114,7 @@ static void clipper_init(MachineState *machine)
+         error_report("no palcode provided");
+         exit(1);
+     }
+-    size = load_elf(palcode_filename, cpu_alpha_superpage_to_phys,
++    size = load_elf(palcode_filename, NULL, cpu_alpha_superpage_to_phys,
+                     NULL, &palcode_entry, &palcode_low, &palcode_high,
+                     0, EM_ALPHA, 0, 0);
+     if (size < 0) {
+@@ -133,7 +133,7 @@ static void clipper_init(MachineState *machine)
+     if (kernel_filename) {
+         uint64_t param_offset;
  
--build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin
-+build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
+-        size = load_elf(kernel_filename, cpu_alpha_superpage_to_phys,
++        size = load_elf(kernel_filename, NULL, cpu_alpha_superpage_to_phys,
+                         NULL, &kernel_entry, &kernel_low, &kernel_high,
+                         0, EM_ALPHA, 0, 0);
+         if (size < 0) {
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index adae11e..c4b2a9a 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -310,7 +310,8 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+     as = cpu_get_address_space(cs, asidx);
  
- # suppress auto-removal of intermediate files
- .SECONDARY:
-@@ -46,6 +46,9 @@ build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin
- %.o: %.S
- 	$(call quiet-command,$(CPP) $(QEMU_INCLUDES) $(QEMU_DGFLAGS) -c -o - $< | $(AS) $(ASFLAGS) -o $@,"AS","$(TARGET_DIR)$@")
+     if (kernel_filename) {
+-        image_size = load_elf_as(kernel_filename, NULL, NULL, &entry, &lowaddr,
++        image_size = load_elf_as(kernel_filename, NULL, NULL, NULL,
++                                 &entry, &lowaddr,
+                                  NULL, big_endian, EM_ARM, 1, 0, as);
+         if (image_size < 0) {
+             image_size = load_image_targphys_as(kernel_filename, 0,
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 05762d0..be25902 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -881,7 +881,7 @@ static int64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
+         }
+     }
  
-+pvh.img: pvh.o pvh_main.o
-+	$(call quiet-command,$(LD) $(LDFLAGS_NOPIE) -m $(LD_I386_EMULATION) -T $(SRC_PATH)/pc-bios/optionrom/flat.lds -s -o $@ $^,"BUILD","$(TARGET_DIR)$@")
-+
- %.img: %.o
- 	$(call quiet-command,$(LD) $(LDFLAGS_NOPIE) -m $(LD_I386_EMULATION) -T $(SRC_PATH)/pc-bios/optionrom/flat.lds -s -o $@ $<,"BUILD","$(TARGET_DIR)$@")
+-    ret = load_elf_as(info->kernel_filename, NULL, NULL,
++    ret = load_elf_as(info->kernel_filename, NULL, NULL, NULL,
+                       pentry, lowaddr, highaddr, big_endian, elf_machine,
+                       1, data_swab, as);
+     if (ret <= 0) {
+diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+index fbae05f..3695dd4 100644
+--- a/hw/core/generic-loader.c
++++ b/hw/core/generic-loader.c
+@@ -136,7 +136,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+         AddressSpace *as = s->cpu ? s->cpu->as :  NULL;
  
-diff --git a/pc-bios/optionrom/pvh.S b/pc-bios/optionrom/pvh.S
-new file mode 100644
-index 0000000..e1d7f4a
---- /dev/null
-+++ b/pc-bios/optionrom/pvh.S
-@@ -0,0 +1,200 @@
-+/*
-+ * PVH Option ROM
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * Copyright Novell Inc, 2009
-+ *   Authors: Alexander Graf <agraf@suse.de>
-+ *
-+ * Copyright (c) 2019 Red Hat Inc.
-+ *   Authors: Stefano Garzarella <sgarzare@redhat.com>
-+ */
+         if (!s->force_raw) {
+-            size = load_elf_as(s->file, NULL, NULL, &entry, NULL, NULL,
++            size = load_elf_as(s->file, NULL, NULL, NULL, &entry, NULL, NULL,
+                                big_endian, 0, 0, 0, as);
+ 
+             if (size < 0) {
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index c4f62fe..3a000d5 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -396,37 +396,42 @@ fail:
+ }
+ 
+ /* return < 0 if error, otherwise the number of bytes loaded in memory */
+-int load_elf(const char *filename, uint64_t (*translate_fn)(void *, uint64_t),
++int load_elf(const char *filename,
++             uint64_t (*elf_note_fn)(void *, void *, bool),
++             uint64_t (*translate_fn)(void *, uint64_t),
+              void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+              uint64_t *highaddr, int big_endian, int elf_machine,
+              int clear_lsb, int data_swab)
+ {
+-    return load_elf_as(filename, translate_fn, translate_opaque, pentry,
+-                       lowaddr, highaddr, big_endian, elf_machine, clear_lsb,
+-                       data_swab, NULL);
++    return load_elf_as(filename, elf_note_fn, translate_fn, translate_opaque,
++                       pentry, lowaddr, highaddr, big_endian, elf_machine,
++                       clear_lsb, data_swab, NULL);
+ }
+ 
+ /* return < 0 if error, otherwise the number of bytes loaded in memory */
+ int load_elf_as(const char *filename,
++                uint64_t (*elf_note_fn)(void *, void *, bool),
+                 uint64_t (*translate_fn)(void *, uint64_t),
+                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+                 uint64_t *highaddr, int big_endian, int elf_machine,
+                 int clear_lsb, int data_swab, AddressSpace *as)
+ {
+-    return load_elf_ram(filename, translate_fn, translate_opaque,
++    return load_elf_ram(filename, elf_note_fn, translate_fn, translate_opaque,
+                         pentry, lowaddr, highaddr, big_endian, elf_machine,
+                         clear_lsb, data_swab, as, true);
+ }
+ 
+ /* return < 0 if error, otherwise the number of bytes loaded in memory */
+ int load_elf_ram(const char *filename,
++                 uint64_t (*elf_note_fn)(void *, void *, bool),
+                  uint64_t (*translate_fn)(void *, uint64_t),
+                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+                  uint64_t *highaddr, int big_endian, int elf_machine,
+                  int clear_lsb, int data_swab, AddressSpace *as,
+                  bool load_rom)
+ {
+-    return load_elf_ram_sym(filename, translate_fn, translate_opaque,
++    return load_elf_ram_sym(filename, elf_note_fn,
++                            translate_fn, translate_opaque,
+                             pentry, lowaddr, highaddr, big_endian,
+                             elf_machine, clear_lsb, data_swab, as,
+                             load_rom, NULL);
+@@ -434,6 +439,7 @@ int load_elf_ram(const char *filename,
+ 
+ /* return < 0 if error, otherwise the number of bytes loaded in memory */
+ int load_elf_ram_sym(const char *filename,
++                     uint64_t (*elf_note_fn)(void *, void *, bool),
+                      uint64_t (*translate_fn)(void *, uint64_t),
+                      void *translate_opaque, uint64_t *pentry,
+                      uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
+@@ -476,11 +482,13 @@ int load_elf_ram_sym(const char *filename,
+ 
+     lseek(fd, 0, SEEK_SET);
+     if (e_ident[EI_CLASS] == ELFCLASS64) {
+-        ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
++        ret = load_elf64(filename, fd, elf_note_fn,
++                         translate_fn, translate_opaque, must_swab,
+                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+                          data_swab, as, load_rom, sym_cb);
+     } else {
+-        ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
++        ret = load_elf32(filename, fd, elf_note_fn,
++                         translate_fn, translate_opaque, must_swab,
+                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+                          data_swab, as, load_rom, sym_cb);
+     }
+diff --git a/hw/cris/boot.c b/hw/cris/boot.c
+index f896ed7..95cba21 100644
+--- a/hw/cris/boot.c
++++ b/hw/cris/boot.c
+@@ -75,7 +75,8 @@ void cris_load_image(CRISCPU *cpu, struct cris_load_info *li)
+     env->load_info = li;
+     /* Boots a kernel elf binary, os/linux-2.6/vmlinux from the axis 
+        devboard SDK.  */
+-    image_size = load_elf(li->image_filename, translate_kernel_address, NULL,
++    image_size = load_elf(li->image_filename, NULL,
++                          translate_kernel_address, NULL,
+                           &entry, NULL, &high, 0, EM_CRIS, 0, 0);
+     li->entry = entry;
+     if (image_size < 0) {
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index ac6dd7f..d1b1d3c 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -135,8 +135,8 @@ static void machine_hppa_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    size = load_elf(firmware_filename, NULL,
+-                    NULL, &firmware_entry, &firmware_low, &firmware_high,
++    size = load_elf(firmware_filename, NULL, NULL, NULL,
++                    &firmware_entry, &firmware_low, &firmware_high,
+                     true, EM_PARISC, 0, 0);
+ 
+     /* Unfortunately, load_elf sign-extends reading elf32.  */
+@@ -165,7 +165,7 @@ static void machine_hppa_init(MachineState *machine)
+ 
+     /* Load kernel */
+     if (kernel_filename) {
+-        size = load_elf(kernel_filename, &cpu_hppa_to_phys,
++        size = load_elf(kernel_filename, NULL, &cpu_hppa_to_phys,
+                         NULL, &kernel_entry, &kernel_low, &kernel_high,
+                         true, EM_PARISC, 0, 0);
+ 
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 6234068..a3e33fb 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -199,7 +199,7 @@ int load_multiboot(FWCfgState *fw_cfg,
+             exit(1);
+         }
+ 
+-        kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
+                                &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+                                0, 0);
+         if (kernel_size < 0) {
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index fd8eccc..05157f8 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -138,7 +138,8 @@ static void lm32_evr_init(MachineState *machine)
+         uint64_t entry;
+         int kernel_size;
+ 
+-        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &entry, NULL, NULL,
+                                1, EM_LATTICEMICO32, 0, 0);
+         reset_info->bootstrap_pc = entry;
+ 
+@@ -231,7 +232,8 @@ static void lm32_uclinux_init(MachineState *machine)
+         uint64_t entry;
+         int kernel_size;
+ 
+-        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &entry, NULL, NULL,
+                                1, EM_LATTICEMICO32, 0, 0);
+         reset_info->bootstrap_pc = entry;
+ 
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 26a2398..b080cf1 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -176,7 +176,8 @@ milkymist_init(MachineState *machine)
+         uint64_t entry;
+ 
+         /* Boots a kernel elf binary.  */
+-        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &entry, NULL, NULL,
+                                1, EM_LATTICEMICO32, 0, 0);
+         reset_info->bootstrap_pc = entry;
+ 
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index 5e067ea..06e3803 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -66,7 +66,7 @@ static void an5206_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
++    kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
+                            NULL, NULL, 1, EM_68K, 0, 0);
+     entry = elf_entry;
+     if (kernel_size < 0) {
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index 0f2245d..8531e07 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -294,7 +294,7 @@ static void mcf5208evb_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
++    kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
+                            NULL, NULL, 1, EM_68K, 0, 0);
+     entry = elf_entry;
+     if (kernel_size < 0) {
+diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+index 489ab83..a7af4c0 100644
+--- a/hw/microblaze/boot.c
++++ b/hw/microblaze/boot.c
+@@ -142,13 +142,14 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+ #endif
+ 
+         /* Boots a kernel elf binary.  */
+-        kernel_size = load_elf(kernel_filename, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
+                                &entry, &low, &high,
+                                big_endian, EM_MICROBLAZE, 0, 0);
+         base32 = entry;
+         if (base32 == 0xc0000000) {
+-            kernel_size = load_elf(kernel_filename, translate_kernel_address,
+-                                   NULL, &entry, NULL, NULL,
++            kernel_size = load_elf(kernel_filename, NULL,
++                                   translate_kernel_address, NULL,
++                                   &entry, NULL, NULL,
+                                    big_endian, EM_MICROBLAZE, 0, 0);
+         }
+         /* Always boot into physical ram.  */
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 42d09f6..02549d5 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -111,8 +111,9 @@ static int64_t load_kernel (CPUMIPSState *env)
+     uint32_t *prom_buf;
+     long prom_size;
+ 
+-    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
+-                           NULL, (uint64_t *)&kernel_entry,
++    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
++                           cpu_mips_kseg0_to_phys, NULL,
++                           (uint64_t *)&kernel_entry,
+                            (uint64_t *)&kernel_low, (uint64_t *)&kernel_high,
+                            0, EM_MIPS, 1, 0);
+     if (kernel_size < 0) {
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index c1cf0fe..7466776 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1010,8 +1010,9 @@ static int64_t load_kernel (void)
+     big_endian = 0;
+ #endif
+ 
+-    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
+-                           NULL, (uint64_t *)&kernel_entry, NULL,
++    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
++                           cpu_mips_kseg0_to_phys, NULL,
++                           (uint64_t *)&kernel_entry, NULL,
+                            (uint64_t *)&kernel_high, big_endian, EM_MIPS, 1, 0);
+     if (kernel_size < 0) {
+         error_report("could not load kernel '%s': %s",
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+index f665752..824abda 100644
+--- a/hw/mips/mips_mipssim.c
++++ b/hw/mips/mips_mipssim.c
+@@ -69,8 +69,9 @@ static int64_t load_kernel(void)
+     big_endian = 0;
+ #endif
+ 
+-    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
+-                           NULL, (uint64_t *)&entry, NULL,
++    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
++                           cpu_mips_kseg0_to_phys, NULL,
++                           (uint64_t *)&entry, NULL,
+                            (uint64_t *)&kernel_high, big_endian,
+                            EM_MIPS, 1, 0);
+     if (kernel_size >= 0) {
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 1922407..a015a6d 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -92,8 +92,9 @@ static int64_t load_kernel(void)
+ #else
+     big_endian = 0;
+ #endif
+-    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
+-                           NULL, (uint64_t *)&entry, NULL,
++    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
++                           cpu_mips_kseg0_to_phys, NULL,
++                           (uint64_t *)&entry, NULL,
+                            (uint64_t *)&kernel_high, big_endian,
+                            EM_MIPS, 1, 0);
+     if (kernel_size >= 0) {
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index c6b6f72..eddeed9 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -57,7 +57,7 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *loader_params)
+     long kernel_size;
+     ram_addr_t initrd_offset;
+ 
+-    kernel_size = load_elf(loader_params->kernel_filename,  NULL, NULL,
++    kernel_size = load_elf(loader_params->kernel_filename,  NULL, NULL, NULL,
+                            &entry, &kernel_low, &kernel_high, 1, EM_MOXIE,
+                            0, 0);
+ 
+diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+index ed5cb28..5f0ab2f 100644
+--- a/hw/nios2/boot.c
++++ b/hw/nios2/boot.c
+@@ -146,13 +146,14 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
+ #endif
+ 
+         /* Boots a kernel elf binary. */
+-        kernel_size = load_elf(kernel_filename, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
+                                &entry, &low, &high,
+                                big_endian, EM_ALTERA_NIOS2, 0, 0);
+         base32 = entry;
+         if (base32 == 0xc0000000) {
+-            kernel_size = load_elf(kernel_filename, translate_kernel_address,
+-                                   NULL, &entry, NULL, NULL,
++            kernel_size = load_elf(kernel_filename, NULL,
++                                   translate_kernel_address, NULL,
++                                   &entry, NULL, NULL,
+                                    big_endian, EM_ALTERA_NIOS2, 0, 0);
+         }
+ 
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index a495a84..7d3b734 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -96,7 +96,7 @@ static void openrisc_load_kernel(ram_addr_t ram_size,
+     hwaddr entry;
+ 
+     if (kernel_filename && !qtest_enabled()) {
+-        kernel_size = load_elf(kernel_filename, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
+                                &elf_entry, NULL, NULL, 1, EM_OPENRISC,
+                                1, 0);
+         entry = elf_entry;
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index b1b6b16..8b9e1fd 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -331,7 +331,7 @@ static void raven_realize(PCIDevice *d, Error **errp)
+         filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, s->bios_name);
+         if (filename) {
+             if (s->elf_machine != EM_NONE) {
+-                bios_size = load_elf(filename, NULL, NULL, NULL,
++                bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
+                                      NULL, NULL, 1, s->elf_machine, 0, 0);
+             }
+             if (bios_size < 0) {
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 0581e9e..7553f67 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -988,7 +988,8 @@ void ppce500_init(MachineState *machine)
+ 
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
+ 
+-    payload_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
++    payload_size = load_elf(filename, NULL, NULL, NULL,
++                            &bios_entry, &loadaddr, NULL,
+                             1, PPC_ELF_MACHINE, 0, 0);
+     if (payload_size < 0) {
+         /*
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index f1c8400..10be728 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -164,7 +164,7 @@ static void ppc_core99_init(MachineState *machine)
+ 
+     /* Load OpenBIOS (ELF) */
+     if (filename) {
+-        bios_size = load_elf(filename, NULL, NULL, NULL,
++        bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
+                              NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+ 
+         g_free(filename);
+@@ -187,7 +187,8 @@ static void ppc_core99_init(MachineState *machine)
+ #endif
+         kernel_base = KERNEL_LOAD_ADDR;
+ 
+-        kernel_size = load_elf(kernel_filename, translate_kernel_address, NULL,
++        kernel_size = load_elf(kernel_filename, NULL,
++                               translate_kernel_address, NULL,
+                                NULL, &lowaddr, NULL, 1, PPC_ELF_MACHINE,
+                                0, 0);
+         if (kernel_size < 0)
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 98d531d..284431d 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -139,7 +139,7 @@ static void ppc_heathrow_init(MachineState *machine)
+ 
+     /* Load OpenBIOS (ELF) */
+     if (filename) {
+-        bios_size = load_elf(filename, 0, NULL, NULL, NULL, NULL,
++        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL,
+                              1, PPC_ELF_MACHINE, 0, 0);
+         g_free(filename);
+     } else {
+@@ -160,7 +160,8 @@ static void ppc_heathrow_init(MachineState *machine)
+         bswap_needed = 0;
+ #endif
+         kernel_base = KERNEL_LOAD_ADDR;
+-        kernel_size = load_elf(kernel_filename, translate_kernel_address, NULL,
++        kernel_size = load_elf(kernel_filename, NULL,
++                               translate_kernel_address, NULL,
+                                NULL, &lowaddr, NULL, 1, PPC_ELF_MACHINE,
+                                0, 0);
+         if (kernel_size < 0)
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 4b547ea..b4da099 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -256,7 +256,7 @@ static void bamboo_init(MachineState *machine)
+         success = load_uimage(kernel_filename, &entry, &loadaddr, NULL,
+                               NULL, NULL);
+         if (success < 0) {
+-            success = load_elf(kernel_filename, NULL, NULL, &elf_entry,
++            success = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
+                                &elf_lowaddr, NULL, 1, PPC_ELF_MACHINE,
+                                0, 0);
+             entry = elf_entry;
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 202ed14..75250d4 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -426,7 +426,8 @@ static void sam460ex_init(MachineState *machine)
+         if (success < 0) {
+             uint64_t elf_entry, elf_lowaddr;
+ 
+-            success = load_elf(machine->kernel_filename, NULL, NULL, &elf_entry,
++            success = load_elf(machine->kernel_filename, NULL,
++                               NULL, NULL, &elf_entry,
+                                &elf_lowaddr, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+             entry = elf_entry;
+             loadaddr = elf_lowaddr;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0fcdd35..332cba8 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2851,11 +2851,12 @@ static void spapr_machine_init(MachineState *machine)
+     if (kernel_filename) {
+         uint64_t lowaddr = 0;
+ 
+-        spapr->kernel_size = load_elf(kernel_filename, translate_kernel_address,
+-                                      NULL, NULL, &lowaddr, NULL, 1,
++        spapr->kernel_size = load_elf(kernel_filename, NULL,
++                                      translate_kernel_address, NULL,
++                                      NULL, &lowaddr, NULL, 1,
+                                       PPC_ELF_MACHINE, 0, 0);
+         if (spapr->kernel_size == ELF_LOAD_WRONG_ENDIAN) {
+-            spapr->kernel_size = load_elf(kernel_filename,
++            spapr->kernel_size = load_elf(kernel_filename, NULL,
+                                           translate_kernel_address, NULL, NULL,
+                                           &lowaddr, NULL, 0, PPC_ELF_MACHINE,
+                                           0, 0);
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 5177120..5a711cb 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -258,7 +258,7 @@ static void virtex_init(MachineState *machine)
+         hwaddr boot_offset;
+ 
+         /* Boots a kernel elf binary.  */
+-        kernel_size = load_elf(kernel_filename, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
+                                &entry, &low, &high, 1, PPC_ELF_MACHINE,
+                                0, 0);
+         boot_info.bootstrap_pc = entry & 0x00ffffff;
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 5d9d65f..bfc0866 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -78,7 +78,7 @@ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf(kernel_filename, NULL, NULL,
++    if (load_elf(kernel_filename, NULL, NULL, NULL,
+                  &kernel_entry, NULL, &kernel_high,
+                  0, EM_RISCV, 1, 0) < 0) {
+         error_report("could not load kernel '%s'", kernel_filename);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 3bd3b67..2730b25 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -69,7 +69,7 @@ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf(kernel_filename, NULL, NULL,
++    if (load_elf(kernel_filename, NULL, NULL, NULL,
+                  &kernel_entry, NULL, &kernel_high,
+                  0, EM_RISCV, 1, 0) < 0) {
+         error_report("could not load kernel '%s'", kernel_filename);
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 268df04..c66ffc5 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -57,7 +57,7 @@ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf_ram_sym(kernel_filename, NULL, NULL,
++    if (load_elf_ram_sym(kernel_filename, NULL, NULL, NULL,
+             &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0,
+             NULL, true, htif_symbol_callback) < 0) {
+         error_report("could not load kernel '%s'", kernel_filename);
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index e7f0716..3e8b19c 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -66,7 +66,7 @@ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+ 
+-    if (load_elf(kernel_filename, NULL, NULL,
++    if (load_elf(kernel_filename, NULL, NULL, NULL,
+                  &kernel_entry, NULL, &kernel_high,
+                  0, EM_RISCV, 1, 0) < 0) {
+         error_report("could not load kernel '%s'", kernel_filename);
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 21f64ad..896888b 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -131,7 +131,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+             goto error;
+         }
+ 
+-        bios_size = load_elf(bios_filename, bios_translate_addr, &fwbase,
++        bios_size = load_elf(bios_filename, NULL,
++                             bios_translate_addr, &fwbase,
+                              &ipl->bios_start_addr, NULL, NULL, 1,
+                              EM_S390, 0, 0);
+         if (bios_size > 0) {
+@@ -155,7 +156,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (ipl->kernel) {
+-        kernel_size = load_elf(ipl->kernel, NULL, NULL, &pentry, NULL,
++        kernel_size = load_elf(ipl->kernel, NULL, NULL, NULL,
++                               &pentry, NULL,
+                                NULL, 1, EM_S390, 0, 0);
+         if (kernel_size < 0) {
+             kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+@@ -436,7 +438,8 @@ static int load_netboot_image(Error **errp)
+         goto unref_mr;
+     }
+ 
+-    img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
++    img_size = load_elf_ram(netboot_filename, NULL, NULL, NULL,
++                            &ipl->start_addr,
+                             NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
+ 
+     if (img_size < 0) {
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index fa98ab8..774639a 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -190,7 +190,8 @@ static void leon3_generic_hw_init(MachineState *machine)
+         long     kernel_size;
+         uint64_t entry;
+ 
+-        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &entry, NULL, NULL,
+                                1 /* big endian */, EM_SPARC, 0, 0);
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 709ee37..779f3f9 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -242,7 +242,8 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
+ #else
+         bswap_needed = 0;
+ #endif
+-        kernel_size = load_elf(kernel_filename, translate_kernel_address, NULL,
++        kernel_size = load_elf(kernel_filename, NULL,
++                               translate_kernel_address, NULL,
+                                NULL, NULL, NULL, 1, EM_SPARC, 0, 0);
+         if (kernel_size < 0)
+             kernel_size = load_aout(kernel_filename, KERNEL_LOAD_ADDR,
+@@ -692,7 +693,8 @@ static void prom_init(hwaddr addr, const char *bios_name)
+     }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+     if (filename) {
+-        ret = load_elf(filename, translate_prom_address, &addr, NULL,
++        ret = load_elf(filename, NULL,
++                       translate_prom_address, &addr, NULL,
+                        NULL, NULL, 1, EM_SPARC, 0, 0);
+         if (ret < 0 || ret > PROM_SIZE_MAX) {
+             ret = load_image_targphys(filename, addr, PROM_SIZE_MAX);
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index f76b19e..b9bd4be 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -153,7 +153,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
+ #else
+         bswap_needed = 0;
+ #endif
+-        kernel_size = load_elf(kernel_filename, NULL, NULL, kernel_entry,
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, kernel_entry,
+                                kernel_addr, &kernel_top, 1, EM_SPARCV9, 0, 0);
+         if (kernel_size < 0) {
+             *kernel_addr = KERNEL_LOAD_ADDR;
+@@ -411,7 +411,7 @@ static void prom_init(hwaddr addr, const char *bios_name)
+     }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+     if (filename) {
+-        ret = load_elf(filename, translate_prom_address, &addr,
++        ret = load_elf(filename, NULL, translate_prom_address, &addr,
+                        NULL, NULL, NULL, 1, EM_SPARCV9, 0, 0);
+         if (ret < 0 || ret > PROM_SIZE_MAX) {
+             ret = load_image_targphys(filename, addr, PROM_SIZE_MAX);
+diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.c
+index a58096f..003592a 100644
+--- a/hw/tricore/tricore_testboard.c
++++ b/hw/tricore/tricore_testboard.c
+@@ -45,7 +45,7 @@ static void tricore_load_kernel(CPUTriCoreState *env)
+     long kernel_size;
+ 
+     kernel_size = load_elf(tricoretb_binfo.kernel_filename, NULL,
+-                           NULL, &entry, NULL,
++                           NULL, NULL, &entry, NULL,
+                            NULL, 0,
+                            EM_TRICORE, 1, 0);
+     if (kernel_size <= 0) {
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index b6ccb3c..12c7437 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -97,11 +97,15 @@ static void xtensa_sim_init(MachineState *machine)
+         uint64_t elf_entry;
+         uint64_t elf_lowaddr;
+ #ifdef TARGET_WORDS_BIGENDIAN
+-        int success = load_elf(kernel_filename, translate_phys_addr, cpu,
+-                &elf_entry, &elf_lowaddr, NULL, 1, EM_XTENSA, 0, 0);
++        int success = load_elf(kernel_filename, NULL,
++                               translate_phys_addr, cpu,
++                               &elf_entry, &elf_lowaddr,
++                               NULL, 1, EM_XTENSA, 0, 0);
+ #else
+-        int success = load_elf(kernel_filename, translate_phys_addr, cpu,
+-                &elf_entry, &elf_lowaddr, NULL, 0, EM_XTENSA, 0, 0);
++        int success = load_elf(kernel_filename, NULL,
++                               translate_phys_addr, cpu,
++                               &elf_entry, &elf_lowaddr,
++                               NULL, 0, EM_XTENSA, 0, 0);
+ #endif
+         if (success > 0) {
+             env->pc = elf_entry;
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 1d21162..ab3e52b 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -409,7 +409,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+ 
+         uint64_t elf_entry;
+         uint64_t elf_lowaddr;
+-        int success = load_elf(kernel_filename, translate_phys_addr, cpu,
++        int success = load_elf(kernel_filename, NULL, translate_phys_addr, cpu,
+                 &elf_entry, &elf_lowaddr, NULL, be, EM_XTENSA, 0, 0);
+         if (success > 0) {
+             entry_point = elf_entry;
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index e2cb675..3438d6f 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -266,6 +266,7 @@ fail:
+ }
+ 
+ static int glue(load_elf, SZ)(const char *name, int fd,
++                              uint64_t (*elf_note_fn)(void *, void *, bool),
+                               uint64_t (*translate_fn)(void *, uint64_t),
+                               void *translate_opaque,
+                               int must_swab, uint64_t *pentry,
+@@ -498,6 +499,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+             data = NULL;
+         }
+     }
 +
-+#include "optionrom.h"
-+
-+#define BOOT_ROM_PRODUCT "PVH loader"
-+
-+#define GS_PROT_JUMP		0
-+#define GS_GDT_DESC		6
-+
-+#ifdef OPTION_ROM_START
-+#undef OPTION_ROM_START
-+#endif
-+#ifdef OPTION_ROM_END
-+#undef OPTION_ROM_END
-+#endif
-+
-+/*
-+ * Redefine OPTION_ROM_START and OPTION_ROM_END, because this rom is produced
-+ * linking multiple objects.
-+ * signrom.py will add padding.
-+ */
-+#define OPTION_ROM_START                                \
-+    .code16;						\
-+    .text;						\
-+	.global 	_start;				\
-+    _start:;						\
-+	.short		0xaa55;				\
-+	.byte		3; /* desired size in 512 units */
-+
-+#define OPTION_ROM_END					\
-+    _end:
-+
-+BOOT_ROM_START
-+
-+run_pvhboot:
-+
-+	cli
-+	cld
-+
-+	mov		%cs, %eax
-+	shl		$0x4, %eax
-+
-+	/* set up a long jump descriptor that is PC relative */
-+
-+	/* move stack memory to %gs */
-+	mov		%ss, %ecx
-+	shl		$0x4, %ecx
-+	mov		%esp, %ebx
-+	add		%ebx, %ecx
-+	sub		$0x20, %ecx
-+	sub		$0x30, %esp
-+	shr		$0x4, %ecx
-+	mov		%cx, %gs
-+
-+	/* now push the indirect jump descriptor there */
-+	mov		(prot_jump), %ebx
-+	add		%eax, %ebx
-+	movl		%ebx, %gs:GS_PROT_JUMP
-+	mov		$8, %bx
-+	movw		%bx, %gs:GS_PROT_JUMP + 4
-+
-+	/* fix the gdt descriptor to be PC relative */
-+	movw		(gdt_desc), %bx
-+	movw		%bx, %gs:GS_GDT_DESC
-+	movl		(gdt_desc+2), %ebx
-+	add		%eax, %ebx
-+	movl		%ebx, %gs:GS_GDT_DESC + 2
-+
-+	/* initialize HVM memmap table using int 0x15(e820) */
-+
-+	/* ES = pvh_e820 struct */
-+	mov 		$pvh_e820, %eax
-+	shr		$4, %eax
-+	mov		%ax, %es
-+
-+	/* start storing memmap table at %es:8 (pvh_e820.table) */
-+	mov 		$8,%edi
-+	xor		%ebx, %ebx
-+	jmp 		memmap_loop
-+
-+memmap_loop_check:
-+	/* pvh_e820 can contains up to 128 entries */
-+	cmp 		$128, %ebx
-+	je 		memmap_done
-+
-+memmap_loop:
-+	/* entry size (hvm_memmap_table_entry) & max buffer size (int15) */
-+	movl		$24, %ecx
-+	/* e820 */
-+	movl		$0x0000e820, %eax
-+	/* 'SMAP' magic */
-+	movl		$0x534d4150, %edx
-+	/* store counter value at %es:0 (pvh_e820.entries) */
-+	movl 		%ebx, %es:0
-+
-+	int		$0x15
-+	/* error or last entry already done? */
-+	jb		memmap_err
-+
-+	/* %edi += entry size (hvm_memmap_table_entry) */
-+	add		$24, %edi
-+
-+	/* continuation value 0 means last entry */
-+	test		%ebx, %ebx
-+	jnz		memmap_loop_check
-+
-+	/* increase pvh_e820.entries to save the last entry */
-+	movl 		%es:0, %ebx
-+	inc 		%ebx
-+
-+memmap_done:
-+	movl 		%ebx, %es:0
-+
-+memmap_err:
-+
-+	/* load the GDT before going into protected mode */
-+lgdt:
-+	data32 lgdt	%gs:GS_GDT_DESC
-+
-+	/* get us to protected mode now */
-+	movl		$1, %eax
-+	movl		%eax, %cr0
-+
-+	/* the LJMP sets CS for us and gets us to 32-bit */
-+ljmp:
-+	data32 ljmp	*%gs:GS_PROT_JUMP
-+
-+prot_mode:
-+.code32
-+
-+	/* initialize all other segments */
-+	movl		$0x10, %eax
-+	movl		%eax, %ss
-+	movl		%eax, %ds
-+	movl		%eax, %es
-+	movl		%eax, %fs
-+	movl		%eax, %gs
-+
-+	jmp pvh_load_kernel
-+
-+/* Variables */
-+.align 4, 0
-+prot_jump:	.long prot_mode
-+		.short 8
-+
-+.align 4, 0
-+gdt:
-+	/* 0x00 */
-+.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-+
-+	/*
-+	 * 0x08: code segment
-+	 * (base=0, limit=0xfffff, type=32bit code exec/read, DPL=0, 4k)
-+	 */
-+.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00
-+
-+	/*
-+	 * 0x10: data segment
-+	 * (base=0, limit=0xfffff, type=32bit data read/write, DPL=0, 4k)
-+	 */
-+.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00
-+
-+	/*
-+	 * 0x18: code segment
-+	 * (base=0, limit=0x0ffff, type=16bit code exec/read/conf, DPL=0, 1b)
-+	 */
-+.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9e, 0x00, 0x00
-+
-+	/*
-+	 * 0x20: data segment
-+	 * (base=0, limit=0x0ffff, type=16bit data read/write, DPL=0, 1b)
-+	 */
-+.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0x00, 0x00
-+
-+gdt_desc:
-+.short	(5 * 8) - 1
-+.long	gdt
-+
-+BOOT_ROM_END
-diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
-new file mode 100644
-index 0000000..1dcc5c9
---- /dev/null
-+++ b/pc-bios/optionrom/pvh_main.c
-@@ -0,0 +1,116 @@
-+/*
-+ * PVH Option ROM for fw_cfg DMA
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * Copyright (c) 2019 Red Hat Inc.
-+ *   Authors:
-+ *     Stefano Garzarella <sgarzare@redhat.com>
-+ */
-+
-+asm (".code32"); /* this code will be executed in protected mode */
-+
-+#include <stddef.h>
-+#include <stdint.h>
-+#include "optrom.h"
-+#include "optrom_fw_cfg.h"
-+#include "../../include/hw/xen/start_info.h"
-+
-+#define RSDP_SIGNATURE          0x2052545020445352LL /* "RSD PTR " */
-+#define RSDP_AREA_ADDR          0x000E0000
-+#define RSDP_AREA_SIZE          2048
-+#define EBDA_BASE_ADDR          0x0000040E
-+#define EBDA_SIZE               1024
-+
-+#define E820_MAXENTRIES         128
-+#define CMDLINE_BUFSIZE         4096
-+
-+/* e820 table filled in pvh.S using int 0x15 */
-+struct pvh_e820_table {
-+    uint32_t entries;
-+    uint32_t reserved;
-+    struct hvm_memmap_table_entry table[E820_MAXENTRIES];
-+};
-+
-+struct pvh_e820_table pvh_e820 asm("pvh_e820") __attribute__ ((aligned));
-+
-+static struct hvm_start_info start_info;
-+static uint8_t cmdline_buffer[CMDLINE_BUFSIZE];
-+
-+
-+/* Search RSDP signature. */
-+static uintptr_t search_rsdp(uint32_t start_addr, uint32_t end_addr)
-+{
-+    uint64_t *rsdp_p;
-+
-+    /* RSDP signature is always on a 16 byte boundary */
-+    for (rsdp_p = (uint64_t *)start_addr; rsdp_p < (uint64_t *)end_addr;
-+         rsdp_p += 2) {
-+        if (*rsdp_p == RSDP_SIGNATURE) {
-+            return (uintptr_t)rsdp_p;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+/* Force the asm name without leading underscore, even on Win32. */
-+extern void pvh_load_kernel(void) asm("pvh_load_kernel");
-+
-+void pvh_load_kernel(void)
-+{
-+    void *cmdline_addr = &cmdline_buffer;
-+    void *kernel_entry;
-+    uint32_t cmdline_size, fw_cfg_version = bios_cfg_version();
-+
-+    start_info.magic = XEN_HVM_START_MAGIC_VALUE;
-+    start_info.version = 1;
-+
-+    /*
-+     * pvh_e820 is filled in the pvh.S before to switch in protected mode,
-+     * because we can use int 0x15 only in real mode.
-+     */
-+    start_info.memmap_entries = pvh_e820.entries;
-+    start_info.memmap_paddr = (uintptr_t)pvh_e820.table;
-+
-+    /*
-+     * Search RSDP in the main BIOS area below 1 MB.
-+     * SeaBIOS store the RSDP in this area, so we try it first.
-+     */
-+    start_info.rsdp_paddr = search_rsdp(RSDP_AREA_ADDR,
-+                                        RSDP_AREA_ADDR + RSDP_AREA_SIZE);
-+
-+    /* Search RSDP in the EBDA if it is not found */
-+    if (!start_info.rsdp_paddr) {
-+        /*
-+         * Th EBDA address is stored at EBDA_BASE_ADDR. It contains 2 bytes
-+         * segment pointer to EBDA, so we must convert it to a linear address.
-+         */
-+        uint32_t ebda_paddr = ((uint32_t)*((uint16_t *)EBDA_BASE_ADDR)) << 4;
-+        if (ebda_paddr > 0x400) {
-+            uint32_t *ebda = (uint32_t *)ebda_paddr;
-+
-+            start_info.rsdp_paddr = search_rsdp(*ebda, *ebda + EBDA_SIZE);
-+        }
-+    }
-+
-+    bios_cfg_read_entry(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4, fw_cfg_version);
-+    bios_cfg_read_entry(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size,
-+                        fw_cfg_version);
-+    start_info.cmdline_paddr = (uintptr_t)cmdline_addr;
-+
-+    bios_cfg_read_entry(&kernel_entry, FW_CFG_KERNEL_ENTRY, 4, fw_cfg_version);
-+
-+    asm volatile("jmp *%1" : : "b"(&start_info), "c"(kernel_entry));
-+}
-diff --git a/pc-bios/pvh.bin b/pc-bios/pvh.bin
-new file mode 100644
-index 0000000000000000000000000000000000000000..38a41761014957d50eb55d790b6957888cbeee0a
-GIT binary patch
-literal 1536
-zcmeHFO=uHA6n<Mbnu=ssNNWxu1R3K=F$hAzLe;1RTZsKrX#Im`@DQq$r1jvTWvz7B
-z?oxVDJP5Tn&m!9tH6fLa717p9wTLMN$!ew8f`@9mzS(9Ku{W=skT>6(H}8AjdpoTU
-zx4nc-R}e_ND=t*H!BfH+!No@%FjUZISAWu>0?idgIy6ml^CD#nRCq@fD@>KeLo{cJ
-zx<%EHEKnhzpezJ1;e`YXiJ*q+1O(dw!^hpQ7pT$a2cWr<sAuUjFBYQFxi6Kp|3@F<
-z)B!pk;Acj-gf<gD*4P|zXkS%z@1cqrpaXO1nFw-X_{2siK_#IY>lj?Wv^Sfe_CWwc
-zMo)jE&+1vdsF$n<=mM<bpBHtPZ6mt(8k~Kkyx)hi53nBs$a?l<V=Khl>ch!vS2`2j
-zK!@F5v$80&x6v7?AWe<181b?evP*iw8i<%%klA}>YNs^C{Dc*yLMGq=SW-nI6_nz7
-z%BQ6w;Ckur%B0+$A8tL@hLl04m5hw{>C(7}61AJepV^K6N>WV`zv-#NDc*SAb=dU8
-z5b@4O`C!McqcH|Kx{Aj1B+>F^0QgY1D)%opHOIngz1aUP-qIAVoR)6wz;q=m*Mipv
-z=?|voayiHJbe2&xOGkaE10O;y;NEju1??_JHTm9Z>j)BPk9irSsmV*X_u;`NrP9Ud
-z%ot~9Rh(Jtfr&cgU_oNW2m;LiR3Q!ALGXk(Z}9T$GhKShTmL->w!D%ws>&g?f%w@+
-zeuT4BTZlMz-YL+5)_DUw-%XYIy$L=$Oq1<-Wir@)@zRC7_9%jMI3GvdpT4aQ+qTO=
-z{<(%7q70X%#fZPOwr1O0K*musTl&iVe`IVV@%M;Ha;boqtX@vs1JUeX6R{T8otMbP
-NY^|*c{O<$?e*uLwDi8nw
-
-literal 0
-HcmV?d00001
-
+     g_free(phdr);
+     if (lowaddr)
+         *lowaddr = (uint64_t)(elf_sword)low;
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index de8a296..3e1b3a4 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -93,6 +93,8 @@ const char *load_elf_strerror(int error);
+ 
+ /** load_elf_ram_sym:
+  * @filename: Path of ELF file
++ * @elf_note_fn: optional function to parse ELF Note type
++ *               passed via @translate_opaque
+  * @translate_fn: optional function to translate load addresses
+  * @translate_opaque: opaque data passed to @translate_fn
+  * @pentry: Populated with program entry point. Ignored if NULL.
+@@ -125,6 +127,7 @@ typedef void (*symbol_fn_t)(const char *st_name, int st_info,
+                             uint64_t st_value, uint64_t st_size);
+ 
+ int load_elf_ram_sym(const char *filename,
++                     uint64_t (*elf_note_fn)(void *, void *, bool),
+                      uint64_t (*translate_fn)(void *, uint64_t),
+                      void *translate_opaque, uint64_t *pentry,
+                      uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
+@@ -136,6 +139,7 @@ int load_elf_ram_sym(const char *filename,
+  * symbol callback function
+  */
+ int load_elf_ram(const char *filename,
++                 uint64_t (*elf_note_fn)(void *, void *, bool),
+                  uint64_t (*translate_fn)(void *, uint64_t),
+                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+                  uint64_t *highaddr, int big_endian, int elf_machine,
+@@ -146,6 +150,7 @@ int load_elf_ram(const char *filename,
+  * Same as load_elf_ram(), but always loads the elf as ROM
+  */
+ int load_elf_as(const char *filename,
++                uint64_t (*elf_note_fn)(void *, void *, bool),
+                 uint64_t (*translate_fn)(void *, uint64_t),
+                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+                 uint64_t *highaddr, int big_endian, int elf_machine,
+@@ -155,7 +160,9 @@ int load_elf_as(const char *filename,
+  * Same as load_elf_as(), but doesn't allow the caller to specify an
+  * AddressSpace.
+  */
+-int load_elf(const char *filename, uint64_t (*translate_fn)(void *, uint64_t),
++int load_elf(const char *filename,
++             uint64_t (*elf_note_fn)(void *, void *, bool),
++             uint64_t (*translate_fn)(void *, uint64_t),
+              void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+              uint64_t *highaddr, int big_endian, int elf_machine,
+              int clear_lsb, int data_swab);
 -- 
 1.8.3.1
