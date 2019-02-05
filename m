@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36838)
+Received: from eggs.gnu.org ([209.51.188.92]:37483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr4By-00037Q-Dq
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:07:27 -0500
+	(envelope-from <crosa@redhat.com>) id 1gr4De-0004Vy-3J
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr4Bx-0001M4-Ej
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:07:26 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 5 Feb 2019 17:07:17 +0000
-Message-ID: <e78b4a65-e103-7df7-fa77-7d67699b9c91@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-10-vsementsov@virtuozzo.com>
-	<8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
-In-Reply-To: <8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <92546F0195CD3A4E898E367C60229100@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <crosa@redhat.com>) id 1gr4Dd-0001mt-3V
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gr4Dc-0001ie-R3
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:09 -0500
+References: <20190205151810.571-1-peter.maydell@linaro.org>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <04561627-3b15-d688-9fb8-107017175fa4@redhat.com>
+Date: Tue, 5 Feb 2019 11:52:53 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/nbd-client: nbd reconnect
+In-Reply-To: <20190205151810.571-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] accel/tcg: Consider cluster index in
+ tb_lookup__cpu_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Howard Spoelstra <hsp.cat7@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Emilio G . Cota" <cota@braap.org>
 
-MTYuMDEuMjAxOSAyMDowNCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNy8zMS8xOCAxMjozMCBQ
-TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEltcGxlbWVudCByZWNv
-bm5lY3QuIFRvIGFjaGlldmUgdGhpczoNCj4+DQo+PiAxLiBhZGQgbmV3IG1vZGVzOg0KPj4gICAg
-IGNvbm5lY3Rpbmctd2FpdDogbWVhbnMsIHRoYXQgcmVjb25uZWN0aW5nIGlzIGluIHByb2dyZXNz
-LCBhbmQgdGhlcmUNCj4+ICAgICAgIHdlcmUgc21hbGwgbnVtYmVyIG9mIHJlY29ubmVjdCBhdHRl
-bXB0cywgc28gYWxsIHJlcXVlc3RzIGFyZQ0KPj4gICAgICAgd2FpdGluZyBmb3IgdGhlIGNvbm5l
-Y3Rpb24uDQo+PiAgICAgY29ubmVjdGluZy1ub3dhaXQ6IHJlY29ubmVjdGluZyBpcyBpbiBwcm9n
-cmVzcywgdGhlcmUgd2VyZSBhIGxvdCBvZg0KPj4gICAgICAgYXR0ZW1wdHMgb2YgcmVjb25uZWN0
-LCBhbGwgcmVxdWVzdHMgd2lsbCByZXR1cm4gZXJyb3JzLg0KPj4NCj4+ICAgICB0d28gb2xkIG1v
-ZGVzIGFyZSB1c2VkIHRvbzoNCj4+ICAgICBjb25uZWN0ZWQ6IG5vcm1hbCBzdGF0ZQ0KPj4gICAg
-IHF1aXQ6IGV4aXRpbmcgYWZ0ZXIgZmF0YWwgZXJyb3Igb3Igb24gY2xvc2UNCj4gDQo+IFdoYXQg
-bWFrZXMgYW4gZXJyb3IgZmF0YWw/ICBXaXRob3V0IHJlY29ubmVjdCwgbGlmZSBpcyBzaW1wbGUg
-LSBpZiB0aGUNCj4gc2VydmVyIHNlbmRzIHNvbWV0aGluZyB3ZSBjYW4ndCBwYXJzZSwgd2UgcGVy
-bWFuZW50bHkgdHVybiB0aGUgZGV2aWNlDQo+IGludG8gYW4gZXJyb3IgY29uZGl0aW9uIC0gYmVj
-YXVzZSB3ZSBoYXZlIG5vIHdheSB0byBnZXQgYmFjayBpbiBzeW5jDQo+IHdpdGggdGhlIHNlcnZl
-ciBmb3IgZnVydGhlciBjb21tYW5kcy4gIFlvdXIgcGF0Y2ggYWxsb3dzIHJlY29ubmVjdA0KPiBh
-dHRlbXB0cyB3aGVyZSB0aGUgY29ubmVjdGlvbiBpcyBkb3duICh3ZSBmYWlsZWQgdG8gc2VuZCB0
-byB0aGUgc2VydmVyDQo+IG9yIGZhaWxlZCB0byByZWNlaXZlIHRoZSBzZXJ2ZXIncyByZXBseSks
-IGJ1dCB3aHkgY2FuIHdlIG5vdCBBTFNPDQo+IGF0dGVtcHQgdG8gcmVjb25uZWN0IGFmdGVyIGEg
-cGFyc2UgZXJyb3I/ICBBIHJlY29ubmVjdCB3b3VsZCBsZXQgdXMgZ2V0DQo+IGJhY2sgaW4gc3lu
-YyBmb3IgYXR0ZW1wdGluZyBmdXJ0aGVyIGNvbW1hbmRzLiAgWW91J3JlIHJpZ2h0IHRoYXQgdGhl
-DQo+IGN1cnJlbnQgY29tbWFuZCBzaG91bGQgcHJvYmFibHkgZmFpbCBpbiB0aGF0IGNhc2UgKGlm
-IHRoZSBzZXJ2ZXIgc2VudCB1cw0KPiBnYXJiYWdlIGZvciBhIHNwZWNpZmljIHJlcXVlc3QsIGl0
-IHdpbGwgcHJvYmFibHkgZG8gc28gYWdhaW4gb24gYSByZXBlYXQNCj4gb2YgdGhhdCByZXF1ZXN0
-OyB3aGljaCBpcyBkaWZmZXJlbnQgdGhhbiB3aGVuIHdlIGRvbid0IGV2ZW4ga25vdyB3aGF0DQo+
-IHRoZSBzZXJ2ZXIgd291bGQgaGF2ZSBzZW50IGJlY2F1c2Ugb2YgYSBkaXNjb25uZWN0KS4NCg0K
-TXkgdGhvdWdodCB3YXMgdGhhdCBwcm90b2NvbCBlcnJvciBpcyBmYXRhbCwgYXMgaXQgc2hvd3Mg
-dGhhdCBzZXJ2ZXIgaXMNCmJ1Z2d5LCBhbmQgaXQgc2VlbXMgdW5zYWZlIHRvIGNvbW11bmljYXRl
-IHRvIGJ1Z2d5IHNlcnZlci4uDQoNCj4gDQo+IE9yLCBwdXQgYW5vdGhlciB3YXksIHdlIEtOT1cg
-d2UgaGF2ZSAoY29ybmVyKSBjYXNlcyB3aGVyZSBhIG1pcy1hbGlnbmVkDQo+IGltYWdlIGNhbiBj
-dXJyZW50bHkgY2F1c2UgdGhlIHNlcnZlciB0byByZXR1cm4gQkxPQ0tfU1RBVFVTIHJlcGxpZXMg
-dGhhdA0KPiBhcmVuJ3QgYWxpZ25lZCB0byB0aGUgYWR2ZXJ0aXNlZCBtaW5pbXVtbSBibG9jayBz
-aXplLiAgQXR0ZW1wdGluZyB0bw0KPiByZWFkIHRoZSBsYXN0IHNlY3RvciBvZiBhbiBpbWFnZSB0
-aGVuIGNhdXNlcyB0aGUgY2xpZW50IHRvIHNlZSB0aGUNCj4gbWlzYWxpZ25lZCByZXBseSBhbmQg
-Y29tcGxhaW4sIHdoaWNoIHdlIGFyZSB0cmVhdGluZyBhcyBmYXRhbC4NCg0KRG8gd2UgaGF2ZSBm
-aXhlcyBmb3IgaXQ/DQoNCj4gQnV0IHdoeQ0KPiBub3QgaW5zdGVhZCBqdXN0IGZhaWwgdGhhdCBw
-YXJ0aWN1bGFyIHJlYWQsIGJ1dCBzdGlsbCBhdHRlbXB0IGENCj4gcmVjb25uZWN0LCBpbiBvcmRl
-ciB0byBhdHRlbXB0IGZ1cnRoZXIgcmVhZHMgZWxzZXdoZXJlIGluIHRoZSBpbWFnZSB0aGF0DQo+
-IGRvIG5vdCB0cmlwIHVwIHRoZSBzZXJ2ZXIncyBtaXNhbGlnbmVkIHJlcGx5Pw0KPiANCg0KSG1t
-LCBmb3IgdGhlc2UgY2FzZXMsIGlmIHdlIGNvbnNpZGVyIHRoaXMgZXJyb3JzIG5vdCBmYXRhbCwg
-d2UgZG9uJ3QgbmVlZA0KZXZlbiBhIHJlY29ubmVjdC4uDQoNCklmIHdlIHdhbnQgdG8gY29uc2lk
-ZXIgcHJvdG9jb2wgZXJyb3JzIHRvIGJlIHJlY292ZXJhYmxlLCB3ZSBuZWVkIHJlY29ubmVjdCBv
-bmx5DQpvbiB3cm9uZyBtYWdpYyBhbmQgbWF5IGJlIHNvbWUga2luZCBvZiBpbmNvbnNpc3RlbnQg
-dmFyaWFibGUgZGF0YSBsZW5naHRzLi4NCg0KQW5kIGl0IG1heSBuZWVkIGFkZGl0aW9uIG9wdGlv
-biwgbGlrZSAtLXN0cmljdD1mYWxzZQ0KDQo+Pg0KPj4gUG9zc2libGUgdHJhbnNpdGlvbnMgYXJl
-Og0KPj4NCj4+ICAgICAqIC0+IHF1aXQNCj4+ICAgICBjb25uZWN0aW5nLSogLT4gY29ubmVjdGVk
-DQo+PiAgICAgY29ubmVjdGluZy13YWl0IC0+IGNvbm5lY3Rpbmctbm93YWl0ICh0cmFuc2l0aW9u
-IGlzIGRvbmUgYWZ0ZXINCj4+ICAgICAgICAgICAgICAgICAgICAgICAgcmVjb25uZWN0LWRlbGF5
-IHNlY29uZHMgaW4gY29ubmVjdGluZy13YWl0IG1vZGUpDQo+PiAgICAgY29ubmVjdGVkIC0+IGNv
-bm5lY3Rpbmctd2FpdA0KPj4NCj4+IDIuIEltcGxlbWVudCByZWNvbm5lY3QgaW4gY29ubmVjdGlv
-bl9jby4gU28sIGluIGNvbm5lY3RpbmctKiBtb2RlLA0KPj4gICAgICBjb25uZWN0aW9uX2NvLCB0
-cmllcyB0byByZWNvbm5lY3QgdW5saW1pdGVkIHRpbWVzLg0KPj4NCj4+IDMuIFJldHJ5IG5iZCBx
-dWVyaWVzIG9uIGNoYW5uZWwgZXJyb3IsIGlmIHdlIGFyZSBpbiBjb25uZWN0aW5nLXdhaXQNCj4+
-ICAgICAgc3RhdGUuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9n
-aWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIGJsb2NrL25i
-ZC1jbGllbnQuaCB8ICAgNCArDQo+PiAgIGJsb2NrL25iZC1jbGllbnQuYyB8IDMwNCArKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPj4gICAyIGZp
-bGVzIGNoYW5nZWQsIDI1NSBpbnNlcnRpb25zKCspLCA1MyBkZWxldGlvbnMoLSkNCj4+DQo+IA0K
-Pj4gQEAgLTc4MSwxNiArOTM2LDIxIEBAIHN0YXRpYyBpbnQgbmJkX2NvX3JlcXVlc3QoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMsIE5CRFJlcXVlc3QgKnJlcXVlc3QsDQo+PiAgICAgICB9IGVsc2Ugew0K
-Pj4gICAgICAgICAgIGFzc2VydChyZXF1ZXN0LT50eXBlICE9IE5CRF9DTURfV1JJVEUpOw0KPj4g
-ICAgICAgfQ0KPj4gLSAgICByZXQgPSBuYmRfY29fc2VuZF9yZXF1ZXN0KGJzLCByZXF1ZXN0LCB3
-cml0ZV9xaW92KTsNCj4+IC0gICAgaWYgKHJldCA8IDApIHsNCj4+IC0gICAgICAgIHJldHVybiBy
-ZXQ7DQo+PiAtICAgIH0NCj4+ICAgDQo+PiAtICAgIHJldCA9IG5iZF9jb19yZWNlaXZlX3JldHVy
-bl9jb2RlKGNsaWVudCwgcmVxdWVzdC0+aGFuZGxlLA0KPj4gLSAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAmcmVxdWVzdF9yZXQsICZsb2NhbF9lcnIpOw0KPj4gLSAgICBpZiAo
-bG9jYWxfZXJyKSB7DQo+PiAtICAgICAgICBlcnJvcl9yZXBvcnRfZXJyKGxvY2FsX2Vycik7DQo+
-PiAtICAgIH0NCj4+ICsgICAgZG8gew0KPj4gKyAgICAgICAgcmV0ID0gbmJkX2NvX3NlbmRfcmVx
-dWVzdChicywgcmVxdWVzdCwgd3JpdGVfcWlvdik7DQo+PiArICAgICAgICBpZiAocmV0IDwgMCkg
-ew0KPj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gKyAgICAgICAgfQ0KPj4gKw0KPj4gKyAg
-ICAgICAgcmV0ID0gbmJkX2NvX3JlY2VpdmVfcmV0dXJuX2NvZGUoY2xpZW50LCByZXF1ZXN0LT5o
-YW5kbGUsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcmVx
-dWVzdF9yZXQsICZsb2NhbF9lcnIpOw0KPj4gKyAgICAgICAgaWYgKGxvY2FsX2Vycikgew0KPj4g
-KyAgICAgICAgICAgIGVycm9yX3JlcG9ydF9lcnIobG9jYWxfZXJyKTsNCj4+ICsgICAgICAgICAg
-ICBsb2NhbF9lcnIgPSBOVUxMOw0KPiANCj4gQ29uZmxpY3RzIHdpdGggdGhlIGNvbnZlcnNpb24g
-dG8gdXNlIHRyYWNlIHBvaW50cy4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1p
-cg0K
+
+
+On 2/5/19 10:18 AM, Peter Maydell wrote:
+> In commit f7b78602fdc6c6e4be we added the CPU cluster number to the
+> cflags field of the TB hash; this included adding it to the value
+> kept in tb->cflags, since we pass that field directly into the hash
+> calculation in some places. Unfortunately we forgot to check whether
+> other parts of the code were doing comparisons against tb->cflags
+> that would need to be updated.
+> 
+> It turns out that there is exactly one such place: the
+> tb_lookup__cpu_state() function checks whether the TB it has
+> found in the tb_jmp_cache has a tb->cflags matching the cf_mask
+> that is passed in. The tb->cflags has the cluster_index in it
+> but the cf_mask does not.
+> 
+> Hoist the "add cluster index to the cf_mask" code up from
+> tb_htable_lookup() to tb_lookup__cpu_state() so it can be considered
+> in the "did this TB match in the jmp cache" condition, as well as
+> when we do the full hash lookup by physical PC, flags, etc.
+> (tb_htable_lookup() is only called from tb_lookup__cpu_state(),
+> so this change doesn't require any further knock-on changes.)
+> 
+> Fixes: f7b78602fdc6c6e4be ("accel/tcg: Add cluster number to TCG TB hash")
+> Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+> Reported-by: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Does anybody know why tb_lookup__cpu_state() has that odd
+> double-underscore in the middle of its name?
+> 
+> Since the jmp_cache is per-vcpu we know that we're always going
+> to match on the cluster_index, so the other option would be to
+> leave the cluster_index bits out of the comparison, and leave the
+> "fold in cluster index to cf_mask" code in tb_htable_lookup().
+> Or we could require the callers of tb_lookup__cpu_state() to all
+> provide the cluster index, but that's more places to change,
+> so I prefer this.
+
+I can confirm the performance regression I experienced is fixed by this
+patch.
+
+Tested-by: Cleber Rosa <crosa@redhat.com>
