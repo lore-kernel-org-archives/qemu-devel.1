@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42139)
+Received: from eggs.gnu.org ([209.51.188.92]:42224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr5Sw-0004pu-7p
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:03 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr5Sz-0004t5-46
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr5Sv-0005L1-9n
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:02 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:42618)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr5Sx-0005Nc-95
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:05 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:34702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gr5Su-0005HJ-VA
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:01 -0500
+	id 1gr5Sw-0005Lm-PS
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:29:03 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Tue,  5 Feb 2019 20:28:17 +0200
-Message-Id: <20190205182848.29887-2-samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 20:28:25 +0200
+Message-Id: <20190205182848.29887-10-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
 References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv3 01/32] slirp: Avoid unaligned 16bit memory
- access
+Subject: [Qemu-devel] [PULLv3 09/32] slirp: replace trace functions with
+ DEBUG calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +29,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, Richard Henderson <richard.henderson@linaro.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-pkt parameter may be unaligned, so we must access it byte-wise.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This fixes sparc64 host SIGBUS during pxe boot.
+Remove a dependency on QEMU. Use the existing logging facilities.
+Set SLIRP_DEBUG=3Dtftp to get tftp log.
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- slirp/slirp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile.objs      |  1 -
+ slirp/debug.h      | 13 ++++++++++---
+ slirp/slirp.c      |  1 +
+ slirp/tftp.c       |  7 ++++---
+ slirp/trace-events |  5 -----
+ 5 files changed, 15 insertions(+), 12 deletions(-)
+ delete mode 100644 slirp/trace-events
 
+diff --git a/Makefile.objs b/Makefile.objs
+index 67a054b08a..b7aae33367 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -192,7 +192,6 @@ trace-events-subdirs +=3D net
+ trace-events-subdirs +=3D qapi
+ trace-events-subdirs +=3D qom
+ trace-events-subdirs +=3D scsi
+-trace-events-subdirs +=3D slirp
+ trace-events-subdirs +=3D target/arm
+ trace-events-subdirs +=3D target/i386
+ trace-events-subdirs +=3D target/mips
+diff --git a/slirp/debug.h b/slirp/debug.h
+index 269d97d807..44d922df37 100644
+--- a/slirp/debug.h
++++ b/slirp/debug.h
+@@ -8,9 +8,10 @@
+ #ifndef DEBUG_H_
+ #define DEBUG_H_
+=20
+-#define DBG_CALL 0x1
+-#define DBG_MISC 0x2
+-#define DBG_ERROR 0x4
++#define DBG_CALL (1 << 0)
++#define DBG_MISC (1 << 1)
++#define DBG_ERROR (1 << 2)
++#define DBG_TFTP (1 << 3)
+=20
+ extern int slirp_debug;
+=20
+@@ -38,4 +39,10 @@ extern int slirp_debug;
+     }                                           \
+ } while (0)
+=20
++#define DEBUG_TFTP(fmt, ...) do {               \
++    if (G_UNLIKELY(slirp_debug & DBG_TFTP)) {   \
++        g_debug(fmt, ##__VA_ARGS__);            \
++    }                                           \
++} while (0)
++
+ #endif /* DEBUG_H_ */
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index a9674ab090..739f364770 100644
+index a411221914..12677e5da7 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -829,7 +829,7 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt, in=
-t pkt_len)
-     if (pkt_len < ETH_HLEN)
-         return;
+@@ -270,6 +270,7 @@ static void slirp_init_once(void)
+             { "call", DBG_CALL },
+             { "misc", DBG_MISC },
+             { "error", DBG_ERROR },
++            { "tftp", DBG_TFTP },
+         };
+         slirp_debug =3D g_parse_debug_string(debug, keys, G_N_ELEMENTS(k=
+eys));
+     }
+diff --git a/slirp/tftp.c b/slirp/tftp.c
+index a9ba1480db..6fb381ef33 100644
+--- a/slirp/tftp.c
++++ b/slirp/tftp.c
+@@ -26,7 +26,6 @@
+ #include "slirp.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+-#include "trace.h"
 =20
--    proto =3D ntohs(*(uint16_t *)(pkt + 12));
-+    proto =3D (((uint16_t) pkt[12]) << 8) + pkt[13];
-     switch(proto) {
-     case ETH_P_ARP:
-         arp_input(slirp, pkt, pkt_len);
+ static inline int tftp_session_in_use(struct tftp_session *spt)
+ {
+@@ -205,7 +204,8 @@ static void tftp_send_error(struct tftp_session *spt,
+   struct mbuf *m;
+   struct tftp_t *tp;
+=20
+-  trace_slirp_tftp_error(msg);
++  DEBUG_TFTP("tftp error msg: %s", msg);
++
+   m =3D m_get(spt->slirp);
+=20
+   if (!m) {
+@@ -325,7 +325,8 @@ static void tftp_handle_rrq(Slirp *slirp, struct sock=
+addr_storage *srcsas,
+       break;
+     }
+   }
+-  trace_slirp_tftp_rrq(req_fname);
++
++  DEBUG_TFTP("tftp rrq file: %s", req_fname);
+=20
+   /* check mode */
+   if ((pktlen - k) < 6) {
+diff --git a/slirp/trace-events b/slirp/trace-events
+deleted file mode 100644
+index ff8f656e8c..0000000000
+--- a/slirp/trace-events
++++ /dev/null
+@@ -1,5 +0,0 @@
+-# See docs/devel/tracing.txt for syntax documentation.
+-
+-# slirp/tftp.c
+-slirp_tftp_rrq(const char *file) "file: %s"
+-slirp_tftp_error(const char *file) "msg: %s"
 --=20
 2.20.1
