@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37483)
+Received: from eggs.gnu.org ([209.51.188.92]:37597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gr4De-0004Vy-3J
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:11 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gr4Dr-0004iB-DQ
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gr4Dd-0001mt-3V
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gr4Dc-0001ie-R3
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:09 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gr4Dp-0001si-Sl
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:23 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:38512
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gr4Dp-0001rq-HC
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:09:21 -0500
 References: <20190205151810.571-1-peter.maydell@linaro.org>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <04561627-3b15-d688-9fb8-107017175fa4@redhat.com>
-Date: Tue, 5 Feb 2019 11:52:53 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <dda9f210-6f40-ad6e-f309-665856bf54f6@ilande.co.uk>
+Date: Tue, 5 Feb 2019 17:09:06 +0000
 MIME-Version: 1.0
 In-Reply-To: <20190205151810.571-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] accel/tcg: Consider cluster index in
  tb_lookup__cpu_state()
@@ -29,11 +31,10 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Howard Spoelstra <hsp.cat7@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Emilio G . Cota" <cota@braap.org>
+Cc: patches@linaro.org, Richard Henderson <richard.henderson@linaro.org>, Howard Spoelstra <hsp.cat7@gmail.com>, "Emilio G . Cota" <cota@braap.org>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
+On 05/02/2019 15:18, Peter Maydell wrote:
 
-
-On 2/5/19 10:18 AM, Peter Maydell wrote:
 > In commit f7b78602fdc6c6e4be we added the CPU cluster number to the
 > cflags field of the TB hash; this included adding it to the value
 > kept in tb->cflags, since we pass that field directly into the hash
@@ -69,8 +70,48 @@ On 2/5/19 10:18 AM, Peter Maydell wrote:
 > Or we could require the callers of tb_lookup__cpu_state() to all
 > provide the cluster index, but that's more places to change,
 > so I prefer this.
+> ---
+>  include/exec/tb-lookup.h | 4 ++++
+>  accel/tcg/cpu-exec.c     | 3 ---
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
+> index 492cb682894..26921b6dafd 100644
+> --- a/include/exec/tb-lookup.h
+> +++ b/include/exec/tb-lookup.h
+> @@ -28,6 +28,10 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
+>      cpu_get_tb_cpu_state(env, pc, cs_base, flags);
+>      hash = tb_jmp_cache_hash_func(*pc);
+>      tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
+> +
+> +    cf_mask &= ~CF_CLUSTER_MASK;
+> +    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
+> +
+>      if (likely(tb &&
+>                 tb->pc == *pc &&
+>                 tb->cs_base == *cs_base &&
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 7cf1292546f..60d87d5a19b 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -325,9 +325,6 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+>      struct tb_desc desc;
+>      uint32_t h;
+>  
+> -    cf_mask &= ~CF_CLUSTER_MASK;
+> -    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
+> -
+>      desc.env = (CPUArchState *)cpu->env_ptr;
+>      desc.cs_base = cs_base;
+>      desc.flags = flags;
+> 
 
-I can confirm the performance regression I experienced is fixed by this
-patch.
+Looks good to me: without performing a detailed benchmark, with this patch applied
+the performance seems to be back to where it was before f7b78602fdc6c6e4be was merged.
 
-Tested-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
