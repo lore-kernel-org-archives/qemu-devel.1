@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50380)
+Received: from eggs.gnu.org ([209.51.188.92]:51153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gr4jH-0006xn-3q
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:41:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr4k2-0007Zj-Pg
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gr4jG-0000wO-1h
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:41:51 -0500
-Date: Tue, 5 Feb 2019 12:40:57 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190205124033-mutt-send-email-mst@kernel.org>
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-14-philmd@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gr4k0-0001Vl-Br
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:42:38 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40799)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr4jz-0001JF-Uh
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:42:36 -0500
+Received: by mail-wr1-x443.google.com with SMTP id p4so4589227wrt.7
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:42:11 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  5 Feb 2019 17:42:07 +0000
+Message-Id: <20190205174207.9278-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190129175403.18017-14-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 13/18] oslib-posix: Ignore
- fcntl("/dev/null", F_SETFL, O_NONBLOCK) failure
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] linux-user: Check sscanf return value in
+ open_net_route()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, Kamil Rytarowski <kamil@netbsd.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-On Tue, Jan 29, 2019 at 06:53:58PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Previous to OpenBSD 6.3 [1], fcntl(F_SETFL) is not permitted on
-> memory devices.
-> Trying this call sets errno to ENODEV ("not a memory device"):
->=20
->   19 ENODEV Operation not supported by device.
->     An attempt was made to apply an inappropriate function to a device,
->     for example, trying to read a write-only device such as a printer.
->=20
-> Do not assert fcntl failures in this specific case (errno set to ENODEV=
-)
-> on OpenBSD. This fixes:
->=20
->   $ lm32-softmmu/qemu-system-lm32
->   assertion "f !=3D -1" failed: file "util/oslib-posix.c", line 247, fu=
-nction "qemu_set_nonblock"
->   Abort trap (core dumped)
->=20
-> [1] The fix seems https://github.com/openbsd/src/commit/c2a35b387f9d3c
->   "fcntl(F_SETFL) invokes the FIONBIO and FIOASYNC ioctls internally, s=
-o
->   the memory devices (/dev/null, /dev/zero, etc) need to permit them."
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Coverity warns (CID 1390634) that open_net_route() is not
+checking the return value from sscanf(), which means that
+it might then use values that aren't initialized.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Errors here should in general not happen since we're passing
+an assumed-good /proc/net/route from the host kernel, but
+if we do fail to parse a line then just skip it in the output
+we pass to the guest.
 
-> ---
->  util/oslib-posix.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->=20
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 4ce1ba9ca4..2f0f27e6d9 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -244,7 +244,17 @@ void qemu_set_nonblock(int fd)
->      f =3D fcntl(fd, F_GETFL);
->      assert(f !=3D -1);
->      f =3D fcntl(fd, F_SETFL, f | O_NONBLOCK);
-> +#ifdef __OpenBSD__
-> +    if (f =3D=3D -1) {
-> +        /*
-> +         * Previous to OpenBSD 6.3, fcntl(F_SETFL) is not permitted on
-> +         * memory devices and sets errno to ENODEV.
-> +         */
-> +        assert(errno =3D=3D ENODEV);
-> +    }
-> +#else
->      assert(f !=3D -1);
-> +#endif
->  }
-> =20
->  int socket_set_fast_reuse(int fd)
-> --=20
-> 2.20.1
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/syscall.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b5786d4fc1f..894678aa8b4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6762,9 +6762,15 @@ static int open_net_route(void *cpu_env, int fd)
+         char iface[16];
+         uint32_t dest, gw, mask;
+         unsigned int flags, refcnt, use, metric, mtu, window, irtt;
+-        sscanf(line, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
+-                     iface, &dest, &gw, &flags, &refcnt, &use, &metric,
+-                     &mask, &mtu, &window, &irtt);
++        int fields;
++
++        fields = sscanf(line,
++                        "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
++                        iface, &dest, &gw, &flags, &refcnt, &use, &metric,
++                        &mask, &mtu, &window, &irtt);
++        if (fields != 11) {
++            continue;
++        }
+         dprintf(fd, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
+                 iface, tswap32(dest), tswap32(gw), flags, refcnt, use,
+                 metric, tswap32(mask), mtu, window, irtt);
+-- 
+2.20.1
