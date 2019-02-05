@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43308)
+Received: from eggs.gnu.org ([209.51.188.92]:46708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqwyI-00060t-VR
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:24:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqx60-0007ZG-9u
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqwyI-0006Bx-02
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:24:50 -0500
-Date: Tue, 5 Feb 2019 10:24:36 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gqx5z-0006So-3w
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:32:48 -0500
+Date: Tue, 5 Feb 2019 10:32:16 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190205102436.030db556.cohuck@redhat.com>
-In-Reply-To: <c4fb3400-3d6d-5294-1129-415a2367619b@redhat.com>
+Message-ID: <20190205103216.449d5ec3.cohuck@redhat.com>
+In-Reply-To: <e59ccaf4-8df4-f8da-0682-4d388fab672e@redhat.com>
 References: <20190130155733.32742-1-david@redhat.com>
-	<20190130155733.32742-3-david@redhat.com>
-	<83c38b9c-4b61-0067-2053-cdfe34b128bf@linux.ibm.com>
-	<c4fb3400-3d6d-5294-1129-415a2367619b@redhat.com>
+	<20190130155733.32742-4-david@redhat.com>
+	<80dae41f-f3f0-1acd-1fd6-8e7473712802@linux.ibm.com>
+	<5c81b64a-7de0-210f-adb9-bf7f1ad10622@redhat.com>
+	<810ede3a-7d69-8cff-7058-9e2bb002fff9@linux.ibm.com>
+	<e59ccaf4-8df4-f8da-0682-4d388fab672e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/6] s390x/pci: Fix
- hotplugging of PCI bridges
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/6] s390x/pci: Warn when
+ adding PCI devices without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +31,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>
 Cc: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, 5 Feb 2019 00:43:08 +0100
+On Mon, 4 Feb 2019 23:45:35 +0100
 David Hildenbrand <david@redhat.com> wrote:
 
-> On 04.02.19 23:48, Collin Walling wrote:
+> On 04.02.19 23:42, Collin Walling wrote:
+> > On 2/4/19 4:54 PM, David Hildenbrand wrote:  
+> >> On 04.02.19 21:19, Collin Walling wrote:  
+> >>> On 1/30/19 10:57 AM, David Hildenbrand wrote:  
+> >>>> We decided to always create the PCI host bridge, even if 'zpci' is not
+> >>>> enabled (due to migration compatibility). This however right now allows
+> >>>> to add zPCI/PCI devices to a VM although the guest will never actually see
+> >>>> them, confusing people that are using a simple CPU model that has no
+> >>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+> >>>>
+> >>>> Let's check for 'zpci' and at least print a warning that this will not
+> >>>> work as expected. We could also bail out, however that might break
+> >>>> existing QEMU commandlines.
+> >>>>
+> >>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>>> ---
+> >>>>    hw/s390x/s390-pci-bus.c | 5 +++++
+> >>>>    1 file changed, 5 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> >>>> index 9b5c5fff60..2efd9186c2 100644
+> >>>> --- a/hw/s390x/s390-pci-bus.c
+> >>>> +++ b/hw/s390x/s390-pci-bus.c
+> >>>> @@ -826,6 +826,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >>>>    {
+> >>>>        S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+> >>>>    
+> >>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+> >>>> +        warn_report("PCI/zPCI device without the 'zpci' CPU feature."
+> >>>> +                    " The guest will not be able to see/use this device");
+> >>>> +    }
+> >>>> +
+> >>>>        if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >>>>            PCIDevice *pdev = PCI_DEVICE(dev);
+> >>>>    
+> >>>>  
+> >>>
+> >>> I wonder if someone might misconstrue this as "the _PCI device_ needs
+> >>> the zpci feature." I think "'zpci' CPU feature required to support
+> >>> PCI/zPCI devices." reads better. The last sentence is fine to me.
+> >>>  
+> >>
+> >> Well, the guest needs the 'zpci' feature to see the device. And that's
+> >> what that message says in my opinion. Not that a device needs to have a
+> >> feature (I added "CPU feature" for this reason).
+> >>
+> >> "required to support" does it not make very clear what we actually want
+> >> to say.
+> >>
+> >> Thanks!
+> >>  
+> > 
+> > I see your point. We can still plug in the device without the CPU
+> > feature, but the device will ultimately be useless to the guest. Thanks
+> > for clearing that up.
+> > 
+> > Still, the wording reads strangely to me. I read it as the PCI device
+> > itself requires a "zpci CPU feature" which of course does not make sense
+> > (and I fully understand that's not what you mean here).
+> > 
+> > What do you think about:
+> > 
+> > "PCI/zPCI device plugging without 'zpci' CPU feature enabled." along
+> > with your second sentence, of course.  
+> 
+> "Plugging a PCI/zPCI device without the 'zpci' CPU feature enabled. The
+> guest will not be able to see/use this device."
+> 
+> would make sense to me!
 
-> > Side note: unrelated to the changes here -- and if you can clarify for
-> > me -- any idea why we do s->bus_no += 1? This throws me off a bit and
-> > begs me to ask what exactly is the S390pciState object suppose to
-> > represent? (My guess is that it is representative of the entire PCI
-> > topology, and we increment the bus_no to denote the subordinate bus
-> > number?)  
-> On x86, the bios builds the topology. On spapr and s390x, the firmware
-> builds the topology. The topology is constructed in a way that all buses
-> can be found ("tree traversed") from the root.
-> 
-> In a clean topology, each bridge has it's dedicated number.
-> 
-> primary: The bus the bridge is attached to
-> secondary: The bus the bridge spans up
-> subordinate: The highest bus number that can be found from this bridge
-> 
-> So when we add a new bridge, we have to assign a new "global" bus number
-> for the topology. This is what we do here. So we denote actually the
-> "seconardy" bus nr here, which we propagate as "subordinate" up to the root.
-> 
-> But this is the interesting point: When hotplugging on x86 and on power,
-> the _guest_ is responsible for rebuilding the topology. Not the bios,
-> not the firmware. No numbers are assigned. Code like we have here does
-> not exist for them.
-> 
-> 
-> And most probably this is also broken on s390x: When hotplugging a
-> bridge, we should not mess with the topology (because as Thomas noted,
-> we can easily break the topology so the search does no longer work
-> reliably).
+Ok, I have now
 
-One thing I'm always wondering about: How does that work on "real"
-hardware? The guest basically sees uid/fid, and I'm not sure how much
-topology actually shines through here (visible in some generic pci
-structures?) In QEMU, we're plugging into the generic pci
-infrastructure, so our behaviour may be different than what we see on
-an LPAR.
+        warn_report("Plugging a PCI/zPCI device without the 'zpci' CPU "
+                    "feature enabled; the guest will not be able to see/use "
+                    "this device");
 
-> 
-> But this is your task to find out :)
-> 
-> Although it sounds like I "speak PCI", I really only have a rough idea
-> how it all (is supposed to) work(s).
-> 
-> So while I am fixing the current code, we should find out next if we can
-> drop this "messing with the topology on hotplug" completely. Or e.g.
-> rework it to have standby numbers we can use when hotplugging ...
-> 
 > 
 > > 
-> > (let me know if these kind of discussions are too noisy and deemed
-> > inappropriate for the mailing list, and I'll start pestering you off-
-> > list instead)  
+> > Either way you decide, it's still a good idea to have this warning in
+> > here. I'm really just debating syntax and not semantics, so it's not
+> > really important. I won't impede this patch over a differing opinion of
+> > a small rewording. :)
+> > 
+> > Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> >   
 > 
-> Not at all. This allows other people to learn as well and also to jump
-> in in case I make up things.
+> Thanks!
 > 
-
-Seconded. Remember that people sometimes only read along and are not
-really visible in the discussion :)
