@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52869)
+Received: from eggs.gnu.org ([209.51.188.92]:53215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3hH-0007AK-FT
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:35:44 -0500
+	(envelope-from <mst@redhat.com>) id 1gr3iK-0007ee-U2
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:36:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3h5-0005d0-J7
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:35:36 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 5 Feb 2019 16:35:13 +0000
-Message-ID: <261d4eb9-eb91-5654-e5ad-995b7f93432b@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-7-vsementsov@virtuozzo.com>
-	<64d9a2e7-6dd9-d71b-b9bf-c476e9e218f8@redhat.com>
-	<20190116165837.GF20275@redhat.com>
-In-Reply-To: <20190116165837.GF20275@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D835A1263BB5C0418B2E781F6544F83E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gr3iJ-00062z-Ac
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:36:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36550)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gr3iI-0005yV-NS
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:36:47 -0500
+Date: Tue, 5 Feb 2019 11:36:26 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190205113147-mutt-send-email-mst@kernel.org>
+References: <20190204160325.4914-1-lersek@redhat.com>
+	<20190204160325.4914-5-lersek@redhat.com>
+	<20190204124613-mutt-send-email-mst@kernel.org>
+	<e9e9ed1d-0675-6a6e-1706-b6a23169719c@redhat.com>
+	<20190204142534-mutt-send-email-mst@kernel.org>
+	<d4e8a405-cfb5-a302-bc7f-34537f2d7fcf@redhat.com>
+	<20190204165316-mutt-send-email-mst@kernel.org>
+	<a4693593-0efe-77bf-ae68-4774d759b018@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 06/10] block/nbd-client: move from quit
- to state
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <a4693593-0efe-77bf-ae68-4774d759b018@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] tests/uefi-test-tools: add build
+ scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +35,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-MTYuMDEuMjAxOSAxOTo1OCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gV2VkLCBK
-YW4gMTYsIDIwMTkgYXQgMTA6MjU6MDNBTSAtMDYwMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IFth
-ZGRpbmcgRGFuXQ0KPj4NCj4+IE9uIDcvMzEvMTggMTI6MzAgUE0sIFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gVG8gaW1wbGVtZW50IHJlY29ubmVjdCB3ZSBuZWVkIHNl
-dmVyYWwgc3RhdGVzIGZvciB0aGUgY2xpZW50Og0KPj4+IENPTk5FQ1RFRCwgUVVJVCBhbmQgdHdv
-IENPTk5FQ1RJTkcgc3RhdGVzLiBDT05ORUNUSU5HIHN0YXRlcyB3aWxsDQo+Pj4gYmUgcmVhbGl6
-ZWQgaW4gdGhlIGZvbGxvd2luZyBwYXRjaGVzLiBUaGlzIHBhdGNoIGltcGxlbWVudHMgQ09OTkVD
-VEVEDQo+Pj4gYW5kIFFVSVQuDQo+Pj4NCj4+PiBRVUlUIG1lYW5zLCB0aGF0IHdlIHNob3VsZCBj
-bG9zZSB0aGUgY29ubmVjdGlvbiBhbmQgZmFpbCBhbGwgY3VycmVudA0KPj4+IGFuZCBmdXJ0aGVy
-IHJlcXVlc3RzIChsaWtlIG9sZCBxdWl0ID0gdHJ1ZSkuDQo+Pj4NCj4+PiBDT05ORUNURUQgbWVh
-bnMgdGhhdCBjb25uZWN0aW9uIGlzIG9rLCB3ZSBjYW4gc2VuZCByZXF1ZXN0cyAobGlrZSBvbGQN
-Cj4+PiBxdWl0ID0gZmFsc2UpLg0KPj4+DQo+Pj4gRm9yIHJlY2VpdmluZyBsb29wIHdlIHVzZSBh
-IGNvbXBhcmlzb24gb2YgdGhlIGN1cnJlbnQgc3RhdGUgd2l0aCBRVUlULA0KPj4+IGJlY2F1c2Ug
-cmVjb25uZWN0IHdpbGwgYmUgaW4gdGhlIHNhbWUgbG9vcCwgc28gaXQgc2hvdWxkIGJlIGxvb3Bp
-bmcNCj4+PiB1bnRpbCB0aGUgZW5kLg0KPj4+DQo+Pj4gT3Bwb3NpdGUsIGZvciByZXF1ZXN0cyB3
-ZSB1c2UgYSBjb21wYXJpc29uIG9mIHRoZSBjdXJyZW50IHN0YXRlIHdpdGgNCj4+PiBDT05ORUNU
-RUQsIGFzIHdlIGRvbid0IHdhbnQgdG8gc2VuZCByZXF1ZXN0cyBpbiBDT05ORUNUSU5HIHN0YXRl
-cyAoDQo+Pj4gd2hpY2ggYXJlIHVucmVhY2hhYmxlIG5vdywgYnV0IHdpbGwgYmUgcmVhY2hhYmxl
-IGFmdGVyIHRoZSBmb2xsb3dpbmcNCj4+PiBjb21taXRzKQ0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1i
-eTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29t
-Pg0KPj4+IC0tLQ0KPj4+ICAgYmxvY2svbmJkLWNsaWVudC5oIHwgIDkgKysrKysrKystDQo+Pj4g
-ICBibG9jay9uYmQtY2xpZW50LmMgfCA1NSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+PiAgIDIgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0
-aW9ucygrKSwgMjMgZGVsZXRpb25zKC0pDQo+Pg0KPj4gRGFuIGp1c3QgcmVjZW50bHkgcHJvcG9z
-ZWQgcGF0Y2hlcyB0byBTb2NrZXRDaGFyZGV2IGluIGdlbmVyYWwgdG8gdXNlIGENCj4+IHN0YXRl
-IG1hY2hpbmUgdGhhdCBkaXN0aW5ndWlzaGVzIGJldHdlZW4gY29ubmVjdGluZyBhbmQgY29ubmVj
-dGVkOg0KPj4NCj4+IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZl
-bC8yMDE5LTAxL21zZzAzMzM5Lmh0bWwNCj4+DQo+PiBJJ20gd29uZGVyaW5nIGhvdyBtdWNoIG9m
-IGhpcyB3b3JrIGlzIHJlbGF0ZWQgb3IgY2FuIGJlIHJldXNlZCB0byBnZXQNCj4+IHJlc3RhcnRh
-YmxlIGNvbm5lY3Rpb25zIG9uIE5CRCBzb2NrZXRzPw0KPiANCj4gVGhlcmUncyBub3RoaW5nIHJl
-YWxseSBzcGVjaWFsIGFib3V0IHdoYXQgSSBkaWQuIFZsYWRpbWlyIGxvb2tzIHRvDQo+IGhhdmUg
-YmFzaWNhbGx5IGRvbmUgdGhlIHNhbWUga2luZCBvZiBhcHByb2FjaCwgYnV0IEkgZG9uJ3QgdGhp
-bmsNCj4gdGhlcmUncyByZWFsIHNjb3BlIGZvciBzaGFyaW5nIHdpdGggY2hhcmRldnMsIGFzIGVh
-Y2ggY2FyZSBhYm91dA0KPiB0aGVpciBvd24gc2V0IG9mIHN0YXRlcy4NCj4gDQo+PiBSZW1lbWJl
-ciwgcmlnaHQgbm93LCB0aGUgTkJEIGNvZGUgYWx3YXlzIHN0YXJ0cyBpbiBibG9ja2luZyBtb2Rl
-LCBhbmQNCj4+IGRvZXMgc2luZ2xlLXRocmVhZGVkIGhhbmRzaGFraW5nIHVudGlsIGl0IGlzIHJl
-YWR5IGZvciB0cmFuc21pc3Npb24sDQo+PiB0aGVuIHN3aXRjaGVzIHRvIG5vbi1ibG9ja2luZyBt
-b2RlIGZvciBhbGwgc3Vic2VxdWVudCB0cmFuc21pc3Npb25zIChzbywNCj4+IGZvciBleGFtcGxl
-LCBzZXJ2aWNpbmcgYSByZWFkIHJlcXVlc3QgY2FuIGFzc3VtZSB0aGF0IHRoZSBzb2NrZXQgaXMN
-Cj4+IHZhbGlkIHdpdGhvdXQgZnVydGhlciB3YWl0aW5nKS4gIEJ1dCBvbmNlIHdlIHN0YXJ0IGFs
-bG93aW5nIHJlY29ubmVjdHMsDQo+PiBhIHJlYWQgcmVxdWVzdCB3aWxsIG5lZWQgdG8gZGV0ZWN0
-IHdoZW4gb25lIHNvY2tldCBoYXMgZ29uZSBkb3duLCBhbmQNCj4+IHdhaXQgZm9yIGl0cyByZXBs
-YWNlbWVudCBzb2NrZXQgdG8gY29tZSBiYWNrIHVwLCBpbiBvcmRlciB0byByZXRyeSB0aGUNCj4+
-IHJlcXVlc3Q7IHRoaXMgcmV0cnkgaXMgaW4gYSBjb250ZXh0IHdoZXJlIHdlIGFyZSBpbiBub24t
-YmxvY2tpbmcNCj4+IGNvbnRleHQsIGJ1dCB0aGUgcmV0cnkgbXVzdCBlc3RhYmxpc2ggYSBuZXcg
-c29ja2V0LCBhbmQgcG9zc2libHkgY29udmVydA0KPj4gdGhlIHNvY2tldCBpbnRvIFRMUyBtb2Rl
-LCBhbGwgYmVmb3JlIGJlaW5nIHJlYWR5IHRvIHJldHJ5IHRoZSByZWFkIHJlcXVlc3QuDQo+IA0K
-PiBUaGF0IG1ha2VzIGl0IHNvdW5kIGxpa2UgdGhlIE5CRCBoYW5kc2hha2UgbmVlZHMgdG8gYmUg
-Y29udmVydGVkIHRvDQo+IHVzZSBlbnRpcmVseSBub24tYmxvY2tpbmcgSS9PLg0KPiANCj4gVGhl
-IFRMUyBoYW5kc2hha2UgYWxyZWFkeSB1c2VzIGFuIGFzeW5jaHJvbm91cyBjYWxsYmFjayBwYXR0
-ZXJuIGFuZA0KPiB0byBkZWFsIHdpdGggdGhhdCBOQkQgaGFkIHRvIGNyZWF0ZSAmIHJ1biBhIHBy
-aXZhdGUgbWFpbiBsb29wIHRvDQo+IGNvbXBsZXRlIHRoZSBUTFMgaGFuZHNoYWtlIGluIGl0cyBi
-bG9ja2luZyBjb2RlIHBhdHRlcm4uDQo+IA0KPiBZb3UgY291bGQgcG90ZW50aWFsbHkgcHVzaCB0
-aGlzIGNvbmNlcHQgdXAgdG8gdGhlIHRvcCBsZXZlbC4gaWUNCj4gaW1wbGVtZW50IHRoZSBlbnRp
-cmUgTkJEIGhhbmRzaGFrZSB3aXRoIGFzeW5jIGNhbGxiYWNrcyAvIG5vbi1ibG9ja2luZw0KPiBJ
-L08uIFRoZW4gc2ltcGx5IHVzZSBhIHByaXZhdGUgbWFpbiBsb29wIHRvIHJ1biB0aGF0IGluIGEg
-YmxvY2tpbmcNCj4gZmFzaGlvbiBmb3IgdGhlIGluaXRpYWwgY29ubmVjdGlvbi4gV2hlbiB5b3Ug
-bmVlZCB0byBkbyByZS1jb25uZWN0DQo+IHlvdSBub3cganVzdCBydW4gdGhlIGFzeW5jIGNvZGUg
-d2l0aG91dCB0aGUgZXh0cmEgbWFpbiBsb29wIGFyb3VuZA0KPiBpdC4NCj4gDQoNCkhtbSwgeW91
-IG1lYW4gdGhpcyBjb2RlOg0KDQogICAgIGRhdGEubG9vcCA9IGdfbWFpbl9sb29wX25ldyhnX21h
-aW5fY29udGV4dF9kZWZhdWx0KCksIEZBTFNFKTsNCiAgICAgdHJhY2VfbmJkX3JlY2VpdmVfc3Rh
-cnR0bHNfdGxzX2hhbmRzaGFrZSgpOw0KICAgICBxaW9fY2hhbm5lbF90bHNfaGFuZHNoYWtlKHRp
-b2MsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmJkX3Rsc19oYW5kc2hha2UsDQog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmRhdGEsDQogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgTlVMTCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBOVUxMKTsN
-Cg0KICAgICBpZiAoIWRhdGEuY29tcGxldGUpIHsNCiAgICAgICAgIGdfbWFpbl9sb29wX3J1bihk
-YXRhLmxvb3ApOw0KICAgICB9DQogICAgIGdfbWFpbl9sb29wX3VucmVmKGRhdGEubG9vcCk7DQoN
-Cg0KV2hhdCB0aGlzIGRvZXMgaW4gY29udGV4dCBvZiBRZW11PyBJc24ndCBpdCBtb3JlIGNvcnJl
-Y3QgdG8gZG8NCmNvcm91dGluZSBiYXNlZCBhc3luYyBzdGFmZiwgbGlrZSBpbiBxY293Ml9vcGVu
-KCk6DQoNCiAgICAgaWYgKHFlbXVfaW5fY29yb3V0aW5lKCkpIHsNCiAgICAgICAgIC8qIEZyb20g
-YmRydl9jb19jcmVhdGUuICAqLw0KICAgICAgICAgcWNvdzJfb3Blbl9lbnRyeSgmcW9jKTsNCiAg
-ICAgfSBlbHNlIHsNCiAgICAgICAgIGFzc2VydChxZW11X2dldF9jdXJyZW50X2Fpb19jb250ZXh0
-KCkgPT0gcWVtdV9nZXRfYWlvX2NvbnRleHQoKSk7DQogICAgICAgICBxZW11X2Nvcm91dGluZV9l
-bnRlcihxZW11X2Nvcm91dGluZV9jcmVhdGUocWNvdzJfb3Blbl9lbnRyeSwgJnFvYykpOw0KICAg
-ICAgICAgQkRSVl9QT0xMX1dISUxFKGJzLCBxb2MucmV0ID09IC1FSU5QUk9HUkVTUyk7DQogICAg
-IH0NCiAgICAgcmV0dXJuIHFvYy5yZXQ7DQoNCkFuZCB0aGVuIHlpZWxkIGFmdGVyIGhhbmRzaGFr
-ZSgpIGFuZCBlbnRlciBiYWNrIGZyb20gbmJkX3Rsc19oYW5kc2hha2UgY2FsbGJhY2s/DQoNCkht
-bSwgYWxzbywgY2hlY2tlZCwgbm9ib2R5IGNhbGxzIGdfbWFpbl9jb250ZXh0X2RlZmF1bHQoKSBp
-biBxZW11LCBleGNlcHQNCnV0aWwvbWFpbi1sb29wLmMsIG5iZCBhbmQgdGVzdHMuIFNvLCBJJ20g
-bm90IHN1cmUgdGhhdCB0aGlzIGlzIGEgdmFsaWQgdGhpbmcNCnRvIGRvIGluIG5iZC4uDQoNCg0K
-LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Tue, Feb 05, 2019 at 09:49:57AM +0100, Laszlo Ersek wrote:
+> On 02/04/19 22:55, Michael S. Tsirkin wrote:
+> > On Mon, Feb 04, 2019 at 08:46:33PM +0100, Philippe Mathieu-Daud=E9
+> > wrote:
+> >> Hi Michael,
+> >>
+> >> On 2/4/19 8:32 PM,  Michael S. Tsirkin wrote:
+>=20
+> >>> And question would be what if someone wanted a reproducible
+> >>> build of QEMU, what would be the right way to do it?
+> >>
+> >> This question deserves his own thread :)
+> >
+> > Sure.
+>=20
+> (I don't know enough to comment on this sensibly; so I'm only following
+> up to show that I'm not willfully ignoring the topic.)
+
+Thanks!
+
+> What constitutes a "QEMU build" in this context?
+>=20
+> If it means the sum of artifacts that get installed by "make install",
+> then the current patch set doesn't factor into that at all.
+
+That's true in that it's just a test.
+
+> If it means something else, then "it depends". For example,
+> "genisoimage" and "mkdosfs" place pseudo-random / timestamp-based
+> identifiers into the images that they generate, and there's no way to
+> prevent at least "genisoimage" from doing that. Thus, if we consider
+> UEFI-bootable ISO images, rebuilt from zero, a part of a "reproducible
+> build", then the answer is "there's no right way until someone extends
+> genisoimage with some new cmdline options".
+
+Yep that's true too.
+
+> >>> Yes right now roms seems to be broken for an out of tree build but
+> >>> is that by design and should we add more examples of this?
+> >>
+> >> IMO having these tests build out-of-tree is easier than trying to
+> >> build various of the projects in roms/ out-of-tree. This would be a
+> >> good effort, but I'm not sure it is worth it with this series.
+> >> Eventually once we have a qtest using the bios-tables, we could spen=
+d
+> >> some time to make this script work out-of-tree.
+> >
+> > I'm not saying it's a blocker.
+>=20
+> Regarding roms/edk2, we have to distinguish two sets of source code,
+> wrt. building out-of-tree.
+>=20
+> - The firmware modules build just fine outside of the tree, and this
+>   patch set already puts that feature to use. (Namely, all the
+>   dependencies that the
+>=20
+>     tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTes=
+t.inf
+>=20
+>   application pulls in from roms/edk2 are compiled outside of
+>   roms/edk2.)
+>=20
+> - However, the native build utilities (in the
+>=20
+>     roms/edk2/BaseTools
+>=20
+>   subdirectory) that first have to be built natively, so that they can
+>   help produce the firmware executables from the firmware source, don't
+>   themselves build outside of that subdirectory. This is a genuine
+>   limitation of upstream edk2, as far as I can tell.
+>=20
+> Thanks,
+> Laszlo
+
+Interesting, thanks for sharing.
+
+--=20
+MST
