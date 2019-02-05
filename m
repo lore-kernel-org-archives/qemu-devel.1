@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36020)
+Received: from eggs.gnu.org ([209.51.188.92]:36226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002O5-S8
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:06 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GT-0002VG-Lj
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003p5-JG
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:37118)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GK-0003rz-2j
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:05 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:37802)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GI-0003m4-5f
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id s12so4725308wrt.4
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:58 -0800 (PST)
+	id 1gr5GJ-0003qO-Q3
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id g67so4751223wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:59 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:37 +0100
-Message-Id: <1549390526-24246-28-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:39 +0100
+Message-Id: <1549390526-24246-30-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 27/76] contrib/elf2dmp: use GLib in ELF
- processing
+Subject: [Qemu-devel] [PULL 29/76] contrib/elf2dmp: fix structures
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +33,90 @@ Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
 From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-Replace POSIX mmap with GLib g_mapped_file_new in ELF processing module
-to make elf2dmp cross-platform.
+Remove duplicate structures definitions in case of build for Windows hosts.
 
 Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-3-viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-5-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/elf2dmp/qemu_elf.c | 27 ++++++++-------------------
- contrib/elf2dmp/qemu_elf.h |  2 +-
- 2 files changed, 9 insertions(+), 20 deletions(-)
+ contrib/elf2dmp/kdbg.h | 12 ++++++++----
+ contrib/elf2dmp/pdb.h  |  2 ++
+ contrib/elf2dmp/pe.h   |  6 ++++--
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/contrib/elf2dmp/qemu_elf.c b/contrib/elf2dmp/qemu_elf.c
-index e9c0d25..0db7816 100644
---- a/contrib/elf2dmp/qemu_elf.c
-+++ b/contrib/elf2dmp/qemu_elf.c
-@@ -120,25 +120,17 @@ static void exit_states(QEMU_Elf *qe)
+diff --git a/contrib/elf2dmp/kdbg.h b/contrib/elf2dmp/kdbg.h
+index 851b57c..002e3d0 100644
+--- a/contrib/elf2dmp/kdbg.h
++++ b/contrib/elf2dmp/kdbg.h
+@@ -25,11 +25,15 @@ typedef struct DBGKD_GET_VERSION64 {
+     uint64_t DebuggerDataList;
+ } DBGKD_GET_VERSION64;
  
- int QEMU_Elf_init(QEMU_Elf *qe, const char *filename)
- {
-+    GError *gerr = NULL;
-     int err = 0;
--    struct stat st;
++#ifndef _WIN32
++typedef struct LIST_ENTRY64 {
++    struct LIST_ENTRY64 *Flink;
++    struct LIST_ENTRY64 *Blink;
++} LIST_ENTRY64;
++#endif
++
+ typedef struct DBGKD_DEBUG_DATA_HEADER64 {
+-    struct LIST_ENTRY64 {
+-       struct LIST_ENTRY64 *Flink;
+-       struct LIST_ENTRY64 *Blink;
+-    } List;
++    LIST_ENTRY64    List;
+     uint32_t           OwnerTag;
+     uint32_t           Size;
+ } DBGKD_DEBUG_DATA_HEADER64;
+diff --git a/contrib/elf2dmp/pdb.h b/contrib/elf2dmp/pdb.h
+index 1640d54..4ea8925 100644
+--- a/contrib/elf2dmp/pdb.h
++++ b/contrib/elf2dmp/pdb.h
+@@ -9,12 +9,14 @@
+ #define PDB_H
  
--    qe->fd = open(filename, O_RDONLY, 0);
--    if (qe->fd == -1) {
--        eprintf("Failed to open ELF dump file \'%s\'\n", filename);
-+    qe->gmf = g_mapped_file_new(filename, TRUE, &gerr);
-+    if (gerr) {
-+        eprintf("Failed to map ELF dump file \'%s\'\n", filename);
-         return 1;
-     }
  
--    fstat(qe->fd, &st);
--    qe->size = st.st_size;
++#ifndef _WIN32
+ typedef struct GUID {
+     unsigned int Data1;
+     unsigned short Data2;
+     unsigned short Data3;
+     unsigned char Data4[8];
+ } GUID;
++#endif
+ 
+ struct PDB_FILE {
+     uint32_t size;
+diff --git a/contrib/elf2dmp/pe.h b/contrib/elf2dmp/pe.h
+index dafb26a..c2a4a6b 100644
+--- a/contrib/elf2dmp/pe.h
++++ b/contrib/elf2dmp/pe.h
+@@ -9,6 +9,7 @@
+ #define PE_H
+ 
+ 
++#ifndef _WIN32
+ typedef struct IMAGE_DOS_HEADER {
+     uint16_t  e_magic;      /* 0x00: MZ Header signature */
+     uint16_t  e_cblp;       /* 0x02: Bytes on last page of file */
+@@ -87,8 +88,6 @@ typedef struct IMAGE_NT_HEADERS64 {
+   IMAGE_OPTIONAL_HEADER64 OptionalHeader;
+ } __attribute__ ((packed)) IMAGE_NT_HEADERS64;
+ 
+-#define IMAGE_FILE_DEBUG_DIRECTORY  6
 -
--    qe->map = mmap(NULL, qe->size, PROT_READ | PROT_WRITE,
--            MAP_PRIVATE, qe->fd, 0);
--    if (qe->map == MAP_FAILED) {
--        eprintf("Failed to map ELF file\n");
--        err = 1;
--        goto out_fd;
--    }
-+    qe->map = g_mapped_file_get_contents(qe->gmf);
-+    qe->size = g_mapped_file_get_length(qe->gmf);
+ typedef struct IMAGE_DEBUG_DIRECTORY {
+   uint32_t Characteristics;
+   uint32_t TimeDateStamp;
+@@ -101,6 +100,9 @@ typedef struct IMAGE_DEBUG_DIRECTORY {
+ } __attribute__ ((packed)) IMAGE_DEBUG_DIRECTORY;
  
-     if (init_states(qe)) {
-         eprintf("Failed to extract QEMU CPU states\n");
-@@ -149,9 +141,7 @@ int QEMU_Elf_init(QEMU_Elf *qe, const char *filename)
-     return 0;
+ #define IMAGE_DEBUG_TYPE_CODEVIEW   2
++#endif
++
++#define IMAGE_FILE_DEBUG_DIRECTORY  6
  
- out_unmap:
--    munmap(qe->map, qe->size);
--out_fd:
--    close(qe->fd);
-+    g_mapped_file_unref(qe->gmf);
- 
-     return err;
- }
-@@ -159,6 +149,5 @@ out_fd:
- void QEMU_Elf_exit(QEMU_Elf *qe)
- {
-     exit_states(qe);
--    munmap(qe->map, qe->size);
--    close(qe->fd);
-+    g_mapped_file_unref(qe->gmf);
- }
-diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
-index da70aff..2a79638 100644
---- a/contrib/elf2dmp/qemu_elf.h
-+++ b/contrib/elf2dmp/qemu_elf.h
-@@ -33,7 +33,7 @@ typedef struct QEMUCPUState {
- int is_system(QEMUCPUState *s);
- 
- typedef struct QEMU_Elf {
--    int fd;
-+    GMappedFile *gmf;
-     size_t size;
-     void *map;
-     QEMUCPUState **state;
+ typedef struct guid_t {
+     uint32_t a;
 -- 
 1.8.3.1
