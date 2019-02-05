@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35895)
+Received: from eggs.gnu.org ([209.51.188.92]:35881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002LX-Ff
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:03 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002LC-5k
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GH-0003n0-Ld
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GG-0003lD-Ns
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44628)
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GH-0003kG-Ct
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
-Received: by mail-wr1-x432.google.com with SMTP id v16so2845429wrn.11
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:56 -0800 (PST)
+	id 1gr5GG-0003Yc-Dp
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:56 -0500
+Received: by mail-wm1-x342.google.com with SMTP id d15so4678074wmb.3
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:41 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:36 +0100
-Message-Id: <1549390526-24246-27-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:22 +0100
+Message-Id: <1549390526-24246-13-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 26/76] contrib/elf2dmp: fix elf.h including
+Subject: [Qemu-devel] [PULL 12/76] elf-ops.h: Add get_elf_note_type()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +28,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+From: Liam Merwick <liam.merwick@oracle.com>
 
-Before this patch QEMU elf.h was not actually included.
+Introduce a routine which, given a pointer to a range of ELF Notes,
+searches through them looking for a note matching the type specified
+and returns a pointer to the matching ELF note.
 
-Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-2-viktor.prutyanov@phystech.edu>
+get_elf_note_type() is used by elf_load[32|64]() to find the
+specified note type required by the 'elf_note_fn' parameter
+added in the previous commit.
+
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
 ---
- contrib/elf2dmp/qemu_elf.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/hw/elf_ops.h | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
-diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
-index 86e6e68..da70aff 100644
---- a/contrib/elf2dmp/qemu_elf.h
-+++ b/contrib/elf2dmp/qemu_elf.h
-@@ -5,10 +5,10 @@
-  *
-  */
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 3438d6f..690f923 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -265,6 +265,51 @@ fail:
+     return ret;
+ }
  
--#ifndef QEMU_ELF_H
--#define QEMU_ELF_H
-+#ifndef ELF2DMP_ELF_H
-+#define ELF2DMP_ELF_H
++/*
++ * Given 'nhdr', a pointer to a range of ELF Notes, search through them
++ * for a note matching type 'elf_note_type' and return a pointer to
++ * the matching ELF note.
++ */
++static struct elf_note *glue(get_elf_note_type, SZ)(struct elf_note *nhdr,
++                                                    elf_word note_size,
++                                                    elf_word phdr_align,
++                                                    elf_word elf_note_type)
++{
++    elf_word nhdr_size = sizeof(struct elf_note);
++    elf_word elf_note_entry_offset = 0;
++    elf_word note_type;
++    elf_word nhdr_namesz;
++    elf_word nhdr_descsz;
++
++    if (nhdr == NULL) {
++        return NULL;
++    }
++
++    note_type = nhdr->n_type;
++    while (note_type != elf_note_type) {
++        nhdr_namesz = nhdr->n_namesz;
++        nhdr_descsz = nhdr->n_descsz;
++
++        elf_note_entry_offset = nhdr_size +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align) +
++            QEMU_ALIGN_UP(nhdr_descsz, phdr_align);
++
++        /*
++         * If the offset calculated in this iteration exceeds the
++         * supplied size, we are done and no matching note was found.
++         */
++        if (elf_note_entry_offset > note_size) {
++            return NULL;
++        }
++
++        /* skip to the next ELF Note entry */
++        nhdr = (void *)nhdr + elf_note_entry_offset;
++        note_type = nhdr->n_type;
++    }
++
++    return nhdr;
++}
++
+ static int glue(load_elf, SZ)(const char *name, int fd,
+                               uint64_t (*elf_note_fn)(void *, void *, bool),
+                               uint64_t (*translate_fn)(void *, uint64_t),
+@@ -497,6 +542,36 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                 high = addr + mem_size;
  
--#include <elf.h>
-+#include "elf.h"
+             data = NULL;
++
++        } else if (ph->p_type == PT_NOTE && elf_note_fn) {
++            struct elf_note *nhdr = NULL;
++
++            file_size = ph->p_filesz; /* Size of the range of ELF notes */
++            data = g_malloc0(file_size);
++            if (ph->p_filesz > 0) {
++                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
++                    goto fail;
++                }
++                if (read(fd, data, file_size) != file_size) {
++                    goto fail;
++                }
++            }
++
++            /*
++             * Search the ELF notes to find one with a type matching the
++             * value passed in via 'translate_opaque'
++             */
++            nhdr = (struct elf_note *)data;
++            assert(translate_opaque != NULL);
++            nhdr = glue(get_elf_note_type, SZ)(nhdr, file_size, ph->p_align,
++                                               *(uint64_t *)translate_opaque);
++            if (nhdr != NULL) {
++                bool is64 =
++                    sizeof(struct elf_note) == sizeof(struct elf64_note);
++                elf_note_fn((void *)nhdr, (void *)&ph->p_align, is64);
++            }
++            g_free(data);
++            data = NULL;
+         }
+     }
  
- typedef struct QEMUCPUSegment {
-     uint32_t selector;
-@@ -47,4 +47,4 @@ void QEMU_Elf_exit(QEMU_Elf *qe);
- Elf64_Phdr *elf64_getphdr(void *map);
- Elf64_Half elf_getphdrnum(void *map);
- 
--#endif /* QEMU_ELF_H */
-+#endif /* ELF2DMP_ELF_H */
 -- 
 1.8.3.1
