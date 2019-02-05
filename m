@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55739)
+Received: from eggs.gnu.org ([209.51.188.92]:56072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqzG5-0001VU-6k
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:51:22 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gqzHZ-0002Cl-E6
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:52:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqzG4-0001fq-1n
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:51:21 -0500
-Resent-Message-Id: <E1gqzG4-0001fq-1n@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21017)
+	(envelope-from <pasic@linux.ibm.com>) id 1gqzHY-0002Qy-Ek
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:52:53 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqzG3-0001ek-Pc
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:51:19 -0500
-Message-ID: <154936745223.29184.11490370246397611291@ebba9967afc0>
-In-Reply-To: <20190205112315.23454-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gqzHX-0002N1-T6
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:52:52 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x15Bo48S067453
+	for <qemu-devel@nongnu.org>; Tue, 5 Feb 2019 06:52:50 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qf7maet7j-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 06:52:49 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Tue, 5 Feb 2019 11:52:46 -0000
+Date: Tue, 5 Feb 2019 12:52:29 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190204163102.33d744d8.cohuck@redhat.com>
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-2-cohuck@redhat.com>
+	<20190130195127.5ff3c849@oc2783563651>
+	<20190131125220.285a4bc8.cohuck@redhat.com>
+	<20190131133455.3097613f@oc2783563651>
+	<20190204163102.33d744d8.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Feb 2019 03:50:53 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4] scripts: use git archive in
- archive-source
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190205125229.56c6e252@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +45,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, famz@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTExMjMxNS4yMzQ1
-NC0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNTExMjMxNS4y
-MzQ1NC0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On Mon, 4 Feb 2019 16:31:02 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Thu, 31 Jan 2019 13:34:55 +0100
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > On Thu, 31 Jan 2019 12:52:20 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> > 
+> > > On Wed, 30 Jan 2019 19:51:27 +0100
+> > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > >   
+> > > > On Wed, 30 Jan 2019 14:22:07 +0100
+> > > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > > >   
+> > > > > When we get a solicited interrupt, the start function may have
+> > > > > been cleared by a csch, but we still have a channel program
+> > > > > structure allocated. Make it safe to call the cp accessors in
+> > > > > any case, so we can call them unconditionally.    
+> > > > 
+> > > > I read this like it is supposed to be safe regardless of
+> > > > parallelism and threads. However I don't see any explicit
+> > > > synchronization done for cp->initialized.
+> > > > 
+> > > > I've managed to figure out how is that supposed to be safe
+> > > > for the cp_free() (which is probably our main concern) in
+> > > > vfio_ccw_sch_io_todo(), but if fail when it comes to the one
+> > > > in vfio_ccw_mdev_notifier().
+> > > > 
+> > > > Can you explain us how does the synchronization work?  
+> > > 
+> > > You read that wrong, I don't add synchronization, I just add a check.
+> > >   
+> > 
+> > Now I'm confused. Does that mean we don't need synchronization for this?
+> 
+> If we lack synchronization (that is not provided by the current state
+> machine handling, or the rework here), we should do a patch on top
+> (preferably on top of the whole series, so this does not get even more
+> tangled up.) This is really just about the extra check.
+> 
+
+I'm not a huge fan of keeping or introducing races -- it makes things
+difficult to reason about, but I do have some understanging your
+position.
+
+This patch-series is AFAICT a big improvement over what we have. I would
+like Farhan confirming that it makes these hick-ups when he used to hit
+BUSY with another ssch request disappear. If it does (I hope it does)
+it's definitely a good thing for anybody who wants to use vfio-ccw.
+
+Yet I find it difficult to slap my r-b over racy code, or partial
+solutions. In the latter case, when I lack conceptual clarity, I find it
+difficult to tell if we are heading into the right direction, or is what
+we build today going to turn against us tomorrow. Sorry for being a drag.
+
+Regards,
+Halil
