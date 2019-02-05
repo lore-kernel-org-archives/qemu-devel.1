@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48723)
+Received: from eggs.gnu.org ([209.51.188.92]:52303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gr0fv-0001KC-PS
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:22:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr0w6-0004Hv-A1
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:38:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gr0fv-0004Pw-0q
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:22:07 -0500
-References: <1549371525-29899-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA9PKSW92GJO1KcBEQcbGY7TB4pqaW8qSe9j6JJZ7Z2MKA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b23135c0-50d7-f203-5cfe-63cd0fa27377@redhat.com>
-Date: Tue, 5 Feb 2019 14:21:58 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gr0hN-0005e9-6x
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:23:42 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr0hF-0005X4-70
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:23:32 -0500
+Received: by mail-ot1-x341.google.com with SMTP id a11so5532178otr.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 05:23:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9PKSW92GJO1KcBEQcbGY7TB4pqaW8qSe9j6JJZ7Z2MKA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-15-philmd@redhat.com>
+In-Reply-To: <20190129175403.18017-15-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Feb 2019 13:23:05 +0000
+Message-ID: <CAFEAcA-P4=no6DeKvPCDVjgPnSMQpO8vnLLs7vtmxw3Td=-5gA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/cpu/cluster: Mark the cpu-cluster
- device with user_creatable = false
+Subject: Re: [Qemu-devel] [PATCH v2 14/18] tests/vm: Run tests on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Luc Michel <luc.michel@greensocs.com>, Alistair Francis <alistair.francis@wdc.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
 
-On 2019-02-05 14:09, Peter Maydell wrote:
-> On Tue, 5 Feb 2019 at 12:58, Thomas Huth <thuth@redhat.com> wrote:
->>
->> The device can not be instantiated by the user and QEMU currently
->> aborts when you try to use it:
->>
->> $ x86_64-softmmu/qemu-system-x86_64 -device cpu-cluster
->> qemu-system-x86_64: hw/cpu/cluster.c:73: cpu_cluster_realize:
->>  Assertion `cbdata.cpu_count > 0' failed.
->> Aborted (core dumped)
->>
->> Since this is an internal device only, mark it with user_creatable =3D=
- false.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/cpu/cluster.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
->> index 25f9070..6f5f037 100644
->> --- a/hw/cpu/cluster.c
->> +++ b/hw/cpu/cluster.c
->> @@ -79,6 +79,9 @@ static void cpu_cluster_class_init(ObjectClass *klas=
-s, void *data)
->>
->>      dc->props =3D cpu_cluster_properties;
->>      dc->realize =3D cpu_cluster_realize;
->> +
->> +    /* This is not directly for users, CPU children must be attached =
-by code */
->> +    dc->user_creatable =3D false;
->>  }
->>
->>  static const TypeInfo cpu_cluster_type_info =3D {
->> --
->=20
->=20
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->=20
-> Would it be possible to add a 'make check' test that every device
-> we claim to be user-creatable can be created without crashing ?
+On Tue, 29 Jan 2019 at 17:59, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Now than failing tests are commented out, let's reenable the testing
+> of this OS.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/vm/openbsd | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> index 7c456e9706..ff6d5fa549 100755
+> --- a/tests/vm/openbsd
+> +++ b/tests/vm/openbsd
+> @@ -25,9 +25,7 @@ class OpenBSDVM(basevm.BaseVM):
+>          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>          tar -xf /dev/rsd1c;
+>          ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=
+=3Dpython2.7 {configure_opts};
+> -        gmake --output-sync -j{jobs} {verbose};
+> -        # XXX: "gmake check" seems to always hang or fail
+> -        #gmake --output-sync -j{jobs} check {verbose};
+> +        gmake --output-sync -j{jobs} check {verbose};
+>      """
+>
+>      def build_image(self, img):
+> --
+> 2.20.1
 
-That's what Eduardo's scripts/device-crash-test is good for. It's just
-too slow to run during "make check" currently, since it checks each
-device with each machine type... But IIRC Eduardo once had ideas to
-improve this...?
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
- Thomas
+thanks
+-- PMM
