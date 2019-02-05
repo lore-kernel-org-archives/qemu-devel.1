@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37013)
+Received: from eggs.gnu.org ([209.51.188.92]:38824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqoWn-0001js-4i
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:23:53 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqodv-0005Be-0Y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:31:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqoWm-0001up-6J
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:23:53 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue,  5 Feb 2019 01:18:28 +0100
-Message-Id: <20190205001835.25660-2-philmd@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gqodt-0006F3-S4
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:31:14 -0500
+Resent-Message-Id: <E1gqodt-0006F3-S4@eggs.gnu.org>
+Message-ID: <154932662894.29184.16166096343310582294@ebba9967afc0>
 In-Reply-To: <20190205001835.25660-1-philmd@redhat.com>
-References: <20190205001835.25660-1-philmd@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/8] ahci-test: Add dependency to qemu-img
- tool
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Feb 2019 16:30:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] OpenBSD: Block layer fixes (was
+ 'Enable qtesting')
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: philmd@redhat.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, brad@comstyle.com
 
-Since the ahci-test uses qemu-img, add a dependency to build it
-before using it.
-This fixes:
-
-  $ gmake check-qtest V=3D1
-  QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3D=
-qemu-img tests/ahci-test
-  Failed to execute child process "/tmp/qemu-test.19tMRF/qemu-img" (No su=
-ch file or directory)
-  ERROR:tests/libqos/libqos.c:192:mkimg: assertion failed: (ret && !err)
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Slighly related is when vm-tests expect qemu-img available:
-https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08415.html
-
-  $ make vm-build-ubuntu.i386
-  Traceback (most recent call last):
-    File "source/qemu/tests/vm/basevm.py", line 236, in main
-      return vm.build_image(args.image)
-    File "tests/vm/ubuntu.i386", line 67, in build_image
-      subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
-  OSError: [Errno 2] No such file or directory
-  tests/vm/Makefile.include:23: recipe for target 'tests/vm/ubuntu.i386.i=
-mg' failed
-  make: *** [tests/vm/ubuntu.i386.img] Error 2
-
-A better fix would be checking those tools via ./configure...
----
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 75ad9c0dd3..679656b64a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -708,7 +708,7 @@ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $=
-(libqos-obj-y)
- tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
- tests/fdc-test$(EXESUF): tests/fdc-test.o
- tests/ide-test$(EXESUF): tests/ide-test.o $(libqos-pc-obj-y)
--tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y)
-+tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y) qemu-img$=
-(EXESUF)
- tests/ipmi-kcs-test$(EXESUF): tests/ipmi-kcs-test.o
- tests/ipmi-bt-test$(EXESUF): tests/ipmi-bt-test.o
- tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTAwMTgzNS4yNTY2
+MC0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNTAwMTgzNS4y
+NTY2MC0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
