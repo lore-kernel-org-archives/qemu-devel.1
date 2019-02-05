@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36786)
+Received: from eggs.gnu.org ([209.51.188.92]:36975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5H4-00036L-IH
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:49 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5HA-0003Bb-Cx
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gz-0004Ps-N8
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:45 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40598)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5H8-0004XQ-Lx
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:52 -0500
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:39707)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5Gq-0004Kk-AU
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:36 -0500
-Received: by mail-wm1-x331.google.com with SMTP id f188so4727051wmf.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:31 -0800 (PST)
+	id 1gr5H8-0004QB-8L
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:50 -0500
+Received: by mail-wm1-x330.google.com with SMTP id y8so4741050wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:42 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:15:10 +0100
-Message-Id: <1549390526-24246-61-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:15:22 +0100
+Message-Id: <1549390526-24246-73-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 60/76] hw/xtensa/Makefile.objs: Build xtensa_sim
- and xtensa_fpga conditionally
+Subject: [Qemu-devel] [PULL 72/76] i386: hvf: Fix smp boot hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +28,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?=C3=81kos=20Kov=C3=A1cs?= <akoskovacs@gmx.com>
+Cc: Heiher <r@hev.cc>
 
-From: Ákos Kovács <akoskovacs@gmx.com>
+From: Heiher <r@hev.cc>
 
-Add the new CONFIG_* values to default-config/xtensa*-softmmu.mak.
+The machine that with hvf accelerator and smp sometimes boot hangs
+because all processors are executing instructions at startup,
+including early I/O emulations. We should just allow the bootstrap
+processor to initialize the machine and then to wake up slave
+processors by interrupt.
 
-Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
-Message-Id: <20190202072456.6468-17-yang.zhong@intel.com>
+Signed-off-by: Heiher <r@hev.cc>
+Message-Id: <20190123073402.28465-1-r@hev.cc>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/xtensa-softmmu.mak   | 3 +++
- default-configs/xtensaeb-softmmu.mak | 3 +++
- hw/xtensa/Makefile.objs              | 4 ++--
- 3 files changed, 8 insertions(+), 2 deletions(-)
+ target/i386/hvf/hvf.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
-index 9d8899c..baf90ca 100644
---- a/default-configs/xtensa-softmmu.mak
-+++ b/default-configs/xtensa-softmmu.mak
-@@ -3,3 +3,6 @@
- CONFIG_SERIAL=y
- CONFIG_OPENCORES_ETH=y
- CONFIG_PFLASH_CFI01=y
-+
-+CONFIG_XTENSA_SIM=y
-+CONFIG_XTENSA_FPGA=y
-diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/xtensaeb-softmmu.mak
-index 9d8899c..baf90ca 100644
---- a/default-configs/xtensaeb-softmmu.mak
-+++ b/default-configs/xtensaeb-softmmu.mak
-@@ -3,3 +3,6 @@
- CONFIG_SERIAL=y
- CONFIG_OPENCORES_ETH=y
- CONFIG_PFLASH_CFI01=y
-+
-+CONFIG_XTENSA_SIM=y
-+CONFIG_XTENSA_FPGA=y
-diff --git a/hw/xtensa/Makefile.objs b/hw/xtensa/Makefile.objs
-index f30e4a7..fa86730 100644
---- a/hw/xtensa/Makefile.objs
-+++ b/hw/xtensa/Makefile.objs
-@@ -1,5 +1,5 @@
- obj-y += mx_pic.o
- obj-y += pic_cpu.o
--obj-y += sim.o
- obj-y += xtensa_memory.o
--obj-y += xtfpga.o
-+obj-$(CONFIG_XTENSA_SIM) += sim.o
-+obj-$(CONFIG_XTENSA_FPGA) += xtfpga.o
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index 689b585..42f9447 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -499,7 +499,6 @@ void hvf_reset_vcpu(CPUState *cpu) {
+     }
+ 
+     hv_vm_sync_tsc(0);
+-    cpu->halted = 0;
+     hv_vcpu_invalidate_tlb(cpu->hvf_fd);
+     hv_vcpu_flush(cpu->hvf_fd);
+ }
+@@ -582,8 +581,6 @@ int hvf_init_vcpu(CPUState *cpu)
+ 
+     wvmcs(cpu->hvf_fd, VMCS_TPR_THRESHOLD, 0);
+ 
+-    hvf_reset_vcpu(cpu);
+-
+     x86cpu = X86_CPU(cpu);
+     x86cpu->env.xsave_buf = qemu_memalign(4096, 4096);
+ 
+@@ -659,8 +656,6 @@ int hvf_vcpu_exec(CPUState *cpu)
+     int ret = 0;
+     uint64_t rip = 0;
+ 
+-    cpu->halted = 0;
+-
+     if (hvf_process_events(cpu)) {
+         return EXCP_HLT;
+     }
 -- 
 1.8.3.1
