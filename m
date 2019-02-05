@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36870)
+Received: from eggs.gnu.org ([209.51.188.92]:38133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqzxA-0005F7-G1
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:35:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr03E-0006hX-MP
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:42:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqzx8-000377-1S
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:35:51 -0500
-Date: Tue, 5 Feb 2019 13:35:40 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190205133540.573902d8.cohuck@redhat.com>
-In-Reply-To: <20190205125229.56c6e252@oc2783563651>
-References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190130132212.7376-2-cohuck@redhat.com>
-	<20190130195127.5ff3c849@oc2783563651>
-	<20190131125220.285a4bc8.cohuck@redhat.com>
-	<20190131133455.3097613f@oc2783563651>
-	<20190204163102.33d744d8.cohuck@redhat.com>
-	<20190205125229.56c6e252@oc2783563651>
+	(envelope-from <peter.maydell@linaro.org>) id 1gr03D-0007it-QY
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:42:08 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35670)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr03D-0007iX-Kg
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:42:07 -0500
+Received: by mail-ot1-x342.google.com with SMTP id 81so5440152otj.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 04:42:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
- channel programs
+References: <20190204142638.27021-1-mst@redhat.com>
+	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
+	<20190204205105-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190204205105-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Feb 2019 12:41:55 +0000
+Message-ID: <CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 5 Feb 2019 12:52:29 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On Tue, 5 Feb 2019 at 01:52, Michael S. Tsirkin <mst@redhat.com> wrote:
+> So I think I fixed the build errors. And who knows maybe
+> that will fix the runtime ones somehow ..
+> Could you try pls? Re-pushed to same tag.
 
-> On Mon, 4 Feb 2019 16:31:02 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Thu, 31 Jan 2019 13:34:55 +0100
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >   
-> > > On Thu, 31 Jan 2019 12:52:20 +0100
-> > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > >   
-> > > > On Wed, 30 Jan 2019 19:51:27 +0100
-> > > > Halil Pasic <pasic@linux.ibm.com> wrote:
-> > > >     
-> > > > > On Wed, 30 Jan 2019 14:22:07 +0100
-> > > > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > > > >     
-> > > > > > When we get a solicited interrupt, the start function may have
-> > > > > > been cleared by a csch, but we still have a channel program
-> > > > > > structure allocated. Make it safe to call the cp accessors in
-> > > > > > any case, so we can call them unconditionally.      
-> > > > > 
-> > > > > I read this like it is supposed to be safe regardless of
-> > > > > parallelism and threads. However I don't see any explicit
-> > > > > synchronization done for cp->initialized.
-> > > > > 
-> > > > > I've managed to figure out how is that supposed to be safe
-> > > > > for the cp_free() (which is probably our main concern) in
-> > > > > vfio_ccw_sch_io_todo(), but if fail when it comes to the one
-> > > > > in vfio_ccw_mdev_notifier().
-> > > > > 
-> > > > > Can you explain us how does the synchronization work?    
-> > > > 
-> > > > You read that wrong, I don't add synchronization, I just add a check.
-> > > >     
-> > > 
-> > > Now I'm confused. Does that mean we don't need synchronization for this?  
-> > 
-> > If we lack synchronization (that is not provided by the current state
-> > machine handling, or the rework here), we should do a patch on top
-> > (preferably on top of the whole series, so this does not get even more
-> > tangled up.) This is really just about the extra check.
-> >   
-> 
-> I'm not a huge fan of keeping or introducing races -- it makes things
-> difficult to reason about, but I do have some understanging your
-> position.
+these failures still remain:
 
-The only thing I want to avoid is knowingly making things worse than
-before, and I don't think this patch does that.
+unused variable for OSX and the BSDs:
 
-> 
-> This patch-series is AFAICT a big improvement over what we have. I would
-> like Farhan confirming that it makes these hick-ups when he used to hit
-> BUSY with another ssch request disappear. If it does (I hope it does)
-> it's definitely a good thing for anybody who wants to use vfio-ccw.
+tests/vhost-user-test.c:942:17: warning: unused variable 'hugefs'
+[-Wunused-variable]
+    const char *hugefs;
+                ^
 
-Yep. There remains a lot to be done, but it's a first step.
+Assertion failure on sparc, s390x and PPC64 hosts:
 
-> 
-> Yet I find it difficult to slap my r-b over racy code, or partial
-> solutions. In the latter case, when I lack conceptual clarity, I find it
-> difficult to tell if we are heading into the right direction, or is what
-> we build today going to turn against us tomorrow. Sorry for being a drag.
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
+QTEST_QEMU_IMG=qemu-img tests/vhost-user-test -m=quick -k --tap <
+/dev/null | ./scripts/tap-driver.pl --test-name="vhost-user-test"
+qemu-system-i386: backend does not support LE vnet headers; falling
+back on userspace virtio
+qemu-system-i386: backend does not support LE vnet headers; falling
+back on userspace virtio
+**
+ERROR:/home/pm215/qemu/tests/vhost-user-test.c:243:wait_for_fds:
+assertion failed: (s->fds_num)
+ERROR - too few tests run (expected 4, got 0)
 
-As long as we don't introduce bad user space interfaces we have to drag
-around forever, I think anything is fair game if we think it's a good
-idea at that moment. We can rewrite things if it turned out to be a bad
-idea (although I'm not arguing for doing random crap, of course :)
+Given the set of hosts affected this is almost certainly
+a big-endian-host specific bug.
+
+thanks
+-- PMM
