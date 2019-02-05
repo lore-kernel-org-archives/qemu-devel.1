@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54917)
+Received: from eggs.gnu.org ([209.51.188.92]:54420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gr7VL-0005jz-DK
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:39:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1gr7VP-0005X6-D6
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gr7PS-0005qS-3N
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:33:35 -0500
-References: <1549397675-189741-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1549397675-189741-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ce1a623e-8844-72d5-e4a7-ca8cb9354c86@redhat.com>
-Date: Tue, 5 Feb 2019 14:33:15 -0600
+	(envelope-from <bounces@canonical.com>) id 1gr7Mh-0004L7-Eh
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:30:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gr7Mh-0004Jf-8w
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:30:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gr7Mf-0005f7-SK
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 20:30:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D52C22E80C7
+	for <qemu-devel@nongnu.org>; Tue,  5 Feb 2019 20:30:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1549397675-189741-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aR2UHf0IY4p7KOx4gdMFh23i8aRwMXQHd"
-Subject: Re: [Qemu-devel] [PATCH v12 2/3] qcow2: Add list of bitmaps to
- ImageInfoSpecificQCow2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 Feb 2019 20:25:09 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 1813940 <1813940@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154885462996.30915.15408927273139016803.malonedeb@gac.canonical.com>
+Message-Id: <154939830955.25442.7968563754645386838.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813940] Re: kvm_mem_ioeventfd_add: error adding
+ ioeventfd: No space left on device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aR2UHf0IY4p7KOx4gdMFh23i8aRwMXQHd
-From: Eric Blake <eblake@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com,
- berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
-Message-ID: <ce1a623e-8844-72d5-e4a7-ca8cb9354c86@redhat.com>
-Subject: Re: [PATCH v12 2/3] qcow2: Add list of bitmaps to
- ImageInfoSpecificQCow2
-References: <1549397675-189741-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1549397675-189741-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1549397675-189741-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hmm that's not surprising because coalesced ranges were completely
+broken before that commit.  I'll take a look.
 
-On 2/5/19 2:14 PM, Andrey Shinkevich wrote:
-> In the 'Format specific information' section of the 'qemu-img info'
-> command output, the supplemental information about existing QCOW2
-> bitmaps will be shown, such as a bitmap name, flags and granularity:
->=20
+-- =
 
-> +##
-> +# @Qcow2BitmapInfo:
-> +#
-> +# Qcow2 bitmap information.
-> +#
-> +# @name: the name of the bitmap
-> +#
-> +# @granularity: granularity of the bitmap in bytes
-> +#
-> +# @flags: flags of the bitmap
-> +#
-> +# Since: 4.0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813940
 
-You got rid of the docs for unknown-flags,
+Title:
+  kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
 
-> +##
-> +{ 'struct': 'Qcow2BitmapInfo',
-> +  'data': {'name': 'str', 'granularity': 'uint32',
-> +           'flags': ['Qcow2BitmapInfoFlags'],
-> +           '*unknown-flags': 'uint32' } }
+Status in QEMU:
+  New
 
-but forgot to actually get rid of the field. That's a pretty simple
-cleanup, which I don't mind making if this series is otherwise ready to g=
-o.
+Bug description:
+  Latest QEMU master fails to run with too many MMIO devices specified.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  After patch 3ac7d43a6fb [1] QEMU just prints an error message and exits.
+  > kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+  This is reproducible e.g. with the following setup:
 
+  qemu-3.1.50-dirty \
+      -machine pc-i440fx-2.7,accel=3Dkvm \
+      -cpu host -m 4096 \
+      -smp 2,sockets=3D2,cores=3D1,threads=3D1 \
+      -drive file=3Dfreebsd_vm_1.qcow2,format=3Dqcow2,if=3Dnone,id=3Dbootdr=
+ \
+      -device ide-hd,drive=3Dbootdr,bootindex=3D0 \
+      -device virtio-scsi-pci,id=3Dvc0 \
+      -device virtio-scsi-pci,id=3Dvc1 \
+      -device virtio-scsi-pci,id=3Dvc2 \
+      -device virtio-scsi-pci,id=3Dvc3 \
 
---aR2UHf0IY4p7KOx4gdMFh23i8aRwMXQHd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Running with just 3 Virtio-SCSI controllers seems to work fine, adding
+  more than that causes the error above. Note that this is not Virtio-
+  SCSI specific. I've also reproduced this without any Virtio devices
+  whatsoever.
 
------BEGIN PGP SIGNATURE-----
+  strace shows the following ioctl chain over and over:
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxZ8wsACgkQp6FrSiUn
-Q2quEggAqY0M9lSNeURIgJzBB8rCW2oAPFfyRKr0vjVOSsk1pIfJkYSdDwdfHRiq
-6PRmyjxrX7GO7C6Xs86VW+WI5kqCGx+IcTUf9hVE3caqdxt2gvT4Vu+9k+2f+wIi
-s1krTMiNF+e/PB9CojCsndvvBSmC5SPJ5p34EVzPUmJqQMS07afa4/ozJ+ljKELw
-aMk4jBLVodY9WH1PieQVk0AiA3wJ9DlQqv0Q/nYMW1TCZ9h0AdRwSarVH6+6R2oP
-aJ9c4Rj1f/QOwforZYy7dcVcQIWIxoXe7ubsyOLIAY7lOrossE40Hu09QpkpNJmh
-VxzDwLh9e3f64MQ53IFeTaBAMfoeaw==
-=Ckd8
------END PGP SIGNATURE-----
+  145787 ioctl(11, KVM_UNREGISTER_COALESCED_MMIO, 0x7f60a4985410) =3D 0
+  145787 ioctl(11, KVM_UNREGISTER_COALESCED_MMIO, 0x7f60a4985410) =3D 0
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D 0
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
 
---aR2UHf0IY4p7KOx4gdMFh23i8aRwMXQHd--
+  Which suggests there's some kind of MMIO region leak.
+
+  [1]
+  commit 3ac7d43a6fbb5d4a3d01fc9a055c218030af3727
+  Author:     Paolo Bonzini <pbonzini@redhat.com>
+  AuthorDate: Wed Nov 28 17:28:45 2018 +0100
+  Commit:     Paolo Bonzini <pbonzini@redhat.com>
+  CommitDate: Fri Jan 11 13:57:24 2019 +0100
+
+      memory: update coalesced_range on transaction_commit
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813940/+subscriptions
