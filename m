@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36253)
+Received: from eggs.gnu.org ([209.51.188.92]:36021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GV-0002Vw-Ij
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:14 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002O6-SM
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GM-0003ux-7c
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:07 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37808)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003oo-GP
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42399)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GL-0003tB-QR
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:02 -0500
-Received: by mail-wm1-x335.google.com with SMTP id g67so4751341wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:01 -0800 (PST)
+	id 1gr5GH-0003av-SP
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
+Received: by mail-wr1-x433.google.com with SMTP id q18so4689334wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:45 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:41 +0100
-Message-Id: <1549390526-24246-32-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:26 +0100
+Message-Id: <1549390526-24246-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 31/76] configure: enable elf2dmp build for
- Windows hosts
+Subject: [Qemu-devel] [PULL 16/76] linuxboot_dma: remove duplicate
+ definitions of FW_CFG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-After this patch contrib/elf2dmp can be built for Windows x86 and x86_64
-hosts by mingw.
+FW_CFG_DMA_CTL_* bits and struct fw_cfg_dma_access are
+defined in the qemu_fw_cfg.h header file already included
+in linuxboot_dma.c, so we can remove the definition of
+BIOS_CFG_DMA_CTL_* and struct FWCfgDmaAccess.
 
-Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-7-viktor.prutyanov@phystech.edu>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Based-on: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile  | 4 ++--
- configure | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ pc-bios/optionrom/linuxboot_dma.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 76f6ab4..3658310 100644
---- a/Makefile
-+++ b/Makefile
-@@ -570,8 +570,8 @@ ifneq ($(EXESUF),)
- qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
- endif
+diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxboot_dma.c
+index d856d41..f728dc8 100644
+--- a/pc-bios/optionrom/linuxboot_dma.c
++++ b/pc-bios/optionrom/linuxboot_dma.c
+@@ -58,12 +58,6 @@ asm(
+ "   jmp load_kernel\n"
+ );
  
--elf2dmp: LIBS = $(CURL_LIBS)
--elf2dmp: $(elf2dmp-obj-y)
-+elf2dmp$(EXESUF): LIBS += $(CURL_LIBS)
-+elf2dmp$(EXESUF): $(elf2dmp-obj-y)
- 	$(call LINK, $^)
+-/* QEMU_CFG_DMA_CONTROL bits */
+-#define BIOS_CFG_DMA_CTL_ERROR   0x01
+-#define BIOS_CFG_DMA_CTL_READ    0x02
+-#define BIOS_CFG_DMA_CTL_SKIP    0x04
+-#define BIOS_CFG_DMA_CTL_SELECT  0x08
+-
+ #define BIOS_CFG_DMA_ADDR_HIGH 0x514
+ #define BIOS_CFG_DMA_ADDR_LOW  0x518
  
- ifdef CONFIG_IVSHMEM
-diff --git a/configure b/configure
-index f6a51e0..244bc7a 100755
---- a/configure
-+++ b/configure
-@@ -5790,8 +5790,8 @@ if test "$want_tools" = "yes" ; then
-   if [ "$ivshmem" = "yes" ]; then
-     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-   fi
--  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
--    tools="elf2dmp $tools"
-+  if [ "$curl" = "yes" ]; then
-+      tools="elf2dmp\$(EXESUF) $tools"
-   fi
- fi
- if test "$softmmu" = yes ; then
+@@ -75,12 +69,6 @@ asm(
+ 
+ #define barrier() asm("" : : : "memory")
+ 
+-typedef struct FWCfgDmaAccess {
+-    uint32_t control;
+-    uint32_t length;
+-    uint64_t address;
+-} __attribute__((packed)) FWCfgDmaAccess;
+-
+ static inline void outl(uint32_t value, uint16_t port)
+ {
+     asm("outl %0, %w1" : : "a"(value), "Nd"(port));
+@@ -153,9 +141,9 @@ static inline uint32_t be32_to_cpu(uint32_t x)
+ static __attribute__((__noinline__))
+ void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
+ {
+-    FWCfgDmaAccess access;
+-    uint32_t control = (entry << 16) | BIOS_CFG_DMA_CTL_SELECT
+-                        | BIOS_CFG_DMA_CTL_READ;
++    struct fw_cfg_dma_access access;
++    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
++                        | FW_CFG_DMA_CTL_READ;
+ 
+     access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
+     access.length = cpu_to_be32(len);
+@@ -165,7 +153,7 @@ void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
+ 
+     outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
+ 
+-    while (be32_to_cpu(access.control) & ~BIOS_CFG_DMA_CTL_ERROR) {
++    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
+         barrier();
+     }
+ }
 -- 
 1.8.3.1
