@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35865)
+Received: from eggs.gnu.org ([209.51.188.92]:35899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002L0-0x
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002La-IQ
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GG-0003lO-QC
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GH-0003mE-CO
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:38246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gr5GG-0003XX-U0
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
+Received: by mail-wr1-x435.google.com with SMTP id v13so4716360wrw.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:39 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:33 +0100
-Message-Id: <1549390526-24246-24-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:20 +0100
+Message-Id: <1549390526-24246-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/76] i386: remove the 'INTEL_PT' CPUID bit
- from named CPU models
+Subject: [Qemu-devel] [PULL 10/76] cpus: ignore ESRCH in
+ qemu_cpu_kick_thread()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +29,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>
 
-Processor tracing is not yet implemented for KVM and it will be an
-opt in feature requiring a special module parameter.
-Disable it, because it is wrong to enable it by default and
-it is impossible that no one has ever used it.
+From: Laurent Vivier <lvivier@redhat.com>
 
-Cc: qemu-stable@nongnu.org
+We can have a race condition between qemu_cpu_kick_thread() and
+qemu_kvm_cpu_thread_fn() when we hotunplug a CPU. In this case,
+qemu_cpu_kick_thread() can try to kick a thread that is exiting.
+pthread_kill() returns an error and qemu is stopped by an exit(1).
+
+   qemu:qemu_cpu_kick_thread: No such process
+
+We can ignore safely this error.
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ cpus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 4d21ae4..7301e7d 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2530,8 +2530,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
--            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
--            CPUID_7_0_EBX_INTEL_PT,
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-         .features[FEAT_7_0_ECX] =
-             CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
-             CPUID_7_0_ECX_AVX512VNNI,
-@@ -2583,7 +2582,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-             CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-             CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
--            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_INTEL_PT,
-+            CPUID_7_0_EBX_SMAP,
-         .features[FEAT_7_0_ECX] =
-             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
-@@ -2641,8 +2640,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLWB |
-             CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-             CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
--            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
--            CPUID_7_0_EBX_INTEL_PT,
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
-         .features[FEAT_7_0_ECX] =
-             CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-             CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
+diff --git a/cpus.c b/cpus.c
+index b09b702..154daf5 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1778,7 +1778,7 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+     }
+     cpu->thread_kicked = true;
+     err = pthread_kill(cpu->thread->thread, SIG_IPI);
+-    if (err) {
++    if (err && err != ESRCH) {
+         fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
+         exit(1);
+     }
 -- 
 1.8.3.1
