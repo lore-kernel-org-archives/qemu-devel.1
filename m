@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36872)
+Received: from eggs.gnu.org ([209.51.188.92]:38474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gr1ir-0008Tc-I0
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 09:29:14 -0500
+	(envelope-from <farman@linux.ibm.com>) id 1gr1le-0000zT-Ot
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 09:32:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gr1iq-0002UK-E4
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 09:29:13 -0500
-Date: Tue, 5 Feb 2019 15:28:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190205142855.GD5273@linux.fritz.box>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<87pnsbxsi7.fsf@dusky.pond.sub.org>
-	<20190204094621.GB5855@linux.fritz.box>
-	<87d0o7psz6.fsf@dusky.pond.sub.org>
-	<b448da30-7e0d-98be-d3dc-578fffc55de8@virtuozzo.com>
-	<20190205100039.GC5273@linux.fritz.box>
-	<8bdd3e6e-f83f-e73a-6dad-870d05698334@virtuozzo.com>
+	(envelope-from <farman@linux.ibm.com>) id 1gr1lc-0004Sq-2j
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 09:32:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+	id 1gr1lb-0004RE-4k
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 09:32:03 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x15EOmgl085229
+	for <qemu-devel@nongnu.org>; Tue, 5 Feb 2019 09:32:00 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qfa0j7d7w-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:32:00 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+	Tue, 5 Feb 2019 14:31:59 -0000
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-3-cohuck@redhat.com>
+	<55d9fc3d-12ec-9ad7-cdaa-72c5dbb65aca@linux.ibm.com>
+	<20190205131047.32f7c7a1.cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Tue, 5 Feb 2019 09:31:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8bdd3e6e-f83f-e73a-6dad-870d05698334@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+In-Reply-To: <20190205131047.32f7c7a1.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <bd078c02-e08a-545f-3c17-52e291ef60ad@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vfio-ccw: rework ssch state handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +44,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Am 05.02.2019 um 14:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 05.02.2019 13:00, Kevin Wolf wrote:
-> > Am 04.02.2019 um 16:36 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> 04.02.2019 16:45, Markus Armbruster wrote:
-> >>> Kevin Wolf <kwolf@redhat.com> writes:
-> >>>
-> >>>> Am 01.02.2019 um 19:39 hat Markus Armbruster geschrieben:
-> >>>>> Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
-> >>>>>
-> >>>>>> In the 'Format specific information' section of the 'qemu-img info'
-> >>>>>> command output, the supplemental information about existing QCOW2
-> >>>>>> bitmaps will be shown, such as a bitmap name, flags and granularity:
-> >>>>>>
-> >>>>>> image: /vz/vmprivate/VM1/harddisk.hdd
-> >>>>>> file format: qcow2
-> >>>>>> virtual size: 64G (68719476736 bytes)
-> >>>>>> disk size: 3.0M
-> >>>>>> cluster_size: 1048576
-> >>>>>> Format specific information:
-> >>>>>>       compat: 1.1
-> >>>>>>       lazy refcounts: true
-> >>>>>>       bitmaps:
-> >>>>>>           [0]:
-> >>>>>>               flags:
-> >>>>>>                   [0]: in-use
-> >>>>>>                   [1]: auto
-> >>>>>>               name: back-up1
-> >>>>>>               unknown flags: 4
-> >>>>>>               granularity: 65536
-> >>>>>>           [1]:
-> >>>>>>               flags:
-> >>>>>>                   [0]: in-use
-> >>>>>>                   [1]: auto
-> >>>>>>               name: back-up2
-> >>>>>>               unknown flags: 8
-> >>>>>>               granularity: 65536
-> >>>>>>       refcount bits: 16
-> >>>>>>       corrupt: false
-> >>>>>>
-> >>>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> >>>>>> ---
-> >>>>> [...]
-> >>>>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> >>>>>> index 91685be..271e0df 100644
-> >>>>>> --- a/qapi/block-core.json
-> >>>>>> +++ b/qapi/block-core.json
-> >>>>>> @@ -69,6 +69,8 @@
-> >>>>>>    # @encrypt: details about encryption parameters; only set if image
-> >>>>>>    #           is encrypted (since 2.10)
-> >>>>>>    #
-> >>>>>> +# @bitmaps: A list of qcow2 bitmap details (since 4.0)
-> >>>>>> +#
-> >>>>>>    # Since: 1.7
-> >>>>>>    ##
-> >>>>>>    { 'struct': 'ImageInfoSpecificQCow2',
-> >>>>>> @@ -77,7 +79,8 @@
-> >>>>>>          '*lazy-refcounts': 'bool',
-> >>>>>>          '*corrupt': 'bool',
-> >>>>>>          'refcount-bits': 'int',
-> >>>>>> -      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
-> >>>>>> +      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-> >>>>>> +      '*bitmaps': ['Qcow2BitmapInfo']
-> >>>>>>      } }
-> >>>>>>    
-> >>>>>>    ##
-> >>>>>> @@ -454,6 +457,41 @@
-> >>>>>>               'status': 'DirtyBitmapStatus'} }
-> >>>>>>    
-> >>>>>>    ##
-> >>>>>> +# @Qcow2BitmapInfoFlags:
-> >>>>>> +#
-> >>>>>> +# An enumeration of flags that a bitmap can report to the user.
-> >>>>>> +#
-> >>>>>> +# @in-use: The bitmap was not saved correctly and may be inconsistent.
-> >>>>>
-> >>>>> I doubt the casual reader could guess the meaning from the name.  What
-> >>>>> about @dirty?
-> >>>>
-> >>>> Feels like overloading the word "dirty" in the context of "dirty
-> >>>> bitmaps". This might easily lead to misinterpretation as "this bitmap
-> >>>> marks some clusters as dirty" rather than "this bitmap might be
-> >>>> inconsistent".
-> >>>
-> >>> Call it @possibly-inconsistent then?
-> >>>
-> >>
-> >> If you run qmp query-block while vm is running, all bitmaps in image will
-> >> be in use. And in this context, in-use seems more appropriate than
-> >> possibly-inconsistent. And in-use has less interference with the fact that
-> >> actual bitmaps now are in-RAM BdrvDirtyBitmap structures which are actually
-> >> consistent (and also shown by query-block)
-> > 
-> > Good point, but then this description isn't correct either:
-> > 
-> >      @in-use: The bitmap was not saved correctly and may be inconsistent.
-> > 
-> > Maybe what needs to change is the description, not the name?
-> > 
-> > Kevin
-> > 
+
+
+On 02/05/2019 07:10 AM, Cornelia Huck wrote:
+> On Mon, 4 Feb 2019 16:29:40 -0500
+> Eric Farman <farman@linux.ibm.com> wrote:
 > 
-> How about the following:
+>> On 01/30/2019 08:22 AM, Cornelia Huck wrote:
+>>> The flow for processing ssch requests can be improved by splitting
+>>> the BUSY state:
+>>>
+>>> - CP_PROCESSING: We reject any user space requests while we are in
+>>>     the process of translating a channel program and submitting it to
+>>>     the hardware. Use -EAGAIN to signal user space that it should
+>>>     retry the request.
+>>> - CP_PENDING: We have successfully submitted a request with ssch and
+>>>     are now expecting an interrupt. As we can't handle more than one
+>>>     channel program being processed, reject any further requests with
+>>>     -EBUSY. A final interrupt will move us out of this state; this also
+>>>     fixes a latent bug where a non-final interrupt might have freed up
+>>>     a channel program that still was in progress.
+>>>     By making this a separate state, we make it possible to issue a
+>>>     halt or a clear while we're still waiting for the final interrupt
+>>>     for the ssch (in a follow-on patch).
+>>>
+>>> It also makes a lot of sense not to preemptively filter out writes to
+>>> the io_region if we're in an incorrect state: the state machine will
+>>> handle this correctly.
+>>>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>    drivers/s390/cio/vfio_ccw_drv.c     |  8 ++++++--
+>>>    drivers/s390/cio/vfio_ccw_fsm.c     | 19 ++++++++++++++-----
+>>>    drivers/s390/cio/vfio_ccw_ops.c     |  2 --
+>>>    drivers/s390/cio/vfio_ccw_private.h |  3 ++-
+>>>    4 files changed, 22 insertions(+), 10 deletions(-)
 > 
-> @in-use: This flag is set while bitmap is in use by software and it's data in
-> qcow2 image may be out of date when actual bitmap data is managed by software.
-> Presence of this flag in offline image means that bitmap was not saved correctly
-> after last usage and it's data may be inconsistent.
+>>> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+>>> index e7c9877c9f1e..b4a141fbd1a8 100644
+>>> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+>>> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+>>> @@ -28,7 +28,6 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+>>>    	sch = private->sch;
+>>>    
+>>>    	spin_lock_irqsave(sch->lock, flags);
+>>> -	private->state = VFIO_CCW_STATE_BUSY;
+>>>    
+>>>    	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
+>>>    	if (!orb) {
+>>> @@ -46,6 +45,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+>>>    		 */
+>>>    		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
+>>>    		ret = 0;
+>>> +		private->state = VFIO_CCW_STATE_CP_PENDING;
+>>
+>> [1]
+>>
+>>>    		break;
+>>>    	case 1:		/* Status pending */
+>>>    	case 2:		/* Busy */
+>>> @@ -107,6 +107,12 @@ static void fsm_io_busy(struct vfio_ccw_private *private,
+>>>    	private->io_region->ret_code = -EBUSY;
+>>>    }
+>>>    
+>>> +static void fsm_io_retry(struct vfio_ccw_private *private,
+>>> +			 enum vfio_ccw_event event)
+>>> +{
+>>> +	private->io_region->ret_code = -EAGAIN;
+>>> +}
+>>> +
+>>>    static void fsm_disabled_irq(struct vfio_ccw_private *private,
+>>>    			     enum vfio_ccw_event event)
+>>>    {
+>>> @@ -135,8 +141,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+>>>    	struct mdev_device *mdev = private->mdev;
+>>>    	char *errstr = "request";
+>>>    
+>>> -	private->state = VFIO_CCW_STATE_BUSY;
+>>> -
+>>> +	private->state = VFIO_CCW_STATE_CP_PROCESSING;
+>>
+>> [1]
+>>
+>>>    	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+>>>    
+>>>    	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+>>> @@ -181,7 +186,6 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+>>>    	}
+>>>    
+>>>    err_out:
+>>> -	private->state = VFIO_CCW_STATE_IDLE;
+>>
+>> [1] Revisiting these locations as from an earlier discussion [2]...
+>> These go IDLE->CP_PROCESSING->CP_PENDING if we get a cc=0 on the SSCH,
+>> but we stop in CP_PROCESSING if the SSCH gets a nonzero cc.  Shouldn't
+>> we cleanup and go back to IDLE in this scenario, rather than forcing
+>> userspace to escalate to CSCH/HSCH after some number of retries (via FSM)?
+>>
+>> [2] https://patchwork.kernel.org/patch/10773611/#22447997
+> 
+> It does do that (in vfio_ccw_mdev_write), it was not needed here. Or do
+> you think doing it here would be more obvious?
 
-Yes, I think this has the information it needs to have.
+Ah, my mistake, I missed that.  (That function is renamed to 
+vfio_ccw_mdev_write_io_region in patch 4.)
 
-It needs some spelling and grammar fixes, but before I make them, I'll
-wait if Eric would phrase it in a different way that sounds more natural
-to him as a native speaker.
+I don't think keeping it here is necessary then.  I got too focused 
+looking at what you ripped out that I lost the things that stayed.  Once 
+this series gets in its entirety, and Pierre has a chance to rebase his 
+FSM series on top of it all, this should be in great shape.
 
-Kevin
+> 
+>>
+>> Besides that, I think this looks good to me.
+> 
+> Thanks!
+> 
+
+You're welcome!  Here, have a thing to add to this patch:
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
