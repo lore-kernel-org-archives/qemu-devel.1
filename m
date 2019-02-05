@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35857)
+Received: from eggs.gnu.org ([209.51.188.92]:37633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqwWB-0005de-Fh
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:55:48 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqwdA-00075s-CF
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:03:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqwW2-0004fy-2g
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:55:40 -0500
-Date: Tue, 5 Feb 2019 09:55:25 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190205085525.jc6zj6p5jbcngcmk@sirius.home.kraxel.org>
-References: <1549282241-23535-1-git-send-email-thuth@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gqwd9-0008SH-HC
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:03:00 -0500
+Date: Tue, 5 Feb 2019 10:02:48 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190205100248.54f5d1cd.cohuck@redhat.com>
+In-Reply-To: <9a93a2a0-f352-1fb6-eb27-49f607cd0b97@redhat.com>
+References: <20190204225542.5597-1-eblake@redhat.com>
+	<9a93a2a0-f352-1fb6-eb27-49f607cd0b97@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1549282241-23535-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] ui/sdl_keysym: Remove obsolete SDL1.2
- related code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: Flag suspicious attribution
+ lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, peter.maydell@linaro.org
 
-On Mon, Feb 04, 2019 at 01:10:41PM +0100, Thomas Huth wrote:
-> sdl_keysym.h has only been included by sdl.c which has recently been
-> removed recently with this commit:
-> 
->   0015ca5cbabe0b31d31610ddfaafd90a9e5911a4
->   ("ui: remove support for SDL1.2 in favour of SDL2")
-> 
-> So we can drop this header file now completely, too.
+On Tue, 5 Feb 2019 00:29:14 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Added to UI queue.
+> On 2/4/19 11:55 PM, Eric Blake wrote:
+> > Flag commit attribution tags that are unusual (often because they
+> > were a typo), but only as a warning (because sometimes a humorous
+> > or otherwise useful tag is intentionally supplied).
+> >=20
+> > This picks the 6-most popular tags, each with 700 or more uses (well,
+> > S-o-b was already checked for case-sensitivity and typos, leaving
+> > only 5 new tags being checked), as determined by:
+> > $ git log | sed -n 's/^ *\([A-Za-z-]*-by:\).*/\1/p' | \
+> >   sort | uniq -c | sort -k1,1n | tail
+> >=20
+> > Most of the rejected lines were obvious typos (among others, we've
+> > had 4 cases of someone being burnt, based on Singed-off-by; and 2
+> > cases of list-reading via an e-reader, based on eviewed-by; there
+> > are also lines forgetting a space after the ':') or otherwise
+> > tongue-in-check (3 Approximately-suggested-by). A few lines not
+> > whitelisted here may be legitimate, but as they are orders of
+> > magnitude rarer, it is therefore not worth worrying about
+> > (7 Requested-by, 3 Co-authored-by, 1 Inspired-by, etc.). =20
 
-thanks,
-  Gerd
+Hm, wasn't Co-authored-by: actually intended to cover the cases where
+someone else did write significant parts of the patch? (I cannot point
+to the source without searching, though...)
+
+>=20
+> 'Inspired-by' is kinda Zen :) And is from Peter!
+
+I also like that one :)
