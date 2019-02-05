@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42700)
+Received: from eggs.gnu.org ([209.51.188.92]:42698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqyQz-0007Vy-KF
+	(envelope-from <kraxel@redhat.com>) id 1gqyQz-0007Vx-K7
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqyQt-0006L2-B0
+	(envelope-from <kraxel@redhat.com>) id 1gqyQw-0006Mq-6d
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:20563)
+Received: from mx1.redhat.com ([209.132.183.28]:58868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqyQs-0006BK-QP
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:26 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqyQt-000685-9v
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:28 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  5 Feb 2019 11:57:54 +0100
-Message-Id: <20190205105758.4230-11-kraxel@redhat.com>
+Date: Tue,  5 Feb 2019 11:57:58 +0100
+Message-Id: <20190205105758.4230-15-kraxel@redhat.com>
 In-Reply-To: <20190205105758.4230-1-kraxel@redhat.com>
 References: <20190205105758.4230-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/14] sdl2: use only QKeyCode in
- sdl2_process_key()
+Subject: [Qemu-devel] [PULL 14/14] keymap: fix keyup mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +29,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Also: sdl2_process_key is never called with scon =3D=3D NULL.
+It is possible that the modifier state on keyup is different from the
+modifier state on keydown.  In that case the keycode lookup can end up
+with different keys in case multiple keysym -> keycode mappings exist,
+because it picks the mapping depending on modifier state.
 
+To fix that change the lookup logic for keyup events.  Instead of
+looking at the modifier state check the key state and prefer a keycodes
+where the key is in "down" state right now.
+
+Fixes: abb4f2c965 keymap: consider modifier state when picking a mapping
+Buglink: https://bugs.launchpad.net/bugs/1738283
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1658676
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-id: 20190122092814.14919-5-kraxel@redhat.com
+Message-id: 20190122092814.14919-9-kraxel@redhat.com
 ---
- ui/sdl2-input.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index 22e3336aab..664364a5e5 100644
---- a/ui/sdl2-input.c
-+++ b/ui/sdl2-input.c
-@@ -34,20 +34,19 @@ void sdl2_process_key(struct sdl2_console *scon,
-                       SDL_KeyboardEvent *ev)
- {
-     int qcode;
--    QemuConsole *con =3D scon ? scon->dcl.con : NULL;
-+    QemuConsole *con =3D scon->dcl.con;
-=20
-     if (ev->keysym.scancode >=3D qemu_input_map_usb_to_qcode_len) {
-         return;
-     }
+ ui/keymaps.h |  2 +-
+ ui/curses.c  |  2 +-
+ ui/keymaps.c | 55 ++++++++++++++++++++++++++++++++++--------------------=
 -
-     qcode =3D qemu_input_map_usb_to_qcode[ev->keysym.scancode];
-     qkbd_state_key_event(scon->kbd, qcode, ev->type =3D=3D SDL_KEYDOWN);
+ ui/vnc.c     |  2 +-
+ 4 files changed, 37 insertions(+), 24 deletions(-)
+
+diff --git a/ui/keymaps.h b/ui/keymaps.h
+index d8652b8a5a..b6d48aac40 100644
+--- a/ui/keymaps.h
++++ b/ui/keymaps.h
+@@ -56,7 +56,7 @@ typedef struct kbd_layout_t kbd_layout_t;
+ kbd_layout_t *init_keyboard_layout(const name2keysym_t *table,
+                                    const char *language, Error **errp);
+ int keysym2scancode(kbd_layout_t *k, int keysym,
+-                    QKbdState *kbd);
++                    QKbdState *kbd, bool down);
+ int keycode_is_keypad(kbd_layout_t *k, int keycode);
+ int keysym_is_numlock(kbd_layout_t *k, int keysym);
 =20
-     if (!qemu_console_is_graphic(con)) {
-         bool ctrl =3D qkbd_state_modifier_get(scon->kbd, QKBD_MOD_CTRL);
-         if (ev->type =3D=3D SDL_KEYDOWN) {
--            switch (ev->keysym.scancode) {
--            case SDL_SCANCODE_RETURN:
-+            switch (qcode) {
-+            case Q_KEY_CODE_RET:
-                 kbd_put_keysym_console(con, '\n');
-                 break;
-             default:
+diff --git a/ui/curses.c b/ui/curses.c
+index 54687589d4..6e0091c3b2 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -273,7 +273,7 @@ static void curses_refresh(DisplayChangeListener *dcl=
+)
+             }
+=20
+             keycode =3D keysym2scancode(kbd_layout, keysym & KEYSYM_MASK=
+,
+-                                      NULL);
++                                      NULL, false);
+             if (keycode =3D=3D 0)
+                 continue;
+=20
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index c8b2135340..544b55c27b 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -28,6 +28,7 @@
+ #include "trace.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "ui/input.h"
+=20
+ struct keysym2code {
+     uint32_t count;
+@@ -188,7 +189,7 @@ kbd_layout_t *init_keyboard_layout(const name2keysym_=
+t *table,
+=20
+=20
+ int keysym2scancode(kbd_layout_t *k, int keysym,
+-                    QKbdState *kbd)
++                    QKbdState *kbd, bool down)
+ {
+     static const uint32_t mask =3D
+         SCANCODE_SHIFT | SCANCODE_ALTGR | SCANCODE_CTRL;
+@@ -212,27 +213,39 @@ int keysym2scancode(kbd_layout_t *k, int keysym,
+         return keysym2code->keycodes[0];
+     }
+=20
+-    /*
+-     * We have multiple keysym -> keycode mappings.
+-     *
+-     * Check whenever we find one mapping where the modifier state of
+-     * the mapping matches the current user interface modifier state.
+-     * If so, prefer that one.
+-     */
+-    mods =3D 0;
+-    if (kbd && qkbd_state_modifier_get(kbd, QKBD_MOD_SHIFT)) {
+-        mods |=3D SCANCODE_SHIFT;
+-    }
+-    if (kbd && qkbd_state_modifier_get(kbd, QKBD_MOD_ALTGR)) {
+-        mods |=3D SCANCODE_ALTGR;
+-    }
+-    if (kbd && qkbd_state_modifier_get(kbd, QKBD_MOD_CTRL)) {
+-        mods |=3D SCANCODE_CTRL;
+-    }
++    /* We have multiple keysym -> keycode mappings. */
++    if (down) {
++        /*
++         * On keydown: Check whenever we find one mapping where the
++         * modifier state of the mapping matches the current user
++         * interface modifier state.  If so, prefer that one.
++         */
++        mods =3D 0;
++        if (kbd && qkbd_state_modifier_get(kbd, QKBD_MOD_SHIFT)) {
++            mods |=3D SCANCODE_SHIFT;
++        }
++        if (kbd && qkbd_state_modifier_get(kbd, QKBD_MOD_ALTGR)) {
++            mods |=3D SCANCODE_ALTGR;
++        }
++        if (kbd && qkbd_state_modifier_get(kbd, QKBD_MOD_CTRL)) {
++            mods |=3D SCANCODE_CTRL;
++        }
+=20
+-    for (i =3D 0; i < keysym2code->count; i++) {
+-        if ((keysym2code->keycodes[i] & mask) =3D=3D mods) {
+-            return keysym2code->keycodes[i];
++        for (i =3D 0; i < keysym2code->count; i++) {
++            if ((keysym2code->keycodes[i] & mask) =3D=3D mods) {
++                return keysym2code->keycodes[i];
++            }
++        }
++    } else {
++        /*
++         * On keyup: Try find a key which is actually down.
++         */
++        for (i =3D 0; i < keysym2code->count; i++) {
++            QKeyCode qcode =3D qemu_input_key_number_to_qcode
++                (keysym2code->keycodes[i]);
++            if (kbd && qkbd_state_key_get(kbd, qcode)) {
++                return keysym2code->keycodes[i];
++            }
+         }
+     }
+     return keysym2code->keycodes[0];
+diff --git a/ui/vnc.c b/ui/vnc.c
+index f66ed53094..0fef646fc4 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1981,7 +1981,7 @@ static void key_event(VncState *vs, int down, uint3=
+2_t sym)
+     }
+=20
+     keycode =3D keysym2scancode(vs->vd->kbd_layout, lsym & 0xFFFF,
+-                              vs->vd->kbd) & SCANCODE_KEYMASK;
++                              vs->vd->kbd, down) & SCANCODE_KEYMASK;
+     trace_vnc_key_event_map(down, sym, keycode, code2name(keycode));
+     do_key_event(vs, down, keycode, sym);
+ }
 --=20
 2.9.3
