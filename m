@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54858)
+Received: from eggs.gnu.org ([209.51.188.92]:54905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gr3nO-0001Yl-BY
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:42:03 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gr3nS-0001d2-5z
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gr3nK-00087C-Hr
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:42:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gr3nQ-0008Az-8z
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:42:06 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue,  5 Feb 2019 17:41:07 +0100
-Message-Id: <20190205164109.25413-9-cohuck@redhat.com>
+Date: Tue,  5 Feb 2019 17:41:08 +0100
+Message-Id: <20190205164109.25413-10-cohuck@redhat.com>
 In-Reply-To: <20190205164109.25413-1-cohuck@redhat.com>
 References: <20190205164109.25413-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 08/10] s390x/pci: Fix hotplugging of PCI bridges
+Subject: [Qemu-devel] [PULL 09/10] s390x/pci: Warn when adding PCI devices
+ without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +25,41 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redha
 
 From: David Hildenbrand <david@redhat.com>
 
-When hotplugging a PCI bridge right now to the root port, we resolve
-pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotplugging
-really only works right now when hotplugging to another bridge.
+We decided to always create the PCI host bridge, even if 'zpci' is not
+enabled (due to migration compatibility). This however right now allows
+to add zPCI/PCI devices to a VM although the guest will never actually see
+them, confusing people that are using a simple CPU model that has no
+'zpci' enabled - "Why isn't this working" (David Hildenbrand)
 
-Instead, we have to properly check if we are already at the root.
-
-Let's cleanup the code while at it a bit and factor out updating the
-subordinate bus number into a separate function. The check for
-"old_nr < nr" is right now not strictly necessary, but makes it more
-obvious what is actually going on.
-
-Most probably fixing up the topology is not our responsibility when
-hotplugging. The guest has to sort this out. But let's keep it for now
-and only fix current code to not crash.
+Let's check for 'zpci' and at least print a warning that this will not
+work as expected. We could also bail out, however that might break
+existing QEMU commandlines.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190130155733.32742-3-david@redhat.com>
+Message-Id: <20190130155733.32742-4-david@redhat.com>
 Reviewed-by: Collin Walling <walling@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+ hw/s390x/s390-pci-bus.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 4200e48fb9..d85bc34617 100644
+index d85bc34617..3816fb1f11 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -877,6 +877,21 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     }
- }
- 
-+static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
-+{
-+    uint32_t old_nr;
-+
-+    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
-+    while (!pci_bus_is_root(pci_get_bus(dev))) {
-+        dev = pci_get_bus(dev)->parent_dev;
-+
-+        old_nr = pci_default_read_config(dev, PCI_SUBORDINATE_BUS, 1);
-+        if (old_nr < nr) {
-+            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
-+        }
-+    }
-+}
-+
- static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                               Error **errp)
+@@ -860,6 +860,12 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
  {
-@@ -885,26 +900,21 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     S390PCIBusDevice *pbdev = NULL;
+     S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
  
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
--        BusState *bus;
-         PCIBridge *pb = PCI_BRIDGE(dev);
--        PCIDevice *pdev = PCI_DEVICE(dev);
- 
-+        pdev = PCI_DEVICE(dev);
-         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
-         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
- 
--        bus = BUS(&pb->sec_bus);
--        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
-+        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp);
- 
-         if (dev->hotplugged) {
-             pci_default_write_config(pdev, PCI_PRIMARY_BUS,
-                                      pci_dev_bus_num(pdev), 1);
-             s->bus_no += 1;
-             pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
--            do {
--                pdev = pci_get_bus(pdev)->parent_dev;
--                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
--                                         s->bus_no, 1);
--            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
++    if (!s390_has_feat(S390_FEAT_ZPCI)) {
++        warn_report("Plugging a PCI/zPCI device without the 'zpci' CPU "
++                    "feature enabled; the guest will not be able to see/use "
++                    "this device");
++    }
 +
-+            s390_pci_update_subordinate(pdev, s->bus_no);
-         }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         pdev = PCI_DEVICE(dev);
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         PCIDevice *pdev = PCI_DEVICE(dev);
+ 
 -- 
 2.17.2
