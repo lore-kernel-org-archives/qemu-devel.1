@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38651)
+Received: from eggs.gnu.org ([209.51.188.92]:44111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gr2wh-0006FU-4d
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 10:47:35 -0500
+	(envelope-from <mst@redhat.com>) id 1gr3Fi-0003aX-OB
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gr2wa-0002tR-V9
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 10:47:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50258)
+	(envelope-from <mst@redhat.com>) id 1gr3FX-0002ZQ-L9
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:07:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gr2wV-0002rX-Mt
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 10:47:25 -0500
-Date: Tue, 5 Feb 2019 16:47:16 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190205164716.79b9cd08@Igors-MacBook-Pro.local>
-In-Reply-To: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
-References: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gr3FR-0002RJ-Gm
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:06:57 -0500
+Date: Tue, 5 Feb 2019 11:06:42 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190205110518-mutt-send-email-mst@kernel.org>
+References: <20190204142638.27021-1-mst@redhat.com>
+	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
+	<20190204205105-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Issues] PCI hotplug does not work well on pc
- platform?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, yang.zhong@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 30 Jan 2019 21:02:10 +0800
-"Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
-
-> Hi everyone,
+On Tue, Feb 05, 2019 at 12:41:55PM +0000, Peter Maydell wrote:
+> On Tue, 5 Feb 2019 at 01:52, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > So I think I fixed the build errors. And who knows maybe
+> > that will fix the runtime ones somehow ..
+> > Could you try pls? Re-pushed to same tag.
 > 
-> I have two questions.
-> 1. PCI hotplug on pci.0 must manually rescan in guest. The ACPI hotplug 
-> handler sends the GPE event to guest but it seems guest doesn't receive 
-> it? I tried to open ACPI debug level/layer to 0xffffffff, in order to 
-> see if there is any message after device_add in monitor, but no message 
-> comes out until I manually rescan. Also tried printk in 
-> acpi_ev_gpe_xrupt_handler() and acpi_ev_sci_xrupt_handler(). No output 
-> in dmesg.
-> (I'm sure that CONFIG_HOTPLUG_PCI_PCIE=y, CONFIG_HOTPLUG_PCI_CPCI=y, 
-> CONFIG_HOTPLUG_PCI=y, CONFIG_HOTPLUG_PCI_ACPI=y)
+> these failures still remain:
 > 
-> Whether this is a kind of design or a known issue? Does guest receive 
-> the request, where can I find the
-does it work with known to work kernels (RHEL7)?
-
-Also sharing used QEMU version and command line could help.
-
+> unused variable for OSX and the BSDs:
 > 
-> 2. I want to try hotplugging on pci-bridge on pc platform, using shpc. I 
-> set shpc=on, but when I do device_add, qemu still calls 
-> acpi_pcihp_device_plug_cb? Why it does not call pci_bridge_dev_hotplug_cb?
-> (CONFIG_HOTPLUG_PCI_SHPC=y)
-
-try to disable ACPI hotplug for bridges
- -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off
-
-> Thanks very much!
-> Jing
+> tests/vhost-user-test.c:942:17: warning: unused variable 'hugefs'
+> [-Wunused-variable]
+>     const char *hugefs;
+>                 ^
 > 
+> Assertion failure on sparc, s390x and PPC64 hosts:
+> 
+> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
+> QTEST_QEMU_IMG=qemu-img tests/vhost-user-test -m=quick -k --tap <
+> /dev/null | ./scripts/tap-driver.pl --test-name="vhost-user-test"
+> qemu-system-i386: backend does not support LE vnet headers; falling
+> back on userspace virtio
+> qemu-system-i386: backend does not support LE vnet headers; falling
+> back on userspace virtio
+> **
+> ERROR:/home/pm215/qemu/tests/vhost-user-test.c:243:wait_for_fds:
+> assertion failed: (s->fds_num)
+> ERROR - too few tests run (expected 4, got 0)
+> 
+> Given the set of hosts affected this is almost certainly
+> a big-endian-host specific bug.
+> 
+> thanks
+> -- PMM
+
+You were right.
+
+OK I reverted the whole part dealing with vhost-user and reposted.
+
+I'm sure it's fine now.
+
+
+-- 
+MST
