@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53231)
+Received: from eggs.gnu.org ([209.51.188.92]:54352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqry4-0005wy-Oj
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:04:17 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqs20-0007dI-Kj
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:08:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqry2-0002Fv-Mr
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:04:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gqry0-00029P-IH
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:04:14 -0500
-References: <20190204202609.26956-1-philmd@redhat.com>
-	<20190204202609.26956-3-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <670e437d-845c-22fa-24d6-f44dd2568e15@redhat.com>
-Date: Tue, 5 Feb 2019 05:04:00 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gqs1z-0003Ih-Ev
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:08:20 -0500
+Resent-Message-Id: <E1gqs1z-0003Ih-Ev@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21092)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqs1z-0003H7-44
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:08:19 -0500
+Message-ID: <154933968376.29184.4083651247596634131@ebba9967afc0>
+In-Reply-To: <20190205035704.26014-1-eblake@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190204202609.26956-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] mips: Express dependencies of the
- Jazz machine with kconfig
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Feb 2019 20:08:04 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/8] NBD patches for 2019-02-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>
+To: eblake@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-On 2019-02-04 21:26, Philippe Mathieu-Daud=C3=A9 wrote:
-> The Jazz use the RC4030 Asic to provide an EISA bus and DMA/IRQ. The
-> framebuffer display is managed by a G364, the network card is a Sonic
-> DP83932. A QLogic ESP216 provides a SCSI bus.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  default-configs/mips-softmmu-common.mak |  1 -
->  default-configs/mips64-softmmu.mak      |  5 -----
->  default-configs/mips64el-softmmu.mak    |  6 ------
->  hw/mips/Kconfig                         | 17 +++++++++++++++++
->  4 files changed, 17 insertions(+), 12 deletions(-)
->=20
-> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/=
-mips-softmmu-common.mak
-> index 8c5fdf5ee1..caebafd416 100644
-> --- a/default-configs/mips-softmmu-common.mak
-> +++ b/default-configs/mips-softmmu-common.mak
-> @@ -3,7 +3,6 @@
->  CONFIG_ISA_BUS=3Dy
->  CONFIG_PCI=3Dy
->  CONFIG_PCI_DEVICES=3Dy
-> -CONFIG_ESP=3Dy
->  CONFIG_VGA_ISA=3Dy
->  CONFIG_VGA_ISA_MM=3Dy
->  CONFIG_VGA_CIRRUS=3Dy
-> diff --git a/default-configs/mips64-softmmu.mak b/default-configs/mips6=
-4-softmmu.mak
-> index bad7496672..a169738635 100644
-> --- a/default-configs/mips64-softmmu.mak
-> +++ b/default-configs/mips64-softmmu.mak
-> @@ -1,9 +1,4 @@
->  # Default configuration for mips64-softmmu
-> =20
->  include mips-softmmu-common.mak
-> -CONFIG_RC4030=3Dy
-> -CONFIG_DP8393X=3Dy
-> -CONFIG_DS1225Y=3Dy
->  CONFIG_JAZZ=3Dy
-> -CONFIG_G364FB=3Dy
-> -CONFIG_JAZZ_LED=3Dy
-> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mip=
-s64el-softmmu.mak
-> index 8b255efc54..23445cfcf9 100644
-> --- a/default-configs/mips64el-softmmu.mak
-> +++ b/default-configs/mips64el-softmmu.mak
-> @@ -2,13 +2,7 @@
-> =20
->  include mips-softmmu-common.mak
->  CONFIG_IDE_VIA=3Dy
-> -CONFIG_RC4030=3Dy
-> -CONFIG_DP8393X=3Dy
-> -CONFIG_DS1225Y=3Dy
->  CONFIG_FULONG=3Dy
-> -CONFIG_JAZZ=3Dy
-
-Please keep the CONFIG_JAZZ line here.
-
- Thomas
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTAzNTcwNC4yNjAx
+NC0xLWVibGFrZUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC84XSBOQkQgcGF0Y2hlcyBm
+b3IgMjAxOS0wMi0wNApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAyMDUwMzU3MDQuMjYw
+MTQtMS1lYmxha2VAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
+aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
+CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMDQyMDQ1MTcuMjM2OTgt
+MS1waGlsbWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjA0MjA0NTE3LjIzNjk4LTEtcGhp
+bG1kQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIw
+NTAzNTcwNC4yNjAxNC0xLWVibGFrZUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTAyMDUwMzU3
+MDQuMjYwMTQtMS1lYmxha2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjlmMjIwNDhjMGEgYmxvY2svbmJkLWNsaWVudDogcmVuYW1lIHJlYWRfcmVwbHlfY28gdG8g
+Y29ubmVjdGlvbl9jbwplODFhYjI3ZjgyIGJsb2NrL25iZC1jbGllbnQ6IGRvbid0IGNoZWNrIGlv
+YwpjZTU1YjRiMzMxIGJsb2NrL25iZC1jbGllbnQ6IGZpeCBuYmRfcmVwbHlfY2h1bmtfaXRlcl9y
+ZWNlaXZlCjgwYzA5M2YzYjEgYmxvY2svbmJkLWNsaWVudDogc3BsaXQgY29ubmVjdGlvbiBmcm9t
+IGluaXRpYWxpemF0aW9uCmEyNDU0M2VlN2IgYmxvY2svbmJkOiBtb3ZlIGNvbm5lY3Rpb24gY29k
+ZSBmcm9tIGJsb2NrL25iZCB0byBibG9jay9uYmQtY2xpZW50CjQ2N2EyOGRiZjIgYmxvY2svbmJk
+LWNsaWVudDogc3BsaXQgY2hhbm5lbCBlcnJvcnMgZnJvbSBleHBvcnQgZXJyb3JzCmJkOTA2YjAx
+ZmYgbmJkOiBnZW5lcmFsaXplIHVzYWdlIG9mIG5iZF9yZWFkCjNkM2JlMWY5YmMgcWVtdS1uYmQ6
+IERlcHJlY2F0ZSBxZW11LW5iZCAtLXBhcnRpdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS84
+IENoZWNraW5nIGNvbW1pdCAzZDNiZTFmOWJjYzggKHFlbXUtbmJkOiBEZXByZWNhdGUgcWVtdS1u
+YmQgLS1wYXJ0aXRpb24pCjIvOCBDaGVja2luZyBjb21taXQgYmQ5MDZiMDFmZmU4IChuYmQ6IGdl
+bmVyYWxpemUgdXNhZ2Ugb2YgbmJkX3JlYWQpCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
+IHRoYXQgJyonIChjdHg6V3hWKQojODU6IEZJTEU6IGluY2x1ZGUvYmxvY2svbmJkLmg6MzU2Ogor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludCMjYml0cyMjX3QgKnZhbCwgICAg
+ICAgICAgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzODYgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMi84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzggQ2hlY2tpbmcgY29t
+bWl0IDQ2N2EyOGRiZjI2MSAoYmxvY2svbmJkLWNsaWVudDogc3BsaXQgY2hhbm5lbCBlcnJvcnMg
+ZnJvbSBleHBvcnQgZXJyb3JzKQo0LzggQ2hlY2tpbmcgY29tbWl0IGEyNDU0M2VlN2I0MSAoYmxv
+Y2svbmJkOiBtb3ZlIGNvbm5lY3Rpb24gY29kZSBmcm9tIGJsb2NrL25iZCB0byBibG9jay9uYmQt
+Y2xpZW50KQo1LzggQ2hlY2tpbmcgY29tbWl0IDgwYzA5M2YzYjE4MCAoYmxvY2svbmJkLWNsaWVu
+dDogc3BsaXQgY29ubmVjdGlvbiBmcm9tIGluaXRpYWxpemF0aW9uKQo2LzggQ2hlY2tpbmcgY29t
+bWl0IGNlNTViNGIzMzFmOSAoYmxvY2svbmJkLWNsaWVudDogZml4IG5iZF9yZXBseV9jaHVua19p
+dGVyX3JlY2VpdmUpCjcvOCBDaGVja2luZyBjb21taXQgZTgxYWIyN2Y4MjhlIChibG9jay9uYmQt
+Y2xpZW50OiBkb24ndCBjaGVjayBpb2MpCjgvOCBDaGVja2luZyBjb21taXQgOWYyMjA0OGMwYTA3
+IChibG9jay9uYmQtY2xpZW50OiByZW5hbWUgcmVhZF9yZXBseV9jbyB0byBjb25uZWN0aW9uX2Nv
+KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5
+MDIwNTAzNTcwNC4yNjAxNC0xLWVibGFrZUByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/
+dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
