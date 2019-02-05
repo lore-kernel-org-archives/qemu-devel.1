@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36990)
+Received: from eggs.gnu.org ([209.51.188.92]:38832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5HA-0003Bv-Kp
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr5M1-0007As-Km
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:21:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5H8-0004Xp-PH
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:52 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:40600)
+	(envelope-from <peter.maydell@linaro.org>) id 1gr5M0-0000Jd-KW
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:21:53 -0500
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:46797)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5H8-0004MA-EW
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:50 -0500
-Received: by mail-wm1-x333.google.com with SMTP id f188so4727154wmf.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:33 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:15:12 +0100
-Message-Id: <1549390526-24246-63-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 62/76] hw/riscv/Makefile.objs: Create CONFIG_*
- for riscv boards
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr5M0-0008O5-FT
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:21:52 -0500
+Received: by mail-ot1-x32f.google.com with SMTP id w25so7289941otm.13
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:21:22 -0800 (PST)
+MIME-Version: 1.0
+References: <20190205164109.25413-1-cohuck@redhat.com>
+In-Reply-To: <20190205164109.25413-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Feb 2019 18:21:10 +0000
+Message-ID: <CAFEAcA9pXNRDRn_EUBt1R-Fgtq9rc8NSobndstgHDqXmnNYueg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Yang Zhong <yang.zhong@intel.com>
+On Tue, 5 Feb 2019 at 16:41, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit a61faa3d02159d24d4fa984733dbc0c905508752:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.0-20190204' into staging (2019-02-04 10:33:40 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190205
+>
+> for you to fetch changes up to 2313a88fe68cb970532ba1641ffc35c848daae86:
+>
+>   s390x/pci: Unplug remaining requested devices on pcihost reset (2019-02-05 10:34:06 +0100)
+>
+> ----------------------------------------------------------------
+> Fixes and improvements in tcg and the zPCI code.
+>
+> ----------------------------------------------------------------
 
-Add the new configs to default-configs/riscv*-sofmmu.mak.
+Applied, thanks.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-19-yang.zhong@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- default-configs/riscv32-softmmu.mak |  7 +++++++
- default-configs/riscv64-softmmu.mak |  7 +++++++
- hw/riscv/Makefile.objs              | 22 +++++++++++-----------
- 3 files changed, 25 insertions(+), 11 deletions(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index fbfd1d4..6533716 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -12,3 +12,10 @@ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-+
-+CONFIG_SPIKE=y
-+CONFIG_HART=y
-+CONFIG_SIFIVE_E=y
-+CONFIG_SIFIVE=y
-+CONFIG_SIFIVE_U=y
-+CONFIG_RISCV_VIRT=y
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index fbfd1d4..6533716 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -12,3 +12,10 @@ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-+
-+CONFIG_SPIKE=y
-+CONFIG_HART=y
-+CONFIG_SIFIVE_E=y
-+CONFIG_SIFIVE=y
-+CONFIG_SIFIVE_U=y
-+CONFIG_RISCV_VIRT=y
-diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-index 1dde01d..79bfb3a 100644
---- a/hw/riscv/Makefile.objs
-+++ b/hw/riscv/Makefile.objs
-@@ -1,11 +1,11 @@
--obj-y += riscv_htif.o
--obj-y += riscv_hart.o
--obj-y += sifive_e.o
--obj-y += sifive_clint.o
--obj-y += sifive_prci.o
--obj-y += sifive_plic.o
--obj-y += sifive_test.o
--obj-y += sifive_u.o
--obj-y += sifive_uart.o
--obj-y += spike.o
--obj-y += virt.o
-+obj-$(CONFIG_SPIKE) += riscv_htif.o
-+obj-$(CONFIG_HART) += riscv_hart.o
-+obj-$(CONFIG_SIFIVE_E) += sifive_e.o
-+obj-$(CONFIG_SIFIVE) += sifive_clint.o
-+obj-$(CONFIG_SIFIVE) += sifive_prci.o
-+obj-$(CONFIG_SIFIVE) += sifive_plic.o
-+obj-$(CONFIG_SIFIVE) += sifive_test.o
-+obj-$(CONFIG_SIFIVE_U) += sifive_u.o
-+obj-$(CONFIG_SIFIVE) += sifive_uart.o
-+obj-$(CONFIG_SPIKE) += spike.o
-+obj-$(CONFIG_RISCV_VIRT) += virt.o
--- 
-1.8.3.1
+-- PMM
