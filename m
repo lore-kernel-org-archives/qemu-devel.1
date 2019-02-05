@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35515)
+Received: from eggs.gnu.org ([209.51.188.92]:35573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqoRz-0006Ex-1I
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:18:56 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqoS6-0006Jf-PG
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqoRx-0007oX-Nc
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:18:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqoS5-0007sB-KF
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:19:02 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Tue,  5 Feb 2019 01:18:27 +0100
-Message-Id: <20190205001835.25660-1-philmd@redhat.com>
+Date: Tue,  5 Feb 2019 01:18:31 +0100
+Message-Id: <20190205001835.25660-5-philmd@redhat.com>
+In-Reply-To: <20190205001835.25660-1-philmd@redhat.com>
+References: <20190205001835.25660-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/8] OpenBSD: Block layer fixes (was 'Enable
- qtesting')
+Subject: [Qemu-devel] [PATCH v3 4/8] qemu-iotests: Ensure GNU sed is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,230 +23,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Various fixes I encountered while trying to run QEMU test suite on OpenBS=
-D.
+Various sed regexp from common.filter use sed GNU extensions.
+Instead of spending time to write these regex to be POSIX compliant,
+verify the GNU sed is available and use it.
 
-This is the 'block' part of the v2.
-Most non-RFC patches are reviewed and could be applied.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/qemu-iotests/common.filter | 36 ++++++++++++++++----------------
+ tests/qemu-iotests/common.rc     | 13 ++++++++++++
+ 2 files changed, 31 insertions(+), 18 deletions(-)
 
-Since v2:
-- Added R-b tags
-- Addressed Eric's comments (in code and commit descriptions)
-
-Since v1:
-- various qemu-block fixes and notes.
-
-Regards,
-
-Phil.
-
-v2: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07513.html
-v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06676.html
-
-Philippe Mathieu-Daud=C3=A9 (8):
-  ahci-test: Add dependency to qemu-img tool
-  qemu-iotests: Add dependency to qemu-nbd tool
-  qemu-iotests: Improve portability by searching bash in the $PATH
-  qemu-iotests: Ensure GNU sed is used
-  iotests: Let verify_platform() check for unsupported platforms
-  RFC iotests: Disable 208 on OpenBSD
-  RFC iotests: Disable 209 on OpenBSD
-  RFC iotests: Disable 236 and 238 on OpenBSD
-
- tests/Makefile.include            |  4 ++--
- tests/qemu-iotests/001            |  2 +-
- tests/qemu-iotests/002            |  2 +-
- tests/qemu-iotests/003            |  2 +-
- tests/qemu-iotests/004            |  2 +-
- tests/qemu-iotests/005            |  2 +-
- tests/qemu-iotests/007            |  2 +-
- tests/qemu-iotests/008            |  2 +-
- tests/qemu-iotests/009            |  2 +-
- tests/qemu-iotests/010            |  2 +-
- tests/qemu-iotests/011            |  2 +-
- tests/qemu-iotests/012            |  2 +-
- tests/qemu-iotests/013            |  2 +-
- tests/qemu-iotests/014            |  2 +-
- tests/qemu-iotests/015            |  2 +-
- tests/qemu-iotests/017            |  2 +-
- tests/qemu-iotests/018            |  2 +-
- tests/qemu-iotests/019            |  2 +-
- tests/qemu-iotests/020            |  2 +-
- tests/qemu-iotests/021            |  2 +-
- tests/qemu-iotests/022            |  2 +-
- tests/qemu-iotests/023            |  2 +-
- tests/qemu-iotests/024            |  2 +-
- tests/qemu-iotests/025            |  2 +-
- tests/qemu-iotests/026            |  2 +-
- tests/qemu-iotests/027            |  2 +-
- tests/qemu-iotests/028            |  2 +-
- tests/qemu-iotests/029            |  2 +-
- tests/qemu-iotests/031            |  2 +-
- tests/qemu-iotests/032            |  2 +-
- tests/qemu-iotests/033            |  2 +-
- tests/qemu-iotests/034            |  2 +-
- tests/qemu-iotests/035            |  2 +-
- tests/qemu-iotests/036            |  2 +-
- tests/qemu-iotests/037            |  2 +-
- tests/qemu-iotests/038            |  2 +-
- tests/qemu-iotests/039            |  2 +-
- tests/qemu-iotests/042            |  2 +-
- tests/qemu-iotests/043            |  2 +-
- tests/qemu-iotests/046            |  2 +-
- tests/qemu-iotests/047            |  2 +-
- tests/qemu-iotests/048            |  2 +-
- tests/qemu-iotests/049            |  2 +-
- tests/qemu-iotests/050            |  2 +-
- tests/qemu-iotests/051            |  2 +-
- tests/qemu-iotests/052            |  2 +-
- tests/qemu-iotests/053            |  2 +-
- tests/qemu-iotests/054            |  2 +-
- tests/qemu-iotests/058            |  2 +-
- tests/qemu-iotests/059            |  2 +-
- tests/qemu-iotests/060            |  2 +-
- tests/qemu-iotests/061            |  2 +-
- tests/qemu-iotests/062            |  2 +-
- tests/qemu-iotests/063            |  2 +-
- tests/qemu-iotests/064            |  2 +-
- tests/qemu-iotests/066            |  2 +-
- tests/qemu-iotests/067            |  2 +-
- tests/qemu-iotests/068            |  2 +-
- tests/qemu-iotests/069            |  2 +-
- tests/qemu-iotests/070            |  2 +-
- tests/qemu-iotests/071            |  2 +-
- tests/qemu-iotests/072            |  2 +-
- tests/qemu-iotests/073            |  2 +-
- tests/qemu-iotests/074            |  2 +-
- tests/qemu-iotests/075            |  2 +-
- tests/qemu-iotests/076            |  2 +-
- tests/qemu-iotests/077            |  2 +-
- tests/qemu-iotests/078            |  2 +-
- tests/qemu-iotests/079            |  2 +-
- tests/qemu-iotests/080            |  2 +-
- tests/qemu-iotests/081            |  2 +-
- tests/qemu-iotests/082            |  2 +-
- tests/qemu-iotests/083            |  2 +-
- tests/qemu-iotests/084            |  2 +-
- tests/qemu-iotests/085            |  2 +-
- tests/qemu-iotests/086            |  2 +-
- tests/qemu-iotests/087            |  2 +-
- tests/qemu-iotests/088            |  2 +-
- tests/qemu-iotests/089            |  2 +-
- tests/qemu-iotests/090            |  2 +-
- tests/qemu-iotests/091            |  2 +-
- tests/qemu-iotests/092            |  2 +-
- tests/qemu-iotests/094            |  2 +-
- tests/qemu-iotests/095            |  2 +-
- tests/qemu-iotests/097            |  2 +-
- tests/qemu-iotests/098            |  2 +-
- tests/qemu-iotests/099            |  2 +-
- tests/qemu-iotests/101            |  2 +-
- tests/qemu-iotests/102            |  2 +-
- tests/qemu-iotests/103            |  2 +-
- tests/qemu-iotests/104            |  2 +-
- tests/qemu-iotests/105            |  2 +-
- tests/qemu-iotests/106            |  2 +-
- tests/qemu-iotests/107            |  2 +-
- tests/qemu-iotests/108            |  2 +-
- tests/qemu-iotests/109            |  2 +-
- tests/qemu-iotests/110            |  2 +-
- tests/qemu-iotests/111            |  2 +-
- tests/qemu-iotests/112            |  2 +-
- tests/qemu-iotests/113            |  2 +-
- tests/qemu-iotests/114            |  2 +-
- tests/qemu-iotests/115            |  2 +-
- tests/qemu-iotests/116            |  2 +-
- tests/qemu-iotests/117            |  2 +-
- tests/qemu-iotests/119            |  2 +-
- tests/qemu-iotests/120            |  2 +-
- tests/qemu-iotests/121            |  2 +-
- tests/qemu-iotests/122            |  2 +-
- tests/qemu-iotests/123            |  2 +-
- tests/qemu-iotests/125            |  2 +-
- tests/qemu-iotests/126            |  2 +-
- tests/qemu-iotests/127            |  2 +-
- tests/qemu-iotests/128            |  2 +-
- tests/qemu-iotests/130            |  2 +-
- tests/qemu-iotests/131            |  2 +-
- tests/qemu-iotests/133            |  2 +-
- tests/qemu-iotests/134            |  2 +-
- tests/qemu-iotests/135            |  2 +-
- tests/qemu-iotests/137            |  2 +-
- tests/qemu-iotests/138            |  2 +-
- tests/qemu-iotests/140            |  2 +-
- tests/qemu-iotests/141            |  2 +-
- tests/qemu-iotests/142            |  2 +-
- tests/qemu-iotests/143            |  2 +-
- tests/qemu-iotests/144            |  2 +-
- tests/qemu-iotests/145            |  2 +-
- tests/qemu-iotests/146            |  2 +-
- tests/qemu-iotests/150            |  2 +-
- tests/qemu-iotests/153            |  2 +-
- tests/qemu-iotests/154            |  2 +-
- tests/qemu-iotests/156            |  2 +-
- tests/qemu-iotests/157            |  2 +-
- tests/qemu-iotests/158            |  2 +-
- tests/qemu-iotests/159            |  2 +-
- tests/qemu-iotests/160            |  2 +-
- tests/qemu-iotests/161            |  2 +-
- tests/qemu-iotests/162            |  2 +-
- tests/qemu-iotests/170            |  2 +-
- tests/qemu-iotests/171            |  2 +-
- tests/qemu-iotests/172            |  2 +-
- tests/qemu-iotests/173            |  2 +-
- tests/qemu-iotests/174            |  2 +-
- tests/qemu-iotests/175            |  2 +-
- tests/qemu-iotests/176            |  2 +-
- tests/qemu-iotests/177            |  2 +-
- tests/qemu-iotests/178            |  2 +-
- tests/qemu-iotests/179            |  2 +-
- tests/qemu-iotests/181            |  2 +-
- tests/qemu-iotests/182            |  2 +-
- tests/qemu-iotests/183            |  2 +-
- tests/qemu-iotests/184            |  2 +-
- tests/qemu-iotests/185            |  2 +-
- tests/qemu-iotests/186            |  2 +-
- tests/qemu-iotests/187            |  2 +-
- tests/qemu-iotests/188            |  2 +-
- tests/qemu-iotests/189            |  2 +-
- tests/qemu-iotests/190            |  2 +-
- tests/qemu-iotests/191            |  2 +-
- tests/qemu-iotests/192            |  2 +-
- tests/qemu-iotests/195            |  2 +-
- tests/qemu-iotests/197            |  2 +-
- tests/qemu-iotests/198            |  2 +-
- tests/qemu-iotests/200            |  2 +-
- tests/qemu-iotests/201            |  2 +-
- tests/qemu-iotests/204            |  2 +-
- tests/qemu-iotests/208            |  1 +
- tests/qemu-iotests/209            |  1 +
- tests/qemu-iotests/214            |  2 +-
- tests/qemu-iotests/215            |  2 +-
- tests/qemu-iotests/217            |  2 +-
- tests/qemu-iotests/220            |  2 +-
- tests/qemu-iotests/221            |  2 +-
- tests/qemu-iotests/223            |  2 +-
- tests/qemu-iotests/225            |  2 +-
- tests/qemu-iotests/226            |  2 +-
- tests/qemu-iotests/227            |  2 +-
- tests/qemu-iotests/229            |  2 +-
- tests/qemu-iotests/231            |  2 +-
- tests/qemu-iotests/232            |  2 +-
- tests/qemu-iotests/233            |  2 +-
- tests/qemu-iotests/236            |  1 +
- tests/qemu-iotests/238            |  2 ++
- tests/qemu-iotests/check          |  2 +-
- tests/qemu-iotests/common.config  |  2 +-
- tests/qemu-iotests/common.filter  | 38 +++++++++++++++----------------
- tests/qemu-iotests/common.nbd     |  2 +-
- tests/qemu-iotests/common.pattern |  2 +-
- tests/qemu-iotests/common.qemu    |  2 +-
- tests/qemu-iotests/common.rc      | 15 +++++++++++-
- tests/qemu-iotests/common.tls     |  2 +-
- tests/qemu-iotests/iotests.py     |  4 +++-
- 191 files changed, 226 insertions(+), 206 deletions(-)
-
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
+.filter
+index c282bc24f0..35fddc746f 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -23,37 +23,37 @@
+ #
+ _filter_date()
+ {
+-    sed \
++    $SED \
+         -e 's/[A-Z][a-z][a-z] [A-z][a-z][a-z]  *[0-9][0-9]* [0-9][0-9]:[=
+0-9][0-9]:[0-9][0-9] [0-9][0-9][0-9][0-9]$/DATE/'
+ }
+=20
+ _filter_generated_node_ids()
+ {
+-     sed -re 's/\#block[0-9]{3,}/NODE_NAME/'
++    $SED -re 's/\#block[0-9]{3,}/NODE_NAME/'
+ }
+=20
+ _filter_qom_path()
+ {
+-    sed -e 's#\(Attached to: *\) /.*#\1 PATH#'
++    $SED -e 's#\(Attached to: *\) /.*#\1 PATH#'
+ }
+=20
+ # replace occurrences of the actual TEST_DIR value with TEST_DIR
+ _filter_testdir()
+ {
+-    sed -e "s#$TEST_DIR/#TEST_DIR/#g"
++    $SED -e "s#$TEST_DIR/#TEST_DIR/#g"
+ }
+=20
+ # replace occurrences of the actual IMGFMT value with IMGFMT
+ _filter_imgfmt()
+ {
+-    sed -e "s#$IMGFMT#IMGFMT#g"
++    $SED -e "s#$IMGFMT#IMGFMT#g"
+ }
+=20
+ # Replace error message when the format is not supported and delete
+ # the output lines after the first one
+ _filter_qemu_img_check()
+ {
+-    sed -e '/allocated.*fragmented.*compressed clusters/d' \
++    $SED -e '/allocated.*fragmented.*compressed clusters/d' \
+         -e 's/qemu-img: This image format does not support checks/No err=
+ors were found on the image./' \
+         -e '/Image end offset: [0-9]\+/d'
+ }
+@@ -61,13 +61,13 @@ _filter_qemu_img_check()
+ # Removes \r from messages
+ _filter_win32()
+ {
+-    sed -e 's/\r//g'
++    $SED -e 's/\r//g'
+ }
+=20
+ # sanitize qemu-io output
+ _filter_qemu_io()
+ {
+-    _filter_win32 | sed -e "s/[0-9]* ops\; [0-9/:. sec]* ([0-9/.inf]* [E=
+PTGMKiBbytes]*\/sec and [0-9/.inf]* ops\/sec)/X ops\; XX:XX:XX.X (XXX YYY=
+\/sec and XXX ops\/sec)/" \
++    _filter_win32 | $SED -e "s/[0-9]* ops\; [0-9/:. sec]* ([0-9/.inf]* [=
+EPTGMKiBbytes]*\/sec and [0-9/.inf]* ops\/sec)/X ops\; XX:XX:XX.X (XXX YY=
+Y\/sec and XXX ops\/sec)/" \
+         -e "s/: line [0-9][0-9]*:  *[0-9][0-9]*\( Aborted\| Killed\)/:\1=
+/" \
+         -e "s/qemu-io> //g"
+ }
+@@ -75,7 +75,7 @@ _filter_qemu_io()
+ # replace occurrences of QEMU_PROG with "qemu"
+ _filter_qemu()
+ {
+-    sed -e "s#\\(^\\|(qemu) \\)$(basename $QEMU_PROG):#\1QEMU_PROG:#" \
++    $SED -e "s#\\(^\\|(qemu) \\)$(basename $QEMU_PROG):#\1QEMU_PROG:#" \
+         -e 's#^QEMU [0-9]\+\.[0-9]\+\.[0-9]\+ monitor#QEMU X.Y.Z monitor=
+#' \
+         -e $'s#\r##' # QEMU monitor uses \r\n line endings
+ }
+@@ -84,7 +84,7 @@ _filter_qemu()
+ _filter_qmp()
+ {
+     _filter_win32 | \
+-    sed -e 's#\("\(micro\)\?seconds": \)[0-9]\+#\1 TIMESTAMP#g' \
++    $SED -e 's#\("\(micro\)\?seconds": \)[0-9]\+#\1 TIMESTAMP#g' \
+         -e 's#^{"QMP":.*}$#QMP_VERSION#' \
+         -e '/^    "QMP": {\s*$/, /^    }\s*$/ c\' \
+         -e '    QMP_VERSION'
+@@ -93,32 +93,32 @@ _filter_qmp()
+ # readline makes HMP command strings so long that git complains
+ _filter_hmp()
+ {
+-    sed -e $'s/^\\((qemu) \\)\\?.*\e\\[D/\\1/g' \
++    $SED -e $'s/^\\((qemu) \\)\\?.*\e\\[D/\\1/g' \
+         -e $'s/\e\\[K//g'
+ }
+=20
+ # replace block job offset
+ _filter_block_job_offset()
+ {
+-    sed -e 's/, "offset": [0-9]\+,/, "offset": OFFSET,/'
++    $SED -e 's/, "offset": [0-9]\+,/, "offset": OFFSET,/'
+ }
+=20
+ # replace block job len
+ _filter_block_job_len()
+ {
+-    sed -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
++    $SED -e 's/, "len": [0-9]\+,/, "len": LEN,/g'
+ }
+=20
+ # replace actual image size (depends on the host filesystem)
+ _filter_actual_image_size()
+ {
+-    sed -s 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g'
++    $SED -s 's/\("actual-size":\s*\)[0-9]\+/\1SIZE/g'
+ }
+=20
+ # replace driver-specific options in the "Formatting..." line
+ _filter_img_create()
+ {
+-    sed -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
++    $SED -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+@@ -154,7 +154,7 @@ _filter_img_info()
+=20
+     discard=3D0
+     regex_json_spec_start=3D'^ *"format-specific": \{'
+-    sed -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
++    $SED -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
+@@ -201,7 +201,7 @@ _filter_img_info()
+ # human and json output
+ _filter_qemu_img_map()
+ {
+-    sed -e 's/\([0-9a-fx]* *[0-9a-fx]* *\)[0-9a-fx]* */\1/g' \
++    $SED -e 's/\([0-9a-fx]* *[0-9a-fx]* *\)[0-9a-fx]* */\1/g' \
+         -e 's/"offset": [0-9]\+/"offset": OFFSET/g' \
+         -e 's/Mapped to *//' | _filter_testdir | _filter_imgfmt
+ }
+@@ -213,7 +213,7 @@ _filter_nbd()
+     # receive callbacks sometimes, making them unreliable.
+     #
+     # Filter out the TCP port number since this changes between runs.
+-    sed -e '/nbd\/.*\.c:/d' \
++    $SED -e '/nbd\/.*\.c:/d' \
+         -e 's#127\.0\.0\.1:[0-9]*#127.0.0.1:PORT#g' \
+         -e "s#?socket=3D$TEST_DIR#?socket=3DTEST_DIR#g" \
+         -e 's#\(foo\|PORT/\?\|.sock\): Failed to .*$#\1#'
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 1240b26e32..8e8f3ae89b 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -17,6 +17,19 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+=20
++SED=3D
++for sed in sed gsed; do
++    ($sed --version | grep 'GNU sed') > /dev/null 2>&1
++    if [ "$?" -eq 0 ]; then
++        SED=3D$sed
++        break
++    fi
++done
++if [ -z "$SED" ]; then
++    echo "$0: GNU sed not found"
++    exit 1
++fi
++
+ dd()
+ {
+    if [ "$HOSTOS" =3D=3D "Linux" ]
 --=20
 2.20.1
