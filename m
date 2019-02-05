@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36227)
+Received: from eggs.gnu.org ([209.51.188.92]:36261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GT-0002VH-Lv
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:10 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GV-0002Vy-Kd
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0003qd-9a
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:05 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:39702)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GN-0003w5-8R
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:09 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:40588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GJ-0003oT-04
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
-Received: by mail-wm1-x331.google.com with SMTP id y8so4738880wmi.4
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:58 -0800 (PST)
+	id 1gr5GM-0003v2-Uw
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:03 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id f188so4725654wmf.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:02 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+	by smtp.gmail.com with ESMTPSA id p5sm8931665wmh.16.2019.02.05.10.16.00
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 05 Feb 2019 10:16:00 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:38 +0100
-Message-Id: <1549390526-24246-29-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:42 +0100
+Message-Id: <1549390526-24246-33-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 28/76] contrib/elf2dmp: use GLib in PDB
- processing
+Subject: [Qemu-devel] [PULL 32/76] monitor: do not use QTAILQ_FOREACH_SAFE
+ across critical sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +34,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+monitor_qmp_requests_pop_any_with_lock cannot modify the monitor list
+concurrently with monitor_cleanup, since the dispatch bottom half
+runs in the main thread, but anyway it is a bit ugly to keep
+"next" live across critical sections of monitor_lock and Coverity
+complains (CID 1397072).
 
-Replace POSIX mmap with GLib g_mapped_file_new in PDB processing stage
-to make elf2dmp cross-platform. There are no direct POSIX in elf2dmp
-after this patch.
+Replace QTAILQ_FOREACH_SAFE with a while loop and QTAILQ_FIRST,
+it is cleaner and more future-proof.
 
-Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-4-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/elf2dmp/pdb.c | 29 ++++++++---------------------
- contrib/elf2dmp/pdb.h |  2 +-
- 2 files changed, 9 insertions(+), 22 deletions(-)
+ monitor.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/contrib/elf2dmp/pdb.c b/contrib/elf2dmp/pdb.c
-index bcb01b4..52e352d 100644
---- a/contrib/elf2dmp/pdb.c
-+++ b/contrib/elf2dmp/pdb.c
-@@ -277,28 +277,18 @@ static void pdb_reader_exit(struct pdb_reader *r)
+diff --git a/monitor.c b/monitor.c
+index c09fa63..e5de576 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4617,8 +4617,6 @@ void monitor_init(Chardev *chr, int flags)
  
- int pdb_init_from_file(const char *name, struct pdb_reader *reader)
+ void monitor_cleanup(void)
  {
-+    GError *gerr = NULL;
-     int err = 0;
--    int fd;
-     void *map;
--    struct stat st;
- 
--    fd = open(name, O_RDONLY, 0);
--    if (fd == -1) {
--        eprintf("Failed to open PDB file \'%s\'\n", name);
-+    reader->gmf = g_mapped_file_new(name, TRUE, &gerr);
-+    if (gerr) {
-+        eprintf("Failed to map PDB file \'%s\'\n", name);
-         return 1;
-     }
--    reader->fd = fd;
+-    Monitor *mon, *next;
 -
--    fstat(fd, &st);
--    reader->file_size = st.st_size;
--
--    map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
--    if (map == MAP_FAILED) {
--        eprintf("Failed to map PDB file\n");
--        err = 1;
--        goto out_fd;
--    }
- 
-+    reader->file_size = g_mapped_file_get_length(reader->gmf);
-+    map = g_mapped_file_get_contents(reader->gmf);
-     if (pdb_reader_init(reader, map)) {
-         err = 1;
-         goto out_unmap;
-@@ -307,16 +297,13 @@ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
-     return 0;
- 
- out_unmap:
--    munmap(map, st.st_size);
--out_fd:
--    close(fd);
-+    g_mapped_file_unref(reader->gmf);
- 
-     return err;
- }
- 
- void pdb_exit(struct pdb_reader *reader)
- {
--    munmap(reader->ds.header, reader->file_size);
--    close(reader->fd);
-+    g_mapped_file_unref(reader->gmf);
-     pdb_reader_exit(reader);
- }
-diff --git a/contrib/elf2dmp/pdb.h b/contrib/elf2dmp/pdb.h
-index a3a3cac..1640d54 100644
---- a/contrib/elf2dmp/pdb.h
-+++ b/contrib/elf2dmp/pdb.h
-@@ -216,7 +216,7 @@ typedef struct pdb_seg {
- #define IMAGE_FILE_MACHINE_AMD64 0x8664
- 
- struct pdb_reader {
--    int fd;
-+    GMappedFile *gmf;
-     size_t file_size;
-     struct {
-         PDB_DS_HEADER *header;
+     /*
+      * We need to explicitly stop the I/O thread (but not destroy it),
+      * clean up the monitor resources, then destroy the I/O thread since
+@@ -4632,7 +4630,8 @@ void monitor_cleanup(void)
+     /* Flush output buffers and destroy monitors */
+     qemu_mutex_lock(&monitor_lock);
+     monitor_destroyed = true;
+-    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
++    while (!QTAILQ_EMPTY(&mon_list)) {
++        Monitor *mon = QTAILQ_FIRST(&mon_list);
+         QTAILQ_REMOVE(&mon_list, mon, entry);
+         /* Permit QAPI event emission from character frontend release */
+         qemu_mutex_unlock(&monitor_lock);
 -- 
 1.8.3.1
