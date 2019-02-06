@@ -1,26 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grJ3z-0007BX-6h
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:00:19 -0500
+	(envelope-from <david@redhat.com>) id 1grJ4O-0007BX-Ra
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grIw0-0008Oa-8E
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:51:57 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Feb 2019 08:51:48 +0000
-Message-ID: <96b9a104-47b5-ec53-faa7-ac5eadb1c826@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-7-vsementsov@virtuozzo.com>
-	<64d9a2e7-6dd9-d71b-b9bf-c476e9e218f8@redhat.com>
-	<20190116165837.GF20275@redhat.com>
-	<261d4eb9-eb91-5654-e5ad-995b7f93432b@virtuozzo.com>
-In-Reply-To: <261d4eb9-eb91-5654-e5ad-995b7f93432b@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <95655D07AC0F3549A52896151A822533@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <david@redhat.com>) id 1grItz-0007X7-0Q
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:49:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52880)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1grIty-0007QN-Of
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:49:50 -0500
+References: <20190205162253.9155-1-david@redhat.com>
+	<69586972-35c7-4941-4b65-6b49fed66532@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <f6797f15-759a-3a1a-a7bd-9f22a6dc34f1@redhat.com>
+Date: Wed, 6 Feb 2019 09:49:19 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 06/10] block/nbd-client: move from quit
- to state
+In-Reply-To: <69586972-35c7-4941-4b65-6b49fed66532@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] softfloat: add float128_is_{normal,
+ denormal}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-MDUuMDIuMjAxOSAxOTozNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTYuMDEuMjAxOSAxOTo1OCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4+IE9uIFdlZCwg
-SmFuIDE2LCAyMDE5IGF0IDEwOjI1OjAzQU0gLTA2MDAsIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4g
-W2FkZGluZyBEYW5dDQo+Pj4NCj4+PiBPbiA3LzMxLzE4IDEyOjMwIFBNLCBWbGFkaW1pciBTZW1l
-bnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4+PiBUbyBpbXBsZW1lbnQgcmVjb25uZWN0IHdlIG5l
-ZWQgc2V2ZXJhbCBzdGF0ZXMgZm9yIHRoZSBjbGllbnQ6DQo+Pj4+IENPTk5FQ1RFRCwgUVVJVCBh
-bmQgdHdvIENPTk5FQ1RJTkcgc3RhdGVzLiBDT05ORUNUSU5HIHN0YXRlcyB3aWxsDQo+Pj4+IGJl
-IHJlYWxpemVkIGluIHRoZSBmb2xsb3dpbmcgcGF0Y2hlcy4gVGhpcyBwYXRjaCBpbXBsZW1lbnRz
-IENPTk5FQ1RFRA0KPj4+PiBhbmQgUVVJVC4NCj4+Pj4NCj4+Pj4gUVVJVCBtZWFucywgdGhhdCB3
-ZSBzaG91bGQgY2xvc2UgdGhlIGNvbm5lY3Rpb24gYW5kIGZhaWwgYWxsIGN1cnJlbnQNCj4+Pj4g
-YW5kIGZ1cnRoZXIgcmVxdWVzdHMgKGxpa2Ugb2xkIHF1aXQgPSB0cnVlKS4NCj4+Pj4NCj4+Pj4g
-Q09OTkVDVEVEIG1lYW5zIHRoYXQgY29ubmVjdGlvbiBpcyBvaywgd2UgY2FuIHNlbmQgcmVxdWVz
-dHMgKGxpa2Ugb2xkDQo+Pj4+IHF1aXQgPSBmYWxzZSkuDQo+Pj4+DQo+Pj4+IEZvciByZWNlaXZp
-bmcgbG9vcCB3ZSB1c2UgYSBjb21wYXJpc29uIG9mIHRoZSBjdXJyZW50IHN0YXRlIHdpdGggUVVJ
-VCwNCj4+Pj4gYmVjYXVzZSByZWNvbm5lY3Qgd2lsbCBiZSBpbiB0aGUgc2FtZSBsb29wLCBzbyBp
-dCBzaG91bGQgYmUgbG9vcGluZw0KPj4+PiB1bnRpbCB0aGUgZW5kLg0KPj4+Pg0KPj4+PiBPcHBv
-c2l0ZSwgZm9yIHJlcXVlc3RzIHdlIHVzZSBhIGNvbXBhcmlzb24gb2YgdGhlIGN1cnJlbnQgc3Rh
-dGUgd2l0aA0KPj4+PiBDT05ORUNURUQsIGFzIHdlIGRvbid0IHdhbnQgdG8gc2VuZCByZXF1ZXN0
-cyBpbiBDT05ORUNUSU5HIHN0YXRlcyAoDQo+Pj4+IHdoaWNoIGFyZSB1bnJlYWNoYWJsZSBub3cs
-IGJ1dCB3aWxsIGJlIHJlYWNoYWJsZSBhZnRlciB0aGUgZm9sbG93aW5nDQo+Pj4+IGNvbW1pdHMp
-DQo+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
-PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pj4gLS0tDQo+Pj4+IMKgIGJsb2NrL25iZC1j
-bGllbnQuaCB8wqAgOSArKysrKysrKy0NCj4+Pj4gwqAgYmxvY2svbmJkLWNsaWVudC5jIHwgNTUg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+
-Pj4+IMKgIDIgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0aW9ucygrKSwgMjMgZGVsZXRpb25zKC0p
-DQo+Pj4NCj4+PiBEYW4ganVzdCByZWNlbnRseSBwcm9wb3NlZCBwYXRjaGVzIHRvIFNvY2tldENo
-YXJkZXYgaW4gZ2VuZXJhbCB0byB1c2UgYQ0KPj4+IHN0YXRlIG1hY2hpbmUgdGhhdCBkaXN0aW5n
-dWlzaGVzIGJldHdlZW4gY29ubmVjdGluZyBhbmQgY29ubmVjdGVkOg0KPj4+DQo+Pj4gaHR0cHM6
-Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNnMDMzMzku
-aHRtbA0KPj4+DQo+Pj4gSSdtIHdvbmRlcmluZyBob3cgbXVjaCBvZiBoaXMgd29yayBpcyByZWxh
-dGVkIG9yIGNhbiBiZSByZXVzZWQgdG8gZ2V0DQo+Pj4gcmVzdGFydGFibGUgY29ubmVjdGlvbnMg
-b24gTkJEIHNvY2tldHM/DQo+Pg0KPj4gVGhlcmUncyBub3RoaW5nIHJlYWxseSBzcGVjaWFsIGFi
-b3V0IHdoYXQgSSBkaWQuIFZsYWRpbWlyIGxvb2tzIHRvDQo+PiBoYXZlIGJhc2ljYWxseSBkb25l
-IHRoZSBzYW1lIGtpbmQgb2YgYXBwcm9hY2gsIGJ1dCBJIGRvbid0IHRoaW5rDQo+PiB0aGVyZSdz
-IHJlYWwgc2NvcGUgZm9yIHNoYXJpbmcgd2l0aCBjaGFyZGV2cywgYXMgZWFjaCBjYXJlIGFib3V0
-DQo+PiB0aGVpciBvd24gc2V0IG9mIHN0YXRlcy4NCj4+DQo+Pj4gUmVtZW1iZXIsIHJpZ2h0IG5v
-dywgdGhlIE5CRCBjb2RlIGFsd2F5cyBzdGFydHMgaW4gYmxvY2tpbmcgbW9kZSwgYW5kDQo+Pj4g
-ZG9lcyBzaW5nbGUtdGhyZWFkZWQgaGFuZHNoYWtpbmcgdW50aWwgaXQgaXMgcmVhZHkgZm9yIHRy
-YW5zbWlzc2lvbiwNCj4+PiB0aGVuIHN3aXRjaGVzIHRvIG5vbi1ibG9ja2luZyBtb2RlIGZvciBh
-bGwgc3Vic2VxdWVudCB0cmFuc21pc3Npb25zIChzbywNCj4+PiBmb3IgZXhhbXBsZSwgc2Vydmlj
-aW5nIGEgcmVhZCByZXF1ZXN0IGNhbiBhc3N1bWUgdGhhdCB0aGUgc29ja2V0IGlzDQo+Pj4gdmFs
-aWQgd2l0aG91dCBmdXJ0aGVyIHdhaXRpbmcpLsKgIEJ1dCBvbmNlIHdlIHN0YXJ0IGFsbG93aW5n
-IHJlY29ubmVjdHMsDQo+Pj4gYSByZWFkIHJlcXVlc3Qgd2lsbCBuZWVkIHRvIGRldGVjdCB3aGVu
-IG9uZSBzb2NrZXQgaGFzIGdvbmUgZG93biwgYW5kDQo+Pj4gd2FpdCBmb3IgaXRzIHJlcGxhY2Vt
-ZW50IHNvY2tldCB0byBjb21lIGJhY2sgdXAsIGluIG9yZGVyIHRvIHJldHJ5IHRoZQ0KPj4+IHJl
-cXVlc3Q7IHRoaXMgcmV0cnkgaXMgaW4gYSBjb250ZXh0IHdoZXJlIHdlIGFyZSBpbiBub24tYmxv
-Y2tpbmcNCj4+PiBjb250ZXh0LCBidXQgdGhlIHJldHJ5IG11c3QgZXN0YWJsaXNoIGEgbmV3IHNv
-Y2tldCwgYW5kIHBvc3NpYmx5IGNvbnZlcnQNCj4+PiB0aGUgc29ja2V0IGludG8gVExTIG1vZGUs
-IGFsbCBiZWZvcmUgYmVpbmcgcmVhZHkgdG8gcmV0cnkgdGhlIHJlYWQgcmVxdWVzdC4NCj4+DQo+
-PiBUaGF0IG1ha2VzIGl0IHNvdW5kIGxpa2UgdGhlIE5CRCBoYW5kc2hha2UgbmVlZHMgdG8gYmUg
-Y29udmVydGVkIHRvDQo+PiB1c2UgZW50aXJlbHkgbm9uLWJsb2NraW5nIEkvTy4NCj4+DQo+PiBU
-aGUgVExTIGhhbmRzaGFrZSBhbHJlYWR5IHVzZXMgYW4gYXN5bmNocm9ub3VzIGNhbGxiYWNrIHBh
-dHRlcm4gYW5kDQo+PiB0byBkZWFsIHdpdGggdGhhdCBOQkQgaGFkIHRvIGNyZWF0ZSAmIHJ1biBh
-IHByaXZhdGUgbWFpbiBsb29wIHRvDQo+PiBjb21wbGV0ZSB0aGUgVExTIGhhbmRzaGFrZSBpbiBp
-dHMgYmxvY2tpbmcgY29kZSBwYXR0ZXJuLg0KPj4NCj4+IFlvdSBjb3VsZCBwb3RlbnRpYWxseSBw
-dXNoIHRoaXMgY29uY2VwdCB1cCB0byB0aGUgdG9wIGxldmVsLiBpZQ0KPj4gaW1wbGVtZW50IHRo
-ZSBlbnRpcmUgTkJEIGhhbmRzaGFrZSB3aXRoIGFzeW5jIGNhbGxiYWNrcyAvIG5vbi1ibG9ja2lu
-Zw0KPj4gSS9PLiBUaGVuIHNpbXBseSB1c2UgYSBwcml2YXRlIG1haW4gbG9vcCB0byBydW4gdGhh
-dCBpbiBhIGJsb2NraW5nDQo+PiBmYXNoaW9uIGZvciB0aGUgaW5pdGlhbCBjb25uZWN0aW9uLiBX
-aGVuIHlvdSBuZWVkIHRvIGRvIHJlLWNvbm5lY3QNCj4+IHlvdSBub3cganVzdCBydW4gdGhlIGFz
-eW5jIGNvZGUgd2l0aG91dCB0aGUgZXh0cmEgbWFpbiBsb29wIGFyb3VuZA0KPj4gaXQuDQo+Pg0K
-PiANCj4gSG1tLCB5b3UgbWVhbiB0aGlzIGNvZGU6DQo+IA0KPiAgwqDCoMKgIGRhdGEubG9vcCA9
-IGdfbWFpbl9sb29wX25ldyhnX21haW5fY29udGV4dF9kZWZhdWx0KCksIEZBTFNFKTsNCj4gIMKg
-wqDCoCB0cmFjZV9uYmRfcmVjZWl2ZV9zdGFydHRsc190bHNfaGFuZHNoYWtlKCk7DQo+ICDCoMKg
-wqAgcWlvX2NoYW5uZWxfdGxzX2hhbmRzaGFrZSh0aW9jLA0KPiAgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBuYmRfdGxzX2hhbmRzaGFr
-ZSwNCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgJmRhdGEsDQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIE5VTEwsDQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE5VTEwpOw0KPiANCj4gIMKgwqDCoCBp
-ZiAoIWRhdGEuY29tcGxldGUpIHsNCj4gIMKgwqDCoMKgwqDCoMKgIGdfbWFpbl9sb29wX3J1bihk
-YXRhLmxvb3ApOw0KPiAgwqDCoMKgIH0NCj4gIMKgwqDCoCBnX21haW5fbG9vcF91bnJlZihkYXRh
-Lmxvb3ApOw0KPiANCj4gDQo+IFdoYXQgdGhpcyBkb2VzIGluIGNvbnRleHQgb2YgUWVtdT8gSXNu
-J3QgaXQgbW9yZSBjb3JyZWN0IHRvIGRvDQo+IGNvcm91dGluZSBiYXNlZCBhc3luYyBzdGFmZiwg
-bGlrZSBpbiBxY293Ml9vcGVuKCk6DQo+IA0KPiAgwqDCoMKgIGlmIChxZW11X2luX2Nvcm91dGlu
-ZSgpKSB7DQo+ICDCoMKgwqDCoMKgwqDCoCAvKiBGcm9tIGJkcnZfY29fY3JlYXRlLsKgICovDQo+
-ICDCoMKgwqDCoMKgwqDCoCBxY293Ml9vcGVuX2VudHJ5KCZxb2MpOw0KPiAgwqDCoMKgIH0gZWxz
-ZSB7DQo+ICDCoMKgwqDCoMKgwqDCoCBhc3NlcnQocWVtdV9nZXRfY3VycmVudF9haW9fY29udGV4
-dCgpID09IHFlbXVfZ2V0X2Fpb19jb250ZXh0KCkpOw0KPiAgwqDCoMKgwqDCoMKgwqAgcWVtdV9j
-b3JvdXRpbmVfZW50ZXIocWVtdV9jb3JvdXRpbmVfY3JlYXRlKHFjb3cyX29wZW5fZW50cnksICZx
-b2MpKTsNCj4gIMKgwqDCoMKgwqDCoMKgIEJEUlZfUE9MTF9XSElMRShicywgcW9jLnJldCA9PSAt
-RUlOUFJPR1JFU1MpOw0KPiAgwqDCoMKgIH0NCj4gIMKgwqDCoCByZXR1cm4gcW9jLnJldDsNCj4g
-DQo+IEFuZCB0aGVuIHlpZWxkIGFmdGVyIGhhbmRzaGFrZSgpIGFuZCBlbnRlciBiYWNrIGZyb20g
-bmJkX3Rsc19oYW5kc2hha2UgY2FsbGJhY2s/DQo+IA0KPiBIbW0sIGFsc28sIGNoZWNrZWQsIG5v
-Ym9keSBjYWxscyBnX21haW5fY29udGV4dF9kZWZhdWx0KCkgaW4gcWVtdSwgZXhjZXB0DQo+IHV0
-aWwvbWFpbi1sb29wLmMsIG5iZCBhbmQgdGVzdHMuIFNvLCBJJ20gbm90IHN1cmUgdGhhdCB0aGlz
-IGlzIGEgdmFsaWQgdGhpbmcNCj4gdG8gZG8gaW4gbmJkLi4NCj4gDQo+IA0KDQpBaGEsIHdlIGp1
-c3QgZG9uJ3QgaGF2ZSBhbnkgYnMgaW4gbmJkLyBjb2RlLiBCdXQgYW55d2F5LCBtb3ZpbmcgdG8g
-QWlvQ29udGV4dCBhbmQgbWFrZQ0KbmVnb3RpYXRpb24gbm9uLWJsb2NraW5nIHNob3VsZCBiZSBn
-b29kIGlkZWEuIEknbGwgdHJ5IHRvIGRvIHNvbWV0aGluZyBhcm91bmQgaXQuDQoNCg0KLS0gDQpC
-ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On 06.02.19 04:08, Richard Henderson wrote:
+> On 2/5/19 4:22 PM, David Hildenbrand wrote:
+>> +static inline bool float128_is_normal(float128 a)
+>> +{
+>> +    return ((a.high + (1ULL << 47)) & -1ULL >> 1) >=3D 1ULL << 48;
+>=20
+> I believe this is off by one: 1 << 48 and >=3D 1 << 49.
+>=20
+> The exponent is at [62:48].  The trick is adding 1, letting Inf+NaN ove=
+rflow
+> into the sign, masking out the sign, and checking that the result >=3D =
+2 to
+> eliminate Inf+NaN (0) and Zero+Denormal (1).
+
+Right, the exponent must not be 0 or all 1's. so after adding 1, it must
+be >=3D2.
+
+Yesterday it all made sense on my sheet of paper :) Let's verify against
+float64
+
+float64 has an exponent of 11:
+
+return ((float64_val(a) + (1ULL << 52)) & -1ULL >> 1) >=3D 1ULL << 53;
+
+float128 has an exponent of 15, the difference is 4. So 52 -> 48, 53 -> 4=
+9.
+
+So you're right.
+
+>=20
+> I think this is clearer as
+>=20
+>   (((a.high >> 48) + 1) & 0x7fff) >=3D 2.>
+> It might be worth applying this to the other formats for clarity...
+>=20
+
+Yes, this makes it much clearer, will send a patch for the others as
+well, thanks!
+
+>=20
+> r~
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
