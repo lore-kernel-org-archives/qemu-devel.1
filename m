@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42701)
+Received: from eggs.gnu.org ([209.51.188.92]:44158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1grJEW-0006ZC-Na
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:11:05 -0500
+	(envelope-from <imammedo@redhat.com>) id 1grJKd-0000Il-Bj
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:17:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1grJEV-0001fO-Qq
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:11:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34332)
+	(envelope-from <imammedo@redhat.com>) id 1grJKX-0003uY-WF
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:17:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1grJEP-0001be-1a
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:10:59 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed,  6 Feb 2019 10:10:43 +0100
-Message-Id: <20190206091043.10985-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] softfloat: add float128_is_{normal,
- denormal}
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1grJKW-0003ty-4L
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:17:17 -0500
+Date: Wed, 6 Feb 2019 10:17:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190206101702.3cf834bc@Igors-MacBook-Pro.local>
+In-Reply-To: <20190131071658.29120-3-tao3.xu@intel.com>
+References: <20190131071658.29120-1-tao3.xu@intel.com>
+	<20190131071658.29120-3-tao3.xu@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] hmat acpi: Build System Locality
+ Latency and Bandwidth Information Structure(s) in ACPI HMAT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +28,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, David Hildenbrand <david@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Cc: eblake@redhat.com, mst@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, karl.heubaum@oracle.com, jingqi.liu@intel.com, danmei.wei@intel.com, qemu-devel@nongnu.org
 
-Needed on s390x, to test for the data class of a number. So it will
-gain soon a user.
+On Thu, 31 Jan 2019 15:16:52 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-A number is considered normal if the exponent is neither 0 nor all 1's.
-That can be checked by adding 1 to the exponent, and comparing against
->= 2 after dropping an eventual overflow into the sign bit.
+> From: Liu Jingqi <jingqi.liu@intel.com>
+> 
+> This structure describes the memory access latency and bandwidth
+> information from various memory access initiator proximity domains.
+> The latency and bandwidth numbers represented in this structure
+> correspond to rated latency and bandwidth for the platform.
+> The software could use this information as hint for optimization.
+> 
+> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+>  hw/acpi/hmat.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/acpi/hmat.h | 76 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 174 insertions(+)
+> 
+> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+> index 7e0fc0a9ae..e3deeaa36b 100644
+> --- a/hw/acpi/hmat.c
+> +++ b/hw/acpi/hmat.c
+> @@ -29,6 +29,11 @@
+>  #include "hw/acpi/hmat.h"
+>  #include "hw/nvram/fw_cfg.h"
+>  
+> +struct numa_hmat_lb_info *hmat_lb_info[HMAT_LB_LEVELS][HMAT_LB_TYPES] = {0};
+Another global,
+it's not acceptable to add new globals unless you have a very good reason to do so.
+So try to get by without using them.
 
-While at it, convert the other floatXX_is_normal functions to use a
-similar, less error prone calculation, as suggested by Richard H.
+> +
+> +static uint32_t initiator_pxm[MAX_NODES], target_pxm[MAX_NODES];
+> +static uint32_t num_initiator, num_target;
+> +
+>  /* Build Memory Subsystem Address Range Structure */
+>  static void build_hmat_spa(GArray *table_data,
+>                                  uint64_t base, uint64_t length, int node)
+> @@ -110,10 +115,103 @@ static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
+>      }
+>  }
+>  
+> +static void classify_proximity_domains(void)
+> +{
+> +    int node;
+> +
+> +    for (node = 0; node < nb_numa_nodes; node++) {
+> +        if (numa_info[node].is_initiator) {
+> +            initiator_pxm[num_initiator++] = node;
+> +        }
+> +        if (numa_info[node].is_target) {
+> +            target_pxm[num_target++] = node;
+> +        }
+> +    }
+> +}
+> +
+> +static void hmat_build_lb(GArray *table_data)
+> +{
+> +    AcpiHmatLBInfo *hmat_lb;
+> +    struct numa_hmat_lb_info *numa_hmat_lb;
+> +    int i, j, hrchy, type;
+> +
+> +    if (!num_initiator && !num_target) {
+> +        classify_proximity_domains();
+> +    }
+> +
+> +    for (hrchy = HMAT_LB_MEM_MEMORY;
+> +         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
+> +        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
+> +             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
+> +            numa_hmat_lb = hmat_lb_info[hrchy][type];
+> +
+> +            if (numa_hmat_lb) {
+> +                uint64_t start;
+> +                uint32_t *list_entry;
+> +                uint16_t *entry, *entry_start;
+> +                uint32_t size;
+> +                uint8_t m, n;
+> +
+> +                start = table_data->len;
+> +                hmat_lb = acpi_data_push(table_data, sizeof(*hmat_lb));
+> +
+> +                hmat_lb->type          = cpu_to_le16(ACPI_HMAT_LB_INFO);
+> +                hmat_lb->flags         = numa_hmat_lb->hierarchy;
+> +                hmat_lb->data_type     = numa_hmat_lb->data_type;
+> +                hmat_lb->num_initiator = cpu_to_le32(num_initiator);
+> +                hmat_lb->num_target    = cpu_to_le32(num_target);
+use build_append_int_noprefix() like in previous patch to build parts of ACPI table
+and drop all packed structures.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- include/fpu/softfloat.h | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 38a5e99cf3..3ff5215b81 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -466,7 +466,7 @@ static inline int float32_is_zero_or_denormal(float32 a)
- 
- static inline bool float32_is_normal(float32 a)
- {
--    return ((float32_val(a) + 0x00800000) & 0x7fffffff) >= 0x01000000;
-+    return (((float32_val(a) >> 23) + 1) & 0xff) >= 2;
- }
- 
- static inline bool float32_is_denormal(float32 a)
-@@ -622,7 +622,7 @@ static inline int float64_is_zero_or_denormal(float64 a)
- 
- static inline bool float64_is_normal(float64 a)
- {
--    return ((float64_val(a) + (1ULL << 52)) & -1ULL >> 1) >= 1ULL << 53;
-+    return (((float64_val(a) >> 52) + 1) & 0x7ff) >= 2;
- }
- 
- static inline bool float64_is_denormal(float64 a)
-@@ -940,6 +940,16 @@ static inline int float128_is_zero_or_denormal(float128 a)
-     return (a.high & 0x7fff000000000000LL) == 0;
- }
- 
-+static inline bool float128_is_normal(float128 a)
-+{
-+    return (((a.high >> 48) + 1) & 0x7fff) >= 2;
-+}
-+
-+static inline bool float128_is_denormal(float128 a)
-+{
-+    return float128_is_zero_or_denormal(a) && !float128_is_zero(a);
-+}
-+
- static inline int float128_is_any_nan(float128 a)
- {
-     return ((a.high >> 48) & 0x7fff) == 0x7fff &&
--- 
-2.17.2
+> +
+> +                if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
+> +                    hmat_lb->base_unit = cpu_to_le32(numa_hmat_lb->base_lat);
+> +                } else {
+> +                    hmat_lb->base_unit = cpu_to_le32(numa_hmat_lb->base_bw);
+> +                }
+> +                if (!hmat_lb->base_unit) {
+> +                    hmat_lb->base_unit = cpu_to_le32(1);
+> +                }
+> +
+> +                /* the initiator proximity domain list */
+> +                for (i = 0; i < num_initiator; i++) {
+> +                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
+> +                    *list_entry = cpu_to_le32(initiator_pxm[i]);
+> +                }
+> +
+> +                /* the target proximity domain list */
+> +                for (i = 0; i < num_target; i++) {
+> +                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
+> +                    *list_entry = cpu_to_le32(target_pxm[i]);
+> +                }
+> +
+> +                /* latency or bandwidth entries */
+> +                size = sizeof(uint16_t) * num_initiator * num_target;
+> +                entry_start = acpi_data_push(table_data, size);
+> +
+> +                for (i = 0; i < num_initiator; i++) {
+> +                    m = initiator_pxm[i];
+> +                    for (j = 0; j < num_target; j++) {
+> +                        n = target_pxm[j];
+> +                        entry = entry_start + i * num_target + j;
+> +                        if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
+> +                            *entry = cpu_to_le16(numa_hmat_lb->latency[m][n]);
+> +                        } else {
+> +                            *entry = cpu_to_le16(numa_hmat_lb->bandwidth[m][n]);
+> +                        }
+> +                    }
+> +                }
+> +                hmat_lb = (AcpiHmatLBInfo *)(table_data->data + start);
+> +                hmat_lb->length = cpu_to_le16(table_data->len - start);
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  static void hmat_build_hma(GArray *hma, PCMachineState *pcms)
+>  {
+>      /* Build HMAT Memory Subsystem Address Range. */
+>      hmat_build_spa(hma, pcms);
+> +
+> +    /* Build HMAT System Locality Latency and Bandwidth Information. */
+> +    hmat_build_lb(hma);
+>  }
+>  
+>  void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
+> diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+> index f216e658c4..ffef9f6243 100644
+> --- a/hw/acpi/hmat.h
+> +++ b/hw/acpi/hmat.h
+> @@ -32,6 +32,7 @@
+>  #include "hw/acpi/aml-build.h"
+>  
+>  #define ACPI_HMAT_SPA               0
+> +#define ACPI_HMAT_LB_INFO           1
+>  
+>  /* ACPI HMAT sub-structure header */
+>  #define ACPI_HMAT_SUB_HEADER_DEF    \
+> @@ -46,6 +47,81 @@ enum {
+>      HMAT_SPA_RESERVATION_HINT = 0x4,
+>  };
+>  
+> +/* the value of AcpiHmatLBInfo flags */
+> +enum {
+> +    HMAT_LB_MEM_MEMORY           = 0,
+> +    HMAT_LB_MEM_CACHE_LAST_LEVEL = 1,
+> +    HMAT_LB_MEM_CACHE_1ST_LEVEL  = 2,
+> +    HMAT_LB_MEM_CACHE_2ND_LEVEL  = 3,
+> +    HMAT_LB_MEM_CACHE_3RD_LEVEL  = 4,
+> +};
+> +
+> +/* the value of AcpiHmatLBInfo data type */
+> +enum {
+> +    HMAT_LB_DATA_ACCESS_LATENCY = 0,
+> +    HMAT_LB_DATA_READ_LATENCY = 1,
+> +    HMAT_LB_DATA_WRITE_LATENCY = 2,
+> +    HMAT_LB_DATA_ACCESS_BANDWIDTH = 3,
+> +    HMAT_LB_DATA_READ_BANDWIDTH = 4,
+> +    HMAT_LB_DATA_WRITE_BANDWIDTH = 5,
+> +};
+> +
+> +#define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
+> +#define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
+> +
+> +struct AcpiHmatLBInfo {
+> +    ACPI_HMAT_SUB_HEADER_DEF
+> +    uint8_t     flags;
+> +    uint8_t     data_type;
+> +    uint16_t    reserved1;
+> +    uint32_t    num_initiator;
+> +    uint32_t    num_target;
+> +    uint32_t    reserved2;
+> +    uint64_t    base_unit;
+> +} QEMU_PACKED;
+> +typedef struct AcpiHmatLBInfo AcpiHmatLBInfo;
+> +
+> +struct numa_hmat_lb_info {
+> +    /*
+> +     * Indicates total number of Proximity Domains
+> +     * that can initiate memory access requests.
+> +     */
+> +    uint32_t    num_initiator;
+> +    /*
+> +     * Indicates total number of Proximity Domains
+> +     * that can act as target.
+> +     */
+> +    uint32_t    num_target;
+> +    /*
+> +     * Indicates it's memory or
+> +     * the specified level memory side cache.
+> +     */
+> +    uint8_t     hierarchy;
+> +    /*
+> +     * Present the type of data,
+> +     * access/read/write latency or bandwidth.
+> +     */
+> +    uint8_t     data_type;
+> +    /* The base unit for latency in nanoseconds. */
+> +    uint64_t    base_lat;
+> +    /* The base unit for bandwidth in megabytes per second(MB/s). */
+> +    uint64_t    base_bw;
+> +    /*
+> +     * latency[i][j]:
+> +     * Indicates the latency based on base_lat
+> +     * from Initiator Proximity Domain i to Target Proximity Domain j.
+> +     */
+> +    uint16_t    latency[MAX_NODES][MAX_NODES];
+> +    /*
+> +     * bandwidth[i][j]:
+> +     * Indicates the bandwidth based on base_bw
+> +     * from Initiator Proximity Domain i to Target Proximity Domain j.
+> +     */
+> +    uint16_t    bandwidth[MAX_NODES][MAX_NODES];
+> +};
+> +
+> +extern struct numa_hmat_lb_info *hmat_lb_info[HMAT_LB_LEVELS][HMAT_LB_TYPES];
+> +
+>  void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
+>                       MachineState *machine);
+>  
