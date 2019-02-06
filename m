@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48357)
+Received: from eggs.gnu.org ([209.51.188.92]:51222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grQSL-00010j-Q6
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:53:51 -0500
+	(envelope-from <crosa@redhat.com>) id 1grQkv-0000EX-Af
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:13:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grQSK-000283-9i
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:53:49 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  6 Feb 2019 19:53:42 +0300
-Message-Id: <20190206165342.219192-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190206165342.219192-1-vsementsov@virtuozzo.com>
-References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
+	(envelope-from <crosa@redhat.com>) id 1grQbJ-0007tl-11
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:03:07 -0500
+References: <20190202005610.24048-1-crosa@redhat.com>
+	<20190202005610.24048-3-crosa@redhat.com>
+	<20190206153639.61a5411c.cohuck@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <85b0f519-38d8-cf7d-a22a-537dab8470a7@redhat.com>
+Date: Wed, 6 Feb 2019 12:02:55 -0500
+MIME-Version: 1.0
+In-Reply-To: <20190206153639.61a5411c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/20] Acceptance tests: show avocado
+ test execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,258 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net, stefanha@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org, Stefan Markovic <smarkovic@wavecomp.com>
 
-Use new qemu_iovec_init_buf() instead of
-qemu_iovec_init_external( ... , 1), which simplifies the code.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/io.c | 90 +++++++++++++-----------------------------------------
- 1 file changed, 21 insertions(+), 69 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index bd9d688f8b..4c4fd17d89 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -842,17 +842,13 @@ static int bdrv_prwv_co(BdrvChild *child, int64_t offset,
- static int bdrv_rw_co(BdrvChild *child, int64_t sector_num, uint8_t *buf,
-                       int nb_sectors, bool is_write, BdrvRequestFlags flags)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base = (void *)buf,
--        .iov_len = nb_sectors * BDRV_SECTOR_SIZE,
--    };
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf,
-+                                            nb_sectors * BDRV_SECTOR_SIZE);
- 
-     if (nb_sectors < 0 || nb_sectors > BDRV_REQUEST_MAX_SECTORS) {
-         return -EINVAL;
-     }
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
-     return bdrv_prwv_co(child, sector_num << BDRV_SECTOR_BITS,
-                         &qiov, is_write, flags);
- }
-@@ -879,13 +875,8 @@ int bdrv_write(BdrvChild *child, int64_t sector_num,
- int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base = NULL,
--        .iov_len = bytes,
--    };
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
-     return bdrv_prwv_co(child, offset, &qiov, true,
-                         BDRV_REQ_ZERO_WRITE | flags);
- }
-@@ -949,17 +940,12 @@ int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
- 
- int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base = (void *)buf,
--        .iov_len = bytes,
--    };
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
- 
-     if (bytes < 0) {
-         return -EINVAL;
-     }
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
-     return bdrv_preadv(child, offset, &qiov);
- }
- 
-@@ -977,17 +963,12 @@ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
- 
- int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base   = (void *) buf,
--        .iov_len    = bytes,
--    };
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
- 
-     if (bytes < 0) {
-         return -EINVAL;
-     }
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
-     return bdrv_pwritev(child, offset, &qiov);
- }
- 
-@@ -1164,7 +1145,6 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-     void *bounce_buffer;
- 
-     BlockDriver *drv = bs->drv;
--    struct iovec iov;
-     QEMUIOVector local_qiov;
-     int64_t cluster_offset;
-     int64_t cluster_bytes;
-@@ -1229,9 +1209,8 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
- 
-         if (ret <= 0) {
-             /* Must copy-on-read; use the bounce buffer */
--            iov.iov_base = bounce_buffer;
--            iov.iov_len = pnum = MIN(pnum, MAX_BOUNCE_BUFFER);
--            qemu_iovec_init_external(&local_qiov, &iov, 1);
-+            pnum = MIN(pnum, MAX_BOUNCE_BUFFER);
-+            qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
- 
-             ret = bdrv_driver_preadv(bs, cluster_offset, pnum,
-                                      &local_qiov, 0);
-@@ -1476,7 +1455,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
- {
-     BlockDriver *drv = bs->drv;
-     QEMUIOVector qiov;
--    struct iovec iov = {0};
-+    void *buf = NULL;
-     int ret = 0;
-     bool need_flush = false;
-     int head = 0;
-@@ -1546,16 +1525,15 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-                 need_flush = true;
-             }
-             num = MIN(num, max_transfer);
--            iov.iov_len = num;
--            if (iov.iov_base == NULL) {
--                iov.iov_base = qemu_try_blockalign(bs, num);
--                if (iov.iov_base == NULL) {
-+            if (buf == NULL) {
-+                buf = qemu_try_blockalign(bs, num);
-+                if (buf == NULL) {
-                     ret = -ENOMEM;
-                     goto fail;
-                 }
--                memset(iov.iov_base, 0, num);
-+                memset(buf, 0, num);
-             }
--            qemu_iovec_init_external(&qiov, &iov, 1);
-+            qemu_iovec_init_buf(&qiov, buf, num);
- 
-             ret = bdrv_driver_pwritev(bs, offset, num, &qiov, write_flags);
- 
-@@ -1563,8 +1541,8 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-              * all future requests.
-              */
-             if (num < max_transfer) {
--                qemu_vfree(iov.iov_base);
--                iov.iov_base = NULL;
-+                qemu_vfree(buf);
-+                buf = NULL;
-             }
-         }
- 
-@@ -1576,7 +1554,7 @@ fail:
-     if (ret == 0 && need_flush) {
-         ret = bdrv_co_flush(bs);
-     }
--    qemu_vfree(iov.iov_base);
-+    qemu_vfree(buf);
-     return ret;
- }
- 
-@@ -1762,7 +1740,6 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-     BlockDriverState *bs = child->bs;
-     uint8_t *buf = NULL;
-     QEMUIOVector local_qiov;
--    struct iovec iov;
-     uint64_t align = bs->bl.request_alignment;
-     unsigned int head_padding_bytes, tail_padding_bytes;
-     int ret = 0;
-@@ -1774,11 +1751,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
-     assert(flags & BDRV_REQ_ZERO_WRITE);
-     if (head_padding_bytes || tail_padding_bytes) {
-         buf = qemu_blockalign(bs, align);
--        iov = (struct iovec) {
--            .iov_base   = buf,
--            .iov_len    = align,
--        };
--        qemu_iovec_init_external(&local_qiov, &iov, 1);
-+        qemu_iovec_init_buf(&local_qiov, buf, align);
-     }
-     if (head_padding_bytes) {
-         uint64_t zero_bytes = MIN(bytes, align - head_padding_bytes);
-@@ -1884,17 +1857,12 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
- 
-     if (offset & (align - 1)) {
-         QEMUIOVector head_qiov;
--        struct iovec head_iov;
- 
-         mark_request_serialising(&req, align);
-         wait_serialising_requests(&req);
- 
-         head_buf = qemu_blockalign(bs, align);
--        head_iov = (struct iovec) {
--            .iov_base   = head_buf,
--            .iov_len    = align,
--        };
--        qemu_iovec_init_external(&head_qiov, &head_iov, 1);
-+        qemu_iovec_init_buf(&head_qiov, head_buf, align);
- 
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
-         ret = bdrv_aligned_preadv(child, &req, offset & ~(align - 1), align,
-@@ -1923,7 +1891,6 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
- 
-     if ((offset + bytes) & (align - 1)) {
-         QEMUIOVector tail_qiov;
--        struct iovec tail_iov;
-         size_t tail_bytes;
-         bool waited;
- 
-@@ -1932,11 +1899,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-         assert(!waited || !use_local_qiov);
- 
-         tail_buf = qemu_blockalign(bs, align);
--        tail_iov = (struct iovec) {
--            .iov_base   = tail_buf,
--            .iov_len    = align,
--        };
--        qemu_iovec_init_external(&tail_qiov, &tail_iov, 1);
-+        qemu_iovec_init_buf(&tail_qiov, tail_buf, align);
- 
-         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
-         ret = bdrv_aligned_preadv(child, &req, (offset + bytes) & ~(align - 1),
-@@ -2465,15 +2428,9 @@ bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
- int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base   = (void *) buf,
--        .iov_len    = size,
--    };
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
-     int ret;
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
--
-     ret = bdrv_writev_vmstate(bs, &qiov, pos);
-     if (ret < 0) {
-         return ret;
-@@ -2490,14 +2447,9 @@ int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
- int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-                       int64_t pos, int size)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base   = buf,
--        .iov_len    = size,
--    };
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, size);
-     int ret;
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
-     ret = bdrv_readv_vmstate(bs, &qiov, pos);
-     if (ret < 0) {
-         return ret;
--- 
-2.18.0
+On 2/6/19 9:36 AM, Cornelia Huck wrote:
+> On Fri,  1 Feb 2019 19:55:52 -0500
+> Cleber Rosa <crosa@redhat.com> wrote:
+>=20
+>> The current version of the "check-acceptance" target will only show
+>> one line for execution of all tests.  That's probably OK if the tests
+>> to be run are quick enough and they're always the same.
+>>
+>> But, there's already one test alone that takes on average ~5 seconds
+>> to run, we intend to adapt the list of tests to match the user's build
+>> environment (among other choices).
+>=20
+> Btw: What are our expectations regarding execution time for tests?
+> Especially if we continue adding tests, and architecture-specific tests
+> are bound to be slower if run on a foreign architecture via tcg.
+>=20
+> Would a make check-acceptance-quick command make sense? ("I only want
+> to verify quickly that I didn't break too much, so run the quicker
+> tests only, probably only for my host architecture")
+>=20
+
+Yes, it definitely makes sense.  Now, let me know if the following also
+makes sense to you:
+
+1) Because these tests focus on functional testing, the default
+target/shortcut ("make check-acceptance") should run the complete set of
+test cases (including the slow ones).
+
+2) Requirements vary greatly from user to user, to while adding a
+"check-acceptance-quick" is fine, you just mentioned one extra test
+execution variation ("for my host architecture").  For those, the idea
+is that:
+
+ a) "make check-acceptance[-quick]" will adapt to the build environment
+(if you only built s390x targets, that's all it's going to use)
+
+ b) "avocado" command line interface *should* be easy enough to fulfill
+other requirements, and not necessarily require a "make" target.  For
+instance, if you're only interested in your host arch and one specific
+machine type, a command line such as the following should do the trick:
+
+  $ make check-venv
+  $ ./tests/venv/bin/avocado run -t arch:`uname -m` -t
+machine:WHAT_I_CARE_ABOUT tests/acceptance/
+
+How does that sound?
+
+Regards,
+- Cleber.
+
+>>
+>> Because of that, let's present the default Avocado UI by default.
+>> Users can always choose a different output by setting the AVOCADO_SHOW
+>> variable.
+>>
+>> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  .travis.yml            | 2 +-
+>>  tests/Makefile.include | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
