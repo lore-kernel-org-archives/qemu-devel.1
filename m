@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53949)
+Received: from eggs.gnu.org ([209.51.188.92]:57541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grSG2-00009W-2U
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:49:14 -0500
+	(envelope-from <lvivier@redhat.com>) id 1grScM-0003rs-A3
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grSG0-00036k-QE
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:49:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:8476)
+	(envelope-from <lvivier@redhat.com>) id 1grSSD-0005VB-1n
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:01:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grSG0-00036S-Kk
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:49:12 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1grSSC-0005RQ-3W
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:01:48 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C641E58E43
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:49:11 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190130120616.5260-1-quintela@redhat.com>
-	<20190130120616.5260-3-quintela@redhat.com>
-	<711166e7-e8de-9335-5a7f-63cf86a62524@redhat.com>
-	<875ztxf62a.fsf@trasno.org>
-Date: Wed, 06 Feb 2019 19:49:10 +0100
-In-Reply-To: <875ztxf62a.fsf@trasno.org> (Juan Quintela's message of "Wed, 06
-	Feb 2019 13:35:25 +0100")
-Message-ID: <87h8dgoiqh.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 0C13843A25
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 19:01:36 +0000 (UTC)
+References: <20190206132331.1694-1-quintela@redhat.com>
+	<20190206132331.1694-3-quintela@redhat.com>
+	<3beec7d3-7a57-30be-affb-c68caa713a60@redhat.com>
+	<87zhr8er47.fsf@trasno.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <d3c2373f-89cf-dc2f-472e-180ddcaaa64e@redhat.com>
+Date: Wed, 6 Feb 2019 20:00:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v11 2/4] migration: Create socket-address
+In-Reply-To: <87zhr8er47.fsf@trasno.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] multifd: Drop x-multifd-page-count
  parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,48 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Juan Quintela <quintela@redhat.com> writes:
-
-> Eric Blake <eblake@redhat.com> wrote:
->> On 1/30/19 6:06 AM, Juan Quintela wrote:
->>> It will be used to store the uri parameters. We want this only for
->>> tcp, so we don't set it for other uris.  We need it to know what port
->>> is migration running.
->>> 
+On 06/02/2019 18:58, Juan Quintela wrote:
+> Laurent Vivier <lvivier@redhat.com> wrote:
+>> On 06/02/2019 14:23, Juan Quintela wrote:
+>>> Libvirt don't want to expose (and explain it).  And testing looks like
+>>> 128 is good for all use cases, so just drop it.
+>>>
 >>> Signed-off-by: Juan Quintela <quintela@redhat.com>
-[...]
->>> @@ -199,6 +200,8 @@
->>>  # @compression: migration compression statistics, only returned if compression
->>>  #           feature is on and status is 'active' or 'completed' (Since 3.1)
->>>  #
->>> +# @socket-address: Only used for tcp, to know what the real port is (Since 3.1)
->>> +#
+>>> ---
+>>>  hmp.c                 |  7 -------
+>>>  migration/migration.c | 30 ------------------------------
+>>>  migration/migration.h |  1 -
+>>>  migration/ram.c       | 13 ++++++++-----
+>>>  qapi/migration.json   | 13 +------------
+>>>  5 files changed, 9 insertions(+), 55 deletions(-)
+>>>
+>> ...
+>>> diff --git a/migration/migration.c b/migration/migration.c
+>>> index f673486679..65df9b566e 100644
+>>> --- a/migration/migration.c
+>>> +++ b/migration/migration.c
+>>> @@ -81,7 +81,6 @@
+>>>  /* The delay time (in ms) between two COLO checkpoints */
+>>>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+>>>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+>>> -#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 128
 >>
->> s/3.1/4.0/
->
-> Done.
->
->>> +##
->>> +# @DummyStruct:
->>> +#
->>> +# Both block-core and migration needs SocketAddressList
->>> +# I am open to comments about how to share it
->>> +#
->>> +# @dummy-list: A dummy list
->>> +#
->>> +# Since: 3.1
->>
->> s/3.1/4.0/
->> This matches how we force list types elsewhere for use in C code even
->> when the type is not exposed through QMP. But do you still need to force
->> the generation, given that ['SocketAddress'] used in MigrationInfo is
->> visible through QMP?
->
-> I think so but I am not an expert here.
+>> Why do you update it in the previous patch to remove it in this one?
+> 
+> To make clear that I change the default.  Otherwise it gets hidden into
+> the whole patch.  if you preffer I could have done the other way around.
 
-If the list type is visible in QMP, we shouldn't add this hack to force
-it.  Easy to find out: drop DummyStruct, and if it still compiles, the
-forcing needs to go.
+OK, I understand. It's not really clear because the new default
+(MULTIFD_PAGE_COUNT) is hidden in the patch.
+
+Moreover, in the first patch you update the value, but you don't update
+the comments in qapi/migration.json (I've seen that because you remove
+them in this patch).
+
+Perhaps you can proceed in the reverse order: remove the parameter and
+then set the new default... or merge the two patches and saying in the
+commit message you change the default value.
+
+Thanks,
+Laurent
