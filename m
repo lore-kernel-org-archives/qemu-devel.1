@@ -1,20 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ3o-0007BX-Up
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:00:07 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grJ3z-0007BX-6h
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:00:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grIyu-0001i6-8o
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:54:57 -0500
-Received: from mga03.intel.com ([134.134.136.65]:8439)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1grIyt-0001Mv-WE
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:54:56 -0500
-From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Thu,  7 Feb 2019 01:25:28 +0800
-Message-Id: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V12 0/5] support MAP_SYNC for
- memory-backend-file
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grIw0-0008Oa-8E
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:51:57 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 6 Feb 2019 08:51:48 +0000
+Message-ID: <96b9a104-47b5-ec53-faa7-ac5eadb1c826@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-7-vsementsov@virtuozzo.com>
+	<64d9a2e7-6dd9-d71b-b9bf-c476e9e218f8@redhat.com>
+	<20190116165837.GF20275@redhat.com>
+	<261d4eb9-eb91-5654-e5ad-995b7f93432b@virtuozzo.com>
+In-Reply-To: <261d4eb9-eb91-5654-e5ad-995b7f93432b@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <95655D07AC0F3549A52896151A822533@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 06/10] block/nbd-client: move from quit
+ to state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,175 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, "Zhang, Yi" <yi.z.zhang@linux.intel.com>
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-files on ext4/xfs file system mounted with '-o dax').
-
-A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
-    https://patchwork.kernel.org/patch/10028151/
-
-In order to make sure that the file metadata is in sync after a fault 
-while we are writing a shared DAX supporting backend files, this
-patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
-
-As the DAX vs DMA truncated issue was solved, we refined the code and
-send out this feature for the v5 version.
-
-We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
-'share=on' & 'pmem=on'. 
-Or QEMU will not pass this flag to mmap(2)
-
-Test with below cases:
-1. pmem=on is set, shared=on is set, MAP_SYNC supported:
-   a: backend is a dax supporting file.
-   1) start VM1 with options:
-   -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
-   -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-   
-   2) start VM2 with options:
-   -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
-   -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-
-   3) live migrate from VM1 to VM2.
-   
-   4) Suddly let Host crash or power failure.
-
-   5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
-
-   b: backend is a regular file.
-   1) start with options
-   -object memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
-   -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-
-   will warning "failed to validate with mapping flags: Operation not supported"
-   FILE_1 and FILE_2 random corrupt.
-
-2. Other cases:
-   FILE_1 and FILE_2 random corrupt.
-
-Changes in V12:
- * 2/5: Micheal: Update update-linux-headers.sh
- * 3/5: Micheal: Use script update add linux/mman.h
- * 4/5: Pankaj,Micheal: 1) fallback to mmap without
-        MAP_SYNC & MAP_SHARED_VALIDATE if sync not supported or failed
-	2) Replace the include with 3/5 added linux/mman.h
- * 5/5: Micheal: Refine the Documentations.
-
-Changes in V11:
- * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
- * 2/3: Micheal: Fix the compatibility for old kernel.
- * 2/3&3/3: Micheal&Eduardo :Update the behavior below: 
-   Waning at no-dax and continue without MAP_SYNC.
-   Test if fails again for compatibility, then remove the MAP_VALIDATE and
-   silently proceed.
-
-Changes in V10:
- * 4/4: refine the document.
- * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
- * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
- * 2/4: Fix the wrong include header
-
-Changes in V9:
- * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
- * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
- since I don't have much knowledge about the sparse feature, @Micheal Could you 
- add some documentation/commit message on this patch? Thank you very much.
- * 3/6: from 2/5: Eduardo: updated the commit message. 
- * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
- * 5/6: from 4/5: Eduardo: updated the commit message.
- * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
-
-Changes in v8:
- * Micheal: 3/5, remove the duplicated define in the os_dep.h
- * Micheal: 2/5, make type define safety.
- * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
- * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
-   MAP_SYNC only worked with pmem=on.
- * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
-   all the flags in one parameter.
-
-Changes in v7:
- * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
-
-Changes in v6:
- * Pankaj: 3/7 are squashed with 2/7
- * Pankaj: 7/7 update comments to "consistent filesystem metadata".
- * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
- * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
- * Stefan, 5/7 Add missing "munmap"
- * Stefan, 2/7 refine the shared/flag.
-
-Changes in v5:
- * Add patch 1 to fix a memory leak issue.
- * Refine the patch 4-6
- * Remove the patch 3 as we already change the parameter from "shared" to
-   "flags"
-
-Changes in v4:
- * Add patch 1-3 to switch some functions to a single 'flags'
-   parameters. (Michael S. Tsirkin)
- * v3 patch 1-3 become v4 patch 4-6.
- * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
-   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
- * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-
-Changes in v3:
- * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
-   cases, and add back the retry mechanism. MAP_SYNC will be ignored
-   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
- * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
-   platforms in order to make qemu_ram_mmap() compile on those platforms.
- * Patch 2&3: include more information in error messages of
-   memory-backend in hope to help user to identify the error.
-   (Dr. David Alan Gilbert)
- * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-
-Changes in v2:
- * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
- * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
-   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
- * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
-   to osdep.h. (Michael S. Tsirkin)
-
-Zhang Yi (5):
-  util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
-  scripts/update-linux-headers: add linux/mman.h
-  linux-headers: add linux/mman.h.
-  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
-  docs: Added MAP_SYNC documentation
-
- docs/nvdimm.txt                            |  25 ++++++-
- exec.c                                     |   2 +-
- include/qemu/mmap-alloc.h                  |  21 +++++-
- include/qemu/osdep.h                       |   7 ++
- linux-headers/asm-arm/mman.h               |   4 ++
- linux-headers/asm-arm64/mman.h             |   1 +
- linux-headers/asm-generic/hugetlb_encode.h |  36 ++++++++++
- linux-headers/asm-generic/mman-common.h    |  77 ++++++++++++++++++++
- linux-headers/asm-generic/mman.h           |  24 +++++++
- linux-headers/asm-mips/mman.h              | 108 +++++++++++++++++++++++++++++
- linux-headers/asm-powerpc/mman.h           |  39 +++++++++++
- linux-headers/asm-s390/mman.h              |   1 +
- linux-headers/asm-x86/mman.h               |  31 +++++++++
- linux-headers/linux/mman.h                 |  38 ++++++++++
- qemu-options.hx                            |   4 ++
- scripts/update-linux-headers.sh            |   6 +-
- util/mmap-alloc.c                          |  30 +++++++-
- util/oslib-posix.c                         |   2 +-
- 18 files changed, 445 insertions(+), 11 deletions(-)
- create mode 100644 linux-headers/asm-arm/mman.h
- create mode 100644 linux-headers/asm-arm64/mman.h
- create mode 100644 linux-headers/asm-generic/hugetlb_encode.h
- create mode 100644 linux-headers/asm-generic/mman-common.h
- create mode 100644 linux-headers/asm-generic/mman.h
- create mode 100644 linux-headers/asm-mips/mman.h
- create mode 100644 linux-headers/asm-powerpc/mman.h
- create mode 100644 linux-headers/asm-s390/mman.h
- create mode 100644 linux-headers/asm-x86/mman.h
- create mode 100644 linux-headers/linux/mman.h
-
--- 
-2.7.4
+MDUuMDIuMjAxOSAxOTozNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTYuMDEuMjAxOSAxOTo1OCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4+IE9uIFdlZCwg
+SmFuIDE2LCAyMDE5IGF0IDEwOjI1OjAzQU0gLTA2MDAsIEVyaWMgQmxha2Ugd3JvdGU6DQo+Pj4g
+W2FkZGluZyBEYW5dDQo+Pj4NCj4+PiBPbiA3LzMxLzE4IDEyOjMwIFBNLCBWbGFkaW1pciBTZW1l
+bnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4+PiBUbyBpbXBsZW1lbnQgcmVjb25uZWN0IHdlIG5l
+ZWQgc2V2ZXJhbCBzdGF0ZXMgZm9yIHRoZSBjbGllbnQ6DQo+Pj4+IENPTk5FQ1RFRCwgUVVJVCBh
+bmQgdHdvIENPTk5FQ1RJTkcgc3RhdGVzLiBDT05ORUNUSU5HIHN0YXRlcyB3aWxsDQo+Pj4+IGJl
+IHJlYWxpemVkIGluIHRoZSBmb2xsb3dpbmcgcGF0Y2hlcy4gVGhpcyBwYXRjaCBpbXBsZW1lbnRz
+IENPTk5FQ1RFRA0KPj4+PiBhbmQgUVVJVC4NCj4+Pj4NCj4+Pj4gUVVJVCBtZWFucywgdGhhdCB3
+ZSBzaG91bGQgY2xvc2UgdGhlIGNvbm5lY3Rpb24gYW5kIGZhaWwgYWxsIGN1cnJlbnQNCj4+Pj4g
+YW5kIGZ1cnRoZXIgcmVxdWVzdHMgKGxpa2Ugb2xkIHF1aXQgPSB0cnVlKS4NCj4+Pj4NCj4+Pj4g
+Q09OTkVDVEVEIG1lYW5zIHRoYXQgY29ubmVjdGlvbiBpcyBvaywgd2UgY2FuIHNlbmQgcmVxdWVz
+dHMgKGxpa2Ugb2xkDQo+Pj4+IHF1aXQgPSBmYWxzZSkuDQo+Pj4+DQo+Pj4+IEZvciByZWNlaXZp
+bmcgbG9vcCB3ZSB1c2UgYSBjb21wYXJpc29uIG9mIHRoZSBjdXJyZW50IHN0YXRlIHdpdGggUVVJ
+VCwNCj4+Pj4gYmVjYXVzZSByZWNvbm5lY3Qgd2lsbCBiZSBpbiB0aGUgc2FtZSBsb29wLCBzbyBp
+dCBzaG91bGQgYmUgbG9vcGluZw0KPj4+PiB1bnRpbCB0aGUgZW5kLg0KPj4+Pg0KPj4+PiBPcHBv
+c2l0ZSwgZm9yIHJlcXVlc3RzIHdlIHVzZSBhIGNvbXBhcmlzb24gb2YgdGhlIGN1cnJlbnQgc3Rh
+dGUgd2l0aA0KPj4+PiBDT05ORUNURUQsIGFzIHdlIGRvbid0IHdhbnQgdG8gc2VuZCByZXF1ZXN0
+cyBpbiBDT05ORUNUSU5HIHN0YXRlcyAoDQo+Pj4+IHdoaWNoIGFyZSB1bnJlYWNoYWJsZSBub3cs
+IGJ1dCB3aWxsIGJlIHJlYWNoYWJsZSBhZnRlciB0aGUgZm9sbG93aW5nDQo+Pj4+IGNvbW1pdHMp
+DQo+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
+PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pj4gLS0tDQo+Pj4+IMKgIGJsb2NrL25iZC1j
+bGllbnQuaCB8wqAgOSArKysrKysrKy0NCj4+Pj4gwqAgYmxvY2svbmJkLWNsaWVudC5jIHwgNTUg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+
+Pj4+IMKgIDIgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0aW9ucygrKSwgMjMgZGVsZXRpb25zKC0p
+DQo+Pj4NCj4+PiBEYW4ganVzdCByZWNlbnRseSBwcm9wb3NlZCBwYXRjaGVzIHRvIFNvY2tldENo
+YXJkZXYgaW4gZ2VuZXJhbCB0byB1c2UgYQ0KPj4+IHN0YXRlIG1hY2hpbmUgdGhhdCBkaXN0aW5n
+dWlzaGVzIGJldHdlZW4gY29ubmVjdGluZyBhbmQgY29ubmVjdGVkOg0KPj4+DQo+Pj4gaHR0cHM6
+Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNnMDMzMzku
+aHRtbA0KPj4+DQo+Pj4gSSdtIHdvbmRlcmluZyBob3cgbXVjaCBvZiBoaXMgd29yayBpcyByZWxh
+dGVkIG9yIGNhbiBiZSByZXVzZWQgdG8gZ2V0DQo+Pj4gcmVzdGFydGFibGUgY29ubmVjdGlvbnMg
+b24gTkJEIHNvY2tldHM/DQo+Pg0KPj4gVGhlcmUncyBub3RoaW5nIHJlYWxseSBzcGVjaWFsIGFi
+b3V0IHdoYXQgSSBkaWQuIFZsYWRpbWlyIGxvb2tzIHRvDQo+PiBoYXZlIGJhc2ljYWxseSBkb25l
+IHRoZSBzYW1lIGtpbmQgb2YgYXBwcm9hY2gsIGJ1dCBJIGRvbid0IHRoaW5rDQo+PiB0aGVyZSdz
+IHJlYWwgc2NvcGUgZm9yIHNoYXJpbmcgd2l0aCBjaGFyZGV2cywgYXMgZWFjaCBjYXJlIGFib3V0
+DQo+PiB0aGVpciBvd24gc2V0IG9mIHN0YXRlcy4NCj4+DQo+Pj4gUmVtZW1iZXIsIHJpZ2h0IG5v
+dywgdGhlIE5CRCBjb2RlIGFsd2F5cyBzdGFydHMgaW4gYmxvY2tpbmcgbW9kZSwgYW5kDQo+Pj4g
+ZG9lcyBzaW5nbGUtdGhyZWFkZWQgaGFuZHNoYWtpbmcgdW50aWwgaXQgaXMgcmVhZHkgZm9yIHRy
+YW5zbWlzc2lvbiwNCj4+PiB0aGVuIHN3aXRjaGVzIHRvIG5vbi1ibG9ja2luZyBtb2RlIGZvciBh
+bGwgc3Vic2VxdWVudCB0cmFuc21pc3Npb25zIChzbywNCj4+PiBmb3IgZXhhbXBsZSwgc2Vydmlj
+aW5nIGEgcmVhZCByZXF1ZXN0IGNhbiBhc3N1bWUgdGhhdCB0aGUgc29ja2V0IGlzDQo+Pj4gdmFs
+aWQgd2l0aG91dCBmdXJ0aGVyIHdhaXRpbmcpLsKgIEJ1dCBvbmNlIHdlIHN0YXJ0IGFsbG93aW5n
+IHJlY29ubmVjdHMsDQo+Pj4gYSByZWFkIHJlcXVlc3Qgd2lsbCBuZWVkIHRvIGRldGVjdCB3aGVu
+IG9uZSBzb2NrZXQgaGFzIGdvbmUgZG93biwgYW5kDQo+Pj4gd2FpdCBmb3IgaXRzIHJlcGxhY2Vt
+ZW50IHNvY2tldCB0byBjb21lIGJhY2sgdXAsIGluIG9yZGVyIHRvIHJldHJ5IHRoZQ0KPj4+IHJl
+cXVlc3Q7IHRoaXMgcmV0cnkgaXMgaW4gYSBjb250ZXh0IHdoZXJlIHdlIGFyZSBpbiBub24tYmxv
+Y2tpbmcNCj4+PiBjb250ZXh0LCBidXQgdGhlIHJldHJ5IG11c3QgZXN0YWJsaXNoIGEgbmV3IHNv
+Y2tldCwgYW5kIHBvc3NpYmx5IGNvbnZlcnQNCj4+PiB0aGUgc29ja2V0IGludG8gVExTIG1vZGUs
+IGFsbCBiZWZvcmUgYmVpbmcgcmVhZHkgdG8gcmV0cnkgdGhlIHJlYWQgcmVxdWVzdC4NCj4+DQo+
+PiBUaGF0IG1ha2VzIGl0IHNvdW5kIGxpa2UgdGhlIE5CRCBoYW5kc2hha2UgbmVlZHMgdG8gYmUg
+Y29udmVydGVkIHRvDQo+PiB1c2UgZW50aXJlbHkgbm9uLWJsb2NraW5nIEkvTy4NCj4+DQo+PiBU
+aGUgVExTIGhhbmRzaGFrZSBhbHJlYWR5IHVzZXMgYW4gYXN5bmNocm9ub3VzIGNhbGxiYWNrIHBh
+dHRlcm4gYW5kDQo+PiB0byBkZWFsIHdpdGggdGhhdCBOQkQgaGFkIHRvIGNyZWF0ZSAmIHJ1biBh
+IHByaXZhdGUgbWFpbiBsb29wIHRvDQo+PiBjb21wbGV0ZSB0aGUgVExTIGhhbmRzaGFrZSBpbiBp
+dHMgYmxvY2tpbmcgY29kZSBwYXR0ZXJuLg0KPj4NCj4+IFlvdSBjb3VsZCBwb3RlbnRpYWxseSBw
+dXNoIHRoaXMgY29uY2VwdCB1cCB0byB0aGUgdG9wIGxldmVsLiBpZQ0KPj4gaW1wbGVtZW50IHRo
+ZSBlbnRpcmUgTkJEIGhhbmRzaGFrZSB3aXRoIGFzeW5jIGNhbGxiYWNrcyAvIG5vbi1ibG9ja2lu
+Zw0KPj4gSS9PLiBUaGVuIHNpbXBseSB1c2UgYSBwcml2YXRlIG1haW4gbG9vcCB0byBydW4gdGhh
+dCBpbiBhIGJsb2NraW5nDQo+PiBmYXNoaW9uIGZvciB0aGUgaW5pdGlhbCBjb25uZWN0aW9uLiBX
+aGVuIHlvdSBuZWVkIHRvIGRvIHJlLWNvbm5lY3QNCj4+IHlvdSBub3cganVzdCBydW4gdGhlIGFz
+eW5jIGNvZGUgd2l0aG91dCB0aGUgZXh0cmEgbWFpbiBsb29wIGFyb3VuZA0KPj4gaXQuDQo+Pg0K
+PiANCj4gSG1tLCB5b3UgbWVhbiB0aGlzIGNvZGU6DQo+IA0KPiAgwqDCoMKgIGRhdGEubG9vcCA9
+IGdfbWFpbl9sb29wX25ldyhnX21haW5fY29udGV4dF9kZWZhdWx0KCksIEZBTFNFKTsNCj4gIMKg
+wqDCoCB0cmFjZV9uYmRfcmVjZWl2ZV9zdGFydHRsc190bHNfaGFuZHNoYWtlKCk7DQo+ICDCoMKg
+wqAgcWlvX2NoYW5uZWxfdGxzX2hhbmRzaGFrZSh0aW9jLA0KPiAgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBuYmRfdGxzX2hhbmRzaGFr
+ZSwNCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgJmRhdGEsDQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIE5VTEwsDQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE5VTEwpOw0KPiANCj4gIMKgwqDCoCBp
+ZiAoIWRhdGEuY29tcGxldGUpIHsNCj4gIMKgwqDCoMKgwqDCoMKgIGdfbWFpbl9sb29wX3J1bihk
+YXRhLmxvb3ApOw0KPiAgwqDCoMKgIH0NCj4gIMKgwqDCoCBnX21haW5fbG9vcF91bnJlZihkYXRh
+Lmxvb3ApOw0KPiANCj4gDQo+IFdoYXQgdGhpcyBkb2VzIGluIGNvbnRleHQgb2YgUWVtdT8gSXNu
+J3QgaXQgbW9yZSBjb3JyZWN0IHRvIGRvDQo+IGNvcm91dGluZSBiYXNlZCBhc3luYyBzdGFmZiwg
+bGlrZSBpbiBxY293Ml9vcGVuKCk6DQo+IA0KPiAgwqDCoMKgIGlmIChxZW11X2luX2Nvcm91dGlu
+ZSgpKSB7DQo+ICDCoMKgwqDCoMKgwqDCoCAvKiBGcm9tIGJkcnZfY29fY3JlYXRlLsKgICovDQo+
+ICDCoMKgwqDCoMKgwqDCoCBxY293Ml9vcGVuX2VudHJ5KCZxb2MpOw0KPiAgwqDCoMKgIH0gZWxz
+ZSB7DQo+ICDCoMKgwqDCoMKgwqDCoCBhc3NlcnQocWVtdV9nZXRfY3VycmVudF9haW9fY29udGV4
+dCgpID09IHFlbXVfZ2V0X2Fpb19jb250ZXh0KCkpOw0KPiAgwqDCoMKgwqDCoMKgwqAgcWVtdV9j
+b3JvdXRpbmVfZW50ZXIocWVtdV9jb3JvdXRpbmVfY3JlYXRlKHFjb3cyX29wZW5fZW50cnksICZx
+b2MpKTsNCj4gIMKgwqDCoMKgwqDCoMKgIEJEUlZfUE9MTF9XSElMRShicywgcW9jLnJldCA9PSAt
+RUlOUFJPR1JFU1MpOw0KPiAgwqDCoMKgIH0NCj4gIMKgwqDCoCByZXR1cm4gcW9jLnJldDsNCj4g
+DQo+IEFuZCB0aGVuIHlpZWxkIGFmdGVyIGhhbmRzaGFrZSgpIGFuZCBlbnRlciBiYWNrIGZyb20g
+bmJkX3Rsc19oYW5kc2hha2UgY2FsbGJhY2s/DQo+IA0KPiBIbW0sIGFsc28sIGNoZWNrZWQsIG5v
+Ym9keSBjYWxscyBnX21haW5fY29udGV4dF9kZWZhdWx0KCkgaW4gcWVtdSwgZXhjZXB0DQo+IHV0
+aWwvbWFpbi1sb29wLmMsIG5iZCBhbmQgdGVzdHMuIFNvLCBJJ20gbm90IHN1cmUgdGhhdCB0aGlz
+IGlzIGEgdmFsaWQgdGhpbmcNCj4gdG8gZG8gaW4gbmJkLi4NCj4gDQo+IA0KDQpBaGEsIHdlIGp1
+c3QgZG9uJ3QgaGF2ZSBhbnkgYnMgaW4gbmJkLyBjb2RlLiBCdXQgYW55d2F5LCBtb3ZpbmcgdG8g
+QWlvQ29udGV4dCBhbmQgbWFrZQ0KbmVnb3RpYXRpb24gbm9uLWJsb2NraW5nIHNob3VsZCBiZSBn
+b29kIGlkZWEuIEknbGwgdHJ5IHRvIGRvIHNvbWV0aGluZyBhcm91bmQgaXQuDQoNCg0KLS0gDQpC
+ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
