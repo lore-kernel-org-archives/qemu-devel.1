@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58082)
+Received: from eggs.gnu.org ([209.51.188.92]:58192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1grPFI-0005vk-Ne
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:17 -0500
+	(envelope-from <berrange@redhat.com>) id 1grPFw-0006NN-1c
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1grPFI-000074-06
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:16 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  6 Feb 2019 16:29:19 +0100
-Message-Id: <20190206152919.5532-3-mreitz@redhat.com>
-In-Reply-To: <20190206152919.5532-1-mreitz@redhat.com>
-References: <20190206152919.5532-1-mreitz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1grPFu-0000KD-Cy
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1grPFl-0000ES-MN
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:47 -0500
+Date: Wed, 6 Feb 2019 15:36:31 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190206153631.GS12331@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1548509635-15776-1-git-send-email-ptsneves@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/2] block/ssh: Implement .bdrv_dirname()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1548509635-15776-1-git-send-email-ptsneves@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] chardev: Allow for pty path passing.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Paulo Neves <ptsneves@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-ssh_bdrv_dirname() is basically the generic bdrv_dirname(), except it
-takes care not to silently chop off any query string (i.e.,
-host_key_check).
+On Sat, Jan 26, 2019 at 02:33:55PM +0100, Paulo Neves wrote:
+> If a user requires a virtual serial device like provided
+> by the pty char device, the user needs to accept the
+> returned device name. This makes the program need to
+> have smarts to parse or communicate with qemu to get the
+> pty device.
+> With this patch the program can pass the path where
+> a symlink to the pty device will be, removing the
+> need for 2 way communication or smarts.
+> 
+> Signed-off-by: Paulo Neves <ptsneves@gmail.com>
+> ---
+>  chardev/char-pty.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  chardev/char.c     |  6 +++++-
+>  qapi/char.json     |  4 ++--
+>  3 files changed, 47 insertions(+), 4 deletions(-)
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/ssh.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+qemu-options.hx needs updating to document the new syntax too
 
-diff --git a/block/ssh.c b/block/ssh.c
-index 88401bbd31..b519c00869 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -1295,6 +1295,26 @@ static void ssh_refresh_filename(BlockDriverState =
-*bs)
-     }
- }
-=20
-+static char *ssh_bdrv_dirname(BlockDriverState *bs, Error **errp)
-+{
-+    if (qdict_haskey(bs->full_open_options, "host_key_check")) {
-+        /*
-+         * We cannot generate a simple prefix if we would have to
-+         * append a query string.
-+         */
-+        error_setg(errp,
-+                   "Cannot generate a base directory with host_key_check=
- set");
-+        return NULL;
-+    }
-+
-+    if (bs->exact_filename[0] =3D=3D '\0') {
-+        error_setg(errp, "Cannot generate a base directory for this ssh =
-node");
-+        return NULL;
-+    }
-+
-+    return path_combine(bs->exact_filename, "");
-+}
-+
- static const char *const ssh_strong_runtime_opts[] =3D {
-     "host",
-     "port",
-@@ -1322,6 +1342,7 @@ static BlockDriver bdrv_ssh =3D {
-     .bdrv_co_truncate             =3D ssh_co_truncate,
-     .bdrv_co_flush_to_disk        =3D ssh_co_flush,
-     .bdrv_refresh_filename        =3D ssh_refresh_filename,
-+    .bdrv_dirname                 =3D ssh_bdrv_dirname,
-     .create_opts                  =3D &ssh_create_opts,
-     .strong_runtime_opts          =3D ssh_strong_runtime_opts,
- };
---=20
-2.20.1
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
