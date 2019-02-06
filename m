@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36487)
+Received: from eggs.gnu.org ([209.51.188.92]:36668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grKMA-0001RW-V2
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:03 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1grKMQ-0001YO-3D
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grKM9-0002bS-Tv
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:02 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1grKM9-0002b3-Fb
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:01 -0500
-Received: by mail-wm1-x344.google.com with SMTP id y8so2002847wmi.4
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 02:23:01 -0800 (PST)
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-10-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <35625906-0595-186e-d6bb-eef8292a894a@gmail.com>
-Date: Wed, 6 Feb 2019 12:23:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190131130850.6850-10-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 09/10] hw/rdma: Free all receive buffers
- when QP is destroyed
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1grKMN-0002r6-VV
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:18 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Wed,  6 Feb 2019 13:23:06 +0300
+Message-Id: <1549448589-381285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v13 0/3] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,177 +18,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
+v13:
+The enhancement of the Python code style for fopen() in the new test 242.
+The 'unknown flag' was actually removed from the structure Qcow2BitmapInfo.
 
+v12:
+In the function block_crypto_get_specific_info_luks(),
+checking the format was replaced with assertion.
+The 'unknown flag' was removed from the structure Qcow2BitmapInfo.
+A new case added to the test file 242 to check QEMU behavior in case of
+unknown flag in a bitmap directory entry of QCOW2 image file.
 
-On 1/31/19 3:08 PM, Yuval Shaia wrote:
-> When QP is destroyed the backend QP is destroyed as well. This ensures
-> we clean all received buffer we posted to it.
-> However, a contexts of these buffers are still remain in the device.
+v11:
+An assertion was added to the get_bitmap_info_flags() to check the
+completed mapping of all the reserved bitmap BME_ flags.
+The heading comment of get_bitmap_info_flags() was changed to
+describe the function design properly.
+In qcow2_get_specific_info(), two function calls g_free() were
+replaced with one call to qapi_free_ImageInfoSpecific() that does
+all the cleaning work.
+The version #11 was discussed in email thread with the message ID:
+<1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-I think without 'a' and without 'are'
+v10:
+The 'struct Error' parameter was added to the function prototype
+bdrv_query_image_info().
+The code refactoring of the function get_bitmap_info_flags().
+The comments to the structures ImageInfoSpecificQCow2 and
+Qcow2BitmapInfo in the file qapi/block-core.json were corrected.
+The changes in the *.out files of the tests 060, 065 082, 198
+and 206 were discarded. The new test 239 was enriched by adding human
+readable format output and by checking the output with bitmap extra
+parameters, such as  non-persistent and disabled.
+The version #10 was discussed in email thread with the message ID:
+<1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-> Fix it by maintaining a list of buffer's context and free them when QP
-> is destroyed.
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_backend.c      | 25 +++++++++++++++++++------
->   hw/rdma/rdma_backend.h      |  2 +-
->   hw/rdma/rdma_backend_defs.h |  1 +
->   hw/rdma/rdma_rm.c           |  2 +-
->   4 files changed, 22 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 65b28aa5b2..3283461b15 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -39,6 +39,7 @@
->   typedef struct BackendCtx {
->       void *up_ctx;
->       struct ibv_sge sge; /* Used to save MAD recv buffer */
-> +    RdmaBackendQP *backend_qp; /* To maintain recv buffers */
->   } BackendCtx;
->   
->   struct backend_umad {
-> @@ -90,7 +91,8 @@ static void clean_recv_mads(RdmaBackendDev *backend_dev)
->       } while (cqe_ctx_id != -ENOENT);
->   }
->   
-> -static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-> +static int rdma_poll_cq(RdmaBackendDev *backend_dev,
-> +                        RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->   {
->       int i, ne, total_ne = 0;
->       BackendCtx *bctx;
-> @@ -113,6 +115,9 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->   
->               comp_handler(bctx->up_ctx, &wc[i]);
->   
-> +            bctx->backend_qp->cqe_ctx_list =
-> +                g_slist_remove(bctx->backend_qp->cqe_ctx_list,
-> +                               GINT_TO_POINTER(wc[i].wr_id));
+v9:
+The new test 239 of the qemu-iotests set was amended to show the bitmaps
+being added and to demonstrate the bitmap flag "in-use".
+The version #9 was discussed with the message ID:
+<1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-No synchronization needed ?
+v8:
+The output benchmark files for the qemu-iotests, namely 060, 065 082, 198
+and 206, were modified to show the bitmap extension for the qemu specific
+information. A new test file 239 was added to the test set that checks the
+output for the fields of the bitmap section.
+The backward compatibility of the output for images of the version 2
+of qcow2 was added.
+The version #8 was discussed in email thread with the message ID:
+<1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-Thanks,
-Marcel
+v7:
+A description was added to the function qcow2_get_bitmap_info_list().
+In the function qcow2_get_specific_info(), the comment was modified
+so that we ignore any error in obtaining the list of bitmaps to
+pass the rest of QCOW2 specific information to a caller.
+The version #7 was discussed in email thread with the message ID:
+<1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
->               rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
->               g_free(bctx);
->           }
-> @@ -173,14 +178,12 @@ static void *comp_handler_thread(void *arg)
->               }
->   
->               backend_dev->rdma_dev_res->stats.poll_cq_from_bk++;
-> -            rdma_poll_cq(backend_dev->rdma_dev_res, ev_cq);
-> +            rdma_poll_cq(backend_dev, backend_dev->rdma_dev_res, ev_cq);
->   
->               ibv_ack_cq_events(ev_cq, 1);
->           }
->       }
->   
-> -    /* TODO: Post cqe for all remaining buffs that were posted */
-> -
->       backend_dev->comp_thread.is_running = false;
->   
->       qemu_thread_exit(0);
-> @@ -307,7 +310,7 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
->   int rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
->   {
->       rdma_dev_res->stats.poll_cq_from_guest++;
-> -    return rdma_poll_cq(rdma_dev_res, cq->ibcq);
-> +    return rdma_poll_cq(cq->backend_dev, rdma_dev_res, cq->ibcq);
->   }
->   
->   static GHashTable *ah_hash;
-> @@ -494,6 +497,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->   
->       bctx = g_malloc0(sizeof(*bctx));
->       bctx->up_ctx = ctx;
-> +    bctx->backend_qp = qp;
->   
->       rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
->       if (unlikely(rc)) {
-> @@ -501,6 +505,9 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->           goto err_free_bctx;
->       }
->   
-> +    qp->cqe_ctx_list = g_slist_append(qp->cqe_ctx_list,
-> +                                      GINT_TO_POINTER(bctx_id));
-> +
->       rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
->                                 &backend_dev->rdma_dev_res->stats.tx_len);
->       if (rc) {
-> @@ -608,6 +615,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->   
->       bctx = g_malloc0(sizeof(*bctx));
->       bctx->up_ctx = ctx;
-> +    bctx->backend_qp = qp;
->   
->       rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
->       if (unlikely(rc)) {
-> @@ -615,6 +623,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->           goto err_free_bctx;
->       }
->   
-> +    qp->cqe_ctx_list = g_slist_append(qp->cqe_ctx_list,
-> +                                      GINT_TO_POINTER(bctx_id));
-> +
->       rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
->                                 &backend_dev->rdma_dev_res->stats.rx_bufs_len);
->       if (rc) {
-> @@ -910,11 +921,13 @@ int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
->       return ibv_query_qp(qp->ibqp, attr, attr_mask, init_attr);
->   }
->   
-> -void rdma_backend_destroy_qp(RdmaBackendQP *qp)
-> +void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res)
->   {
->       if (qp->ibqp) {
->           ibv_destroy_qp(qp->ibqp);
->       }
-> +    g_slist_foreach(qp->cqe_ctx_list, free_cqe_ctx, dev_res);
-> +    g_slist_free(qp->cqe_ctx_list);
->   }
->   
->   #define CHK_ATTR(req, dev, member, fmt) ({ \
-> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> index 6abc367a52..798a12f28f 100644
-> --- a/hw/rdma/rdma_backend.h
-> +++ b/hw/rdma/rdma_backend.h
-> @@ -103,7 +103,7 @@ int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
->                                 uint32_t sq_psn, uint32_t qkey, bool use_qkey);
->   int rdma_backend_query_qp(RdmaBackendQP *qp, struct ibv_qp_attr *attr,
->                             int attr_mask, struct ibv_qp_init_attr *init_attr);
-> -void rdma_backend_destroy_qp(RdmaBackendQP *qp);
-> +void rdma_backend_destroy_qp(RdmaBackendQP *qp, RdmaDeviceResources *dev_res);
->   
->   void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->                               RdmaBackendQP *qp, uint8_t qp_type,
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> index bec0457f25..2306bbd18e 100644
-> --- a/hw/rdma/rdma_backend_defs.h
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -66,6 +66,7 @@ typedef struct RdmaBackendQP {
->       struct ibv_pd *ibpd;
->       struct ibv_qp *ibqp;
->       uint8_t sgid_idx;
-> +    GSList *cqe_ctx_list;
->   } RdmaBackendQP;
->   
->   #endif
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index ff536e356b..c7b9ef17f8 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -485,7 +485,7 @@ void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
->           return;
->       }
->   
-> -    rdma_backend_destroy_qp(&qp->backend_qp);
-> +    rdma_backend_destroy_qp(&qp->backend_qp, dev_res);
->   
->       rdma_res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
->   }
+v6:
+'[PATCH v6] qemu-img info lists bitmap directory entries'.
+The error handling logic for the bitmaps empty list was reversed.
+
+v5:
+'[PATCH v5] qemu-img info lists bitmap directory entries'.
+The error handling logic for the bitmaps empty list was fixed and documented.
+
+v4:
+'[PATCH v4] qemu-img info lists bitmap directory entries'.
+Unknown flags are checked with the mask BME_RESERVED_FLAGS.
+The code minor refactoring was made.
+
+v3:
+'[PATCH v3] qemu-img info lists bitmap directory entries'.
+Now, qcow2_get_bitmap_info_list() is invoked under the condition of QCOW
+version #3 to avoid memory leaks in case of QCOW version #2.
+Furthermore, qcow2_get_bitmap_info_list() checks the number of existing bitmaps.
+So, if no bitmap exists, no bitmap error message is printed in the output.
+The data type of the bitmap 'granularity' parameter was left as 'uint32'
+because bitmap_list_load() returns error if granularity_bits is grater than 31.
+
+v2:
+'[PATCH v2] qemu-img info lists bitmap directory entries'.
+The targeted version of the release at 'Since' word of the comments to the new
+structures changed to 4.0 in the file qapi/block-core.json.
+A comment to the 'bitmaps' new member was supplied.
+The 'unknown flags' parameter was introduced to indicate presence of QCOW2
+bitmap unknown flags, if any.
+The word 'dirty' was removed from the code and from the comments as we list all
+the bitmaps.
+The 'bitmaps' printed parameter was removed for the release versions earlier
+than 3.x.
+The example of the output was moved above the 'Signed-off-by' line.
+
+The first version was '[PATCH] qemu-img info lists bitmap directory entries'.
+
+Andrey Shinkevich (3):
+  bdrv_query_image_info Error parameter added
+  qcow2: Add list of bitmaps to ImageInfoSpecificQCow2
+  qcow2: list of bitmaps new test 242
+
+ block.c                    |   5 +-
+ block/crypto.c             |   9 +--
+ block/qapi.c               |   7 +-
+ block/qcow2-bitmap.c       |  76 +++++++++++++++++++++
+ block/qcow2.c              |  21 +++++-
+ block/qcow2.h              |   2 +
+ block/vmdk.c               |   3 +-
+ include/block/block.h      |   3 +-
+ include/block/block_int.h  |   3 +-
+ qapi/block-core.json       |  41 ++++++++++-
+ qemu-io-cmds.c             |   7 +-
+ tests/qemu-iotests/242     |  99 +++++++++++++++++++++++++++
+ tests/qemu-iotests/242.out | 167 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 14 files changed, 427 insertions(+), 17 deletions(-)
+ create mode 100755 tests/qemu-iotests/242
+ create mode 100644 tests/qemu-iotests/242.out
+
+-- 
+1.8.3.1
