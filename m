@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48951)
+Received: from eggs.gnu.org ([209.51.188.92]:49418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grObD-0004qV-MV
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:54:52 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grOcd-0005pI-Uh
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:56:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grObC-0006Ol-Jq
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:54:51 -0500
-References: <20190204210433.26088-1-philmd@redhat.com>
-	<20190204210433.26088-3-philmd@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1grOcd-0007AS-5l
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:56:19 -0500
+References: <1549371525-29899-1-git-send-email-thuth@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a131c869-cc90-eb4c-1a21-746cc9b29b33@vivier.eu>
-Date: Wed, 6 Feb 2019 15:54:29 +0100
+Message-ID: <36af6cca-59aa-3c6d-3be9-71c2e26a2135@vivier.eu>
+Date: Wed, 6 Feb 2019 15:56:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190204210433.26088-3-philmd@redhat.com>
+In-Reply-To: <1549371525-29899-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 2/3] hw/unicore32/puv3: Drop
- useless inclusion of "hw/i386/pc.h"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw/cpu/cluster: Mark the
+ cpu-cluster device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Guan Xuetao <gxt@mprc.pku.edu.cn>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>, Luc Michel <luc.michel@greensocs.com>
 
-On 04/02/2019 22:04, Philippe Mathieu-Daudé wrote:
-> In 47973a2dbf we split the last generic chipset out of the PC
-> board, but forgot to remove the include of "hw/i386/pc.h".
-> Since it is now unused, remove it.
+On 05/02/2019 13:58, Thomas Huth wrote:
+> The device can not be instantiated by the user and QEMU currently
+> aborts when you try to use it:
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> $ x86_64-softmmu/qemu-system-x86_64 -device cpu-cluster
+> qemu-system-x86_64: hw/cpu/cluster.c:73: cpu_cluster_realize:
+>  Assertion `cbdata.cpu_count > 0' failed.
+> Aborted (core dumped)
+> 
+> Since this is an internal device only, mark it with user_creatable = false.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/unicore32/puv3.c | 1 -
->  1 file changed, 1 deletion(-)
+>  hw/cpu/cluster.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-> index 830fe3face..b42e600f74 100644
-> --- a/hw/unicore32/puv3.c
-> +++ b/hw/unicore32/puv3.c
-> @@ -15,7 +15,6 @@
->  #include "ui/console.h"
->  #include "hw/boards.h"
->  #include "hw/loader.h"
-> -#include "hw/i386/pc.h"
->  #include "sysemu/qtest.h"
+> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
+> index 25f9070..6f5f037 100644
+> --- a/hw/cpu/cluster.c
+> +++ b/hw/cpu/cluster.c
+> @@ -79,6 +79,9 @@ static void cpu_cluster_class_init(ObjectClass *klass, void *data)
 >  
->  #undef DEBUG_PUV3
+>      dc->props = cpu_cluster_properties;
+>      dc->realize = cpu_cluster_realize;
+> +
+> +    /* This is not directly for users, CPU children must be attached by code */
+> +    dc->user_creatable = false;
+>  }
+>  
+>  static const TypeInfo cpu_cluster_type_info = {
 > 
 
 Applied to my trivial-patches branch.
