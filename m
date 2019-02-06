@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44958)
+Received: from eggs.gnu.org ([209.51.188.92]:46751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1grOJq-0004w4-3B
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:36:55 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1grORg-0008Mh-PK
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:45:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1grOJp-0004bb-7g
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:36:54 -0500
-Date: Wed, 6 Feb 2019 15:36:39 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190206153639.61a5411c.cohuck@redhat.com>
-In-Reply-To: <20190202005610.24048-3-crosa@redhat.com>
-References: <20190202005610.24048-1-crosa@redhat.com>
-	<20190202005610.24048-3-crosa@redhat.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1grORf-0008Ag-6y
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:45:00 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:55952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1grORb-00089C-PN
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:44:57 -0500
+Date: Wed, 6 Feb 2019 16:44:42 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190206144441.GA4282@lap1>
+References: <20190131130850.6850-1-yuval.shaia@oracle.com>
+	<20190131130850.6850-6-yuval.shaia@oracle.com>
+	<609a6fc1-d612-ee85-b304-23ff1a6f1639@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/20] Acceptance tests: show avocado
- test execution by default
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <609a6fc1-d612-ee85-b304-23ff1a6f1639@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 05/10] hw/pvrdma: Add device statistics
+ counters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +30,315 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org, Stefan Markovic <smarkovic@wavecomp.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On Fri,  1 Feb 2019 19:55:52 -0500
-Cleber Rosa <crosa@redhat.com> wrote:
+On Wed, Feb 06, 2019 at 12:17:54PM +0200, Marcel Apfelbaum wrote:
+> 
+> 
+> On 1/31/19 3:08 PM, Yuval Shaia wrote:
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >   hw/rdma/rdma_backend.c    | 53 ++++++++++++++++++++++++++++-----------
+> >   hw/rdma/rdma_rm.c         |  6 +++++
+> >   hw/rdma/rdma_rm_defs.h    | 21 ++++++++++++++++
+> >   hw/rdma/vmw/pvrdma.h      |  5 ++++
+> >   hw/rdma/vmw/pvrdma_main.c |  3 +++
+> >   5 files changed, 74 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> > index bf8e889144..d43fb1e677 100644
+> > --- a/hw/rdma/rdma_backend.c
+> > +++ b/hw/rdma/rdma_backend.c
+> > @@ -97,6 +97,8 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+> >           rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+> >       }
+> > +    rdma_dev_res->stats.completions += total_ne;
+> > +
+> >       return total_ne;
+> >   }
+> > @@ -125,6 +127,9 @@ static void *comp_handler_thread(void *arg)
+> >       while (backend_dev->comp_thread.run) {
+> >           do {
+> >               rc = qemu_poll_ns(pfds, 1, THR_POLL_TO * (int64_t)SCALE_MS);
+> > +            if (!rc) {
+> > +                backend_dev->rdma_dev_res->stats.poll_cq_ppoll_to++;
+> > +            }
+> >           } while (!rc && backend_dev->comp_thread.run);
+> >           if (backend_dev->comp_thread.run) {
+> > @@ -141,6 +146,7 @@ static void *comp_handler_thread(void *arg)
+> >                                     errno);
+> >               }
+> > +            backend_dev->rdma_dev_res->stats.poll_cq_from_bk++;
+> >               rdma_poll_cq(backend_dev->rdma_dev_res, ev_cq);
+> >               ibv_ack_cq_events(ev_cq, 1);
+> > @@ -274,6 +280,7 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
+> >   int rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
+> >   {
+> > +    rdma_dev_res->stats.poll_cq_from_guest++;
+> >       return rdma_poll_cq(rdma_dev_res, cq->ibcq);
+> >   }
+> > @@ -336,7 +343,7 @@ static void ah_cache_init(void)
+> >   static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+> >                                   struct ibv_sge *dsge, struct ibv_sge *ssge,
+> > -                                uint8_t num_sge)
+> > +                                uint8_t num_sge, uint64_t *total_length)
+> >   {
+> >       RdmaRmMR *mr;
+> >       int ssge_idx;
+> > @@ -352,6 +359,8 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+> >           dsge->length = ssge[ssge_idx].length;
+> >           dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+> > +        *total_length += dsge->length;
+> > +
+> >           dsge++;
+> >       }
+> > @@ -448,8 +457,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+> >               rc = mad_send(backend_dev, sgid_idx, sgid, sge, num_sge);
+> >               if (rc) {
+> >                   complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
+> > +                backend_dev->rdma_dev_res->stats.mad_tx_err++;
+> >               } else {
+> >                   complete_work(IBV_WC_SUCCESS, 0, ctx);
+> > +                backend_dev->rdma_dev_res->stats.mad_tx++;
+> >               }
+> >           }
+> >           return;
+> > @@ -461,20 +472,21 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+> >       rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
+> >       if (unlikely(rc)) {
+> >           complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+> > -        goto out_free_bctx;
+> > +        goto err_free_bctx;
+> >       }
+> > -    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge);
+> > +    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
+> > +                              &backend_dev->rdma_dev_res->stats.tx_len);
+> >       if (rc) {
+> >           complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> > -        goto out_dealloc_cqe_ctx;
+> > +        goto err_dealloc_cqe_ctx;
+> >       }
+> >       if (qp_type == IBV_QPT_UD) {
+> >           wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd, sgid_idx, dgid);
+> >           if (!wr.wr.ud.ah) {
+> >               complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> > -            goto out_dealloc_cqe_ctx;
+> > +            goto err_dealloc_cqe_ctx;
+> >           }
+> >           wr.wr.ud.remote_qpn = dqpn;
+> >           wr.wr.ud.remote_qkey = dqkey;
+> > @@ -491,15 +503,18 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+> >           rdma_error_report("ibv_post_send fail, qpn=0x%x, rc=%d, errno=%d",
+> >                             qp->ibqp->qp_num, rc, errno);
+> >           complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> > -        goto out_dealloc_cqe_ctx;
+> > +        goto err_dealloc_cqe_ctx;
+> >       }
+> > +    backend_dev->rdma_dev_res->stats.tx++;
+> > +
+> >       return;
+> > -out_dealloc_cqe_ctx:
+> > +err_dealloc_cqe_ctx:
+> > +    backend_dev->rdma_dev_res->stats.tx_err++;
+> >       rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
+> > -out_free_bctx:
+> > +err_free_bctx:
+> >       g_free(bctx);
+> >   }
+> > @@ -557,6 +572,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+> >               rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
+> >               if (rc) {
+> >                   complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> > +                rdma_dev_res->stats.mad_rx_bufs_err++;
+> > +            } else {
+> > +                rdma_dev_res->stats.mad_rx_bufs++;
+> >               }
+> >           }
+> >           return;
+> > @@ -568,13 +586,14 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+> >       rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
+> >       if (unlikely(rc)) {
+> >           complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+> > -        goto out_free_bctx;
+> > +        goto err_free_bctx;
+> >       }
+> > -    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
+> > +    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
+> > +                              &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+> >       if (rc) {
+> >           complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> > -        goto out_dealloc_cqe_ctx;
+> > +        goto err_dealloc_cqe_ctx;
+> >       }
+> >       wr.num_sge = num_sge;
+> > @@ -585,15 +604,18 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+> >           rdma_error_report("ibv_post_recv fail, qpn=0x%x, rc=%d, errno=%d",
+> >                             qp->ibqp->qp_num, rc, errno);
+> >           complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> > -        goto out_dealloc_cqe_ctx;
+> > +        goto err_dealloc_cqe_ctx;
+> >       }
+> > +    rdma_dev_res->stats.rx_bufs++;
+> > +
+> >       return;
+> > -out_dealloc_cqe_ctx:
+> > +err_dealloc_cqe_ctx:
+> > +    backend_dev->rdma_dev_res->stats.rx_bufs_err++;
+> >       rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
+> > -out_free_bctx:
+> > +err_free_bctx:
+> >       g_free(bctx);
+> >   }
+> > @@ -932,12 +954,14 @@ static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
+> >       bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
+> >       if (unlikely(!bctx)) {
+> >           rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
+> > +        backend_dev->rdma_dev_res->stats.mad_rx_err++;
+> >           return;
+> >       }
+> >       mad = rdma_pci_dma_map(backend_dev->dev, bctx->sge.addr,
+> >                              bctx->sge.length);
+> >       if (!mad || bctx->sge.length < msg->umad_len + MAD_HDR_SIZE) {
+> > +        backend_dev->rdma_dev_res->stats.mad_rx_err++;
+> >           complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
+> >                         bctx->up_ctx);
+> >       } else {
+> > @@ -952,6 +976,7 @@ static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
+> >           wc.byte_len = msg->umad_len;
+> >           wc.status = IBV_WC_SUCCESS;
+> >           wc.wc_flags = IBV_WC_GRH;
+> > +        backend_dev->rdma_dev_res->stats.mad_rx++;
+> >           comp_handler(bctx->up_ctx, &wc);
+> >       }
+> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> > index 9408bfb751..ff536e356b 100644
+> > --- a/hw/rdma/rdma_rm.c
+> > +++ b/hw/rdma/rdma_rm.c
+> > @@ -37,6 +37,7 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+> >       tbl->bitmap = bitmap_new(tbl_sz);
+> >       tbl->tbl_sz = tbl_sz;
+> >       tbl->res_sz = res_sz;
+> > +    tbl->used = 0;
+> >       qemu_mutex_init(&tbl->lock);
+> >   }
+> > @@ -76,6 +77,8 @@ static inline void *rdma_res_tbl_alloc(RdmaRmResTbl *tbl, uint32_t *handle)
+> >       set_bit(*handle, tbl->bitmap);
+> > +    tbl->used++;
+> > +
+> >       qemu_mutex_unlock(&tbl->lock);
+> >       memset(tbl->tbl + *handle * tbl->res_sz, 0, tbl->res_sz);
+> > @@ -93,6 +96,7 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
+> >       if (handle < tbl->tbl_sz) {
+> >           clear_bit(handle, tbl->bitmap);
+> > +        tbl->used--;
+> >       }
+> >       qemu_mutex_unlock(&tbl->lock);
+> > @@ -621,6 +625,8 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
+> >       qemu_mutex_init(&dev_res->lock);
+> > +    memset(&dev_res->stats, 0, sizeof(dev_res->stats));
+> > +
+> >       return 0;
+> >   }
+> > diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> > index 9e98565a28..49b0a59785 100644
+> > --- a/hw/rdma/rdma_rm_defs.h
+> > +++ b/hw/rdma/rdma_rm_defs.h
+> > @@ -44,6 +44,7 @@ typedef struct RdmaRmResTbl {
+> >       size_t tbl_sz;
+> >       size_t res_sz;
+> >       void *tbl;
+> > +    uint32_t used; /* number of used entries in the table */
+> >   } RdmaRmResTbl;
+> >   typedef struct RdmaRmPD {
+> > @@ -100,6 +101,25 @@ typedef struct RdmaRmPort {
+> >       enum ibv_port_state state;
+> >   } RdmaRmPort;
+> > +typedef struct RdmaRmStats {
+> > +    uint64_t tx;
+> > +    uint64_t tx_len;
+> > +    uint64_t tx_err;
+> > +    uint64_t rx_bufs;
+> > +    uint64_t rx_bufs_len;
+> > +    uint64_t rx_bufs_err;
+> > +    uint64_t completions;
+> > +    uint64_t mad_tx;
+> > +    uint64_t mad_tx_err;
+> > +    uint64_t mad_rx;
+> > +    uint64_t mad_rx_err;
+> > +    uint64_t mad_rx_bufs;
+> > +    uint64_t mad_rx_bufs_err;
+> > +    uint64_t poll_cq_from_bk;
+> > +    uint64_t poll_cq_from_guest;
+> > +    uint64_t poll_cq_ppoll_to;
+> 
+> Maybe it worth adding the cqe polling misses ?
 
-> The current version of the "check-acceptance" target will only show
-> one line for execution of all tests.  That's probably OK if the tests
-> to be run are quick enough and they're always the same.
->=20
-> But, there's already one test alone that takes on average ~5 seconds
-> to run, we intend to adapt the list of tests to match the user's build
-> environment (among other choices).
+Yeah, great idea, this way i can get rid of patch #3 ("hw/rdma: Warn when
+too many consecutive poll CQ triggered on an empty CQ").
 
-Btw: What are our expectations regarding execution time for tests?
-Especially if we continue adding tests, and architecture-specific tests
-are bound to be slower if run on a foreign architecture via tcg.
+> 
+> Anyway
+> Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Would a make check-acceptance-quick command make sense? ("I only want
-to verify quickly that I didn't break too much, so run the quicker
-tests only, probably only for my host architecture")
+Will ignore this for now, please review v1 with your proposal.
 
->=20
-> Because of that, let's present the default Avocado UI by default.
-> Users can always choose a different output by setting the AVOCADO_SHOW
-> variable.
->=20
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  .travis.yml            | 2 +-
->  tests/Makefile.include | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> Thanks,
+> Marcel
+> 
+> 
+> > +} RdmaRmStats;
+> > +
+> >   typedef struct RdmaDeviceResources {
+> >       RdmaRmPort port;
+> >       RdmaRmResTbl pd_tbl;
+> > @@ -110,6 +130,7 @@ typedef struct RdmaDeviceResources {
+> >       RdmaRmResTbl cqe_ctx_tbl;
+> >       GHashTable *qp_hash; /* Keeps mapping between real and emulated */
+> >       QemuMutex lock;
+> > +    RdmaRmStats stats;
+> >   } RdmaDeviceResources;
+> >   #endif
+> > diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> > index 0879224957..167706ec2c 100644
+> > --- a/hw/rdma/vmw/pvrdma.h
+> > +++ b/hw/rdma/vmw/pvrdma.h
+> > @@ -70,6 +70,10 @@ typedef struct DSRInfo {
+> >       PvrdmaRing cq;
+> >   } DSRInfo;
+> > +typedef struct PVRDMADevStats {
+> > +    uint64_t commands;
+> > +} PVRDMADevStats;
+> > +
+> >   typedef struct PVRDMADev {
+> >       PCIDevice parent_obj;
+> >       MemoryRegion msix;
+> > @@ -89,6 +93,7 @@ typedef struct PVRDMADev {
+> >       CharBackend mad_chr;
+> >       VMXNET3State *func0;
+> >       Notifier shutdown_notifier;
+> > +    PVRDMADevStats stats;
+> >   } PVRDMADev;
+> >   #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
+> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> > index b6061f4b6e..cf82e78f08 100644
+> > --- a/hw/rdma/vmw/pvrdma_main.c
+> > +++ b/hw/rdma/vmw/pvrdma_main.c
+> > @@ -394,6 +394,7 @@ static void pvrdma_regs_write(void *opaque, hwaddr addr, uint64_t val,
+> >           if (val == 0) {
+> >               trace_pvrdma_regs_write(addr, val, "REQUEST", "");
+> >               pvrdma_exec_cmd(dev);
+> > +            dev->stats.commands++;
+> >           }
+> >           break;
+> >       default:
+> > @@ -612,6 +613,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+> >           goto out;
+> >       }
+> > +    memset(&dev->stats, 0, sizeof(dev->stats));
+> > +
+> >       dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
+> >       qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+> 
+> 
