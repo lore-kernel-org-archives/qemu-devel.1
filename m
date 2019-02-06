@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42684)
+Received: from eggs.gnu.org ([209.51.188.92]:42759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1grOC2-0001ad-42
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:28:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1grOC7-0001ej-W1
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:28:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1grOBy-0007Ej-LP
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:28:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1grOBx-00071w-LE
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:28:46 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x16EPuLm019538
-	for <qemu-devel@nongnu.org>; Wed, 6 Feb 2019 09:28:19 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qfxsmaa83-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 09:28:19 -0500
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 6 Feb 2019 14:28:16 -0000
-References: <1549456893-16589-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 6 Feb 2019 15:28:12 +0100
+	(envelope-from <eblake@redhat.com>) id 1grOC7-0007Nr-4f
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:28:55 -0500
+References: <1549448589-381285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1549448589-381285-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ebfe71e6-6425-282b-56c4-fb87a90e1910@redhat.com>
+Date: Wed, 6 Feb 2019 08:28:16 -0600
 MIME-Version: 1.0
-In-Reply-To: <1549456893-16589-1-git-send-email-thuth@redhat.com>
-Content-Language: en-US
-Message-Id: <332ccf49-9ae7-f35d-2bf1-6ced1315feb4@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x: Fix the confusing
- contributions-after-2012 license statements
+In-Reply-To: <1549448589-381285-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="yZR2FcJA6SAdhvRF6SSKOdkCfQdWfHEyW"
+Subject: Re: [Qemu-devel] [PATCH v13 3/3] qcow2: list of bitmaps new test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,176 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--yZR2FcJA6SAdhvRF6SSKOdkCfQdWfHEyW
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com,
+ berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <ebfe71e6-6425-282b-56c4-fb87a90e1910@redhat.com>
+Subject: Re: [PATCH v13 3/3] qcow2: list of bitmaps new test 242
+References: <1549448589-381285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1549448589-381285-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1549448589-381285-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2/6/19 4:23 AM, Andrey Shinkevich wrote:
+> A new test file 242 added to the qemu-iotests set. It checks
+> the format of qcow2 specific information for the new added
+> section that lists details of bitmaps.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+> +log('Unset the unknown bitmap flag \'{}\' in the bitmap directory entr=
+y:\n'
+> +    .format(hex(bitmap_flag_unknown)))
+> +img_info_log(disk)
+> diff --git a/tests/qemu-iotests/242.out b/tests/qemu-iotests/242.out
+
+That output results in:
+
+> new file mode 100644
+> index 0000000..cf2b310
+> --- /dev/null
+> +++ b/tests/qemu-iotests/242.out
+> @@ -0,0 +1,167 @@
+
+> +    refcount bits: 16
+> +    corrupt: false
+> +
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+
+an empty blank line at the end of the test, which scripts/checkpatch.pl
+complains about.  Easy fix, though, so no need to respin v14.
+
+> index 0f1c3f9..32acdd7 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -235,3 +235,4 @@
+>  235 auto quick
+>  236 auto quick
+>  238 auto quick
+> +242 rw auto quick
+>=20
+
+Tested-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
+--yZR2FcJA6SAdhvRF6SSKOdkCfQdWfHEyW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 06.02.2019 13:41, Thomas Huth wrote:
-> The license information in these files is rather confusing. The text
-> declares LGPL first, but then says that contributions after 2012 are
-> licensed under the GPL instead. How should the average user who just
-> downloaded the release tarball know which part is now GPL and which
-> is LGPL?
-> 
-> Looking at the text of the LGPL (see COPYING.LIB in the top directory),
-> the license clearly states how this should be done instead:
-> 
-> "3. You may opt to apply the terms of the ordinary GNU General Public
->  License instead of this License to a given copy of the Library. To do
->  this, you must alter all the notices that refer to this License, so
->  that they refer to the ordinary GNU General Public License, version 2,
->  instead of to this License."
-> 
-> Thus let's clean up the confusing statements and use the proper GPL
-> text only.
+-----BEGIN PGP SIGNATURE-----
 
-For the IBM-provided parts GPLv2+ is fine.
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxa7wAACgkQp6FrSiUn
+Q2pFLQgAkSAlwLEppIkaIK9GL0ZPR93yxtAuZjGacR1wFcSVeEWhjeMVQLo5g/ri
+layJoGM7iEk3HON8xlu5bTiey2IRPVI5CStfF2x1pTNElwT7G+K8SVI6hocJZlRs
+6CdzXcEOmfcXvnq317/x4I20lE3dNP4Cd92KzxtsSmqTf6Uw8AK1I9A3cNVc3XRi
+LorBDnKIBS2Ft1aO3ey2Grcva/eRG1AGlLlXnIlGoMyrlKKkCaNsMHvnTYxsk1ID
+e3x9F91J2unTw6RAD1yrMMbjafd7Z8XV4yC5uSNR7GXKPkox92GnshljDl9ovXQm
+mlPlM332/hA/3oV/aumOg0oAu7tIVw==
+=09iR
+-----END PGP SIGNATURE-----
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  linux-user/s390x/target_cpu.h | 19 ++++++++-----------
->  target/s390x/cpu.c            | 19 ++++++++-----------
->  target/s390x/cpu.h            | 19 ++++++++-----------
->  target/s390x/kvm.c            | 19 ++++++++-----------
->  4 files changed, 32 insertions(+), 44 deletions(-)
-> 
-> diff --git a/linux-user/s390x/target_cpu.h b/linux-user/s390x/target_cpu.h
-> index 66ef8aa..aa181ce 100644
-> --- a/linux-user/s390x/target_cpu.h
-> +++ b/linux-user/s390x/target_cpu.h
-> @@ -3,21 +3,18 @@
->   *
->   * Copyright (c) 2009 Ulrich Hecht
->   *
-> - * This library is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU Lesser General Public
-> - * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> + * General Public License for more details.
->   *
-> - * Contributions after 2012-10-29 are licensed under the terms of the
-> - * GNU GPL, version 2 or (at your option) any later version.
-> - *
-> - * You should have received a copy of the GNU (Lesser) General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  #ifndef S390X_TARGET_CPU_H
->  #define S390X_TARGET_CPU_H
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 18ba7f8..698dd9c 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -6,21 +6,18 @@
->   * Copyright (c) 2012 SUSE LINUX Products GmbH
->   * Copyright (c) 2012 IBM Corp.
->   *
-> - * This library is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU Lesser General Public
-> - * License as published by the Free Software Foundation; either
-> - * version 2.1 of the License, or (at your option) any later version.
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> + * General Public License for more details.
->   *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see
-> - * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> - * Contributions after 2012-12-11 are licensed under the terms of the
-> - * GNU GPL, version 2 or (at your option) any later version.
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #include "qemu/osdep.h"
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 47d2c2e..b71ac51 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -4,21 +4,18 @@
->   *  Copyright (c) 2009 Ulrich Hecht
->   *  Copyright IBM Corp. 2012, 2018
->   *
-> - * This library is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU Lesser General Public
-> - * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> + * General Public License for more details.
->   *
-> - * Contributions after 2012-10-29 are licensed under the terms of the
-> - * GNU GPL, version 2 or (at your option) any later version.
-> - *
-> - * You should have received a copy of the GNU (Lesser) General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #ifndef S390X_CPU_H
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 8613e19..9ff80c8 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -4,21 +4,18 @@
->   * Copyright (c) 2009 Alexander Graf <agraf@suse.de>
->   * Copyright IBM Corp. 2012
->   *
-> - * This library is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU Lesser General Public
-> - * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> + * General Public License for more details.
->   *
-> - * Contributions after 2012-10-29 are licensed under the terms of the
-> - * GNU GPL, version 2 or (at your option) any later version.
-> - *
-> - * You should have received a copy of the GNU (Lesser) General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #include "qemu/osdep.h"
-> 
+--yZR2FcJA6SAdhvRF6SSKOdkCfQdWfHEyW--
