@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44042)
+Received: from eggs.gnu.org ([209.51.188.92]:44136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grRdx-0008MF-Jz
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:09:54 -0500
+	(envelope-from <mst@redhat.com>) id 1grRe0-0008N6-4E
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:09:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grRdw-0005Yw-PC
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:09:53 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Feb 2019 18:09:21 +0000
-Message-ID: <aced9235-a3d7-e201-ce13-ff2094ac974f@virtuozzo.com>
-References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
-	<20190206165342.219192-3-vsementsov@virtuozzo.com>
-	<abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
-In-Reply-To: <abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FB5E6FAB1C88924FA7ECB704437E7E2B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1grRdy-0005cb-Fy
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:09:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grRdy-0005Qm-5P
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:09:54 -0500
+Date: Wed, 6 Feb 2019 13:01:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190206125535-mutt-send-email-mst@kernel.org>
+References: <20190109144736.17452-1-pagupta@redhat.com>
+	<20190204170515-mutt-send-email-mst@kernel.org>
+	<5b8a06a7-be44-698f-f319-6b2cbcf1eb8a@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b8a06a7-be44-698f-f319-6b2cbcf1eb8a@redhat.com>
+Subject: Re: [Qemu-devel] security implications of caching with virtio pmem
+ (was Re: [PATCH v3 0/5] kvm "virtio pmem" device)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +29,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, jack@suse.cz, kvm@vger.kernel.org, linux-nvdimm@ml01.01.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, adilger.kernel@dilger.ca, zwisler@kernel.org, eblake@redhat.com, Andrea Arcangeli <aarcange@redhat.com>, dave.jiang@intel.com, darrick.wong@oracle.com, vishal.l.verma@intel.com, willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, lcapitulino@redhat.com, linux-ext4@vger.kernel.org, tytso@mit.edu, xiaoguangrong.eric@gmail.com, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
 
-MDYuMDIuMjAxOSAyMDozMiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi82LzE5IDEwOjUzIEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gVXNlIG5ldyBxZW11X2lv
-dmVjX2luaXRfYnVmKCkgaW5zdGVhZCBvZg0KPj4gcWVtdV9pb3ZlY19pbml0X2V4dGVybmFsKCAu
-Li4gLCAxKSwgd2hpY2ggc2ltcGxpZmllcyB0aGUgY29kZS4NCj4gDQo+IERpZCB5b3UganVzdCBk
-byBhIG1hbnVhbCBzZWFyY2ggZm9yIGNhbmRpZGF0ZSBjYWxsZXJzPw0KPiANCj4gQXMgeW91IHNh
-aWQgaW4gdGhlIGNvdmVyIGxldHRlciwgdGhlcmUgYXJlIG90aGVyIGZpbGVzIHRoYXQgY2FuIGJl
-bmVmaXQNCj4gYXMgd2VsbDsgYXJlIHlvdSBwbGFubmluZyBvbiBtYWtpbmcgdjMgb2YgdGhlIHNl
-cmllcyBsb25nZXI/DQoNCmdpdCBncmVwIHFlbXVfaW92ZWNfaW5pdF9leHRlcm5hbCB8IGdyZXAg
-MQ0KDQpzaG93cyBhIGxvdCBvZiwgZXhhY3RseSAzNCBhZnRlciBpby5jIGFscmVhZHkgdXBkYXRl
-ZC4NClRoZXkgYXJlIGluIGRpZmZlcmVudCBzdWJzeXN0ZW1zLCBzbyBJIHRoaW5rIGl0IHNob3Vs
-ZCBiZSBzaW1wbGVyIHRvIHB1c2ggdGhpcw0Kb25lIGFzIGEgcHJlY2VkZW50IGFuZCBleGFtcGxl
-LCBhbmQgdGhlbiBzZW5kIHNlcGFyYXRlIHBhdGNoZXMgKG9yIHNlcmllcykNCnBlci1tYWludGFp
-bmVyLg0KDQpobSwgaW4gb3RoZXIgd29yZHM6DQojIGdpdCBncmVwIC1sICdxZW11X2lvdmVjX2lu
-aXRfZXh0ZXJuYWwuKjEnDQpibG9jay9iYWNrdXAuYw0KYmxvY2svYmxvY2stYmFja2VuZC5jDQpi
-bG9jay9jb21taXQuYw0KYmxvY2svcGFyYWxsZWxzLmMNCmJsb2NrL3Fjb3cuYw0KYmxvY2svcWNv
-dzIuYw0KYmxvY2svcWVkLXRhYmxlLmMNCmJsb2NrL3FlZC5jDQpibG9jay9zdHJlYW0uYw0KYmxv
-Y2svdm1kay5jDQpody9pZGUvYXRhcGkuYw0KaHcvaWRlL2NvcmUuYw0KaHcvc2NzaS9zY3NpLWRp
-c2suYw0KbWlncmF0aW9uL2Jsb2NrLmMNCnFlbXUtaW1nLmMNCnRlc3RzL3Rlc3QtYmRydi1kcmFp
-bi5jDQoNCg0KDQo+IA0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1P
-Z2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBibG9jay9p
-by5jIHwgOTAgKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCA2OSBkZWxldGlv
-bnMoLSkNCj4gDQo+IEJ1dCBJJ20gbG92aW5nIHRoZSBkaWZmc3RhdCAtIGl0IGlzIGRlZmluaXRl
-bHkgYSBuaWNlIGNoYW5nZS4NCj4gDQo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VA
-cmVkaGF0LmNvbT4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, Feb 06, 2019 at 03:00:26PM +0100, David Hildenbrand wrote:
+> On 04.02.19 23:56, Michael S. Tsirkin wrote:
+> > 
+> > On Wed, Jan 09, 2019 at 08:17:31PM +0530, Pankaj Gupta wrote:
+> >>  This patch series has implementation for "virtio pmem". 
+> >>  "virtio pmem" is fake persistent memory(nvdimm) in guest 
+> >>  which allows to bypass the guest page cache. This also
+> >>  implements a VIRTIO based asynchronous flush mechanism.  
+> > 
+> > 
+> > At Pankaj's request I looked at information leak implications of virtio
+> > pmem in light of the recent page cache side channels paper
+> > (https://arxiv.org/pdf/1901.01161.pdf) - to see what
+> > kind of side channels it might create if any.  TLDR - I think that
+> > depending on the host side implementation there could be some, but this
+> > might be addressable by better documentation in both code and spec.
+> > The fake dax approach backing the guest memory by a host page cache
+> > does seem to have potential issues.
+> > 
+> > For clarity: we are talking about leaking information either to a VM, or
+> > within a VM (I did not look into leaks to hypervisor in configurations
+> > such as SEV) through host page cache.
+> > 
+> > Leaks into a VM: It seems clear that while pmem allows memory accesses
+> > versus read/write with e.g. a block device, from host page cache point
+> > of view this doesn't matter much: reads populate cache in the same way
+> > as memory faults.  Thus ignoring presence of information leaks (which is
+> > an interesting question e.g. in light of recent discard support) pmem
+> > doesn't seem to be any better or worse for leaking information into a
+> > VM.
+> 
+> +1, just a different way to access that cache.
+> 
+> Conceptually a virtio-pmem devices is from the guest view a "device with
+> a managed buffer". Some accesses might be faster than others. There are
+> no guarantees on how fast a certain access is. And yes, actions on other
+> guests can result in accesses being slower but not faster.
+> 
+> Also other storage devices have caches like that (well, the caches size
+> depends on the device) - thinking especially about storage systems -
+> which would in my opinion, also allow similar leaks. How are such
+> security concerns handled there? Are they different (besides eventually
+> access speed)?
+> 
+> > 
+> > Leaks within VM: Right now pmem seems to bypass the guest page cache
+> > completely.  Whether pmem memory is then resident in a page cache would
+> > be up to the device/host. Assuming that it is, the "Preventing
+> > Efficient Eviction while Increasing the System Performance"
+> > countermeasure for the page cache side channel attack would appear to
+> > become ineffective with pmem. What is suggested is a per-process
+> > management of the page cache, and host does not have visibility of
+> > processes within a VM. Another possible countermeasure - not discussed
+> > in the paper - could be modify the applications to lock the security
+> > relevant pages in memory.  Again this becomes impractical with pmem as
+> > host does not have visibility into that. However note that as long
+> > as the only countermeasure linux uses is "Privileged Access"
+> > (i.e. blocking mincore) nothing can be done as guest page cache
+> > remains as vulnerable as host page cache.
+> 
+> This sounds very use-case specific. If I run a VM only with a very
+> specific workload (say, a container running one application), I usually
+> don't care about leaks within the VM. At least not leaks between
+> applications ;)
+> 
+> In contrast, to running different applications (e.g. containers from
+> different customers) on one system, I really care about leaks within a VM.
+
+Clearly, not everyone cares about closing off information leaks.
+
+> > 
+> > 
+> > Countermeasures: which host-side countermeasures can be designed would
+> > depend on which countermeasures are used guest-side - we would need to
+> > make sure they are not broken by pmem.  For "Preventing Efficient
+> > Eviction while Increasing the System Performance" modifying the host
+> > implementation to ensure that pmem device bypasses the host page cache
+> > would seem to address the security problem.Similarly, ensuring that a
+> > real memory device (e.g. DAX, RAM such as hugetlbfs, pmem for nested
+> > virt) is used for pmem would make the memory locking countermeasure
+> > work.  Whether with such limitations the device is still useful
+> > performance wise is an open question.  These questions probably should
+> > be addressed in the documentation, spec and possible qemu code.
+> > 
+> I also want to note that using a disk/file as memory backend with
+> NVDIMMs in QEMU essentially results in the exact same questions we have
+> with virtio-pmem.
+> 
+> E.g. kata-containers use nvdimms for the rootfile system (read-only) as
+> far as I am aware.
+> 
+> Conceptually, a virtio-pmem device is just an emulated nvdimm device
+> with a flush interface. And the nice thing is, that it is designed to
+> also work on architectures that don't speak "nvdimm".
+> 
+> > 
+> > Severity of the security implications: some people argue that the
+> > security implications of the page cache leaks are minor.  I do not have
+> > an opinion on this: the severity would seem to depend on the specific
+> > configuration.
+> 
+> I guess configuration and use case.
+
+Good point.
+
+> Nice summary, thanks for looking into this Michael!
+> 
+> 
+> -- 
+> 
+> Thanks,
+> 
+> David / dhildenb
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
