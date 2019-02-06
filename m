@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35415)
+Received: from eggs.gnu.org ([209.51.188.92]:43109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1grECA-0004Gh-Qj
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:48:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1grEw0-0001TS-91
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 23:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1grEC9-0000Dr-UW
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:48:18 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38726)
+	(envelope-from <richard.henderson@linaro.org>) id 1grEvz-0007UA-F5
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 23:35:40 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:34562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1grEC7-00009H-DD
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:48:17 -0500
-Received: by mail-wr1-x442.google.com with SMTP id v13so5972442wrw.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 19:48:14 -0800 (PST)
-References: <20190205151810.571-1-peter.maydell@linaro.org>
+	id 1grEvz-0007Jx-81
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 23:35:39 -0500
+Received: by mail-wm1-x334.google.com with SMTP id y185so825485wmd.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 20:35:27 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a64b5e02-2238-ef63-a5a6-88ecdef6ea62@linaro.org>
-Date: Wed, 6 Feb 2019 03:48:10 +0000
-MIME-Version: 1.0
-In-Reply-To: <20190205151810.571-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] accel/tcg: Consider cluster index in
- tb_lookup__cpu_state()
+Date: Wed,  6 Feb 2019 04:35:15 +0000
+Message-Id: <20190206043516.11462-2-richard.henderson@linaro.org>
+In-Reply-To: <20190206043516.11462-1-richard.henderson@linaro.org>
+References: <20190206043516.11462-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL 1/2] tcg: add early clober modifier in
+ atomic16_cmpxchg on aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Howard Spoelstra <hsp.cat7@gmail.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>, "Emilio G . Cota" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Catherine Ho <catherine.hecx@gmail.com>
 
-On 2/5/19 3:18 PM, Peter Maydell wrote:
-> In commit f7b78602fdc6c6e4be we added the CPU cluster number to the
-> cflags field of the TB hash; this included adding it to the value
-> kept in tb->cflags, since we pass that field directly into the hash
-> calculation in some places. Unfortunately we forgot to check whether
-> other parts of the code were doing comparisons against tb->cflags
-> that would need to be updated.
-> 
-> It turns out that there is exactly one such place: the
-> tb_lookup__cpu_state() function checks whether the TB it has
-> found in the tb_jmp_cache has a tb->cflags matching the cf_mask
-> that is passed in. The tb->cflags has the cluster_index in it
-> but the cf_mask does not.
-> 
-> Hoist the "add cluster index to the cf_mask" code up from
-> tb_htable_lookup() to tb_lookup__cpu_state() so it can be considered
-> in the "did this TB match in the jmp cache" condition, as well as
-> when we do the full hash lookup by physical PC, flags, etc.
-> (tb_htable_lookup() is only called from tb_lookup__cpu_state(),
-> so this change doesn't require any further knock-on changes.)
-> 
-> Fixes: f7b78602fdc6c6e4be ("accel/tcg: Add cluster number to TCG TB hash")
-> Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
-> Reported-by: Cleber Rosa <crosa@redhat.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+From: Catherine Ho <catherine.hecx@gmail.com>
 
-Queued, thanks.
+Without this patch, gcc might up the Input/Output registers and
+cause unpredictable error.
 
+Fixes: 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128")
 
-r~
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+Message-Id: <1548838794-23757-1-git-send-email-catherine.hecx@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/qemu/atomic128.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
+index a6af22ff10..ddd0d55d31 100644
+--- a/include/qemu/atomic128.h
++++ b/include/qemu/atomic128.h
+@@ -68,7 +68,7 @@ static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
+         "cbnz %w[tmp], 0b\n"
+         "1:"
+         : [mem] "+m"(*ptr), [tmp] "=&r"(tmp),
+-          [oldl] "=&r"(oldl), [oldh] "=r"(oldh)
++          [oldl] "=&r"(oldl), [oldh] "=&r"(oldh)
+         : [cmpl] "r"(cmpl), [cmph] "r"(cmph),
+           [newl] "r"(newl), [newh] "r"(newh)
+         : "memory", "cc");
+-- 
+2.17.2
