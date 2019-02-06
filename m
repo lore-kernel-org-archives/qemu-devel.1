@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44955)
+Received: from eggs.gnu.org ([209.51.188.92]:45422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grTjd-0005Bh-JD
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:23:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1grTlK-00063d-S8
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grTjW-0001A6-J7
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:23:49 -0500
-References: <20190206195551.28893-1-mreitz@redhat.com>
-	<20190206195551.28893-5-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f2beb54f-97f5-e38b-1edf-c59011841e68@redhat.com>
-Date: Wed, 6 Feb 2019 14:23:27 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1grTlJ-00028j-Hf
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:25:38 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1grTlJ-0001jS-5L
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:25:37 -0500
+Received: by mail-wr1-x444.google.com with SMTP id z15so7039931wrn.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 12:25:11 -0800 (PST)
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-10-philmd@redhat.com>
+	<CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
+	<e5dd8130-e041-7774-2141-cc506dee99f7@redhat.com>
+	<94f74717-0bab-ea0a-e7cc-239a1b1136bf@comstyle.com>
+	<97d5ea1c-0621-8f9c-0ee6-6a64540b4ddd@comstyle.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <97d5ea1c-0621-8f9c-0ee6-6a64540b4ddd@comstyle.com>
+Date: Wed, 06 Feb 2019 20:25:09 +0000
+Message-ID: <87zhr8mzq2.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190206195551.28893-5-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZBi7LrxGB397YQuFXk3ww5eCfBSpDz9An"
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] qapi: Formalize qcow2 encryption
- probing
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
+ from the ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZBi7LrxGB397YQuFXk3ww5eCfBSpDz9An
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f2beb54f-97f5-e38b-1edf-c59011841e68@redhat.com>
-Subject: Re: [PATCH v3 4/8] qapi: Formalize qcow2 encryption probing
-References: <20190206195551.28893-1-mreitz@redhat.com>
- <20190206195551.28893-5-mreitz@redhat.com>
-In-Reply-To: <20190206195551.28893-5-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/6/19 1:55 PM, Max Reitz wrote:
-> Currently, you can give no encryption format for a qcow2 file while
-> still passing a key-secret.  That does not conform to the schema, so
-> this patch changes the schema to allow it.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qapi/block-core.json | 31 ++++++++++++++++++++++++++++---
->  block/qcow2.c        |  3 +++
->  2 files changed, 31 insertions(+), 3 deletions(-)
->=20
-
-> @@ -2961,10 +2964,30 @@
->  # @BlockdevQcow2EncryptionFormat:
->  # @aes: AES-CBC with plain64 initialization venctors
-
-We should fix that typo.
-
->  #
-> +# @auto:            Determine the encryption format from the image
-> +#                   header.  This only allows the use of the
-> +#                   key-secret option.  (Since: 4.0)
-> +#
->  # Since: 2.10
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+To: Brad Smith <brad@comstyle.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Qemu-block <qemu-block@nongnu.org>, "Michael
+	S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
---ZBi7LrxGB397YQuFXk3ww5eCfBSpDz9An
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Brad Smith <brad@comstyle.com> writes:
 
------BEGIN PGP SIGNATURE-----
+> On 2/5/2019 8:57 AM, Brad Smith wrote:
+>
+>> If someone could point me in the right direction as to how the image
+>> is created
+>> I could look at coming up with something newer. I would prefer that
+>> over some
+>> of the workarounds I've seen to date.
+>
+> I started creating the image and then wondered what do I set the root
+> password
+> to? The instructions also talk about an SSH key but I don't know how
+> that would
+> work when this image is used for the VM test framework.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxbQj8ACgkQp6FrSiUn
-Q2qHjgf/WK0+bZ7BOFcxPlW/GgH3dUMNcEhnUmnW2rUiCHtAHa99jx3E2VlVg8RG
-48TD8bbZIMaQQ0uAc3A9KGV59LnThwCF3vCYl0Gm1mVVDVIdHKgvRZEZ/ByRsa6T
-tyf/VlfS5e4YYEZS9mPh9/05YNuiDqbRFCWanxn72hk4h/Hg+Awl2Eye0oceGRfQ
-jveWR9scAsg3fWcAgDgSC3x/aAKO0G7gKNf5UD0Jo+kuaRCt+bVqvkGHZ92VOXZu
-rwXxRi7n0QV+nMh7UGHRl3YMYMoPmPff0H2Zgw3Gya0c+C0jTxhVOVBT4VYA2fMA
-3Uua8f8cVFJgwSLgd33CckF9i+eDVQ==
-=jWCN
------END PGP SIGNATURE-----
+See tests/keys - basically we have a hard-wired testing key.
 
---ZBi7LrxGB397YQuFXk3ww5eCfBSpDz9An--
+> I updated the instructions on the Wiki to make use of VirtIO for both
+> the NIC and disk controller.
+
+Can the OpenBSD kernel use virtio-net-pci and virtio-scsi-pci?
+
+It's not super important for build testing but they are the most capable
+variants of virtio. The virtio-pci gives nice discover-able hotplug and
+I believe you need virtio-scsi-pci if you want to use funky options like
+discard for thin provisioning.
+
+--
+Alex Benn=C3=A9e
