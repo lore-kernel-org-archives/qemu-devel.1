@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50350)
+Received: from eggs.gnu.org ([209.51.188.92]:51805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grS19-0001EW-Vp
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:33:52 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grS6I-000547-Gj
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grS19-00025E-9S
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:33:51 -0500
-References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
-	<20190206165342.219192-3-vsementsov@virtuozzo.com>
-	<abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
-	<aced9235-a3d7-e201-ce13-ff2094ac974f@virtuozzo.com>
-	<608f7ff7-7b3c-939a-7bdb-852f63f4828e@redhat.com>
-	<6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <09e2ef0f-7bda-4ad1-c583-b25e5d75a738@redhat.com>
-Date: Wed, 6 Feb 2019 12:33:39 -0600
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grS6H-0005ZP-GZ
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:39:10 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:32928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1grS6H-0005GM-3H
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:39:09 -0500
+Received: by mail-wm1-x344.google.com with SMTP id h22so2497591wmb.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 10:38:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
+References: <f10356c5-c6db-8019-62e4-8ef41e607bf1@redhat.com>
+	<aa77e2fd-d6ac-52a5-0a00-f69c90c27ded@redhat.com>
+	<41572c06-75f0-6dab-c544-6e6713824f48@redhat.com>
+In-Reply-To: <41572c06-75f0-6dab-c544-6e6713824f48@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 6 Feb 2019 19:38:18 +0100
+Message-ID: <CAJ+F1CL12WZc=JAMdprozM9cTDBNESAbUG7MEigUSQkURBuowA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Segfaults in chardev due to races
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>,
- "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- "stefanha@redhat.com" <stefanha@redhat.com>
-Message-ID: <09e2ef0f-7bda-4ad1-c583-b25e5d75a738@redhat.com>
-Subject: Re: [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
-References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
- <20190206165342.219192-3-vsementsov@virtuozzo.com>
- <abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
- <aced9235-a3d7-e201-ce13-ff2094ac974f@virtuozzo.com>
- <608f7ff7-7b3c-939a-7bdb-852f63f4828e@redhat.com>
- <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
-In-Reply-To: <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 2/6/19 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
+On Wed, Jan 23, 2019 at 4:39 PM Max Reitz <mreitz@redhat.com> wrote:
+>
+> On 22.12.18 10:17, Paolo Bonzini wrote:
+> > On 21/12/18 23:31, Max Reitz wrote:
+> >> I suppose the issue is that QMP events are sent by one thread, and
+> >> client disconnects are handled by a different one.  So if a QMP event =
+is
+> >> sent while a client disconnects concurrently, races may occur; and the
+> >> only protection against concurrent access appears to be the
+> >> chr_write_lock, which I don't think is enough.
+> >
+> > I think disconnection (tcp_chr_disconnect) has to take the
+> > chr_write_lock too.
+>
+> That seems to fix the issue for me (can also be reproduced by running
+> iotest 169 in parallel), but how should this be implemented?  I suppose
+> tcp_chr_disconnect() can't really take the lock itself, because it's
+> called by tcp_chr_write() which is invoked with the lock held.
+>
+> Max
+>
 
->>> shows a lot of, exactly 34 after io.c already updated.
->>> They are in different subsystems, so I think it should be simpler to =
-push this
->>> one as a precedent and example, and then send separate patches (or se=
-ries)
->>> per-maintainer.
->>
->> Most are block related, so getting it in through the block maintainers=
+Is anybody fixing this? Paolo suggestion seems right in general, but
+not easy to implement correctly for all chardevs. (C isn't helping!)
 
->> is probably the easiest - but you ARE right that one patch per one or
->> two files or two is going to be smartest (otherwise, it gets too big).=
+I think this can be treated as a regression from commit
+8258292e18c39480b64eba9f3551ab772ce29b5d, OOB monitor is now enabled
+by default (on socket chardev).
 
->>
 
->> I'd group qed-table.c and qed.c; and the two hw/ide/ files; resulting =
-in
->> 14 more patches to go.
->>
->=20
-> So, you, think better is to make one common patch set? Ok, I'll do (hmm=
- or start doing)
-> it tomorrow as v3 if no other opinions.
-
-Yes, a v3 series of 16 patches for the entire conversion, and cc:
-qemu-block, should be sufficient.  Looking forward to seeing v3.
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxbKIMACgkQp6FrSiUn
-Q2qhxAf+Jc+bkXYkq5f+ql2MjjBumNRnFc8w9dMPiFWmFoPCjItlvXlV1WkMCjxd
-uK5CS0KZ8xOplJ8eLR4mHgqn8Kls2xiQw0PGFL2tNHQR4h8ALjqukz5OF8sp7GFu
-VD/Xbfi/rnKOViHOzafR+srmxrAuGNTBbh9DkUKfrGK7OzCmYObh4AePSt/NfSpH
-wUAQSrjJPLVmRKwQvCFEovS84TNR73eala1QQvciSz62PEIb3GqZLWsYQUTrF2Vq
-6+xD+34SwuOf8vRBoWUbmnW85nps0NMLcB+GCR/LovcGyejdoNvuKvMyfXbRwwVu
-DEPhR6PLpcrQdJUs28aa7emZpLBbBw==
-=lus5
------END PGP SIGNATURE-----
-
---vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c--
+Marc-Andr=C3=A9 Lureau
