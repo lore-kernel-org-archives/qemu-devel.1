@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49689)
+Received: from eggs.gnu.org ([209.51.188.92]:50350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1grRyP-0007RL-5i
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:31:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1grS19-0001EW-Vp
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:33:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1grRyH-0000HB-PO
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:31:01 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:45287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1grRyH-00005z-Ij
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:30:53 -0500
-Received: by mail-qt1-f193.google.com with SMTP id e5so8950531qtr.12
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 10:30:34 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1grS19-00025E-9S
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:33:51 -0500
+References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
+	<20190206165342.219192-3-vsementsov@virtuozzo.com>
+	<abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
+	<aced9235-a3d7-e201-ce13-ff2094ac974f@virtuozzo.com>
+	<608f7ff7-7b3c-939a-7bdb-852f63f4828e@redhat.com>
+	<6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <09e2ef0f-7bda-4ad1-c583-b25e5d75a738@redhat.com>
+Date: Wed, 6 Feb 2019 12:33:39 -0600
 MIME-Version: 1.0
-References: <20190206181725.14337-1-armbru@redhat.com>
-	<20190206181725.14337-16-armbru@redhat.com>
-In-Reply-To: <20190206181725.14337-16-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 6 Feb 2019 19:30:23 +0100
-Message-ID: <CAMxuvayWQawJ3we4bJF7npZgaUWqZvKAK3uik5EO7826DcrnYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/17] Revert "qapi-events: add 'if'
- condition to implicit event enum"
+In-Reply-To: <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
+Message-ID: <09e2ef0f-7bda-4ad1-c583-b25e5d75a738@redhat.com>
+Subject: Re: [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
+References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
+ <20190206165342.219192-3-vsementsov@virtuozzo.com>
+ <abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
+ <aced9235-a3d7-e201-ce13-ff2094ac974f@virtuozzo.com>
+ <608f7ff7-7b3c-939a-7bdb-852f63f4828e@redhat.com>
+ <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
+In-Reply-To: <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 6, 2019 at 7:17 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> This reverts commit 7bd263490590ee6fcf34ecb6203437e22f6e5a9c.
->
-> The commit applied the events' conditions to the members of enum
-> QAPIEvent.  Awkward, because it renders QAPIEvent unusable in
-> target-independent code as soon as we make an event target-dependent.
+On 2/6/19 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
 
-Well, my solution didn't have this problem iirc. You could mention
-that by having target-specific event enums, we could solve this.
-It might be worth a FIXME too.
+>>> shows a lot of, exactly 34 after io.c already updated.
+>>> They are in different subsystems, so I think it should be simpler to =
+push this
+>>> one as a precedent and example, and then send separate patches (or se=
+ries)
+>>> per-maintainer.
+>>
+>> Most are block related, so getting it in through the block maintainers=
 
-> Reverting this has the following effects:
->
-> * ui/vnc.c can remain target independent.
->
-> * monitor_qapi_event_conf[] doesn't have to muck around with #ifdef.
->
-> * query-events again doesn't reflect conditionals.  I'm going to
->   deprecate it in favor of query-qmp-schema.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> is probably the easiest - but you ARE right that one patch per one or
+>> two files or two is going to be smartest (otherwise, it gets too big).=
 
-But that's ok for now:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
 
-> ---
->  scripts/qapi/events.py | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-> index 28bbc3745d..2067660be4 100644
-> --- a/scripts/qapi/events.py
-> +++ b/scripts/qapi/events.py
-> @@ -193,7 +193,9 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdic=
-t);
->              self._genc.add(gen_event_send(name, arg_type, boxed,
->                                            self._event_enum_name,
->                                            self._event_emit_name))
-> -        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
-> +        # Note: we generate the enum member regardless of @ifcond, to
-> +        # keep the enumeration usable in target-independent code.
-> +        self._event_enum_members.append(QAPISchemaMember(name))
->
->
->  def gen_events(schema, output_dir, prefix):
-> --
-> 2.17.2
->
+>> I'd group qed-table.c and qed.c; and the two hw/ide/ files; resulting =
+in
+>> 14 more patches to go.
+>>
+>=20
+> So, you, think better is to make one common patch set? Ok, I'll do (hmm=
+ or start doing)
+> it tomorrow as v3 if no other opinions.
+
+Yes, a v3 series of 16 patches for the entire conversion, and cc:
+qemu-block, should be sufficient.  Looking forward to seeing v3.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxbKIMACgkQp6FrSiUn
+Q2qhxAf+Jc+bkXYkq5f+ql2MjjBumNRnFc8w9dMPiFWmFoPCjItlvXlV1WkMCjxd
+uK5CS0KZ8xOplJ8eLR4mHgqn8Kls2xiQw0PGFL2tNHQR4h8ALjqukz5OF8sp7GFu
+VD/Xbfi/rnKOViHOzafR+srmxrAuGNTBbh9DkUKfrGK7OzCmYObh4AePSt/NfSpH
+wUAQSrjJPLVmRKwQvCFEovS84TNR73eala1QQvciSz62PEIb3GqZLWsYQUTrF2Vq
+6+xD+34SwuOf8vRBoWUbmnW85nps0NMLcB+GCR/LovcGyejdoNvuKvMyfXbRwwVu
+DEPhR6PLpcrQdJUs28aa7emZpLBbBw==
+=lus5
+-----END PGP SIGNATURE-----
+
+--vW30fqJdEo9rq5mwDgDLKqUeVEoi79K7c--
