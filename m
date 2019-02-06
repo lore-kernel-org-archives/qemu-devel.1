@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48708)
+Received: from eggs.gnu.org ([209.51.188.92]:48951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grOaL-0004CR-3W
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:53:57 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grObD-0004qV-MV
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:54:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grOaK-00061Y-9y
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:53:56 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grObC-0006Ol-Jq
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:54:51 -0500
 References: <20190204210433.26088-1-philmd@redhat.com>
-	<20190204210433.26088-2-philmd@redhat.com>
+	<20190204210433.26088-3-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9b5cdbdd-4d54-88e5-ecad-2c08c89fcd5f@vivier.eu>
-Date: Wed, 6 Feb 2019 15:53:36 +0100
+Message-ID: <a131c869-cc90-eb4c-1a21-746cc9b29b33@vivier.eu>
+Date: Wed, 6 Feb 2019 15:54:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190204210433.26088-2-philmd@redhat.com>
+In-Reply-To: <20190204210433.26088-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/3] hw/sparc64/sun4u: Drop
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 2/3] hw/unicore32/puv3: Drop
  useless inclusion of "hw/i386/pc.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,21 +35,21 @@ On 04/02/2019 22:04, Philippe Mathieu-Daudé wrote:
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/sparc64/sun4u.c | 1 -
+>  hw/unicore32/puv3.c | 1 -
 >  1 file changed, 1 deletion(-)
 > 
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index f76b19e4e9..fdf3f14a29 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -33,7 +33,6 @@
->  #include "hw/pci/pci_bus.h"
->  #include "hw/pci/pci_host.h"
->  #include "hw/pci-host/sabre.h"
+> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+> index 830fe3face..b42e600f74 100644
+> --- a/hw/unicore32/puv3.c
+> +++ b/hw/unicore32/puv3.c
+> @@ -15,7 +15,6 @@
+>  #include "ui/console.h"
+>  #include "hw/boards.h"
+>  #include "hw/loader.h"
 > -#include "hw/i386/pc.h"
->  #include "hw/char/serial.h"
->  #include "hw/char/parallel.h"
->  #include "hw/timer/m48t59.h"
+>  #include "sysemu/qtest.h"
+>  
+>  #undef DEBUG_PUV3
 > 
 
 Applied to my trivial-patches branch.
