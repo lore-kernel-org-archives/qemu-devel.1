@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46240)
+Received: from eggs.gnu.org ([209.51.188.92]:46223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grRlh-0004od-Du
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:55 -0500
+	(envelope-from <armbru@redhat.com>) id 1grRlf-0004mY-QE
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grRlb-0001zH-VZ
+	(envelope-from <armbru@redhat.com>) id 1grRlb-0001zM-VQ
 	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46124)
+Received: from mx1.redhat.com ([209.132.183.28]:41360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grRlX-0001ry-Uy
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grRlY-0001qz-8l
 	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:46 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7CD7F3DBDB
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:17:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 47C1AC0860DC
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:17:33 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  6 Feb 2019 19:17:20 +0100
-Message-Id: <20190206181725.14337-13-armbru@redhat.com>
+Date: Wed,  6 Feb 2019 19:17:23 +0100
+Message-Id: <20190206181725.14337-16-armbru@redhat.com>
 In-Reply-To: <20190206181725.14337-1-armbru@redhat.com>
 References: <20190206181725.14337-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/17] qapi: make query-cpu-model-expansion
- depend on s390 or x86
+Subject: [Qemu-devel] [PATCH v3 15/17] Revert "qapi-events: add 'if'
+ condition to implicit event enum"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,315 +33,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This reverts commit 7bd263490590ee6fcf34ecb6203437e22f6e5a9c.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+The commit applied the events' conditions to the members of enum
+QAPIEvent.  Awkward, because it renders QAPIEvent unusable in
+target-independent code as soon as we make an event target-dependent.
+Reverting this has the following effects:
+
+* ui/vnc.c can remain target independent.
+
+* monitor_qapi_event_conf[] doesn't have to muck around with #ifdef.
+
+* query-events again doesn't reflect conditionals.  I'm going to
+  deprecate it in favor of query-qmp-schema.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/sysemu/arch_init.h             |  3 --
- monitor.c                              |  3 --
- qapi/misc.json                         | 51 -------------------------
- qapi/target.json                       | 52 ++++++++++++++++++++++++++
- qmp.c                                  |  7 ----
- stubs/Makefile.objs                    |  1 -
- stubs/arch-query-cpu-model-expansion.c | 13 -------
- target/i386/cpu.c                      |  5 ++-
- target/s390x/cpu_models.c              |  2 +-
- 9 files changed, 57 insertions(+), 80 deletions(-)
- delete mode 100644 stubs/arch-query-cpu-model-expansion.c
+ scripts/qapi/events.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index f0ef652b2a..2497fd3351 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -33,7 +33,4 @@ int kvm_available(void);
- int xen_available(void);
-=20
- CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
--CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
-ype type,
--                                                      CpuModelInfo *mode=
-,
--                                                      Error **errp);
- #endif
-diff --git a/monitor.c b/monitor.c
-index 377d3d4d8d..7a228ff6ea 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1145,9 +1145,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
-ect **ret_data,
-  */
- static void qmp_unregister_commands_hack(void)
- {
--#if !defined(TARGET_S390X) && !defined(TARGET_I386)
--    qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
--#endif
- #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
-) \
-     && !defined(TARGET_S390X)
-     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 9df45a27ca..1255201267 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2199,57 +2199,6 @@
-   'data': [ 'static', 'full' ] }
-=20
-=20
--##
--# @CpuModelExpansionInfo:
--#
--# The result of a cpu model expansion.
--#
--# @model: the expanded CpuModelInfo.
--#
--# Since: 2.8.0
--##
--{ 'struct': 'CpuModelExpansionInfo',
--  'data': { 'model': 'CpuModelInfo' } }
--
--
--##
--# @query-cpu-model-expansion:
--#
--# Expands a given CPU model (or a combination of CPU model + additional =
-options)
--# to different granularities, allowing tooling to get an understanding w=
-hat a
--# specific CPU model looks like in QEMU under a certain configuration.
--#
--# This interface can be used to query the "host" CPU model.
--#
--# The data returned by this command may be affected by:
--#
--# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine-type: CPU model  may look different depending on the machine=
--type.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine options (including accelerator): in some architectures, CPU =
-models
--#   may look different depending on machine and accelerator options. (Ex=
-cept for
--#   CPU models reported as "static" in query-cpu-definitions.)
--# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
--#   global properties may affect expansion of CPU models. Using
--#   query-cpu-model-expansion while using these is not advised.
--#
--# Some architectures may not support all expansion types. s390x supports
--# "full" and "static".
--#
--# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
--#          not supported, if the model cannot be expanded, if the model =
-contains
--#          an unknown CPU definition name, unknown properties or propert=
-ies
--#          with a wrong type. Also returns an error if an expansion type=
- is
--#          not supported.
--#
--# Since: 2.8.0
--##
--{ 'command': 'query-cpu-model-expansion',
--  'data': { 'type': 'CpuModelExpansionType',
--            'model': 'CpuModelInfo' },
--  'returns': 'CpuModelExpansionInfo' }
--
- ##
- # @CpuModelCompareResult:
- #
-diff --git a/qapi/target.json b/qapi/target.json
-index f4a7054921..35653648bb 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -373,3 +373,55 @@
- ##
- { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-   'if': 'defined(TARGET_ARM)' }
-+
-+##
-+# @CpuModelExpansionInfo:
-+#
-+# The result of a cpu model expansion.
-+#
-+# @model: the expanded CpuModelInfo.
-+#
-+# Since: 2.8.0
-+##
-+{ 'struct': 'CpuModelExpansionInfo',
-+  'data': { 'model': 'CpuModelInfo' },
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-+
-+##
-+# @query-cpu-model-expansion:
-+#
-+# Expands a given CPU model (or a combination of CPU model + additional =
-options)
-+# to different granularities, allowing tooling to get an understanding w=
-hat a
-+# specific CPU model looks like in QEMU under a certain configuration.
-+#
-+# This interface can be used to query the "host" CPU model.
-+#
-+# The data returned by this command may be affected by:
-+#
-+# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine-type: CPU model  may look different depending on the machine=
--type.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine options (including accelerator): in some architectures, CPU =
-models
-+#   may look different depending on machine and accelerator options. (Ex=
-cept for
-+#   CPU models reported as "static" in query-cpu-definitions.)
-+# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
-+#   global properties may affect expansion of CPU models. Using
-+#   query-cpu-model-expansion while using these is not advised.
-+#
-+# Some architectures may not support all expansion types. s390x supports
-+# "full" and "static".
-+#
-+# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
-+#          not supported, if the model cannot be expanded, if the model =
-contains
-+#          an unknown CPU definition name, unknown properties or propert=
-ies
-+#          with a wrong type. Also returns an error if an expansion type=
- is
-+#          not supported.
-+#
-+# Since: 2.8.0
-+##
-+{ 'command': 'query-cpu-model-expansion',
-+  'data': { 'type': 'CpuModelExpansionType',
-+            'model': 'CpuModelInfo' },
-+  'returns': 'CpuModelExpansionInfo',
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-diff --git a/qmp.c b/qmp.c
-index 8a613bf7c7..c81af9d23f 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -610,13 +610,6 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Err=
-or **errp)
-     return arch_query_cpu_definitions(errp);
- }
-=20
--CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
-pe type,
--                                                     CpuModelInfo *model=
-,
--                                                     Error **errp)
--{
--    return arch_query_cpu_model_expansion(type, model, errp);
--}
--
- void qmp_add_client(const char *protocol, const char *fdname,
-                     bool has_skipauth, bool skipauth, bool has_tls, bool=
- tls,
-                     Error **errp)
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 48eb080bfb..e28f443b7b 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,5 +1,4 @@
- stub-obj-y +=3D arch-query-cpu-def.o
--stub-obj-y +=3D arch-query-cpu-model-expansion.o
- stub-obj-y +=3D bdrv-next-monitor-owned.o
- stub-obj-y +=3D blk-commit-all.o
- stub-obj-y +=3D blockdev-close-all-bdrv-states.o
-diff --git a/stubs/arch-query-cpu-model-expansion.c b/stubs/arch-query-cp=
-u-model-expansion.c
-deleted file mode 100644
-index 26273a8b10..0000000000
---- a/stubs/arch-query-cpu-model-expansion.c
-+++ /dev/null
-@@ -1,13 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "sysemu/arch_init.h"
--#include "qapi/error.h"
--#include "qapi/qmp/qerror.h"
--
--CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
-ype type,
--                                                      CpuModelInfo *mode=
-,
--                                                      Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--    return NULL;
--}
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7483daef58..22c8533066 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -41,6 +41,7 @@
- #include "qapi/visitor.h"
- #include "qom/qom-qobject.h"
- #include "sysemu/arch_init.h"
-+#include "qapi/qapi-commands-target.h"
-=20
- #include "standard-headers/asm-x86/kvm_para.h"
-=20
-@@ -3921,6 +3922,7 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDef=
-inition *def, Error **errp)
-=20
- }
-=20
-+#ifndef CONFIG_USER_ONLY
- /* Return a QDict containing keys for all properties that can be include=
-d
-  * in static expansion of CPU models. All properties set by x86_cpu_load=
-_def()
-  * must be included in the dictionary.
-@@ -4068,7 +4070,7 @@ out:
- }
-=20
- CpuModelExpansionInfo *
--arch_query_cpu_model_expansion(CpuModelExpansionType type,
-+qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-                                                       CpuModelInfo *mode=
-l,
-                                                       Error **errp)
- {
-@@ -4123,6 +4125,7 @@ out:
-     }
-     return ret;
- }
-+#endif  /* !CONFIG_USER_ONLY */
-=20
- static gchar *x86_gdb_arch_name(CPUState *cs)
- {
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index b532cd8d10..cf87488bfc 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -567,7 +567,7 @@ static void cpu_info_from_model(CpuModelInfo *info, c=
-onst S390CPUModel *model,
-     }
- }
-=20
--CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
-ype type,
-+CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
-pe type,
-                                                       CpuModelInfo *mode=
-l,
-                                                       Error **errp)
- {
---=20
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 28bbc3745d..2067660be4 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -193,7 +193,9 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdict);
+             self._genc.add(gen_event_send(name, arg_type, boxed,
+                                           self._event_enum_name,
+                                           self._event_emit_name))
+-        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
++        # Note: we generate the enum member regardless of @ifcond, to
++        # keep the enumeration usable in target-independent code.
++        self._event_enum_members.append(QAPISchemaMember(name))
+ 
+ 
+ def gen_events(schema, output_dir, prefix):
+-- 
 2.17.2
