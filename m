@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52654)
+Received: from eggs.gnu.org ([209.51.188.92]:53949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grS9K-0006oy-M8
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:42:19 -0500
+	(envelope-from <armbru@redhat.com>) id 1grSG2-00009W-2U
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:49:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grS9I-0007Uq-Rd
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:42:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60060)
+	(envelope-from <armbru@redhat.com>) id 1grSG0-00036k-QE
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:49:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1grS9I-0007T2-IO
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:42:16 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grSG0-00036S-Kk
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:49:12 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A58B58592
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:42:14 +0000 (UTC)
-References: <20190206181725.14337-1-armbru@redhat.com>
-	<20190206181725.14337-17-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0e7c814c-5d82-e9c0-3d53-bcc576019b65@redhat.com>
-Date: Wed, 6 Feb 2019 12:42:05 -0600
+	by mx1.redhat.com (Postfix) with ESMTPS id C641E58E43
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:49:11 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190130120616.5260-1-quintela@redhat.com>
+	<20190130120616.5260-3-quintela@redhat.com>
+	<711166e7-e8de-9335-5a7f-63cf86a62524@redhat.com>
+	<875ztxf62a.fsf@trasno.org>
+Date: Wed, 06 Feb 2019 19:49:10 +0100
+In-Reply-To: <875ztxf62a.fsf@trasno.org> (Juan Quintela's message of "Wed, 06
+	Feb 2019 13:35:25 +0100")
+Message-ID: <87h8dgoiqh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190206181725.14337-17-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="zj91kA0CSqdPbqyH4HPbYWTSynT5tZcUH"
-Subject: Re: [Qemu-devel] [PATCH v3 16/17] qmp: Deprecate query-events in
- favor of query-qmp-schema
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 2/4] migration: Create socket-address
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,123 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, libvirt-list@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zj91kA0CSqdPbqyH4HPbYWTSynT5tZcUH
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, libvirt-list@redhat.com
-Message-ID: <0e7c814c-5d82-e9c0-3d53-bcc576019b65@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 16/17] qmp: Deprecate query-events in
- favor of query-qmp-schema
-References: <20190206181725.14337-1-armbru@redhat.com>
- <20190206181725.14337-17-armbru@redhat.com>
-In-Reply-To: <20190206181725.14337-17-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Juan Quintela <quintela@redhat.com> writes:
 
-Adding libvirt in cc
+> Eric Blake <eblake@redhat.com> wrote:
+>> On 1/30/19 6:06 AM, Juan Quintela wrote:
+>>> It will be used to store the uri parameters. We want this only for
+>>> tcp, so we don't set it for other uris.  We need it to know what port
+>>> is migration running.
+>>> 
+>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+[...]
+>>> @@ -199,6 +200,8 @@
+>>>  # @compression: migration compression statistics, only returned if compression
+>>>  #           feature is on and status is 'active' or 'completed' (Since 3.1)
+>>>  #
+>>> +# @socket-address: Only used for tcp, to know what the real port is (Since 3.1)
+>>> +#
+>>
+>> s/3.1/4.0/
+>
+> Done.
+>
+>>> +##
+>>> +# @DummyStruct:
+>>> +#
+>>> +# Both block-core and migration needs SocketAddressList
+>>> +# I am open to comments about how to share it
+>>> +#
+>>> +# @dummy-list: A dummy list
+>>> +#
+>>> +# Since: 3.1
+>>
+>> s/3.1/4.0/
+>> This matches how we force list types elsewhere for use in C code even
+>> when the type is not exposed through QMP. But do you still need to force
+>> the generation, given that ['SocketAddress'] used in MigrationInfo is
+>> visible through QMP?
+>
+> I think so but I am not an expert here.
 
-On 2/6/19 12:17 PM, Markus Armbruster wrote:
-> query-events doesn't reflect compile-time configuration.  Instead of
-> fixing that, deprecate the command in favor of query-qmp-schema.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  monitor.c            | 5 +++++
->  qapi/misc.json       | 7 +++++--
->  qemu-deprecated.texi | 5 +++++
->  3 files changed, 15 insertions(+), 2 deletions(-)
-
-Libvirt uses query-events; we'll need to patch libvirt to start relying
-on query-qmp-schema before this deprecation cycle can complete (although
-I'm in favor of making the change).
-
->=20
-> diff --git a/monitor.c b/monitor.c
-> index eeec289aae..9f27621ed1 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1099,6 +1099,11 @@ CommandInfoList *qmp_query_commands(Error **errp=
-)
-> =20
->  EventInfoList *qmp_query_events(Error **errp)
->  {
-> +    /*
-> +     * TODO This deprecated command is the only user of
-> +     * QAPIEvent_str() and QAPIEvent_lookup[].  When the command goes,=
-
-> +     * they should go, too.
-> +     */
->      EventInfoList *info, *ev_list =3D NULL;
->      QAPIEvent e;
-> =20
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 82f9147353..98f59f828a 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -318,12 +318,15 @@
->  ##
->  # @query-events:
->  #
-> -# Return a list of supported QMP events by this server
-> +# Return information on QMP events.
->  #
-> -# Returns: A list of @EventInfo for all supported events
-> +# Returns: A list of @EventInfo.
->  #
->  # Since: 1.2.0
->  #
-> +# Note: This command is deprecated, because its output doesn't reflect=
-
-> +# compile-time configuration.  Use query-qmp-schema instead.
-> +#
->  # Example:
->  #
->  # -> { "execute": "query-events" }
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 9cc20b365c..3288e102d6 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -103,6 +103,11 @@ Use ``device_add'' for hotplugging vCPUs instead o=
-f ``cpu-add''.  See
->  documentation of ``query-hotpluggable-cpus'' for additional
->  details.
-> =20
-> +@subsection query-events (since 4.0)
-> +
-> +The ``query-events'' command has been superseded by the more powerful
-> +and accurate ``query-qmp-schema'' command.
-> +
->  @section Human Monitor Protocol (HMP) commands
-> =20
->  @subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (=
-since 3.1)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---zj91kA0CSqdPbqyH4HPbYWTSynT5tZcUH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxbKn0ACgkQp6FrSiUn
-Q2qdsAf/YY5+BiD0WUyz1/MesCOfEWBoar698+RiXro16zZQ0sa8tx2JLmwQ7QWb
-1P9eTV7GF4sB6i+4dcNJc8Rj8miYyqqZXFF9bu1uS6239XjFGDVZ0LTBpRvlP+bX
-hprtfLrzI/t50ltU509bhLu6ym5eNug9S+DdX1m8yUSlgiEEgGy/qATQqLGPhO+6
-Yro0smHyWsewMqpErLwnXr9mSQ7RY1oS4zlR8jsC4PiP/S3xJngSLFrOWM3XfsMU
-3Y7CA2uY3GQC9aAklBSLOyRcEUhlUTDvmiKSKaPM7vJSb2mOjWMHT9A5DpTk9s0R
-DoywSihFG6ZxgZcggO+wNLyZbK4Ltg==
-=K/21
------END PGP SIGNATURE-----
-
---zj91kA0CSqdPbqyH4HPbYWTSynT5tZcUH--
+If the list type is visible in QMP, we shouldn't add this hack to force
+it.  Easy to find out: drop DummyStruct, and if it still compiles, the
+forcing needs to go.
