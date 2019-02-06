@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36667)
+Received: from eggs.gnu.org ([209.51.188.92]:37682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1grKMQ-0001YN-3D
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:24 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1grKOs-0003kG-92
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1grKMN-0002qw-C3
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:23:18 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1grKOr-0006lw-7U
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:25:50 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed,  6 Feb 2019 13:23:09 +0300
-Message-Id: <1549448589-381285-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1549448589-381285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1549448589-381285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v13 3/3] qcow2: list of bitmaps new test 242
+Date: Wed, 6 Feb 2019 10:25:19 +0000
+Message-ID: <1ff257a6-282e-5fe9-8039-067e7e6e5360@virtuozzo.com>
+References: <1549397675-189741-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1549397675-189741-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<ce1a623e-8844-72d5-e4a7-ca8cb9354c86@redhat.com>
+In-Reply-To: <ce1a623e-8844-72d5-e4a7-ca8cb9354c86@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5F383E1013674441BC831C1D7AC348E9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v12 2/3] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,310 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-A new test file 242 added to the qemu-iotests set. It checks
-the format of qcow2 specific information for the new added
-section that lists details of bitmaps.
-
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/242     |  99 +++++++++++++++++++++++++++
- tests/qemu-iotests/242.out | 167 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 267 insertions(+)
- create mode 100755 tests/qemu-iotests/242
- create mode 100644 tests/qemu-iotests/242.out
-
-diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
-new file mode 100755
-index 0000000..fbd1b35
---- /dev/null
-+++ b/tests/qemu-iotests/242
-@@ -0,0 +1,99 @@
-+#!/usr/bin/env python
-+#
-+# Test for qcow2 bitmap printed information
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+import json
-+from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
-+    file_path, img_info_log, log, filter_qemu_io
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+
-+disk = file_path('disk')
-+chunk = 256*1024
-+bitmap_flag_unknown = 1 << 2
-+flag_offset = 0x10002f
-+
-+
-+def print_bitmap(extra_args):
-+    log('qemu-img info dump:\n')
-+    img_info_log(disk, extra_args=extra_args)
-+    result = json.loads(qemu_img_pipe('info', '--force-share',
-+                                      '--output=json', disk))
-+    if 'bitmaps' in result['format-specific']['data']:
-+        bitmaps = result['format-specific']['data']['bitmaps']
-+        log('The same bitmaps in JSON format:')
-+        log(bitmaps, indent=2)
-+    else:
-+        log('No bitmap in JSON format output')
-+
-+
-+def add_bitmap(bitmap_number, persistent, disabled):
-+    granularity = 2**(13 + bitmap_number)
-+    bitmap_name = 'bitmap-' + str(bitmap_number-1)
-+    vm = iotests.VM().add_drive(disk)
-+    vm.launch()
-+    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name=bitmap_name,
-+               granularity=granularity, persistent=persistent,
-+               disabled=disabled)
-+    vm.shutdown()
-+
-+
-+def write_to_disk(offset, size):
-+    write = 'write {} {}'.format(offset, size)
-+    log(qemu_io('-c', write, disk), filters=[filter_qemu_io])
-+
-+
-+def toggle_flag(offset):
-+    with open(disk, "r+b") as f:
-+        f.seek(offset, 0)
-+        c = f.read(1)
-+        toggled = chr(ord(c) ^ bitmap_flag_unknown)
-+        f.seek(-1, 1)
-+        f.write(toggled)
-+
-+
-+qemu_img_create('-f', iotests.imgfmt, disk, '1M')
-+
-+for num in range(1, 4):
-+    disabled = False
-+    if num == 2:
-+        disabled = True
-+    log('Test {}'.format(num))
-+    add_bitmap(num, num > 1, disabled)
-+    write_to_disk((num-1) * chunk, chunk)
-+    print_bitmap([])
-+    log('')
-+
-+vm = iotests.VM().add_drive(disk)
-+vm.launch()
-+num += 1
-+log('Test {}\nChecking "in-use" flag...'.format(num))
-+print_bitmap(['--force-share'])
-+vm.shutdown()
-+
-+num += 1
-+log('\nTest {}\nWrite bitmap flag \'{}\' into the QCOW2 image at offset {}'
-+    .format(num, hex(bitmap_flag_unknown), flag_offset))
-+toggle_flag(flag_offset)
-+img_info_log(disk)
-+toggle_flag(flag_offset)
-+log('Unset the unknown bitmap flag \'{}\' in the bitmap directory entry:\n'
-+    .format(hex(bitmap_flag_unknown)))
-+img_info_log(disk)
-diff --git a/tests/qemu-iotests/242.out b/tests/qemu-iotests/242.out
-new file mode 100644
-index 0000000..cf2b310
---- /dev/null
-+++ b/tests/qemu-iotests/242.out
-@@ -0,0 +1,167 @@
-+Test 1
-+{"execute": "block-dirty-bitmap-add", "arguments": {"disabled": false, "granularity": 16384, "name": "bitmap-0", "node": "drive0", "persistent": false}}
-+{"return": {}}
-+wrote 262144/262144 bytes at offset 0
-+256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+qemu-img info dump:
-+
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 1.0M (1048576 bytes)
-+cluster_size: 65536
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    corrupt: false
-+
-+No bitmap in JSON format output
-+
-+Test 2
-+{"execute": "block-dirty-bitmap-add", "arguments": {"disabled": true, "granularity": 32768, "name": "bitmap-1", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+wrote 262144/262144 bytes at offset 262144
-+256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+qemu-img info dump:
-+
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 1.0M (1048576 bytes)
-+cluster_size: 65536
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    bitmaps:
-+        [0]:
-+            flags:
-+            name: bitmap-1
-+            granularity: 32768
-+    refcount bits: 16
-+    corrupt: false
-+
-+The same bitmaps in JSON format:
-+[
-+  {
-+    "flags": [],
-+    "granularity": 32768,
-+    "name": "bitmap-1"
-+  }
-+]
-+
-+Test 3
-+{"execute": "block-dirty-bitmap-add", "arguments": {"disabled": false, "granularity": 65536, "name": "bitmap-2", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+wrote 262144/262144 bytes at offset 524288
-+256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+qemu-img info dump:
-+
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 1.0M (1048576 bytes)
-+cluster_size: 65536
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    bitmaps:
-+        [0]:
-+            flags:
-+            name: bitmap-1
-+            granularity: 32768
-+        [1]:
-+            flags:
-+                [0]: auto
-+            name: bitmap-2
-+            granularity: 65536
-+    refcount bits: 16
-+    corrupt: false
-+
-+The same bitmaps in JSON format:
-+[
-+  {
-+    "flags": [],
-+    "granularity": 32768,
-+    "name": "bitmap-1"
-+  },
-+  {
-+    "flags": [
-+      "auto"
-+    ],
-+    "granularity": 65536,
-+    "name": "bitmap-2"
-+  }
-+]
-+
-+Test 4
-+Checking "in-use" flag...
-+qemu-img info dump:
-+
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 1.0M (1048576 bytes)
-+cluster_size: 65536
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    bitmaps:
-+        [0]:
-+            flags:
-+                [0]: in-use
-+            name: bitmap-1
-+            granularity: 32768
-+        [1]:
-+            flags:
-+                [0]: in-use
-+                [1]: auto
-+            name: bitmap-2
-+            granularity: 65536
-+    refcount bits: 16
-+    corrupt: false
-+
-+The same bitmaps in JSON format:
-+[
-+  {
-+    "flags": [
-+      "in-use"
-+    ],
-+    "granularity": 32768,
-+    "name": "bitmap-1"
-+  },
-+  {
-+    "flags": [
-+      "in-use",
-+      "auto"
-+    ],
-+    "granularity": 65536,
-+    "name": "bitmap-2"
-+  }
-+]
-+
-+Test 5
-+Write bitmap flag '0x4' into the QCOW2 image at offset 1048623
-+qemu-img: Could not open 'TEST_IMG': Bitmap 'bitmap-2' doesn't satisfy the constraints
-+
-+Unset the unknown bitmap flag '0x4' in the bitmap directory entry:
-+
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 1.0M (1048576 bytes)
-+cluster_size: 65536
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    bitmaps:
-+        [0]:
-+            flags:
-+            name: bitmap-1
-+            granularity: 32768
-+        [1]:
-+            flags:
-+                [0]: auto
-+            name: bitmap-2
-+            granularity: 65536
-+    refcount bits: 16
-+    corrupt: false
-+
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 0f1c3f9..32acdd7 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -235,3 +235,4 @@
- 235 auto quick
- 236 auto quick
- 238 auto quick
-+242 rw auto quick
--- 
-1.8.3.1
+DQoNCk9uIDA1LzAyLzIwMTkgMjM6MzMsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDIvNS8xOSAy
+OjE0IFBNLCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+IEluIHRoZSAnRm9ybWF0IHNwZWNp
+ZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1pbWcgaW5mbycNCj4+IGNvbW1h
+bmQgb3V0cHV0LCB0aGUgc3VwcGxlbWVudGFsIGluZm9ybWF0aW9uIGFib3V0IGV4aXN0aW5nIFFD
+T1cyDQo+PiBiaXRtYXBzIHdpbGwgYmUgc2hvd24sIHN1Y2ggYXMgYSBiaXRtYXAgbmFtZSwgZmxh
+Z3MgYW5kIGdyYW51bGFyaXR5Og0KPj4NCj4gDQo+PiArIyMNCj4+ICsjIEBRY293MkJpdG1hcElu
+Zm86DQo+PiArIw0KPj4gKyMgUWNvdzIgYml0bWFwIGluZm9ybWF0aW9uLg0KPj4gKyMNCj4+ICsj
+IEBuYW1lOiB0aGUgbmFtZSBvZiB0aGUgYml0bWFwDQo+PiArIw0KPj4gKyMgQGdyYW51bGFyaXR5
+OiBncmFudWxhcml0eSBvZiB0aGUgYml0bWFwIGluIGJ5dGVzDQo+PiArIw0KPj4gKyMgQGZsYWdz
+OiBmbGFncyBvZiB0aGUgYml0bWFwDQo+PiArIw0KPj4gKyMgU2luY2U6IDQuMA0KPiANCj4gWW91
+IGdvdCByaWQgb2YgdGhlIGRvY3MgZm9yIHVua25vd24tZmxhZ3MsDQo+IA0KPj4gKyMjDQo+PiAr
+eyAnc3RydWN0JzogJ1Fjb3cyQml0bWFwSW5mbycsDQo+PiArICAnZGF0YSc6IHsnbmFtZSc6ICdz
+dHInLCAnZ3JhbnVsYXJpdHknOiAndWludDMyJywNCj4+ICsgICAgICAgICAgICdmbGFncyc6IFsn
+UWNvdzJCaXRtYXBJbmZvRmxhZ3MnXSwNCj4+ICsgICAgICAgICAgICcqdW5rbm93bi1mbGFncyc6
+ICd1aW50MzInIH0gfQ0KPiANCj4gYnV0IGZvcmdvdCB0byBhY3R1YWxseSBnZXQgcmlkIG9mIHRo
+ZSBmaWVsZC4gVGhhdCdzIGEgcHJldHR5IHNpbXBsZQ0KPiBjbGVhbnVwLCB3aGljaCBJIGRvbid0
+IG1pbmQgbWFraW5nIGlmIHRoaXMgc2VyaWVzIGlzIG90aGVyd2lzZSByZWFkeSB0byBnby4NCj4g
+DQo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4gDQoNCkRl
+YXIgRXJpYywNCg0KVGhhbmsgeW91IGZvciBiZWluZyBtaW5kZnVsIG9mIHRoaXMgc2VyaWVzIGFu
+ZCBmb3IgeW91cg0KY29udHJpYnV0aW9uIHRvIHRoZSBjb21tb24gd29yayENCi0tIA0KV2l0aCB0
+aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gNCg==
