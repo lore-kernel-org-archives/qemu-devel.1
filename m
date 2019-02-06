@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39176)
+Received: from eggs.gnu.org ([209.51.188.92]:39260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ3n-00079E-Km
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ3n-0007BY-J2
 	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ05-00045R-II
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:11 -0500
-Received: from mga06.intel.com ([134.134.136.31]:15968)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ0m-0004J9-Gu
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:54 -0500
+Received: from mga04.intel.com ([192.55.52.120]:63226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1grJ03-00044Q-Jg
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:09 -0500
+	id 1grJ0k-000481-Bs
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:50 -0500
 From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Thu,  7 Feb 2019 01:26:49 +0800
-Message-Id: <8d5b28ca0350dfb6a0313f06c6ceb0f15201c8d7.1549473586.git.yi.z.zhang@linux.intel.com>
+Date: Thu,  7 Feb 2019 01:27:01 +0800
+Message-Id: <f6bd986c4b3205f8fe3610dc3680766c3ad624f0.1549473586.git.yi.z.zhang@linux.intel.com>
 In-Reply-To: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
 References: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V12 1/5] util/mmap-alloc: Add a 'is_pmem'
- parameter to qemu_ram_mmap
+Subject: [Qemu-devel] [PATCH V12 2/5] scripts/update-linux-headers: add
+ linux/mman.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +30,42 @@ Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang 
 
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-besides the existing 'shared' flags, we are going to add
-'is_pmem' to qemu_ram_mmap(), which indicated the memory backend
-file is a persist memory.
+Add linux/mman.h,asm/mman.h,asm/mman-common.h to linux-headers,
+So we can use more mmap2 flags.
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 ---
- exec.c                    |  2 +-
- include/qemu/mmap-alloc.h | 21 ++++++++++++++++++++-
- util/mmap-alloc.c         |  6 +++++-
- util/oslib-posix.c        |  2 +-
- 4 files changed, 27 insertions(+), 4 deletions(-)
+ scripts/update-linux-headers.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index bb6170d..27cea52 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1860,7 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 0a964fe..57db5d9 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -95,7 +95,7 @@ for arch in $ARCHLIST; do
  
-     area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         block->flags & RAM_SHARED);
-+                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index 50385e3..190688a 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -7,7 +7,26 @@ size_t qemu_fd_getpagesize(int fd);
+     rm -rf "$output/linux-headers/asm-$arch"
+     mkdir -p "$output/linux-headers/asm-$arch"
+-    for header in kvm.h unistd.h bitsperlong.h; do
++    for header in kvm.h unistd.h bitsperlong.h mman.h; do
+         cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+     done
  
- size_t qemu_mempath_getpagesize(const char *mem_path);
+@@ -126,13 +126,13 @@ done
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+ for header in kvm.h vfio.h vfio_ccw.h vhost.h \
+-              psci.h psp-sev.h userfaultfd.h; do
++              psci.h psp-sev.h userfaultfd.h mman.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
  
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
-+/**
-+ * qemu_ram_mmap: mmap the specified file or device.
-+ *
-+ * Parameters:
-+ *  @fd: the file or the device to mmap
-+ *  @size: the number of bytes to be mmaped
-+ *  @align: if not zero, specify the alignment of the starting mapping address;
-+ *          otherwise, the alignment in use will be determined by QEMU.
-+ *  @shared: map has RAM_SHARED flag.
-+ *  @is_pmem: map has RAM_PMEM flag.
-+ *
-+ * Return:
-+ *  On success, return a pointer to the mapped area.
-+ *  On failure, return MAP_FAILED.
-+ */
-+void *qemu_ram_mmap(int fd,
-+                    size_t size,
-+                    size_t align,
-+                    bool shared,
-+                    bool is_pmem);
+ rm -rf "$output/linux-headers/asm-generic"
+ mkdir -p "$output/linux-headers/asm-generic"
+-for header in unistd.h bitsperlong.h; do
++for header in unistd.h bitsperlong.h mman-common.h mman.h hugetlb_encode.h; do
+     cp "$tmpdir/include/asm-generic/$header" "$output/linux-headers/asm-generic"
+ done
  
- void qemu_ram_munmap(void *ptr, size_t size);
- 
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index fd329ec..97bbeed 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -75,7 +75,11 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-     return getpagesize();
- }
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-+void *qemu_ram_mmap(int fd,
-+                    size_t size,
-+                    size_t align,
-+                    bool shared,
-+                    bool is_pmem)
- {
-     /*
-      * Note: this always allocates at least one extra page of virtual address
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index fbd0dc8..040937f 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -203,7 +203,7 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared);
-+    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
- 
-     if (ptr == MAP_FAILED) {
-         return NULL;
 -- 
 2.7.4
