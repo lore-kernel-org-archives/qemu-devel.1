@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58382)
+Received: from eggs.gnu.org ([209.51.188.92]:58404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1grDle-0005Gp-Oz
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:20:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1grDlf-0005Hd-Lf
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:20:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1grDlc-0003zK-GS
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:20:54 -0500
-Date: Wed, 6 Feb 2019 13:42:51 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1grDlc-0003zo-P2
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 22:20:55 -0500
+Date: Wed, 6 Feb 2019 13:39:40 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190206024250.GV22661@umbus.fritz.box>
+Message-ID: <20190206023940.GU22661@umbus.fritz.box>
 References: <20190107183946.7230-1-clg@kaod.org>
-	<20190107183946.7230-4-clg@kaod.org>
+	<20190107183946.7230-3-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FZIkiClxIZ9JeWSb"
+	protocol="application/pgp-signature"; boundary="4WCFFtl4AQpQKunj"
 Content-Disposition: inline
-In-Reply-To: <20190107183946.7230-4-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 03/13] spapr/xive: add state
- synchronization with KVM
+In-Reply-To: <20190107183946.7230-3-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 02/13] spapr/xive: add KVM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,425 +28,629 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---FZIkiClxIZ9JeWSb
+--4WCFFtl4AQpQKunj
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 07, 2019 at 07:39:36PM +0100, C=E9dric Le Goater wrote:
-> This extends the KVM XIVE device backend with 'synchronize_state'
-> methods used to retrieve the state from KVM. The HW state of the
-> sources, the KVM device and the thread interrupt contexts are
-> collected for the monitor usage and also migration.
+On Mon, Jan 07, 2019 at 07:39:35PM +0100, C=E9dric Le Goater wrote:
+> This introduces a set of helpers when KVM is in use, which create the
+> KVM XIVE device, initialize the interrupt sources at a KVM level and
+> connect the interrupt presenters to the vCPU.
 >=20
-> These get operations rely on their KVM counterpart in the host kernel
-> which acts as a proxy for OPAL, the host firmware. The set operations
-> will be added for migration support later.
+> They also handle the initialization of the TIMA and the source ESB
+> memory regions of the controller. These have a different type under
+> KVM. They are 'ram device' memory mappings, similarly to VFIO, exposed
+> to the guest and the associated VMAs on the host are populated
+> dynamically with the appropriate pages using a fault handler.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Looks fine apart from the details of how the KVM interface works.
 
 > ---
->  include/hw/ppc/spapr_xive.h |   9 ++
->  include/hw/ppc/xive.h       |   1 +
->  hw/intc/spapr_xive.c        |  24 ++--
->  hw/intc/spapr_xive_kvm.c    | 223 ++++++++++++++++++++++++++++++++++++
->  hw/intc/xive.c              |  10 ++
->  5 files changed, 260 insertions(+), 7 deletions(-)
+>  default-configs/ppc64-softmmu.mak |   1 +
+>  include/hw/ppc/spapr_xive.h       |  10 ++
+>  include/hw/ppc/xive.h             |  22 +++
+>  target/ppc/kvm_ppc.h              |   6 +
+>  hw/intc/spapr_xive.c              |  31 ++--
+>  hw/intc/spapr_xive_kvm.c          | 254 ++++++++++++++++++++++++++++++
+>  hw/intc/xive.c                    |  22 ++-
+>  hw/ppc/spapr_irq.c                |  11 +-
+>  target/ppc/kvm.c                  |   7 +
+>  hw/intc/Makefile.objs             |   1 +
+>  10 files changed, 349 insertions(+), 16 deletions(-)
+>  create mode 100644 hw/intc/spapr_xive_kvm.c
 >=20
+> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
+ftmmu.mak
+> index 7f34ad0528ed..c1bf5cd951f5 100644
+> --- a/default-configs/ppc64-softmmu.mak
+> +++ b/default-configs/ppc64-softmmu.mak
+> @@ -18,6 +18,7 @@ CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
+>  CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+>  CONFIG_XIVE=3D$(CONFIG_PSERIES)
+>  CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
+> +CONFIG_XIVE_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+>  CONFIG_MEM_DEVICE=3Dy
+>  CONFIG_DIMM=3Dy
+>  CONFIG_SPAPR_RNG=3Dy
 > diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 24a0be478039..02f2de20111c 100644
+> index 7fdc25057420..24a0be478039 100644
 > --- a/include/hw/ppc/spapr_xive.h
 > +++ b/include/hw/ppc/spapr_xive.h
-> @@ -44,6 +44,14 @@ typedef struct sPAPRXive {
->  bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
->  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
->  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-> +bool spapr_xive_priority_is_reserved(uint8_t priority);
+> @@ -35,6 +35,10 @@ typedef struct sPAPRXive {
+>      /* TIMA mapping address */
+>      hwaddr        tm_base;
+>      MemoryRegion  tm_mmio;
 > +
-> +void spapr_xive_cpu_to_nvt(PowerPCCPU *cpu,
-> +                           uint8_t *out_nvt_blk, uint32_t *out_nvt_idx);
-> +void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
-> +                           uint8_t *out_end_blk, uint32_t *out_end_idx);
-> +int spapr_xive_target_to_end(uint32_t target, uint8_t prio,
-> +                             uint8_t *out_end_blk, uint32_t *out_end_idx=
-);
+> +    /* KVM support */
+> +    int           fd;
+> +    void          *tm_mmap;
+>  } sPAPRXive;
 > =20
->  typedef struct sPAPRMachineState sPAPRMachineState;
-> =20
-> @@ -58,5 +66,6 @@ void spapr_xive_map_mmio(sPAPRXive *xive);
->   * KVM XIVE device helpers
->   */
->  void kvmppc_xive_connect(sPAPRXive *xive, Error **errp);
-> +void kvmppc_xive_synchronize_state(sPAPRXive *xive, Error **errp);
+>  bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+> @@ -48,5 +52,11 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t =
+nr_servers, void *fdt,
+>                     uint32_t phandle);
+>  void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+>  void spapr_xive_mmio_set_enabled(sPAPRXive *xive, bool enable);
+> +void spapr_xive_map_mmio(sPAPRXive *xive);
+> +
+> +/*
+> + * KVM XIVE device helpers
+> + */
+> +void kvmppc_xive_connect(sPAPRXive *xive, Error **errp);
 > =20
 >  #endif /* PPC_SPAPR_XIVE_H */
 > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 4bbba8d39a65..2e48d75a22e0 100644
+> index ec23253ba448..4bbba8d39a65 100644
 > --- a/include/hw/ppc/xive.h
 > +++ b/include/hw/ppc/xive.h
-> @@ -442,5 +442,6 @@ static inline bool kvmppc_xive_enabled(void)
->  void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp);
->  void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
->  void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
-> +void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
+> @@ -140,6 +140,7 @@
+>  #ifndef PPC_XIVE_H
+>  #define PPC_XIVE_H
 > =20
->  #endif /* PPC_XIVE_H */
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index cf6d3a5f12e1..50dd66707968 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -54,8 +54,8 @@ static uint32_t spapr_xive_nvt_to_target(uint8_t nvt_bl=
-k, uint32_t nvt_idx)
->      return nvt_idx - SPAPR_XIVE_NVT_BASE;
->  }
+> +#include "sysemu/kvm.h"
+>  #include "hw/qdev-core.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/ppc/xive_regs.h"
+> @@ -194,6 +195,9 @@ typedef struct XiveSource {
+>      uint32_t        esb_shift;
+>      MemoryRegion    esb_mmio;
 > =20
-> -static void spapr_xive_cpu_to_nvt(PowerPCCPU *cpu,
-> -                                  uint8_t *out_nvt_blk, uint32_t *out_nv=
-t_idx)
-> +void spapr_xive_cpu_to_nvt(PowerPCCPU *cpu,
-> +                           uint8_t *out_nvt_blk, uint32_t *out_nvt_idx)
->  {
->      assert(cpu);
+> +    /* KVM support */
+> +    void            *esb_mmap;
+> +
+>      XiveNotifier    *xive;
+>  } XiveSource;
 > =20
-> @@ -85,8 +85,8 @@ static int spapr_xive_target_to_nvt(uint32_t target,
->   * sPAPR END indexing uses a simple mapping of the CPU vcpu_id, 8
->   * priorities per CPU
->   */
-> -static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
-> -                                  uint8_t *out_end_blk, uint32_t *out_en=
-d_idx)
-> +void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
-> +                           uint8_t *out_end_blk, uint32_t *out_end_idx)
->  {
->      assert(cpu);
-> =20
-> @@ -99,8 +99,8 @@ static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint=
-8_t prio,
->      }
->  }
-> =20
-> -static int spapr_xive_target_to_end(uint32_t target, uint8_t prio,
-> -                                    uint8_t *out_end_blk, uint32_t *out_=
-end_idx)
-> +int spapr_xive_target_to_end(uint32_t target, uint8_t prio,
-> +                             uint8_t *out_end_blk, uint32_t *out_end_idx)
->  {
->      PowerPCCPU *cpu =3D spapr_find_cpu(target);
-> =20
-> @@ -139,6 +139,16 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Moni=
-tor *mon)
->      XiveSource *xsrc =3D &xive->source;
->      int i;
-> =20
-> +    if (kvmppc_xive_enabled()) {
-> +        Error *local_err =3D NULL;
-> +
-> +        kvmppc_xive_synchronize_state(xive, &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            return;
-> +        }
-> +    }
-> +
->      monitor_printf(mon, "  LSIN         PQ    EISN     CPU/PRIO EQ\n");
-> =20
->      for (i =3D 0; i < xive->nr_irqs; i++) {
-> @@ -529,7 +539,7 @@ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t li=
-sn)
->   * interrupts (DD2.X POWER9). So we only allow the guest to use
->   * priorities [0..6].
->   */
-> -static bool spapr_xive_priority_is_reserved(uint8_t priority)
-> +bool spapr_xive_priority_is_reserved(uint8_t priority)
->  {
->      switch (priority) {
->      case 0 ... 6:
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index f96c66fa419d..f52bddc92a2a 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -60,6 +60,57 @@ static void kvm_cpu_enable(CPUState *cs)
->  /*
->   * XIVE Thread Interrupt Management context (KVM)
->   */
-> +static void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
-> +{
-> +    uint64_t state[4] =3D { 0 };
-> +    int ret;
-> +
-> +    ret =3D kvm_get_one_reg(tctx->cs, KVM_REG_PPC_NVT_STATE, state);
-> +    if (ret !=3D 0) {
-> +        error_setg_errno(errp, errno,
-> +                         "XIVE: could not capture KVM state of CPU %ld",
-> +                         kvm_arch_vcpu_id(tctx->cs));
-> +        return;
-> +    }
-> +
-> +    /* word0 and word1 of the OS ring. */
-> +    *((uint64_t *) &tctx->regs[TM_QW1_OS]) =3D state[0];
-> +
-> +    /*
-> +     * KVM also returns word2 containing the OS CAM line which is
-> +     * interesting to print out in the QEMU monitor.
-> +     */
-> +    *((uint64_t *) &tctx->regs[TM_QW1_OS + TM_WORD2]) =3D state[1];
-> +}
-> +
-> +typedef struct {
-> +    XiveTCTX *tctx;
-> +    Error *err;
-> +} XiveCpuGetState;
-> +
-> +static void kvmppc_xive_cpu_do_synchronize_state(CPUState *cpu,
-> +                                                 run_on_cpu_data arg)
-> +{
-> +    XiveCpuGetState *s =3D arg.host_ptr;
-> +
-> +    kvmppc_xive_cpu_get_state(s->tctx, &s->err);
-> +}
-> +
-> +void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp)
-> +{
-> +    XiveCpuGetState s =3D {
-> +        .tctx =3D tctx,
-> +        .err =3D NULL,
-> +    };
-> +
-> +    run_on_cpu(tctx->cs, kvmppc_xive_cpu_do_synchronize_state,
-> +               RUN_ON_CPU_HOST_PTR(&s));
-> +
-> +    if (s.err) {
-> +        error_propagate(errp, s.err);
-> +        return;
-> +    }
-> +}
-> =20
->  void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
->  {
-> @@ -119,6 +170,34 @@ void kvmppc_xive_source_reset(XiveSource *xsrc, Erro=
-r **errp)
->      }
+> @@ -421,4 +425,22 @@ static inline uint32_t xive_nvt_cam_line(uint8_t nvt=
+_blk, uint32_t nvt_idx)
+>      return (nvt_blk << 19) | nvt_idx;
 >  }
 > =20
 > +/*
-> + * This is used to perform the magic loads on the ESB pages, described
-> + * in xive.h.
+> + * KVM XIVE device helpers
 > + */
-> +static uint8_t xive_esb_read(XiveSource *xsrc, int srcno, uint32_t offse=
-t)
+> +
+> +/* Keep inlined to discard compile of KVM code sections */
+> +static inline bool kvmppc_xive_enabled(void)
 > +{
-> +    unsigned long addr =3D (unsigned long) xsrc->esb_mmap +
-> +        xive_source_esb_mgmt(xsrc, srcno) + offset;
-> +
-> +    /* Prevent the compiler from optimizing away the load */
-> +    volatile uint64_t value =3D *((uint64_t *) addr);
-> +
-> +    return be64_to_cpu(value) & 0x3;
-> +}
-> +
-> +static void kvmppc_xive_source_get_state(XiveSource *xsrc)
-> +{
-> +    int i;
-> +
-> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> +        /* Perform a load without side effect to retrieve the PQ bits */
-> +        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> +
-> +        /* and save PQ locally */
-> +        xive_source_esb_set(xsrc, i, pq);
+> +    if (kvm_enabled()) {
+> +        return machine_kernel_irqchip_allowed(MACHINE(qdev_get_machine()=
+));
+> +    } else {
+> +        return false;
 > +    }
 > +}
 > +
->  void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val)
+> +void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp);
+> +void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
+> +void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
+> +
+>  #endif /* PPC_XIVE_H */
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index bdfaa4e70a83..d2159660f9f2 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
+>  bool kvmppc_has_cap_htm(void);
+>  bool kvmppc_has_cap_mmu_radix(void);
+>  bool kvmppc_has_cap_mmu_hash_v3(void);
+> +bool kvmppc_has_cap_xive(void);
+>  int kvmppc_get_cap_safe_cache(void);
+>  int kvmppc_get_cap_safe_bounds_check(void);
+>  int kvmppc_get_cap_safe_indirect_branch(void);
+> @@ -307,6 +308,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
+>      return false;
+>  }
+> =20
+> +static inline bool kvmppc_has_cap_xive(void)
+> +{
+> +    return false;
+> +}
+> +
+>  static inline int kvmppc_get_cap_safe_cache(void)
 >  {
->      XiveSource *xsrc =3D opaque;
-> @@ -149,6 +228,150 @@ void kvmppc_xive_source_set_irq(void *opaque, int s=
-rcno, int val)
->  /*
->   * sPAPR XIVE interrupt controller (KVM)
->   */
-> +static int kvmppc_xive_get_eq_state(sPAPRXive *xive, CPUState *cs, Error=
- **errp)
-> +{
-> +    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
-> +    int ret;
-> +    int i;
+>      return 0;
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index d391177ab81f..cf6d3a5f12e1 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -172,7 +172,7 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Monit=
+or *mon)
+>      }
+>  }
+> =20
+> -static void spapr_xive_map_mmio(sPAPRXive *xive)
+> +void spapr_xive_map_mmio(sPAPRXive *xive)
+>  {
+>      sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->vc_base);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(xive), 1, xive->end_base);
+> @@ -250,6 +250,9 @@ static void spapr_xive_instance_init(Object *obj)
+>                        TYPE_XIVE_END_SOURCE);
+>      object_property_add_child(obj, "end_source", OBJECT(&xive->end_sourc=
+e),
+>                                NULL);
 > +
-> +    for (i =3D 0; i < XIVE_PRIORITY_MAX + 1; i++) {
-> +        Error *local_err =3D NULL;
-> +        struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
-> +        uint64_t kvm_eq_idx;
-> +        XiveEND end =3D { 0 };
-> +        uint8_t end_blk, nvt_blk;
-> +        uint32_t end_idx, nvt_idx;
-> +
-> +        /* Skip priorities reserved for the hypervisor */
-> +        if (spapr_xive_priority_is_reserved(i)) {
-> +            continue;
-> +        }
-> +
-> +        /* Encode the tuple (server, prio) as a KVM EQ index */
-> +        kvm_eq_idx =3D i << KVM_XIVE_EQ_PRIORITY_SHIFT &
-> +            KVM_XIVE_EQ_PRIORITY_MASK;
-> +        kvm_eq_idx |=3D vcpu_id << KVM_XIVE_EQ_SERVER_SHIFT &
-> +            KVM_XIVE_EQ_SERVER_MASK;
-> +
-> +        ret =3D kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ, kvm_eq_=
-idx,
-> +                                &kvm_eq, false, &local_err);
+> +    /* Not connected to the KVM XIVE device */
+> +    xive->fd =3D -1;
+>  }
+> =20
+>  static void spapr_xive_realize(DeviceState *dev, Error **errp)
+> @@ -304,17 +307,25 @@ static void spapr_xive_realize(DeviceState *dev, Er=
+ror **errp)
+>      xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
+>      xive->endt =3D g_new0(XiveEND, xive->nr_ends);
+> =20
+> -    /* TIMA initialization */
+> -    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
+ve,
+> -                          "xive.tima", 4ull << TM_SHIFT);
+> +    if (kvmppc_xive_enabled()) {
+> +        kvmppc_xive_connect(xive, &local_err);
 > +        if (local_err) {
 > +            error_propagate(errp, local_err);
-> +            return ret;
+> +            return;
 > +        }
-> +
-> +        if (!(kvm_eq.flags & KVM_XIVE_EQ_FLAG_ENABLED)) {
-> +            continue;
-> +        }
-> +
-> +        /* Update the local END structure with the KVM input */
-> +        if (kvm_eq.flags & KVM_XIVE_EQ_FLAG_ENABLED) {
-> +            end.w0 |=3D cpu_to_be32(END_W0_VALID | END_W0_ENQUEUE);
-> +        }
-> +        if (kvm_eq.flags & KVM_XIVE_EQ_FLAG_ALWAYS_NOTIFY) {
-> +            end.w0 |=3D cpu_to_be32(END_W0_UCOND_NOTIFY);
-> +        }
-> +        if (kvm_eq.flags & KVM_XIVE_EQ_FLAG_ESCALATE) {
-> +            end.w0 |=3D cpu_to_be32(END_W0_ESCALATE_CTL);
-> +        }
-> +        end.w0 |=3D xive_set_field32(END_W0_QSIZE, 0ul, kvm_eq.qsize - 1=
-2);
-> +
-> +        end.w1 =3D xive_set_field32(END_W1_GENERATION, 0ul, kvm_eq.qtogg=
-le) |
-> +            xive_set_field32(END_W1_PAGE_OFF, 0ul, kvm_eq.qindex);
-> +        end.w2 =3D cpu_to_be32((kvm_eq.qpage >> 32) & 0x0fffffff);
-> +        end.w3 =3D cpu_to_be32(kvm_eq.qpage & 0xffffffff);
-> +        end.w4 =3D 0;
-> +        end.w5 =3D 0;
-> +
-> +        spapr_xive_cpu_to_nvt(POWERPC_CPU(cs), &nvt_blk, &nvt_idx);
-> +
-> +        end.w6 =3D xive_set_field32(END_W6_NVT_BLOCK, 0ul, nvt_blk) |
-> +            xive_set_field32(END_W6_NVT_INDEX, 0ul, nvt_idx);
-> +        end.w7 =3D xive_set_field32(END_W7_F0_PRIORITY, 0ul, i);
-> +
-> +        spapr_xive_cpu_to_end(POWERPC_CPU(cs), i, &end_blk, &end_idx);
-> +
-> +        assert(end_idx < xive->nr_ends);
-> +        memcpy(&xive->endt[end_idx], &end, sizeof(XiveEND));
+> +    } else {
+> +        /* TIMA initialization */
+> +        memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops=
+, xive,
+> +                              "xive.tima", 4ull << TM_SHIFT);
+> =20
+> -    /* Define all XIVE MMIO regions on SysBus */
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+> +        /* Define all XIVE MMIO regions on SysBus */
+> +        sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+> +        sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+> +        sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+> =20
+> -    /* Map all regions */
+> -    spapr_xive_map_mmio(xive);
+> +        /* Map all regions */
+> +        spapr_xive_map_mmio(xive);
 > +    }
+> =20
+>      qemu_register_reset(spapr_xive_reset, dev);
+>  }
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> new file mode 100644
+> index 000000000000..f96c66fa419d
+> --- /dev/null
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -0,0 +1,254 @@
+> +/*
+> + * QEMU PowerPC sPAPR XIVE interrupt controller model
+> + *
+> + * Copyright (c) 2017-2019, IBM Corporation.
+> + *
+> + * This code is licensed under the GPL version 2 or later. See the
+> + * COPYING file in the top-level directory.
+> + */
 > +
-> +    return 0;
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qemu/error-report.h"
+> +#include "qapi/error.h"
+> +#include "target/ppc/cpu.h"
+> +#include "sysemu/cpus.h"
+> +#include "sysemu/kvm.h"
+> +#include "hw/ppc/spapr.h"
+> +#include "hw/ppc/spapr_xive.h"
+> +#include "hw/ppc/xive.h"
+> +#include "kvm_ppc.h"
+> +
+> +#include <sys/ioctl.h>
+> +
+> +/*
+> + * Helpers for CPU hotplug
+> + *
+> + * TODO: make a common KVMEnabledCPU layer for XICS and XIVE
+> + */
+> +typedef struct KVMEnabledCPU {
+> +    unsigned long vcpu_id;
+> +    QLIST_ENTRY(KVMEnabledCPU) node;
+> +} KVMEnabledCPU;
+> +
+> +static QLIST_HEAD(, KVMEnabledCPU)
+> +    kvm_enabled_cpus =3D QLIST_HEAD_INITIALIZER(&kvm_enabled_cpus);
+> +
+> +static bool kvm_cpu_is_enabled(CPUState *cs)
+> +{
+> +    KVMEnabledCPU *enabled_cpu;
+> +    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
+> +
+> +    QLIST_FOREACH(enabled_cpu, &kvm_enabled_cpus, node) {
+> +        if (enabled_cpu->vcpu_id =3D=3D vcpu_id) {
+> +            return true;
+> +        }
+> +    }
+> +    return false;
 > +}
 > +
-> +static void kvmppc_xive_get_eas_state(sPAPRXive *xive, Error **errp)
+> +static void kvm_cpu_enable(CPUState *cs)
 > +{
-> +    XiveSource *xsrc =3D &xive->source;
+> +    KVMEnabledCPU *enabled_cpu;
+> +    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
+> +
+> +    enabled_cpu =3D g_malloc(sizeof(*enabled_cpu));
+> +    enabled_cpu->vcpu_id =3D vcpu_id;
+> +    QLIST_INSERT_HEAD(&kvm_enabled_cpus, enabled_cpu, node);
+> +}
+> +
+> +/*
+> + * XIVE Thread Interrupt Management context (KVM)
+> + */
+> +
+> +void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+> +{
+> +    sPAPRXive *xive =3D SPAPR_MACHINE(qdev_get_machine())->xive;
+> +    unsigned long vcpu_id;
+> +    int ret;
+> +
+> +    /* Check if CPU was hot unplugged and replugged. */
+> +    if (kvm_cpu_is_enabled(tctx->cs)) {
+> +        return;
+> +    }
+> +
+> +    vcpu_id =3D kvm_arch_vcpu_id(tctx->cs);
+> +
+> +    ret =3D kvm_vcpu_enable_cap(tctx->cs, KVM_CAP_PPC_IRQ_XIVE, 0, xive-=
+>fd,
+> +                              vcpu_id, 0);
+> +    if (ret < 0) {
+> +        error_setg(errp, "XIVE: unable to connect CPU%ld to KVM device: =
+%s",
+> +                   vcpu_id, strerror(errno));
+> +        return;
+> +    }
+> +
+> +    kvm_cpu_enable(tctx->cs);
+> +}
+> +
+> +/*
+> + * XIVE Interrupt Source (KVM)
+> + */
+> +
+> +/*
+> + * At reset, the interrupt sources are simply created and MASKED. We
+> + * only need to inform the KVM XIVE device about their type: LSI or
+> + * MSI.
+> + */
+> +void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
+> +{
+> +    sPAPRXive *xive =3D SPAPR_XIVE(xsrc->xive);
 > +    int i;
 > +
 > +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> +        XiveEAS *eas =3D &xive->eat[i];
-> +        XiveEAS new_eas;
-> +        uint64_t kvm_eas;
-> +        uint8_t priority;
-> +        uint32_t server;
-> +        uint32_t end_idx;
-> +        uint8_t end_blk;
-> +        uint32_t eisn;
 > +        Error *local_err =3D NULL;
+> +        uint64_t state =3D 0;
 > +
-> +        if (!xive_eas_is_valid(eas)) {
-> +            continue;
+> +        if (xive_source_irq_is_lsi(xsrc, i)) {
+> +            state |=3D KVM_XIVE_LEVEL_SENSITIVE;
+> +            if (xsrc->status[i] & XIVE_STATUS_ASSERTED) {
+> +                state |=3D KVM_XIVE_LEVEL_ASSERTED;
+> +            }
 > +        }
 > +
-> +        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EAS, i, &kvm_eas, f=
-alse,
-> +                          &local_err);
+> +        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCES, i, &state,
+> +                          true, &local_err);
 > +        if (local_err) {
 > +            error_propagate(errp, local_err);
 > +            return;
 > +        }
-> +
-> +        priority =3D (kvm_eas & KVM_XIVE_EAS_PRIORITY_MASK) >>
-> +            KVM_XIVE_EAS_PRIORITY_SHIFT;
-> +        server =3D (kvm_eas & KVM_XIVE_EAS_SERVER_MASK) >>
-> +            KVM_XIVE_EAS_SERVER_SHIFT;
-> +        eisn =3D (kvm_eas & KVM_XIVE_EAS_EISN_MASK) >> KVM_XIVE_EAS_EISN=
-_SHIFT;
-> +
-> +        if (spapr_xive_target_to_end(server, priority, &end_blk, &end_id=
-x)) {
-> +            error_setg(errp, "XIVE: invalid tuple CPU %d priority %d", s=
-erver,
-> +                       priority);
-> +            return;
-> +        }
-> +
-> +        new_eas.w =3D cpu_to_be64(EAS_VALID);
-> +        if (kvm_eas & KVM_XIVE_EAS_MASK_MASK) {
-> +            new_eas.w |=3D cpu_to_be64(EAS_MASKED);
-> +        }
-> +
-> +        new_eas.w =3D xive_set_field64(EAS_END_INDEX, new_eas.w, end_idx=
-);
-> +        new_eas.w =3D xive_set_field64(EAS_END_BLOCK, new_eas.w, end_blk=
-);
-> +        new_eas.w =3D xive_set_field64(EAS_END_DATA, new_eas.w, eisn);
-> +
-> +        *eas =3D new_eas;
 > +    }
 > +}
 > +
-> +void kvmppc_xive_synchronize_state(sPAPRXive *xive, Error **errp)
+> +void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val)
+> +{
+> +    XiveSource *xsrc =3D opaque;
+> +    struct kvm_irq_level args;
+> +    int rc;
+> +
+> +    args.irq =3D srcno;
+> +    if (!xive_source_irq_is_lsi(xsrc, srcno)) {
+> +        if (!val) {
+> +            return;
+> +        }
+> +        args.level =3D KVM_INTERRUPT_SET;
+> +    } else {
+> +        if (val) {
+> +            xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
+> +            args.level =3D KVM_INTERRUPT_SET_LEVEL;
+> +        } else {
+> +            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
+> +            args.level =3D KVM_INTERRUPT_UNSET;
+> +        }
+> +    }
+> +    rc =3D kvm_vm_ioctl(kvm_state, KVM_IRQ_LINE, &args);
+> +    if (rc < 0) {
+> +        error_report("XIVE: kvm_irq_line() failed : %s", strerror(errno)=
+);
+> +    }
+> +}
+> +
+> +/*
+> + * sPAPR XIVE interrupt controller (KVM)
+> + */
+> +
+> +static void *kvmppc_xive_mmap(sPAPRXive *xive, int ctrl, size_t len,
+> +                                 Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    void *addr;
+> +    int fd;
+> +
+> +    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL, ctrl, &fd, false,
+> +                      &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return NULL;
+> +    }
+> +
+> +    addr =3D mmap(NULL, len, PROT_WRITE | PROT_READ, MAP_SHARED, fd, 0);
+> +    close(fd);
+> +    if (addr =3D=3D MAP_FAILED) {
+> +        error_setg_errno(errp, errno, "XIVE: unable to set memory mappin=
+g");
+> +        return NULL;
+> +    }
+> +
+> +    return addr;
+> +}
+> +
+> +/*
+> + * All the XIVE memory regions are now backed by mappings from the KVM
+> + * XIVE device.
+> + */
+> +void kvmppc_xive_connect(sPAPRXive *xive, Error **errp)
 > +{
 > +    XiveSource *xsrc =3D &xive->source;
-> +    CPUState *cs;
+> +    XiveENDSource *end_xsrc =3D &xive->end_source;
 > +    Error *local_err =3D NULL;
+> +    size_t esb_len;
+> +    size_t tima_len;
 > +
-> +    kvmppc_xive_source_get_state(xsrc);
+> +    if (!kvm_enabled() || !kvmppc_has_cap_xive()) {
+> +        error_setg(errp, "IRQ_XIVE capability must be present for KVM");
+> +        return;
+> +    }
 > +
-> +    kvmppc_xive_get_eas_state(xive, &local_err);
+> +    /* First, create the KVM XIVE device */
+> +    xive->fd =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, false);
+> +    if (xive->fd < 0) {
+> +        error_setg_errno(errp, -xive->fd, "XIVE: error creating KVM devi=
+ce");
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Source ESBs KVM mapping
+> +     *
+> +     * Inform KVM where we will map the ESB pages. This is needed by
+> +     * the H_INT_GET_SOURCE_INFO hcall which returns the source
+> +     * characteristics, among which the ESB page address.
+> +     */
+> +    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL, KVM_DEV_XIVE_VC_B=
+ASE,
+> +                      &xive->vc_base, true, &local_err);
 > +    if (local_err) {
 > +        error_propagate(errp, local_err);
 > +        return;
 > +    }
 > +
-> +    CPU_FOREACH(cs) {
-> +        kvmppc_xive_get_eq_state(xive, cs, &local_err);
+> +    esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> +    xsrc->esb_mmap =3D kvmppc_xive_mmap(xive, KVM_DEV_XIVE_GET_ESB_FD,
+> +                                      esb_len, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    memory_region_init_ram_device_ptr(&xsrc->esb_mmio, OBJECT(xsrc),
+> +                                      "xive.esb", esb_len, xsrc->esb_mma=
+p);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+> +
+> +    /* END ESBs mapping (No KVM) */
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+> +
+> +    /*
+> +     * TIMA KVM mapping
+> +     *
+> +     * We could also inform KVM where the TIMA will be mapped but as
+> +     * this is a fixed MMIO address for the system it does not seem
+> +     * necessary to provide a KVM ioctl to change it.
+> +     */
+> +    tima_len =3D 4ull << TM_SHIFT;
+> +    xive->tm_mmap =3D kvmppc_xive_mmap(xive, KVM_DEV_XIVE_GET_TIMA_FD,
+> +                                     tima_len, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    memory_region_init_ram_device_ptr(&xive->tm_mmio, OBJECT(xive),
+> +                                      "xive.tima", tima_len, xive->tm_mm=
+ap);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+> +
+> +    kvm_kernel_irqchip =3D true;
+> +    kvm_msi_via_irqfd_allowed =3D true;
+> +    kvm_gsi_direct_mapping =3D true;
+> +
+> +    /* Map all regions */
+> +    spapr_xive_map_mmio(xive);
+> +}
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index a3cb0cf0e348..9a2d7be283f8 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -15,6 +15,7 @@
+>  #include "sysemu/dma.h"
+>  #include "hw/qdev-properties.h"
+>  #include "monitor/monitor.h"
+> +#include "hw/boards.h"
+>  #include "hw/ppc/xive.h"
+>  #include "hw/ppc/xive_regs.h"
+> =20
+> @@ -493,6 +494,15 @@ static void xive_tctx_realize(DeviceState *dev, Erro=
+r **errp)
+>          return;
+>      }
+> =20
+> +    /* Connect the presenter to the VCPU (required for CPU hotplug) */
+> +    if (kvmppc_xive_enabled()) {
+> +        kvmppc_xive_cpu_connect(tctx, &local_err);
 > +        if (local_err) {
 > +            error_propagate(errp, local_err);
 > +            return;
 > +        }
 > +    }
-> +}
+> +
+>      qemu_register_reset(xive_tctx_reset, dev);
+>  }
 > =20
->  static void *kvmppc_xive_mmap(sPAPRXive *xive, int ctrl, size_t len,
->                                   Error **errp)
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 9a2d7be283f8..596c29d8c826 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -434,6 +434,16 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
->      int cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
+> @@ -895,6 +905,10 @@ static void xive_source_reset(void *dev)
+> =20
+>      /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints of=
+f" */
+>      memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
+> +
+> +    if (kvmppc_xive_enabled()) {
+> +        kvmppc_xive_source_reset(xsrc, &error_fatal);
+> +    }
+>  }
+> =20
+>  static void xive_source_realize(DeviceState *dev, Error **errp)
+> @@ -928,9 +942,11 @@ static void xive_source_realize(DeviceState *dev, Er=
+ror **errp)
+>      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+>      xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+> =20
+> -    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> -                          &xive_source_esb_ops, xsrc, "xive.esb",
+> -                          (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
+> +    if (!kvmppc_xive_enabled()) {
+> +        memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> +                              &xive_source_esb_ops, xsrc, "xive.esb",
+> +                              (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
+> +    }
+> =20
+>      qemu_register_reset(xive_source_reset, dev);
+>  }
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 5fce72fe0f6c..afbdabfa6543 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -15,6 +15,7 @@
+>  #include "hw/ppc/spapr_xive.h"
+>  #include "hw/ppc/xics.h"
+>  #include "sysemu/kvm.h"
+> +#include "kvm_ppc.h"
+> =20
+>  #include "trace.h"
+> =20
+> @@ -266,9 +267,9 @@ static void spapr_irq_init_xive(sPAPRMachineState *sp=
+apr, Error **errp)
+>      DeviceState *dev;
 >      int i;
 > =20
-> +    if (kvmppc_xive_enabled()) {
-> +        Error *local_err =3D NULL;
-> +
-> +        kvmppc_xive_cpu_synchronize_state(tctx, &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            return;
-> +        }
-> +    }
-> +
->      monitor_printf(mon, "CPU[%04x]:   QW   NSR CPPR IPB LSMFB ACK# INC A=
-GE PIPR"
->                     "  W2\n", cpu_index);
+> -    /* KVM XIVE device not yet available */
+>      if (kvm_enabled()) {
+> -        if (machine_kernel_irqchip_required(machine)) {
+> +        if (machine_kernel_irqchip_required(machine) &&
+> +            !kvmppc_has_cap_xive()) {
+>              error_setg(errp, "kernel_irqchip requested. no KVM XIVE supp=
+ort");
+>              return;
+>          }
+> @@ -384,7 +385,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int=
+ srcno, int val)
+>  {
+>      sPAPRMachineState *spapr =3D opaque;
 > =20
+> -    xive_source_set_irq(&spapr->xive->source, srcno, val);
+> +    if (kvmppc_xive_enabled()) {
+> +        kvmppc_xive_source_set_irq(&spapr->xive->source, srcno, val);
+> +    } else {
+> +        xive_source_set_irq(&spapr->xive->source, srcno, val);
+> +    }
+>  }
+> =20
+>  /*
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index ebbb48c42f25..88a470a73e7c 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -86,6 +86,7 @@ static int cap_fixup_hcalls;
+>  static int cap_htm;             /* Hardware transactional memory support=
+ */
+>  static int cap_mmu_radix;
+>  static int cap_mmu_hash_v3;
+> +static int cap_xive;
+>  static int cap_resize_hpt;
+>  static int cap_ppc_pvr_compat;
+>  static int cap_ppc_safe_cache;
+> @@ -149,6 +150,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+>      cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+>      cap_mmu_hash_v3 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V=
+3);
+> +    cap_xive =3D kvm_vm_check_extension(s, KVM_CAP_PPC_IRQ_XIVE);
+>      cap_resize_hpt =3D kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HP=
+T);
+>      kvmppc_get_cpu_characteristics(s);
+>      cap_ppc_nested_kvm_hv =3D kvm_vm_check_extension(s, KVM_CAP_PPC_NEST=
+ED_HV);
+> @@ -2389,6 +2391,11 @@ static int parse_cap_ppc_safe_indirect_branch(stru=
+ct kvm_ppc_cpu_char c)
+>      return 0;
+>  }
+> =20
+> +bool kvmppc_has_cap_xive(void)
+> +{
+> +    return cap_xive;
+> +}
+> +
+>  static void kvmppc_get_cpu_characteristics(KVMState *s)
+>  {
+>      struct kvm_ppc_cpu_char c;
+> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+> index 301a8e972d91..23126c199178 100644
+> --- a/hw/intc/Makefile.objs
+> +++ b/hw/intc/Makefile.objs
+> @@ -39,6 +39,7 @@ obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
+>  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
+>  obj-$(CONFIG_XIVE) +=3D xive.o
+>  obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
+> +obj-$(CONFIG_XIVE_KVM) +=3D spapr_xive_kvm.o
+>  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
+>  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
+>  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -455,24 +658,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---FZIkiClxIZ9JeWSb
+--4WCFFtl4AQpQKunj
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxaSaoACgkQbDjKyiDZ
-s5KLTBAA3qZR+1qekVbq0Hpgz3sP3IT0rO+i9Z1dpa57jhO3O7dQKNWIr/2HOnCV
-bZIOq5d9BTiWo7CjUFu6fl+TrUmcpGbV+nCl4j5urrW841Y2+oMuBsxG3VCOpQkc
-XeT1edOSAROdwlcZdfOWj0K0zCNkACM3uPrNDA84YAzfbkBXF53JCMxRd7lwktkZ
-J2PO/hsbDjmaqJhb3K6BAGHLyKZTMGUysKYzYiENkwk8U+isFCbFPn387Vd6PKCU
-wbmj5Lo7OxEhHOtnZCGdP8suZbPw8k9ZKgPGTtqQ4mwtH/Htl/lmLuxG2a6XEF4P
-LldNfF+nBpaSLzval5A6qbWNUgA9odyTJbqv24YoxPb6AvUEnqQRuHCY5WoHKXJI
-t8D02N3XwO/sEfNmalHPfgBTPnz/VCRJYM6ZGGQsnSNvoeKeq4GugCL4TLCe8CV2
-wv7c9YuOc7Vz7k+xdh2H8J8SO7UNgzaoCHiDhQMnIEXlciBY2mqk1rktf7cyENWr
-O4VadwHhDyIkpPnrp+d5iC/HZyVxePG8ZCwvT8oucF54AXtDmK687Pch4CV7LOeL
-gT8d/0Y7TQrOXGclok+4o314dJtqqhYju9rnWrGYkXo6loZFsWxMedZ20xdE/R+q
-BiiIckbsM7cIDLUE4cDe2qgQqSBQCguOzGjn9BYlkcJpMOQXidg=
-=HI7k
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxaSOkACgkQbDjKyiDZ
+s5JHRg//ZOAJdj3RRJNCq8yKR0QtCwp4lqraNKg3IvjUW4K5iQYDgIV26GtY/5ke
+MDM7YKC+Y4NF+KxWZH+9HkaqA5AKV2SJJ4yrax+R07SGExo3KXT+T10BsXExfswz
+q2UlG+hHW8GrVCzhqldo5rLLsFSzj5cQO3u6+O8IjX/LOuDzwqLikltgpA7oW3P0
+2xeTI9BYgRZSwa/2+jYLZa7eFhZwFf7BslOlC2WtQjkQ4x/yNhrrDhPudpfj5SLY
+DQXJ70rrm7QlzkxYflD/7hrznr3u4oujlFiANM2/GkrRACWwiD04d39IhY/oEgeB
+uw3lu3T8XF0PrxdxfCrm5EM3d/bd4aYUeeRNhCn56CEcsprZD4h7O3eMHjdMleLo
+Mo989Y1fsEYyoW4bZ0YjtV7QL6rFcTR9rLaqXWSJCyS4cSxDJV3oYSQBY5VDtGIw
+9OQJmmJ9gDlZNFn/WtPuarz2ogA6Bfd7bkUaV7j4OTNFv0Yjv6rq9fdVPeSRJAeN
+Z1/g5xZKulBAGWArjILz1TNJGeVsETuQRHEs4C1MBCBTlQUgOM/GrfOAJp75foGP
+ye76xhj3RQN9B5Azs36ekOuyROz5z2rJht7/qFU/MsS+a/zGWXiYyb5z7AftzYFg
+0U9TiDSoAYgNIs6fj+5QQK3POAkKlZJq9L0lg0px54R9EXvTgGs=
+=hFkm
 -----END PGP SIGNATURE-----
 
---FZIkiClxIZ9JeWSb--
+--4WCFFtl4AQpQKunj--
