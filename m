@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42462)
+Received: from eggs.gnu.org ([209.51.188.92]:42567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1grKlN-0001RS-9l
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:49:06 -0500
+	(envelope-from <imammedo@redhat.com>) id 1grKm2-0001jb-7b
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:49:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1grKlM-0004U4-FM
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:49:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46850)
+	(envelope-from <imammedo@redhat.com>) id 1grKly-0004sn-W5
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:49:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1grKlM-0004QQ-9X
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:49:04 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 66EFB46202
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 10:48:59 +0000 (UTC)
-Date: Wed, 6 Feb 2019 11:48:51 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190206104851.GT5349@paraplu.home>
-References: <20190205134926.8312-1-marcandre.lureau@redhat.com>
-	<781b71d9-f045-ffa9-3674-f6222f6e7e0b@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1grKlx-0004qM-1F
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:49:41 -0500
+Date: Wed, 6 Feb 2019 11:49:25 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190206114925.6f507576@Igors-MacBook-Pro.local>
+In-Reply-To: <20190131071658.29120-8-tao3.xu@intel.com>
+References: <20190131071658.29120-1-tao3.xu@intel.com>
+	<20190131071658.29120-8-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <781b71d9-f045-ffa9-3674-f6222f6e7e0b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qmp-shell: fix nested json regression
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 7/8] hmat acpi: move some function
+ inside of the caller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +28,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, Cleber Rosa <crosa@redhat.com>, ehabkost@redhat.com
+To: Tao Xu <tao3.xu@intel.com>
+Cc: eblake@redhat.com, mst@redhat.com, xiaoguangrong.eric@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, karl.heubaum@oracle.com, jingqi.liu@intel.com, danmei.wei@intel.com, qemu-devel@nongnu.org
 
-On Tue, Feb 05, 2019 at 08:44:12PM -0500, John Snow wrote:
-> On 2/5/19 8:49 AM, Marc-Andr=E9 Lureau wrote:
+On Thu, 31 Jan 2019 15:16:57 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-[...]
+> Per Igor comments, 
+there is no need to mention me in main commit message
+as it carries 0 useful information.
 
-> > Replace with a regexp to split while respecting quoted strings and pr=
-eserving quotes:
-> >=20
-> > re.findall(r'''(?:[^\s"']|"(?:\\.|[^"])*"|'(?:\\.|[^'])*')+''', cmd)
-> > ['blockdev-create',
-> >  'job-id=3D"job0 foo"',
-> >  'options=3D{"driver":"qcow2","size":16384,"file":{"driver":"file","f=
-ilename":"foo.qcow2"}}']
-> >=20
-> > Fixes: fcfab7541 ("qmp-shell: learn to send commands with quoted argu=
-ments")
-> > Reported-by: Kashyap Chamarthy <kchamart@redhat.com>
-> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  scripts/qmp/qmp-shell | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> > index 770140772d..813dd68232 100755
-> > --- a/scripts/qmp/qmp-shell
-> > +++ b/scripts/qmp/qmp-shell
-> > @@ -74,7 +74,7 @@ import sys
-> >  import os
-> >  import errno
-> >  import atexit
-> > -import shlex
-> > +import re
-> > =20
-> >  class QMPCompleter(list):
-> >      def complete(self, text, state):
-> > @@ -220,7 +220,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-> > =20
-> >              < command-name > [ arg-name1=3Darg1 ] ... [ arg-nameN=3D=
-argN ]
-> >          """
-> > -        cmdargs =3D shlex.split(cmdline)
-> > +        cmdargs =3D re.findall(r'''(?:[^\s"']|"(?:\\.|[^"])*"|'(?:\\=
-.|[^'])*')+''', cmdline)
->=20
-> It might really be nice to have a comment briefly explaining the regex.
-> This is pretty close to symbol soup.
+> these function is used only once,
+> move its body inside of the caller
 
-Yeah, a little comment explaining it would be nice. =20
+review comment's generally addressed in the patch to which they belong
+and not with a patch on top of previous mess unless agreed otherwise.
 
-And thanks for the fix, indeed.  FWIW:
+> 
+> Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
 
-    Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
+---
+ v3:
+   * here you put changes description since previous version
+     and who asked for it
+ v2:
+   * previous changes 
 
-> Though I suppose we are approaching the limits of what this hacky littl=
-e
-> debug script can do for us...
-
-It is good enough for 80% of the cases. :-)
-
---=20
-/kashyap
+> ---
+>  hw/acpi/hmat.c | 93 ++++++++++++++++++++------------------------------
+>  1 file changed, 37 insertions(+), 56 deletions(-)
+> 
+> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+> index 93c72ab14e..d802e1cce1 100644
+> --- a/hw/acpi/hmat.c
+> +++ b/hw/acpi/hmat.c
+> @@ -84,22 +84,41 @@ static int pc_dimm_device_list(Object *obj, void *opaque)
+>      return 0;
+>  }
+>  
+> +static void classify_proximity_domains(void)
+> +{
+> +    int node;
+> +
+> +    for (node = 0; node < nb_numa_nodes; node++) {
+> +        if (numa_info[node].is_initiator) {
+> +            initiator_pxm[num_initiator++] = node;
+> +        }
+> +        if (numa_info[node].is_target) {
+> +            target_pxm[num_target++] = node;
+> +        }
+> +    }
+> +}
+> +
+> +static void hmat_build_hma(GArray *hma, PCMachineState *pcms)
+> +{
+>  /*
+>   * The Proximity Domain of System Physical Address ranges defined
+>   * in the HMAT, NFIT and SRAT tables shall match each other.
+>   */
+> -static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
+> -{
+> +
+>      GSList *device_list = NULL;
+> +    AcpiHmatLBInfo *hmat_lb;
+> +    AcpiHmatCacheInfo *hmat_cache;
+> +    struct numa_hmat_lb_info *numa_hmat_lb;
+> +    struct numa_hmat_cache_info *numa_hmat_cache;
+>      uint64_t mem_base, mem_len;
+> -    int i;
+> +    int i, j, hrchy, type, level;
+>  
+>      if (pcms->numa_nodes && !mem_ranges_number) {
+>          build_mem_ranges(pcms);
+>      }
+>  
+>      for (i = 0; i < mem_ranges_number; i++) {
+> -        hmat_build_spa_info(table_data, mem_ranges[i].base,
+> +        build_hmat_spa(hma, mem_ranges[i].base,
+>                              mem_ranges[i].length, mem_ranges[i].node);
+>      }
+>  
+> @@ -113,30 +132,10 @@ static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
+>          mem_len = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
+>                                             NULL);
+>          i = object_property_get_uint(OBJECT(dimm), PC_DIMM_NODE_PROP, NULL);
+> -        hmat_build_spa_info(table_data, mem_base, mem_len, i);
+> -    }
+> -}
+> -
+> -static void classify_proximity_domains(void)
+> -{
+> -    int node;
+> -
+> -    for (node = 0; node < nb_numa_nodes; node++) {
+> -        if (numa_info[node].is_initiator) {
+> -            initiator_pxm[num_initiator++] = node;
+> -        }
+> -        if (numa_info[node].is_target) {
+> -            target_pxm[num_target++] = node;
+> -        }
+> +        build_hmat_spa(hma, mem_base, mem_len, i);
+>      }
+> -}
+> -
+> -static void hmat_build_lb(GArray *table_data)
+> -{
+> -    AcpiHmatLBInfo *hmat_lb;
+> -    struct numa_hmat_lb_info *numa_hmat_lb;
+> -    int i, j, hrchy, type;
+>  
+> +    /* Build HMAT System Locality Latency and Bandwidth Information. */
+>      if (!num_initiator && !num_target) {
+>          classify_proximity_domains();
+>      }
+> @@ -154,8 +153,8 @@ static void hmat_build_lb(GArray *table_data)
+>                  uint32_t size;
+>                  uint8_t m, n;
+>  
+> -                start = table_data->len;
+> -                hmat_lb = acpi_data_push(table_data, sizeof(*hmat_lb));
+> +                start = hma->len;
+> +                hmat_lb = acpi_data_push(hma, sizeof(*hmat_lb));
+>  
+>                  hmat_lb->type          = cpu_to_le16(ACPI_HMAT_LB_INFO);
+>                  hmat_lb->flags         = numa_hmat_lb->hierarchy;
+> @@ -174,19 +173,19 @@ static void hmat_build_lb(GArray *table_data)
+>  
+>                  /* the initiator proximity domain list */
+>                  for (i = 0; i < num_initiator; i++) {
+> -                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
+> +                    list_entry = acpi_data_push(hma, sizeof(uint32_t));
+>                      *list_entry = cpu_to_le32(initiator_pxm[i]);
+>                  }
+>  
+>                  /* the target proximity domain list */
+>                  for (i = 0; i < num_target; i++) {
+> -                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
+> +                    list_entry = acpi_data_push(hma, sizeof(uint32_t));
+>                      *list_entry = cpu_to_le32(target_pxm[i]);
+>                  }
+>  
+>                  /* latency or bandwidth entries */
+>                  size = sizeof(uint16_t) * num_initiator * num_target;
+> -                entry_start = acpi_data_push(table_data, size);
+> +                entry_start = acpi_data_push(hma, size);
+>  
+>                  for (i = 0; i < num_initiator; i++) {
+>                      m = initiator_pxm[i];
+> @@ -200,26 +199,20 @@ static void hmat_build_lb(GArray *table_data)
+>                          }
+>                      }
+>                  }
+> -                hmat_lb = (AcpiHmatLBInfo *)(table_data->data + start);
+> -                hmat_lb->length = cpu_to_le16(table_data->len - start);
+> +                hmat_lb = (AcpiHmatLBInfo *)(hma->data + start);
+> +                hmat_lb->length = cpu_to_le16(hma->len - start);
+>              }
+>          }
+>      }
+> -}
+> -
+> -static void hmat_build_cache(GArray *table_data)
+> -{
+> -    AcpiHmatCacheInfo *hmat_cache;
+> -    struct numa_hmat_cache_info *numa_hmat_cache;
+> -    int i, level;
+>  
+> +    /* Build HMAT Memory Side Cache Information. */
+>      for (i = 0; i < nb_numa_nodes; i++) {
+>          for (level = 0; level <= MAX_HMAT_CACHE_LEVEL; level++) {
+>              numa_hmat_cache = hmat_cache_info[i][level];
+>              if (numa_hmat_cache) {
+> -                uint64_t start = table_data->len;
+> +                uint64_t start = hma->len;
+>  
+> -                hmat_cache = acpi_data_push(table_data, sizeof(*hmat_cache));
+> +                hmat_cache = acpi_data_push(hma, sizeof(*hmat_cache));
+>                  hmat_cache->length = cpu_to_le32(sizeof(*hmat_cache));
+>                  hmat_cache->type = cpu_to_le16(ACPI_HMAT_CACHE_INFO);
+>                  hmat_cache->mem_proximity =
+> @@ -242,10 +235,10 @@ static void hmat_build_cache(GArray *table_data)
+>                      int size;
+>  
+>                      size = hmat_cache->num_smbios_handles * sizeof(uint16_t);
+> -                    smbios_handles = acpi_data_push(table_data, size);
+> +                    smbios_handles = acpi_data_push(hma, size);
+>  
+>                      hmat_cache = (AcpiHmatCacheInfo *)
+> -                                 (table_data->data + start);
+> +                                 (hma->data + start);
+>                      hmat_cache->length += size;
+>  
+>                      /* TBD: set smbios handles */
+> @@ -258,18 +251,6 @@ static void hmat_build_cache(GArray *table_data)
+>      }
+>  }
+>  
+> -static void hmat_build_hma(GArray *hma, PCMachineState *pcms)
+> -{
+> -    /* Build HMAT Memory Subsystem Address Range. */
+> -    hmat_build_spa(hma, pcms);
+> -
+> -    /* Build HMAT System Locality Latency and Bandwidth Information. */
+> -    hmat_build_lb(hma);
+> -
+> -    /* Build HMAT Memory Side Cache Information. */
+> -    hmat_build_cache(hma);
+> -}
+> -
+>  static uint64_t
+>  hmat_hma_method_read(void *opaque, hwaddr addr, unsigned size)
+>  {
