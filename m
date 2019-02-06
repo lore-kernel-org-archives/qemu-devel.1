@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52229)
+Received: from eggs.gnu.org ([209.51.188.92]:34449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grHrG-0005u1-Pq
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:42:59 -0500
+	(envelope-from <imammedo@redhat.com>) id 1grIft-0004NQ-53
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:35:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grHrG-0002II-39
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:42:58 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Feb 2019 07:42:52 +0000
-Message-ID: <9dc9efac-ef70-062f-4668-7ee57bab8026@virtuozzo.com>
-References: <1549397675-189741-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1549397675-189741-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1549397675-189741-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4644405AB33EFE429810A3D467AE8424@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1grIfr-0002M8-5Y
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:35:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1grIfn-0002Ej-ST
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:35:13 -0500
+Date: Wed, 6 Feb 2019 09:34:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190206093459.15fa733a@Igors-MacBook-Pro.local>
+In-Reply-To: <e2394dc4-1d95-2c23-5e11-cff441d57c78@linux.ibm.com>
+References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+	<e2394dc4-1d95-2c23-5e11-cff441d57c78@linux.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v12 3/3] qcow2: list of bitmaps new test 242
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +27,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, pmorel@linux.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-MDUuMDIuMjAxOSAyMzoxNCwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IEEgbmV3IHRlc3Qg
-ZmlsZSAyNDIgYWRkZWQgdG8gdGhlIHFlbXUtaW90ZXN0cyBzZXQuIEl0IGNoZWNrcw0KPiB0aGUg
-Zm9ybWF0IG9mIHFjb3cyIHNwZWNpZmljIGluZm9ybWF0aW9uIGZvciB0aGUgbmV3IGFkZGVkDQo+
-IHNlY3Rpb24gdGhhdCBsaXN0cyBkZXRhaWxzIG9mIGJpdG1hcHMuDQo+IA0KPiBTaWduZWQtb2Zm
-LWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4N
-Cj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0MiAgICAgfCAxMDAgKysrKysrKysrKysr
-KysrKysrKysrKysrKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mi5vdXQgfCAxNjcgKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgdGVzdHMvcWVt
-dS1pb3Rlc3RzL2dyb3VwICAgfCAgIDEgKw0KPiAgIDMgZmlsZXMgY2hhbmdlZCwgMjY4IGluc2Vy
-dGlvbnMoKykNCj4gICBjcmVhdGUgbW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mg0K
-PiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xZW11LWlvdGVzdHMvMjQyLm91dA0KPiANCj4g
-ZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDIgYi90ZXN0cy9xZW11LWlvdGVzdHMv
-MjQyDQo+IG5ldyBmaWxlIG1vZGUgMTAwNzU1DQo+IGluZGV4IDAwMDAwMDAuLjk1YzFmMTgNCj4g
-LS0tIC9kZXYvbnVsbA0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQoNClsuLl0NCg0K
-PiArDQo+ICtkZWYgdG9nZ2xlX2ZsYWcob2Zmc2V0KToNCj4gKyAgICBmID0gb3BlbihkaXNrLCAi
-citiIikNCj4gKyAgICBmLnNlZWsob2Zmc2V0LCAwKQ0KPiArICAgIGMgPSBmLnJlYWQoMSkNCj4g
-KyAgICB0b2dnbGVkID0gY2hyKG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25vd24pDQo+ICsgICAg
-Zi5zZWVrKC0xLCAxKQ0KPiArICAgIGYud3JpdGUodG9nZ2xlZCkNCj4gKyAgICBmLmNsb3NlKCkN
-Cg0Kb2ssIGJ1dCBiZXR0ZXIgdXNlICJ3aXRoIiwgbGlrZQ0Kd2l0aCBvcGVuKGRpc2ssICJyK2Ii
-KSBhcyBmOg0KICAgIC4uLg0KDQphcyBmaWxlIHdpbGwgYmUgY2xvc2VkIG9uIGFueSBleGNlcHRp
-b24NCg0KDQpXaXRoIG9yIHdpdGhvdXQgdGhhdCBmaXhlZDoNClJldmlld2VkLWJ5OiBWbGFkaW1p
-ciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0g
-DQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Mon, 28 Jan 2019 15:35:09 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> On 12/17/18 10:57 AM, Tony Krowiak wrote:
+> > The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
+> > value of the BusState structure with the max_dev value of the BusClass structure
+> > to determine whether the maximum number of children has been reached for the
+> > bus. The problem is, the max_index field of the BusState structure does not
+> > necessarily reflect the number of devices that have been plugged into
+> > the bus.
+> > 
+> > Whenever a child device is plugged into the bus, the bus's max_index value is
+> > assigned to the child device and then incremented. If the child is subsequently
+> > unplugged, the value of the max_index does not change and no longer reflects the
+> > number of children.
+> > 
+> > When the bus's max_index value reaches the maximum number of devices
+> > allowed for the bus (i.e., the max_dev field in the BusClass structure),
+> > attempts to plug another device will be rejected claiming that the bus is
+> > full -- even if the bus is actually empty.
+> > 
+> > To resolve the problem, a new 'num_children' field is being added to the
+> > BusState structure to keep track of the number of children plugged into the
+> > bus. It will be incremented when a child is plugged, and decremented when a
+> > child is unplugged.
+> > 
+> > Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> > Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> > Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> > ---
+> >   hw/core/qdev.c         | 3 +++
+> >   include/hw/qdev-core.h | 1 +
+> >   qdev-monitor.c         | 2 +-
+> >   3 files changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > index 6b3cc55b27c2..956923f33520 100644
+> > --- a/hw/core/qdev.c
+> > +++ b/hw/core/qdev.c
+> > @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+> >               snprintf(name, sizeof(name), "child[%d]", kid->index);
+> >               QTAILQ_REMOVE(&bus->children, kid, sibling);
+> >   
+> > +            bus->num_children--;
+> > +
+> >               /* This gives back ownership of kid->child back to us.  */
+> >               object_property_del(OBJECT(bus), name, NULL);
+> >               object_unref(OBJECT(kid->child));
+> > @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+> >       char name[32];
+> >       BusChild *kid = g_malloc0(sizeof(*kid));
+> >   
+> > +    bus->num_children++;
+> >       kid->index = bus->max_index++;
+> >       kid->child = child;
+> >       object_ref(OBJECT(kid->child));
+> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> > index a24d0dd566e3..521f0a947ead 100644
+> > --- a/include/hw/qdev-core.h
+> > +++ b/include/hw/qdev-core.h
+> > @@ -206,6 +206,7 @@ struct BusState {
+> >       HotplugHandler *hotplug_handler;
+> >       int max_index;
+> >       bool realized;
+> > +    int num_children;
+> >       QTAILQ_HEAD(ChildrenHead, BusChild) children;
+> >       QLIST_ENTRY(BusState) sibling;
+> >   };
+> > diff --git a/qdev-monitor.c b/qdev-monitor.c
+> > index 07147c63bf8b..45a8ba49644c 100644
+> > --- a/qdev-monitor.c
+> > +++ b/qdev-monitor.c
+> > @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
+> >   static inline bool qbus_is_full(BusState *bus)
+> >   {
+> >       BusClass *bus_class = BUS_GET_CLASS(bus);
+> > -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
+> > +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
+> >   }
+> >   
+> >   /*
+> 
+> Just checking back on this one. Do we want to merge this patch and deal
+> with the max_index issue in another patch, in this patch, or not at all?
+I think there were consensus that max_index was a separate problem that should
+be addressed by another patch.
+
+Maybe Paolo (CCed) could take this generic patch.
