@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58192)
+Received: from eggs.gnu.org ([209.51.188.92]:58254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1grPFw-0006NN-1c
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:56 -0500
+	(envelope-from <mreitz@redhat.com>) id 1grPG3-0006SY-QH
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1grPFu-0000KD-Cy
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1grPFl-0000ES-MN
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:36:47 -0500
-Date: Wed, 6 Feb 2019 15:36:31 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190206153631.GS12331@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1548509635-15776-1-git-send-email-ptsneves@gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1grPG1-0000NE-MI
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 10:37:03 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed,  6 Feb 2019 16:29:18 +0100
+Message-Id: <20190206152919.5532-2-mreitz@redhat.com>
+In-Reply-To: <20190206152919.5532-1-mreitz@redhat.com>
+References: <20190206152919.5532-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1548509635-15776-1-git-send-email-ptsneves@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3] chardev: Allow for pty path passing.
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 1/2] block/ssh: Implement
+ .bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +22,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paulo Neves <ptsneves@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, "Richard W . M . Jones" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Sat, Jan 26, 2019 at 02:33:55PM +0100, Paulo Neves wrote:
-> If a user requires a virtual serial device like provided
-> by the pty char device, the user needs to accept the
-> returned device name. This makes the program need to
-> have smarts to parse or communicate with qemu to get the
-> pty device.
-> With this patch the program can pass the path where
-> a symlink to the pty device will be, removing the
-> need for 2 way communication or smarts.
-> 
-> Signed-off-by: Paulo Neves <ptsneves@gmail.com>
-> ---
->  chardev/char-pty.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->  chardev/char.c     |  6 +++++-
->  qapi/char.json     |  4 ++--
->  3 files changed, 47 insertions(+), 4 deletions(-)
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/ssh.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 47 insertions(+), 5 deletions(-)
 
-qemu-options.hx needs updating to document the new syntax too
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+diff --git a/block/ssh.c b/block/ssh.c
+index 190ef95300..88401bbd31 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -75,6 +75,14 @@ typedef struct BDRVSSHState {
+=20
+     /* Used to warn if 'flush' is not supported. */
+     bool unsafe_flush_warning;
++
++    /*
++     * Store the user name for ssh_refresh_filename() because the
++     * default depends on the system you are on -- therefore, when we
++     * generate a filename, it should always contain the user name we
++     * are actually using.
++     */
++    char *user;
+ } BDRVSSHState;
+=20
+ static void ssh_state_init(BDRVSSHState *s)
+@@ -87,6 +95,8 @@ static void ssh_state_init(BDRVSSHState *s)
+=20
+ static void ssh_state_free(BDRVSSHState *s)
+ {
++    g_free(s->user);
++
+     if (s->sftp_handle) {
+         libssh2_sftp_close(s->sftp_handle);
+     }
+@@ -640,14 +650,13 @@ static int connect_to_ssh(BDRVSSHState *s, Blockdev=
+OptionsSsh *opts,
+                           int ssh_flags, int creat_mode, Error **errp)
+ {
+     int r, ret;
+-    const char *user;
+     long port =3D 0;
+=20
+     if (opts->has_user) {
+-        user =3D opts->user;
++        s->user =3D g_strdup(opts->user);
+     } else {
+-        user =3D g_get_user_name();
+-        if (!user) {
++        s->user =3D g_strdup(g_get_user_name());
++        if (!s->user) {
+             error_setg_errno(errp, errno, "Can't get user name");
+             ret =3D -errno;
+             goto err;
+@@ -697,7 +706,7 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOp=
+tionsSsh *opts,
+     }
+=20
+     /* Authenticate. */
+-    ret =3D authenticate(s, user, errp);
++    ret =3D authenticate(s, s->user, errp);
+     if (ret < 0) {
+         goto err;
+     }
+@@ -1254,6 +1263,38 @@ static int coroutine_fn ssh_co_truncate(BlockDrive=
+rState *bs, int64_t offset,
+     return ssh_grow_file(s, offset, errp);
+ }
+=20
++static void ssh_refresh_filename(BlockDriverState *bs)
++{
++    BDRVSSHState *s =3D bs->opaque;
++    const char *path, *host_key_check;
++    int ret;
++
++    /*
++     * None of these options can be represented in a plain "host:port"
++     * format, so if any was given, we have to abort.
++     */
++    if (s->inet->has_ipv4 || s->inet->has_ipv6 || s->inet->has_to ||
++        s->inet->has_numeric)
++    {
++        return;
++    }
++
++    path =3D qdict_get_try_str(bs->full_open_options, "path");
++    assert(path); /* mandatory option */
++
++    host_key_check =3D qdict_get_try_str(bs->full_open_options, "host_ke=
+y_check");
++
++    ret =3D snprintf(bs->exact_filename, sizeof(bs->exact_filename),
++                   "ssh://%s@%s:%s%s%s%s",
++                   s->user, s->inet->host, s->inet->port, path,
++                   host_key_check ? "?host_key_check=3D" : "",
++                   host_key_check ?: "");
++    if (ret >=3D sizeof(bs->exact_filename)) {
++        /* An overflow makes the filename unusable, so do not report any=
+ */
++        bs->exact_filename[0] =3D '\0';
++    }
++}
++
+ static const char *const ssh_strong_runtime_opts[] =3D {
+     "host",
+     "port",
+@@ -1280,6 +1321,7 @@ static BlockDriver bdrv_ssh =3D {
+     .bdrv_getlength               =3D ssh_getlength,
+     .bdrv_co_truncate             =3D ssh_co_truncate,
+     .bdrv_co_flush_to_disk        =3D ssh_co_flush,
++    .bdrv_refresh_filename        =3D ssh_refresh_filename,
+     .create_opts                  =3D &ssh_create_opts,
+     .strong_runtime_opts          =3D ssh_strong_runtime_opts,
+ };
+--=20
+2.20.1
