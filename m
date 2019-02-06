@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51159)
+Received: from eggs.gnu.org ([209.51.188.92]:55097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1grL5e-0005x8-5C
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:10:04 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1grLMw-0002jf-R3
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:27:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1grL5c-0007Yl-22
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:10:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:4727)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1grL5a-0007Wh-3i
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:09:59 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C87E3E2A4
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 11:09:55 +0000 (UTC)
-Date: Wed, 6 Feb 2019 12:09:47 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190206110947.GU5349@paraplu.home>
-References: <20190205134926.8312-1-marcandre.lureau@redhat.com>
-	<781b71d9-f045-ffa9-3674-f6222f6e7e0b@redhat.com>
-	<20190206104851.GT5349@paraplu.home>
+	(envelope-from <sgarzare@redhat.com>) id 1grLMv-0005i0-V3
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:27:54 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed,  6 Feb 2019 12:27:24 +0100
+Message-Id: <20190206112729.37761-2-sgarzare@redhat.com>
+In-Reply-To: <20190206112729.37761-1-sgarzare@redhat.com>
+References: <20190206112729.37761-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190206104851.GT5349@paraplu.home>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qmp-shell: fix nested json regression
+Subject: [Qemu-devel] [PATCH v3 1/6] virtio-blk: add acct_failed param to
+ virtio_blk_handle_rw_error()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, Cleber Rosa <crosa@redhat.com>, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On Wed, Feb 06, 2019 at 11:48:51AM +0100, Kashyap Chamarthy wrote:
-> On Tue, Feb 05, 2019 at 08:44:12PM -0500, John Snow wrote:
-> > On 2/5/19 8:49 AM, Marc-Andr=E9 Lureau wrote:
+We add acct_failed param in order to use virtio_blk_handle_rw_error()
+also when is not required to call block_acct_failed(). (eg. a discard
+operation is failed)
 
-[...]
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ hw/block/virtio-blk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-> > >              < command-name > [ arg-name1=3Darg1 ] ... [ arg-nameN=3D=
-argN ]
-> > >          """
-> > > -        cmdargs =3D shlex.split(cmdline)
-> > > +        cmdargs =3D re.findall(r'''(?:[^\s"']|"(?:\\.|[^"])*"|'(?:=
-\\.|[^'])*')+''', cmdline)
-
-Dan Berrang=E9 explained on IRC this way:
-
-    In plain english what that is saying is: give me all blocks of text
-    which are:
-   =20
-      (a) set of chars not including " or '
-     =20
-      (b) a set of chars surrounded by ".."=20
-     =20
-      (c) a set of chars surrounded by '... =20
-
-> > It might really be nice to have a comment briefly explaining the rege=
-x.
-> > This is pretty close to symbol soup.
->=20
-> Yeah, a little comment explaining it would be nice. =20
-
-For my own education today I learned that ?: is called a "non-capturing
-match".  For reference, quoting from the `perldoc perlretut`:
-
-[quote]
-
-  Non-capturing groupings
-    A group that is required to bundle a set of alternatives may or may n=
-ot
-    be useful as a capturing group. If it isn't, it just creates a
-    superfluous addition to the set of available capture group values,
-    inside as well as outside the regexp. Non-capturing groupings, denote=
-d
-    by "(?:regexp)", still allow the regexp to be treated as a single uni=
-t,
-    but don't establish a capturing group at the same time. Both capturin=
-g
-    and non-capturing groupings are allowed to co-exist in the same regex=
-p.
-    Because there is no extraction, non-capturing groupings are faster th=
-an
-    capturing groupings. Non-capturing groupings are also handy for choos=
-ing
-    exactly which parts of a regexp are to be extracted to matching
-    variables:
-
-        # match a number, $1-$4 are set, but we only want $1
-        /([+-]?\ *(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)/;
-
-        # match a number faster , only $1 is set
-        /([+-]?\ *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)/;
-
-        # match a number, get $1 =3D whole number, $2 =3D exponent
-        /([+-]?\ *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE]([+-]?\d+))?)/;
-
-    Non-capturing groupings are also useful for removing nuisance element=
-s
-    gathered from a split operation where parentheses are required for so=
-me
-    reason:
-
-        $x =3D '12aba34ba5';
-        @num =3D split /(a|b)+/, $x;    # @num =3D ('12','a','34','a','5'=
-)
-        @num =3D split /(?:a|b)+/, $x;  # @num =3D ('12','34','5')
-
-[/quote]
-
-[...]
-
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 9a87b3bfac..b2bb129efa 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -61,7 +61,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
+, unsigned char status)
+ }
+=20
+ static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
+-    bool is_read)
++    bool is_read, bool acct_failed)
+ {
+     BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
+                                                    is_read, error);
+@@ -75,7 +75,9 @@ static int virtio_blk_handle_rw_error(VirtIOBlockReq *r=
+eq, int error,
+         s->rq =3D req;
+     } else if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
+         virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
+-        block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        if (acct_failed) {
++            block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        }
+         virtio_blk_free_request(req);
+     }
+=20
+@@ -113,7 +115,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
+ret)
+              * the memory until the request is completed (which will
+              * happen on the other side of the migration).
+              */
+-            if (virtio_blk_handle_rw_error(req, -ret, is_read)) {
++            if (virtio_blk_handle_rw_error(req, -ret, is_read, true)) {
+                 continue;
+             }
+         }
+@@ -132,7 +134,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
+nt ret)
+=20
+     aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
+     if (ret) {
+-        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
++        if (virtio_blk_handle_rw_error(req, -ret, 0, true)) {
+             goto out;
+         }
+     }
 --=20
-/kashyap
+2.20.1
