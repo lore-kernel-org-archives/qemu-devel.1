@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53812)
+Received: from eggs.gnu.org ([209.51.188.92]:55041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1grN6R-0002Kd-AM
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:18:59 -0500
+	(envelope-from <quintela@redhat.com>) id 1grNBB-0006Qg-G7
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1grN6Q-0006D0-KJ
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:18:59 -0500
-Date: Wed, 6 Feb 2019 14:18:34 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190206141834.6b8f9771@Igors-MacBook-Pro.local>
-In-Reply-To: <71092159-cb69-2cc3-13f3-e621f89bf4a6@redhat.com>
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190128151833.15532428@redhat.com>
-	<71092159-cb69-2cc3-13f3-e621f89bf4a6@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1grNBA-0007cw-Ku
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:23:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1grNBA-0007bX-FF
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:23:52 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 910BF3C2CD0
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 13:23:51 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed,  6 Feb 2019 14:23:27 +0100
+Message-Id: <20190206132331.1694-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFCv2 0/9] qdev: Hotplug handler chaining +
- virtio-pmem
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] migration: Make multifd not experimental
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 31 Jan 2019 15:52:25 +0100
-David Hildenbrand <david@redhat.com> wrote:
+This series:
 
-> On 28.01.19 15:18, Igor Mammedov wrote:
-> > On Wed, 23 Jan 2019 20:55:18 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> > 
-> >> This series implements supprt for hotplug handler chaining (proposed
-> >> by Igor), something that is necessary to turn selected virtio devices into
-> >> memory devices. Planned devices inlude virtio-mem and virtio-pmem. The
-> >> current prototype of virtio-pmem is included.
-> >>
-> >> The machine hotplug handler can intercept hotplug handler calls
-> >> to properly prepare/teardown the memory device part of a device. Control
-> >> is then passed on to the actual bus hotplug handler. So the default hotplug
-> >> handler is effectively overwritten to make interception possible.
-> >>
-> >> It is based on the following patches/series
-> >> - [PATCH v1] pc: Use hotplug_handler_(plug|unplug|unplug_request)
-> >> -- Queued by Paolo
-> >> - [PATCH v3 0/2] s390x/pci: hotplug handler fixes and reworks
-> >>
-> >> Patch 1-3 are the preparations for hotplug handler chaining.
-> > we probably should merge this ones even without pmem patches.
-> 
-> Just to verify, does the general approach on how to hotplug virtio based
-> memory devices now looks okay to you?
-it looks fine (minor comments aside)
+- Change page_count default to 128.
 
-rant: beside a little bit complex dance with nowadays virtio type names
-but that's not related to your series. It just makes understanding virtio
-code more difficult not saying it's wasn't already complicated to begin with.
+  16 was really small, and it makes much less contention on mutexes to
+  just have bigger packets.
 
-> I'll resend the qdev parts separately after more testing. Thanks!
-> 
+- Drop multifd-page_count parameter
+
+  This parameter was useful for testing, but in all my testing 128 is
+  good enough, no need to have an extra knob.  Libvirt don't want to
+  expose this parameter because it is difficult to explain.
+
+- Drop experimental "x-" from multifd
+
+  Code is stable, nothing big is happening here.
+
+- Multifd test
+
+  And a test for multifd, this test has already been on other patch
+  series.  But now it uses the names without "-x".
+
+Please review.
+
+Juan Quintela (4):
+  multifd: Change page count default to 128
+  multifd: Drop x-multifd-page-count parameter
+  multifd: Drop x-
+  tests: Add migration multifd test
+
+ hmp.c                  | 17 ++++---------
+ migration/migration.c  | 56 ++++++++++--------------------------------
+ migration/migration.h  |  1 -
+ migration/ram.c        | 13 ++++++----
+ qapi/migration.json    | 45 +++++++++++++--------------------
+ tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++
+ 6 files changed, 91 insertions(+), 89 deletions(-)
+
+--=20
+2.20.1
