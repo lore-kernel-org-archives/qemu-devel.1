@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36067)
+Received: from eggs.gnu.org ([209.51.188.92]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1grNku-0007F3-O0
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:00:50 -0500
+	(envelope-from <cohuck@redhat.com>) id 1grNl2-0007KB-KI
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:00:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1grNkr-0006lE-29
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:00:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1grNko-0006kA-E2
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:00:44 -0500
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190204170515-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5b8a06a7-be44-698f-f319-6b2cbcf1eb8a@redhat.com>
-Date: Wed, 6 Feb 2019 15:00:26 +0100
+	(envelope-from <cohuck@redhat.com>) id 1grNkw-0006pQ-Jo
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:00:56 -0500
+Date: Wed, 6 Feb 2019 15:00:16 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190206150016.6fdfaf8f.cohuck@redhat.com>
+In-Reply-To: <20190130132212.7376-1-cohuck@redhat.com>
+References: <20190130132212.7376-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190204170515-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] security implications of caching with virtio pmem
- (was Re: [PATCH v3 0/5] kvm "virtio pmem" device)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,117 +23,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, jmoyer@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, rjw@rjwysocki.net, Andrea Arcangeli <aarcange@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On 04.02.19 23:56, Michael S. Tsirkin wrote:
->=20
-> On Wed, Jan 09, 2019 at 08:17:31PM +0530, Pankaj Gupta wrote:
->>  This patch series has implementation for "virtio pmem".=20
->>  "virtio pmem" is fake persistent memory(nvdimm) in guest=20
->>  which allows to bypass the guest page cache. This also
->>  implements a VIRTIO based asynchronous flush mechanism. =20
->=20
->=20
-> At Pankaj's request I looked at information leak implications of virtio
-> pmem in light of the recent page cache side channels paper
-> (https://arxiv.org/pdf/1901.01161.pdf) - to see what
-> kind of side channels it might create if any.  TLDR - I think that
-> depending on the host side implementation there could be some, but this
-> might be addressable by better documentation in both code and spec.
-> The fake dax approach backing the guest memory by a host page cache
-> does seem to have potential issues.
->=20
-> For clarity: we are talking about leaking information either to a VM, o=
-r
-> within a VM (I did not look into leaks to hypervisor in configurations
-> such as SEV) through host page cache.
->=20
-> Leaks into a VM: It seems clear that while pmem allows memory accesses
-> versus read/write with e.g. a block device, from host page cache point
-> of view this doesn't matter much: reads populate cache in the same way
-> as memory faults.  Thus ignoring presence of information leaks (which i=
-s
-> an interesting question e.g. in light of recent discard support) pmem
-> doesn't seem to be any better or worse for leaking information into a
-> VM.
+On Wed, 30 Jan 2019 14:22:06 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-+1, just a different way to access that cache.
+> [This is the Linux kernel part, git tree is available at
+> https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3
 
-Conceptually a virtio-pmem devices is from the guest view a "device with
-a managed buffer". Some accesses might be faster than others. There are
-no guarantees on how fast a certain access is. And yes, actions on other
-guests can result in accesses being slower but not faster.
+I've pushed out the changes I've made so far (patch 1) to
+vfio-ccw-eagain-caps-v3.5. I'll wait a bit for more comments before
+sending a new version.
 
-Also other storage devices have caches like that (well, the caches size
-depends on the device) - thinking especially about storage systems -
-which would in my opinion, also allow similar leaks. How are such
-security concerns handled there? Are they different (besides eventually
-access speed)?
+> 
+> The companion QEMU patches are available at
+> https://github.com/cohuck/qemu vfio-ccw-caps
+> This is the previously posted v2 version, which should continue to work.]
 
->=20
-> Leaks within VM: Right now pmem seems to bypass the guest page cache
-> completely.  Whether pmem memory is then resident in a page cache would
-> be up to the device/host. Assuming that it is, the "Preventing
-> Efficient Eviction while Increasing the System Performance"
-> countermeasure for the page cache side channel attack would appear to
-> become ineffective with pmem. What is suggested is a per-process
-> management of the page cache, and host does not have visibility of
-> processes within a VM. Another possible countermeasure - not discussed
-> in the paper - could be modify the applications to lock the security
-> relevant pages in memory.  Again this becomes impractical with pmem as
-> host does not have visibility into that. However note that as long
-> as the only countermeasure linux uses is "Privileged Access"
-> (i.e. blocking mincore) nothing can be done as guest page cache
-> remains as vulnerable as host page cache.
+I would not mind if somebody looked at those as well :)
 
-This sounds very use-case specific. If I run a VM only with a very
-specific workload (say, a container running one application), I usually
-don't care about leaks within the VM. At least not leaks between
-applications ;)
-
-In contrast, to running different applications (e.g. containers from
-different customers) on one system, I really care about leaks within a VM=
-.
-
->=20
->=20
-> Countermeasures: which host-side countermeasures can be designed would
-> depend on which countermeasures are used guest-side - we would need to
-> make sure they are not broken by pmem.  For "Preventing Efficient
-> Eviction while Increasing the System Performance" modifying the host
-> implementation to ensure that pmem device bypasses the host page cache
-> would seem to address the security problem.Similarly, ensuring that a
-> real memory device (e.g. DAX, RAM such as hugetlbfs, pmem for nested
-> virt) is used for pmem would make the memory locking countermeasure
-> work.  Whether with such limitations the device is still useful
-> performance wise is an open question.  These questions probably should
-> be addressed in the documentation, spec and possible qemu code.
->=20
-I also want to note that using a disk/file as memory backend with
-NVDIMMs in QEMU essentially results in the exact same questions we have
-with virtio-pmem.
-
-E.g. kata-containers use nvdimms for the rootfile system (read-only) as
-far as I am aware.
-
-Conceptually, a virtio-pmem device is just an emulated nvdimm device
-with a flush interface. And the nice thing is, that it is designed to
-also work on architectures that don't speak "nvdimm".
-
->=20
-> Severity of the security implications: some people argue that the
-> security implications of the page cache leaks are minor.  I do not have
-> an opinion on this: the severity would seem to depend on the specific
-> configuration.
-
-I guess configuration and use case.
-
-Nice summary, thanks for looking into this Michael!
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+> 
+> Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+> device. This tends to work well for the most common 'good path' scenarios;
+> however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
+> clearing pending requests at the device is currently not supported.
+> This may be a problem for e.g. error recovery.
+> 
+> This patch series introduces capabilities (similar to what vfio-pci uses)
+> and exposes a new async region for handling hsch/csch.
+> 
+> Lightly tested (I can interact with a dasd as before, and reserve/release
+> seems to work well.) Not sure if there is a better way to test this, ideas
+> welcome.
+> 
+> Changes v2->v3:
+> - Unb0rked patch 1, improved scope
+> - Split out the new mutex from patch 2 into new patch 3; added missing
+>   locking and hopefully improved description
+> - Patch 2 now reworks the state handling by splitting the BUSY state
+>   into CP_PROCESSING and CP_PENDING
+> - Patches 3 and 5 adapted on top of the reworked patches; hsch/csch
+>   are allowed in CP_PENDING, but not in CP_PROCESSING (did not add
+>   any R-b due to that)
+> - Added missing free in patch 5
+> - Probably some small changes I forgot to note down
+> 
+> Changes v1->v2:
+> - New patch 1: make it safe to use the cp accessors at any time; this
+>   should avoid problems with unsolicited interrupt handling
+> - New patch 2: handle concurrent accesses to the io region; the idea is
+>   to return -EAGAIN to userspace more often (so it can simply retry)
+> - also handle concurrent accesses to the async io region
+> - change VFIO_REGION_TYPE_CCW
+> - merge events for halt and clear to a single async event; this turned out
+>   to make the code quite a bit simpler
+> - probably some small changes I forgot to note down
+> 
+> Cornelia Huck (6):
+>   vfio-ccw: make it safe to access channel programs
+>   vfio-ccw: rework ssch state handling
+>   vfio-ccw: protect the I/O region
+>   vfio-ccw: add capabilities chain
+>   s390/cio: export hsch to modules
+>   vfio-ccw: add handling for async channel instructions
+> 
+>  drivers/s390/cio/Makefile           |   3 +-
+>  drivers/s390/cio/ioasm.c            |   1 +
+>  drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++
+>  drivers/s390/cio/vfio_ccw_cp.c      |  20 ++-
+>  drivers/s390/cio/vfio_ccw_cp.h      |   2 +
+>  drivers/s390/cio/vfio_ccw_drv.c     |  57 ++++++--
+>  drivers/s390/cio/vfio_ccw_fsm.c     | 143 ++++++++++++++++++-
+>  drivers/s390/cio/vfio_ccw_ops.c     | 210 +++++++++++++++++++++++-----
+>  drivers/s390/cio/vfio_ccw_private.h |  48 ++++++-
+>  include/uapi/linux/vfio.h           |   4 +
+>  include/uapi/linux/vfio_ccw.h       |  12 ++
+>  11 files changed, 531 insertions(+), 57 deletions(-)
+>  create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+> 
