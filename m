@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44765)
+Received: from eggs.gnu.org ([209.51.188.92]:44839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grOIq-0004Nz-Ij
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:35:53 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grOJ6-0004UF-Tu
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:36:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grOIk-0004AX-QW
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:35:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52686)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grOJ5-0004M3-LB
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:36:08 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40975)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1grOIk-00049u-JG
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:35:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1grOIj-0002LJ-NP
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 14:35:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF82D2E8054
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 14:35:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1grOJ5-0004LO-F9
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 09:36:07 -0500
+Received: by mail-wr1-x444.google.com with SMTP id x10so7784325wrs.8
+	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 06:36:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190123172740.32452-1-berrange@redhat.com>
+	<CAMxuvayEOLrg4FOt2iwHwZrQZ6aY6OhQeU9YaTSG+YBadp-5kQ@mail.gmail.com>
+	<20190206135621.GN12331@redhat.com>
+In-Reply-To: <20190206135621.GN12331@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 6 Feb 2019 15:35:53 +0100
+Message-ID: <CAJ+F1CKS6DNX6iWc8Or5hph4j3TcnHAVc-0LXZw7GUVO0xG8SA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Feb 2019 14:28:41 -0000
-From: Thomas <1813165@bugs.launchpad.net>
-Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <154946332203.19394.2401742805580098927.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
- emulation failure
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] chardev: refactoring & many
+ bugfixes related tcp_chr_wait_connected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +32,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Yongji Xie <elohimes@gmail.com>
 
-Yes. I was using a 4.20.x kernel. But i guess the bug can be closed
-because the vm does not exist anymore and the new one does not show this
-behaviour.
+Hi
 
--- =
+On Wed, Feb 6, 2019 at 2:56 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+>
+> On Wed, Feb 06, 2019 at 02:45:22PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> > On Wed, Jan 23, 2019 at 6:27 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote:
+> > >
+> > > This is a followup to
+> > >
+> > >   v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.=
+html
+> > >
+> > > This series comes out of a discussion between myself & Yongji Xie in:
+> > >
+> > >   https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01881.html
+> > >
+> > > I eventually understood that the problem faced was that
+> > > tcp_chr_wait_connected was racing with the background connection atte=
+mpt
+> > > previously started, causing two connections to be established. This
+> > > broke because some vhost user servers only allow a single connection.
+> > >
+> > > After messing around with the code alot the final solution was in fac=
+t
+> > > very easy. We simply have to delay the first background connection
+> > > attempt until the main loop is running. It will then automatically
+> > > turn into a no-op if tcp_chr_wait_connected has been run. This is
+> > > dealt with in the last patch in this series
+> > >
+> > > I believe this should solve the problem Yongji Xie faced, and thus no=
+t
+> > > require us to add support for "nowait" option with client sockets at
+> > > all. The reconnect=3D1 option effectively already implements nowait
+> > > semantics, and now plays nicely with tcp_chr_wait_connected.
+> > >
+> > > In investigating this I found various other bugs that needed fixing a=
+nd
+> > > identified some useful refactoring to simplify / clarify the code, he=
+nce
+> > > this very long series.
+> > >
+> > > This series passes make check-unit & check-qtest (for x86_64 target).
+> > >
+> > > I did a test with tests/vhost-user-bridge too, which was in fact alre=
+ady
+> > > broken for the same reason Yongji Xie found - it only accepts a singl=
+e
+> > > connection. This series fixes use of reconnect=3D1 with vhost-user-br=
+idge.
+> > >
+> > > Changed in v2:
+> > >
+> > >  - Rewrite the way we synchronize in tcp_chr_wait_connected again
+> > >    to cope with chardev+device hotplug scenario
+> > >  - Add extensive unit test coverage
+> > >  - Resolve conflicts with git master
+> > >
+> > > Daniel P. Berrang=C3=A9 (16):
+> > >   io: store reference to thread information in the QIOTask struct
+> > >   io: add qio_task_wait_thread to join with a background thread
+> > >   chardev: fix validation of options for QMP created chardevs
+> > >   chardev: forbid 'reconnect' option with server sockets
+> > >   chardev: forbid 'wait' option with client sockets
+> > >   chardev: remove many local variables in qemu_chr_parse_socket
+> > >   chardev: ensure qemu_chr_parse_compat reports missing driver error
+> > >   chardev: remove unused 'sioc' variable & cleanup paths
+> > >   chardev: split tcp_chr_wait_connected into two methods
+> > >   chardev: split up qmp_chardev_open_socket connection code
+> > >   chardev: use a state machine for socket connection state
+> > >   chardev: honour the reconnect setting in tcp_chr_wait_connected
+> > >   chardev: disallow TLS/telnet/websocket with tcp_chr_wait_connected
+> > >   chardev: fix race with client connections in tcp_chr_wait_connected
+> > >   tests: expand coverage of socket chardev test
+> > >   chardev: ensure termios is fully initialized
+> > >
+> > >  chardev/char-serial.c          |   2 +-
+> > >  chardev/char-socket.c          | 487 ++++++++++++++++++-------
+> > >  chardev/char.c                 |   2 +
+> > >  include/io/task.h              |  29 +-
+> > >  io/task.c                      |  88 +++--
+> > >  io/trace-events                |   2 +
+> > >  tests/ivshmem-test.c           |   2 +-
+> > >  tests/libqtest.c               |   4 +-
+> > >  tests/test-char.c              | 643 ++++++++++++++++++++++++-------=
+--
+> > >  tests/test-filter-redirector.c |   4 +-
+> > >  10 files changed, 928 insertions(+), 335 deletions(-)
+> > >
+> >
+> > With the fix squashed, I am queuing this series.
+> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> FYI in case you didn't notice, the fix i posted for patch 1, will
+> invalidate a small part of patch 2 where I had fixed the same
+> problem without realizing/remembering
+>
+> I pushed my updated branch to if you want to compare:
+>
+>   https://github.com/berrange/qemu/commits/chr-sock
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813165
+Thanks, I fixed the trivial conflict on rebase.
+I also replaced setenv/unsetenv with glib equivalent to fix mingw build.
 
-Title:
-  KVM internal error. Suberror: 1 emulation failure
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+>
 
-Status in QEMU:
-  New
 
-Bug description:
-  Hello Devs.
-
-  Having problems getting VM to run with qemu 3.1.0. I should mention
-  it's a nested configuration.
-
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-
-  Someone has an idea whats going wrong here?
-
-  thanks and cheers
-  t.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
