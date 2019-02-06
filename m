@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46749)
+Received: from eggs.gnu.org ([209.51.188.92]:49612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1grHRH-0006yy-Io
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:16:09 -0500
+	(envelope-from <clabbe.montjoie@gmail.com>) id 1grHdh-0002Ug-7P
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:28:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1grHRB-00044E-Ht
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:16:07 -0500
-From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
-Date: Wed, 6 Feb 2019 07:15:58 +0000
-Message-ID: <VI1PR0602MB3245032D51A5DF45AF6E1952A46F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-References: <CABdb735e_NjY47LRZ58+zvKGmCRQKAmFo-HhByhsosRzQkOgxA@mail.gmail.com>
-	<HE1PR1001MB1371F7874B487B0907C42A7EB7C50@HE1PR1001MB1371.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7372Pv3hR4S8C0TCV19u9XAKn=y0VmreGuZavhOjqRrypQ@mail.gmail.com>
-	<VI1PR1001MB13731144A5E55914A9E414A5B7DA0@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
-	<1498199343.2815.0@smtp-mail.outlook.com>
-	<VI1PR1001MB13731EF256C1E7380E1D657AB7D90@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
-	<VI1PR0602MB324559765BFE372F75D52E57A4910@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<20190201054849.GH23131@stefanha-x1.localdomain>
-	<VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
-	<20190204060636.GF29758@stefanha-x1.localdomain>
-	<AM5PR0602MB32368CB5ADDEC05F42D8BC8FA46D0@AM5PR0602MB3236.eurprd06.prod.outlook.com>
-In-Reply-To: <AM5PR0602MB32368CB5ADDEC05F42D8BC8FA46D0@AM5PR0602MB3236.eurprd06.prod.outlo
-	ok.com>
-Content-Language: en-US
+	(envelope-from <clabbe.montjoie@gmail.com>) id 1grHdf-0008Fs-5w
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:28:57 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <clabbe.montjoie@gmail.com>)
+	id 1grHde-0008FT-Pn
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:28:54 -0500
+Received: by mail-wm1-x344.google.com with SMTP id q21so1452617wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 23:28:54 -0800 (PST)
+Date: Wed, 6 Feb 2019 08:28:50 +0100
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Message-ID: <20190206072850.GA4295@Red>
+References: <20190103154810.GB32032@Red>
+	<3a375dc6-f0ba-c3f0-6e86-2fd5cdf3ee35@ilande.co.uk>
+	<8c302745-5097-afed-5c7e-9a992da03cf6@ilande.co.uk>
+	<20190205091115.GA27918@Red>
+	<2a85b239-7117-71aa-b921-86c42a54aeba@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
- size exceeded error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a85b239-7117-71aa-b921-86c42a54aeba@ilande.co.uk>
+Subject: Re: [Qemu-devel] sparc: crash when using initrd > 5M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +33,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: sparclinux@vger.kernel.org, qemu-devel@nongnu.org
 
-I can now confirm that the same happens with virtio-blk and virtio-scsi.
-Please find below the qemu log enhanced with the new information added by t=
-he patch provided by Stefan:
+On Tue, Feb 05, 2019 at 04:45:16PM +0000, Mark Cave-Ayland wrote:
+> On 05/02/2019 09:11, Corentin Labbe wrote:
+> 
+> > On Fri, Feb 01, 2019 at 02:15:15PM +0000, Mark Cave-Ayland wrote:
+> >> On 18/01/2019 13:33, Mark Cave-Ayland wrote:
+> >>
+> >>> On 03/01/2019 15:48, Corentin Labbe wrote:
+> >>>
+> >>>> Hello
+> >>>>
+> >>>> When using an initrd > 5M, I hit the following kernel crash:
+> >>>> qemu-system-sparc -kernel vmlinux -initrd rootfs.cpio.gz -nographic
+> >>>> Configuration device id QEMU version 1 machine id 32
+> >>>> Probing SBus slot 0 offset 0
+> >>>> Probing SBus slot 1 offset 0
+> >>>> Probing SBus slot 2 offset 0
+> >>>> Probing SBus slot 3 offset 0
+> >>>> Probing SBus slot 4 offset 0
+> >>>> Probing SBus slot 5 offset 0
+> >>>> Invalid FCode start byte
+> >>>> CPUs: 1 x FMI,MB86904
+> >>>> UUID: 00000000-0000-0000-0000-000000000000
+> >>>> Welcome to OpenBIOS v1.1 built on Oct 5 2018 08:20
+> >>>>   Type 'help' for detailed information
+> >>>> [sparc] Kernel already loaded
+> >>>> switching to new context:
+> >>>> PROMLIB: obio_ranges 1
+> >>>> [    0.000000] PROMLIB: Sun Boot Prom Version 3 Revision 2
+> >>>> [    0.000000] Linux version 4.20.0-next-20190102+ (compile@Red) (gcc version 7.3.0 (Gentoo 7.3.0-r3 p1.4)) #148 Thu Jan 3 16:17:08 CET 2019
+> >>>> [    0.000000] printk: bootconsole [earlyprom0] enabled
+> >>>> [    0.000000] ARCH: SUN4M
+> >>>> [    0.000000] TYPE: SPARCstation 5
+> >>>> [    0.000000] Ethernet address: 52:54:00:12:34:56
+> >>>> [    0.000000] Unable to handle kernel NULL pointer dereference
+> >>>> [    0.000000] tsk->{mm,active_mm}->context = ffffffff
+> >>>> [    0.000000] tsk->{mm,active_mm}->pgd = 00000000
+> >>>> [    0.000000]               \|/ ____ \|/
+> >>>> [    0.000000]               "@'/ ,. \`@"
+> >>>> [    0.000000]               /_| \__/ |_\
+> >>>> [    0.000000]                  \__U_/
+> >>>> [    0.000000] swapper(0): Oops [#1]
+> >>>> [    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 4.20.0-next-20190102+ #148
+> >>>> [    0.000000] PSR: 04001fc0 PC: f0010ef0 NPC: f0010ef4 Y: 00000000    Not tainted
+> >>>> [    0.000000] PC: <do_sparc_fault+0x158/0x404>
+> >>>> [    0.000000] %G: 0000000a 000003c4  f05ece08 f05ecc00  00000000 00e00000  f05d4000 00000001
+> >>>> [    0.000000] %O: 00000000 00e00000  00800000 00e00000  00000000 00000002  f05d5bb8 f00bba58
+> >>>> [    0.000000] RPC: <memblock_reserve+0x38/0x68>
+> >>>> [    0.000000] %L: 00000040 f05dfaf8  f05d5c68 00000001  0003ffff 006951e0  f05ed014 f0674ab4
+> >>>> [    0.000000] %I: f05d5c80 00000000  00000002 f1000000  ffffffff 00000000  f05d5c20 f0007fd8
+> >>>> [    0.000000] Disabling lock debugging due to kernel taint
+> >>>> [    0.000000] Caller[f0007fd8]: srmmu_fault+0x58/0x68
+> >>>> [    0.000000] Caller[f0618598]: memblock_alloc_try_nid+0xb8/0xc8
+> >>>> [    0.000000] Caller[f0611094]: srmmu_paging_init+0x174/0xaf8
+> >>>> [    0.000000] Caller[f06106a8]: paging_init+0x4/0x24
+> >>>> [    0.000000] Caller[f060e4f0]: setup_arch+0x3e8/0x480
+> >>>> [    0.000000] Caller[f060ab50]: start_kernel+0x48/0x460
+> >>>> [    0.000000] Caller[f060a43c]: continue_boot+0x324/0x334
+> >>>> [    0.000000] Caller[00000000]:   (null)
+> >>>> [    0.000000] Instruction DUMP:
+> >>>> [    0.000000]  c800a024 
+> >>>> [    0.000000]  83286002 
+> >>>> [    0.000000]  073c17b3 
+> >>>> [    0.000000] <c4010001>
+> >>>> [    0.000000]  c600e22c 
+> >>>> [    0.000000]  8a08a003 
+> >>>> [    0.000000]  80a16001 
+> >>>> [    0.000000]  0280003b 
+> >>>> [    0.000000]  c600c001 
+> >>>> [    0.000000] 
+> >>>> [    0.000000] Kernel panic - not syncing: Attempted to kill the idle task!
+> >>>> [    0.000000] Press Stop-A (L1-A) from sun keyboard or send break
+> >>>> [    0.000000] twice on console to return to the boot prom
+> >>>> [    0.000000] ---[ end Kernel panic - not syncing: Attempted to kill the idle task! ]---
+> >>>> qemu-system-sparc: terminating on signal 15 from pid 13043 (killall)
+> >>>>
+> >>>> The NULL ptr dereference is done by memset() in srmmu_nocache_init() and memblock_alloc_try_nid().
+> >>>> If I comment both memset, the boot pass
+> >>>>
+> >>>> But since nothing explain the NULL ptr deref in memset(), I suspect something is overriden by the initrd
+> >>>
+> >>> Sorry about the delay in replying to this, I haven't been too well recently.
+> >>>
+> >>> Looking at the code I suspect the problem is that when loading a kernel directly,
+> >>> OpenBIOS isn't adding the kernel/initrd memory ranges to the DT properties, and so
+> >>> the kernel doesn't recreate its own mapping on boot.
+> >>>
+> >>> It shouldn't be too hard to make this happen, let me take and look and see how
+> >>> difficult this would be.
+> >>
+> >> I think I now have a fix for this, with changes needed in both QEMU and OpenBIOS.
+> >>
+> >> Firstly you'll need to apply the QEMU patch from
+> >> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06635.html and then you'll
+> >> need an updated OpenBIOS.
+> >>
+> >> I've uploaded a pre-compiled openbios-sparc32 with the patches from
+> >> https://mail.coreboot.org/hyperkitty/list/openbios@openbios.org/thread/E6IMJNUFRF7W6ALWSYBOOCEYLBFXXQEN/
+> >> to https://www.ilande.co.uk/tmp/qemu/openbios-sparc32-initrdfix for testing.
+> >>
+> >> Please can you test and let me know if this solves the issue? If so, I'll see if I
+> >> can get them merged in time for the upcoming QEMU 4.0 release.
+> >>
+> > 
+> > Hello
+> > 
+> > Sorry even with the patch I still hit the issue.
+> > 
+> > I have added some debug and at least qemu set initrd_size correctly now.
+> > 
+> > I have tried to compile openbios-sparc32 for debugging but fail with
+> > arch/sparc32/context.c:116:5: error: PIC register clobbered by 'l7' in 'asm'
+> >      asm __volatile__ ("\n\tcall __switch_context"
+> >      ^~~
+> > make[1]: *** [rules.mak:219: target/arch/sparc32/context.o] Error 1
+> > (gcc 7.2 and gc 6.4 with binutils 2.30)
+> 
+> Hmmm. One other thing I've noticed is that newer kernels tend need a minimum of 256M
+> RAM to start up - does it work if you add -m 256 to your command line?
+> 
+> 
 
-vdev 0x55d22b8e10f0 ("virtio-blk")
-vq 0x55d22b8ebe40 (idx 0)
-inuse 128 vring.num 128
-2019-02-06T00:40:41.742552Z qemu-system-x86_64: Virtqueue size exceeded
+I have already set 256M of RAM. (and tried 512)
 
-I just changed the disk back to virtio-scsi so I can repro this again with =
-the patched qemu and report back.
-
-Thanks.
-
-On lun, feb 4, 2019 at 8:24 AM, Fernando Casas Sch=F6ssow <casasfernando@ou=
-tlook.com> wrote:
-
-I can test again with qemu 3.1 but with previous versions yes, it was happe=
-ning the same with both virtio-blk and virtio-scsi.
-For 3.1 I can confirm it happens for virtio-scsi (already tested it) and I =
-can test with virtio-blk again if that will add value to the investigation.
-Also I'm attaching a guest console screenshot showing the errors displayed =
-by the guest when it goes unresponsive in case it can help.
-
-Thanks for the patch. I will build the custom qemu binary and reproduce the=
- issue. This may take a couple of days since I cannot reproduce it at will.=
- Sometimes it takes 12 hours sometimes 2 days until it happens.
-Hopefully the code below will add more light on to this problem.
-
-Thanks,
-
-Fernando
-
-On lun, feb 4, 2019 at 7:06 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-Are you sure this happens with both virtio-blk and virtio-scsi? The followi=
-ng patch adds more debug output. You can build as follows: $ git clone http=
-s://git.qemu.org/git/qemu.git $ cd qemu $ patch apply -p1 ...paste the patc=
-h here... ^D # For info on build dependencies see https://wiki.qemu.org/Hos=
-ts/Linux $ ./configure --target-list=3Dx86_64-softmmu $ make -j4 You can co=
-nfigure a libvirt domain to use your custom QEMU binary by changing the <de=
-vices><emulator> tag to the qemu/x86_64-softmmu/qemu-system-x86_64 path. --=
-- diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c index 22bd1ac34e..aa=
-44bffa1f 100644 --- a/hw/virtio/virtio.c +++ b/hw/virtio/virtio.c @@ -879,6=
- +879,9 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz) max =3D vq->vring.=
-num; if (vq->inuse >=3D vq->vring.num) { + fprintf(stderr, "vdev %p (\"%s\"=
-)\n", vdev, vdev->name); + fprintf(stderr, "vq %p (idx %u)\n", vq, (unsigne=
-d int)(vq - vdev->vq)); + fprintf(stderr, "inuse %u vring.num %u\n", vq->in=
-use, vq->vring.num); virtio_error(vdev, "Virtqueue size exceeded"); goto do=
-ne; }
+Regards
