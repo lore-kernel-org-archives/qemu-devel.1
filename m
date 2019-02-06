@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48324)
+Received: from eggs.gnu.org ([209.51.188.92]:48616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1grRtC-0002e5-3o
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:25:39 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grRu8-0003Ti-1M
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:26:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1grRt9-0006BS-Tl
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:25:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grRt2-00066O-Ka
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:25:33 -0500
-Date: Wed, 6 Feb 2019 13:25:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190206131804-mutt-send-email-mst@kernel.org>
-References: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
-	<d1a03d25ff9d68924f07726d8a27d455b059c5a7.1549473586.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grRu1-0006ka-B1
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:26:32 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 6 Feb 2019 18:26:22 +0000
+Message-ID: <6cf6c085-3a28-0a7c-75b2-79f181e3ca6e@virtuozzo.com>
+References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
+	<20190206165342.219192-3-vsementsov@virtuozzo.com>
+	<abf6dafa-da7d-4bf5-5a21-225c2809a038@redhat.com>
+	<aced9235-a3d7-e201-ce13-ff2094ac974f@virtuozzo.com>
+	<608f7ff7-7b3c-939a-7bdb-852f63f4828e@redhat.com>
+In-Reply-To: <608f7ff7-7b3c-939a-7bdb-852f63f4828e@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8B5476E903C69C49B3E0FB0DE7DB9BF6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1a03d25ff9d68924f07726d8a27d455b059c5a7.1549473586.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V12 4/5] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] block/io: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>
 
-On Thu, Feb 07, 2019 at 01:27:19AM +0800, Zhang, Yi wrote:
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> 
-> When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> MAP_SYNC flag in addition which can ensure file system metadata
-> synced in each guest writes to the backend file, without other QEMU
-> actions (e.g., periodic fsync() by QEMU).
-> 
-> Current, We have below different possible use cases:
-> 
-> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
->    a: backend is a dax supporting file.
->     - MAP_SYNC will active.
->    b: backend is not a dax supporting file.
->     - mmap will trigger a warning. then MAP_SYNC flag will be ignored
-> 
-> 2. The rest of cases:
->    - we will never pass the MAP_SYNC to mmap2
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  include/qemu/osdep.h |  7 +++++++
->  util/mmap-alloc.c    | 24 +++++++++++++++++++++++-
->  2 files changed, 30 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 457d24e..9a94cc3 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -115,6 +115,13 @@ extern int daemon(int, int);
->  #include "sysemu/os-win32.h"
->  #endif
->  
-> +#ifdef CONFIG_LINUX
-> +#include <linux/mman.h>
-> +#else  /* !CONFIG_LINUX */
-> +#define MAP_SYNC              0x0
-> +#define MAP_SHARED_VALIDATE   0x0
-> +#endif /* CONFIG_LINUX */
-> +
->  #ifdef CONFIG_POSIX
->  #include "sysemu/os-posix.h"
->  #endif
-
-It's only used in one place. Maybe put this code in mmap-alloc.c ?
-
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index 97bbeed..e4e55fc 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -15,6 +15,7 @@
->  #include "qemu/host-utils.h"
->  
->  #define HUGETLBFS_MAGIC       0x958458f6
-> +#define MAP_SYNC_FLAGS        (MAP_SYNC | MAP_SHARED_VALIDATE)
->  
-
-Pls don't do this, just put it in a local variable within qemu_ram_mmap.
-
->  #ifdef CONFIG_LINUX
->  #include <sys/vfs.h>
-> @@ -101,6 +102,7 @@ void *qemu_ram_mmap(int fd,
->  #else
->      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->  #endif
-> +    int mmap_flags;
->      size_t offset;
->      void *ptr1;
->  
-> @@ -111,13 +113,33 @@ void *qemu_ram_mmap(int fd,
->      assert(is_power_of_2(align));
->      /* Always align to host page size */
->      assert(align >= getpagesize());
-> +    mmap_flags = shared ? MAP_SHARED : MAP_PRIVATE;
-> +    if (shared && is_pmem) {
-> +        mmap_flags |= MAP_SYNC_FLAGS;
-> +    }
->  
->      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
->      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
->                  MAP_FIXED |
->                  (fd == -1 ? MAP_ANONYMOUS : 0) |
-> -                (shared ? MAP_SHARED : MAP_PRIVATE),
-> +                mmap_flags,
->                  fd, 0);
-> +
-> +
-> +    if (ptr1 == MAP_FAILED &&
-> +        (mmap_flags & MAP_SYNC_FLAGS) == MAP_SYNC_FLAGS) {
-> +        if (errno == ENOTSUP) {
-> +            perror("failed to validate with mapping flags");
-
-I don't think this warning message makes sense.
-Are you trying to say:
-                Warning: requesting persistence across crashes
-		for file XYZ failed. Proceeding without persistence,
-		data might become corrupted in case of host crash.
-?
-
-> +        }
-> +        /* if map failed with MAP_SHARED_VALIDATE | MAP_SYNC,
-> +         * we will remove these flags to handle compatibility.
-> +         */
-> +        ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-> +                    MAP_FIXED |
-> +                    (fd == -1 ? MAP_ANONYMOUS : 0) |
-> +                    MAP_SHARED,
-> +                    fd, 0);
-> +    }
->      if (ptr1 == MAP_FAILED) {
->          munmap(ptr, total);
->          return MAP_FAILED;
-> -- 
-> 2.7.4
+MDYuMDIuMjAxOSAyMToxNCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi82LzE5IDEyOjA5IFBN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMDYuMDIuMjAxOSAyMDoz
+MiwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBPbiAyLzYvMTkgMTA6NTMgQU0sIFZsYWRpbWlyIFNl
+bWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+IFVzZSBuZXcgcWVtdV9pb3ZlY19pbml0X2J1
+ZigpIGluc3RlYWQgb2YNCj4+Pj4gcWVtdV9pb3ZlY19pbml0X2V4dGVybmFsKCAuLi4gLCAxKSwg
+d2hpY2ggc2ltcGxpZmllcyB0aGUgY29kZS4NCj4+Pg0KPj4+IERpZCB5b3UganVzdCBkbyBhIG1h
+bnVhbCBzZWFyY2ggZm9yIGNhbmRpZGF0ZSBjYWxsZXJzPw0KPj4+DQo+Pj4gQXMgeW91IHNhaWQg
+aW4gdGhlIGNvdmVyIGxldHRlciwgdGhlcmUgYXJlIG90aGVyIGZpbGVzIHRoYXQgY2FuIGJlbmVm
+aXQNCj4+PiBhcyB3ZWxsOyBhcmUgeW91IHBsYW5uaW5nIG9uIG1ha2luZyB2MyBvZiB0aGUgc2Vy
+aWVzIGxvbmdlcj8NCj4+DQo+PiBnaXQgZ3JlcCBxZW11X2lvdmVjX2luaXRfZXh0ZXJuYWwgfCBn
+cmVwIDENCj4+DQo+PiBzaG93cyBhIGxvdCBvZiwgZXhhY3RseSAzNCBhZnRlciBpby5jIGFscmVh
+ZHkgdXBkYXRlZC4NCj4+IFRoZXkgYXJlIGluIGRpZmZlcmVudCBzdWJzeXN0ZW1zLCBzbyBJIHRo
+aW5rIGl0IHNob3VsZCBiZSBzaW1wbGVyIHRvIHB1c2ggdGhpcw0KPj4gb25lIGFzIGEgcHJlY2Vk
+ZW50IGFuZCBleGFtcGxlLCBhbmQgdGhlbiBzZW5kIHNlcGFyYXRlIHBhdGNoZXMgKG9yIHNlcmll
+cykNCj4+IHBlci1tYWludGFpbmVyLg0KPiANCj4gTW9zdCBhcmUgYmxvY2sgcmVsYXRlZCwgc28g
+Z2V0dGluZyBpdCBpbiB0aHJvdWdoIHRoZSBibG9jayBtYWludGFpbmVycw0KPiBpcyBwcm9iYWJs
+eSB0aGUgZWFzaWVzdCAtIGJ1dCB5b3UgQVJFIHJpZ2h0IHRoYXQgb25lIHBhdGNoIHBlciBvbmUg
+b3INCj4gdHdvIGZpbGVzIG9yIHR3byBpcyBnb2luZyB0byBiZSBzbWFydGVzdCAob3RoZXJ3aXNl
+LCBpdCBnZXRzIHRvbyBiaWcpLg0KPiANCj4+DQo+PiBobSwgaW4gb3RoZXIgd29yZHM6DQo+PiAj
+IGdpdCBncmVwIC1sICdxZW11X2lvdmVjX2luaXRfZXh0ZXJuYWwuKjEnDQo+PiBibG9jay9iYWNr
+dXAuYw0KPj4gYmxvY2svYmxvY2stYmFja2VuZC5jDQo+PiBibG9jay9jb21taXQuYw0KPj4gYmxv
+Y2svcGFyYWxsZWxzLmMNCj4+IGJsb2NrL3Fjb3cuYw0KPj4gYmxvY2svcWNvdzIuYw0KPj4gYmxv
+Y2svcWVkLXRhYmxlLmMNCj4+IGJsb2NrL3FlZC5jDQo+PiBibG9jay9zdHJlYW0uYw0KPj4gYmxv
+Y2svdm1kay5jDQo+PiBody9pZGUvYXRhcGkuYw0KPj4gaHcvaWRlL2NvcmUuYw0KPj4gaHcvc2Nz
+aS9zY3NpLWRpc2suYw0KPj4gbWlncmF0aW9uL2Jsb2NrLmMNCj4+IHFlbXUtaW1nLmMNCj4+IHRl
+c3RzL3Rlc3QtYmRydi1kcmFpbi5jDQo+IA0KPiBJJ2QgZ3JvdXAgcWVkLXRhYmxlLmMgYW5kIHFl
+ZC5jOyBhbmQgdGhlIHR3byBody9pZGUvIGZpbGVzOyByZXN1bHRpbmcgaW4NCj4gMTQgbW9yZSBw
+YXRjaGVzIHRvIGdvLg0KPiANCg0KU28sIHlvdSwgdGhpbmsgYmV0dGVyIGlzIHRvIG1ha2Ugb25l
+IGNvbW1vbiBwYXRjaCBzZXQ/IE9rLCBJJ2xsIGRvIChobW0gb3Igc3RhcnQgZG9pbmcpDQppdCB0
+b21vcnJvdyBhcyB2MyBpZiBubyBvdGhlciBvcGluaW9ucy4NCg0KDQotLSANCkJlc3QgcmVnYXJk
+cywNClZsYWRpbWlyDQo=
