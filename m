@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50725)
+Received: from eggs.gnu.org ([209.51.188.92]:53138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1grWjL-0006nn-I5
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:35:48 -0500
+	(envelope-from <alistair23@gmail.com>) id 1grWyG-0001QX-Mi
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:51:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1grWjH-0007E3-RX
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:35:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35338)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grWjF-0007Bc-Ql
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:35:43 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 89D0689AFF
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 23:35:39 +0000 (UTC)
-Date: Wed, 6 Feb 2019 18:35:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190206183521-mutt-send-email-mst@kernel.org>
-References: <20190206110044.21662-1-dgilbert@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1grWyF-0006oO-8y
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:51:12 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:36746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1grWyF-0006nc-2C
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:51:11 -0500
+Received: by mail-lj1-x243.google.com with SMTP id g11-v6so7747814ljk.3
+	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 15:51:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190206110044.21662-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] Network announce changes
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-25-cota@braap.org>
+In-Reply-To: <20190130004811.27372-25-cota@braap.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 6 Feb 2019 15:50:29 -0800
+Message-ID: <CAKmqyKO1=+2FLzXRt2zbiKP5TVf498rVn63mhmWT1QyWfyNa6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 24/73] riscv: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, quintela@redhat.com, armbru@redhat.com, eblake@redhat.com, germano@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Wed, Feb 06, 2019 at 11:00:35AM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Hi,
->   This is a reworking of a few sets of patches from 2017
-> that were put together by myself, Germano and Vlad that make
-> the network announce system more flexible.
-> 
->   Firstly, it's parameterised, so that you can change the number
-> of packets and the gap between them; the number can be set to 0
-> to disable announce completely.
-> 
->   Secondly, you can force an announce by a qmp or hmp command at
-> any time.  This is useful if you need the guest to do an announce
-> for a different reason; for example if the management layer
-> has just juggled some bonding configuration around.
+On Tue, Jan 29, 2019 at 4:48 PM Emilio G. Cota <cota@braap.org> wrote:
+>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Alistair Francis <alistair23@gmail.com>
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-series
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Alistair
 
-
-
-
->   The packet creation and timing also moves to net/ from migration/
-> 
->   The previous set was:
->      https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05594.html
-> 
-> Dave
-> 
-> v3
->   Fixes from Markus's review: blank lines, and json tweaks
-> 
-> v2
->   Fix the qmp example
->   Typo fixes
-> 
-> 
-> Dr. David Alan Gilbert (9):
->   net: Introduce announce timer
->   migration: Add announce parameters
->   virtio-net: Switch to using announce timer
->   migration: Switch to using announce timer
->   net: Add a network device specific self-announcement ability
->   virtio-net: Allow qemu_announce_self to trigger virtio announcements
->   qmp: Add announce-self command
->   hmp: Add hmp_announce_self
->   tests: Add a test for qemu self announcements
-> 
->  hmp-commands.hx                |  14 ++++
->  hmp.c                          |  33 ++++++++
->  hmp.h                          |   1 +
->  hw/net/trace-events            |   6 ++
->  hw/net/virtio-net.c            |  69 ++++++++++++----
->  include/hw/virtio/virtio-net.h |   4 +-
->  include/migration/misc.h       |  12 +--
->  include/net/announce.h         |  41 ++++++++++
->  include/net/net.h              |   2 +
->  include/qemu/typedefs.h        |   2 +
->  include/sysemu/sysemu.h        |   2 -
->  migration/migration.c          | 103 +++++++++++++++++++++++-
->  migration/migration.h          |   4 +
->  migration/savevm.c             |  72 +----------------
->  migration/trace-events         |   1 -
->  net/Makefile.objs              |   1 +
->  net/announce.c                 | 140 +++++++++++++++++++++++++++++++++
->  net/trace-events               |   3 +
->  qapi/migration.json            |  53 ++++++++++++-
->  qapi/net.json                  |  43 ++++++++++
->  tests/Makefile.include         |   2 +
->  tests/test-announce-self.c     |  83 +++++++++++++++++++
->  tests/test-hmp.c               |   1 +
->  23 files changed, 589 insertions(+), 103 deletions(-)
->  create mode 100644 include/net/announce.h
->  create mode 100644 net/announce.c
->  create mode 100644 tests/test-announce-self.c
-> 
-> -- 
-> 2.20.1
+> ---
+>  target/riscv/op_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> index 81bd1a77ea..261d6fbfe9 100644
+> --- a/target/riscv/op_helper.c
+> +++ b/target/riscv/op_helper.c
+> @@ -125,7 +125,7 @@ void helper_wfi(CPURISCVState *env)
+>  {
+>      CPUState *cs = CPU(riscv_env_get_cpu(env));
+>
+> -    cs->halted = 1;
+> +    cpu_halted_set(cs, 1);
+>      cs->exception_index = EXCP_HLT;
+>      cpu_loop_exit(cs);
+>  }
+> --
+> 2.17.1
+>
