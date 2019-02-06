@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56517)
+Received: from eggs.gnu.org ([209.51.188.92]:57989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1grLRl-0006RM-6A
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:32:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1grLYg-0001Tv-7Z
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1grLRk-0000BA-C5
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:32:53 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed,  6 Feb 2019 12:27:23 +0100
-Message-Id: <20190206112729.37761-1-sgarzare@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1grLYf-0002JP-IF
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:40:02 -0500
+References: <20190206112729.37761-1-sgarzare@redhat.com>
+	<20190206112729.37761-7-sgarzare@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ce44833e-87e3-041d-43bd-4d2c0a796e84@redhat.com>
+Date: Wed, 6 Feb 2019 12:39:46 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+In-Reply-To: <20190206112729.37761-7-sgarzare@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,63 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-This series adds the support of DISCARD and WRITE_ZEROES commands
-and extends the virtio-blk-test to test WRITE_ZEROES command when
-the feature is enabled.
+On 2019-02-06 12:27, Stefano Garzarella wrote:
+> If the WRITE_ZEROES feature is enabled, we check this command
+> in the test_basic().
+> 
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  tests/virtio-blk-test.c | 60 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
 
-v3:
-- rebased on master (I removed Based-on tag since the new virtio headers =
-from
-  linux v5.0-rc1 are merged)
-- added patch 2 to add host_features field (as in virtio-net) [Michael]
-- fixed patch 3 (previously 2/5) using the new host_features field
-- fixed patch 4 (previously 3/5) following the Stefan's comments:
-                - fixed name of functions and fields
-                - used vdev and s pointers
-                - removed "wz-may-unmap" property
-                - split "dwz-max-sectors" in two properties
-
-v2:
-- added patch 1 to use virtio_blk_handle_rw_error() with discard operatio=
-n
-- added patch 2 to make those new features machine-type dependent (thanks=
- David)
-- fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
-rt()
-                for WRITE_ZEROES requests, and configurable parameters to
-                initialize the limits (max_sectors, wzeroes_may_unmap).
-                (thanks Stefan)
-                I moved in a new function the code to handle a single seg=
-ment,
-                in order to simplify the support of multiple segments in =
-the
-                future.
-- added patch 4 to change the assert on data_size following the discussio=
-n with
-                Thomas, Changpeng, Michael, and Stefan (thanks all)
-- fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
-ad of
-                dynamic allocation (thanks Thomas)
-
-Thanks,
-Stefano
-
-Stefano Garzarella (6):
-  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
-  virtio-blk: add host_features field in VirtIOBlock
-  virtio-blk: add "discard" and "write-zeroes" properties
-  virtio-blk: add DISCARD and WRITE_ZEROES features
-  tests/virtio-blk: change assert on data_size in virtio_blk_request()
-  tests/virtio-blk: add test for WRITE_ZEROES command
-
- hw/block/virtio-blk.c          | 213 +++++++++++++++++++++++++++++++--
- hw/core/machine.c              |   2 +
- include/hw/virtio/virtio-blk.h |   5 +-
- tests/virtio-blk-test.c        |  75 +++++++++++-
- 4 files changed, 281 insertions(+), 14 deletions(-)
-
---=20
-2.20.1
+Acked-by: Thomas Huth <thuth@redhat.com>
