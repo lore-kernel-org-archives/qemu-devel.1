@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39260)
+Received: from eggs.gnu.org ([209.51.188.92]:39258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ3l-0007BY-P4
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:59:58 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ3n-0007BX-Jy
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ0q-0004ML-DC
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:58 -0500
-Received: from mga01.intel.com ([192.55.52.88]:8357)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grJ0k-0004IF-B9
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:52 -0500
+Received: from mga01.intel.com ([192.55.52.88]:8360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1grJ0m-0004Ck-LX
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:54 -0500
+	id 1grJ0j-0004F6-TS
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 03:56:50 -0500
 From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Thu,  7 Feb 2019 01:27:19 +0800
-Message-Id: <d1a03d25ff9d68924f07726d8a27d455b059c5a7.1549473586.git.yi.z.zhang@linux.intel.com>
+Date: Thu,  7 Feb 2019 01:27:29 +0800
+Message-Id: <3497114cb20658d8b40837675dcac9c78c04a345.1549473586.git.yi.z.zhang@linux.intel.com>
 In-Reply-To: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
 References: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V12 4/5] util/mmap-alloc: support MAP_SYNC in
- qemu_ram_mmap()
+Subject: [Qemu-devel]  [PATCH V12 5/5] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +29,62 @@ Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang 
 
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-When a file supporting DAX is used as vNVDIMM backend, mmap it with
-MAP_SYNC flag in addition which can ensure file system metadata
-synced in each guest writes to the backend file, without other QEMU
-actions (e.g., periodic fsync() by QEMU).
-
-Current, We have below different possible use cases:
-
-1. pmem=on is set, shared=on is set, MAP_SYNC supported:
-   a: backend is a dax supporting file.
-    - MAP_SYNC will active.
-   b: backend is not a dax supporting file.
-    - mmap will trigger a warning. then MAP_SYNC flag will be ignored
-
-2. The rest of cases:
-   - we will never pass the MAP_SYNC to mmap2
-
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 ---
- include/qemu/osdep.h |  7 +++++++
- util/mmap-alloc.c    | 24 +++++++++++++++++++++++-
- 2 files changed, 30 insertions(+), 1 deletion(-)
+ docs/nvdimm.txt | 25 ++++++++++++++++++++++---
+ qemu-options.hx |  4 ++++
+ 2 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 457d24e..9a94cc3 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -115,6 +115,13 @@ extern int daemon(int, int);
- #include "sysemu/os-win32.h"
- #endif
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index 5f158a6..e2bf89f 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -143,9 +143,28 @@ Guest Data Persistence
+ ----------------------
  
-+#ifdef CONFIG_LINUX
-+#include <linux/mman.h>
-+#else  /* !CONFIG_LINUX */
-+#define MAP_SYNC              0x0
-+#define MAP_SHARED_VALIDATE   0x0
-+#endif /* CONFIG_LINUX */
+ Though QEMU supports multiple types of vNVDIMM backends on Linux,
+-currently the only one that can guarantee the guest write persistence
+-is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+-which all guest access do not involve any host-side kernel cache.
++the only backend that can guarantee the guest write persistence is:
 +
- #ifdef CONFIG_POSIX
- #include "sysemu/os-posix.h"
- #endif
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 97bbeed..e4e55fc 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -15,6 +15,7 @@
- #include "qemu/host-utils.h"
- 
- #define HUGETLBFS_MAGIC       0x958458f6
-+#define MAP_SYNC_FLAGS        (MAP_SYNC | MAP_SHARED_VALIDATE)
- 
- #ifdef CONFIG_LINUX
- #include <sys/vfs.h>
-@@ -101,6 +102,7 @@ void *qemu_ram_mmap(int fd,
- #else
-     void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
- #endif
-+    int mmap_flags;
-     size_t offset;
-     void *ptr1;
- 
-@@ -111,13 +113,33 @@ void *qemu_ram_mmap(int fd,
-     assert(is_power_of_2(align));
-     /* Always align to host page size */
-     assert(align >= getpagesize());
-+    mmap_flags = shared ? MAP_SHARED : MAP_PRIVATE;
-+    if (shared && is_pmem) {
-+        mmap_flags |= MAP_SYNC_FLAGS;
-+    }
- 
-     offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-     ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-                 MAP_FIXED |
-                 (fd == -1 ? MAP_ANONYMOUS : 0) |
--                (shared ? MAP_SHARED : MAP_PRIVATE),
-+                mmap_flags,
-                 fd, 0);
++A. DAX device (e.g., /dev/dax0.0, ) or
++B. DAX file(mounted with dax option)
 +
++both are from the real NVDIMM device, all guest access do not
++involve any host-side kernel cache.
 +
-+    if (ptr1 == MAP_FAILED &&
-+        (mmap_flags & MAP_SYNC_FLAGS) == MAP_SYNC_FLAGS) {
-+        if (errno == ENOTSUP) {
-+            perror("failed to validate with mapping flags");
-+        }
-+        /* if map failed with MAP_SHARED_VALIDATE | MAP_SYNC,
-+         * we will remove these flags to handle compatibility.
-+         */
-+        ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-+                    MAP_FIXED |
-+                    (fd == -1 ? MAP_ANONYMOUS : 0) |
-+                    MAP_SHARED,
-+                    fd, 0);
-+    }
-     if (ptr1 == MAP_FAILED) {
-         munmap(ptr, total);
-         return MAP_FAILED;
++When using B (A file supporting direct mapping of persistent memory)
++as a backend, write persistence is guaranteed if the host kernel has
++support for the MAP_SYNC flag in the mmap system call (available
++since Linux 4.15 and on certain distro kernels) and additionally
++both 'pmem' and 'share' flags are set to 'on' on the backend.
++
++If these conditions are not satisfied i.e. if either 'pmem' or 'share'
++are not set, if the backend file does not support DAX or if MAP_SYNC
++is not supported by the host kernel, write persistence is not
++guaranteed after a system crash. For compatibility reasons, these
++conditions are silently ignored if not satisfied. Currently, no way
++is provided to test for them.
++For more details, please reference mmap(2) man page:
++http://man7.org/linux/man-pages/man2/mmap.2.html.
+ 
+ When using other types of backends, it's suggested to set 'unarmed'
+ option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 08f8516..0cd41f4 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
+ If @option{pmem} is set to 'on', QEMU will take necessary operations to
+ guarantee the persistence of its own writes to @option{mem-path}
+ (e.g. in vNVDIMM label emulation and live migration).
++Also, we will map the backend-file with MAP_SYNC flag, which can ensure
++the file metadata is in sync to @option{mem-path} in case of host crash
++or a power failure. MAP_SYNC requires support from both the host kernel
++(since Linux kernel 4.15) and @option{mem-path} (only files supporting DAX).
+ 
+ @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+ 
 -- 
 2.7.4
