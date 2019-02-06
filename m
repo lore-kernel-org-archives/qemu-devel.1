@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38516)
+Received: from eggs.gnu.org ([209.51.188.92]:40379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grRLZ-0002bG-Iz
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:50:55 -0500
+	(envelope-from <quintela@redhat.com>) id 1grRQO-0004Df-9m
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:55:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grRLX-0000nM-Ko
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:50:53 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Feb 2019 17:50:28 +0000
-Message-ID: <32b1345c-69f5-5406-716a-94e4deb0fce2@virtuozzo.com>
-References: <20190206165342.219192-1-vsementsov@virtuozzo.com>
-	<20190206165342.219192-2-vsementsov@virtuozzo.com>
-	<cb3e35a3-fd92-0b36-52c1-44312c5c11c8@redhat.com>
-In-Reply-To: <cb3e35a3-fd92-0b36-52c1-44312c5c11c8@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <43F7954005F3CC4FBE307850366E76D8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <quintela@redhat.com>) id 1grRQL-0004DK-Ev
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:55:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1grRQK-00047o-Ss
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 12:55:49 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0AE85A787B
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 17:55:41 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <3beec7d3-7a57-30be-affb-c68caa713a60@redhat.com> (Laurent
+	Vivier's message of "Wed, 6 Feb 2019 15:20:57 +0100")
+References: <20190206132331.1694-1-quintela@redhat.com>
+	<20190206132331.1694-3-quintela@redhat.com>
+	<3beec7d3-7a57-30be-affb-c68caa713a60@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 06 Feb 2019 18:58:16 +0100
+Message-ID: <87zhr8er47.fsf@trasno.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: enhance QEMUIOVector
- structure
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/4] multifd: Drop x-multifd-page-count
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-MDYuMDIuMjAxOSAyMDoyNSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi82LzE5IDEwOjUzIEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gQWRkIGEgcG9zc2liaWxp
-dHkgb2YgZW1iZWRkZWQgaW92ZWMsIGZvciBjYXNlcyB3aGVuIHdlIG5lZWQgb25seSBvbmUNCj4+
-IGxvY2FsIGlvdi4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
-ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgaW5jbHVkZS9x
-ZW11L2lvdi5oIHwgNDcgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KystLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgNDUgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMo
-LSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xZW11L2lvdi5oIGIvaW5jbHVkZS9xZW11
-L2lvdi5oDQo+PiBpbmRleCA1ZjQzM2M3NzY4Li4zNzUzYjYzNTU4IDEwMDY0NA0KPj4gLS0tIGEv
-aW5jbHVkZS9xZW11L2lvdi5oDQo+PiArKysgYi9pbmNsdWRlL3FlbXUvaW92LmgNCj4+IEBAIC0x
-MzMsMTAgKzEzMyw1MyBAQCBzaXplX3QgaW92X2Rpc2NhcmRfYmFjayhzdHJ1Y3QgaW92ZWMgKmlv
-diwgdW5zaWduZWQgaW50ICppb3ZfY250LA0KPj4gICB0eXBlZGVmIHN0cnVjdCBRRU1VSU9WZWN0
-b3Igew0KPj4gICAgICAgc3RydWN0IGlvdmVjICppb3Y7DQo+PiAgICAgICBpbnQgbmlvdjsNCj4+
-IC0gICAgaW50IG5hbGxvYzsNCj4+IC0gICAgc2l6ZV90IHNpemU7DQo+PiArDQo+PiArICAgIC8q
-DQo+PiArICAgICAqIEZvciBleHRlcm5hbCBAaW92IChxZW11X2lvdmVjX2luaXRfZXh0ZXJuYWwo
-KSkgb3IgYWxsb2NhdGVkIEBpb3YNCj4+ICsgICAgICogKHFlbXVfaW92ZWNfaW5pdCgpKSBAc2l6
-ZSBpcyB0aGUgY3VtdWxhdGl2ZSBzaXplIG9mIGlvdmVjcyBhbmQNCj4gDQo+IHMvIEBzaXplLywg
-QHNpemUvDQo+IA0KPj4gKyAgICAgKiBAbG9jYWxfaW92IGlzIGludmFsaWQgYW5kIHVudXNlZC4N
-Cj4+ICsgICAgICoNCj4+ICsgICAgICogRm9yIGVtYmVkZGVkIEBpb3YgKFFFTVVfSU9WRUNfSU5J
-VF9CVUYoKSBvciBxZW11X2lvdmVjX2luaXRfYnVmKCkpLA0KPj4gKyAgICAgKiBAaW92IGlzIGVx
-dWFsIHRvICZAbG9jYWxfaW92LCBhbmQgQHNpemUgaXMgdmFsaWQsIGFzIGl0IGhhcyBzYW1lDQo+
-PiArICAgICAqIG9mZnNldCBhbmQgdHlwZSBhcyBAbG9jYWxfaW92Lmlvdl9sZW4sIHdoaWNoIGlz
-IGd1YXJhbnRlZWQgYnkNCj4+ICsgICAgICogc3RhdGljIGFzc2VydGlvbnMgYmVsb3cuDQo+IA0K
-PiBPbmx5IG9uZSBzdGF0aWMgYXNzZXJ0aW9uIGJlbG93IChzL2Fzc2VydGlvbnMvYXNzZXJ0aW9u
-LyksIGJ1dCBldmVuIHRoYXQNCj4gb25lIGNvdWxkIHBlcmhhcHMgYmUgZHJvcHBlZCBhbmQgdGhp
-cyB3b3JkaW5nIGNoYW5nZWQgdG8gIndoaWNoIGlzDQo+IGd1YXJhbnRlZWQgYnkgdGhlIGxheW91
-dCBiZWxvdyI7IG9yIHlvdSBjb3VsZCByZXN0b3JlIHRoZSBhc3NlcnRpb24gaW4NCj4gdGhlIGVh
-cmxpZXIgcGF0Y2ggdGhhdCBzaXplb2Yoc2l6ZSkgYW5kIHNpemVvZihzdHJ1Y3QgaW92ZWMuaW92
-X2xlbikgYXJlDQo+IGVxdWFsKSB0byBtYWtlIHRoZSBwbHVyYWwgY29ycmVjdC4NCj4gDQo+PiAr
-ICAgICAqDQo+PiArICAgICAqIEBuYWxsb2MgaXMgdmFsaWQgYWx3YXlzIGFuZCBpcyAtMSBib3Ro
-IGZvciBlbWJlZGRlZCBhbmQgZXh0ZXJuYWwNCj4gDQo+IHMvdmFsaWQgYWx3YXlzL2Fsd2F5cyB2
-YWxpZC8NCj4gDQo+PiArICAgICAqIGNhc2VzLiBJdCBpbmNsdWRlZCBpbnRvIHVuaW9uIG9ubHkg
-dG8gbWFrZSBhcHByb3ByaWF0ZSBwYWRkaW5nIGZvcg0KPj4gKyAgICAgKiBAc2l6ZSBmaWVsZCBh
-dm9pZGluZyBjcmVhdGlvbiBvZiAwLWxlbmd0aCBhcnJheSBpbiB0aGUgd29yc3QgY2FzZS4NCj4g
-DQo+IEl0IGlzIGluY2x1ZGVkIGluIHRoZSB1bmlvbiBvbmx5IHRvIGVuc3VyZSB0aGUgcGFkZGlu
-ZyBwcmlvciB0byB0aGUNCj4gQHNpemUgZmllbGQgd2lsbCBub3QgcmVzdWx0IGluIGEgMC1sZW5n
-dGggYXJyYXkuDQo+IA0KPj4gKyAgICAgKi8NCj4+ICsgICAgdW5pb24gew0KPj4gKyAgICAgICAg
-c3RydWN0IHsNCj4+ICsgICAgICAgICAgICBpbnQgbmFsbG9jOw0KPj4gKyAgICAgICAgICAgIHN0
-cnVjdCBpb3ZlYyBsb2NhbF9pb3Y7DQo+PiArICAgICAgICB9Ow0KPj4gKyAgICAgICAgc3RydWN0
-IHsNCj4+ICsgICAgICAgICAgICBjaGFyIF9fcGFkW3NpemVvZihpbnQpICsgb2Zmc2V0b2Yoc3Ry
-dWN0IGlvdmVjLCBpb3ZfbGVuKV07DQo+PiArICAgICAgICAgICAgc2l6ZV90IHNpemU7DQo+PiAr
-ICAgICAgICB9Ow0KPj4gKyAgICB9Ow0KPj4gICB9IFFFTVVJT1ZlY3RvcjsNCj4+ICAgDQo+PiAr
-UUVNVV9CVUlMRF9CVUdfT04ob2Zmc2V0b2YoUUVNVUlPVmVjdG9yLCBzaXplKSAhPQ0KPj4gKyAg
-ICAgICAgICAgICAgICAgIG9mZnNldG9mKFFFTVVJT1ZlY3RvciwgbG9jYWxfaW92Lmlvdl9sZW4p
-KTsNCj4gDQo+IEknbSBub3Qgc3VyZSB0aGlzIGFzc2VydGlvbiBhZGRzIGFueSB2YWx1ZTsgSSBk
-b24ndCBzZWUgYW55IGxlZXdheSBvbg0KPiBob3cgYSBjb21waWxlciBjb3VsZCBsYXkgb3V0IHRo
-ZSBzdHJ1Y3QgYmFzZWQgb24gdGhlIGRlY2xhcmF0aW9uIG9mIHRoZQ0KPiBwYWRkaW5nLiAgSG93
-ZXZlciwgSSdtIG5vdCBvcHBvc2VkIHRvIGtlZXBpbmcgaXQgaW4gdGhlIHBhdGNoIGlmIHNvbWVv
-bmUNCj4gZWxzZSBmaW5kcyBpdCB1c2VmdWwuDQoNCkFzc2VydGlvbiBpcyBhIGJpdCBzaW1wbGVy
-IHRvIHVuZGVyc3RhbmQgdGhhbiBzdHJ1Y3R1cmUgbGF5b3V0LiBBbmQgaXQgZXhhY3RseQ0KYXNz
-ZXJ0cyB3aGF0IHRoZSBjb21tZW50IHNheSBhYm91dCBAc2l6ZS4uLg0KDQo+IA0KPj4gKw0KPj4g
-KyNkZWZpbmUgUUVNVV9JT1ZFQ19JTklUX0JVRihzZWxmLCBidWYsIGxlbikgICAgICAgICAgICAg
-IFwNCj4+ICt7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBcDQo+PiArICAgIC5pb3YgPSAmKHNlbGYpLmxvY2FsX2lvdiwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXA0KPj4gKyAgICAubmlvdiA9IDEsICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwNCj4+ICsgICAgLm5hbGxvYyA9IC0xLCAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+PiArICAgIC5sb2NhbF9pb3YgPSB7ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPj4gKyAgICAgICAgLmlvdl9i
-YXNlID0gKHZvaWQgKikoYnVmKSwgLyogY2FzdCBhd2F5IGNvbnN0ICovIFwNCj4+ICsgICAgICAg
-IC5pb3ZfbGVuID0gKGxlbiksICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+PiAr
-ICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XA0KPj4gK30NCj4+ICsNCj4+ICtzdGF0aWMgaW5saW5lIHZvaWQgcWVtdV9pb3ZlY19pbml0X2J1
-ZihRRU1VSU9WZWN0b3IgKnFpb3YsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgdm9pZCAqYnVmLCBzaXplX3QgbGVuKQ0KPiANCj4gU2hvdWxkIHRoaXMgYmUgJ2Nv
-bnN0IHZvaWQgKmJ1ZicsIHRvIG1ha2UgaXQgZWFzaWVyIHRvIGluaXRpYWxpemUgYSBxaW92DQo+
-IHVzZWQgZm9yIHdyaXRlcyBmcm9tIGFuIGluY29taW5nIGNvbnN0IHBvaW50ZXI/ICBUaGF0LCBh
-bmQgaGF2aW5nIGNvbnN0DQo+IGhlcmUgd291bGQgbWFrZSB0aGUgJ2Nhc3QgYXdheSBjb25zdCcg
-Y29tbWVudCBhYm92ZSBhbGwgdGhlIG1vcmUgb2J2aW91cw0KPiAoSSBrbm93IGl0IGlzIG5lY2Vz
-c2FyeSBiYXNlZCBvbiBjb2RlIGluIHBhdGNoIDIsIGJ1dCBoYXZpbmcgaXQgYmUNCj4gd29ydGh3
-aGlsZSBpbiBwYXRjaCAxIG1ha2VzIGl0IGFsbCB0aGUgbW9yZSBvYnZpb3VzIGFzIGEgc3RhbmRh
-bG9uZSBwYXRjaCkuDQoNCkkgdGhpbmssIHllcy4gU28sIHdlJ2xsIGJlIGFibGUgdG8gdXNlIGJv
-dGggbWFjcm8gYW5kIGZ1bmN0aW9uIGZvciBjb25zdCBidWZmZXJzDQppbiB0aGUgc2FtZSB3YXkN
-Cg0KPiANCj4+ICt7DQo+PiArICAgICpxaW92ID0gKFFFTVVJT1ZlY3RvcikgUUVNVV9JT1ZFQ19J
-TklUX0JVRigqcWlvdiwgYnVmLCBsZW4pOw0KPj4gK30NCj4+ICsNCj4+ICAgdm9pZCBxZW11X2lv
-dmVjX2luaXQoUUVNVUlPVmVjdG9yICpxaW92LCBpbnQgYWxsb2NfaGludCk7DQo+PiAgIHZvaWQg
-cWVtdV9pb3ZlY19pbml0X2V4dGVybmFsKFFFTVVJT1ZlY3RvciAqcWlvdiwgc3RydWN0IGlvdmVj
-ICppb3YsIGludCBuaW92KTsNCj4+ICAgdm9pZCBxZW11X2lvdmVjX2FkZChRRU1VSU9WZWN0b3Ig
-KnFpb3YsIHZvaWQgKmJhc2UsIHNpemVfdCBsZW4pOw0KPj4NCj4gDQoNCg0KLS0gDQpCZXN0IHJl
-Z2FyZHMsDQpWbGFkaW1pcg0K
+Laurent Vivier <lvivier@redhat.com> wrote:
+> On 06/02/2019 14:23, Juan Quintela wrote:
+>> Libvirt don't want to expose (and explain it).  And testing looks like
+>> 128 is good for all use cases, so just drop it.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  hmp.c                 |  7 -------
+>>  migration/migration.c | 30 ------------------------------
+>>  migration/migration.h |  1 -
+>>  migration/ram.c       | 13 ++++++++-----
+>>  qapi/migration.json   | 13 +------------
+>>  5 files changed, 9 insertions(+), 55 deletions(-)
+>> 
+> ...
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index f673486679..65df9b566e 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -81,7 +81,6 @@
+>>  /* The delay time (in ms) between two COLO checkpoints */
+>>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+>>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+>> -#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 128
+>
+> Why do you update it in the previous patch to remove it in this one?
+
+To make clear that I change the default.  Otherwise it gets hidden into
+the whole patch.  if you preffer I could have done the other way around.
+
+Later, Juan.
