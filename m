@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32939)
+Received: from eggs.gnu.org ([209.51.188.92]:33044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grKDS-00053K-SD
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:14:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1grKE0-0005NI-Pr
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:14:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grKDQ-0007N7-DV
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:14:02 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1grKDQ-0007Ms-2k
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:14:00 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z18so6106554wrh.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 02:14:00 -0800 (PST)
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-4-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <3dc624dc-7940-f3cc-6d22-bfe0b9d6bc14@gmail.com>
-Date: Wed, 6 Feb 2019 12:14:24 +0200
+	(envelope-from <imammedo@redhat.com>) id 1grKDz-0007aQ-TG
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:14:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1grKDz-0007Xr-KV
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:14:35 -0500
+Date: Wed, 6 Feb 2019 11:14:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190206111419.47fb6a7a@Igors-MacBook-Pro.local>
+In-Reply-To: <20190204160325.4914-1-lersek@redhat.com>
+References: <20190204160325.4914-1-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190131130850.6850-4-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 03/10] hw/rdma: Warn when too many
- consecutive poll CQ triggered on an empty CQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] add the BiosTablesTest UEFI app,
+ build it with the new roms/edk2 submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,215 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Hi Yuval,
+On Mon,  4 Feb 2019 17:03:20 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-On 1/31/19 3:08 PM, Yuval Shaia wrote:
-> To protect against CPU over utilization when guest performs unneeded
-> busy waiting loop on an empty CQ.
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_backend.c      | 11 +++++++----
->   hw/rdma/rdma_backend.h      |  2 +-
->   hw/rdma/rdma_rm.c           |  1 +
->   hw/rdma/rdma_rm_defs.h      |  6 +++++-
->   hw/rdma/vmw/pvrdma_qp_ops.c | 24 +++++++++++++++++++++++-
->   5 files changed, 37 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 2f6372f8f0..b7d6afb5da 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -64,9 +64,9 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
->       comp_handler(ctx, &wc);
->   }
->   
-> -static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
-> +static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->   {
-> -    int i, ne;
-> +    int i, ne, total_ne = 0;
->       BackendCtx *bctx;
->       struct ibv_wc wc[2];
->   
-> @@ -76,6 +76,7 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->           trace_rdma_poll_cq(ne, ibcq);
->   
->           for (i = 0; i < ne; i++) {
-> +            total_ne++;
+> Previous version (v2):
+> http://mid.mail-archive.com/20190124203959.30875-1-lersek@redhat.com
+>=20
+> Updates in v3 have been noted on each patch in the series.
+>=20
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 
-It seems 'i' and 'total_ne' hold the same value, do you need them both?
+For series:
 
->               bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
->               if (unlikely(!bctx)) {
->                   rdma_error_report("No matching ctx for req %"PRId64,
-> @@ -93,6 +94,8 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->       if (ne < 0) {
->           rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
->       }
-> +
-> +    return total_ne;
->   }
->   
->   static void *comp_handler_thread(void *arg)
-> @@ -267,9 +270,9 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
->       return 0;
->   }
->   
-> -void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
-> +int rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
->   {
-> -    rdma_poll_cq(rdma_dev_res, cq->ibcq);
-> +    return rdma_poll_cq(rdma_dev_res, cq->ibcq);
->   }
->   
->   static GHashTable *ah_hash;
-> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> index 5114c90e67..36305cd148 100644
-> --- a/hw/rdma/rdma_backend.h
-> +++ b/hw/rdma/rdma_backend.h
-> @@ -85,7 +85,7 @@ void rdma_backend_destroy_mr(RdmaBackendMR *mr);
->   int rdma_backend_create_cq(RdmaBackendDev *backend_dev, RdmaBackendCQ *cq,
->                              int cqe);
->   void rdma_backend_destroy_cq(RdmaBackendCQ *cq);
-> -void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq);
-> +int rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq);
->   
->   int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
->                              RdmaBackendPD *pd, RdmaBackendCQ *scq,
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index 64c6ea1a4e..1ba77ac42c 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -261,6 +261,7 @@ int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
->       if (!cq) {
->           return -ENOMEM;
->       }
-> +    atomic_set(&cq->missing_cqe, 0);
->   
->       cq->opaque = opaque;
->       cq->notify = CNT_CLEAR;
-> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-> index 0ba61d1838..08692e87d4 100644
-> --- a/hw/rdma/rdma_rm_defs.h
-> +++ b/hw/rdma/rdma_rm_defs.h
-> @@ -34,7 +34,9 @@
->   #define MAX_QP_INIT_RD_ATOM   16
->   #define MAX_AH                64
->   
-> -#define MAX_RM_TBL_NAME 16
-> +#define MAX_RM_TBL_NAME             16
-> +#define MAX_CONSEQ_EMPTY_POLL_CQ    2048 /* considered as error above this */
-> +
->   typedef struct RdmaRmResTbl {
->       char name[MAX_RM_TBL_NAME];
->       QemuMutex lock;
-> @@ -59,6 +61,8 @@ typedef struct RdmaRmCQ {
->       RdmaBackendCQ backend_cq;
->       void *opaque;
->       CQNotificationType notify;
-> +    int missing_cqe;
+ Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Maybe cq_empty_hit_cnt ? We don't really have a missing cqe.
-
-> +    int conseq_empty_poll;
->   } RdmaRmCQ;
->   
->   /* MR (DMA region) */
-> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> index 16db726dac..5d650a4943 100644
-> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> @@ -60,6 +60,8 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
->           return -EINVAL;
->       }
->   
-> +    atomic_dec(&cq->missing_cqe);
-> +
-
-We should set it to 0 here? (If we are counting cq-empty hits)
-
->       ring = (PvrdmaRing *)cq->opaque;
->   
->       /* Step #1: Put CQE on CQ ring */
-> @@ -141,12 +143,15 @@ void pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
->       PvrdmaRing *ring;
->       int sgid_idx;
->       union ibv_gid *sgid;
-> +    RdmaRmCQ *cq;
->   
->       qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
->       if (unlikely(!qp)) {
->           return;
->       }
->   
-> +    cq = rdma_rm_get_cq(&dev->rdma_dev_res, qp->send_cq_handle);
-> +
->       ring = (PvrdmaRing *)qp->opaque;
->   
->       wqe = (struct PvrdmaSqWqe *)pvrdma_ring_next_elem_read(ring);
-> @@ -186,6 +191,7 @@ void pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
->               continue;
->           }
->   
-> +        atomic_inc(&cq->missing_cqe);
->           rdma_backend_post_send(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
->                                  (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
->                                  sgid_idx, sgid,
-> @@ -204,12 +210,15 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
->       RdmaRmQP *qp;
->       PvrdmaRqWqe *wqe;
->       PvrdmaRing *ring;
-> +    RdmaRmCQ *cq;
->   
->       qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
->       if (unlikely(!qp)) {
->           return;
->       }
->   
-> +    cq = rdma_rm_get_cq(&dev->rdma_dev_res, qp->recv_cq_handle);
-> +
->       ring = &((PvrdmaRing *)qp->opaque)[1];
->   
->       wqe = (struct PvrdmaRqWqe *)pvrdma_ring_next_elem_read(ring);
-> @@ -231,6 +240,7 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
->               continue;
->           }
->   
-> +        atomic_inc(&cq->missing_cqe);
->           rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
->                                  &qp->backend_qp, qp->qp_type,
->                                  (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
-> @@ -245,11 +255,23 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
->   void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle)
->   {
->       RdmaRmCQ *cq;
-> +    int polled;
->   
->       cq = rdma_rm_get_cq(dev_res, cq_handle);
->       if (!cq) {
->           return;
->       }
->   
-> -    rdma_backend_poll_cq(dev_res, &cq->backend_cq);
-> +    polled = rdma_backend_poll_cq(dev_res, &cq->backend_cq);
-> +    if (!polled) {
-> +        if (cq->conseq_empty_poll == MAX_CONSEQ_EMPTY_POLL_CQ) {
-> +            rdma_warn_report("%d consequtive empty polls from CQ %d, missing cqe %d",
-> +                             cq->conseq_empty_poll, cq_handle,
-> +                             atomic_read(&cq->missing_cqe));
-> +            cq->conseq_empty_poll = 0;
-> +        }
-> +        cq->conseq_empty_poll++;
-> +    } else {
-> +        cq->conseq_empty_poll = 0;
-> +    }
->   }
-
-So we don't really protect against high CPU usage, we only warn.
-Are the both counters interesting?
-
-Thanks,
-Marcel
+>=20
+> Thanks
+> Laszlo
+>=20
+> Laszlo Ersek (5):
+>   roms: add the edk2 project as a git submodule
+>   roms: build the EfiRom utility from the roms/edk2 submodule
+>   tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
+>   tests/uefi-test-tools: add build scripts
+>   tests/data: introduce "uefi-boot-images" with the "bios-tables-test"
+>     ISOs
+>=20
+>  .gitmodules                                                             =
+ |   3 +
+>  Makefile                                                                =
+ |   6 +-
+>  roms/Makefile                                                           =
+ |  13 +-
+>  roms/edk2                                                               =
+ |   1 +
+>  tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
+ | Bin 0 -> 11776 bytes
+>  tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
+ | Bin 0 -> 11776 bytes
+>  tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
+ | Bin 0 -> 12800 bytes
+>  tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
+ | Bin 0 -> 13312 bytes
+>  tests/uefi-test-tools/.gitignore                                        =
+ |   3 +
+>  tests/uefi-test-tools/LICENSE                                           =
+ |  25 ++++
+>  tests/uefi-test-tools/Makefile                                          =
+ | 106 ++++++++++++++
+>  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
+ | 130 ++++++++++++++++++
+>  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
+ |  41 ++++++
+>  tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
+ |  67 +++++++++
+>  tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec             =
+ |  27 ++++
+>  tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc             =
+ |  69 ++++++++++
+>  tests/uefi-test-tools/build.sh                                          =
+ | 145 ++++++++++++++++++++
+>  17 files changed, 628 insertions(+), 8 deletions(-)
+>  create mode 160000 roms/edk2
+>  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.=
+iso.qcow2
+>  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.=
+qcow2
+>  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso=
+.qcow2
+>  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.i=
+so.qcow2
+>  create mode 100644 tests/uefi-test-tools/.gitignore
+>  create mode 100644 tests/uefi-test-tools/LICENSE
+>  create mode 100644 tests/uefi-test-tools/Makefile
+>  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
+/BiosTablesTest.c
+>  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
+/BiosTablesTest.inf
+>  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/B=
+iosTablesTest.h
+>  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
+kg.dec
+>  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
+kg.dsc
+>  create mode 100755 tests/uefi-test-tools/build.sh
+>=20
