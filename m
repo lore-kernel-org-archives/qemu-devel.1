@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53001)
+Received: from eggs.gnu.org ([209.51.188.92]:52568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1grN4f-0000jd-7M
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:17:10 -0500
+	(envelope-from <berto@igalia.com>) id 1grN4g-0008Lh-A0
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1grMpw-0006qz-V4
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:02:02 -0500
-Date: Wed, 6 Feb 2019 14:01:45 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190206140145.5f98dff9@Igors-MacBook-Pro.local>
-In-Reply-To: <20190123195527.29575-10-david@redhat.com>
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190123195527.29575-10-david@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1grMpp-0006li-IK
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:01:53 -0500
+Received: from fanzine.igalia.com ([91.117.99.155]:60821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1grMpn-0006ig-MI
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 08:01:48 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190206124902.GI12331@redhat.com>
+References: <20190206124345.14942-1-berto@igalia.com>
+	<20190206124902.GI12331@redhat.com>
+Date: Wed, 06 Feb 2019 14:01:39 +0100
+Message-ID: <w51tvhhrryk.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFCv2 9/9] pc: Support for virtio-pmem-pci
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] char-socket: hold chr_write_lock
+ during tcp_chr_free_connection()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,168 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, 23 Jan 2019 20:55:27 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Wed 06 Feb 2019 01:49:02 PM CET, Daniel P. Berrang=C3=A9 wrote:
+>>  (gdb) bt
+>>  #0  0x00005558b842902d in object_get_class (obj=3D0x0) at qom/object.c:=
+860
+>>  #1  0x00005558b84f92db in qio_channel_writev_full (ioc=3D0x0, iov=3D0x7=
+ffc355decf0, niov=3D1, fds=3D0x0, nfds=3D0, errp=3D0x0) at io/channel.c:76
+>>  #2  0x00005558b84e0e9e in io_channel_send_full (ioc=3D0x0, buf=3D0x5558=
+baf5beb0, len=3D138, fds=3D0x0, nfds=3D0) at chardev/char-io.c:123
+>>  #3  0x00005558b84e4a69 in tcp_chr_write (chr=3D0x5558ba460380, buf=3D0x=
+5558baf5beb0 "...", len=3D138) at chardev/char-socket.c:135
+>>  #4  0x00005558b84dca55 in qemu_chr_write_buffer (s=3D0x5558ba460380, bu=
+f=3D0x5558baf5beb0 "...", len=3D138, offset=3D0x7ffc355dedd0, write_all=3Df=
+alse) at chardev/char.c:112
+>>  #5  0x00005558b84dcbc2 in qemu_chr_write (s=3D0x5558ba460380, buf=3D0x5=
+558baf5beb0 "...", len=3D138, write_all=3Dfalse) at chardev/char.c:147
+>>  #6  0x00005558b84dfb26 in qemu_chr_fe_write (be=3D0x5558ba476610, buf=
+=3D0x5558baf5beb0 "...", len=3D138) at chardev/char-fe.c:42
+>>  #7  0x00005558b8088c86 in monitor_flush_locked (mon=3D0x5558ba476610) a=
+t monitor.c:406
+>>  #8  0x00005558b8088e8c in monitor_puts (mon=3D0x5558ba476610, str=3D0x5=
+558ba921e49 "") at monitor.c:449
+>>  #9  0x00005558b8089178 in qmp_send_response (mon=3D0x5558ba476610, rsp=
+=3D0x5558bb161600) at monitor.c:498
+>>  #10 0x00005558b808920c in monitor_qapi_event_emit (event=3DQAPI_EVENT_S=
+HUTDOWN, qdict=3D0x5558bb161600) at monitor.c:526
+>>  #11 0x00005558b8089307 in monitor_qapi_event_queue_no_reenter (event=3D=
+QAPI_EVENT_SHUTDOWN, qdict=3D0x5558bb161600) at monitor.c:551
+>>  #12 0x00005558b80896c0 in qapi_event_emit (event=3DQAPI_EVENT_SHUTDOWN,=
+ qdict=3D0x5558bb161600) at monitor.c:626
+>>  #13 0x00005558b855f23b in qapi_event_send_shutdown (guest=3Dfalse, reas=
+on=3DSHUTDOWN_CAUSE_HOST_QMP_QUIT) at qapi/qapi-events-run-state.c:43
+>>  #14 0x00005558b81911ef in qemu_system_shutdown (cause=3DSHUTDOWN_CAUSE_=
+HOST_QMP_QUIT) at vl.c:1837
+>>  #15 0x00005558b8191308 in main_loop_should_exit () at vl.c:1885
+>>  #16 0x00005558b819140d in main_loop () at vl.c:1924
+>>  #17 0x00005558b8198c84 in main (argc=3D18, argv=3D0x7ffc355df3f8, envp=
+=3D0x7ffc355df490) at vl.c:4665
+>
+> This shows the main thread trace - i'd be interested to see a trace of
+> the other thread which is calling tcp_chr_free_connection() to
+> understand why we have 2 threads racing at all.
 
-> Override the device hotplug handler to properly handle the memory device
-> part via virtio-pmem-pci callbacks from the machine hotplug handler and
-> forward to the actual PCI bus hotplug handler.
-> 
-> As PCI hotplug has not been properly factored out into hotplug handlers,
-> most magic is performed in the (un)realize functions. Also some PCI host
-> buses don't have a PCI hotplug handler at all yet, just to be sure that
-> we alway have a hotplug handler on x86, add a simple error check.
-> 
-> Unlocking virtio-pmem will unlock virtio-pmem-pci.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  default-configs/i386-softmmu.mak |  1 +
->  hw/i386/pc.c                     | 70 +++++++++++++++++++++++++++++++-
->  2 files changed, 70 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index 64c998c4c8..3f63e95a55 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -52,6 +52,7 @@ CONFIG_APIC=y
->  CONFIG_IOAPIC=y
->  CONFIG_PVPANIC=y
->  CONFIG_MEM_DEVICE=y
-> +CONFIG_VIRTIO_PMEM=y
->  CONFIG_DIMM=y
->  CONFIG_NVDIMM=y
->  CONFIG_ACPI_NVDIMM=y
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index fd0cb29ba9..6a176caeb9 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -75,6 +75,7 @@
->  #include "hw/usb.h"
->  #include "hw/i386/intel_iommu.h"
->  #include "hw/net/ne2000-isa.h"
-> +#include "hw/virtio/virtio-pmem-pci.h"
->  
->  /* debug PC/ISA interrupts */
->  //#define DEBUG_IRQ
-> @@ -2224,6 +2225,64 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->      numa_cpu_pre_plug(cpu_slot, dev, errp);
->  }
->  
-> +static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
-> +                                        DeviceState *dev, Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +    Error *local_err = NULL;
-> +
-> +    if (!hotplug_dev2) {
-> +        /*
-> +         * Without a bus hotplug handler, we cannot control the plug/unplug
-> +         * order. This should never be the case on x86, however better add
-> +         * a safety net.
-> +         */
-> +        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
-> +        return;
-> +    }
-> +    virtio_pmem_pci_pre_plug(VIRTIO_PMEM_PCI(dev), MACHINE(hotplug_dev),
-       ^^^
-doesn't do anything beside being dumb proxy to memory_device_pre_plug()
-I'd just use memory_device_pre_plug() here and avoid so far needles wrappers
+The other thread is already done by the time this one crashes, but you
+can see what's going on if you replace the qemu_mutex_lock() call in
+this patch with a trylock() + an assertion:
 
-> +                             &local_err);
-> +    if (!local_err) {
-since logic is not trivial I'd add comment somewhere in this function
-explaining why handlers are called in this particular order.
+#0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:=
+51
+#1  0x00007fafc05e642a in __GI_abort () at abort.c:89
+#2  0x00007fafc05dde67 in __assert_fail_base (fmt=3D<optimized out>, assert=
+ion=3Dassertion@entry=3D0x55a4dbe78448 "qemu_mutex_trylock(&chr->chr_write_=
+lock) !=3D -EBUSY",=20
+    file=3Dfile@entry=3D0x55a4dbe78320 "chardev/char-socket.c", line=3Dline=
+@entry=3D452,=20
+    function=3Dfunction@entry=3D0x55a4dbe788d0 <__PRETTY_FUNCTION__.20007> =
+"tcp_chr_disconnect") at assert.c:92
+#3  0x00007fafc05ddf12 in __GI___assert_fail (assertion=3D0x55a4dbe78448 "q=
+emu_mutex_trylock(&chr->chr_write_lock) !=3D -EBUSY",=20
+    file=3D0x55a4dbe78320 "chardev/char-socket.c", line=3D452, function=3D0=
+x55a4dbe788d0 <__PRETTY_FUNCTION__.20007> "tcp_chr_disconnect")
+    at assert.c:101
+#4  0x000055a4dbbbdab1 in tcp_chr_disconnect (chr=3D0x55a4dc76e380) at char=
+dev/char-socket.c:452
+#5  0x000055a4dbbbdca0 in tcp_chr_read (chan=3D0x55a4dc76e770, cond=3D(G_IO=
+_IN | G_IO_HUP), opaque=3D0x55a4dc76e380) at chardev/char-socket.c:486
+#6  0x000055a4dbbd7f76 in qio_channel_fd_source_dispatch (source=3D0x7fafac=
+005000, callback=3D0x55a4dbbbdb5c <tcp_chr_read>, user_data=3D0x55a4dc76e38=
+0)
+    at io/channel-watch.c:84
+#7  0x00007fafc3ad16aa in g_main_context_dispatch () from /lib/x86_64-linux=
+-gnu/libglib-2.0.so.0
+#8  0x00007fafc3ad1a60 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#9  0x00007fafc3ad1d82 in g_main_loop_run () from /lib/x86_64-linux-gnu/lib=
+glib-2.0.so.0
+#10 0x000055a4db8601f9 in iothread_run (opaque=3D0x55a4dc781440) at iothrea=
+d.c:74
+#11 0x000055a4dbc57039 in qemu_thread_start (args=3D0x55a4dc774c10) at util=
+/qemu-thread-posix.c:502
+#12 0x00007fafc0958494 in start_thread (arg=3D0x7fafb23aa700) at pthread_cr=
+eate.c:333
+#13 0x00007fafc069aacf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:97
 
-> +        hotplug_handler_pre_plug(hotplug_dev2, dev, &local_err);
-> +    }
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
-> +                                    DeviceState *dev, Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +    Error *local_err = NULL;
-> +
-> +    virtio_pmem_pci_plug(VIRTIO_PMEM_PCI(dev), MACHINE(hotplug_dev));
-> +    hotplug_handler_plug(hotplug_dev2, dev, &local_err);
-> +    if (local_err) {
-> +        virtio_pmem_pci_unplug(VIRTIO_PMEM_PCI(dev), MACHINE(hotplug_dev));
-> +    }
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void pc_virtio_pmem_pci_unplug_request(HotplugHandler *hotplug_dev,
-> +                                              DeviceState *dev, Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +
-> +    hotplug_handler_unplug_request(hotplug_dev2, dev, errp);
-> +}
-> +
-> +static void pc_virtio_pmem_pci_unplug(HotplugHandler *hotplug_dev,
-> +                                      DeviceState *dev, Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +    Error *local_err = NULL;
-> +
-> +    hotplug_handler_unplug(hotplug_dev2, dev, &local_err);
-> +    if (!local_err) {
-> +        virtio_pmem_pci_unplug(VIRTIO_PMEM_PCI(dev), MACHINE(hotplug_dev));
-> +    }
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->                                            DeviceState *dev, Error **errp)
->  {
-> @@ -2231,6 +2290,8 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->          pc_memory_pre_plug(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_pre_plug(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-> +        pc_virtio_pmem_pci_pre_plug(hotplug_dev, dev, errp);
->      }
->  }
->  
-> @@ -2241,6 +2302,8 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
->          pc_memory_plug(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_plug(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-> +        pc_virtio_pmem_pci_plug(hotplug_dev, dev, errp);
->      }
->  }
->  
-> @@ -2251,6 +2314,8 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->          pc_memory_unplug_request(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-> +        pc_virtio_pmem_pci_unplug_request(hotplug_dev, dev, errp);
->      } else {
->          error_setg(errp, "acpi: device unplug request for not supported device"
->                     " type: %s", object_get_typename(OBJECT(dev)));
-> @@ -2264,6 +2329,8 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
->          pc_memory_unplug(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_unplug_cb(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-> +        pc_virtio_pmem_pci_unplug(hotplug_dev, dev, errp);
->      } else {
->          error_setg(errp, "acpi: device unplug for not supported device"
->                     " type: %s", object_get_typename(OBJECT(dev)));
-> @@ -2274,7 +2341,8 @@ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
->                                               DeviceState *dev)
->  {
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-> -        object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> +        object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
-> +        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
->          return HOTPLUG_HANDLER(machine);
->      }
->  
+Berto
