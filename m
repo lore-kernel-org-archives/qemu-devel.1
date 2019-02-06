@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57037)
+Received: from eggs.gnu.org ([209.51.188.92]:59807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grJwH-0000Z9-Kr
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:56:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grK7I-0002oy-EP
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:07:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grJwG-00082C-P0
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:56:17 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:51161)
+	(envelope-from <laurent@vivier.eu>) id 1grK7G-0004Ah-R0
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:07:40 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:54943)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grJwG-00081Y-DZ
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 04:56:16 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grK7E-00048L-R6
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:07:38 -0500
 References: <20190205174207.9278-1-peter.maydell@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <1ad3ba81-bc64-c1d9-6340-6b9965f2a84a@vivier.eu>
-Date: Wed, 6 Feb 2019 10:56:03 +0100
+Message-ID: <15cf1d40-52e8-90db-71df-8d8f881c6c7e@vivier.eu>
+Date: Wed, 6 Feb 2019 11:07:14 +0100
 MIME-Version: 1.0
 In-Reply-To: <20190205174207.9278-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>
+Cc: Riku Voipio <riku.voipio@iki.fi>, patches@linaro.org
 
 On 05/02/2019 18:42, Peter Maydell wrote:
 > Coverity warns (CID 1390634) that open_net_route() is not
@@ -71,4 +71,8 @@ On 05/02/2019 18:42, Peter Maydell wrote:
 >                  metric, tswap32(mask), mtu, window, irtt);
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
