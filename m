@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45423)
+Received: from eggs.gnu.org ([209.51.188.92]:48746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1grKpx-0003mL-OY
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:53:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1grKwp-0007ia-OI
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1grKpx-00009E-1u
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:53:49 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:44736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1grKpw-00007I-Rq
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 05:53:48 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id v16so5134663wrn.11
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 02:53:48 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Feb 2019 10:53:37 +0000
-Message-Id: <20190206105337.11559-4-richard.henderson@linaro.org>
-In-Reply-To: <20190206105337.11559-1-richard.henderson@linaro.org>
-References: <20190206105337.11559-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 3/3] target/hppa: fix PSW Q bit behaviour to
- match hardware
+	(envelope-from <thuth@redhat.com>) id 1grKwo-0003aW-Nv
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:00:55 -0500
+References: <20190127101836.15451-1-sourav.jb1988@gmail.com>
+	<33a499ed-6f6a-ccd2-a1f8-48646b6be6c9@redhat.com>
+	<05c9ef91-39d7-0579-b007-443748559007@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fd1de933-9547-3ccb-97e4-090820d2ff31@redhat.com>
+Date: Wed, 6 Feb 2019 12:00:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <05c9ef91-39d7-0579-b007-443748559007@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/input/lm832x: set device category of
+ lm832x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Sven Schnelle <svens@stackframe.org>
+On 2019-01-28 12:10, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 1/28/19 9:37 AM, Thomas Huth wrote:
+>>  Hi,
+>>
+>> On 2019-01-27 11:18, kumar sourav wrote:
+>>> Sets the category of lm832x as DEVICE_CATEGORY_INPUT
+>>> Devices should be assigned to one of DEVICE_CATEGORY_XXXX
+>>>
+>>> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+>>> ---
+>>>  hw/input/lm832x.c | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
+>>> index cffbf586d4..07ae5e0aee 100644
+>>> --- a/hw/input/lm832x.c
+>>> +++ b/hw/input/lm832x.c
+>>> @@ -509,6 +509,7 @@ static void lm8323_class_init(ObjectClass *klass,=
+ void *data)
+>>>      k->recv =3D lm_i2c_rx;
+>>>      k->send =3D lm_i2c_tx;
+>>>      dc->vmsd =3D &vmstate_lm_kbd;
+>>> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>>>  }
+>>
+>> This device already has DEVICE_CATEGORY_MISC set since it is derived
+>> from TYPE_I2C_SLAVE. If you now set another category bit here, the
+>> device shows up twice in the output of "-device help". That's not so n=
+ice.
+>>
+>> I see multiple options here:
+>>
+>> 1) Drop this patch since the device already has a category
+>>
+>> 2) Make sure to clear_bit() the MISC category here again
+>>
+>> 3) Remove the set_bit(DEVICE_CATEGORY_MISC, k->categories) in
+>>    hw/i2c/core.c - it does not make that much sense to set the
+>>    MISC category for an abstract parent class.
+>>
+>> 4) Introduce a new DEVICE_CATEGORY_I2C which could be used
+>>    instead of the DEVICE_CATEGORY_MISC in hw/i2c/core.c
+>>
+>> One of the last two options sound most appealing to me.
+>=20
+> Can we go with 0/3/4 together? 0 being this patch:
+>=20
+>   0) This devices inherited DEVICE_CATEGORY_I2C from his
+>      abstract parent, also select the DEVICE_CATEGORY_INPUT
+>      bit.
 
-PA-RISC specification says: "Setting the PSW Q-bit, PSW{28}, to 1
-with this instruction, if it was not already 1, is an undefined
-operation." However, at least HP-UX 10.20 sets the Q bit from 0 to 1
-with the SSM instruction. Tested this both on HP9000/712 and
-HP9000/785/C3750, both machines set the Q bit from 0 to 1 without
-exception. This makes HP-UX 10.20 progress a little bit further.
+Yes, I guess... Thinking about this again ... dc->categories is a
+bitfield, so there is or at least was the original intention that a
+device can go into multiple categories. Question: Is this what we want,
+and if yes, is everybody fine with the fact that a device shows up
+multiple times in the output of "-device help" ? If not, shall we change
+the bitfield into a normal enum value?
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Message-Id: <20190129191402.29539-1-svens@stackframe.org>
-[rth: Add a comment to the code as well.]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/hppa/op_helper.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+Anyway, a DEVICE_CATEGORY_I2C is likely a good idea, at least it's
+better than MISC here (and we already have DEVICE_CATOGORY_USB, too).
+Anybody want to send a patch?
 
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index 912e8d5be4..6bf478e7b0 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -665,11 +665,15 @@ void HELPER(reset)(CPUHPPAState *env)
- target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
- {
-     target_ulong psw = env->psw;
--    /* ??? On second reading this condition simply seems
--       to be undefined rather than a diagnosed trap.  */
--    if (nsm & ~psw & PSW_Q) {
--        hppa_dynamic_excp(env, EXCP_ILL, GETPC());
--    }
-+    /*
-+     * Setting the PSW Q bit to 1, if it was not already 1, is an
-+     * undefined operation.
-+     *
-+     * However, HP-UX 10.20 does this with the SSM instruction.
-+     * Tested this on HP9000/712 and HP9000/785/C3750 and both
-+     * machines set the Q bit from 0 to 1 without an exception,
-+     * so let this go without comment.
-+     */
-     env->psw = (psw & ~PSW_SM) | (nsm & PSW_SM);
-     return psw & PSW_SM;
- }
--- 
-2.17.2
+ Thomas
