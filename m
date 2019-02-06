@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57989)
+Received: from eggs.gnu.org ([209.51.188.92]:34170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1grLYg-0001Tv-7Z
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:40:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1grLry-0005HL-Rt
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1grLYf-0002JP-IF
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:40:02 -0500
-References: <20190206112729.37761-1-sgarzare@redhat.com>
-	<20190206112729.37761-7-sgarzare@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ce44833e-87e3-041d-43bd-4d2c0a796e84@redhat.com>
-Date: Wed, 6 Feb 2019 12:39:46 +0100
+	(envelope-from <imammedo@redhat.com>) id 1grLrx-0008PF-GB
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:59:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48998)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1grLrx-0008P1-9h
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:59:57 -0500
+Date: Wed, 6 Feb 2019 12:59:49 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190206125949.511438c9@Igors-MacBook-Pro.local>
+In-Reply-To: <20190201010837.19278-1-richardw.yang@linux.intel.com>
+References: <20190201010837.19278-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190206112729.37761-7-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] tests/virtio-blk: add test for
- WRITE_ZEROES command
+Subject: Re: [Qemu-devel] [PATCH] pc-dimm: use same mechanism for
+ [get|set]_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On 2019-02-06 12:27, Stefano Garzarella wrote:
-> If the WRITE_ZEROES feature is enabled, we check this command
-> in the test_basic().
+On Fri,  1 Feb 2019 09:08:37 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+
+> [get|set]_addr are two counterpart to access PCDIMMDevice.addr.
 > 
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> Since we have already set up a property PC_DIMM_ADDR_PROP for this
+> field and use this mechanism in set_addr, it would be more proper to use
+> the same mechanism in set_addr.
+> 
+> This patch uses object_property_get_uint() to replace the direct memory
+> access to make [get|set]_addr with the same mechanism.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->  tests/virtio-blk-test.c | 60 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 60 insertions(+)
+>  hw/mem/pc-dimm.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 0c9b9e8292..c0658b9b88 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -204,9 +204,7 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+>  
+>  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+>  {
+> -    const PCDIMMDevice *dimm = PC_DIMM(md);
+> -
+> -    return dimm->addr;
+> +    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, NULL);
+it's not good to ignore errors
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+s/NULL/error_abort/
+
+so we would notice if error ever happened.
+
+>  }
+>  
+>  static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
