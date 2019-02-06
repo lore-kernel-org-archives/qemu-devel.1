@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41965)
+Received: from eggs.gnu.org ([209.51.188.92]:42795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grTW0-0000gb-Sv
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:09:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1grTZo-0002SS-JF
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grTVz-00052e-1j
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:09:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grTVy-00050b-Er
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:09:46 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E838C8F507
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 20:09:36 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190206181725.14337-1-armbru@redhat.com>
-	<20190206181725.14337-18-armbru@redhat.com>
-	<5ad19847-14c5-fdd4-8cf5-9cacd8a95005@redhat.com>
-Date: Wed, 06 Feb 2019 21:09:31 +0100
-In-Reply-To: <5ad19847-14c5-fdd4-8cf5-9cacd8a95005@redhat.com> (Eric Blake's
-	message of "Wed, 6 Feb 2019 12:40:05 -0600")
-Message-ID: <87lg2sllvo.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1grTZm-00065j-Fb
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 15:13:44 -0500
+References: <20190206195551.28893-1-mreitz@redhat.com>
+	<20190206195551.28893-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <495fa2d7-44cd-ff18-a2b7-aa40c0c37964@redhat.com>
+Date: Wed, 6 Feb 2019 14:13:23 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 17/17] qapi: move RTC_CHANGE to the
- target schema
+In-Reply-To: <20190206195551.28893-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4cVlaygAtyBQaFGJhTyWkOfLo1OkO7gq8"
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4cVlaygAtyBQaFGJhTyWkOfLo1OkO7gq8
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <495fa2d7-44cd-ff18-a2b7-aa40c0c37964@redhat.com>
+Subject: Re: [PATCH v3 1/8] qapi: Add default-variant for flat unions
+References: <20190206195551.28893-1-mreitz@redhat.com>
+ <20190206195551.28893-2-mreitz@redhat.com>
+In-Reply-To: <20190206195551.28893-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 2/6/19 12:17 PM, Markus Armbruster wrote:
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>=20
->> A few targets don't emit RTC_CHANGE, we could restrict the event to
->> the tagets that do emit it.
->
-> s/tagets/targets/
->
->>=20
->> Note: There is a lot more of events & commands that we could restrict
->
-> s/is a lot more of/are a lot more/
->
->> to capable targets, with the cost of some additional complexity, but
->> the benefit of added correctness and better introspection.
->>=20
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
+On 2/6/19 1:55 PM, Max Reitz wrote:
+> This patch allows specifying a discriminator that is an optional member=
 
-Will fix, thanks!
+> of the base struct.  In such a case, a default value must be provided
+> that is used when no value is given.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qapi/introspect.json           |  8 +++++
+>  scripts/qapi/common.py         | 58 ++++++++++++++++++++++++++++------=
+
+>  scripts/qapi/doc.py            | 10 ++++--
+>  scripts/qapi/introspect.py     | 10 ++++--
+>  scripts/qapi/visit.py          | 13 ++++++++
+>  tests/qapi-schema/test-qapi.py |  2 ++
+>  6 files changed, 86 insertions(+), 15 deletions(-)
+
+Missing a change to docs/devel/qapi-code-gen.txt? [re-reads diffstat in
+cover letter...] Oh, you got that later in the series. Maybe those two
+patches are worth squashing?
+
+> +++ b/scripts/qapi/visit.py
+> @@ -77,6 +77,19 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_n=
+ame)s *obj, Error **errp)
+>          ret +=3D gen_endif(memb.ifcond)
+> =20
+>      if variants:
+> +        if variants.default_tag_value is not None:
+> +            ret +=3D mcgen('''
+> +    if (!obj->has_%(c_name)s) {
+> +        obj->has_%(c_name)s =3D true;
+> +        obj->%(c_name)s =3D %(enum_const)s;
+> +    }
+> +''',
+> +                         c_name=3Dc_name(variants.tag_member.name),
+> +                         enum_const=3Dc_enum_const(
+> +                             variants.tag_member.type.name,
+> +                             variants.default_tag_value,
+> +                             variants.tag_member.type.prefix))
+> +
+
+I like that you de-sugar it as early in the input parse as possible.
+
+Markus may have comments, but it looks reasonable to me.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--4cVlaygAtyBQaFGJhTyWkOfLo1OkO7gq8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxbP+QACgkQp6FrSiUn
+Q2r2VAf+MFl5bcJlmekJ/Iu8nhtmUhiU7GU4DKpf/xeHJdkeP4URU9YIhhBfCYmJ
+hnSE5LZ6FYTFktzKHFiUasQ3LX9FJaNv3o8HOdxdkIZMSmfG+d8SarhU0+ZnESR/
+xR17mvQ+/5Momzuz35o92OmHTZFRfe8xRrxgoeYpvsWSwLo1+HjfyHOagHBdPmDX
+HvukVWYXFw+exT+cxn4687vopo5FiIG4+aYZyysEmMz7n03C+/SGOh+9SaBx1ccY
+i2Z5E79kpn/qzxpnSWMwt7Kh+2q7C9y+OpEKgYmPldbVITHhXReuI49uH/30nAyj
+EniVDZvBrR01DeDMFZxtQxmwiOO37Q==
+=8eqw
+-----END PGP SIGNATURE-----
+
+--4cVlaygAtyBQaFGJhTyWkOfLo1OkO7gq8--
