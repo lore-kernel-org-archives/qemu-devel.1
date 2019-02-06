@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34751)
+Received: from eggs.gnu.org ([209.51.188.92]:37551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1grT6c-0001JC-1c
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:43:35 -0500
+	(envelope-from <crosa@redhat.com>) id 1grTGJ-0006L0-LB
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1grSuH-0007Qm-Qn
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:30:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48256)
+	(envelope-from <crosa@redhat.com>) id 1grTGI-0006tA-9y
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:53:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1grSuF-0007O5-R5
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:30:49 -0500
-References: <20181121214818.22874-1-crosa@redhat.com>
-	<20181121214818.22874-2-crosa@redhat.com>
-	<d67d31c9-06fe-1f06-66e0-bc6678212ccd@redhat.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1grTGG-0006rh-SX
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 14:53:33 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <9383c42d-b20f-9337-7d95-7fb57659513e@redhat.com>
-Date: Wed, 6 Feb 2019 14:30:36 -0500
+Date: Wed,  6 Feb 2019 14:53:14 -0500
+Message-Id: <20190206195316.12646-1-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d67d31c9-06fe-1f06-66e0-bc6678212ccd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] RFC: Acceptance tests: add the
- build directory to the system PATH
+Subject: [Qemu-devel] [PATCH v3 0/2] Add "boot_linux" acceptance test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,143 +23,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
+Some hopefully useful pointers for reviewers:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
+Git Info:
+  - URI: https://github.com/clebergnu/qemu/tree/sent/test_boot_linux_v3
+  - Remote: https://github.com/clebergnu/qemu
+  - Branch: sent/test_boot_linux_v3
 
-On 11/22/18 3:15 PM, Wainer dos Santos Moschetta wrote:
->=20
-> On 11/21/2018 07:48 PM, Cleber Rosa wrote:
->> So that when binaries such as qemu-img are searched for, those in the
->> build tree will be favored.=C2=A0 As a clarification, SRC_ROOT_DIR is
->> dependent on the location from where tests are executed, so they are
->> equal to the build directory if one is being used.
->=20
-> On avocado's job.log file I can see the full path of the qemu-img which
-> was called, but I wonder if it wouldn't be better to log that
-> information somewhere more explicitly. It wouldn't prevent this patch
-> from being merged though, it's just an improvement suggestion.
->=20
->>
->> The original motivation is that Avocado libraries such as
->> avocado.utils.vmimage.get() may use the matching binaries, but it may
->> also apply to any other binary that test code may eventually attempt
->> to execute.
->>
->> Other competing alternatives would be a more explicit path or binary
->> registration mechanism, in which we tell the libraries such as
->> avocado.utils.vmimage, the binaries to use in advance.=C2=A0 I think t=
-he
->> model proposed here is simpler though, and is not inconsistent with
->> the general approach of favoring the built binaries, and falling back
->> to binaries available in the system.=C2=A0 I'd love to have comments o=
-n
->> that, though.
->=20
-> IMHO it makes sense to pick the built binaries, falling back to system'=
-s
-> otherwise. Keep it simple (and consistent) unless we eventually need
-> something robust, I would go for that approach here.
->=20
+Travis CI Info:
+  - Build: https://travis-ci.org/clebergnu/qemu/builds/489711644
 
-Agreed.
+Previous version:
+  - v2: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04318.ht=
+ml
+  - v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02530.=
+html
 
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->> =C2=A0 tests/acceptance/avocado_qemu/__init__.py | 9 +++++++++
->> =C2=A0 1 file changed, 9 insertions(+)
->>
->> diff --git a/tests/acceptance/avocado_qemu/__init__.py
->> b/tests/acceptance/avocado_qemu/__init__.py
->> index 1e54fd5932..3d5190cbab 100644
->> --- a/tests/acceptance/avocado_qemu/__init__.py
->> +++ b/tests/acceptance/avocado_qemu/__init__.py
->> @@ -49,6 +49,15 @@ class Test(avocado.Test):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 self.cancel("No QEMU binary defined or found in the
->> source tree")
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm =3D QEM=
-UMachine(self.qemu_bin)
->> =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RFC: avocado.util=
-s.vmimage.get() uses qemu-img, from the
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # system's PATH, to create=
- a snapshot.=C2=A0 This is a transparent,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # but implicit way of maki=
-ng sure it finds the qemu-img that
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # matches the code being t=
-ested (as tests it indirectly too).
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # As for the cleanup, give=
-n that in the Avocado test execution
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # model every test is star=
-ted in a different process, no
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # cleanup is needed.
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.environ['PATH'] =3D '%s=
-:%s' % (SRC_ROOT_DIR,
->> os.environ['PATH'])
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def tearDown(self):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.vm is n=
-ot None:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 self.vm.shutdown()
->=20
-> The boot Linux test (added on patch 02) exits with error when I ran
-> 'make check-acceptance'. I am using Fedora 29 x86_64 which don't have
-> qemu-img installed system-wide. See below:
->=20
-> ------
-> # make check-acceptance
-> =C2=A0 AVOCADO tests/acceptance
-> make: *** [/root/qemu/tests/Makefile.include:940: check-acceptance] Err=
-or 9
-> # cat tests/results/latest/results.tap
-> 1..8
-> not ok 1 /root/qemu/tests/acceptance/boot_linux.py:BootLinux.test
-> # grep -e 'ERROR.*CmdNotFoundError' tests/results/latest/job.log
-> 2018-11-22 14:51:30,540 stacktrace=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-L0047 ERROR|=C2=A0=C2=A0=C2=A0=C2=A0 raise
-> CmdNotFoundError(cmd, path_paths)
-> 2018-11-22 14:51:30,540 stacktrace=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-L0047 ERROR|
-> avocado.utils.path.CmdNotFoundError: Command 'qemu-img' could not be
-> found in any of the PATH dirs: ['/usr/local/bin', '/bin', '/root/bin',
-> '/sbin', '/usr/libexec', '/usr/local/sbin', '/root/qemu', '/usr/bin',
-> '/usr/sbin']
-> 2018-11-22 14:51:30,572 test=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0984 ERROR|
-> avocado.utils.path.CmdNotFoundError: Command 'qemu-img' could not be
-> found in any of the PATH dirs: ['/usr/local/bin', '/bin', '/root/bin',
-> '/sbin', '/usr/libexec', '/usr/local/sbin', '/root/qemu', '/usr/bin',
-> '/usr/sbin']
-> 2018-11-22 14:51:30,572 test=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0999 ERROR| ERROR
-> 1-/root/qemu/tests/acceptance/boot_linux.py:BootLinux.test ->
-> CmdNotFoundError: Command 'qemu-img' could not be found in any of the
-> PATH dirs: ['/usr/local/bin', '/bin', '/root/bin', '/sbin',
-> '/usr/libexec', '/usr/local/sbin', '/root/qemu', '/usr/bin', '/usr/sbin=
-']
-> ------
->=20
-> The same test finished successfully when I ran with 'avocado run (...)'
-> though.
->=20
-> - Wainer
->=20
+Known Issues on this version:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
 
-This is interesting, because:
+ * A recent TCG performance regression[1] affects this test in a
+   number of ways:
+   - The test execution may timeout by itself
+   - The generation of SSH host keys in the guest's first boot is also
+     affected (possibly also a timeout)
+   - The cloud-init "phone home" feature attempts to read the host keys
+     and fails, causing the test to timeout and fail
 
- 1) I can't reproduce it
- 2) I do see '/root/qemu' listed in the PATH, which I assume is the QEMU
-build directory
+   These are not observed anymore once the fix[2] is applied.
 
-The only thing that comes to my mind is that you may have not built QEMU
-before running `make check-acceptance`, and perhaps, did so before
-running "avocado run ..." ?
+[1] - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00338.html
+[2] - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01129.html
 
-Anyway, I'll be sending a v3 shortly, and I'll try further to reproduce
-it.  I'll, of course, appreciate if you try this again! :)
+Changes from v2:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Thanks!
-- Cleber.
+ * Updated the tag to include the "arch:" key, in a similar fashion as to
+   the tests in the "Acceptance Tests: target architecture support":
+   - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00369.html
+
+ * Renamed the test method name to test_x86_64_pc, again, similarly to th=
+e
+   boot_linux_console.py tests in the series mentioned before.
+
+ * Set the machine type explicitly, again similarly to the
+   boot_linux_console.py tests in the series mentioned before.
+
+ * Added messages after the launch of the VM, to let test runners know
+   the test know waits for a boot confirmation from the the guest (Eduard=
+o).
+
+ * Updated commit message to reflect the fact that this version does
+   not allow for parameterization of the guest OS, version, etc.
+
+ * Dropped the RFC prefix on patch "RFC: Acceptance tests: add the
+   build directory to the system PATH"
+
+ * Changed the comments on "RFC: Acceptance tests: add the build
+   directory to the system PATH" to make it clear the addition of a
+   the build directory to the PATH may influence other utility code.
+
+Changes from v1:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+ * The commit message was adjusted, removing the reference to the
+   avocado.utils.vmimage encoding issue on previous Avocado versions
+   (<=3D 64.0) and the fix that would (and was) included in Avocado
+   version 65.0.
+
+ * Effectively added pycdlib=3D=3D1.6.0 to the requirements.txt file,
+   added on a56931eef3, and adjusted the commit message was also
+   to reflect that.
+
+ * Updated the default version of the guest OS, from Fedora 28 to 29.
+   Besides possible improvements in the (virtual) hardware coverage,
+   it brings a performance improvement in the order of 20% to the
+   test.
+
+ * Removed all direct parameters usage.  Because some parameters and
+   its default values implemented in the test would prevent it from
+   running on some environments.  Example: the "accel" parameter had a
+   default value of "kvm", which would prevent this test, that boots a
+   x86_64 OS, from running on a host arch different than x86_64.  I
+   recognize that it's desirable to make tests reusable and
+   parameterized (that was the reason for the first version doing so),
+   but the mechanism to be used to define the architectures that a
+   given test should support is still an open issue, and has been
+   discussed in other threads.  I'll follow up those discussions with
+   a proposal, and until then, removing those aspects from this test
+   implementation seemed to be the best option.  A caveat: this test
+   currently adds the same tag (x86_64) and follows other assumptions
+   made on "boot_linux_console.py", that is, that a x86_64 target
+   binary will be used to run it.  If a user is in an environment that
+   does not have a x86_64 target binary, it could filter those tests
+   out with: "avocado run --filter-by-tags=3D'-x86_64' tests/acceptance".
+
+ * Removed most arguments to the QEMU command line for pretty much the
+   same reasons described above, and by following the general
+   perception that I could grasp from other discussions that QEMU
+   defaults should preferrably be used.  This test, as well as others,
+   can and should be extended later to allow for different test
+   scenarios by passing well documented parameter values.  That is,
+   they should respect well-known parameters such as "accel" mentioned
+   above, so that the same test can run with KVM or TCG.
+
+ * Changed the value of the memory argument to 1024, which based on
+   my experimentations and observations is the minimum amount of RAM
+   for the Fedora 29 cloud image to sucessfully boot on QEMU.  I know
+   there's no such thing as a "one size fits all", specially for QEMU,
+   but this makes me wonder wether a x86_64 machine type shouldn't
+   have its default_ram_size bumped to a number practical enough to
+   run modern operating systems.
+
+ * Added a new patch "RFC: Acceptance tests: add the build directory
+   to the system PATH", which is supposed to gather feedback on how to
+   enable the use of built binaries, such as qemu-img, to code used by
+   the test code.  The specific situation here is that the vmimage,
+   part of the avocado.utils libraries, makes use of qemu-img to create
+   snapshot files.  Even though we could require qemu-img to be installed
+   as a dependency of tests, system wide, it actually goes against the
+   goal of testing all QEMU things from the source/build tree.  This
+   became aparent with tests running on environments such as Travis CI,
+   which don't necessarily have qemu-img available elsewhere.
+
+Cleber Rosa (2):
+  Acceptance tests: add the build directory to the system PATH
+  Add "boot_linux" acceptance test for x86_64 and pc machine type
+
+ tests/acceptance/avocado_qemu/__init__.py |  7 ++++
+ tests/acceptance/boot_linux.py            | 51 +++++++++++++++++++++++
+ tests/requirements.txt                    |  1 +
+ 3 files changed, 59 insertions(+)
+ create mode 100644 tests/acceptance/boot_linux.py
+
+--=20
+2.20.1
