@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54050)
+Received: from eggs.gnu.org ([209.51.188.92]:54345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1grX2R-0004El-PD
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:55:32 -0500
+	(envelope-from <alistair23@gmail.com>) id 1grX3i-0005Df-9z
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1grX2O-0000O3-C1
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:55:29 -0500
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:34583)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1grX2I-0000JI-II
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:55:22 -0500
-Received: by mail-ed1-x543.google.com with SMTP id b3so7563110ede.1
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 15:55:18 -0800 (PST)
-Date: Wed, 6 Feb 2019 23:55:15 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190206235515.r2h6sk74uggt7qg3@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190201010837.19278-1-richardw.yang@linux.intel.com>
-	<20190206125949.511438c9@Igors-MacBook-Pro.local>
+	(envelope-from <alistair23@gmail.com>) id 1grX3h-0000l7-0r
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 18:56:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190206125949.511438c9@Igors-MacBook-Pro.local>
-Subject: Re: [Qemu-devel] [PATCH] pc-dimm: use same mechanism for
- [get|set]_addr
+References: <CAFyWVaZ5tQq4eGaZiPBq7172PB_x3JCqV6c2xo=wSJdgbJakKQ@mail.gmail.com>
+	<20190130025644.12754-1-jimw@sifive.com>
+In-Reply-To: <20190130025644.12754-1-jimw@sifive.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 6 Feb 2019 15:55:59 -0800
+Message-ID: <CAKmqyKMPYYuD1jRT-9pxgAdBcgA3990MmseMNube_zzP0wmncQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 4/5 v3] RISC-V: Add debug support for
+ accessing CSRs.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +23,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Jim Wilson <jimw@sifive.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
-On Wed, Feb 06, 2019 at 12:59:49PM +0100, Igor Mammedov wrote:
->On Fri,  1 Feb 2019 09:08:37 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
+On Tue, Jan 29, 2019 at 6:57 PM Jim Wilson <jimw@sifive.com> wrote:
 >
->> [get|set]_addr are two counterpart to access PCDIMMDevice.addr.
->> 
->> Since we have already set up a property PC_DIMM_ADDR_PROP for this
->> field and use this mechanism in set_addr, it would be more proper to use
->> the same mechanism in set_addr.
->> 
->> This patch uses object_property_get_uint() to replace the direct memory
->> access to make [get|set]_addr with the same mechanism.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  hw/mem/pc-dimm.c | 4 +---
->>  1 file changed, 1 insertion(+), 3 deletions(-)
->> 
->> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
->> index 0c9b9e8292..c0658b9b88 100644
->> --- a/hw/mem/pc-dimm.c
->> +++ b/hw/mem/pc-dimm.c
->> @@ -204,9 +204,7 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
->>  
->>  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
->>  {
->> -    const PCDIMMDevice *dimm = PC_DIMM(md);
->> -
->> -    return dimm->addr;
->> +    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, NULL);
->it's not good to ignore errors
+> Adds a debugger field to CPURISCVState.  Disable mode checks in riscv_csrrw
+> when true.
 >
->s/NULL/error_abort/
+> Signed-off-by: Jim Wilson <jimw@sifive.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
+> ---
+>  target/riscv/cpu.h |  3 +++
+>  target/riscv/csr.c | 16 ++++++++--------
+>  2 files changed, 11 insertions(+), 8 deletions(-)
 >
->so we would notice if error ever happened.
-
-You mean something like this?
-
-	Error *err;
-	uint64_t addr;
-
-	addr = object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, &err);
-
-	if (err) {
-		warn_report_err(&err);
-		return 0;
-	}
-
-	return addr;
-
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 743f02c..faa46d0 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -170,6 +170,9 @@ struct CPURISCVState {
 >
->>  }
->>  
->>  static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
+>      /* physical memory protection */
+>      pmp_table_t pmp_state;
+> +
+> +    /* True if in debugger mode.  */
+> +    bool debugger;
+>  #endif
 >
-
--- 
-Wei Yang
-Help you, Help me
+>      float_status fp_status;
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 5e7e7d1..04e6b59 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -46,7 +46,7 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops)
+>  static int fs(CPURISCVState *env, int csrno)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>  #endif
+> @@ -58,7 +58,7 @@ static int ctr(CPURISCVState *env, int csrno)
+>  #if !defined(CONFIG_USER_ONLY)
+>      target_ulong ctr_en = env->priv == PRV_U ? env->scounteren :
+>                            env->priv == PRV_S ? env->mcounteren : -1U;
+> -    if (!(ctr_en & (1 << (csrno & 31)))) {
+> +    if (!env->debugger && !(ctr_en & (1 << (csrno & 31)))) {
+>          return -1;
+>      }
+>  #endif
+> @@ -86,7 +86,7 @@ static int pmp(CPURISCVState *env, int csrno)
+>  static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>  #endif
+> @@ -97,7 +97,7 @@ static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
+>  static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>      env->mstatus |= MSTATUS_FS;
+> @@ -109,7 +109,7 @@ static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
+>  static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>  #endif
+> @@ -120,7 +120,7 @@ static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
+>  static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>      env->mstatus |= MSTATUS_FS;
+> @@ -132,7 +132,7 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
+>  static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>  #endif
+> @@ -144,7 +144,7 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+>  static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (!(env->mstatus & MSTATUS_FS)) {
+> +    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>          return -1;
+>      }
+>      env->mstatus |= MSTATUS_FS;
+> --
+> 2.7.4
+>
+>
