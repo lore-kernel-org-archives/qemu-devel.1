@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49761)
+Received: from eggs.gnu.org ([209.51.188.92]:51326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1grHeW-0002vR-G6
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:29:49 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grHm8-0004pS-Hx
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1grHeS-00009v-Ak
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:29:46 -0500
-Date: Wed, 6 Feb 2019 08:29:11 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190206072911.urbbsuzxogkzj5sf@sirius.home.kraxel.org>
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-10-philmd@redhat.com>
-	<CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
-	<e5dd8130-e041-7774-2141-cc506dee99f7@redhat.com>
-	<94f74717-0bab-ea0a-e7cc-239a1b1136bf@comstyle.com>
-	<e8177680-28fc-1213-a8f7-a3b94ef92e15@redhat.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grHm7-0005Mu-Uy
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:37:40 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:40202
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1grHm7-0005MV-OC
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 02:37:39 -0500
+References: <20190103154810.GB32032@Red>
+	<3a375dc6-f0ba-c3f0-6e86-2fd5cdf3ee35@ilande.co.uk>
+	<8c302745-5097-afed-5c7e-9a992da03cf6@ilande.co.uk>
+	<20190205091115.GA27918@Red>
+	<2a85b239-7117-71aa-b921-86c42a54aeba@ilande.co.uk>
+	<20190206072850.GA4295@Red>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <8da59b77-eef2-4897-5254-0f6fb22539a6@ilande.co.uk>
+Date: Wed, 6 Feb 2019 07:37:29 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <e8177680-28fc-1213-a8f7-a3b94ef92e15@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
- from the ports
+In-Reply-To: <20190206072850.GA4295@Red>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] sparc: crash when using initrd > 5M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +34,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: sparclinux@vger.kernel.org, qemu-devel@nongnu.org
 
-On Tue, Feb 05, 2019 at 03:23:53PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hi Brad,
->=20
-> On 2/5/19 2:57 PM, Brad Smith wrote:
-> > If someone could point me in the right direction as to how the image =
-is
-> > created
-> > I could look at coming up with something newer. I would prefer that o=
-ver
-> > some
-> > of the workarounds I've seen to date.
->=20
-> I'm not an OpenBSD user, so I'm more than happy if you can help the
-> upstream community to test QEMU codebase on this OS. Testing helps us t=
-o
-> avoid code rot.
->=20
-> What we currently use to run tests is the 'tests/vm/openbsd' script.
-> The script itself doesn't document how it was built, but looking at the
-> commit of his introduction fdfaa33291eb we have:
+On 06/02/2019 07:28, Corentin Labbe wrote:
 
-There also is a patch floating around to auto-install openbsd:
-	https://patchwork.kernel.org/patch/10749459/
+>>> Hello
+>>>
+>>> Sorry even with the patch I still hit the issue.
+>>>
+>>> I have added some debug and at least qemu set initrd_size correctly now.
+>>>
+>>> I have tried to compile openbios-sparc32 for debugging but fail with
+>>> arch/sparc32/context.c:116:5: error: PIC register clobbered by 'l7' in 'asm'
+>>>      asm __volatile__ ("\n\tcall __switch_context"
+>>>      ^~~
+>>> make[1]: *** [rules.mak:219: target/arch/sparc32/context.o] Error 1
+>>> (gcc 7.2 and gc 6.4 with binutils 2.30)
+>>
+>> Hmmm. One other thing I've noticed is that newer kernels tend need a minimum of 256M
+>> RAM to start up - does it work if you add -m 256 to your command line?
+>>
+>>
+> 
+> I have already set 256M of RAM. (and tried 512)
 
-Not fully sure why this wasn't merged yet.  One problem is that this
-patch depends on a new slirp feature (added in the 3.1 devel cycle,
-needed to serve install.conf via http).  Which blocked merge during the
-3.1 cycle, because depending on unreleased qemu for test builds isn't a
-good idea.  But 3.1 is released, so maybe we can merge that for 4.0 now?
+I wonder then if this is being triggered by a recent kernel change? I tend to test
+using the latest Debian ports ISOs which are currently running 4.9 and that booted
+fine when I was testing the patches above.
 
-The openbsd installer trying to fetch install.conf not only via http but
-also via tftp would also simplify things, maybe implementing that is an
-option for the next openbsd release?
+Can you try with a few older kernels to see if this is the case?
 
-cheers,
-  Gerd
+
+ATB,
+
+Mark.
