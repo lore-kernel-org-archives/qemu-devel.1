@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46311)
+Received: from eggs.gnu.org ([209.51.188.92]:46309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grRln-0004sl-Da
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:18:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1grRln-0004sj-Co
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:18:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grRll-00026z-HA
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47108)
+	(envelope-from <armbru@redhat.com>) id 1grRlj-00025s-EF
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grRlj-0001pt-Iz
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:57 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grRlf-0001qA-Qd
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 13:17:53 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDEB480F79
-	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:17:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D4CC18BA00
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 18:17:31 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed,  6 Feb 2019 19:17:12 +0100
-Message-Id: <20190206181725.14337-5-armbru@redhat.com>
+Date: Wed,  6 Feb 2019 19:17:17 +0100
+Message-Id: <20190206181725.14337-10-armbru@redhat.com>
 In-Reply-To: <20190206181725.14337-1-armbru@redhat.com>
 References: <20190206181725.14337-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/17] qapi: Prepare for system modules
- other than 'builtin'
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 09/17] qapi: make s390 commands depend on
+ TARGET_S390X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,108 +36,595 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com
 
-The next commit wants to generate qapi-emit-events.{c.h}.  To support
-that, extend QAPISchemaModularCVisitor to support additional "system
-modules", i.e. modules that don't correspond to a (user-defined) QAPI
-schema module.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py | 35 +++++++++++++++++++++++++----------
- scripts/qapi/types.py  |  2 +-
- scripts/qapi/visit.py  |  2 +-
- 3 files changed, 27 insertions(+), 12 deletions(-)
+ hw/s390x/s390-skeys.c                   |   2 +-
+ include/sysemu/arch_init.h              |   7 --
+ monitor.c                               |  14 ---
+ qapi/misc.json                          | 137 -----------------------
+ qapi/target.json                        | 142 ++++++++++++++++++++++++
+ qmp.c                                   |  14 ---
+ stubs/Makefile.objs                     |   2 -
+ stubs/arch-query-cpu-model-baseline.c   |  13 ---
+ stubs/arch-query-cpu-model-comparison.c |  13 ---
+ target/s390x/cpu_models.c               |   5 +-
+ 10 files changed, 146 insertions(+), 203 deletions(-)
+ delete mode 100644 stubs/arch-query-cpu-model-baseline.c
+ delete mode 100644 stubs/arch-query-cpu-model-comparison.c
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 0e3ec598a4..c327ae5036 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -2327,27 +2327,42 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
-         self._module = {}
-         self._main_module = None
- 
-+    @staticmethod
-+    def _is_user_module(name):
-+        return name and not name.startswith('./')
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index 15f7ab0e53..daac936698 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -14,7 +14,7 @@
+ #include "hw/boards.h"
+ #include "hw/s390x/storage-keys.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-target.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 32abdfe6a1..f0ef652b2a 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -36,11 +36,4 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Erro=
+r **errp);
+ CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
+ype type,
+                                                       CpuModelInfo *mode=
+,
+                                                       Error **errp);
+-CpuModelCompareInfo *arch_query_cpu_model_comparison(CpuModelInfo *model=
+a,
+-                                                     CpuModelInfo *model=
+b,
+-                                                     Error **errp);
+-CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *modela=
+,
+-                                                    CpuModelInfo *modelb=
+,
+-                                                    Error **errp);
+-
+ #endif
+diff --git a/monitor.c b/monitor.c
+index 1fc48df46c..45b37bc982 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1145,19 +1145,12 @@ static void qmp_query_qmp_schema(QDict *qdict, QO=
+bject **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#ifndef TARGET_S390X
+-    qmp_unregister_command(&qmp_commands, "dump-skeys");
+-#endif
+ #ifndef TARGET_ARM
+     qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
+ #endif
+ #if !defined(TARGET_S390X) && !defined(TARGET_I386)
+     qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
+ #endif
+-#if !defined(TARGET_S390X)
+-    qmp_unregister_command(&qmp_commands, "query-cpu-model-baseline");
+-    qmp_unregister_command(&qmp_commands, "query-cpu-model-comparison");
+-#endif
+ #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
+) \
+     && !defined(TARGET_S390X)
+     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
+@@ -4665,13 +4658,6 @@ QemuOptsList qemu_mon_opts =3D {
+     },
+ };
+=20
+-#ifndef TARGET_S390X
+-void qmp_dump_skeys(const char *filename, Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "dump-skeys");
+-}
+-#endif
+-
+ #ifndef TARGET_ARM
+ GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+ {
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 0d9682ba4c..431de64590 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1907,27 +1907,6 @@
+ { 'command': 'query-dump-guest-memory-capability',
+   'returns': 'DumpGuestMemoryCapability' }
+=20
+-##
+-# @dump-skeys:
+-#
+-# Dump guest's storage keys
+-#
+-# @filename: the path to the file to dump to
+-#
+-# This command is only supported on s390 architecture.
+-#
+-# Since: 2.5
+-#
+-# Example:
+-#
+-# -> { "execute": "dump-skeys",
+-#      "arguments": { "filename": "/tmp/skeys" } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'dump-skeys',
+-  'data': { 'filename': 'str' } }
+-
+ ##
+ # @object-add:
+ #
+@@ -2294,122 +2273,6 @@
+ { 'enum': 'CpuModelCompareResult',
+   'data': [ 'incompatible', 'identical', 'superset', 'subset' ] }
+=20
+-##
+-# @CpuModelCompareInfo:
+-#
+-# The result of a CPU model comparison.
+-#
+-# @result: The result of the compare operation.
+-# @responsible-properties: List of properties that led to the comparison=
+ result
+-#                          not being identical.
+-#
+-# @responsible-properties is a list of QOM property names that led to
+-# both CPUs not being detected as identical. For identical models, this
+-# list is empty.
+-# If a QOM property is read-only, that means there's no known way to mak=
+e the
+-# CPU models identical. If the special property name "type" is included,=
+ the
+-# models are by definition not identical and cannot be made identical.
+-#
+-# Since: 2.8.0
+-##
+-{ 'struct': 'CpuModelCompareInfo',
+-  'data': {'result': 'CpuModelCompareResult',
+-           'responsible-properties': ['str']
+-          }
+-}
+-
+-##
+-# @query-cpu-model-comparison:
+-#
+-# Compares two CPU models, returning how they compare in a specific
+-# configuration. The results indicates how both models compare regarding
+-# runnability. This result can be used by tooling to make decisions if a
+-# certain CPU model will run in a certain configuration or if a compatib=
+le
+-# CPU model has to be created by baselining.
+-#
+-# Usually, a CPU model is compared against the maximum possible CPU mode=
+l
+-# of a certain configuration (e.g. the "host" model for KVM). If that CP=
+U
+-# model is identical or a subset, it will run in that configuration.
+-#
+-# The result returned by this command may be affected by:
+-#
+-# * QEMU version: CPU models may look different depending on the QEMU ve=
+rsion.
+-#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
+-# * machine-type: CPU model may look different depending on the machine-=
+type.
+-#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
+-# * machine options (including accelerator): in some architectures, CPU =
+models
+-#   may look different depending on machine and accelerator options. (Ex=
+cept for
+-#   CPU models reported as "static" in query-cpu-definitions.)
+-# * "-cpu" arguments and global properties: arguments to the -cpu option=
+ and
+-#   global properties may affect expansion of CPU models. Using
+-#   query-cpu-model-expansion while using these is not advised.
+-#
+-# Some architectures may not support comparing CPU models. s390x support=
+s
+-# comparing CPU models.
+-#
+-# Returns: a CpuModelBaselineInfo. Returns an error if comparing CPU mod=
+els is
+-#          not supported, if a model cannot be used, if a model contains
+-#          an unknown cpu definition name, unknown properties or propert=
+ies
+-#          with wrong types.
+-#
+-# Since: 2.8.0
+-##
+-{ 'command': 'query-cpu-model-comparison',
+-  'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
+-  'returns': 'CpuModelCompareInfo' }
+-
+-##
+-# @CpuModelBaselineInfo:
+-#
+-# The result of a CPU model baseline.
+-#
+-# @model: the baselined CpuModelInfo.
+-#
+-# Since: 2.8.0
+-##
+-{ 'struct': 'CpuModelBaselineInfo',
+-  'data': { 'model': 'CpuModelInfo' } }
+-
+-##
+-# @query-cpu-model-baseline:
+-#
+-# Baseline two CPU models, creating a compatible third model. The create=
+d
+-# model will always be a static, migration-safe CPU model (see "static"
+-# CPU model expansion for details).
+-#
+-# This interface can be used by tooling to create a compatible CPU model=
+ out
+-# two CPU models. The created CPU model will be identical to or a subset=
+ of
+-# both CPU models when comparing them. Therefore, the created CPU model =
+is
+-# guaranteed to run where the given CPU models run.
+-#
+-# The result returned by this command may be affected by:
+-#
+-# * QEMU version: CPU models may look different depending on the QEMU ve=
+rsion.
+-#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
+-# * machine-type: CPU model may look different depending on the machine-=
+type.
+-#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
+-# * machine options (including accelerator): in some architectures, CPU =
+models
+-#   may look different depending on machine and accelerator options. (Ex=
+cept for
+-#   CPU models reported as "static" in query-cpu-definitions.)
+-# * "-cpu" arguments and global properties: arguments to the -cpu option=
+ and
+-#   global properties may affect expansion of CPU models. Using
+-#   query-cpu-model-expansion while using these is not advised.
+-#
+-# Some architectures may not support baselining CPU models. s390x suppor=
+ts
+-# baselining CPU models.
+-#
+-# Returns: a CpuModelBaselineInfo. Returns an error if baselining CPU mo=
+dels is
+-#          not supported, if a model cannot be used, if a model contains
+-#          an unknown cpu definition name, unknown properties or propert=
+ies
+-#          with wrong types.
+-#
+-# Since: 2.8.0
+-##
+-{ 'command': 'query-cpu-model-baseline',
+-  'data': { 'modela': 'CpuModelInfo',
+-            'modelb': 'CpuModelInfo' },
+-  'returns': 'CpuModelBaselineInfo' }
+-
+ ##
+ # @AddfdInfo:
+ #
+diff --git a/qapi/target.json b/qapi/target.json
+index 2cafd7a0be..17671d77c1 100644
+--- a/qapi/target.json
++++ b/qapi/target.json
+@@ -5,6 +5,8 @@
+ # =3D Target-specific commands & events
+ ##
+=20
++{ 'include': 'misc.json' }
 +
-     @staticmethod
-     def _is_builtin_module(name):
-         return not name
- 
-     def _module_basename(self, what, name):
--        if name is None:
--            return re.sub(r'-', '-builtin-', what)
--        basename = os.path.join(os.path.dirname(name),
--                                self._prefix + what)
--        if name == self._main_module:
--            return basename
--        return basename + '-' + os.path.splitext(os.path.basename(name))[0]
-+        ret = '' if self._is_builtin_module(name) else self._prefix
-+        if self._is_user_module(name):
-+            dirname, basename = os.path.split(name)
-+            ret += what
-+            if name != self._main_module:
-+                ret += '-' + os.path.splitext(basename)[0]
-+            ret = os.path.join(dirname, ret)
-+        else:
-+            name = name[2:] if name else 'builtin'
-+            ret += re.sub(r'-', '-' + name + '-', what)
-+        return ret
- 
-     def _add_module(self, name, blurb):
--        if self._main_module is None and not self._is_builtin_module(name):
--            self._main_module = name
-         genc = QAPIGenC(blurb, self._pydoc)
-         genh = QAPIGenH(blurb, self._pydoc)
-         self._module[name] = (genc, genh)
-         self._set_module(name)
- 
-+    def _add_user_module(self, name, blurb):
-+        assert self._is_user_module(name)
-+        if self._main_module is None:
-+            self._main_module = name
-+        self._add_module(name, blurb)
+ ##
+ # @rtc-reset-reinjection:
+ #
+@@ -180,3 +182,143 @@
+ ##
+ { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+   'if': 'defined(TARGET_I386)' }
 +
-+    def _add_system_module(self, name, blurb):
-+        self._add_module(name and './' + name, blurb)
++##
++# @dump-skeys:
++#
++# Dump guest's storage keys
++#
++# @filename: the path to the file to dump to
++#
++# This command is only supported on s390 architecture.
++#
++# Since: 2.5
++#
++# Example:
++#
++# -> { "execute": "dump-skeys",
++#      "arguments": { "filename": "/tmp/skeys" } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'dump-skeys',
++  'data': { 'filename': 'str' },
++  'if': 'defined(TARGET_S390X)' }
 +
-     def _set_module(self, name):
-         self._genc, self._genh = self._module[name]
- 
-@@ -2372,7 +2387,7 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
-             self._genc = None
-             self._genh = None
-         else:
--            self._add_module(name, self._blurb)
-+            self._add_user_module(name, self._blurb)
-             self._begin_user_module(name)
- 
-     def visit_include(self, name, info):
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 9fa510f7df..2bd6fcd44f 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -183,7 +183,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-types', ' * Schema-defined QAPI types',
-             __doc__)
--        self._add_module(None, ' * Built-in QAPI types')
-+        self._add_system_module(None, ' * Built-in QAPI types')
-         self._genc.preamble_add(mcgen('''
- #include "qemu/osdep.h"
- #include "qapi/dealloc-visitor.h"
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index ca86009398..826b8066e1 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -284,7 +284,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisitor):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-visit', ' * Schema-defined QAPI visitors',
-             __doc__)
--        self._add_module(None, ' * Built-in QAPI visitors')
-+        self._add_system_module(None, ' * Built-in QAPI visitors')
-         self._genc.preamble_add(mcgen('''
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--- 
++##
++# @CpuModelBaselineInfo:
++#
++# The result of a CPU model baseline.
++#
++# @model: the baselined CpuModelInfo.
++#
++# Since: 2.8.0
++##
++{ 'struct': 'CpuModelBaselineInfo',
++  'data': { 'model': 'CpuModelInfo' },
++  'if': 'defined(TARGET_S390X)' }
++
++##
++# @CpuModelCompareInfo:
++#
++# The result of a CPU model comparison.
++#
++# @result: The result of the compare operation.
++# @responsible-properties: List of properties that led to the comparison=
+ result
++#                          not being identical.
++#
++# @responsible-properties is a list of QOM property names that led to
++# both CPUs not being detected as identical. For identical models, this
++# list is empty.
++# If a QOM property is read-only, that means there's no known way to mak=
+e the
++# CPU models identical. If the special property name "type" is included,=
+ the
++# models are by definition not identical and cannot be made identical.
++#
++# Since: 2.8.0
++##
++{ 'struct': 'CpuModelCompareInfo',
++  'data': { 'result': 'CpuModelCompareResult',
++            'responsible-properties': ['str'] },
++  'if': 'defined(TARGET_S390X)' }
++
++##
++# @query-cpu-model-comparison:
++#
++# Compares two CPU models, returning how they compare in a specific
++# configuration. The results indicates how both models compare regarding
++# runnability. This result can be used by tooling to make decisions if a
++# certain CPU model will run in a certain configuration or if a compatib=
+le
++# CPU model has to be created by baselining.
++#
++# Usually, a CPU model is compared against the maximum possible CPU mode=
+l
++# of a certain configuration (e.g. the "host" model for KVM). If that CP=
+U
++# model is identical or a subset, it will run in that configuration.
++#
++# The result returned by this command may be affected by:
++#
++# * QEMU version: CPU models may look different depending on the QEMU ve=
+rsion.
++#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
++# * machine-type: CPU model may look different depending on the machine-=
+type.
++#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
++# * machine options (including accelerator): in some architectures, CPU =
+models
++#   may look different depending on machine and accelerator options. (Ex=
+cept for
++#   CPU models reported as "static" in query-cpu-definitions.)
++# * "-cpu" arguments and global properties: arguments to the -cpu option=
+ and
++#   global properties may affect expansion of CPU models. Using
++#   query-cpu-model-expansion while using these is not advised.
++#
++# Some architectures may not support comparing CPU models. s390x support=
+s
++# comparing CPU models.
++#
++# Returns: a CpuModelBaselineInfo. Returns an error if comparing CPU mod=
+els is
++#          not supported, if a model cannot be used, if a model contains
++#          an unknown cpu definition name, unknown properties or propert=
+ies
++#          with wrong types.
++#
++# Since: 2.8.0
++##
++{ 'command': 'query-cpu-model-comparison',
++  'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
++  'returns': 'CpuModelCompareInfo',
++  'if': 'defined(TARGET_S390X)' }
++
++##
++# @query-cpu-model-baseline:
++#
++# Baseline two CPU models, creating a compatible third model. The create=
+d
++# model will always be a static, migration-safe CPU model (see "static"
++# CPU model expansion for details).
++#
++# This interface can be used by tooling to create a compatible CPU model=
+ out
++# two CPU models. The created CPU model will be identical to or a subset=
+ of
++# both CPU models when comparing them. Therefore, the created CPU model =
+is
++# guaranteed to run where the given CPU models run.
++#
++# The result returned by this command may be affected by:
++#
++# * QEMU version: CPU models may look different depending on the QEMU ve=
+rsion.
++#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
++# * machine-type: CPU model may look different depending on the machine-=
+type.
++#   (Except for CPU models reported as "static" in query-cpu-definitions=
+.)
++# * machine options (including accelerator): in some architectures, CPU =
+models
++#   may look different depending on machine and accelerator options. (Ex=
+cept for
++#   CPU models reported as "static" in query-cpu-definitions.)
++# * "-cpu" arguments and global properties: arguments to the -cpu option=
+ and
++#   global properties may affect expansion of CPU models. Using
++#   query-cpu-model-expansion while using these is not advised.
++#
++# Some architectures may not support baselining CPU models. s390x suppor=
+ts
++# baselining CPU models.
++#
++# Returns: a CpuModelBaselineInfo. Returns an error if baselining CPU mo=
+dels is
++#          not supported, if a model cannot be used, if a model contains
++#          an unknown cpu definition name, unknown properties or propert=
+ies
++#          with wrong types.
++#
++# Since: 2.8.0
++##
++{ 'command': 'query-cpu-model-baseline',
++  'data': { 'modela': 'CpuModelInfo',
++            'modelb': 'CpuModelInfo' },
++  'returns': 'CpuModelBaselineInfo',
++  'if': 'defined(TARGET_S390X)' }
+diff --git a/qmp.c b/qmp.c
+index 4c819dd8cf..8a613bf7c7 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -617,20 +617,6 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion=
+(CpuModelExpansionType type,
+     return arch_query_cpu_model_expansion(type, model, errp);
+ }
+=20
+-CpuModelCompareInfo *qmp_query_cpu_model_comparison(CpuModelInfo *modela=
+,
+-                                                    CpuModelInfo *modelb=
+,
+-                                                    Error **errp)
+-{
+-    return arch_query_cpu_model_comparison(modela, modelb, errp);
+-}
+-
+-CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuModelInfo *modela,
+-                                                   CpuModelInfo *modelb,
+-                                                   Error **errp)
+-{
+-    return arch_query_cpu_model_baseline(modela, modelb, errp);
+-}
+-
+ void qmp_add_client(const char *protocol, const char *fdname,
+                     bool has_skipauth, bool skipauth, bool has_tls, bool=
+ tls,
+                     Error **errp)
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 5dd0aeeec6..48eb080bfb 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,7 +1,5 @@
+ stub-obj-y +=3D arch-query-cpu-def.o
+ stub-obj-y +=3D arch-query-cpu-model-expansion.o
+-stub-obj-y +=3D arch-query-cpu-model-comparison.o
+-stub-obj-y +=3D arch-query-cpu-model-baseline.o
+ stub-obj-y +=3D bdrv-next-monitor-owned.o
+ stub-obj-y +=3D blk-commit-all.o
+ stub-obj-y +=3D blockdev-close-all-bdrv-states.o
+diff --git a/stubs/arch-query-cpu-model-baseline.c b/stubs/arch-query-cpu=
+-model-baseline.c
+deleted file mode 100644
+index 0d066da328..0000000000
+--- a/stubs/arch-query-cpu-model-baseline.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "sysemu/arch_init.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qerror.h"
+-
+-CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *modela=
+,
+-                                                    CpuModelInfo *modelb=
+,
+-                                                    Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
+-    return NULL;
+-}
+diff --git a/stubs/arch-query-cpu-model-comparison.c b/stubs/arch-query-c=
+pu-model-comparison.c
+deleted file mode 100644
+index 8eb311a26c..0000000000
+--- a/stubs/arch-query-cpu-model-comparison.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "sysemu/arch_init.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qerror.h"
+-
+-CpuModelCompareInfo *arch_query_cpu_model_comparison(CpuModelInfo *model=
+a,
+-                                                     CpuModelInfo *model=
+b,
+-                                                     Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
+-    return NULL;
+-}
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 7c253ff308..b532cd8d10 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -25,6 +25,7 @@
+ #include "sysemu/arch_init.h"
+ #include "hw/pci/pci.h"
+ #endif
++#include "qapi/qapi-commands-target.h"
+=20
+ #define CPUDEF_INIT(_type, _gen, _ec_ga, _mha_pow, _hmfai, _name, _desc)=
+ \
+     {                                                                   =
+ \
+@@ -605,7 +606,7 @@ static void list_add_feat(const char *name, void *opa=
+que)
+     *last =3D entry;
+ }
+=20
+-CpuModelCompareInfo *arch_query_cpu_model_comparison(CpuModelInfo *infoa=
+,
++CpuModelCompareInfo *qmp_query_cpu_model_comparison(CpuModelInfo *infoa,
+                                                      CpuModelInfo *infob=
+,
+                                                      Error **errp)
+ {
+@@ -678,7 +679,7 @@ CpuModelCompareInfo *arch_query_cpu_model_comparison(=
+CpuModelInfo *infoa,
+     return compare_info;
+ }
+=20
+-CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *infoa,
++CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuModelInfo *infoa,
+                                                     CpuModelInfo *infob,
+                                                     Error **errp)
+ {
+--=20
 2.17.2
