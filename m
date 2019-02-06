@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47015)
+Received: from eggs.gnu.org ([209.51.188.92]:47845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1grQMh-0005wG-PL
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:48:00 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1grQQW-0007ra-Pw
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1grQMg-0007RN-1j
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:47:59 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1grQMd-0007Iw-SR
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:47:57 -0500
-Received: by mail-pf1-x442.google.com with SMTP id 64so3318157pfr.9
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 08:47:47 -0800 (PST)
-Date: Wed, 06 Feb 2019 08:47:45 -0800 (PST)
-In-Reply-To: <CAFEAcA9JXK5O5tSvBD17CM3Eb132EWuub9VvOJWaAKUOu8KA5A@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-7f0a2867-f9c8-4a43-a410-b60f25df4cc1@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.2, Part 3
+	(envelope-from <farosas@linux.ibm.com>) id 1grQQN-0001EV-Pg
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:51:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55834
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+	id 1grQQK-0001CB-Re
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:51:47 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x16GpAds065716
+	for <qemu-devel@nongnu.org>; Wed, 6 Feb 2019 11:51:42 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qg23pdkfb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 11:51:40 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
+	Wed, 6 Feb 2019 16:51:39 -0000
+From: Fabiano Rosas <farosas@linux.ibm.com>
+Date: Wed,  6 Feb 2019 14:51:32 -0200
+Message-Id: <20190206165133.12246-1-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 0/1] ppc/gdbstub: Expose SPRs to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: thuth@redhat.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, groug@kaod.org
 
-On Mon, 04 Feb 2019 01:59:48 PST (-0800), Peter Maydell wrote:
-> On Mon, 4 Feb 2019 at 09:05, Thomas Huth <thuth@redhat.com> wrote:
->> On 2019-02-02 09:41, Palmer Dabbelt wrote:
->> >> My mail filter finds these RFC pullrequests, yes. I'm then
->> >> relying on my manual brain to not actually apply them.
->> >> (If it's a slow day I might do a test merge on them, but
->> >> usually my queue is full enough that I don't get to them
->> >> before the real PR appears.)
->> >
->> > Ah, OK -- do you want me to do something else?
->>
->> At least I got a little bit confused by "PR RFC" ... I think some other
->> maintainers rather send out patch series marked with "PATCH" first, and
->> add some non-pull-request cover letter with a text like "I'm intending
->> to send a pull request for this soon, please review one more time...".
->> Then after a day or two, once Patchew checked the series and nobody else
->> complained, they send a real "PULL" request.
->
-> Yeah, generally nobody else sends RFC pull requests, they just
-> send the actual pulls. I don't object if Palmer finds them
-> useful, though.
+This series implements the reading and writing of Special Purpose
+Registers in PPC's gdbstub.
 
-If nobody else does it then I might stop -- they were more useful for me when I 
-was new at this, as I was pretty worried about making mistakes and wanted to 
-make sure I didn't screw anything up.  Things have gone pretty smoothly, so it 
-might just have been paranoia.
+How it works generally [1]:
 
-Unless anyone likes these I think I'll stop sending them.
+GDB asks for the target.xml file which contains the target description
+along with the list of available feature XMLs. GDB then asks for each
+of the XML files in sequence.
 
->
-> For what it's worth, my filter for finding pull requests is emails
-> containing "for you to fetch changes up to" but not either of
-> "not for master" or "PULL SUBSYSTEM". So if you want to specifically
-> keep out of the filters you can add "not for master" in the cover
-> letter. But as I say it's not a big deal for me to sort things out
-> manually -- the filter has the odd false positive anyway.
+The XML files contain a list of registers descriptions:
 
-OK, makes sense.
+  <reg name="msr" bitsize="64" type="uint64"/>
+
+When the user tries to access a register, GDB reads the XML file in
+sequence and sends QEMU the number of the register. This number is
+sequential across all feature files.
+
+The index provided by GDB must be converted by QEMU to match QEMU's
+internal representation.
+
+A set of callbacks are implemented to read/write the register.
+
+Note about endianness:
+
+GDB remote protocol defines that registers should be sent in target
+(guest) byte order. It will store the value in memory without regard
+to endianness and later use what it thinks is the target endianness to
+choose a byte order for printing. This means that the `show endian`
+option in GDB should match the guest's current endianness for the
+values to display properly. Notice that GDB and QEMU could be running
+in machines of opposite endianness.
+
+https://sourceware.org/gdb/current/onlinedocs/gdb/Target-Descriptions.html
+
+v1 -> v2:
+ - patch 1: explicitly store the gdb_id and add comment explaining why
+            we need it
+ - patch 2: use gdb_id to find the correct env->spr array's index
+
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00648.html
+
+v2 -> v3:
+ - patch 2: move gdb_register_coprocessor call from patch 3 so that
+            all patches build independently
+
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02939.html
+
+v3 -> v4:
+ - patch 1: move gdb_spr_xml into PowerPCCPUClass so that it is
+            generated only once for all CPUs
+
+ http://lists.nongnu.org/archive/html/qemu-ppc/2019-01/msg00357.html
+
+v4 -> v5:
+ - squash all 3 patches
+ - use g_string_append() instead of g_string_append_printf() where
+ possible
+ - free the g_ascii_strdown() string
+ - fix uninitialized variable
+ - use POWERPC_CPU_GET_CLASS with CPUState
+
+ Regarding the endianness discussion, continue providing the registers
+ in the target endianness as GBD currently requires this.
+
+ http://lists.nongnu.org/archive/html/qemu-ppc/2019-01/msg00498.html
+
+
+Fabiano Rosas (1):
+  target/ppc: Enable reporting of SPRs to GDB
+
+ target/ppc/cpu-qom.h            |  4 +++
+ target/ppc/cpu.h                |  5 +++
+ target/ppc/gdbstub.c            | 61 ++++++++++++++++++++++++++++++++
+ target/ppc/translate_init.inc.c | 62 +++++++++++++++++++++++++++++++--
+ 4 files changed, 130 insertions(+), 2 deletions(-)
+
+--
+2.17.1
