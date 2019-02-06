@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41701)
+Received: from eggs.gnu.org ([209.51.188.92]:43247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grMLN-0002lf-2L
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 07:30:22 -0500
+	(envelope-from <quintela@redhat.com>) id 1grMSr-0004kP-LY
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 07:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grMLL-0001Ay-1x
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 07:30:20 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 6 Feb 2019 12:30:02 +0000
-Message-ID: <c84c9ea6-9c35-a70b-3459-a3981208e421@virtuozzo.com>
-References: <20190125142138.76710-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190125142138.76710-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E9E9CE75EABAEB42A267E282E12B86C4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <quintela@redhat.com>) id 1grMSq-00048z-Ex
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 07:38:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1grMSm-00047W-Jj
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 07:38:03 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 54C9C89ADF
+	for <qemu-devel@nongnu.org>; Wed,  6 Feb 2019 12:37:57 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed,  6 Feb 2019 13:36:22 +0100
+Message-Id: <20190206123625.1147-1-quintela@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] qcow2: avoid lseek on block_status if
- possible
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 0/3] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,127 +29,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-cGluZy4NCg0KRmluYWxseSwgd2hhdCBhYm91dCB0aGlzPw0KDQoyNS4wMS4yMDE5IDE3OjIxLCBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiBkcnZfY29fYmxvY2tfc3RhdHVz
-IGRpZ3MgYnMtPmZpbGUgZm9yIGFkZGl0aW9uYWwsIG1vcmUgYWNjdXJhdGUgc2VhcmNoDQo+IGZv
-ciBob2xlIGluc2lkZSByZWdpb24sIHJlcG9ydGVkIGFzIERBVEEgYnkgYnMgc2luY2UgNWRhYTc0
-YTZlYmMuDQo+IA0KPiBUaGlzIGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBx
-Y293MiBkaXNrLiBBY3R1YWxseSwgcWNvdzINCj4ga25vd3MsIHdoZXJlIGFyZSBob2xlcyBhbmQg
-d2hlcmUgaXMgZGF0YS4gQnV0IGV2ZXJ5IGJsb2NrX3N0YXR1cw0KPiByZXF1ZXN0IGNhbGxzIGxz
-ZWVrIGFkZGl0aW9uYWxseS4gQXNzdW1lIGEgYmlnIGRpc2ssIGZ1bGwgb2YNCj4gZGF0YSwgaW4g
-YW55IGl0ZXJhdGl2ZSBjb3B5aW5nIGJsb2NrIGpvYiAob3IgaW1nIGNvbnZlcnQpIHdlJ2xsIGNh
-bGwNCj4gbHNlZWsoSE9MRSkgb24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0aGVzZSBs
-c2Vla3Mgd2lsbCBoYXZlIHRvDQo+IGl0ZXJhdGUgdGhyb3VnaCBhbGwgbWV0YWRhdGEgdXAgdG8g
-dGhlIGVuZCBvZiBmaWxlLiBJdCdzIG9idmlvdXNseQ0KPiBpbmVmZmVjdGl2ZSBiZWhhdmlvci4g
-QW5kIGZvciBtYW55IHNjZW5hcmlvcyB3ZSBkb24ndCBuZWVkIHRoaXMgbHNlZWsNCj4gYXQgYWxs
-Lg0KPiANCj4gSG93ZXZlciwgbHNlZWsgaXMgbmVlZGVkIHdoZW4gd2UgaGF2ZSBtZXRhZGF0YS1w
-cmVhbGxvY2F0ZWQgaW1hZ2UuDQo+IA0KPiBTbywgbGV0J3MgZGV0ZWN0IG1ldGFkYXRhLXByZWFs
-bG9jYXRpb24gY2FzZSBhbmQgZG9uJ3QgZGlnIHFjb3cyJ3MNCj4gcHJvdG9jb2wgZmlsZSBpbiBv
-dGhlciBjYXNlcy4NCj4gDQo+IFRoZSBpZGVhIGlzIHRvIGNvbXBhcmUgYWxsb2NhdGlvbiBzaXpl
-IGluIFBPViBvZiBmaWxlc3lzdGVtIHdpdGgNCj4gYWxsb2NhdGlvbnMgc2l6ZSBpbiBQT1Ygb2Yg
-UWNvdzIgKGJ5IHJlZmNvdW50cykuIElmIGFsbG9jYXRpb24gaW4gZnMgaXMNCj4gc2lnbmlmaWNh
-bnRseSBsb3dlciwgY29uc2lkZXIgaXQgYXMgbWV0YWRhdGEtcHJlYWxsb2NhdGlvbiBjYXNlLg0K
-PiANCj4gU3VnZ2VzdGVkLWJ5OiBEZW5pcyBWLiBMdW5ldiA8ZGVuQG9wZW52ei5vcmc+DQo+IFNp
-Z25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmly
-dHVvenpvLmNvbT4NCj4gLS0tDQo+IA0KPiBIaSENCj4gDQo+IFNvLCB0byBjb250aW51ZSB0YWxr
-IGFib3V0IGxzZWVrL25vIGxzZWVrIHdoZW4gcWNvdzIgYmxvY2tfc3RhdHVzIHJlcG9ydHMNCj4g
-REFUQS4NCj4gDQo+IFJlc3VsdHMgb24gdG1wZnM6DQo+IGNhY2hlZCBpcyBsc2VlayBjYWNoZSBi
-eSBLZXZpbg0KPiBkZXRlY3QgaXMgdGhpcyBwYXRjaA0KPiBubyBsc2VlayBpcyBqdXN0IHJlbW92
-ZSBibG9ja19zdGF0dXMgcXVlcnkgb24gYnMtPmZpbGUtPmJzIGluDQo+ICAgICAgICAgICBiZHJ2
-X2NvX2Jsb2NrX3N0YXR1cw0KPiANCj4gICAgICArLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0t
-LS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0rDQo+ICAgICAgfCAgICAgICAgICAgICAg
-ICAgICAgIHwgbWFzdGVyIHwgY2FjaGVkIHwgZGV0ZWN0IHwgbm8gbHNlZWsgfA0KPiAgICAgICst
-LS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0t
-LSsNCj4gICAgICB8IHRlc3QucWNvdzIgICAgICAgICAgfCA4MCAgICAgfCA0MCAgICAgfCAwLjE2
-OSAgfCAwLjE2MiAgICB8DQo+ICAgICAgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLSst
-LS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tKw0KPiAgICAgIHwgdGVzdF9mb3J3YXJkLnFjb3cy
-ICB8IDc5ICAgICB8IDAuMTcxICB8IDAuMTY5ICB8IDAuMTYzICAgIHwNCj4gICAgICArLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0rDQo+
-ICAgICAgfCB0ZXN0X3ByZWFsbG9jLnFjb3cyIHwgMC4wNTQgIHwgMC4wNTMgIHwgMC4wNTUgIHwg
-MC4yNjMgICAgfA0KPiAgICAgICstLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0t
-LS0rLS0tLS0tLS0rLS0tLS0tLS0tLSsNCj4gDQo+ICAgYmxvY2svcWNvdzIuaCAgICAgICAgICAg
-ICB8ICAxICsNCj4gICBpbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oIHwgIDcgKysrKysrKw0KPiAg
-IGJsb2NrL2lvLmMgICAgICAgICAgICAgICAgfCAgMyArKy0NCj4gICBibG9jay9xY293Mi1yZWZj
-b3VudC5jICAgIHwgMzYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAg
-YmxvY2svcWNvdzIuYyAgICAgICAgICAgICB8ICA3ICsrKysrKysNCj4gICA1IGZpbGVzIGNoYW5n
-ZWQsIDUzIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9i
-bG9jay9xY293Mi5oIGIvYmxvY2svcWNvdzIuaA0KPiBpbmRleCA0MzhhMWRlZTllLi5kNzExM2Vk
-NDRjIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5oDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLmgN
-Cj4gQEAgLTYxMCw2ICs2MTAsNyBAQCBpbnQgcWNvdzJfY2hhbmdlX3JlZmNvdW50X29yZGVyKEJs
-b2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQgcmVmY291bnRfb3JkZXIsDQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICB2b2lkICpjYl9vcGFxdWUsIEVycm9yICoqZXJycCk7DQo+ICAg
-aW50IHFjb3cyX3Nocmlua19yZWZ0YWJsZShCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+ICAgaW50
-NjRfdCBxY293Ml9nZXRfbGFzdF9jbHVzdGVyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2NF90
-IHNpemUpOw0KPiAraW50IHFjb3cyX2RldGVjdF9tZXRhZGF0YV9wcmVhbGxvY2F0aW9uKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzKTsNCj4gICANCj4gICAvKiBxY293Mi1jbHVzdGVyLmMgZnVuY3Rpb25z
-ICovDQo+ICAgaW50IHFjb3cyX2dyb3dfbDFfdGFibGUoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVp
-bnQ2NF90IG1pbl9zaXplLA0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9ibG9ja19pbnQu
-aCBiL2luY2x1ZGUvYmxvY2svYmxvY2tfaW50LmgNCj4gaW5kZXggZjYwNTYyMjIxNi4uYzg5NWNh
-NzE2OSAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaA0KPiArKysgYi9p
-bmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oDQo+IEBAIC01OSw2ICs1OSwxMiBAQA0KPiAgIA0KPiAg
-ICNkZWZpbmUgQkxPQ0tfUFJPQkVfQlVGX1NJWkUgICAgICAgIDUxMg0KPiAgIA0KPiArdHlwZWRl
-ZiBlbnVtIEJkcnZZZXNOb1Vua25vd24gew0KPiArICAgIEJEUlZfVU5LTk9XTiA9IDAsDQo+ICsg
-ICAgQkRSVl9OTywNCj4gKyAgICBCRFJWX1lFUywNCj4gK30gQmRydlllc05vVW5rbm93bjsNCj4g
-Kw0KPiAgIGVudW0gQmRydlRyYWNrZWRSZXF1ZXN0VHlwZSB7DQo+ICAgICAgIEJEUlZfVFJBQ0tF
-RF9SRUFELA0KPiAgICAgICBCRFJWX1RSQUNLRURfV1JJVEUsDQo+IEBAIC02ODIsNiArNjg4LDcg
-QEAgc3RydWN0IEJsb2NrRHJpdmVyU3RhdGUgew0KPiAgICAgICBib29sIHByb2JlZDsgICAgLyog
-aWYgdHJ1ZSwgZm9ybWF0IHdhcyBwcm9iZWQgcmF0aGVyIHRoYW4gc3BlY2lmaWVkICovDQo+ICAg
-ICAgIGJvb2wgZm9yY2Vfc2hhcmU7IC8qIGlmIHRydWUsIGFsd2F5cyBhbGxvdyBhbGwgc2hhcmVk
-IHBlcm1pc3Npb25zICovDQo+ICAgICAgIGJvb2wgaW1wbGljaXQ7ICAvKiBpZiB0cnVlLCB0aGlz
-IGZpbHRlciBub2RlIHdhcyBhdXRvbWF0aWNhbGx5IGluc2VydGVkICovDQo+ICsgICAgQmRydlll
-c05vVW5rbm93biBtZXRhZGF0YV9wcmVhbGxvY2F0aW9uOw0KPiAgIA0KPiAgICAgICBCbG9ja0Ry
-aXZlciAqZHJ2OyAvKiBOVUxMIG1lYW5zIG5vIG1lZGlhICovDQo+ICAgICAgIHZvaWQgKm9wYXF1
-ZTsNCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2lvLmMgYi9ibG9jay9pby5jDQo+IGluZGV4IGJkOWQ2
-ODhmOGIuLjgxNTY2MTc1MGEgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2lvLmMNCj4gKysrIGIvYmxv
-Y2svaW8uYw0KPiBAQCAtMjE4Niw3ICsyMTg2LDggQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4g
-YmRydl9jb19ibG9ja19zdGF0dXMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgICAgICB9
-DQo+ICAgICAgIH0NCj4gICANCj4gLSAgICBpZiAod2FudF96ZXJvICYmIGxvY2FsX2ZpbGUgJiYg
-bG9jYWxfZmlsZSAhPSBicyAmJg0KPiArICAgIGlmICh3YW50X3plcm8gJiYgYnMtPm1ldGFkYXRh
-X3ByZWFsbG9jYXRpb24gIT0gQkRSVl9OTyAmJg0KPiArICAgICAgICBsb2NhbF9maWxlICYmIGxv
-Y2FsX2ZpbGUgIT0gYnMgJiYNCj4gICAgICAgICAgIChyZXQgJiBCRFJWX0JMT0NLX0RBVEEpICYm
-ICEocmV0ICYgQkRSVl9CTE9DS19aRVJPKSAmJg0KPiAgICAgICAgICAgKHJldCAmIEJEUlZfQkxP
-Q0tfT0ZGU0VUX1ZBTElEKSkgew0KPiAgICAgICAgICAgaW50NjRfdCBmaWxlX3BudW07DQo+IGRp
-ZmYgLS1naXQgYS9ibG9jay9xY293Mi1yZWZjb3VudC5jIGIvYmxvY2svcWNvdzItcmVmY291bnQu
-Yw0KPiBpbmRleCAxYzYzYWMyNDRhLi4wMDgxOTZkODQ5IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9x
-Y293Mi1yZWZjb3VudC5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4gQEAgLTMz
-NzksMyArMzM3OSwzOSBAQCBpbnQ2NF90IHFjb3cyX2dldF9sYXN0X2NsdXN0ZXIoQmxvY2tEcml2
-ZXJTdGF0ZSAqYnMsIGludDY0X3Qgc2l6ZSkNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIlRoZXJlIGFyZSBubyByZWZlcmVuY2VzIGluIHRoZSByZWZjb3VudCB0YWJsZS4iKTsNCj4g
-ICAgICAgcmV0dXJuIC1FSU87DQo+ICAgfQ0KPiArDQo+ICtpbnQgcWNvdzJfZGV0ZWN0X21ldGFk
-YXRhX3ByZWFsbG9jYXRpb24oQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICt7DQo+ICsgICAgQkRS
-VlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPiArICAgIGludDY0X3QgaSwgZW5kX2NsdXN0
-ZXIsIGNsdXN0ZXJfY291bnQgPSAwOw0KPiArICAgIGludDY0X3QgZmlsZV9sZW5ndGgsIHJlYWxf
-YWxsb2NhdGlvbiwgbWV0YWRhdGFfYWxsb2NhdGlvbiwgZmlsZV90YWlsOw0KPiArICAgIHVpbnQ2
-NF90IHJlZmNvdW50Ow0KPiArDQo+ICsgICAgZmlsZV9sZW5ndGggPSBiZHJ2X2dldGxlbmd0aChi
-cy0+ZmlsZS0+YnMpOw0KPiArICAgIGlmIChmaWxlX2xlbmd0aCA8IDApIHsNCj4gKyAgICAgICAg
-cmV0dXJuIGZpbGVfbGVuZ3RoOw0KPiArICAgIH0NCj4gKyAgICBmaWxlX3RhaWwgPSBvZmZzZXRf
-aW50b19jbHVzdGVyKHMsIGZpbGVfbGVuZ3RoKTsNCj4gKw0KPiArICAgIHJlYWxfYWxsb2NhdGlv
-biA9IGJkcnZfZ2V0X2FsbG9jYXRlZF9maWxlX3NpemUoYnMtPmZpbGUtPmJzKTsNCj4gKyAgICBp
-ZiAocmVhbF9hbGxvY2F0aW9uIDwgMCkgew0KPiArICAgICAgICByZXR1cm4gcmVhbF9hbGxvY2F0
-aW9uOw0KPiArICAgIH0NCj4gKw0KPiArICAgIGVuZF9jbHVzdGVyID0gc2l6ZV90b19jbHVzdGVy
-cyhzLCBmaWxlX2xlbmd0aCk7DQo+ICsgICAgZm9yIChpID0gMDsgaSA8IGVuZF9jbHVzdGVyOyBp
-KyspIHsNCj4gKyAgICAgICAgaW50IHJldCA9IHFjb3cyX2dldF9yZWZjb3VudChicywgaSwgJnJl
-ZmNvdW50KTsNCj4gKyAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gKyAgICAgICAgICAgIHJldHVy
-biByZXQ7DQo+ICsgICAgICAgIH0NCj4gKyAgICAgICAgY2x1c3Rlcl9jb3VudCArPSAhIXJlZmNv
-dW50Ow0KPiArICAgIH0NCj4gKw0KPiArICAgIG1ldGFkYXRhX2FsbG9jYXRpb24gPSBjbHVzdGVy
-X2NvdW50ICogcy0+Y2x1c3Rlcl9zaXplOw0KPiArICAgIGlmICghIXJlZmNvdW50ICYmIGZpbGVf
-dGFpbCkgew0KPiArICAgICAgICBtZXRhZGF0YV9hbGxvY2F0aW9uIC09IHMtPmNsdXN0ZXJfc2l6
-ZSAtIGZpbGVfdGFpbDsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICByZXR1cm4gcmVhbF9hbGxvY2F0
-aW9uIDwgMC45ICogbWV0YWRhdGFfYWxsb2NhdGlvbiAmJg0KPiArICAgICAgICByZWFsX2FsbG9j
-YXRpb24gKyBzLT5jbHVzdGVyX3NpemUgPCBtZXRhZGF0YV9hbGxvY2F0aW9uOw0KPiArfQ0KPiBk
-aWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIuYyBiL2Jsb2NrL3Fjb3cyLmMNCj4gaW5kZXggNDg5N2Fi
-YWU1ZS4uYWRjOWNkY2IyNyAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzIuYw0KPiArKysgYi9i
-bG9jay9xY293Mi5jDQo+IEBAIC0xODAwLDYgKzE4MDAsMTMgQEAgc3RhdGljIGludCBjb3JvdXRp
-bmVfZm4gcWNvdzJfY29fYmxvY2tfc3RhdHVzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAg
-ICB1bnNpZ25lZCBpbnQgYnl0ZXM7DQo+ICAgICAgIGludCBzdGF0dXMgPSAwOw0KPiAgIA0KPiAr
-ICAgIGlmIChicy0+bWV0YWRhdGFfcHJlYWxsb2NhdGlvbiA9PSBCRFJWX1VOS05PV04pIHsNCj4g
-KyAgICAgICAgcmV0ID0gcWNvdzJfZGV0ZWN0X21ldGFkYXRhX3ByZWFsbG9jYXRpb24oYnMpOw0K
-PiArICAgICAgICBpZiAocmV0ID49IDApIHsNCj4gKyAgICAgICAgICAgIGJzLT5tZXRhZGF0YV9w
-cmVhbGxvY2F0aW9uID0gcmV0ID8gQkRSVl9ZRVMgOiBCRFJWX05POw0KPiArICAgICAgICB9DQo+
-ICsgICAgfQ0KPiArDQo+ICAgICAgIGJ5dGVzID0gTUlOKElOVF9NQVgsIGNvdW50KTsNCj4gICAg
-ICAgcWVtdV9jb19tdXRleF9sb2NrKCZzLT5sb2NrKTsNCj4gICAgICAgcmV0ID0gcWNvdzJfZ2V0
-X2NsdXN0ZXJfb2Zmc2V0KGJzLCBvZmZzZXQsICZieXRlcywgJmNsdXN0ZXJfb2Zmc2V0KTsNCj4g
-DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+In v12:
+- drop multifd case (caming in next series)
+- fix leak of socketaddress (eric)
+- handle vsock printing correctly (eric)
+
+Iv v11:
+- Rebase to lastest
+- Remove the compress test.  It didin't worked really.
+  See my next series.
+- Only patch missing review-by is the second one.
+
+Please, consider them.
+
+In v10:
+- rebase to latest upstream
+- code changed quite a bit with qmp refactorings
+  apllied them
+- make it work again
+- compress threads test, continue working there, not trivial.
+
+Two question-:
+- should we integrate them on this cycle?
+  they are tests
+- should we enable them only on baremetal, and not on emulation?
+  There is still a problem on TCG that sometimes fails the migration
+  thread
+
+ToDo:
+- Finish debug compress test
+  Still stuck why the test wonk when I launch qemu by hand but not
+  trough qtest.  Creatuve uses of launching gdb through launched
+  guests have not help so far.
+
+- Finish fd transport test
+  Not very difficult in principle, need more checking to see if it
+  don't fail in other setups.
+
+- Finish tl trasport test
+  I already knew that I hate certificates, but this is too much.  Trying
+  to understand how to use them.
+
+Please commet, Juan.
+
+In v9:
+- Dropp Export SocketAddress_to_str
+  just create the functions where I need them.
+- drop precopy test and xbzrle (on pull requset)
+  Use 100M for cache as dave suggests
+- drop ppc improvemnet (on pull request)
+- drop RFH, will work on tha later
+- move socket_address to info migrate
+
+Please, review.
+
+Later, Juan.
+
+v8:
+- just rebase to make things continue to wonk
+
+New in the other v7:
+- SocketAddress is now a list (a.k.a make happy danp)
+- Rebase on top of upstream
+  network listener is *interesting*
+- *HACK* to make SocketAddress list in common
+  see patch: create-socket-paramenter
+
+Please review, Juan.
+
+CC: berrange@redhat.com
+
+[v7]
+This is v6, it differest from the patches that I sent with previous
+multifd post:
+- Rename x-tcp-port to x-socket-address
+  This is more *complicated* that it looks as:
+
+  * it is a pointer, so I need to use QAPI_CLONE() to make info
+    migrate work
+
+  * this is an union of structs.  In QAPI. So, a dict of strings.  The
+    only way that I was able to make things work is parsing the qdict
+    to a SocketAddress and then output a SocketAddress as an str.  It
+    needs to be an easier way, for sure.
+
+  * Cleanups here andthere.
+
+Please, review, Juan.
+
+[v5]
+- Several patches moved to pull request
+- merge info_migrate and migration_tests
+  only missing bit is tcp_port, needed for tcp tests
+- Rename tcp-port to x-tcp-port
+  We will get better naming from David at some point, and we will use tha=
+t bit
+- ppc: use inline code as suggested by lvivier
+
+Please, review.
+
+It is based on my previous pull request
+
+Based-on: 20180129120932.12874-1-quintela@redhat.com
+
+[v4]
+- rebase on top on v4 info_migrate patches
+- Tune sleeps to make patches fast
+- Create a deprecated test for deprecated commands (i.e. make peterxu hap=
+py)
+- create migrate_start_postcopy function
+- fix naming/sizes between power and x86
+- cleanup comments to match code
+
+[v3]
+
+- No more tests for deprecated parameters. Now I only use
+  migrate_set_parameter.  If there is a deprecated command for that,
+  we tests it there.
+- free "result" string, always good to return memory (Peter found it)
+- use the new tcp_port parameter from info migrate.  So we are
+  handling well the tcp case.
+- lots of code movement around to make everything consistent.
+- Several patches already integrated upstream.
+
+[v2]
+- to make review easier, I started renaming postcopy-test.c to migration-=
+test.c
+- Did cleanups/refactoring there
+- Don't use global-qtest anymore
+- check that the parameters that we sent got really set
+- RFH: comrpress threads tests is not working for some weird reason.  Usi=
+ng the same code on command line works.
+  still investigating why.
+
+ToDoo:
+
+- tcp: after discussions with dave, we ended in conclusion that we
+  need to use the 0 port and let the system gives us a free one
+
+  But .... that means that we need to be able to get that port back someh=
+ow.
+  "info migrate" woring on destination side?
+
+- compression threads.  There is some weird interaction with the test
+  hardness and every migration thread get waiting in a different
+  semaphore.  Investigating if it is a race/bug/whateverr
+
+- deprecated commands: There was a suggestion to make
+  migrate_set_parameter look at the parameter name and test old/new
+  depending on something.  Not sure what to do here.
+
+- testing commands: Is there a way to launch qemu and just sent
+  qmp/hmp commands without having to really run anything else?
+
+[v1]
+- add test for precopy for unix/tcp
+  exec and fd to came, don't know how to test rdma without hardware
+- add tests using deprecated interfaces
+- add test for xbzrle
+  Note to myself, there is no way to set the cache size with migraton_set=
+_parameters
+- Add test for compress threads
+  disabled on the series, right now it appears that compression is not wo=
+rking at all
+- Move postcopy to use new results
+  Idea is to move it on top of migration-test.c, but first I want some re=
+views on basic idea
+
+Juan Quintela (3):
+  tests: Add migration xbzrle test
+  migration: Create socket-address parameter
+  tests: Add basic migration precopy tcp test
+
+ hmp.c                  |  37 +++++++++
+ migration/migration.c  |  24 ++++++
+ migration/migration.h  |   4 +
+ migration/socket.c     |  11 +++
+ qapi/migration.json    |   6 +-
+ qapi/sockets.json      |  13 ++++
+ tests/migration-test.c | 173 +++++++++++++++++++++++++++++++++++++++--
+ 7 files changed, 262 insertions(+), 6 deletions(-)
+
+--=20
+2.20.1
