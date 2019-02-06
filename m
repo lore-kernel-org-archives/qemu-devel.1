@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56040)
+Received: from eggs.gnu.org ([209.51.188.92]:56419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1grLPv-0005EH-Fa
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:31:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1grLRb-0006Ia-Gn
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:32:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1grLPu-0007hc-Bx
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:30:59 -0500
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1grLRQ-0008Tl-S2
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 06:32:38 -0500
+References: <20190206112729.37761-1-sgarzare@redhat.com>
+	<20190206112729.37761-6-sgarzare@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e22e1a26-2dd7-cc4c-86cc-2a78adba409f@redhat.com>
-Date: Wed, 6 Feb 2019 12:30:54 +0100
+Message-ID: <6304b7b8-a777-b4bc-9ff4-54bbcbce22be@redhat.com>
+Date: Wed, 6 Feb 2019 12:32:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
+In-Reply-To: <20190206112729.37761-6-sgarzare@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 01/15] s390 vfio-ccw: Add
- bootindex property and IPLB data
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] tests/virtio-blk: change assert on
+ data_size in virtio_blk_request()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,187 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 2019-01-29 14:29, Jason J. Herne wrote:
-> Add bootindex property and iplb data for vfio-ccw devices. This allows us to
-> forward boot information into the bios for vfio-ccw devices.
+On 2019-02-06 12:27, Stefano Garzarella wrote:
+> The size of data in the virtio_blk_request must be a multiple
+> of 512 bytes for IN and OUT requests, or a multiple of the size
+> of struct virtio_blk_discard_write_zeroes for DISCARD and
+> WRITE_ZEROES requests.
 > 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  hw/s390x/ipl.c              | 14 ++++++++++++++
->  hw/s390x/s390-ccw.c         |  9 +++++++++
->  hw/vfio/ccw.c               | 13 +------------
->  include/hw/s390x/s390-ccw.h |  1 +
->  include/hw/s390x/vfio-ccw.h | 38 ++++++++++++++++++++++++++++++++++++++
->  5 files changed, 63 insertions(+), 12 deletions(-)
->  create mode 100644 include/hw/s390x/vfio-ccw.h
+>  tests/virtio-blk-test.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 21f64ad..a993f65 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -19,6 +19,7 @@
->  #include "hw/loader.h"
->  #include "hw/boards.h"
->  #include "hw/s390x/virtio-ccw.h"
-> +#include "hw/s390x/vfio-ccw.h"
->  #include "hw/s390x/css.h"
->  #include "hw/s390x/ebcdic.h"
->  #include "ipl.h"
-> @@ -311,8 +312,12 @@ static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
->          VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
->              object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
->                                  TYPE_VIRTIO_CCW_DEVICE);
-> +        VFIOCCWDevice *vfio_ccw_dev = (VFIOCCWDevice *)
-> +            object_dynamic_cast(OBJECT(dev_st), TYPE_VFIO_CCW);
->          if (virtio_ccw_dev) {
->              ccw_dev = CCW_DEVICE(virtio_ccw_dev);
-> +        } else if (vfio_ccw_dev) {
-> +            ccw_dev = CCW_DEVICE(vfio_ccw_dev);
->          } else {
->              SCSIDevice *sd = (SCSIDevice *)
->                  object_dynamic_cast(OBJECT(dev_st),
-> @@ -347,6 +352,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
->      if (ccw_dev) {
->          SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
->                                                              TYPE_SCSI_DEVICE);
-> +        VFIOCCWDevice *vc = (VFIOCCWDevice *)
-> +            object_dynamic_cast(OBJECT(dev_st), TYPE_VFIO_CCW);
+> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+> index 04c608764b..0739498da7 100644
+> --- a/tests/virtio-blk-test.c
+> +++ b/tests/virtio-blk-test.c
+> @@ -144,7 +144,20 @@ static uint64_t virtio_blk_request(QGuestAllocator *alloc, QVirtioDevice *d,
+>      uint64_t addr;
+>      uint8_t status = 0xFF;
 >  
->          if (sd) {
->              ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
-> @@ -358,6 +365,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
->              ipl->iplb.scsi.channel = cpu_to_be16(sd->channel);
->              ipl->iplb.scsi.devno = cpu_to_be16(ccw_dev->sch->devno);
->              ipl->iplb.scsi.ssid = ccw_dev->sch->ssid & 3;
-> +        } else if (vc) {
-> +            CcwDevice *ccw_dev = CCW_DEVICE(vc);
+> -    g_assert_cmpuint(data_size % 512, ==, 0);
+> +    switch (req->type) {
+> +    case VIRTIO_BLK_T_IN:
+> +    case VIRTIO_BLK_T_OUT:
+> +        g_assert_cmpuint(data_size % 512, ==, 0);
+> +        break;
+> +    case VIRTIO_BLK_T_DISCARD:
+> +    case VIRTIO_BLK_T_WRITE_ZEROES:
+> +        g_assert_cmpuint(data_size %
+> +                         sizeof(struct virtio_blk_discard_write_zeroes), ==, 0);
+> +        break;
+> +    default:
+> +        g_assert_cmpuint(data_size, ==, 0);
+> +    }
 > +
-> +            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
-> +            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
-> +            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
-> +            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
->          } else {
->              VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
->                                                                TYPE_VIRTIO_NET);
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index cad91ee..f5f025d 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -124,6 +124,14 @@ static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
->      g_free(cdev->mdevid);
->  }
+>      addr = guest_alloc(alloc, sizeof(*req) + data_size);
 >  
-> +static void s390_ccw_instance_init(Object *obj)
-> +{
-> +    S390CCWDevice *dev = S390_CCW_DEVICE(obj);
-> +
-> +    device_add_bootindex_property(obj, &dev->bootindex, "bootindex",
-> +                                  "/disk@0,0", DEVICE(obj), NULL);
-> +}
-> +
->  static void s390_ccw_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -137,6 +145,7 @@ static void s390_ccw_class_init(ObjectClass *klass, void *data)
->  static const TypeInfo s390_ccw_info = {
->      .name          = TYPE_S390_CCW,
->      .parent        = TYPE_CCW_DEVICE,
-> +    .instance_init = s390_ccw_instance_init,
->      .instance_size = sizeof(S390CCWDevice),
->      .class_size    = sizeof(S390CCWDeviceClass),
->      .class_init    = s390_ccw_class_init,
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 9246729..d815a4f 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -21,22 +21,11 @@
->  #include "hw/vfio/vfio.h"
->  #include "hw/vfio/vfio-common.h"
->  #include "hw/s390x/s390-ccw.h"
-> +#include "hw/s390x/vfio-ccw.h"
->  #include "hw/s390x/ccw-device.h"
->  #include "exec/address-spaces.h"
->  #include "qemu/error-report.h"
->  
-> -#define TYPE_VFIO_CCW "vfio-ccw"
-> -typedef struct VFIOCCWDevice {
-> -    S390CCWDevice cdev;
-> -    VFIODevice vdev;
-> -    uint64_t io_region_size;
-> -    uint64_t io_region_offset;
-> -    struct ccw_io_region *io_region;
-> -    EventNotifier io_notifier;
-> -    bool force_orb_pfch;
-> -    bool warned_orb_pfch;
-> -} VFIOCCWDevice;
-> -
->  static inline void warn_once_pfch(VFIOCCWDevice *vcdev, SubchDev *sch,
->                                    const char *msg)
->  {
-> diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-> index 7d15a1a..901d805 100644
-> --- a/include/hw/s390x/s390-ccw.h
-> +++ b/include/hw/s390x/s390-ccw.h
-> @@ -27,6 +27,7 @@ typedef struct S390CCWDevice {
->      CcwDevice parent_obj;
->      CssDevId hostid;
->      char *mdevid;
-> +    int32_t bootindex;
->  } S390CCWDevice;
->  
->  typedef struct S390CCWDeviceClass {
-> diff --git a/include/hw/s390x/vfio-ccw.h b/include/hw/s390x/vfio-ccw.h
-> new file mode 100644
-> index 0000000..a7d699d
-> --- /dev/null
-> +++ b/include/hw/s390x/vfio-ccw.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + * vfio based subchannel assignment support
-> + *
-> + * Copyright 2018 IBM Corp.
-> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef HW_VFIO_CCW_H
-> +#define HW_VFIO_CCW_H
-> +
-> +#include "hw/vfio/vfio-common.h"
-> +#include "hw/s390x/s390-ccw.h"
-> +#include "hw/s390x/ccw-device.h"
-> +
-> +#define TYPE_VFIO_CCW "vfio-ccw"
-> +#define VFIO_CCW(obj) \
-> +        OBJECT_CHECK(VFIOCCWDevice, (obj), TYPE_VFIO_CCW)
-> +
-> +
+>      virtio_blk_fix_request(d, req);
 
-Remove one empty line, please.
-
-> +#define TYPE_VFIO_CCW "vfio-ccw"
-> +typedef struct VFIOCCWDevice {
-> +    S390CCWDevice cdev;
-> +    VFIODevice vdev;
-> +    uint64_t io_region_size;
-> +    uint64_t io_region_offset;
-> +    struct ccw_io_region *io_region;
-> +    EventNotifier io_notifier;
-> +    bool force_orb_pfch;
-> +    bool warned_orb_pfch;
-> +} VFIOCCWDevice;
-
-Do you really need to make the whole structure public here? If not, I
-think it would be sufficient to only have the "anonymous" typedef here:
-
-typedef struct VFIOCCWDevice VFIOCCWDevice;
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
