@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45649)
+Received: from eggs.gnu.org ([209.51.188.92]:46046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1grQHm-0002Aq-Fr
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:42:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1grQIw-00037u-DC
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:44:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1grQHj-0005HH-0M
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:42:52 -0500
-References: <20190206152919.5532-1-mreitz@redhat.com>
-	<20190206163704.GV12500@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0d644429-0b16-bc7c-c583-d4684e47adb1@redhat.com>
-Date: Wed, 6 Feb 2019 17:42:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190206163704.GV12500@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ta4OAZcrlYG4tscItozK3VgODdh5S7qOj"
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] block/ssh: Implement
- .bdrv_refresh_filename()
+	(envelope-from <thuth@redhat.com>) id 1grQIu-0005h7-8n
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:44:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1grQIu-0005eo-2n
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 11:44:04 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed,  6 Feb 2019 17:43:55 +0100
+Message-Id: <1549471435-21887-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/i2c/smbus_ich9: Fix the confusing
+ contributions-after-2012 statement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +22,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ta4OAZcrlYG4tscItozK3VgODdh5S7qOj
-From: Max Reitz <mreitz@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <0d644429-0b16-bc7c-c583-d4684e47adb1@redhat.com>
-Subject: Re: [PATCH v2 0/2] block/ssh: Implement .bdrv_refresh_filename()
-References: <20190206152919.5532-1-mreitz@redhat.com>
- <20190206163704.GV12500@redhat.com>
-In-Reply-To: <20190206163704.GV12500@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The license information in this file is rather confusing. The text
+declares LGPL first, but then says that contributions after Jan 2012
+are licensed under the GPL instead. How should the average user who
+just downloaded the release tarball know which part is now GPL and
+which is LGPL? Also, as far as I can see, the file has been added to
+QEMU *after* January in 2012, so the whole file should be GPL by
+default instead.
 
-On 06.02.19 17:37, Richard W.M. Jones wrote:
-> On Wed, Feb 06, 2019 at 04:29:17PM +0100, Max Reitz wrote:
->> This series implements .bdrv_refresh_filename() for the ssh block
->> driver, along with an appropriate .bdrv_dirname() so we don't chop off=
+Furthermore, looking at the text of the LGPL (see COPYING.LIB in the
+top directory), the license clearly states in section "3." that one
+should rather replace the license information in such a case instead.
+Thus let's clean up the confusing statements and use the proper GPL
+text only.
 
->> query strings for backing files with relative filenames.
->>
->> This series depends on my "block: Fix some filename generation issues"=
+While we're at it, also remove the comment about acpi.c, since that
+file does not exist under this name in the QEMU tree anymore.
 
->> series.
->>
->> Based-on: 20190201192935.18394-1-mreitz@redhat.com
->=20
-> I have verified that this doesn't appear to break the existing driver:
-> ssh connections to block devices still work as well as they did before
-> (which is to say, not very well, I wish we would replace this driver
-> with Pino Toscano's reimplementation that uses libssh1).
->=20
-> However I wasn't sure how I could trigger the bdrv_refresh_filename
-> code path, so I don't think I tested that.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/i2c/smbus_ich9.c | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
 
-One test case goes like this:
-
-Before this series:
-
-$ ./qemu-img create -f qcow2 /tmp/base.qcow2 64M
-$ ./qemu-img create -f qcow2 -b base.qcow2 /tmp/top.qcow2
-$ ./qemu-img info ssh://localhost/tmp/top.qcow2
-image: json:{"driver": "qcow2", "file": {"server.host": "localhost",
-"server.port": "22", "driver": "ssh", "path": "/tmp/top.qcow2"}}
-[...]
-backing file: base.qcow2 (cannot determine actual path)
-[...]
-$ ./qemu-io ssh://localhost/tmp/top.qcow2
-can't open device ssh://localhost/tmp/top.qcow2: Cannot generate a base
-directory for ssh nodes
-
-
-So the filename is weird and you cannot open overlays with relative
-backing files.
-
-After this series:
-
-$ ./qemu-img info ssh://localhost/tmp/top.qcow2
-image: ssh://maxx@localhost:22/tmp/top.qcow2
-[...]
-backing file: base.qcow2 (actual path:
-ssh://maxx@localhost:22/tmp/base.qcow2)
-$ ./qemu-io ssh://localhost/tmp/top.qcow2
-qemu-io> quit
-
-The filename looks better and the image is usable.
-
-Max
-
-
---ta4OAZcrlYG4tscItozK3VgODdh5S7qOj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxbDmcACgkQ9AfbAGHV
-z0AmqQf+P7/2bZvbhu8Vutm0nbHyWDYn0Y04QpXuCoTQ4loqZAHgoxK7ZH3hx78D
-A1BqhLlkTIDE0+aOkIrv1qCD1x95BfNMlH1zeYr3TM8xk/AkxsjyEVy3YDwk0L+Z
-yAneZ2su4TqzEjTq/6Drie10opiR2WgDVvSFJMQ6YZcR7XF6yYcbxiEP7O8SOcgJ
-AEGdH2Ja/eylqrZ9raSc5stqIE6M2Abp6LVJtF9UuUwb+fYBL2WEE3TWVnZz2pAN
-bTcofqG8uB3rztklSd9APg1v0rHXb3isLj2oVtoTApCtMR9Tv3Fhgo2mgmmuCALx
-pqwXJzspK+sFT1rXOmypFRqDfTsvUg==
-=IHKw
------END PGP SIGNATURE-----
-
---ta4OAZcrlYG4tscItozK3VgODdh5S7qOj--
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index 2a8b49e..484aef5 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -6,23 +6,18 @@
+  *               VA Linux Systems Japan K.K.
+  * Copyright (C) 2012 Jason Baron <jbaron@redhat.com>
+  *
+- * This is based on acpi.c, but heavily rewritten.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
+  *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License version 2 as published by the Free Software Foundation.
+- *
+- * This library is distributed in the hope that it will be useful,
++ * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>
+- *
+- * Contributions after 2012-01-13 are licensed under the terms of the
+- * GNU GPL, version 2 or (at your option) any later version.
++ * General Public License for more details.
+  *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-- 
+1.8.3.1
