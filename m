@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51126)
+Received: from eggs.gnu.org ([209.51.188.92]:51972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1grhmj-0007n0-Rv
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:24:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1grhpp-0000Fu-Iw
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:27:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1grhmi-0008Si-Il
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:24:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58042)
+	(envelope-from <thuth@redhat.com>) id 1grhpn-0001w2-8W
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:27:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1grhmi-0008Ri-9d
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:24:00 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7860810F85
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 11:23:58 +0000 (UTC)
-Date: Thu, 7 Feb 2019 11:23:51 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190207112350.GA2773@work-vm>
-References: <20190206132331.1694-1-quintela@redhat.com>
-	<20190206132331.1694-4-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1grhpm-0001nD-V8
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:27:11 -0500
+References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
+	<20190207114913.2c5f2c5b.cohuck@redhat.com>
+	<6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ffb48b9f-fc99-0766-925c-4f79c692cba7@redhat.com>
+Date: Thu, 7 Feb 2019 12:26:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190206132331.1694-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] multifd: Drop x-
+In-Reply-To: <6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="mjQieWmoo95fJlKoJokQYFTttmrDiB0Hs"
+Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
+ under qemu-s390x in user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,239 +30,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Giovanni Mascellani <gio@debian.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We make it supported from now on.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mjQieWmoo95fJlKoJokQYFTttmrDiB0Hs
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 2019-02-07 12:05, Giovanni Mascellani wrote:
+> Hi, thanks for answering!
+>=20
+> Il 07/02/19 11:49, Cornelia Huck ha scritto:
+>> Did that work before commit 7de3b1cdc67 ("s390x/tcg: properly implemen=
+t
+>> the TOD")?
+>=20
+> It does not seem so
+The problem is rather that the STCK instruction is fenced with
+"#ifndef CONFIG_USER_ONLY" ... quick-n-dirty hack to allow it:
 
-> ---
->  hmp.c                 | 10 +++++-----
->  migration/migration.c | 26 +++++++++++++-------------
->  qapi/migration.json   | 34 +++++++++++++++++-----------------
->  3 files changed, 35 insertions(+), 35 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 73b8443a8e..0cafce9713 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -424,8 +424,8 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->              MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL),
->              params->block_incremental ? "on" : "off");
->          monitor_printf(mon, "%s: %u\n",
-> -            MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNELS),
-> -            params->x_multifd_channels);
-> +            MigrationParameter_str(MIGRATION_PARAMETER_MULTIFD_CHANNELS),
-> +            params->multifd_channels);
->          monitor_printf(mon, "%s: %" PRIu64 "\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
->              params->xbzrle_cache_size);
-> @@ -1769,9 +1769,9 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->          p->has_block_incremental = true;
->          visit_type_bool(v, param, &p->block_incremental, &err);
->          break;
-> -    case MIGRATION_PARAMETER_X_MULTIFD_CHANNELS:
-> -        p->has_x_multifd_channels = true;
-> -        visit_type_int(v, param, &p->x_multifd_channels, &err);
-> +    case MIGRATION_PARAMETER_MULTIFD_CHANNELS:
-> +        p->has_multifd_channels = true;
-> +        visit_type_int(v, param, &p->multifd_channels, &err);
->          break;
->      case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
->          p->has_xbzrle_cache_size = true;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 65df9b566e..c7dbc44562 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -746,8 +746,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->      params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
->      params->has_block_incremental = true;
->      params->block_incremental = s->parameters.block_incremental;
-> -    params->has_x_multifd_channels = true;
-> -    params->x_multifd_channels = s->parameters.x_multifd_channels;
-> +    params->has_multifd_channels = true;
-> +    params->multifd_channels = s->parameters.multifd_channels;
->      params->has_xbzrle_cache_size = true;
->      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
->      params->has_max_postcopy_bandwidth = true;
-> @@ -1103,7 +1103,7 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
->  
->      /* x_checkpoint_delay is now always positive */
->  
-> -    if (params->has_x_multifd_channels && (params->x_multifd_channels < 1)) {
-> +    if (params->has_multifd_channels && (params->multifd_channels < 1)) {
->          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
->                     "multifd_channels",
->                     "is invalid, it should be in the range of 1 to 255");
-> @@ -1188,8 +1188,8 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
->      if (params->has_block_incremental) {
->          dest->block_incremental = params->block_incremental;
->      }
-> -    if (params->has_x_multifd_channels) {
-> -        dest->x_multifd_channels = params->x_multifd_channels;
-> +    if (params->has_multifd_channels) {
-> +        dest->multifd_channels = params->multifd_channels;
->      }
->      if (params->has_xbzrle_cache_size) {
->          dest->xbzrle_cache_size = params->xbzrle_cache_size;
-> @@ -1266,8 +1266,8 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
->      if (params->has_block_incremental) {
->          s->parameters.block_incremental = params->block_incremental;
->      }
-> -    if (params->has_x_multifd_channels) {
-> -        s->parameters.x_multifd_channels = params->x_multifd_channels;
-> +    if (params->has_multifd_channels) {
-> +        s->parameters.multifd_channels = params->multifd_channels;
->      }
->      if (params->has_xbzrle_cache_size) {
->          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
-> @@ -2005,7 +2005,7 @@ bool migrate_use_multifd(void)
->  
->      s = migrate_get_current();
->  
-> -    return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_MULTIFD];
->  }
->  
->  bool migrate_pause_before_switchover(void)
-> @@ -2024,7 +2024,7 @@ int migrate_multifd_channels(void)
->  
->      s = migrate_get_current();
->  
-> -    return s->parameters.x_multifd_channels;
-> +    return s->parameters.multifd_channels;
->  }
->  
->  int migrate_use_xbzrle(void)
-> @@ -3257,8 +3257,8 @@ static Property migration_properties[] = {
->      DEFINE_PROP_UINT32("x-checkpoint-delay", MigrationState,
->                        parameters.x_checkpoint_delay,
->                        DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
-> -    DEFINE_PROP_UINT8("x-multifd-channels", MigrationState,
-> -                      parameters.x_multifd_channels,
-> +    DEFINE_PROP_UINT8("multifd-channels", MigrationState,
-> +                      parameters.multifd_channels,
->                        DEFAULT_MIGRATE_MULTIFD_CHANNELS),
->      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
->                        parameters.xbzrle_cache_size,
-> @@ -3282,7 +3282,7 @@ static Property migration_properties[] = {
->      DEFINE_PROP_MIG_CAP("x-release-ram", MIGRATION_CAPABILITY_RELEASE_RAM),
->      DEFINE_PROP_MIG_CAP("x-block", MIGRATION_CAPABILITY_BLOCK),
->      DEFINE_PROP_MIG_CAP("x-return-path", MIGRATION_CAPABILITY_RETURN_PATH),
-> -    DEFINE_PROP_MIG_CAP("x-multifd", MIGRATION_CAPABILITY_X_MULTIFD),
-> +    DEFINE_PROP_MIG_CAP("x-multifd", MIGRATION_CAPABILITY_MULTIFD),
->  
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> @@ -3336,7 +3336,7 @@ static void migration_instance_init(Object *obj)
->      params->has_downtime_limit = true;
->      params->has_x_checkpoint_delay = true;
->      params->has_block_incremental = true;
-> -    params->has_x_multifd_channels = true;
-> +    params->has_multifd_channels = true;
->      params->has_xbzrle_cache_size = true;
->      params->has_max_postcopy_bandwidth = true;
->      params->has_max_cpu_throttle = true;
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 8c5db60406..c202703889 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -401,7 +401,7 @@
->  # @pause-before-switchover: Pause outgoing migration before serialising device
->  #          state and before disabling block IO (since 2.11)
->  #
-> -# @x-multifd: Use more than one fd for migration (since 2.11)
-> +# @multifd: Use more than one fd for migration (since 4.0)
->  #
->  # @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
->  #                 (since 2.12)
-> @@ -418,7 +418,7 @@
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> -           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
-> +           'block', 'return-path', 'pause-before-switchover', 'multifd',
->             'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate' ] }
->  
->  ##
-> @@ -542,10 +542,10 @@
->  # 	migrated and the destination must already have access to the
->  # 	same backing chain as was used on the source.  (since 2.10)
->  #
-> -# @x-multifd-channels: Number of channels used to migrate data in
-> -#                     parallel. This is the same number that the
-> -#                     number of sockets used for migration.  The
-> -#                     default value is 2 (since 2.11)
-> +# @multifd-channels: Number of channels used to migrate data in
-> +#                    parallel. This is the same number that the
-> +#                    number of sockets used for migration.  The
-> +#                    default value is 2 (since 4.0)
->  #
->  # @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
->  #                     needs to be a multiple of the target page size
-> @@ -566,7 +566,7 @@
->             'cpu-throttle-initial', 'cpu-throttle-increment',
->             'tls-creds', 'tls-hostname', 'max-bandwidth',
->             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-> -           'x-multifd-channels',
-> +           'multifd-channels',
->             'xbzrle-cache-size', 'max-postcopy-bandwidth',
->             'max-cpu-throttle' ] }
->  
-> @@ -629,10 +629,10 @@
->  # 	migrated and the destination must already have access to the
->  # 	same backing chain as was used on the source.  (since 2.10)
->  #
-> -# @x-multifd-channels: Number of channels used to migrate data in
-> -#                     parallel. This is the same number that the
-> -#                     number of sockets used for migration.  The
-> -#                     default value is 2 (since 2.11)
-> +# @multifd-channels: Number of channels used to migrate data in
-> +#                    parallel. This is the same number that the
-> +#                    number of sockets used for migration.  The
-> +#                    default value is 2 (since 4.0)
->  #
->  # @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
->  #                     needs to be a multiple of the target page size
-> @@ -663,7 +663,7 @@
->              '*downtime-limit': 'int',
->              '*x-checkpoint-delay': 'int',
->              '*block-incremental': 'bool',
-> -            '*x-multifd-channels': 'int',
-> +            '*multifd-channels': 'int',
->              '*xbzrle-cache-size': 'size',
->              '*max-postcopy-bandwidth': 'size',
->  	    '*max-cpu-throttle': 'int' } }
-> @@ -742,10 +742,10 @@
->  # 	migrated and the destination must already have access to the
->  # 	same backing chain as was used on the source.  (since 2.10)
->  #
-> -# @x-multifd-channels: Number of channels used to migrate data in
-> -#                     parallel. This is the same number that the
-> -#                     number of sockets used for migration.
-> -#                     The default value is 2 (since 2.11)
-> +# @multifd-channels: Number of channels used to migrate data in
-> +#                    parallel. This is the same number that the
-> +#                    number of sockets used for migration.
-> +#                    The default value is 2 (since 4.0)
->  #
->  # @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
->  #                     needs to be a multiple of the target page size
-> @@ -775,7 +775,7 @@
->              '*downtime-limit': 'uint64',
->              '*x-checkpoint-delay': 'uint32',
->              '*block-incremental': 'bool' ,
-> -            '*x-multifd-channels': 'uint8',
-> +            '*multifd-channels': 'uint8',
->              '*xbzrle-cache-size': 'size',
->  	    '*max-postcopy-bandwidth': 'size',
->              '*max-cpu-throttle':'uint8'} }
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 018e9dd..8baa784 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -122,12 +122,13 @@ DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+ DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+=20
++DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
++
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+ DEF_HELPER_4(diag, void, env, i32, i32, i32)
+ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+ DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+-DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+ DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index dab805f..41e2911 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -962,6 +962,10 @@
+     D(0xb93e, KIMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_K=
+IMD)
+     D(0xb93f, KLMD,    RRE,   MSA,  0, 0, 0, 0, msa, 0, S390_FEAT_TYPE_K=
+LMD)
+=20
++/* STORE CLOCK */
++    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
++    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
++
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL=
+, IF_PRIV)
+@@ -1020,9 +1024,6 @@
+     F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
+ /* SIGNAL PROCESSOR */
+     F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
+-/* STORE CLOCK */
+-    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
+-    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
+ /* STORE CLOCK EXTENDED */
+     C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
+ /* STORE CLOCK COMPARATOR */
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 52262f6..b9eea7f 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -396,6 +396,16 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t o=
+rder_code, uint32_t r1,
+=20
+     return cc;
+ }
++
++#else
++
++uint64_t HELPER(stck)(CPUS390XState *env)
++{
++    uint64_t ns =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++
++    return (ns << 9) / 125 + (((ns & 0xff80000000000000ull) / 125) << 9)=
+;
++}
++
+ #endif
+=20
+ #ifndef CONFIG_USER_ONLY
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 639084a..177e281 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4034,6 +4034,14 @@ static DisasJumpType op_ectg(DisasContext *s, Disa=
+sOps *o)
+     return DISAS_NEXT;
+ }
+=20
++static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
++{
++    gen_helper_stck(o->out, cpu_env);
++    /* ??? We don't implement clock states.  */
++    gen_op_movi_cc(s, 0);
++    return DISAS_NEXT;
++}
++
+ #ifndef CONFIG_USER_ONLY
+ static DisasJumpType op_spka(DisasContext *s, DisasOps *o)
+ {
+@@ -4061,14 +4069,6 @@ static DisasJumpType op_stap(DisasContext *s, Disa=
+sOps *o)
+     return DISAS_NEXT;
+ }
+=20
+-static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
+-{
+-    gen_helper_stck(o->out, cpu_env);
+-    /* ??? We don't implement clock states.  */
+-    gen_op_movi_cc(s, 0);
+-    return DISAS_NEXT;
+-}
+-
+ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
+ {
+     TCGv_i64 c1 =3D tcg_temp_new_i64();
+
+
+=2E.. then your test program works fine without crashing.
+
+ Thomas
+
+
+--mjQieWmoo95fJlKoJokQYFTttmrDiB0Hs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJcXBX4AAoJEC7Z13T+cC21agEP/A7qwywQmRZyAkrz0y6YoLVw
+KUlZBltVvoeDhHuqp+maLx8v93dvwY8z5swPB2skehMSwOnGtpk4kX887DXrCUdT
+2pxDpR9Gvf+XF1iJ9DK6X1XVrBImt0crr+XxysPecpkJhcwGZPEb2rodKp/GfpX0
+Ka8+cYHwl0baUV7/WmkaRMWfOP3vpuChJMAWhKRA0N/2kEfnZzURcJz5F5Tg9bO7
+Tt7Sj8lFNqCQJzRcHRGYVJguhInTuB2dqsDszdknZ1iZ89SVJT6bg6JC0r219xjO
+IObKm3Du6j+Cj06vM++aitRZa5nRDxgfTEMP/y4T60ZuUBUHdTvETIs7J6aX8Es2
+P2zPBPYzHyXEgcnaQbqQiEjP0p1B33NXnNYYvw36htcdhURFT6ZnLokqMaJXs9os
+6aMxmfH1IcOcdeWG2d9Vwt97Y3ESWLqW90Iyzp/H8/q21pCF2CICSsTzhB5mJryj
+1zCELro5/KY4PwccCS79Db7gxvNCnFiC2GQu/iqvklpOfAoaNZjYcGCYDk1WCPqw
+qiLqiwWMD6uHqo9LeuTtHEVV07PxoVXpv+IrByNPEgp6E2S8g8wo42IAcQiyFIkQ
+ezNC1FGvlU6QobZVR8NCS2YG7WAg02VvHpwVL8Egmul/Ct0FYAuXxISMqYjLxSiE
+8qNQUDdH4Wc5Xp3MuHfO
+=0mts
+-----END PGP SIGNATURE-----
+
+--mjQieWmoo95fJlKoJokQYFTttmrDiB0Hs--
