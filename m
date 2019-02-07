@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55900)
+Received: from eggs.gnu.org ([209.51.188.92]:56876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1grkAF-0007NN-0J
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:56:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1grkFn-0001JX-Ih
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:02:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1grkA9-0004eh-4n
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:56:23 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:33815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1grkA5-0004ax-G4
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:56:17 -0500
-Received: by mail-qt1-f195.google.com with SMTP id b8so12006209qtj.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 05:56:10 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1grkFh-0008Rm-5X
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:02:09 -0500
+References: <20190206195551.28893-1-mreitz@redhat.com>
+	<20190206195551.28893-2-mreitz@redhat.com>
+	<87mun8jddk.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
+Date: Thu, 7 Feb 2019 08:01:50 -0600
 MIME-Version: 1.0
-References: <20181126105125.30973-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20181126105125.30973-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 7 Feb 2019 14:55:57 +0100
-Message-ID: <CAMxuvawePkNOOQ3qrMK39KfXZnrdH1QikFsHoL3W27xWgpFW2A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] doc: fix the configuration path
+In-Reply-To: <87mun8jddk.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr"
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +26,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Mon, Nov 26, 2018 at 11:51 AM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Use a CONFDIR variable to show the configured sysconf path in the
-> generated documentations (html, man pages etc).
->
-> Related to:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1644985
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
+ unions
+References: <20190206195551.28893-1-mreitz@redhat.com>
+ <20190206195551.28893-2-mreitz@redhat.com>
+ <87mun8jddk.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mun8jddk.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-ping
+On 2/7/19 12:56 AM, Markus Armbruster wrote:
+> Max Reitz <mreitz@redhat.com> writes:
+>=20
+>> This patch allows specifying a discriminator that is an optional membe=
+r
+>> of the base struct.  In such a case, a default value must be provided
+>> that is used when no value is given.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
 
-> ---
->  Makefile     | 9 ++++++---
->  qemu-ga.texi | 4 ++--
->  2 files changed, 8 insertions(+), 5 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 9cc4dae1a6..a39c231d1c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -932,11 +932,14 @@ ui/shader.o: $(SRC_PATH)/ui/shader.c \
->  MAKEINFO=3Dmakeinfo
->  MAKEINFOINCLUDES=3D -I docs -I $(<D) -I $(@D)
->  MAKEINFOFLAGS=3D--no-split --number-sections $(MAKEINFOINCLUDES)
-> -TEXI2PODFLAGS=3D$(MAKEINFOINCLUDES) "-DVERSION=3D$(VERSION)"
-> +TEXI2PODFLAGS=3D$(MAKEINFOINCLUDES) -DVERSION=3D"$(VERSION)" -DCONFDIR=
-=3D"$(qemu_confdir)"
->  TEXI2PDFFLAGS=3D$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
->
-> -docs/version.texi: $(SRC_PATH)/VERSION
-> -       $(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$=
-@")
-> +docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
-> +       $(call quiet-command,(\
-> +               echo "@set VERSION $(VERSION)" && \
-> +               echo "@set CONFDIR $(qemu_confdir)" \
-> +       )> $@,"GEN","$@")
->
->  %.html: %.texi docs/version.texi
->         $(call quiet-command,LC_ALL=3DC $(MAKEINFO) $(MAKEINFOFLAGS) --no=
--headers \
-> diff --git a/qemu-ga.texi b/qemu-ga.texi
-> index 4c7a8fd163..f00ad830f2 100644
-> --- a/qemu-ga.texi
-> +++ b/qemu-ga.texi
-> @@ -30,7 +30,7 @@ set user's password
->  @end itemize
->
->  qemu-ga will read a system configuration file on startup (located at
-> -@file{/etc/qemu/qemu-ga.conf} by default), then parse remaining
-> +@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
->  configuration options on the command line. For the same key, the last
->  option wins, but the lists accumulate (see below for configuration
->  file format).
-> @@ -58,7 +58,7 @@ file format).
->    Enable fsfreeze hook. Accepts an optional argument that specifies
->    script to run on freeze/thaw. Script will be called with
->    'freeze'/'thaw' arguments accordingly (default is
-> -  @samp{/etc/qemu/fsfreeze-hook}). If using -F with an argument, do
-> +  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, d=
-o
->    not follow -F with a space (for example:
->    @samp{-F/var/run/fsfreezehook.sh}).
->
-> --
-> 2.20.0.rc1
->
+> I'm afraid this could become awkward later on.  Let me explain.
+>=20
+> In many programming languages, absent optional arguments / members
+> default to a default value specified in the declaration.  Simple.
+>=20
+> In others, 'absent' is effectively an additional value.  The code
+> consuming the argument / member can interpret 'absent' however it wants=
+=2E
+> It may eliminate the additional value by mapping it to a default value,=
+
+> but it can also interpret 'absent' unlike any value.  If there's more
+> than one consumer, their interpretations need not be consistent.  The
+> declaration provides no clue on semantics of 'absent'.
+>=20
+> QAPI is in the latter camp.  I trust you can already sense how much I
+> like that.
+>=20
+> Now you want to permit optional variant discriminators.  As per general=
+
+> rule, their interpretation is left to the code consuming it.  One
+> instance of such code is the generated union visitor, which needs to
+> decide which variant to visit.  Your default-variant tells it which
+> variant to visit.  Other code interpreting the discriminator better be
+> consistent with that, but that's the other code's problem.  Hmm.
+>=20
+> If I could go back in time, I'd flip QAPI to "'absent' defaults to a
+> default value".  Lacking a time machine, we're stuck with cases of
+> "'absent' means something you can't express with a value" and "'absent'=
+
+> means different things in different contexts" that have been enshrined
+> in external interfaces.  Is there anything we could do to improve
+> matters for saner cases?
+>=20
+> I think there is: we could provide for an *optional* default value.  If=
+
+> the schema specifies it, that's what 'absent' means.  If it doesn't, al=
+l
+> bets are off, just like they are now.
+
+And we already have the planned syntax, thanks to our recent work on
+adding conditionals - where we now have:
+
+{ '*field': 'mytype' }
+
+we can also do long-hand:
+
+{ { 'name': '*field', 'type': 'mytype' } }
+
+which also lends itself well to declaring a default:
+
+{ { 'name': '*field', 'type': 'mytype', 'default': 'xyz' } }
+
+>=20
+> Say we do that (for what it's worth, introspect.json is already prepare=
+d
+> for it).  How would it play with your default-variant?
+>=20
+> If an optional discriminator specifies a default value, then that's the=
+
+> default variant.  But wait, if there's also a default-variant, *that's*=
+
+> the default variant!  Awkward clash.  To resolve it, we could either
+> forbid combining the two, or rule default-variant overrides the default=
+=2E
+> Feels needlessly complicated.
+>=20
+> Could we get away with "if you want a default variant, the discriminato=
+r
+> must specify a default"?
+
+I like the idea. It means finally biting the bullet and implementing
+default values, but we've known we've wanted them for a while (as
+evidenced by the existing introspection output, and by the syntax that
+we have ready to put into use for it).
+
+It means that representing the default variant in a union now depends on
+the base class declaring a default for the optional parameter (that is,
+an optional parameter can only be used as discriminator if it has a
+declared default), and gives us variable defaults in more uses than just
+unions.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcOk4ACgkQp6FrSiUn
+Q2rMxQf8DYdmZry6VzJ2FE9HtzsbHdHlvkyemIuFAO0p44vaTW4IYEnHzI1/9Xk+
+Q6BDpaBd62kwYXPUDH9GAjJuDSX8wPLfNeMGjakXH8kKecuElhR/SBYNlrnAeAPZ
+fE+KxUxMAqBMHzh3KUdmp4W5NILL2harI+XMsEYUrASiWP/KcjlQY5iTpJ+FEjZ9
+egEupfhDiu1+oj2+P2s6Y374V9qTRNHW6cJzQfpVICszbp2zynToUGwXJiM5cfGJ
+/T8ryt9VBtxipoKoId4QjlekAPXhuL5NKZ8ovx/SKFnlK5WoVSNdbOhsjYQdaLio
+0/TsL6kmscNkiii82ADaG3G2X2MbIg==
+=yftR
+-----END PGP SIGNATURE-----
+
+--kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr--
