@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48614)
+Received: from eggs.gnu.org ([209.51.188.92]:48684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1grlS4-0000qm-95
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:18:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1grlSA-0000tq-Dl
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1grlS2-0007ot-M8
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:18:56 -0500
-Date: Thu, 7 Feb 2019 08:18:30 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190207081830.4dcbb822@x1.home>
-In-Reply-To: <b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
-	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
+	(envelope-from <eblake@redhat.com>) id 1grlS4-0007qG-Sx
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:19:02 -0500
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+	<20190207102445.71998-11-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4a86c84f-4455-5d87-be76-dd503142ebe2@redhat.com>
+Date: Thu, 7 Feb 2019 09:18:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
- vfio: NVIDIA V100 + P9 passthrough
+In-Reply-To: <20190207102445.71998-11-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GDsSihanaaTSYm1AYSRVgMruWIWKWuW8R"
+Subject: Re: [Qemu-devel] [PATCH v3 10/17] block/qed: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 
-On Thu, 7 Feb 2019 15:43:18 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GDsSihanaaTSYm1AYSRVgMruWIWKWuW8R
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
+ jsnow@redhat.com
+Message-ID: <4a86c84f-4455-5d87-be76-dd503142ebe2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 10/17] block/qed: use qemu_iovec_init_buf
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+ <20190207102445.71998-11-vsementsov@virtuozzo.com>
+In-Reply-To: <20190207102445.71998-11-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:
-> > Based on this series, I've sent a Libvirt patch to allow a QEMU process
-> > to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
-> > GPU:
-> > 
-> > https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
-> > 
-> > 
-> > In that thread, Alex raised concerns about allowing QEMU to freely lock
-> > all the memory it wants. Is this an issue to be considered in the review
-> > of this series here?
-> > 
-> > Reading the patches, specially patch 3/3, it seems to me that QEMU is
-> > going to lock the KVM memory to populate the NUMA node with memory
-> > of the GPU itself, so at first there is no risk of not taking over the
-> > host RAM.
-> > Am I missing something?  
-> 
-> 
-> The GPU memory belongs to the device and not visible to the host as
-> memory blocks and not covered by page structs, for the host it is more
-> like MMIO which is passed through to the guest without that locked
-> accounting, I'd expect libvirt to keep working as usual except that:
-> 
-> when libvirt calculates the amount of memory needed for TCE tables
-> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
-> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
-> 
-> FlatView #2
->  AS "memory", root: system
->  AS "cpu-memory-0", root: system
->  Root memory region: system
->   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
->   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
-> 
-> So previously the DMA window would cover 0x7fffffff+1, now it has to
-> cover 0x11fffffffff+1.
+On 2/7/19 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Use new qemu_iovec_init_buf() instead of
+> qemu_iovec_init_external( ... , 1), which simplifies the code.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qed-table.c | 16 +++-------------
+>  block/qed.c       | 31 +++++++++----------------------
+>  2 files changed, 12 insertions(+), 35 deletions(-)
+>=20
 
-This looks like a chicken and egg problem, you're saying libvirt needs
-to query mtree to understand the extent of the GPU layout, but we need
-to specify the locked memory limits in order for QEMU to start?  Is
-libvirt supposed to start the VM with unlimited locked memory and fix
-it at some indeterminate point in the future?  Run a dummy VM with
-unlimited locked memory in order to determine the limits for the real
-VM?  Neither of these sound practical.  Thanks,
+> @@ -921,11 +915,7 @@ static int coroutine_fn qed_copy_from_backing_file=
+(BDRVQEDState *s,
+>          return 0;
+>      }
+> =20
+> -    iov =3D (struct iovec) {
+> -        .iov_base =3D qemu_blockalign(s->bs, len),
+> -        .iov_len =3D len,
+> -    };
+> -    qemu_iovec_init_external(&qiov, &iov, 1);
+> +    qemu_iovec_init_buf(&qiov, qemu_blockalign(s->bs, len), len);
+> =20
+>      ret =3D qed_read_backing_file(s, pos, &qiov, &backing_qiov);
+> =20
+> @@ -946,7 +936,7 @@ static int coroutine_fn qed_copy_from_backing_file(=
+BDRVQEDState *s,
+>      }
+>      ret =3D 0;
+>  out:
+> -    qemu_vfree(iov.iov_base);
+> +    qemu_vfree(qemu_iovec_get_buf(&qiov));
 
-Alex
+Matching my comments on 7/17, a separate variable to hold the allocated
+buffer may mean that you don't need qemu_iovec_get_buf().
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--GDsSihanaaTSYm1AYSRVgMruWIWKWuW8R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcTEAACgkQp6FrSiUn
+Q2pmPwf/YGEACpwOKy0B0Rm0eIKMtpW9Yc4rwS/B7ZUTFeIgkvpf8U53KERzgH0r
+r8Kfv9BLSQWfhW7Ky8eWDMCrRN27HMgE1E3EvxVVS8JvHbm2xOhafeYmZhciVQJH
+I6UNTsBBowZWdr2fdRvZeE9MDpICHEcfODOyb/mMrrvT2rdv3pnlGLGhW9S2k1ob
+gYAx95T6mzBlkyq2imdXlJXxicRrAluMqvgWfkB1UxhfuAuHRxKlGI8vHBJJsDPc
+s0KakzapZfbnODLi1kf8ahcvsIIPY177Tw9Q6r64U+SRQ50DruLz5CdKxNozWHiv
+q4A4+HDofAqtCQtx1ed/DLAzj6sH6g==
+=WYmj
+-----END PGP SIGNATURE-----
+
+--GDsSihanaaTSYm1AYSRVgMruWIWKWuW8R--
