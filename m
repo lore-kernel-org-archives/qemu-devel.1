@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58208)
+Received: from eggs.gnu.org ([209.51.188.92]:58220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griFz-0007Et-Fo
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:17 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1griG0-0007FT-2j
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griFx-0001Qx-Du
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:15 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:37278)
+	(envelope-from <richard.henderson@linaro.org>) id 1griFy-0001RC-4J
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:16 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33596)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1griFx-0001Pz-3w
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:13 -0500
-Received: by mail-wm1-x333.google.com with SMTP id g67so6357334wmd.2
+	id 1griFx-0001QZ-PH
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:14 -0500
+Received: by mail-wr1-x442.google.com with SMTP id a16so11268079wrv.0
 	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:13 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Feb 2019 11:53:47 +0000
-Message-Id: <20190207115400.647-7-richard.henderson@linaro.org>
+Date: Thu,  7 Feb 2019 11:53:48 +0000
+Message-Id: <20190207115400.647-8-richard.henderson@linaro.org>
 In-Reply-To: <20190207115400.647-1-richard.henderson@linaro.org>
 References: <20190207115400.647-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 06/19] target/hppa: Convert memory management
+Subject: [Qemu-devel] [PATCH 07/19] target/hppa: Convert arithmetic/logical
  insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,352 +32,519 @@ Cc: deller@gmx.de, svens@stackframe.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 162 ++++++++++++---------------------------
- target/hppa/insns.decode |  38 +++++++++
- 2 files changed, 89 insertions(+), 111 deletions(-)
+ target/hppa/translate.c  | 326 ++++++++++++++++++---------------------
+ target/hppa/insns.decode |  42 +++++
+ 2 files changed, 195 insertions(+), 173 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 6c2f560fc1..961b890153 100644
+index 961b890153..6c7d301904 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -290,6 +290,12 @@ static int expand_sm_imm(int val)
-     return val;
+@@ -1217,6 +1217,20 @@ static void do_add(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+     ctx->null_cond = cond;
  }
  
-+/* Inverted space register indicates 0 means sr0 not inferred from base.  */
-+static int expand_sr3x(int val)
++static bool do_add_reg(DisasContext *ctx, arg_rrr_cf_sh *a,
++                       bool is_l, bool is_tsv, bool is_tc, bool is_c)
 +{
-+    return ~val;
++    TCGv_reg tcg_r1, tcg_r2;
++
++    if (a->cf) {
++        nullify_over(ctx);
++    }
++    tcg_r1 = load_gpr(ctx, a->r1);
++    tcg_r2 = load_gpr(ctx, a->r2);
++    do_add(ctx, a->t, tcg_r1, tcg_r2, a->sh, is_l, is_tsv, is_tc, is_c, a->cf);
++    return nullify_end(ctx);
 +}
 +
- /* Include the auto-generated decoder.  */
- #include "decode.inc.c"
- 
-@@ -1997,7 +2003,7 @@ static void do_page_zero(DisasContext *ctx)
+ static void do_sub(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+                    TCGv_reg in2, bool is_tsv, bool is_b,
+                    bool is_tc, unsigned cf)
+@@ -1283,6 +1297,20 @@ static void do_sub(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+     ctx->null_cond = cond;
  }
- #endif
  
--static bool trans_nop(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_nop(DisasContext *ctx, arg_nop *a)
- {
-     cond_free(&ctx->null_cond);
-     return true;
-@@ -2317,81 +2323,62 @@ static bool gen_hlt(DisasContext *ctx, int reset)
- }
- #endif /* !CONFIG_USER_ONLY */
- 
--static bool trans_base_idx_mod(DisasContext *ctx, uint32_t insn,
--                               const DisasInsn *di)
-+static bool trans_nop_addrx(DisasContext *ctx, arg_ldst *a)
- {
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned rx = extract32(insn, 16, 5);
--    TCGv_reg dest = dest_gpr(ctx, rb);
--    TCGv_reg src1 = load_gpr(ctx, rb);
--    TCGv_reg src2 = load_gpr(ctx, rx);
--
--    /* The only thing we need to do is the base register modification.  */
--    tcg_gen_add_reg(dest, src1, src2);
--    save_gpr(ctx, rb, dest);
-+    if (a->m) {
-+        TCGv_reg dest = dest_gpr(ctx, a->b);
-+        TCGv_reg src1 = load_gpr(ctx, a->b);
-+        TCGv_reg src2 = load_gpr(ctx, a->x);
- 
-+        /* The only thing we need to do is the base register modification.  */
-+        tcg_gen_add_reg(dest, src1, src2);
-+        save_gpr(ctx, a->b, dest);
++static bool do_sub_reg(DisasContext *ctx, arg_rrr_cf *a,
++                       bool is_tsv, bool is_b, bool is_tc)
++{
++    TCGv_reg tcg_r1, tcg_r2;
++
++    if (a->cf) {
++        nullify_over(ctx);
 +    }
-     cond_free(&ctx->null_cond);
++    tcg_r1 = load_gpr(ctx, a->r1);
++    tcg_r2 = load_gpr(ctx, a->r2);
++    do_sub(ctx, a->t, tcg_r1, tcg_r2, is_tsv, is_b, is_tc, a->cf);
++    return nullify_end(ctx);
++}
++
+ static void do_cmpclr(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+                       TCGv_reg in2, unsigned cf)
+ {
+@@ -1328,6 +1356,20 @@ static void do_log(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+     }
+ }
+ 
++static bool do_log_reg(DisasContext *ctx, arg_rrr_cf *a,
++                       void (*fn)(TCGv_reg, TCGv_reg, TCGv_reg))
++{
++    TCGv_reg tcg_r1, tcg_r2;
++
++    if (a->cf) {
++        nullify_over(ctx);
++    }
++    tcg_r1 = load_gpr(ctx, a->r1);
++    tcg_r2 = load_gpr(ctx, a->r2);
++    do_log(ctx, a->t, tcg_r1, tcg_r2, a->cf, fn);
++    return nullify_end(ctx);
++}
++
+ static void do_unit(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+                     TCGv_reg in2, unsigned cf, bool is_tc,
+                     void (*fn)(TCGv_reg, TCGv_reg, TCGv_reg))
+@@ -2463,117 +2505,78 @@ static bool trans_lci(DisasContext *ctx, arg_lci *a)
      return true;
  }
  
--static bool trans_probe(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_probe(DisasContext *ctx, arg_probe *a)
+-static bool trans_add(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_add(DisasContext *ctx, arg_rrr_cf_sh *a)
  {
--    unsigned rt = extract32(insn, 0, 5);
--    unsigned sp = extract32(insn, 14, 2);
--    unsigned rr = extract32(insn, 16, 5);
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned is_write = extract32(insn, 6, 1);
--    unsigned is_imm = extract32(insn, 13, 1);
-     TCGv_reg dest, ofs;
-     TCGv_i32 level, want;
-     TCGv_tl addr;
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned ext = extract32(insn, 8, 4);
+-    unsigned shift = extract32(insn, 6, 2);
+-    unsigned rt = extract32(insn,  0, 5);
+-    TCGv_reg tcg_r1, tcg_r2;
+-    bool is_c = false;
+-    bool is_l = false;
+-    bool is_tc = false;
+-    bool is_tsv = false;
+-
+-    switch (ext) {
+-    case 0x6: /* ADD, SHLADD */
+-        break;
+-    case 0xa: /* ADD,L, SHLADD,L */
+-        is_l = true;
+-        break;
+-    case 0xe: /* ADD,TSV, SHLADD,TSV (1) */
+-        is_tsv = true;
+-        break;
+-    case 0x7: /* ADD,C */
+-        is_c = true;
+-        break;
+-    case 0xf: /* ADD,C,TSV */
+-        is_c = is_tsv = true;
+-        break;
+-    default:
+-        return gen_illegal(ctx);
+-    }
+-
+-    if (cf) {
+-        nullify_over(ctx);
+-    }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_add(ctx, rt, tcg_r1, tcg_r2, shift, is_l, is_tsv, is_tc, is_c, cf);
+-    return nullify_end(ctx);
++    return do_add_reg(ctx, a, false, false, false, false);
+ }
+ 
+-static bool trans_sub(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_add_l(DisasContext *ctx, arg_rrr_cf_sh *a)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned ext = extract32(insn, 6, 6);
+-    unsigned rt = extract32(insn,  0, 5);
+-    TCGv_reg tcg_r1, tcg_r2;
+-    bool is_b = false;
+-    bool is_tc = false;
+-    bool is_tsv = false;
+-
+-    switch (ext) {
+-    case 0x10: /* SUB */
+-        break;
+-    case 0x30: /* SUB,TSV */
+-        is_tsv = true;
+-        break;
+-    case 0x14: /* SUB,B */
+-        is_b = true;
+-        break;
+-    case 0x34: /* SUB,B,TSV */
+-        is_b = is_tsv = true;
+-        break;
+-    case 0x13: /* SUB,TC */
+-        is_tc = true;
+-        break;
+-    case 0x33: /* SUB,TSV,TC */
+-        is_tc = is_tsv = true;
+-        break;
+-    default:
+-        return gen_illegal(ctx);
+-    }
+-
+-    if (cf) {
+-        nullify_over(ctx);
+-    }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_sub(ctx, rt, tcg_r1, tcg_r2, is_tsv, is_b, is_tc, cf);
+-    return nullify_end(ctx);
++    return do_add_reg(ctx, a, true, false, false, false);
+ }
+ 
+-static bool trans_log(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_add_tsv(DisasContext *ctx, arg_rrr_cf_sh *a)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn,  0, 5);
+-    TCGv_reg tcg_r1, tcg_r2;
+-
+-    if (cf) {
+-        nullify_over(ctx);
+-    }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_log(ctx, rt, tcg_r1, tcg_r2, cf, di->f.ttt);
+-    return nullify_end(ctx);
++    return do_add_reg(ctx, a, false, true, false, false);
+ }
+ 
+-static bool trans_or(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_add_c(DisasContext *ctx, arg_rrr_cf_sh *a)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn,  0, 5);
+-    TCGv_reg tcg_r1, tcg_r2;
++    return do_add_reg(ctx, a, false, false, false, true);
++}
++
++static bool trans_add_c_tsv(DisasContext *ctx, arg_rrr_cf_sh *a)
++{
++    return do_add_reg(ctx, a, false, true, false, true);
++}
++
++static bool trans_sub(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_sub_reg(ctx, a, false, false, false);
++}
++
++static bool trans_sub_tsv(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_sub_reg(ctx, a, true, false, false);
++}
++
++static bool trans_sub_tc(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_sub_reg(ctx, a, false, false, true);
++}
++
++static bool trans_sub_tsv_tc(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_sub_reg(ctx, a, true, false, true);
++}
++
++static bool trans_sub_b(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_sub_reg(ctx, a, false, true, false);
++}
++
++static bool trans_sub_b_tsv(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_sub_reg(ctx, a, true, true, false);
++}
++
++static bool trans_andcm(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_log_reg(ctx, a, tcg_gen_andc_reg);
++}
++
++static bool trans_and(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_log_reg(ctx, a, tcg_gen_and_reg);
++}
++
++static bool trans_or(DisasContext *ctx, arg_rrr_cf *a)
++{
++    if (a->cf == 0) {
++        unsigned r2 = a->r2;
++        unsigned r1 = a->r1;
++        unsigned rt = a->t;
+ 
+-    if (cf == 0) {
+         if (rt == 0) { /* NOP */
+             cond_free(&ctx->null_cond);
+             return true;
+@@ -2620,76 +2623,67 @@ static bool trans_or(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+         }
+ #endif
+     }
+-
+-    if (cf) {
+-        nullify_over(ctx);
+-    }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_log(ctx, rt, tcg_r1, tcg_r2, cf, tcg_gen_or_reg);
+-    return nullify_end(ctx);
++    return do_log_reg(ctx, a, tcg_gen_or_reg);
+ }
+ 
+-static bool trans_cmpclr(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_xor(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_log_reg(ctx, a, tcg_gen_xor_reg);
++}
++
++static bool trans_cmpclr(DisasContext *ctx, arg_rrr_cf *a)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn,  0, 5);
+     TCGv_reg tcg_r1, tcg_r2;
+ 
+-    if (cf) {
++    if (a->cf) {
+         nullify_over(ctx);
+     }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_cmpclr(ctx, rt, tcg_r1, tcg_r2, cf);
++    tcg_r1 = load_gpr(ctx, a->r1);
++    tcg_r2 = load_gpr(ctx, a->r2);
++    do_cmpclr(ctx, a->t, tcg_r1, tcg_r2, a->cf);
+     return nullify_end(ctx);
+ }
+ 
+-static bool trans_uxor(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_uxor(DisasContext *ctx, arg_rrr_cf *a)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn,  0, 5);
+     TCGv_reg tcg_r1, tcg_r2;
+ 
+-    if (cf) {
++    if (a->cf) {
+         nullify_over(ctx);
+     }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_unit(ctx, rt, tcg_r1, tcg_r2, cf, false, tcg_gen_xor_reg);
++    tcg_r1 = load_gpr(ctx, a->r1);
++    tcg_r2 = load_gpr(ctx, a->r2);
++    do_unit(ctx, a->t, tcg_r1, tcg_r2, a->cf, false, tcg_gen_xor_reg);
+     return nullify_end(ctx);
+ }
+ 
+-static bool trans_uaddcm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool do_uaddcm(DisasContext *ctx, arg_rrr_cf *a, bool is_tc)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned is_tc = extract32(insn, 6, 1);
+-    unsigned rt = extract32(insn,  0, 5);
+     TCGv_reg tcg_r1, tcg_r2, tmp;
+ 
+-    if (cf) {
++    if (a->cf) {
+         nullify_over(ctx);
+     }
+-    tcg_r1 = load_gpr(ctx, r1);
+-    tcg_r2 = load_gpr(ctx, r2);
++    tcg_r1 = load_gpr(ctx, a->r1);
++    tcg_r2 = load_gpr(ctx, a->r2);
+     tmp = get_temp(ctx);
+     tcg_gen_not_reg(tmp, tcg_r2);
+-    do_unit(ctx, rt, tcg_r1, tmp, cf, is_tc, tcg_gen_add_reg);
++    do_unit(ctx, a->t, tcg_r1, tmp, a->cf, is_tc, tcg_gen_add_reg);
+     return nullify_end(ctx);
+ }
+ 
+-static bool trans_dcor(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_uaddcm(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_uaddcm(ctx, a, false);
++}
++
++static bool trans_uaddcm_tc(DisasContext *ctx, arg_rrr_cf *a)
++{
++    return do_uaddcm(ctx, a, true);
++}
++
++static bool do_dcor(DisasContext *ctx, arg_rr_cf *a, bool is_i)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned is_i = extract32(insn, 6, 1);
+-    unsigned rt = extract32(insn,  0, 5);
+     TCGv_reg tmp;
+ 
+     nullify_over(ctx);
+@@ -2701,24 +2695,29 @@ static bool trans_dcor(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     }
+     tcg_gen_andi_reg(tmp, tmp, 0x11111111);
+     tcg_gen_muli_reg(tmp, tmp, 6);
+-    do_unit(ctx, rt, tmp, load_gpr(ctx, r2), cf, false,
++    do_unit(ctx, a->t, tmp, load_gpr(ctx, a->r), a->cf, false,
+             is_i ? tcg_gen_add_reg : tcg_gen_sub_reg);
+-
+     return nullify_end(ctx);
+ }
+ 
+-static bool trans_ds(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_dcor(DisasContext *ctx, arg_rr_cf *a)
++{
++    return do_dcor(ctx, a, false);
++}
++
++static bool trans_dcor_i(DisasContext *ctx, arg_rr_cf *a)
++{
++    return do_dcor(ctx, a, true);
++}
++
++static bool trans_ds(DisasContext *ctx, arg_rrr_cf *a)
+ {
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned r1 = extract32(insn, 16, 5);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn,  0, 5);
+     TCGv_reg dest, add1, add2, addc, zero, in1, in2;
  
      nullify_over(ctx);
  
--    dest = dest_gpr(ctx, rt);
--    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
-+    dest = dest_gpr(ctx, a->t);
-+    form_gva(ctx, &addr, &ofs, a->b, 0, 0, 0, a->sp, 0, false);
+-    in1 = load_gpr(ctx, r1);
+-    in2 = load_gpr(ctx, r2);
++    in1 = load_gpr(ctx, a->r1);
++    in2 = load_gpr(ctx, a->r2);
  
--    if (is_imm) {
--        level = tcg_const_i32(extract32(insn, 16, 2));
-+    if (a->imm) {
-+        level = tcg_const_i32(a->ri);
-     } else {
-         level = tcg_temp_new_i32();
--        tcg_gen_trunc_reg_i32(level, load_gpr(ctx, rr));
-+        tcg_gen_trunc_reg_i32(level, load_gpr(ctx, a->ri));
-         tcg_gen_andi_i32(level, level, 3);
-     }
--    want = tcg_const_i32(is_write ? PAGE_WRITE : PAGE_READ);
-+    want = tcg_const_i32(a->write ? PAGE_WRITE : PAGE_READ);
+     add1 = tcg_temp_new();
+     add2 = tcg_temp_new();
+@@ -2745,7 +2744,7 @@ static bool trans_ds(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     tcg_temp_free(zero);
  
-     gen_helper_probe(dest, cpu_env, addr, level, want);
- 
-     tcg_temp_free_i32(want);
-     tcg_temp_free_i32(level);
- 
+     /* Write back the result register.  */
 -    save_gpr(ctx, rt, dest);
 +    save_gpr(ctx, a->t, dest);
+ 
+     /* Write back PSW[CB].  */
+     tcg_gen_xor_reg(cpu_psw_cb, add1, add2);
+@@ -2756,13 +2755,13 @@ static bool trans_ds(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     tcg_gen_xor_reg(cpu_psw_v, cpu_psw_v, in2);
+ 
+     /* Install the new nullification.  */
+-    if (cf) {
++    if (a->cf) {
+         TCGv_reg sv = NULL;
+-        if (cf >> 1 == 6) {
++        if (a->cf >> 1 == 6) {
+             /* ??? The lshift is supposed to contribute to overflow.  */
+             sv = do_add_sv(ctx, dest, add1, add2);
+         }
+-        ctx->null_cond = do_cond(cf, dest, cpu_psw_cb_msb, sv);
++        ctx->null_cond = do_cond(a->cf, dest, cpu_psw_cb_msb, sv);
+     }
+ 
+     tcg_temp_free(add1);
+@@ -2772,22 +2771,6 @@ static bool trans_ds(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
      return nullify_end(ctx);
  }
  
--#ifndef CONFIG_USER_ONLY
--static bool trans_ixtlbx(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_ixtlbx(DisasContext *ctx, arg_ixtlbx *a)
- {
--    unsigned sp;
--    unsigned rr = extract32(insn, 16, 5);
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned is_data = insn & 0x1000;
--    unsigned is_addr = insn & 0x40;
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     TCGv_tl addr;
-     TCGv_reg ofs, reg;
- 
--    if (is_data) {
--        sp = extract32(insn, 14, 2);
--    } else {
--        sp = ~assemble_sr3(insn);
--    }
--
--    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-     nullify_over(ctx);
- 
--    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
--    reg = load_gpr(ctx, rr);
--    if (is_addr) {
-+    form_gva(ctx, &addr, &ofs, a->b, 0, 0, 0, a->sp, 0, false);
-+    reg = load_gpr(ctx, a->r);
-+    if (a->addr) {
-         gen_helper_itlba(cpu_env, addr, reg);
-     } else {
-         gen_helper_itlbp(cpu_env, addr, reg);
-@@ -2399,80 +2386,67 @@ static bool trans_ixtlbx(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
- 
-     /* Exit TB for ITLB change if mmu is enabled.  This *should* not be
-        the case, since the OS TLB fill handler runs with mmu disabled.  */
--    if (!is_data && (ctx->tb_flags & PSW_C)) {
-+    if (!a->data && (ctx->tb_flags & PSW_C)) {
-         ctx->base.is_jmp = DISAS_IAQ_N_STALE;
-     }
-     return nullify_end(ctx);
-+#endif
- }
- 
--static bool trans_pxtlbx(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_pxtlbx(DisasContext *ctx, arg_pxtlbx *a)
- {
--    unsigned m = extract32(insn, 5, 1);
--    unsigned sp;
--    unsigned rx = extract32(insn, 16, 5);
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned is_data = insn & 0x1000;
--    unsigned is_local = insn & 0x40;
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     TCGv_tl addr;
-     TCGv_reg ofs;
- 
--    if (is_data) {
--        sp = extract32(insn, 14, 2);
--    } else {
--        sp = ~assemble_sr3(insn);
--    }
--
--    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-     nullify_over(ctx);
- 
--    form_gva(ctx, &addr, &ofs, rb, rx, 0, 0, sp, m, false);
--    if (m) {
--        save_gpr(ctx, rb, ofs);
-+    form_gva(ctx, &addr, &ofs, a->b, a->x, 0, 0, a->sp, a->m, false);
-+    if (a->m) {
-+        save_gpr(ctx, a->b, ofs);
-     }
--    if (is_local) {
-+    if (a->local) {
-         gen_helper_ptlbe(cpu_env);
-     } else {
-         gen_helper_ptlb(cpu_env, addr);
-     }
- 
-     /* Exit TB for TLB change if mmu is enabled.  */
--    if (!is_data && (ctx->tb_flags & PSW_C)) {
-+    if (!a->data && (ctx->tb_flags & PSW_C)) {
-         ctx->base.is_jmp = DISAS_IAQ_N_STALE;
-     }
-     return nullify_end(ctx);
-+#endif
- }
- 
--static bool trans_lpa(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_lpa(DisasContext *ctx, arg_ldst *a)
- {
--    unsigned rt = extract32(insn, 0, 5);
--    unsigned m = extract32(insn, 5, 1);
--    unsigned sp = extract32(insn, 14, 2);
--    unsigned rx = extract32(insn, 16, 5);
--    unsigned rb = extract32(insn, 21, 5);
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     TCGv_tl vaddr;
-     TCGv_reg ofs, paddr;
- 
--    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-     nullify_over(ctx);
- 
--    form_gva(ctx, &vaddr, &ofs, rb, rx, 0, 0, sp, m, false);
-+    form_gva(ctx, &vaddr, &ofs, a->b, a->x, 0, 0, a->sp, a->m, false);
- 
-     paddr = tcg_temp_new();
-     gen_helper_lpa(paddr, cpu_env, vaddr);
- 
-     /* Note that physical address result overrides base modification.  */
--    if (m) {
--        save_gpr(ctx, rb, ofs);
-+    if (a->m) {
-+        save_gpr(ctx, a->b, ofs);
-     }
--    save_gpr(ctx, rt, paddr);
-+    save_gpr(ctx, a->t, paddr);
-     tcg_temp_free(paddr);
- 
-     return nullify_end(ctx);
-+#endif
- }
- 
--static bool trans_lci(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_lci(DisasContext *ctx, arg_lci *a)
- {
--    unsigned rt = extract32(insn, 0, 5);
-     TCGv_reg ci;
- 
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-@@ -2482,43 +2456,12 @@ static bool trans_lci(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-        view of the cache.  Our implementation is to return 0 for all,
-        since the entire address space is coherent.  */
-     ci = tcg_const_reg(0);
--    save_gpr(ctx, rt, ci);
-+    save_gpr(ctx, a->t, ci);
-     tcg_temp_free(ci);
- 
-     cond_free(&ctx->null_cond);
-     return true;
- }
--#endif /* !CONFIG_USER_ONLY */
--
--static const DisasInsn table_mem_mgmt[] = {
--    { 0x04003280u, 0xfc003fffu, trans_nop },          /* fdc, disp */
--    { 0x04001280u, 0xfc003fffu, trans_nop },          /* fdc, index */
--    { 0x040012a0u, 0xfc003fffu, trans_base_idx_mod }, /* fdc, index, base mod */
--    { 0x040012c0u, 0xfc003fffu, trans_nop },          /* fdce */
--    { 0x040012e0u, 0xfc003fffu, trans_base_idx_mod }, /* fdce, base mod */
--    { 0x04000280u, 0xfc001fffu, trans_nop },          /* fic 0a */
--    { 0x040002a0u, 0xfc001fffu, trans_base_idx_mod }, /* fic 0a, base mod */
--    { 0x040013c0u, 0xfc003fffu, trans_nop },          /* fic 4f */
--    { 0x040013e0u, 0xfc003fffu, trans_base_idx_mod }, /* fic 4f, base mod */
--    { 0x040002c0u, 0xfc001fffu, trans_nop },          /* fice */
--    { 0x040002e0u, 0xfc001fffu, trans_base_idx_mod }, /* fice, base mod */
--    { 0x04002700u, 0xfc003fffu, trans_nop },          /* pdc */
--    { 0x04002720u, 0xfc003fffu, trans_base_idx_mod }, /* pdc, base mod */
--    { 0x04001180u, 0xfc003fa0u, trans_probe },        /* probe */
--    { 0x04003180u, 0xfc003fa0u, trans_probe },        /* probei */
--#ifndef CONFIG_USER_ONLY
--    { 0x04000000u, 0xfc001fffu, trans_ixtlbx },       /* iitlbp */
--    { 0x04000040u, 0xfc001fffu, trans_ixtlbx },       /* iitlba */
--    { 0x04001000u, 0xfc001fffu, trans_ixtlbx },       /* idtlbp */
--    { 0x04001040u, 0xfc001fffu, trans_ixtlbx },       /* idtlba */
--    { 0x04000200u, 0xfc001fdfu, trans_pxtlbx },       /* pitlb */
--    { 0x04000240u, 0xfc001fdfu, trans_pxtlbx },       /* pitlbe */
--    { 0x04001200u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlb */
--    { 0x04001240u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlbe */
--    { 0x04001340u, 0xfc003fc0u, trans_lpa },
--    { 0x04001300u, 0xfc003fe0u, trans_lci },
--#endif
+-static const DisasInsn table_arith_log[] = {
+-    { 0x08000240u, 0xfc000fe0u, trans_or },
+-    { 0x08000000u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_andc_reg },
+-    { 0x08000200u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_and_reg },
+-    { 0x08000280u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_xor_reg },
+-    { 0x08000880u, 0xfc000fe0u, trans_cmpclr },
+-    { 0x08000380u, 0xfc000fe0u, trans_uxor },
+-    { 0x08000980u, 0xfc000fa0u, trans_uaddcm },
+-    { 0x08000b80u, 0xfc1f0fa0u, trans_dcor },
+-    { 0x08000440u, 0xfc000fe0u, trans_ds },
+-    { 0x08000700u, 0xfc0007e0u, trans_add }, /* add */
+-    { 0x08000400u, 0xfc0006e0u, trans_sub }, /* sub; sub,b; sub,tsv */
+-    { 0x080004c0u, 0xfc0007e0u, trans_sub }, /* sub,tc; sub,tsv,tc */
+-    { 0x08000200u, 0xfc000320u, trans_add }, /* shladd */
 -};
- 
- static bool trans_add(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+-
+ static bool trans_addi(DisasContext *ctx, uint32_t insn)
  {
-@@ -4544,9 +4487,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+     target_sreg im = low_sextract(insn, 0, 11);
+@@ -4487,9 +4470,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
  
      opc = extract32(insn, 26, 6);
      switch (opc) {
--    case 0x01:
--        translate_table(ctx, insn, table_mem_mgmt);
+-    case 0x02:
+-        translate_table(ctx, insn, table_arith_log);
 -        return;
-     case 0x02:
-         translate_table(ctx, insn, table_arith_log);
+     case 0x03:
+         translate_table(ctx, insn, table_index_mem);
          return;
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index 16ea5e1b46..41c999eeb8 100644
+index 41c999eeb8..a576bb1d4d 100644
 --- a/target/hppa/insns.decode
 +++ b/target/hppa/insns.decode
-@@ -22,9 +22,17 @@
- ####
+@@ -33,6 +33,19 @@
+ # All insns that need to form a virtual address should use this set.
+ &ldst           t b x disp sp m scale size
  
- %assemble_sr3   13:1 14:2
-+%assemble_sr3x  13:1 14:2 !function=expand_sr3x
- 
- %sm_imm         16:10 !function=expand_sm_imm
- 
++&rr_cf          t r cf
++&rrr_cf         t r1 r2 cf
++&rrr_cf_sh      t r1 r2 cf sh
++
 +####
-+# Argument set definitions
++# Format definitions
 +####
 +
-+# All insns that need to form a virtual address should use this set.
-+&ldst           t b x disp sp m scale size
++@rr_cf          ...... r:5 ..... cf:4 ....... t:5       &rr_cf
++@rrr_cf         ...... r2:5 r1:5 cf:4 ....... t:5       &rrr_cf
++@rrr_cf_sh      ...... r2:5 r1:5 cf:4 .... sh:2 . t:5   &rrr_cf_sh
++@rrr_cf_sh0     ...... r2:5 r1:5 cf:4 ....... t:5       &rrr_cf_sh sh=0
 +
  ####
  # System
  ####
-@@ -49,3 +57,33 @@ ssm             000000 ..........  000 01101011 t:5     i=%sm_imm
+@@ -87,3 +100,32 @@ lpa             000001 b:5 x:5 sp:2 01001101 m:1 t:5    \
+                 &ldst disp=0 scale=0 size=0
  
- rfi             000000 ----- ----- --- 01100000 00000
- rfi_r           000000 ----- ----- --- 01100101 00000
+ lci             000001 ----- ----- -- 01001100 0 t:5
 +
 +####
-+# Memory Management
++# Arith/Log
 +####
 +
-+@addrx          ...... b:5 x:5 .. ........ m:1 .....    \
-+                &ldst disp=0 scale=0 t=0 sp=0 size=0
++andcm           000010 ..... ..... .... 000000 0 .....  @rrr_cf
++and             000010 ..... ..... .... 001000 0 .....  @rrr_cf
++or              000010 ..... ..... .... 001001 0 .....  @rrr_cf
++xor             000010 ..... ..... .... 001010 0 .....  @rrr_cf
++uxor            000010 ..... ..... .... 001110 0 .....  @rrr_cf
++ds              000010 ..... ..... .... 010001 0 .....  @rrr_cf
++cmpclr          000010 ..... ..... .... 100010 0 .....  @rrr_cf
++uaddcm          000010 ..... ..... .... 100110 0 .....  @rrr_cf
++uaddcm_tc       000010 ..... ..... .... 100111 0 .....  @rrr_cf
++dcor            000010 ..... 00000 .... 101110 0 .....  @rr_cf
++dcor_i          000010 ..... 00000 .... 101111 0 .....  @rr_cf
 +
-+nop             000001 ----- ----- -- 11001010 0 -----         # fdc, disp
-+nop_addrx       000001 ..... ..... -- 01001010 . -----  @addrx # fdc, index
-+nop_addrx       000001 ..... ..... -- 01001011 . -----  @addrx # fdce
-+nop_addrx       000001 ..... ..... --- 0001010 . -----  @addrx # fic 0x0a
-+nop_addrx       000001 ..... ..... -- 01001111 . 00000  @addrx # fic 0x4f
-+nop_addrx       000001 ..... ..... --- 0001011 . -----  @addrx # fice
-+nop_addrx       000001 ..... ..... -- 01001110 . 00000  @addrx # pdc
++add             000010 ..... ..... .... 0110.. 0 .....  @rrr_cf_sh
++add_l           000010 ..... ..... .... 1010.. 0 .....  @rrr_cf_sh
++add_tsv         000010 ..... ..... .... 1110.. 0 .....  @rrr_cf_sh
++add_c           000010 ..... ..... .... 011100 0 .....  @rrr_cf_sh0
++add_c_tsv       000010 ..... ..... .... 111100 0 .....  @rrr_cf_sh0
 +
-+probe           000001 b:5 ri:5 sp:2 imm:1 100011 write:1 0 t:5
-+
-+ixtlbx          000001 b:5 r:5 sp:2 0100000 addr:1 0 00000      data=1
-+ixtlbx          000001 b:5 r:5 ... 000000 addr:1 0 00000        \
-+                sp=%assemble_sr3x data=0
-+
-+pxtlbx          000001 b:5 x:5 sp:2 0100100 local:1 m:1 -----   data=1
-+pxtlbx          000001 b:5 x:5 ... 000100 local:1 m:1 -----     \
-+                sp=%assemble_sr3x data=0
-+
-+lpa             000001 b:5 x:5 sp:2 01001101 m:1 t:5    \
-+                &ldst disp=0 scale=0 size=0
-+
-+lci             000001 ----- ----- -- 01001100 0 t:5
++sub             000010 ..... ..... .... 010000 0 .....  @rrr_cf
++sub_tsv         000010 ..... ..... .... 110000 0 .....  @rrr_cf
++sub_tc          000010 ..... ..... .... 010011 0 .....  @rrr_cf
++sub_tsv_tc      000010 ..... ..... .... 110011 0 .....  @rrr_cf
++sub_b           000010 ..... ..... .... 010100 0 .....  @rrr_cf
++sub_b_tsv       000010 ..... ..... .... 110100 0 .....  @rrr_cf
 -- 
 2.17.2
