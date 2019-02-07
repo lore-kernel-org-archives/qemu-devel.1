@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59035)
+Received: from eggs.gnu.org ([209.51.188.92]:59050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grgPJ-0003I0-4u
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:55:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1grgPL-0003IF-5U
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grgPH-0008Cg-5f
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:55:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37286)
+	(envelope-from <bounces@canonical.com>) id 1grgPJ-0008Db-4i
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:55:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37246)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1grgPE-0008AG-WF
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:55:42 -0500
+	id 1grgPH-00089e-7H
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:55:43 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1grgPC-0005n4-IG
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:55:38 +0000
+	id 1grgPB-0005qs-DF
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:55:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 890EE2E80C7
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 09:55:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5F3562E80C7
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 09:55:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Feb 2019 09:48:00 -0000
+Date: Thu, 07 Feb 2019 09:46:25 -0000
 From: Giovanni Mascellani <gio@debian.org>
 Reply-To: Bug 1815024 <1815024@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154953288014.19320.15836708058370027460.malone@soybean.canonical.com>
+Message-Id: <154953278604.21779.11003069267712755770.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1815024] Re: SIGILL on instruction "stck" under
  qemu-s390x in user mode
@@ -39,11 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I am also attaching the compiled program, in case it is helpful.
-
-** Attachment added: "test"
-   https://bugs.launchpad.net/qemu/+bug/1815024/+attachment/5236690/+files/=
-test
+** Attachment added: "rdtsc.S"
+   https://bugs.launchpad.net/qemu/+bug/1815024/+attachment/5236688/+files/=
+rdtsc.S
 
 -- =
 
