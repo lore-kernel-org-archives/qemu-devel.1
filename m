@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59728)
+Received: from eggs.gnu.org ([209.51.188.92]:59731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCT-0007hV-Dd
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCT-0007hZ-Ec
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCS-0006OS-5x
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCO-0006Hc-J0
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56652)
+Received: from mx1.redhat.com ([209.132.183.28]:54022)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1grmCR-0006MP-Rr
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:52 -0500
+	id 1grmCK-000663-KK
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:48 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  7 Feb 2019 17:06:09 +0100
-Message-Id: <20190207160617.1142-11-marcandre.lureau@redhat.com>
+Date: Thu,  7 Feb 2019 17:06:04 +0100
+Message-Id: <20190207160617.1142-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20190207160617.1142-1-marcandre.lureau@redhat.com>
 References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/18] chardev: split up qmp_chardev_open_socket
- connection code
+Subject: [Qemu-devel] [PULL 05/18] chardev: forbid 'wait' option with client
+ sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,141 +29,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, peter.maydell@linaro.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, peter.maydell@linaro.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-In qmp_chardev_open_socket the code for connecting client chardevs is
-split across two conditionals far apart with some server chardev code in
-the middle. Split up the method so that code for client connection setup
-is separate from code for server connection setup.
+The 'wait'/'nowait' parameter is used to tell server sockets whether to
+block until a client is accepted during initialization. Client chardevs
+have always silently ignored this option. Various tests were mistakenly
+passing this option for their client chardevs.
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190123172740.32452-11-berrange@redhat.com>
+Message-Id: <20190123172740.32452-6-berrange@redhat.com>
 ---
- chardev/char-socket.c | 96 +++++++++++++++++++++++++++----------------
- 1 file changed, 60 insertions(+), 36 deletions(-)
+ chardev/char-socket.c          | 12 +++++++++++-
+ tests/ivshmem-test.c           |  2 +-
+ tests/libqtest.c               |  4 ++--
+ tests/test-filter-redirector.c |  4 ++--
+ 4 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 222adbbad3..90dafef7d4 100644
+index 743b7b11cd..728342dc9f 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -1005,6 +1005,61 @@ static gboolean socket_reconnect_timeout(gpointer =
-opaque)
- }
-=20
-=20
-+static int qmp_chardev_open_socket_server(Chardev *chr,
-+                                          bool is_telnet,
-+                                          bool is_waitconnect,
-+                                          Error **errp)
-+{
-+    SocketChardev *s =3D SOCKET_CHARDEV(chr);
-+    char *name;
-+    if (is_telnet) {
-+        s->do_telnetopt =3D 1;
-+    }
-+    s->listener =3D qio_net_listener_new();
-+
-+    name =3D g_strdup_printf("chardev-tcp-listener-%s", chr->label);
-+    qio_net_listener_set_name(s->listener, name);
-+    g_free(name);
-+
-+    if (qio_net_listener_open_sync(s->listener, s->addr, errp) < 0) {
-+        object_unref(OBJECT(s->listener));
-+        s->listener =3D NULL;
-+        return -1;
-+    }
-+
-+    qapi_free_SocketAddress(s->addr);
-+    s->addr =3D socket_local_address(s->listener->sioc[0]->fd, errp);
-+    update_disconnected_filename(s);
-+
-+    if (is_waitconnect) {
-+        tcp_chr_accept_server_sync(chr);
-+    } else {
-+        qio_net_listener_set_client_func_full(s->listener,
-+                                              tcp_chr_accept,
-+                                              chr, NULL,
-+                                              chr->gcontext);
-+    }
-+
-+    return 0;
-+}
-+
-+
-+static int qmp_chardev_open_socket_client(Chardev *chr,
-+                                          int64_t reconnect,
-+                                          Error **errp)
-+{
-+    SocketChardev *s =3D SOCKET_CHARDEV(chr);
-+
-+    if (reconnect > 0) {
-+        s->reconnect_time =3D reconnect;
-+        tcp_chr_connect_client_async(chr);
-+        return 0;
-+    } else {
-+        return tcp_chr_connect_client_sync(chr, errp);
-+    }
-+}
-+
-+
- static bool qmp_chardev_validate_socket(ChardevSocket *sock,
-                                         SocketAddress *addr,
-                                         Error **errp)
-@@ -1147,44 +1202,13 @@ static void qmp_chardev_open_socket(Chardev *chr,
-=20
-     update_disconnected_filename(s);
-=20
--    if (is_listen) {
--        if (is_telnet || is_tn3270) {
--            s->do_telnetopt =3D 1;
-+    if (s->is_listen) {
-+        if (qmp_chardev_open_socket_server(chr, is_telnet || is_tn3270,
-+                                           is_waitconnect, errp) < 0) {
-+            return;
+@@ -1047,6 +1047,12 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
+ket *sock,
+             error_setg(errp, "%s", "Websocket client is not implemented"=
+);
+             return false;
          }
--    } else if (reconnect > 0) {
--        s->reconnect_time =3D reconnect;
--    }
--
--    if (s->reconnect_time) {
--        tcp_chr_connect_client_async(chr);
-     } else {
--        if (s->is_listen) {
--            char *name;
--            s->listener =3D qio_net_listener_new();
--
--            name =3D g_strdup_printf("chardev-tcp-listener-%s", chr->lab=
-el);
--            qio_net_listener_set_name(s->listener, name);
--            g_free(name);
--
--            if (qio_net_listener_open_sync(s->listener, s->addr, errp) <=
- 0) {
--                object_unref(OBJECT(s->listener));
--                s->listener =3D NULL;
--                return;
--            }
--
--            qapi_free_SocketAddress(s->addr);
--            s->addr =3D socket_local_address(s->listener->sioc[0]->fd, e=
-rrp);
--            update_disconnected_filename(s);
--
--            if (is_waitconnect) {
--                tcp_chr_accept_server_sync(chr);
--            } else {
--                qio_net_listener_set_client_func_full(s->listener,
--                                                      tcp_chr_accept,
--                                                      chr, NULL,
--                                                      chr->gcontext);
--            }
--        } else if (tcp_chr_connect_client_sync(chr, errp) < 0) {
-+        if (qmp_chardev_open_socket_client(chr, reconnect, errp) < 0) {
-             return;
-         }
++        if (sock->has_wait) {
++            error_setg(errp, "%s",
++                       "'wait' option is incompatible with "
++                       "socket in client connect mode");
++            return false;
++        }
      }
+=20
+     return true;
+@@ -1220,7 +1226,11 @@ static void qemu_chr_parse_socket(QemuOpts *opts, =
+ChardevBackend *backend,
+     sock->tn3270 =3D is_tn3270;
+     sock->has_websocket =3D true;
+     sock->websocket =3D is_websock;
+-    sock->has_wait =3D true;
++    /*
++     * We have different default to QMP for 'wait' when 'server'
++     * is set, hence we can't just check for existence of 'wait'
++     */
++    sock->has_wait =3D qemu_opt_find(opts, "wait") || is_listen;
+     sock->wait =3D is_waitconnect;
+     sock->has_reconnect =3D qemu_opt_find(opts, "reconnect");
+     sock->reconnect =3D reconnect;
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 4911b69317..942ddc9192 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -295,7 +295,7 @@ static void setup_vm_with_server(IVState *s, int nvec=
+tors)
+ {
+     char *cmd;
+=20
+-    cmd =3D g_strdup_printf("-chardev socket,id=3Dchr0,path=3D%s,nowait =
+"
++    cmd =3D g_strdup_printf("-chardev socket,id=3Dchr0,path=3D%s "
+                           "-device ivshmem-doorbell,chardev=3Dchr0,vecto=
+rs=3D%d",
+                           tmpserver, nvectors);
+=20
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 6fb30855fa..c49b85482d 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -232,9 +232,9 @@ QTestState *qtest_init_without_qmp_handshake(const ch=
+ar *extra_args)
+     qtest_add_abrt_handler(kill_qemu_hook_func, s);
+=20
+     command =3D g_strdup_printf("exec %s "
+-                              "-qtest unix:%s,nowait "
++                              "-qtest unix:%s "
+                               "-qtest-log %s "
+-                              "-chardev socket,path=3D%s,nowait,id=3Dcha=
+r0 "
++                              "-chardev socket,path=3D%s,id=3Dchar0 "
+                               "-mon chardev=3Dchar0,mode=3Dcontrol "
+                               "-machine accel=3Dqtest "
+                               "-display none "
+diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirecto=
+r.c
+index 9ca9feabf8..6dc21dd4fb 100644
+--- a/tests/test-filter-redirector.c
++++ b/tests/test-filter-redirector.c
+@@ -96,7 +96,7 @@ static void test_redirector_tx(void)
+         "-device %s,netdev=3Dqtest-bn0,id=3Dqtest-e0 "
+         "-chardev socket,id=3Dredirector0,path=3D%s,server,nowait "
+         "-chardev socket,id=3Dredirector1,path=3D%s,server,nowait "
+-        "-chardev socket,id=3Dredirector2,path=3D%s,nowait "
++        "-chardev socket,id=3Dredirector2,path=3D%s "
+         "-object filter-redirector,id=3Dqtest-f0,netdev=3Dqtest-bn0,"
+         "queue=3Dtx,outdev=3Dredirector0 "
+         "-object filter-redirector,id=3Dqtest-f1,netdev=3Dqtest-bn0,"
+@@ -166,7 +166,7 @@ static void test_redirector_rx(void)
+         "-device %s,netdev=3Dqtest-bn0,id=3Dqtest-e0 "
+         "-chardev socket,id=3Dredirector0,path=3D%s,server,nowait "
+         "-chardev socket,id=3Dredirector1,path=3D%s,server,nowait "
+-        "-chardev socket,id=3Dredirector2,path=3D%s,nowait "
++        "-chardev socket,id=3Dredirector2,path=3D%s "
+         "-object filter-redirector,id=3Dqtest-f0,netdev=3Dqtest-bn0,"
+         "queue=3Drx,indev=3Dredirector0 "
+         "-object filter-redirector,id=3Dqtest-f1,netdev=3Dqtest-bn0,"
 --=20
 2.20.1.519.g8feddda32c
