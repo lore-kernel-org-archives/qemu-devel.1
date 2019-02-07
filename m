@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47578)
+Received: from eggs.gnu.org ([209.51.188.92]:49393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1grjWP-0004Jq-8v
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:15:18 -0500
+	(envelope-from <berto@igalia.com>) id 1grjeu-0001Dq-PI
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1grjWJ-0007lW-OR
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:15:17 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  7 Feb 2019 14:14:56 +0100
-Message-Id: <1549545296-18903-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1549545296-18903-1-git-send-email-thuth@redhat.com>
-References: <1549545296-18903-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] qemu-options: Remove deprecated option
- -clock
+	(envelope-from <berto@igalia.com>) id 1grjeu-0004Bg-58
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:24:04 -0500
+Received: from fanzine.igalia.com ([91.117.99.155]:59535)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1grjet-000405-Jo
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:24:04 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Thu,  7 Feb 2019 15:23:21 +0200
+Message-Id: <c741408825d01f5a186901c5a8248126ffebe9fd.1549545591.git.berto@igalia.com>
+In-Reply-To: <cover.1549545591.git.berto@igalia.com>
+References: <cover.1549545591.git.berto@igalia.com>
+In-Reply-To: <cover.1549545591.git.berto@igalia.com>
+References: <cover.1549545591.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 1/3] main-loop: Don't leak GSources attached to
+ a GMainContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,65 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The option is only a dummy since a long time. We've finally deprecated
-it in QEMU v3.0, so it's time to remove it now.
+After g_source_attach() the GMainContext holds a reference to the
+GSource, so the caller does not need to keep it.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+pty_chr_state() and qio_task_thread_worker() are not doing this, so
+the GSource is being leaked in both cases (pty_chr_open_src_cancel()
+is the exception here because it does remove the extra reference
+correctly).
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- qemu-deprecated.texi | 5 -----
- qemu-options.hx      | 3 ---
- vl.c                 | 6 ------
- 3 files changed, 14 deletions(-)
+ chardev/char-pty.c | 2 +-
+ io/task.c          | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 90e5860..fe90555 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -37,11 +37,6 @@ would automatically enable USB support on the machine type.
- If using the new syntax, USB support must be explicitly
- enabled via the ``-machine usb=on'' argument.
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index f681d637c1..f16a5e8d59 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -60,7 +60,6 @@ static void pty_chr_open_src_cancel(PtyChardev *s)
+ {
+     if (s->open_source) {
+         g_source_destroy(s->open_source);
+-        g_source_unref(s->open_source);
+         s->open_source = NULL;
+     }
+ }
+@@ -216,6 +215,7 @@ static void pty_chr_state(Chardev *chr, int connected)
+                                   qemu_chr_be_generic_open_func,
+                                   chr, NULL);
+             g_source_attach(s->open_source, chr->gcontext);
++            g_source_unref(s->open_source);
+         }
+         if (!chr->gsource) {
+             chr->gsource = io_add_watch_poll(chr, s->ioc,
+diff --git a/io/task.c b/io/task.c
+index 2886a2c1bc..c8489fb790 100644
+--- a/io/task.c
++++ b/io/task.c
+@@ -120,6 +120,7 @@ static gpointer qio_task_thread_worker(gpointer opaque)
+     idle = g_idle_source_new();
+     g_source_set_callback(idle, qio_task_thread_result, data, NULL);
+     g_source_attach(idle, data->context);
++    g_source_unref(idle);
  
--@subsection -clock (since 3.0.0)
--
--The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
--replacement since it is not needed anymore.
--
- @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
- 
- The 'file' driver for drives is no longer appropriate for character or host
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 06ef1a7..77bd98e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3444,9 +3444,6 @@ Load the contents of @var{file} as an option ROM.
- This option is useful to load things like EtherBoot.
- ETEXI
- 
--HXCOMM Silently ignored for compatibility
--DEF("clock", HAS_ARG, QEMU_OPTION_clock, "", QEMU_ARCH_ALL)
--
- DEF("rtc", HAS_ARG, QEMU_OPTION_rtc, \
-     "-rtc [base=utc|localtime|<datetime>][,clock=host|rt|vm][,driftfix=none|slew]\n" \
-     "                set the RTC base and clock, enable drift fix for clock ticks (x86 only)\n",
-diff --git a/vl.c b/vl.c
-index 9e4dba7..90ff233 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3735,12 +3735,6 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_old_param:
-                 old_param = 1;
-                 break;
--            case QEMU_OPTION_clock:
--                /* Clock options no longer exist.  Keep this option for
--                 * backward compatibility.
--                 */
--                warn_report("This option is ignored and will be removed soon");
--                break;
-             case QEMU_OPTION_rtc:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("rtc"), optarg,
-                                                false);
+     return NULL;
+ }
 -- 
-1.8.3.1
+2.11.0
