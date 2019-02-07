@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36644)
+Received: from eggs.gnu.org ([209.51.188.92]:37044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrb-0002iU-AH
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:02 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgru-0002z8-PW
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrZ-0001jF-Vu
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:24:59 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrt-00025t-Sq
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:18 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Feb 2019 13:24:28 +0300
-Message-Id: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 00/17] block: local qiov helper
+Date: Thu,  7 Feb 2019 13:24:42 +0300
+Message-Id: <20190207102445.71998-15-vsementsov@virtuozzo.com>
+In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 14/17] tests/test-bdrv-drain: use
+ QEMU_IOVEC_INIT_BUF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,61 +23,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com
 
-Hi all!
+Use new QEMU_IOVEC_INIT_BUF() instead of
+qemu_iovec_init_external( ... , 1), which simplifies the code.
 
-Here is a new simple helper for a very often patter
-around qemu_iovec_init_external, when we need simple qiov with only
-one iov, initialized from external buffer.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/test-bdrv-drain.c | 29 ++++-------------------------
+ 1 file changed, 4 insertions(+), 25 deletions(-)
 
-v3:
-  01-02: tiny improvements, described in patch-emails
-  03-17: new patches
-
-  Note: only hw/scsi/scsi-disk.c not updated, as it has too tricky
-        logic around @iov fields of structures. So, it is simpler to
-        keep it as is.
-
-Previous series version was "[PATCH v2 0/2] block: local qiov helper: part I"
-https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01610.html
-
-Vladimir Sementsov-Ogievskiy (17):
-  block: enhance QEMUIOVector structure
-  block/io: use qemu_iovec_init_buf
-  block/block-backend: use QEMU_IOVEC_INIT_BUF
-  block/backup: use qemu_iovec_init_buf
-  block/commit: use QEMU_IOVEC_INIT_BUF
-  block/stream: use QEMU_IOVEC_INIT_BUF
-  block/parallels: use QEMU_IOVEC_INIT_BUF
-  block/qcow: use qemu_iovec_init_buf
-  block/qcow2: use qemu_iovec_init_buf
-  block/qed: use qemu_iovec_init_buf
-  block/vmdk: use qemu_iovec_init_buf
-  qemu-img: use qemu_iovec_init_buf
-  migration/block: use qemu_iovec_init_buf
-  tests/test-bdrv-drain: use QEMU_IOVEC_INIT_BUF
-  hw/ide: drop iov field from IDEState
-  hw/ide: drop iov field from IDEBufferedRequest
-  hw/ide: drop iov field from IDEDMA
-
- include/hw/ide/internal.h |  3 --
- include/qemu/iov.h        | 64 +++++++++++++++++++++++++++-
- block/backup.c            |  5 +--
- block/block-backend.c     | 13 +-----
- block/commit.c            |  7 +--
- block/io.c                | 89 +++++++++------------------------------
- block/parallels.c         | 13 +++---
- block/qcow.c              | 21 ++-------
- block/qcow2.c             | 12 +-----
- block/qed-table.c         | 16 ++-----
- block/qed.c               | 31 ++++----------
- block/stream.c            |  7 +--
- block/vmdk.c              |  7 +--
- hw/ide/atapi.c            | 14 +++---
- hw/ide/core.c             | 19 ++++-----
- migration/block.c         | 10 ++---
- qemu-img.c                | 10 +----
- tests/test-bdrv-drain.c   | 29 ++-----------
- 18 files changed, 134 insertions(+), 236 deletions(-)
-
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index ee1740ff06..821be405f0 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -204,12 +204,7 @@ static void test_drv_cb_common(enum drain_type drain_type, bool recursive)
+     BlockAIOCB *acb;
+     int aio_ret;
+ 
+-    QEMUIOVector qiov;
+-    struct iovec iov = {
+-        .iov_base = NULL,
+-        .iov_len = 0,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, 0);
+ 
+     blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
+     bs = bdrv_new_open_driver(&bdrv_test, "test-node", BDRV_O_RDWR,
+@@ -670,12 +665,7 @@ static void test_iothread_common(enum drain_type drain_type, int drain_thread)
+     AioContext *ctx_a = iothread_get_aio_context(a);
+     AioContext *ctx_b = iothread_get_aio_context(b);
+ 
+-    QEMUIOVector qiov;
+-    struct iovec iov = {
+-        .iov_base = NULL,
+-        .iov_len = 0,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, 0);
+ 
+     /* bdrv_drain_all() may only be called from the main loop thread */
+     if (drain_type == BDRV_DRAIN_ALL && drain_thread != 0) {
+@@ -1148,13 +1138,7 @@ static void coroutine_fn test_co_delete_by_drain(void *opaque)
+     BlockDriverState *bs = blk_bs(blk);
+     BDRVTestTopState *tts = bs->opaque;
+     void *buffer = g_malloc(65536);
+-    QEMUIOVector qiov;
+-    struct iovec iov = {
+-        .iov_base = buffer,
+-        .iov_len  = 65536,
+-    };
+-
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buffer, 65536);
+ 
+     /* Pretend some internal write operation from parent to child.
+      * Important: We have to read from the child, not from the parent!
+@@ -1365,12 +1349,7 @@ static void test_detach_indirect(bool by_parent_cb)
+     BdrvChild *child_a, *child_b;
+     BlockAIOCB *acb;
+ 
+-    QEMUIOVector qiov;
+-    struct iovec iov = {
+-        .iov_base = NULL,
+-        .iov_len = 0,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, 0);
+ 
+     if (!by_parent_cb) {
+         detach_by_driver_cb_role = child_file;
 -- 
 2.18.0
