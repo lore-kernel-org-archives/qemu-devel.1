@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41106)
+Received: from eggs.gnu.org ([209.51.188.92]:41171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1groYr-0000P7-HY
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:10 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1groYt-0000RL-Tv
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1groYn-0007fz-O4
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:07 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33341)
+	(envelope-from <alex.bennee@linaro.org>) id 1groYr-0007l5-SM
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:11 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:33725)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1groYl-0007UL-1Q
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:03 -0500
-Received: by mail-wr1-x441.google.com with SMTP id a16so997741wrv.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:37:58 -0800 (PST)
+	id 1groYr-0007Np-K2
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:09 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id a16so997547wrv.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:37:54 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  7 Feb 2019 18:37:40 +0000
-Message-Id: <20190207183744.5054-13-alex.bennee@linaro.org>
+Date: Thu,  7 Feb 2019 18:37:35 +0000
+Message-Id: <20190207183744.5054-8-alex.bennee@linaro.org>
 In-Reply-To: <20190207183744.5054-1-alex.bennee@linaro.org>
 References: <20190207183744.5054-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 12/16] tests/vm: move images to
- $HOME/.cache/qemu-vm/images
+Subject: [Qemu-devel] [PATCH v2 07/16] docker: add debian-buster-arm64-cross
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +30,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+We can't build QEMU with this but we can use this image to build newer
+arm64 testcases which need more up to date tools.
 
-It's easier to move around the images then, by replacing the
-subdirectory with a symlink.  Allows to share the images between
-multiple qemu checkouts for example.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/vm/Makefile.include | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ tests/docker/Makefile.include                 |  1 +
+ .../debian-buster-arm64-cross.docker          | 15 +++++++++
+ tests/docker/dockerfiles/debian10.docker      | 31 +++++++++++++++++++
+ tests/tcg/aarch64/Makefile.include            |  2 +-
+ 4 files changed, 48 insertions(+), 1 deletion(-)
+ create mode 100644 tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian10.docker
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index a98fb3027f..a58383d263 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -3,7 +3,8 @@
- .PHONY: vm-build-all vm-clean-all
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 7032c68895..83d43c50e4 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -90,6 +90,7 @@ docker-image-debian-amd64: docker-image-debian9
+ docker-image-debian-armel-cross: docker-image-debian9
+ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-arm64-cross: docker-image-debian9
++docker-image-debian-buster-arm64-cross: docker-image-debian10
+ docker-image-debian-mips-cross: docker-image-debian9
+ docker-image-debian-mipsel-cross: docker-image-debian9
+ docker-image-debian-mips64el-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian-buster-arm64-cross.docker b/tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+new file mode 100644
+index 0000000000..33ada13806
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+@@ -0,0 +1,15 @@
++#
++# Docker arm64 cross-compiler target
++#
++# This docker target builds on the Debian's Buster base image. There
++# are no QEMU pre-requistes so this image can only be used to build
++# test cases.
++#
++FROM qemu:debian10
++
++# Add the foreign architecture we want and install dependencies
++RUN dpkg --add-architecture arm64
++RUN apt update
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        crossbuild-essential-arm64
+diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
+new file mode 100644
+index 0000000000..aeeb151b52
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian10.docker
+@@ -0,0 +1,31 @@
++#
++# Docker multiarch cross-compiler target
++#
++# This docker target is builds on Debian cross compiler targets to build distro
++# with a selection of cross compilers for building test binaries.
++#
++# On its own you can't build much but the docker-foo-cross targets
++# build on top of the base debian image.
++#
++FROM debian:buster-slim
++
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
++
++# Install common build utilities
++RUN apt update
++RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        clang \
++        flex \
++        gettext \
++        git \
++        pkg-config \
++        psmisc \
++        python \
++        texinfo \
++        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+diff --git a/tests/tcg/aarch64/Makefile.include b/tests/tcg/aarch64/Makefile.include
+index de32c91235..5d4e4c6f99 100644
+--- a/tests/tcg/aarch64/Makefile.include
++++ b/tests/tcg/aarch64/Makefile.include
+@@ -3,6 +3,6 @@
+ # We don't have any bigendian build tools so we only use this for AArch64
  
- IMAGES := ubuntu.i386 freebsd netbsd openbsd centos
--IMAGE_FILES := $(patsubst %, tests/vm/%.img, $(IMAGES))
-+IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
-+IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
- 
- .PRECIOUS: $(IMAGE_FILES)
- 
-@@ -24,9 +25,10 @@ vm-build-all: $(addprefix vm-build-, $(IMAGES))
- vm-clean-all:
- 	rm -f $(IMAGE_FILES)
- 
--tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
--		$(SRC_PATH)/tests/vm/basevm.py \
--		$(SRC_PATH)/tests/vm/Makefile.include
-+$(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
-+			$(SRC_PATH)/tests/vm/basevm.py \
-+			$(SRC_PATH)/tests/vm/Makefile.include
-+	@mkdir -p $(IMAGES_DIR)
- 	$(call quiet-command, \
- 		$< \
- 		$(if $(V)$(DEBUG), --debug) \
-@@ -37,7 +39,7 @@ tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
- 
- 
- # Build in VM $(IMAGE)
--vm-build-%: tests/vm/%.img
-+vm-build-%: $(IMAGES_DIR)/%.img
- 	$(call quiet-command, \
- 		$(SRC_PATH)/tests/vm/$* \
- 		$(if $(V)$(DEBUG), --debug) \
+ ifeq ($(TARGET_NAME),aarch64)
+-DOCKER_IMAGE=debian-arm64-cross
++DOCKER_IMAGE=debian-buster-arm64-cross
+ DOCKER_CROSS_COMPILER=aarch64-linux-gnu-gcc
+ endif
 -- 
 2.20.1
