@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50921)
+Received: from eggs.gnu.org ([209.51.188.92]:51066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grpBO-0007eT-5L
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 14:17:58 -0500
+	(envelope-from <mst@redhat.com>) id 1grpBw-00083U-LE
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 14:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grpBN-0001ZB-AU
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 14:17:58 -0500
-References: <20190114162605.5330-1-eblake@redhat.com>
-	<20190114162605.5330-20-eblake@redhat.com>
-	<CAFEAcA83L0jFLVDK8ebF2pxtAqoM+YsTU2vYUx2y7-PbSuEW9g@mail.gmail.com>
-	<60feac5a-d45e-bfd0-b0c8-45e16aa95e6b@redhat.com>
-	<CAFEAcA93i079grGNsNurdme8Et-Up_hg+_R0txXAXUYdLCxpFg@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cd0f9e38-cc1f-2d53-b1fd-3d59340cb5eb@redhat.com>
-Date: Thu, 7 Feb 2019 13:17:41 -0600
+	(envelope-from <mst@redhat.com>) id 1grpBt-0001yi-4w
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 14:18:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grpBq-0001vv-Q6
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 14:18:27 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1807D3DE0E
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 19:18:24 +0000 (UTC)
+Date: Thu, 7 Feb 2019 14:18:17 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190207141559-mutt-send-email-mst@kernel.org>
+References: <20190207165449.6125-1-marcandre.lureau@redhat.com>
+	<20190207165449.6125-6-marcandre.lureau@redhat.com>
+	<20190207122432-mutt-send-email-mst@kernel.org>
+	<CAMxuvaw1XW33zVxYb7sGLVXABBOrO_x206X1sffvYnJ5-Ge9gA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA93i079grGNsNurdme8Et-Up_hg+_R0txXAXUYdLCxpFg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XrAZVfxNGHXUHpV8ja2ouCGgfZQ8Yo7cS"
-Subject: Re: [Qemu-devel] [PULL 19/20] nbd: Merge nbd_export_bitmap into
- nbd_export_new
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAMxuvaw1XW33zVxYb7sGLVXABBOrO_x206X1sffvYnJ5-Ge9gA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/12] Add vhost-user-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +36,505 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XrAZVfxNGHXUHpV8ja2ouCGgfZQ8Yo7cS
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <cd0f9e38-cc1f-2d53-b1fd-3d59340cb5eb@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 19/20] nbd: Merge nbd_export_bitmap into
- nbd_export_new
-References: <20190114162605.5330-1-eblake@redhat.com>
- <20190114162605.5330-20-eblake@redhat.com>
- <CAFEAcA83L0jFLVDK8ebF2pxtAqoM+YsTU2vYUx2y7-PbSuEW9g@mail.gmail.com>
- <60feac5a-d45e-bfd0-b0c8-45e16aa95e6b@redhat.com>
- <CAFEAcA93i079grGNsNurdme8Et-Up_hg+_R0txXAXUYdLCxpFg@mail.gmail.com>
-In-Reply-To: <CAFEAcA93i079grGNsNurdme8Et-Up_hg+_R0txXAXUYdLCxpFg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/7/19 1:05 PM, Peter Maydell wrote:
-> On Thu, 7 Feb 2019 at 19:00, Eric Blake <eblake@redhat.com> wrote:
->> (Someday, it would be
->> nice to turn -Wshadow on, to catch stuff like this sooner)
+On Thu, Feb 07, 2019 at 07:29:20PM +0100, Marc-Andr=E9 Lureau wrote:
+> Hi
 >=20
-> Yes; unfortunately -Wshadow currently generates a ton of
-> warnings in existing code which we'd need to fix to get
-> the noise level down...
+> On Thu, Feb 7, 2019 at 6:36 PM Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
+> >
+> > On Thu, Feb 07, 2019 at 05:54:42PM +0100, Marc-Andr=E9 Lureau wrote:
+> > > Create a vhost-user-backend object that holds a connection to a
+> > > vhost-user backend and can be referenced from virtio devices that
+> > > support it. See later patches for input & gpu usage.
+> > >
+> > > A chardev must be specified to communicate with the vhost-user
+> > > backend, ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -objec=
+t
+> > > vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
+> > >
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > So having an internal object that can maintain runtime state
+> > might be a good idea. However I don't yet really see
+> > what kind of property could such an object have that
+> > the char device couldn't.>
+> > I could see value if user did not have to specify
+> > a completely separate device.
+> >
+> > Consider:
+> >
+> > -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock
+> > -object vhost-user-backend,id=3Dvuid,chardev=3Dchar0
+> > -device vhost-user-input-pci,vhost-user=3Dvuid
+> >
+> >
+> > There's 3 times vhost-user here, and nothing actually says it's
+> > virtio-input, that is implicit :(
+> >
+> > So I feel CLI needs to change.  But I do think the idea of
+> > an object in between does have some potential.
+>=20
+> Ok, I dropped the -object from CLI. It can be added later if needed.
+>=20
+> It makes some sense imho to wrap all the configuration/documentation
+> in a backend object. But since we have only chardev=3D now (cmd=3D is
+> being postponed), and I can only speculate on what could come next,
+> let's just have it as internal helper for now.
+>=20
+> I'll adjust/resend this series, this will also impact the -gpu and
+> libvirt series.
 
-I've added the wish to https://wiki.qemu.org/BiteSizedTasks
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+But, can we make it so that these devices are created using
+-device virtio-gpu-pci etc?
+This is not a vhost user device, vhost user is the backend.
 
 
---XrAZVfxNGHXUHpV8ja2ouCGgfZQ8Yo7cS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxchFUACgkQp6FrSiUn
-Q2qvcwf/b+c+1joKiyEwADUZX+NvR46gBgUCViGuNJEFJxa+F5qtlGaS0YLriAye
-6ZQTO8yAR/P0AbT0newt/j+jrQNwtKbu3DHJf3U5yFlczIObvXpMp07b0/v+etWr
-Qmd7rsavo6R4W8Jx40tOvgarSjn0rMIJwmKXoyfWPzv/JzxSaQ+mCmYPCtWf8iLr
-on66ePGmtm7BqOD9aQpa7sdcQEfAtCiEgBX0lm+N6qUxhgd9cK3Q3093jXJHIWK1
-tQM0YzoHY7ehOIk0+JTy3tGAT0nomsxLwEujqtEmV9YCZh4SsQWGQOawo59LPRD7
-RV1Z2z1GaiFSxRhsU8+qD52f9VII8w==
-=5wEv
------END PGP SIGNATURE-----
-
---XrAZVfxNGHXUHpV8ja2ouCGgfZQ8Yo7cS--
+> >
+> > Consider virtio net which now has modern, legacy and transitional
+> > variants. How is vhost-user-X type going to scale there?
+> > That's a problem worth solving IMHO.
+> >
+> > Also, there's a problem right now in that if backend
+> > connects before device is available (e.g. because we
+> > want to hotplug the device later) then we can not
+> > validate the backend. So it will fail way later.
+> > I am not sure how much do we want to validate,
+> > but if e.g. it's a different device type completely,
+> > that seems like a reasonable thing to validate.
+> >
+> > So I do see potential in a vhost user backend object
+> > but then it has to encapsulate all vhost user things,
+> > such that you can connect a virtio device to a
+> > vhost user object.
+> >
+> >
+> >
+> >
+> >
+> > > ---
+> > >  include/sysemu/vhost-user-backend.h |  60 +++++++
+> > >  backends/vhost-user.c               | 244 ++++++++++++++++++++++++=
+++++
+> > >  vl.c                                |   3 +-
+> > >  MAINTAINERS                         |   2 +
+> > >  backends/Makefile.objs              |   3 +-
+> > >  qemu-options.hx                     |  20 +++
+> > >  6 files changed, 330 insertions(+), 2 deletions(-)
+> > >  create mode 100644 include/sysemu/vhost-user-backend.h
+> > >  create mode 100644 backends/vhost-user.c
+> > >
+> > > diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/v=
+host-user-backend.h
+> > > new file mode 100644
+> > > index 0000000000..60f811cae7
+> > > --- /dev/null
+> > > +++ b/include/sysemu/vhost-user-backend.h
+> > > @@ -0,0 +1,60 @@
+> > > +/*
+> > > + * QEMU vhost-user backend
+> > > + *
+> > > + * Copyright (C) 2018 Red Hat Inc
+> > > + *
+> > > + * Authors:
+> > > + *  Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2=
+ or later.
+> > > + * See the COPYING file in the top-level directory.
+> > > + */
+> > > +#ifndef QEMU_VHOST_USER_BACKEND_H
+> > > +#define QEMU_VHOST_USER_BACKEND_H
+> > > +
+> > > +#include "qom/object.h"
+> > > +#include "exec/memory.h"
+> > > +#include "qemu/option.h"
+> > > +#include "qemu/bitmap.h"
+> > > +#include "hw/virtio/vhost.h"
+> > > +#include "hw/virtio/vhost-user.h"
+> > > +#include "chardev/char-fe.h"
+> > > +#include "io/channel.h"
+> > > +
+> > > +#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
+> > > +#define VHOST_USER_BACKEND(obj) \
+> > > +    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
+> > > +#define VHOST_USER_BACKEND_GET_CLASS(obj) \
+> > > +    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER=
+_BACKEND)
+> > > +#define VHOST_USER_BACKEND_CLASS(klass) \
+> > > +    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_=
+USER_BACKEND)
+> > > +
+> > > +typedef struct VhostUserBackend VhostUserBackend;
+> > > +typedef struct VhostUserBackendClass VhostUserBackendClass;
+> > > +
+> > > +struct VhostUserBackendClass {
+> > > +    ObjectClass parent_class;
+> > > +};
+> > > +
+> > > +struct VhostUserBackend {
+> > > +    /* private */
+> > > +    Object parent;
+> > > +
+> > > +    char *cmd;
+> > > +    char *chr_name;
+> > > +
+> > > +    CharBackend chr;
+> > > +    VhostUserState vhost_user;
+> > > +    struct vhost_dev dev;
+> > > +    QIOChannel *child;
+> > > +    VirtIODevice *vdev;
+> > > +    bool started;
+> > > +    bool completed;
+> > > +};
+> > > +
+> > > +int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice =
+*vdev,
+> > > +                                unsigned nvqs, Error **errp);
+> > > +void vhost_user_backend_start(VhostUserBackend *b);
+> > > +void vhost_user_backend_stop(VhostUserBackend *b);
+> > > +
+> > > +#endif
+> > > diff --git a/backends/vhost-user.c b/backends/vhost-user.c
+> > > new file mode 100644
+> > > index 0000000000..bf39c0751d
+> > > --- /dev/null
+> > > +++ b/backends/vhost-user.c
+> > > @@ -0,0 +1,244 @@
+> > > +/*
+> > > + * QEMU vhost-user backend
+> > > + *
+> > > + * Copyright (C) 2018 Red Hat Inc
+> > > + *
+> > > + * Authors:
+> > > + *  Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2=
+ or later.
+> > > + * See the COPYING file in the top-level directory.
+> > > + */
+> > > +
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include "hw/qdev.h"
+> > > +#include "qapi/error.h"
+> > > +#include "qapi/qmp/qerror.h"
+> > > +#include "qemu/error-report.h"
+> > > +#include "qom/object_interfaces.h"
+> > > +#include "sysemu/vhost-user-backend.h"
+> > > +#include "sysemu/kvm.h"
+> > > +#include "io/channel-command.h"
+> > > +#include "hw/virtio/virtio-bus.h"
+> > > +
+> > > +static bool
+> > > +ioeventfd_enabled(void)
+> > > +{
+> > > +    return kvm_enabled() && kvm_eventfds_enabled();
+> > > +}
+> > > +
+> > > +int
+> > > +vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vde=
+v,
+> > > +                            unsigned nvqs, Error **errp)
+> > > +{
+> > > +    int ret;
+> > > +
+> > > +    assert(!b->vdev && vdev);
+> > > +
+> > > +    if (!ioeventfd_enabled()) {
+> > > +        error_setg(errp, "vhost initialization failed: requires kv=
+m");
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    b->vdev =3D vdev;
+> > > +    b->dev.nvqs =3D nvqs;
+> > > +    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
+> > > +
+> > > +    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_=
+TYPE_USER, 0);
+> > > +    if (ret < 0) {
+> > > +        error_setg_errno(errp, -ret, "vhost initialization failed"=
+);
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    return 0;
+> > > +}
+> > > +
+> > > +void
+> > > +vhost_user_backend_start(VhostUserBackend *b)
+> > > +{
+> > > +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
+> > > +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> > > +    int ret, i ;
+> > > +
+> > > +    if (b->started) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!k->set_guest_notifiers) {
+> > > +        error_report("binding does not support guest notifiers");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
+> > > +    if (ret < 0) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true=
+);
+> > > +    if (ret < 0) {
+> > > +        error_report("Error binding guest notifier");
+> > > +        goto err_host_notifiers;
+> > > +    }
+> > > +
+> > > +    b->dev.acked_features =3D b->vdev->guest_features;
+> > > +    ret =3D vhost_dev_start(&b->dev, b->vdev);
+> > > +    if (ret < 0) {
+> > > +        error_report("Error start vhost dev");
+> > > +        goto err_guest_notifiers;
+> > > +    }
+> > > +
+> > > +    /* guest_notifier_mask/pending not used yet, so just unmask
+> > > +     * everything here.  virtio-pci will do the right thing by
+> > > +     * enabling/disabling irqfd.
+> > > +     */
+> > > +    for (i =3D 0; i < b->dev.nvqs; i++) {
+> > > +        vhost_virtqueue_mask(&b->dev, b->vdev,
+> > > +                             b->dev.vq_index + i, false);
+> > > +    }
+> > > +
+> > > +    b->started =3D true;
+> > > +    return;
+> > > +
+> > > +err_guest_notifiers:
+> > > +    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
+> > > +err_host_notifiers:
+> > > +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
+> > > +}
+> > > +
+> > > +void
+> > > +vhost_user_backend_stop(VhostUserBackend *b)
+> > > +{
+> > > +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
+> > > +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> > > +    int ret =3D 0;
+> > > +
+> > > +    if (!b->started) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    vhost_dev_stop(&b->dev, b->vdev);
+> > > +
+> > > +    if (k->set_guest_notifiers) {
+> > > +        ret =3D k->set_guest_notifiers(qbus->parent,
+> > > +                                     b->dev.nvqs, false);
+> > > +        if (ret < 0) {
+> > > +            error_report("vhost guest notifier cleanup failed: %d"=
+, ret);
+> > > +        }
+> > > +    }
+> > > +    assert(ret >=3D 0);
+> > > +
+> > > +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
+> > > +    b->started =3D false;
+> > > +}
+> > > +
+> > > +static void
+> > > +vhost_user_backend_complete(UserCreatable *uc, Error **errp)
+> > > +{
+> > > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(uc);
+> > > +    Chardev *chr;
+> > > +
+> > > +    if (!b->chr_name) {
+> > > +        error_setg(errp, "You must specificy 'chardev'.");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    chr =3D qemu_chr_find(b->chr_name);
+> > > +    if (chr =3D=3D NULL) {
+> > > +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> > > +                  "Chardev '%s' not found", b->chr_name);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    b->completed =3D true;
+> > > +    /* could vhost_dev_init() happen here, so early vhost-user mes=
+sage
+> > > +     * can be exchanged */
+> > > +}
+> > > +
+> > > +static void set_chardev(Object *obj, const char *value, Error **er=
+rp)
+> > > +{
+> > > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
+> > > +
+> > > +    if (b->completed) {
+> > > +        error_setg(errp, QERR_PERMISSION_DENIED);
+> > > +    } else {
+> > > +        g_free(b->chr_name);
+> > > +        b->chr_name =3D g_strdup(value);
+> > > +    }
+> > > +}
+> > > +
+> > > +static char *get_chardev(Object *obj, Error **errp)
+> > > +{
+> > > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
+> > > +    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
+> > > +
+> > > +    if (chr && chr->label) {
+> > > +        return g_strdup(chr->label);
+> > > +    }
+> > > +
+> > > +    return NULL;
+> > > +}
+> > > +
+> > > +static void vhost_user_backend_init(Object *obj)
+> > > +{
+> > > +    object_property_add_str(obj, "chardev", get_chardev, set_chard=
+ev, NULL);
+> > > +}
+> > > +
+> > > +static void vhost_user_backend_finalize(Object *obj)
+> > > +{
+> > > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
+> > > +
+> > > +    g_free(b->dev.vqs);
+> > > +    g_free(b->chr_name);
+> > > +
+> > > +    vhost_user_cleanup(&b->vhost_user);
+> > > +    qemu_chr_fe_deinit(&b->chr, true);
+> > > +
+> > > +    if (b->child) {
+> > > +        object_unref(OBJECT(b->child));
+> > > +    }
+> > > +}
+> > > +
+> > > +static bool
+> > > +vhost_user_backend_can_be_deleted(UserCreatable *uc)
+> > > +{
+> > > +    return true;
+> > > +}
+> > > +
+> > > +static void
+> > > +vhost_user_backend_class_init(ObjectClass *oc, void *data)
+> > > +{
+> > > +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+> > > +
+> > > +    ucc->complete =3D vhost_user_backend_complete;
+> > > +    ucc->can_be_deleted =3D vhost_user_backend_can_be_deleted;
+> > > +}
+> > > +
+> > > +static const TypeInfo vhost_user_backend_info =3D {
+> > > +    .name =3D TYPE_VHOST_USER_BACKEND,
+> > > +    .parent =3D TYPE_OBJECT,
+> > > +    .instance_size =3D sizeof(VhostUserBackend),
+> > > +    .instance_init =3D vhost_user_backend_init,
+> > > +    .instance_finalize =3D vhost_user_backend_finalize,
+> > > +    .class_size =3D sizeof(VhostUserBackendClass),
+> > > +    .class_init =3D vhost_user_backend_class_init,
+> > > +    .interfaces =3D (InterfaceInfo[]) {
+> > > +        { TYPE_USER_CREATABLE },
+> > > +        { }
+> > > +    }
+> > > +};
+> > > +
+> > > +static void register_types(void)
+> > > +{
+> > > +    type_register_static(&vhost_user_backend_info);
+> > > +}
+> > > +
+> > > +type_init(register_types);
+> > > diff --git a/vl.c b/vl.c
+> > > index 9e4dba7f92..43012ee6a3 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -2784,7 +2784,8 @@ static bool object_create_initial(const char =
+*type, QemuOpts *opts)
+> > >      }
+> > >
+> > >  #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+> > > -    if (g_str_equal(type, "cryptodev-vhost-user")) {
+> > > +    if (g_str_equal(type, "cryptodev-vhost-user") ||
+> > > +        g_str_equal(type, "vhost-user-backend")) {
+> > >          return false;
+> > >      }
+> > >  #endif
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 16b6264412..e077fe788d 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -1424,6 +1424,8 @@ F: hw/*/*vhost*
+> > >  F: docs/interop/vhost-user.json
+> > >  F: docs/interop/vhost-user.txt
+> > >  F: contrib/vhost-user-*/
+> > > +F: backends/vhost-user.c
+> > > +F: include/sysemu/vhost-user-backend.h
+> > >
+> > >  virtio
+> > >  M: Michael S. Tsirkin <mst@redhat.com>
+> > > diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+> > > index 717fcbdae4..a5ec0bf907 100644
+> > > --- a/backends/Makefile.objs
+> > > +++ b/backends/Makefile.objs
+> > > @@ -12,7 +12,8 @@ common-obj-y +=3D cryptodev-builtin.o
+> > >  ifeq ($(CONFIG_VIRTIO),y)
+> > >  common-obj-y +=3D cryptodev-vhost.o
+> > >  common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D =
+\
+> > > -    cryptodev-vhost-user.o
+> > > +    cryptodev-vhost-user.o \
+> > > +    vhost-user.o
+> > >  endif
+> > >
+> > >  common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
+> > > diff --git a/qemu-options.hx b/qemu-options.hx
+> > > index 06ef1a7c5c..24315a4cda 100644
+> > > --- a/qemu-options.hx
+> > > +++ b/qemu-options.hx
+> > > @@ -4203,6 +4203,26 @@ secondary:
+> > >  If you want to know the detail of above command line, you can read
+> > >  the colo-compare git log.
+> > >
+> > > +@item -object vhost-user-backend,id=3Did=3D@var{id},chardev=3D@var=
+{chardevid}
+> > > +
+> > > +Create a vhost-user-backend object that holds a connection to a
+> > > +vhost-user backend and can be referenced from virtio/vhost-user
+> > > +devices that support it.
+> > > +
+> > > +The @var{id} parameter is a unique ID that will be used to referen=
+ce
+> > > +this vhost-user backend from the @option{vhost-user} device. The
+> > > +@var{chardev} parameter is the unique ID of a character device bac=
+kend
+> > > +that provides the connection to the vhost-user slave process. (Sin=
+ce 3.2)
+> > > +
+> > > +@example
+> > > +
+> > > + # qemu-system-x86_64 \
+> > > +   [...] \
+> > > +   -object vhost-user-backend,id=3Dvuid,chardev=3Dchar0 \
+> > > +   -device vhost-user-input-pci,vhost-user=3Dvuid
+> > > +   [...]
+> > > +@end example
+> > > +
+> > >  @item -object cryptodev-backend-builtin,id=3D@var{id}[,queues=3D@v=
+ar{queues}]
+> > >
+> > >  Creates a cryptodev backend which executes crypto opreation from
+> > > --
+> > > 2.20.1.519.g8feddda32c
