@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42590)
+Received: from eggs.gnu.org ([209.51.188.92]:42809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1grof0-0005jA-9M
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:44:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1grofc-0006Hh-Gx
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:45:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1groez-0004hr-CW
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:44:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43166
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1groez-0004g9-70
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:44:29 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x17IdXjZ044072
-	for <qemu-devel@nongnu.org>; Thu, 7 Feb 2019 13:44:27 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qgrq0wmne-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 13:44:26 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Thu, 7 Feb 2019 18:44:25 -0000
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Date: Thu,  7 Feb 2019 16:43:46 -0200
+	(envelope-from <alex.bennee@linaro.org>) id 1grofb-0005KO-Lr
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:45:08 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40969)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1grofb-0005JJ-D0
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:45:07 -0500
+Received: by mail-wr1-x444.google.com with SMTP id x10so955058wrs.8
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:45:07 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  7 Feb 2019 18:37:43 +0000
+Message-Id: <20190207183744.5054-16-alex.bennee@linaro.org>
+In-Reply-To: <20190207183744.5054-1-alex.bennee@linaro.org>
+References: <20190207183744.5054-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Message-Id: <20190207184346.6840-1-muriloo@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] docs/devel/testing: Add -a option to usermod
- command on docker setup
+Subject: [Qemu-devel] [PATCH  v2 15/16] tests/vm: expose BUILD_TARGET,
+ TARGET_LIST and EXTRA_CONFIGURE_OPTS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,41 +31,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mopsfelder@gmail.com, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-trivial@nongnu.org
+Cc: qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-The option -G of usermod command will remove user from other groups
-not listed, i.e.: $USER will belong only to group 'docker' after
-following the documentation as is.
+Now the underlying basevm support passes these along we can expose
+some additional variables to our Makefile to allow more customised
+tweaking of the build. For example:
 
->From usermod(8) manual page:
+  make vm-build-freebsd TARGET_LIST=aarch64-softmmu \
+    EXTRA_CONFIGURE_OPTS="--disable-tools --disable-docs" \
+    BUILD_TARGET=check-softfloat
 
-    If the user is currently a member of a group which is not listed,
-    the user will be removed from the group. This behaviour can be
-    changed via the -a option, which appends the user to the current
-    supplementary group list.
-
-This patch improves the situation by adding the -a option to the
-usermod command, which will just append user to the supplementary
-group list.
-
-Cc: qemu-trivial@nongnu.org
-Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- docs/devel/testing.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/vm/Makefile.include | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 18e2c0868a..135743a2bf 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -301,7 +301,7 @@ An alternative method to set up permissions is by adding the current user to
- .. code::
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index a58383d263..992d823f6b 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -19,6 +19,11 @@ vm-test:
+ 	@echo ""
+ 	@echo "  vm-build-all                    - Build QEMU in all VMs"
+ 	@echo "  vm-clean-all                    - Clean up VM images"
++	@echo
++	@echo "Special variables:"
++	@echo "    BUILD_TARGET=foo		 - override the build target"
++	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds."
++	@echo '    EXTRA_CONFIGURE_OPTS="..."'
  
-   $ sudo groupadd docker
--  $ sudo usermod $USER -G docker
-+  $ sudo usermod $USER -a -G docker
-   $ sudo chown :docker /var/run/docker.sock
+ vm-build-all: $(addprefix vm-build-, $(IMAGES))
  
- Note that any one of above configurations makes it possible for the user to
+@@ -47,6 +52,9 @@ vm-build-%: $(IMAGES_DIR)/%.img
+ 		$(if $(J),--jobs $(J)) \
+ 		$(if $(V),--verbose) \
+ 		--image "$<" \
+-		--build-qemu $(SRC_PATH), \
++		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
++		--build-qemu $(SRC_PATH) -- \
++		$(if $(TARGET_LIST),--target-list=$(TARGET_LIST)) \
++		$(if $(EXTRA_CONFIGURE_OPTS),$(EXTRA_CONFIGURE_OPTS)), \
+ 		"  VM-BUILD $*")
+ 
 -- 
 2.20.1
