@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54271)
+Received: from eggs.gnu.org ([209.51.188.92]:55053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grk3u-0003YM-0b
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:49:55 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grk6y-0004eJ-Q2
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:53:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grk3s-0001Ds-TK
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:49:53 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<87mun8gd2x.fsf@dusky.pond.sub.org>
-	<4675f707-1215-80ac-fc27-362688e51df9@redhat.com>
-Date: Thu, 07 Feb 2019 14:49:25 +0100
-In-Reply-To: <4675f707-1215-80ac-fc27-362688e51df9@redhat.com> (Laszlo Ersek's
-	message of "Thu, 7 Feb 2019 13:31:13 +0100")
-Message-ID: <87sgwzd7yy.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grk6w-0002qo-OI
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:53:04 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1grk6w-0002pl-4m
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:53:02 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c8so4829741wrs.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 05:53:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
+	<CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
+	<20190207132935.ijtfsiafpfggugiz@function>
+In-Reply-To: <20190207132935.ijtfsiafpfggugiz@function>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 7 Feb 2019 14:52:48 +0100
+Message-ID: <CAJ+F1CLc0kK30ZVOkksfSBNTbooYGv-Pf1AYwKAntVB4-QUiYQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Subject: Re: [Qemu-devel] [PULLv3 00/32] More work towards libslirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+Hi
 
-> Hi Markus,
+On Thu, Feb 7, 2019 at 2:31 PM Samuel Thibault <samuel.thibault@gnu.org> wr=
+ote:
 >
-> On 02/07/19 10:30, Markus Armbruster wrote:
->> The thread got long, let me try to summarize, and elaborate a few
->> points.
->>=20
->> * The problem at hand is configuring firmware residing in flash memory
->>   (OVMF requires this) without legacy -drive.
->>=20
->> * The wider problem is configuring onboard devices.  Our general device
->>   configuration interface doesn't cover them.  Instead, we have a zoo of
->>   ad hoc interfaces that are much more limited.  Some of them we'd
->>   rather deprecate (-drive, -net), but can't until we have a suitable
->>   replacements.
->>=20
->>   I think a board should be a composite object that exposes properties
->>   of its own and its parts, just like other composite devices, so that
->>   "create, set properties, realize" just works.  That would extend our
->>   common device configuration mechanism naturally to onboard devices.
->>=20
->>   A PC board's flash memory device would be just another part.  It could
->>   be something like /machine/q35/cfi.pflash01/ in the QOM tree.  To
->>   configure it, you'd set its properties, such as
->>   /machine/q35/cfi.pflash01/drive.
->>=20
->>   Note that this requires a way to set an existing device's properties.
->>   Perhaps qom-set already works.
->>=20
->> * While I do believe we should tackle the wider problem, I'd rather not
->>   sit on the narrow problem until we crack it.  So, what can we do about
->>   it?
->>=20
->>   - Paolo proposed to add block backend properties to the PC machine,
->>     settable like -machine pflash0=3DBLOCK-BACKEND.
->>=20
->>     Possible drawback: if we add /machine/q35/pflash0 to the QOM tree
->>     now, and later replace it by /machine/q35/cfi.pflash01/drive, we'll
->>     have to deal with yet another machine type variation.  We'll live.
->>=20
->>   - I proposed to sidestep our onboard device configuration problem by
->>     adding the cfi.pflash01 devices with our existing general device
->>     configuration interface: -device.  Possible since the onboard
->>     cfi.pflash01 devices are optional.  Requires a small extension to
->>     the firmware descriptors, and a bit of extra work in libvirt to
->>     process that extension.  I think it's workable, but Paolo's idea is
->>     simpler.
->>=20
->>   I can give Paolo's idea a try.  Objections?
->>=20
->> * A flash device supporting multiple regions is desirable, because it's
->>   what physical hardware has.  We currently use multiple flash devices
->>   instead.  We'll be stuck with them for existing machine types due to
->>   guest ABI and migration compatibility.
->>=20
->> * cfi.pflash01 currently requires users to opt out of "bad, do not use".
->>   It should require opt in, to guard against accidental new uses of
->>   "bad".
->>=20
->>=20
->> PS: Big thanks to L=C3=A1szl=C3=B3, whose patient guidance helped me map=
- this part
->> of the jungle.
->>=20
+> Peter Maydell, le jeu. 07 f=C3=A9vr. 2019 11:46:23 +0000, a ecrit:
+> > On Tue, 5 Feb 2019 at 18:28, Samuel Thibault
+> > <samuel.thibault@ens-lyon.org> wrote:
+> > >
+> > > The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a35=
+6e159d:
+> > >
+> > >   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pull-=
+request' into staging (2019-02-05 14:01:29 +0000)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+> > >
+> > > for you to fetch changes up to 1e924479dce65a26a7432bf5920f89c1bf957d=
+74:
+> > >
+> > >   slirp: API is extern C (2019-02-05 20:27:27 +0200)
+> > >
+> > > ----------------------------------------------------------------
+> > > More work towards libslirp
+> > >
+> >
+> > Format string issues for the Windows build:
 >
-> I've read the above carefully.
+> Oh, I am not getting these errors with make docker-test-mingw@fedora,
+> perhaps something would need to be fixed there to test as much as you do?
 >
-> At the QEMU design level, I don't have any opinion or preference; there
-> I simply don't know enough -- and don't suffer from bad decisions enough
-> -- to make sensible comments.
+> > All the other builds went OK.
 >
-> Regarding the choice betwen "-machine pflash0=3DBLOCK-BACKEND" and
-> "-device pflash": I don't object to exploring the former first.
+> Good :) I'll have a look at these formatting issues.
 >
-> I'd just like to note that "-machine pflash0=3DBLOCK-BACKEND" will also
-> require changes to the firmware descriptor schema. Not to the types that
-> the schema defines -- and therefore concrete descriptor *documents* that
-> already conform to the schema wouldn't be affected --, but to the
-> documentation that the schema directs at management applications.
->
-> The schema is supposed to specify (in the documentation) QEMU command
-> line options for management applications. If we add "-machine
-> pflash0=3DBLOCK-BACKEND", then even if the types in the schema stay the
-> same, some mappings to the QEMU cmdline will have to be re-documented.
 
-Good point.
+I am also unable to reproduce yet. Any hint on how to reproduce?
 
-> Of course, that's still easier / less intrusive than changing the types!
-> ... Which does make me prefer "-machine pflash0=3DBLOCK-BACKEND", if I'm
-> being honest.
->
-> (I hope my followup isn't totally useless. I certainly didn't want to
-> ignore your summary.)
+I wonder if this is related to __USE_MINGW_ANSI_STDIO somehow (could
+be, although glib doesn't use the same functions, the compiler might
+not know the difference)
 
-Pointing out the need to update these comments is anything but useless.
+In any case, we should replace %PRI & %z with glib equivalents under slirp/=
+.
 
-Thanks!
+
+
+
+--
+Marc-Andr=C3=A9 Lureau
