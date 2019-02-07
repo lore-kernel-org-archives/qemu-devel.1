@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43550)
+Received: from eggs.gnu.org ([209.51.188.92]:43630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmxK-0003kW-O8
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:20 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmxq-00047p-57
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmxI-0002gK-8v
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1grmxH-0002ft-Uo
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:16 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E635C063D04
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 16:55:15 +0000 (UTC)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmxi-00031o-Vs
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:50 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  7 Feb 2019 17:54:38 +0100
-Message-Id: <20190207165449.6125-2-marcandre.lureau@redhat.com>
+Date: Thu,  7 Feb 2019 17:54:39 +0100
+Message-Id: <20190207165449.6125-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20190207165449.6125-1-marcandre.lureau@redhat.com>
 References: <20190207165449.6125-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 01/12] vhost-user: define conventions for
- vhost-user backends
+Subject: [Qemu-devel] [PATCH v2 02/12] vhost-user: simplify
+ vhost_user_init/vhost_user_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,381 +24,368 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, Jason Wang <jasowang@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
-review, let's define a common set of backend conventions to help with
-management layer implementation, and interoperability.
+Take a VhostUserState* that can be pre-allocated, and initialize it
+with the associated chardev.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Tiwei Bie <tiwei.bie@intel.com>
 ---
- MAINTAINERS                  |   1 +
- docs/interop/vhost-user.json | 219 +++++++++++++++++++++++++++++++++++
- docs/interop/vhost-user.txt  | 101 +++++++++++++++-
- 3 files changed, 319 insertions(+), 2 deletions(-)
- create mode 100644 docs/interop/vhost-user.json
+ include/hw/virtio/vhost-user-blk.h  |  2 +-
+ include/hw/virtio/vhost-user-scsi.h |  2 +-
+ include/hw/virtio/vhost-user.h      |  2 +-
+ backends/cryptodev-vhost-user.c     | 18 ++++--------------
+ hw/block/vhost-user-blk.c           | 22 ++++------------------
+ hw/scsi/vhost-user-scsi.c           | 20 ++++----------------
+ hw/virtio/vhost-stub.c              |  4 ++--
+ hw/virtio/vhost-user.c              | 16 ++++++++++++----
+ net/vhost-user.c                    | 13 ++++---------
+ 9 files changed, 33 insertions(+), 66 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9a76845581..16b6264412 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1421,6 +1421,7 @@ vhost
- M: Michael S. Tsirkin <mst@redhat.com>
- S: Supported
- F: hw/*/*vhost*
-+F: docs/interop/vhost-user.json
- F: docs/interop/vhost-user.txt
- F: contrib/vhost-user-*/
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost=
+-user-blk.h
+index d52944aeeb..a8a106eecb 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -36,7 +36,7 @@ typedef struct VHostUserBlk {
+     uint32_t queue_size;
+     uint32_t config_wce;
+     struct vhost_dev dev;
+-    VhostUserState *vhost_user;
++    VhostUserState vhost_user;
+ } VHostUserBlk;
 =20
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-new file mode 100644
-index 0000000000..91b5bf499e
---- /dev/null
-+++ b/docs/interop/vhost-user.json
-@@ -0,0 +1,219 @@
-+# -*- Mode: Python -*-
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# Authors:
-+#  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later. See the COPYING file in the top-level directory.
-+
-+##
-+# =3D vhost user backend discovery & capabilities
-+##
-+
-+##
-+# @VHostUserBackendType:
-+#
-+# List the various vhost user backend types.
-+#
-+# @net: virtio net
-+# @block: virtio block
-+# @console: virtio console
-+# @rng: virtio rng
-+# @balloon: virtio balloon
-+# @rpmsg: virtio remote processor messaging
-+# @scsi: virtio scsi
-+# @9p: 9p virtio console
-+# @rproc-serial: virtio remoteproc serial link
-+# @caif: virtio caif
-+# @gpu: virtio gpu
-+# @input: virtio input
-+# @vsock: virtio vsock transport
-+# @crypto: virtio crypto
-+#
-+# Since: 3.2
-+##
-+{
-+  'enum': 'VHostUserBackendType',
-+  'data': [ 'net', 'block', 'console', 'rng', 'balloon', 'rpmsg',
-+            'scsi', '9p', 'rproc-serial', 'caif', 'gpu', 'input', 'vsock=
-',
-+            'crypto' ]
-+}
-+
-+##
-+# @VHostUserBackendInputFeature:
-+#
-+# List of vhost user "input" features.
-+#
-+# @evdev-path: The --evdev-path command line option is supported.
-+# @no-grab: The --no-grab command line option is supported.
-+#
-+# Since: 3.2
-+##
-+{
-+  'enum': 'VHostUserBackendInputFeature',
-+  'data': [ 'evdev-path', 'no-grab' ]
-+}
-+
-+##
-+# @VHostUserBackendCapabilitiesInput:
-+#
-+# Capabilities reported by vhost user "input" backends
-+#
-+# @features: list of supported features.
-+#
-+# Since: 3.2
-+##
-+{
-+  'struct': 'VHostUserBackendCapabilitiesInput',
-+  'data': {
-+    'features': [ 'VHostUserBackendInputFeature' ]
-+  }
-+}
-+
-+##
-+# @VHostUserBackendGPUFeature:
-+#
-+# List of vhost user "gpu" features.
-+#
-+# @render-node: The --render-node command line option is supported.
-+# @virgl: The --virgl command line option is supported.
-+#
-+# Since: 3.2
-+##
-+{
-+  'enum': 'VHostUserBackendGPUFeature',
-+  'data': [ 'render-node', 'virgl' ]
-+}
-+
-+##
-+# @VHostUserBackendCapabilitiesGPU:
-+#
-+# Capabilities reported by vhost user "gpu" backends.
-+#
-+# @features: list of supported features.
-+#
-+# Since: 3.2
-+##
-+{
-+  'struct': 'VHostUserBackendCapabilitiesGPU',
-+  'data': {
-+    'features': [ 'VHostUserBackendGPUFeature' ]
-+  }
-+}
-+
-+##
-+# @VHostUserBackendCapabilities:
-+#
-+# Capabilities reported by vhost user backends.
-+#
-+# @type: The vhost user backend type.
-+#
-+# Since: 3.2
-+##
-+{
-+  'union': 'VHostUserBackendCapabilities',
-+  'base': { 'type': 'VHostUserBackendType' },
-+  'discriminator': 'type',
-+  'data': {
-+    'input': 'VHostUserBackendCapabilitiesInput',
-+    'gpu': 'VHostUserBackendCapabilitiesGPU'
-+  }
-+}
-+
-+##
-+# @VhostUserBackend:
-+#
-+# Describes a vhost user backend to management software.
-+#
-+# It is possible for multiple @VhostUserBackend elements to match the
-+# search criteria of management software. Applications thus need rules
-+# to pick one of the many matches, and users need the ability to
-+# override distro defaults.
-+#
-+# It is recommended to create vhost user backend JSON files (each
-+# containing a single @VhostUserBackend root element) with a
-+# double-digit prefix, for example "50-qemu-gpu.json",
-+# "50-crosvm-gpu.json", etc, so they can be sorted in predictable
-+# order. The backend JSON files should be searched for in three
-+# directories:
-+#
-+#   - /usr/share/qemu/vhost-user -- populated by distro-provided
-+#                                   packages (XDG_DATA_DIRS covers
-+#                                   /usr/share by default),
-+#
-+#   - /etc/qemu/vhost-user -- exclusively for sysadmins' local additions=
-,
-+#
-+#   - $XDG_CONFIG_HOME/qemu/vhost-user -- exclusively for per-user local
-+#                                         additions (XDG_CONFIG_HOME
-+#                                         defaults to $HOME/.config).
-+#
-+# Top-down, the list of directories goes from general to specific.
-+#
-+# Management software should build a list of files from all three
-+# locations, then sort the list by filename (i.e., last pathname
-+# component). Management software should choose the first JSON file on
-+# the sorted list that matches the search criteria. If a more specific
-+# directory has a file with same name as a less specific directory, then
-+# the file in the more specific directory takes effect. If the more
-+# specific file is zero length, it hides the less specific one.
-+#
-+# For example, if a distro ships
-+#
-+#   - /usr/share/qemu/vhost-user/50-qemu-gpu.json
-+#
-+#   - /usr/share/qemu/vhost-user/50-crosvm-gpu.json
-+#
-+# then the sysadmin can prevent the default QEMU being used at all with
-+#
-+#   $ touch /etc/qemu/vhost-user/50-qemu-gpu.json
-+#
-+# The sysadmin can replace/alter the distro default OVMF with
-+#
-+#   $ vim /etc/qemu/vhost-user/50-qemu-gpu.json
-+#
-+# or they can provide a parallel QEMU GPU with higher priority
-+#
-+#   $ vim /etc/qemu/vhost-user/10-qemu-gpu.json
-+#
-+# or they can provide a parallel OVMF with lower priority
-+#
-+#   $ vim /etc/qemu/vhost-user/99-qemu-gpu.json
-+#
-+# @type: The vhost user backend type.
-+#
-+# @description: Provides a human-readable description of the backend.
-+#               Management software may or may not display @description.
-+#
-+# @binary: Absolute path to the backend binary.
-+#
-+# @tags: An optional list of auxiliary strings associated with the
-+#        backend for which @description is not appropriate, due to the
-+#        latter's possible exposure to the end-user. @tags serves
-+#        development and debugging purposes only, and management
-+#        software shall explicitly ignore it.
-+#
-+# Since: 3.2
-+#
-+# Example:
-+#
-+# {
-+#   "description": "QEMU vhost-user-gpu",
-+#   "type": "gpu",
-+#   "binary": "/usr/libexec/qemu/vhost-user-gpu",
-+#   "tags": [
-+#     "CONFIG_OPENGL_DMABUF=3Dy"
-+#   ]
-+# }
-+#
-+##
-+{
-+  'struct' : 'VhostUserBackend',
-+  'data'   : {
-+    'description': 'str',
-+    'type': 'VHostUserBackendType',
-+    'binary': 'str',
-+    '*tags': [ 'str' ]
-+  }
-+}
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index c2194711d9..cefec9ffe1 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -17,8 +17,13 @@ The protocol defines 2 sides of the communication, mas=
-ter and slave. Master is
- the application that shares its virtqueues, in our case QEMU. Slave is t=
-he
- consumer of the virtqueues.
+ #endif
+diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhos=
+t-user-scsi.h
+index e429cacd8e..738f9288bd 100644
+--- a/include/hw/virtio/vhost-user-scsi.h
++++ b/include/hw/virtio/vhost-user-scsi.h
+@@ -30,7 +30,7 @@
 =20
--In the current implementation QEMU is the Master, and the Slave is inten=
-ded to
--be a software Ethernet switch running in user space, such as Snabbswitch=
-.
-+In the current implementation QEMU is the Master, and the Slave is the
-+external process consuming the virtio queues, for example a software
-+Ethernet switch running in user space, such as Snabbswitch, or a block
-+device backend processing read & write to a virtual disk. In order to
-+facilitate interoperability between various backend implementations,
-+it is recommended to follow the "Backend program conventions"
-+described in this document.
+ typedef struct VHostUserSCSI {
+     VHostSCSICommon parent_obj;
+-    VhostUserState *vhost_user;
++    VhostUserState vhost_user;
+ } VHostUserSCSI;
 =20
- Master and slave can be either a client (i.e. connecting) or server (lis=
-tening)
- in the socket communication.
-@@ -835,3 +840,95 @@ resilient for selective requests.
- For the message types that already solicit a reply from the client, the
- presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being set =
-brings
- no behavioural change. (See the 'Communication' section for details.)
+ #endif /* VHOST_USER_SCSI_H */
+diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-use=
+r.h
+index fd660393a0..811e325f42 100644
+--- a/include/hw/virtio/vhost-user.h
++++ b/include/hw/virtio/vhost-user.h
+@@ -22,7 +22,7 @@ typedef struct VhostUserState {
+     VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
+ } VhostUserState;
+=20
+-VhostUserState *vhost_user_init(void);
++bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
+p);
+ void vhost_user_cleanup(VhostUserState *user);
+=20
+ #endif
+diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-u=
+ser.c
+index d539f14d59..1052a5d0e9 100644
+--- a/backends/cryptodev-vhost-user.c
++++ b/backends/cryptodev-vhost-user.c
+@@ -47,7 +47,7 @@
+ typedef struct CryptoDevBackendVhostUser {
+     CryptoDevBackend parent_obj;
+=20
+-    VhostUserState *vhost_user;
++    VhostUserState vhost_user;
+     CharBackend chr;
+     char *chr_name;
+     bool opened;
+@@ -104,7 +104,7 @@ cryptodev_vhost_user_start(int queues,
+             continue;
+         }
+=20
+-        options.opaque =3D s->vhost_user;
++        options.opaque =3D &s->vhost_user;
+         options.backend_type =3D VHOST_BACKEND_TYPE_USER;
+         options.cc =3D b->conf.peers.ccs[i];
+         s->vhost_crypto[i] =3D cryptodev_vhost_init(&options);
+@@ -182,7 +182,6 @@ static void cryptodev_vhost_user_init(
+     size_t i;
+     Error *local_err =3D NULL;
+     Chardev *chr;
+-    VhostUserState *user;
+     CryptoDevBackendClient *cc;
+     CryptoDevBackendVhostUser *s =3D
+                       CRYPTODEV_BACKEND_VHOST_USER(backend);
+@@ -213,15 +212,10 @@ static void cryptodev_vhost_user_init(
+         }
+     }
+=20
+-    user =3D vhost_user_init();
+-    if (!user) {
+-        error_setg(errp, "Failed to init vhost_user");
++    if (!vhost_user_init(&s->vhost_user, &s->chr, errp)) {
+         return;
+     }
+=20
+-    user->chr =3D &s->chr;
+-    s->vhost_user =3D user;
+-
+     qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+                      cryptodev_vhost_user_event, NULL, s, NULL, true);
+=20
+@@ -307,11 +301,7 @@ static void cryptodev_vhost_user_cleanup(
+         }
+     }
+=20
+-    if (s->vhost_user) {
+-        vhost_user_cleanup(s->vhost_user);
+-        g_free(s->vhost_user);
+-        s->vhost_user =3D NULL;
+-    }
++    vhost_user_cleanup(&s->vhost_user);
+ }
+=20
+ static void cryptodev_vhost_user_set_chardev(Object *obj,
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 44ac814016..767c734a81 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -253,7 +253,6 @@ static void vhost_user_blk_device_realize(DeviceState=
+ *dev, Error **errp)
+ {
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+     VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+-    VhostUserState *user;
+     struct vhost_virtqueue *vqs =3D NULL;
+     int i, ret;
+=20
+@@ -272,15 +271,10 @@ static void vhost_user_blk_device_realize(DeviceSta=
+te *dev, Error **errp)
+         return;
+     }
+=20
+-    user =3D vhost_user_init();
+-    if (!user) {
+-        error_setg(errp, "vhost-user-blk: failed to init vhost_user");
++    if (!vhost_user_init(&s->vhost_user, &s->chardev, errp)) {
+         return;
+     }
+=20
+-    user->chr =3D &s->chardev;
+-    s->vhost_user =3D user;
+-
+     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+                 sizeof(struct virtio_blk_config));
+=20
+@@ -297,7 +291,7 @@ static void vhost_user_blk_device_realize(DeviceState=
+ *dev, Error **errp)
+=20
+     vhost_dev_set_config_notifier(&s->dev, &blk_ops);
+=20
+-    ret =3D vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_US=
+ER, 0);
++    ret =3D vhost_dev_init(&s->dev, &s->vhost_user, VHOST_BACKEND_TYPE_U=
+SER, 0);
+     if (ret < 0) {
+         error_setg(errp, "vhost-user-blk: vhost initialization failed: %=
+s",
+                    strerror(-ret));
+@@ -322,10 +316,7 @@ vhost_err:
+ virtio_err:
+     g_free(vqs);
+     virtio_cleanup(vdev);
+-
+-    vhost_user_cleanup(user);
+-    g_free(user);
+-    s->vhost_user =3D NULL;
++    vhost_user_cleanup(&s->vhost_user);
+ }
+=20
+ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **er=
+rp)
+@@ -338,12 +329,7 @@ static void vhost_user_blk_device_unrealize(DeviceSt=
+ate *dev, Error **errp)
+     vhost_dev_cleanup(&s->dev);
+     g_free(vqs);
+     virtio_cleanup(vdev);
+-
+-    if (s->vhost_user) {
+-        vhost_user_cleanup(s->vhost_user);
+-        g_free(s->vhost_user);
+-        s->vhost_user =3D NULL;
+-    }
++    vhost_user_cleanup(&s->vhost_user);
+ }
+=20
+ static void vhost_user_blk_instance_init(Object *obj)
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 6728878a52..8b1e6876db 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -69,7 +69,6 @@ static void vhost_user_scsi_realize(DeviceState *dev, E=
+rror **errp)
+     VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(dev);
+     VHostUserSCSI *s =3D VHOST_USER_SCSI(dev);
+     VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
+-    VhostUserState *user;
+     Error *err =3D NULL;
+     int ret;
+=20
+@@ -86,30 +85,24 @@ static void vhost_user_scsi_realize(DeviceState *dev,=
+ Error **errp)
+         return;
+     }
+=20
+-    user =3D vhost_user_init();
+-    if (!user) {
+-        error_setg(errp, "vhost-user-scsi: failed to init vhost_user");
++    if (!vhost_user_init(&s->vhost_user, &vs->conf.chardev, errp)) {
+         return;
+     }
+-    user->chr =3D &vs->conf.chardev;
+=20
+     vsc->dev.nvqs =3D 2 + vs->conf.num_queues;
+     vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.nvqs);
+     vsc->dev.vq_index =3D 0;
+     vsc->dev.backend_features =3D 0;
+=20
+-    ret =3D vhost_dev_init(&vsc->dev, user,
++    ret =3D vhost_dev_init(&vsc->dev, &s->vhost_user,
+                          VHOST_BACKEND_TYPE_USER, 0);
+     if (ret < 0) {
+         error_setg(errp, "vhost-user-scsi: vhost initialization failed: =
+%s",
+                    strerror(-ret));
+-        vhost_user_cleanup(user);
+-        g_free(user);
++        vhost_user_cleanup(&s->vhost_user);
+         return;
+     }
+=20
+-    s->vhost_user =3D user;
+-
+     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
+     vsc->channel =3D 0;
+     vsc->lun =3D 0;
+@@ -130,12 +123,7 @@ static void vhost_user_scsi_unrealize(DeviceState *d=
+ev, Error **errp)
+     g_free(vqs);
+=20
+     virtio_scsi_common_unrealize(dev, errp);
+-
+-    if (s->vhost_user) {
+-        vhost_user_cleanup(s->vhost_user);
+-        g_free(s->vhost_user);
+-        s->vhost_user =3D NULL;
+-    }
++    vhost_user_cleanup(&s->vhost_user);
+ }
+=20
+ static Property vhost_user_scsi_properties[] =3D {
+diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
+index 049089b5e2..c175148fce 100644
+--- a/hw/virtio/vhost-stub.c
++++ b/hw/virtio/vhost-stub.c
+@@ -7,9 +7,9 @@ bool vhost_has_free_slot(void)
+     return true;
+ }
+=20
+-VhostUserState *vhost_user_init(void)
++bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
+p)
+ {
+-    return NULL;
++    return false;
+ }
+=20
+ void vhost_user_cleanup(VhostUserState *user)
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 564a31d12c..a0e8a81857 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1739,17 +1739,24 @@ static bool vhost_user_mem_section_filter(struct =
+vhost_dev *dev,
+     return result;
+ }
+=20
+-VhostUserState *vhost_user_init(void)
++bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **err=
+p)
+ {
+-    VhostUserState *user =3D g_new0(struct VhostUserState, 1);
+-
+-    return user;
++    if (user->chr) {
++        error_setg(errp, "Cannot initialize vhost-user state");
++        return false;
++    }
++    user->chr =3D chr;
++    return true;
+ }
+=20
+ void vhost_user_cleanup(VhostUserState *user)
+ {
+     int i;
+=20
++    if (!user->chr) {
++        return;
++    }
 +
-+Backend program conventions
-+---------------------------
-+
-+vhost-user backends can provide various devices & services and may
-+need to be configured manually depending on the use case. However, it
-+is a good idea to follow the conventions listed here when
-+possible. Users, QEMU or libvirt, can then rely on some common
-+behaviour to avoid heterogenous configuration and management of the
-+backend programs and facilitate interoperability.
-+
-+Each backend installed on a host system should come with at least one
-+JSON file that conforms to the vhost-user.json schema. Each file
-+informs the management applications about the backend type, and binary
-+location. In addition, it defines rules for management apps for
-+picking the highest priority backend when multiple match the search
-+criteria (see @VhostUserBackend documentation in the schema file).
-+
-+If the backend is not capable of enabling a requested feature on the
-+host (such as 3D acceleration with virgl), or the initialization
-+failed, the backend should fail to start early and exit with a status
-+!=3D 0. It may also print a message to stderr for further details.
-+
-+The backend program must not daemonize itself, but it may be
-+daemonized by the management layer. It may also have a restricted
-+access to the system.
-+
-+File descriptors 0, 1 and 2 will exist, and have regular
-+stdin/stdout/stderr usage (they may have been redirected to /dev/null
-+by the management layer, or to a log handler).
-+
-+The backend program must end (as quickly and cleanly as possible) when
-+the SIGTERM signal is received. Eventually, it may be SIGKILL by the
-+management layer after a few seconds.
-+
-+The following command line options have an expected behaviour. They
-+are mandatory, unless explicitly said differently:
-+
-+* --socket-path=3DPATH
-+
-+This option specify the location of the vhost-user Unix domain socket.
-+It is incompatible with --fd.
-+
-+* --fd=3DFDNUM
-+
-+When this argument is given, the backend program is started with the
-+vhost-user socket as file descriptor FDNUM. It is incompatible with
-+--socket-path.
-+
-+* --print-capabilities
-+
-+Output to stdout the backend capabilities in JSON format, and then
-+exit successfully. Other options and arguments should be ignored, and
-+the backend program should not perform its normal function.  The
-+capabilities can be reported dynamically depending on the host
-+capabilities.
-+
-+The JSON output is described in the vhost-user.json schema, by
-+@VHostUserBackendCapabilities.  Example:
-+{
-+  "type": "foo",
-+  "features": [
-+    "feature-a",
-+    "feature-b"
-+  ]
-+}
-+
-+vhost-user-input
-+----------------
-+
-+Command line options:
-+
-+* --evdev-path=3DPATH (optional)
-+
-+Specify the linux input device.
-+
-+* --no-grab (optional)
-+
-+Do no request exclusive access to the input device.
-+
-+vhost-user-gpu
-+--------------
-+
-+Command line options:
-+
-+* --render-node=3DPATH (optional)
-+
-+Specify the GPU DRM render node.
-+
-+* --virgl (optional)
-+
-+Enable virgl rendering support.
+     for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
+         if (user->notifier[i].addr) {
+             object_unparent(OBJECT(&user->notifier[i].mr));
+@@ -1757,6 +1764,7 @@ void vhost_user_cleanup(VhostUserState *user)
+             user->notifier[i].addr =3D NULL;
+         }
+     }
++    user->chr =3D NULL;
+ }
+=20
+ const VhostOps user_ops =3D {
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index a39f9c9974..cea78b81f6 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -291,19 +291,14 @@ static int net_vhost_user_init(NetClientState *peer=
+, const char *device,
+ {
+     Error *err =3D NULL;
+     NetClientState *nc, *nc0 =3D NULL;
+-    VhostUserState *user =3D NULL;
+     NetVhostUserState *s =3D NULL;
++    VhostUserState *user;
+     int i;
+=20
+     assert(name);
+     assert(queues > 0);
+=20
+-    user =3D vhost_user_init();
+-    if (!user) {
+-        error_report("failed to init vhost_user");
+-        goto err;
+-    }
+-
++    user =3D g_new0(struct VhostUserState, 1);
+     for (i =3D 0; i < queues; i++) {
+         nc =3D qemu_new_net_client(&net_vhost_user_info, peer, device, n=
+ame);
+         snprintf(nc->info_str, sizeof(nc->info_str), "vhost-user%d to %s=
+",
+@@ -312,11 +307,11 @@ static int net_vhost_user_init(NetClientState *peer=
+, const char *device,
+         if (!nc0) {
+             nc0 =3D nc;
+             s =3D DO_UPCAST(NetVhostUserState, nc, nc);
+-            if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
++            if (!qemu_chr_fe_init(&s->chr, chr, &err) ||
++                !vhost_user_init(user, &s->chr, &err)) {
+                 error_report_err(err);
+                 goto err;
+             }
+-            user->chr =3D &s->chr;
+         }
+         s =3D DO_UPCAST(NetVhostUserState, nc, nc);
+         s->vhost_user =3D user;
 --=20
 2.20.1.519.g8feddda32c
