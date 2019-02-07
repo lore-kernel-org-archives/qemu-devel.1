@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36627)
+Received: from eggs.gnu.org ([209.51.188.92]:36642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1grgrb-0002iQ-0l
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrb-0002iT-9u
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1grgrZ-0001iw-Mt
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:24:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1grgrZ-0001T4-CY
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:24:57 -0500
-Date: Thu, 7 Feb 2019 05:24:19 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <206743624.70377131.1549535059368.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAJ+F1CLbVsR12vavTBKi0rQjBQ+JaZuD_7Tpb5WqRthwn0uUhQ@mail.gmail.com>
-References: <20190129062801.15799-1-pagupta@redhat.com>
-	<CAJ+F1CKenN+Ujg1ajtgixwJabir5+zfBAV3r=4LBqodpqHd8iA@mail.gmail.com>
-	<20190206162901.GW12331@redhat.com>
-	<1385614518.70345867.1549524112156.JavaMail.zimbra@redhat.com>
-	<CAJ+F1CKia-RCF=oDcKoLAQapD8pRYd4vXhztDspmww+bi-H-AQ@mail.gmail.com>
-	<20190207093400.GB19438@redhat.com>
-	<1487450667.70375757.1549534386311.JavaMail.zimbra@redhat.com>
-	<CAJ+F1CLbVsR12vavTBKi0rQjBQ+JaZuD_7Tpb5WqRthwn0uUhQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgra-0001je-1e
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:24:59 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  7 Feb 2019 13:24:44 +0300
+Message-Id: <20190207102445.71998-17-vsementsov@virtuozzo.com>
+In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 16/17] hw/ide: drop iov field from
+ IDEBufferedRequest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,98 +20,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Daniel =?utf-8?Q?P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, xiaohli@redhat.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com
 
+@iov is used only to initialize @qiov. Let's use new
+qemu_iovec_init_buf() instead, which simplifies the code.
 
-> 
-> Hi
-> 
-> On Thu, Feb 7, 2019 at 11:13 AM Pankaj Gupta <pagupta@redhat.com> wrote:
-> >
-> >
-> > > > > Thanks for your reply. Please find my reply inline.
-> > > > >
-> > > > > > > > Hotplugging existing char chardev with qmp,
-> > > > > > > > dereferences(removes)
-> > > > > > > > existing chardev. This patch avoids adding a chardev if a
-> > > > > > > > chardev
-> > > > > > > > with same id exists.
-> > > > > > >
-> > > > > > > As you pointed out, if you attempt to add a chardev with an
-> > > > > > > existing
-> > > > > > > ID, you get an error:
-> > > > > > >
-> > > > > > > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket","data":{"addr":{"type":"unix",
-> > > > > > > "data": {"path": "/tmp/helloworld1"}}}}}}
-> > > > > > > {"return": {}}
-> > > > > > > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket","data":{"addr":{"type":"unix",
-> > > > > > > "data": {"path": "/tmp/helloworld1"}}}}}}
-> > > > > > > {"error": {"class": "GenericError", "desc": "attempt to add
-> > > > > > > duplicate
-> > > > > > > property 'charchannel1' to object (type 'container')"}}
-> > > > > > >
-> > > > > > >
-> > > > > > > But the existing chardev is left untouched.
-> > > > > > >
-> > > > > > > However, since unix socket chardev will delete existing file and
-> > > > > > > rebind (this is not always a good idea, but people seem to prefer
-> > > > > > > that)
-> > > > > > > the rebound socket is removed on error cleanup.
-> > > > > > >
-> > > > > > >
-> > > > > > > I am not sure this is a bug tbh.
-> > > > > > >
-> > > > > > > Your solution to check for duplicate ID upfront is ok. But any
-> > > > > > > other
-> > > > > > > later error path could have the same "bug" effect of removing
-> > > > > > > existing
-> > > > > > > chardev because of the overwrite socket creation.
-> > > > > >
-> > > > > > Checking the ID is not a useful fix IMHO. Someone could just as
-> > > > > > easily
-> > > > > > send 2 commands with different IDs and the same socket path.
-> > > > > >
-> > > > > > A more accurate fix would be to iterate over existing chardevs and
-> > > > > > check
-> > > > > > whether any of them clash, but even that is useless if you have two
-> > > > > > separate QEMU instances and both try to use the same UNIX socket
-> > > > > > path.
-> > > > > > To deal with that you need to start taking out fcntl locks to
-> > > > > > ensure
-> > > > > > real mutual exclusion.
-> > > > >
-> > > > > The reason we are already throwing error "attempt to add duplicate
-> > > > > property"
-> > > > > implies we are considering "id" as primary key? Even if we throw the
-> > > > > error
-> > > > > existing chardev should work as before. But this is not the case
-> > > > > right
-> > > > > now,
-> > > > > it just deletes the existing chardev after error.
-> > > >
-> > > > It deletes the socket "file" (since it overwrites it on chardev
-> > > > creation). The existing chardev is not deleted:
-> > >
-> > > I think this is yet another example of why it is a bad idea for the
-> > > qemu_chardev_new API to also open the backend. We should have a
-> > > qemu_chardev_new that only does the arg parsing, object creation
-> > > and registration. Then have a separate API for actually opening
-> > > it.
-> >
-> > Agree. This looks bigger fix. Till we fix that. Can we accept this patch
-> > to avoid deleting/corrupting existing socket "file" if user tries to add
-> > chardev with existing same "id"?
-> 
-> It's not a proper fix. As I and Daniel explained, there are many other
-> cases where a similar effect of deleting existing socket file can
-> happen.
-> 
-> I would rather not merge this, but if it's critical, I would add a
-> FIXME comment around.
-> 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/hw/ide/internal.h |  1 -
+ hw/ide/core.c             | 11 ++++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-Sure. Sounds good.
-
-Thanks,
-Pankaj
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index fa99486d7a..1b02bb9151 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -346,7 +346,6 @@ extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
+ 
+ typedef struct IDEBufferedRequest {
+     QLIST_ENTRY(IDEBufferedRequest) list;
+-    struct iovec iov;
+     QEMUIOVector qiov;
+     QEMUIOVector *original_qiov;
+     BlockCompletionFunc *original_cb;
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index e94ba8c488..1cf87fdefe 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -629,13 +629,15 @@ static void ide_buffered_readv_cb(void *opaque, int ret)
+     IDEBufferedRequest *req = opaque;
+     if (!req->orphaned) {
+         if (!ret) {
+-            qemu_iovec_from_buf(req->original_qiov, 0, req->iov.iov_base,
++            assert(req->qiov.size == req->original_qiov->size);
++            qemu_iovec_from_buf(req->original_qiov, 0,
++                                req->qiov.local_iov.iov_base,
+                                 req->original_qiov->size);
+         }
+         req->original_cb(req->original_opaque, ret);
+     }
+     QLIST_REMOVE(req, list);
+-    qemu_vfree(req->iov.iov_base);
++    qemu_vfree(qemu_iovec_get_buf(&req->qiov));
+     g_free(req);
+ }
+ 
+@@ -660,9 +662,8 @@ BlockAIOCB *ide_buffered_readv(IDEState *s, int64_t sector_num,
+     req->original_qiov = iov;
+     req->original_cb = cb;
+     req->original_opaque = opaque;
+-    req->iov.iov_base = qemu_blockalign(blk_bs(s->blk), iov->size);
+-    req->iov.iov_len = iov->size;
+-    qemu_iovec_init_external(&req->qiov, &req->iov, 1);
++    qemu_iovec_init_buf(&req->qiov, blk_blockalign(s->blk, iov->size),
++                        iov->size);
+ 
+     aioreq = blk_aio_preadv(s->blk, sector_num << BDRV_SECTOR_BITS,
+                             &req->qiov, 0, ide_buffered_readv_cb, req);
+-- 
+2.18.0
