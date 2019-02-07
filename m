@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55834)
+Received: from eggs.gnu.org ([209.51.188.92]:56373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grnp8-0007cx-LZ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:50:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1grnsF-0000HC-TO
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grnp7-0007DQ-C7
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:50:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41086)
+	(envelope-from <peter.maydell@linaro.org>) id 1grnsD-0000DD-RB
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:54:07 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42498)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1grnp4-00074F-W3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:50:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1grnos-0003ec-9K
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 17:50:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 43A542E80C7
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 17:50:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1grnsA-0000Bp-20
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:54:04 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v23so1242137otk.9
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:54:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Feb 2019 17:35:57 -0000
-From: Bugdal <1813398@bugs.launchpad.net>
-Reply-To: Bug 1813398 <1813398@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154851076407.2082.8506477460504942900.malonedeb@wampee.canonical.com>
-Message-Id: <154956095786.25442.18237100168063953141.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813398] Re: qemu user calls malloc after fork in
- multi-threaded process
+References: <20190114011122.5995-1-richard.henderson@linaro.org>
+	<CAFEAcA8XTc5RTxifOA-cYb2FfRaC5ZMBh3AEcxL8LZqh7qxo7Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA8XTc5RTxifOA-cYb2FfRaC5ZMBh3AEcxL8LZqh7qxo7Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Feb 2019 17:53:48 +0000
+Message-ID: <CAFEAcA9ecJu19JjSgHrNK9n7tHmjJRkGrRvJZ5MYNLdRCfk-VQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/17] target/arm: Implement ARMv8.5-MemTag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,84 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Will Deacon <will.deacon@arm.com>, Dave P Martin <dave.martin@arm.com>, szabolcs.nagy@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
 
-I'm not sure how extensively the RCU code is used (it looks like not
-much), but I don't think this bug is fixable without disabling it, or at
-least getting rid of the RCU thread in cases where the emulated process
-is not multithreaded.
+On Tue, 5 Feb 2019 at 19:42, Peter Maydell <peter.maydell@linaro.org> wrote:
+> I'm working through review of this, but feel free to rebase on
+> current master (which has now got a pile of your other patches
+> in it, since I've just merged target-arm.next) without waiting
+> for me to finish going through it.
 
--- =
+OK, I've now finished review of it. I haven't looked at the
+last few patches which are linux-user, because it doesn't
+seem worth doing much review on them until we have at least
+a proposed Linux userspace ABI for MemTag to compare them
+against. (If we do want to do an implementation that precedes
+the ABI being nailed down, we need to hide it behind a
+defaults-to-off x-property.)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813398
-
-Title:
-  qemu user calls malloc after fork in multi-threaded process
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu user may hang in malloc on a musl based system because
-  it calls malloc after fork (in a pthread_atfork handler)
-  in the child process.
-
-  this is undefined behaviour since the parent process is
-  multi-threaded and only as-safe functions may be called
-  in the child then. (if malloc/free is called concurrently
-  with fork the malloc state will be corrupted in the child,
-  it works on glibc because glibc takes the malloc locks
-  before the fork syscall, but that breaks the as-safety of
-  fork and thus non-conforming to posix)
-
-  discussed at
-  https://www.openwall.com/lists/musl/2019/01/26/1
-
-  the bug is hard to reproduce (requires the call_rcu thread
-  to call free concurrently with do_fork in the main thread),
-  this one is observed with qemu-arm 3.1.0 running on x86_64
-  executing an arm busybox sh:
-
-  (gdb) bt
-  #0  malloc (n=3D<optimized out>, n@entry=3D9) at src/malloc/malloc.c:306
-  #1  0x0000000060184ad3 in g_malloc (n_bytes=3Dn_bytes@entry=3D9) at gmem.=
-c:99
-  #2  0x000000006018bcab in g_strdup (str=3D<optimized out>, str@entry=3D0x=
-60200abf "call_rcu") at gstrfuncs.c:363
-  #3  0x000000006016e31d in qemu_thread_create (thread=3Dthread@entry=3D0x7=
-ffe367d1870, name=3Dname@entry=3D0x60200abf "call_rcu", =
-
-      start_routine=3Dstart_routine@entry=3D0x60174c00 <call_rcu_thread>, a=
-rg=3Darg@entry=3D0x0, mode=3Dmode@entry=3D1)
-      at /home/pmos/build/src/qemu-3.1.0/util/qemu-thread-posix.c:526
-  #4  0x0000000060174b99 in rcu_init_complete () at /home/pmos/build/src/qe=
-mu-3.1.0/util/rcu.c:327
-  #5  0x00000000601c4fac in __fork_handler (who=3D1) at src/thread/pthread_=
-atfork.c:26
-  #6  0x00000000601be8db in fork () at src/process/fork.c:33
-  #7  0x000000006009d191 in do_fork (env=3D0x627aaed0, flags=3Dflags@entry=
-=3D17, newsp=3Dnewsp@entry=3D0, parent_tidptr=3Dparent_tidptr@entry=3D0, =
-
-      newtls=3Dnewtls@entry=3D0, child_tidptr=3Dchild_tidptr@entry=3D0) at =
-/home/pmos/build/src/qemu-3.1.0/linux-user/syscall.c:5528
-  #8  0x00000000600af894 in do_syscall1 (cpu_env=3Dcpu_env@entry=3D0x627aae=
-d0, num=3Dnum@entry=3D2, arg1=3Darg1@entry=3D0, arg2=3Darg2@entry=3D-870019=
-2, =
-
-      arg3=3D<optimized out>, arg4=3D8, arg5=3D1015744, arg6=3D-74144, arg7=
-=3D0, arg8=3D0) at /home/pmos/build/src/qemu-3.1.0/linux-user/syscall.c:7042
-  #9  0x00000000600a835c in do_syscall (cpu_env=3Dcpu_env@entry=3D0x627aaed=
-0, num=3D2, arg1=3D0, arg2=3D-8700192, arg3=3D<optimized out>, =
-
-      arg4=3D<optimized out>, arg5=3D1015744, arg6=3D-74144, arg7=3D0, arg8=
-=3D0) at /home/pmos/build/src/qemu-3.1.0/linux-user/syscall.c:11533
-  #10 0x00000000600c265f in cpu_loop (env=3Denv@entry=3D0x627aaed0) at /hom=
-e/pmos/build/src/qemu-3.1.0/linux-user/arm/cpu_loop.c:360
-  #11 0x00000000600417a2 in main (argc=3D<optimized out>, argv=3D0x7ffe367d=
-57b8, envp=3D<optimized out>)
-      at /home/pmos/build/src/qemu-3.1.0/linux-user/main.c:819
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813398/+subscriptions
+thanks
+-- PMM
