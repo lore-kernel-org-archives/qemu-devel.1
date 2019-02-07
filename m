@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37037)
+Received: from eggs.gnu.org ([209.51.188.92]:37308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgru-0002z6-Ko
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:19 -0500
+	(envelope-from <cohuck@redhat.com>) id 1grgsj-0003oM-Bc
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrt-00025M-O3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:18 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Feb 2019 13:24:29 +0300
-Message-Id: <20190207102445.71998-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 01/17] block: enhance QEMUIOVector structure
+	(envelope-from <cohuck@redhat.com>) id 1grgsi-0002eO-Av
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:26:09 -0500
+Date: Thu, 7 Feb 2019 11:25:54 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190207112554.6368595d.cohuck@redhat.com>
+In-Reply-To: <12a1b55d-bb0b-8a5d-20ba-9777172144c3@redhat.com>
+References: <20190202005610.24048-1-crosa@redhat.com>
+	<20190202005610.24048-3-crosa@redhat.com>
+	<20190206153639.61a5411c.cohuck@redhat.com>
+	<85b0f519-38d8-cf7d-a22a-537dab8470a7@redhat.com>
+	<20190206182043.49a18542.cohuck@redhat.com>
+	<12a1b55d-bb0b-8a5d-20ba-9777172144c3@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/20] Acceptance tests: show avocado
+ test execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,93 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Add a possibility of embedded iovec, for cases when we need only one
-local iov.
+On Wed, 6 Feb 2019 12:36:23 -0500
+Cleber Rosa <crosa@redhat.com> wrote:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/qemu/iov.h | 64 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 62 insertions(+), 2 deletions(-)
+> On 2/6/19 12:20 PM, Cornelia Huck wrote:
+> > So, to summarize:
+> > - add 'make check-acceptance-quick' that excludes tests marked as 'slow'  
+> 
+> Yes... with one caveat: since the default is to have functional tests
+> that are not necessarily quick, the other approach has been used.  Tests
+> that are known to be quick are currently marked as such.
+> 
+> Anyway, this task is being tracked here:
+> 
+> https://trello.com/c/9HZWfKeE/79-add-a-make-check-acceptance-quick-target
 
-diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-index 5f433c7768..034b9ae080 100644
---- a/include/qemu/iov.h
-+++ b/include/qemu/iov.h
-@@ -133,10 +133,70 @@ size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,
- typedef struct QEMUIOVector {
-     struct iovec *iov;
-     int niov;
--    int nalloc;
--    size_t size;
-+
-+    /*
-+     * For external @iov (qemu_iovec_init_external()) or allocated @iov
-+     * (qemu_iovec_init()), @size is the cumulative size of iovecs and
-+     * @local_iov is invalid and unused.
-+     *
-+     * For embedded @iov (QEMU_IOVEC_INIT_BUF() or qemu_iovec_init_buf()),
-+     * @iov is equal to &@local_iov, and @size is valid, as it has same
-+     * offset and type as @local_iov.iov_len, which is guaranteed by
-+     * static assertion below.
-+     *
-+     * @nalloc is always valid and is -1 both for embedded and external
-+     * cases. It is included in the union only to ensure the padding prior
-+     * to the @size field will not result in a 0-length array.
-+     */
-+    union {
-+        struct {
-+            int nalloc;
-+            struct iovec local_iov;
-+        };
-+        struct {
-+            char __pad[sizeof(int) + offsetof(struct iovec, iov_len)];
-+            size_t size;
-+        };
-+    };
- } QEMUIOVector;
- 
-+QEMU_BUILD_BUG_ON(offsetof(QEMUIOVector, size) !=
-+                  offsetof(QEMUIOVector, local_iov.iov_len));
-+
-+#define QEMU_IOVEC_INIT_BUF(self, buf, len)              \
-+{                                                        \
-+    .iov = &(self).local_iov,                            \
-+    .niov = 1,                                           \
-+    .nalloc = -1,                                        \
-+    .local_iov = {                                       \
-+        .iov_base = (void *)(buf), /* cast away const */ \
-+        .iov_len = (len),                                \
-+    },                                                   \
-+}
-+
-+/*
-+ * qemu_iovec_init_buf
-+ *
-+ * Initialize embedded QEMUIOVector.
-+ *
-+ * Note: "const" is used over @buf pointer to make it simple to pass
-+ * const pointers, appearing in read functions. Then this "const" is
-+ * casted away by QEMU_IOVEC_INIT_BUF().
-+ */
-+static inline void qemu_iovec_init_buf(QEMUIOVector *qiov,
-+                                       const void *buf, size_t len)
-+{
-+    *qiov = (QEMUIOVector) QEMU_IOVEC_INIT_BUF(*qiov, buf, len);
-+}
-+
-+static inline void *qemu_iovec_get_buf(QEMUIOVector *qiov)
-+{
-+    /* Only supports embedded iov */
-+    assert(qiov->niov == -1 && qiov->iov == &(qiov->local_iov));
-+
-+    return qiov->local_iov.iov_base;
-+}
-+
- void qemu_iovec_init(QEMUIOVector *qiov, int alloc_hint);
- void qemu_iovec_init_external(QEMUIOVector *qiov, struct iovec *iov, int niov);
- void qemu_iovec_add(QEMUIOVector *qiov, void *base, size_t len);
--- 
-2.18.0
+Yes, that sounds good as well.
+
+> 
+> > - use the avocado command line interface to further narrow down
+> >   architectures and machines, if wanted
+> > ?
+> >   
+> 
+> Yes.  Do you think this deserves a section in the docs?
+
+I know that I'll find myself searching the docs for that info at some
+point in the future, so yes :)
