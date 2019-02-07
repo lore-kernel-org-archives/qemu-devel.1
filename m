@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41578)
+Received: from eggs.gnu.org ([209.51.188.92]:49774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1greqX-0001OC-8O
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 03:15:46 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grfcS-0000Z1-8D
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1greqR-0003We-Fw
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 03:15:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1greqI-0003Kw-6x
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 03:15:35 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B170C062C6A
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 08:15:20 +0000 (UTC)
-References: <cb3e0855-a729-9a3d-e6ef-bfebea17b2cb@redhat.com>
-	<20190205075249.6tx74rgbnojzssyp@sirius.home.kraxel.org>
-	<225bc7bb-3c2c-1e26-4a29-4a900f60fe11@redhat.com>
-	<20190205094229.5p27mdjj55awy3j2@sirius.home.kraxel.org>
-	<129f0590-324a-0fc6-dc12-52965fef66d7@redhat.com>
-	<f8e99916-b992-c89b-8137-a74d50ebf1a6@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a2087497-4ba1-810a-8f3b-9e97041a7398@redhat.com>
-Date: Thu, 7 Feb 2019 09:15:11 +0100
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grfcN-0007Nu-5o
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:05:16 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40328)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1grfcI-0007Av-PR
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:05:08 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q1so637251wrp.7
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 01:05:01 -0800 (PST)
+References: <20190131130850.6850-1-yuval.shaia@oracle.com>
+	<20190131130850.6850-3-yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <c8791020-7fa0-e452-16f1-974ad021dd1d@gmail.com>
+Date: Thu, 7 Feb 2019 11:05:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <f8e99916-b992-c89b-8137-a74d50ebf1a6@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190131130850.6850-3-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] SeaBIOS regression
+Subject: Re: [Qemu-devel] [PATCH 02/10] hw/rdma: Introduce locked qlist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,181 +31,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 2019-02-06 18:29, John Snow wrote:
->=20
->=20
-> On 2/5/19 4:47 AM, Thomas Huth wrote:
->> On 2019-02-05 10:42, Gerd Hoffmann wrote:
->>> On Tue, Feb 05, 2019 at 10:31:24AM +0100, Thomas Huth wrote:
->>>> On 2019-02-05 08:52, Gerd Hoffmann wrote:
->>>>> On Mon, Feb 04, 2019 at 04:10:37PM +0100, Thomas Huth wrote:
->>>>>>
->>>>>>  Hi Gerd,
->>>>>>
->>>>>> I noticed that certain FreeDOS images are not working correctly an=
-ymore
->>>>>> with the current version of QEMU, for example
->>>>>> http://www.qemu-advent-calendar.org/2016/download/day10.tar.xz ...=
- It
->>>>>> aborts with:
->>>>>>
->>>>>>  Error reading from drive C: DOS area: write-protection violation =
-attempted
->>>>>>
->>>>>> I've bisected the issue, and it has apparently been introduced wit=
-h:
->>>>>>
->>>>>>  cd1bfd5ef336166b275a09dc9842542bf5e63ae3
->>>>>>  seabios: update bios and vgabios binaries
->>>>>>
->>>>>> Any idea what might be going wrong here?
->>>>>
->>>>> Hmm, no.  bisect seabios?
->>>>
->>>> I haven't bisected yet, but it seems to be related to CONFIG_ATA_DMA=
-=3Dy
->>>> in our roms/config.seabios-128k config file. When I switch that to "=
-n",
->>>> then the old FreeDOS disks are working again...
->>>
->>> Hmm, guess I should turn that off again on the next update (there wil=
-l
->>> be a seabios 1.12.1 release before qemu 4.0).
->>
->> Ah, right, I just noticed that this has just been enabled in QEMU for
->> the 3.0 release, where the problem occurred for the first time. So thi=
-s
->> switch is likely the culprit, not a change in SeaBIOS. I'd also vote t=
-o
->> revert commit eda553a442e94d now.
->>
->>  Thomas
->>
->=20
-> If you enable the tracing in hw/ide/core, does it say anything that
-> looks interesting? I'm wondering if there's some deficiency there.
+Hi Yuval,
 
-At the end of the log, I can see:
+On 1/31/19 3:08 PM, Yuval Shaia wrote:
+> To make code more readable move handling of locked list to a generic
+> functions.
+>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>   hw/rdma/rdma_backend.c      | 20 +++++--------------
+>   hw/rdma/rdma_backend_defs.h |  8 ++------
+>   hw/rdma/rdma_utils.c        | 39 +++++++++++++++++++++++++++++++++++++
+>   hw/rdma/rdma_utils.h        |  9 +++++++++
+>   4 files changed, 55 insertions(+), 21 deletions(-)
+>
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index 5f60856d19..2f6372f8f0 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -527,9 +527,7 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
+>       bctx->up_ctx = ctx;
+>       bctx->sge = *sge;
+>   
+> -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> -    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
+> -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+> +    rdma_locked_list_append_int64(&backend_dev->recv_mads_list, bctx_id);
+>   
+>       return 0;
+>   }
+> @@ -913,23 +911,19 @@ static inline void build_mad_hdr(struct ibv_grh *grh, union ibv_gid *sgid,
+>   static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
+>                                        RdmaCmMuxMsg *msg)
+>   {
+> -    QObject *o_ctx_id;
+>       unsigned long cqe_ctx_id;
+>       BackendCtx *bctx;
+>       char *mad;
+>   
+>       trace_mad_message("recv", msg->umad.mad, msg->umad_len);
+>   
+> -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> -    o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
+> -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+> -    if (!o_ctx_id) {
+> +    cqe_ctx_id = rdma_locked_list_pop_int64(&backend_dev->recv_mads_list);
+> +    if (cqe_ctx_id == -ENOENT) {
+>           rdma_warn_report("No more free MADs buffers, waiting for a while");
+>           sleep(THR_POLL_TO);
+>           return;
+>       }
+>   
+> -    cqe_ctx_id = qnum_get_uint(qobject_to(QNum, o_ctx_id));
+>       bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
+>       if (unlikely(!bctx)) {
+>           rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
+> @@ -994,8 +988,7 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
+>           return -EIO;
+>       }
+>   
+> -    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
+> -    backend_dev->recv_mads_list.list = qlist_new();
+> +    rdma_locked_list_init(&backend_dev->recv_mads_list);
+>   
+>       enable_rdmacm_mux_async(backend_dev);
+>   
+> @@ -1010,10 +1003,7 @@ static void mad_fini(RdmaBackendDev *backend_dev)
+>   {
+>       disable_rdmacm_mux_async(backend_dev);
+>       qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
+> -    if (backend_dev->recv_mads_list.list) {
+> -        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+> -        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+> -    }
+> +    rdma_locked_list_destroy(&backend_dev->recv_mads_list);
+>   }
+>   
+>   int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
+> index 15ae8b970e..bec0457f25 100644
+> --- a/hw/rdma/rdma_backend_defs.h
+> +++ b/hw/rdma/rdma_backend_defs.h
+> @@ -20,6 +20,7 @@
+>   #include "chardev/char-fe.h"
+>   #include <infiniband/verbs.h>
+>   #include "contrib/rdmacm-mux/rdmacm-mux.h"
+> +#include "rdma_utils.h"
+>   
+>   typedef struct RdmaDeviceResources RdmaDeviceResources;
+>   
+> @@ -30,11 +31,6 @@ typedef struct RdmaBackendThread {
+>       bool is_running; /* Set by the thread to report its status */
+>   } RdmaBackendThread;
+>   
+> -typedef struct RecvMadList {
+> -    QemuMutex lock;
+> -    QList *list;
+> -} RecvMadList;
+> -
+>   typedef struct RdmaCmMux {
+>       CharBackend *chr_be;
+>       int can_receive;
+> @@ -48,7 +44,7 @@ typedef struct RdmaBackendDev {
+>       struct ibv_context *context;
+>       struct ibv_comp_channel *channel;
+>       uint8_t port_num;
+> -    RecvMadList recv_mads_list;
+> +    LockedList recv_mads_list;
+>       RdmaCmMux rdmacm_mux;
+>   } RdmaBackendDev;
+>   
+> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
+> index f1c980c6be..a2a4ea2a15 100644
+> --- a/hw/rdma/rdma_utils.c
+> +++ b/hw/rdma/rdma_utils.c
+> @@ -14,6 +14,8 @@
+>    */
+>   
+>   #include "qemu/osdep.h"
+> +#include "qapi/qmp/qlist.h"
+> +#include "qapi/qmp/qnum.h"
+>   #include "trace.h"
+>   #include "rdma_utils.h"
+>   
+> @@ -55,3 +57,40 @@ void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
+>           pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
+>       }
+>   }
+> +
+> +void rdma_locked_list_init(LockedList *list)
+> +{
+> +    qemu_mutex_init(&list->lock);
+> +    list->list = qlist_new();
+> +}
+> +
+> +void rdma_locked_list_destroy(LockedList *list)
+> +{
+> +    if (list->list) {
+> +        qlist_destroy_obj(QOBJECT(list->list));
+> +        qemu_mutex_destroy(&list->lock);
+> +        list->list = NULL;
+> +    }
+> +}
+> +
+> +void rdma_locked_list_append_int64(LockedList *list, int64_t value)
+> +{
+> +    qemu_mutex_lock(&list->lock);
+> +    qlist_append_int(list->list, value);
+> +    qemu_mutex_unlock(&list->lock);
+> +}
+> +
+> +int64_t rdma_locked_list_pop_int64(LockedList *list)
+> +{
+> +    QObject *obj;
+> +
+> +    qemu_mutex_lock(&list->lock);
+> +    obj = qlist_pop(list->list);
+> +    qemu_mutex_unlock(&list->lock);
+> +
+> +    if (!obj) {
+> +        return -ENOENT;
+> +    }
+> +
+> +    return qnum_get_uint(qobject_to(QNum, obj));
+> +}
+> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
+> index acd148837f..4ba9956f81 100644
+> --- a/hw/rdma/rdma_utils.h
+> +++ b/hw/rdma/rdma_utils.h
+> @@ -29,8 +29,17 @@
+>   #define rdma_info_report(fmt, ...) \
+>       info_report("%s: " fmt, "rdma", ## __VA_ARGS__)
+>   
+> +typedef struct LockedList {
 
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
-ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
-0xc8
-ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
-ide_cancel_dma_sync_remaining draining all remaining requests
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
-ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
-0xc8
-ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
-ide_cancel_dma_sync_remaining draining all remaining requests
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
-ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
-0xc8
-ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
-ide_cancel_dma_sync_remaining draining all remaining requests
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
-ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
-0xc8
-ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
-ide_cancel_dma_sync_remaining draining all remaining requests
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
-ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
-ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
-ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
-ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
-0xc8
-ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
-ide_cancel_dma_sync_remaining draining all remaining requests
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
-ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
-ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
+The naming is a little off, maybe SynchronizedList ?
 
-Looks like command 0xc8 (READDMA) goes wrong for some reason?
+The more pressing issue, it doesn't seem this code is related to RDMA.
+Does anybody think we should move this code to more appropriate place?
 
-Anyway, looking at commit eda553a442e94dc16d424849b65c6cb7f1
-it seems like there is a known problem in SeaBIOS with
-CONFIG_ATA_DMA=3Dy with real hardware - so maybe we just hit
-the same problem here, too? That would mean that the bug
-is in SeaBIOS and not in QEMU, thus we should simply disable
-that config switch again.
+Thanks,
+Marcel
 
- Thomas
+> +    QemuMutex lock;
+> +    QList *list;
+> +} LockedList;
+
+
+
+
+> +
+>   void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
+>   void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
+> +void rdma_locked_list_init(LockedList *list);
+> +void rdma_locked_list_destroy(LockedList *list);
+> +void rdma_locked_list_append_int64(LockedList *list, int64_t value);
+> +int64_t rdma_locked_list_pop_int64(LockedList *list);
+>   
+>   static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
+>   {
