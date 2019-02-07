@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49774)
+Received: from eggs.gnu.org ([209.51.188.92]:50779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grfcS-0000Z1-8D
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:05:20 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grfii-0002K0-W0
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:11:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1grfcN-0007Nu-5o
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:05:16 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40328)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grfih-0003Uq-QT
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:11:45 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42205)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1grfcI-0007Av-PR
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:05:08 -0500
-Received: by mail-wr1-x442.google.com with SMTP id q1so637251wrp.7
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 01:05:01 -0800 (PST)
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-3-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <c8791020-7fa0-e452-16f1-974ad021dd1d@gmail.com>
-Date: Thu, 7 Feb 2019 11:05:23 +0200
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1grfih-0003UP-KX
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:11:43 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q18so10613766wrx.9
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 01:11:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190131130850.6850-3-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 02/10] hw/rdma: Introduce locked qlist
+References: <20190129062801.15799-1-pagupta@redhat.com>
+	<CAJ+F1CKenN+Ujg1ajtgixwJabir5+zfBAV3r=4LBqodpqHd8iA@mail.gmail.com>
+	<20190206162901.GW12331@redhat.com>
+	<1385614518.70345867.1549524112156.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1385614518.70345867.1549524112156.JavaMail.zimbra@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 7 Feb 2019 10:11:29 +0100
+Message-ID: <CAJ+F1CKia-RCF=oDcKoLAQapD8pRYd4vXhztDspmww+bi-H-AQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,204 +32,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>, xiaohli@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Yuval,
+Hi
 
-On 1/31/19 3:08 PM, Yuval Shaia wrote:
-> To make code more readable move handling of locked list to a generic
-> functions.
+On Thu, Feb 7, 2019 at 8:21 AM Pankaj Gupta <pagupta@redhat.com> wrote:
 >
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->   hw/rdma/rdma_backend.c      | 20 +++++--------------
->   hw/rdma/rdma_backend_defs.h |  8 ++------
->   hw/rdma/rdma_utils.c        | 39 +++++++++++++++++++++++++++++++++++++
->   hw/rdma/rdma_utils.h        |  9 +++++++++
->   4 files changed, 55 insertions(+), 21 deletions(-)
 >
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 5f60856d19..2f6372f8f0 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -527,9 +527,7 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
->       bctx->up_ctx = ctx;
->       bctx->sge = *sge;
->   
-> -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
-> -    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
-> -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
-> +    rdma_locked_list_append_int64(&backend_dev->recv_mads_list, bctx_id);
->   
->       return 0;
->   }
-> @@ -913,23 +911,19 @@ static inline void build_mad_hdr(struct ibv_grh *grh, union ibv_gid *sgid,
->   static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
->                                        RdmaCmMuxMsg *msg)
->   {
-> -    QObject *o_ctx_id;
->       unsigned long cqe_ctx_id;
->       BackendCtx *bctx;
->       char *mad;
->   
->       trace_mad_message("recv", msg->umad.mad, msg->umad_len);
->   
-> -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
-> -    o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
-> -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
-> -    if (!o_ctx_id) {
-> +    cqe_ctx_id = rdma_locked_list_pop_int64(&backend_dev->recv_mads_list);
-> +    if (cqe_ctx_id == -ENOENT) {
->           rdma_warn_report("No more free MADs buffers, waiting for a while");
->           sleep(THR_POLL_TO);
->           return;
->       }
->   
-> -    cqe_ctx_id = qnum_get_uint(qobject_to(QNum, o_ctx_id));
->       bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
->       if (unlikely(!bctx)) {
->           rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
-> @@ -994,8 +988,7 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
->           return -EIO;
->       }
->   
-> -    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
-> -    backend_dev->recv_mads_list.list = qlist_new();
-> +    rdma_locked_list_init(&backend_dev->recv_mads_list);
->   
->       enable_rdmacm_mux_async(backend_dev);
->   
-> @@ -1010,10 +1003,7 @@ static void mad_fini(RdmaBackendDev *backend_dev)
->   {
->       disable_rdmacm_mux_async(backend_dev);
->       qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
-> -    if (backend_dev->recv_mads_list.list) {
-> -        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
-> -        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-> -    }
-> +    rdma_locked_list_destroy(&backend_dev->recv_mads_list);
->   }
->   
->   int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> index 15ae8b970e..bec0457f25 100644
-> --- a/hw/rdma/rdma_backend_defs.h
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -20,6 +20,7 @@
->   #include "chardev/char-fe.h"
->   #include <infiniband/verbs.h>
->   #include "contrib/rdmacm-mux/rdmacm-mux.h"
-> +#include "rdma_utils.h"
->   
->   typedef struct RdmaDeviceResources RdmaDeviceResources;
->   
-> @@ -30,11 +31,6 @@ typedef struct RdmaBackendThread {
->       bool is_running; /* Set by the thread to report its status */
->   } RdmaBackendThread;
->   
-> -typedef struct RecvMadList {
-> -    QemuMutex lock;
-> -    QList *list;
-> -} RecvMadList;
-> -
->   typedef struct RdmaCmMux {
->       CharBackend *chr_be;
->       int can_receive;
-> @@ -48,7 +44,7 @@ typedef struct RdmaBackendDev {
->       struct ibv_context *context;
->       struct ibv_comp_channel *channel;
->       uint8_t port_num;
-> -    RecvMadList recv_mads_list;
-> +    LockedList recv_mads_list;
->       RdmaCmMux rdmacm_mux;
->   } RdmaBackendDev;
->   
-> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-> index f1c980c6be..a2a4ea2a15 100644
-> --- a/hw/rdma/rdma_utils.c
-> +++ b/hw/rdma/rdma_utils.c
-> @@ -14,6 +14,8 @@
->    */
->   
->   #include "qemu/osdep.h"
-> +#include "qapi/qmp/qlist.h"
-> +#include "qapi/qmp/qnum.h"
->   #include "trace.h"
->   #include "rdma_utils.h"
->   
-> @@ -55,3 +57,40 @@ void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
->           pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
->       }
->   }
-> +
-> +void rdma_locked_list_init(LockedList *list)
-> +{
-> +    qemu_mutex_init(&list->lock);
-> +    list->list = qlist_new();
-> +}
-> +
-> +void rdma_locked_list_destroy(LockedList *list)
-> +{
-> +    if (list->list) {
-> +        qlist_destroy_obj(QOBJECT(list->list));
-> +        qemu_mutex_destroy(&list->lock);
-> +        list->list = NULL;
-> +    }
-> +}
-> +
-> +void rdma_locked_list_append_int64(LockedList *list, int64_t value)
-> +{
-> +    qemu_mutex_lock(&list->lock);
-> +    qlist_append_int(list->list, value);
-> +    qemu_mutex_unlock(&list->lock);
-> +}
-> +
-> +int64_t rdma_locked_list_pop_int64(LockedList *list)
-> +{
-> +    QObject *obj;
-> +
-> +    qemu_mutex_lock(&list->lock);
-> +    obj = qlist_pop(list->list);
-> +    qemu_mutex_unlock(&list->lock);
-> +
-> +    if (!obj) {
-> +        return -ENOENT;
-> +    }
-> +
-> +    return qnum_get_uint(qobject_to(QNum, obj));
-> +}
-> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-> index acd148837f..4ba9956f81 100644
-> --- a/hw/rdma/rdma_utils.h
-> +++ b/hw/rdma/rdma_utils.h
-> @@ -29,8 +29,17 @@
->   #define rdma_info_report(fmt, ...) \
->       info_report("%s: " fmt, "rdma", ## __VA_ARGS__)
->   
-> +typedef struct LockedList {
+> Hi Daniel, Marc-Andre,
+>
+> Thanks for your reply. Please find my reply inline.
+>
+> > > > Hotplugging existing char chardev with qmp, dereferences(removes)
+> > > > existing chardev. This patch avoids adding a chardev if a chardev
+> > > > with same id exists.
+> > >
+> > > As you pointed out, if you attempt to add a chardev with an existing
+> > > ID, you get an error:
+> > >
+> > > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{=
+"type":"socket","data":{"addr":{"type":"unix",
+> > > "data": {"path": "/tmp/helloworld1"}}}}}}
+> > > {"return": {}}
+> > > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{=
+"type":"socket","data":{"addr":{"type":"unix",
+> > > "data": {"path": "/tmp/helloworld1"}}}}}}
+> > > {"error": {"class": "GenericError", "desc": "attempt to add duplicate
+> > > property 'charchannel1' to object (type 'container')"}}
+> > >
+> > >
+> > > But the existing chardev is left untouched.
+> > >
+> > > However, since unix socket chardev will delete existing file and
+> > > rebind (this is not always a good idea, but people seem to prefer
+> > > that)
+> > > the rebound socket is removed on error cleanup.
+> > >
+> > >
+> > > I am not sure this is a bug tbh.
+> > >
+> > > Your solution to check for duplicate ID upfront is ok. But any other
+> > > later error path could have the same "bug" effect of removing existin=
+g
+> > > chardev because of the overwrite socket creation.
+> >
+> > Checking the ID is not a useful fix IMHO. Someone could just as easily
+> > send 2 commands with different IDs and the same socket path.
+> >
+> > A more accurate fix would be to iterate over existing chardevs and chec=
+k
+> > whether any of them clash, but even that is useless if you have two
+> > separate QEMU instances and both try to use the same UNIX socket path.
+> > To deal with that you need to start taking out fcntl locks to ensure
+> > real mutual exclusion.
+>
+> The reason we are already throwing error "attempt to add duplicate proper=
+ty"
+> implies we are considering "id" as primary key? Even if we throw the erro=
+r
+> existing chardev should work as before. But this is not the case right no=
+w,
+> it just deletes the existing chardev after error.
 
-The naming is a little off, maybe SynchronizedList ?
+It deletes the socket "file" (since it overwrites it on chardev
+creation). The existing chardev is not deleted:
 
-The more pressing issue, it doesn't seem this code is related to RDMA.
-Does anybody think we should move this code to more appropriate place?
+qemu-system-x86_64 -qmp stdio
+{"QMP": {"version": {"qemu": {"micro": 0, "minor": 0, "major": 3},
+"package": "qemu-3.0.0-3.fc29"}, "capabilities": []}}
+{"execute":"qmp_capabilities"}
+{"return": {}}
+ {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type=
+":"socket","data":{"addr":{"type":"unix",
+"data": {"path": "/tmp/helloworld1"}}}}}}
+{"return": {}}
+{"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type"=
+:"socket","data":{"addr":{"type":"unix",
+"data": {"path": "/tmp/helloworld1"}}}}}}
+{"error": {"class": "GenericError", "desc": "attempt to add duplicate
+property 'charchannel1' to object (type 'container')"}}
+{"execute":"query-chardev"}
+{"return": [{"frontend-open": true, "filename": "vc", "label":
+"serial0"}, {"frontend-open": true, "filename": "stdio", "label":
+"compat_monitor0"}, {"frontend-open": false, "filename":
+"disconnected:unix:/tmp/helloworld1,server", "label": "charchannel1"},
+{"frontend-open": true, "filename": "vc", "label": "parallel0"}]}
 
-Thanks,
-Marcel
 
-> +    QemuMutex lock;
-> +    QList *list;
-> +} LockedList;
+>
+> Thanks,
+> Pankaj
+>
+> >
+> > I think I'd really just call this user error and do nothing
+> >
+> > Regards,
+> > Daniel
+> > --
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange
+> > |:|
+> > |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com
+> > |:|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange
+> > |:|
+> >
 
 
 
-
-> +
->   void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
->   void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
-> +void rdma_locked_list_init(LockedList *list);
-> +void rdma_locked_list_destroy(LockedList *list);
-> +void rdma_locked_list_append_int64(LockedList *list, int64_t value);
-> +int64_t rdma_locked_list_pop_int64(LockedList *list);
->   
->   static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
->   {
+--=20
+Marc-Andr=C3=A9 Lureau
