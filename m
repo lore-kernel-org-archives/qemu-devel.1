@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56373)
+Received: from eggs.gnu.org ([209.51.188.92]:57322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grnsF-0000HC-TO
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:54:08 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvs-0001un-Ui
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grnsD-0000DD-RB
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:54:07 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42498)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002D2-MR
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:52 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33024)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1grnsA-0000Bp-20
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:54:04 -0500
-Received: by mail-ot1-x341.google.com with SMTP id v23so1242137otk.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:54:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20190114011122.5995-1-richard.henderson@linaro.org>
-	<CAFEAcA8XTc5RTxifOA-cYb2FfRaC5ZMBh3AEcxL8LZqh7qxo7Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA8XTc5RTxifOA-cYb2FfRaC5ZMBh3AEcxL8LZqh7qxo7Q@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Feb 2019 17:53:48 +0000
-Message-ID: <CAFEAcA9ecJu19JjSgHrNK9n7tHmjJRkGrRvJZ5MYNLdRCfk-VQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/17] target/arm: Implement ARMv8.5-MemTag
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1grnvr-0002Ap-D9
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:51 -0500
+Received: by mail-wm1-x342.google.com with SMTP id h22so4956411wmb.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:50 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:56:55 +0100
+Message-Id: <1549562254-41157-13-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 12/51] build: convert sound.mak to Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +27,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Will Deacon <will.deacon@arm.com>, Dave P Martin <dave.martin@arm.com>, szabolcs.nagy@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, philmd@redhat.com
 
-On Tue, 5 Feb 2019 at 19:42, Peter Maydell <peter.maydell@linaro.org> wrote:
-> I'm working through review of this, but feel free to rebase on
-> current master (which has now got a pile of your other patches
-> in it, since I've just merged target-arm.next) without waiting
-> for me to finish going through it.
+There is really nothing special in these devices; they are just
+ISA devices.  Instead of including them for each target,
+set CONFIG_ISA_BUS to true, and make the devices default to present
+whenever ISA is available.  More conversion of ISA devices will
+follow.
 
-OK, I've now finished review of it. I haven't looked at the
-last few patches which are linux-user, because it doesn't
-seem worth doing much review on them until we have at least
-a proposed Linux userspace ABI for MemTag to compare them
-against. (If we do want to do an implementation that precedes
-the ABI being nailed down, we need to hide it behind a
-defaults-to-off x-property.)
+Done with the following script:
 
-thanks
--- PMM
+  while read i; do
+     i=${i%=y}; i=${i#CONFIG_}
+     sed -i -e'/^config '$i'$/!b' -en \
+            -e'a\' -e'    default y\' -e'    depends on ISA_BUS' \
+          `grep -lw $i hw/*/Kconfig`
+  done < default-configs/sound.mak
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190123065618.3520-32-yang.zhong@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ default-configs/i386-softmmu.mak        | 2 +-
+ default-configs/mips-softmmu-common.mak | 2 +-
+ default-configs/ppc-softmmu.mak         | 2 +-
+ default-configs/sound.mak               | 4 ----
+ hw/audio/Kconfig                        | 8 ++++++++
+ 5 files changed, 11 insertions(+), 7 deletions(-)
+ delete mode 100644 default-configs/sound.mak
+
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 80c4b49..db841b6 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -2,7 +2,7 @@
+ 
+ CONFIG_PCI=y
+ CONFIG_PCI_DEVICES=y
+-include sound.mak
++CONFIG_ISA_BUS=y
+ include usb.mak
+ include hyperv.mak
+ CONFIG_TEST_DEVICES=y
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index 88f28e5..4a48960 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -1,7 +1,7 @@
+ # Common mips*-softmmu CONFIG defines
+ 
+-include sound.mak
+ include usb.mak
++CONFIG_ISA_BUS=y
+ CONFIG_PCI=y
+ CONFIG_PCI_DEVICES=y
+ CONFIG_ESP=y
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index f47c069..f1d06f4 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -1,7 +1,7 @@
+ # Default configuration for ppc-softmmu
+ 
+-include sound.mak
+ include usb.mak
++CONFIG_ISA_BUS=y
+ CONFIG_PCI=y
+ CONFIG_PCI_DEVICES=y
+ CONFIG_TEST_DEVICES=y
+diff --git a/default-configs/sound.mak b/default-configs/sound.mak
+deleted file mode 100644
+index 4f22c34..0000000
+--- a/default-configs/sound.mak
++++ /dev/null
+@@ -1,4 +0,0 @@
+-CONFIG_SB16=y
+-CONFIG_ADLIB=y
+-CONFIG_GUS=y
+-CONFIG_CS4231A=y
+diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
+index aa5c82b..dedb513 100644
+--- a/hw/audio/Kconfig
++++ b/hw/audio/Kconfig
+@@ -1,5 +1,7 @@
+ config SB16
+     bool
++    default y
++    depends on ISA_BUS
+ 
+ config ES1370
+     bool
+@@ -13,12 +15,18 @@ config AC97
+ 
+ config ADLIB
+     bool
++    default y
++    depends on ISA_BUS
+ 
+ config GUS
+     bool
++    default y
++    depends on ISA_BUS
+ 
+ config CS4231A
+     bool
++    default y
++    depends on ISA_BUS
+ 
+ config HDA
+     bool
+-- 
+1.8.3.1
