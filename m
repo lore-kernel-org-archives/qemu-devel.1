@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41013)
+Received: from eggs.gnu.org ([209.51.188.92]:41106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1groYk-0000Ih-0K
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:04 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1groYr-0000P7-HY
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1groYf-0007UV-Mc
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:00 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:38528)
+	(envelope-from <alex.bennee@linaro.org>) id 1groYn-0007fz-O4
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:07 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1groYe-0007IK-SP
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:37:57 -0500
-Received: by mail-wm1-x329.google.com with SMTP id v26so936753wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:37:50 -0800 (PST)
+	id 1groYl-0007UL-1Q
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:38:03 -0500
+Received: by mail-wr1-x441.google.com with SMTP id a16so997741wrv.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:37:58 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  7 Feb 2019 18:37:31 +0000
-Message-Id: <20190207183744.5054-4-alex.bennee@linaro.org>
+Date: Thu,  7 Feb 2019 18:37:40 +0000
+Message-Id: <20190207183744.5054-13-alex.bennee@linaro.org>
 In-Reply-To: <20190207183744.5054-1-alex.bennee@linaro.org>
 References: <20190207183744.5054-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/16] .travis.yml: separate tools and docs
- into another entry
+Subject: [Qemu-devel] [PATCH v2 12/16] tests/vm: move images to
+ $HOME/.cache/qemu-vm/images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +31,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Re-building the tools and documents by default is a little wasteful as
-they are not really affected by the main build options. Split tools
-and documents into their own task with a minimal softmmu and
-linux-user target list just to check they don't interact badly.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+It's easier to move around the images then, by replacing the
+subdirectory with a symlink.  Allows to share the images between
+multiple qemu checkouts for example.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .travis.yml | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ tests/vm/Makefile.include | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index beea941408..652be702ac 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -59,6 +59,7 @@ env:
-   global:
-     - SRC_DIR="."
-     - BUILD_DIR="."
-+    - BASE_CONFIG="--disable-docs --disable-tools"
-     - TEST_CMD="make check -j3 V=1"
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index a98fb3027f..a58383d263 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -3,7 +3,8 @@
+ .PHONY: vm-build-all vm-clean-all
+ 
+ IMAGES := ubuntu.i386 freebsd netbsd openbsd centos
+-IMAGE_FILES := $(patsubst %, tests/vm/%.img, $(IMAGES))
++IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
++IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
+ 
+ .PRECIOUS: $(IMAGE_FILES)
+ 
+@@ -24,9 +25,10 @@ vm-build-all: $(addprefix vm-build-, $(IMAGES))
+ vm-clean-all:
+ 	rm -f $(IMAGE_FILES)
+ 
+-tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
+-		$(SRC_PATH)/tests/vm/basevm.py \
+-		$(SRC_PATH)/tests/vm/Makefile.include
++$(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
++			$(SRC_PATH)/tests/vm/basevm.py \
++			$(SRC_PATH)/tests/vm/Makefile.include
++	@mkdir -p $(IMAGES_DIR)
+ 	$(call quiet-command, \
+ 		$< \
+ 		$(if $(V)$(DEBUG), --debug) \
+@@ -37,7 +39,7 @@ tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
  
  
-@@ -69,7 +70,7 @@ git:
- 
- before_script:
-   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
--  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
-+  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
- script:
-   - make -j3 && ${TEST_CMD}
- 
-@@ -104,6 +105,17 @@ matrix:
-         - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
- 
- 
-+    # Check we can build docs and tools
-+    - env:
-+        - BASE_CONFIG="--enable-tools --enable-docs"
-+        - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
-+      addons:
-+        apt:
-+          packages:
-+            - python-sphinx
-+            - texinfo
-+            - perl
-+
-     # Test out-of-tree builds
-     - env:
-         - CONFIG="--enable-debug --enable-debug-tcg"
-@@ -241,5 +253,5 @@ matrix:
- 
- 
-     - env:
--        - CONFIG="--disable-system --disable-docs"
-+        - CONFIG="--disable-system"
-         - TEST_CMD="make -j3 check-tcg V=1"
+ # Build in VM $(IMAGE)
+-vm-build-%: tests/vm/%.img
++vm-build-%: $(IMAGES_DIR)/%.img
+ 	$(call quiet-command, \
+ 		$(SRC_PATH)/tests/vm/$* \
+ 		$(if $(V)$(DEBUG), --debug) \
 -- 
 2.20.1
