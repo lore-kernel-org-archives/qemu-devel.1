@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58067)
+Received: from eggs.gnu.org ([209.51.188.92]:58594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwt-0002sz-9L
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:57 -0500
+	(envelope-from <crosa@redhat.com>) id 1grnyQ-0004T2-9C
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:00:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwq-0002k8-Mi
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:55 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46153)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnwq-0002X5-AD
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:52 -0500
-Received: by mail-wr1-x441.google.com with SMTP id l9so764988wrt.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:24 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:57:29 +0100
-Message-Id: <1549562254-41157-47-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 46/51] sparc-softmmu.mak: express dependencies
- with Kconfig
+	(envelope-from <crosa@redhat.com>) id 1grnyG-0003X9-NZ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:00:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50972)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1grnyF-0003WQ-52
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:00:20 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu,  7 Feb 2019 13:00:11 -0500
+Message-Id: <20190207180012.27303-3-crosa@redhat.com>
+In-Reply-To: <20190207180012.27303-1-crosa@redhat.com>
+References: <20190207180012.27303-1-crosa@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 2/3] Acceptance tests: depend on qemu-img
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +27,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com
+Cc: Samuel Ortiz <sameo@linux.intel.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-%-softmmu.mak only keep boards and optional device
-definitions in Kconfig mode.
+Tests using the avocado.utils.vmimage library make use of qemu-img,
+and because it makes sense to use the version matching the rest of the
+source code, let's make sure it gets built.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Its selection, instead of a possible qemu-img binary installed system
+wide, is already dealt with by the change that adds the build dir to
+the PATH during the test execution.
+
+This is based on the same work for qemu-iotests, and suggested by its
+author:
+
+  - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00951.html
+
+CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- default-configs/sparc-softmmu.mak | 22 ++++++----------------
- hw/misc/Kconfig                   |  1 +
- hw/net/Kconfig                    |  1 +
- hw/sparc/Kconfig                  | 13 +++++++++++++
- 4 files changed, 21 insertions(+), 16 deletions(-)
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
-index b31a9f2..ee85218 100644
---- a/default-configs/sparc-softmmu.mak
-+++ b/default-configs/sparc-softmmu.mak
-@@ -1,21 +1,11 @@
- # Default configuration for sparc-softmmu
- 
--CONFIG_ISA_BUS=y
--CONFIG_ECC=y
--CONFIG_ESP=y
--CONFIG_ESCC=y
--CONFIG_M48T59=y
--CONFIG_FDC=y
--CONFIG_EMPTY_SLOT=y
--CONFIG_PCNET_COMMON=y
--CONFIG_LANCE=y
--CONFIG_TCX=y
--CONFIG_CG3=y
--CONFIG_SLAVIO=y
--CONFIG_CS4231=y
--CONFIG_GRLIB=y
--CONFIG_STP2000=y
--CONFIG_ECCMEMCTL=y
-+# Uncomment the following lines to disable these optional devices:
-+#
-+#CONFIG_TCX=n
-+#CONFIG_CG3=n
- 
-+# Boards:
-+#
- CONFIG_SUN4M=y
- CONFIG_LEON3=y
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 728c561..11d4b30 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -71,6 +71,7 @@ config IVSHMEM_DEVICE
- 
- config ECCMEMCTL
-     bool
-+    select ECC
- 
- config IMX
-     bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index 1aa1071..c132180 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -77,6 +77,7 @@ config STELLARIS_ENET
- 
- config LANCE
-     bool
-+    select PCNET_COMMON
- 
- config SUNHME
-     bool
-diff --git a/hw/sparc/Kconfig b/hw/sparc/Kconfig
-index c9c2142..2a83a80 100644
---- a/hw/sparc/Kconfig
-+++ b/hw/sparc/Kconfig
-@@ -1,8 +1,21 @@
- config SUN4M
-     bool
-+    imply TCX
-+    imply CG3
-+    select CS4231
-+    select ECCMEMCTL
-+    select EMPTY_SLOT
-+    select ESCC
-+    select ESP
-+    select FDC
-+    select SLAVIO
-+    select LANCE
-+    select M48T59
-+    select STP2000
- 
- config LEON3
-     bool
-+    select GRLIB
- 
- config GRLIB
-     bool
--- 
-1.8.3.1
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b39e989f72..9a2fb94f4a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1111,7 +1111,7 @@ $(TESTS_RESULTS_DIR):
+=20
+ check-venv: $(TESTS_VENV_DIR)
+=20
+-check-acceptance: check-venv $(TESTS_RESULTS_DIR)
++check-acceptance: check-venv $(TESTS_RESULTS_DIR) qemu-img$(EXESUF)
+ 	$(call quiet-command, \
+             $(TESTS_VENV_DIR)/bin/python -m avocado \
+             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RES=
+ULTS_DIR) \
+--=20
+2.20.1
