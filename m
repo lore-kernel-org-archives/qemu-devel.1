@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57885)
+Received: from eggs.gnu.org ([209.51.188.92]:59658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grm3y-000521-T9
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:58:07 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCR-0007dT-3E
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grm3x-0008FQ-WB
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:58:06 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42215)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1grm3x-0008Ej-RR
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:58:05 -0500
-Received: by mail-ot1-x342.google.com with SMTP id v23so534163otk.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 07:58:05 -0800 (PST)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCP-0006IW-0Z
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:28481)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1grmCO-0005yi-Nt
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:06:48 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  7 Feb 2019 17:05:59 +0100
+Message-Id: <20190207160617.1142-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190114011122.5995-1-richard.henderson@linaro.org>
-	<20190114011122.5995-5-richard.henderson@linaro.org>
-In-Reply-To: <20190114011122.5995-5-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Feb 2019 15:57:52 +0000
-Message-ID: <CAFEAcA_EWtyqOnsropKbsmAnoZc60H339u5YtoLbx6H6m-K3sQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 04/17] target/arm: Fill in helper_mte_check
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/18] Chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, peter.maydell@linaro.org
 
-On Mon, 14 Jan 2019 at 01:11, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Implements the rules of "PE generation of Checked and
-> Unchecked accesses" which aren't already covered by XXX.
+The following changes since commit 632351e0e1a861f2eaf709b053c53f96a12258=
+25:
 
-What should the "XXX" be here ?
+  Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request' i=
+nto staging (2019-02-07 14:20:46 +0000)
 
-> Implements the rules of "PE handling of Tag Check Failure".
->
-> Does not implement tag physical address space, so all
-> operations reduce to unchecked so far.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/mte_helper.c | 80 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 79 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-> index a3226c44a4..6f4bc0aa04 100644
-> --- a/target/arm/mte_helper.c
-> +++ b/target/arm/mte_helper.c
-> @@ -25,8 +25,86 @@
->  #include "exec/helper-proto.h"
->
->
-> +static int get_allocation_tag(CPUARMState *env, uint64_t ptr)
-> +{
-> +    /* Tag storage not implemented.  */
-> +    return -1;
-> +}
-> +
-> +static int allocation_tag_from_addr(uint64_t ptr)
-> +{
-> +    return (extract64(ptr, 56, 4) + extract64(ptr, 55, 1)) & 15;
-> +}
-> +
->  uint64_t HELPER(mte_check)(CPUARMState *env, uint64_t ptr)
->  {
-> -    /* Only unchecked implemented so far.  */
-> +    ARMMMUIdx mmu_idx = arm_stage1_mmu_idx(env);
-> +    ARMVAParameters param = aa64_va_parameters(env, ptr, mmu_idx, true);
-> +    int ptr_tag, mem_tag;
-> +
-> +    /*
-> +     * If TBI is disabled, then the access is unchecked.
-> +     * While we filtered out TBI0==0 && TBI1==0 in cpu_get_tb_cpu_state,
-> +     * we did not save separate bits for TBI0 != TBI1.
-> +     */
-> +    if (!param.tbi) {
-> +        /* Do not ignore the top byte.  */
-> +        return ptr;
-> +    }
-> +
-> +    /*
-> +     * If TCMA is enabled, then physical tag 0 is unchecked.
-> +     * Note the rules R0076 & R0077 are written with logical tags,
-> +     * and we need the physical tag below anyway.
-> +     */
-> +    ptr_tag = allocation_tag_from_addr(ptr);
-> +    if (param.tcma && ptr_tag == 0) {
-> +        goto pass;
-> +    }
-> +
-> +    /*
-> +     * If an access is made to an address that does not provide tag storage,
-> +     * the result is implementation defined (R0006).  We choose to treat the
-> +     * access as unchecked.
-> +     * This is similar to MemAttr != Tagged, which are also unchecked.
-> +     */
-> +    mem_tag = get_allocation_tag(env, ptr);
-> +    if (mem_tag < 0) {
-> +        goto pass;
-> +    }
-> +
-> +    /* If the tags do not match, the tag check operation fails.  */
-> +    if (ptr_tag != mem_tag) {
-> +        int el = arm_current_el(env);
-> +        int tcf;
-> +
-> +        /* Indicate the tag check fail, both async and sync reporting.  */
-> +        env->cp15.tfsr_el[el] |= 1 << param.select;
+are available in the Git repository at:
 
-We should only update the TFSR bits if we're not taking a fault
-(ie if tcf == 2).
+  https://github.com/elmarco/qemu.git tags/chardev-pull-request
 
-> +
-> +        if (el == 0) {
-> +            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
-> +            tcf = extract64(env->cp15.sctlr_el[1], 38, 2);
-> +        } else {
-> +            tcf = extract64(env->cp15.sctlr_el[el], 40, 2);
-> +        }
-> +        if (tcf == 1) {
-> +            /* Tag check fail causes a synchronous exception.  */
-> +            CPUState *cs = ENV_GET_CPU(env);
-> +
-> +            /*
-> +             * In restore_state_to_opc, we set the exception syndrome
-> +             * for the load or store operation.  Do that first so we
-> +             * may overwrite that with the syndrome for the tag check.
-> +             */
-> +            cpu_restore_state(cs, GETPC(), true);
-> +            env->exception.vaddress = ptr;
-> +            raise_exception(env, EXCP_DATA_ABORT,
-> +                            syn_data_abort_no_iss(el != 0, 0, 0, 0, 0, 0x11),
-> +                            exception_target_el(env));
-> +        }
-> +    }
-> +
-> + pass:
-> +    /* Unchecked, or tag check pass.  Ignore the top byte.  */
->      return sextract64(ptr, 0, 55);
->  }
+for you to fetch changes up to df3afdedd23ade0c9de55cadeb1d85055689023f:
 
-Remarks from earlier patch still apply about the 'unchecked or check pass'
-code path needing to do the usual TBI stuff.
+  tests/test-char: add muxed chardev testing for open/close (2019-02-07 1=
+6:18:25 +0100)
 
-thanks
--- PMM
+----------------------------------------------------------------
+Various chardev fixes
+
+----------------------------------------------------------------
+
+Artem Pisarenko (2):
+  chardev: fix mess in OPENED/CLOSED events when muxed
+  tests/test-char: add muxed chardev testing for open/close
+
+Daniel P. Berrang=C3=A9 (16):
+  io: store reference to thread information in the QIOTask struct
+  io: add qio_task_wait_thread to join with a background thread
+  chardev: fix validation of options for QMP created chardevs
+  chardev: forbid 'reconnect' option with server sockets
+  chardev: forbid 'wait' option with client sockets
+  chardev: remove many local variables in qemu_chr_parse_socket
+  chardev: ensure qemu_chr_parse_compat reports missing driver error
+  chardev: remove unused 'sioc' variable & cleanup paths
+  chardev: split tcp_chr_wait_connected into two methods
+  chardev: split up qmp_chardev_open_socket connection code
+  chardev: use a state machine for socket connection state
+  chardev: honour the reconnect setting in tcp_chr_wait_connected
+  chardev: disallow TLS/telnet/websocket with tcp_chr_wait_connected
+  chardev: fix race with client connections in tcp_chr_wait_connected
+  tests: expand coverage of socket chardev test
+  chardev: ensure termios is fully initialized
+
+ include/chardev/char-fe.h      |  18 +-
+ include/io/task.h              |  29 +-
+ chardev/char-fe.c              |  33 +-
+ chardev/char-mux.c             |  16 +-
+ chardev/char-serial.c          |   2 +-
+ chardev/char-socket.c          | 487 ++++++++++++++++------
+ chardev/char.c                 |   2 +
+ io/task.c                      |  98 +++--
+ tests/ivshmem-test.c           |   2 +-
+ tests/libqtest.c               |   4 +-
+ tests/test-char.c              | 723 +++++++++++++++++++++++++--------
+ tests/test-filter-redirector.c |   4 +-
+ io/trace-events                |   2 +
+ 13 files changed, 1061 insertions(+), 359 deletions(-)
+
+--=20
+2.20.1.519.g8feddda32c
