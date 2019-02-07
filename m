@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54162)
+Received: from eggs.gnu.org ([209.51.188.92]:55394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grdR9-0002gq-Jl
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 01:45:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1grdbZ-0004QX-BU
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 01:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grdR8-0000Ni-LJ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 01:45:27 -0500
-Received: from mga12.intel.com ([192.55.52.136]:15054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1grdR8-0000M0-Cp
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 01:45:26 -0500
-Date: Thu, 7 Feb 2019 23:16:05 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20190207151604.GA56533@tiger-server>
-References: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
-	<3497114cb20658d8b40837675dcac9c78c04a345.1549473586.git.yi.z.zhang@linux.intel.com>
-	<20190206132538-mutt-send-email-mst@kernel.org>
+	(envelope-from <armbru@redhat.com>) id 1grdbY-0006f4-F7
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 01:56:13 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190206195551.28893-1-mreitz@redhat.com>
+	<20190206195551.28893-2-mreitz@redhat.com>
+Date: Thu, 07 Feb 2019 07:56:07 +0100
+In-Reply-To: <20190206195551.28893-2-mreitz@redhat.com> (Max Reitz's message
+	of "Wed, 6 Feb 2019 20:55:44 +0100")
+Message-ID: <87mun8jddk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190206132538-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V12 5/5] docs: Added MAP_SYNC documentation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 2019-02-06 at 13:29:37 -0500, Michael S. Tsirkin wrote:
-> On Thu, Feb 07, 2019 at 01:27:29AM +0800, Zhang, Yi wrote:
-> > From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > 
-> > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > ---
-> >  docs/nvdimm.txt | 25 ++++++++++++++++++++++---
-> >  qemu-options.hx |  4 ++++
-> >  2 files changed, 26 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> > index 5f158a6..e2bf89f 100644
-> > --- a/docs/nvdimm.txt
-> > +++ b/docs/nvdimm.txt
-> > @@ -143,9 +143,28 @@ Guest Data Persistence
-> >  ----------------------
-> >  
-> >  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> > -currently the only one that can guarantee the guest write persistence
-> > -is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
-> > -which all guest access do not involve any host-side kernel cache.
-> > +the only backend that can guarantee the guest write persistence is:
-> > +
-> > +A. DAX device (e.g., /dev/dax0.0, ) or
-> > +B. DAX file(mounted with dax option)
-> > +
-> > +both are from the real NVDIMM device, all guest access do not
-> > +involve any host-side kernel cache.
-> 
-> I'm not sure - what do above 2 lines mean?
-> That cache must not be used if persistence is desired?
-same meaning of direct mapping of pmem, 
-Ah, Maybe better to change to:
-"both are backend from the real NVDIMM device, which supportting direct
-mapping of persistent memory." ?
-> 
-> > +
-> > +When using B (A file supporting direct mapping of persistent memory)
-> > +as a backend, write persistence is guaranteed if the host kernel has
-> > +support for the MAP_SYNC flag in the mmap system call (available
-> > +since Linux 4.15 and on certain distro kernels) and additionally
-> > +both 'pmem' and 'share' flags are set to 'on' on the backend.
-> > +
-> > +If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-> > +are not set, if the backend file does not support DAX or if MAP_SYNC
-> > +is not supported by the host kernel, write persistence is not
-> > +guaranteed after a system crash. For compatibility reasons, these
-> > +conditions are silently ignored if not satisfied. Currently, no way
-> > +is provided to test for them.
-> > +For more details, please reference mmap(2) man page:
-> > +http://man7.org/linux/man-pages/man2/mmap.2.html.
-> >  
-> >  When using other types of backends, it's suggested to set 'unarmed'
-> >  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 08f8516..0cd41f4 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
-> >  If @option{pmem} is set to 'on', QEMU will take necessary operations to
-> >  guarantee the persistence of its own writes to @option{mem-path}
-> >  (e.g. in vNVDIMM label emulation and live migration).
-> > +Also, we will map the backend-file with MAP_SYNC flag, which can ensure
-> 
-> should be
-> 	which ensures
-> 
-> > +the file metadata is in sync to @option{mem-path}
-> 
-> 
-> should be
-> 	for @option{mem-path}
-> 
-> > in case of host crash
-> > +or a power failure. MAP_SYNC requires support from both the host kernel
-> > +(since Linux kernel 4.15) and @option{mem-path}
-> 
-> 
-> should be
-> 	and the filesystem of @option{mem-path}
-Thanks, will update it.
-> 
-> > (only files supporting DAX).
-> >  
-> >  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
-> >  
-> > -- 
-> > 2.7.4
+Max Reitz <mreitz@redhat.com> writes:
+
+> This patch allows specifying a discriminator that is an optional member
+> of the base struct.  In such a case, a default value must be provided
+> that is used when no value is given.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qapi/introspect.json           |  8 +++++
+>  scripts/qapi/common.py         | 58 ++++++++++++++++++++++++++++------
+>  scripts/qapi/doc.py            | 10 ++++--
+>  scripts/qapi/introspect.py     | 10 ++++--
+>  scripts/qapi/visit.py          | 13 ++++++++
+>  tests/qapi-schema/test-qapi.py |  2 ++
+>  6 files changed, 86 insertions(+), 15 deletions(-)
+>
+> diff --git a/qapi/introspect.json b/qapi/introspect.json
+> index 3d22166b2b..e4740aa7a0 100644
+> --- a/qapi/introspect.json
+> +++ b/qapi/introspect.json
+> @@ -168,6 +168,13 @@
+>  # @tag: the name of the member serving as type tag.
+>  #       An element of @members with this name must exist.
+>  #
+> +# @default-variant: if the @tag element of @members is optional, this
+> +#                   is the default value for choosing a variant.  Its
+> +#                   value will be a valid value for @tag.
+> +#                   Present exactly when @tag is present and the
+> +#                   associated element of @members is optional.
+> +#                   (Since: 4.0)
+> +#
+>  # @variants: variant members, i.e. additional members that
+>  #            depend on the type tag's value.  Present exactly when
+>  #            @tag is present.  The variants are in no particular order,
+> @@ -181,6 +188,7 @@
+>  { 'struct': 'SchemaInfoObject',
+>    'data': { 'members': [ 'SchemaInfoObjectMember' ],
+>              '*tag': 'str',
+> +            '*default-variant': 'str',
+>              '*variants': [ 'SchemaInfoObjectVariant' ] } }
+>  
+>  ##
+
+I'm afraid this could become awkward later on.  Let me explain.
+
+In many programming languages, absent optional arguments / members
+default to a default value specified in the declaration.  Simple.
+
+In others, 'absent' is effectively an additional value.  The code
+consuming the argument / member can interpret 'absent' however it wants.
+It may eliminate the additional value by mapping it to a default value,
+but it can also interpret 'absent' unlike any value.  If there's more
+than one consumer, their interpretations need not be consistent.  The
+declaration provides no clue on semantics of 'absent'.
+
+QAPI is in the latter camp.  I trust you can already sense how much I
+like that.
+
+Now you want to permit optional variant discriminators.  As per general
+rule, their interpretation is left to the code consuming it.  One
+instance of such code is the generated union visitor, which needs to
+decide which variant to visit.  Your default-variant tells it which
+variant to visit.  Other code interpreting the discriminator better be
+consistent with that, but that's the other code's problem.  Hmm.
+
+If I could go back in time, I'd flip QAPI to "'absent' defaults to a
+default value".  Lacking a time machine, we're stuck with cases of
+"'absent' means something you can't express with a value" and "'absent'
+means different things in different contexts" that have been enshrined
+in external interfaces.  Is there anything we could do to improve
+matters for saner cases?
+
+I think there is: we could provide for an *optional* default value.  If
+the schema specifies it, that's what 'absent' means.  If it doesn't, all
+bets are off, just like they are now.
+
+Say we do that (for what it's worth, introspect.json is already prepared
+for it).  How would it play with your default-variant?
+
+If an optional discriminator specifies a default value, then that's the
+default variant.  But wait, if there's also a default-variant, *that's*
+the default variant!  Awkward clash.  To resolve it, we could either
+forbid combining the two, or rule default-variant overrides the default.
+Feels needlessly complicated.
+
+Could we get away with "if you want a default variant, the discriminator
+must specify a default"?
+
+[...]
