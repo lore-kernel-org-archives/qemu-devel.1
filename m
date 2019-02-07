@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37918)
+Received: from eggs.gnu.org ([209.51.188.92]:39618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1grqJ6-0003eL-Tu
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:30:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1grqSg-0006Xn-HX
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1grqIx-0002bP-OR
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:29:56 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33007)
+	(envelope-from <alex.bennee@linaro.org>) id 1grqSf-00071V-G1
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:39:54 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37100)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1grqIw-0002X5-Rl
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:29:51 -0500
-Received: by mail-wr1-x441.google.com with SMTP id a16so1330443wrv.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 12:29:46 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
-	<c0642d4f64a82bf2c04c8b52095d11cf9263b5ad.1548714862.git.DirtY.iCE.hu@gmail.com>
-	<87womn31ac.fsf@dusky.pond.sub.org>
-Message-ID: <f5295fcf-56a1-3593-2ceb-065d88c1e742@gmail.com>
-Date: Thu, 7 Feb 2019 21:29:43 +0100
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1grqSf-0006y2-7d
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:39:53 -0500
+Received: by mail-wr1-x443.google.com with SMTP id c8so1322652wrs.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 12:39:49 -0800 (PST)
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-32-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190130004811.27372-32-cota@braap.org>
+Date: Thu, 07 Feb 2019 20:39:46 +0000
+Message-ID: <87imxvmiy5.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <87womn31ac.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] audio: -audiodev command line
- option basic implementation
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 31/73] cpu: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,132 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-On 2019-01-29 16:56, Markus Armbruster wrote:
-> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
-> 
->> Audio drivers now get an Audiodev * as config paramters, instead of the
->> global audio_option structs.  There is some code in audio/audio_legacy.c
->> that converts the old environment variables to audiodev options (this
->> way backends do not have to worry about legacy options).  It also
->> contains a replacement of -audio-help, which prints out the equivalent
->> -audiodev based config of the currently specified environment variables.
->>
->> Note that backends are not updated and still rely on environment
->> variables.
->>
->> Also note that (due to moving try-poll from global to backend specific
->> option) currently ALSA and OSS will always try poll mode, regardless of
->> environment variables or -audiodev options.
->>
->> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->> ---
-> [...]
->> diff --git a/audio/audio.c b/audio/audio.c
->> index ce8e6ea8c2..b37c245a8a 100644
->> --- a/audio/audio.c
->> +++ b/audio/audio.c
-> [...]
->> @@ -2129,3 +1866,145 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
->>          }
->>      }
->>  }
->> +
->> +static void audio_validate_per_direction_opts(
->> +    AudiodevPerDirectionOptions **pdo, bool *has_pdo, Error **errp)
->> +{
->> +    if (!*has_pdo) {
->> +        *pdo = g_malloc0(sizeof(AudiodevPerDirectionOptions));
->> +        *has_pdo = true;
->> +    }
->> +
->> +    if (!(*pdo)->has_fixed_settings) {
->> +        (*pdo)->has_fixed_settings = true;
->> +        (*pdo)->fixed_settings = true;
->> +    }
->> +    if (!(*pdo)->fixed_settings &&
->> +        ((*pdo)->has_frequency || (*pdo)->has_channels || (*pdo)->has_format)) {
->> +        error_setg(errp,
->> +                   "You can't use frequency, channels or format with fixed-settings=off");
->> +        return;
->> +    }
->> +
->> +    if (!(*pdo)->has_frequency) {
->> +        (*pdo)->has_frequency = true;
->> +        (*pdo)->frequency = 44100;
->> +    }
->> +    if (!(*pdo)->has_channels) {
->> +        (*pdo)->has_channels = true;
->> +        (*pdo)->channels = 2;
->> +    }
->> +    if (!(*pdo)->has_voices) {
->> +        (*pdo)->has_voices = true;
->> +        (*pdo)->voices = 1;
->> +    }
->> +    if (!(*pdo)->has_format) {
->> +        (*pdo)->has_format = true;
->> +        (*pdo)->format = AUDIO_FORMAT_S16;
->> +    }
->> +}
->> +
->> +static void audio_validate_opts(Audiodev *dev, Error **errp)
->> +{
->> +    Error *err = NULL;
->> +
->> +    audio_validate_per_direction_opts(&dev->in, &dev->has_in, &err);
->> +    if (err) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +
->> +    audio_validate_per_direction_opts(&dev->out, &dev->has_out, &err);
->> +    if (err) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +
->> +    if (!dev->has_timer_period) {
->> +        dev->has_timer_period = true;
->> +        dev->timer_period = 10000; /* 100Hz -> 10ms */
->> +    }
->> +}
-> 
-> Drive-by question: this validates just the generic part of Audiodev gets
-> validated, not the driver-specific part.  Is there nothing to validate?
-> Does it happen somewhere else?
 
-Driver specific validation/initialization happens in each driver's init
-function (they're added in the upcoming patches).
+Emilio G. Cota <cota@braap.org> writes:
 
->> +
->> +void audio_parse_option(const char *opt)
->> +{
->> +    AudiodevListEntry *e;
->> +    Audiodev *dev = NULL;
->> +
->> +    Visitor *v = qobject_input_visitor_new_str(opt, "driver", &error_fatal);
->> +    visit_type_Audiodev(v, NULL, &dev, &error_fatal);
->> +    visit_free(v);
->> +
->> +    audio_validate_opts(dev, &error_fatal);
->> +
->> +    e = g_malloc0(sizeof(AudiodevListEntry));
->> +    e->dev = dev;
->> +    QSIMPLEQ_INSERT_TAIL(&audiodevs, e, next);
->> +}
->> +
->> +void audio_init_audiodevs(void)
->> +{
->> +    AudiodevListEntry *e;
->> +
->> +    QSIMPLEQ_FOREACH(e, &audiodevs, next) {
->> +        audio_init(e->dev);
->> +    }
->> +}
-> 
-> Your use of QAPI here looks good to me.
-> 
-> [...]
-> 
+> This finishes the conversion to cpu_halted.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  cpus.c    | 8 ++++----
+>  qom/cpu.c | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/cpus.c b/cpus.c
+> index c4fa3cc876..aee129c0b3 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -204,7 +204,7 @@ static bool cpu_thread_is_idle(CPUState *cpu)
+>      if (cpu_is_stopped(cpu)) {
+>          return true;
+>      }
+> -    if (!cpu->halted || cpu_has_work(cpu) ||
+> +    if (!cpu_halted(cpu) || cpu_has_work(cpu) ||
+>          kvm_halt_in_kernel()) {
+>          return false;
+>      }
+> @@ -1686,7 +1686,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>
+>      cpu->thread_id =3D qemu_get_thread_id();
+>      cpu->created =3D true;
+> -    cpu->halted =3D 0;
+> +    cpu_halted_set(cpu, 0);
+>      current_cpu =3D cpu;
+>
+>      hax_init_vcpu(cpu);
+> @@ -1845,7 +1845,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>                   *
+>                   * cpu->halted should ensure we sleep in wait_io_event
+>                   */
+> -                g_assert(cpu->halted);
+> +                g_assert(cpu_halted(cpu));
+>                  break;
+>              case EXCP_ATOMIC:
+>                  qemu_mutex_unlock_iothread();
+> @@ -2342,7 +2342,7 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+>          info->value =3D g_malloc0(sizeof(*info->value));
+>          info->value->CPU =3D cpu->cpu_index;
+>          info->value->current =3D (cpu =3D=3D first_cpu);
+> -        info->value->halted =3D cpu->halted;
+> +        info->value->halted =3D cpu_halted(cpu);
+>          info->value->qom_path =3D object_get_canonical_path(OBJECT(cpu));
+>          info->value->thread_id =3D cpu->thread_id;
+>  #if defined(TARGET_I386)
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 2c05aa1bca..c5106d5af8 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -261,7 +261,7 @@ static void cpu_common_reset(CPUState *cpu)
+>      }
+>
+>      cpu->interrupt_request =3D 0;
+> -    cpu->halted =3D 0;
+> +    cpu_halted_set(cpu, 0);
+>      cpu->mem_io_pc =3D 0;
+>      cpu->mem_io_vaddr =3D 0;
+>      cpu->icount_extra =3D 0;
+
+
+--
+Alex Benn=C3=A9e
