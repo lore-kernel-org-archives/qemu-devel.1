@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42165)
+Received: from eggs.gnu.org ([209.51.188.92]:42665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1grl1o-0006bR-5b
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:51:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1grl3l-00083U-RQ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1grl1k-0005GT-EE
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:51:47 -0500
-Received: from mx2.suse.de ([195.135.220.15]:56596 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1grl1j-0005DR-Qb
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:51:44 -0500
-From: Andreas Schwab <schwab@suse.de>
-Date: Thu, 07 Feb 2019 15:51:35 +0100
-Message-ID: <mvmmun7y7m0.fsf@suse.de>
+	(envelope-from <eblake@redhat.com>) id 1grl3k-0006fs-Ps
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:53:49 -0500
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+	<20190207102445.71998-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bb7672c3-9b57-ff63-c0dd-1ddace483fa1@redhat.com>
+Date: Thu, 7 Feb 2019 08:53:18 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] linux-user: fix emulation of
- accept4/getpeername/getsockname/recvfrom syscalls
+In-Reply-To: <20190207102445.71998-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XaihfD6KAGFxaGKdNJCzhqWMhOwQlKN0C"
+Subject: Re: [Qemu-devel] [PATCH v3 02/17] block/io: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 
-System calls that return a socket address do so by writing the (possibly
-truncated) address into the provided buffer space, but setting the addrlen
-parameter to the actual size of the address.  To determine how much to
-copy back to the target memory the emulation needs to remember the old
-value of the addrlen parameter, so that it doesn't write past the buffer
-limits.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XaihfD6KAGFxaGKdNJCzhqWMhOwQlKN0C
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
+ jsnow@redhat.com
+Message-ID: <bb7672c3-9b57-ff63-c0dd-1ddace483fa1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 02/17] block/io: use qemu_iovec_init_buf
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+ <20190207102445.71998-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190207102445.71998-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
----
- linux-user/syscall.c | 38 ++++++++++++++++++++++----------------
- 1 file changed, 22 insertions(+), 16 deletions(-)
+On 2/7/19 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Use new qemu_iovec_init_buf() instead of
+> qemu_iovec_init_external( ... , 1), which simplifies the code.
+>=20
+> While being here, use qemu_try_blockalign0 as well.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/io.c | 89 ++++++++++++------------------------------------------=
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 55fa235a56..90bfda3563 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2884,7 +2884,7 @@ static abi_long do_sendrecvmmsg(int fd, abi_ulong target_msgvec,
- static abi_long do_accept4(int fd, abi_ulong target_addr,
-                            abi_ulong target_addrlen_addr, int flags)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
-     int host_flags;
-@@ -2908,10 +2908,11 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(safe_accept4(fd, addr, &addrlen, host_flags));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(safe_accept4(fd, addr, &ret_addrlen, host_flags));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr))
-             ret = -TARGET_EFAULT;
-     }
-     return ret;
-@@ -2921,7 +2922,7 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
- static abi_long do_getpeername(int fd, abi_ulong target_addr,
-                                abi_ulong target_addrlen_addr)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
- 
-@@ -2937,10 +2938,11 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(getpeername(fd, addr, &addrlen));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(getpeername(fd, addr, &ret_addrlen));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr))
-             ret = -TARGET_EFAULT;
-     }
-     return ret;
-@@ -2950,7 +2952,7 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
- static abi_long do_getsockname(int fd, abi_ulong target_addr,
-                                abi_ulong target_addrlen_addr)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
- 
-@@ -2966,10 +2968,11 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(getsockname(fd, addr, &addrlen));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(getsockname(fd, addr, &ret_addrlen));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr))
-             ret = -TARGET_EFAULT;
-     }
-     return ret;
-@@ -3042,7 +3045,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-                             abi_ulong target_addr,
-                             abi_ulong target_addrlen)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     void *host_msg;
-     abi_long ret;
-@@ -3060,10 +3063,12 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             goto fail;
-         }
-         addr = alloca(addrlen);
-+        ret_addrlen = addrlen;
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
--                                      addr, &addrlen));
-+                                      addr, &ret_addrlen));
-     } else {
-         addr = NULL; /* To keep compiler quiet.  */
-+        addrlen = 0; /* To keep compiler quiet.  */
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags, NULL, 0));
-     }
-     if (!is_error(ret)) {
-@@ -3076,8 +3081,9 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             }
-         }
-         if (target_addr) {
--            host_to_target_sockaddr(target_addr, addr, addrlen);
--            if (put_user_u32(addrlen, target_addrlen)) {
-+            host_to_target_sockaddr(target_addr, addr,
-+                                    MIN(addrlen, ret_addrlen));
-+            if (put_user_u32(ret_addrlen, target_addrlen)) {
-                 ret = -TARGET_EFAULT;
-                 goto fail;
-             }
--- 
-2.20.1
+>  1 file changed, 20 insertions(+), 69 deletions(-)
+>=20
+
+> @@ -1477,7 +1456,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(=
+BlockDriverState *bs,
+>  {
+>      BlockDriver *drv =3D bs->drv;
+>      QEMUIOVector qiov;
+> -    struct iovec iov =3D {0};
+> +    void *buf =3D NULL;
+>      int ret =3D 0;
+>      bool need_flush =3D false;
+>      int head =3D 0;
+> @@ -1547,16 +1526,14 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroe=
+s(BlockDriverState *bs,
+>                  need_flush =3D true;
+>              }
+>              num =3D MIN(num, max_transfer);
+> -            iov.iov_len =3D num;
+> -            if (iov.iov_base =3D=3D NULL) {
+> -                iov.iov_base =3D qemu_try_blockalign(bs, num);
+> -                if (iov.iov_base =3D=3D NULL) {
+> +            if (buf =3D=3D NULL) {
+> +                buf =3D qemu_try_blockalign0(bs, num);
+> +                if (buf =3D=3D NULL) {
+>                      ret =3D -ENOMEM;
+>                      goto fail;
+>                  }
+> -                memset(iov.iov_base, 0, num);
+>              }
+> -            qemu_iovec_init_external(&qiov, &iov, 1);
+> +            qemu_iovec_init_buf(&qiov, buf, num);
+
+The use of qemu_try_blockalign0() is new to this revision, but fits in
+well enough that I don't think you need to split the patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+--XaihfD6KAGFxaGKdNJCzhqWMhOwQlKN0C
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcRl8ACgkQp6FrSiUn
+Q2pSSQf+JYS/OlB2kMi6izhaGE69Kyv0R/IZGRz5TH+7b8FEyKtdNdmNz1SFj9Ir
+GZ4aE0TSRvYJmm02MvQTaGXY3JJUC1udCmwaIQwiNCOYP4CJTnWag3KqEsnYVVaa
+nk3dkUVoumDBUSb8Wi2zD89lJ+JU16Xz2FZDR53Df89PDHENz3YYrhwhuCe9oEzZ
+QRXhVJEWE7bii8M4oQ6/PMP9g3l4x3HKWf11wjZTkm5KoUppO94iSou9EIXgwT0K
+UAaaQC0sc2iROY5CuritkiumRnrKa0HQrP+xmPTOi9HjVm6ttE+y4LoNAtD15tn0
+2GuZjwDMqIZFlBl6JuI04GhEdauruw==
+=ZwWt
+-----END PGP SIGNATURE-----
+
+--XaihfD6KAGFxaGKdNJCzhqWMhOwQlKN0C--
