@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38595)
+Received: from eggs.gnu.org ([209.51.188.92]:39068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1griq2-0003Xc-L1
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:31:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1grisL-0004ob-Ni
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gripy-0007Hm-5Y
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:31:28 -0500
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<87mun8gd2x.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <4675f707-1215-80ac-fc27-362688e51df9@redhat.com>
-Date: Thu, 7 Feb 2019 13:31:13 +0100
+	(envelope-from <berrange@redhat.com>) id 1grisK-000094-ET
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:33:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1grisI-0008WQ-Ga
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:33:50 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DB6248E3C1
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 12:33:45 +0000 (UTC)
+Date: Thu, 7 Feb 2019 12:33:38 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190207123338.GG19438@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190206132331.1694-1-quintela@redhat.com>
+	<20190206132331.1694-3-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87mun8gd2x.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Content-Disposition: inline
+In-Reply-To: <20190206132331.1694-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] multifd: Drop x-multifd-page-count
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +35,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, libvir-list@redhat.com, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Markus,
+On Wed, Feb 06, 2019 at 02:23:29PM +0100, Juan Quintela wrote:
+> Libvirt don't want to expose (and explain it).  And testing looks like
+> 128 is good for all use cases, so just drop it.
 
-On 02/07/19 10:30, Markus Armbruster wrote:
-> The thread got long, let me try to summarize, and elaborate a few
-> points.
->=20
-> * The problem at hand is configuring firmware residing in flash memory
->   (OVMF requires this) without legacy -drive.
->=20
-> * The wider problem is configuring onboard devices.  Our general device
->   configuration interface doesn't cover them.  Instead, we have a zoo o=
-f
->   ad hoc interfaces that are much more limited.  Some of them we'd
->   rather deprecate (-drive, -net), but can't until we have a suitable
->   replacements.
->=20
->   I think a board should be a composite object that exposes properties
->   of its own and its parts, just like other composite devices, so that
->   "create, set properties, realize" just works.  That would extend our
->   common device configuration mechanism naturally to onboard devices.
->=20
->   A PC board's flash memory device would be just another part.  It coul=
-d
->   be something like /machine/q35/cfi.pflash01/ in the QOM tree.  To
->   configure it, you'd set its properties, such as
->   /machine/q35/cfi.pflash01/drive.
->=20
->   Note that this requires a way to set an existing device's properties.
->   Perhaps qom-set already works.
->=20
-> * While I do believe we should tackle the wider problem, I'd rather not
->   sit on the narrow problem until we crack it.  So, what can we do abou=
-t
->   it?
->=20
->   - Paolo proposed to add block backend properties to the PC machine,
->     settable like -machine pflash0=3DBLOCK-BACKEND.
->=20
->     Possible drawback: if we add /machine/q35/pflash0 to the QOM tree
->     now, and later replace it by /machine/q35/cfi.pflash01/drive, we'll
->     have to deal with yet another machine type variation.  We'll live.
->=20
->   - I proposed to sidestep our onboard device configuration problem by
->     adding the cfi.pflash01 devices with our existing general device
->     configuration interface: -device.  Possible since the onboard
->     cfi.pflash01 devices are optional.  Requires a small extension to
->     the firmware descriptors, and a bit of extra work in libvirt to
->     process that extension.  I think it's workable, but Paolo's idea is
->     simpler.
->=20
->   I can give Paolo's idea a try.  Objections?
->=20
-> * A flash device supporting multiple regions is desirable, because it's
->   what physical hardware has.  We currently use multiple flash devices
->   instead.  We'll be stuck with them for existing machine types due to
->   guest ABI and migration compatibility.
->=20
-> * cfi.pflash01 currently requires users to opt out of "bad, do not use"=
-.
->   It should require opt in, to guard against accidental new uses of
->   "bad".
->=20
->=20
-> PS: Big thanks to L=C3=A1szl=C3=B3, whose patient guidance helped me ma=
-p this part
-> of the jungle.
->=20
+One significant concern inline...
 
-I've read the above carefully.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hmp.c                 |  7 -------
+>  migration/migration.c | 30 ------------------------------
+>  migration/migration.h |  1 -
+>  migration/ram.c       | 13 ++++++++-----
+>  qapi/migration.json   | 13 +------------
+>  5 files changed, 9 insertions(+), 55 deletions(-)
 
-At the QEMU design level, I don't have any opinion or preference; there
-I simply don't know enough -- and don't suffer from bad decisions enough
--- to make sensible comments.
 
-Regarding the choice betwen "-machine pflash0=3DBLOCK-BACKEND" and
-"-device pflash": I don't object to exploring the former first.
+> @@ -718,7 +721,7 @@ static void multifd_send_fill_packet(MultiFDSendParams *p)
+>      packet->magic = cpu_to_be32(MULTIFD_MAGIC);
+>      packet->version = cpu_to_be32(MULTIFD_VERSION);
+>      packet->flags = cpu_to_be32(p->flags);
+> -    packet->size = cpu_to_be32(migrate_multifd_page_count());
+> +    packet->size = cpu_to_be32(MULTIFD_PAGE_COUNT);
+>      packet->used = cpu_to_be32(p->pages->used);
+>      packet->packet_num = cpu_to_be64(p->packet_num);
+>
 
-I'd just like to note that "-machine pflash0=3DBLOCK-BACKEND" will also
-require changes to the firmware descriptor schema. Not to the types that
-the schema defines -- and therefore concrete descriptor *documents* that
-already conform to the schema wouldn't be affected --, but to the
-documentation that the schema directs at management applications.
+Here the source QEMU sends the page size - which is now
+a hardcoded constant - to the target QEMU.
 
-The schema is supposed to specify (in the documentation) QEMU command
-line options for management applications. If we add "-machine
-pflash0=3DBLOCK-BACKEND", then even if the types in the schema stay the
-same, some mappings to the QEMU cmdline will have to be re-documented.
+> @@ -756,10 +759,10 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
+>      p->flags = be32_to_cpu(packet->flags);
+>  
+>      packet->size = be32_to_cpu(packet->size);
+> -    if (packet->size > migrate_multifd_page_count()) {
+> +    if (packet->size > MULTIFD_PAGE_COUNT) {
+>          error_setg(errp, "multifd: received packet "
+>                     "with size %d and expected maximum size %d",
+> -                   packet->size, migrate_multifd_page_count()) ;
+> +                   packet->size, MULTIFD_PAGE_COUNT) ;
+>          return -1;
+>      }
+>
 
-Of course, that's still easier / less intrusive than changing the types!
-... Which does make me prefer "-machine pflash0=3DBLOCK-BACKEND", if I'm
-being honest.
+Here the dest QEMU receives the page size that the source QEMU used, and
+checks that it is not larger than its constant.
 
-(I hope my followup isn't totally useless. I certainly didn't want to
-ignore your summary.)
+IIUC, the implication here is that if we ever increase the size of this
+constant in future QEMU, we will break live migration from new to old
+QEMU due to this check.  In fact your previous patch in this series has
+done exactly that, so this appears to mean QEMU 4.0 -> QEMU 3.2
+multifd migration is broken now.
 
-Thanks,
-Laszlo
+Alternatively if we decrease the size of the constant in future
+QEMU, we will break live migration from old QEMU to new QEMU which
+is even worse.
+
+This problem existed before this patch, if the management app was
+not explicitly using migrate-set-parameters to set the page count
+on both sides of QEMU. So we're already broken, but at least the
+feature was marked experimental.
+
+What is the purpose of this packet size check ?  Is it something
+we can safely remove, so that we can increase or decrease the
+size at will without breaking migration compat.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
