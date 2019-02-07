@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53769)
+Received: from eggs.gnu.org ([209.51.188.92]:54689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1grhwL-0001wm-GL
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:33:58 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gri0A-00035G-Mw
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1grhw9-0004bH-C7
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:33:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1grhvy-0004VO-BM
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:33:36 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5B4880511
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 11:33:18 +0000 (UTC)
-Date: Thu, 7 Feb 2019 11:33:12 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190207113312.GD19438@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190206132331.1694-1-quintela@redhat.com>
-	<20190206132331.1694-2-quintela@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gri09-0007yV-Me
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:37:54 -0500
+Resent-Message-Id: <E1gri09-0007yV-Me@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gri09-0007PX-Dy
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:37:53 -0500
+Message-ID: <154953942151.29184.7694211057153536439@ebba9967afc0>
+In-Reply-To: <20190207105347.22337-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190206132331.1694-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] multifd: Change page count default to
- 128
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Feb 2019 03:37:02 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 4.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: laurent@vivier.eu
+Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi
 
-On Wed, Feb 06, 2019 at 02:23:28PM +0100, Juan Quintela wrote:
-> I haven't seend any problem about using 64 or 128.  And it make much
-> less contention on the locks.  Just change it.
-
-Isn't there a issue with having a fixed page count given the
-very different default page sizes across architectures ?
-
-x86 is 4kb pages, while ppc64 uses 64kb pages IIUC.
-
-This would mean current value of 64 pages, would correspond
-to 1/4 MB on x86, and 4 MB on ppc64.  The new value would
-be 1/2 MB on x86 and 8 MB on ppc64.
-
-Should we instead be measuring this tunable in units that
-are independant of page size ? eg meansure in KB, with a
-requirement that the value is a multiple of the page size.
-Then set the default to 512 KB ?
-
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index ef1d53cde2..f673486679 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -81,7 +81,7 @@
->  /* The delay time (in ms) between two COLO checkpoints */
->  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
->  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
-> -#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
-> +#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 128
->  
->  /* Background transfer rate for postcopy, 0 means unlimited, note
->   * that page requests can still exceed this limit.
-> -- 
-> 2.20.1
-> 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNzEwNTM0Ny4yMjMz
+Ny0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC8zXSBMaW51eCB1c2VyIGZv
+ciA0LjAgcGF0Y2hlcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAyMDcxMDUzNDcuMjIz
+MzctMS1sYXVyZW50QHZpdmllci5ldQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
+aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
+CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMDYxODE3MjUuMTQzMzct
+MS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjA2MTgxNzI1LjE0MzM3LTEtYXJt
+YnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIw
+NzEwNTM0Ny4yMjMzNy0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxOTAyMDcxMDUz
+NDcuMjIzMzctMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjExZWZkMGI1NTQgbGludXgtdXNlcjogYWRkIG5ldyBuZXRsaW5rIHR5cGVzCmE3YzBhNmE2
+OTYgbGludXgtdXNlcjogQ2hlY2sgc3NjYW5mIHJldHVybiB2YWx1ZSBpbiBvcGVuX25ldF9yb3V0
+ZSgpCmUxZWRiMGJjMDQgRml4IGxpbnV4LXVzZXIgY3Jhc2hlcyBpbiBpb2N0bChTSU9DR0lGQ09O
+Rikgd2hlbiBpZmNfYnVmIGlzIE5VTEwuCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzMgQ2hlY2tp
+bmcgY29tbWl0IGUxZWRiMGJjMDRhZiAoRml4IGxpbnV4LXVzZXIgY3Jhc2hlcyBpbiBpb2N0bChT
+SU9DR0lGQ09ORikgd2hlbiBpZmNfYnVmIGlzIE5VTEwuKQpXQVJOSU5HOiBCbG9jayBjb21tZW50
+cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNDg6IEZJTEU6IGxpbnV4LXVz
+ZXIvc3lzY2FsbC5jOjQyMDA6CisgICAgICAgICAgICAvKiBXZSBjYW4ndCBmaXQgYWxsIHRoZSBl
+eHRlbnRzIGludG8gdGhlIGZpeGVkIHNpemUgYnVmZmVyLgoKRVJST1I6ICIoZm9vKikiIHNob3Vs
+ZCBiZSAiKGZvbyAqKSIKIzYyOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo0MjEwOgorICAg
+ICAgICBob3N0X2lmY19idWYgPSAoY2hhciopaG9zdF9pZmNvbmYgKyBzaXplb2YoKmhvc3RfaWZj
+b25mKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNzMgbGluZXMgY2hlY2tlZAoKUGF0
+Y2ggMS8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzMgQ2hlY2tpbmcgY29tbWl0IGE3
+YzBhNmE2OTZmOCAobGludXgtdXNlcjogQ2hlY2sgc3NjYW5mIHJldHVybiB2YWx1ZSBpbiBvcGVu
+X25ldF9yb3V0ZSgpKQozLzMgQ2hlY2tpbmcgY29tbWl0IDExZWZkMGI1NTQyMiAobGludXgtdXNl
+cjogYWRkIG5ldyBuZXRsaW5rIHR5cGVzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNzEwNTM0Ny4yMjMzNy0xLWxhdXJlbnRAdml2aWVy
+LmV1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
