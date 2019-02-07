@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34355)
+Received: from eggs.gnu.org ([209.51.188.92]:35067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1griXy-0005a9-8k
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:12:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1griaw-0007oh-EI
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1griXw-0005Hu-81
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:12:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1griXo-0005Dw-5P
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:12:43 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE3F089AF9
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 12:12:36 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <d3c2373f-89cf-dc2f-472e-180ddcaaa64e@redhat.com> (Laurent
-	Vivier's message of "Wed, 6 Feb 2019 20:00:46 +0100")
-References: <20190206132331.1694-1-quintela@redhat.com>
-	<20190206132331.1694-3-quintela@redhat.com>
-	<3beec7d3-7a57-30be-affb-c68caa713a60@redhat.com>
-	<87zhr8er47.fsf@trasno.org>
-	<d3c2373f-89cf-dc2f-472e-180ddcaaa64e@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 07 Feb 2019 13:15:22 +0100
-Message-ID: <8736ozg5gl.fsf@trasno.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1griav-0006dA-LQ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:15:54 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1griav-0006cj-FB
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:15:53 -0500
+Received: by mail-wm1-x344.google.com with SMTP id f16so1628636wmh.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 04:15:53 -0800 (PST)
+References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
+	<20190207114913.2c5f2c5b.cohuck@redhat.com>
+	<6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
+	<ffb48b9f-fc99-0766-925c-4f79c692cba7@redhat.com>
+	<1a3f847e-a371-eacb-8be6-678bb3c20b05@debian.org>
+	<951bf77e-f953-48aa-9e2e-3f7c66bb9db2@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <78990142-121a-f84d-811b-60ec503f394b@linaro.org>
+Date: Thu, 7 Feb 2019 12:15:49 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/4] multifd: Drop x-multifd-page-count
- parameter
+In-Reply-To: <951bf77e-f953-48aa-9e2e-3f7c66bb9db2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
+ under qemu-s390x in user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,57 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Giovanni Mascellani <gio@debian.org>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> On 06/02/2019 18:58, Juan Quintela wrote:
->> Laurent Vivier <lvivier@redhat.com> wrote:
->>> On 06/02/2019 14:23, Juan Quintela wrote:
->>>> Libvirt don't want to expose (and explain it).  And testing looks like
->>>> 128 is good for all use cases, so just drop it.
->>>>
->>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>>> ---
->>>>  hmp.c                 |  7 -------
->>>>  migration/migration.c | 30 ------------------------------
->>>>  migration/migration.h |  1 -
->>>>  migration/ram.c       | 13 ++++++++-----
->>>>  qapi/migration.json   | 13 +------------
->>>>  5 files changed, 9 insertions(+), 55 deletions(-)
->>>>
->>> ...
->>>> diff --git a/migration/migration.c b/migration/migration.c
->>>> index f673486679..65df9b566e 100644
->>>> --- a/migration/migration.c
->>>> +++ b/migration/migration.c
->>>> @@ -81,7 +81,6 @@
->>>>  /* The delay time (in ms) between two COLO checkpoints */
->>>>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
->>>>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
->>>> -#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 128
->>>
->>> Why do you update it in the previous patch to remove it in this one?
->> 
->> To make clear that I change the default.  Otherwise it gets hidden into
->> the whole patch.  if you preffer I could have done the other way around.
->
-> OK, I understand. It's not really clear because the new default
-> (MULTIFD_PAGE_COUNT) is hidden in the patch.
->
-> Moreover, in the first patch you update the value, but you don't update
-> the comments in qapi/migration.json (I've seen that because you remove
-> them in this patch).
+On 2/7/19 12:01 PM, Thomas Huth wrote:
+> On 2019-02-07 12:46, Giovanni Mascellani wrote:
+>> Hi,
+>>
+>> Il 07/02/19 12:26, Thomas Huth ha scritto:
+>>> The problem is rather that the STCK instruction is fenced with
+>>> "#ifndef CONFIG_USER_ONLY" ... quick-n-dirty hack to allow it:
+>>
+>> Thanks for the patch. Unfortunately on my system it failes with:
+>>
+>>   LINK    s390x-linux-user/qemu-s390x
+>> /usr/bin/ld: ../libqemuutil.a(cpu-get-icount.o):(.bss+0x0): multiple
+>> definition of `use_icount'; exec.o:(.bss+0x58): first defined here
+>> collect2: error: ld returned 1 exit status
+>> make[1]: *** [Makefile:207: qemu-s390x] Error 1
+>> make: *** [Makefile:432: subdir-s390x-linux-user] Error 2
+>>
+>> The error does not appear when compiling from current master.
+> 
+> I just saw it, too. Seems like the stubs/cpu-get-icount.c file now gets
+> pulled in for some reason. Try this on top:
+> 
+> diff --git a/stubs/cpu-get-icount.c b/stubs/cpu-get-icount.c
+> index 35f0c1e..8da6646 100644
+> --- a/stubs/cpu-get-icount.c
+> +++ b/stubs/cpu-get-icount.c
+> @@ -4,7 +4,7 @@
+>  #include "sysemu/cpus.h"
+>  #include "qemu/main-loop.h"
+> 
+> -int use_icount;
+> +int use_icount __attribute__((weak));
+> 
+>  int64_t cpu_get_icount(void)
+>  {
+> 
+> ... anyway, I'll ponder about that a little bit and will try to come up
+> with a proper, mergable patch instead.
 
-Aha, I knew I was forgetting something.
+See also
 
-> Perhaps you can proceed in the reverse order: remove the parameter and
-> then set the new default... or merge the two patches and saying in the
-> commit message you change the default value.
+  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg06734.html
 
-Ok.
+which I never followed up on the review changes requested.
 
-> Thanks,
-> Laurent
 
-Later, Juan.
+r~
