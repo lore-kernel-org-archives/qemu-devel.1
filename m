@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52099)
+Received: from eggs.gnu.org ([209.51.188.92]:52772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grrfL-0003xK-DP
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:57:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1grrjd-0004q5-8I
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grrfK-0000Nq-JJ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:57:03 -0500
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:34667)
+	(envelope-from <philmd@redhat.com>) id 1grrjb-0001x5-Se
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:01:29 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53771)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grrfK-0000NT-DS
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:57:02 -0500
-Received: by mail-wm1-f44.google.com with SMTP id y185so5382315wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 13:57:02 -0800 (PST)
-References: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grrjZ-0001un-Om
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:01:27 -0500
+Received: by mail-wm1-f68.google.com with SMTP id d15so1475115wmb.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 14:01:23 -0800 (PST)
+References: <20190207183744.5054-1-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a8cd7b35-b473-4197-be03-8a41cf8cdd7f@redhat.com>
-Date: Thu, 7 Feb 2019 22:56:58 +0100
+Message-ID: <8cd5c316-f912-7184-f854-c892a4391990@redhat.com>
+Date: Thu, 7 Feb 2019 23:01:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+In-Reply-To: <20190207183744.5054-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] should we try to stop using variable length arrays?
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] current testing/next queue (with
+ build fixes)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-arm@nongnu.org
 
-On 2/7/19 8:30 PM, Peter Maydell wrote:
-> Currently QEMU has 9 uses of variable length arrays
-> (found using -Wvla):
+Cc'ing Michael.
+
+On 2/7/19 7:37 PM, Alex Bennée wrote:
 > 
-> hw/block/dataplane/virtio-blk.c:62:25: warning: variable length array
-> used [-Wvla]
->     unsigned long bitmap[BITS_TO_LONGS(nvqs)];
->                         ^
-> hw/i386/multiboot.c:364:18: warning: variable length array used [-Wvla]
->     char kcmdline[strlen(kernel_filename) + strlen(kernel_cmdline) + 2];
->                  ^
-> hw/i386/xen/xen-hvm.c:618:25: warning: variable length array used [-Wvla]
->     unsigned long bitmap[DIV_ROUND_UP(npages, width)];
->                         ^
-> hw/intc/xics.c:604:18: warning: variable length array used [-Wvla]
->     uint8_t flags[ics->nr_irqs];
->                  ^
-> hw/net/fsl_etsec/rings.c:383:18: warning: variable length array used [-Wvla]
->     uint8_t  padd[etsec->rx_padding];
->                  ^
-> hw/ppc/pnv.c:130:26: warning: variable length array used [-Wvla]
->     uint32_t servers_prop[smt_threads];
->                          ^
-> hw/ppc/spapr.c:162:26: warning: variable length array used [-Wvla]
->     uint32_t servers_prop[smt_threads];
->                          ^
-> hw/ppc/spapr.c:163:27: warning: variable length array used [-Wvla]
->     uint32_t gservers_prop[smt_threads * 2];
->                           ^
-> linux-user/syscall.c:3478:23: warning: variable length array used [-Wvla]
->     struct sembuf sops[nsops];
->                       ^
+> Hi,
 > 
-> Should we be looking to get rid of these and turn on the -Wvla
-> warning? I know the Linux kernel has recently decided to do this
-
-Yes please!
-
-> (some rationale at the start of https://lwn.net/Articles/749064/).
-> Now that doesn't necessarily apply to us as a userspace program,
-> but on the other hand if any of these were allowing the guest to
-> determine the size of an on-stack array that would not be great.
-> (The linux-user one is bogus in that way, though not a security issue
-> as the guest code there has full control anyway.)
-
-The manpage says "[The semaphore] limit should not be raised above 1000".
-
+> There are a few more additions from the last iteration including some
+> more fixes to try and get Travis green again. It's nice to see our ARM
+> features are now catching up we need a newer toolchain to build
+> things. I did try upgrading to debian 10 for the cross build but there
+> are some upstream problems with the multiarch build deps that get in
+> the way of that. People with Debian packaging experience can jump in
+> on:
 > 
-> Opinions? I admit that to some extent this is just my sense of
-> tidiness thinking that if we only have a handful of uses of
-> something we should squash that down to zero :-)
-
-None of these case have strong justification to use the stack rather
-than the heap (and the rest of the codebase heavily uses the heap).
-
+>   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=921458
+>   (dependancy on gcc-s390x-linux-gnu fails on non-x86 hosts)
 > 
-> thanks
-> -- PMM
+>   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=921648
+>   (apt-get build-dep -a arm64 qemu fails on multiarch setup)
+> 
+> as it would be good to get these problems fixed as we get to
+> softfreeze (and given how much we leverage Debian's cross toolchains).
+> 
+> If all the testing is green by tomorrow I'll put together a pull
+> request. Unless people are desperate to grab the arm64 compiler image
+> now as a build fix?
+> 
+> The following patches need review
+>  patch 0004/.travis.yml fold disable tcg into alternate corou.patch
+>  patch 0007/docker add debian buster arm64 cross.patch
+>  patch 0008/tests make docker.py update use configured binfmt.patch
+>  patch 0009/tests make docker.py check for persistent configs.patch
+>  patch 0010/tests docker.py be even smarter with persistent b.patch
+>  patch 0011/tests PEP8 cleanup of docker.py mostly white spac.patch
+>  patch 0016/scripts qemu.py allow arches use KVM for their 32.patch
+> 
+> 
+> Alex Bennée (11):
+>   .travis.yml: separate tools and docs into another entry
+>   .travis.yml: fold --disable-tcg into alternate coroutine builds
+>   docker: add debian-buster-arm64-cross
+>   tests: make docker.py update use configured binfmt path
+>   tests: make docker.py check for persistent configs
+>   tests: docker.py be even smarter with persistent binfmt_misc
+>   tests: PEP8 cleanup of docker.py, mostly white space
+>   tests/vm: call make check directly for netbsd/freebsd/ubuntu.i386
+>   tests/vm: add --build-target option
+>   tests/vm: expose BUILD_TARGET, TARGET_LIST and EXTRA_CONFIGURE_OPTS
+>   scripts/qemu.py: allow arches use KVM for their 32bit cousins
+> 
+> Daniel P. Berrangé (1):
+>   .travis.yml: stop requesting libffi & gettext from homebrew
+> 
+> Ed Maste (1):
+>   .cirrus.yml: basic compile and test for FreeBSD
+> 
+> Gerd Hoffmann (1):
+>   tests/vm: move images to $HOME/.cache/qemu-vm/images
+> 
+> Philippe Mathieu-Daudé (2):
+>   MAINTAINERS: Add an entry for scripts/archive-source.sh
+>   archive-source.sh: Clone the submodules locally
+> 
+>  .cirrus.yml                                   |  16 +++
+>  .travis.yml                                   |  31 +++--
+>  MAINTAINERS                                   |   9 ++
+>  scripts/archive-source.sh                     |   7 ++
+>  scripts/qemu.py                               |  12 +-
+>  tests/docker/Makefile.include                 |   1 +
+>  tests/docker/docker.py                        | 110 +++++++++++++-----
+>  .../debian-buster-arm64-cross.docker          |  15 +++
+>  tests/docker/dockerfiles/debian10.docker      |  31 +++++
+>  tests/tcg/aarch64/Makefile.include            |   2 +-
+>  tests/vm/Makefile.include                     |  22 +++-
+>  tests/vm/basevm.py                            |   3 +
+>  tests/vm/freebsd                              |   3 +-
+>  tests/vm/netbsd                               |   3 +-
+>  tests/vm/ubuntu.i386                          |   3 +-
+>  15 files changed, 213 insertions(+), 55 deletions(-)
+>  create mode 100644 .cirrus.yml
+>  create mode 100644 tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian10.docker
 > 
