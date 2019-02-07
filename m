@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39608)
+Received: from eggs.gnu.org ([209.51.188.92]:39958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1grksz-0007np-U9
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:42:42 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grkuU-0000XN-8V
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1grkso-0004VC-Io
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:42:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1grksk-0004TA-HL
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:42:28 -0500
-Date: Thu, 7 Feb 2019 14:42:10 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190207144210.GM19438@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
-	<20190207132935.ijtfsiafpfggugiz@function>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1grkuT-0005aF-I8
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:44:14 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1grkuT-0005Yi-74
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:44:13 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f16so103573wmh.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 06:44:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190207132935.ijtfsiafpfggugiz@function>
+References: <cover.1549545591.git.berto@igalia.com>
+	<c741408825d01f5a186901c5a8248126ffebe9fd.1549545591.git.berto@igalia.com>
+	<CAMxuvayhuXEWTvJqNyKFjuae3u47MnjN4NPQ_J+vVWLK9pM5Rg@mail.gmail.com>
+	<CAMxuvawnNqvUYf2Z-+8zX63wRNFp+F_A7Uo==pY_9n1HDXumqQ@mail.gmail.com>
+	<w51ftszhdwg.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51ftszhdwg.fsf@maestria.local.igalia.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 7 Feb 2019 15:43:59 +0100
+Message-ID: <CAJ+F1CKA_WuJog780XFWXG3VHTtUzjMw8e+X_GPoWdMrQygY1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULLv3 00/32] More work towards libslirp
+Subject: Re: [Qemu-devel] [PATCH 1/3] main-loop: Don't leak GSources
+ attached to a GMainContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Feb 07, 2019 at 03:29:35PM +0200, Samuel Thibault wrote:
-> Peter Maydell, le jeu. 07 f=C3=A9vr. 2019 11:46:23 +0000, a ecrit:
-> > On Tue, 5 Feb 2019 at 18:28, Samuel Thibault
-> > <samuel.thibault@ens-lyon.org> wrote:
-> > >
-> > > The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a=
-356e159d:
-> > >
-> > >   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pul=
-l-request' into staging (2019-02-05 14:01:29 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibaul=
-t
-> > >
-> > > for you to fetch changes up to 1e924479dce65a26a7432bf5920f89c1bf95=
-7d74:
-> > >
-> > >   slirp: API is extern C (2019-02-05 20:27:27 +0200)
-> > >
-> > > ----------------------------------------------------------------
-> > > More work towards libslirp
-> > >
-> >=20
-> > Format string issues for the Windows build:
->=20
-> Oh, I am not getting these errors with make docker-test-mingw@fedora,
-> perhaps something would need to be fixed there to test as much as you d=
-o?
+Hi
 
-You're seeing a difference due to the version of glib2 that's built.
+On Thu, Feb 7, 2019 at 3:37 PM Alberto Garcia <berto@igalia.com> wrote:
+>
+> On Thu 07 Feb 2019 03:24:40 PM CET, Marc-Andr=C3=A9 Lureau wrote:
+> > On Thu, Feb 7, 2019 at 3:23 PM Marc-Andr=C3=A9 Lureau
+> > <marcandre.lureau@redhat.com> wrote:
+> >>
+> >> On Thu, Feb 7, 2019 at 2:23 PM Alberto Garcia <berto@igalia.com> wrote=
+:
+> >> >
+> >> > After g_source_attach() the GMainContext holds a reference to the
+> >> > GSource, so the caller does not need to keep it.
+> >> >
+> >> > pty_chr_state() and qio_task_thread_worker() are not doing this, so
+> >> > the GSource is being leaked in both cases (pty_chr_open_src_cancel()
+> >> > is the exception here because it does remove the extra reference
+> >> > correctly).
+> >> >
+> >> > Signed-off-by: Alberto Garcia <berto@igalia.com>
+> >>
+> >> You could mention this is a fix for regression from
+> >> a17536c594bfed94d05667b419f747b692f5fc7f
+> >
+> > and 938eb9e9c83d34d90cac6ec5c5388e7998840e4e
+>
+> Ok, feel free to add this to the commit message if I don't need to
+> resend the series.
 
-Previously the GLIB_*_FORMAT macros would contain the win32 platform
-specific formats, and the g_critical function would be annotated
-with 'printf'.
+Well, the series conflicts with the currently queued chardev series. I
+think I will send the pullreq and let you rebase.
 
-Now GLib2's  GLIB_*_FORMAT macros will contain the GNU compatible=20
-formats, and the g_critical function would be annotated 'gnu_printf'.
+(I also have a related series pending review "[PATCH v2 0/6] chardev:
+various cleanups and improvements")
 
-So your Fedora build test used the gnu_printf based glib2 and so
-didn't trigger the warnings.
 
-Peter's build probably uses an older glib.
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Marc-Andr=C3=A9 Lureau
