@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58448)
+Received: from eggs.gnu.org ([209.51.188.92]:60372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grsCm-0002Fi-43
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:31:38 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grsNy-00045m-Be
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grsCg-0006UQ-Sa
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:31:34 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:45108
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grsNx-0004xe-JY
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:43:10 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:45138
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1grsCZ-0006Pq-7z
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:31:26 -0500
+	id 1grsNx-0004wp-DN
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:43:09 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <20190104223116.14037-1-richard.henderson@linaro.org>
-	<d52c8ae0-edee-ed9a-56b8-43cc1cf0208d@ilande.co.uk>
-	<362de5ba-a678-aeed-6a5d-3a02844c2560@linaro.org>
-	<6314c25b-a8c9-a8e2-2e1d-a8eeb3b88f2c@ilande.co.uk>
-Message-ID: <490c6687-d13e-9591-f3b9-0dac9550bfbb@ilande.co.uk>
-Date: Thu, 7 Feb 2019 22:31:02 +0000
-MIME-Version: 1.0
-In-Reply-To: <6314c25b-a8c9-a8e2-2e1d-a8eeb3b88f2c@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/10] tcg vector improvements
+Date: Thu,  7 Feb 2019 22:42:58 +0000
+Message-Id: <20190207224258.426-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH] tcg/i386: fix unsigned vector saturating
+ arithmetic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>
+To: qemu-devel@nongnu.org, richard.henderson@linaro.org
 
-On 05/02/2019 21:29, Mark Cave-Ayland wrote:
+Due to a cut/paste error in the original implementation, the unsigned vector
+saturating arithmetic was erroneously being calculated as signed vector saturating
+arithmetic.
 
-> Now that this and the other pre-requisite patches have been merged into master, I've
-> rebased the outstanding PPC parts of your "tcg, target/ppc vector improvements" on
-> master including the above fix and pushed the result to
-> https://github.com/mcayland/qemu/commits/ppc-altivec-v6.
-> 
-> The good news is that the graphics corruption I originally noticed caused by the
-> patch introducing the saturating add/sub vector ops has now gone, and with my
-> little-endian vsplt fix included then both OS X and MacOS 9 appear to run without any
-> obvious issues on an x86 host, and certainly feel smoother compared to before.
+Fixes: 8ffafbcec2 ("tcg/i386: Implement vector saturating arithmetic")
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ tcg/i386/tcg-target.inc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I started to follow up Howard's report that he could still see graphical corruption
-with these patches, and I was surprised to notice that it had reappeared locally once
-again :/
-
-After working out that this was because the relevant instructions weren't being
-generated for all Mac machines, I was able to figure it out after a few hours of
-digging. Patch to follow shortly.
-
-
-ATB,
-
-Mark.
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 4d84aea3a9..e0670e5098 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2615,7 +2615,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         OPC_PADDSB, OPC_PADDSW, OPC_UD2, OPC_UD2
+     };
+     static int const usadd_insn[4] = {
+-        OPC_PADDSB, OPC_PADDSW, OPC_UD2, OPC_UD2
++        OPC_PADDUB, OPC_PADDUW, OPC_UD2, OPC_UD2
+     };
+     static int const sub_insn[4] = {
+         OPC_PSUBB, OPC_PSUBW, OPC_PSUBD, OPC_PSUBQ
+@@ -2624,7 +2624,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         OPC_PSUBSB, OPC_PSUBSW, OPC_UD2, OPC_UD2
+     };
+     static int const ussub_insn[4] = {
+-        OPC_PSUBSB, OPC_PSUBSW, OPC_UD2, OPC_UD2
++        OPC_PSUBUB, OPC_PSUBUW, OPC_UD2, OPC_UD2
+     };
+     static int const mul_insn[4] = {
+         OPC_UD2, OPC_PMULLW, OPC_PMULLD, OPC_UD2
+-- 
+2.11.0
