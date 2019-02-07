@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57824)
+Received: from eggs.gnu.org ([209.51.188.92]:57807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwW-0002ax-UG
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:33 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwS-0002WW-S1
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwS-0002aT-T6
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:30 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37855)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwP-0002YV-Q0
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:26 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnwQ-0002XJ-2c
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:26 -0500
-Received: by mail-wm1-x341.google.com with SMTP id g67so816822wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:24 -0800 (PST)
+	id 1grnwN-0002Td-6D
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:25 -0500
+Received: by mail-wm1-x344.google.com with SMTP id m1so822942wml.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:16 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:57:30 +0100
-Message-Id: <1549562254-41157-48-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:57:21 +0100
+Message-Id: <1549562254-41157-39-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 47/51] sparc64-softmmu.mak: express
- dependencies with Kconfig
+Subject: [Qemu-devel] [PATCH 38/51] lm32-softmmu.mak: express dependencies
+ with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,65 +36,61 @@ definitions in Kconfig mode.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/sparc64-softmmu.mak | 23 ++++++++---------------
- hw/sparc64/Kconfig                  | 13 +++++++++++++
- 2 files changed, 21 insertions(+), 15 deletions(-)
+ default-configs/lm32-softmmu.mak | 10 ++++++----
+ hw/display/Kconfig               |  3 +--
+ hw/lm32/Kconfig                  |  6 ++++++
+ 3 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 528af8f..e50030a 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -1,19 +1,12 @@
- # Default configuration for sparc64-softmmu
+diff --git a/default-configs/lm32-softmmu.mak b/default-configs/lm32-softmmu.mak
+index f489838..6d25966 100644
+--- a/default-configs/lm32-softmmu.mak
++++ b/default-configs/lm32-softmmu.mak
+@@ -1,8 +1,10 @@
+ # Default configuration for lm32-softmmu
  
--CONFIG_PCI=y
--CONFIG_PCI_DEVICES=y
--CONFIG_M48T59=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
--CONFIG_PARALLEL=y
--CONFIG_PCKBD=y
--CONFIG_FDC=y
--CONFIG_IDE_CMD646=y
--CONFIG_PCI_SABRE=y
--CONFIG_SIMBA=y
--CONFIG_SUNHME=y
--CONFIG_MC146818RTC=y
--CONFIG_TEST_DEVICES=y
--CONFIG_SUN4V_RTC=y
 +# Uncomment the following lines to disable these optional devices:
 +#
-+#CONFIG_PCI_DEVICES=n
-+#CONFIG_SUNHME=n
-+#CONFIG_TEST_DEVICES=n
++#CONFIG_MILKYMIST_TMU2=n        # disabling it actually causes compile-time failures
 +
 +# Boards:
 +#
- CONFIG_SUN4U=y
- CONFIG_NIAGARA=y
-diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
-index 41f7295..4a8166e 100644
---- a/hw/sparc64/Kconfig
-+++ b/hw/sparc64/Kconfig
-@@ -1,6 +1,19 @@
- config SUN4U
-     bool
-+    imply PCI_DEVICES
-+    imply SUNHME
-+    imply TEST_DEVICES
-+    select M48T59
-     select ISA_BUS
-+    select FDC
-+    select SERIAL_ISA
-+    select PCI_SABRE
-+    select IDE_CMD646
-+    select PARALLEL
-+    select PCKBD
-+    select SIMBA
+ CONFIG_LM32=y
+ CONFIG_MILKYMIST=y
+-CONFIG_FRAMEBUFFER=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_PFLASH_CFI02=y
+-CONFIG_SD=y
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 69f8a7e..ee3acd9 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -71,8 +71,7 @@ config FRAMEBUFFER
  
- config NIAGARA
+ config MILKYMIST_TMU2
      bool
-+    select EMPTY_SLOT
-+    select SUN4V_RTC
+-    default y
+-    depends on OPENGL && X11 && MILKYMIST
++    depends on OPENGL && X11
+ 
+ config SM501
+     bool
+diff --git a/hw/lm32/Kconfig b/hw/lm32/Kconfig
+index 4f45840..3d09c2d 100644
+--- a/hw/lm32/Kconfig
++++ b/hw/lm32/Kconfig
+@@ -1,7 +1,13 @@
+ config LM32
+     bool
+     select PTIMER
++    select PFLASH_CFI02
+ 
+ config MILKYMIST
+     bool
++    # FIXME: disabling it results in compile-time errors
++    select MILKYMIST_TMU2 if OPENGL && X11
+     select PTIMER
++    select PFLASH_CFI01
++    select FRAMEBUFFER
++    select SD
 -- 
 1.8.3.1
