@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50779)
+Received: from eggs.gnu.org ([209.51.188.92]:54339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1grfii-0002K0-W0
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:11:45 -0500
+	(envelope-from <armbru@redhat.com>) id 1grg1b-0006gE-R4
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:31:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1grfih-0003Uq-QT
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:11:45 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42205)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1grfih-0003UP-KX
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:11:43 -0500
-Received: by mail-wr1-x442.google.com with SMTP id q18so10613766wrx.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 01:11:43 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1grg1U-0005yk-1R
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 04:31:15 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+Date: Thu, 07 Feb 2019 10:30:46 +0100
+In-Reply-To: <87y378n5iy.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 25 Jan 2019 16:03:33 +0100")
+Message-ID: <87mun8gd2x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190129062801.15799-1-pagupta@redhat.com>
-	<CAJ+F1CKenN+Ujg1ajtgixwJabir5+zfBAV3r=4LBqodpqHd8iA@mail.gmail.com>
-	<20190206162901.GW12331@redhat.com>
-	<1385614518.70345867.1549524112156.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1385614518.70345867.1549524112156.JavaMail.zimbra@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 7 Feb 2019 10:11:29 +0100
-Message-ID: <CAJ+F1CKia-RCF=oDcKoLAQapD8pRYd4vXhztDspmww+bi-H-AQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
+Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,116 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>, xiaohli@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, libvir-list@redhat.com, =?utf-8?B?TMOhc3ps?= =?utf-8?B?w7Mgw4lyc2Vr?= <lersek@redhat.com>, "Daniel P. =?utf-8?Q?Berran?= =?utf-8?Q?g=C3=A9?=" <berrange@redhat.com>, Peter Krempa <pkrempa@redhat.com>
 
-Hi
+The thread got long, let me try to summarize, and elaborate a few
+points.
 
-On Thu, Feb 7, 2019 at 8:21 AM Pankaj Gupta <pagupta@redhat.com> wrote:
->
->
-> Hi Daniel, Marc-Andre,
->
-> Thanks for your reply. Please find my reply inline.
->
-> > > > Hotplugging existing char chardev with qmp, dereferences(removes)
-> > > > existing chardev. This patch avoids adding a chardev if a chardev
-> > > > with same id exists.
-> > >
-> > > As you pointed out, if you attempt to add a chardev with an existing
-> > > ID, you get an error:
-> > >
-> > > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{=
-"type":"socket","data":{"addr":{"type":"unix",
-> > > "data": {"path": "/tmp/helloworld1"}}}}}}
-> > > {"return": {}}
-> > > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{=
-"type":"socket","data":{"addr":{"type":"unix",
-> > > "data": {"path": "/tmp/helloworld1"}}}}}}
-> > > {"error": {"class": "GenericError", "desc": "attempt to add duplicate
-> > > property 'charchannel1' to object (type 'container')"}}
-> > >
-> > >
-> > > But the existing chardev is left untouched.
-> > >
-> > > However, since unix socket chardev will delete existing file and
-> > > rebind (this is not always a good idea, but people seem to prefer
-> > > that)
-> > > the rebound socket is removed on error cleanup.
-> > >
-> > >
-> > > I am not sure this is a bug tbh.
-> > >
-> > > Your solution to check for duplicate ID upfront is ok. But any other
-> > > later error path could have the same "bug" effect of removing existin=
-g
-> > > chardev because of the overwrite socket creation.
-> >
-> > Checking the ID is not a useful fix IMHO. Someone could just as easily
-> > send 2 commands with different IDs and the same socket path.
-> >
-> > A more accurate fix would be to iterate over existing chardevs and chec=
-k
-> > whether any of them clash, but even that is useless if you have two
-> > separate QEMU instances and both try to use the same UNIX socket path.
-> > To deal with that you need to start taking out fcntl locks to ensure
-> > real mutual exclusion.
->
-> The reason we are already throwing error "attempt to add duplicate proper=
-ty"
-> implies we are considering "id" as primary key? Even if we throw the erro=
-r
-> existing chardev should work as before. But this is not the case right no=
-w,
-> it just deletes the existing chardev after error.
+* The problem at hand is configuring firmware residing in flash memory
+  (OVMF requires this) without legacy -drive.
 
-It deletes the socket "file" (since it overwrites it on chardev
-creation). The existing chardev is not deleted:
+* The wider problem is configuring onboard devices.  Our general device
+  configuration interface doesn't cover them.  Instead, we have a zoo of
+  ad hoc interfaces that are much more limited.  Some of them we'd
+  rather deprecate (-drive, -net), but can't until we have a suitable
+  replacements.
 
-qemu-system-x86_64 -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 0, "minor": 0, "major": 3},
-"package": "qemu-3.0.0-3.fc29"}, "capabilities": []}}
-{"execute":"qmp_capabilities"}
-{"return": {}}
- {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type=
-":"socket","data":{"addr":{"type":"unix",
-"data": {"path": "/tmp/helloworld1"}}}}}}
-{"return": {}}
-{"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type"=
-:"socket","data":{"addr":{"type":"unix",
-"data": {"path": "/tmp/helloworld1"}}}}}}
-{"error": {"class": "GenericError", "desc": "attempt to add duplicate
-property 'charchannel1' to object (type 'container')"}}
-{"execute":"query-chardev"}
-{"return": [{"frontend-open": true, "filename": "vc", "label":
-"serial0"}, {"frontend-open": true, "filename": "stdio", "label":
-"compat_monitor0"}, {"frontend-open": false, "filename":
-"disconnected:unix:/tmp/helloworld1,server", "label": "charchannel1"},
-{"frontend-open": true, "filename": "vc", "label": "parallel0"}]}
+  I think a board should be a composite object that exposes properties
+  of its own and its parts, just like other composite devices, so that
+  "create, set properties, realize" just works.  That would extend our
+  common device configuration mechanism naturally to onboard devices.
+
+  A PC board's flash memory device would be just another part.  It could
+  be something like /machine/q35/cfi.pflash01/ in the QOM tree.  To
+  configure it, you'd set its properties, such as
+  /machine/q35/cfi.pflash01/drive.
+
+  Note that this requires a way to set an existing device's properties.
+  Perhaps qom-set already works.
+
+* While I do believe we should tackle the wider problem, I'd rather not
+  sit on the narrow problem until we crack it.  So, what can we do about
+  it?
+
+  - Paolo proposed to add block backend properties to the PC machine,
+    settable like -machine pflash0=3DBLOCK-BACKEND.
+
+    Possible drawback: if we add /machine/q35/pflash0 to the QOM tree
+    now, and later replace it by /machine/q35/cfi.pflash01/drive, we'll
+    have to deal with yet another machine type variation.  We'll live.
+
+  - I proposed to sidestep our onboard device configuration problem by
+    adding the cfi.pflash01 devices with our existing general device
+    configuration interface: -device.  Possible since the onboard
+    cfi.pflash01 devices are optional.  Requires a small extension to
+    the firmware descriptors, and a bit of extra work in libvirt to
+    process that extension.  I think it's workable, but Paolo's idea is
+    simpler.
+
+  I can give Paolo's idea a try.  Objections?
+
+* A flash device supporting multiple regions is desirable, because it's
+  what physical hardware has.  We currently use multiple flash devices
+  instead.  We'll be stuck with them for existing machine types due to
+  guest ABI and migration compatibility.
+
+* cfi.pflash01 currently requires users to opt out of "bad, do not use".
+  It should require opt in, to guard against accidental new uses of
+  "bad".
 
 
->
-> Thanks,
-> Pankaj
->
-> >
-> > I think I'd really just call this user error and do nothing
-> >
-> > Regards,
-> > Daniel
-> > --
-> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange
-> > |:|
-> > |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com
-> > |:|
-> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange
-> > |:|
-> >
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+PS: Big thanks to L=C3=A1szl=C3=B3, whose patient guidance helped me map th=
+is part
+of the jungle.
