@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57634)
+Received: from eggs.gnu.org ([209.51.188.92]:57633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHi-0002I8-N5
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHi-0002I7-Mf
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHg-0001C3-2R
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHg-0001Bx-1z
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:10 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41886)
+Received: from hera.aquilenet.fr ([185.233.100.1]:41908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grkHd-0000yb-VZ
+	id 1grkHc-0000z1-JL
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:06 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Feb 2019 16:02:56 +0200
-Message-Id: <20190207140316.16103-13-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:03:11 +0200
+Message-Id: <20190207140316.16103-28-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv4 12/32] slirp: replace qemu_set_nonblock()
+Subject: [Qemu-devel] [PULLv4 27/32] slirp: improve send_packet() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,152 +32,207 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Replace qemu_set_nonblock() with slirp_set_nonblock()
+Use a more descriptive name for the callback.
 
-qemu_set_nonblock() does some event registration with the main
-loop. Add a new callback register_poll_fd() for that reason.
+Reuse the SlirpWriteCb type. Wrap it to check that all data has been writ=
+ten.
 
-Always build the fd-register stub, to avoid #if WIN32.
+Return a ssize_t for potential error handling and data-loss reporting.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c         |  6 ++++++
- slirp/libslirp.h    |  2 ++
- slirp/misc.c        |  3 ++-
- slirp/tcp_subr.c    |  6 ++++--
- slirp/util.c        | 14 ++++++++++++++
- slirp/util.h        |  1 +
- stubs/Makefile.objs |  2 +-
- 7 files changed, 30 insertions(+), 4 deletions(-)
+ include/net/net.h |  2 +-
+ net/net.c         |  4 ++--
+ net/slirp.c       |  9 +++++----
+ slirp/libslirp.h  | 11 +++++++----
+ slirp/ncsi.c      |  2 +-
+ slirp/slirp.c     | 18 +++++++++++++++---
+ slirp/slirp.h     |  2 ++
+ 7 files changed, 33 insertions(+), 15 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index c24a779425..6f756a4dcc 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -186,6 +186,11 @@ static void net_slirp_timer_mod(void *timer, int64_t=
- expire_timer)
-     timer_mod(timer, expire_timer);
+diff --git a/include/net/net.h b/include/net/net.h
+index 643295d163..075cc01267 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -146,7 +146,7 @@ ssize_t qemu_sendv_packet(NetClientState *nc, const s=
+truct iovec *iov,
+                           int iovcnt);
+ ssize_t qemu_sendv_packet_async(NetClientState *nc, const struct iovec *=
+iov,
+                                 int iovcnt, NetPacketSent *sent_cb);
+-void qemu_send_packet(NetClientState *nc, const uint8_t *buf, int size);
++ssize_t qemu_send_packet(NetClientState *nc, const uint8_t *buf, int siz=
+e);
+ ssize_t qemu_send_packet_raw(NetClientState *nc, const uint8_t *buf, int=
+ size);
+ ssize_t qemu_send_packet_async(NetClientState *nc, const uint8_t *buf,
+                                int size, NetPacketSent *sent_cb);
+diff --git a/net/net.c b/net/net.c
+index 3acbdccd61..5dcff7fe2a 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -668,9 +668,9 @@ ssize_t qemu_send_packet_async(NetClientState *sender=
+,
+                                              buf, size, sent_cb);
  }
 =20
-+static void net_slirp_register_poll_fd(int fd)
-+{
-+    qemu_fd_register(fd);
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .output =3D net_slirp_output,
-     .guest_error =3D net_slirp_guest_error,
-@@ -193,6 +198,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_new =3D net_slirp_timer_new,
-     .timer_free =3D net_slirp_timer_free,
-     .timer_mod =3D net_slirp_timer_mod,
-+    .register_poll_fd =3D net_slirp_register_poll_fd,
- };
+-void qemu_send_packet(NetClientState *nc, const uint8_t *buf, int size)
++ssize_t qemu_send_packet(NetClientState *nc, const uint8_t *buf, int siz=
+e)
+ {
+-    qemu_send_packet_async(nc, buf, size, NULL);
++    return qemu_send_packet_async(nc, buf, size, NULL);
+ }
 =20
- static int net_slirp_init(NetClientState *peer, const char *model,
+ ssize_t qemu_send_packet_raw(NetClientState *nc, const uint8_t *buf, int=
+ size)
+diff --git a/net/slirp.c b/net/slirp.c
+index 7b4f9f5c5e..664ff1c002 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -108,11 +108,12 @@ static void slirp_smb_cleanup(SlirpState *s);
+ static inline void slirp_smb_cleanup(SlirpState *s) { }
+ #endif
+=20
+-static void net_slirp_output(void *opaque, const uint8_t *pkt, int pkt_l=
+en)
++static ssize_t net_slirp_send_packet(const void *pkt, size_t pkt_len,
++                                     void *opaque)
+ {
+     SlirpState *s =3D opaque;
+=20
+-    qemu_send_packet(&s->nc, pkt, pkt_len);
++    return qemu_send_packet(&s->nc, pkt, pkt_len);
+ }
+=20
+ static ssize_t net_slirp_receive(NetClientState *nc, const uint8_t *buf,=
+ size_t size)
+@@ -197,7 +198,7 @@ static void net_slirp_unregister_poll_fd(int fd)
+ }
+=20
+ static const SlirpCb slirp_cb =3D {
+-    .output =3D net_slirp_output,
++    .send_packet =3D net_slirp_send_packet,
+     .guest_error =3D net_slirp_guest_error,
+     .clock_get_ns =3D net_slirp_clock_get_ns,
+     .timer_new =3D net_slirp_timer_new,
+@@ -780,7 +781,7 @@ static void guestfwd_read(void *opaque, const uint8_t=
+ *buf, int size)
+     slirp_socket_recv(fwd->slirp, fwd->server, fwd->port, buf, size);
+ }
+=20
+-static int guestfwd_write(const void *buf, size_t len, void *chr)
++static ssize_t guestfwd_write(const void *buf, size_t len, void *chr)
+ {
+     return qemu_chr_fe_write_all(chr, buf, len);
+ }
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 3e75dadfa3..70e99139bf 100644
+index 02cbec9f8b..8e5d4ed11b 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -27,6 +27,8 @@ typedef struct SlirpCb {
-     void (*timer_free)(void *timer);
-     /* Modify a timer to expire at @expire_time */
-     void (*timer_mod)(void *timer, int64_t expire_time);
-+    /* Register a fd for future polling */
-+    void (*register_poll_fd)(int fd);
- } SlirpCb;
+@@ -15,7 +15,7 @@
 =20
+ typedef struct Slirp Slirp;
 =20
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 32ec02a525..4ee20a10e4 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -163,7 +163,8 @@ fork_exec(struct socket *so, const char *ex)
-     slirp_socket_set_fast_reuse(so->s);
-     opt =3D 1;
-     slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
-;
--    qemu_set_nonblock(so->s);
-+    slirp_set_nonblock(so->s);
-+    so->slirp->cb->register_poll_fd(so->s);
+-typedef int (*SlirpWriteCb)(const void *buf, size_t len, void *opaque);
++typedef ssize_t (*SlirpWriteCb)(const void *buf, size_t len, void *opaqu=
+e);
+ typedef void (*SlirpTimerCb)(void *opaque);
+=20
+ /*
+@@ -23,10 +23,13 @@ typedef void (*SlirpTimerCb)(void *opaque);
+  */
+ typedef struct SlirpCb {
+     /*
+-     * Send an ethernet frame to the guest network. The opaque parameter
+-     * is the one given to slirp_init().
++     * Send an ethernet frame to the guest network. The opaque
++     * parameter is the one given to slirp_init(). The function
++     * doesn't need to send all the data and may return <len (no
++     * buffering is done on libslirp side, so the data will be dropped
++     * in this case). <0 reports an IO error.
+      */
+-    void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
++    SlirpWriteCb send_packet;
+     /* Print a message for an error due to guest misbehavior.  */
+     void (*guest_error)(const char *msg);
+     /* Return the virtual clock value in nanoseconds */
+diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+index 327f17543c..359f52c284 100644
+--- a/slirp/ncsi.c
++++ b/slirp/ncsi.c
+@@ -162,5 +162,5 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int=
+ pkt_len)
+     *pchecksum =3D htonl(checksum);
+     ncsi_rsp_len +=3D 4;
+=20
+-    slirp->cb->output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len=
+);
++    slirp_send_packet_all(slirp, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
+ }
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 3304c83001..2bc53e3e12 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -800,7 +800,7 @@ static void arp_input(Slirp *slirp, const uint8_t *pk=
+t, int pkt_len)
+             rah->ar_sip =3D ah->ar_tip;
+             memcpy(rah->ar_tha, ah->ar_sha, ETH_ALEN);
+             rah->ar_tip =3D ah->ar_sip;
+-            slirp->cb->output(slirp->opaque, arp_reply, sizeof(arp_reply=
+));
++            slirp_send_packet_all(slirp, arp_reply, sizeof(arp_reply));
+         }
+         break;
+     case ARPOP_REPLY:
+@@ -900,7 +900,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
+struct ethhdr *eh,
+             /* target IP */
+             rah->ar_tip =3D iph->ip_dst.s_addr;
+             slirp->client_ipaddr =3D iph->ip_dst;
+-            slirp->cb->output(slirp->opaque, arp_req, sizeof(arp_req));
++            slirp_send_packet_all(slirp, arp_req, sizeof(arp_req));
+             ifm->resolution_requested =3D true;
+=20
+             /* Expire request and drop outgoing packet after 1 second */
+@@ -985,7 +985,7 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
+               eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
+               eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
+     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
+-    slirp->cb->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
++    slirp_send_packet_all(slirp, buf, ifm->m_len + ETH_HLEN);
      return 1;
  }
 =20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 3567f320ff..8087ffc047 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -412,7 +412,8 @@ int tcp_fconnect(struct socket *so, unsigned short af=
-)
-     int opt, s=3Dso->s;
-     struct sockaddr_storage addr;
-=20
--    qemu_set_nonblock(s);
-+    slirp_set_nonblock(s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
-@@ -484,7 +485,8 @@ void tcp_connect(struct socket *inso)
-         tcp_close(sototcpcb(so)); /* This will sofree() as well */
-         return;
-     }
--    qemu_set_nonblock(s);
-+    slirp_set_nonblock(s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
-diff --git a/slirp/util.c b/slirp/util.c
-index b1a36b27bc..59f6713c8b 100644
---- a/slirp/util.c
-+++ b/slirp/util.c
-@@ -43,6 +43,20 @@ int inet_aton(const char *cp, struct in_addr *ia)
+@@ -1152,3 +1152,15 @@ void slirp_socket_recv(Slirp *slirp, struct in_add=
+r guest_addr, int guest_port,
+     if (ret > 0)
+         tcp_output(sototcpcb(so));
  }
- #endif
-=20
-+void slirp_set_nonblock(int fd)
-+{
-+#ifndef _WIN32
-+    int f;
-+    f =3D fcntl(fd, F_GETFL);
-+    assert(f !=3D -1);
-+    f =3D fcntl(fd, F_SETFL, f | O_NONBLOCK);
-+    assert(f !=3D -1);
-+#else
-+    unsigned long opt =3D 1;
-+    ioctlsocket(fd, FIONBIO, &opt);
-+#endif
-+}
 +
- static void slirp_set_cloexec(int fd)
- {
- #ifndef _WIN32
-diff --git a/slirp/util.h b/slirp/util.h
-index fe6f1fbb62..4f6e80c3ed 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -68,6 +68,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
++void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len)
++{
++    ssize_t ret =3D slirp->cb->send_packet(buf, len, slirp->opaque);
++
++    if (ret < 0) {
++        g_critical("Failed to send packet, ret: %ld", (long) ret);
++    } else if (ret < len) {
++        DEBUG_ERROR("send_packet() didn't send all data: %ld < %lu",
++                (long) ret, (unsigned long) len);
++    }
++}
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index 05b8364c07..752a4cd8c8 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -269,4 +269,6 @@ struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
+ struct socket *
+ slirp_find_ctl_socket(Slirp *slirp, struct in_addr guest_addr, int guest=
+_port);
+=20
++void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len);
++
  #endif
-=20
- int slirp_socket(int domain, int type, int protocol);
-+void slirp_set_nonblock(int fd);
-=20
- static inline int slirp_socket_set_nodelay(int fd)
- {
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 5dd0aeeec6..cda0efa4e8 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -33,7 +33,7 @@ stub-obj-y +=3D trace-control.o
- stub-obj-y +=3D uuid.o
- stub-obj-y +=3D vm-stop.o
- stub-obj-y +=3D vmstate.o
--stub-obj-$(CONFIG_WIN32) +=3D fd-register.o
-+stub-obj-y +=3D fd-register.o
- stub-obj-y +=3D qmp_memory_device.o
- stub-obj-y +=3D target-monitor-defs.o
- stub-obj-y +=3D target-get-monitor-def.o
 --=20
 2.20.1
