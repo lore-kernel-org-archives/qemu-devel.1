@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33697)
+Received: from eggs.gnu.org ([209.51.188.92]:37459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1grXn1-0006IF-Gl
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 19:43:40 -0500
+	(envelope-from <brad@comstyle.com>) id 1grYBW-0001b2-7z
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 20:08:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1grXmw-0000w3-6H
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 19:43:35 -0500
+	(envelope-from <brad@comstyle.com>) id 1grYBU-0001n4-7p
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 20:08:58 -0500
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-10-philmd@redhat.com>
+	<CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
+	<e5dd8130-e041-7774-2141-cc506dee99f7@redhat.com>
+	<94f74717-0bab-ea0a-e7cc-239a1b1136bf@comstyle.com>
+	<97d5ea1c-0621-8f9c-0ee6-6a64540b4ddd@comstyle.com>
+	<87zhr8mzq2.fsf@zen.linaroharston>
+From: Brad Smith <brad@comstyle.com>
+Message-ID: <1afc34a0-1267-dbf8-15fa-d35ec3428e3d@comstyle.com>
+Date: Wed, 6 Feb 2019 20:03:44 -0500
 MIME-Version: 1.0
-References: <20190130185242.12490-1-chouteau@adacore.com>
-In-Reply-To: <20190130185242.12490-1-chouteau@adacore.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 6 Feb 2019 16:42:42 -0800
-Message-ID: <CAKmqyKMNqYBN9ZCESAxfqWSOidjFRhQNofN130MOPDOyRwQ28w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/riscv/sifive_clint.c: avoid integer
- overflow in timecmp write
+In-Reply-To: <87zhr8mzq2.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
+ from the ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabien Chouteau <chouteau@adacore.com>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Jan 30, 2019 at 10:53 AM Fabien Chouteau <chouteau@adacore.com> wrote:
->
-> Writing a high value in timecmp leads to an integer overflow. This patch
-> modifies the code to detect such case, and use the maximum integer value
-> as the next trigger for the timer.
->
-> Signed-off-by: Fabien Chouteau <chouteau@adacore.com>
-> ---
->  hw/riscv/sifive_clint.c | 31 ++++++++++++++++++++++++++-----
->  1 file changed, 26 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-> index d4c159e937..1ca1f8c75e 100644
-> --- a/hw/riscv/sifive_clint.c
-> +++ b/hw/riscv/sifive_clint.c
-> @@ -38,8 +38,10 @@ static uint64_t cpu_riscv_read_rtc(void)
->   */
->  static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
->  {
-> -    uint64_t next;
->      uint64_t diff;
-> +    uint64_t lapse_ns;
-> +    uint64_t clock_ns;
-> +    int64_t  next_ns;
->
->      uint64_t rtc_r = cpu_riscv_read_rtc();
->
-> @@ -54,10 +56,29 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
->      /* otherwise, set up the future timer interrupt */
->      riscv_cpu_update_mip(cpu, MIP_MTIP, BOOL_TO_MASK(0));
->      diff = cpu->env.timecmp - rtc_r;
-> -    /* back to ns (note args switched in muldiv64) */
-> -    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-> -        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
-> -    timer_mod(cpu->env.timer, next);
-> +
-> +    /*
-> +     * How many nanoseconds until the next trigger (note args switched in
-> +     * muldiv64)
-> +     */
-> +    lapse_ns = muldiv64(diff,
-> +                        NANOSECONDS_PER_SECOND,
-> +                        SIFIVE_CLINT_TIMEBASE_FREQ);
-> +
-> +    /* Current time in nanoseconds */
-> +    clock_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +
-> +    if ((G_MAXINT64 - clock_ns) <= lapse_ns) {
-> +        /*
-> +         * clock + lapse would overflow on 64bit. The highest 64bit value is
-> +         * used as the next trigger time.
-> +         */
-> +        next_ns = G_MAXINT64;
-> +    } else {
-> +        next_ns = clock_ns + lapse_ns;
-> +    }
+On 2/6/2019 3:25 PM, Alex Benn=C3=A9e wrote:
 
-Can you describe what this fixes?
-
-Won't an overflow be ok as we then just wrap around anyway? I guess
-there is a problem if we want a value so large that we wrap around
-past our current time though.
-
-Alistair
-
-> +
-> +    timer_mod(cpu->env.timer, next_ns);
->  }
+> Brad Smith <brad@comstyle.com> writes:
 >
->  /*
-> --
-> 2.17.1
+>> On 2/5/2019 8:57 AM, Brad Smith wrote:
+>>
+>>> If someone could point me in the right direction as to how the image
+>>> is created
+>>> I could look at coming up with something newer. I would prefer that
+>>> over some
+>>> of the workarounds I've seen to date.
+>> I started creating the image and then wondered what do I set the root
+>> password
+>> to? The instructions also talk about an SSH key but I don't know how
+>> that would
+>> work when this image is used for the VM test framework.
+> See tests/keys - basically we have a hard-wired testing key.
+So the root password doesn't matter?
+>> I updated the instructions on the Wiki to make use of VirtIO for both
+>> the NIC and disk controller.
+> Can the OpenBSD kernel use virtio-net-pci and virtio-scsi-pci?
 >
->
+> It's not super important for build testing but they are the most capabl=
+e
+> variants of virtio. The virtio-pci gives nice discover-able hotplug and
+> I believe you need virtio-scsi-pci if you want to use funky options lik=
+e
+> discard for thin provisioning.
+
+Yes to both.
