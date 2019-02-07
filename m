@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54689)
+Received: from eggs.gnu.org ([209.51.188.92]:56434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gri0A-00035G-Mw
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:37:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gri8l-0004XB-Le
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:46:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gri09-0007yV-Me
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:37:54 -0500
-Resent-Message-Id: <E1gri09-0007yV-Me@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gri09-0007PX-Dy
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:37:53 -0500
-Message-ID: <154953942151.29184.7694211057153536439@ebba9967afc0>
-In-Reply-To: <20190207105347.22337-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gri8i-0005bt-Dd
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:46:46 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35051)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gri8b-0005Wj-KA
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:46:42 -0500
+Received: by mail-ot1-x341.google.com with SMTP id 81so17729023otj.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:46:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Feb 2019 03:37:02 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 4.0 patches
+References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Feb 2019 11:46:23 +0000
+Message-ID: <CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULLv3 00/32] More work towards libslirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNzEwNTM0Ny4yMjMz
-Ny0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC8zXSBMaW51eCB1c2VyIGZv
-ciA0LjAgcGF0Y2hlcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAyMDcxMDUzNDcuMjIz
-MzctMS1sYXVyZW50QHZpdmllci5ldQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
-CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMDYxODE3MjUuMTQzMzct
-MS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjA2MTgxNzI1LjE0MzM3LTEtYXJt
-YnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIw
-NzEwNTM0Ny4yMjMzNy0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxOTAyMDcxMDUz
-NDcuMjIzMzctMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjExZWZkMGI1NTQgbGludXgtdXNlcjogYWRkIG5ldyBuZXRsaW5rIHR5cGVzCmE3YzBhNmE2
-OTYgbGludXgtdXNlcjogQ2hlY2sgc3NjYW5mIHJldHVybiB2YWx1ZSBpbiBvcGVuX25ldF9yb3V0
-ZSgpCmUxZWRiMGJjMDQgRml4IGxpbnV4LXVzZXIgY3Jhc2hlcyBpbiBpb2N0bChTSU9DR0lGQ09O
-Rikgd2hlbiBpZmNfYnVmIGlzIE5VTEwuCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzMgQ2hlY2tp
-bmcgY29tbWl0IGUxZWRiMGJjMDRhZiAoRml4IGxpbnV4LXVzZXIgY3Jhc2hlcyBpbiBpb2N0bChT
-SU9DR0lGQ09ORikgd2hlbiBpZmNfYnVmIGlzIE5VTEwuKQpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNDg6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbC5jOjQyMDA6CisgICAgICAgICAgICAvKiBXZSBjYW4ndCBmaXQgYWxsIHRoZSBl
-eHRlbnRzIGludG8gdGhlIGZpeGVkIHNpemUgYnVmZmVyLgoKRVJST1I6ICIoZm9vKikiIHNob3Vs
-ZCBiZSAiKGZvbyAqKSIKIzYyOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo0MjEwOgorICAg
-ICAgICBob3N0X2lmY19idWYgPSAoY2hhciopaG9zdF9pZmNvbmYgKyBzaXplb2YoKmhvc3RfaWZj
-b25mKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNzMgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMS8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzMgQ2hlY2tpbmcgY29tbWl0IGE3
-YzBhNmE2OTZmOCAobGludXgtdXNlcjogQ2hlY2sgc3NjYW5mIHJldHVybiB2YWx1ZSBpbiBvcGVu
-X25ldF9yb3V0ZSgpKQozLzMgQ2hlY2tpbmcgY29tbWl0IDExZWZkMGI1NTQyMiAobGludXgtdXNl
-cjogYWRkIG5ldyBuZXRsaW5rIHR5cGVzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNzEwNTM0Ny4yMjMzNy0xLWxhdXJlbnRAdml2aWVy
-LmV1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Tue, 5 Feb 2019 at 18:28, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+>
+> The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a356e159d:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pull-request' into staging (2019-02-05 14:01:29 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 1e924479dce65a26a7432bf5920f89c1bf957d74:
+>
+>   slirp: API is extern C (2019-02-05 20:27:27 +0200)
+>
+> ----------------------------------------------------------------
+> More work towards libslirp
+>
+
+Format string issues for the Windows build:
+
+/home/petmay01/qemu-for-merges/slirp/slirp.c: In function
+'slirp_send_packet_all':
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1116:20: error: unknown
+conversion type character 'z' in format [-Werror=format=]
+         g_critical("Failed to send packet, ret: %zd", ret);
+                    ^
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmessages.h:333:32:
+note: in definition of macro 'g_critical'
+                                __VA_ARGS__)
+                                ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1116:20: error: too many
+arguments for format [-Werror=format-extra-args]
+         g_critical("Failed to send packet, ret: %zd", ret);
+                    ^
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmessages.h:333:32:
+note: in definition of macro 'g_critical'
+                                __VA_ARGS__)
+                                ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1118:21: error: unknown
+conversion type character 'z' in format [-Werror=format=]
+         DEBUG_ERROR("send_packet() didn't send all data: %zd < %zu", ret, len);
+                     ^
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmessages.h:342:32:
+note: in definition of macro 'g_debug'
+                                __VA_ARGS__)
+                                ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1118:9: note: in
+expansion of macro 'DEBUG_ERROR'
+         DEBUG_ERROR("send_packet() didn't send all data: %zd < %zu", ret, len);
+         ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1118:21: error: unknown
+conversion type character 'z' in format [-Werror=format=]
+         DEBUG_ERROR("send_packet() didn't send all data: %zd < %zu", ret, len);
+                     ^
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmessages.h:342:32:
+note: in definition of macro 'g_debug'
+                                __VA_ARGS__)
+                                ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1118:9: note: in
+expansion of macro 'DEBUG_ERROR'
+         DEBUG_ERROR("send_packet() didn't send all data: %zd < %zu", ret, len);
+         ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1118:21: error: too many
+arguments for format [-Werror=format-extra-args]
+         DEBUG_ERROR("send_packet() didn't send all data: %zd < %zu", ret, len);
+                     ^
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0/glib/gmessages.h:342:32:
+note: in definition of macro 'g_debug'
+                                __VA_ARGS__)
+                                ^
+/home/petmay01/qemu-for-merges/slirp/slirp.c:1118:9: note: in
+expansion of macro 'DEBUG_ERROR'
+         DEBUG_ERROR("send_packet() didn't send all data: %zd < %zu", ret, len);
+         ^
+cc1: all warnings being treated as errors
+
+
+All the other builds went OK.
+
+thanks
+-- PMM
