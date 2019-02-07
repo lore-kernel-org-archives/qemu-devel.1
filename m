@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33244)
+Received: from eggs.gnu.org ([209.51.188.92]:34567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grq1c-0006j0-UK
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:11:57 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1grq7c-00088Q-Bc
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grq1c-00015F-8K
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:11:56 -0500
-References: <20190207193605.25676-1-crosa@redhat.com>
-	<20190207193605.25676-3-crosa@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <eb52ed3a-e2fb-d5d2-5d7e-ceb41e8a7987@vivier.eu>
-Date: Thu, 7 Feb 2019 21:11:47 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1grq7b-0004H6-Kg
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:18:08 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1grq7b-0004G8-Fg
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:18:07 -0500
+Received: by mail-ot1-f67.google.com with SMTP id e24so2011585otp.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 12:18:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190207193605.25676-3-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] configure: fix qemu-img name
+References: <20190206112729.37761-1-sgarzare@redhat.com>
+	<20190207142945-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190207142945-mutt-send-email-mst@kernel.org>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 7 Feb 2019 21:17:54 +0100
+Message-ID: <CAGxU2F4dSD=KRuD0ffpj9cNufG5A24X-vdua_t9GetVrtr_ieg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 07/02/2019 20:36, Cleber Rosa wrote:
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index ff55e2273e..c8fc1647fe 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1768,7 +1768,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->    virglrenderer   virgl rendering support
->    xfsctl          xfsctl support
->    qom-cast-debug  cast debugging support
-> -  tools           build qemu-io, qemu-nbd and qemu-image tools
-> +  tools           build qemu-io, qemu-nbd and qemu-img tools
->    vxhs            Veritas HyperScale vDisk backend support
->    bochs           bochs image format support
->    cloop           cloop image format support
-> 
+On Thu, Feb 7, 2019 at 8:30 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Feb 06, 2019 at 12:27:23PM +0100, Stefano Garzarella wrote:
+> > This series adds the support of DISCARD and WRITE_ZEROES commands
+> > and extends the virtio-blk-test to test WRITE_ZEROES command when
+> > the feature is enabled.
+>
+> pls note and fix patchew errors:
+>
+> https://patchew.org/QEMU/20190206112729.37761-1-sgarzare@redhat.com/
 
-Fixes: c12d66aac1aa ("configure: add the missing help output for
-optional features")
+Oh, thanks! I'll fix on v4.
 
-Perhaps the list can be updated with qemu-edid, ivshmem-client and elf2dmp?
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Stefano
