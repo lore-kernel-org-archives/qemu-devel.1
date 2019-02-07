@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43281)
+Received: from eggs.gnu.org ([209.51.188.92]:43487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmw0-0002xo-Bg
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:53:57 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmx4-0003ZU-Eo
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmvz-00025M-93
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:53:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45488)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmx3-0002Wf-Hm
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1grmvy-00024q-U3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:53:55 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1grmx3-0002WA-Ai
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:55:01 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 07DF77F41D
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 16:53:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 932DE432A2
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 16:55:00 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  7 Feb 2019 17:53:39 +0100
-Message-Id: <20190207165352.5439-1-marcandre.lureau@redhat.com>
+Date: Thu,  7 Feb 2019 17:54:37 +0100
+Message-Id: <20190207165449.6125-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 v2 00/12] vhost-user-backend &
- vhost-user-input
+Subject: [Qemu-devel] [PATCH v2 00/12] vhost-user-backend & vhost-user-input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
