@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57933)
+Received: from eggs.gnu.org ([209.51.188.92]:58134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1griFC-0006kU-Lh
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:53:27 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1griFt-0007A1-0J
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1griFB-00013p-Ro
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:53:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1griFB-00013M-MG
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:53:25 -0500
-Date: Thu, 7 Feb 2019 11:53:17 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190207115316.GE19438@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULLv3 00/32] More work towards libslirp
+	(envelope-from <richard.henderson@linaro.org>) id 1griFs-0001Nf-65
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:08 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1griFr-0001Lk-Tj
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:08 -0500
+Received: by mail-wr1-x442.google.com with SMTP id v13so11218777wrw.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:04 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu,  7 Feb 2019 11:53:41 +0000
+Message-Id: <20190207115400.647-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 00/19] target/hppa: Convert to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: deller@gmx.de, svens@stackframe.org
 
-On Thu, Feb 07, 2019 at 11:46:23AM +0000, Peter Maydell wrote:
-> On Tue, 5 Feb 2019 at 18:28, Samuel Thibault
-> <samuel.thibault@ens-lyon.org> wrote:
-> >
-> > The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a356e159d:
-> >
-> >   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pull-request' into staging (2019-02-05 14:01:29 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
-> >
-> > for you to fetch changes up to 1e924479dce65a26a7432bf5920f89c1bf957d74:
-> >
-> >   slirp: API is extern C (2019-02-05 20:27:27 +0200)
-> >
-> > ----------------------------------------------------------------
-> > More work towards libslirp
-> >
-> 
-> Format string issues for the Windows build:
-> 
-> /home/petmay01/qemu-for-merges/slirp/slirp.c: In function
-> 'slirp_send_packet_all':
-> /home/petmay01/qemu-for-merges/slirp/slirp.c:1116:20: error: unknown
-> conversion type character 'z' in format [-Werror=format=]
->          g_critical("Failed to send packet, ret: %zd", ret);
->                     ^
+I started this last year, but only recently have found the time
+to ferret out the bugs.
 
-Note that with any of the glib functions that take a format string,
-you *must* use the glib format macros, not the system provided
-format macros.  ie  G_*_FORMAT, not any of the PRI*  macros
-from stdint.h.   This is because you can't assume that the glib
-functions call through to the platform's own printf impl. See:
+I've tested this vs the gcc execute.exp testsuite, against which
+there are no regressions.  It also continues to boot my old debian
+sid installation.
 
-  https://developer.gnome.org/glib/stable/glib-Basic-Types.html
+I had not previously been aware, but I now know this fixes a bug
+with respect to the purge data cache (PDC) instruction.
 
-Regards,
-Daniel
+Helge or Sven, if you have a chance to do a bit more testing in
+the next week, I would appreciate it.  Otherwise we can fix any
+other minor problems on mainline.
+
+This is based on the target/hppa pull request from this week;
+the whole tree can be found at
+
+  https://github.com/rth7680/qemu.git tgt-hppa
+
+
+r~
+
+
+Richard Henderson (19):
+  target/hppa: Use DisasContextBase.is_jmp
+  target/hppa: Begin using scripts/decodetree.py
+  target/hppa: Convert move to/from system registers
+  target/hppa: Convert remainder of system insns
+  target/hppa: Unify specializations of OR
+  target/hppa: Convert memory management insns
+  target/hppa: Convert arithmetic/logical insns
+  target/hppa: Convert indexed memory insns
+  target/hppa: Convert fp multiply-add
+  target/hppa: Convert conditional branches
+  target/hppa: Convert shift, extract, deposit insns
+  target/hppa: Convert direct and indirect branches
+  target/hppa: Convert arithmetic immediate insns
+  target/hppa: Convert offset memory insns
+  target/hppa: Convert fp indexed memory insns
+  target/hppa: Convert halt/reset insns
+  target/hppa: Convert fp fused multiply-add insns
+  target/hppa: Convert fp operate insns
+  target/hppa: Merge translate_one into hppa_tr_translate_insn
+
+ target/hppa/translate.c   | 3218 +++++++++++++++----------------------
+ target/hppa/Makefile.objs |    8 +
+ target/hppa/insns.decode  |  527 ++++++
+ 3 files changed, 1802 insertions(+), 1951 deletions(-)
+ create mode 100644 target/hppa/insns.decode
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.2
