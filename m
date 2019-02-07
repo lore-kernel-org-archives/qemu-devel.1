@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36407)
+Received: from eggs.gnu.org ([209.51.188.92]:38362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grmSw-0004YA-1M
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:23:54 -0500
+	(envelope-from <philmd@redhat.com>) id 1grmac-0000zl-Sg
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grmSt-0002WD-0V
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:23:52 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38134)
+	(envelope-from <philmd@redhat.com>) id 1grmab-0007mO-Us
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:31:50 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grmSs-0002RP-N4
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:23:50 -0500
-Received: by mail-wr1-f66.google.com with SMTP id v13so486342wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 08:23:43 -0800 (PST)
-References: <1549545296-18903-1-git-send-email-thuth@redhat.com>
-	<1549545296-18903-3-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grmab-0007iv-Ok
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:31:49 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r2so470987wrv.10
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 08:31:39 -0800 (PST)
+References: <20181126105125.30973-1-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <34660833-04f1-b3e8-6e78-8fc4665a1f11@redhat.com>
-Date: Thu, 7 Feb 2019 17:23:40 +0100
+Message-ID: <7c5bc3fe-116e-f29c-977d-cac890bdfa93@redhat.com>
+Date: Thu, 7 Feb 2019 17:31:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <1549545296-18903-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <20181126105125.30973-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-options: Remove deprecated option
- -clock
+Subject: Re: [Qemu-devel] [PATCH] doc: fix the configuration path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 2/7/19 2:14 PM, Thomas Huth wrote:
-> The option is only a dummy since a long time. We've finally deprecated
-> it in QEMU v3.0, so it's time to remove it now.
+On 11/26/18 11:51 AM, Marc-André Lureau wrote:
+> Use a CONFDIR variable to show the configured sysconf path in the
+> generated documentations (html, man pages etc).
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Related to:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1644985
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  qemu-deprecated.texi | 5 -----
->  qemu-options.hx      | 3 ---
->  vl.c                 | 6 ------
->  3 files changed, 14 deletions(-)
+>  Makefile     | 9 ++++++---
+>  qemu-ga.texi | 4 ++--
+>  2 files changed, 8 insertions(+), 5 deletions(-)
 > 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 90e5860..fe90555 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -37,11 +37,6 @@ would automatically enable USB support on the machine type.
->  If using the new syntax, USB support must be explicitly
->  enabled via the ``-machine usb=on'' argument.
+> diff --git a/Makefile b/Makefile
+> index 9cc4dae1a6..a39c231d1c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -932,11 +932,14 @@ ui/shader.o: $(SRC_PATH)/ui/shader.c \
+>  MAKEINFO=makeinfo
+>  MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
+>  MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
+> -TEXI2PODFLAGS=$(MAKEINFOINCLUDES) "-DVERSION=$(VERSION)"
+> +TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
+>  TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
 >  
-> -@subsection -clock (since 3.0.0)
-> -
-> -The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
-> -replacement since it is not needed anymore.
-> -
->  @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
+> -docs/version.texi: $(SRC_PATH)/VERSION
+> -	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
+> +docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+> +	$(call quiet-command,(\
+> +		echo "@set VERSION $(VERSION)" && \
+> +		echo "@set CONFDIR $(qemu_confdir)" \
+> +	)> $@,"GEN","$@")
 >  
->  The 'file' driver for drives is no longer appropriate for character or host
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 06ef1a7..77bd98e 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3444,9 +3444,6 @@ Load the contents of @var{file} as an option ROM.
->  This option is useful to load things like EtherBoot.
->  ETEXI
+>  %.html: %.texi docs/version.texi
+>  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
+> diff --git a/qemu-ga.texi b/qemu-ga.texi
+> index 4c7a8fd163..f00ad830f2 100644
+> --- a/qemu-ga.texi
+> +++ b/qemu-ga.texi
+> @@ -30,7 +30,7 @@ set user's password
+>  @end itemize
 >  
-> -HXCOMM Silently ignored for compatibility
-> -DEF("clock", HAS_ARG, QEMU_OPTION_clock, "", QEMU_ARCH_ALL)
-> -
->  DEF("rtc", HAS_ARG, QEMU_OPTION_rtc, \
->      "-rtc [base=utc|localtime|<datetime>][,clock=host|rt|vm][,driftfix=none|slew]\n" \
->      "                set the RTC base and clock, enable drift fix for clock ticks (x86 only)\n",
-> diff --git a/vl.c b/vl.c
-> index 9e4dba7..90ff233 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3735,12 +3735,6 @@ int main(int argc, char **argv, char **envp)
->              case QEMU_OPTION_old_param:
->                  old_param = 1;
->                  break;
-> -            case QEMU_OPTION_clock:
-> -                /* Clock options no longer exist.  Keep this option for
-> -                 * backward compatibility.
-> -                 */
-> -                warn_report("This option is ignored and will be removed soon");
-> -                break;
->              case QEMU_OPTION_rtc:
->                  opts = qemu_opts_parse_noisily(qemu_find_opts("rtc"), optarg,
->                                                 false);
+>  qemu-ga will read a system configuration file on startup (located at
+> -@file{/etc/qemu/qemu-ga.conf} by default), then parse remaining
+> +@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
+>  configuration options on the command line. For the same key, the last
+>  option wins, but the lists accumulate (see below for configuration
+>  file format).
+> @@ -58,7 +58,7 @@ file format).
+>    Enable fsfreeze hook. Accepts an optional argument that specifies
+>    script to run on freeze/thaw. Script will be called with
+>    'freeze'/'thaw' arguments accordingly (default is
+> -  @samp{/etc/qemu/fsfreeze-hook}). If using -F with an argument, do
+> +  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, do
+>    not follow -F with a space (for example:
+>    @samp{-F/var/run/fsfreezehook.sh}).
+>  
 > 
