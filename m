@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50842)
+Received: from eggs.gnu.org ([209.51.188.92]:53543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grjkX-0005Rp-GU
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:29:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1grk0x-0002ZE-0C
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grjkW-00070Z-OD
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:29:53 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:49026)
+	(envelope-from <armbru@redhat.com>) id 1grk0v-00083T-Qg
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:46:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grjkW-0006tU-HK
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:29:52 -0500
-Date: Thu, 7 Feb 2019 15:29:35 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190207132935.ijtfsiafpfggugiz@function>
-References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grk0v-00082b-50
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:46:49 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B06EC5856F
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 13:46:46 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190206181725.14337-1-armbru@redhat.com>
+	<20190206181725.14337-17-armbru@redhat.com>
+	<0e7c814c-5d82-e9c0-3d53-bcc576019b65@redhat.com>
+	<20190207122950.GA1854@andariel.pipo.sk>
+Date: Thu, 07 Feb 2019 14:46:41 +0100
+In-Reply-To: <20190207122950.GA1854@andariel.pipo.sk> (Peter Krempa's message
+	of "Thu, 7 Feb 2019 13:29:50 +0100")
+Message-ID: <87wombd83i.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULLv3 00/32] More work towards libslirp
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [libvirt] [PATCH v3 16/17] qmp: Deprecate
+ query-events in favor of query-qmp-schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, libvirt-list@redhat.com, qemu-devel@nongnu.org
 
-Peter Maydell, le jeu. 07 f=C3=A9vr. 2019 11:46:23 +0000, a ecrit:
-> On Tue, 5 Feb 2019 at 18:28, Samuel Thibault
-> <samuel.thibault@ens-lyon.org> wrote:
-> >
-> > The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a35=
-6e159d:
-> >
-> >   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pull-=
-request' into staging (2019-02-05 14:01:29 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
-> >
-> > for you to fetch changes up to 1e924479dce65a26a7432bf5920f89c1bf957d=
-74:
-> >
-> >   slirp: API is extern C (2019-02-05 20:27:27 +0200)
-> >
-> > ----------------------------------------------------------------
-> > More work towards libslirp
-> >
->=20
-> Format string issues for the Windows build:
+Peter Krempa <pkrempa@redhat.com> writes:
 
-Oh, I am not getting these errors with make docker-test-mingw@fedora,
-perhaps something would need to be fixed there to test as much as you do?
+> On Wed, Feb 06, 2019 at 12:42:05 -0600, Eric Blake wrote:
+>> Adding libvirt in cc
+>> 
+>> On 2/6/19 12:17 PM, Markus Armbruster wrote:
+>> > query-events doesn't reflect compile-time configuration.  Instead of
+>> > fixing that, deprecate the command in favor of query-qmp-schema.
+>> > 
+>> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> > ---
+>> >  monitor.c            | 5 +++++
+>> >  qapi/misc.json       | 7 +++++--
+>> >  qemu-deprecated.texi | 5 +++++
+>> >  3 files changed, 15 insertions(+), 2 deletions(-)
+>> 
+>> Libvirt uses query-events; we'll need to patch libvirt to start relying
+>> on query-qmp-schema before this deprecation cycle can complete (although
+>> I'm in favor of making the change).
+>
+> Patches to use 'query-qmp-schema' output rather than 'query-events' in
+> libvirt:
+>
+> https://www.redhat.com/archives/libvir-list/2019-February/msg00298.html
+>
+> You can start the deprecation clock.
 
-> All the other builds went OK.
-
-Good :) I'll have a look at these formatting issues.
-
-Samuel
+Awesome!
