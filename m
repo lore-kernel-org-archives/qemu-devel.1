@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56876)
+Received: from eggs.gnu.org ([209.51.188.92]:57237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grkFn-0001JX-Ih
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:02:15 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHG-0001we-1X
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grkFh-0008Rm-5X
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:02:09 -0500
-References: <20190206195551.28893-1-mreitz@redhat.com>
-	<20190206195551.28893-2-mreitz@redhat.com>
-	<87mun8jddk.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
-Date: Thu, 7 Feb 2019 08:01:50 -0600
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHD-0000rF-Jd
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:41 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:49540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1grkGy-0000lp-Gw
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:28 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:02:46 +0200
+Message-Id: <20190207140316.16103-3-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
+References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-In-Reply-To: <87mun8jddk.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr"
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
- unions
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULLv4 02/32] slirp: Avoid marking naturally packed
+ structs as QEMU_PACKED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,138 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: stefanha@redhat.com, jan.kiszka@siemens.com, Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
- unions
-References: <20190206195551.28893-1-mreitz@redhat.com>
- <20190206195551.28893-2-mreitz@redhat.com>
- <87mun8jddk.fsf@dusky.pond.sub.org>
-In-Reply-To: <87mun8jddk.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Peter Maydell <peter.maydell@linaro.org>
 
-On 2/7/19 12:56 AM, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
->=20
->> This patch allows specifying a discriminator that is an optional membe=
-r
->> of the base struct.  In such a case, a default value must be provided
->> that is used when no value is given.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
+Various ipv6 structs in the slirp headers are marked QEMU_PACKED,
+but they are actually naturally aligned and will have no padding
+in them. Instead of marking them with the 'packed' attribute,
+assert at compile time that they are the size we expect. This
+allows us to take the address of fields within the structs
+without risking undefined behaviour, and suppresses clang
+-Waddress-of-packed-member warnings.
 
-> I'm afraid this could become awkward later on.  Let me explain.
->=20
-> In many programming languages, absent optional arguments / members
-> default to a default value specified in the declaration.  Simple.
->=20
-> In others, 'absent' is effectively an additional value.  The code
-> consuming the argument / member can interpret 'absent' however it wants=
-=2E
-> It may eliminate the additional value by mapping it to a default value,=
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/ip6.h      | 12 ++++++++++--
+ slirp/ip6_icmp.h | 20 +++++++++++++++-----
+ 2 files changed, 25 insertions(+), 7 deletions(-)
 
-> but it can also interpret 'absent' unlike any value.  If there's more
-> than one consumer, their interpretations need not be consistent.  The
-> declaration provides no clue on semantics of 'absent'.
->=20
-> QAPI is in the latter camp.  I trust you can already sense how much I
-> like that.
->=20
-> Now you want to permit optional variant discriminators.  As per general=
-
-> rule, their interpretation is left to the code consuming it.  One
-> instance of such code is the generated union visitor, which needs to
-> decide which variant to visit.  Your default-variant tells it which
-> variant to visit.  Other code interpreting the discriminator better be
-> consistent with that, but that's the other code's problem.  Hmm.
->=20
-> If I could go back in time, I'd flip QAPI to "'absent' defaults to a
-> default value".  Lacking a time machine, we're stuck with cases of
-> "'absent' means something you can't express with a value" and "'absent'=
-
-> means different things in different contexts" that have been enshrined
-> in external interfaces.  Is there anything we could do to improve
-> matters for saner cases?
->=20
-> I think there is: we could provide for an *optional* default value.  If=
-
-> the schema specifies it, that's what 'absent' means.  If it doesn't, al=
-l
-> bets are off, just like they are now.
-
-And we already have the planned syntax, thanks to our recent work on
-adding conditionals - where we now have:
-
-{ '*field': 'mytype' }
-
-we can also do long-hand:
-
-{ { 'name': '*field', 'type': 'mytype' } }
-
-which also lends itself well to declaring a default:
-
-{ { 'name': '*field', 'type': 'mytype', 'default': 'xyz' } }
-
->=20
-> Say we do that (for what it's worth, introspect.json is already prepare=
-d
-> for it).  How would it play with your default-variant?
->=20
-> If an optional discriminator specifies a default value, then that's the=
-
-> default variant.  But wait, if there's also a default-variant, *that's*=
-
-> the default variant!  Awkward clash.  To resolve it, we could either
-> forbid combining the two, or rule default-variant overrides the default=
-=2E
-> Feels needlessly complicated.
->=20
-> Could we get away with "if you want a default variant, the discriminato=
-r
-> must specify a default"?
-
-I like the idea. It means finally biting the bullet and implementing
-default values, but we've known we've wanted them for a while (as
-evidenced by the existing introspection output, and by the syntax that
-we have ready to put into use for it).
-
-It means that representing the default variant in a union now depends on
-the base class declaring a default for the optional parameter (that is,
-an optional parameter can only be used as discriminator if it has a
-declared default), and gives us variable defaults in more uses than just
-unions.
-
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 14e9c78735..1e3e329ce6 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -133,7 +133,7 @@ struct ip6 {
+     uint8_t     ip_nh;               /* next header */
+     uint8_t     ip_hl;               /* hop limit */
+     struct in6_addr ip_src, ip_dst;  /* source and dest address */
+-} QEMU_PACKED;
++};
+=20
+ /*
+  * IPv6 pseudo-header used by upper-layer protocols
+@@ -145,7 +145,15 @@ struct ip6_pseudohdr {
+     uint16_t    ih_zero_hi;       /* zero */
+     uint8_t     ih_zero_lo;       /* zero */
+     uint8_t     ih_nh;            /* next header */
+-} QEMU_PACKED;
++};
+=20
++/*
++ * We don't want to mark these ip6 structs as packed as they are natural=
+ly
++ * correctly aligned; instead assert that there is no stray padding.
++ * If we marked the struct as packed then we would be unable to take
++ * the address of any of the fields in it.
++ */
++QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
++QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
+=20
+ #endif
+diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+index 32b0914055..2ad2b75e67 100644
+--- a/slirp/ip6_icmp.h
++++ b/slirp/ip6_icmp.h
+@@ -48,12 +48,16 @@ struct ndp_ra {     /* Router Advertisement Message *=
+/
+     uint16_t lifetime;      /* Router Lifetime */
+     uint32_t reach_time;    /* Reachable Time */
+     uint32_t retrans_time;  /* Retrans Timer */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
+=20
+ struct ndp_ns {     /* Neighbor Solicitation Message */
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
+=20
+ struct ndp_na {     /* Neighbor Advertisement Message */
+ #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+@@ -72,13 +76,17 @@ struct ndp_na {     /* Neighbor Advertisement Message=
+ */
+         reserved_lo:24;
+ #endif
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
+=20
+ struct ndp_redirect {
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+     struct in6_addr dest;   /* Destination Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
+=20
+ /*
+  * Structure of an icmpv6 header.
+@@ -103,7 +111,9 @@ struct icmp6 {
+ #define icmp6_nns icmp6_body.ndp_ns
+ #define icmp6_nna icmp6_body.ndp_na
+ #define icmp6_redirect icmp6_body.ndp_redirect
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
+=20
+ #define ICMP6_MINLEN    4
+ #define ICMP6_ERROR_MINLEN  8
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcOk4ACgkQp6FrSiUn
-Q2rMxQf8DYdmZry6VzJ2FE9HtzsbHdHlvkyemIuFAO0p44vaTW4IYEnHzI1/9Xk+
-Q6BDpaBd62kwYXPUDH9GAjJuDSX8wPLfNeMGjakXH8kKecuElhR/SBYNlrnAeAPZ
-fE+KxUxMAqBMHzh3KUdmp4W5NILL2harI+XMsEYUrASiWP/KcjlQY5iTpJ+FEjZ9
-egEupfhDiu1+oj2+P2s6Y374V9qTRNHW6cJzQfpVICszbp2zynToUGwXJiM5cfGJ
-/T8ryt9VBtxipoKoId4QjlekAPXhuL5NKZ8ovx/SKFnlK5WoVSNdbOhsjYQdaLio
-0/TsL6kmscNkiii82ADaG3G2X2MbIg==
-=yftR
------END PGP SIGNATURE-----
-
---kbZZNk5EwamoO1OV9OcGhjcml3FIQ9jTr--
+2.20.1
