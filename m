@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36319)
+Received: from eggs.gnu.org ([209.51.188.92]:36929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1grkfn-0006Mg-7j
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:29:04 -0500
+	(envelope-from <mst@redhat.com>) id 1grkhk-00009u-Qj
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1grkfl-0004yT-KO
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:29:03 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:42573)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1grkfl-0004xh-6x
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:29:01 -0500
-Received: by mail-qt1-f195.google.com with SMTP id b8so2259qtr.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 06:29:01 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1grkhh-0006Pr-0C
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:31:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59119)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grkhf-00069Z-5M
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:31:00 -0500
+Date: Thu, 7 Feb 2019 09:30:12 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190207092914-mutt-send-email-mst@kernel.org>
+References: <cover.1549473586.git.yi.z.zhang@linux.intel.com>
+	<3497114cb20658d8b40837675dcac9c78c04a345.1549473586.git.yi.z.zhang@linux.intel.com>
+	<20190206132538-mutt-send-email-mst@kernel.org>
+	<20190207151604.GA56533@tiger-server>
 MIME-Version: 1.0
-References: <cover.1549545591.git.berto@igalia.com>
-	<2c1d9d03c5b3ee26b116db3438caa3df73dffa46.1549545591.git.berto@igalia.com>
-In-Reply-To: <2c1d9d03c5b3ee26b116db3438caa3df73dffa46.1549545591.git.berto@igalia.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 7 Feb 2019 15:28:49 +0100
-Message-ID: <CAMxuvazff=VRnBdv46CofLg3p5QDQyU4TMQD2pQxu2sFX99tSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] main-loop: Add qemu_idle_add()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190207151604.GA56533@tiger-server>
+Subject: Re: [Qemu-devel] [PATCH V12 5/5] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,132 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>
+To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-Hi
+On Thu, Feb 07, 2019 at 11:16:05PM +0800, Yi Zhang wrote:
+> On 2019-02-06 at 13:29:37 -0500, Michael S. Tsirkin wrote:
+> > On Thu, Feb 07, 2019 at 01:27:29AM +0800, Zhang, Yi wrote:
+> > > From: Zhang Yi <yi.z.zhang@linux.intel.com>
+> > > 
+> > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> > > ---
+> > >  docs/nvdimm.txt | 25 ++++++++++++++++++++++---
+> > >  qemu-options.hx |  4 ++++
+> > >  2 files changed, 26 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> > > index 5f158a6..e2bf89f 100644
+> > > --- a/docs/nvdimm.txt
+> > > +++ b/docs/nvdimm.txt
+> > > @@ -143,9 +143,28 @@ Guest Data Persistence
+> > >  ----------------------
+> > >  
+> > >  Though QEMU supports multiple types of vNVDIMM backends on Linux,
+> > > -currently the only one that can guarantee the guest write persistence
+> > > -is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+> > > -which all guest access do not involve any host-side kernel cache.
+> > > +the only backend that can guarantee the guest write persistence is:
+> > > +
+> > > +A. DAX device (e.g., /dev/dax0.0, ) or
+> > > +B. DAX file(mounted with dax option)
+> > > +
+> > > +both are from the real NVDIMM device, all guest access do not
+> > > +involve any host-side kernel cache.
+> > 
+> > I'm not sure - what do above 2 lines mean?
+> > That cache must not be used if persistence is desired?
+> same meaning of direct mapping of pmem, 
+> Ah, Maybe better to change to:
+> "both are backend from the real NVDIMM device, which supportting direct
+> mapping of persistent memory." ?
 
-On Thu, Feb 7, 2019 at 2:23 PM Alberto Garcia <berto@igalia.com> wrote:
->
-> This works like g_idle_add() but allows specifying a different
-> GMainContext. It also returns the GSource directly instead of its ID
-> number for convenience.
->
-> pty_chr_state() and qio_task_thread_worker() are modified to make use
-> of this new function.
->
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  chardev/char-pty.c       | 8 ++------
->  include/qemu/main-loop.h | 8 ++++++++
->  io/task.c                | 7 ++-----
->  util/main-loop.c         | 9 +++++++++
->  4 files changed, 21 insertions(+), 11 deletions(-)
->
-> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-> index f16a5e8d59..6562c38f39 100644
-> --- a/chardev/char-pty.c
-> +++ b/chardev/char-pty.c
-> @@ -209,13 +209,9 @@ static void pty_chr_state(Chardev *chr, int connecte=
-d)
->          pty_chr_timer_cancel(s);
->          if (!s->connected) {
->              g_assert(s->open_source =3D=3D NULL);
-> -            s->open_source =3D g_idle_source_new();
-> +            s->open_source =3D qemu_idle_add(qemu_chr_be_generic_open_fu=
-nc,
-> +                                           chr, chr->gcontext);
->              s->connected =3D 1;
-> -            g_source_set_callback(s->open_source,
-> -                                  qemu_chr_be_generic_open_func,
-> -                                  chr, NULL);
-> -            g_source_attach(s->open_source, chr->gcontext);
-> -            g_source_unref(s->open_source);
->          }
->          if (!chr->gsource) {
->              chr->gsource =3D io_add_watch_poll(chr, s->ioc,
-> diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-> index e59f9ae1e9..1865afd993 100644
-> --- a/include/qemu/main-loop.h
-> +++ b/include/qemu/main-loop.h
-> @@ -295,6 +295,14 @@ void qemu_mutex_lock_iothread_impl(const char *file,=
- int line);
->   */
->  void qemu_mutex_unlock_iothread(void);
->
-> +/**
-> + * qemu_idle_add: Add an idle function to a GMainContext
-> + *
-> + * This function is similar to GLib's g_idle_add() but it allows
-> + * specifying a GMainContext instead of using the global one.
-> + */
-> +GSource *qemu_idle_add(GSourceFunc func, gpointer data, GMainContext *ct=
-x);
+Yes but typos aside it is still unclear - what is this? An extra
+condition when persistence is guaranteed?
 
-I think you should document that returned GSource* isn't ref/owned.
 
-> +
->  /* internal interfaces */
->
->  void qemu_fd_register(int fd);
-> diff --git a/io/task.c b/io/task.c
-> index c8489fb790..bdd395b0ad 100644
-> --- a/io/task.c
-> +++ b/io/task.c
-> @@ -19,6 +19,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/main-loop.h"
->  #include "io/task.h"
->  #include "qapi/error.h"
->  #include "qemu/thread.h"
-> @@ -105,7 +106,6 @@ static gboolean qio_task_thread_result(gpointer opaqu=
-e)
->  static gpointer qio_task_thread_worker(gpointer opaque)
->  {
->      struct QIOTaskThreadData *data =3D opaque;
-> -    GSource *idle;
->
->      trace_qio_task_thread_run(data->task);
->      data->worker(data->task, data->opaque);
-> @@ -117,10 +117,7 @@ static gpointer qio_task_thread_worker(gpointer opaq=
-ue)
->       */
->      trace_qio_task_thread_exit(data->task);
->
-> -    idle =3D g_idle_source_new();
-> -    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
-> -    g_source_attach(idle, data->context);
-> -    g_source_unref(idle);
-> +    qemu_idle_add(qio_task_thread_result, data, data->context);
->
->      return NULL;
->  }
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index 443cb4cfe8..1c68e3bf5f 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -171,6 +171,15 @@ int qemu_init_main_loop(Error **errp)
->      return 0;
->  }
->
-> +GSource *qemu_idle_add(GSourceFunc func, gpointer data, GMainContext *ct=
-x)
-> +{
-> +    GSource *idle =3D g_idle_source_new();
-> +    g_source_set_callback(idle, func, data, NULL);
-> +    g_source_attach(idle, ctx);
-> +    g_source_unref(idle);
-> +    return idle;
-> +}
-> +
->  static int max_priority;
->
->  #ifndef _WIN32
-> --
-> 2.11.0
->
-
-looks ok otherwise
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > 
+> > > +
+> > > +When using B (A file supporting direct mapping of persistent memory)
+> > > +as a backend, write persistence is guaranteed if the host kernel has
+> > > +support for the MAP_SYNC flag in the mmap system call (available
+> > > +since Linux 4.15 and on certain distro kernels) and additionally
+> > > +both 'pmem' and 'share' flags are set to 'on' on the backend.
+> > > +
+> > > +If these conditions are not satisfied i.e. if either 'pmem' or 'share'
+> > > +are not set, if the backend file does not support DAX or if MAP_SYNC
+> > > +is not supported by the host kernel, write persistence is not
+> > > +guaranteed after a system crash. For compatibility reasons, these
+> > > +conditions are silently ignored if not satisfied. Currently, no way
+> > > +is provided to test for them.
+> > > +For more details, please reference mmap(2) man page:
+> > > +http://man7.org/linux/man-pages/man2/mmap.2.html.
+> > >  
+> > >  When using other types of backends, it's suggested to set 'unarmed'
+> > >  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+> > > diff --git a/qemu-options.hx b/qemu-options.hx
+> > > index 08f8516..0cd41f4 100644
+> > > --- a/qemu-options.hx
+> > > +++ b/qemu-options.hx
+> > > @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
+> > >  If @option{pmem} is set to 'on', QEMU will take necessary operations to
+> > >  guarantee the persistence of its own writes to @option{mem-path}
+> > >  (e.g. in vNVDIMM label emulation and live migration).
+> > > +Also, we will map the backend-file with MAP_SYNC flag, which can ensure
+> > 
+> > should be
+> > 	which ensures
+> > 
+> > > +the file metadata is in sync to @option{mem-path}
+> > 
+> > 
+> > should be
+> > 	for @option{mem-path}
+> > 
+> > > in case of host crash
+> > > +or a power failure. MAP_SYNC requires support from both the host kernel
+> > > +(since Linux kernel 4.15) and @option{mem-path}
+> > 
+> > 
+> > should be
+> > 	and the filesystem of @option{mem-path}
+> Thanks, will update it.
+> > 
+> > > (only files supporting DAX).
+> > >  
+> > >  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+> > >  
+> > > -- 
+> > > 2.7.4
