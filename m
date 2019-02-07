@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34059)
+Received: from eggs.gnu.org ([209.51.188.92]:34534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grmLA-00072J-6E
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:15:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1grmNB-0008UL-QM
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:17:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grmL8-0005IF-Ap
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:15:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58656)
+	(envelope-from <peter.maydell@linaro.org>) id 1grmNA-0006V4-R3
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:17:57 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41280)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1grmL4-0005Bx-G0
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:15:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1grmKw-0005Io-8m
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 16:15:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 410432E80C9
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 16:15:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1grmNA-0006Be-E3
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:17:56 -0500
+Received: by mail-ot1-x344.google.com with SMTP id u16so673350otk.8
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 08:17:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Feb 2019 16:01:34 -0000
-From: RTOS Pharos <1815078@bugs.launchpad.net>
-Reply-To: Bug 1815078 <1815078@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154955529480.22127.1382747582342462477.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815078] [NEW] Qemu 3.1.0 risc-v mie.MEIE
+References: <20190114011122.5995-1-richard.henderson@linaro.org>
+	<20190114011122.5995-6-richard.henderson@linaro.org>
+In-Reply-To: <20190114011122.5995-6-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Feb 2019 16:17:14 +0000
+Message-ID: <CAFEAcA-EA9DHLiuJc=GBjQo6ajN_nU7EhEY_yniEbke5NgWK5Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 05/17] target/arm: Suppress tag check for
+ sp+offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Public bug reported:
+On Mon, 14 Jan 2019 at 01:11, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> R0078 specifies that base register, or base register plus immediate
+> offset, is unchecked when the base register is SP.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 37 ++++++++++++++++++-------------------
+>  1 file changed, 18 insertions(+), 19 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 5c2577a9ac..ee95ba7165 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -336,12 +336,11 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
+>   * This is always a fresh temporary, as we need to be able to
+>   * increment this independently of a dirty write-back address.
+>   */
+> -static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
+> +static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr, bool sp_off)
 
-Hello all,
+I think sp_off is not sufficiently general here. For instance
+if you look at the pseudocode for LDR (immediate)
+ https://developer.arm.com/docs/ddi0596/b/base-instructions-alphabetic-order/ldr-immediate-load-register-immediate
+we do the tag check if wback || n != 31.
 
-There is a bug in qemu for Risc-v, related to the mie register: when we
-try to set the MEIE bit (11) nothing is done, even when we are running
-at machine mode.
+That is, when the spec says "base register only, or base register
+plus immediate offset addressing form", it is referencing the
+list of addressing modes in the v8A Arm ARM DDA0487D.a C1.3.3,
+and "pre-indexed" and "post-indexed" are separate from "base + immediate".
+It looks like your patch is treating pre-indexed and
+post-indexed the same as base+imm.
 
-Li   a0 , 1 << 11
-Csrs mie , a0
-
-And when we read mie it is as though nothing was done.
-
-Going through the qemu source code I was able to correct it: on file
-op_helper.c, line 94, the variable all_ints should be initialized with:
-
-uint64_t all_ints =3D delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
-
-That is, the MIP_MEIP was missing.
-
-I've successfully triggered uart interrupts with this patch (virt
-machine).
-
-All the best,
-Pharos team
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815078
-
-Title:
-  Qemu 3.1.0 risc-v mie.MEIE
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello all,
-
-  There is a bug in qemu for Risc-v, related to the mie register: when
-  we try to set the MEIE bit (11) nothing is done, even when we are
-  running at machine mode.
-
-  Li   a0 , 1 << 11
-  Csrs mie , a0
-
-  And when we read mie it is as though nothing was done.
-
-  Going through the qemu source code I was able to correct it: on file
-  op_helper.c, line 94, the variable all_ints should be initialized
-  with:
-
-  uint64_t all_ints =3D delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
-
-  That is, the MIP_MEIP was missing.
-
-  I've successfully triggered uart interrupts with this patch (virt
-  machine).
-
-  All the best,
-  Pharos team
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815078/+subscriptions
+thanks
+-- PMM
