@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42642)
+Received: from eggs.gnu.org ([209.51.188.92]:43743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1grhFF-0002jo-T9
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:49:26 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grhJp-0004e5-J1
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1grhFD-0005Vg-KV
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:49:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1grhFB-0005Ty-Jp
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:49:23 -0500
-Date: Thu, 7 Feb 2019 11:49:13 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190207114913.2c5f2c5b.cohuck@redhat.com>
-In-Reply-To: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
-References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
+	(envelope-from <laurent@vivier.eu>) id 1grhJn-000887-Dy
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:09 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:48829)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grhJj-00085l-JV
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:05 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu,  7 Feb 2019 11:53:47 +0100
+Message-Id: <20190207105347.22337-4-laurent@vivier.eu>
+In-Reply-To: <20190207105347.22337-1-laurent@vivier.eu>
+References: <20190207105347.22337-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
- under qemu-s390x in user mode
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 3/3] linux-user: add new netlink types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Giovanni Mascellani <gio@debian.org>, David Hildenbrand <david@redhat.com>
-Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-On Thu, 07 Feb 2019 09:46:07 -0000
-Giovanni Mascellani <gio@debian.org> wrote:
+Add QEMU_IFLA_MIN_MTU, QEMU_IFLA_MAX_MTU (from linux v4.19)
+    QEMU_IFLA_BRPORT_ISOLATED (from linux v4.18) and
+    QEMU_IFLA_BRPORT_BACKUP_PORT (from linux v4.19).
 
-> Public bug reported:
-> 
-> qemu-s390x in user mode crashes with SIGILL (under host architecture
-> x86_64, running Debian unstable) when executing target instruction
-> "stck" ("STORE CLOCK", see
-> https://www-01.ibm.com/support/docview.wss?uid=isg26480faec85f44e2385256d5200627dee&aid=1),
-> which is basically a kind of equivalent of Intel "rdtsc". The same
-> instruction works fine under qemu-s390x in system mode. The bug is
-> reproducible with both the qemu version distributed in Debian unstable
-> and with the latest upstream master (commit
-> 47994e16b1d66411953623e7c0bf0cdcd50bd507).
+These new types fix this error flow with sudo:
+...
+Unknown host QEMU_IFLA type: 50
+Unknown host QEMU_IFLA type: 51
+Unknown QEMU_IFLA_BRPORT type 33
+...
 
-Did that work before commit 7de3b1cdc67 ("s390x/tcg: properly implement
-the TOD")?
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20190206193211.6683-1-laurent@vivier.eu>
+---
+ linux-user/fd-trans.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> 
-> This bug manifested itself as a crash of ssh-keygen program, which uses
-> "stck" to obtain some bits of randomness during key creation. Bisection
-> of the code led to the attached minimal example. Compile with (inside an
-> s390x system):
-> 
->  $ gcc -c -o test.o test.c
->  $ gcc -c -o rdtsc.o rdtsc.S
->  $ gcc -o test test.o rdtsc.o
-> 
-> Then run test. It will crash with SIGILL in user mode and run fine in
-> system mode. Also, compare with the original file at
-> https://github.com/openssl/openssl/blob/master/crypto/s390xcpuid.pl#L139
-> (there the instruction "stckf" is also used; it is probable that it has
-> the same problem if it is supported altogether, but it did not test for
-> this).
-
-stckf will end up at the same helper, so it seems likely to hit the
-same problem.
-
-> 
-> Running qemu-s390x with options -d
-> in_asm,out_asm,op,op_opt,exec,nochain,cpu gives the trace attached in
-> log.txt.
-
-I think the problem is that the helper tries to access the todstate
-object, which we won't have in user mode IIUC. David?
+diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
+index 216b9f0614..30425c9df6 100644
+--- a/linux-user/fd-trans.c
++++ b/linux-user/fd-trans.c
+@@ -129,6 +129,8 @@ enum {
+     QEMU_IFLA_CARRIER_UP_COUNT,
+     QEMU_IFLA_CARRIER_DOWN_COUNT,
+     QEMU_IFLA_NEW_IFINDEX,
++    QEMU_IFLA_MIN_MTU,
++    QEMU_IFLA_MAX_MTU,
+     QEMU___IFLA_MAX
+ };
+ 
+@@ -166,6 +168,8 @@ enum {
+     QEMU_IFLA_BRPORT_BCAST_FLOOD,
+     QEMU_IFLA_BRPORT_GROUP_FWD_MASK,
+     QEMU_IFLA_BRPORT_NEIGH_SUPPRESS,
++    QEMU_IFLA_BRPORT_ISOLATED,
++    QEMU_IFLA_BRPORT_BACKUP_PORT,
+     QEMU___IFLA_BRPORT_MAX
+ };
+ 
+@@ -510,6 +514,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+     case QEMU_IFLA_BRPORT_VLAN_TUNNEL:
+     case QEMU_IFLA_BRPORT_BCAST_FLOOD:
+     case QEMU_IFLA_BRPORT_NEIGH_SUPPRESS:
++    case QEMU_IFLA_BRPORT_ISOLATED:
+         break;
+     /* uint16_t */
+     case QEMU_IFLA_BRPORT_PRIORITY:
+@@ -523,6 +528,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+         break;
+     /* uin32_t */
+     case QEMU_IFLA_BRPORT_COST:
++    case QEMU_IFLA_BRPORT_BACKUP_PORT:
+         u32 = NLA_DATA(nlattr);
+         *u32 = tswap32(*u32);
+         break;
+@@ -787,6 +793,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+     case QEMU_IFLA_GSO_MAX_SIZE:
+     case QEMU_IFLA_CARRIER_UP_COUNT:
+     case QEMU_IFLA_CARRIER_DOWN_COUNT:
++    case QEMU_IFLA_MIN_MTU:
++    case QEMU_IFLA_MAX_MTU:
+         u32 = RTA_DATA(rtattr);
+         *u32 = tswap32(*u32);
+         break;
+-- 
+2.20.1
