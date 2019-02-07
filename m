@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39602)
+Received: from eggs.gnu.org ([209.51.188.92]:42642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grh1E-0002RA-Qf
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:34:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1grhFF-0002jo-T9
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:49:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grh1D-0000xw-Bs
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:34:56 -0500
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:42063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1grh1A-0000t1-T2
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:34:53 -0500
-Received: by mail-ot1-x32c.google.com with SMTP id v23so17340357otk.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 02:34:50 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1grhFD-0005Vg-KV
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:49:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1grhFB-0005Ty-Jp
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:49:23 -0500
+Date: Thu, 7 Feb 2019 11:49:13 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190207114913.2c5f2c5b.cohuck@redhat.com>
+In-Reply-To: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
+References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
 MIME-Version: 1.0
-References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Feb 2019 10:34:38 +0000
-Message-ID: <CAFEAcA8UU_wb-ALhGyq2zdZoexBw-sKaAmWRXzFNn18YHLwjmA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/76] misc patches for 2019-02-04
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
+ under qemu-s390x in user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Giovanni Mascellani <gio@debian.org>, David Hildenbrand <david@redhat.com>
+Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-On Tue, 5 Feb 2019 at 18:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 1c3d45df5e94042d5fb2bb31416072563ab30e49:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-02-04' into staging (2019-02-05 12:46:18 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 5ed76a4c63db9295c6c5d67895925810050d4a46:
->
->   queue: fix QTAILQ_FOREACH_REVERSE_SAFE (2019-02-05 16:50:21 +0100)
->
-> ----------------------------------------------------------------
-> * cpu-exec fixes (Emilio, Laurent)
-> * TCG bugfix in queue.h (Paolo)
-> * high address load for linuxboot (Zhijian)
-> * PVH support (Liam, Stefano)
-> * misc i386 changes (Paolo, Robert, Doug)
-> * configure tweak for openpty (Thomas)
-> * elf2dmp port to Windows (Viktor)
-> * initial improvements to Makefile infrastructure (Yang + GSoC 2013)
+On Thu, 07 Feb 2019 09:46:07 -0000
+Giovanni Mascellani <gio@debian.org> wrote:
 
-Applied, thanks.
+> Public bug reported:
+> 
+> qemu-s390x in user mode crashes with SIGILL (under host architecture
+> x86_64, running Debian unstable) when executing target instruction
+> "stck" ("STORE CLOCK", see
+> https://www-01.ibm.com/support/docview.wss?uid=isg26480faec85f44e2385256d5200627dee&aid=1),
+> which is basically a kind of equivalent of Intel "rdtsc". The same
+> instruction works fine under qemu-s390x in system mode. The bug is
+> reproducible with both the qemu version distributed in Debian unstable
+> and with the latest upstream master (commit
+> 47994e16b1d66411953623e7c0bf0cdcd50bd507).
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Did that work before commit 7de3b1cdc67 ("s390x/tcg: properly implement
+the TOD")?
 
--- PMM
+> 
+> This bug manifested itself as a crash of ssh-keygen program, which uses
+> "stck" to obtain some bits of randomness during key creation. Bisection
+> of the code led to the attached minimal example. Compile with (inside an
+> s390x system):
+> 
+>  $ gcc -c -o test.o test.c
+>  $ gcc -c -o rdtsc.o rdtsc.S
+>  $ gcc -o test test.o rdtsc.o
+> 
+> Then run test. It will crash with SIGILL in user mode and run fine in
+> system mode. Also, compare with the original file at
+> https://github.com/openssl/openssl/blob/master/crypto/s390xcpuid.pl#L139
+> (there the instruction "stckf" is also used; it is probable that it has
+> the same problem if it is supported altogether, but it did not test for
+> this).
+
+stckf will end up at the same helper, so it seems likely to hit the
+same problem.
+
+> 
+> Running qemu-s390x with options -d
+> in_asm,out_asm,op,op_opt,exec,nochain,cpu gives the trace attached in
+> log.txt.
+
+I think the problem is that the helper tries to access the todstate
+object, which we won't have in user mode IIUC. David?
