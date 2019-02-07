@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39958)
+Received: from eggs.gnu.org ([209.51.188.92]:40597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1grkuU-0000XN-8V
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:44:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1grkx1-0002V7-CL
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:46:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1grkuT-0005aF-I8
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:44:14 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39070)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1grkuT-0005Yi-74
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:44:13 -0500
-Received: by mail-wm1-x341.google.com with SMTP id f16so103573wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 06:44:12 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1grkx0-0007WP-DC
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:46:51 -0500
+References: <20190206195551.28893-1-mreitz@redhat.com>
+	<20190206195551.28893-2-mreitz@redhat.com>
+	<87mun8jddk.fsf@dusky.pond.sub.org>
+	<041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4ccd4724-af9c-ccf1-3598-399bd3e4483b@redhat.com>
+Date: Thu, 7 Feb 2019 08:46:25 -0600
 MIME-Version: 1.0
-References: <cover.1549545591.git.berto@igalia.com>
-	<c741408825d01f5a186901c5a8248126ffebe9fd.1549545591.git.berto@igalia.com>
-	<CAMxuvayhuXEWTvJqNyKFjuae3u47MnjN4NPQ_J+vVWLK9pM5Rg@mail.gmail.com>
-	<CAMxuvawnNqvUYf2Z-+8zX63wRNFp+F_A7Uo==pY_9n1HDXumqQ@mail.gmail.com>
-	<w51ftszhdwg.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51ftszhdwg.fsf@maestria.local.igalia.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 7 Feb 2019 15:43:59 +0100
-Message-ID: <CAJ+F1CKA_WuJog780XFWXG3VHTtUzjMw8e+X_GPoWdMrQygY1Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] main-loop: Don't leak GSources
- attached to a GMainContext
+In-Reply-To: <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SYhO708rTXaSeAlYZLv5mmBhNjGuhtUOf"
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SYhO708rTXaSeAlYZLv5mmBhNjGuhtUOf
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <4ccd4724-af9c-ccf1-3598-399bd3e4483b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] qapi: Add default-variant for flat
+ unions
+References: <20190206195551.28893-1-mreitz@redhat.com>
+ <20190206195551.28893-2-mreitz@redhat.com>
+ <87mun8jddk.fsf@dusky.pond.sub.org>
+ <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
+In-Reply-To: <041a22c8-ae8d-2a25-736d-2ef4e3dc2f8b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 7, 2019 at 3:37 PM Alberto Garcia <berto@igalia.com> wrote:
->
-> On Thu 07 Feb 2019 03:24:40 PM CET, Marc-Andr=C3=A9 Lureau wrote:
-> > On Thu, Feb 7, 2019 at 3:23 PM Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@redhat.com> wrote:
-> >>
-> >> On Thu, Feb 7, 2019 at 2:23 PM Alberto Garcia <berto@igalia.com> wrote=
-:
-> >> >
-> >> > After g_source_attach() the GMainContext holds a reference to the
-> >> > GSource, so the caller does not need to keep it.
-> >> >
-> >> > pty_chr_state() and qio_task_thread_worker() are not doing this, so
-> >> > the GSource is being leaked in both cases (pty_chr_open_src_cancel()
-> >> > is the exception here because it does remove the extra reference
-> >> > correctly).
-> >> >
-> >> > Signed-off-by: Alberto Garcia <berto@igalia.com>
-> >>
-> >> You could mention this is a fix for regression from
-> >> a17536c594bfed94d05667b419f747b692f5fc7f
-> >
-> > and 938eb9e9c83d34d90cac6ec5c5388e7998840e4e
->
-> Ok, feel free to add this to the commit message if I don't need to
-> resend the series.
+On 2/7/19 8:01 AM, Eric Blake wrote:
 
-Well, the series conflicts with the currently queued chardev series. I
-think I will send the pullreq and let you rebase.
+>> I think there is: we could provide for an *optional* default value.  I=
+f
+>> the schema specifies it, that's what 'absent' means.  If it doesn't, a=
+ll
+>> bets are off, just like they are now.
+>=20
+> And we already have the planned syntax, thanks to our recent work on
+> adding conditionals - where we now have:
+>=20
+> { '*field': 'mytype' }
+>=20
+> we can also do long-hand:
+>=20
+> { { 'name': '*field', 'type': 'mytype' } }
 
-(I also have a related series pending review "[PATCH v2 0/6] chardev:
-various cleanups and improvements")
+I'd better use the actual syntax, instead of inventing non-JSON off the
+top of my head:
 
+{ '*field': { 'type': 'mytype' } }
+
+>=20
+> which also lends itself well to declaring a default:
+>=20
+> { { 'name': '*field', 'type': 'mytype', 'default': 'xyz' } }
+
+{ '*field': { 'type': 'mytype', 'default': 'xyz' } }
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--SYhO708rTXaSeAlYZLv5mmBhNjGuhtUOf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcRMEACgkQp6FrSiUn
+Q2rTyQgAmiXP8d123Jdv7ttawXK/WOHOLt43SAot3/jM7hOhuv7e1gqM8DRTV09q
+zquPvFak35l39sdD8QxZ64FTRytwvMVPQn2iBOypOIykNfA8vAATJFX5sUR4Krzl
+Mu4Cm8hz00ZFNNS0v4CJQudEI0a6J2+nb/iI37yZH0ZzIIfMxW7iEqpxpfwbUhbK
+/Dmz7g0MsXYSpIN+He2VlbhbML70DvRDch/HT1Ni+za9d/+iExJcVx6Qy+/266Ak
+wJ8sBwnj+wQH7/A8QpFvXz9xE+DMrTT9aBqUJYs929caQLaQLCl1A40PoUmTM4zH
+VN+JfBO3pQgZcX6Ew8JT8/JW3x4yyw==
+=VXp/
+-----END PGP SIGNATURE-----
+
+--SYhO708rTXaSeAlYZLv5mmBhNjGuhtUOf--
