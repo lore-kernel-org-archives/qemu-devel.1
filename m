@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37025)
+Received: from eggs.gnu.org ([209.51.188.92]:37051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgru-0002z4-Cv
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgru-0002zA-Sd
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrt-00025S-OV
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrt-00025Y-PD
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:18 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Feb 2019 13:24:35 +0300
-Message-Id: <20190207102445.71998-8-vsementsov@virtuozzo.com>
+Date: Thu,  7 Feb 2019 13:24:38 +0300
+Message-Id: <20190207102445.71998-11-vsementsov@virtuozzo.com>
 In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
 References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 07/17] block/parallels: use
- QEMU_IOVEC_INIT_BUF
+Subject: [Qemu-devel] [PATCH v3 10/17] block/qed: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +22,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, vsementsov@virtuozzo.com
 
-Use new QEMU_IOVEC_INIT_BUF() instead of
+Use new qemu_iovec_init_buf() instead of
 qemu_iovec_init_external( ... , 1), which simplifies the code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/parallels.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ block/qed-table.c | 16 +++-------------
+ block/qed.c       | 31 +++++++++----------------------
+ 2 files changed, 12 insertions(+), 35 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index cc9445879d..6d24ee6d8e 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -220,23 +220,20 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
-     if (bs->backing) {
-         int64_t nb_cow_sectors = to_allocate * s->tracks;
-         int64_t nb_cow_bytes = nb_cow_sectors << BDRV_SECTOR_BITS;
--        QEMUIOVector qiov;
--        struct iovec iov = {
--            .iov_len = nb_cow_bytes,
--            .iov_base = qemu_blockalign(bs, nb_cow_bytes)
--        };
--        qemu_iovec_init_external(&qiov, &iov, 1);
-+        QEMUIOVector qiov =
-+            QEMU_IOVEC_INIT_BUF(qiov, qemu_blockalign(bs, nb_cow_bytes),
-+                                nb_cow_bytes);
+diff --git a/block/qed-table.c b/block/qed-table.c
+index 7df5680adb..c497bd4aec 100644
+--- a/block/qed-table.c
++++ b/block/qed-table.c
+@@ -21,16 +21,11 @@
+ /* Called with table_lock held.  */
+ static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
+ {
+-    QEMUIOVector qiov;
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(
++        qiov, table->offsets, s->header.cluster_size * s->header.table_size);
+     int noffsets;
+     int i, ret;
  
-         ret = bdrv_co_preadv(bs->backing, idx * s->tracks * BDRV_SECTOR_SIZE,
-                              nb_cow_bytes, &qiov, 0);
-         if (ret < 0) {
--            qemu_vfree(iov.iov_base);
-+            qemu_vfree(qemu_iovec_get_buf(&qiov));
-             return ret;
-         }
+-    struct iovec iov = {
+-        .iov_base = table->offsets,
+-        .iov_len = s->header.cluster_size * s->header.table_size,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+-
+     trace_qed_read_table(s, offset, table);
  
-         ret = bdrv_co_pwritev(bs->file, s->data_end * BDRV_SECTOR_SIZE,
-                               nb_cow_bytes, &qiov, 0);
--        qemu_vfree(iov.iov_base);
-+        qemu_vfree(qemu_iovec_get_buf(&qiov));
-         if (ret < 0) {
-             return ret;
-         }
+     qemu_co_mutex_unlock(&s->table_lock);
+@@ -71,7 +66,6 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
+     unsigned int sector_mask = BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1;
+     unsigned int start, end, i;
+     QEDTable *new_table;
+-    struct iovec iov;
+     QEMUIOVector qiov;
+     size_t len_bytes;
+     int ret;
+@@ -85,11 +79,7 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
+     len_bytes = (end - start) * sizeof(uint64_t);
+ 
+     new_table = qemu_blockalign(s->bs, len_bytes);
+-    iov = (struct iovec) {
+-        .iov_base = new_table->offsets,
+-        .iov_len = len_bytes,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    qemu_iovec_init_buf(&qiov, new_table->offsets, len_bytes);
+ 
+     /* Byteswap table */
+     for (i = start; i < end; i++) {
+diff --git a/block/qed.c b/block/qed.c
+index 1280870024..a010e5b349 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -113,18 +113,13 @@ static int coroutine_fn qed_write_header(BDRVQEDState *s)
+     int nsectors = DIV_ROUND_UP(sizeof(QEDHeader), BDRV_SECTOR_SIZE);
+     size_t len = nsectors * BDRV_SECTOR_SIZE;
+     uint8_t *buf;
+-    struct iovec iov;
+     QEMUIOVector qiov;
+     int ret;
+ 
+     assert(s->allocating_acb || s->allocating_write_reqs_plugged);
+ 
+     buf = qemu_blockalign(s->bs, len);
+-    iov = (struct iovec) {
+-        .iov_base = buf,
+-        .iov_len = len,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    qemu_iovec_init_buf(&qiov, buf, len);
+ 
+     ret = bdrv_co_preadv(s->bs->file, 0, qiov.size, &qiov, 0);
+     if (ret < 0) {
+@@ -913,7 +908,6 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
+ {
+     QEMUIOVector qiov;
+     QEMUIOVector *backing_qiov = NULL;
+-    struct iovec iov;
+     int ret;
+ 
+     /* Skip copy entirely if there is no work to do */
+@@ -921,11 +915,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
+         return 0;
+     }
+ 
+-    iov = (struct iovec) {
+-        .iov_base = qemu_blockalign(s->bs, len),
+-        .iov_len = len,
+-    };
+-    qemu_iovec_init_external(&qiov, &iov, 1);
++    qemu_iovec_init_buf(&qiov, qemu_blockalign(s->bs, len), len);
+ 
+     ret = qed_read_backing_file(s, pos, &qiov, &backing_qiov);
+ 
+@@ -946,7 +936,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
+     }
+     ret = 0;
+ out:
+-    qemu_vfree(iov.iov_base);
++    qemu_vfree(qemu_iovec_get_buf(&qiov));
+     return ret;
+ }
+ 
+@@ -1447,8 +1437,12 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+                                                   BdrvRequestFlags flags)
+ {
+     BDRVQEDState *s = bs->opaque;
+-    QEMUIOVector qiov;
+-    struct iovec iov;
++
++    /*
++     * Zero writes start without an I/O buffer.  If a buffer becomes necessary
++     * then it will be allocated during request processing.
++     */
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
+ 
+     /* Fall back if the request is not aligned */
+     if (qed_offset_into_cluster(s, offset) ||
+@@ -1456,13 +1450,6 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
+         return -ENOTSUP;
+     }
+ 
+-    /* Zero writes start without an I/O buffer.  If a buffer becomes necessary
+-     * then it will be allocated during request processing.
+-     */
+-    iov.iov_base = NULL;
+-    iov.iov_len = bytes;
+-
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+     return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
+                           bytes >> BDRV_SECTOR_BITS,
+                           QED_AIOCB_WRITE | QED_AIOCB_ZERO);
 -- 
 2.18.0
