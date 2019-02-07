@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57500)
+Received: from eggs.gnu.org ([209.51.188.92]:57501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHX-00029E-06
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:04 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHX-00029F-05
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHP-0000yN-TT
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHP-0000xY-Qk
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:58 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:49754)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:49588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grkHP-0000qg-KF
+	id 1grkHN-0000n1-Nf
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:51 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Feb 2019 16:02:49 +0200
-Message-Id: <20190207140316.16103-6-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:02:50 +0200
+Message-Id: <20190207140316.16103-7-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv4 05/32] net/slirp: simplify checking for cmd:
- prefix
+Subject: [Qemu-devel] [PULLv4 06/32] net/slirp: free forwarding rules on
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,22 +36,79 @@ From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/slirp.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
 diff --git a/net/slirp.c b/net/slirp.c
-index ec07f662c0..b91741b8fc 100644
+index b91741b8fc..750105a466 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -773,7 +773,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+@@ -75,6 +75,13 @@ struct slirp_config_str {
+     char str[1024];
+ };
+=20
++struct GuestFwd {
++    CharBackend hd;
++    struct in_addr server;
++    int port;
++    Slirp *slirp;
++};
++
+ typedef struct SlirpState {
+     NetClientState nc;
+     QTAILQ_ENTRY(SlirpState) entry;
+@@ -83,6 +90,7 @@ typedef struct SlirpState {
+ #ifndef _WIN32
+     gchar *smb_dir;
+ #endif
++    GSList *fwd;
+ } SlirpState;
+=20
+ static struct slirp_config_str *slirp_configs;
+@@ -122,10 +130,19 @@ static void slirp_smb_exit(Notifier *n, void *data)
+     slirp_smb_cleanup(s);
+ }
+=20
++static void slirp_free_fwd(gpointer data)
++{
++    struct GuestFwd *fwd =3D data;
++
++    qemu_chr_fe_deinit(&fwd->hd, true);
++    g_free(data);
++}
++
+ static void net_slirp_cleanup(NetClientState *nc)
+ {
+     SlirpState *s =3D DO_UPCAST(SlirpState, nc, nc);
+=20
++    g_slist_free_full(s->fwd, slirp_free_fwd);
+     slirp_cleanup(s->slirp);
+     if (s->exit_notifier.notify) {
+         qemu_remove_exit_notifier(&s->exit_notifier);
+@@ -717,13 +734,6 @@ static int slirp_smb(SlirpState* s, const char *expo=
+rted_dir,
+=20
+ #endif /* !defined(_WIN32) */
+=20
+-struct GuestFwd {
+-    CharBackend hd;
+-    struct in_addr server;
+-    int port;
+-    Slirp *slirp;
+-};
+-
+ static int guestfwd_can_read(void *opaque)
+ {
+     struct GuestFwd *fwd =3D opaque;
+@@ -814,6 +824,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
 config_str, Error **errp)
 =20
-     snprintf(buf, sizeof(buf), "guestfwd.tcp.%d", port);
+         qemu_chr_fe_set_handlers(&fwd->hd, guestfwd_can_read, guestfwd_r=
+ead,
+                                  NULL, NULL, fwd, NULL, true);
++        s->fwd =3D g_slist_append(s->fwd, fwd);
+     }
+     return 0;
 =20
--    if ((strlen(p) > 4) && !strncmp(p, "cmd:", 4)) {
-+    if (g_str_has_prefix(p, "cmd:")) {
-         if (slirp_add_exec(s->slirp, &p[4], &server, port) < 0) {
-             error_setg(errp, "Conflicting/invalid host:port in guest "
-                        "forwarding rule '%s'", config_str);
 --=20
 2.20.1
