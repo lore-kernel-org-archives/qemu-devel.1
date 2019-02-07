@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45070)
+Received: from eggs.gnu.org ([209.51.188.92]:45252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gio@debian.org>) id 1grjIt-0006zS-KO
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:01:25 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grjK0-0007WK-D4
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:02:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gio@debian.org>) id 1grjId-00062g-EN
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:01:16 -0500
-Received: from pietrobattiston.it ([2001:4b98:dc0:41:216:3eff:feb1:1135]:58692
-	helo=jauntuale.pietrobattiston.it)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gio@debian.org>) id 1grjIb-0005i7-5T
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:01:01 -0500
-References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
-	<20190207114913.2c5f2c5b.cohuck@redhat.com>
-	<6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
-	<ffb48b9f-fc99-0766-925c-4f79c692cba7@redhat.com>
-	<1a3f847e-a371-eacb-8be6-678bb3c20b05@debian.org>
-	<951bf77e-f953-48aa-9e2e-3f7c66bb9db2@redhat.com>
-	<78990142-121a-f84d-811b-60ec503f394b@linaro.org>
-From: Giovanni Mascellani <gio@debian.org>
-Message-ID: <175f1e54-4517-d815-f6ac-566be14bfc3a@debian.org>
-Date: Thu, 7 Feb 2019 14:00:50 +0100
+	(envelope-from <laurent@vivier.eu>) id 1grjJs-0006k3-Tu
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:02:27 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:49387)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grjJs-0006jY-Fr
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:02:20 -0500
+References: <154953942151.29184.7694211057153536439@ebba9967afc0>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <211054d1-50ff-f5db-b235-2bd8fb33894b@vivier.eu>
+Date: Thu, 7 Feb 2019 14:01:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <78990142-121a-f84d-811b-60ec503f394b@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="y4iljxKzkShfp4o52JT2HvFlM62kdMuSo"
-Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
- under qemu-s390x in user mode
+In-Reply-To: <154953942151.29184.7694211057153536439@ebba9967afc0>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/3] Linux user for 4.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,65 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, riku.voipio@iki.fi, Peter Maydell <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---y4iljxKzkShfp4o52JT2HvFlM62kdMuSo
-From: Giovanni Mascellani <gio@debian.org>
-To: Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- David Hildenbrand <david@redhat.com>
-Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
-Message-ID: <175f1e54-4517-d815-f6ac-566be14bfc3a@debian.org>
-Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
- under qemu-s390x in user mode
-References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
- <20190207114913.2c5f2c5b.cohuck@redhat.com>
- <6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
- <ffb48b9f-fc99-0766-925c-4f79c692cba7@redhat.com>
- <1a3f847e-a371-eacb-8be6-678bb3c20b05@debian.org>
- <951bf77e-f953-48aa-9e2e-3f7c66bb9db2@redhat.com>
- <78990142-121a-f84d-811b-60ec503f394b@linaro.org>
-In-Reply-To: <78990142-121a-f84d-811b-60ec503f394b@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I'm going to resend an updated series.
 
-Hi,
+Thanks,
+Laurent
 
-Il 07/02/19 13:15, Richard Henderson ha scritto:
-> See also
->=20
->   https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg06734.html
->=20
-> which I never followed up on the review changes requested.
-
-I can confirm that both patches (Thomas' and Richard's) work for me.
-Although they produce rather different results:
-
- Thomas' patch:   around 6346926678828662276
- Richard's patch: around 9048173079139739571
-
-They also appear to grow at different speeds, if I am not mistaken. I
-have no idea of what is correct, because I do not know s390x.
-
-Thanks again for your interest, Giovanni.
---=20
-Giovanni Mascellani <g.mascellani@gmail.com>
-Postdoc researcher - Universit=C3=A9 Libre de Bruxelles
-
-
---y4iljxKzkShfp4o52JT2HvFlM62kdMuSo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEARYKAB0WIQSiBF6hBvCQNcghJEaNr8EMz954SQUCXFwsAgAKCRCNr8EMz954
-SVtGAQCPlIARB1RSM7fHwM9zxLnHYaA4nfTm9br8lwabhPPFAQEA5I2KriL16LSN
-DoQEfHu9KbqWiH+me0e6u2zyrkKsDAU=
-=FT4+
------END PGP SIGNATURE-----
-
---y4iljxKzkShfp4o52JT2HvFlM62kdMuSo--
+On 07/02/2019 12:37, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190207105347.22337-1-laurent@vivier.eu/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Subject: [Qemu-devel] [PULL 0/3] Linux user for 4.0 patches
+> Type: series
+> Message-id: 20190207105347.22337-1-laurent@vivier.eu
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  t [tag update]            patchew/20190206181725.14337-1-armbru@redhat.com -> patchew/20190206181725.14337-1-armbru@redhat.com
+>  * [new tag]               patchew/20190207105347.22337-1-laurent@vivier.eu -> patchew/20190207105347.22337-1-laurent@vivier.eu
+> Switched to a new branch 'test'
+> 11efd0b554 linux-user: add new netlink types
+> a7c0a6a696 linux-user: Check sscanf return value in open_net_route()
+> e1edb0bc04 Fix linux-user crashes in ioctl(SIOCGIFCONF) when ifc_buf is NULL.
+> 
+> === OUTPUT BEGIN ===
+> 1/3 Checking commit e1edb0bc04af (Fix linux-user crashes in ioctl(SIOCGIFCONF) when ifc_buf is NULL.)
+> WARNING: Block comments use a leading /* on a separate line
+> #48: FILE: linux-user/syscall.c:4200:
+> +            /* We can't fit all the extents into the fixed size buffer.
+> 
+> ERROR: "(foo*)" should be "(foo *)"
+> #62: FILE: linux-user/syscall.c:4210:
+> +        host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
+> 
+> total: 1 errors, 1 warnings, 73 lines checked
+> 
+> Patch 1/3 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 2/3 Checking commit a7c0a6a696f8 (linux-user: Check sscanf return value in open_net_route())
+> 3/3 Checking commit 11efd0b55422 (linux-user: add new netlink types)
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20190207105347.22337-1-laurent@vivier.eu/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
