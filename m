@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57341)
+Received: from eggs.gnu.org ([209.51.188.92]:57319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvt-0001vt-Fx
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvs-0001uX-RQ
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002DE-PC
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:53 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40393)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002Cq-Is
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:52 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35345)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnvr-00027h-Ex
+	id 1grnvr-00026j-AB
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:51 -0500
-Received: by mail-wr1-x444.google.com with SMTP id q1so809902wrp.7
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:46 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id z18so855410wrh.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:45 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:56:51 +0100
-Message-Id: <1549562254-41157-9-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:56:50 +0100
+Message-Id: <1549562254-41157-8-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/51] kconfig: introduce CONFIG_TEST_DEVICES
+Subject: [Qemu-devel] [PATCH 07/51] minikconfig: implement allnoconfig and
+ defconfig modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +31,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, philmd@redhat.com
 
-Devices that are mostly used for testing purposes (for example in
-endianness-test) will be moved under a new symbol CONFIG_TEST_DEVICES
-that can be disabled in the default-configs file.  This makes
-it easier to drop this code from QEMU if desirable.
+Apart from defconfig (which is a no-op),
+allyesconfig/allnoconfig/randcondfig can be implemented simply by ignoring
+the RHS of assignments and "default" statements.  The RHS is replaced
+respectively by "true", "false" or a random value.
+
+However, allyesconfig and randconfig do not quite work, because all the
+files for hw/ARCH/Kconfig are sourced and therefore you could end up
+enabling some ARM boards in x86 or things like that.  This is left for
+future work, but I am leaving it in to help debugging minikconf itself.
+
+allnoconfig mode is tied to a new configure option, --without-default-devices.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/alpha-softmmu.mak       | 1 +
- default-configs/i386-softmmu.mak        | 1 +
- default-configs/mips-softmmu-common.mak | 1 +
- default-configs/ppc-softmmu.mak         | 1 +
- default-configs/sh4-softmmu.mak         | 1 +
- default-configs/sh4eb-softmmu.mak       | 1 +
- default-configs/sparc64-softmmu.mak     | 1 +
- hw/Kconfig                              | 3 +++
- 8 files changed, 10 insertions(+)
+ Makefile             |  1 +
+ configure            | 12 +++++++++++-
+ scripts/minikconf.py | 43 ++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 46 insertions(+), 10 deletions(-)
 
-diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
-index 49cb7ce..74501ca 100644
---- a/default-configs/alpha-softmmu.mak
-+++ b/default-configs/alpha-softmmu.mak
-@@ -18,5 +18,6 @@ CONFIG_IDE_CMD646=y
- CONFIG_I8259=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
-+CONFIG_TEST_DEVICES=y
- CONFIG_SMC37C669=y
- CONFIG_DP264=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 412c8c5..1d43fb2 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -4,6 +4,7 @@ include pci.mak
- include sound.mak
- include usb.mak
- include hyperv.mak
-+CONFIG_TEST_DEVICES=y
- CONFIG_VGA_ISA=y
- CONFIG_VGA_CIRRUS=y
- CONFIG_VMWARE_VGA=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index ded7498..331bdc5 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -41,3 +41,4 @@ CONFIG_MALTA=y
- CONFIG_MIPSSIM=y
- CONFIG_ACPI_SMBUS=y
- CONFIG_SMBUS_EEPROM=y
-+CONFIG_TEST_DEVICES=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 90118cb..a58d81a 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -3,6 +3,7 @@
- include pci.mak
- include sound.mak
- include usb.mak
-+CONFIG_TEST_DEVICES=y
+diff --git a/Makefile b/Makefile
+index 959ab9e..e444f91 100644
+--- a/Makefile
++++ b/Makefile
+@@ -331,6 +331,7 @@ endif
  
- # For embedded PPCs:
- CONFIG_PPC4XX=y
-diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index 1fdb009..38c7290 100644
---- a/default-configs/sh4-softmmu.mak
-+++ b/default-configs/sh4-softmmu.mak
-@@ -12,6 +12,7 @@ CONFIG_SM501=y
- CONFIG_I2C=y
- CONFIG_DDC=y
- CONFIG_ISA_TESTDEV=y
-+CONFIG_TEST_DEVICES=y
- CONFIG_I82378=y
- CONFIG_I8259=y
- CONFIG_I8254=y
-diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index 3b550a5..c966cca 100644
---- a/default-configs/sh4eb-softmmu.mak
-+++ b/default-configs/sh4eb-softmmu.mak
-@@ -12,6 +12,7 @@ CONFIG_SM501=y
- CONFIG_I2C=y
- CONFIG_DDC=y
- CONFIG_ISA_TESTDEV=y
-+CONFIG_TEST_DEVICES=y
- CONFIG_I82378=y
- CONFIG_I8259=y
- CONFIG_I8254=y
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 1fae488..415d4e0 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -16,6 +16,7 @@ CONFIG_SIMBA=y
- CONFIG_SUNHME=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
-+CONFIG_TEST_DEVICES=y
- CONFIG_SUN4V_RTC=y
- CONFIG_SUN4U=y
- CONFIG_NIAGARA=y
-diff --git a/hw/Kconfig b/hw/Kconfig
-index c4f1547..f902c8f 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -61,6 +61,9 @@ source unicore32/Kconfig
- source xtensa/Kconfig
+ # This has to be kept in sync with Kconfig.host.
+ MINIKCONF_ARGS = \
++    $(CONFIG_MINIKCONF_MODE) \
+     $@ $*-config.devices.mak.d $< $(MINIKCONF_INPUTS) \
+     CONFIG_KVM=$(CONFIG_KVM) \
+     CONFIG_SPICE=$(CONFIG_SPICE) \
+diff --git a/configure b/configure
+index 64f843f..39e80c7 100755
+--- a/configure
++++ b/configure
+@@ -486,7 +486,7 @@ libxml2=""
+ docker="no"
+ debug_mutex="no"
+ libpmem=""
+-libudev="no"
++default_devices="yes"
  
- # Symbols used by multiple targets
-+config TEST_DEVICES
-+    bool
+ # cross compilers defaults, can be overridden with --cross-cc-ARCH
+ cross_cc_aarch64="aarch64-linux-gnu-gcc"
+@@ -997,6 +997,10 @@ for opt do
+   ;;
+   --with-trace-file=*) trace_file="$optarg"
+   ;;
++  --with-default-devices) default_devices="yes"
++  ;;
++  --without-default-devices) default_devices="no"
++  ;;
+   --enable-gprof) gprof="yes"
+   ;;
+   --enable-gcov) gcov="yes"
+@@ -6183,6 +6187,7 @@ echo "capstone          $capstone"
+ echo "docker            $docker"
+ echo "libpmem support   $libpmem"
+ echo "libudev           $libudev"
++echo "default devices   $default_devices"
+ 
+ if test "$supported_cpu" = "no"; then
+     echo
+@@ -6244,6 +6249,11 @@ echo "GIT_UPDATE=$git_update" >> $config_host_mak
+ 
+ echo "ARCH=$ARCH" >> $config_host_mak
+ 
++if test "$default_devices" = "yes" ; then
++  echo "CONFIG_MINIKCONF_MODE=--defconfig" >> $config_host_mak
++else
++  echo "CONFIG_MINIKCONF_MODE=--allnoconfig" >> $config_host_mak
++fi
+ if test "$debug_tcg" = "yes" ; then
+   echo "CONFIG_DEBUG_TCG=y" >> $config_host_mak
+ fi
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+index dd96ab9..dc1b612 100644
+--- a/scripts/minikconf.py
++++ b/scripts/minikconf.py
+@@ -14,17 +14,15 @@ from __future__ import print_function
+ import os
+ import sys
+ import re
++import random
+ 
+- __all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
++__all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser',
++        'defconfig', 'allyesconfig', 'allnoconfig', 'randconfig' ]
+ 
+ def debug_print(*args):
+     print('#' + (' '.join(str(x) for x in args)))
+     pass
+ 
+-def debug_print(*args):
+-    #print ' '.join(str(x) for x in args)
+-    pass
+-
+ # -------------------------------------------
+ # KconfigData implements the Kconfig semantics.  For now it can only
+ # detect undefined symbols, i.e. symbols that were referenced in
+@@ -35,6 +33,11 @@ def debug_print(*args):
+ # just its name).
+ # -------------------------------------------
+ 
++allyesconfig = lambda x: True
++allnoconfig = lambda x: False
++defconfig = lambda x: x
++randconfig = lambda x: random.randint(0, 1) == 1
 +
- config XILINX
-     bool
+ class KconfigData:
+     class Expr:
+         def __and__(self, rhs):
+@@ -188,7 +191,8 @@ class KconfigData:
+             if self.cond.evaluate():
+                 self.dest.set_value(True, self)
  
+-    def __init__(self):
++    def __init__(self, value_mangler=defconfig):
++        self.value_mangler = value_mangler
+         self.previously_included = []
+         self.incl_info = None
+         self.defined_vars = set()
+@@ -268,6 +272,7 @@ class KconfigData:
+         self.clauses.append(KconfigData.AssignmentClause(var, val))
+ 
+     def do_default(self, var, val, cond=None):
++        val = self.value_mangler(val)
+         self.clauses.append(KconfigData.DefaultClause(var, val, cond))
+ 
+     def do_depends_on(self, var, expr):
+@@ -324,9 +329,10 @@ class KconfigParserError(Exception):
+         return "%s: %s" % (self.loc, self.msg)
+ 
+ class KconfigParser:
++
+     @classmethod
+-    def parse(self, fp):
+-        data = KconfigData()
++    def parse(self, fp, mode=None):
++        data = KconfigData(mode or KconfigParser.defconfig)
+         parser = KconfigParser(data)
+         parser.parse_file(fp)
+         return data
+@@ -649,11 +655,30 @@ class KconfigParser:
+ 
+ if __name__ == '__main__':
+     argv = sys.argv
++    mode = defconfig
++    if len(sys.argv) > 1:
++        if argv[1] == '--defconfig':
++            del argv[1]
++        elif argv[1] == '--randconfig':
++            random.seed()
++            mode = randconfig
++            del argv[1]
++        elif argv[1] == '--allyesconfig':
++            mode = allyesconfig
++            del argv[1]
++        elif argv[1] == '--allnoconfig':
++            mode = allnoconfig
++            del argv[1]
++
+     if len(argv) == 1:
+         print ("%s: at least one argument is required" % argv[0], file=sys.stderr)
+         sys.exit(1)
+ 
+-    data = KconfigData()
++    if argv[1].startswith('-'):
++        print ("%s: invalid option %s" % (argv[0], argv[1]), file=sys.stderr)
++        sys.exit(1)
++
++    data = KconfigData(mode)
+     parser = KconfigParser(data)
+     for arg in argv[3:]:
+         m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
 -- 
 1.8.3.1
