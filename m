@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36423)
+Received: from eggs.gnu.org ([209.51.188.92]:37331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1grqFW-0001WJ-Cq
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:26:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1grqHP-0002I3-3z
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:28:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1grqFL-00006Y-Dr
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:26:10 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42169)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1grqFK-0008Ve-Qd
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:26:07 -0500
-Received: by mail-wr1-x443.google.com with SMTP id q18so1249062wrx.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 12:26:06 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
-	<2ea7c5fe169dc201b4f3276f02d93e65aa9780fe.1548714862.git.DirtY.iCE.hu@gmail.com>
-	<87lg33h9lo.fsf@dusky.pond.sub.org>
-Message-ID: <2dd27326-e491-9460-5fae-5706449d004e@gmail.com>
-Date: Thu, 7 Feb 2019 21:26:02 +0100
+	(envelope-from <eblake@redhat.com>) id 1grqHL-0001Tn-Bv
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:28:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1grqHK-0001SH-2U
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:28:11 -0500
+References: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d99cf209-b79f-ae75-af2a-37e87d26af7b@redhat.com>
+Date: Thu, 7 Feb 2019 14:28:07 -0600
 MIME-Version: 1.0
-In-Reply-To: <87lg33h9lo.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 01/14] qapi: qapi for audio backends
+In-Reply-To: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5lE8vICz1bmpujWYpLnZYTI9zU3aB4XWa"
+Subject: Re: [Qemu-devel] should we try to stop using variable length arrays?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,173 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 2019-01-29 14:33, Markus Armbruster wrote:
-> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
-[...]
->> +
->> +##
->> +# @AudiodevPaOptions:
->> +#
->> +# Options of the pa (PulseAudio) audio backend.
->> +#
->> +# @server: PulseAudio server address (default: let PulseAudio choose)
->> +#
->> +# @sink: name of the sink to use
->> +#
->> +# @source: name of the source to use
->> +#
->> +# Since: 4.0
->> +##
->> +{ 'struct': 'AudiodevPaOptions',
->> +  'data': {
->> +    '*server': 'str',
->> +    '*sink':   'AudiodevPaPerDirectionOptions',
->> +    '*source': 'AudiodevPaPerDirectionOptions' } }
->> +
->> +##
->> +# @AudiodevWavOptions:
->> +#
->> +# Options of the wav audio backend.
->> +#
->> +# @path: name of the wav file to record (default 'qemu.wav')
->> +#
->> +# Since: 4.0
->> +##
->> +{ 'struct': 'AudiodevWavOptions',
->> +  'data': {
->> +    '*path': 'str' } }
-> 
-> Pattern so far:
-> 
-> * AudiodevFooOptions 
-> 
->   Foo           direction options       other options
->   Alsa          alsa-in, alsa-out       threshold
->   Dsound                                latency
->   Oss           oss-in, oss-out         try-map, exclusive, dsp-policy
->   Pa            sink, source            server
->   Wav                                   path
-> 
-> Any particular reason for naming the direction options differently?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5lE8vICz1bmpujWYpLnZYTI9zU3aB4XWa
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <d99cf209-b79f-ae75-af2a-37e87d26af7b@redhat.com>
+Subject: Re: should we try to stop using variable length arrays?
+References: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+In-Reply-To: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I probably chose that name because in PulseAudio parlance you have
-sources and sinks, and the current environment variable based setting of
-pa doesn't use ADC/DAC to refer to source/sink, but now that you mention
-it it probably makes sense to rename them to pa-in and pa-out, it's more
-uniform that way.
+On 2/7/19 1:30 PM, Peter Maydell wrote:
+> Currently QEMU has 9 uses of variable length arrays
+> (found using -Wvla):
+>=20
 
-[...]
->> +##
->> +# @Audiodev:
->> +#
->> +# Options of an audio backend.
->> +#
->> +# @id: identifier of the backend
->> +#
->> +# @driver: the backend driver to use
->> +#
->> +# @in: options of the capture stream
->> +#
->> +# @out: options of the playback stream
->> +#
->> +# @timer-period: timer period (in microseconds, 0: use lowest possible)
->> +#
->> +# Since: 4.0
->> +##
->> +{ 'union': 'Audiodev',
->> +  'base': {
->> +    'id':            'str',
->> +    'driver':        'AudiodevDriver',
->> +    '*in':           'AudiodevPerDirectionOptions',
->> +    '*out':          'AudiodevPerDirectionOptions',
->> +    '*timer-period': 'uint32' },
->> +  'discriminator': 'driver',
->> +  'data': {
->> +    'alsa':      'AudiodevAlsaOptions',
->> +    'dsound':    'AudiodevDsoundOptions',
->> +    'oss':       'AudiodevOssOptions',
->> +    'pa':        'AudiodevPaOptions',
->> +    'wav':       'AudiodevWavOptions' } }
-> 
-> 'none', 'coreaudio', 'sdl' and 'spice' have no driver-specific options.
-> 
-> Do all the generic options apply to all drivers?  Even 'none'?
+>=20
+> Should we be looking to get rid of these and turn on the -Wvla
+> warning? I know the Linux kernel has recently decided to do this
+> (some rationale at the start of https://lwn.net/Articles/749064/).
 
-'fixed-settings', 'frequency', 'channels', 'voices' and 'format' are
-used by the mixeng thus they apply to all backends, even 'none'.
-(Whether it makes any sense to set them is a different story.)
+A big part of that article was a discussion on how hard it is to write
+an eval-once macro MAX() that does not trigger a VLA, and that the
+kernel settled on a second macro for use in constant contexts.  Do we
+want to revist my patch that would add eval-once MAX() and constant-use
+MAX_CONST(), to make it easier to avoid accidental VLAs?
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00727.html
 
-'buffer-len' and 'buffer-count' was introduced as a means to give a more
-uniform interface to setting buffer sizes, because currently to set
-buffer size:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-* in case of alsa: you set microseconds or frames depending on a second
-environment variable
-* in case of coreaudio: you set it in frames
-* in case of dsound, oss: you set it in milliseconds
-* in case of pa, sdl: you set it in samples
-* in case of spice, wav: you can't set it
 
-I added 'buffer-len' and 'buffer-count' because they seemed like a
-generic option that *most* backends would support, and I didn't want to
-create extra backend specific options for them.  But if I combine it
-with your inheritance-like proposal, it's probably not that bad.
+--5lE8vICz1bmpujWYpLnZYTI9zU3aB4XWa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> Do @in and @out apply to drivers 'dsound' and 'wav'?
+-----BEGIN PGP SIGNATURE-----
 
-@out applies to every driver.  @in shouldn't apply to drivers without
-input support, but currently the base of mixeng is created for the input
-too, it'll just fail if the sound card tries to create a capture stream...
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxclNcACgkQp6FrSiUn
+Q2oW8Af/SuAbVRjesOfRKwteyyn8TGtOlrFFBXt0q1Rhg7sls3cYo7BIcbphrlLy
+Ra9ZMEThbBRlXHC+10aYEWOko+0BEtQDh9SZpIKeO6L95iLkRSxsby88bCfbQ2gg
+HJRunddwwBeVlWICogGNhy+WNRpBIoBqlk49NTnrFRWUvbC/c34B2J5im1B+57Sa
+ZwubQ8wCwvpuWRrnp3S9Bgyw1gIhccyNCJUgGd3ov4ioTcx2fTzwDLx7bk2geBYI
+JXtN+UUG++9odYHw9MW7PfwobOJJEg0elg7hFu8eeOvsXDibjrT7b+2nF2jvn435
+M2Pr1hHkQzHHzD0k+ntSlr6VMWapZQ==
+=h0qt
+-----END PGP SIGNATURE-----
 
-> 
-> Per-direction options are split between generic ones in @in and @out,
-> and driver-specific ones in @alsa-in and @alsa-out / @oss-in and
-> @oss-out / @sink and @source.
-> 
-> Perhaps the following would be tidier: make the generic per-direction
-> options AudiodevPerDirectionOptions the base of driver-specific ones
-> AudiodevAlsaPerDirectionOptions, AudiodevOssPerDirectionOptions,
-> AudiodevPaPerDirectionOptions, and then
-> 
->    { 'struct': 'AudiodevGenericOptions',
->      'data': {
->        '*in':     'AudiodevPerDirectionOptions',
->        '*out':    'AudiodevPerDirectionOptions' } }
-> 
->    { 'union': 'Audiodev',
->      'base': {
->        'id':            'str',
->        'driver':        'AudiodevDriver',
->        '*timer-period': 'uint32' },
->      'discriminator': 'driver',
->      'data': {
->        'none':      'AudiodevGenericOptions',
->        'alsa':      'AudiodevAlsaOptions',
->        'coreaudio:  'AudiodevGenericOptions',
->        'dsound':    'AudiodevDsoundOptions',
->        'oss':       'AudiodevOssOptions',
->        'pa':        'AudiodevPaOptions',
->        'sdl:        'AudiodevGenericOptions',
->        'spice':     'AudiodevGenericOptions',
->        'wav':       'AudiodevWavOptions' } }
-
-Neat, I'll play around with this a bit.
-
->> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
->> index 3bbdfcee84..d5f9856be7 100644
->> --- a/qapi/qapi-schema.json
->> +++ b/qapi/qapi-schema.json
->> @@ -95,3 +95,4 @@
->>  { 'include': 'trace.json' }
->>  { 'include': 'introspect.json' }
->>  { 'include': 'misc.json' }
->> +{ 'include': 'audio.json' }
-> 
-> Looks pretty good.
-> 
-
-Regards,
-Zoltan
+--5lE8vICz1bmpujWYpLnZYTI9zU3aB4XWa--
