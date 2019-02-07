@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42017)
+Received: from eggs.gnu.org ([209.51.188.92]:43707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grj57-0002CF-A7
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:47:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1grjCt-0005UA-3b
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:55:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grj56-000678-I4
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:47:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grj56-00065c-C3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:47:04 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F5D013CF4
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 12:47:03 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190206181725.14337-1-armbru@redhat.com>
-	<20190206181725.14337-4-armbru@redhat.com>
-	<CAMxuvaxkDUt=kBxJ+nBQGGx1z18T5F7pt3TQ97KOcvGg_ag+7w@mail.gmail.com>
-Date: Thu, 07 Feb 2019 13:46:57 +0100
-In-Reply-To: <CAMxuvaxkDUt=kBxJ+nBQGGx1z18T5F7pt3TQ97KOcvGg_ag+7w@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 7 Feb 2019
-	12:15:53 +0100")
-Message-ID: <87tvhfepfi.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1grjCr-0001vJ-Ub
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:55:07 -0500
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:44629)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1grjCr-0001tn-OY
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:55:05 -0500
+Received: by mail-ot1-x333.google.com with SMTP id e24so8680505otp.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 04:55:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/17] qapi: Clean up modular built-in
- code generation a bit
+References: <20190206043516.11462-1-richard.henderson@linaro.org>
+In-Reply-To: <20190206043516.11462-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Feb 2019 12:54:51 +0000
+Message-ID: <CAFEAcA-U40+zDwnR29NQkpgz3m+izm23SrDm3ZPk8uJ=y7JOqw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Hi
+On Wed, 6 Feb 2019 at 04:35, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> On Wed, Feb 6, 2019 at 7:17 PM Markus Armbruster <armbru@redhat.com> wrot=
-e:
->>
->> We neglect to call .visit_module() for the special module we use for
->> built-ins.  Harmless, but clean it up anyway.  The
->> tests/qapi-schema/*.out now show the built-in module as 'module None'.
->>
->> Subclasses of QAPISchemaModularCVisitor need to ._add_module() this
->> special module to enable code generation for built-ins.  When this
->> hasn't been done, QAPISchemaModularCVisitor.visit_module() does
->> nothing for the special module.  That looks like built-ins could
->> accidentally be generated into the wrong module when a subclass
->> neglects to call ._add_module().  Can't happen, because built-ins are
->> all visited before any other module.  But that's non-obvious.  Switch
->> off code generation explicitly.
->>
->> Split QAPISchemaModularCVisitor._add_module() into ._add_user_module()
->> and ._add_system_module(), for clarity.
+> The following changes since commit 47994e16b1d66411953623e7c0bf0cdcd50bd507:
 >
-> That's in next patch.
-
-You caught me fiddling with the patch split after having written the
-commit messages.  Will fix.
-
->> Rename QAPISchemaModularCVisitor._begin_module() to
->> ._begin_user_module().
->>
->> New QAPISchemaModularCVisitor._is_builtin_module(), for clarity.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190205' into staging (2019-02-05 18:25:07 +0000)
 >
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20190206
+>
+> for you to fetch changes up to 9fd9b7de61b24c70a8a82d9627a20ed95433e1b5:
+>
+>   accel/tcg: Consider cluster index in tb_lookup__cpu_state() (2019-02-06 03:39:24 +0000)
+>
+> ----------------------------------------------------------------
+> Queued accel/tcg patches
+>
+> ----------------------------------------------------------------
+> Catherine Ho (1):
+>       tcg: add early clober modifier in atomic16_cmpxchg on aarch64
+>
+> Peter Maydell (1):
+>       accel/tcg: Consider cluster index in tb_lookup__cpu_state()
 
-Thanks!
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
