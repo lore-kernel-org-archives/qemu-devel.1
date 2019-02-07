@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57632)
+Received: from eggs.gnu.org ([209.51.188.92]:57546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHi-0002I6-MT
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHa-0002CG-Ln
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHf-0001BA-9C
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:10 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41916)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHS-00010c-5v
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:00 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:49858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grkHc-0000zT-HS
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:06 -0500
+	id 1grkHR-0000yq-4a
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:53 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Feb 2019 16:03:14 +0200
-Message-Id: <20190207140316.16103-31-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:03:06 +0200
+Message-Id: <20190207140316.16103-23-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv4 30/32] slirp: use polling callbacks,
- drop glib requirement
+Subject: [Qemu-devel] [PULLv4 22/32] slirp: replace qemu qtailq with slirp
+ own copy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,366 +33,314 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-It would be legitimate to use libslirp without glib. Let's
-add_poll/get_revents pair of callbacks to provide the same
-functionality.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      | 72 ++++++++++++++++++++++++++++++++++++++++++++++--
- slirp/libslirp.h | 17 ++++++++++--
- slirp/slirp.c    | 72 +++++++++++++++++-------------------------------
- 3 files changed, 109 insertions(+), 52 deletions(-)
+ slirp/qtailq.h | 193 +++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/slirp.h  |   3 +-
+ 2 files changed, 194 insertions(+), 2 deletions(-)
+ create mode 100644 slirp/qtailq.h
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 4d55f64168..a85e42ff43 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -211,6 +211,71 @@ static const SlirpCb slirp_cb =3D {
-     .notify =3D qemu_notify_event,
- };
-=20
-+static int slirp_poll_to_gio(int events)
-+{
-+    int ret =3D 0;
+diff --git a/slirp/qtailq.h b/slirp/qtailq.h
+new file mode 100644
+index 0000000000..a89b0c439a
+--- /dev/null
++++ b/slirp/qtailq.h
+@@ -0,0 +1,193 @@
++/*      $NetBSD: queue.h,v 1.52 2009/04/20 09:56:08 mschuett Exp $ */
 +
-+    if (events & SLIRP_POLL_IN) {
-+        ret |=3D G_IO_IN;
-+    }
-+    if (events & SLIRP_POLL_OUT) {
-+        ret |=3D G_IO_OUT;
-+    }
-+    if (events & SLIRP_POLL_PRI) {
-+        ret |=3D G_IO_PRI;
-+    }
-+    if (events & SLIRP_POLL_ERR) {
-+        ret |=3D G_IO_ERR;
-+    }
-+    if (events & SLIRP_POLL_HUP) {
-+        ret |=3D G_IO_HUP;
++/*
++ * slirp version: Copy from QEMU, removed all but tail queues.
++ */
++
++/*
++ * Copyright (c) 1991, 1993
++ *      The Regents of the University of California.  All rights reserve=
+d.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in th=
+e
++ *    documentation and/or other materials provided with the distributio=
+n.
++ * 3. Neither the name of the University nor the names of its contributo=
+rs
++ *    may be used to endorse or promote products derived from this softw=
+are
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
++ * SUCH DAMAGE.
++ *
++ *      @(#)queue.h     8.5 (Berkeley) 8/20/94
++ */
++
++#ifndef QTAILQ_H
++#define QTAILQ_H
++
++/*
++ * A tail queue is headed by a pair of pointers, one to the head of the
++ * list and the other to the tail of the list. The elements are doubly
++ * linked so that an arbitrary element can be removed without a need to
++ * traverse the list. New elements can be added to the list before or
++ * after an existing element, at the head of the list, or at the end of
++ * the list. A tail queue may be traversed in either direction.
++ */
++typedef struct QTailQLink {
++    void *tql_next;
++    struct QTailQLink *tql_prev;
++} QTailQLink;
++
++/*
++ * Tail queue definitions.  The union acts as a poor man template, as if
++ * it were QTailQLink<type>.
++ */
++#define QTAILQ_HEAD(name, type)                                         =
+\
++    union name {                                                        =
+\
++        struct type *tqh_first;       /* first element */               =
+\
++        QTailQLink tqh_circ;          /* link for circular backwards lis=
+t */ \
 +    }
 +
-+    return ret;
-+}
++#define QTAILQ_HEAD_INITIALIZER(head)           \
++    { .tqh_circ =3D { NULL, &(head).tqh_circ } }
 +
-+static int net_slirp_add_poll(int fd, int events, void *opaque)
-+{
-+    GArray *pollfds =3D opaque;
-+    GPollFD pfd =3D {
-+        .fd =3D fd,
-+        .events =3D slirp_poll_to_gio(events),
-+    };
-+    int idx =3D pollfds->len;
-+    g_array_append_val(pollfds, pfd);
-+    return idx;
-+}
-+
-+static int slirp_gio_to_poll(int events)
-+{
-+    int ret =3D 0;
-+
-+    if (events & G_IO_IN) {
-+        ret |=3D SLIRP_POLL_IN;
-+    }
-+    if (events & G_IO_OUT) {
-+        ret |=3D SLIRP_POLL_OUT;
-+    }
-+    if (events & G_IO_PRI) {
-+        ret |=3D SLIRP_POLL_PRI;
-+    }
-+    if (events & G_IO_ERR) {
-+        ret |=3D SLIRP_POLL_ERR;
-+    }
-+    if (events & G_IO_HUP) {
-+        ret |=3D SLIRP_POLL_HUP;
++#define QTAILQ_ENTRY(type)                                              =
+\
++    union {                                                             =
+\
++        struct type *tqe_next;        /* next element */                =
+\
++        QTailQLink tqe_circ;          /* link for circular backwards lis=
+t */ \
 +    }
 +
-+    return ret;
-+}
++#define QTAILQ_INIT(head) do {                                          =
+\
++        (head)->tqh_first =3D NULL;                                     =
+  \
++        (head)->tqh_circ.tql_prev =3D &(head)->tqh_circ;                =
+  \
++} while (/*CONSTCOND*/0)
 +
-+static int net_slirp_get_revents(int idx, void *opaque)
-+{
-+    GArray *pollfds =3D opaque;
++#define QTAILQ_INSERT_HEAD(head, elm, field) do {                       =
+\
++        if (((elm)->field.tqe_next =3D (head)->tqh_first) !=3D NULL)    =
+    \
++            (head)->tqh_first->field.tqe_circ.tql_prev =3D              =
+  \
++                &(elm)->field.tqe_circ;                                 =
+\
++        else                                                            =
+\
++            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
++        (head)->tqh_first =3D (elm);                                    =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D &(head)->tqh_circ;           =
+  \
++} while (/*CONSTCOND*/0)
 +
-+    return slirp_gio_to_poll(g_array_index(pollfds, GPollFD, idx).revent=
-s);
-+}
++#define QTAILQ_INSERT_TAIL(head, elm, field) do {                       =
+\
++        (elm)->field.tqe_next =3D NULL;                                 =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D (head)->tqh_circ.tql_prev;   =
+  \
++        (head)->tqh_circ.tql_prev->tql_next =3D (elm);                  =
+  \
++        (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;           =
+  \
++} while (/*CONSTCOND*/0)
 +
- static void net_slirp_poll_notify(Notifier *notifier, void *data)
- {
-     MainLoopPoll *poll =3D data;
-@@ -218,12 +283,13 @@ static void net_slirp_poll_notify(Notifier *notifie=
-r, void *data)
-=20
-     switch (poll->state) {
-     case MAIN_LOOP_POLL_FILL:
--        slirp_pollfds_fill(s->slirp, poll->pollfds, &poll->timeout);
-+        slirp_pollfds_fill(s->slirp, &poll->timeout,
-+                           net_slirp_add_poll, poll->pollfds);
-         break;
-     case MAIN_LOOP_POLL_OK:
-     case MAIN_LOOP_POLL_ERR:
--        slirp_pollfds_poll(s->slirp, poll->pollfds,
--                           poll->state =3D=3D MAIN_LOOP_POLL_ERR);
-+        slirp_pollfds_poll(s->slirp, poll->state =3D=3D MAIN_LOOP_POLL_E=
-RR,
-+                           net_slirp_get_revents, poll->pollfds);
-         break;
-     default:
-         g_assert_not_reached();
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 18d5fb0133..b5c1b2122b 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -1,7 +1,6 @@
- #ifndef LIBSLIRP_H
- #define LIBSLIRP_H
-=20
--#include <glib.h>
- #include <stdint.h>
- #include <stdbool.h>
-=20
-@@ -15,8 +14,18 @@
-=20
- typedef struct Slirp Slirp;
-=20
-+enum {
-+    SLIRP_POLL_IN  =3D 1 << 0,
-+    SLIRP_POLL_OUT =3D 1 << 1,
-+    SLIRP_POLL_PRI =3D 1 << 2,
-+    SLIRP_POLL_ERR =3D 1 << 3,
-+    SLIRP_POLL_HUP =3D 1 << 4,
-+};
++#define QTAILQ_INSERT_AFTER(head, listelm, elm, field) do {             =
+\
++        if (((elm)->field.tqe_next =3D (listelm)->field.tqe_next) !=3D N=
+ULL)\
++            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
++                &(elm)->field.tqe_circ;                                 =
+\
++        else                                                            =
+\
++            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
++        (listelm)->field.tqe_next =3D (elm);                            =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D &(listelm)->field.tqe_circ;  =
+  \
++} while (/*CONSTCOND*/0)
 +
- typedef ssize_t (*SlirpWriteCb)(const void *buf, size_t len, void *opaqu=
-e);
- typedef void (*SlirpTimerCb)(void *opaque);
-+typedef int (*SlirpAddPollCb)(int fd, int events, void *opaque);
-+typedef int (*SlirpGetREventsCb)(int idx, void *opaque);
++#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do {                  =
+     \
++        (elm)->field.tqe_circ.tql_prev =3D (listelm)->field.tqe_circ.tql=
+_prev; \
++        (elm)->field.tqe_next =3D (listelm);                            =
+       \
++        (listelm)->field.tqe_circ.tql_prev->tql_next =3D (elm);         =
+       \
++        (listelm)->field.tqe_circ.tql_prev =3D &(elm)->field.tqe_circ;  =
+       \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_REMOVE(head, elm, field) do {                            =
+\
++        if (((elm)->field.tqe_next) !=3D NULL)                          =
+  \
++            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
++                (elm)->field.tqe_circ.tql_prev;                         =
+\
++        else                                                            =
+\
++            (head)->tqh_circ.tql_prev =3D (elm)->field.tqe_circ.tql_prev=
+; \
++        (elm)->field.tqe_circ.tql_prev->tql_next =3D (elm)->field.tqe_ne=
+xt; \
++        (elm)->field.tqe_circ.tql_prev =3D NULL;                        =
+  \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_FOREACH(var, head, field)                                =
+\
++        for ((var) =3D ((head)->tqh_first);                             =
+  \
++                (var);                                                  =
+\
++                (var) =3D ((var)->field.tqe_next))
++
++#define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 =
+\
++        for ((var) =3D ((head)->tqh_first);                             =
+  \
++                (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
+  \
++                (var) =3D (next_var))
++
++#define QTAILQ_FOREACH_REVERSE(var, head, field)                        =
+\
++        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
++                (var);                                                  =
+\
++                (var) =3D QTAILQ_PREV(var, field))
++
++#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         =
+\
++        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
++             (var) && ((prev_var) =3D QTAILQ_PREV(var, field));         =
+  \
++             (var) =3D (prev_var))
++
++/*
++ * Tail queue access methods.
++ */
++#define QTAILQ_EMPTY(head)               ((head)->tqh_first =3D=3D NULL)
++#define QTAILQ_FIRST(head)               ((head)->tqh_first)
++#define QTAILQ_NEXT(elm, field)          ((elm)->field.tqe_next)
++#define QTAILQ_IN_USE(elm, field)        ((elm)->field.tqe_circ.tql_prev=
+ !=3D NULL)
++
++#define QTAILQ_LINK_PREV(link)                                          =
+\
++        ((link).tql_prev->tql_prev->tql_next)
++#define QTAILQ_LAST(head)                                               =
+\
++        ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
++#define QTAILQ_PREV(elm, field)                                         =
+\
++        ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.t=
+qe_circ))
++
++#define field_at_offset(base, offset, type)                             =
+       \
++        ((type *) (((char *) (base)) + (offset)))
++
++/*
++ * Raw access of elements of a tail queue head.  Offsets are all zero
++ * because it's a union.
++ */
++#define QTAILQ_RAW_FIRST(head)                                          =
+       \
++        field_at_offset(head, 0, void *)
++#define QTAILQ_RAW_TQH_CIRC(head)                                       =
+       \
++        field_at_offset(head, 0, QTailQLink)
++
++/*
++ * Raw access of elements of a tail entry
++ */
++#define QTAILQ_RAW_NEXT(elm, entry)                                     =
+       \
++        field_at_offset(elm, entry, void *)
++#define QTAILQ_RAW_TQE_CIRC(elm, entry)                                 =
+       \
++        field_at_offset(elm, entry, QTailQLink)
++/*
++ * Tail queue traversal using pointer arithmetic.
++ */
++#define QTAILQ_RAW_FOREACH(elm, head, entry)                            =
+       \
++        for ((elm) =3D *QTAILQ_RAW_FIRST(head);                         =
+         \
++             (elm);                                                     =
+       \
++             (elm) =3D *QTAILQ_RAW_NEXT(elm, entry))
++/*
++ * Tail queue insertion using pointer arithmetic.
++ */
++#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                   =
+        \
++        *QTAILQ_RAW_NEXT(elm, entry) =3D NULL;                          =
+          \
++        QTAILQ_RAW_TQE_CIRC(elm, entry)->tql_prev =3D QTAILQ_RAW_TQH_CIR=
+C(head)->tql_prev; \
++        QTAILQ_RAW_TQH_CIRC(head)->tql_prev->tql_next =3D (elm);        =
+          \
++        QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm,=
+ entry);  \
++} while (/*CONSTCOND*/0)
++
++#endif /* QTAILQ_H */
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index c9f9143801..0e4d973c2a 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -46,8 +46,7 @@ typedef char *caddr_t;
 =20
- /*
-  * Callbacks from slirp
-@@ -63,9 +72,11 @@ Slirp *slirp_init(int restricted, bool in_enabled, str=
-uct in_addr vnetwork,
-                   void *opaque);
- void slirp_cleanup(Slirp *slirp);
+ #include "debug.h"
+ #include "util.h"
+-
+-#include "qemu/queue.h"
++#include "qtailq.h"
 =20
--void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds, uint32_t *timeout=
-);
-+void slirp_pollfds_fill(Slirp *slirp, uint32_t *timeout,
-+                        SlirpAddPollCb add_poll, void *opaque);
-=20
--void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds, int select_error)=
-;
-+void slirp_pollfds_poll(Slirp *slirp, int select_error,
-+                        SlirpGetREventsCb get_revents, void *opaque);
-=20
- void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
-=20
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index b37dd34382..eedbce23dc 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -386,7 +386,8 @@ static void slirp_update_timeout(Slirp *slirp, uint32=
-_t *timeout)
-     *timeout =3D t;
- }
-=20
--void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds, uint32_t *timeout=
-)
-+void slirp_pollfds_fill(Slirp *slirp, uint32_t *timeout,
-+                        SlirpAddPollCb add_poll, void *opaque)
- {
-     struct socket *so, *so_next;
-=20
-@@ -428,12 +429,8 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfd=
-s, uint32_t *timeout)
-          * Set for reading sockets which are accepting
-          */
-         if (so->so_state & SS_FACCEPTCONN) {
--            GPollFD pfd =3D {
--                .fd =3D so->s,
--                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
--            };
--            so->pollfds_idx =3D pollfds->len;
--            g_array_append_val(pollfds, pfd);
-+            so->pollfds_idx =3D add_poll(so->s,
-+                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
-;
-             continue;
-         }
-=20
-@@ -441,12 +438,8 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfd=
-s, uint32_t *timeout)
-          * Set for writing sockets which are connecting
-          */
-         if (so->so_state & SS_ISFCONNECTING) {
--            GPollFD pfd =3D {
--                .fd =3D so->s,
--                .events =3D G_IO_OUT | G_IO_ERR,
--            };
--            so->pollfds_idx =3D pollfds->len;
--            g_array_append_val(pollfds, pfd);
-+            so->pollfds_idx =3D add_poll(so->s,
-+                SLIRP_POLL_OUT | SLIRP_POLL_ERR, opaque);
-             continue;
-         }
-=20
-@@ -455,7 +448,7 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds=
-, uint32_t *timeout)
-          * we have something to send
-          */
-         if (CONN_CANFSEND(so) && so->so_rcv.sb_cc) {
--            events |=3D G_IO_OUT | G_IO_ERR;
-+            events |=3D SLIRP_POLL_OUT | SLIRP_POLL_ERR;
-         }
-=20
-         /*
-@@ -464,16 +457,12 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollf=
-ds, uint32_t *timeout)
-          */
-         if (CONN_CANFRCV(so) &&
-             (so->so_snd.sb_cc < (so->so_snd.sb_datalen/2))) {
--            events |=3D G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI;
-+            events |=3D SLIRP_POLL_IN | SLIRP_POLL_HUP |
-+                      SLIRP_POLL_ERR | SLIRP_POLL_PRI;
-         }
-=20
-         if (events) {
--            GPollFD pfd =3D {
--                .fd =3D so->s,
--                .events =3D events,
--            };
--            so->pollfds_idx =3D pollfds->len;
--            g_array_append_val(pollfds, pfd);
-+            so->pollfds_idx =3D add_poll(so->s, events, opaque);
-         }
-     }
-=20
-@@ -508,12 +497,8 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollfd=
-s, uint32_t *timeout)
-          * (XXX <=3D 4 ?)
-          */
-         if ((so->so_state & SS_ISFCONNECTED) && so->so_queued <=3D 4) {
--            GPollFD pfd =3D {
--                .fd =3D so->s,
--                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
--            };
--            so->pollfds_idx =3D pollfds->len;
--            g_array_append_val(pollfds, pfd);
-+            so->pollfds_idx =3D add_poll(so->s,
-+                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
-;
-         }
-     }
-=20
-@@ -538,19 +523,16 @@ void slirp_pollfds_fill(Slirp *slirp, GArray *pollf=
-ds, uint32_t *timeout)
-         }
-=20
-         if (so->so_state & SS_ISFCONNECTED) {
--            GPollFD pfd =3D {
--                .fd =3D so->s,
--                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
--            };
--            so->pollfds_idx =3D pollfds->len;
--            g_array_append_val(pollfds, pfd);
-+            so->pollfds_idx =3D add_poll(so->s,
-+                SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR, opaque)=
-;
-         }
-     }
-=20
-     slirp_update_timeout(slirp, timeout);
- }
-=20
--void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds, int select_error)
-+void slirp_pollfds_poll(Slirp *slirp, int select_error,
-+                        SlirpGetREventsCb get_revents, void *opaque)
- {
-     struct socket *so, *so_next;
-     int ret;
-@@ -587,8 +569,7 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
-, int select_error)
-=20
-             revents =3D 0;
-             if (so->pollfds_idx !=3D -1) {
--                revents =3D g_array_index(pollfds, GPollFD,
--                                        so->pollfds_idx).revents;
-+                revents =3D get_revents(so->pollfds_idx, opaque);
-             }
-=20
-             if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
-@@ -598,9 +579,9 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
-, int select_error)
-             /*
-              * Check for URG data
-              * This will soread as well, so no need to
--             * test for G_IO_IN below if this succeeds
-+             * test for SLIRP_POLL_IN below if this succeeds
-              */
--            if (revents & G_IO_PRI) {
-+            if (revents & SLIRP_POLL_PRI) {
-                 ret =3D sorecvoob(so);
-                 if (ret < 0) {
-                     /* Socket error might have resulted in the socket be=
-ing
-@@ -611,7 +592,8 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
-, int select_error)
-             /*
-              * Check sockets for reading
-              */
--            else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
-+            else if (revents &
-+                     (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_ERR)) =
-{
-                 /*
-                  * Check for incoming connections
-                  */
-@@ -636,7 +618,7 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds=
-, int select_error)
-              * Check sockets for writing
-              */
-             if (!(so->so_state & SS_NOFDREF) &&
--                (revents & (G_IO_OUT | G_IO_ERR))) {
-+                (revents & (SLIRP_POLL_OUT | SLIRP_POLL_ERR))) {
-                 /*
-                  * Check for non-blocking, still-connecting sockets
-                  */
-@@ -689,12 +671,11 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollf=
-ds, int select_error)
-=20
-             revents =3D 0;
-             if (so->pollfds_idx !=3D -1) {
--                revents =3D g_array_index(pollfds, GPollFD,
--                                        so->pollfds_idx).revents;
-+                revents =3D get_revents(so->pollfds_idx, opaque);
-             }
-=20
-             if (so->s !=3D -1 &&
--                (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
-+                (revents & (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_=
-ERR))) {
-                 sorecvfrom(so);
-             }
-         }
-@@ -710,12 +691,11 @@ void slirp_pollfds_poll(Slirp *slirp, GArray *pollf=
-ds, int select_error)
-=20
-             revents =3D 0;
-             if (so->pollfds_idx !=3D -1) {
--                revents =3D g_array_index(pollfds, GPollFD,
--                                        so->pollfds_idx).revents;
-+                revents =3D get_revents(so->pollfds_idx, opaque);
-             }
-=20
-             if (so->s !=3D -1 &&
--                (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
-+                (revents & (SLIRP_POLL_IN | SLIRP_POLL_HUP | SLIRP_POLL_=
-ERR))) {
-                 icmp_receive(so);
-             }
-         }
+ #include "libslirp.h"
+ #include "ip.h"
 --=20
 2.20.1
