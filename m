@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59850)
+Received: from eggs.gnu.org ([209.51.188.92]:60751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gre0V-00089q-Nx
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:22:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1gre49-0000aI-0r
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gre0T-00032w-TW
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:21:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:9753)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gre0R-00030x-R6
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:21:56 -0500
-Date: Thu, 7 Feb 2019 02:21:52 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1385614518.70345867.1549524112156.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190206162901.GW12331@redhat.com>
-References: <20190129062801.15799-1-pagupta@redhat.com>
-	<CAJ+F1CKenN+Ujg1ajtgixwJabir5+zfBAV3r=4LBqodpqHd8iA@mail.gmail.com>
-	<20190206162901.GW12331@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gre45-0004tn-4B
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:25:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gre43-0004rX-Il
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:25:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gre40-0001iv-N6
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 07:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A41012E80C7
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 07:25:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Feb 2019 07:18:48 -0000
+From: Frantisek Novak <1815009@bugs.launchpad.net>
+Reply-To: Bug 1815009 <1815009@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154952392807.22205.13838145528944162860.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815009] [NEW] Qemu evdev multiple guests/host
+ switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +36,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?Q?P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, xiaohli@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+Hello,
+
+Qemu up to version 3.1
+
+it would be nice if passed through evdev can be switched (using lctrl +
+rctrl) through all running guests configured for evdev passthrough and
+the host. Currently, only the last started guest and host can be
+switched only so the previously started guests can't be controlled.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
-Hi Daniel, Marc-Andre,
+** Tags: evdev
 
-Thanks for your reply. Please find my reply inline.
+** Description changed:
 
-> > > Hotplugging existing char chardev with qmp, dereferences(removes)
-> > > existing chardev. This patch avoids adding a chardev if a chardev
-> > > with same id exists.
-> > 
-> > As you pointed out, if you attempt to add a chardev with an existing
-> > ID, you get an error:
-> > 
-> > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket","data":{"addr":{"type":"unix",
-> > "data": {"path": "/tmp/helloworld1"}}}}}}
-> > {"return": {}}
-> > {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket","data":{"addr":{"type":"unix",
-> > "data": {"path": "/tmp/helloworld1"}}}}}}
-> > {"error": {"class": "GenericError", "desc": "attempt to add duplicate
-> > property 'charchannel1' to object (type 'container')"}}
-> > 
-> > 
-> > But the existing chardev is left untouched.
-> > 
-> > However, since unix socket chardev will delete existing file and
-> > rebind (this is not always a good idea, but people seem to prefer
-> > that)
-> > the rebound socket is removed on error cleanup.
-> > 
-> > 
-> > I am not sure this is a bug tbh.
-> > 
-> > Your solution to check for duplicate ID upfront is ok. But any other
-> > later error path could have the same "bug" effect of removing existing
-> > chardev because of the overwrite socket creation.
-> 
-> Checking the ID is not a useful fix IMHO. Someone could just as easily
-> send 2 commands with different IDs and the same socket path.
-> 
-> A more accurate fix would be to iterate over existing chardevs and check
-> whether any of them clash, but even that is useless if you have two
-> separate QEMU instances and both try to use the same UNIX socket path.
-> To deal with that you need to start taking out fcntl locks to ensure
-> real mutual exclusion.
+  Hello,
+  =
 
-The reason we are already throwing error "attempt to add duplicate property"
-implies we are considering "id" as primary key? Even if we throw the error
-existing chardev should work as before. But this is not the case right now, 
-it just deletes the existing chardev after error.  
+  Qemu up to version 3.1
+  =
 
-Thanks,
-Pankaj
+  it would be nice if passed through evdev can be switched (using lctrl +
+- rctrl) through all running guests configured for evdev and the host.
+- Currently, only the last started guest and host can be switched only so
+- the previously started guests can't be controlled.
++ rctrl) through all running guests configured for evdev passthrough and
++ the host. Currently, only the last started guest and host can be
++ switched only so the previously started guests can't be controlled.
 
-> 
-> I think I'd really just call this user error and do nothing
-> 
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange
-> |:|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com
-> |:|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange
-> |:|
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815009
+
+Title:
+  Qemu evdev multiple guests/host switch
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  Qemu up to version 3.1
+
+  it would be nice if passed through evdev can be switched (using lctrl
+  + rctrl) through all running guests configured for evdev passthrough
+  and the host. Currently, only the last started guest and host can be
+  switched only so the previously started guests can't be controlled.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815009/+subscriptions
