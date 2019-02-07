@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57596)
+Received: from eggs.gnu.org ([209.51.188.92]:57643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHh-0002G6-07
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:11 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHi-0002IC-Nt
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHf-0001BH-9H
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:08 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41890)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHg-0001CY-Jl
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:10 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:41906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grkHc-0000yc-LN
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:06 -0500
+	id 1grkHe-0000yz-Hs
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:08 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Feb 2019 16:03:02 +0200
-Message-Id: <20190207140316.16103-19-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:03:09 +0200
+Message-Id: <20190207140316.16103-26-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv4 18/32] slirp: add slirp own version of pstrcpy
+Subject: [Qemu-devel] [PULLv4 25/32] slirp: replace remaining qemu headers
+ dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +33,417 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Remove a dependency on qemu util.
+Except for the migration code which is gated by WITH_QEMU, only
+include our own headers, so libslirp can be built standalone.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c |  4 ++--
- slirp/tftp.c  |  2 +-
- slirp/util.c  | 17 +++++++++++++++++
- slirp/util.h  |  2 ++
- 4 files changed, 22 insertions(+), 3 deletions(-)
+ slirp/arp_table.c  |  3 ++-
+ slirp/bootp.c      |  1 -
+ slirp/cksum.c      |  1 -
+ slirp/dhcpv6.c     |  1 -
+ slirp/dnssearch.c  |  1 -
+ slirp/if.c         |  1 -
+ slirp/ip6.h        |  1 +
+ slirp/ip6_icmp.c   |  1 -
+ slirp/ip6_input.c  |  1 -
+ slirp/ip6_output.c |  2 --
+ slirp/ip_icmp.c    |  1 -
+ slirp/ip_input.c   |  1 -
+ slirp/ip_output.c  |  1 -
+ slirp/mbuf.c       |  1 -
+ slirp/misc.c       |  2 --
+ slirp/ncsi.c       |  1 -
+ slirp/ndp_table.c  |  2 --
+ slirp/sbuf.c       |  1 -
+ slirp/slirp.c      |  2 --
+ slirp/socket.c     |  2 --
+ slirp/tcp_input.c  |  1 -
+ slirp/tcp_output.c |  1 -
+ slirp/tcp_subr.c   |  1 -
+ slirp/tcp_timer.c  |  1 -
+ slirp/tftp.c       |  6 ++++--
+ slirp/udp.c        |  1 -
+ slirp/udp6.c       |  2 --
+ slirp/util.h       | 21 +++++++++++++++++++++
+ 28 files changed, 28 insertions(+), 33 deletions(-)
 
+diff --git a/slirp/arp_table.c b/slirp/arp_table.c
+index bf71b984ad..58eafdcfd8 100644
+--- a/slirp/arp_table.c
++++ b/slirp/arp_table.c
+@@ -22,9 +22,10 @@
+  * THE SOFTWARE.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
++#include <string.h>
++
+ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_A=
+LEN])
+ {
+     const uint32_t broadcast_addr =3D
+diff --git a/slirp/bootp.c b/slirp/bootp.c
+index 4c9a77eb98..d396849a05 100644
+--- a/slirp/bootp.c
++++ b/slirp/bootp.c
+@@ -21,7 +21,6 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ #if defined(_WIN32)
+diff --git a/slirp/cksum.c b/slirp/cksum.c
+index 84c858fafb..25bfa67348 100644
+--- a/slirp/cksum.c
++++ b/slirp/cksum.c
+@@ -30,7 +30,6 @@
+  * in_cksum.c,v 1.2 1994/08/02 07:48:16 davidg Exp
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ /*
+diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
+index e27d9a46f8..9ffba38e8f 100644
+--- a/slirp/dhcpv6.c
++++ b/slirp/dhcpv6.c
+@@ -20,7 +20,6 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "dhcpv6.h"
+=20
+diff --git a/slirp/dnssearch.c b/slirp/dnssearch.c
+index 8fb563321b..c459cece8d 100644
+--- a/slirp/dnssearch.c
++++ b/slirp/dnssearch.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static const uint8_t RFC3397_OPT_DOMAIN_SEARCH =3D 119;
+diff --git a/slirp/if.c b/slirp/if.c
+index 90b9078687..2ad03b8a79 100644
+--- a/slirp/if.c
++++ b/slirp/if.c
+@@ -5,7 +5,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static void
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 5361bd7449..1b3364f960 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -7,6 +7,7 @@
+ #define SLIRP_IP6_H
+=20
+ #include <glib.h>
++#include <string.h>
+=20
+ #define ALLNODES_MULTICAST  { .s6_addr =3D \
+                             { 0xff, 0x02, 0x00, 0x00,\
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index b3b7e50a31..2a432ebbd4 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -3,7 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip6_icmp.h"
+=20
+diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
+index ab656a0a9d..1b8c003c66 100644
+--- a/slirp/ip6_input.c
++++ b/slirp/ip6_input.c
+@@ -3,7 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip6_icmp.h"
+=20
+diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
+index 52c88ad691..19d1ae7748 100644
+--- a/slirp/ip6_output.c
++++ b/slirp/ip6_output.c
+@@ -3,8 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+=20
+ /* Number of packets queued before we start sending
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index 19e247f773..6b6344b776 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -30,7 +30,6 @@
+  * ip_icmp.c,v 1.7 1995/05/30 08:09:42 rgrimes Exp
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+diff --git a/slirp/ip_input.c b/slirp/ip_input.c
+index d360620838..774ce662e6 100644
+--- a/slirp/ip_input.c
++++ b/slirp/ip_input.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+diff --git a/slirp/ip_output.c b/slirp/ip_output.c
+index db403f04c1..f6ec141df5 100644
+--- a/slirp/ip_output.c
++++ b/slirp/ip_output.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ /* Number of packets queued before we start sending
+diff --git a/slirp/mbuf.c b/slirp/mbuf.c
+index d8d275e0e7..521c02c967 100644
+--- a/slirp/mbuf.c
++++ b/slirp/mbuf.c
+@@ -15,7 +15,6 @@
+  * the flags
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ #define MBUF_THRESH 30
+diff --git a/slirp/misc.c b/slirp/misc.c
+index ee77aff337..3c02510101 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -5,9 +5,7 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+-#include "libslirp.h"
+=20
+ inline void
+ insque(void *a, void *b)
+diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+index 8594382270..327f17543c 100644
+--- a/slirp/ncsi.c
++++ b/slirp/ncsi.c
+@@ -6,7 +6,6 @@
+  * This code is licensed under the GPL version 2 or later. See the
+  * COPYING file in the top-level directory.
+  */
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ #include "ncsi-pkt.h"
+diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
+index b7b73722f7..34ea4fdf1f 100644
+--- a/slirp/ndp_table.c
++++ b/slirp/ndp_table.c
+@@ -3,8 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+=20
+ void ndp_table_add(Slirp *slirp, struct in6_addr ip_addr,
+diff --git a/slirp/sbuf.c b/slirp/sbuf.c
+index c83e4dd8ed..51a9f0cc7d 100644
+--- a/slirp/sbuf.c
++++ b/slirp/sbuf.c
+@@ -5,7 +5,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static void sbappendsb(struct sbuf *sb, struct mbuf *m);
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 9ec1e4c62f..b5c4788489 100644
+index ec1f606d72..730b78255c 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -320,8 +320,8 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
-ruct in_addr vnetwork,
-     slirp->vprefix_len =3D vprefix_len;
-     slirp->vhost_addr6 =3D vhost6;
-     if (vhostname) {
--        pstrcpy(slirp->client_hostname, sizeof(slirp->client_hostname),
--                vhostname);
-+        slirp_pstrcpy(slirp->client_hostname, sizeof(slirp->client_hostn=
-ame),
-+                      vhostname);
-     }
-     slirp->tftp_prefix =3D g_strdup(tftp_path);
-     slirp->bootp_filename =3D g_strdup(bootfile);
+@@ -21,8 +21,6 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+=20
+ #ifdef WITH_QEMU
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 2e8dc22fb6..dea201f5ce 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -5,8 +5,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+ #ifdef __sun__
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index 7c1fe18fec..864da7d857 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
+index 6dd1ecf5d9..2b4335eb34 100644
+--- a/slirp/tcp_output.c
++++ b/slirp/tcp_output.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static const u_char  tcp_outflags[TCP_NSTATES] =3D {
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index d8846a33b0..879a7dcd29 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ /* patchable/settable parameters for tcp */
+diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
+index a843e57a2b..703907eb37 100644
+--- a/slirp/tcp_timer.c
++++ b/slirp/tcp_timer.c
+@@ -30,7 +30,6 @@
+  * tcp_timer.c,v 1.2 1994/08/02 07:49:10 davidg Exp
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static struct tcpcb *tcp_timers(register struct tcpcb *tp, int timer);
 diff --git a/slirp/tftp.c b/slirp/tftp.c
-index 6fb381ef33..f0bcc72c92 100644
+index 5c31886190..2d8f978786 100644
 --- a/slirp/tftp.c
 +++ b/slirp/tftp.c
-@@ -216,7 +216,7 @@ static void tftp_send_error(struct tftp_session *spt,
+@@ -22,9 +22,11 @@
+  * THE SOFTWARE.
+  */
 =20
-   tp->tp_op =3D htons(TFTP_ERROR);
-   tp->x.tp_error.tp_error_code =3D htons(errorcode);
--  pstrcpy((char *)tp->x.tp_error.tp_msg, sizeof(tp->x.tp_error.tp_msg), =
-msg);
-+  slirp_pstrcpy((char *)tp->x.tp_error.tp_msg, sizeof(tp->x.tp_error.tp_=
-msg), msg);
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+-#include "qemu-common.h"
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
 =20
-   m->m_len =3D sizeof(struct tftp_t) - (TFTP_BLOCKSIZE_MAX + 2) + 3 + st=
-rlen(msg)
-              - sizeof(struct udphdr);
-diff --git a/slirp/util.c b/slirp/util.c
-index 59f6713c8b..84f5afdbc3 100644
---- a/slirp/util.c
-+++ b/slirp/util.c
-@@ -188,3 +188,20 @@ int slirp_closesocket(int fd)
-     return ret;
- }
- #endif /* WIN32 */
-+
-+void slirp_pstrcpy(char *buf, int buf_size, const char *str)
-+{
-+    int c;
-+    char *q =3D buf;
-+
-+    if (buf_size <=3D 0)
-+        return;
-+
-+    for(;;) {
-+        c =3D *str++;
-+        if (c =3D=3D 0 || q >=3D buf + buf_size - 1)
-+            break;
-+        *q++ =3D c;
-+    }
-+    *q =3D '\0';
-+}
+ static inline int tftp_session_in_use(struct tftp_session *spt)
+ {
+diff --git a/slirp/udp.c b/slirp/udp.c
+index 3915971b50..ac42be0d8e 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+diff --git a/slirp/udp6.c b/slirp/udp6.c
+index fa531e03c4..be5cba1f54 100644
+--- a/slirp/udp6.c
++++ b/slirp/udp6.c
+@@ -3,8 +3,6 @@
+  * Guillaume Subiron
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+ #include "udp.h"
+ #include "dhcpv6.h"
 diff --git a/slirp/util.h b/slirp/util.h
-index 4f6e80c3ed..586517bb30 100644
+index ef75804560..4963747aef 100644
 --- a/slirp/util.h
 +++ b/slirp/util.h
-@@ -91,4 +91,6 @@ static inline int slirp_socket_set_fast_reuse(int fd)
+@@ -48,6 +48,27 @@
+ # define SLIRP_PACKED __attribute__((packed))
  #endif
- }
 =20
-+void slirp_pstrcpy(char *buf, int buf_size, const char *str);
++#ifndef DIV_ROUND_UP
++#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
++#endif
 +
- #endif
++#ifndef container_of
++#define container_of(ptr, type, member) __extension__ ({    \
++    void *__mptr =3D (void *)(ptr);               \
++    ((type *)(__mptr - offsetof(type, member))); })
++#endif
++
++#if defined(_WIN32) /* CONFIG_IOVEC */
++# if !defined(IOV_MAX) /* XXX: to avoid duplicate with QEMU osdep.h */
++struct iovec {
++    void *iov_base;
++    size_t iov_len;
++};
++# endif
++#else
++#include <sys/uio.h>
++#endif
++
+ #define SCALE_MS 1000000
+=20
+ #define ETH_ALEN    6
 --=20
 2.20.1
