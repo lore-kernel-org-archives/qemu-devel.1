@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38292)
+Received: from eggs.gnu.org ([209.51.188.92]:39061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1groQu-0002bm-TQ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:29:58 -0500
+	(envelope-from <philmd@redhat.com>) id 1groSr-00049Z-2J
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:31:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1groQq-0000Ze-VE
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:29:54 -0500
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:33351)
+	(envelope-from <philmd@redhat.com>) id 1groSp-0002JI-0L
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:31:56 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40927)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1groQi-0000K8-Mz
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:29:47 -0500
-Received: by mail-qt1-f194.google.com with SMTP id l11so1047544qtp.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:29:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1groSo-0002FV-Lc
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 13:31:54 -0500
+Received: by mail-wr1-f65.google.com with SMTP id q1so922276wrp.7
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 10:31:52 -0800 (PST)
+References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
+	<20190207140316.16103-28-samuel.thibault@ens-lyon.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <df0735c3-cab0-085f-f8ea-db820055b221@redhat.com>
+Date: Thu, 7 Feb 2019 19:31:49 +0100
 MIME-Version: 1.0
-References: <20190207165449.6125-1-marcandre.lureau@redhat.com>
-	<20190207165449.6125-6-marcandre.lureau@redhat.com>
-	<20190207122432-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190207122432-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 7 Feb 2019 19:29:20 +0100
-Message-ID: <CAMxuvaw1XW33zVxYb7sGLVXABBOrO_x206X1sffvYnJ5-Ge9gA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/12] Add vhost-user-backend
+In-Reply-To: <20190207140316.16103-28-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULLv4 27/32] slirp: improve send_packet()
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,487 +31,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-Hi
+Hi Samuel,
 
-On Thu, Feb 7, 2019 at 6:36 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, Feb 07, 2019 at 05:54:42PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> > Create a vhost-user-backend object that holds a connection to a
-> > vhost-user backend and can be referenced from virtio devices that
-> > support it. See later patches for input & gpu usage.
-> >
-> > A chardev must be specified to communicate with the vhost-user
-> > backend, ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -object
-> > vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> So having an internal object that can maintain runtime state
-> might be a good idea. However I don't yet really see
-> what kind of property could such an object have that
-> the char device couldn't.>
-> I could see value if user did not have to specify
-> a completely separate device.
->
-> Consider:
->
-> -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock
-> -object vhost-user-backend,id=3Dvuid,chardev=3Dchar0
-> -device vhost-user-input-pci,vhost-user=3Dvuid
->
->
-> There's 3 times vhost-user here, and nothing actually says it's
-> virtio-input, that is implicit :(
->
-> So I feel CLI needs to change.  But I do think the idea of
-> an object in between does have some potential.
+On 2/7/19 3:03 PM, Samuel Thibault wrote:
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+> 
+> Use a more descriptive name for the callback.
+> 
+> Reuse the SlirpWriteCb type. Wrap it to check that all data has been written.
+> 
+> Return a ssize_t for potential error handling and data-loss reporting.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>  include/net/net.h |  2 +-
+>  net/net.c         |  4 ++--
+>  net/slirp.c       |  9 +++++----
+>  slirp/libslirp.h  | 11 +++++++----
+>  slirp/ncsi.c      |  2 +-
+>  slirp/slirp.c     | 18 +++++++++++++++---
+>  slirp/slirp.h     |  2 ++
+>  7 files changed, 33 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/net/net.h b/include/net/net.h
+> index 643295d163..075cc01267 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -146,7 +146,7 @@ ssize_t qemu_sendv_packet(NetClientState *nc, const struct iovec *iov,
+>                            int iovcnt);
+>  ssize_t qemu_sendv_packet_async(NetClientState *nc, const struct iovec *iov,
+>                                  int iovcnt, NetPacketSent *sent_cb);
+> -void qemu_send_packet(NetClientState *nc, const uint8_t *buf, int size);
+> +ssize_t qemu_send_packet(NetClientState *nc, const uint8_t *buf, int size);
+>  ssize_t qemu_send_packet_raw(NetClientState *nc, const uint8_t *buf, int size);
+>  ssize_t qemu_send_packet_async(NetClientState *nc, const uint8_t *buf,
+>                                 int size, NetPacketSent *sent_cb);
+> diff --git a/net/net.c b/net/net.c
+> index 3acbdccd61..5dcff7fe2a 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -668,9 +668,9 @@ ssize_t qemu_send_packet_async(NetClientState *sender,
+>                                               buf, size, sent_cb);
+>  }
+>  
+> -void qemu_send_packet(NetClientState *nc, const uint8_t *buf, int size)
+> +ssize_t qemu_send_packet(NetClientState *nc, const uint8_t *buf, int size)
+>  {
+> -    qemu_send_packet_async(nc, buf, size, NULL);
+> +    return qemu_send_packet_async(nc, buf, size, NULL);
+>  }
+>  
+>  ssize_t qemu_send_packet_raw(NetClientState *nc, const uint8_t *buf, int size)
+> diff --git a/net/slirp.c b/net/slirp.c
+> index 7b4f9f5c5e..664ff1c002 100644
+> --- a/net/slirp.c
+> +++ b/net/slirp.c
+> @@ -108,11 +108,12 @@ static void slirp_smb_cleanup(SlirpState *s);
+>  static inline void slirp_smb_cleanup(SlirpState *s) { }
+>  #endif
+>  
+> -static void net_slirp_output(void *opaque, const uint8_t *pkt, int pkt_len)
+> +static ssize_t net_slirp_send_packet(const void *pkt, size_t pkt_len,
+> +                                     void *opaque)
+>  {
+>      SlirpState *s = opaque;
+>  
+> -    qemu_send_packet(&s->nc, pkt, pkt_len);
+> +    return qemu_send_packet(&s->nc, pkt, pkt_len);
+>  }
+>  
+>  static ssize_t net_slirp_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+> @@ -197,7 +198,7 @@ static void net_slirp_unregister_poll_fd(int fd)
+>  }
+>  
+>  static const SlirpCb slirp_cb = {
+> -    .output = net_slirp_output,
+> +    .send_packet = net_slirp_send_packet,
+>      .guest_error = net_slirp_guest_error,
+>      .clock_get_ns = net_slirp_clock_get_ns,
+>      .timer_new = net_slirp_timer_new,
+> @@ -780,7 +781,7 @@ static void guestfwd_read(void *opaque, const uint8_t *buf, int size)
+>      slirp_socket_recv(fwd->slirp, fwd->server, fwd->port, buf, size);
+>  }
+>  
+> -static int guestfwd_write(const void *buf, size_t len, void *chr)
+> +static ssize_t guestfwd_write(const void *buf, size_t len, void *chr)
+>  {
+>      return qemu_chr_fe_write_all(chr, buf, len);
+>  }
+> diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+> index 02cbec9f8b..8e5d4ed11b 100644
+> --- a/slirp/libslirp.h
+> +++ b/slirp/libslirp.h
+> @@ -15,7 +15,7 @@
+>  
+>  typedef struct Slirp Slirp;
+>  
+> -typedef int (*SlirpWriteCb)(const void *buf, size_t len, void *opaque);
+> +typedef ssize_t (*SlirpWriteCb)(const void *buf, size_t len, void *opaque);
+>  typedef void (*SlirpTimerCb)(void *opaque);
+>  
+>  /*
+> @@ -23,10 +23,13 @@ typedef void (*SlirpTimerCb)(void *opaque);
+>   */
+>  typedef struct SlirpCb {
+>      /*
+> -     * Send an ethernet frame to the guest network. The opaque parameter
+> -     * is the one given to slirp_init().
+> +     * Send an ethernet frame to the guest network. The opaque
+> +     * parameter is the one given to slirp_init(). The function
+> +     * doesn't need to send all the data and may return <len (no
+> +     * buffering is done on libslirp side, so the data will be dropped
+> +     * in this case). <0 reports an IO error.
+>       */
+> -    void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
+> +    SlirpWriteCb send_packet;
+>      /* Print a message for an error due to guest misbehavior.  */
+>      void (*guest_error)(const char *msg);
+>      /* Return the virtual clock value in nanoseconds */
+> diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+> index 327f17543c..359f52c284 100644
+> --- a/slirp/ncsi.c
+> +++ b/slirp/ncsi.c
+> @@ -162,5 +162,5 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+>      *pchecksum = htonl(checksum);
+>      ncsi_rsp_len += 4;
+>  
+> -    slirp->cb->output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
+> +    slirp_send_packet_all(slirp, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
+>  }
+> diff --git a/slirp/slirp.c b/slirp/slirp.c
+> index 3304c83001..2bc53e3e12 100644
+> --- a/slirp/slirp.c
+> +++ b/slirp/slirp.c
+> @@ -800,7 +800,7 @@ static void arp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+>              rah->ar_sip = ah->ar_tip;
+>              memcpy(rah->ar_tha, ah->ar_sha, ETH_ALEN);
+>              rah->ar_tip = ah->ar_sip;
+> -            slirp->cb->output(slirp->opaque, arp_reply, sizeof(arp_reply));
+> +            slirp_send_packet_all(slirp, arp_reply, sizeof(arp_reply));
+>          }
+>          break;
+>      case ARPOP_REPLY:
+> @@ -900,7 +900,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
+>              /* target IP */
+>              rah->ar_tip = iph->ip_dst.s_addr;
+>              slirp->client_ipaddr = iph->ip_dst;
+> -            slirp->cb->output(slirp->opaque, arp_req, sizeof(arp_req));
+> +            slirp_send_packet_all(slirp, arp_req, sizeof(arp_req));
+>              ifm->resolution_requested = true;
+>  
+>              /* Expire request and drop outgoing packet after 1 second */
+> @@ -985,7 +985,7 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
+>                eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
+>                eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
+>      memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
+> -    slirp->cb->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
+> +    slirp_send_packet_all(slirp, buf, ifm->m_len + ETH_HLEN);
+>      return 1;
+>  }
+>  
+> @@ -1152,3 +1152,15 @@ void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr, int guest_port,
+>      if (ret > 0)
+>          tcp_output(sototcpcb(so));
+>  }
+> +
+> +void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len)
+> +{
+> +    ssize_t ret = slirp->cb->send_packet(buf, len, slirp->opaque);
+> +
+> +    if (ret < 0) {
+> +        g_critical("Failed to send packet, ret: %ld", (long) ret);
 
-Ok, I dropped the -object from CLI. It can be added later if needed.
+>From the v3 discussion [*] I thought send_packet() would return a
+gssize, then we'd use G_GSSIZE_FORMAT here (and similarly use gssize
+instead ssize_t in this series).
+Anyway your fix is simpler. And we can still do this on top of this PR.
 
-It makes some sense imho to wrap all the configuration/documentation
-in a backend object. But since we have only chardev=3D now (cmd=3D is
-being postponed), and I can only speculate on what could come next,
-let's just have it as internal helper for now.
+[*] https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01841.html
 
-I'll adjust/resend this series, this will also impact the -gpu and
-libvirt series.
-
->
-> Consider virtio net which now has modern, legacy and transitional
-> variants. How is vhost-user-X type going to scale there?
-> That's a problem worth solving IMHO.
->
-> Also, there's a problem right now in that if backend
-> connects before device is available (e.g. because we
-> want to hotplug the device later) then we can not
-> validate the backend. So it will fail way later.
-> I am not sure how much do we want to validate,
-> but if e.g. it's a different device type completely,
-> that seems like a reasonable thing to validate.
->
-> So I do see potential in a vhost user backend object
-> but then it has to encapsulate all vhost user things,
-> such that you can connect a virtio device to a
-> vhost user object.
->
->
->
->
->
-> > ---
-> >  include/sysemu/vhost-user-backend.h |  60 +++++++
-> >  backends/vhost-user.c               | 244 ++++++++++++++++++++++++++++
-> >  vl.c                                |   3 +-
-> >  MAINTAINERS                         |   2 +
-> >  backends/Makefile.objs              |   3 +-
-> >  qemu-options.hx                     |  20 +++
-> >  6 files changed, 330 insertions(+), 2 deletions(-)
-> >  create mode 100644 include/sysemu/vhost-user-backend.h
-> >  create mode 100644 backends/vhost-user.c
-> >
-> > diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost=
--user-backend.h
-> > new file mode 100644
-> > index 0000000000..60f811cae7
-> > --- /dev/null
-> > +++ b/include/sysemu/vhost-user-backend.h
-> > @@ -0,0 +1,60 @@
-> > +/*
-> > + * QEMU vhost-user backend
-> > + *
-> > + * Copyright (C) 2018 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
-> > +#ifndef QEMU_VHOST_USER_BACKEND_H
-> > +#define QEMU_VHOST_USER_BACKEND_H
-> > +
-> > +#include "qom/object.h"
-> > +#include "exec/memory.h"
-> > +#include "qemu/option.h"
-> > +#include "qemu/bitmap.h"
-> > +#include "hw/virtio/vhost.h"
-> > +#include "hw/virtio/vhost-user.h"
-> > +#include "chardev/char-fe.h"
-> > +#include "io/channel.h"
-> > +
-> > +#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
-> > +#define VHOST_USER_BACKEND(obj) \
-> > +    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
-> > +#define VHOST_USER_BACKEND_GET_CLASS(obj) \
-> > +    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BAC=
-KEND)
-> > +#define VHOST_USER_BACKEND_CLASS(klass) \
-> > +    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER=
-_BACKEND)
-> > +
-> > +typedef struct VhostUserBackend VhostUserBackend;
-> > +typedef struct VhostUserBackendClass VhostUserBackendClass;
-> > +
-> > +struct VhostUserBackendClass {
-> > +    ObjectClass parent_class;
-> > +};
-> > +
-> > +struct VhostUserBackend {
-> > +    /* private */
-> > +    Object parent;
-> > +
-> > +    char *cmd;
-> > +    char *chr_name;
-> > +
-> > +    CharBackend chr;
-> > +    VhostUserState vhost_user;
-> > +    struct vhost_dev dev;
-> > +    QIOChannel *child;
-> > +    VirtIODevice *vdev;
-> > +    bool started;
-> > +    bool completed;
-> > +};
-> > +
-> > +int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vde=
-v,
-> > +                                unsigned nvqs, Error **errp);
-> > +void vhost_user_backend_start(VhostUserBackend *b);
-> > +void vhost_user_backend_stop(VhostUserBackend *b);
-> > +
-> > +#endif
-> > diff --git a/backends/vhost-user.c b/backends/vhost-user.c
-> > new file mode 100644
-> > index 0000000000..bf39c0751d
-> > --- /dev/null
-> > +++ b/backends/vhost-user.c
-> > @@ -0,0 +1,244 @@
-> > +/*
-> > + * QEMU vhost-user backend
-> > + *
-> > + * Copyright (C) 2018 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
-> > +
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/qdev.h"
-> > +#include "qapi/error.h"
-> > +#include "qapi/qmp/qerror.h"
-> > +#include "qemu/error-report.h"
-> > +#include "qom/object_interfaces.h"
-> > +#include "sysemu/vhost-user-backend.h"
-> > +#include "sysemu/kvm.h"
-> > +#include "io/channel-command.h"
-> > +#include "hw/virtio/virtio-bus.h"
-> > +
-> > +static bool
-> > +ioeventfd_enabled(void)
-> > +{
-> > +    return kvm_enabled() && kvm_eventfds_enabled();
-> > +}
-> > +
-> > +int
-> > +vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
-> > +                            unsigned nvqs, Error **errp)
-> > +{
-> > +    int ret;
-> > +
-> > +    assert(!b->vdev && vdev);
-> > +
-> > +    if (!ioeventfd_enabled()) {
-> > +        error_setg(errp, "vhost initialization failed: requires kvm");
-> > +        return -1;
-> > +    }
-> > +
-> > +    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    b->vdev =3D vdev;
-> > +    b->dev.nvqs =3D nvqs;
-> > +    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
-> > +
-> > +    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_TYPE=
-_USER, 0);
-> > +    if (ret < 0) {
-> > +        error_setg_errno(errp, -ret, "vhost initialization failed");
-> > +        return -1;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +void
-> > +vhost_user_backend_start(VhostUserBackend *b)
-> > +{
-> > +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
-> > +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-> > +    int ret, i ;
-> > +
-> > +    if (b->started) {
-> > +        return;
-> > +    }
-> > +
-> > +    if (!k->set_guest_notifiers) {
-> > +        error_report("binding does not support guest notifiers");
-> > +        return;
-> > +    }
-> > +
-> > +    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
-> > +    if (ret < 0) {
-> > +        return;
-> > +    }
-> > +
-> > +    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true);
-> > +    if (ret < 0) {
-> > +        error_report("Error binding guest notifier");
-> > +        goto err_host_notifiers;
-> > +    }
-> > +
-> > +    b->dev.acked_features =3D b->vdev->guest_features;
-> > +    ret =3D vhost_dev_start(&b->dev, b->vdev);
-> > +    if (ret < 0) {
-> > +        error_report("Error start vhost dev");
-> > +        goto err_guest_notifiers;
-> > +    }
-> > +
-> > +    /* guest_notifier_mask/pending not used yet, so just unmask
-> > +     * everything here.  virtio-pci will do the right thing by
-> > +     * enabling/disabling irqfd.
-> > +     */
-> > +    for (i =3D 0; i < b->dev.nvqs; i++) {
-> > +        vhost_virtqueue_mask(&b->dev, b->vdev,
-> > +                             b->dev.vq_index + i, false);
-> > +    }
-> > +
-> > +    b->started =3D true;
-> > +    return;
-> > +
-> > +err_guest_notifiers:
-> > +    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
-> > +err_host_notifiers:
-> > +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
-> > +}
-> > +
-> > +void
-> > +vhost_user_backend_stop(VhostUserBackend *b)
-> > +{
-> > +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
-> > +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-> > +    int ret =3D 0;
-> > +
-> > +    if (!b->started) {
-> > +        return;
-> > +    }
-> > +
-> > +    vhost_dev_stop(&b->dev, b->vdev);
-> > +
-> > +    if (k->set_guest_notifiers) {
-> > +        ret =3D k->set_guest_notifiers(qbus->parent,
-> > +                                     b->dev.nvqs, false);
-> > +        if (ret < 0) {
-> > +            error_report("vhost guest notifier cleanup failed: %d", re=
-t);
-> > +        }
-> > +    }
-> > +    assert(ret >=3D 0);
-> > +
-> > +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
-> > +    b->started =3D false;
-> > +}
-> > +
-> > +static void
-> > +vhost_user_backend_complete(UserCreatable *uc, Error **errp)
-> > +{
-> > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(uc);
-> > +    Chardev *chr;
-> > +
-> > +    if (!b->chr_name) {
-> > +        error_setg(errp, "You must specificy 'chardev'.");
-> > +        return;
-> > +    }
-> > +
-> > +    chr =3D qemu_chr_find(b->chr_name);
-> > +    if (chr =3D=3D NULL) {
-> > +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> > +                  "Chardev '%s' not found", b->chr_name);
-> > +        return;
-> > +    }
-> > +
-> > +    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
-> > +        return;
-> > +    }
-> > +
-> > +    b->completed =3D true;
-> > +    /* could vhost_dev_init() happen here, so early vhost-user message
-> > +     * can be exchanged */
-> > +}
-> > +
-> > +static void set_chardev(Object *obj, const char *value, Error **errp)
-> > +{
-> > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-> > +
-> > +    if (b->completed) {
-> > +        error_setg(errp, QERR_PERMISSION_DENIED);
-> > +    } else {
-> > +        g_free(b->chr_name);
-> > +        b->chr_name =3D g_strdup(value);
-> > +    }
-> > +}
-> > +
-> > +static char *get_chardev(Object *obj, Error **errp)
-> > +{
-> > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-> > +    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
-> > +
-> > +    if (chr && chr->label) {
-> > +        return g_strdup(chr->label);
-> > +    }
-> > +
-> > +    return NULL;
-> > +}
-> > +
-> > +static void vhost_user_backend_init(Object *obj)
-> > +{
-> > +    object_property_add_str(obj, "chardev", get_chardev, set_chardev, =
-NULL);
-> > +}
-> > +
-> > +static void vhost_user_backend_finalize(Object *obj)
-> > +{
-> > +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-> > +
-> > +    g_free(b->dev.vqs);
-> > +    g_free(b->chr_name);
-> > +
-> > +    vhost_user_cleanup(&b->vhost_user);
-> > +    qemu_chr_fe_deinit(&b->chr, true);
-> > +
-> > +    if (b->child) {
-> > +        object_unref(OBJECT(b->child));
-> > +    }
-> > +}
-> > +
-> > +static bool
-> > +vhost_user_backend_can_be_deleted(UserCreatable *uc)
-> > +{
-> > +    return true;
-> > +}
-> > +
-> > +static void
-> > +vhost_user_backend_class_init(ObjectClass *oc, void *data)
-> > +{
-> > +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-> > +
-> > +    ucc->complete =3D vhost_user_backend_complete;
-> > +    ucc->can_be_deleted =3D vhost_user_backend_can_be_deleted;
-> > +}
-> > +
-> > +static const TypeInfo vhost_user_backend_info =3D {
-> > +    .name =3D TYPE_VHOST_USER_BACKEND,
-> > +    .parent =3D TYPE_OBJECT,
-> > +    .instance_size =3D sizeof(VhostUserBackend),
-> > +    .instance_init =3D vhost_user_backend_init,
-> > +    .instance_finalize =3D vhost_user_backend_finalize,
-> > +    .class_size =3D sizeof(VhostUserBackendClass),
-> > +    .class_init =3D vhost_user_backend_class_init,
-> > +    .interfaces =3D (InterfaceInfo[]) {
-> > +        { TYPE_USER_CREATABLE },
-> > +        { }
-> > +    }
-> > +};
-> > +
-> > +static void register_types(void)
-> > +{
-> > +    type_register_static(&vhost_user_backend_info);
-> > +}
-> > +
-> > +type_init(register_types);
-> > diff --git a/vl.c b/vl.c
-> > index 9e4dba7f92..43012ee6a3 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -2784,7 +2784,8 @@ static bool object_create_initial(const char *typ=
-e, QemuOpts *opts)
-> >      }
-> >
-> >  #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
-> > -    if (g_str_equal(type, "cryptodev-vhost-user")) {
-> > +    if (g_str_equal(type, "cryptodev-vhost-user") ||
-> > +        g_str_equal(type, "vhost-user-backend")) {
-> >          return false;
-> >      }
-> >  #endif
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 16b6264412..e077fe788d 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -1424,6 +1424,8 @@ F: hw/*/*vhost*
-> >  F: docs/interop/vhost-user.json
-> >  F: docs/interop/vhost-user.txt
-> >  F: contrib/vhost-user-*/
-> > +F: backends/vhost-user.c
-> > +F: include/sysemu/vhost-user-backend.h
-> >
-> >  virtio
-> >  M: Michael S. Tsirkin <mst@redhat.com>
-> > diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-> > index 717fcbdae4..a5ec0bf907 100644
-> > --- a/backends/Makefile.objs
-> > +++ b/backends/Makefile.objs
-> > @@ -12,7 +12,8 @@ common-obj-y +=3D cryptodev-builtin.o
-> >  ifeq ($(CONFIG_VIRTIO),y)
-> >  common-obj-y +=3D cryptodev-vhost.o
-> >  common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D \
-> > -    cryptodev-vhost-user.o
-> > +    cryptodev-vhost-user.o \
-> > +    vhost-user.o
-> >  endif
-> >
-> >  common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 06ef1a7c5c..24315a4cda 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -4203,6 +4203,26 @@ secondary:
-> >  If you want to know the detail of above command line, you can read
-> >  the colo-compare git log.
-> >
-> > +@item -object vhost-user-backend,id=3Did=3D@var{id},chardev=3D@var{cha=
-rdevid}
-> > +
-> > +Create a vhost-user-backend object that holds a connection to a
-> > +vhost-user backend and can be referenced from virtio/vhost-user
-> > +devices that support it.
-> > +
-> > +The @var{id} parameter is a unique ID that will be used to reference
-> > +this vhost-user backend from the @option{vhost-user} device. The
-> > +@var{chardev} parameter is the unique ID of a character device backend
-> > +that provides the connection to the vhost-user slave process. (Since 3=
-.2)
-> > +
-> > +@example
-> > +
-> > + # qemu-system-x86_64 \
-> > +   [...] \
-> > +   -object vhost-user-backend,id=3Dvuid,chardev=3Dchar0 \
-> > +   -device vhost-user-input-pci,vhost-user=3Dvuid
-> > +   [...]
-> > +@end example
-> > +
-> >  @item -object cryptodev-backend-builtin,id=3D@var{id}[,queues=3D@var{q=
-ueues}]
-> >
-> >  Creates a cryptodev backend which executes crypto opreation from
-> > --
-> > 2.20.1.519.g8feddda32c
+> +    } else if (ret < len) {
+> +        DEBUG_ERROR("send_packet() didn't send all data: %ld < %lu",
+> +                (long) ret, (unsigned long) len);
+> +    }
+> +}
+> diff --git a/slirp/slirp.h b/slirp/slirp.h
+> index 05b8364c07..752a4cd8c8 100644
+> --- a/slirp/slirp.h
+> +++ b/slirp/slirp.h
+> @@ -269,4 +269,6 @@ struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
+>  struct socket *
+>  slirp_find_ctl_socket(Slirp *slirp, struct in_addr guest_addr, int guest_port);
+>  
+> +void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len);
+> +
+>  #endif
+> 
