@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37459)
+Received: from eggs.gnu.org ([209.51.188.92]:46395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1grYBW-0001b2-7z
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 20:08:59 -0500
+	(envelope-from <jimw@sifive.com>) id 1grZ4b-0001UY-18
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 21:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1grYBU-0001n4-7p
-	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 20:08:58 -0500
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-10-philmd@redhat.com>
-	<CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
-	<e5dd8130-e041-7774-2141-cc506dee99f7@redhat.com>
-	<94f74717-0bab-ea0a-e7cc-239a1b1136bf@comstyle.com>
-	<97d5ea1c-0621-8f9c-0ee6-6a64540b4ddd@comstyle.com>
-	<87zhr8mzq2.fsf@zen.linaroharston>
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <1afc34a0-1267-dbf8-15fa-d35ec3428e3d@comstyle.com>
-Date: Wed, 6 Feb 2019 20:03:44 -0500
+	(envelope-from <jimw@sifive.com>) id 1grZ4Z-0006Pb-Vg
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 21:05:52 -0500
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:45768)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1grZ4P-0006Kz-2U
+	for qemu-devel@nongnu.org; Wed, 06 Feb 2019 21:05:45 -0500
+Received: by mail-vs1-xe43.google.com with SMTP id x28so5744760vsh.12
+	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 18:05:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87zhr8mzq2.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
- from the ports
+References: <CAFyWVaZ5tQq4eGaZiPBq7172PB_x3JCqV6c2xo=wSJdgbJakKQ@mail.gmail.com>
+	<20190130025708.12811-1-jimw@sifive.com>
+	<CAKmqyKMrCVqudmyJUPta9q6TJtDkeLV=FseAqQ7YhYMu3ak_NQ@mail.gmail.com>
+In-Reply-To: <CAKmqyKMrCVqudmyJUPta9q6TJtDkeLV=FseAqQ7YhYMu3ak_NQ@mail.gmail.com>
+From: Jim Wilson <jimw@sifive.com>
+Date: Wed, 6 Feb 2019 18:05:09 -0800
+Message-ID: <CAFyWVaaS_4RY9YKXcgJ1F4Ep1TDWkExtBTEigJedZQCcXG+44Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 5/5 v3] RISC-V: Add hooks to use the gdb
+ xml files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
-On 2/6/2019 3:25 PM, Alex Benn=C3=A9e wrote:
-
-> Brad Smith <brad@comstyle.com> writes:
+On Wed, Feb 6, 2019 at 4:04 PM Alistair Francis <alistair23@gmail.com> wrote:
+> Would it not be easier to add an extra argument to the functions
+> intstead of setting and unsetting this?
 >
->> On 2/5/2019 8:57 AM, Brad Smith wrote:
->>
->>> If someone could point me in the right direction as to how the image
->>> is created
->>> I could look at coming up with something newer. I would prefer that
->>> over some
->>> of the workarounds I've seen to date.
->> I started creating the image and then wondered what do I set the root
->> password
->> to? The instructions also talk about an SSH key but I don't know how
->> that would
->> work when this image is used for the VM test framework.
-> See tests/keys - basically we have a hard-wired testing key.
-So the root password doesn't matter?
->> I updated the instructions on the Wiki to make use of VirtIO for both
->> the NIC and disk controller.
-> Can the OpenBSD kernel use virtio-net-pci and virtio-scsi-pci?
->
-> It's not super important for build testing but they are the most capabl=
-e
-> variants of virtio. The virtio-pci gives nice discover-able hotplug and
-> I believe you need virtio-scsi-pci if you want to use funky options lik=
-e
-> discard for thin provisioning.
+> That's what you had in the earlier version of this set.
 
-Yes to both.
+The csr support was rewritten, and is now a table of functions.  If I
+change the type signature for one function in a table column I have to
+change them all.  This means I have to change the type signature of
+about 50 functions, the vast majority of which will never use the new
+argument.  I was hoping to avoid that, so I added a variable into the
+cpu state instead.  In the old patch, before the csr rewrite, I only
+had to change the type signature of a couple of functions, most of
+which did use the new argument, so that was reasonable at the time.
+
+If I do need to change a lot of type signatures, what about attribute
+((unused))?  I see that there is a ATTRIBUTE_UNUSED in the disas dir
+but it is apparently not used outside there, and only defined in
+include/disas/bfd.h.  I see a few scattered uses of
+attribute((unused)) but that seems unwise for portability reasons.
+Maybe qemu doesn't care about unused arguments/parameters?
+
+Jim
