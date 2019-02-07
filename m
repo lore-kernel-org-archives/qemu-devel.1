@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57630)
+Received: from eggs.gnu.org ([209.51.188.92]:57687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnw9-0002Bj-9Z
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:10 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwD-0002GI-1c
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnw7-0002P3-9L
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:09 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38651)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwA-0002QZ-3n
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:12 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55513)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnw5-0002O8-5Q
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:05 -0500
-Received: by mail-wr1-x444.google.com with SMTP id v13so829760wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:05 -0800 (PST)
+	id 1grnw9-0002PM-AP
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:09 -0500
+Received: by mail-wm1-x342.google.com with SMTP id r17so793871wmh.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:08 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:57:09 +0100
-Message-Id: <1549562254-41157-27-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:57:12 +0100
+Message-Id: <1549562254-41157-30-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 26/51] ssi: express dependencies with kconfig
+Subject: [Qemu-devel] [PATCH 29/51] i386-softmmu.mak: remove all CONFIG_*
+ except boards definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +29,173 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com
+Cc: thuth@redhat.com, philmd@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
+From: Yang Zhong <yang.zhong@intel.com>
+
+%-softmmu.mak only keep boards definitions in Kconfig mode.
+
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Message-Id: <20190123065618.3520-43-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/arm-softmmu.mak        | 1 -
- default-configs/microblaze-softmmu.mak | 1 -
- hw/sd/Kconfig                          | 1 +
- hw/ssi/Kconfig                         | 4 ++++
- 4 files changed, 5 insertions(+), 2 deletions(-)
+ default-configs/i386-softmmu.mak | 37 ++++++++++++++++++-------------------
+ hw/acpi/Kconfig                  |  6 ++++++
+ hw/i386/Kconfig                  | 15 +++++++++++++++
+ hw/mem/Kconfig                   |  2 ++
+ hw/pci-bridge/Kconfig            |  1 +
+ hw/timer/Kconfig                 |  1 +
+ 6 files changed, 43 insertions(+), 19 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index c1871c7..3491403 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -24,7 +24,6 @@ CONFIG_DDC=y
- CONFIG_SII9022=y
- CONFIG_ADS7846=y
- CONFIG_MAX111X=y
--CONFIG_SSI=y
- CONFIG_SSI_SD=y
- CONFIG_SSI_M25P80=y
- CONFIG_LAN9118=y
-diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
-index a4a6770..7140ef3 100644
---- a/default-configs/microblaze-softmmu.mak
-+++ b/default-configs/microblaze-softmmu.mak
-@@ -6,7 +6,6 @@ CONFIG_XILINX=y
- CONFIG_XILINX_AXI=y
- CONFIG_XILINX_SPI=y
- CONFIG_XILINX_ETHLITE=y
--CONFIG_SSI=y
- CONFIG_SSI_M25P80=y
- CONFIG_XLNX_ZYNQMP=y
- CONFIG_PETALOGIX_S3ADSP1800=y
-diff --git a/hw/sd/Kconfig b/hw/sd/Kconfig
-index c6c5dfb..8f12d9c 100644
---- a/hw/sd/Kconfig
-+++ b/hw/sd/Kconfig
-@@ -3,6 +3,7 @@ config PL181
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index e779ee1..ba3fb3f 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -1,25 +1,24 @@
+ # Default configuration for i386-softmmu
  
- config SSI_SD
-     bool
-+    depends on SSI
+-CONFIG_VMXNET3_PCI=y
+-CONFIG_ISA_IPMI_KCS=y
+-CONFIG_ISA_IPMI_BT=y
+-
+-# Optional devices:
++# Uncomment the following lines to disable these optional devices:
+ #
+-CONFIG_HPET=y
+-CONFIG_APPLESMC=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_ISA_DEBUG=y
+-CONFIG_ISA_TESTDEV=y
+-CONFIG_TEST_DEVICES=y
+-CONFIG_SGA=y
+-CONFIG_PVPANIC=y
+-CONFIG_MEM_DEVICE=y
+-CONFIG_NVDIMM=y
+-CONFIG_ACPI_NVDIMM=y
+-CONFIG_PXB=y
+-CONFIG_ACPI_VMGENID=y
+-CONFIG_PCI_DEVICES=y
++#CONFIG_AMD_IOMMU=n
++#CONFIG_APPLESMC=n
++#CONFIG_FDC=n
++#CONFIG_HPET=n
++#CONFIG_HYPERV=n
++#CONFIG_ISA_DEBUG=n
++#CONFIG_ISA_IPMI_BT=n
++#CONFIG_ISA_IPMI_KCS=n
++#CONFIG_PCI_DEVICES=n
++#CONFIG_PVPANIC=n
++#CONFIG_QXL=n
++#CONFIG_SEV=n
++#CONFIG_SGA=n
++#CONFIG_TEST_DEVICES=n
++#CONFIG_TPM_CRB=n
++#CONFIG_TPM_TIS=n
++#CONFIG_VTD=n
  
- config SD
+ # Boards:
+ #
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 035a28f..eca3bee 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -4,6 +4,9 @@ config ACPI
+ config ACPI_X86
      bool
-diff --git a/hw/ssi/Kconfig b/hw/ssi/Kconfig
-index 5a03110..9e54a0c 100644
---- a/hw/ssi/Kconfig
-+++ b/hw/ssi/Kconfig
-@@ -1,14 +1,18 @@
- config PL022
-     bool
-+    select SSI
+     select ACPI
++    select ACPI_NVDIMM
++    select ACPI_CPU_HOTPLUG
++    select ACPI_MEMORY_HOTPLUG
  
- config SSI
+ config ACPI_X86_ICH
      bool
+@@ -18,6 +21,9 @@ config ACPI_MEMORY_HOTPLUG
  
- config XILINX_SPI
+ config ACPI_NVDIMM
      bool
-+    select SSI
++    depends on ACPI
  
- config XILINX_SPIPS
+ config ACPI_VMGENID
      bool
-+    select SSI
++    default y
++    depends on PC
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index b9d9168..790d37e 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -4,17 +4,31 @@ config SEV
  
- config STM32F2XX_SPI
+ config PC
      bool
-+    select SSI
++    imply APPLESMC
+     imply HYPERV
++    imply ISA_IPMI_KCS
++    imply ISA_IPMI_BT
++    imply ISA_DEBUG
++    imply PCI_DEVICES
++    imply PVPANIC
+     imply QXL
+     imply SEV
++    imply SGA
++    imply TEST_DEVICES
+     imply TPM_CRB
+     imply TPM_TIS
+     select I8259
+     select I8254
++    select PCKBD
+     select PCSPK
+     select I82374
+     select I8257
+     select MC146818RTC
++    # Needed by the board code:
++    select PARALLEL
++    # For ACPI builder:
++    select SERIAL_ISA
++    select ACPI_VMGENID
+ 
+ config PC_PCI
+     bool
+@@ -29,6 +43,7 @@ config PC_ACPI
+     select ACPI_CPU_HOTPLUG
+     select ACPI_MEMORY_HOTPLUG
+     select SMBUS_EEPROM
++    select PFLASH_CFI01
+     depends on ACPI_SMBUS
+ 
+ config I440FX
+diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
+index a3a4372..d1e635c 100644
+--- a/hw/mem/Kconfig
++++ b/hw/mem/Kconfig
+@@ -6,3 +6,5 @@ config MEM_DEVICE
+ 
+ config NVDIMM
+     bool
++    default y
++    depends on PC
+diff --git a/hw/pci-bridge/Kconfig b/hw/pci-bridge/Kconfig
+index 0519eb1..b167b98 100644
+--- a/hw/pci-bridge/Kconfig
++++ b/hw/pci-bridge/Kconfig
+@@ -5,6 +5,7 @@ config PCIE_PORT
+ 
+ config PXB
+     bool
++    default y if Q35
+ 
+ config XIO3130
+     bool
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index a021c74..51921eb 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -15,6 +15,7 @@ config DS1338
+ 
+ config HPET
+     bool
++    default y if PC
+ 
+ config I8254
+     bool
 -- 
 1.8.3.1
