@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57332)
+Received: from eggs.gnu.org ([209.51.188.92]:57418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvt-0001vl-5C
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:55 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvw-0001wx-0L
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002Cw-K5
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:53 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:42492)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvt-0002HI-U2
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:55 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36765)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnvr-00024e-B6
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:51 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id q18so796758wrx.9
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:41 -0800 (PST)
+	id 1grnvt-0002Fj-Ln
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:53 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p6so828571wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:53 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:56:45 +0100
-Message-Id: <1549562254-41157-3-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:56:58 +0100
+Message-Id: <1549562254-41157-16-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/51] minikconfig: add AST
+Subject: [Qemu-devel] [PATCH 15/51] scsi: express dependencies with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,212 +28,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com
+Cc: thuth@redhat.com, philmd@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
-Add Python classes that represent the Kconfig abstract syntax tree.
-The abstract syntax tree is stored as a list of clauses.  For example:
-
-    config FOO
-        depends on BAR
-        select BAZ
-
-is represented as three clauses:
-
-    FOO depends on BAR
-    FOO default n
-    select BAZ if FOO
+This automatically removes the SCSI subsystem from the
+binary altogether if no controllers are selected.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190123065618.3520-24-yang.zhong@intel.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Message-Id: <20190123065618.3520-34-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/minikconf.py | 121 +++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 102 insertions(+), 19 deletions(-)
+ default-configs/arm-softmmu.mak         |  1 -
+ default-configs/hppa-softmmu.mak        |  1 -
+ default-configs/mips-softmmu-common.mak |  1 -
+ default-configs/sparc-softmmu.mak       |  1 -
+ default-configs/virtio.mak              |  1 -
+ hw/scsi/Kconfig                         | 10 +++++++++-
+ hw/scsi/Makefile.objs                   |  2 +-
+ hw/usb/Kconfig                          |  2 ++
+ 8 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index 8861a32..d74b9df 100644
---- a/scripts/minikconf.py
-+++ b/scripts/minikconf.py
-@@ -31,11 +31,84 @@ def debug_print(*args):
- # -------------------------------------------
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 901f42a..44acb5a 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -163,5 +163,4 @@ CONFIG_HIGHBANK=y
+ CONFIG_MUSICPAL=y
  
- class KconfigData:
-+    class Expr:
-+        def __and__(self, rhs):
-+            return KconfigData.AND(self, rhs)
-+        def __or__(self, rhs):
-+            return KconfigData.OR(self, rhs)
-+        def __invert__(self):
-+            return KconfigData.NOT(self)
-+
-+    class AND(Expr):
-+        def __init__(self, lhs, rhs):
-+            self.lhs = lhs
-+            self.rhs = rhs
-+        def __str__(self):
-+            return "(%s && %s)" % (self.lhs, self.rhs)
-+
-+    class OR(Expr):
-+        def __init__(self, lhs, rhs):
-+            self.lhs = lhs
-+            self.rhs = rhs
-+        def __str__(self):
-+            return "(%s || %s)" % (self.lhs, self.rhs)
-+
-+    class NOT(Expr):
-+        def __init__(self, lhs):
-+            self.lhs = lhs
-+        def __str__(self):
-+            return "!%s" % (self.lhs)
-+
-+    class Var(Expr):
-+        def __init__(self, name):
-+            self.name = name
-+            self.value = None
-+        def __str__(self):
-+            return self.name
-+
-+    class Clause:
-+        def __init__(self, dest):
-+            self.dest = dest
-+
-+    class AssignmentClause(Clause):
-+        def __init__(self, dest, value):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.value = value
-+        def __str__(self):
-+            return "%s=%s" % (self.dest, 'y' if self.value else 'n')
-+
-+    class DefaultClause(Clause):
-+        def __init__(self, dest, value, cond=None):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.value = value
-+            self.cond = cond
-+        def __str__(self):
-+            value = 'y' if self.value else 'n'
-+            if self.cond is None:
-+                return "config %s default %s" % (self.dest, value)
-+            else:
-+                return "config %s default %s if %s" % (self.dest, value, self.cond)
-+
-+    class DependsOnClause(Clause):
-+        def __init__(self, dest, expr):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.expr = expr
-+        def __str__(self):
-+            return "config %s depends on %s" % (self.dest, self.expr)
-+
-+    class SelectClause(Clause):
-+        def __init__(self, dest, cond):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.cond = cond
-+        def __str__(self):
-+            return "select %s if %s" % (self.dest, self.cond)
-+
-     def __init__(self):
-         self.previously_included = []
-         self.incl_info = None
-         self.defined_vars = set()
--        self.referenced_vars = set()
-+        self.referenced_vars = dict()
-+        self.clauses = list()
+ # for realview and versatilepb
+-CONFIG_SCSI=y
+ CONFIG_LSI_SCSI_PCI=y
+diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-softmmu.mak
+index 5089a94..b7f2b43 100644
+--- a/default-configs/hppa-softmmu.mak
++++ b/default-configs/hppa-softmmu.mak
+@@ -7,7 +7,6 @@ CONFIG_I8259=y
+ CONFIG_E1000_PCI=y
+ CONFIG_IDE_CMD646=y
+ # CONFIG_IDE_MMIO=y
+-CONFIG_SCSI=y
+ CONFIG_LSI_SCSI_PCI=y
+ CONFIG_VIRTIO_VGA=y
+ CONFIG_MC146818RTC=y
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index 90a2412..a7a8d4e 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -4,7 +4,6 @@ CONFIG_ISA_BUS=y
+ CONFIG_PCI=y
+ CONFIG_PCI_DEVICES=y
+ CONFIG_ESP=y
+-CONFIG_SCSI=y
+ CONFIG_VGA_ISA=y
+ CONFIG_VGA_ISA_MM=y
+ CONFIG_VGA_CIRRUS=y
+diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+index 59a4a3d..805c400 100644
+--- a/default-configs/sparc-softmmu.mak
++++ b/default-configs/sparc-softmmu.mak
+@@ -2,7 +2,6 @@
  
-     # semantic analysis -------------
+ CONFIG_ISA_BUS=y
+ CONFIG_ECC=y
+-CONFIG_SCSI=y
+ CONFIG_ESP=y
+ CONFIG_ESCC=y
+ CONFIG_M48T59=y
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+index 51599ed..82d0726 100644
+--- a/default-configs/virtio.mak
++++ b/default-configs/virtio.mak
+@@ -7,6 +7,5 @@ CONFIG_VIRTIO_GPU=y
+ CONFIG_VIRTIO_INPUT=y
+ CONFIG_VIRTIO_NET=y
+ CONFIG_VIRTIO_RNG=y
+-CONFIG_SCSI=y
+ CONFIG_VIRTIO_SCSI=y
+ CONFIG_VIRTIO_SERIAL=y
+diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
+index a7d25d3..b9cf269 100644
+--- a/hw/scsi/Kconfig
++++ b/hw/scsi/Kconfig
+@@ -5,24 +5,29 @@ config LSI_SCSI_PCI
+     bool
+     default y if PCI_DEVICES
+     depends on PCI
++    select SCSI
  
-@@ -53,29 +126,34 @@ class KconfigData:
-         if (var in self.defined_vars):
-             raise Exception('variable "' + var + '" defined twice')
+ config MPTSAS_SCSI_PCI
+     bool
+     default y if PCI_DEVICES
+     depends on PCI
++    select SCSI
  
--        self.defined_vars.add(var)
-+        self.defined_vars.add(var.name)
+ config MEGASAS_SCSI_PCI
+     bool
+     default y if PCI_DEVICES
+     depends on PCI
++    select SCSI
  
-     # var is a string with the variable's name.
--    #
--    # For now this just returns the variable's name itself.
-     def do_var(self, var):
--        self.referenced_vars.add(var)
--        return var
-+        if (var in self.referenced_vars):
-+            return self.referenced_vars[var]
-+
-+        var_obj = self.referenced_vars[var] = KconfigData.Var(var)
-+        return var_obj
+ config VMW_PVSCSI_SCSI_PCI
+     bool
+     default y if PCI_DEVICES
+     depends on PCI
++    select SCSI
  
-     def do_assignment(self, var, val):
--        pass
-+        self.clauses.append(KconfigData.AssignmentClause(var, val))
+ config ESP
+     bool
++    select SCSI
  
-     def do_default(self, var, val, cond=None):
--        pass
-+        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
+ config ESP_PCI
+     bool
+@@ -34,11 +39,14 @@ config SPAPR_VSCSI
+     bool
+     default y
+     depends on PSERIES
++    select SCSI
  
-     def do_depends_on(self, var, expr):
--        pass
-+        self.clauses.append(KconfigData.DependsOnClause(var, expr))
+ config VIRTIO_SCSI
+     bool
++    select SCSI
  
-     def do_select(self, var, symbol, cond=None):
--        pass
-+        cond = (cond & var) if cond is not None else var
-+        self.clauses.append(KconfigData.SelectClause(symbol, cond))
+ config VHOST_USER_SCSI
+     bool
+-    default y
++    # Only PCI devices are provided for now
++    default y if VIRTIO_PCI
+     depends on VHOST_USER && LINUX
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index 45167ba..54b36ed 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -6,7 +6,7 @@ common-obj-$(CONFIG_MEGASAS_SCSI_PCI) += megasas.o
+ common-obj-$(CONFIG_VMW_PVSCSI_SCSI_PCI) += vmw_pvscsi.o
+ common-obj-$(CONFIG_ESP) += esp.o
+ common-obj-$(CONFIG_ESP_PCI) += esp-pci.o
+-obj-$(CONFIG_PSERIES) += spapr_vscsi.o
++obj-$(CONFIG_SPAPR_VSCSI) += spapr_vscsi.o
  
-     def do_imply(self, var, symbol, cond=None):
--        pass
-+        # "config X imply Y [if COND]" is the same as
-+        # "config Y default y if X [&& COND]"
-+        cond = (cond & var) if cond is not None else var
-+        self.do_default(symbol, True, cond)
+ ifeq ($(CONFIG_VIRTIO_SCSI),y)
+ obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index e20670a..a1b7acb 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -52,11 +52,13 @@ config USB_STORAGE_BOT
+     bool
+     default y
+     depends on USB
++    select SCSI
  
- # -------------------------------------------
- # KconfigParser implements a recursive descent parser for (simplified)
-@@ -237,31 +315,34 @@ class KconfigParser:
-     def parse_primary(self):
-         if self.tok == TOK_NOT:
-             self.get_token()
--            self.parse_primary()
-+            val = ~self.parse_primary()
-         elif self.tok == TOK_LPAREN:
-             self.get_token()
--            self.parse_expr()
-+            val = self.parse_expr()
-             if self.tok != TOK_RPAREN:
-                 raise KconfigParserError(self, 'Expected ")"')
-             self.get_token()
-         elif self.tok == TOK_ID:
--            self.parse_var()
-+            val = self.parse_var()
-         else:
-             raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
-+        return val
+ config USB_STORAGE_UAS
+     bool
+     default y
+     depends on USB
++    select SCSI
  
-     # disj: primary (OR primary)*
-     def parse_disj(self):
--        self.parse_primary()
-+        lhs = self.parse_primary()
-         while self.tok == TOK_OR:
-             self.get_token()
--            self.parse_primary()
-+            lhs = lhs | self.parse_primary()
-+        return lhs
- 
-     # expr: disj (AND disj)*
-     def parse_expr(self):
--        self.parse_disj()
-+        lhs = self.parse_disj()
-         while self.tok == TOK_AND:
-             self.get_token()
--            self.parse_disj()
-+            lhs = lhs & self.parse_disj()
-+        return lhs
- 
-     # condition: IF expr
-     #       | empty
-@@ -438,4 +519,6 @@ class KconfigParser:
- 
- if __name__ == '__main__':
-     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
--    KconfigParser.parse(open(fname, 'r'))
-+    data = KconfigParser.parse(open(fname, 'r'))
-+    for i in data.clauses:
-+        print i
+ config USB_AUDIO
+     bool
 -- 
 1.8.3.1
