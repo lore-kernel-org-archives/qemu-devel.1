@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49816)
+Received: from eggs.gnu.org ([209.51.188.92]:49991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grlVH-00037k-Hx
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:22:17 -0500
+	(envelope-from <no-reply@patchew.org>) id 1grlW7-0003lU-Dh
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:23:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grlVG-0001ei-RB
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:22:15 -0500
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-	<20190207102445.71998-15-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4b0d316c-0113-9a0f-2d5b-bbd429eae7bb@redhat.com>
-Date: Thu, 7 Feb 2019 09:21:53 -0600
+	(envelope-from <no-reply@patchew.org>) id 1grlW6-00028H-E7
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:23:07 -0500
+Resent-Message-Id: <E1grlW6-00028H-E7@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21021)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1grlW6-00026i-61
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:23:06 -0500
+Message-ID: <154955295626.29184.11180095438459173218@ebba9967afc0>
+In-Reply-To: <mvmmun7y7m0.fsf@suse.de>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190207102445.71998-15-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uB5xZfZcYKK5boFa87iuVaZH79UHXtOqA"
-Subject: Re: [Qemu-devel] [PATCH v3 14/17] tests/test-bdrv-drain: use
- QEMU_IOVEC_INIT_BUF
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Feb 2019 07:22:37 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix emulation of
+ accept4/getpeername/getsockname/recvfrom syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+To: schwab@suse.de
+Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uB5xZfZcYKK5boFa87iuVaZH79UHXtOqA
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com,
- dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
- jsnow@redhat.com
-Message-ID: <4b0d316c-0113-9a0f-2d5b-bbd429eae7bb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 14/17] tests/test-bdrv-drain: use
- QEMU_IOVEC_INIT_BUF
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
- <20190207102445.71998-15-vsementsov@virtuozzo.com>
-In-Reply-To: <20190207102445.71998-15-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/7/19 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Use new QEMU_IOVEC_INIT_BUF() instead of
-> qemu_iovec_init_external( ... , 1), which simplifies the code.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/test-bdrv-drain.c | 29 ++++-------------------------
->  1 file changed, 4 insertions(+), 25 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---uB5xZfZcYKK5boFa87iuVaZH79UHXtOqA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcTRIACgkQp6FrSiUn
-Q2ortAf/XOKa1vx8XnUryBjOxPA/FbScwUMCzWIXmK9z/AZdB3SnWsv3Ux7GcWdc
-xfMA81VxEr1xuAvdF7/FtxCuNGE+ZlyFB4IdfZ+X8pwsdQhDh++AwxcPRPLNaPgS
-jjG1/EzJMy+rzZTR4ij+A4eL4s57ssX9qmeBYmVhFhl/GUegtc+TelmlMwSHQppV
-xUfMOAJA9w5cviVwZPmmJfhjoNfSmiBn/PT2Ytww6r0m81UIw0oP/8DX/W5Ga1so
-oTytJppJ8OqBIyJ2gaxUobOwLzUbR/COZF61VmrnmVIcmH4pkqqDNeLAcnrTF8KR
-VDKfD7o0ETbHMC4OdMDQrvK1lw0geg==
-=O0qA
------END PGP SIGNATURE-----
-
---uB5xZfZcYKK5boFa87iuVaZH79UHXtOqA--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9tdm1tdW43eTdtMC5mc2ZAc3Vz
+ZS5kZS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxl
+IHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gbGludXgtdXNlcjogZml4IGVtdWxhdGlvbiBvZiBhY2Nl
+cHQ0L2dldHBlZXJuYW1lL2dldHNvY2tuYW1lL3JlY3Zmcm9tIHN5c2NhbGxzClR5cGU6IHNlcmll
+cwpNZXNzYWdlLWlkOiBtdm1tdW43eTdtMC5mc2ZAc3VzZS5kZQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAgIDFkY2EwNTQ5NTUuLjYzMjM1MWUwZTEgIG1hc3RlciAgICAgLT4g
+bWFzdGVyCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMDcxMDI0NDUu
+NzE5OTgtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20gLT4gcGF0Y2hldy8yMDE5MDIwNzEwMjQ0
+NS43MTk5OC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3L212bW11bjd5N20wLmZzZkBzdXNlLmRlIC0+IHBhdGNoZXcvbXZtbXVuN3k3
+bTAuZnNmQHN1c2UuZGUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNzZkOGIyYzVk
+IGxpbnV4LXVzZXI6IGZpeCBlbXVsYXRpb24gb2YgYWNjZXB0NC9nZXRwZWVybmFtZS9nZXRzb2Nr
+bmFtZS9yZWN2ZnJvbSBzeXNjYWxscwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDE6IEZJ
+TEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjI4Nzc6CisgICAgICAgIGlmIChwdXRfdXNlcl91MzIo
+cmV0X2FkZHJsZW4sIHRhcmdldF9hZGRybGVuX2FkZHIpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
+fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjU6IEZJTEU6
+IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjI5MDc6CisgICAgICAgIGlmIChwdXRfdXNlcl91MzIocmV0
+X2FkZHJsZW4sIHRhcmdldF9hZGRybGVuX2FkZHIpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojODk6IEZJTEU6IGxp
+bnV4LXVzZXIvc3lzY2FsbC5jOjI5Mzc6CisgICAgICAgIGlmIChwdXRfdXNlcl91MzIocmV0X2Fk
+ZHJsZW4sIHRhcmdldF9hZGRybGVuX2FkZHIpKQpbLi4uXQoKdG90YWw6IDMgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA5OCBsaW5lcyBjaGVja2VkCgpDb21taXQgMjc2ZDhiMmM1ZDdiIChsaW51eC11c2Vy
+OiBmaXggZW11bGF0aW9uIG9mIGFjY2VwdDQvZ2V0cGVlcm5hbWUvZ2V0c29ja25hbWUvcmVjdmZy
+b20gc3lzY2FsbHMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL212bW11bjd5N20wLmZzZkBzdXNlLmRl
+L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
