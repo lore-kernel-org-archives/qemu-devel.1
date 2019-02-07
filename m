@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57710)
+Received: from eggs.gnu.org ([209.51.188.92]:57723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHq-0002RY-G7
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:24 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHs-0002Ri-A0
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHg-0001Cn-Ld
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHe-0001AW-KU
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:16 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:49846)
+Received: from hera.aquilenet.fr ([185.233.100.1]:41904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grkHg-0000yX-18
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:08 -0500
+	id 1grkHc-0000yy-Ga
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:04:05 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Feb 2019 16:03:01 +0200
-Message-Id: <20190207140316.16103-18-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:03:13 +0200
+Message-Id: <20190207140316.16103-30-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv4 17/32] slirp: improve windows headers inclusion
+Subject: [Qemu-devel] [PULLv4 29/32] slirp: remove slirp_instances list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +32,45 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Our API usage requires Vista, set WIN32_LEAN_AND_MEAN to fix a number
-of issues (winsock2.h include order for ex, which is better to include
-first for legacy reasons).
-
-While at it, group redundants #ifndef _WIN32 blocks.
+Now that polling is done per-instance, we don't need a global list of
+slirp instances.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.h | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ slirp/slirp.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 8d9d72ca9d..5a830ddcb8 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -3,10 +3,19 @@
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 3a8d1bc459..b37dd34382 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -48,9 +48,6 @@ static const uint8_t special_ethaddr[ETH_ALEN] =3D {
 =20
- #ifdef _WIN32
+ unsigned curtime;
 =20
-+/* as defined in sdkddkver.h */
-+#ifndef _WIN32_WINNT
-+#define _WIN32_WINNT 0x0600 /* Vista */
-+#endif
-+/* reduces the number of implicitly included headers */
-+#ifndef WIN32_LEAN_AND_MEAN
-+#define WIN32_LEAN_AND_MEAN
-+#endif
-+
- typedef char *caddr_t;
-=20
--# include <windows.h>
- # include <winsock2.h>
-+# include <windows.h>
- # include <ws2tcpip.h>
- # include <sys/timeb.h>
- # include <iphlpapi.h>
-@@ -19,19 +28,10 @@ typedef char *caddr_t;
-=20
+-static QTAILQ_HEAD(, Slirp) slirp_instances =3D
+-    QTAILQ_HEAD_INITIALIZER(slirp_instances);
+-
+ static struct in_addr dns_addr;
  #ifndef _WIN32
- #include <sys/uio.h>
--#endif
--
--#ifndef _WIN32
- #include <netinet/in.h>
- #include <arpa/inet.h>
--#endif
--
--#ifndef _WIN32
- #include <sys/socket.h>
--#endif
--
--#ifndef _WIN32
--# include <sys/ioctl.h>
-+#include <sys/ioctl.h>
+ static struct in6_addr dns6_addr;
+@@ -333,7 +330,6 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
+ruct in_addr vnetwork,
+ #ifdef WITH_QEMU
+     slirp_state_register(slirp);
  #endif
+-    QTAILQ_INSERT_TAIL(&slirp_instances, slirp, entry);
 =20
- #ifdef __APPLE__
+     return slirp;
+ }
+@@ -348,7 +344,6 @@ void slirp_cleanup(Slirp *slirp)
+         g_free(e);
+     }
+=20
+-    QTAILQ_REMOVE(&slirp_instances, slirp, entry);
+ #ifdef WITH_QEMU
+     slirp_state_unregister(slirp);
+ #endif
 --=20
 2.20.1
