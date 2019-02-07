@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57716)
+Received: from eggs.gnu.org ([209.51.188.92]:57723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwG-0002Kr-TV
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:17 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwI-0002Mu-PF
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwD-0002SF-52
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwD-0002ST-6t
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:14 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40346)
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52272)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnwC-0002RA-JY
+	id 1grnwC-0002RO-S3
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:13 -0500
-Received: by mail-wm1-x344.google.com with SMTP id q21so800837wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:10 -0800 (PST)
+Received: by mail-wm1-x342.google.com with SMTP id m1so822684wml.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:11 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:57:15 +0100
-Message-Id: <1549562254-41157-33-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:57:16 +0100
+Message-Id: <1549562254-41157-34-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 32/51] ppc: Express dependencies of the Mac
- machines with kconfig
+Subject: [Qemu-devel] [PATCH 33/51] ppc: Express dependencies of the
+ Sam460EX machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +29,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: thuth@redhat.com, philmd@redhat.com
 
 From: Thomas Huth <thuth@redhat.com>
 
-This will make it for example easier if the users want to disable
-one of the two machines for their builds.
+Most of the dependencies are now directly selected by the SAM460EX
+switch. We can drop CONFIG_VGA_CIRRUS since this device is already
+selected automatically when CONFIG_PCI_DEVICES is set.
 
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/ppc-softmmu.mak | 15 ---------------
- hw/misc/Kconfig                 |  6 ++++++
- hw/net/Kconfig                  |  1 +
- hw/pci-host/Kconfig             |  4 +++-
- hw/ppc/Kconfig                  | 15 +++++++++++++++
- 5 files changed, 25 insertions(+), 16 deletions(-)
+ default-configs/ppc-softmmu.mak |  8 --------
+ hw/display/Kconfig              |  1 +
+ hw/ppc/Kconfig                  | 11 +++++++++++
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 066cec9..caaff60 100644
+index caaff60..fb43cba 100644
 --- a/default-configs/ppc-softmmu.mak
 +++ b/default-configs/ppc-softmmu.mak
-@@ -35,21 +35,6 @@ CONFIG_VGA_CIRRUS=y
- CONFIG_SMBUS_EEPROM=y
+@@ -25,14 +25,6 @@ CONFIG_PCI_EXPRESS=y
+ 
+ # For Sam460ex
+ CONFIG_SAM460EX=y
+-CONFIG_USB_EHCI_SYSBUS=y
+-CONFIG_SM501=y
+-CONFIG_IDE_SII3112=y
+-CONFIG_AT24C=y
+-CONFIG_BITBANG_I2C=y
+-CONFIG_M41T80=y
+-CONFIG_VGA_CIRRUS=y
+-CONFIG_SMBUS_EEPROM=y
  
  # For Macs
--CONFIG_ESCC=y
--CONFIG_MACIO=y
--CONFIG_MACIO_GPIO=y
--CONFIG_SUNGEM=y
--CONFIG_MOS6522=y
--CONFIG_CUDA=y
--CONFIG_ADB=y
--CONFIG_MAC_NVRAM=y
--CONFIG_MAC_DBDMA=y
--CONFIG_MAC_PMU=y
--CONFIG_HEATHROW_PIC=y
--CONFIG_GRACKLE_PCI=y
--CONFIG_UNIN_PCI=y
--CONFIG_DEC_PCI=y
--CONFIG_IDE_MACIO=y
  CONFIG_MAC_OLDWORLD=y
- CONFIG_MAC_NEWWORLD=y
- 
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 74031cc..728c561 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -57,6 +57,12 @@ config MOS6522
- 
- config MACIO
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 0f659e9..69f8a7e 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -29,6 +29,7 @@ config SII9022
+ config SSD0303
      bool
-+    select CUDA
-+    select ESCC
-+    select IDE_MACIO
-+    select MAC_DBDMA
-+    select MAC_NVRAM
-+    select MOS6522
+     depends on I2C
++    select DDC
  
- config IVSHMEM_DEVICE
+ config SSD0323
      bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index dc69e55..1aa1071 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -86,6 +86,7 @@ config FTGMAC100
- 
- config SUNGEM
-     bool
-+    depends on PCI
- 
- config COLDFIRE
-     bool
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index ff4080c..b39ea29 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -10,8 +10,10 @@ config GRACKLE_PCI
-     bool
- 
- config UNIN_PCI
--    select PCI
-     bool
-+    select PCI
-+    select DEC_PCI
-+    select OPENPIC
- 
- config PPCE500_PCI
-     select PCI
 diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index 9cebf0f..fb77151 100644
+index fb77151..664fc31 100644
 --- a/hw/ppc/Kconfig
 +++ b/hw/ppc/Kconfig
-@@ -55,9 +55,24 @@ config RS6000_MC
+@@ -33,9 +33,20 @@ config PPC440
  
- config MAC_OLDWORLD
+ config PPC4XX
      bool
-+    imply PCI_DEVICES
-+    imply SUNGEM
-+    imply TEST_DEVICES
-+    select ADB
-+    select GRACKLE_PCI
-+    select HEATHROW_PIC
-+    select MACIO
++    select BITBANG_I2C
++    select PCI
  
- config MAC_NEWWORLD
+ config SAM460EX
      bool
-+    imply PCI_DEVICES
-+    imply SUNGEM
-+    imply TEST_DEVICES
-+    select ADB
-+    select MACIO
-+    select MACIO_GPIO
-+    select MAC_PMU
-+    select UNIN_PCI
++    select PFLASH_CFI01
++    select IDE_SII3112
++    select M41T80
++    select PPC440
++    select SERIAL
++    select SM501
++    select SMBUS_EEPROM
++    select USB_EHCI_SYSBUS
++    select USB_OHCI
  
- config E500
+ config PREP
      bool
 -- 
 1.8.3.1
