@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58167)
+Received: from eggs.gnu.org ([209.51.188.92]:58137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griFv-0007BQ-DS
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1griFt-0007AD-Bg
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griFu-0001Ov-5l
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:11 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38170)
+	(envelope-from <richard.henderson@linaro.org>) id 1griFs-0001Nk-6Q
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:09 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37562)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1griFt-0001OU-VL
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:10 -0500
-Received: by mail-wm1-x343.google.com with SMTP id v26so1308554wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:09 -0800 (PST)
+	id 1griFr-0001Mm-VK
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:08 -0500
+Received: by mail-wm1-x342.google.com with SMTP id g67so6357047wmd.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:07 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Feb 2019 11:53:45 +0000
-Message-Id: <20190207115400.647-5-richard.henderson@linaro.org>
+Date: Thu,  7 Feb 2019 11:53:43 +0000
+Message-Id: <20190207115400.647-3-richard.henderson@linaro.org>
 In-Reply-To: <20190207115400.647-1-richard.henderson@linaro.org>
 References: <20190207115400.647-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/19] target/hppa: Convert remainder of system
- insns
+Subject: [Qemu-devel] [PATCH 02/19] target/hppa: Begin using
+ scripts/decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,241 +30,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: deller@gmx.de, svens@stackframe.org
 
+Convert the BREAK instruction to start.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 99 ++++++++++++++++++----------------------
- target/hppa/insns.decode | 12 +++++
- 2 files changed, 56 insertions(+), 55 deletions(-)
+ target/hppa/translate.c   | 24 +++++++++++++++++++-----
+ target/hppa/Makefile.objs |  8 ++++++++
+ target/hppa/insns.decode  | 24 ++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+), 5 deletions(-)
+ create mode 100644 target/hppa/insns.decode
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 72cb7b477e..2ca0f5da10 100644
+index a4f253a022..f50ec7b9c2 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -278,6 +278,18 @@ typedef struct DisasContext {
+@@ -278,6 +278,9 @@ typedef struct DisasContext {
      bool psw_n_nonzero;
  } DisasContext;
  
-+/* Note that ssm/rsm instructions number PSW_W and PSW_E differently.  */
-+static int expand_sm_imm(int val)
-+{
-+    if (val & PSW_SM_E) {
-+        val = (val & ~PSW_SM_E) | PSW_E;
-+    }
-+    if (val & PSW_SM_W) {
-+        val = (val & ~PSW_SM_W) | PSW_W;
-+    }
-+    return val;
-+}
++/* Include the auto-generated decoder.  */
++#include "decode.inc.c"
 +
- /* Include the auto-generated decoder.  */
- #include "decode.inc.c"
+ /* We are not using a goto_tb (for whatever reason), but have updated
+    the iaq (for whatever reason), so don't do it again on exit.  */
+ #define DISAS_IAQ_N_UPDATED  DISAS_TARGET_0
+@@ -661,7 +664,8 @@ static void nullify_set(DisasContext *ctx, bool x)
+ }
  
-@@ -1996,7 +2008,7 @@ static bool trans_break(DisasContext *ctx, arg_break *a)
+ /* Mark the end of an instruction that may have been nullified.
+-   This is the pair to nullify_over.  */
++   This is the pair to nullify_over.  Always returns true so that
++   it may be tail-called from a translate function.  */
+ static bool nullify_end(DisasContext *ctx)
+ {
+     TCGLabel *null_lab = ctx->null_lab;
+@@ -745,12 +749,17 @@ static bool gen_illegal(DisasContext *ctx)
+     return gen_excp_iir(ctx, EXCP_ILL);
+ }
+ 
+-#define CHECK_MOST_PRIVILEGED(EXCP)          \
++#ifdef CONFIG_USER_ONLY
++#define CHECK_MOST_PRIVILEGED(EXCP) \
++    return gen_excp_iir(ctx, EXCP)
++#else
++#define CHECK_MOST_PRIVILEGED(EXCP) \
+     do {                                     \
+         if (ctx->privilege != 0) {           \
+             return gen_excp_iir(ctx, EXCP);  \
+         }                                    \
+     } while (0)
++#endif
+ 
+ static bool use_goto_tb(DisasContext *ctx, target_ureg dest)
+ {
+@@ -1982,7 +1991,7 @@ static bool trans_nop(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     return true;
+ }
+ 
+-static bool trans_break(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_break(DisasContext *ctx, arg_break *a)
+ {
      return gen_excp_iir(ctx, EXCP_BREAK);
  }
- 
--static bool trans_sync(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_sync(DisasContext *ctx, arg_sync *a)
- {
-     /* No point in nullifying the memory barrier.  */
-     tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
-@@ -2178,86 +2190,67 @@ static bool trans_mtsarcm(DisasContext *ctx, arg_mtsarcm *a)
-     return true;
- }
- 
--static bool trans_ldsid(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_ldsid(DisasContext *ctx, arg_ldsid *a)
- {
--    unsigned rt = extract32(insn, 0, 5);
--    TCGv_reg dest = dest_gpr(ctx, rt);
-+    TCGv_reg dest = dest_gpr(ctx, a->t);
- 
- #ifdef CONFIG_USER_ONLY
-     /* We don't implement space registers in user mode. */
-     tcg_gen_movi_reg(dest, 0);
- #else
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned sp = extract32(insn, 14, 2);
-     TCGv_i64 t0 = tcg_temp_new_i64();
- 
--    tcg_gen_mov_i64(t0, space_select(ctx, sp, load_gpr(ctx, rb)));
-+    tcg_gen_mov_i64(t0, space_select(ctx, a->sp, load_gpr(ctx, a->b)));
-     tcg_gen_shri_i64(t0, t0, 32);
-     tcg_gen_trunc_i64_reg(dest, t0);
- 
-     tcg_temp_free_i64(t0);
- #endif
--    save_gpr(ctx, rt, dest);
-+    save_gpr(ctx, a->t, dest);
- 
-     cond_free(&ctx->null_cond);
-     return true;
- }
- 
-+static bool trans_rsm(DisasContext *ctx, arg_rsm *a)
-+{
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
- #ifndef CONFIG_USER_ONLY
--/* Note that ssm/rsm instructions number PSW_W and PSW_E differently.  */
--static target_ureg extract_sm_imm(uint32_t insn)
--{
--    target_ureg val = extract32(insn, 16, 10);
--
--    if (val & PSW_SM_E) {
--        val = (val & ~PSW_SM_E) | PSW_E;
--    }
--    if (val & PSW_SM_W) {
--        val = (val & ~PSW_SM_W) | PSW_W;
--    }
--    return val;
--}
--
--static bool trans_rsm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
--{
--    unsigned rt = extract32(insn, 0, 5);
--    target_ureg sm = extract_sm_imm(insn);
-     TCGv_reg tmp;
- 
--    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-     nullify_over(ctx);
- 
-     tmp = get_temp(ctx);
-     tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, psw));
--    tcg_gen_andi_reg(tmp, tmp, ~sm);
-+    tcg_gen_andi_reg(tmp, tmp, ~a->i);
-     gen_helper_swap_system_mask(tmp, cpu_env, tmp);
--    save_gpr(ctx, rt, tmp);
-+    save_gpr(ctx, a->t, tmp);
- 
-     /* Exit the TB to recognize new interrupts, e.g. PSW_M.  */
-     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
-     return nullify_end(ctx);
-+#endif
- }
- 
--static bool trans_ssm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_ssm(DisasContext *ctx, arg_ssm *a)
- {
--    unsigned rt = extract32(insn, 0, 5);
--    target_ureg sm = extract_sm_imm(insn);
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     TCGv_reg tmp;
- 
--    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-     nullify_over(ctx);
- 
-     tmp = get_temp(ctx);
-     tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, psw));
--    tcg_gen_ori_reg(tmp, tmp, sm);
-+    tcg_gen_ori_reg(tmp, tmp, a->i);
-     gen_helper_swap_system_mask(tmp, cpu_env, tmp);
--    save_gpr(ctx, rt, tmp);
-+    save_gpr(ctx, a->t, tmp);
- 
-     /* Exit the TB to recognize new interrupts, e.g. PSW_I.  */
-     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
-     return nullify_end(ctx);
-+#endif
- }
--#endif /* !CONFIG_USER_ONLY */
- 
- static bool trans_mtsm(DisasContext *ctx, arg_mtsm *a)
- {
-@@ -2276,15 +2269,13 @@ static bool trans_mtsm(DisasContext *ctx, arg_mtsm *a)
- #endif
- }
- 
--#ifndef CONFIG_USER_ONLY
--static bool trans_rfi(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool do_rfi(DisasContext *ctx, bool rfi_r)
- {
--    unsigned comp = extract32(insn, 5, 4);
--
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     nullify_over(ctx);
- 
--    if (comp == 5) {
-+    if (rfi_r) {
-         gen_helper_rfi_r(cpu_env);
-     } else {
-         gen_helper_rfi(cpu_env);
-@@ -2298,8 +2289,20 @@ static bool trans_rfi(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-     ctx->base.is_jmp = DISAS_NORETURN;
- 
-     return nullify_end(ctx);
-+#endif
- }
- 
-+static bool trans_rfi(DisasContext *ctx, arg_rfi *a)
-+{
-+    return do_rfi(ctx, false);
-+}
-+
-+static bool trans_rfi_r(DisasContext *ctx, arg_rfi_r *a)
-+{
-+    return do_rfi(ctx, true);
-+}
-+
-+#ifndef CONFIG_USER_ONLY
- static bool gen_hlt(DisasContext *ctx, int reset)
- {
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-@@ -2314,17 +2317,6 @@ static bool gen_hlt(DisasContext *ctx, int reset)
- }
+@@ -2308,7 +2317,6 @@ static bool gen_hlt(DisasContext *ctx, int reset)
  #endif /* !CONFIG_USER_ONLY */
  
--static const DisasInsn table_system[] = {
--    { 0x00000400u, 0xffffffffu, trans_sync },  /* sync */
--    { 0x00100400u, 0xffffffffu, trans_sync },  /* syncdma */
--    { 0x000010a0u, 0xfc1f3fe0u, trans_ldsid },
--#ifndef CONFIG_USER_ONLY
--    { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
--    { 0x00000d60u, 0xfc00ffe0u, trans_ssm },
--    { 0x00000c00u, 0xfffffe1fu, trans_rfi },
--#endif
--};
--
- static bool trans_base_idx_mod(DisasContext *ctx, uint32_t insn,
-                                const DisasInsn *di)
+ static const DisasInsn table_system[] = {
+-    { 0x00000000u, 0xfc001fe0u, trans_break },
+     { 0x00001820u, 0xffe01fffu, trans_mtsp },
+     { 0x00001840u, 0xfc00ffffu, trans_mtctl },
+     { 0x016018c0u, 0xffe0ffffu, trans_mtsarcm },
+@@ -4534,8 +4542,14 @@ static void translate_table_int(DisasContext *ctx, uint32_t insn,
+ 
+ static void translate_one(DisasContext *ctx, uint32_t insn)
  {
-@@ -4542,9 +4534,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+-    uint32_t opc = extract32(insn, 26, 6);
++    uint32_t opc;
  
-     opc = extract32(insn, 26, 6);
++    /* Transition to the auto-generated decoder.  */
++    if (decode(ctx, insn)) {
++        return;
++    }
++
++    opc = extract32(insn, 26, 6);
      switch (opc) {
--    case 0x00: /* system op */
--        translate_table(ctx, insn, table_system);
--        return;
-     case 0x01:
-         translate_table(ctx, insn, table_mem_mgmt);
-         return;
+     case 0x00: /* system op */
+         translate_table(ctx, insn, table_system);
+diff --git a/target/hppa/Makefile.objs b/target/hppa/Makefile.objs
+index 3359da5341..174f50a96c 100644
+--- a/target/hppa/Makefile.objs
++++ b/target/hppa/Makefile.objs
+@@ -1,3 +1,11 @@
+ obj-y += translate.o helper.o cpu.o op_helper.o gdbstub.o mem_helper.o
+ obj-y += int_helper.o
+ obj-$(CONFIG_SOFTMMU) += machine.o
++
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++
++target/hppa/decode.inc.c: $(SRC_PATH)/target/hppa/insns.decode $(DECODETREE)
++	$(call quiet-command,\
++	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
++
++target/hppa/translate.o: target/hppa/decode.inc.c
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index 047a9d01ec..16ea5e1b46 100644
---- a/target/hppa/insns.decode
+new file mode 100644
+index 0000000000..2822fbc58b
+--- /dev/null
 +++ b/target/hppa/insns.decode
-@@ -23,6 +23,8 @@
- 
- %assemble_sr3   13:1 14:2
- 
-+%sm_imm         16:10 !function=expand_sm_imm
+@@ -0,0 +1,24 @@
++#
++# HPPA instruction decode definitions.
++#
++# Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licenses/>.
++#
 +
- ####
- # System
- ####
-@@ -37,3 +39,13 @@ mtsm            000000 00000 r:5   000 11000011 00000
- mfia            000000 ----- 00000 ---   10100101 t:5
- mfsp            000000 ----- 00000 ...   00100101 t:5   sp=%assemble_sr3
- mfctl           000000 r:5   00000- e:1 -01000101 t:5
++####
++# System
++####
 +
-+sync            000000 ----- ----- 000 00100000 00000   # sync, syncdma
-+
-+ldsid           000000 b:5   ----- sp:2 0 10000101 t:5
-+
-+rsm             000000 ..........  000 01110011 t:5     i=%sm_imm
-+ssm             000000 ..........  000 01101011 t:5     i=%sm_imm
-+
-+rfi             000000 ----- ----- --- 01100000 00000
-+rfi_r           000000 ----- ----- --- 01100101 00000
++break           000000 ----- ----- --- 00000000 -----
 -- 
 2.17.2
