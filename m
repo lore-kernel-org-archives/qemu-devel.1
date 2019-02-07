@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33705)
+Received: from eggs.gnu.org ([209.51.188.92]:37230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <neil@tembosocial.com>) id 1grsWZ-0005b2-96
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:52:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1grsrZ-0000ts-RS
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 18:13:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <neil@tembosocial.com>) id 1grsWY-0000TS-8R
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:52:03 -0500
-Received: from 206-248-184-9.dsl.teksavvy.com ([206.248.184.9]:39526
-	helo=puppet.polldev.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <neil@tembosocial.com>)
-	id 1grsWY-0000T8-17
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:52:02 -0500
-From: Neil Skrypuch <neil@tembosocial.com>
-Date: Thu, 07 Feb 2019 17:33:25 -0500
-Message-ID: <2932080.UxbmD43V0u@neil>
+	(envelope-from <dgibson@ozlabs.org>) id 1grsrT-0001Gd-8V
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 18:13:42 -0500
+Date: Fri, 8 Feb 2019 10:06:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190207230647.GC518@umbus.fritz.box>
+References: <154956051753.218871.1505640778712413716.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Qemu-devel] [regression] Clock jump on VM migration
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="YD3LsXFS42OYHhNZ"
+Content-Disposition: inline
+In-Reply-To: <154956051753.218871.1505640778712413716.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr_pci: Fix interrupt leak in
+ rtas_ibm_change_msi() error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-stable@nongnu.org
 
-We (ab)use migration + block mirroring to perform transparent zero downtime VM 
-backups. Basically:
 
-1) do a block mirror of the source VM's disk
-2) migrate the source VM to a destination VM using the disk copy
-3) cancel the block mirroring
-4) resume the source VM
-5) shut down the destination VM gracefully and move the disk to backup
+--YD3LsXFS42OYHhNZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Note that both source and destination VMs are running on the same host and 
-same disk array.
+On Thu, Feb 07, 2019 at 06:28:37PM +0100, Greg Kurz wrote:
+> Now that IRQ allocation has been split in two (first allocate IRQ numbers,
+> then claim them), if the claiming fails, we must release the IRQs.
+>=20
+> Fixes: 4fe75a8ccd80 "spapr: split the IRQ allocation sequence"
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Relatively recently, the source VM's clock started jumping after step #4. The 
-specific amount of clock jump is generally around 1s, but sometimes as much as 
-2-3s. I was able to bisect this down to the following QEMU change:
+Applied to ppc-for-4.0, thanks.
 
-commit dd577a26ff03b6829721b1ffbbf9e7c411b72378
-Author: Stefan Hajnoczi <stefanha@redhat.com>
-Date:   Fri Apr 27 17:23:11 2018 +0100
+> ---
+>  hw/ppc/spapr_pci.c |    6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 41d81f4a8500..6fe3c10c8d4c 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -393,6 +393,12 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+>      for (i =3D 0; i < req_num; i++) {
+>          spapr_irq_claim(spapr, irq + i, false, &err);
+>          if (err) {
+> +            if (i) {
+> +                spapr_irq_free(spapr, irq, i + 1);
+> +            }
+> +            if (!smc->legacy_irq_allocation) {
+> +                spapr_irq_msi_free(spapr, irq, req_num);
+> +            }
+>              error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+>                                config_addr);
+>              rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+>=20
 
-    block/file-posix: implement bdrv_co_invalidate_cache() on Linux
-    
-    On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
-    this to drop page cache on the destination host during shared storage
-    migration.  This way the destination host will read the latest copy of
-    the data and will not use stale data from the page cache.
-    
-    The flow is as follows:
-    
-    1. Source host writes out all dirty pages and inactivates drives.
-    2. QEMU_VM_EOF is sent on migration stream.
-    3. Destination host invalidates caches before accessing drives.
-    
-    This patch enables live migration even with -drive cache.direct=off.
-    
-    * Terms and conditions may apply, please see patch for details.
-    
-    Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-    Reviewed-by: Fam Zheng <famz@redhat.com>
-    Message-id: 20180427162312.18583-2-stefanha@redhat.com
-    Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-That patch went in for QEMU 3.0.0, and I can confirm this issue affects both 
-3.1.0 and 3.0.0, but not 2.12.0. Most testing has been done on kernel 4.20.5, 
-but I also confirmed the issue with 4.13.0.
+--YD3LsXFS42OYHhNZ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Reproducing this issue is easy, it happens 100% of the time with a CentOS 7 
-guest (other guests not tested), NTP will notice the clock jump quite soon 
-after migration.
+-----BEGIN PGP SIGNATURE-----
 
-We are seeing this issue across our entire fleet of VMs, but the specific VM 
-I've been testing with has a 20G disk and 1.5G of RAM.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxcugUACgkQbDjKyiDZ
+s5JKzg/+I0+yTf/J5XLrVUZRVQcGQ6DqPNN+znQqWROCMkaHVG1nlhNOgbxEkVbL
+W28CxB9kC4DjvVnqy+3S+y+xeSMlwkrXz7vxhlwsbRzQRmm5otqB9UKyOzTwobw1
+LiXErM2Opp6tky6nGosW9D6zgz5M0rOAj+ojbU5XsnAVDkaBeyxVWfUpggLYCEaI
+RzuM/JMz0DFeDzE7E9JfFbFrBhNPfS6ob9/U5JcBXHN3+WgGlf/xDeh4MwDJx8SR
+c2pGt5nxf2KB062mow1yJ/Ju2ykN2QwXACNDKejl20SEldy1xPABfNb58hVU7okc
+q7Ojynmq92L9rru/dlCNdrj0uFMc/bu0vLek1kSm69+cFjXoZLuqfq3gOGdJCxQz
+46+JhbV4G2o4Hau66kPde0yIvvWILXpAgRPKDIKqp5SBKZsmSBiuGpdytg2LkoFs
+MFPGm3eQLgicCj7kjWC173ad014sqj3+MQrvDV5ae4fGgxrx0N9eqeI7T+ewUAkD
+GkA+QmTKGQ2EGGx+CAJsHgqyhbquDPQPs6rqPBof4Y5F+mIIkxqvreBwSTXAXGoX
+B8n9DnNVJzV+CsF6/hS50FS7Z4hN9J5m4vtJw5Dq2Kfr/A0oPn0w7JUc6VhThBEU
+RIi+U5znqZETw+ysN28HykuT7fUEmPhvA/mRaGUDE7YoKPwIXQA=
+=uKxo
+-----END PGP SIGNATURE-----
 
-To further debug this issue, I made the following changes:
-
-diff --git a/block/file-posix.c b/block/file-posix.c                                                                                                                           
-index 07bbdab953..4724b543df 100644                                                                                                                                            
---- a/block/file-posix.c                                                                                                                                                       
-+++ b/block/file-posix.c                                                                                                                                                       
-@@ -2570,6 +2570,7 @@ static void coroutine_fn 
-raw_co_invalidate_cache(BlockDriverState *bs,                                                                                   
- {                                                                                                                                                                             
-     BDRVRawState *s = bs->opaque;                                                                                                                                             
-     int ret;                                                                                                                                                                  
-+    struct timeval t;                                                                                                                                                         
-                                                                                                                                                                               
-     ret = fd_open(bs);                                                                                                                                                        
-     if (ret < 0) {                                                                                                                                                            
-@@ -2581,6 +2582,8 @@ static void coroutine_fn 
-raw_co_invalidate_cache(BlockDriverState *bs,                                                                                   
-         return; /* No host kernel page cache */                                                                                                                               
-     }                                                                                                                                                                         
-                                                                                                                                                                               
-+    gettimeofday(&t, NULL);                                                                                                                                                   
-+    printf("before: %d.%d\n", (int) t.tv_sec, (int) t.tv_usec);                                                                                                               
- #if defined(__linux__)                                                                                                                                                        
-     /* This sets the scene for the next syscall... */                                                                                                                         
-     ret = bdrv_co_flush(bs);                                                                                                                                                  
-@@ -2610,6 +2613,8 @@ static void coroutine_fn 
-raw_co_invalidate_cache(BlockDriverState *bs,                                                                                   
-      * configurations that should not cause errors.                                                                                                                           
-      */                                                                                                                                                                       
- #endif /* !__linux__ */                                                                                                                                                       
-+    gettimeofday(&t, NULL);                                                                                                                                                   
-+    printf("after: %d.%d\n", (int) t.tv_sec, (int) t.tv_usec);                                                                                                                
- }                                                                                                                                                                             
-                                                                                                                                                                               
- static coroutine_fn int
-
-In two separate runs, they produced the following:
-
-before: 1549567702.412048
-after: 1549567703.295500
--> clock jump: 949ms
-
-before: 1549576767.707454
-after: 1549576768.584981
--> clock jump: 941ms
-
-The clock jump numbers above are from NTP, but you can see that they are quite 
-close to the amount of time spent in raw_co_invalidate_cache. So, it looks 
-like flushing the cache is just taking a long time and stalling the guest, 
-which causes the clock jump. This isn't too surprising as the entire disk 
-image was just written as part of the block mirror and would likely still be 
-in the cache.
-
-I see the use case for this feature, but I don't think it applies here, as 
-we're not technically using shared storage. I believe an option to toggle this 
-behaviour on/off and/or some sort of heuristic to guess whether or not it 
-should be enabled by default would be in order here.
-
-- Neil
+--YD3LsXFS42OYHhNZ--
