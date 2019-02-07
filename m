@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47241)
+Received: from eggs.gnu.org ([209.51.188.92]:47240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grjV0-00033D-7A
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:50 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grjV0-00033C-9G
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grjUx-0006QC-O0
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:50 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:45239)
+	(envelope-from <laurent@vivier.eu>) id 1grjUx-0006Q7-Nk
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:49 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:58959)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grjUx-0006Du-Dw
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grjUx-0006Fv-DL
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:47 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  7 Feb 2019 14:13:16 +0100
-Message-Id: <20190207131316.2957-4-laurent@vivier.eu>
+Date: Thu,  7 Feb 2019 14:13:15 +0100
+Message-Id: <20190207131316.2957-3-laurent@vivier.eu>
 In-Reply-To: <20190207131316.2957-1-laurent@vivier.eu>
 References: <20190207131316.2957-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 3/3] linux-user: add new netlink types
+Subject: [Qemu-devel] [PULL v2 2/3] linux-user: Check sscanf return value in
+ open_net_route()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +28,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 
-Add QEMU_IFLA_MIN_MTU, QEMU_IFLA_MAX_MTU (from linux v4.19)
-    QEMU_IFLA_BRPORT_ISOLATED (from linux v4.18) and
-    QEMU_IFLA_BRPORT_BACKUP_PORT (from linux v4.19).
+From: Peter Maydell <peter.maydell@linaro.org>
 
-These new types fix this error flow with sudo:
-...
-Unknown host QEMU_IFLA type: 50
-Unknown host QEMU_IFLA type: 51
-Unknown QEMU_IFLA_BRPORT type 33
-...
+Coverity warns (CID 1390634) that open_net_route() is not
+checking the return value from sscanf(), which means that
+it might then use values that aren't initialized.
 
+Errors here should in general not happen since we're passing
+an assumed-good /proc/net/route from the host kernel, but
+if we do fail to parse a line then just skip it in the output
+we pass to the guest.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20190205174207.9278-1-peter.maydell@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20190206193211.6683-1-laurent@vivier.eu>
 ---
- linux-user/fd-trans.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ linux-user/syscall.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
-index 216b9f0614..30425c9df6 100644
---- a/linux-user/fd-trans.c
-+++ b/linux-user/fd-trans.c
-@@ -129,6 +129,8 @@ enum {
-     QEMU_IFLA_CARRIER_UP_COUNT,
-     QEMU_IFLA_CARRIER_DOWN_COUNT,
-     QEMU_IFLA_NEW_IFINDEX,
-+    QEMU_IFLA_MIN_MTU,
-+    QEMU_IFLA_MAX_MTU,
-     QEMU___IFLA_MAX
- };
- 
-@@ -166,6 +168,8 @@ enum {
-     QEMU_IFLA_BRPORT_BCAST_FLOOD,
-     QEMU_IFLA_BRPORT_GROUP_FWD_MASK,
-     QEMU_IFLA_BRPORT_NEIGH_SUPPRESS,
-+    QEMU_IFLA_BRPORT_ISOLATED,
-+    QEMU_IFLA_BRPORT_BACKUP_PORT,
-     QEMU___IFLA_BRPORT_MAX
- };
- 
-@@ -510,6 +514,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-     case QEMU_IFLA_BRPORT_VLAN_TUNNEL:
-     case QEMU_IFLA_BRPORT_BCAST_FLOOD:
-     case QEMU_IFLA_BRPORT_NEIGH_SUPPRESS:
-+    case QEMU_IFLA_BRPORT_ISOLATED:
-         break;
-     /* uint16_t */
-     case QEMU_IFLA_BRPORT_PRIORITY:
-@@ -523,6 +528,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-         break;
-     /* uin32_t */
-     case QEMU_IFLA_BRPORT_COST:
-+    case QEMU_IFLA_BRPORT_BACKUP_PORT:
-         u32 = NLA_DATA(nlattr);
-         *u32 = tswap32(*u32);
-         break;
-@@ -787,6 +793,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
-     case QEMU_IFLA_GSO_MAX_SIZE:
-     case QEMU_IFLA_CARRIER_UP_COUNT:
-     case QEMU_IFLA_CARRIER_DOWN_COUNT:
-+    case QEMU_IFLA_MIN_MTU:
-+    case QEMU_IFLA_MAX_MTU:
-         u32 = RTA_DATA(rtattr);
-         *u32 = tswap32(*u32);
-         break;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 08acc4d860..5bbb72f3d5 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6768,9 +6768,15 @@ static int open_net_route(void *cpu_env, int fd)
+         char iface[16];
+         uint32_t dest, gw, mask;
+         unsigned int flags, refcnt, use, metric, mtu, window, irtt;
+-        sscanf(line, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
+-                     iface, &dest, &gw, &flags, &refcnt, &use, &metric,
+-                     &mask, &mtu, &window, &irtt);
++        int fields;
++
++        fields = sscanf(line,
++                        "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
++                        iface, &dest, &gw, &flags, &refcnt, &use, &metric,
++                        &mask, &mtu, &window, &irtt);
++        if (fields != 11) {
++            continue;
++        }
+         dprintf(fd, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
+                 iface, tswap32(dest), tswap32(gw), flags, refcnt, use,
+                 metric, tswap32(mask), mtu, window, irtt);
 -- 
 2.20.1
