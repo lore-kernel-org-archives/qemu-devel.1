@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42102)
+Received: from eggs.gnu.org ([209.51.188.92]:48185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1grqiB-0002iW-5S
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:55:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1grrIt-0000Z0-QA
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:33:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1grqiA-0005GU-8G
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:55:55 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46278)
+	(envelope-from <philmd@redhat.com>) id 1grrIr-0006Cl-S4
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:33:51 -0500
+Received: from mail-wm1-f52.google.com ([209.85.128.52]:50876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1grqi9-0005ES-WA
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 15:55:54 -0500
-Received: by mail-wr1-x442.google.com with SMTP id l9so1294405wrt.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 12:55:53 -0800 (PST)
-References: <20190130004811.27372-1-cota@braap.org>
-	<20190130004811.27372-39-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190130004811.27372-39-cota@braap.org>
-Date: Thu, 07 Feb 2019 20:55:50 +0000
-Message-ID: <87h8dfmi7d.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grrIq-00069S-2G
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:33:49 -0500
+Received: by mail-wm1-f52.google.com with SMTP id z5so1427737wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 13:33:43 -0800 (PST)
+References: <20190207193605.25676-1-crosa@redhat.com>
+	<20190207193605.25676-2-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bfda8184-db4e-ac05-2054-cb33fc45f1bb@redhat.com>
+Date: Thu, 7 Feb 2019 22:33:40 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190207193605.25676-2-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 38/73] arm: convert to
- cpu_interrupt_request
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] configure: remove handling of "wav"
+ audio driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>
 
+On 2/7/19 8:36 PM, Cleber Rosa wrote:
+> This looks like a leftover that was never implemented.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  configure | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index fbd0825488..ff55e2273e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3350,10 +3350,6 @@ for drv in $audio_drv_list; do
+>        oss_libs="$oss_lib"
+>      ;;
+>  
+> -    wav)
+> -    # XXX: Probes for CoreAudio, DirectSound
+> -    ;;
+> -
+>      *)
+>      echo "$audio_possible_drivers" | grep -q "\<$drv\>" || {
+>          error_exit "Unknown driver '$drv' selected" \
+> 
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-<snip>
->
-> -    /* Hooks may change global state so BQL should be held, also the
-> -     * BQL needs to be held for any modification of
-> -     * cs->interrupt_request.
-> -     */
-> +    /* Hooks may change global state so BQL should be held */
->      g_assert(qemu_mutex_iothread_locked());
->
->      arm_call_pre_el_change_hook(cpu);
-
-So I dug into this and currently the only user is pmu_pre_el_change
-which updates a bunch of the performance counters. While profiling the
-system running the other thing that showed up was:
-
-  void HELPER(set_cp_reg)(CPUARMState *env, void *rip, uint32_t value)
-  {
-      const ARMCPRegInfo *ri =3D rip;
-
-      if (ri->type & ARM_CP_IO) {
-          qemu_mutex_lock_iothread();
-          ri->writefn(env, ri, value);
-          qemu_mutex_unlock_iothread();
-      } else {
-          ri->writefn(env, ri, value);
-      }
-  }
-
-And friends. I'm wondering now if these are candidates for using CPU
-locks. We mention it in out docs (which might be a little out of date now):
-
-  MMIO access automatically serialises hardware emulation by way of the
-  BQL. Currently ARM targets serialise all ARM_CP_IO register accesses
-  and also defer the reset/startup of vCPUs to the vCPU context by way
-  of async_run_on_cpu().
-
-for registers that affect things like the GIC that can have cross-vCPU
-effects I suspect the race free IRQ raising might be enough. Are we over
-locking if only a vCPU can read/write it's own CP regs?
-
-Peter any thoughts?
-
-Anyway as far as this patch goes:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
