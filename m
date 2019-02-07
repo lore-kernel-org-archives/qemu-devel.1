@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57258)
+Received: from eggs.gnu.org ([209.51.188.92]:57388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHJ-0001wr-V9
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:53 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHS-00024a-CF
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHC-0000qa-7h
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:43 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:41586)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grkHP-0000xv-TL
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:53 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:41878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1grkGy-0000m0-Es
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:27 -0500
+	id 1grkHN-0000uQ-M4
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:03:51 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu,  7 Feb 2019 16:02:47 +0200
-Message-Id: <20190207140316.16103-4-samuel.thibault@ens-lyon.org>
+Date: Thu,  7 Feb 2019 16:02:57 +0200
+Message-Id: <20190207140316.16103-14-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 References: <20190207140316.16103-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv4 03/32] slirp: Don't mark struct ipq or struct
- ipasfrag as packed
+Subject: [Qemu-devel] [PULLv4 13/32] slirp: add unregister_poll_fd() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: stefanha@redhat.com, jan.kiszka@siemens.com, Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-There is no reason to mark the struct ipq and struct ipasfrag as
-packed: they are naturally aligned anyway, and are not representing
-any on-the-wire packet format.  Indeed they vary in size depending on
-the size of pointers on the host system, because the 'struct qlink'
-members include 'void *' fields.
+Add a counter-part to register_poll_fd() for completeness.
 
-Dropping the 'packed' annotation fixes clang -Waddress-of-packed-member
-warnings and probably lets the compiler generate better code too.
+(so far, register_poll_fd() is called only on struct socket fd)
 
-The only thing we do care about in the layout of the struct is
-that the frag_link matches up with the ipf_link of the struct
-ipasfrag, as documented in the comment on that struct; assert
-at build time that this is the case.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/slirp.c      | 6 ++++++
+ slirp/ip_icmp.c  | 1 +
+ slirp/libslirp.h | 2 ++
+ slirp/slirp.c    | 3 ++-
+ slirp/tcp_subr.c | 2 ++
+ slirp/udp.c      | 1 +
+ 6 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/slirp/ip.h b/slirp/ip.h
-index 243b6c8b24..20614f3b53 100644
---- a/slirp/ip.h
-+++ b/slirp/ip.h
-@@ -217,7 +217,7 @@ struct ipq {
- 	uint8_t	ipq_p;			/* protocol of this fragment */
- 	uint16_t	ipq_id;			/* sequence id for reassembly */
- 	struct	in_addr ipq_src,ipq_dst;
--} QEMU_PACKED;
-+};
+diff --git a/net/slirp.c b/net/slirp.c
+index 6f756a4dcc..78ba96b63f 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -191,6 +191,11 @@ static void net_slirp_register_poll_fd(int fd)
+     qemu_fd_register(fd);
+ }
 =20
- /*
-  * Ip header, when holding a fragment.
-@@ -227,7 +227,10 @@ struct ipq {
- struct	ipasfrag {
- 	struct qlink ipf_link;
- 	struct ip ipf_ip;
--} QEMU_PACKED;
-+};
++static void net_slirp_unregister_poll_fd(int fd)
++{
++    /* no qemu_fd_unregister */
++}
 +
-+QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
-+                  offsetof(struct ipasfrag, ipf_link));
+ static const SlirpCb slirp_cb =3D {
+     .output =3D net_slirp_output,
+     .guest_error =3D net_slirp_guest_error,
+@@ -199,6 +204,7 @@ static const SlirpCb slirp_cb =3D {
+     .timer_free =3D net_slirp_timer_free,
+     .timer_mod =3D net_slirp_timer_mod,
+     .register_poll_fd =3D net_slirp_register_poll_fd,
++    .unregister_poll_fd =3D net_slirp_unregister_poll_fd,
+ };
 =20
- #define ipf_off      ipf_ip.ip_off
- #define ipf_tos      ipf_ip.ip_tos
+ static int net_slirp_init(NetClientState *peer, const char *model,
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index b59daa801d..19e247f773 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -114,6 +114,7 @@ static int icmp_send(struct socket *so, struct mbuf *=
+m, int hlen)
+=20
+ void icmp_detach(struct socket *so)
+ {
++    so->slirp->cb->unregister_poll_fd(so->s);
+     slirp_closesocket(so->s);
+     sofree(so);
+ }
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 70e99139bf..8ce69f0be3 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -29,6 +29,8 @@ typedef struct SlirpCb {
+     void (*timer_mod)(void *timer, int64_t expire_time);
+     /* Register a fd for future polling */
+     void (*register_poll_fd)(int fd);
++    /* Unregister a fd */
++    void (*unregister_poll_fd)(int fd);
+ } SlirpCb;
+=20
+=20
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 12677e5da7..f0bd59fd6f 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -1015,7 +1015,8 @@ int slirp_remove_hostfwd(Slirp *slirp, int is_udp, =
+struct in_addr host_addr,
+             getsockname(so->s, (struct sockaddr *)&addr, &addr_len) =3D=3D=
+ 0 &&
+             addr.sin_addr.s_addr =3D=3D host_addr.s_addr &&
+             addr.sin_port =3D=3D port) {
+-            close(so->s);
++            so->slirp->cb->unregister_poll_fd(so->s);
++            slirp_closesocket(so->s);
+             sofree(so);
+             return 0;
+         }
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 8087ffc047..d8846a33b0 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -337,6 +337,7 @@ tcp_close(struct tcpcb *tp)
+ 	/* clobber input socket cache if we're closing the cached connection */
+ 	if (so =3D=3D slirp->tcp_last_so)
+ 		slirp->tcp_last_so =3D &slirp->tcb;
++	so->slirp->cb->unregister_poll_fd(so->s);
+ 	slirp_closesocket(so->s);
+ 	sbfree(&so->so_rcv);
+ 	sbfree(&so->so_snd);
+@@ -498,6 +499,7 @@ void tcp_connect(struct socket *inso)
+     /* Close the accept() socket, set right state */
+     if (inso->so_state & SS_FACCEPTONCE) {
+         /* If we only accept once, close the accept() socket */
++        so->slirp->cb->unregister_poll_fd(so->s);
+         slirp_closesocket(so->s);
+=20
+         /* Don't select it yet, even though we have an FD */
+diff --git a/slirp/udp.c b/slirp/udp.c
+index 6c3fb9a29f..3915971b50 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -292,6 +292,7 @@ udp_attach(struct socket *so, unsigned short af)
+ void
+ udp_detach(struct socket *so)
+ {
++	so->slirp->cb->unregister_poll_fd(so->s);
+ 	slirp_closesocket(so->s);
+ 	sofree(so);
+ }
 --=20
 2.20.1
