@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43790)
+Received: from eggs.gnu.org ([209.51.188.92]:43744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grhJr-0004eu-OJ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:12 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grhJq-0008AY-HZ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:11 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:45071)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grhJq-00089K-7m
+	(envelope-from <laurent@vivier.eu>) id 1grhJp-0004e6-J5
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:10 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1grhJn-00088C-E0
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:09 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:53275)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grhJj-000856-Iv
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:05 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  7 Feb 2019 11:53:45 +0100
-Message-Id: <20190207105347.22337-2-laurent@vivier.eu>
-In-Reply-To: <20190207105347.22337-1-laurent@vivier.eu>
-References: <20190207105347.22337-1-laurent@vivier.eu>
+Date: Thu,  7 Feb 2019 11:53:44 +0100
+Message-Id: <20190207105347.22337-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/3] Fix linux-user crashes in
- ioctl(SIOCGIFCONF) when ifc_buf is NULL.
+Subject: [Qemu-devel] [PULL 0/3] Linux user for 4.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +25,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Kan Li <likan_999.student@sina.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-From: Kan Li <likan_999.student@sina.com>
+The following changes since commit 47994e16b1d66411953623e7c0bf0cdcd50bd507:
 
-Summary:
-This is to fix bug https://bugs.launchpad.net/qemu/+bug/1796754.
-It is valid for ifc_buf to be NULL according to
-http://man7.org/linux/man-pages/man7/netdevice.7.html.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190205' into staging (2019-02-05 18:25:07 +0000)
 
-Signed-off-by: Kan Li <likan_999.student@sina.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20181024201303.114-1-likan_999.student@sina.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 55 ++++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 25 deletions(-)
+are available in the Git repository at:
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index bf076cbf8c..5b9d75fbb4 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -4187,28 +4187,32 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
-     unlock_user(argptr, arg, 0);
- 
-     host_ifconf = (struct ifconf *)(unsigned long)buf_temp;
--    target_ifc_len = host_ifconf->ifc_len;
-     target_ifc_buf = (abi_long)(unsigned long)host_ifconf->ifc_buf;
--
-     target_ifreq_size = thunk_type_size(ifreq_arg_type, 0);
--    nb_ifreq = target_ifc_len / target_ifreq_size;
--    host_ifc_len = nb_ifreq * sizeof(struct ifreq);
- 
--    outbufsz = sizeof(*host_ifconf) + host_ifc_len;
--    if (outbufsz > MAX_STRUCT_SIZE) {
--        /* We can't fit all the extents into the fixed size buffer.
--         * Allocate one that is large enough and use it instead.
--         */
--        host_ifconf = malloc(outbufsz);
--        if (!host_ifconf) {
--            return -TARGET_ENOMEM;
-+    if (target_ifc_buf != 0) {
-+        target_ifc_len = host_ifconf->ifc_len;
-+        nb_ifreq = target_ifc_len / target_ifreq_size;
-+        host_ifc_len = nb_ifreq * sizeof(struct ifreq);
-+
-+        outbufsz = sizeof(*host_ifconf) + host_ifc_len;
-+        if (outbufsz > MAX_STRUCT_SIZE) {
-+            /* We can't fit all the extents into the fixed size buffer.
-+             * Allocate one that is large enough and use it instead.
-+             */
-+            host_ifconf = malloc(outbufsz);
-+            if (!host_ifconf) {
-+                return -TARGET_ENOMEM;
-+            }
-+            memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
-+            free_buf = 1;
-         }
--        memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
--        free_buf = 1;
--    }
--    host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
-+        host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
- 
--    host_ifconf->ifc_len = host_ifc_len;
-+        host_ifconf->ifc_len = host_ifc_len;
-+    } else {
-+      host_ifc_buf = NULL;
-+    }
-     host_ifconf->ifc_buf = host_ifc_buf;
- 
-     ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_ifconf));
-@@ -4231,15 +4235,16 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
-         thunk_convert(argptr, host_ifconf, arg_type, THUNK_TARGET);
-         unlock_user(argptr, arg, target_size);
- 
--	/* copy ifreq[] to target user */
--
--        argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
--        for (i = 0; i < nb_ifreq ; i++) {
--            thunk_convert(argptr + i * target_ifreq_size,
--                          host_ifc_buf + i * sizeof(struct ifreq),
--                          ifreq_arg_type, THUNK_TARGET);
-+        if (target_ifc_buf != 0) {
-+            /* copy ifreq[] to target user */
-+            argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
-+            for (i = 0; i < nb_ifreq ; i++) {
-+                thunk_convert(argptr + i * target_ifreq_size,
-+                              host_ifc_buf + i * sizeof(struct ifreq),
-+                              ifreq_arg_type, THUNK_TARGET);
-+            }
-+            unlock_user(argptr, target_ifc_buf, target_ifc_len);
-         }
--        unlock_user(argptr, target_ifc_buf, target_ifc_len);
-     }
- 
-     if (free_buf) {
+  git://github.com/vivier/qemu.git tags/linux-user-for-4.0-pull-request
+
+for you to fetch changes up to 0c1beacdb528319fd446b8d44bc540d4d8fb7504:
+
+  linux-user: add new netlink types (2019-02-07 11:51:13 +0100)
+
+----------------------------------------------------------------
+- add new netlink type from linux v4.18 and v4.19
+- fix coverity warning (CID 1390634)
+- fix ioctl(SIOCGIFCONF) crash
+
+----------------------------------------------------------------
+
+Kan Li (1):
+  Fix linux-user crashes in ioctl(SIOCGIFCONF) when ifc_buf is NULL.
+
+Laurent Vivier (1):
+  linux-user: add new netlink types
+
+Peter Maydell (1):
+  linux-user: Check sscanf return value in open_net_route()
+
+ linux-user/fd-trans.c |  8 ++++++
+ linux-user/syscall.c  | 67 +++++++++++++++++++++++++------------------
+ 2 files changed, 47 insertions(+), 28 deletions(-)
+
 -- 
 2.20.1
