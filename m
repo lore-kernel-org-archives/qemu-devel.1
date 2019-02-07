@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38362)
+Received: from eggs.gnu.org ([209.51.188.92]:38571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grmac-0000zl-Sg
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:31:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1grmbZ-0001VA-CI
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grmab-0007mO-Us
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:31:50 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grmab-0007iv-Ok
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:31:49 -0500
-Received: by mail-wr1-f67.google.com with SMTP id r2so470987wrv.10
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 08:31:39 -0800 (PST)
-References: <20181126105125.30973-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7c5bc3fe-116e-f29c-977d-cac890bdfa93@redhat.com>
-Date: Thu, 7 Feb 2019 17:31:37 +0100
+	(envelope-from <armbru@redhat.com>) id 1grmbY-0008BU-AD
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:32:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grmbX-000899-FO
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:32:48 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DEEF280F7C
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 16:32:43 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190206181725.14337-1-armbru@redhat.com>
+	<20190206181725.14337-8-armbru@redhat.com>
+	<5426a5c4-421e-4a4b-6063-9fb38bc02ab4@redhat.com>
+Date: Thu, 07 Feb 2019 17:32:41 +0100
+In-Reply-To: <5426a5c4-421e-4a4b-6063-9fb38bc02ab4@redhat.com> (Eric Blake's
+	message of "Thu, 7 Feb 2019 08:58:53 -0600")
+Message-ID: <87ftsz8spi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181126105125.30973-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] doc: fix the configuration path
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 07/17] qapi: New module target.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-On 11/26/18 11:51 AM, Marc-André Lureau wrote:
-> Use a CONFDIR variable to show the configured sysconf path in the
-> generated documentations (html, man pages etc).
-> 
-> Related to:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1644985
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Eric Blake <eblake@redhat.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> On 2/6/19 12:17 PM, Markus Armbruster wrote:
+>> We can't add appropriate target-specific conditionals to misc.json,
+>> because that would make all of misc.json unusable in
+>> target-independent code.  To keep misc.json target-independent, we
+>> need to split off target-dependent target.json.
+>> 
+>> This commit doesn't actually split off anything, it merely creates the
+>> empty module.  The next few patches will move stuff from misc.json
+>> there.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  Makefile.objs         | 20 +++++++++-----------
+>>  Makefile.target       | 10 ++++++++++
+>>  qapi/qapi-schema.json |  1 +
+>>  qapi/target.json      | 13 +++++++++++++
+>>  4 files changed, 33 insertions(+), 11 deletions(-)
+>>  create mode 100644 qapi/target.json
+>
+>> +++ b/Makefile.target
+>> @@ -164,6 +164,16 @@ endif
+>>  
+>>  GENERATED_FILES += hmp-commands.h hmp-commands-info.h
+>>  
+>> +# FIXME duplicates Makefile.obj's
+>
+> Is this addressed later in the series, or should the commit message call
+> it out?
 
-> ---
->  Makefile     | 9 ++++++---
->  qemu-ga.texi | 4 ++--
->  2 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 9cc4dae1a6..a39c231d1c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -932,11 +932,14 @@ ui/shader.o: $(SRC_PATH)/ui/shader.c \
->  MAKEINFO=makeinfo
->  MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
->  MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
-> -TEXI2PODFLAGS=$(MAKEINFOINCLUDES) "-DVERSION=$(VERSION)"
-> +TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
->  TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
->  
-> -docs/version.texi: $(SRC_PATH)/VERSION
-> -	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
-> +docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
-> +	$(call quiet-command,(\
-> +		echo "@set VERSION $(VERSION)" && \
-> +		echo "@set CONFDIR $(qemu_confdir)" \
-> +	)> $@,"GEN","$@")
->  
->  %.html: %.texi docs/version.texi
->  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
-> diff --git a/qemu-ga.texi b/qemu-ga.texi
-> index 4c7a8fd163..f00ad830f2 100644
-> --- a/qemu-ga.texi
-> +++ b/qemu-ga.texi
-> @@ -30,7 +30,7 @@ set user's password
->  @end itemize
->  
->  qemu-ga will read a system configuration file on startup (located at
-> -@file{/etc/qemu/qemu-ga.conf} by default), then parse remaining
-> +@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
->  configuration options on the command line. For the same key, the last
->  option wins, but the lists accumulate (see below for configuration
->  file format).
-> @@ -58,7 +58,7 @@ file format).
->    Enable fsfreeze hook. Accepts an optional argument that specifies
->    script to run on freeze/thaw. Script will be called with
->    'freeze'/'thaw' arguments accordingly (default is
-> -  @samp{/etc/qemu/fsfreeze-hook}). If using -F with an argument, do
-> +  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, do
->    not follow -F with a space (for example:
->    @samp{-F/var/run/fsfreezehook.sh}).
->  
-> 
+It's not addressed.
+
+I added the FIXME for my RFC v2, which went out in a bit of a hurry
+right before my Christmas break.  I promptly forgot it exists.
+
+Either I find a way to avoid the duplication, or I mention the FIXME in
+my commit message.
+
+Thanks!
+
+>> +QAPI_TARGET_MODULES = target
+>> +obj-y += $(QAPI_TARGET_MODULES:%=qapi/qapi-types-%.o)
+>> +obj-y += qapi/qapi-types.o
+>> +obj-y += $(QAPI_TARGET_MODULES:%=qapi/qapi-visit-%.o)
+>> +obj-y += qapi/qapi-visit.o
+>> +obj-y += $(QAPI_TARGET_MODULES:%=qapi/qapi-events-%.o)
+>> +obj-y += qapi/qapi-events.o
+>> +obj-y += $(QAPI_TARGET_MODULES:%=qapi/qapi-commands-%.o)
+>> +obj-y += qapi/qapi-commands.o
+>>  obj-y += qapi/qapi-introspect.o
+>>  
