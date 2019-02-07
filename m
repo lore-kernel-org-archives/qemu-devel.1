@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36713)
+Received: from eggs.gnu.org ([209.51.188.92]:36640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrd-0002il-Cs
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:03 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgrb-0002iS-8l
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1grgra-0001kO-BJ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:25:01 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1grgra-0001jN-13
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:24:59 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Feb 2019 13:24:41 +0300
-Message-Id: <20190207102445.71998-14-vsementsov@virtuozzo.com>
+Date: Thu,  7 Feb 2019 13:24:40 +0300
+Message-Id: <20190207102445.71998-13-vsementsov@virtuozzo.com>
 In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
 References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 13/17] migration/block: use
- qemu_iovec_init_buf
+Subject: [Qemu-devel] [PATCH v3 12/17] qemu-img: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,50 @@ qemu_iovec_init_external( ... , 1), which simplifies the code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- migration/block.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ qemu-img.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/migration/block.c b/migration/block.c
-index 0e24e18d13..83c633fb3f 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -83,7 +83,6 @@ typedef struct BlkMigBlock {
-     BlkMigDevState *bmds;
-     int64_t sector;
-     int nr_sectors;
--    struct iovec iov;
+diff --git a/qemu-img.c b/qemu-img.c
+index 25288c4d18..7853935049 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1670,7 +1670,6 @@ static int coroutine_fn convert_co_read(ImgConvertState *s, int64_t sector_num,
+ {
+     int n, ret;
      QEMUIOVector qiov;
-     BlockAIOCB *aiocb;
+-    struct iovec iov;
  
-@@ -314,9 +313,7 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
-     blk->sector = cur_sector;
-     blk->nr_sectors = nr_sectors;
+     assert(nb_sectors <= s->buf_sectors);
+     while (nb_sectors > 0) {
+@@ -1686,9 +1685,7 @@ static int coroutine_fn convert_co_read(ImgConvertState *s, int64_t sector_num,
+         bs_sectors = s->src_sectors[src_cur];
  
--    blk->iov.iov_base = blk->buf;
--    blk->iov.iov_len = nr_sectors * BDRV_SECTOR_SIZE;
--    qemu_iovec_init_external(&blk->qiov, &blk->iov, 1);
-+    qemu_iovec_init_buf(&blk->qiov, blk->buf, nr_sectors * BDRV_SECTOR_SIZE);
+         n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
+-        iov.iov_base = buf;
+-        iov.iov_len = n << BDRV_SECTOR_BITS;
+-        qemu_iovec_init_external(&qiov, &iov, 1);
++        qemu_iovec_init_buf(&qiov, buf, n << BDRV_SECTOR_BITS);
  
-     blk_mig_lock();
-     block_mig_state.submitted++;
-@@ -556,9 +553,8 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
-             blk->nr_sectors = nr_sectors;
+         ret = blk_co_preadv(
+                 blk, (sector_num - src_cur_offset) << BDRV_SECTOR_BITS,
+@@ -1712,7 +1709,6 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+ {
+     int ret;
+     QEMUIOVector qiov;
+-    struct iovec iov;
  
-             if (is_async) {
--                blk->iov.iov_base = blk->buf;
--                blk->iov.iov_len = nr_sectors * BDRV_SECTOR_SIZE;
--                qemu_iovec_init_external(&blk->qiov, &blk->iov, 1);
-+                qemu_iovec_init_buf(&blk->qiov, blk->buf,
-+                                    nr_sectors * BDRV_SECTOR_SIZE);
+     while (nb_sectors > 0) {
+         int n = nb_sectors;
+@@ -1740,9 +1736,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+                 (s->compressed &&
+                  !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)))
+             {
+-                iov.iov_base = buf;
+-                iov.iov_len = n << BDRV_SECTOR_BITS;
+-                qemu_iovec_init_external(&qiov, &iov, 1);
++                qemu_iovec_init_buf(&qiov, buf, n << BDRV_SECTOR_BITS);
  
-                 blk->aiocb = blk_aio_preadv(bmds->blk,
-                                             sector * BDRV_SECTOR_SIZE,
+                 ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+                                      n << BDRV_SECTOR_BITS, &qiov, flags);
 -- 
 2.18.0
