@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55878)
+Received: from eggs.gnu.org ([209.51.188.92]:58448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grrxh-0007oe-Hg
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:16:03 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grsCm-0002Fi-43
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:31:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1grrxf-0007gj-S4
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:16:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1grrxe-0007YV-S7
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:15:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1grrxL-0004DW-GZ
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 22:15:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 77B062E80C7
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 22:15:39 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1grsCg-0006UQ-Sa
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:31:34 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:45108
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1grsCZ-0006Pq-7z
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 17:31:26 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20190104223116.14037-1-richard.henderson@linaro.org>
+	<d52c8ae0-edee-ed9a-56b8-43cc1cf0208d@ilande.co.uk>
+	<362de5ba-a678-aeed-6a5d-3a02844c2560@linaro.org>
+	<6314c25b-a8c9-a8e2-2e1d-a8eeb3b88f2c@ilande.co.uk>
+Message-ID: <490c6687-d13e-9591-f3b9-0dac9550bfbb@ilande.co.uk>
+Date: Thu, 7 Feb 2019 22:31:02 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Feb 2019 22:07:50 -0000
-From: liang yan <lyan@suse.com>
-Reply-To: Bug 1815143 <1815143@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154957727033.18791.11498118265359264370.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815143] [NEW] qemu-system-s390x fails when
- running without kvm: fatal: EXECUTE on instruction prefix 0x7f4 not
- implemented
+In-Reply-To: <6314c25b-a8c9-a8e2-2e1d-a8eeb3b88f2c@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] tcg vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,264 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>
 
-Public bug reported:
+On 05/02/2019 21:29, Mark Cave-Ayland wrote:
 
-just wondering if TCG implements instruction prefix 0x7f4
+> Now that this and the other pre-requisite patches have been merged into master, I've
+> rebased the outstanding PPC parts of your "tcg, target/ppc vector improvements" on
+> master including the above fix and pushed the result to
+> https://github.com/mcayland/qemu/commits/ppc-altivec-v6.
+> 
+> The good news is that the graphics corruption I originally noticed caused by the
+> patch introducing the saturating add/sub vector ops has now gone, and with my
+> little-endian vsplt fix included then both OS X and MacOS 9 appear to run without any
+> obvious issues on an x86 host, and certainly feel smoother compared to before.
 
-server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
+I started to follow up Howard's report that he could still see graphical corruption
+with these patches, and I was surprised to notice that it had reappeared locally once
+again :/
 
---> starting qemu with kvm enabled works fine
-server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boot/=
-initrd -enable-kvm
-Initializing cgroup subsys cpuset
-Initializing cgroup subsys cpu
-Initializing cgroup subsys cpuacct
-Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 (S=
-USE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
-setup.289988: Linux is running under KVM in 64-bit mode
-setup.b050d0: The maximum memory size is 128MB
-numa.196305: NUMA mode: plain
-Write protected kernel read-only data: 8692k
-[...]
-
---> but starting qemu without kvm enabled works fails
-server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boot/=
-initrd =
-
-qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
-
-PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
-R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=3D=
-0000000000000000
-R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=3D=
-0000000000000000
-R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=3D=
-0000000000000000
-R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=3D=
-000000000000bef0
-F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=3D=
-0000000000000000
-F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=3D=
-0000000000000000
-F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=3D=
-0000000000000000
-F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=3D=
-0000000000000000
-V00=3D00000000000000000000000000000000 V01=3D000000000000000000000000000000=
-00
-V02=3D00000000000000000000000000000000 V03=3D000000000000000000000000000000=
-00
-V04=3D00000000000000000000000000000000 V05=3D000000000000000000000000000000=
-00
-V06=3D00000000000000000000000000000000 V07=3D000000000000000000000000000000=
-00
-V08=3D00000000000000000000000000000000 V09=3D000000000000000000000000000000=
-00
-V10=3D00000000000000000000000000000000 V11=3D000000000000000000000000000000=
-00
-V12=3D00000000000000000000000000000000 V13=3D000000000000000000000000000000=
-00
-V14=3D00000000000000000000000000000000 V15=3D000000000000000000000000000000=
-00
-V16=3D00000000000000000000000000000000 V17=3D000000000000000000000000000000=
-00
-V18=3D00000000000000000000000000000000 V19=3D000000000000000000000000000000=
-00
-V20=3D00000000000000000000000000000000 V21=3D000000000000000000000000000000=
-00
-V22=3D00000000000000000000000000000000 V23=3D000000000000000000000000000000=
-00
-V24=3D00000000000000000000000000000000 V25=3D000000000000000000000000000000=
-00
-V26=3D00000000000000000000000000000000 V27=3D000000000000000000000000000000=
-00
-V28=3D00000000000000000000000000000000 V29=3D000000000000000000000000000000=
-00
-V30=3D00000000000000000000000000000000 V31=3D000000000000000000000000000000=
-00
-C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=3D=
-0000000000000000
-C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=3D=
-0000000000000000
-C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=3D=
-0000000000000000
-C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=3D=
-0000000000000000
-
-Aborted (core dumped)
+After working out that this was because the relevant instructions weren't being
+generated for all Mac machines, I was able to figure it out after a few hours of
+digging. Patch to follow shortly.
 
 
-server3:~ # lscpu
-Architecture:          s390x
-CPU op-mode(s):        32-bit, 64-bit
-Byte Order:            Big Endian
-CPU(s):                2
-On-line CPU(s) list:   0,1
-Thread(s) per core:    1
-Core(s) per socket:    1
-Socket(s) per book:    1
-Book(s) per drawer:    1
-Drawer(s):             2
-NUMA node(s):          1
-Vendor ID:             IBM/S390
-Machine type:          2964
-BogoMIPS:              20325.00
-Hypervisor:            z/VM 6.4.0
-Hypervisor vendor:     IBM
-Virtualization type:   full
-Dispatching mode:      horizontal
-L1d cache:             128K
-L1i cache:             96K
-L2d cache:             2048K
-L2i cache:             2048K
-L3 cache:              65536K
-L4 cache:              491520K
-NUMA node0 CPU(s):     0-63
-Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh hig=
-hgprs te vx sie
-server3:~ # uname -a
-Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (96=
-49989) s390x s390x s390x GNU/Linux
-server3:~ #
+ATB,
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815143
-
-Title:
-   qemu-system-s390x fails when running without kvm: fatal: EXECUTE on
-  instruction prefix 0x7f4 not implemented
-
-Status in QEMU:
-  New
-
-Bug description:
-  just wondering if TCG implements instruction prefix 0x7f4
-
-  server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
-
-  --> starting qemu with kvm enabled works fine
-  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
-t/initrd -enable-kvm
-  Initializing cgroup subsys cpuset
-  Initializing cgroup subsys cpu
-  Initializing cgroup subsys cpuacct
-  Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 =
-(SUSE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
-  setup.289988: Linux is running under KVM in 64-bit mode
-  setup.b050d0: The maximum memory size is 128MB
-  numa.196305: NUMA mode: plain
-  Write protected kernel read-only data: 8692k
-  [...]
-
-  --> but starting qemu without kvm enabled works fails
-  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
-t/initrd =
-
-  qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
-
-  PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
-  R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=
-=3D0000000000000000
-  R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=
-=3D0000000000000000
-  R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=
-=3D0000000000000000
-  R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=
-=3D000000000000bef0
-  F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=
-=3D0000000000000000
-  F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=
-=3D0000000000000000
-  F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=
-=3D0000000000000000
-  F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=
-=3D0000000000000000
-  V00=3D00000000000000000000000000000000 V01=3D0000000000000000000000000000=
-0000
-  V02=3D00000000000000000000000000000000 V03=3D0000000000000000000000000000=
-0000
-  V04=3D00000000000000000000000000000000 V05=3D0000000000000000000000000000=
-0000
-  V06=3D00000000000000000000000000000000 V07=3D0000000000000000000000000000=
-0000
-  V08=3D00000000000000000000000000000000 V09=3D0000000000000000000000000000=
-0000
-  V10=3D00000000000000000000000000000000 V11=3D0000000000000000000000000000=
-0000
-  V12=3D00000000000000000000000000000000 V13=3D0000000000000000000000000000=
-0000
-  V14=3D00000000000000000000000000000000 V15=3D0000000000000000000000000000=
-0000
-  V16=3D00000000000000000000000000000000 V17=3D0000000000000000000000000000=
-0000
-  V18=3D00000000000000000000000000000000 V19=3D0000000000000000000000000000=
-0000
-  V20=3D00000000000000000000000000000000 V21=3D0000000000000000000000000000=
-0000
-  V22=3D00000000000000000000000000000000 V23=3D0000000000000000000000000000=
-0000
-  V24=3D00000000000000000000000000000000 V25=3D0000000000000000000000000000=
-0000
-  V26=3D00000000000000000000000000000000 V27=3D0000000000000000000000000000=
-0000
-  V28=3D00000000000000000000000000000000 V29=3D0000000000000000000000000000=
-0000
-  V30=3D00000000000000000000000000000000 V31=3D0000000000000000000000000000=
-0000
-  C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=
-=3D0000000000000000
-  C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=
-=3D0000000000000000
-  C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=
-=3D0000000000000000
-  C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=
-=3D0000000000000000
-
-  Aborted (core dumped)
-
-  =
-
-  server3:~ # lscpu
-  Architecture:          s390x
-  CPU op-mode(s):        32-bit, 64-bit
-  Byte Order:            Big Endian
-  CPU(s):                2
-  On-line CPU(s) list:   0,1
-  Thread(s) per core:    1
-  Core(s) per socket:    1
-  Socket(s) per book:    1
-  Book(s) per drawer:    1
-  Drawer(s):             2
-  NUMA node(s):          1
-  Vendor ID:             IBM/S390
-  Machine type:          2964
-  BogoMIPS:              20325.00
-  Hypervisor:            z/VM 6.4.0
-  Hypervisor vendor:     IBM
-  Virtualization type:   full
-  Dispatching mode:      horizontal
-  L1d cache:             128K
-  L1i cache:             96K
-  L2d cache:             2048K
-  L2i cache:             2048K
-  L3 cache:              65536K
-  L4 cache:              491520K
-  NUMA node0 CPU(s):     0-63
-  Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh h=
-ighgprs te vx sie
-  server3:~ # uname -a
-  Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (=
-9649989) s390x s390x s390x GNU/Linux
-  server3:~ #
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815143/+subscriptions
+Mark.
