@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57333)
+Received: from eggs.gnu.org ([209.51.188.92]:57330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvt-0001vn-5H
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:54 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvt-0001vY-4J
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002DL-Sp
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002D9-OS
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:53 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:38272)
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44331)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnvr-00025X-Gw
+	id 1grnvr-000299-Eq
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:51 -0500
-Received: by mail-wm1-x334.google.com with SMTP id v26so812143wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:42 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id v16so782022wrn.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:48 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:56:47 +0100
-Message-Id: <1549562254-41157-5-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:56:53 +0100
+Message-Id: <1549562254-41157-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/51] hw/display: make edid configurable
+Subject: [Qemu-devel] [PATCH 10/51] hw/pci/Makefile.objs: make pcie
+ configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +29,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com, Yang Zhong <yang.zhong@intel.com>
+Cc: thuth@redhat.com, philmd@redhat.com, Yang Zhong <yang.zhong@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
 From: Yang Zhong <yang.zhong@intel.com>
 
-Use CONFIG_EDID to make edid-generate.c and edid-region.c
-configurable.
+Make pcie splited from pci and make it configurable.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190123065618.3520-26-yang.zhong@intel.com>
+Message-Id: <20190123065618.3520-30-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/pci.mak  | 1 +
- hw/display/Makefile.objs | 4 +---
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ default-configs/arm-softmmu.mak      | 1 +
+ default-configs/i386-softmmu.mak     | 1 +
+ default-configs/mips64el-softmmu.mak | 1 +
+ default-configs/ppc-softmmu.mak      | 1 +
+ default-configs/riscv32-softmmu.mak  | 1 +
+ default-configs/riscv64-softmmu.mak  | 1 +
+ hw/pci/Kconfig                       | 4 ++++
+ hw/pci/Makefile.objs                 | 9 +++++++--
+ 8 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index 037636f..0552190 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -49,3 +49,4 @@ CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
- CONFIG_ROCKER=y
- CONFIG_VFIO=$(CONFIG_LINUX)
- CONFIG_VFIO_PCI=y
-+CONFIG_EDID=y
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 7c4ae9a..576fca4 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += edid-generate.o
-+common-obj-$(CONFIG_EDID) += edid-generate.o edid-region.o
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 40d31cc..3c87a22 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -122,6 +122,7 @@ CONFIG_VERSATILE=y
+ CONFIG_VERSATILE_PCI=y
+ CONFIG_VERSATILE_I2C=y
  
- common-obj-$(CONFIG_FW_CFG_DMA) += ramfb.o
- common-obj-$(CONFIG_FW_CFG_DMA) += ramfb-standalone.o
-@@ -15,12 +15,10 @@ common-obj-$(CONFIG_SSD0323) += ssd0323.o
- common-obj-$(CONFIG_XEN) += xenfb.o
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ CONFIG_VFIO_PLATFORM=y
+ CONFIG_VFIO_XGMAC=y
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 1d43fb2..256443e 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -45,6 +45,7 @@ CONFIG_ISA_TESTDEV=y
+ CONFIG_VMPORT=y
+ CONFIG_SGA=y
+ CONFIG_LPC_ICH9=y
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_Q35=y
+ CONFIG_APIC=y
+ CONFIG_IOAPIC=y
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
+index 9eb1208..c6ad4da 100644
+--- a/default-configs/mips64el-softmmu.mak
++++ b/default-configs/mips64el-softmmu.mak
+@@ -12,4 +12,5 @@ CONFIG_JAZZ_LED=y
+ CONFIG_VT82C686=y
+ CONFIG_MIPS_BOSTON=y
+ CONFIG_FITLOADER=y
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_XILINX=y
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index a58d81a..5c576fe 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -24,6 +24,7 @@ CONFIG_ETSEC=y
+ CONFIG_PPC405=y
+ CONFIG_PPC440=y
+ CONFIG_VIRTEX=y
++CONFIG_PCI_EXPRESS=y
  
- common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
--common-obj-$(CONFIG_VGA_PCI) += edid-region.o
- common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
- common-obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
- common-obj-$(CONFIG_VMWARE_VGA) += vmware_vga.o
- common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
--common-obj-$(CONFIG_BOCHS_DISPLAY) += edid-region.o
+ # For Sam460ex
+ CONFIG_SAM460EX=y
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index 6533716..8c3a91a 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -8,6 +8,7 @@ CONFIG_VIRTIO_MMIO=y
  
- common-obj-$(CONFIG_BLIZZARD) += blizzard.o
- common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
+ CONFIG_CADENCE=y
+ 
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ 
+ CONFIG_VGA=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index 6533716..8c3a91a 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -8,6 +8,7 @@ CONFIG_VIRTIO_MMIO=y
+ 
+ CONFIG_CADENCE=y
+ 
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ 
+ CONFIG_VGA=y
+diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
+index d3d2205..4ca2537 100644
+--- a/hw/pci/Kconfig
++++ b/hw/pci/Kconfig
+@@ -1,2 +1,6 @@
+ config PCI
+     bool
++
++config PCI_EXPRESS
++    bool
++    select PCI
+diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+index 9f905e6..c78f2fb 100644
+--- a/hw/pci/Makefile.objs
++++ b/hw/pci/Makefile.objs
+@@ -2,8 +2,13 @@ common-obj-$(CONFIG_PCI) += pci.o pci_bridge.o
+ common-obj-$(CONFIG_PCI) += msix.o msi.o
+ common-obj-$(CONFIG_PCI) += shpc.o
+ common-obj-$(CONFIG_PCI) += slotid_cap.o
+-common-obj-$(CONFIG_PCI) += pci_host.o pcie_host.o
+-common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
++common-obj-$(CONFIG_PCI) += pci_host.o
++
++# The functions in these modules can be used by devices too.  Since we
++# allow plugging PCIe devices into PCI buses, include them even if
++# CONFIG_PCI_EXPRESS=n.
++common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o
++common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
+ 
+ common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
+ common-obj-$(CONFIG_ALL) += pci-stub.o
 -- 
 1.8.3.1
