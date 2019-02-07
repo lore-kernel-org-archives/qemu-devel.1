@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53543)
+Received: from eggs.gnu.org ([209.51.188.92]:54271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grk0x-0002ZE-0C
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:46:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1grk3u-0003YM-0b
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:49:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1grk0v-00083T-Qg
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:46:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1grk0v-00082b-50
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:46:49 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B06EC5856F
-	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 13:46:46 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1grk3s-0001Ds-TK
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:49:53 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20190206181725.14337-1-armbru@redhat.com>
-	<20190206181725.14337-17-armbru@redhat.com>
-	<0e7c814c-5d82-e9c0-3d53-bcc576019b65@redhat.com>
-	<20190207122950.GA1854@andariel.pipo.sk>
-Date: Thu, 07 Feb 2019 14:46:41 +0100
-In-Reply-To: <20190207122950.GA1854@andariel.pipo.sk> (Peter Krempa's message
-	of "Thu, 7 Feb 2019 13:29:50 +0100")
-Message-ID: <87wombd83i.fsf@dusky.pond.sub.org>
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+	<87mun8gd2x.fsf@dusky.pond.sub.org>
+	<4675f707-1215-80ac-fc27-362688e51df9@redhat.com>
+Date: Thu, 07 Feb 2019 14:49:25 +0100
+In-Reply-To: <4675f707-1215-80ac-fc27-362688e51df9@redhat.com> (Laszlo Ersek's
+	message of "Thu, 7 Feb 2019 13:31:13 +0100")
+Message-ID: <87sgwzd7yy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [libvirt] [PATCH v3 16/17] qmp: Deprecate
- query-events in favor of query-qmp-schema
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +25,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, libvirt-list@redhat.com, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org
 
-Peter Krempa <pkrempa@redhat.com> writes:
+Laszlo Ersek <lersek@redhat.com> writes:
 
-> On Wed, Feb 06, 2019 at 12:42:05 -0600, Eric Blake wrote:
->> Adding libvirt in cc
->> 
->> On 2/6/19 12:17 PM, Markus Armbruster wrote:
->> > query-events doesn't reflect compile-time configuration.  Instead of
->> > fixing that, deprecate the command in favor of query-qmp-schema.
->> > 
->> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> > ---
->> >  monitor.c            | 5 +++++
->> >  qapi/misc.json       | 7 +++++--
->> >  qemu-deprecated.texi | 5 +++++
->> >  3 files changed, 15 insertions(+), 2 deletions(-)
->> 
->> Libvirt uses query-events; we'll need to patch libvirt to start relying
->> on query-qmp-schema before this deprecation cycle can complete (although
->> I'm in favor of making the change).
+> Hi Markus,
 >
-> Patches to use 'query-qmp-schema' output rather than 'query-events' in
-> libvirt:
+> On 02/07/19 10:30, Markus Armbruster wrote:
+>> The thread got long, let me try to summarize, and elaborate a few
+>> points.
+>>=20
+>> * The problem at hand is configuring firmware residing in flash memory
+>>   (OVMF requires this) without legacy -drive.
+>>=20
+>> * The wider problem is configuring onboard devices.  Our general device
+>>   configuration interface doesn't cover them.  Instead, we have a zoo of
+>>   ad hoc interfaces that are much more limited.  Some of them we'd
+>>   rather deprecate (-drive, -net), but can't until we have a suitable
+>>   replacements.
+>>=20
+>>   I think a board should be a composite object that exposes properties
+>>   of its own and its parts, just like other composite devices, so that
+>>   "create, set properties, realize" just works.  That would extend our
+>>   common device configuration mechanism naturally to onboard devices.
+>>=20
+>>   A PC board's flash memory device would be just another part.  It could
+>>   be something like /machine/q35/cfi.pflash01/ in the QOM tree.  To
+>>   configure it, you'd set its properties, such as
+>>   /machine/q35/cfi.pflash01/drive.
+>>=20
+>>   Note that this requires a way to set an existing device's properties.
+>>   Perhaps qom-set already works.
+>>=20
+>> * While I do believe we should tackle the wider problem, I'd rather not
+>>   sit on the narrow problem until we crack it.  So, what can we do about
+>>   it?
+>>=20
+>>   - Paolo proposed to add block backend properties to the PC machine,
+>>     settable like -machine pflash0=3DBLOCK-BACKEND.
+>>=20
+>>     Possible drawback: if we add /machine/q35/pflash0 to the QOM tree
+>>     now, and later replace it by /machine/q35/cfi.pflash01/drive, we'll
+>>     have to deal with yet another machine type variation.  We'll live.
+>>=20
+>>   - I proposed to sidestep our onboard device configuration problem by
+>>     adding the cfi.pflash01 devices with our existing general device
+>>     configuration interface: -device.  Possible since the onboard
+>>     cfi.pflash01 devices are optional.  Requires a small extension to
+>>     the firmware descriptors, and a bit of extra work in libvirt to
+>>     process that extension.  I think it's workable, but Paolo's idea is
+>>     simpler.
+>>=20
+>>   I can give Paolo's idea a try.  Objections?
+>>=20
+>> * A flash device supporting multiple regions is desirable, because it's
+>>   what physical hardware has.  We currently use multiple flash devices
+>>   instead.  We'll be stuck with them for existing machine types due to
+>>   guest ABI and migration compatibility.
+>>=20
+>> * cfi.pflash01 currently requires users to opt out of "bad, do not use".
+>>   It should require opt in, to guard against accidental new uses of
+>>   "bad".
+>>=20
+>>=20
+>> PS: Big thanks to L=C3=A1szl=C3=B3, whose patient guidance helped me map=
+ this part
+>> of the jungle.
+>>=20
 >
-> https://www.redhat.com/archives/libvir-list/2019-February/msg00298.html
+> I've read the above carefully.
 >
-> You can start the deprecation clock.
+> At the QEMU design level, I don't have any opinion or preference; there
+> I simply don't know enough -- and don't suffer from bad decisions enough
+> -- to make sensible comments.
+>
+> Regarding the choice betwen "-machine pflash0=3DBLOCK-BACKEND" and
+> "-device pflash": I don't object to exploring the former first.
+>
+> I'd just like to note that "-machine pflash0=3DBLOCK-BACKEND" will also
+> require changes to the firmware descriptor schema. Not to the types that
+> the schema defines -- and therefore concrete descriptor *documents* that
+> already conform to the schema wouldn't be affected --, but to the
+> documentation that the schema directs at management applications.
+>
+> The schema is supposed to specify (in the documentation) QEMU command
+> line options for management applications. If we add "-machine
+> pflash0=3DBLOCK-BACKEND", then even if the types in the schema stay the
+> same, some mappings to the QEMU cmdline will have to be re-documented.
 
-Awesome!
+Good point.
+
+> Of course, that's still easier / less intrusive than changing the types!
+> ... Which does make me prefer "-machine pflash0=3DBLOCK-BACKEND", if I'm
+> being honest.
+>
+> (I hope my followup isn't totally useless. I certainly didn't want to
+> ignore your summary.)
+
+Pointing out the need to update these comments is anything but useless.
+
+Thanks!
