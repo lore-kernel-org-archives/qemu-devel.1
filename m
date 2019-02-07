@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51097)
+Received: from eggs.gnu.org ([209.51.188.92]:52388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1grla1-0006wN-Ur
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:27:11 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1grlf1-00025M-Ft
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:32:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1grla0-0004qu-Mj
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:27:09 -0500
-Resent-Message-Id: <E1grla0-0004qu-Mj@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1grla0-0004q9-H9
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:27:08 -0500
-Message-ID: <154955320087.29184.16678095410348195081@ebba9967afc0>
-In-Reply-To: <mvmmun7y7m0.fsf@suse.de>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eric.auger@redhat.com>) id 1grleu-00008l-Cd
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 10:32:19 -0500
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-11-eric.auger@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8392B2D8D@lhreml524-mbs.china.huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <49dfe0ee-7afb-6639-3a4e-f4317073feba@redhat.com>
+Date: Thu, 7 Feb 2019 16:25:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Feb 2019 07:26:42 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fix emulation of
- accept4/getpeername/getsockname/recvfrom syscalls
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA8392B2D8D@lhreml524-mbs.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 10/18] hw/arm/virt: Bump the 255GB
+ initial RAM limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +26,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: schwab@suse.de
-Cc: fam@euphon.net, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>, "david@redhat.com" <david@redhat.com>
+Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "drjones@redhat.com" <drjones@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9tdm1tdW43eTdtMC5mc2ZAc3Vz
-ZS5kZS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxl
-IHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gbGludXgtdXNlcjogZml4IGVtdWxhdGlvbiBvZiBhY2Nl
-cHQ0L2dldHBlZXJuYW1lL2dldHNvY2tuYW1lL3JlY3Zmcm9tIHN5c2NhbGxzCk1lc3NhZ2UtaWQ6
-IG12bW11bjd5N20wLmZzZkBzdXNlLmRlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAgIDFkY2EwNTQuLjYzMjM1MWUgIG1hc3RlciAgICAgLT4gbWFzdGVy
-CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMDcxMDI0NDUuNzE5OTgtMS12c2Vt
-ZW50c292QHZpcnR1b3p6by5jb20gLT4gcGF0Y2hldy8yMDE5MDIwNzEwMjQ0NS43MTk5OC0xLXZz
-ZW1lbnRzb3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3L212bW11
-bjd5N20wLmZzZkBzdXNlLmRlIC0+IHBhdGNoZXcvbXZtbXVuN3k3bTAuZnNmQHN1c2UuZGUKU3Vi
-bW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1v
-ZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11
-TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMn
-ClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0
-KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAo
-aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1
-Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3Bl
-bmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1
-Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVt
-dS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1
-Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3Mu
-Z2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMv
-c2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXRodWIuY29tL2hkZWxsZXIvc2VhYmlvcy1ocHBhLmdp
-dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnClN1Ym1vZHVsZSAncm9t
-cy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NnYWJpb3MuZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9za2lib290JyAoaHR0
-cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1v
-ZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1i
-b290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYw
-ZXgnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dp
-dGh1Yi5jb20vY290YS9iZXJrZWxleS1zb2Z0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
-dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2Vs
-ZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS10ZXN0Zmxv
-YXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMn
-ClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2tl
-eWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xv
-bmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0b25lJzogY2hlY2tl
-ZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2YmYnCkNsb25pbmcg
-aW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzg4ZjE4OTA5
-ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50byAncm9tcy9RZW11
-TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnOiBjaGVj
-a2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVhODY5ZGYxYzJkOWM4ZTI2NicKQ2xvbmlu
-ZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NMT0YnOiBjaGVja2Vk
-IG91dCAnYTViNDI4ZTFjMWVhZTcwM2JkZDYyYTNmNTI3MjIzYzI5MWVlM2ZkYycKQ2xvbmluZyBp
-bnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91
-dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRv
-ICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNr
-ZWQgb3V0ICc0NDFhODRkM2E2NDJhMTBiOTQ4MzY5YzYzZjMyMzY3ZThmZjYzOTViJwpDbG9uaW5n
-IGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFj
-a3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1
-NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJzUxYzIzN2Q3ZTIwZDA1MTAwZWFjYWRl
-ZTJmNjFhYmMxN2U2YmMwOTcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E2OThjODk5NWZmYjI4MzgyOTZl
-YzI4NGZlM2M0YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcxZWY5OWEw
-MTU3MmMyNTgxYzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2UwJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dh
-YmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFl
-ZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMv
-c2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICdl
-MGVlMjRjMjdhMTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFjMTM0YmNjJwpDbG9uaW5nIGludG8gJ3Jv
-bXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAn
-ZDg1Y2EwMjlmMjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEwMDNhOTk0MycKQ2xvbmluZyBpbnRvICdy
-b21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2
-MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1
-ODgnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1v
-ZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdi
-NjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rl
-c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAv
-YmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFh
-MTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4uClN1
-Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0
-NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwoyNzZkOGIyIGxpbnV4LXVzZXI6IGZpeCBlbXVsYXRpb24gb2YgYWNjZXB0NC9nZXRwZWVy
-bmFtZS9nZXRzb2NrbmFtZS9yZWN2ZnJvbSBzeXNjYWxscwoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
-bWVudAojNDE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjI4Nzc6CisgICAgICAgIGlmIChw
-dXRfdXNlcl91MzIocmV0X2FkZHJsZW4sIHRhcmdldF9hZGRybGVuX2FkZHIpKQpbLi4uXQoKRVJS
-T1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVu
-dAojNjU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjI5MDc6CisgICAgICAgIGlmIChwdXRf
-dXNlcl91MzIocmV0X2FkZHJsZW4sIHRhcmdldF9hZGRybGVuX2FkZHIpKQpbLi4uXQoKRVJST1I6
-IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
-ODk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjI5Mzc6CisgICAgICAgIGlmIChwdXRfdXNl
-cl91MzIocmV0X2FkZHJsZW4sIHRhcmdldF9hZGRybGVuX2FkZHIpKQpbLi4uXQoKdG90YWw6IDMg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCA5OCBsaW5lcyBjaGVja2VkCgpDb21taXQgMjc2ZDhiMmM1ZDdi
-IChsaW51eC11c2VyOiBmaXggZW11bGF0aW9uIG9mIGFjY2VwdDQvZ2V0cGVlcm5hbWUvZ2V0c29j
-a25hbWUvcmVjdmZyb20gc3lzY2FsbHMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVs
-bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL212bW11bjd5N20w
-LmZzZkBzdXNlLmRlL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Hi Shameer,
+
+On 2/7/19 4:19 PM, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
+> 
+>> -----Original Message-----
+>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>> Sent: 05 February 2019 17:33
+>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
+>> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+>> imammedo@redhat.com; david@redhat.com
+>> Cc: dgilbert@redhat.com; david@gibson.dropbear.id.au; drjones@redhat.com
+>> Subject: [PATCH v6 10/18] hw/arm/virt: Bump the 255GB initial RAM limit
+>>
+>> Now we have the extended memory map (high IO regions beyond the
+>> scalable RAM) and dynamic IPA range support at KVM/ARM level
+>> we can bump the legacy 255GB initial RAM limit. The actual maximum
+>> RAM size now depends on the physical CPU and host kernel.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  hw/arm/virt.c | 26 +++++++-------------------
+>>  1 file changed, 7 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index b90ffc2e5d..f01886da22 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -93,22 +93,9 @@
+>>
+>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>
+>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>> - * address space unallocated and free for future use between 256G and 512G.
+>> - * If we need to provide more RAM to VMs in the future then we need to:
+>> - *  * allocate a second bank of RAM starting at 2TB and working up
+>> - *  * fix the DT and ACPI table generation code in QEMU to correctly
+>> - *    report two split lumps of RAM to the guest
+>> - *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
+>> - * (We don't want to fill all the way up to 512GB with RAM because
+>> - * we might want it for non-RAM purposes later. Conversely it seems
+>> - * reasonable to assume that anybody configuring a VM with a quarter
+>> - * of a terabyte of RAM will be doing it on a host with more than a
+>> - * terabyte of physical address space.)
+>> - */
+>> -#define RAMLIMIT_GB 255
+>> -#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
+>> +/* Legacy RAM limit in GB (< version 4.0) */
+>> +#define LEGACY_RAMLIMIT_GB 255
+>> +#define LEGACY_RAMLIMIT_BYTES (LEGACY_RAMLIMIT_GB * GiB)
+>>
+>>  /* Addresses and sizes of our components.
+>>   * 0..128MB is space for a flash device so we can run bootrom code such as
+>> UEFI.
+>> @@ -149,7 +136,7 @@ static const MemMapEntry a15memmap[] = {
+>>      [VIRT_PCIE_MMIO] =          { 0x10000000, 0x2eff0000 },
+>>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>> -    [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+>> +    [VIRT_MEM] =                { 0x40000000,
+>> LEGACY_RAMLIMIT_BYTES },
+>>  };
+>>
+>>  /*
+>> @@ -1483,8 +1470,9 @@ static void machvirt_init(MachineState *machine)
+>>
+>>      vms->smp_cpus = smp_cpus;
+>>
+>> -    if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
+>> -        error_report("mach-virt: cannot model more than %dGB RAM",
+>> RAMLIMIT_GB);
+>> +    if (!vms->extended_memmap && machine->ram_size >
+>> LEGACY_RAMLIMIT_GB) {
+> 
+> Just hit this while testing, should this check be against LEGACY_RAMLIMIT_BYTES?
+Definitively, my mistake. Thank you for spotting that.
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> Shameer
+> 
+>> +        error_report("mach-virt: cannot model more than %dGB RAM",
+>> +                     LEGACY_RAMLIMIT_GB);
+>>          exit(1);
+>>      }
+>>
+>> --
+>> 2.20.1
+> 
