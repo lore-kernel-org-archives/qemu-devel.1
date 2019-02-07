@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53891)
+Received: from eggs.gnu.org ([209.51.188.92]:54114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grngM-0001zt-94
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:41:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1grngk-0002GB-0S
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:42:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grngK-0003Bs-AU
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:41:50 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34609)
+	(envelope-from <peter.maydell@linaro.org>) id 1grngi-0003Pw-8V
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:42:12 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34617)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1grngD-00034M-B3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:41:44 -0500
-Received: by mail-ot1-x342.google.com with SMTP id t5so1270449otk.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:41:26 -0800 (PST)
+	id 1grngi-0003Pe-2a
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:42:12 -0500
+Received: by mail-ot1-x341.google.com with SMTP id t5so1274730otk.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:42:12 -0800 (PST)
 MIME-Version: 1.0
 References: <20190114011122.5995-1-richard.henderson@linaro.org>
-	<20190114011122.5995-11-richard.henderson@linaro.org>
-In-Reply-To: <20190114011122.5995-11-richard.henderson@linaro.org>
+	<20190114011122.5995-12-richard.henderson@linaro.org>
+In-Reply-To: <20190114011122.5995-12-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Feb 2019 17:41:14 +0000
-Message-ID: <CAFEAcA-mZ01Za4SA92ZABGsfHJ+C=zZgLbDYMMxVoTWqUEaiQQ@mail.gmail.com>
+Date: Thu, 7 Feb 2019 17:41:59 +0000
+Message-ID: <CAFEAcA-YLZc1yqwucsyiPgz_qXLxaLB3pJUG7Jbdwp+fX03POA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 10/17] target/arm: Implement LDG, STG,
- ST2G instructions
+Subject: Re: [Qemu-devel] [PATCH 11/17] target/arm: Implement the STGP
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,14 +38,10 @@ On Mon, 14 Jan 2019 at 01:12, Richard Henderson
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/helper-a64.h    |   3 ++
->  target/arm/mte_helper.c    |  53 +++++++++++++++++++
->  target/arm/translate-a64.c | 106 +++++++++++++++++++++++++++++++++++++
->  3 files changed, 162 insertions(+)
->
+>  target/arm/translate-a64.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
 
-I'm going to skip review of this one, since it will need
-updating for the STG/LDG spec change.
+Same remark as for patch 10.
 
 thanks
 -- PMM
