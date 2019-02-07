@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47240)
+Received: from eggs.gnu.org ([209.51.188.92]:47508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grjV0-00033C-9G
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1grjWD-00049H-Cc
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:15:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grjUx-0006Q7-Nk
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:49 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:58959)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grjUx-0006Fv-DL
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:13:47 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  7 Feb 2019 14:13:15 +0100
-Message-Id: <20190207131316.2957-3-laurent@vivier.eu>
-In-Reply-To: <20190207131316.2957-1-laurent@vivier.eu>
-References: <20190207131316.2957-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 2/3] linux-user: Check sscanf return value in
- open_net_route()
+	(envelope-from <thuth@redhat.com>) id 1grjW9-0007Zu-RK
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:15:05 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  7 Feb 2019 14:14:54 +0100
+Message-Id: <1549545296-18903-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] Deprecation patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +17,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org
 
-From: Peter Maydell <peter.maydell@linaro.org>
+A fix for a wrongly resolved merge conflict in qemu-deprecated.texi,
+and the removal of the deprecated -clock option.
 
-Coverity warns (CID 1390634) that open_net_route() is not
-checking the return value from sscanf(), which means that
-it might then use values that aren't initialized.
+Thomas Huth (2):
+  qemu-deprecated: Remove -virtioconsole and -no-frame for good
+  qemu-options: Remove deprecated option -clock
 
-Errors here should in general not happen since we're passing
-an assumed-good /proc/net/route from the host kernel, but
-if we do fail to parse a line then just skip it in the output
-we pass to the guest.
+ qemu-deprecated.texi | 17 -----------------
+ qemu-options.hx      |  3 ---
+ vl.c                 |  6 ------
+ 3 files changed, 26 deletions(-)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20190205174207.9278-1-peter.maydell@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 08acc4d860..5bbb72f3d5 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6768,9 +6768,15 @@ static int open_net_route(void *cpu_env, int fd)
-         char iface[16];
-         uint32_t dest, gw, mask;
-         unsigned int flags, refcnt, use, metric, mtu, window, irtt;
--        sscanf(line, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
--                     iface, &dest, &gw, &flags, &refcnt, &use, &metric,
--                     &mask, &mtu, &window, &irtt);
-+        int fields;
-+
-+        fields = sscanf(line,
-+                        "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
-+                        iface, &dest, &gw, &flags, &refcnt, &use, &metric,
-+                        &mask, &mtu, &window, &irtt);
-+        if (fields != 11) {
-+            continue;
-+        }
-         dprintf(fd, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
-                 iface, tswap32(dest), tswap32(gw), flags, refcnt, use,
-                 metric, tswap32(mask), mtu, window, irtt);
 -- 
-2.20.1
+1.8.3.1
