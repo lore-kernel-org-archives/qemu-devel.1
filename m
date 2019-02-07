@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58336)
+Received: from eggs.gnu.org ([209.51.188.92]:58328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griGJ-0007ZY-AA
+	(envelope-from <richard.henderson@linaro.org>) id 1griGJ-0007ZT-33
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griGI-0001Y4-6l
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:35 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:34849)
+	(envelope-from <richard.henderson@linaro.org>) id 1griGH-0001Xf-Oh
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:34 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33596)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1griGH-0001Uj-S5
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:34 -0500
-Received: by mail-wr1-x430.google.com with SMTP id z18so10469554wrh.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:24 -0800 (PST)
+	id 1griGH-0001UF-0x
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:33 -0500
+Received: by mail-wr1-x441.google.com with SMTP id a16so11268576wrv.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:22 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Feb 2019 11:53:57 +0000
-Message-Id: <20190207115400.647-17-richard.henderson@linaro.org>
+Date: Thu,  7 Feb 2019 11:53:56 +0000
+Message-Id: <20190207115400.647-16-richard.henderson@linaro.org>
 In-Reply-To: <20190207115400.647-1-richard.henderson@linaro.org>
 References: <20190207115400.647-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 16/19] target/hppa: Convert halt/reset insns
+Subject: [Qemu-devel] [PATCH 15/19] target/hppa: Convert fp indexed memory
+ insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +32,166 @@ Cc: deller@gmx.de, svens@stackframe.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 49 ++++++++++++----------------------------
- target/hppa/insns.decode |  5 ++++
- 2 files changed, 20 insertions(+), 34 deletions(-)
+ target/hppa/translate.c  | 93 ----------------------------------------
+ target/hppa/insns.decode | 21 +++++++++
+ 2 files changed, 21 insertions(+), 93 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 4ecd522e51..c73a7ab3db 100644
+index 4ce65bcc61..4ecd522e51 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2376,20 +2376,27 @@ static bool trans_rfi_r(DisasContext *ctx, arg_rfi_r *a)
-     return do_rfi(ctx, true);
+@@ -855,15 +855,6 @@ static void gen_goto_tb(DisasContext *ctx, int which,
+     }
  }
  
--#ifndef CONFIG_USER_ONLY
--static bool gen_hlt(DisasContext *ctx, int reset)
-+static bool trans_halt(DisasContext *ctx, arg_halt *a)
+-/* PA has a habit of taking the LSB of a field and using that as the sign,
+-   with the rest of the field becoming the least significant bits.  */
+-static target_sreg low_sextract(uint32_t val, int pos, int len)
+-{
+-    target_ureg x = -(target_ureg)extract32(val, pos, 1);
+-    x = (x << (len - 1)) | extract32(val, pos + 1, len - 1);
+-    return x;
+-}
+-
+ static unsigned assemble_rt64(uint32_t insn)
  {
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     nullify_over(ctx);
--    if (reset) {
--        gen_helper_reset(cpu_env);
+     unsigned r1 = extract32(insn, 6, 1);
+@@ -2981,84 +2972,6 @@ static bool trans_ldo(DisasContext *ctx, arg_ldo *a)
+     return true;
+ }
+ 
+-static bool trans_copr_w(DisasContext *ctx, uint32_t insn)
+-{
+-    unsigned t0 = extract32(insn, 0, 5);
+-    unsigned m = extract32(insn, 5, 1);
+-    unsigned t1 = extract32(insn, 6, 1);
+-    unsigned ext3 = extract32(insn, 7, 3);
+-    /* unsigned cc = extract32(insn, 10, 2); */
+-    unsigned i = extract32(insn, 12, 1);
+-    unsigned ua = extract32(insn, 13, 1);
+-    unsigned sp = extract32(insn, 14, 2);
+-    unsigned rx = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned rt = t1 * 32 + t0;
+-    int modify = (m ? (ua ? -1 : 1) : 0);
+-    int disp, scale;
+-
+-    if (i == 0) {
+-        scale = (ua ? 2 : 0);
+-        disp = 0;
+-        modify = m;
 -    } else {
--        gen_helper_halt(cpu_env);
+-        disp = low_sextract(rx, 0, 5);
+-        scale = 0;
+-        rx = 0;
+-        modify = (m ? (ua ? -1 : 1) : 0);
 -    }
-+    gen_helper_halt(cpu_env);
-     ctx->base.is_jmp = DISAS_NORETURN;
-     return nullify_end(ctx);
-+#endif
-+}
-+
-+static bool trans_reset(DisasContext *ctx, arg_reset *a)
-+{
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-+    nullify_over(ctx);
-+    gen_helper_reset(cpu_env);
-+    ctx->base.is_jmp = DISAS_NORETURN;
-+    return nullify_end(ctx);
-+#endif
- }
--#endif /* !CONFIG_USER_ONLY */
- 
- static bool trans_nop_addrx(DisasContext *ctx, arg_ldst *a)
- {
-@@ -4134,32 +4141,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
-     case 0x2E:
-         translate_table(ctx, insn, table_fp_fused);
-         return;
 -
--    case 0x04: /* spopn */
--    case 0x05: /* diag */
--    case 0x0F: /* product specific */
+-    switch (ext3) {
+-    case 0: /* FLDW */
+-        do_floadw(ctx, rt, rb, rx, scale, disp, sp, modify);
 -        break;
--
--    case 0x07: /* unassigned */
--    case 0x15: /* unassigned */
--    case 0x1D: /* unassigned */
--    case 0x37: /* unassigned */
--        break;
--    case 0x3F:
--#ifndef CONFIG_USER_ONLY
--        /* Unassigned, but use as system-halt.  */
--        if (insn == 0xfffdead0) {
--            gen_hlt(ctx, 0); /* halt system */
--            return;
--        }
--        if (insn == 0xfffdead1) {
--            gen_hlt(ctx, 1); /* reset system */
--            return;
--        }
--#endif
+-    case 4: /* FSTW */
+-        do_fstorew(ctx, rt, rb, rx, scale, disp, sp, modify);
 -        break;
 -    default:
+-        return gen_illegal(ctx);
+-    }
+-    return true;
+-}
+-
+-static bool trans_copr_dw(DisasContext *ctx, uint32_t insn)
+-{
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned m = extract32(insn, 5, 1);
+-    unsigned ext4 = extract32(insn, 6, 4);
+-    /* unsigned cc = extract32(insn, 10, 2); */
+-    unsigned i = extract32(insn, 12, 1);
+-    unsigned ua = extract32(insn, 13, 1);
+-    unsigned sp = extract32(insn, 14, 2);
+-    unsigned rx = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
+-    int modify = (m ? (ua ? -1 : 1) : 0);
+-    int disp, scale;
+-
+-    if (i == 0) {
+-        scale = (ua ? 3 : 0);
+-        disp = 0;
+-        modify = m;
+-    } else {
+-        disp = low_sextract(rx, 0, 5);
+-        scale = 0;
+-        rx = 0;
+-        modify = (m ? (ua ? -1 : 1) : 0);
+-    }
+-
+-    switch (ext4) {
+-    case 0: /* FLDD */
+-        do_floadd(ctx, rt, rb, rx, scale, disp, sp, modify);
 -        break;
-     }
-     gen_illegal(ctx);
- }
+-    case 8: /* FSTD */
+-        do_fstored(ctx, rt, rb, rx, scale, disp, sp, modify);
+-        break;
+-    default:
+-        return gen_illegal(ctx);
+-    }
+-    return true;
+-}
+-
+ static bool do_cmpb(DisasContext *ctx, unsigned r, TCGv_reg in1,
+                     unsigned c, unsigned f, unsigned n, int disp)
+ {
+@@ -4211,12 +4124,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+ 
+     opc = extract32(insn, 26, 6);
+     switch (opc) {
+-    case 0x09:
+-        trans_copr_w(ctx, insn);
+-        return;
+-    case 0x0B:
+-        trans_copr_dw(ctx, insn);
+-        return;
+     case 0x0C:
+         translate_table(ctx, insn, table_float_0c);
+         return;
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index 25ac09d9d6..f564e54f1d 100644
+index 40b23823d0..25ac09d9d6 100644
 --- a/target/hppa/insns.decode
 +++ b/target/hppa/insns.decode
-@@ -103,6 +103,11 @@ ssm             000000 ..........  000 01101011 t:5     i=%sm_imm
- rfi             000000 ----- ----- --- 01100000 00000
- rfi_r           000000 ----- ----- --- 01100101 00000
+@@ -38,6 +38,7 @@
+ %sm_imm         16:10 !function=expand_sm_imm
  
-+# These are artificial instructions used by QEMU firmware.
-+# They are allocated from the unassigned instruction space.
-+halt            1111 1111 1111 1101 1110 1010 1101 0000
-+reset           1111 1111 1111 1101 1110 1010 1101 0001
+ %rm64           1:1 16:5
++%rt64           6:1 0:5
+ 
+ %im5_0          0:s1 1:4
+ %im5_16         16:s1 17:4
+@@ -195,6 +196,26 @@ lda             000011 ..... ..... .. . 0 -- 0110      ......   @ldstx size=2
+ sta             000011 ..... ..... .. . 1 -- 1110      ......   @stim5 size=2
+ stby            000011 b:5 r:5 sp:2 a:1 1 -- 1100 m:1   .....   disp=%im5_0
+ 
++@fldstwx        ...... b:5 x:5   sp:2 scale:1 ....... m:1 ..... \
++                &ldst t=%rt64 disp=0 size=2
++@fldstwi        ...... b:5 ..... sp:2 .       ....... .   ..... \
++                &ldst t=%rt64 disp=%im5_16 m=%ma_to_m x=0 scale=0 size=2
++
++fldw            001001 ..... ..... .. . 0 -- 000 . . .....      @fldstwx
++fldw            001001 ..... ..... .. . 1 -- 000 . . .....      @fldstwi
++fstw            001001 ..... ..... .. . 0 -- 100 . . .....      @fldstwx
++fstw            001001 ..... ..... .. . 1 -- 100 . . .....      @fldstwi
++
++@fldstdx        ...... b:5 x:5   sp:2 scale:1 ....... m:1 t:5 \
++                &ldst disp=0 size=3
++@fldstdi        ...... b:5 ..... sp:2 .       ....... .   t:5 \
++                &ldst disp=%im5_16 m=%ma_to_m x=0 scale=0 size=3
++
++fldd            001011 ..... ..... .. . 0 -- 000 0 . .....      @fldstdx
++fldd            001011 ..... ..... .. . 1 -- 000 0 . .....      @fldstdi
++fstd            001011 ..... ..... .. . 0 -- 100 0 . .....      @fldstdx
++fstd            001011 ..... ..... .. . 1 -- 100 0 . .....      @fldstdi
 +
  ####
- # Memory Management
+ # Offset Mem
  ####
 -- 
 2.17.2
