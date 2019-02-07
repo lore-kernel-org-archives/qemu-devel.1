@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43763)
+Received: from eggs.gnu.org ([209.51.188.92]:43790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grhJq-0004eC-At
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:11 -0500
+	(envelope-from <laurent@vivier.eu>) id 1grhJr-0004eu-OJ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1grhJp-00089Q-IH
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:10 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:40003)
+	(envelope-from <laurent@vivier.eu>) id 1grhJq-0008AY-HZ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:11 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:45071)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grhJn-00087R-Ga
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:08 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1grhJq-00089K-7m
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:54:10 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  7 Feb 2019 11:53:46 +0100
-Message-Id: <20190207105347.22337-3-laurent@vivier.eu>
+Date: Thu,  7 Feb 2019 11:53:45 +0100
+Message-Id: <20190207105347.22337-2-laurent@vivier.eu>
 In-Reply-To: <20190207105347.22337-1-laurent@vivier.eu>
 References: <20190207105347.22337-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 2/3] linux-user: Check sscanf return value in
- open_net_route()
+Subject: [Qemu-devel] [PULL 1/3] Fix linux-user crashes in
+ ioctl(SIOCGIFCONF) when ifc_buf is NULL.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +27,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Kan Li <likan_999.student@sina.com>, Laurent Vivier <lvivier@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Kan Li <likan_999.student@sina.com>
 
-Coverity warns (CID 1390634) that open_net_route() is not
-checking the return value from sscanf(), which means that
-it might then use values that aren't initialized.
+Summary:
+This is to fix bug https://bugs.launchpad.net/qemu/+bug/1796754.
+It is valid for ifc_buf to be NULL according to
+http://man7.org/linux/man-pages/man7/netdevice.7.html.
 
-Errors here should in general not happen since we're passing
-an assumed-good /proc/net/route from the host kernel, but
-if we do fail to parse a line then just skip it in the output
-we pass to the guest.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20190205174207.9278-1-peter.maydell@linaro.org>
+Signed-off-by: Kan Li <likan_999.student@sina.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20181024201303.114-1-likan_999.student@sina.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ linux-user/syscall.c | 55 ++++++++++++++++++++++++--------------------
+ 1 file changed, 30 insertions(+), 25 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5b9d75fbb4..a69c734aa0 100644
+index bf076cbf8c..5b9d75fbb4 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -6767,9 +6767,15 @@ static int open_net_route(void *cpu_env, int fd)
-         char iface[16];
-         uint32_t dest, gw, mask;
-         unsigned int flags, refcnt, use, metric, mtu, window, irtt;
--        sscanf(line, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
--                     iface, &dest, &gw, &flags, &refcnt, &use, &metric,
--                     &mask, &mtu, &window, &irtt);
-+        int fields;
+@@ -4187,28 +4187,32 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
+     unlock_user(argptr, arg, 0);
+ 
+     host_ifconf = (struct ifconf *)(unsigned long)buf_temp;
+-    target_ifc_len = host_ifconf->ifc_len;
+     target_ifc_buf = (abi_long)(unsigned long)host_ifconf->ifc_buf;
+-
+     target_ifreq_size = thunk_type_size(ifreq_arg_type, 0);
+-    nb_ifreq = target_ifc_len / target_ifreq_size;
+-    host_ifc_len = nb_ifreq * sizeof(struct ifreq);
+ 
+-    outbufsz = sizeof(*host_ifconf) + host_ifc_len;
+-    if (outbufsz > MAX_STRUCT_SIZE) {
+-        /* We can't fit all the extents into the fixed size buffer.
+-         * Allocate one that is large enough and use it instead.
+-         */
+-        host_ifconf = malloc(outbufsz);
+-        if (!host_ifconf) {
+-            return -TARGET_ENOMEM;
++    if (target_ifc_buf != 0) {
++        target_ifc_len = host_ifconf->ifc_len;
++        nb_ifreq = target_ifc_len / target_ifreq_size;
++        host_ifc_len = nb_ifreq * sizeof(struct ifreq);
 +
-+        fields = sscanf(line,
-+                        "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
-+                        iface, &dest, &gw, &flags, &refcnt, &use, &metric,
-+                        &mask, &mtu, &window, &irtt);
-+        if (fields != 11) {
-+            continue;
-+        }
-         dprintf(fd, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
-                 iface, tswap32(dest), tswap32(gw), flags, refcnt, use,
-                 metric, tswap32(mask), mtu, window, irtt);
++        outbufsz = sizeof(*host_ifconf) + host_ifc_len;
++        if (outbufsz > MAX_STRUCT_SIZE) {
++            /* We can't fit all the extents into the fixed size buffer.
++             * Allocate one that is large enough and use it instead.
++             */
++            host_ifconf = malloc(outbufsz);
++            if (!host_ifconf) {
++                return -TARGET_ENOMEM;
++            }
++            memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
++            free_buf = 1;
+         }
+-        memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
+-        free_buf = 1;
+-    }
+-    host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
++        host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
+ 
+-    host_ifconf->ifc_len = host_ifc_len;
++        host_ifconf->ifc_len = host_ifc_len;
++    } else {
++      host_ifc_buf = NULL;
++    }
+     host_ifconf->ifc_buf = host_ifc_buf;
+ 
+     ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_ifconf));
+@@ -4231,15 +4235,16 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
+         thunk_convert(argptr, host_ifconf, arg_type, THUNK_TARGET);
+         unlock_user(argptr, arg, target_size);
+ 
+-	/* copy ifreq[] to target user */
+-
+-        argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
+-        for (i = 0; i < nb_ifreq ; i++) {
+-            thunk_convert(argptr + i * target_ifreq_size,
+-                          host_ifc_buf + i * sizeof(struct ifreq),
+-                          ifreq_arg_type, THUNK_TARGET);
++        if (target_ifc_buf != 0) {
++            /* copy ifreq[] to target user */
++            argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
++            for (i = 0; i < nb_ifreq ; i++) {
++                thunk_convert(argptr + i * target_ifreq_size,
++                              host_ifc_buf + i * sizeof(struct ifreq),
++                              ifreq_arg_type, THUNK_TARGET);
++            }
++            unlock_user(argptr, target_ifc_buf, target_ifc_len);
+         }
+-        unlock_user(argptr, target_ifc_buf, target_ifc_len);
+     }
+ 
+     if (free_buf) {
 -- 
 2.20.1
