@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34534)
+Received: from eggs.gnu.org ([209.51.188.92]:36407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grmNB-0008UL-QM
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:17:58 -0500
+	(envelope-from <philmd@redhat.com>) id 1grmSw-0004YA-1M
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1grmNA-0006V4-R3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:17:57 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41280)
+	(envelope-from <philmd@redhat.com>) id 1grmSt-0002WD-0V
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:23:52 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1grmNA-0006Be-E3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:17:56 -0500
-Received: by mail-ot1-x344.google.com with SMTP id u16so673350otk.8
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 08:17:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grmSs-0002RP-N4
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:23:50 -0500
+Received: by mail-wr1-f66.google.com with SMTP id v13so486342wrw.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 08:23:43 -0800 (PST)
+References: <1549545296-18903-1-git-send-email-thuth@redhat.com>
+	<1549545296-18903-3-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <34660833-04f1-b3e8-6e78-8fc4665a1f11@redhat.com>
+Date: Thu, 7 Feb 2019 17:23:40 +0100
 MIME-Version: 1.0
-References: <20190114011122.5995-1-richard.henderson@linaro.org>
-	<20190114011122.5995-6-richard.henderson@linaro.org>
-In-Reply-To: <20190114011122.5995-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Feb 2019 16:17:14 +0000
-Message-ID: <CAFEAcA-EA9DHLiuJc=GBjQo6ajN_nU7EhEY_yniEbke5NgWK5Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 05/17] target/arm: Suppress tag check for
- sp+offset
+In-Reply-To: <1549545296-18903-3-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-options: Remove deprecated option
+ -clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Mon, 14 Jan 2019 at 01:11, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> R0078 specifies that base register, or base register plus immediate
-> offset, is unchecked when the base register is SP.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 2/7/19 2:14 PM, Thomas Huth wrote:
+> The option is only a dummy since a long time. We've finally deprecated
+> it in QEMU v3.0, so it's time to remove it now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  target/arm/translate-a64.c | 37 ++++++++++++++++++-------------------
->  1 file changed, 18 insertions(+), 19 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 5c2577a9ac..ee95ba7165 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -336,12 +336,11 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
->   * This is always a fresh temporary, as we need to be able to
->   * increment this independently of a dirty write-back address.
->   */
-> -static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
-> +static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr, bool sp_off)
-
-I think sp_off is not sufficiently general here. For instance
-if you look at the pseudocode for LDR (immediate)
- https://developer.arm.com/docs/ddi0596/b/base-instructions-alphabetic-order/ldr-immediate-load-register-immediate
-we do the tag check if wback || n != 31.
-
-That is, when the spec says "base register only, or base register
-plus immediate offset addressing form", it is referencing the
-list of addressing modes in the v8A Arm ARM DDA0487D.a C1.3.3,
-and "pre-indexed" and "post-indexed" are separate from "base + immediate".
-It looks like your patch is treating pre-indexed and
-post-indexed the same as base+imm.
-
-thanks
--- PMM
+>  qemu-deprecated.texi | 5 -----
+>  qemu-options.hx      | 3 ---
+>  vl.c                 | 6 ------
+>  3 files changed, 14 deletions(-)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 90e5860..fe90555 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -37,11 +37,6 @@ would automatically enable USB support on the machine type.
+>  If using the new syntax, USB support must be explicitly
+>  enabled via the ``-machine usb=on'' argument.
+>  
+> -@subsection -clock (since 3.0.0)
+> -
+> -The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
+> -replacement since it is not needed anymore.
+> -
+>  @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
+>  
+>  The 'file' driver for drives is no longer appropriate for character or host
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 06ef1a7..77bd98e 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3444,9 +3444,6 @@ Load the contents of @var{file} as an option ROM.
+>  This option is useful to load things like EtherBoot.
+>  ETEXI
+>  
+> -HXCOMM Silently ignored for compatibility
+> -DEF("clock", HAS_ARG, QEMU_OPTION_clock, "", QEMU_ARCH_ALL)
+> -
+>  DEF("rtc", HAS_ARG, QEMU_OPTION_rtc, \
+>      "-rtc [base=utc|localtime|<datetime>][,clock=host|rt|vm][,driftfix=none|slew]\n" \
+>      "                set the RTC base and clock, enable drift fix for clock ticks (x86 only)\n",
+> diff --git a/vl.c b/vl.c
+> index 9e4dba7..90ff233 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3735,12 +3735,6 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_old_param:
+>                  old_param = 1;
+>                  break;
+> -            case QEMU_OPTION_clock:
+> -                /* Clock options no longer exist.  Keep this option for
+> -                 * backward compatibility.
+> -                 */
+> -                warn_report("This option is ignored and will be removed soon");
+> -                break;
+>              case QEMU_OPTION_rtc:
+>                  opts = qemu_opts_parse_noisily(qemu_find_opts("rtc"), optarg,
+>                                                 false);
+> 
