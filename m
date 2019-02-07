@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60369)
+Received: from eggs.gnu.org ([209.51.188.92]:60943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1griNk-00060w-My
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:02:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1griQF-0007sf-9i
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:04:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1griNj-0006C5-KL
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:02:16 -0500
-Received: from mail.uni-paderborn.de ([131.234.142.9]:44598)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1griNi-00067K-VA
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:02:15 -0500
-References: <20190207073928.4048-1-david.brenken@efs-auto.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <74b6408e-55ef-81d2-e622-b9c37312ea6b@mail.uni-paderborn.de>
-Date: Thu, 7 Feb 2019 13:02:02 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1griQ9-0008Md-Ms
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:04:49 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1griPv-0008C0-3Z
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 07:04:37 -0500
+Received: by mail-wm1-x341.google.com with SMTP id g67so6392839wmd.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 04:04:29 -0800 (PST)
+References: <CAFyWVaZ5tQq4eGaZiPBq7172PB_x3JCqV6c2xo=wSJdgbJakKQ@mail.gmail.com>
+	<20190130025708.12811-1-jimw@sifive.com>
+	<CAKmqyKMrCVqudmyJUPta9q6TJtDkeLV=FseAqQ7YhYMu3ak_NQ@mail.gmail.com>
+	<CAFyWVaaS_4RY9YKXcgJ1F4Ep1TDWkExtBTEigJedZQCcXG+44Q@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9b4e0b04-e941-a433-0175-33ba9f79945b@linaro.org>
+Date: Thu, 7 Feb 2019 12:04:20 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190207073928.4048-1-david.brenken@efs-auto.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFyWVaaS_4RY9YKXcgJ1F4Ep1TDWkExtBTEigJedZQCcXG+44Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH 0/2] tricore: fixes for CADD and CADDN
- instructions
+Subject: Re: [Qemu-devel] [PATCH 5/5 v3] RISC-V: Add hooks to use the gdb
+ xml files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +34,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
-Cc: David Brenken <david.brenken@efs-auto.de>
+To: Jim Wilson <jimw@sifive.com>, Alistair Francis <alistair23@gmail.com>
+Cc: qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Hi David,
+On 2/7/19 2:05 AM, Jim Wilson wrote:
+> Maybe qemu doesn't care about unused arguments/parameters?
 
-On 2/7/19 8:39 AM, David Brenken wrote:
-> From: David Brenken <david.brenken@efs-auto.de>
->
-> Hello,
->
-> this patch series contains a fix for the RCR CADD and RCR CADDN instruction of the TriCore.
-> The r4 and r3 registers were swapped.
->
-> Best regards
->
-> David Brenken
->
-> David Brenken (2):
->    tricore: fixed RCR_CADD instruction
->    tricore: fixed RCR_CADDN instruction
->
->   target/tricore/translate.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
->
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+We do not.
 
-I queued it for the next PR.
 
-Cheers,
-
-Bastian
+r~
