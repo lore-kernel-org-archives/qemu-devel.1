@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49868)
+Received: from eggs.gnu.org ([209.51.188.92]:50842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1grjgm-0002jN-OT
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:26:01 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grjkX-0005Rp-GU
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:29:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1grjgk-0005Hy-T5
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:26:00 -0500
-Received: from fanzine.igalia.com ([91.117.99.155]:59922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1grjgi-0005FS-UZ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:25:58 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <c741408825d01f5a186901c5a8248126ffebe9fd.1549545591.git.berto@igalia.com>
-References: <cover.1549545591.git.berto@igalia.com>
-	<c741408825d01f5a186901c5a8248126ffebe9fd.1549545591.git.berto@igalia.com>
-Date: Thu, 07 Feb 2019 14:25:54 +0100
-Message-ID: <w51imxvhgrh.fsf@maestria.local.igalia.com>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1grjkW-00070Z-OD
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:29:53 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:49026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1grjkW-0006tU-HK
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 08:29:52 -0500
+Date: Thu, 7 Feb 2019 15:29:35 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190207132935.ijtfsiafpfggugiz@function>
+References: <20190205182848.29887-1-samuel.thibault@ens-lyon.org>
+	<CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/3] main-loop: Don't leak GSources
- attached to a GMainContext
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8zvq6eUVWhAVSmaxKe4hyrDu08m==RbwKXvL+2zBDrnQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULLv3 00/32] More work towards libslirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang?= =?utf-8?Q?=C3=A9?= <berrange@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-On Thu 07 Feb 2019 02:23:21 PM CET, Alberto Garcia wrote:
-> After g_source_attach() the GMainContext holds a reference to the
-> GSource, so the caller does not need to keep it.
->
-> pty_chr_state() and qio_task_thread_worker() are not doing this, so
+Peter Maydell, le jeu. 07 f=C3=A9vr. 2019 11:46:23 +0000, a ecrit:
+> On Tue, 5 Feb 2019 at 18:28, Samuel Thibault
+> <samuel.thibault@ens-lyon.org> wrote:
+> >
+> > The following changes since commit 01a9a51ffaf4699827ea6425cb2b834a35=
+6e159d:
+> >
+> >   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190205-pull-=
+request' into staging (2019-02-05 14:01:29 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+> >
+> > for you to fetch changes up to 1e924479dce65a26a7432bf5920f89c1bf957d=
+74:
+> >
+> >   slirp: API is extern C (2019-02-05 20:27:27 +0200)
+> >
+> > ----------------------------------------------------------------
+> > More work towards libslirp
+> >
+>=20
+> Format string issues for the Windows build:
 
-s/are not doing this/are not releasing their references/
+Oh, I am not getting these errors with make docker-test-mingw@fedora,
+perhaps something would need to be fixed there to test as much as you do?
 
-I'll correct this if I need to send a new version of the series,
-otherwise please fix when committing this patch.
+> All the other builds went OK.
 
-Berto
+Good :) I'll have a look at these formatting issues.
+
+Samuel
