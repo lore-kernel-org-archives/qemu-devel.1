@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57322)
+Received: from eggs.gnu.org ([209.51.188.92]:57300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvs-0001un-Ui
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvs-0001tl-Et
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002D2-MR
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002Ca-Bh
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:52 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33024)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnvr-0002Ap-D9
+	id 1grnvr-00028h-3W
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:51 -0500
-Received: by mail-wm1-x342.google.com with SMTP id h22so4956411wmb.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:50 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id b11so828184wmj.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:47 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:56:55 +0100
-Message-Id: <1549562254-41157-13-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:56:52 +0100
+Message-Id: <1549562254-41157-10-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/51] build: convert sound.mak to Kconfig
+Subject: [Qemu-devel] [PATCH 09/51] ide: express dependencies with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +30,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, philmd@redhat.com
 
-There is really nothing special in these devices; they are just
-ISA devices.  Instead of including them for each target,
-set CONFIG_ISA_BUS to true, and make the devices default to present
-whenever ISA is available.  More conversion of ISA devices will
-follow.
-
-Done with the following script:
-
-  while read i; do
-     i=${i%=y}; i=${i#CONFIG_}
-     sed -i -e'/^config '$i'$/!b' -en \
-            -e'a\' -e'    default y\' -e'    depends on ISA_BUS' \
-          `grep -lw $i hw/*/Kconfig`
-  done < default-configs/sound.mak
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190123065618.3520-32-yang.zhong@intel.com>
+Message-Id: <20190123065618.3520-29-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/i386-softmmu.mak        | 2 +-
- default-configs/mips-softmmu-common.mak | 2 +-
- default-configs/ppc-softmmu.mak         | 2 +-
- default-configs/sound.mak               | 4 ----
- hw/audio/Kconfig                        | 8 ++++++++
- 5 files changed, 11 insertions(+), 7 deletions(-)
- delete mode 100644 default-configs/sound.mak
+ default-configs/alpha-softmmu.mak   |  2 --
+ default-configs/hppa-softmmu.mak    |  1 -
+ default-configs/pci.mak             |  3 ---
+ default-configs/sparc64-softmmu.mak |  1 -
+ hw/ide/Kconfig                      | 15 +++++++++++++++
+ 5 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 80c4b49..db841b6 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -2,7 +2,7 @@
- 
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
--include sound.mak
-+CONFIG_ISA_BUS=y
- include usb.mak
- include hyperv.mak
- CONFIG_TEST_DEVICES=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index 88f28e5..4a48960 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -1,7 +1,7 @@
- # Common mips*-softmmu CONFIG defines
- 
--include sound.mak
- include usb.mak
-+CONFIG_ISA_BUS=y
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
+diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
+index 74501ca..3fd656e 100644
+--- a/default-configs/alpha-softmmu.mak
++++ b/default-configs/alpha-softmmu.mak
+@@ -11,8 +11,6 @@ CONFIG_PARALLEL=y
+ CONFIG_FDC=y
+ CONFIG_PCKBD=y
+ CONFIG_VGA_CIRRUS=y
+-CONFIG_IDE_CORE=y
+-CONFIG_IDE_QDEV=y
+ CONFIG_VMWARE_VGA=y
+ CONFIG_IDE_CMD646=y
+ CONFIG_I8259=y
+diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-softmmu.mak
+index b594a6d..e0a6cdc 100644
+--- a/default-configs/hppa-softmmu.mak
++++ b/default-configs/hppa-softmmu.mak
+@@ -5,7 +5,6 @@ CONFIG_SERIAL_ISA=y
+ CONFIG_ISA_BUS=y
+ CONFIG_I8259=y
+ CONFIG_E1000_PCI=y
+-CONFIG_IDE_ISA=y
+ CONFIG_IDE_CMD646=y
+ # CONFIG_IDE_MMIO=y
+ CONFIG_VIRTIO_VGA=y
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 3d4c71d..41af5e7 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -23,9 +23,6 @@ CONFIG_MPTSAS_SCSI_PCI=y
+ CONFIG_RTL8139_PCI=y
+ CONFIG_E1000_PCI=y
+ CONFIG_E1000E_PCI_EXPRESS=y
+-CONFIG_IDE_CORE=y
+-CONFIG_IDE_QDEV=y
+-CONFIG_IDE_PCI=y
+ CONFIG_AHCI=y
  CONFIG_ESP=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index f47c069..f1d06f4 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for ppc-softmmu
+ CONFIG_ESP_PCI=y
+diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
+index 415d4e0..b17513b 100644
+--- a/default-configs/sparc64-softmmu.mak
++++ b/default-configs/sparc64-softmmu.mak
+@@ -9,7 +9,6 @@ CONFIG_SERIAL_ISA=y
+ CONFIG_PARALLEL=y
+ CONFIG_PCKBD=y
+ CONFIG_FDC=y
+-CONFIG_IDE_ISA=y
+ CONFIG_IDE_CMD646=y
+ CONFIG_PCI_SABRE=y
+ CONFIG_SIMBA=y
+diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
+index 5ec4495..fe27705 100644
+--- a/hw/ide/Kconfig
++++ b/hw/ide/Kconfig
+@@ -3,33 +3,48 @@ config IDE_CORE
  
--include sound.mak
- include usb.mak
-+CONFIG_ISA_BUS=y
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
- CONFIG_TEST_DEVICES=y
-diff --git a/default-configs/sound.mak b/default-configs/sound.mak
-deleted file mode 100644
-index 4f22c34..0000000
---- a/default-configs/sound.mak
-+++ /dev/null
-@@ -1,4 +0,0 @@
--CONFIG_SB16=y
--CONFIG_ADLIB=y
--CONFIG_GUS=y
--CONFIG_CS4231A=y
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index aa5c82b..dedb513 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -1,5 +1,7 @@
- config SB16
+ config IDE_QDEV
      bool
-+    default y
-+    depends on ISA_BUS
++    select IDE_CORE
  
- config ES1370
+ config IDE_PCI
      bool
-@@ -13,12 +15,18 @@ config AC97
++    select IDE_CORE
  
- config ADLIB
+ config IDE_ISA
      bool
-+    default y
-+    depends on ISA_BUS
++    select IDE_QDEV
  
- config GUS
+ config IDE_PIIX
      bool
-+    default y
-+    depends on ISA_BUS
++    select IDE_PCI
++    select IDE_QDEV
  
- config CS4231A
+ config IDE_CMD646
      bool
-+    default y
-+    depends on ISA_BUS
++    select IDE_PCI
++    select IDE_QDEV
  
- config HDA
+ config IDE_MACIO
      bool
++    select IDE_QDEV
+ 
+ config IDE_MMIO
+     bool
++    select IDE_QDEV
+ 
+ config IDE_VIA
+     bool
++    select IDE_PCI
++    select IDE_QDEV
+ 
+ config MICRODRIVE
+     bool
++    select IDE_QDEV
+ 
+ config AHCI
+     bool
++    select IDE_QDEV
+ 
+ config IDE_SII3112
+     bool
++    select IDE_PCI
++    select IDE_QDEV
 -- 
 1.8.3.1
