@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57446)
+Received: from eggs.gnu.org ([209.51.188.92]:57422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvw-0001xj-Tb
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvw-0001x4-4f
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvv-0002Hl-2h
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:56 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38648)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnvr-0002DW-UM
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:55 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36556)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnvu-0002HS-P8
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:55 -0500
-Received: by mail-wr1-x442.google.com with SMTP id v13so829100wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:54 -0800 (PST)
+	id 1grnvr-00024Q-GM
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:57:51 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z3so844615wrv.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:57:40 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:56:59 +0100
-Message-Id: <1549562254-41157-17-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:56:44 +0100
+Message-Id: <1549562254-41157-2-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/51] isa: express dependencies with kconfig
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 01/51] minikconfig: add parser skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,399 +31,484 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com, Yang Zhong <yang.zhong@intel.com>
+Cc: thuth@redhat.com, philmd@redhat.com
+
+This implements a scanner and recursive descent parser for Kconfig-like
+configuration files.  The only "action" of the parser is for now to
+detect undefined variables and process include files.
+
+The main differences between Kconfig and this are:
+
+* only the "bool" type is supported
+
+* variables can only be defined once
+
+* choices are not supported (but they could be added as syntactic
+sugar for multiple Boolean values)
+
+* menus and other graphical concepts (prompts, help text) are not
+supported
+
+* assignments ("CONFIG_FOO=y", "CONFIG_FOO=n") are parsed as part
+of the Kconfig language, not as a separate file.
+
+The idea was originally by Ákos Kovács, but I could not find his
+implementation so I had to redo it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Message-Id: <20190123065618.3520-36-yang.zhong@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190123065618.3520-23-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/alpha-softmmu.mak       | 1 -
- default-configs/i386-softmmu.mak        | 9 ---------
- default-configs/mips-softmmu-common.mak | 1 -
- default-configs/ppc-softmmu.mak         | 1 -
- default-configs/sh4-softmmu.mak         | 1 -
- default-configs/sh4eb-softmmu.mak       | 1 -
- default-configs/sparc64-softmmu.mak     | 1 -
- hw/audio/Kconfig                        | 2 ++
- hw/block/Kconfig                        | 2 ++
- hw/char/Kconfig                         | 6 ++++++
- hw/display/Kconfig                      | 3 +++
- hw/dma/Kconfig                          | 1 +
- hw/i386/Kconfig                         | 1 +
- hw/ide/Kconfig                          | 1 +
- hw/input/Kconfig                        | 2 ++
- hw/ipmi/Kconfig                         | 2 ++
- hw/isa/Kconfig                          | 7 +++++++
- hw/misc/Kconfig                         | 6 ++++++
- hw/net/Kconfig                          | 4 ++++
- hw/sparc64/Kconfig                      | 1 +
- hw/tpm/Kconfig                          | 2 +-
- hw/watchdog/Kconfig                     | 2 ++
- 22 files changed, 41 insertions(+), 16 deletions(-)
+ scripts/minikconf.py | 441 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 441 insertions(+)
+ create mode 100644 scripts/minikconf.py
 
-diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
-index e1017aa..f0c1928 100644
---- a/default-configs/alpha-softmmu.mak
-+++ b/default-configs/alpha-softmmu.mak
-@@ -15,7 +15,6 @@ CONFIG_VMWARE_VGA=y
- CONFIG_IDE_CMD646=y
- CONFIG_I8259=y
- CONFIG_MC146818RTC=y
--CONFIG_ISA_TESTDEV=y
- CONFIG_TEST_DEVICES=y
- CONFIG_SMC37C669=y
- CONFIG_DP264=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 60356ed..54b571f 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -9,19 +9,12 @@ CONFIG_VGA_ISA=y
- CONFIG_VMWARE_VGA=y
- CONFIG_VMXNET3_PCI=y
- CONFIG_VIRTIO_VGA=y
--CONFIG_VMMOUSE=y
- CONFIG_IPMI=y
- CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
--CONFIG_PARALLEL=y
- CONFIG_I8254=y
--CONFIG_PCSPK=y
--CONFIG_PCKBD=y
--CONFIG_FDC=y
- CONFIG_ACPI=y
- CONFIG_ACPI_X86=y
- CONFIG_ACPI_X86_ICH=y
-@@ -31,14 +24,12 @@ CONFIG_APM=y
- CONFIG_I8257=y
- CONFIG_IDE_ISA=y
- CONFIG_IDE_PIIX=y
--CONFIG_NE2000_ISA=y
- CONFIG_HPET=y
- CONFIG_APPLESMC=y
- CONFIG_I8259=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_MC146818RTC=y
- CONFIG_PCI_PIIX=y
--CONFIG_WDT_IB700=y
- CONFIG_ISA_DEBUG=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_VMPORT=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index a7a8d4e..45c599b 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -30,7 +30,6 @@ CONFIG_MIPSNET=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_I8259=y
- CONFIG_MC146818RTC=y
--CONFIG_ISA_TESTDEV=y
- CONFIG_EMPTY_SLOT=y
- CONFIG_MIPS_CPS=y
- CONFIG_MIPS_ITU=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index f5df65f..d4807b3 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -63,7 +63,6 @@ CONFIG_PREP=y
- CONFIG_PREP_PCI=y
- CONFIG_SERIAL_ISA=y
- CONFIG_MC146818RTC=y
--CONFIG_ISA_TESTDEV=y
- CONFIG_RS6000_MC=y
- CONFIG_PARALLEL=y
- CONFIG_I82374=y
-diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index 651fe1a..3f7fbe2 100644
---- a/default-configs/sh4-softmmu.mak
-+++ b/default-configs/sh4-softmmu.mak
-@@ -11,7 +11,6 @@ CONFIG_IDE_MMIO=y
- CONFIG_SM501=y
- CONFIG_I2C=y
- CONFIG_DDC=y
--CONFIG_ISA_TESTDEV=y
- CONFIG_TEST_DEVICES=y
- CONFIG_I82378=y
- CONFIG_I8259=y
-diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index fa3e07e..17f07a4 100644
---- a/default-configs/sh4eb-softmmu.mak
-+++ b/default-configs/sh4eb-softmmu.mak
-@@ -11,7 +11,6 @@ CONFIG_IDE_MMIO=y
- CONFIG_SM501=y
- CONFIG_I2C=y
- CONFIG_DDC=y
--CONFIG_ISA_TESTDEV=y
- CONFIG_TEST_DEVICES=y
- CONFIG_I82378=y
- CONFIG_I8259=y
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 24d7389..2d23b0c 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -14,7 +14,6 @@ CONFIG_PCI_SABRE=y
- CONFIG_SIMBA=y
- CONFIG_SUNHME=y
- CONFIG_MC146818RTC=y
--CONFIG_ISA_TESTDEV=y
- CONFIG_TEST_DEVICES=y
- CONFIG_SUN4V_RTC=y
- CONFIG_SUN4U=y
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index dedb513..01aea55 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -35,6 +35,8 @@ config HDA
- 
- config PCSPK
-     bool
-+    default y
-+    depends on I8254
- 
- config WM8750
-     bool
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index b60e2ab..6a23659 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -1,5 +1,7 @@
- config FDC
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config SSI_M25P80
-     bool
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 6eba69a..fc18481 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -3,6 +3,8 @@ config ESCC
- 
- config PARALLEL
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config PL011
-     bool
-@@ -12,11 +14,15 @@ config SERIAL
- 
- config SERIAL_ISA
-     bool
-+    default y
-+    depends on ISA_BUS
-+    select SERIAL
- 
- config SERIAL_PCI
-     bool
-     default y if PCI_DEVICES
-     depends on PCI
-+    select SERIAL
- 
- config VIRTIO_SERIAL
-     bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 9199beb..e5f347f 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -39,9 +39,12 @@ config VGA_PCI
- 
- config VGA_ISA
-     bool
-+    depends on ISA_BUS
-+    select VGA
- 
- config VGA_ISA_MM
-     bool
-+    select VGA
- 
- config VMWARE_VGA
-     bool
-diff --git a/hw/dma/Kconfig b/hw/dma/Kconfig
-index b9ce1c5..751dec5 100644
---- a/hw/dma/Kconfig
-+++ b/hw/dma/Kconfig
-@@ -9,6 +9,7 @@ config PL330
- 
- config I82374
-     bool
-+    select I8257
- 
- config I8257
-     bool
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index 6df3f7c..0f94ae1 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -13,6 +13,7 @@ config I440FX
- 
- config ISAPC
-     bool
-+    select ISA_BUS
- 
- config Q35
-     bool
-diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-index 246e27b..ab47b6a 100644
---- a/hw/ide/Kconfig
-+++ b/hw/ide/Kconfig
-@@ -12,6 +12,7 @@ config IDE_PCI
- 
- config IDE_ISA
-     bool
-+    depends on ISA_BUS
-     select IDE_QDEV
- 
- config IDE_PIIX
-diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-index c729dcd..814f87f 100644
---- a/hw/input/Kconfig
-+++ b/hw/input/Kconfig
-@@ -6,6 +6,8 @@ config LM832X
- 
- config PCKBD
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config PL050
-     bool
-diff --git a/hw/ipmi/Kconfig b/hw/ipmi/Kconfig
-index 68f8ba1..6a4f08f 100644
---- a/hw/ipmi/Kconfig
-+++ b/hw/ipmi/Kconfig
-@@ -9,6 +9,8 @@ config IPMI_EXTERN
- 
- config ISA_IPMI_KCS
-     bool
-+    depends on ISA_BUS
- 
- config ISA_IPMI_BT
-     bool
-+    depends on ISA_BUS
-diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index b59d074..af68af9 100644
---- a/hw/isa/Kconfig
-+++ b/hw/isa/Kconfig
-@@ -6,18 +6,25 @@ config APM
- 
- config I82378
-     bool
-+    select ISA_BUS
- 
- config PC87312
-     bool
-+    select ISA_BUS
- 
- config PIIX4
-     bool
-+    select ISA_BUS
- 
- config VT82C686
-     bool
-+    select ISA_BUS
- 
- config SMC37C669
-     bool
-+    select ISA_BUS
- 
- config LPC_ICH9
-     bool
-+    select ISA_BUS
-+    select ACPI_X86_ICH
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 830b457..5a7dbe1 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -1,5 +1,6 @@
- config APPLESMC
-     bool
-+    depends on ISA_BUS
- 
- config MAX111X
-     bool
-@@ -12,12 +13,16 @@ config TMP421
- 
- config ISA_DEBUG
-     bool
-+    depends on ISA_BUS
- 
- config SGA
-     bool
-+    depends on ISA_BUS
- 
- config ISA_TESTDEV
-     bool
-+    default y if TEST_DEVICES
-+    depends on ISA_BUS
- 
- config PCI_TESTDEV
-     bool
-@@ -93,6 +98,7 @@ config IOTKIT_SYSINFO
- 
- config PVPANIC
-     bool
-+    depends on ISA_BUS
- 
- config AUX
-     bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index d50e301..ff974bc 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -48,6 +48,10 @@ config LAN9118
- 
- config NE2000_ISA
-     bool
-+    default y
-+    depends on ISA_BUS
-+    depends on PCI # for NE2000State
-+    select NE2000_PCI
- 
- config OPENCORES_ETH
-     bool
-diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
-index 8c13345..41f7295 100644
---- a/hw/sparc64/Kconfig
-+++ b/hw/sparc64/Kconfig
-@@ -1,5 +1,6 @@
- config SUN4U
-     bool
-+    select ISA_BUS
- 
- config NIAGARA
-     bool
-diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-index da4bb5b..f3eb570 100644
---- a/hw/tpm/Kconfig
-+++ b/hw/tpm/Kconfig
-@@ -3,7 +3,7 @@ config TPM
- 
- config TPM_TIS
-     bool
--    depends on TPM
-+    depends on TPM && ISA_BUS
- 
- config TPM_CRB
-     bool
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index edb3d42..35ccb72 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -8,6 +8,8 @@ config WDT_IB6300ESB
- 
- config WDT_IB700
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config WDT_DIAG288
-     bool
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+new file mode 100644
+index 0000000..8861a32
+--- /dev/null
++++ b/scripts/minikconf.py
+@@ -0,0 +1,441 @@
++#
++# Mini-Kconfig parser
++#
++# Copyright (c) 2015 Red Hat Inc.
++#
++# Authors:
++#  Paolo Bonzini <pbonzini@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or, at your option, any later version.  See the COPYING file in
++# the top-level directory.
++
++from __future__ import print_function
++import os
++import sys
++
++ __all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
++
++def debug_print(*args):
++    print('#' + (' '.join(str(x) for x in args)))
++    pass
++
++# -------------------------------------------
++# KconfigData implements the Kconfig semantics.  For now it can only
++# detect undefined symbols, i.e. symbols that were referenced in
++# assignments or dependencies but were not declared with "config FOO".
++#
++# Semantic actions are represented by methods called do_*.  The do_var
++# method return the semantic value of a variable (which right now is
++# just its name).
++# -------------------------------------------
++
++class KconfigData:
++    def __init__(self):
++        self.previously_included = []
++        self.incl_info = None
++        self.defined_vars = set()
++        self.referenced_vars = set()
++
++    # semantic analysis -------------
++
++    def check_undefined(self):
++        undef = False
++        for i in self.referenced_vars:
++            if not (i in self.defined_vars):
++                print("undefined symbol %s" % (i), file=sys.stderr)
++                undef = True
++        return undef
++
++    # semantic actions -------------
++
++    def do_declaration(self, var):
++        if (var in self.defined_vars):
++            raise Exception('variable "' + var + '" defined twice')
++
++        self.defined_vars.add(var)
++
++    # var is a string with the variable's name.
++    #
++    # For now this just returns the variable's name itself.
++    def do_var(self, var):
++        self.referenced_vars.add(var)
++        return var
++
++    def do_assignment(self, var, val):
++        pass
++
++    def do_default(self, var, val, cond=None):
++        pass
++
++    def do_depends_on(self, var, expr):
++        pass
++
++    def do_select(self, var, symbol, cond=None):
++        pass
++
++    def do_imply(self, var, symbol, cond=None):
++        pass
++
++# -------------------------------------------
++# KconfigParser implements a recursive descent parser for (simplified)
++# Kconfig syntax.
++# -------------------------------------------
++
++# tokens table
++TOKENS = {}
++TOK_NONE = -1
++TOK_LPAREN = 0;   TOKENS[TOK_LPAREN] = '"("';
++TOK_RPAREN = 1;   TOKENS[TOK_RPAREN] = '")"';
++TOK_EQUAL = 2;    TOKENS[TOK_EQUAL] = '"="';
++TOK_AND = 3;      TOKENS[TOK_AND] = '"&&"';
++TOK_OR = 4;       TOKENS[TOK_OR] = '"||"';
++TOK_NOT = 5;      TOKENS[TOK_NOT] = '"!"';
++TOK_DEPENDS = 6;  TOKENS[TOK_DEPENDS] = '"depends"';
++TOK_ON = 7;       TOKENS[TOK_ON] = '"on"';
++TOK_SELECT = 8;   TOKENS[TOK_SELECT] = '"select"';
++TOK_IMPLY = 9;    TOKENS[TOK_IMPLY] = '"imply"';
++TOK_CONFIG = 10;  TOKENS[TOK_CONFIG] = '"config"';
++TOK_DEFAULT = 11; TOKENS[TOK_DEFAULT] = '"default"';
++TOK_Y = 12;       TOKENS[TOK_Y] = '"y"';
++TOK_N = 13;       TOKENS[TOK_N] = '"n"';
++TOK_SOURCE = 14;  TOKENS[TOK_SOURCE] = '"source"';
++TOK_BOOL = 15;    TOKENS[TOK_BOOL] = '"bool"';
++TOK_IF = 16;      TOKENS[TOK_IF] = '"if"';
++TOK_ID = 17;      TOKENS[TOK_ID] = 'identifier';
++TOK_EOF = 18;     TOKENS[TOK_EOF] = 'end of file';
++
++class KconfigParserError(Exception):
++    def __init__(self, parser, msg, tok=None):
++        self.loc = parser.location()
++        tok = tok or parser.tok
++        if tok != TOK_NONE:
++            location = TOKENS.get(tok, None) or ('"%s"' % tok)
++            msg = '%s before %s' % (msg, location)
++        self.msg = msg
++
++    def __str__(self):
++        return "%s: %s" % (self.loc, self.msg)
++
++class KconfigParser:
++    @classmethod
++    def parse(self, fp):
++        data = KconfigData()
++        parser = KconfigParser(data)
++        parser.parse_file(fp)
++        if data.check_undefined():
++            raise KconfigParserError(parser, "there were undefined symbols")
++
++        return data
++
++    def __init__(self, data):
++        self.data = data
++
++    def parse_file(self, fp):
++        self.abs_fname = os.path.abspath(fp.name)
++        self.fname = fp.name
++        self.data.previously_included.append(self.abs_fname)
++        self.src = fp.read()
++        if self.src == '' or self.src[-1] != '\n':
++            self.src += '\n'
++        self.cursor = 0
++        self.line = 1
++        self.line_pos = 0
++        self.get_token()
++        self.parse_config()
++
++    # file management -----
++
++    def error_path(self):
++        inf = self.data.incl_info
++        res = ""
++        while inf:
++            res = ("In file included from %s:%d:\n" % (inf['file'],
++                                                       inf['line'])) + res
++            inf = inf['parent']
++        return res
++
++    def location(self):
++        col = 1
++        for ch in self.src[self.line_pos:self.pos]:
++            if ch == '\t':
++                col += 8 - ((col - 1) % 8)
++            else:
++                col += 1
++        return '%s%s:%d:%d' %(self.error_path(), self.fname, self.line, col)
++
++    def do_include(self, include):
++        incl_abs_fname = os.path.join(os.path.dirname(self.abs_fname),
++                                      include)
++        # catch inclusion cycle
++        inf = self.data.incl_info
++        while inf:
++            if incl_abs_fname == os.path.abspath(inf['file']):
++                raise KconfigParserError(self, "Inclusion loop for %s"
++                                    % include)
++            inf = inf['parent']
++
++        # skip multiple include of the same file
++        if incl_abs_fname in self.data.previously_included:
++            return
++        try:
++            fp = open(incl_abs_fname, 'r')
++        except IOError as e:
++            raise KconfigParserError(self,
++                                '%s: %s' % (e.strerror, include))
++
++        inf = self.data.incl_info
++        self.data.incl_info = { 'file': self.fname, 'line': self.line,
++                'parent': inf }
++        KconfigParser(self.data).parse_file(fp)
++        self.data.incl_info = inf
++
++    # recursive descent parser -----
++
++    # y_or_n: Y | N
++    def parse_y_or_n(self):
++        if self.tok == TOK_Y:
++            self.get_token()
++            return True
++        if self.tok == TOK_N:
++            self.get_token()
++            return False
++        raise KconfigParserError(self, 'Expected "y" or "n"')
++
++    # var: ID
++    def parse_var(self):
++        if self.tok == TOK_ID:
++            val = self.val
++            self.get_token()
++            return self.data.do_var(val)
++        else:
++            raise KconfigParserError(self, 'Expected identifier')
++
++    # assignment_var: ID (starting with "CONFIG_")
++    def parse_assignment_var(self):
++        if self.tok == TOK_ID:
++            val = self.val
++            if not val.startswith("CONFIG_"):
++                raise KconfigParserError(self,
++                           'Expected identifier starting with "CONFIG_"', TOK_NONE)
++            self.get_token()
++            return self.data.do_var(val[7:])
++        else:
++            raise KconfigParserError(self, 'Expected identifier')
++
++    # assignment: var EQUAL y_or_n
++    def parse_assignment(self):
++        var = self.parse_assignment_var()
++        if self.tok != TOK_EQUAL:
++            raise KconfigParserError(self, 'Expected "="')
++        self.get_token()
++        self.data.do_assignment(var, self.parse_y_or_n())
++
++    # primary: NOT primary
++    #       | LPAREN expr RPAREN
++    #       | var
++    def parse_primary(self):
++        if self.tok == TOK_NOT:
++            self.get_token()
++            self.parse_primary()
++        elif self.tok == TOK_LPAREN:
++            self.get_token()
++            self.parse_expr()
++            if self.tok != TOK_RPAREN:
++                raise KconfigParserError(self, 'Expected ")"')
++            self.get_token()
++        elif self.tok == TOK_ID:
++            self.parse_var()
++        else:
++            raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
++
++    # disj: primary (OR primary)*
++    def parse_disj(self):
++        self.parse_primary()
++        while self.tok == TOK_OR:
++            self.get_token()
++            self.parse_primary()
++
++    # expr: disj (AND disj)*
++    def parse_expr(self):
++        self.parse_disj()
++        while self.tok == TOK_AND:
++            self.get_token()
++            self.parse_disj()
++
++    # condition: IF expr
++    #       | empty
++    def parse_condition(self):
++        if self.tok == TOK_IF:
++            self.get_token()
++            return self.parse_expr()
++        else:
++            return None
++
++    # property: DEFAULT y_or_n condition
++    #       | DEPENDS ON expr
++    #       | SELECT var condition
++    #       | BOOL
++    def parse_property(self, var):
++        if self.tok == TOK_DEFAULT:
++            self.get_token()
++            val = self.parse_y_or_n()
++            cond = self.parse_condition()
++            self.data.do_default(var, val, cond)
++        elif self.tok == TOK_DEPENDS:
++            self.get_token()
++            if self.tok != TOK_ON:
++                raise KconfigParserError(self, 'Expected "on"')
++            self.get_token()
++            self.data.do_depends_on(var, self.parse_expr())
++        elif self.tok == TOK_SELECT:
++            self.get_token()
++            symbol = self.parse_var()
++            cond = self.parse_condition()
++            self.data.do_select(var, symbol, cond)
++        elif self.tok == TOK_IMPLY:
++            self.get_token()
++            symbol = self.parse_var()
++            cond = self.parse_condition()
++            self.data.do_imply(var, symbol, cond)
++        elif self.tok == TOK_BOOL:
++            self.get_token()
++        else:
++            raise KconfigParserError(self, 'Error in recursive descent?')
++
++    # properties: properties property
++    #       | /* empty */
++    def parse_properties(self, var):
++        had_default = False
++        while self.tok == TOK_DEFAULT or self.tok == TOK_DEPENDS or \
++              self.tok == TOK_SELECT or self.tok == TOK_BOOL or \
++              self.tok == TOK_IMPLY:
++            self.parse_property(var)
++        self.data.do_default(var, False)
++
++        # for nicer error message
++        if self.tok != TOK_SOURCE and self.tok != TOK_CONFIG and \
++           self.tok != TOK_ID and self.tok != TOK_EOF:
++            raise KconfigParserError(self, 'expected "source", "config", identifier, '
++                    + '"default", "depends on", "imply" or "select"')
++
++    # declaration: config var properties
++    def parse_declaration(self):
++        if self.tok == TOK_CONFIG:
++            self.get_token()
++            var = self.parse_var()
++            self.data.do_declaration(var)
++            self.parse_properties(var)
++        else:
++            raise KconfigParserError(self, 'Error in recursive descent?')
++
++    # clause: SOURCE
++    #       | declaration
++    #       | assignment
++    def parse_clause(self):
++        if self.tok == TOK_SOURCE:
++            val = self.val
++            self.get_token()
++            self.do_include(val)
++        elif self.tok == TOK_CONFIG:
++            self.parse_declaration()
++        elif self.tok == TOK_ID:
++            self.parse_assignment()
++        else:
++            raise KconfigParserError(self, 'expected "source", "config" or identifier')
++
++    # config: clause+ EOF
++    def parse_config(self):
++        while self.tok != TOK_EOF:
++            self.parse_clause()
++        return self.data
++
++    # scanner -----
++
++    def get_token(self):
++        while True:
++            self.tok = self.src[self.cursor]
++            self.pos = self.cursor
++            self.cursor += 1
++
++            self.val = None
++            self.tok = self.scan_token()
++            if self.tok is not None:
++                return
++
++    def check_keyword(self, rest):
++        if not self.src.startswith(rest, self.cursor):
++            return False
++        length = len(rest)
++        if self.src[self.cursor + length].isalnum() or self.src[self.cursor + length] == '|':
++            return False
++        self.cursor += length
++        return True
++
++    def scan_token(self):
++        if self.tok == '#':
++            self.cursor = self.src.find('\n', self.cursor)
++            return None
++        elif self.tok == '=':
++            return TOK_EQUAL
++        elif self.tok == '(':
++            return TOK_LPAREN
++        elif self.tok == ')':
++            return TOK_RPAREN
++        elif self.tok == '&' and self.src[self.pos+1] == '&':
++            self.cursor += 1
++            return TOK_AND
++        elif self.tok == '|' and self.src[self.pos+1] == '|':
++            self.cursor += 1
++            return TOK_OR
++        elif self.tok == '!':
++            return TOK_NOT
++        elif self.tok == 'd' and self.check_keyword("epends"):
++            return TOK_DEPENDS
++        elif self.tok == 'o' and self.check_keyword("n"):
++            return TOK_ON
++        elif self.tok == 's' and self.check_keyword("elect"):
++            return TOK_SELECT
++        elif self.tok == 'i' and self.check_keyword("mply"):
++            return TOK_IMPLY
++        elif self.tok == 'c' and self.check_keyword("onfig"):
++            return TOK_CONFIG
++        elif self.tok == 'd' and self.check_keyword("efault"):
++            return TOK_DEFAULT
++        elif self.tok == 'b' and self.check_keyword("ool"):
++            return TOK_BOOL
++        elif self.tok == 'i' and self.check_keyword("f"):
++            return TOK_IF
++        elif self.tok == 'y' and self.check_keyword(""):
++            return TOK_Y
++        elif self.tok == 'n' and self.check_keyword(""):
++            return TOK_N
++        elif (self.tok == 's' and self.check_keyword("ource")) or \
++              self.tok == 'i' and self.check_keyword("nclude"):
++            # source FILENAME
++            # include FILENAME
++            while self.src[self.cursor].isspace():
++                self.cursor += 1
++            start = self.cursor
++            self.cursor = self.src.find('\n', self.cursor)
++            self.val = self.src[start:self.cursor]
++            return TOK_SOURCE
++        elif self.tok.isalpha():
++            # identifier
++            while self.src[self.cursor].isalnum() or self.src[self.cursor] == '_':
++                self.cursor += 1
++            self.val = self.src[self.pos:self.cursor]
++            return TOK_ID
++        elif self.tok == '\n':
++            if self.cursor == len(self.src):
++                return TOK_EOF
++            self.line += 1
++            self.line_pos = self.cursor
++        elif not self.tok.isspace():
++            raise KconfigParserError(self, 'invalid input')
++
++        return None
++
++if __name__ == '__main__':
++    fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
++    KconfigParser.parse(open(fname, 'r'))
 -- 
 1.8.3.1
