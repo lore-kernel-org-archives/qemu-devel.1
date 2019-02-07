@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45156)
+Received: from eggs.gnu.org ([209.51.188.92]:46942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1grhNr-0007Td-JM
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:58:20 -0500
+	(envelope-from <gio@debian.org>) id 1grhV1-00022e-Jq
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:05:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1grhNq-0002Qi-RL
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:58:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49100)
+	(envelope-from <gio@debian.org>) id 1grhUq-0007Mi-2r
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:05:33 -0500
+Received: from pietrobattiston.it ([92.243.7.39]:55962
+	helo=jauntuale.pietrobattiston.it)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1grhNq-0002OK-Jv
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 05:58:18 -0500
-Date: Thu, 7 Feb 2019 11:49:47 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190207114947.2d96ed9e@Igors-MacBook-Pro.local>
-In-Reply-To: <20190206235515.r2h6sk74uggt7qg3@master>
-References: <20190201010837.19278-1-richardw.yang@linux.intel.com>
-	<20190206125949.511438c9@Igors-MacBook-Pro.local>
-	<20190206235515.r2h6sk74uggt7qg3@master>
+	(Exim 4.71) (envelope-from <gio@debian.org>) id 1grhUg-0006mH-4F
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:05:29 -0500
+References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
+	<20190207114913.2c5f2c5b.cohuck@redhat.com>
+From: Giovanni Mascellani <gio@debian.org>
+Message-ID: <6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
+Date: Thu, 7 Feb 2019 12:05:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc-dimm: use same mechanism for
- [get|set]_addr
+In-Reply-To: <20190207114913.2c5f2c5b.cohuck@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="i4NmYQPYso7JrfWRvxPiwsyRPODiTSj2z"
+Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
+ under qemu-s390x in user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-On Wed, 6 Feb 2019 23:55:15 +0000
-Wei Yang <richard.weiyang@gmail.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--i4NmYQPYso7JrfWRvxPiwsyRPODiTSj2z
+From: Giovanni Mascellani <gio@debian.org>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Bug 1815024 <1815024@bugs.launchpad.net>, qemu-devel@nongnu.org
+Message-ID: <6c5ac94e-065f-e66a-2df2-5d8ac81c76e1@debian.org>
+Subject: Re: [Qemu-devel] [Bug 1815024] [NEW] SIGILL on instruction "stck"
+ under qemu-s390x in user mode
+References: <154953276796.22523.967637403683519556.malonedeb@chaenomeles.canonical.com>
+ <20190207114913.2c5f2c5b.cohuck@redhat.com>
+In-Reply-To: <20190207114913.2c5f2c5b.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Feb 06, 2019 at 12:59:49PM +0100, Igor Mammedov wrote:
-> >On Fri,  1 Feb 2019 09:08:37 +0800
-> >Wei Yang <richardw.yang@linux.intel.com> wrote:
-> >
-> >> [get|set]_addr are two counterpart to access PCDIMMDevice.addr.
-> >> 
-> >> Since we have already set up a property PC_DIMM_ADDR_PROP for this
-> >> field and use this mechanism in set_addr, it would be more proper to use
-> >> the same mechanism in set_addr.
-> >> 
-> >> This patch uses object_property_get_uint() to replace the direct memory
-> >> access to make [get|set]_addr with the same mechanism.
-> >> 
-> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> >> ---
-> >>  hw/mem/pc-dimm.c | 4 +---
-> >>  1 file changed, 1 insertion(+), 3 deletions(-)
-> >> 
-> >> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> >> index 0c9b9e8292..c0658b9b88 100644
-> >> --- a/hw/mem/pc-dimm.c
-> >> +++ b/hw/mem/pc-dimm.c
-> >> @@ -204,9 +204,7 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-> >>  
-> >>  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-> >>  {
-> >> -    const PCDIMMDevice *dimm = PC_DIMM(md);
-> >> -
-> >> -    return dimm->addr;
-> >> +    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, NULL);
-> >it's not good to ignore errors
-> >
-> >s/NULL/error_abort/
-> >
-> >so we would notice if error ever happened.
-> 
-> You mean something like this?
-> 
-> 	Error *err;
-> 	uint64_t addr;
-> 
-> 	addr = object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, &err);
+Hi, thanks for answering!
 
-see how error_abort is used in QEMU,
-point is if there is a error that should never happen it is programming error so
-QEMU should crash and we should fix it.
+Il 07/02/19 11:49, Cornelia Huck ha scritto:
+> Did that work before commit 7de3b1cdc67 ("s390x/tcg: properly implement=
 
-> 
-> 	if (err) {
-> 		warn_report_err(&err);
-> 		return 0;
-> 	}
-> 
-> 	return addr;
-> 
-> >
-> >>  }
-> >>  
-> >>  static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
-> >
-> 
+> the TOD")?
+
+It does not seem so:
+
+$ /qemu-s390x-new -version
+qemu-s390x version 2.12.50 (v2.12.0-1983-g7de3b1cdc6-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+$ /qemu-s390x-new ./a.out
+Istruzione non consentita
+
+(i.e., "illegal instruction")
+
+But this might be expected. Now I go to the previous commit (f777b20544)
+and recompile:
+
+$ /qemu-s390x-new -version
+qemu-s390x version 2.12.50 (v2.12.0-1982-gf777b20544-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+$ /qemu-s390x-new ./a.out
+Istruzione non consentita
+
+So again. And even going back to 76ed4b18de (i.e., skipping a few
+apparently related s390x commits):
+
+$ /qemu-s390x-new -version
+qemu-s390x version 2.12.50 (v2.12.0-1976-g76ed4b18de-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+$ /qemu-s390x-new ./a.out
+Istruzione non consentita
+> stckf will end up at the same helper, so it seems likely to hit the
+> same problem.
+
+I guessed so.
+
+Thanks again, Giovanni.
+--=20
+Giovanni Mascellani <g.mascellani@gmail.com>
+Postdoc researcher - Universit=C3=A9 Libre de Bruxelles
+
+
+--i4NmYQPYso7JrfWRvxPiwsyRPODiTSj2z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQSiBF6hBvCQNcghJEaNr8EMz954SQUCXFwQ5QAKCRCNr8EMz954
+SQx0AQDf//9Bw2be/QWrPsxHkpiHAwUfxIw/8Oy4jDVfSRC7sgEA/q/RZdM/83hM
++T4bgYDmD91/mh+/w3Fz+cTjzDeiKAo=
+=GgA8
+-----END PGP SIGNATURE-----
+
+--i4NmYQPYso7JrfWRvxPiwsyRPODiTSj2z--
