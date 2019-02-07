@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38813)
+Received: from eggs.gnu.org ([209.51.188.92]:41578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1grebC-00079x-Lf
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:59:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1greqX-0001OC-8O
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 03:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1grebA-0001vI-NW
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:59:54 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34968)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1greb7-0001dR-5P
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 02:59:50 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z18so9668183wrh.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Feb 2019 23:59:39 -0800 (PST)
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-10-philmd@redhat.com>
-	<CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
-	<e5dd8130-e041-7774-2141-cc506dee99f7@redhat.com>
-	<94f74717-0bab-ea0a-e7cc-239a1b1136bf@comstyle.com>
-	<97d5ea1c-0621-8f9c-0ee6-6a64540b4ddd@comstyle.com>
-	<87zhr8mzq2.fsf@zen.linaroharston>
-	<1afc34a0-1267-dbf8-15fa-d35ec3428e3d@comstyle.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1afc34a0-1267-dbf8-15fa-d35ec3428e3d@comstyle.com>
-Date: Thu, 07 Feb 2019 07:59:36 +0000
-Message-ID: <87womcm3kn.fsf@zen.linaroharston>
+	(envelope-from <thuth@redhat.com>) id 1greqR-0003We-Fw
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 03:15:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1greqI-0003Kw-6x
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 03:15:35 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6B170C062C6A
+	for <qemu-devel@nongnu.org>; Thu,  7 Feb 2019 08:15:20 +0000 (UTC)
+References: <cb3e0855-a729-9a3d-e6ef-bfebea17b2cb@redhat.com>
+	<20190205075249.6tx74rgbnojzssyp@sirius.home.kraxel.org>
+	<225bc7bb-3c2c-1e26-4a29-4a900f60fe11@redhat.com>
+	<20190205094229.5p27mdjj55awy3j2@sirius.home.kraxel.org>
+	<129f0590-324a-0fc6-dc12-52965fef66d7@redhat.com>
+	<f8e99916-b992-c89b-8137-a74d50ebf1a6@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a2087497-4ba1-810a-8f3b-9e97041a7398@redhat.com>
+Date: Thu, 7 Feb 2019 09:15:11 +0100
 MIME-Version: 1.0
+In-Reply-To: <f8e99916-b992-c89b-8137-a74d50ebf1a6@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
- from the ports
+Subject: Re: [Qemu-devel] SeaBIOS regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +38,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Smith <brad@comstyle.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mat?= =?utf-8?Q?hieu-Daud=C3=A9?= <philmd@redhat.com>
+To: John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
-Brad Smith <brad@comstyle.com> writes:
-
-> On 2/6/2019 3:25 PM, Alex Benn=C3=A9e wrote:
->
->> Brad Smith <brad@comstyle.com> writes:
->>
->>> On 2/5/2019 8:57 AM, Brad Smith wrote:
+On 2019-02-06 18:29, John Snow wrote:
+>=20
+>=20
+> On 2/5/19 4:47 AM, Thomas Huth wrote:
+>> On 2019-02-05 10:42, Gerd Hoffmann wrote:
+>>> On Tue, Feb 05, 2019 at 10:31:24AM +0100, Thomas Huth wrote:
+>>>> On 2019-02-05 08:52, Gerd Hoffmann wrote:
+>>>>> On Mon, Feb 04, 2019 at 04:10:37PM +0100, Thomas Huth wrote:
+>>>>>>
+>>>>>>  Hi Gerd,
+>>>>>>
+>>>>>> I noticed that certain FreeDOS images are not working correctly an=
+ymore
+>>>>>> with the current version of QEMU, for example
+>>>>>> http://www.qemu-advent-calendar.org/2016/download/day10.tar.xz ...=
+ It
+>>>>>> aborts with:
+>>>>>>
+>>>>>>  Error reading from drive C: DOS area: write-protection violation =
+attempted
+>>>>>>
+>>>>>> I've bisected the issue, and it has apparently been introduced wit=
+h:
+>>>>>>
+>>>>>>  cd1bfd5ef336166b275a09dc9842542bf5e63ae3
+>>>>>>  seabios: update bios and vgabios binaries
+>>>>>>
+>>>>>> Any idea what might be going wrong here?
+>>>>>
+>>>>> Hmm, no.  bisect seabios?
+>>>>
+>>>> I haven't bisected yet, but it seems to be related to CONFIG_ATA_DMA=
+=3Dy
+>>>> in our roms/config.seabios-128k config file. When I switch that to "=
+n",
+>>>> then the old FreeDOS disks are working again...
 >>>
->>>> If someone could point me in the right direction as to how the image
->>>> is created
->>>> I could look at coming up with something newer. I would prefer that
->>>> over some
->>>> of the workarounds I've seen to date.
->>> I started creating the image and then wondered what do I set the root
->>> password
->>> to? The instructions also talk about an SSH key but I don't know how
->>> that would
->>> work when this image is used for the VM test framework.
->> See tests/keys - basically we have a hard-wired testing key.
-> So the root password doesn't matter?
-
-I don't think so. See "Adding new guests" in docs/devel/testing.rst
-
-The Ubuntu and CentOS build_image methods are a bit more elaborate in
-that they build a cloud-image iso which contains a bunch of metadata for
-the image to apply on boot-up. The OpenBSD build_image just downloads
-the data and uncompresses it.
-
-The defaults in BaseIMG are:
-
-    GUEST_USER =3D "qemu"
-    GUEST_PASS =3D "qemupass"
-    ROOT_PASS =3D "qemupass"
-
->>> I updated the instructions on the Wiki to make use of VirtIO for both
->>> the NIC and disk controller.
->> Can the OpenBSD kernel use virtio-net-pci and virtio-scsi-pci?
+>>> Hmm, guess I should turn that off again on the next update (there wil=
+l
+>>> be a seabios 1.12.1 release before qemu 4.0).
 >>
->> It's not super important for build testing but they are the most capable
->> variants of virtio. The virtio-pci gives nice discover-able hotplug and
->> I believe you need virtio-scsi-pci if you want to use funky options like
->> discard for thin provisioning.
->
-> Yes to both.
+>> Ah, right, I just noticed that this has just been enabled in QEMU for
+>> the 3.0 release, where the problem occurred for the first time. So thi=
+s
+>> switch is likely the culprit, not a change in SeaBIOS. I'd also vote t=
+o
+>> revert commit eda553a442e94d now.
+>>
+>>  Thomas
+>>
+>=20
+> If you enable the tracing in hw/ide/core, does it say anything that
+> looks interesting? I'm wondering if there's some deficiency there.
 
-Cool.
+At the end of the log, I can see:
 
---
-Alex Benn=C3=A9e
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
+ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
+0xc8
+ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
+ide_cancel_dma_sync_remaining draining all remaining requests
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
+ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
+0xc8
+ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
+ide_cancel_dma_sync_remaining draining all remaining requests
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
+ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
+0xc8
+ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
+ide_cancel_dma_sync_remaining draining all remaining requests
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
+ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
+0xc8
+ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
+ide_cancel_dma_sync_remaining draining all remaining requests
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f2 (Sector Count); val 0x01;=20
+ide_ioport_write IDE PIO wr @ 0x1f3 (Sector Number); val 0x84;=20
+ide_ioport_write IDE PIO wr @ 0x1f4 (Cylinder Low); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f5 (Cylinder High); val 0x00;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xe0;=20
+ide_ioport_write IDE PIO wr @ 0x1f7 (Command); val 0xc8;=20
+ide_exec_cmd IDE exec cmd: bus 0x55eb8c5c0620; state 0x55eb8c5c0698; cmd =
+0xc8
+ide_dma_cb IDEState 0x55eb8c5c0698; sector_num=3D132 n=3D1 cmd=3DDMA READ
+ide_cancel_dma_sync_remaining draining all remaining requests
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0e;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x0a;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_ioport_write IDE PIO wr @ 0x1f6 (Device/Head); val 0xa0;=20
+ide_ioport_read IDE PIO rd @ 0x1f7 (Status); val 0x50;=20
+ide_cmd_write IDE PIO wr @ 0x3f6 (Device Control); val 0x08;=20
+
+Looks like command 0xc8 (READDMA) goes wrong for some reason?
+
+Anyway, looking at commit eda553a442e94dc16d424849b65c6cb7f1
+it seems like there is a known problem in SeaBIOS with
+CONFIG_ATA_DMA=3Dy with real hardware - so maybe we just hit
+the same problem here, too? That would mean that the bug
+is in SeaBIOS and not in QEMU, thus we should simply disable
+that config switch again.
+
+ Thomas
