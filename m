@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57678)
+Received: from eggs.gnu.org ([209.51.188.92]:57716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwC-0002Fj-Jj
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:13 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwG-0002Kr-TV
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwA-0002Qj-4Q
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:11 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43200)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1grnwD-0002SF-52
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:14 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40346)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1grnw9-0002PV-A0
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:09 -0500
-Received: by mail-wr1-x444.google.com with SMTP id r2so785336wrv.10
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:08 -0800 (PST)
+	id 1grnwC-0002RA-JY
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 12:58:13 -0500
+Received: by mail-wm1-x344.google.com with SMTP id q21so800837wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 09:58:10 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  7 Feb 2019 18:57:13 +0100
-Message-Id: <1549562254-41157-31-git-send-email-pbonzini@redhat.com>
+Date: Thu,  7 Feb 2019 18:57:15 +0100
+Message-Id: <1549562254-41157-33-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
 References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 30/51] ppc64: Express dependencies of 'pseries'
- and 'powernv' machines with kconfig
+Subject: [Qemu-devel] [PATCH 32/51] ppc: Express dependencies of the Mac
+ machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +29,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com
+Cc: thuth@redhat.com, philmd@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
 From: Thomas Huth <thuth@redhat.com>
 
-The POWERNV switch should always select ISA_IPMI_BT, then the other
-IPMI options are turned on automatically now.
-CONFIG_DIMM should always be selected by the pseries machine,
-which in turn depends on CONFIG_MEM_DEVICE since DIMM implements
-this interface.
-CONFIG_VIRTIO_VGA can be dropped from default-configs/ppc64-softmmu.mak
-completely since this device is already automatically enabled via
-hw/display/Kconfig now.
+This will make it for example easier if the users want to disable
+one of the two machines for their builds.
 
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/ppc64-softmmu.mak |  5 -----
- hw/intc/Kconfig                   |  6 ++----
- hw/mem/Kconfig                    |  1 +
- hw/ppc/Kconfig                    | 22 ++++++++++++++++++++--
- 4 files changed, 23 insertions(+), 11 deletions(-)
+ default-configs/ppc-softmmu.mak | 15 ---------------
+ hw/misc/Kconfig                 |  6 ++++++
+ hw/net/Kconfig                  |  1 +
+ hw/pci-host/Kconfig             |  4 +++-
+ hw/ppc/Kconfig                  | 15 +++++++++++++++
+ 5 files changed, 25 insertions(+), 16 deletions(-)
 
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index d642b67..cca5266 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -5,11 +5,6 @@ include ppc-softmmu.mak
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 066cec9..caaff60 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -35,21 +35,6 @@ CONFIG_VGA_CIRRUS=y
+ CONFIG_SMBUS_EEPROM=y
  
- # For PowerNV
- CONFIG_POWERNV=y
--CONFIG_ISA_IPMI_BT=y
+ # For Macs
+-CONFIG_ESCC=y
+-CONFIG_MACIO=y
+-CONFIG_MACIO_GPIO=y
+-CONFIG_SUNGEM=y
+-CONFIG_MOS6522=y
+-CONFIG_CUDA=y
+-CONFIG_ADB=y
+-CONFIG_MAC_NVRAM=y
+-CONFIG_MAC_DBDMA=y
+-CONFIG_MAC_PMU=y
+-CONFIG_HEATHROW_PIC=y
+-CONFIG_GRACKLE_PCI=y
+-CONFIG_UNIN_PCI=y
+-CONFIG_DEC_PCI=y
+-CONFIG_IDE_MACIO=y
+ CONFIG_MAC_OLDWORLD=y
+ CONFIG_MAC_NEWWORLD=y
  
- # For pSeries
- CONFIG_PSERIES=y
--CONFIG_VIRTIO_VGA=y
--CONFIG_MEM_DEVICE=y
--CONFIG_DIMM=y
--CONFIG_SPAPR_RNG=y
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-index 6eea14e..de10a6b 100644
---- a/hw/intc/Kconfig
-+++ b/hw/intc/Kconfig
-@@ -31,13 +31,11 @@ config OPENPIC_KVM
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 74031cc..728c561 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -57,6 +57,12 @@ config MOS6522
  
- config XICS
+ config MACIO
      bool
--    default y
--    depends on PSERIES
-+    depends on POWERNV || PSERIES
++    select CUDA
++    select ESCC
++    select IDE_MACIO
++    select MAC_DBDMA
++    select MAC_NVRAM
++    select MOS6522
  
- config XICS_SPAPR
+ config IVSHMEM_DEVICE
      bool
--    default y
--    depends on PSERIES
-+    select XICS
+diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+index dc69e55..1aa1071 100644
+--- a/hw/net/Kconfig
++++ b/hw/net/Kconfig
+@@ -86,6 +86,7 @@ config FTGMAC100
  
- config XICS_KVM
+ config SUNGEM
      bool
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index d1e635c..620fd4c 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -1,5 +1,6 @@
- config DIMM
-     bool
-+    select MEM_DEVICE
++    depends on PCI
  
- config MEM_DEVICE
+ config COLDFIRE
      bool
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index ff4080c..b39ea29 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -10,8 +10,10 @@ config GRACKLE_PCI
+     bool
+ 
+ config UNIN_PCI
+-    select PCI
+     bool
++    select PCI
++    select DEC_PCI
++    select OPENPIC
+ 
+ config PPCE500_PCI
+     select PCI
 diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index fb085d7..be6440e 100644
+index 9cebf0f..fb77151 100644
 --- a/hw/ppc/Kconfig
 +++ b/hw/ppc/Kconfig
-@@ -1,11 +1,29 @@
- config PSERIES
+@@ -55,9 +55,24 @@ config RS6000_MC
+ 
+ config MAC_OLDWORLD
      bool
 +    imply PCI_DEVICES
++    imply SUNGEM
 +    imply TEST_DEVICES
-+    select DIMM
-+    select PCI
-+    select VFIO
-+    select XICS_SPAPR
-+    select XIVE_SPAPR
-+    select SPAPR_VSCSI
++    select ADB
++    select GRACKLE_PCI
++    select HEATHROW_PIC
++    select MACIO
  
- config SPAPR_RNG
-     bool
-+    default y
-+    depends on PSERIES
- 
- config POWERNV
+ config MAC_NEWWORLD
      bool
 +    imply PCI_DEVICES
++    imply SUNGEM
 +    imply TEST_DEVICES
-+    select ISA_IPMI_BT
-+    select IPMI_LOCAL
-+    select ISA_BUS
-+    select MC146818RTC
-+    select XICS
-+    select XIVE
++    select ADB
++    select MACIO
++    select MACIO_GPIO
++    select MAC_PMU
++    select UNIN_PCI
  
- config PPC405
+ config E500
      bool
-@@ -39,10 +57,10 @@ config VIRTEX
- 
- config XIVE
-     bool
--    default y
--    depends on PSERIES
-+    depends on POWERNV || PSERIES
- 
- config XIVE_SPAPR
-     bool
-     default y
-     depends on PSERIES
-+    select XIVE
 -- 
 1.8.3.1
