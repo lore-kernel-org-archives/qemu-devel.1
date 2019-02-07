@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58134)
+Received: from eggs.gnu.org ([209.51.188.92]:58147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griFt-0007A1-0J
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1griFt-0007Ab-W9
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1griFs-0001Nf-65
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:08 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38680)
+	(envelope-from <richard.henderson@linaro.org>) id 1griFs-0001Nx-Ma
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:09 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1griFr-0001Lk-Tj
+	id 1griFs-0001N7-52
 	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 06:54:08 -0500
-Received: by mail-wr1-x442.google.com with SMTP id v13so11218777wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:04 -0800 (PST)
+Received: by mail-wr1-x442.google.com with SMTP id c8so4412682wrs.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 03:54:08 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Feb 2019 11:53:41 +0000
-Message-Id: <20190207115400.647-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 00/19] target/hppa: Convert to decodetree
+Date: Thu,  7 Feb 2019 11:53:44 +0000
+Message-Id: <20190207115400.647-4-richard.henderson@linaro.org>
+In-Reply-To: <20190207115400.647-1-richard.henderson@linaro.org>
+References: <20190207115400.647-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 03/19] target/hppa: Convert move to/from system
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +30,206 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: deller@gmx.de, svens@stackframe.org
 
-I started this last year, but only recently have found the time
-to ferret out the bugs.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/hppa/translate.c  | 61 +++++++++++++++++-----------------------
+ target/hppa/insns.decode | 15 ++++++++++
+ 2 files changed, 41 insertions(+), 35 deletions(-)
 
-I've tested this vs the gcc execute.exp testsuite, against which
-there are no regressions.  It also continues to boot my old debian
-sid installation.
-
-I had not previously been aware, but I now know this fixes a bug
-with respect to the purge data cache (PDC) instruction.
-
-Helge or Sven, if you have a chance to do a bit more testing in
-the next week, I would appreciate it.  Otherwise we can fix any
-other minor problems on mainline.
-
-This is based on the target/hppa pull request from this week;
-the whole tree can be found at
-
-  https://github.com/rth7680/qemu.git tgt-hppa
-
-
-r~
-
-
-Richard Henderson (19):
-  target/hppa: Use DisasContextBase.is_jmp
-  target/hppa: Begin using scripts/decodetree.py
-  target/hppa: Convert move to/from system registers
-  target/hppa: Convert remainder of system insns
-  target/hppa: Unify specializations of OR
-  target/hppa: Convert memory management insns
-  target/hppa: Convert arithmetic/logical insns
-  target/hppa: Convert indexed memory insns
-  target/hppa: Convert fp multiply-add
-  target/hppa: Convert conditional branches
-  target/hppa: Convert shift, extract, deposit insns
-  target/hppa: Convert direct and indirect branches
-  target/hppa: Convert arithmetic immediate insns
-  target/hppa: Convert offset memory insns
-  target/hppa: Convert fp indexed memory insns
-  target/hppa: Convert halt/reset insns
-  target/hppa: Convert fp fused multiply-add insns
-  target/hppa: Convert fp operate insns
-  target/hppa: Merge translate_one into hppa_tr_translate_insn
-
- target/hppa/translate.c   | 3218 +++++++++++++++----------------------
- target/hppa/Makefile.objs |    8 +
- target/hppa/insns.decode  |  527 ++++++
- 3 files changed, 1802 insertions(+), 1951 deletions(-)
- create mode 100644 target/hppa/insns.decode
-
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index f50ec7b9c2..72cb7b477e 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -838,7 +838,7 @@ static unsigned assemble_rc64(uint32_t insn)
+     return r2 * 32 + r1 * 4 + r0;
+ }
+ 
+-static unsigned assemble_sr3(uint32_t insn)
++static inline unsigned assemble_sr3(uint32_t insn)
+ {
+     unsigned s2 = extract32(insn, 13, 1);
+     unsigned s0 = extract32(insn, 14, 2);
+@@ -2005,9 +2005,9 @@ static bool trans_sync(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     return true;
+ }
+ 
+-static bool trans_mfia(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mfia(DisasContext *ctx, arg_mfia *a)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
++    unsigned rt = a->t;
+     TCGv_reg tmp = dest_gpr(ctx, rt);
+     tcg_gen_movi_reg(tmp, ctx->iaoq_f);
+     save_gpr(ctx, rt, tmp);
+@@ -2016,10 +2016,10 @@ static bool trans_mfia(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     return true;
+ }
+ 
+-static bool trans_mfsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mfsp(DisasContext *ctx, arg_mfsp *a)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned rs = assemble_sr3(insn);
++    unsigned rt = a->t;
++    unsigned rs = a->sp;
+     TCGv_i64 t0 = tcg_temp_new_i64();
+     TCGv_reg t1 = tcg_temp_new();
+ 
+@@ -2035,16 +2035,16 @@ static bool trans_mfsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     return true;
+ }
+ 
+-static bool trans_mfctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mfctl(DisasContext *ctx, arg_mfctl *a)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned ctl = extract32(insn, 21, 5);
++    unsigned rt = a->t;
++    unsigned ctl = a->r;
+     TCGv_reg tmp;
+ 
+     switch (ctl) {
+     case CR_SAR:
+ #ifdef TARGET_HPPA64
+-        if (extract32(insn, 14, 1) == 0) {
++        if (a->e == 0) {
+             /* MFSAR without ,W masks low 5 bits.  */
+             tmp = dest_gpr(ctx, rt);
+             tcg_gen_andi_reg(tmp, cpu_sar, 31);
+@@ -2086,10 +2086,10 @@ static bool trans_mfctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     return true;
+ }
+ 
+-static bool trans_mtsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mtsp(DisasContext *ctx, arg_mtsp *a)
+ {
+-    unsigned rr = extract32(insn, 16, 5);
+-    unsigned rs = assemble_sr3(insn);
++    unsigned rr = a->r;
++    unsigned rs = a->sp;
+     TCGv_i64 t64;
+ 
+     if (rs >= 5) {
+@@ -2112,11 +2112,10 @@ static bool trans_mtsp(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     return nullify_end(ctx);
+ }
+ 
+-static bool trans_mtctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mtctl(DisasContext *ctx, arg_mtctl *a)
+ {
+-    unsigned rin = extract32(insn, 16, 5);
+-    unsigned ctl = extract32(insn, 21, 5);
+-    TCGv_reg reg = load_gpr(ctx, rin);
++    unsigned ctl = a->t;
++    TCGv_reg reg = load_gpr(ctx, a->r);
+     TCGv_reg tmp;
+ 
+     if (ctl == CR_SAR) {
+@@ -2132,9 +2131,7 @@ static bool trans_mtctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     /* All other control registers are privileged or read-only.  */
+     CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
+ 
+-#ifdef CONFIG_USER_ONLY
+-    g_assert_not_reached();
+-#else
++#ifndef CONFIG_USER_ONLY
+     nullify_over(ctx);
+     switch (ctl) {
+     case CR_IT:
+@@ -2168,12 +2165,11 @@ static bool trans_mtctl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+ #endif
+ }
+ 
+-static bool trans_mtsarcm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mtsarcm(DisasContext *ctx, arg_mtsarcm *a)
+ {
+-    unsigned rin = extract32(insn, 16, 5);
+     TCGv_reg tmp = tcg_temp_new();
+ 
+-    tcg_gen_not_reg(tmp, load_gpr(ctx, rin));
++    tcg_gen_not_reg(tmp, load_gpr(ctx, a->r));
+     tcg_gen_andi_reg(tmp, tmp, TARGET_REGISTER_BITS - 1);
+     save_or_nullify(ctx, cpu_sar, tmp);
+     tcg_temp_free(tmp);
+@@ -2261,24 +2257,26 @@ static bool trans_ssm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
+     return nullify_end(ctx);
+ }
++#endif /* !CONFIG_USER_ONLY */
+ 
+-static bool trans_mtsm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_mtsm(DisasContext *ctx, arg_mtsm *a)
+ {
+-    unsigned rr = extract32(insn, 16, 5);
+-    TCGv_reg tmp, reg;
+-
+     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++#ifndef CONFIG_USER_ONLY
++    TCGv_reg tmp, reg;
+     nullify_over(ctx);
+ 
+-    reg = load_gpr(ctx, rr);
++    reg = load_gpr(ctx, a->r);
+     tmp = get_temp(ctx);
+     gen_helper_swap_system_mask(tmp, cpu_env, reg);
+ 
+     /* Exit the TB to recognize new interrupts.  */
+     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
+     return nullify_end(ctx);
++#endif
+ }
+ 
++#ifndef CONFIG_USER_ONLY
+ static bool trans_rfi(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+ {
+     unsigned comp = extract32(insn, 5, 4);
+@@ -2317,19 +2315,12 @@ static bool gen_hlt(DisasContext *ctx, int reset)
+ #endif /* !CONFIG_USER_ONLY */
+ 
+ static const DisasInsn table_system[] = {
+-    { 0x00001820u, 0xffe01fffu, trans_mtsp },
+-    { 0x00001840u, 0xfc00ffffu, trans_mtctl },
+-    { 0x016018c0u, 0xffe0ffffu, trans_mtsarcm },
+-    { 0x000014a0u, 0xffffffe0u, trans_mfia },
+-    { 0x000004a0u, 0xffff1fe0u, trans_mfsp },
+-    { 0x000008a0u, 0xfc1fbfe0u, trans_mfctl },
+     { 0x00000400u, 0xffffffffu, trans_sync },  /* sync */
+     { 0x00100400u, 0xffffffffu, trans_sync },  /* syncdma */
+     { 0x000010a0u, 0xfc1f3fe0u, trans_ldsid },
+ #ifndef CONFIG_USER_ONLY
+     { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
+     { 0x00000d60u, 0xfc00ffe0u, trans_ssm },
+-    { 0x00001860u, 0xffe0ffffu, trans_mtsm },
+     { 0x00000c00u, 0xfffffe1fu, trans_rfi },
+ #endif
+ };
+diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
+index 2822fbc58b..047a9d01ec 100644
+--- a/target/hppa/insns.decode
++++ b/target/hppa/insns.decode
+@@ -17,8 +17,23 @@
+ # License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ #
+ 
++####
++# Field definitions
++####
++
++%assemble_sr3   13:1 14:2
++
+ ####
+ # System
+ ####
+ 
+ break           000000 ----- ----- --- 00000000 -----
++
++mtsp            000000 ----- r:5   ... 11000001 00000   sp=%assemble_sr3
++mtctl           000000 t:5   r:5   --- 11000010 00000
++mtsarcm         000000 01011 r:5   --- 11000110 00000
++mtsm            000000 00000 r:5   000 11000011 00000
++
++mfia            000000 ----- 00000 ---   10100101 t:5
++mfsp            000000 ----- 00000 ...   00100101 t:5   sp=%assemble_sr3
++mfctl           000000 r:5   00000- e:1 -01000101 t:5
 -- 
 2.17.2
