@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59818)
+Received: from eggs.gnu.org ([209.51.188.92]:59833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCi-0007tp-He
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:07:09 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCk-0007vF-K2
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCg-0006Zi-N5
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:07:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55924)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1grmCi-0006b3-KS
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:07:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1grmCd-0006VK-0I
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:07:03 -0500
+	id 1grmCh-0006Y6-Ic
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 11:07:08 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  7 Feb 2019 17:06:11 +0100
-Message-Id: <20190207160617.1142-13-marcandre.lureau@redhat.com>
+Date: Thu,  7 Feb 2019 17:06:12 +0100
+Message-Id: <20190207160617.1142-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20190207160617.1142-1-marcandre.lureau@redhat.com>
 References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/18] chardev: honour the reconnect setting in
- tcp_chr_wait_connected
+Subject: [Qemu-devel] [PULL 13/18] chardev: disallow TLS/telnet/websocket
+ with tcp_chr_wait_connected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,75 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, peter.ma
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-If establishing a client connection fails, the tcp_chr_wait_connected
-method should sleep for the reconnect timeout and then retry the
-attempt. This ensures the callers don't immediately abort with an
-error when the initial connection fails.
+In the previous commit
+
+    commit 1dc8a6695c731abb7461c637b2512c3670d82be4
+    Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+    Date:   Tue Aug 16 12:33:32 2016 +0400
+
+      char: fix waiting for TLS and telnet connection
+
+the tcp_chr_wait_connected() method was changed to check for a non-NULL
+'s->ioc' as a sign that there is already a connection present, as
+opposed to checking the "connected" flag to supposedly fix handling of
+TLS/telnet connections.
+
+The original code would repeatedly call tcp_chr_wait_connected creating
+many connections as 'connected' would never become true. The changed
+code would still repeatedly call tcp_chr_wait_connected busy waiting
+because s->ioc is set but the chardev will never see CHR_EVENT_OPENED.
+IOW, the code is still broken with TLS/telnet, but in a different way.
+
+Checking for a non-NULL 's->ioc' does not mean that a CHR_EVENT_OPENED
+will be ready for a TLS/telnet connection. These protocols (and the
+websocket protocol) all require the main loop to be running in order
+to complete the protocol handshake before emitting CHR_EVENT_OPENED.
+The tcp_chr_wait_connected() method is only used during early startup
+before a main loop is running, so TLS/telnet/websock connections can
+never complete initialization.
+
+Making this work would require changing tcp_chr_wait_connected to run
+a main loop. This is quite complex since we must not allow GSource's
+that other parts of QEMU have registered to run yet. The current callers
+of tcp_chr_wait_connected do not require use of the TLS/telnet/websocket
+protocols, so the simplest option is to just forbid this combination
+completely for now.
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190123172740.32452-13-berrange@redhat.com>
+Message-Id: <20190123172740.32452-14-berrange@redhat.com>
 ---
- chardev/char-socket.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ chardev/char-socket.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index d6de5d2305..7db20ff0a0 100644
+index 7db20ff0a0..86c1f502d6 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -957,8 +957,15 @@ static int tcp_chr_wait_connected(Chardev *chr, Erro=
-r **errp)
+@@ -951,8 +951,20 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
+ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
+ {
+     SocketChardev *s =3D SOCKET_CHARDEV(chr);
+-    /* It can't wait on s->connected, since it is set asynchronously
+-     * in TLS and telnet cases, only wait for an accepted socket */
++    const char *opts[] =3D { "telnet", "tn3270", "websock", "tls-creds" =
+};
++    bool optset[] =3D { s->is_telnet, s->is_tn3270, s->is_websock, s->tl=
+s_creds };
++    size_t i;
++
++    QEMU_BUILD_BUG_ON(G_N_ELEMENTS(opts) !=3D G_N_ELEMENTS(optset));
++    for (i =3D 0; i < G_N_ELEMENTS(opts); i++) {
++        if (optset[i]) {
++            error_setg(errp,
++                       "'%s' option is incompatible with waiting for "
++                       "connection completion", opts[i]);
++            return -1;
++        }
++    }
++
+     while (!s->ioc) {
          if (s->is_listen) {
              tcp_chr_accept_server_sync(chr);
-         } else {
--            if (tcp_chr_connect_client_sync(chr, errp) < 0) {
--                return -1;
-+            Error *err =3D NULL;
-+            if (tcp_chr_connect_client_sync(chr, &err) < 0) {
-+                if (s->reconnect_time) {
-+                    error_free(err);
-+                    g_usleep(s->reconnect_time * 1000ULL * 1000ULL);
-+                } else {
-+                    error_propagate(errp, err);
-+                    return -1;
-+                }
-             }
-         }
-     }
 --=20
 2.20.1.519.g8feddda32c
