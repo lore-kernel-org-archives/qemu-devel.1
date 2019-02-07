@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48854)
+Received: from eggs.gnu.org ([209.51.188.92]:52099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grrLY-0001dh-Ny
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:36:37 -0500
+	(envelope-from <philmd@redhat.com>) id 1grrfL-0003xK-DP
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:57:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1grrLX-0007ks-RR
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:36:36 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51695)
+	(envelope-from <philmd@redhat.com>) id 1grrfK-0000Nq-JJ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:57:03 -0500
+Received: from mail-wm1-f44.google.com ([209.85.128.44]:34667)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grrLX-0007ef-E5
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:36:35 -0500
-Received: by mail-wm1-f65.google.com with SMTP id b11so1434918wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 13:36:27 -0800 (PST)
-References: <20190207193605.25676-1-crosa@redhat.com>
-	<20190207193605.25676-3-crosa@redhat.com>
-	<eb52ed3a-e2fb-d5d2-5d7e-ceb41e8a7987@vivier.eu>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1grrfK-0000NT-DS
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 16:57:02 -0500
+Received: by mail-wm1-f44.google.com with SMTP id y185so5382315wmd.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 13:57:02 -0800 (PST)
+References: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ae5fa4e8-24aa-4d00-8d74-21f6539dc59f@redhat.com>
-Date: Thu, 7 Feb 2019 22:36:24 +0100
+Message-ID: <a8cd7b35-b473-4197-be03-8a41cf8cdd7f@redhat.com>
+Date: Thu, 7 Feb 2019 22:56:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <eb52ed3a-e2fb-d5d2-5d7e-ceb41e8a7987@vivier.eu>
+In-Reply-To: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] configure: fix qemu-img name
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] should we try to stop using variable length arrays?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 2/7/19 9:11 PM, Laurent Vivier wrote:
-> On 07/02/2019 20:36, Cleber Rosa wrote:
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>  configure | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/configure b/configure
->> index ff55e2273e..c8fc1647fe 100755
->> --- a/configure
->> +++ b/configure
->> @@ -1768,7 +1768,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->>    virglrenderer   virgl rendering support
->>    xfsctl          xfsctl support
->>    qom-cast-debug  cast debugging support
->> -  tools           build qemu-io, qemu-nbd and qemu-image tools
->> +  tools           build qemu-io, qemu-nbd and qemu-img tools
->>    vxhs            Veritas HyperScale vDisk backend support
->>    bochs           bochs image format support
->>    cloop           cloop image format support
->>
+On 2/7/19 8:30 PM, Peter Maydell wrote:
+> Currently QEMU has 9 uses of variable length arrays
+> (found using -Wvla):
 > 
-> Fixes: c12d66aac1aa ("configure: add the missing help output for
-> optional features")
+> hw/block/dataplane/virtio-blk.c:62:25: warning: variable length array
+> used [-Wvla]
+>     unsigned long bitmap[BITS_TO_LONGS(nvqs)];
+>                         ^
+> hw/i386/multiboot.c:364:18: warning: variable length array used [-Wvla]
+>     char kcmdline[strlen(kernel_filename) + strlen(kernel_cmdline) + 2];
+>                  ^
+> hw/i386/xen/xen-hvm.c:618:25: warning: variable length array used [-Wvla]
+>     unsigned long bitmap[DIV_ROUND_UP(npages, width)];
+>                         ^
+> hw/intc/xics.c:604:18: warning: variable length array used [-Wvla]
+>     uint8_t flags[ics->nr_irqs];
+>                  ^
+> hw/net/fsl_etsec/rings.c:383:18: warning: variable length array used [-Wvla]
+>     uint8_t  padd[etsec->rx_padding];
+>                  ^
+> hw/ppc/pnv.c:130:26: warning: variable length array used [-Wvla]
+>     uint32_t servers_prop[smt_threads];
+>                          ^
+> hw/ppc/spapr.c:162:26: warning: variable length array used [-Wvla]
+>     uint32_t servers_prop[smt_threads];
+>                          ^
+> hw/ppc/spapr.c:163:27: warning: variable length array used [-Wvla]
+>     uint32_t gservers_prop[smt_threads * 2];
+>                           ^
+> linux-user/syscall.c:3478:23: warning: variable length array used [-Wvla]
+>     struct sembuf sops[nsops];
+>                       ^
 > 
-> Perhaps the list can be updated with qemu-edid, ivshmem-client and elf2dmp?
+> Should we be looking to get rid of these and turn on the -Wvla
+> warning? I know the Linux kernel has recently decided to do this
 
-Good idea! Eventually the trivial@ maintainer is willing to fulfil your
-request if he takes this patch :D
+Yes please!
 
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> (some rationale at the start of https://lwn.net/Articles/749064/).
+> Now that doesn't necessarily apply to us as a userspace program,
+> but on the other hand if any of these were allowing the guest to
+> determine the size of an on-stack array that would not be great.
+> (The linux-user one is bogus in that way, though not a security issue
+> as the guest code there has full control anyway.)
 
-As it or with Laurent's suggestion:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+The manpage says "[The semaphore] limit should not be raised above 1000".
+
+> 
+> Opinions? I admit that to some extent this is just my sense of
+> tidiness thinking that if we only have a handful of uses of
+> something we should squash that down to zero :-)
+
+None of these case have strong justification to use the stack rather
+than the heap (and the rest of the codebase heavily uses the heap).
+
+> 
+> thanks
+> -- PMM
+> 
