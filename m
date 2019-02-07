@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42997)
+Received: from eggs.gnu.org ([209.51.188.92]:43067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grl4o-0000eD-KT
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:54:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1grl4x-0000n3-UZ
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1grl4n-0007IS-CJ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:54:54 -0500
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-	<20190207102445.71998-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <783d7c00-6f3d-9c7d-3439-7b14383050b5@redhat.com>
-Date: Thu, 7 Feb 2019 08:54:31 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1grl4w-0007Nk-0v
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:55:03 -0500
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:40126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1grl4u-0007MA-Ay
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 09:55:01 -0500
+Received: by mail-ot1-x330.google.com with SMTP id s5so169490oth.7
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 06:54:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190207102445.71998-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D5BjeYP9cicn24sHxqDzEDua9gcgRKSoS"
-Subject: Re: [Qemu-devel] [PATCH v3 03/17] block/block-backend: use
- QEMU_IOVEC_INIT_BUF
+References: <20190206145831.656-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190206145831.656-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Feb 2019 14:54:46 +0000
+Message-ID: <CAFEAcA8orzDQqhufFSJ0tRKs_wvwQDFX5P9rdEBz9ivzcW26pw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/1] Dump patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D5BjeYP9cicn24sHxqDzEDua9gcgRKSoS
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com,
- dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
- jsnow@redhat.com
-Message-ID: <783d7c00-6f3d-9c7d-3439-7b14383050b5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 03/17] block/block-backend: use
- QEMU_IOVEC_INIT_BUF
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
- <20190207102445.71998-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190207102445.71998-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 6 Feb 2019 at 14:58, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit 47994e16b1d66411953623e7c0bf0cdcd50bd5=
+07:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+90205' into staging (2019-02-05 18:25:07 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/dump-pull-request
+>
+> for you to fetch changes up to e17bebd049d78f489c2cff755e2b66a0536a156e:
+>
+>   dump: Set correct vaddr for ELF dump (2019-02-06 15:51:12 +0100)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
 
-On 2/7/19 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Use new QEMU_IOVEC_INIT_BUF() instead of
-> qemu_iovec_init_external( ... , 1), which simplifies the code.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/block-backend.c | 13 ++-----------
->  1 file changed, 2 insertions(+), 11 deletions(-)
->=20
+Applied, thanks.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---D5BjeYP9cicn24sHxqDzEDua9gcgRKSoS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxcRqcACgkQp6FrSiUn
-Q2p/zwgArJhJWl79+Np0fuR1UHjKRaUNljlbDhWfdiHShK5Eik9SSpsSL6W+gd/i
-ogJwLBJFR7kRp6qaEN0qYepshzMLoOLqBeSie0O7tljpve6uWFvr9vg/+aNLnvqh
-ZsPUo3ZqYwWgDx8CIZE/QRCSkpxZq/gGMniSSYWP0ylu6w1iA6Xw6iAmyf4L0xh0
-ny9/f4y8FSaY64mb42Ftr5DDBNXdG/16Mho5zJG3xImWt/1HeeVt0iJhCLWL5Dm8
-amM0eewCevtnqmuKrbiLwKhPVYkdBOKKJ/S73Jzx1ZGOJNqXF3di5BuTqeiQOoaD
-qYwZR0qhRNvwgPT8FCCYTS93xMpY/Q==
-=dMPz
------END PGP SIGNATURE-----
-
---D5BjeYP9cicn24sHxqDzEDua9gcgRKSoS--
+-- PMM
