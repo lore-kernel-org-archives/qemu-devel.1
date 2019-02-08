@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36559)
+Received: from eggs.gnu.org ([209.51.188.92]:40027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gsCf9-0005cB-9U
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:22:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gsCjy-00022e-6b
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gsCf6-0003Yi-Ui
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:22:14 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gsCjs-0006Qk-SV
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:27:13 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gsCjs-0006Pg-Ks
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:27:08 -0500
+Received: by mail-pf1-x442.google.com with SMTP id j3so2186889pfi.12
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 12:27:08 -0800 (PST)
+References: <20190208163727.13733-1-remi@remlab.net>
+	<8f51cf7f-ba18-a123-e31d-a95d18918cb8@linaro.org>
+	<2034657.8N3RCfXzMK@basile.remlab.net>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <85b56507-bc4b-a4fc-18a3-d45569f19968@linaro.org>
+Date: Fri, 8 Feb 2019 12:27:04 -0800
 MIME-Version: 1.0
-References: <20190130185242.12490-1-chouteau@adacore.com>
-	<CAKmqyKMNqYBN9ZCESAxfqWSOidjFRhQNofN130MOPDOyRwQ28w@mail.gmail.com>
-	<5cb673ce-930d-81d5-eb59-d33471f7318b@adacore.com>
-In-Reply-To: <5cb673ce-930d-81d5-eb59-d33471f7318b@adacore.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 8 Feb 2019 10:41:17 -0800
-Message-ID: <CAKmqyKMWuqYD-_nYFR1dwvw7ZqPTqqsBdF_V0FBzryuWOgL4zQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/riscv/sifive_clint.c: avoid integer
- overflow in timecmp write
+In-Reply-To: <2034657.8N3RCfXzMK@basile.remlab.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: assert last byte is in guest space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabien Chouteau <chouteau@adacore.com>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
+To: =?UTF-8?Q?R=c3=a9mi_Denis-Courmont?= <remi@remlab.net>, qemu-devel@nongnu.org
 
-On Thu, Feb 7, 2019 at 2:08 AM Fabien Chouteau <chouteau@adacore.com> wrote:
->
-> Hello Alistair,
->
-> On 07/02/2019 01:42, Alistair Francis wrote:>
-> > Can you describe what this fixes?
-> >
->
-> I encountered this problem when I tried to write 0xffffffffffffffff in timecmp.
->
-> With the integer overflow in QEMU, writing this value means that the QEMU timer
-> will be set in the past.
->
-> > Won't an overflow be ok as we then just wrap around anyway? I guess
-> > there is a problem if we want a value so large that we wrap around
-> > past our current time though.
-> >
->
-> The overflow was in the computation of the value `next_ns`. It is used to set
-> the QEMU timer:
->
-> timer_mod(cpu->env.timer, next_ns);
->
-> A negative `next_ns` -because of the overflow- means that the timer
-> triggers immediately instead of far in the future.
+On 2/8/19 10:32 AM, Rémi Denis-Courmont wrote:
+> Le perjantaina 8. helmikuuta 2019, 20.12.13 EET Richard Henderson a écrit :
+>> On 2/8/19 8:37 AM, Rémi Denis-Courmont wrote:
+>>> Rather than assert that the first byte of a checked range is within the
+>>> guest address space, assert that the last byte is. The assertion is
+>>> moved past the overflow check to ensure that the last byte is actually
+>>> the one with the highest address.
+>>>
+>>> Signed-off-by: Rémi Denis-Courmont <remi@remlab.net>
+>>> ---
+>>>
+>>>  accel/tcg/translate-all.c | 14 +++++++-------
+>>>  1 file changed, 7 insertions(+), 7 deletions(-)
+>>
+>> What are you trying to fix here?
+> 
+> As far as I can tell, the following code assumes that the entire range of 
+> checked addresses falls within the guest address range. So it makes sense to 
+> fail the assertion if the any byte is out of range, rather than only the first 
+> one.
 
-Ah you are right here. The expired time of the timer will be set to
-zero (it looks like QEMU ensures it can't be negative) but then it
-detects that as being in the past and will trigger the timer event as
-timer_expired_ns() will return true.
+Sure.  But that would call for adding a second assert, rather than removing one
+from some paths.  Which you say you "would not dare", which is confusing to me.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Is there a particular problem you are attempting to solve, or is this mere code
+inspection?
 
-Alistair
 
->
-> Regards,
+r~
