@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53912)
+Received: from eggs.gnu.org ([209.51.188.92]:55908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gs65q-0002Q7-A5
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:21:23 -0500
+	(envelope-from <thuth@redhat.com>) id 1gs6IA-00046R-Us
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:34:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gs65o-0002XR-7c
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:21:22 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gs65m-0002V6-Lf
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:21:19 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z3so3576226wrv.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 05:21:16 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  8 Feb 2019 13:21:12 +0000
-Message-Id: <20190208132112.31493-1-peter.maydell@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gs6I7-0004QE-6C
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:34:05 -0500
+References: <20190208132112.31493-1-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5b9474b0-7ce7-3efb-253e-4be7f1918281@redhat.com>
+Date: Fri, 8 Feb 2019 14:33:45 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] configure: Make -Waddress-of-packed-member
+In-Reply-To: <20190208132112.31493-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Make -Waddress-of-packed-member
  warnings be errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,30 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, QEMU Trivial <qemu-trivial@nongnu.org>
 
-We have now managed to eradicate all the places in the codebase
-that triggered clang's -Waddress-of-packed-member warning. Remove
-the compiler flag that exempted it from our usual -Werror policy.
-This will prevent any new problematic code being added in future.
+On 2019-02-08 14:21, Peter Maydell wrote:
+> We have now managed to eradicate all the places in the codebase
+> that triggered clang's -Waddress-of-packed-member warning. Remove
+> the compiler flag that exempted it from our usual -Werror policy.
+> This will prevent any new problematic code being added in future.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  configure | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index fbd0825488c..50ac5d90f2e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1881,7 +1881,6 @@ gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
+>  gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
+>  gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
+>  gcc_flags="-Wno-string-plus-int $gcc_flags"
+> -gcc_flags="-Wno-error=address-of-packed-member $gcc_flags"
+>  # Note that we do not add -Werror to gcc_flags here, because that would
+>  # enable it for all configure tests. If a configure test failed due
+>  # to -Werror this would just silently disable some features,
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- configure | 1 -
- 1 file changed, 1 deletion(-)
+Great!
 
-diff --git a/configure b/configure
-index fbd0825488c..50ac5d90f2e 100755
---- a/configure
-+++ b/configure
-@@ -1881,7 +1881,6 @@ gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
- gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
- gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
- gcc_flags="-Wno-string-plus-int $gcc_flags"
--gcc_flags="-Wno-error=address-of-packed-member $gcc_flags"
- # Note that we do not add -Werror to gcc_flags here, because that would
- # enable it for all configure tests. If a configure test failed due
- # to -Werror this would just silently disable some features,
--- 
-2.20.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
