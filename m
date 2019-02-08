@@ -1,18 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53042)
+Received: from eggs.gnu.org ([209.51.188.92]:53131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gs0Zm-0008Dx-Ao
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:27:54 -0500
+	(envelope-from <clg@kaod.org>) id 1gs0aA-0008Rw-V9
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gs0Zl-0001ik-Fx
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:27:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48234)
+	(envelope-from <clg@kaod.org>) id 1gs0a6-0001wi-Vv
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:28:17 -0500
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:44752)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gs0Zl-0001h0-66
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:27:53 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  8 Feb 2019 08:27:44 +0100
-Message-Id: <20190208072744.10687-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] sdl2: drop qemu_input_event_send_key_qcode call
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gs0a6-0001up-8y
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:28:14 -0500
+Received: from player759.ha.ovh.net (unknown [10.109.143.18])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 8BF5321A81A
+	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 08:28:11 +0100 (CET)
+References: <20190128094625.4428-1-clg@kaod.org>
+	<20190128094625.4428-2-clg@kaod.org>
+	<20190208054445.GD12810@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <dd7cd5b1-d57c-e4bd-e0ba-b725aa740db6@kaod.org>
+Date: Fri, 8 Feb 2019 08:28:07 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190208054445.GD12810@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/19] ppc/xive: hardwire the Physical CAM
+ line of the thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,30 +33,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, balaton@eik.bme.hu
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-qkbd_state_key_event() does that for us.
+On 2/8/19 6:44 AM, David Gibson wrote:
+> On Mon, Jan 28, 2019 at 10:46:07AM +0100, C=E9dric Le Goater wrote:
+>> By default on P9, the HW CAM line (23bits) is hardwired to :
+>>
+>>       0x000||0b1||4Bit chip number||7Bit Thread number.
+>>
+>> When the block group mode is enabled at the controller level (PowerNV)=
+,
+>> the CAM line is changed for CAM compares to :
+>>
+>>       4Bit chip number||0x001||7Bit Thread number
+>>
+>> This will require changes in xive_presenter_tctx_match() possibly.
+>> This is a lowlevel functionality of the HW controller and it is not
+>> strictly needed. Leave it for later.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h |  1 +
+>>  hw/intc/xive.c        | 53 ++++++++++++++++++++++++++++++++++++++++--=
+-
+>>  hw/ppc/pnv_core.c     | 16 ++++++++-----
+>>  3 files changed, 61 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index ec3bb2aae45a..04d54e8315f7 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -319,6 +319,7 @@ typedef struct XiveTCTX {
+>>      qemu_irq    output;
+>> =20
+>>      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
+>> +    uint32_t    hw_cam;
+>=20
+> I don't love the fact that the hw_cam field is mirroring something
+> that's in the regs structure.  Any way you can have the property poke
+> the right value directly into regs?  Or else split up regs so you can
+> set the pieces individually.
 
-Fixes: 07333e1ca3 kbd-state: use state tracker for sdl2
-Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2-input.c | 3 ---
- 1 file changed, 3 deletions(-)
+We only need the PIR value to compute the HW CAM line. That's was the
+initial proposal :
 
-diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index 664364a5e5..fb345f45fb 100644
---- a/ui/sdl2-input.c
-+++ b/ui/sdl2-input.c
-@@ -54,8 +54,5 @@ void sdl2_process_key(struct sdl2_console *scon,
-                 break;
-             }
-         }
--    } else {
--        qemu_input_event_send_key_qcode(con, qcode,
--                                        ev->type == SDL_KEYDOWN);
-     }
- }
--- 
-2.9.3
++static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx, bool block_group)
++{
++    PowerPCCPU *cpu =3D POWERPC_CPU(tctx->cs);
++    CPUPPCState *env =3D &cpu->env;
++    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
++
++    return tctx_hw_cam_line(block_group, (pir >> 8) & 0xf, pir & 0x7f);
++}
+
+but you didn't like either because it peeked into the CPUPPCState.
+
+But I prefer the initial method. Less fuss.=20
+
+C.
+
+>=20
+>>  } XiveTCTX;
+>> =20
+>>  /*
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index 2e9b8efd4342..f5642f2338de 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -469,6 +469,12 @@ static void xive_tctx_realize(DeviceState *dev, E=
+rror **errp)
+>>      Object *obj;
+>>      Error *local_err =3D NULL;
+>> =20
+>> +    if (!tctx->hw_cam) {
+>> +        error_setg(errp, "XIVE: HW CAM is not set for CPU %d",
+>> +                   tctx->cs->cpu_index);
+>> +        return;
+>> +    }
+>> +
+>>      obj =3D object_property_get_link(OBJECT(dev), "cpu", &local_err);
+>>      if (!obj) {
+>>          error_propagate(errp, local_err);
+>> @@ -509,11 +515,17 @@ static const VMStateDescription vmstate_xive_tct=
+x =3D {
+>>      },
+>>  };
+>> =20
+>> +static Property  xive_tctx_properties[] =3D {
+>> +    DEFINE_PROP_UINT32("hw-cam", XiveTCTX, hw_cam, 0),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>>  static void xive_tctx_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> =20
+>>      dc->desc =3D "XIVE Interrupt Thread Context";
+>> +    dc->props =3D xive_tctx_properties;
+>>      dc->realize =3D xive_tctx_realize;
+>>      dc->unrealize =3D xive_tctx_unrealize;
+>>      dc->vmsd =3D &vmstate_xive_tctx;
+>> @@ -526,8 +538,21 @@ static const TypeInfo xive_tctx_info =3D {
+>>      .class_init    =3D xive_tctx_class_init,
+>>  };
+>> =20
+>> +/*
+>> + * The HW CAM line (23bits) is hardwired to :
+>> + *
+>> + *   0x000||0b1||4Bit chip number||7Bit Thread number.
+>> + */
+>> +static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
+>> +{
+>> +    return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
+>> +}
+>> +
+>>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
+>>  {
+>> +    CPUPPCState *env =3D &POWERPC_CPU(cpu)->env;
+>> +    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
+>> +    uint32_t hw_cam =3D hw_cam_line((pir >> 8) & 0xf, pir & 0x7f);
+>>      Error *local_err =3D NULL;
+>>      Object *obj;
+>> =20
+>> @@ -535,6 +560,10 @@ Object *xive_tctx_create(Object *cpu, XiveRouter =
+*xrtr, Error **errp)
+>>      object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort)=
+;
+>>      object_unref(obj);
+>>      object_property_add_const_link(obj, "cpu", cpu, &error_abort);
+>> +    object_property_set_int(obj, hw_cam, "hw-cam", &local_err);
+>> +    if (local_err) {
+>> +        goto error;
+>> +    }
+>>      object_property_set_bool(obj, true, "realized", &local_err);
+>>      if (local_err) {
+>>          goto error;
+>> @@ -1112,14 +1141,28 @@ XiveTCTX *xive_router_get_tctx(XiveRouter *xrt=
+r, CPUState *cs)
+>>      return xrc->get_tctx(xrtr, cs);
+>>  }
+>> =20
+>> +/*
+>> + * When the block grouping is enabled, the CAM line is changed to :
+>> + *
+>> + *   4Bit chip number||0x001||7Bit Thread number.
+>> + */
+>> +static bool xive_presenter_tctx_match_hw(XiveRouter *xrtr, XiveTCTX *=
+tctx,
+>> +                                         uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>> +{
+>> +    /* TODO: block group support */
+>> +    return tctx->hw_cam =3D=3D hw_cam_line(nvt_blk, nvt_idx);
+>> +}
+>> +
+>>  /*
+>>   * The thread context register words are in big-endian format.
+>>   */
+>> -static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
+>> +static int xive_presenter_tctx_match(XiveRouter *xrtr,
+>> +                                     XiveTCTX *tctx, uint8_t format,
+>>                                       uint8_t nvt_blk, uint32_t nvt_id=
+x,
+>>                                       bool cam_ignore, uint32_t logic_=
+serv)
+>>  {
+>>      uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
+>> +    uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
+>>      uint32_t qw2w2 =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
+>>      uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
+>>      uint32_t qw0w2 =3D xive_tctx_word2(&tctx->regs[TM_QW0_USER]);
+>> @@ -1142,7 +1185,11 @@ static int xive_presenter_tctx_match(XiveTCTX *=
+tctx, uint8_t format,
+>> =20
+>>          /* F=3D0 & i=3D0: Specific NVT notification */
+>> =20
+>> -        /* TODO (PowerNV) : PHYS ring */
+>> +        /* PHYS ring */
+>> +        if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
+>> +            xive_presenter_tctx_match_hw(xrtr, tctx, nvt_blk, nvt_idx=
+)) {
+>> +            return TM_QW3_HV_PHYS;
+>> +        }
+>> =20
+>>          /* HV POOL ring */
+>>          if ((be32_to_cpu(qw2w2) & TM_QW2W2_VP) &&
+>> @@ -1199,7 +1246,7 @@ static bool xive_presenter_match(XiveRouter *xrt=
+r, uint8_t format,
+>>           * Check the thread context CAM lines and record matches. We
+>>           * will handle CPU exception delivery later
+>>           */
+>> -        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt=
+_idx,
+>> +        ring =3D xive_presenter_tctx_match(xrtr, tctx, format, nvt_bl=
+k, nvt_idx,
+>>                                           cam_ignore, logic_serv);
+>>          /*
+>>           * Save the context and follow on to catch duplicates, that w=
+e
+>> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+>> index 7c806da720c6..f035522b4ec9 100644
+>> --- a/hw/ppc/pnv_core.c
+>> +++ b/hw/ppc/pnv_core.c
+>> @@ -114,12 +114,6 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, Pnv=
+Chip *chip, Error **errp)
+>>          return;
+>>      }
+>> =20
+>> -    pcc->intc_create(chip, cpu, &local_err);
+>> -    if (local_err) {
+>> -        error_propagate(errp, local_err);
+>> -        return;
+>> -    }
+>> -
+>>      core_pir =3D object_property_get_uint(OBJECT(cpu), "core-pir", &e=
+rror_abort);
+>> =20
+>>      /*
+>> @@ -129,6 +123,16 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, Pnv=
+Chip *chip, Error **errp)
+>>       */
+>>      pir->default_value =3D core_pir + thread_index;
+>> =20
+>> +    /*
+>> +     * On P9, the interrupt presenter needs to hardwire the PIR value
+>> +     * in the thread interrupt context of the CPU.
+>> +     */
+>> +    pcc->intc_create(chip, cpu, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +
+>>      /* Set time-base frequency to 512 MHz */
+>>      cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+>> =20
+>=20
