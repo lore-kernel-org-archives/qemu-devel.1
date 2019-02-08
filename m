@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59577)
+Received: from eggs.gnu.org ([209.51.188.92]:60163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gs3tZ-0001RD-So
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:00:34 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gs3x0-0002KG-Fo
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gs3tV-00067s-8B
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:00:33 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39450)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gs3tV-000650-1V
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:00:29 -0500
-Received: by mail-wm1-x343.google.com with SMTP id f16so2916467wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 03:00:28 -0800 (PST)
-References: <20190130004811.27372-1-cota@braap.org>
-	<20190130004811.27372-40-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190130004811.27372-40-cota@braap.org>
-Date: Fri, 08 Feb 2019 11:00:23 +0000
-Message-ID: <87ef8imto8.fsf@zen.linaroharston>
+	(envelope-from <kwolf@redhat.com>) id 1gs3wx-0001AA-VR
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:04:06 -0500
+Date: Fri, 8 Feb 2019 12:03:30 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190208110330.GC4494@dhcp-200-176.str.redhat.com>
+References: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 39/73] i386: convert to
- cpu_interrupt_request
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] block: skip initializer BDS on recursive
+ aio context attachment/detachment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com, vsementsov@virtuozzo.com, berto@igalia.com
 
+Am 24.01.2019 um 08:48 hat Denis Plotnikov geschrieben:
+> When there is a Backup Block Job running and shutdown command is sent to
+> a guest, the guest crushes due to assert(!bs->walking_aio_notifiers).
+> 
+> Call stack:
+> 
+> 0  __GI_raise
+> 1  __GI_abort
+> 2  __assert_fail_base
+> 3  __GI___assert_fail
+> 4  bdrv_detach_aio_context (bs=0x55f54d65c000)      <<<
+> 5  bdrv_detach_aio_context (bs=0x55f54fc8a800)
+> 6  bdrv_set_aio_context (bs=0x55f54fc8a800, ...)
+> 7  block_job_attached_aio_context
+> 8  bdrv_attach_aio_context (bs=0x55f54d65c000, ...) <<<
+> 9  bdrv_set_aio_context (bs=0x55f54d65c000)
+> 10 blk_set_aio_context
+> 11 virtio_blk_data_plane_stop
+> 12 virtio_bus_stop_ioeventfd
+> 13 virtio_vmstate_change
+> 14 vm_state_notify (running=0, state=RUN_STATE_SHUTDOWN)
+> 15 do_vm_stop (state=RUN_STATE_SHUTDOWN, send_stop=true)
+> 16 vm_stop (state=RUN_STATE_SHUTDOWN)
+> 17 main_loop_should_exit
+> 18 main_loop
+> 19 main
+> 
+> This happens because of "new" context attachment to VM disk bds.
+> When attaching a new context the corresponding aio context handler is
+> called for each of aio_notifiers registered on the VM disk bds context.
+> Among those handlers there is the block_job_attached_aio_context handler
+> which sets a new aio context for the block job bds. When doing so,
+> the old context is detached from all the block job bds children and one of
+> them is the VM disk bds, serving as backing store for the blockjob bds,
+> although the VM disk bds is actually the initializer of that process.
+> Since the VM disk bds is protected with walking_aio_notifiers flag
+> from double processing in recursive calls, the assert fires.
+> 
+> The patch fixes the problem by skipping the bds-es in recursive calls
+> which have started attachment/detachment already.
+> 
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
-Emilio G. Cota <cota@braap.org> writes:
+I'm not sure if this fix is actually correct in more than just your
+special case. It assumes without checking that the nested attach is for
+the same context as the outer attach. (Of course, I'm not sure what you
+would do if they were for different contexts! It's a case to avoid, and
+it should fail very visibly instead of moving nodes to unexpected
+contexts.)
 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/i386/cpu.c        | 2 +-
->  target/i386/helper.c     | 4 ++--
->  target/i386/svm_helper.c | 4 ++--
->  3 files changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index a37b984b61..35dea8c152 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5678,7 +5678,7 @@ int x86_cpu_pending_interrupt(CPUState *cs, int int=
-errupt_request)
->
->  static bool x86_cpu_has_work(CPUState *cs)
->  {
-> -    return x86_cpu_pending_interrupt(cs, cs->interrupt_request) !=3D 0;
-> +    return x86_cpu_pending_interrupt(cs, cpu_interrupt_request(cs))
->  !=3D 0;
+bdrv_set_aio_context() is pretty messy, so it may still turn out that
+leaving the greater problem unadressed and just fixing what breaks in
+practice is what we need to do.
 
-This is fine in itself but is there a chance of a race with the
-env->eflags/hflags/hflags2 that x86_cpu_pending_interrupt deals with?
-Are they only ever self vCPU references?
+But did you consider just forbidding nested bdrv_set_aio_context()
+instead? Essentially, instead of your checks you would assert
+!walking_aio_notifiers. This would simplify the interface instead of
+adding more complexity.
 
-Anyway:
+If I understand the code correctly, at the time of the nested call, the
+respective nodes have already been moved to the new context, so avoiding
+the nested calls might be as easy as adding a shortcut to
+bdrv_set_aio_context() for this case:
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+    if (ctx == new_context) {
+        return;
+    }
 
---
-Alex Benn=C3=A9e
+Most importantly, though, please write a test case for this. We will
+probably need to rework bdrv_set_aio_context() fundamentally (as Berto
+recently noticed), and we will want to avoid regressing on this bug.
+
+Kevin
