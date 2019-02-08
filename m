@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33847)
+Received: from eggs.gnu.org ([209.51.188.92]:33848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gsFRt-0002w9-H8
+	(envelope-from <bounces@canonical.com>) id 1gsFRt-0002wA-HI
 	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 18:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gsFRr-0006dY-Ou
+	(envelope-from <bounces@canonical.com>) id 1gsFRr-0006dd-Ow
 	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 18:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51116)
+Received: from indium.canonical.com ([91.189.90.7]:51094)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gsFRp-0006X7-Q8
+	id 1gsFRp-0006Wu-Q1
 	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 18:20:43 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gsFRl-0006zb-QC
+	id 1gsFRl-0006zZ-A7
 	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 23:20:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C4EF82E80C7
+	by loganberry.canonical.com (Postfix) with ESMTP id 4B9182E80C7
 	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 23:20:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Feb 2019 23:08:42 -0000
+Date: Fri, 08 Feb 2019 23:08:20 -0000
 From: john <johnandersenpdx@gmail.com>
 Reply-To: Bug 1815252 <1815252@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154966719970.21699.16286451963680929757.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154966732220.25090.2844814482089503786.malone@gac.canonical.com>
+Message-Id: <154966730074.22353.18157467149066233731.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1815252] Re: virtio-9p-pci passthrough fsync hang
 List-Id: <qemu-devel.nongnu.org>
@@ -41,10 +41,6 @@ To: qemu-devel@nongnu.org
 I forgot to add that the kernel in that image
 (/usr/lib/kernel/org.clearlinux.*) does not have 9p support. So to
 compile the kernel I used the attached config
-
-** Attachment added: "Kernel config"
-   https://bugs.launchpad.net/qemu/+bug/1815252/+attachment/5237112/+files/=
-.config
 
 -- =
 
