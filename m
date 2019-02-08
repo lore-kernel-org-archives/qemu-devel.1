@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58778)
+Received: from eggs.gnu.org ([209.51.188.92]:58806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs6Xx-0008Nw-As
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:26 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gs6YB-00005d-Gm
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs6Xw-0005Rs-HF
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:25 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gs6Y5-0005WI-IV
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:38 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri,  8 Feb 2019 14:49:44 +0100
-Message-Id: <20190208134950.187665-1-sgarzare@redhat.com>
+Date: Fri,  8 Feb 2019 14:49:45 +0100
+Message-Id: <20190208134950.187665-2-sgarzare@redhat.com>
+In-Reply-To: <20190208134950.187665-1-sgarzare@redhat.com>
+References: <20190208134950.187665-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/6] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+Subject: [Qemu-devel] [PATCH v4 1/6] virtio-blk: add acct_failed param to
+ virtio_blk_handle_rw_error()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +25,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This series adds the support of DISCARD and WRITE_ZEROES commands
-and extends the virtio-blk-test to test WRITE_ZEROES command when
-the feature is enabled.
+We add acct_failed param in order to use virtio_blk_handle_rw_error()
+also when is not required to call block_acct_failed(). (eg. a discard
+operation is failed)
 
-v4:
-- fixed error with mingw compiler in patch 4
-  gcc and clang want %lu, but mingw wants %llu for BDRV_REQUEST_MAX_SECTO=
-RS.
-  Since is less than INT_MAX, I casted it to integer and I used %d in the
-  format string of error_setg. (mingw now is happy)
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ hw/block/virtio-blk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-v3:
-- rebased on master (I removed Based-on tag since the new virtio headers =
-from
-  linux v5.0-rc1 are merged)
-- added patch 2 to add host_features field (as in virtio-net) [Michael]
-- fixed patch 3 (previously 2/5) using the new host_features field
-- fixed patch 4 (previously 3/5) following the Stefan's comments:
-                - fixed name of functions and fields
-                - used vdev and s pointers
-                - removed "wz-may-unmap" property
-                - split "dwz-max-sectors" in two properties
-
-v2:
-- added patch 1 to use virtio_blk_handle_rw_error() with discard operatio=
-n
-- added patch 2 to make those new features machine-type dependent (thanks=
- David)
-- fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
-rt()
-                for WRITE_ZEROES requests, and configurable parameters to
-                initialize the limits (max_sectors, wzeroes_may_unmap).
-                (thanks Stefan)
-                I moved in a new function the code to handle a single seg=
-ment,
-                in order to simplify the support of multiple segments in =
-the
-                future.
-- added patch 4 to change the assert on data_size following the discussio=
-n with
-                Thomas, Changpeng, Michael, and Stefan (thanks all)
-- fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
-ad of
-                dynamic allocation (thanks Thomas)
-
-Thanks,
-Stefano
-
-Stefano Garzarella (6):
-  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
-  virtio-blk: add host_features field in VirtIOBlock
-  virtio-blk: add "discard" and "write-zeroes" properties
-  virtio-blk: add DISCARD and WRITE_ZEROES features
-  tests/virtio-blk: change assert on data_size in virtio_blk_request()
-  tests/virtio-blk: add test for WRITE_ZEROES command
-
- hw/block/virtio-blk.c          | 214 +++++++++++++++++++++++++++++++--
- hw/core/machine.c              |   2 +
- include/hw/virtio/virtio-blk.h |   5 +-
- tests/virtio-blk-test.c        |  75 +++++++++++-
- 4 files changed, 282 insertions(+), 14 deletions(-)
-
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 9a87b3bfac..b2bb129efa 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -61,7 +61,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
+, unsigned char status)
+ }
+=20
+ static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
+-    bool is_read)
++    bool is_read, bool acct_failed)
+ {
+     BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
+                                                    is_read, error);
+@@ -75,7 +75,9 @@ static int virtio_blk_handle_rw_error(VirtIOBlockReq *r=
+eq, int error,
+         s->rq =3D req;
+     } else if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
+         virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
+-        block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        if (acct_failed) {
++            block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        }
+         virtio_blk_free_request(req);
+     }
+=20
+@@ -113,7 +115,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
+ret)
+              * the memory until the request is completed (which will
+              * happen on the other side of the migration).
+              */
+-            if (virtio_blk_handle_rw_error(req, -ret, is_read)) {
++            if (virtio_blk_handle_rw_error(req, -ret, is_read, true)) {
+                 continue;
+             }
+         }
+@@ -132,7 +134,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
+nt ret)
+=20
+     aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
+     if (ret) {
+-        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
++        if (virtio_blk_handle_rw_error(req, -ret, 0, true)) {
+             goto out;
+         }
+     }
 --=20
 2.20.1
