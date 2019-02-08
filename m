@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53386)
+Received: from eggs.gnu.org ([209.51.188.92]:55059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gsDCs-0003WO-Hr
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:57:09 -0500
+	(envelope-from <remi@remlab.net>) id 1gsDGU-0005G6-DD
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 16:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gsDCr-0000KN-Ab
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:57:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49708)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gsDCr-0000Jj-2u
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:57:05 -0500
-From: marcandre.lureau@redhat.com
-Date: Fri,  8 Feb 2019 19:11:17 +0100
-Message-Id: <20190208181122.23393-1-marcandre.lureau@redhat.com>
+	(envelope-from <remi@remlab.net>) id 1gsDGS-0001cv-SY
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 16:00:50 -0500
+Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:47370
+	helo=ns207790.ip-94-23-215.eu) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <remi@remlab.net>) id 1gsDGQ-0001a4-Ho
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 16:00:48 -0500
+From: =?ISO-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>
+Date: Fri, 08 Feb 2019 20:32:34 +0200
+Message-ID: <2034657.8N3RCfXzMK@basile.remlab.net>
+In-Reply-To: <8f51cf7f-ba18-a123-e31d-a95d18918cb8@linaro.org>
+References: <20190208163727.13733-1-remi@remlab.net>
+	<8f51cf7f-ba18-a123-e31d-a95d18918cb8@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH slirp 0/5] Make it a standalone project
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg: assert last byte is in guest space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,170 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: samuel.thibault@ens-lyon.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Le perjantaina 8. helmikuuta 2019, 20.12.13 EET Richard Henderson a =C3=A9c=
+rit :
+> On 2/8/19 8:37 AM, R=C3=A9mi Denis-Courmont wrote:
+> > Rather than assert that the first byte of a checked range is within the
+> > guest address space, assert that the last byte is. The assertion is
+> > moved past the overflow check to ensure that the last byte is actually
+> > the one with the highest address.
+> >=20
+> > Signed-off-by: R=C3=A9mi Denis-Courmont <remi@remlab.net>
+> > ---
+> >=20
+> >  accel/tcg/translate-all.c | 14 +++++++-------
+> >  1 file changed, 7 insertions(+), 7 deletions(-)
+>=20
+> What are you trying to fix here?
 
-Hi,
+As far as I can tell, the following code assumes that the entire range of=20
+checked addresses falls within the guest address range. So it makes sense t=
+o=20
+fail the assertion if the any byte is out of range, rather than only the fi=
+rst=20
+one.
 
-As discussed earlier in "[PATCH for-3.2 00/41] RFC: slirp: make it
-again a standalone project" and other threads, it would be useful to
-make slirp a separate project (the submodule approach was discarded)
-for various projects to share.
+> You've moved the assert past some returns, so that some cases that should
+> not be handled by this function no longer get checked.  As the comment
+> says, the address should already have been filtered by h2g_valid.
 
-The first patch describes how to filter the qemu repository for the
-slirp/ content, and initial layout.
+I find it generally hard to argue what an assertion should or should not do=
+=20
+insofar as an assertion failure is supposed to be impossible. I am not in a=
+=20
+position to decide if the assertion should fail in error cases that would b=
+e=20
+handled properly with a safe failure anyway - namely 0 bytes ranges and=20
+wrapping-around ranges.
 
-The following patches add meson build system (if necessary for older
-distros, autotools could be added - however I believe python & ninja
-are generally available on the QEMU supported platforms)
+However, it seems odd to live some undefined cases not failing the assertio=
+n,=20
+and I would not dare to add an extra assertion, so I replaced the one.
 
-Finally, to be able to provide migration handling (currently handled
-by QEMU), I ported a subset of the QEMU state saving/loading code in
-"slirp: add state saving/loading" and added some slirp API.
-
-Where should this new project be hosted? (I suggest some gitlab
-instance, because of the nice ui/CI/issues/milestone...)
-
-thanks
-
-Marc-Andr=C3=A9 Lureau (5):
-  Extract slirp/ from qemu repository
-  build-sys: add a meson build
-  build-sys: add version tooling
-  slirp: add state saving/loading
-  Add .gitlab-ci.yml
-
- .gitlab-ci.yml                   |  20 ++
- Makefile.objs                    |  34 ---
- meson.build                      | 127 ++++++++++
- arp_table.c =3D> src/arp_table.c   |   0
- bootp.c =3D> src/bootp.c           |   0
- bootp.h =3D> src/bootp.h           |   0
- cksum.c =3D> src/cksum.c           |   0
- debug.h =3D> src/debug.h           |   0
- dhcpv6.c =3D> src/dhcpv6.c         |   0
- dhcpv6.h =3D> src/dhcpv6.h         |   0
- dnssearch.c =3D> src/dnssearch.c   |   0
- if.c =3D> src/if.c                 |   0
- if.h =3D> src/if.h                 |   0
- ip.h =3D> src/ip.h                 |   0
- ip6.h =3D> src/ip6.h               |   0
- ip6_icmp.c =3D> src/ip6_icmp.c     |   0
- ip6_icmp.h =3D> src/ip6_icmp.h     |   0
- ip6_input.c =3D> src/ip6_input.c   |   0
- ip6_output.c =3D> src/ip6_output.c |   0
- ip_icmp.c =3D> src/ip_icmp.c       |   0
- ip_icmp.h =3D> src/ip_icmp.h       |   0
- ip_input.c =3D> src/ip_input.c     |   0
- ip_output.c =3D> src/ip_output.c   |   0
- src/libslirp-version.h.in        |  22 ++
- libslirp.h =3D> src/libslirp.h     |  13 +
- src/libslirp.map                 |  21 ++
- main.h =3D> src/main.h             |   0
- mbuf.c =3D> src/mbuf.c             |   0
- mbuf.h =3D> src/mbuf.h             |   0
- misc.c =3D> src/misc.c             |   0
- misc.h =3D> src/misc.h             |   0
- ncsi-pkt.h =3D> src/ncsi-pkt.h     |   0
- ncsi.c =3D> src/ncsi.c             |   0
- ndp_table.c =3D> src/ndp_table.c   |   0
- qtailq.h =3D> src/qtailq.h         |   0
- sbuf.c =3D> src/sbuf.c             |   0
- sbuf.h =3D> src/sbuf.h             |   0
- slirp.c =3D> src/slirp.c           |   9 -
- slirp.h =3D> src/slirp.h           |   0
- socket.c =3D> src/socket.c         |   0
- socket.h =3D> src/socket.h         |   0
- state.c =3D> src/state.c           |  50 ++--
- src/state.h                      |   0
- src/stream.c                     | 119 +++++++++
- src/stream.h                     |  34 +++
- tcp.h =3D> src/tcp.h               |   0
- tcp_input.c =3D> src/tcp_input.c   |   0
- tcp_output.c =3D> src/tcp_output.c |   0
- tcp_subr.c =3D> src/tcp_subr.c     |   0
- tcp_timer.c =3D> src/tcp_timer.c   |   0
- tcp_timer.h =3D> src/tcp_timer.h   |   0
- tcp_var.h =3D> src/tcp_var.h       |   0
- tcpip.h =3D> src/tcpip.h           |   0
- tftp.c =3D> src/tftp.c             |   0
- tftp.h =3D> src/tftp.h             |   0
- udp.c =3D> src/udp.c               |   0
- udp.h =3D> src/udp.h               |   0
- udp6.c =3D> src/udp6.c             |   0
- util.c =3D> src/util.c             |   0
- util.h =3D> src/util.h             |   3 +
- src/version.c                    |  33 +++
- src/vmstate.c                    | 401 +++++++++++++++++++++++++++++++
- src/vmstate.h                    | 396 ++++++++++++++++++++++++++++++
- state.h                          |   9 -
- 64 files changed, 1211 insertions(+), 80 deletions(-)
- create mode 100644 .gitlab-ci.yml
- delete mode 100644 Makefile.objs
- create mode 100644 meson.build
- rename arp_table.c =3D> src/arp_table.c (100%)
- rename bootp.c =3D> src/bootp.c (100%)
- rename bootp.h =3D> src/bootp.h (100%)
- rename cksum.c =3D> src/cksum.c (100%)
- rename debug.h =3D> src/debug.h (100%)
- rename dhcpv6.c =3D> src/dhcpv6.c (100%)
- rename dhcpv6.h =3D> src/dhcpv6.h (100%)
- rename dnssearch.c =3D> src/dnssearch.c (100%)
- rename if.c =3D> src/if.c (100%)
- rename if.h =3D> src/if.h (100%)
- rename ip.h =3D> src/ip.h (100%)
- rename ip6.h =3D> src/ip6.h (100%)
- rename ip6_icmp.c =3D> src/ip6_icmp.c (100%)
- rename ip6_icmp.h =3D> src/ip6_icmp.h (100%)
- rename ip6_input.c =3D> src/ip6_input.c (100%)
- rename ip6_output.c =3D> src/ip6_output.c (100%)
- rename ip_icmp.c =3D> src/ip_icmp.c (100%)
- rename ip_icmp.h =3D> src/ip_icmp.h (100%)
- rename ip_input.c =3D> src/ip_input.c (100%)
- rename ip_output.c =3D> src/ip_output.c (100%)
- create mode 100644 src/libslirp-version.h.in
- rename libslirp.h =3D> src/libslirp.h (91%)
- create mode 100644 src/libslirp.map
- rename main.h =3D> src/main.h (100%)
- rename mbuf.c =3D> src/mbuf.c (100%)
- rename mbuf.h =3D> src/mbuf.h (100%)
- rename misc.c =3D> src/misc.c (100%)
- rename misc.h =3D> src/misc.h (100%)
- rename ncsi-pkt.h =3D> src/ncsi-pkt.h (100%)
- rename ncsi.c =3D> src/ncsi.c (100%)
- rename ndp_table.c =3D> src/ndp_table.c (100%)
- rename qtailq.h =3D> src/qtailq.h (100%)
- rename sbuf.c =3D> src/sbuf.c (100%)
- rename sbuf.h =3D> src/sbuf.h (100%)
- rename slirp.c =3D> src/slirp.c (99%)
- rename slirp.h =3D> src/slirp.h (100%)
- rename socket.c =3D> src/socket.c (100%)
- rename socket.h =3D> src/socket.h (100%)
- rename state.c =3D> src/state.c (93%)
- create mode 100644 src/state.h
- create mode 100644 src/stream.c
- create mode 100644 src/stream.h
- rename tcp.h =3D> src/tcp.h (100%)
- rename tcp_input.c =3D> src/tcp_input.c (100%)
- rename tcp_output.c =3D> src/tcp_output.c (100%)
- rename tcp_subr.c =3D> src/tcp_subr.c (100%)
- rename tcp_timer.c =3D> src/tcp_timer.c (100%)
- rename tcp_timer.h =3D> src/tcp_timer.h (100%)
- rename tcp_var.h =3D> src/tcp_var.h (100%)
- rename tcpip.h =3D> src/tcpip.h (100%)
- rename tftp.c =3D> src/tftp.c (100%)
- rename tftp.h =3D> src/tftp.h (100%)
- rename udp.c =3D> src/udp.c (100%)
- rename udp.h =3D> src/udp.h (100%)
- rename udp6.c =3D> src/udp6.c (100%)
- rename util.c =3D> src/util.c (100%)
- rename util.h =3D> src/util.h (98%)
- create mode 100644 src/version.c
- create mode 100644 src/vmstate.c
- create mode 100644 src/vmstate.h
- delete mode 100644 state.h
-
---=20
-2.21.0.rc0.1.g036caf7885
+=2D-=20
+R=C3=A9mi Denis-Courmont
+http://www.remlab.net/
