@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52383)
+Received: from eggs.gnu.org ([209.51.188.92]:52919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1grxGg-00008h-Bt
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:55:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1grxLe-0001M8-GL
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1grxGf-0001AU-5H
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:55:58 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1grxGe-00018O-MT
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:55:57 -0500
-Received: by mail-pf1-x442.google.com with SMTP id c73so1023910pfe.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 19:55:56 -0800 (PST)
-Received: from cloudburst.twiddle.net (97-126-115-157.tukw.qwest.net.
-	[97.126.115.157])
-	by smtp.gmail.com with ESMTPSA id a13sm636729pgw.34.2019.02.07.19.55.52
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 07 Feb 2019 19:55:53 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Feb 2019 19:55:51 -0800
-Message-Id: <20190208035551.3036-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] tcg: Diagnose referenced labels that have not
- been emitted
+	(envelope-from <no-reply@patchew.org>) id 1grxLd-00017y-BA
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:01:06 -0500
+Resent-Message-Id: <E1grxLd-00017y-BA@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21003)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1grxLd-00015t-3K
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:01:05 -0500
+Message-ID: <154959844954.29184.7443590448859351019@ebba9967afc0>
+In-Reply-To: <20190208035551.3036-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Feb 2019 20:00:50 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] tcg: Diagnose referenced labels that have
+ not been emitted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,126 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-Currently, a jump to a label that is not defined anywhere will
-be emitted not be relocated.  This results in a jump to a random
-jump target.  With tcg debugging, print a diagnostic to the -d op
-file and abort.
-
-This could help debug or detect errors like
-c2d9644e6d ("target/arm: Fix crash on conditional instruction in an IT block")
-
-Reported-by: Roman Kapl <code@rkapl.cz>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op.h |  1 +
- tcg/tcg.h    | 12 +++++++++---
- tcg/tcg.c    | 23 +++++++++++++++++++++++
- 3 files changed, 33 insertions(+), 3 deletions(-)
----
-This detects errors earlier than the patch that Roman posted.
-
-
-r~
-
-
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 2d98868d8f..d3e51b15af 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -255,6 +255,7 @@ static inline void tcg_gen_op6ii_i64(TCGOpcode opc, TCGv_i64 a1, TCGv_i64 a2,
- 
- static inline void gen_set_label(TCGLabel *l)
- {
-+    l->present = 1;
-     tcg_gen_op1(INDEX_op_set_label, label_arg(l));
- }
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 045c24a357..32b7cf3489 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -244,16 +244,21 @@ typedef struct TCGRelocation {
-     intptr_t addend;
- } TCGRelocation; 
- 
--typedef struct TCGLabel {
-+typedef struct TCGLabel TCGLabel;
-+struct TCGLabel {
-+    unsigned present : 1;
-     unsigned has_value : 1;
--    unsigned id : 15;
-+    unsigned id : 14;
-     unsigned refs : 16;
-     union {
-         uintptr_t value;
-         tcg_insn_unit *value_ptr;
-         TCGRelocation *first_reloc;
-     } u;
--} TCGLabel;
-+#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_ENTRY(TCGLabel) next;
-+#endif
-+};
- 
- typedef struct TCGPool {
-     struct TCGPool *next;
-@@ -685,6 +690,7 @@ struct TCGContext {
- #endif
- 
- #ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_HEAD(, TCGLabel) labels;
-     int temps_in_use;
-     int goto_tb_issue_mask;
- #endif
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 20a5d8f315..9b2bf7f439 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -305,6 +305,9 @@ TCGLabel *gen_new_label(void)
-     *l = (TCGLabel){
-         .id = s->nb_labels++
-     };
-+#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_INSERT_TAIL(&s->labels, l, next);
-+#endif
- 
-     return l;
- }
-@@ -1092,6 +1095,9 @@ void tcg_func_start(TCGContext *s)
- 
-     QTAILQ_INIT(&s->ops);
-     QTAILQ_INIT(&s->free_ops);
-+#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_INIT(&s->labels);
-+#endif
- }
- 
- static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
-@@ -3841,6 +3847,23 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-     }
- #endif
- 
-+#ifdef CONFIG_DEBUG_TCG
-+    /* Ensure all labels referenced have been emitted.  */
-+    {
-+        TCGLabel *l;
-+        bool error = false;
-+
-+        QSIMPLEQ_FOREACH(l, &s->labels, next) {
-+            if (unlikely(!l->present) && l->refs) {
-+                qemu_log_mask(CPU_LOG_TB_OP,
-+                              "$L%d referenced but not present.\n", l->id);
-+                error = true;
-+            }
-+        }
-+        assert(!error);
-+    }
-+#endif
-+
- #ifdef CONFIG_PROFILER
-     atomic_set(&prof->opt_time, prof->opt_time - profile_getclock());
- #endif
--- 
-2.17.2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwODAzNTU1MS4zMDM2
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gdGNnOiBE
+aWFnbm9zZSByZWZlcmVuY2VkIGxhYmVscyB0aGF0IGhhdmUgbm90IGJlZW4gZW1pdHRlZApUeXBl
+OiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAyMDgwMzU1NTEuMzAzNi0xLXJpY2hhcmQuaGVuZGVy
+c29uQGxpbmFyby5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3
+IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwMjA4MDM1NTUxLjMwMzYtMS1yaWNoYXJk
+LmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAyMDgwMzU1NTEuMzAzNi0xLXJp
+Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+Jwo3MDJhMTUyZjdkIHRjZzogRGlhZ25vc2UgcmVmZXJlbmNlZCBsYWJlbHMgdGhhdCBoYXZlIG5v
+dCBiZWVuIGVtaXR0ZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBzcGFjZXMgcHJvaGli
+aXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM5MDogRklMRTogdGNnL3RjZy5oOjI0OToK
+KyAgICB1bnNpZ25lZCBwcmVzZW50IDogMTsKICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
+OiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM5MzogRklMRTog
+dGNnL3RjZy5oOjI1MToKKyAgICB1bnNpZ25lZCBpZCA6IDE0OwogICAgICAgICAgICAgICAgIF4K
+CnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNzkgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDcw
+MmExNTJmN2QwNiAodGNnOiBEaWFnbm9zZSByZWZlcmVuY2VkIGxhYmVscyB0aGF0IGhhdmUgbm90
+IGJlZW4gZW1pdHRlZCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDgwMzU1NTEuMzAzNi0x
+LXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1l
+c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
+dmVsQHJlZGhhdC5jb20=
