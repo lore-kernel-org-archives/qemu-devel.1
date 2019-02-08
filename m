@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48187)
+Received: from eggs.gnu.org ([209.51.188.92]:48735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gsD1D-0004mJ-Q3
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:45:04 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gsD21-0005aA-8e
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:45:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gsD1B-0006kA-TO
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:45:03 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gsD20-0007Zv-Ch
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:45:53 -0500
 MIME-Version: 1.0
 References: <CAFyWVaZ5tQq4eGaZiPBq7172PB_x3JCqV6c2xo=wSJdgbJakKQ@mail.gmail.com>
 	<20190130025708.12811-1-jimw@sifive.com>
 	<CAKmqyKMrCVqudmyJUPta9q6TJtDkeLV=FseAqQ7YhYMu3ak_NQ@mail.gmail.com>
 	<CAFyWVaaS_4RY9YKXcgJ1F4Ep1TDWkExtBTEigJedZQCcXG+44Q@mail.gmail.com>
-In-Reply-To: <CAFyWVaaS_4RY9YKXcgJ1F4Ep1TDWkExtBTEigJedZQCcXG+44Q@mail.gmail.com>
+	<CAKmqyKOgnM0+6EByX-AWry-pkry_VQOa3SN5PWU75E0Q3_rbSw@mail.gmail.com>
+	<CAFyWVabDFOoC2QzcquL+taW58j42hN7C3Us98LPBFqQf4oUXzA@mail.gmail.com>
+In-Reply-To: <CAFyWVabDFOoC2QzcquL+taW58j42hN7C3Us98LPBFqQf4oUXzA@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 8 Feb 2019 10:16:56 -0800
-Message-ID: <CAKmqyKOgnM0+6EByX-AWry-pkry_VQOa3SN5PWU75E0Q3_rbSw@mail.gmail.com>
+Date: Fri, 8 Feb 2019 11:28:48 -0800
+Message-ID: <CAKmqyKOr5eX1hQXURdz6Y7qDgygGOwYyFeKKZCH83UuuRkuR9w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH 5/5 v3] RISC-V: Add hooks to use the gdb
  xml files.
@@ -28,47 +30,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jim Wilson <jimw@sifive.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:RISC-V" <qemu-riscv@nongnu.org>
 
-On Wed, Feb 6, 2019 at 6:05 PM Jim Wilson <jimw@sifive.com> wrote:
+On Fri, Feb 8, 2019 at 11:09 AM Jim Wilson <jimw@sifive.com> wrote:
 >
-> On Wed, Feb 6, 2019 at 4:04 PM Alistair Francis <alistair23@gmail.com> wrote:
-> > Would it not be easier to add an extra argument to the functions
-> > intstead of setting and unsetting this?
+> On Fri, Feb 8, 2019 at 10:17 AM Alistair Francis <alistair23@gmail.com> wrote:
+> > Can we just write a wrapper function then that sets and unsets the variable?
+> > Something like this:
 > >
-> > That's what you had in the earlier version of this set.
+> > riscv_csrrw_debug(...) {
+> >     #if !defined(CONFIG_USER_ONLY)
+> >             env->debugger = true;
+> >     #endif
+> >             result = riscv_csrrw(env, ...);
+> >     #if !defined(CONFIG_USER_ONLY)
+> >             env->debugger = false;
+> >     #endif
+> > }
 >
-> The csr support was rewritten, and is now a table of functions.  If I
-> change the type signature for one function in a table column I have to
-> change them all.  This means I have to change the type signature of
-> about 50 functions, the vast majority of which will never use the new
-> argument.  I was hoping to avoid that, so I added a variable into the
-> cpu state instead.  In the old patch, before the csr rewrite, I only
-> had to change the type signature of a couple of functions, most of
-> which did use the new argument, so that was reasonable at the time.
+> Yes, that would work.  Do you want me to resubmit a fixed part 5 patch?
 
-Ah good point.
-
-Can we just write a wrapper function then that sets and unsets the variable?
-
-Something like this:
-
-riscv_csrrw_debug(...) {
-    #if !defined(CONFIG_USER_ONLY)
-            env->debugger = true;
-    #endif
-            result = riscv_csrrw(env, ...);
-    #if !defined(CONFIG_USER_ONLY)
-            env->debugger = false;
-    #endif
-}
+It's probably best to send out a new version of the whole series.
+Include all the Reviewed-by tags and then that should be the last
+version and Palmer can apply that series directly.
 
 Alistair
 
->
-> If I do need to change a lot of type signatures, what about attribute
-> ((unused))?  I see that there is a ATTRIBUTE_UNUSED in the disas dir
-> but it is apparently not used outside there, and only defined in
-> include/disas/bfd.h.  I see a few scattered uses of
-> attribute((unused)) but that seems unwise for portability reasons.
-> Maybe qemu doesn't care about unused arguments/parameters?
 >
 > Jim
