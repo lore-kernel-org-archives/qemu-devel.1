@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56975)
+Received: from eggs.gnu.org ([209.51.188.92]:57165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gs8SU-0008WB-Mx
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:52:55 -0500
+	(envelope-from <eblake@redhat.com>) id 1gs8TX-0000ix-S0
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gs8SS-0006ZU-SV
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:52:54 -0500
-Date: Fri, 8 Feb 2019 08:52:35 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190208085235.12583ada@x1.home>
-In-Reply-To: <20190208052849.GB6434@umbus.fritz.box>
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
-	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
-	<20190207081830.4dcbb822@x1.home>
-	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
-	<20190207202620.23e9c063@x1.home>
-	<20190208052849.GB6434@umbus.fritz.box>
+	(envelope-from <eblake@redhat.com>) id 1gs8TX-0007d4-2y
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:53:59 -0500
+References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
+	<0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1be61aa6-c6ad-ac25-8a3f-37a7b48f04da@redhat.com>
+Date: Fri, 8 Feb 2019 09:53:54 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
- vfio: NVIDIA V100 + P9 passthrough
+In-Reply-To: <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ"
+Subject: Re: [Qemu-devel] [PATCH v14 0/3] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Fri, 8 Feb 2019 16:28:50 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev
+ <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <1be61aa6-c6ad-ac25-8a3f-37a7b48f04da@redhat.com>
+Subject: Re: [PATCH v14 0/3] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
+References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
+ <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
+In-Reply-To: <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, Feb 07, 2019 at 08:26:20PM -0700, Alex Williamson wrote:
-> > On Fri, 8 Feb 2019 13:29:37 +1100
-> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >   
-> > > On 08/02/2019 02:18, Alex Williamson wrote:  
-> > > > On Thu, 7 Feb 2019 15:43:18 +1100
-> > > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> > > >     
-> > > >> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:    
-> > > >>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
-> > > >>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
-> > > >>> GPU:
-> > > >>>
-> > > >>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
-> > > >>>
-> > > >>>
-> > > >>> In that thread, Alex raised concerns about allowing QEMU to freely lock
-> > > >>> all the memory it wants. Is this an issue to be considered in the review
-> > > >>> of this series here?
-> > > >>>
-> > > >>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
-> > > >>> going to lock the KVM memory to populate the NUMA node with memory
-> > > >>> of the GPU itself, so at first there is no risk of not taking over the
-> > > >>> host RAM.
-> > > >>> Am I missing something?      
-> > > >>
-> > > >>
-> > > >> The GPU memory belongs to the device and not visible to the host as
-> > > >> memory blocks and not covered by page structs, for the host it is more
-> > > >> like MMIO which is passed through to the guest without that locked
-> > > >> accounting, I'd expect libvirt to keep working as usual except that:
-> > > >>
-> > > >> when libvirt calculates the amount of memory needed for TCE tables
-> > > >> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
-> > > >> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
-> > > >>
-> > > >> FlatView #2
-> > > >>  AS "memory", root: system
-> > > >>  AS "cpu-memory-0", root: system
-> > > >>  Root memory region: system
-> > > >>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> > > >>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
-> > > >>
-> > > >> So previously the DMA window would cover 0x7fffffff+1, now it has to
-> > > >> cover 0x11fffffffff+1.    
-> > > > 
-> > > > This looks like a chicken and egg problem, you're saying libvirt needs
-> > > > to query mtree to understand the extent of the GPU layout, but we need
-> > > > to specify the locked memory limits in order for QEMU to start?  Is
-> > > > libvirt supposed to start the VM with unlimited locked memory and fix
-> > > > it at some indeterminate point in the future?  Run a dummy VM with
-> > > > unlimited locked memory in order to determine the limits for the real
-> > > > VM?  Neither of these sound practical.  Thanks,    
-> > > 
-> > > 
-> > > QEMU maps GPU RAM at known locations (which only depends on the vPHB's
-> > > index or can be set explicitely) and libvirt knows how many GPUs are
-> > > passed so it is quite easy to calculate the required amount of memory.
-> > > 
-> > > Here is the window start calculation:
-> > > https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
-> > > 
-> > > We do not exactly know the GPU RAM window size until QEMU reads it from
-> > > VFIO/nvlink2 but we know that all existing hardware has a window of
-> > > 128GB (the adapters I have access to only have 16/32GB on board).  
-> > 
-> > So you're asking that libvirt add 128GB per GPU with magic nvlink
-> > properties, which may be 8x what's actually necessary and libvirt
-> > determines which GPUs to apply this to how?  Does libvirt need to sort
-> > through device tree properties for this?  Thanks,  
-> 
-> Hm.  If the GPU memory is really separate from main RAM, which it
-> sounds like, I don't think it makes sense to account it against the
-> same locked memory limit as regular RAM.
+On 2/8/19 9:37 AM, Andrey Shinkevich wrote:
+>=20
+>=20
+> On 08/02/2019 18:25, Eric Blake wrote:
+>> On 2/8/19 9:06 AM, Andrey Shinkevich wrote:
+>>> v14:
+>>> The test 242 was amended to be safer against changes in the bitmap al=
+location
+>>> algorithm because the bitmap directory is reallocated on VM shutdown.=
 
-That's true, if the user owns the device and the device provides the
-memory backing, it doesn't seem like it should count against the user's
-locked memory limit.  That'd make things easy for libvirt.  Thanks,
+>>> Unfortunately, an empty line at the end of the benchmark file 242.out=
+ persists.
+>>
+>> Easy solution: in 242, add an extra log("Test complete") or similar
+>> after the output that produces the blank line, then 242.out will no
+>> longer have a trailing blank line.
+>>
+> Thank you, Eric. It is going to be version 15.
 
-Alex
+If that's the only change, then no need to post v15; you can check what
+I'm preparing to include in Monday's pull request:
+
+https://repo.or.cz/qemu/ericb.git/shortlog/refs/heads/nbd
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxdphIACgkQp6FrSiUn
+Q2pxpAf7BtVXkB8ft/cphMKPO1y5QbnbkDFN2c2YhVUIPCEtqQUii1rEoPQECEiF
+IEjOTzt0qrLUdUeu4y6Me3msFnz7pLwNLuxmfBoM32FD7GUPYXFIGHVzkCzy0cgL
+S6YJyt+botnSXGu3ZFAcdkmA9MnpkKJduyUkKh+N/E/iAvSIPTVIOY4uIfwabfOn
+oLJntzTdXgGFEIVlTQJM6PlpAIRnYgdu8t0iodhr11+NcUHUDLzg/6CP2w1sE1IU
+GQIziaiA8s/sz+cj5ewhjvhtVAfvsy4u3iy8BHg+0VFCPuwC4RSZOfoXEz9/Zr5C
+mS+xW1hOyzZ0G3gEtps55URQFQAFhw==
+=kE3O
+-----END PGP SIGNATURE-----
+
+--kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ--
