@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42371)
+Received: from eggs.gnu.org ([209.51.188.92]:42366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1grzT3-0003Be-Gz
+	(envelope-from <dgibson@ozlabs.org>) id 1grzT3-0003Bc-F4
 	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:16:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1grzT1-0004zf-LG
+	(envelope-from <dgibson@ozlabs.org>) id 1grzT0-0004zE-8C
 	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:16:53 -0500
-Date: Fri, 8 Feb 2019 16:28:50 +1100
+Date: Fri, 8 Feb 2019 16:20:28 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190208052849.GB6434@umbus.fritz.box>
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
-	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
-	<20190207081830.4dcbb822@x1.home>
-	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
-	<20190207202620.23e9c063@x1.home>
+Message-ID: <20190208052027.GA6434@umbus.fritz.box>
+References: <20190206165133.12246-1-farosas@linux.ibm.com>
+	<20190206165133.12246-2-farosas@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4bRzO86E/ozDv8r1"
+	protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
 Content-Disposition: inline
-In-Reply-To: <20190207202620.23e9c063@x1.home>
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
- vfio: NVIDIA V100 + P9 passthrough
+In-Reply-To: <20190206165133.12246-2-farosas@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/1] target/ppc: Enable reporting of
+ SPRs to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +25,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, groug@kaod.org
 
 
---4bRzO86E/ozDv8r1
+--C7zPtVaVf+AK4Oqc
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 07, 2019 at 08:26:20PM -0700, Alex Williamson wrote:
-> On Fri, 8 Feb 2019 13:29:37 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Wed, Feb 06, 2019 at 02:51:33PM -0200, Fabiano Rosas wrote:
+> This allows reading and writing of SPRs via GDB:
 >=20
-> > On 08/02/2019 02:18, Alex Williamson wrote:
-> > > On Thu, 7 Feb 2019 15:43:18 +1100
-> > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> > >  =20
-> > >> On 07/02/2019 04:22, Daniel Henrique Barboza wrote: =20
-> > >>> Based on this series, I've sent a Libvirt patch to allow a QEMU pro=
-cess
-> > >>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
-> > >>> GPU:
-> > >>>
-> > >>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.=
-html
-> > >>>
-> > >>>
-> > >>> In that thread, Alex raised concerns about allowing QEMU to freely =
-lock
-> > >>> all the memory it wants. Is this an issue to be considered in the r=
-eview
-> > >>> of this series here?
-> > >>>
-> > >>> Reading the patches, specially patch 3/3, it seems to me that QEMU =
-is
-> > >>> going to lock the KVM memory to populate the NUMA node with memory
-> > >>> of the GPU itself, so at first there is no risk of not taking over =
-the
-> > >>> host RAM.
-> > >>> Am I missing something?   =20
-> > >>
-> > >>
-> > >> The GPU memory belongs to the device and not visible to the host as
-> > >> memory blocks and not covered by page structs, for the host it is mo=
-re
-> > >> like MMIO which is passed through to the guest without that locked
-> > >> accounting, I'd expect libvirt to keep working as usual except that:
-> > >>
-> > >> when libvirt calculates the amount of memory needed for TCE tables
-> > >> (which is guestRAM/64k*8), now it needs to use the end of the last G=
-PU
-> > >> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree=
- -f":
-> > >>
-> > >> FlatView #2
-> > >>  AS "memory", root: system
-> > >>  AS "cpu-memory-0", root: system
-> > >>  Root memory region: system
-> > >>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> > >>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
-> > >>
-> > >> So previously the DMA window would cover 0x7fffffff+1, now it has to
-> > >> cover 0x11fffffffff+1. =20
-> > >=20
-> > > This looks like a chicken and egg problem, you're saying libvirt needs
-> > > to query mtree to understand the extent of the GPU layout, but we need
-> > > to specify the locked memory limits in order for QEMU to start?  Is
-> > > libvirt supposed to start the VM with unlimited locked memory and fix
-> > > it at some indeterminate point in the future?  Run a dummy VM with
-> > > unlimited locked memory in order to determine the limits for the real
-> > > VM?  Neither of these sound practical.  Thanks, =20
-> >=20
-> >=20
-> > QEMU maps GPU RAM at known locations (which only depends on the vPHB's
-> > index or can be set explicitely) and libvirt knows how many GPUs are
-> > passed so it is quite easy to calculate the required amount of memory.
-> >=20
-> > Here is the window start calculation:
-> > https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b=
-54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
-> >=20
-> > We do not exactly know the GPU RAM window size until QEMU reads it from
-> > VFIO/nvlink2 but we know that all existing hardware has a window of
-> > 128GB (the adapters I have access to only have 16/32GB on board).
+> (gdb) p/x $srr1
+> $1 =3D 0x8000000002803033
 >=20
-> So you're asking that libvirt add 128GB per GPU with magic nvlink
-> properties, which may be 8x what's actually necessary and libvirt
-> determines which GPUs to apply this to how?  Does libvirt need to sort
-> through device tree properties for this?  Thanks,
+> (gdb) p/x $pvr
+> $2 =3D 0x4b0201
+> (gdb) set $pvr=3D0x4b0000
+> (gdb) p/x $pvr
+> $3 =3D 0x4b0000
+>=20
+> The `info` command can also be used:
+> (gdb) info registers spr
+>=20
+> For this purpose, GDB needs to be provided with an XML description of
+> the registers (see the gdb-xml directory for examples) and a set of
+> callbacks for reading and writing the registers must be defined.
+>=20
+> The XML file in this case is created dynamically, based on the SPRs
+> already defined in the machine. This way we avoid the need for several
+> XML files to suit each possible ppc machine.
+>=20
+> The gdb_{get,set}_spr_reg callbacks take an index based on the order
+> the registers appear in the XML file. This index does not match the
+> actual location of the registers in the env->spr array so the
+> gdb_find_spr_idx function does that conversion.
+>=20
+> Note: GDB currently needs to know the guest endianness in order to
+> properly print the registers values. This is done automatically by GDB
+> when provided with the ELF file or explicitly with the `set endian
+> <big|little>` command.
+>=20
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-Hm.  If the GPU memory is really separate from main RAM, which it
-sounds like, I don't think it makes sense to account it against the
-same locked memory limit as regular RAM.
+I've applied this to ppc-for-4.0 because it does something we don't
+currently do.  I'm still a bit baffled by the endian handling, but we
+can fix that later if necessary.
+
+> ---
+>  target/ppc/cpu-qom.h            |  4 +++
+>  target/ppc/cpu.h                |  5 +++
+>  target/ppc/gdbstub.c            | 61 ++++++++++++++++++++++++++++++++
+>  target/ppc/translate_init.inc.c | 62 +++++++++++++++++++++++++++++++--
+>  4 files changed, 130 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index 4ea67692e2..3130802304 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -179,6 +179,10 @@ typedef struct PowerPCCPUClass {
+>      uint32_t flags;
+>      int bfd_mach;
+>      uint32_t l1_dcache_size, l1_icache_size;
+> +#ifndef CONFIG_USER_ONLY
+> +    unsigned int gdb_num_sprs;
+> +    const char *gdb_spr_xml;
+> +#endif
+>      const PPCHash64Options *hash64_opts;
+>      struct ppc_radix_page_info *radix_page_info;
+>      void (*init_proc)(CPUPPCState *env);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 2c22292e7f..78af7e4608 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -230,6 +230,7 @@ struct ppc_spr_t {
+>      void (*oea_write)(DisasContext *ctx, int spr_num, int gpr_num);
+>      void (*hea_read)(DisasContext *ctx, int gpr_num, int spr_num);
+>      void (*hea_write)(DisasContext *ctx, int spr_num, int gpr_num);
+> +    unsigned int gdb_id;
+>  #endif
+>      const char *name;
+>      target_ulong default_value;
+> @@ -1263,6 +1264,10 @@ int ppc_cpu_gdb_read_register(CPUState *cpu, uint8=
+_t *buf, int reg);
+>  int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg=
+);
+>  int ppc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>  int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int re=
+g);
+> +#ifndef CONFIG_USER_ONLY
+> +void ppc_gdb_gen_spr_xml(PowerPCCPU *cpu);
+> +const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name);
+> +#endif
+>  int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>                                 int cpuid, void *opaque);
+>  int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+> diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+> index 19565b584d..fbf3821f4b 100644
+> --- a/target/ppc/gdbstub.c
+> +++ b/target/ppc/gdbstub.c
+> @@ -319,3 +319,64 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, u=
+int8_t *mem_buf, int n)
+>      }
+>      return r;
+>  }
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +void ppc_gdb_gen_spr_xml(PowerPCCPU *cpu)
+> +{
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +    CPUPPCState *env =3D &cpu->env;
+> +    GString *xml;
+> +    char *spr_name;
+> +    unsigned int num_regs =3D 0;
+> +    int i;
+> +
+> +    if (pcc->gdb_spr_xml) {
+> +        return;
+> +    }
+> +
+> +    xml =3D g_string_new("<?xml version=3D\"1.0\"?>");
+> +    g_string_append(xml, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
+> +    g_string_append(xml, "<feature name=3D\"org.qemu.power.spr\">");
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+> +        ppc_spr_t *spr =3D &env->spr_cb[i];
+> +
+> +        if (!spr->name) {
+> +            continue;
+> +        }
+> +
+> +        spr_name =3D g_ascii_strdown(spr->name, -1);
+> +        g_string_append_printf(xml, "<reg name=3D\"%s\"", spr_name);
+> +        g_free(spr_name);
+> +
+> +        g_string_append_printf(xml, " bitsize=3D\"%d\"", TARGET_LONG_BIT=
+S);
+> +        g_string_append(xml, " group=3D\"spr\"/>");
+> +
+> +        /*
+> +         * GDB identifies registers based on the order they are
+> +         * presented in the XML. These ids will not match QEMU's
+> +         * representation (which follows the PowerISA).
+> +         *
+> +         * Store the position of the current register description so
+> +         * we can make the correspondence later.
+> +         */
+> +        spr->gdb_id =3D num_regs;
+> +        num_regs++;
+> +    }
+> +
+> +    g_string_append(xml, "</feature>");
+> +
+> +    pcc->gdb_num_sprs =3D num_regs;
+> +    pcc->gdb_spr_xml =3D g_string_free(xml, false);
+> +}
+> +
+> +const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name)
+> +{
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
+> +
+> +    if (strcmp(xml_name, "power-spr.xml") =3D=3D 0) {
+> +        return pcc->gdb_spr_xml;
+> +    }
+> +    return NULL;
+> +}
+> +#endif
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 59e0b86762..9295f78d5f 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8979,6 +8979,10 @@ static void init_ppc_proc(PowerPCCPU *cpu)
+>      /* PowerPC implementation specific initialisations (SPRs, timers, ..=
+=2E) */
+>      (*pcc->init_proc)(env);
+> =20
+> +#if !defined(CONFIG_USER_ONLY)
+> +    ppc_gdb_gen_spr_xml(cpu);
+> +#endif
+> +
+>      /* MSR bits & flags consistency checks */
+>      if (env->msr_mask & (1 << 25)) {
+>          switch (env->flags & (POWERPC_FLAG_SPE | POWERPC_FLAG_VRE)) {
+> @@ -9475,6 +9479,55 @@ static bool avr_need_swap(CPUPPCState *env)
+>  #endif
+>  }
+> =20
+> +#if !defined(CONFIG_USER_ONLY)
+> +static int gdb_find_spr_idx(CPUPPCState *env, int n)
+> +{
+> +    int i;
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+> +        ppc_spr_t *spr =3D &env->spr_cb[i];
+> +
+> +        if (spr->name && spr->gdb_id =3D=3D n) {
+> +            return i;
+> +        }
+> +    }
+> +    return -1;
+> +}
+> +
+> +static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+> +{
+> +    int reg;
+> +    int len;
+> +
+> +    reg =3D gdb_find_spr_idx(env, n);
+> +    if (reg < 0) {
+> +        return 0;
+> +    }
+> +
+> +    len =3D TARGET_LONG_SIZE;
+> +    stn_p(mem_buf, len, env->spr[reg]);
+> +    ppc_maybe_bswap_register(env, mem_buf, len);
+> +    return len;
+> +}
+> +
+> +static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+> +{
+> +    int reg;
+> +    int len;
+> +
+> +    reg =3D gdb_find_spr_idx(env, n);
+> +    if (reg < 0) {
+> +        return 0;
+> +    }
+> +
+> +    len =3D TARGET_LONG_SIZE;
+> +    ppc_maybe_bswap_register(env, mem_buf, len);
+> +    env->spr[reg] =3D ldn_p(mem_buf, len);
+> +
+> +    return len;
+> +}
+> +#endif
+> +
+>  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+> @@ -9704,7 +9757,10 @@ static void ppc_cpu_realize(DeviceState *dev, Erro=
+r **errp)
+>          gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
+>                                   32, "power-vsx.xml", 0);
+>      }
+> -
+> +#ifndef CONFIG_USER_ONLY
+> +    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
+> +                             pcc->gdb_num_sprs, "power-spr.xml", 0);
+> +#endif
+>      qemu_init_vcpu(cs);
+> =20
+>      pcc->parent_realize(dev, errp);
+> @@ -10467,7 +10523,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, v=
+oid *data)
+>  #endif
+> =20
+>      cc->gdb_num_core_regs =3D 71;
+> -
+> +#ifndef CONFIG_USER_ONLY
+> +    cc->gdb_get_dynamic_xml =3D ppc_gdb_get_dynamic_xml;
+> +#endif
+>  #ifdef USE_APPLE_GDB
+>      cc->gdb_read_register =3D ppc_cpu_gdb_read_register_apple;
+>      cc->gdb_write_register =3D ppc_cpu_gdb_write_register_apple;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -129,24 +297,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---4bRzO86E/ozDv8r1
+--C7zPtVaVf+AK4Oqc
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxdE5EACgkQbDjKyiDZ
-s5Llig//RA9jgl1MGVHFsK7w/Q6DhdOIL6BJYtpoYo/INkQD2CVwOLgp4B5uAUlm
-1iJKBEb/hMmnzqBMkGVxBy0So/u7xrzYveBahgbC/z8iGo661vptJGrRGf2Q11bE
-Nphidx2n/wofR1D8nwO/SU9ZJT6ubGI/Gm4BR3Ob48NROv3qFj+OpiNJ8mTbex95
-n4xxkTpS4DAUu4iRORz5W9qAMFM2e6L/L3GuBZlb/ImpMzwC2+blSe7N2jkg6AJk
-tKedxcap27c5y6Ha6oeMVT9mehF8NU3izJ9SIj00uRlfKkjoR75tL8j4lRjdgy2Q
-V2AL3iNnw9WHhJEunh1pDMHh4G3EtM7odSk7quDBUi0hI5s3eegRakdiBXqyDDes
-DJiTU4oAt7kKNPgIu8qRq48TP3fsEgXfS/rWJxWg006frjoBSLQhg4iOqCiJiCCA
-gRzz7fcUespp1sTD7yVMzJJg808UYU0L22tUq+tZYE4DjeOCisFik7ZbU5D8fedv
-Jwlq6tFj/I4vPEGB/Q+jLci0wibnSACyHPkZKfzCnFukI2jKKGjIFwKx/kzIEo6d
-WIX77qyJ00XBznGImO0za5bkn1hXM5qmhs5uTIaI8bY7bezdNJ0KJKuGwcmePJCs
-mkDxmhroFrSMNCGY6Afs7sQPeQpiuHyxU5sVkZ6rhMcF5Cj7OR8=
-=383v
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxdEZsACgkQbDjKyiDZ
+s5J0Lg//YFny+R5ouQ2nUfctxeAa4xzxkUHYwN9kF0d7vrwIfNWB9Q61/Of8LE6x
+HWYgvWXvdhtFPeB85K4PwH5yGxlcFzNyYlK/pGLGkCZi7SrXZOndc1WW8R6IGxEP
+PY7a6cIzJqbQYZwFNxqbrPHN9kdpsJwsw0gp2iLaA9M8tJlgrI/0SA7ySnsOeFPA
+h0Jlv+u1Llb8UX/A5ZewHhjPjoqQ2NGmAnjR2n9NloyppHvzhb3YFn08SEzJlYhK
+uDwhdSh32LOHqoBTGPVHcGjFSGvgYi/ifoBEkvhsvlP/ckD13YDdBG12ISQdpqOB
+uW2j5n+CpcbZhSBvKvuSUlBZdfUL25orKeifpiPN6JpwXUAZdk8vhMrZ9wz8rZii
+7SMoAiaFw2diuWL5qkR1VzqEGGm4s+9JA8cgCp15o5NWFFy2cSeXdNFfN2y0ESDh
+3v6NdZmJAyBXETfstAmSaORNU/b1QmvZI0EQYkQvwbowyODBD9Jb4cgK01Pk4RxF
+22eTIKWPzk2VEogk8JgH3021PPfUCH2YYLmVLzO0Wt3WL2ozuXMmFBC6jI+y8OG2
+vYeNBhuknk+vRnvQw8wIszlSWf2bf9QVZ8QHSSflvqgdw8qqLAI8SH+JWckWjFbq
+WUFkTiNtl1yVy6shTHNS5msuJ9tjXDUQVGIhWNlkXcJ3PAFPFy0=
+=QfVG
 -----END PGP SIGNATURE-----
 
---4bRzO86E/ozDv8r1--
+--C7zPtVaVf+AK4Oqc--
