@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34327)
+Received: from eggs.gnu.org ([209.51.188.92]:36559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gsCco-0003ph-T5
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:19:52 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gsCf9-0005cB-9U
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:22:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gsCcX-0001wW-48
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:19:45 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:37881)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gsCcV-0001JT-E6
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:19:32 -0500
-References: <20190208173520.15007-1-remi@remlab.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b7f75e48-e710-46fc-a420-8cba0d663542@vivier.eu>
-Date: Fri, 8 Feb 2019 19:33:20 +0100
+	(envelope-from <alistair23@gmail.com>) id 1gsCf6-0003Yi-Ui
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 15:22:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190208173520.15007-1-remi@remlab.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: check valid address in
- access_ok()
+References: <20190130185242.12490-1-chouteau@adacore.com>
+	<CAKmqyKMNqYBN9ZCESAxfqWSOidjFRhQNofN130MOPDOyRwQ28w@mail.gmail.com>
+	<5cb673ce-930d-81d5-eb59-d33471f7318b@adacore.com>
+In-Reply-To: <5cb673ce-930d-81d5-eb59-d33471f7318b@adacore.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 8 Feb 2019 10:41:17 -0800
+Message-ID: <CAKmqyKMWuqYD-_nYFR1dwvw7ZqPTqqsBdF_V0FBzryuWOgL4zQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/riscv/sifive_clint.c: avoid integer
+ overflow in timecmp write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?R=c3=a9mi_Denis-Courmont?= <remi@remlab.net>, qemu-devel@nongnu.org
+To: Fabien Chouteau <chouteau@adacore.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-On 08/02/2019 18:35, Rémi Denis-Courmont wrote:
-> This works around the LTP crash, but there are problably better ways to
-> go about it.
-> 
-> Signed-off-by: Rémi Denis-Courmont <remi@remlab.net>
-> Cc: <lvivier@redhat.com>
-> ---
->  linux-user/qemu.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-> index ef400cb78a..1d222a0cce 100644
-> --- a/linux-user/qemu.h
-> +++ b/linux-user/qemu.h
-> @@ -457,7 +457,8 @@ extern unsigned long guest_stack_size;
->  
->  static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
->  {
-> -    return page_check_range((target_ulong)addr, size,
-> +    return guest_addr_valid(addr) && guest_addr_valid(addr + size) &&
+On Thu, Feb 7, 2019 at 2:08 AM Fabien Chouteau <chouteau@adacore.com> wrote:
+>
+> Hello Alistair,
+>
+> On 07/02/2019 01:42, Alistair Francis wrote:>
+> > Can you describe what this fixes?
+> >
+>
+> I encountered this problem when I tried to write 0xffffffffffffffff in timecmp.
+>
+> With the integer overflow in QEMU, writing this value means that the QEMU timer
+> will be set in the past.
+>
+> > Won't an overflow be ok as we then just wrap around anyway? I guess
+> > there is a problem if we want a value so large that we wrap around
+> > past our current time though.
+> >
+>
+> The overflow was in the computation of the value `next_ns`. It is used to set
+> the QEMU timer:
+>
+> timer_mod(cpu->env.timer, next_ns);
+>
+> A negative `next_ns` -because of the overflow- means that the timer
+> triggers immediately instead of far in the future.
 
-I think it should be guest_addr_valid(addr + size - 1).
+Ah you are right here. The expired time of the timer will be set to
+zero (it looks like QEMU ensures it can't be negative) but then it
+detects that as being in the past and will trigger the timer event as
+timer_expired_ns() will return true.
 
-Except that, it looks good.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Thanks,
-Laurent
+Alistair
+
+>
+> Regards,
