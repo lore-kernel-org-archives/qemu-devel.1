@@ -1,37 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49165)
+Received: from eggs.gnu.org ([209.51.188.92]:52938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gsENO-0001ES-JM
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 17:12:03 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gsEjT-0007kg-Kh
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 17:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gsENK-0007FF-Om
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 17:12:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41480
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gsENK-0007EF-JI
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 17:11:58 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x18M8lCD098914
-	for <qemu-devel@nongnu.org>; Fri, 8 Feb 2019 17:11:54 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qhgk3c4rv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 17:11:54 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 8 Feb 2019 22:11:54 -0000
-From: Collin Walling <walling@linux.ibm.com>
-Date: Fri,  8 Feb 2019 17:11:11 -0500
-In-Reply-To: <20190208221111.25237-1-walling@linux.ibm.com>
-References: <20190208221111.25237-1-walling@linux.ibm.com>
+	(envelope-from <jsnow@redhat.com>) id 1gsEjR-0007ED-6z
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 17:34:50 -0500
+References: <20190205001835.25660-1-philmd@redhat.com>
+	<20190205001835.25660-2-philmd@redhat.com>
+	<99509706-b027-bf45-b17b-e9f66943f86c@redhat.com>
+	<adf3d864-936d-d53d-ce26-1a5c75e88264@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <cfeec01c-0397-f7e9-2abc-1339a6847945@redhat.com>
+Date: Fri, 8 Feb 2019 17:34:30 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Message-Id: <20190208221111.25237-2-walling@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] s390x/cpumodel: add z14 GA2 model
+In-Reply-To: <adf3d864-936d-d53d-ce26-1a5c75e88264@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] ahci-test: Add dependency to
+ qemu-img tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,69 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: david@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com, pasic@linux.ibm.com, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-Introduce the z14 GA2 cpu model for QEMU. There are no new features
-introduced with this model, and will inherit the same feature set as
-z14 GA1.
 
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- target/s390x/cpu_models.c   | 1 +
- target/s390x/gen-features.c | 7 +++++++
- 2 files changed, 8 insertions(+)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 7c253ff308..968c21cd47 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -79,6 +79,7 @@ static S390CPUDef s390_cpu_defs[] = {
-     CPUDEF_INIT(0x2964, 13, 2, 47, 0x08000000U, "z13.2", "IBM z13 GA2"),
-     CPUDEF_INIT(0x2965, 13, 2, 47, 0x08000000U, "z13s", "IBM z13s GA1"),
-     CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
-+    CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
-     CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
- };
- 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index d258d67dca..3026fbd88e 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -353,6 +353,8 @@ static uint16_t base_GEN14_GA1[] = {
-     S390_FEAT_ORDER_PRESERVING_COMPRESSION,
- };
- 
-+#define base_GEN14_GA2 EmptyFeat
-+
- /* Full features (in order of release)
-  * Automatically includes corresponding base features.
-  * Full features are all features this hardware supports even if kvm/QEMU do not
-@@ -480,6 +482,8 @@ static uint16_t full_GEN14_GA1[] = {
-     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
- };
- 
-+#define full_GEN14_GA2 EmptyFeat
-+
- /* Default features (in order of release)
-  * Automatically includes corresponding base features.
-  * Default features are all features this version of QEMU supports for this
-@@ -553,6 +557,8 @@ static uint16_t default_GEN14_GA1[] = {
-     S390_FEAT_MULTIPLE_EPOCH,
- };
- 
-+#define default_GEN14_GA2 EmptyFeat
-+
- /* QEMU (CPU model) features */
- 
- static uint16_t qemu_V2_11[] = {
-@@ -661,6 +667,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
-     CPU_FEAT_INITIALIZER(GEN13_GA1),
-     CPU_FEAT_INITIALIZER(GEN13_GA2),
-     CPU_FEAT_INITIALIZER(GEN14_GA1),
-+    CPU_FEAT_INITIALIZER(GEN14_GA2),
- };
- 
- #define FEAT_GROUP_INITIALIZER(_name)                  \
--- 
-2.20.1
+On 2/7/19 1:51 PM, Thomas Huth wrote:
+> On 2019-02-07 17:50, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 2/5/19 1:18 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Since the ahci-test uses qemu-img, add a dependency to build it
+>>> before using it.
+>>> This fixes:
+>>>
+>>>   $ gmake check-qtest V=3D1
+>>>   QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IM=
+G=3Dqemu-img tests/ahci-test
+>>>   Failed to execute child process "/tmp/qemu-test.19tMRF/qemu-img" (N=
+o such file or directory)
+>>>   ERROR:tests/libqos/libqos.c:192:mkimg: assertion failed: (ret && !e=
+rr)
+>>>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> Slighly related is when vm-tests expect qemu-img available:
+>>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08415.html
+>>>
+>>>   $ make vm-build-ubuntu.i386
+>>>   Traceback (most recent call last):
+>>>     File "source/qemu/tests/vm/basevm.py", line 236, in main
+>>>       return vm.build_image(args.image)
+>>>     File "tests/vm/ubuntu.i386", line 67, in build_image
+>>>       subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
+>>>   OSError: [Errno 2] No such file or directory
+>>>   tests/vm/Makefile.include:23: recipe for target 'tests/vm/ubuntu.i3=
+86.img' failed
+>>>   make: *** [tests/vm/ubuntu.i386.img] Error 2
+>>>
+>>> A better fix would be checking those tools via ./configure...
+>>> ---
+>>>  tests/Makefile.include | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>> index 75ad9c0dd3..679656b64a 100644
+>>> --- a/tests/Makefile.include
+>>> +++ b/tests/Makefile.include
+>>> @@ -708,7 +708,7 @@ tests/prom-env-test$(EXESUF): tests/prom-env-test=
+.o $(libqos-obj-y)
+>>>  tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
+>>>  tests/fdc-test$(EXESUF): tests/fdc-test.o
+>>>  tests/ide-test$(EXESUF): tests/ide-test.o $(libqos-pc-obj-y)
+>>> -tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y)
+>>> +tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y) qemu-=
+img$(EXESUF)
+>>
+>> In [*] Cleber noticed if we configure using --disable-tools, qemu-img =
+is
+>> still built by when running "make check-block" due to this rule.
+>>
+>> I think this is OK because
+>> - at least a test requires it, so this test will run (which is what
+>>   we want)
+>> - while the tool is available in the build directory, it still won't
+>>   be installed by "make install"
+>=20
+> I guess you could also introduce a CONFIG_TOOLS switch and only run the
+> ahci test for CONFIG_TOOLS=3Dy ? ... not that important, but in case yo=
+u
+> respin the series, maybe worth a try.
+>=20
+>  Thomas
+>=20
+
+Is this necessary?
+
+You can run ahci-test by itself without building tools, but you need to
+export QTEST_QEMU_IMG yourself, which you can absolutely point to some
+other copy you have.
+
+If you run "make check" though, it's going to use the built copy of
+qemu-img no matter what, isn't it? so what's so great about preserving a
+configuration where you ask it not to build tools and then intentionally
+try to execute tests that will necessarily fail because they can't find
+the qemu-img binary?
+
+This seems fine the way it is, because you are asking the computer:
+
+1. Not to build tools, please
+2. Actually, please make the tools so I can run the tests
+
+
+Convince me otherwise?
+--js
