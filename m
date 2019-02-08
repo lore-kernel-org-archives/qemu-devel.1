@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59122)
+Received: from eggs.gnu.org ([209.51.188.92]:41116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gry9M-0001zT-5l
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:52:29 -0500
+	(envelope-from <stefanha@redhat.com>) id 1grzJ8-0001fL-JM
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:06:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gry9K-0003rJ-Nh
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:52:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gry9K-0003qm-FA
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:52:26 -0500
-Date: Thu, 7 Feb 2019 23:52:24 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1845097359.70518038.1549601544255.JavaMail.zimbra@redhat.com>
-In-Reply-To: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
-References: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <stefanha@redhat.com>) id 1grzJ6-0000fN-Dc
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:06:38 -0500
+Date: Fri, 8 Feb 2019 14:06:18 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190208060618.GE16257@stefanha-x1.localdomain>
+References: <20190206112729.37761-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V13 0/5] support MAP_SYNC for
- memory-backend-file
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="QXO0/MSS4VvK6f+D"
+Content-Disposition: inline
+In-Reply-To: <20190206112729.37761-1-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,207 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Zhang <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, richardw yang <richardw.yang@linux.intel.com>, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, qemu-devel@nongnu.org
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
 
+--QXO0/MSS4VvK6f+D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> files on ext4/xfs file system mounted with '-o dax').
-> 
-> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
->     https://patchwork.kernel.org/patch/10028151/
-> 
-> In order to make sure that the file metadata is in sync after a fault
-> while we are writing a shared DAX supporting backend files, this
-> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
-> 
-> As the DAX vs DMA truncated issue was solved, we refined the code and
-> send out this feature for the v5 version.
-> 
-> We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
-> 'share=on' & 'pmem=on'.
-> Or QEMU will not pass this flag to mmap(2)
-> 
-> Test with below cases:
-> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
->    a: backend is a dax supporting file.
->    1) start VM1 with options:
->    -object
->    memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
->    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
->    
->    2) start VM2 with options:
->    -object
->    memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
->    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-> 
->    3) live migrate from VM1 to VM2.
->    
->    4) Suddly let Host crash or power failure.
-> 
->    5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
-> 
->    b: backend is a regular file.
->    1) start with options
->    -object
->    memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
->    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
-> 
->    will warning "failed to validate with mapping flags: Operation not
->    supported"
->    FILE_1 and FILE_2 random corrupt.
-> 
-> 2. Other cases:
->    FILE_1 and FILE_2 random corrupt.
-> 
-> Changes in V13:
->  * 4/5 Micheal: move the inlcude to mmap_alloc.c.
->  * 4/5 Micheal: refine the warning message.
->  * 5/5 Micheal: refine the Documentations.
-> 
-> Changes in V12:
->  * 2/5: Micheal: Update update-linux-headers.sh
->  * 3/5: Micheal: Use script update add linux/mman.h
->  * 4/5: Pankaj,Micheal: 1) fallback to mmap without
->         MAP_SYNC & MAP_SHARED_VALIDATE if sync not supported or failed
-> 	2) Replace the include with 3/5 added linux/mman.h
->  * 5/5: Micheal: Refine the Documentations.
-> 
-> Changes in V11:
->  * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
->  * 2/3: Micheal: Fix the compatibility for old kernel.
->  * 2/3&3/3: Micheal&Eduardo :Update the behavior below:
->    Waning at no-dax and continue without MAP_SYNC.
->    Test if fails again for compatibility, then remove the MAP_VALIDATE and
->    silently proceed.
-> 
-> Changes in V10:
->  * 4/4: refine the document.
->  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
->  * 2/4: Fix the wrong include header
-> 
-> Changes in V9:
->  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG.
->  since I don't have much knowledge about the sparse feature, @Micheal Could
->  you
->  add some documentation/commit message on this patch? Thank you very much.
->  * 3/6: from 2/5: Eduardo: updated the commit message.
->  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
->  * 5/6: from 4/5: Eduardo: updated the commit message.
->  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
-> 
-> Changes in v8:
->  * Micheal: 3/5, remove the duplicated define in the os_dep.h
->  * Micheal: 2/5, make type define safety.
->  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
->  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
->    MAP_SYNC only worked with pmem=on.
->  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to
->  parse
->    all the flags in one parameter.
-> 
-> Changes in v7:
->  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm
->  backend.(pmem=on)
-> 
-> Changes in v6:
->  * Pankaj: 3/7 are squashed with 2/7
->  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
->  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
->  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
->  * Stefan, 5/7 Add missing "munmap"
->  * Stefan, 2/7 refine the shared/flag.
-> 
-> Changes in v5:
->  * Add patch 1 to fix a memory leak issue.
->  * Refine the patch 4-6
->  * Remove the patch 3 as we already change the parameter from "shared" to
->    "flags"
-> 
-> Changes in v4:
->  * Add patch 1-3 to switch some functions to a single 'flags'
->    parameters. (Michael S. Tsirkin)
->  * v3 patch 1-3 become v4 patch 4-6.
->  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
->    new header file under include/standard-headers/linux/. (Michael S.
->    Tsirkin)
->  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-> 
-> Changes in v3:
->  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
->    cases, and add back the retry mechanism. MAP_SYNC will be ignored
->    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
->  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
->    platforms in order to make qemu_ram_mmap() compile on those platforms.
->  * Patch 2&3: include more information in error messages of
->    memory-backend in hope to help user to identify the error.
->    (Dr. David Alan Gilbert)
->  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-> 
-> Changes in v2:
->  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
->  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
->    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
->  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
->    to osdep.h. (Michael S. Tsirkin)
-> 
-> Zhang Yi (5):
->   util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
->   scripts/update-linux-headers: add linux/mman.h
->   linux-headers: add linux/mman.h.
->   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
->   docs: Added MAP_SYNC documentation
-> 
-> Zhang Yi (5):
->   util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
->   scripts/update-linux-headers: add linux/mman.h
->   linux-headers: add linux/mman.h.
->   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
->   docs: Added MAP_SYNC documentation
-> 
->  docs/nvdimm.txt                            |  25 ++++++-
->  exec.c                                     |   2 +-
->  include/qemu/mmap-alloc.h                  |  21 +++++-
->  linux-headers/asm-arm/mman.h               |   4 ++
->  linux-headers/asm-arm64/mman.h             |   1 +
->  linux-headers/asm-generic/hugetlb_encode.h |  36 ++++++++++
->  linux-headers/asm-generic/mman-common.h    |  77 ++++++++++++++++++++
->  linux-headers/asm-generic/mman.h           |  24 +++++++
->  linux-headers/asm-mips/mman.h              | 108
->  +++++++++++++++++++++++++++++
->  linux-headers/asm-powerpc/mman.h           |  39 +++++++++++
->  linux-headers/asm-s390/mman.h              |   1 +
->  linux-headers/asm-x86/mman.h               |  31 +++++++++
->  linux-headers/linux/mman.h                 |  38 ++++++++++
->  qemu-options.hx                            |   5 ++
->  scripts/update-linux-headers.sh            |   6 +-
->  util/mmap-alloc.c                          |  51 +++++++++++++-
->  util/oslib-posix.c                         |   2 +-
->  17 files changed, 460 insertions(+), 11 deletions(-)
->  create mode 100644 linux-headers/asm-arm/mman.h
->  create mode 100644 linux-headers/asm-arm64/mman.h
->  create mode 100644 linux-headers/asm-generic/hugetlb_encode.h
->  create mode 100644 linux-headers/asm-generic/mman-common.h
->  create mode 100644 linux-headers/asm-generic/mman.h
->  create mode 100644 linux-headers/asm-mips/mman.h
->  create mode 100644 linux-headers/asm-powerpc/mman.h
->  create mode 100644 linux-headers/asm-s390/mman.h
->  create mode 100644 linux-headers/asm-x86/mman.h
->  create mode 100644 linux-headers/linux/mman.h
-> 
-> --
-> 2.7.4
+On Wed, Feb 06, 2019 at 12:27:23PM +0100, Stefano Garzarella wrote:
+> This series adds the support of DISCARD and WRITE_ZEROES commands
+> and extends the virtio-blk-test to test WRITE_ZEROES command when
+> the feature is enabled.
+>=20
+> v3:
+> - rebased on master (I removed Based-on tag since the new virtio headers =
+=66rom
+>   linux v5.0-rc1 are merged)
+> - added patch 2 to add host_features field (as in virtio-net) [Michael]
+> - fixed patch 3 (previously 2/5) using the new host_features field
+> - fixed patch 4 (previously 3/5) following the Stefan's comments:
+>                 - fixed name of functions and fields
+>                 - used vdev and s pointers
+>                 - removed "wz-may-unmap" property
+>                 - split "dwz-max-sectors" in two properties
+>=20
+> v2:
+> - added patch 1 to use virtio_blk_handle_rw_error() with discard operation
+> - added patch 2 to make those new features machine-type dependent (thanks=
+ David)
+> - fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
+rt()
+>                 for WRITE_ZEROES requests, and configurable parameters to
+>                 initialize the limits (max_sectors, wzeroes_may_unmap).
+>                 (thanks Stefan)
+>                 I moved in a new function the code to handle a single seg=
+ment,
+>                 in order to simplify the support of multiple segments in =
+the
+>                 future.
+> - added patch 4 to change the assert on data_size following the discussio=
+n with
+>                 Thomas, Changpeng, Michael, and Stefan (thanks all)
+> - fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
+ad of
+>                 dynamic allocation (thanks Thomas)
+>=20
+> Thanks,
+> Stefano
+>=20
+> Stefano Garzarella (6):
+>   virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
+>   virtio-blk: add host_features field in VirtIOBlock
+>   virtio-blk: add "discard" and "write-zeroes" properties
+>   virtio-blk: add DISCARD and WRITE_ZEROES features
+>   tests/virtio-blk: change assert on data_size in virtio_blk_request()
+>   tests/virtio-blk: add test for WRITE_ZEROES command
+>=20
+>  hw/block/virtio-blk.c          | 213 +++++++++++++++++++++++++++++++--
+>  hw/core/machine.c              |   2 +
+>  include/hw/virtio/virtio-blk.h |   5 +-
+>  tests/virtio-blk-test.c        |  75 +++++++++++-
+>  4 files changed, 281 insertions(+), 14 deletions(-)
+>=20
+> --=20
+> 2.20.1
+>=20
 
-This patch series look good to me. 
-With updated patch 5, feel free to add.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+--QXO0/MSS4VvK6f+D
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 
-> 
-> 
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcXRxaAAoJEJykq7OBq3PIW3kIAIKt5N3GP1sI3aaIEgMt1x3c
+yQmGtL44NjsKeoxdnGqwyFuA4Z0jNDhR0UPxCjpNy2aAGd2um5BIaLhgzp6CibfS
+fjF7rIc0VX4jAMQS7AOWpTFPAHjNkpOaMj04PeW+IGm3ybUNaKs8A4an+MSaBhs0
+6ayR1lAqNl16nI9y0cP8BXEAceGyPKfCa7r3MJ5KKEQoL6coTxCK4lgCuJkNYMGU
+OY39vMSY9lqr8sI5XLP4AHdi2ox2ajcUuB7iitqTBRnbaDF48uO2yH3SJB8JbQlj
+VY6L4X67vQ/EkFm8g/NhIz0ngjF1NWQM8hA6XXgbhVuuQmLoAyCv6Eg1zALPYm4=
+=Y5zg
+-----END PGP SIGNATURE-----
+
+--QXO0/MSS4VvK6f+D--
