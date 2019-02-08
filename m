@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44115)
+Received: from eggs.gnu.org ([209.51.188.92]:44221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1grwPR-0005k5-0k
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:00:58 -0500
+	(envelope-from <mst@redhat.com>) id 1grwQf-0006Ih-RE
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:02:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1grwPQ-000249-1G
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:00:56 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:46189)
+	(envelope-from <mst@redhat.com>) id 1grwQe-0002WS-DG
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:02:13 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:44067)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grwPP-000225-Q7
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:00:55 -0500
-Received: by mail-ed1-f68.google.com with SMTP id o10so1556610edt.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 19:00:54 -0800 (PST)
-Date: Thu, 7 Feb 2019 22:00:46 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grwQe-0002N6-2o
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:02:12 -0500
+Received: by mail-ed1-f68.google.com with SMTP id y56so1571366edd.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 19:01:56 -0800 (PST)
+Date: Thu, 7 Feb 2019 22:01:40 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190207215556-mutt-send-email-mst@kernel.org>
+Message-ID: <20190207220115-mutt-send-email-mst@kernel.org>
 References: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
-	<42dd91019c7aa480cb0d26565fefcb1238c37dc8.1549555521.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <42dd91019c7aa480cb0d26565fefcb1238c37dc8.1549555521.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V13 5/5] docs: Added MAP_SYNC documentation
+In-Reply-To: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V13 0/5] support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +32,190 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
 Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On Fri, Feb 08, 2019 at 06:11:23PM +0800, Zhang, Yi wrote:
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
+On Fri, Feb 08, 2019 at 06:10:23PM +0800, Zhang, Yi wrote:
+> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> files on ext4/xfs file system mounted with '-o dax').
 > 
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  docs/nvdimm.txt | 25 ++++++++++++++++++++++---
->  qemu-options.hx |  5 +++++
->  2 files changed, 27 insertions(+), 3 deletions(-)
+> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+>     https://patchwork.kernel.org/patch/10028151/
 > 
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index 5f158a6..a168429 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -143,9 +143,28 @@ Guest Data Persistence
->  ----------------------
->  
->  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> -currently the only one that can guarantee the guest write persistence
-> -is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
-> -which all guest access do not involve any host-side kernel cache.
-> +the only backend that can guarantee the guest write persistence is:
-> +
-> +A. DAX device (e.g., /dev/dax0.0, ) or
-> +B. DAX file(mounted with dax option)
-> +
-> +both are use real NVDIMM device as backend, which supporting direct
-> +access for files(no page cache).
+> In order to make sure that the file metadata is in sync after a fault 
+> while we are writing a shared DAX supporting backend files, this
+> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+> 
+> As the DAX vs DMA truncated issue was solved, we refined the code and
+> send out this feature for the v5 version.
+> 
+> We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
+> 'share=on' & 'pmem=on'. 
+> Or QEMU will not pass this flag to mmap(2)
 
-So I would just drop above two lines.
+Overall this looks reasonable to me.
+Besides the documentation nit:
 
-How does one know that there's support for direct access?
-it's just a question of kernel right?
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-And I don't think it matter wrt "real NVDIMM" - e.g. it
-could be vNVDIMM in a nested virt scenario.
-It will still survive host (i.e. L1 guest) crash.
 
-Besides, the above two lines aren't grammatical.
-
-> +
-> +When using B (A file supporting direct mapping of persistent memory)
-> +as a backend, write persistence is guaranteed if the host kernel has
-> +support for the MAP_SYNC flag in the mmap system call (available
-> +since Linux 4.15 and on certain distro kernels) and additionally
-> +both 'pmem' and 'share' flags are set to 'on' on the backend.
-> +
-> +If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-> +are not set, if the backend file does not support DAX or if MAP_SYNC
-> +is not supported by the host kernel, write persistence is not
-> +guaranteed after a system crash. For compatibility reasons, these
-> +conditions are silently ignored if not satisfied. Currently, no way
-> +is provided to test for them.
-> +For more details, please reference mmap(2) man page:
-> +http://man7.org/linux/man-pages/man2/mmap.2.html.
->  
->  When using other types of backends, it's suggested to set 'unarmed'
->  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 08f8516..ef1da8f 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4002,6 +4002,11 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
->  If @option{pmem} is set to 'on', QEMU will take necessary operations to
->  guarantee the persistence of its own writes to @option{mem-path}
->  (e.g. in vNVDIMM label emulation and live migration).
-> +Also, we will map the backend-file with MAP_SYNC flag, which ensures the
-> +file metadata is in sync for @option{mem-path} in case of host crash
-> +or a power failure. MAP_SYNC requires support from both the host kernel
-> +(since Linux kernel 4.15) and the filesystem of @option{mem-path} mounted
-> +with DAX option.
->  
->  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
->  
+> Test with below cases:
+> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+>    a: backend is a dax supporting file.
+>    1) start VM1 with options:
+>    -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+>    
+>    2) start VM2 with options:
+>    -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+> 
+>    3) live migrate from VM1 to VM2.
+>    
+>    4) Suddly let Host crash or power failure.
+> 
+>    5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
+> 
+>    b: backend is a regular file.
+>    1) start with options
+>    -object memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+> 
+>    will warning "failed to validate with mapping flags: Operation not supported"
+>    FILE_1 and FILE_2 random corrupt.
+> 
+> 2. Other cases:
+>    FILE_1 and FILE_2 random corrupt.
+> 
+> Changes in V13:
+>  * 4/5 Micheal: move the inlcude to mmap_alloc.c.
+>  * 4/5 Micheal: refine the warning message.
+>  * 5/5 Micheal: refine the Documentations.
+> 
+> Changes in V12:
+>  * 2/5: Micheal: Update update-linux-headers.sh
+>  * 3/5: Micheal: Use script update add linux/mman.h
+>  * 4/5: Pankaj,Micheal: 1) fallback to mmap without
+>         MAP_SYNC & MAP_SHARED_VALIDATE if sync not supported or failed
+> 	2) Replace the include with 3/5 added linux/mman.h
+>  * 5/5: Micheal: Refine the Documentations.
+> 
+> Changes in V11:
+>  * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
+>  * 2/3: Micheal: Fix the compatibility for old kernel.
+>  * 2/3&3/3: Micheal&Eduardo :Update the behavior below: 
+>    Waning at no-dax and continue without MAP_SYNC.
+>    Test if fails again for compatibility, then remove the MAP_VALIDATE and
+>    silently proceed.
+> 
+> Changes in V10:
+>  * 4/4: refine the document.
+>  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
+>  * 2/4: Fix the wrong include header
+> 
+> Changes in V9:
+>  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
+>  since I don't have much knowledge about the sparse feature, @Micheal Could you 
+>  add some documentation/commit message on this patch? Thank you very much.
+>  * 3/6: from 2/5: Eduardo: updated the commit message. 
+>  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
+>  * 5/6: from 4/5: Eduardo: updated the commit message.
+>  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
+> 
+> Changes in v8:
+>  * Micheal: 3/5, remove the duplicated define in the os_dep.h
+>  * Micheal: 2/5, make type define safety.
+>  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
+>  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
+>    MAP_SYNC only worked with pmem=on.
+>  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
+>    all the flags in one parameter.
+> 
+> Changes in v7:
+>  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
+> 
+> Changes in v6:
+>  * Pankaj: 3/7 are squashed with 2/7
+>  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+>  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+>  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+>  * Stefan, 5/7 Add missing "munmap"
+>  * Stefan, 2/7 refine the shared/flag.
+> 
+> Changes in v5:
+>  * Add patch 1 to fix a memory leak issue.
+>  * Refine the patch 4-6
+>  * Remove the patch 3 as we already change the parameter from "shared" to
+>    "flags"
+> 
+> Changes in v4:
+>  * Add patch 1-3 to switch some functions to a single 'flags'
+>    parameters. (Michael S. Tsirkin)
+>  * v3 patch 1-3 become v4 patch 4-6.
+>  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+>    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+>  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+> 
+> Changes in v3:
+>  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+>    cases, and add back the retry mechanism. MAP_SYNC will be ignored
+>    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+>  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+>    platforms in order to make qemu_ram_mmap() compile on those platforms.
+>  * Patch 2&3: include more information in error messages of
+>    memory-backend in hope to help user to identify the error.
+>    (Dr. David Alan Gilbert)
+>  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+> 
+> Changes in v2:
+>  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+>  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+>    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+>  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+>    to osdep.h. (Michael S. Tsirkin)
+> 
+> Zhang Yi (5):
+>   util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+>   scripts/update-linux-headers: add linux/mman.h
+>   linux-headers: add linux/mman.h.
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   docs: Added MAP_SYNC documentation
+> 
+> Zhang Yi (5):
+>   util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+>   scripts/update-linux-headers: add linux/mman.h
+>   linux-headers: add linux/mman.h.
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   docs: Added MAP_SYNC documentation
+> 
+>  docs/nvdimm.txt                            |  25 ++++++-
+>  exec.c                                     |   2 +-
+>  include/qemu/mmap-alloc.h                  |  21 +++++-
+>  linux-headers/asm-arm/mman.h               |   4 ++
+>  linux-headers/asm-arm64/mman.h             |   1 +
+>  linux-headers/asm-generic/hugetlb_encode.h |  36 ++++++++++
+>  linux-headers/asm-generic/mman-common.h    |  77 ++++++++++++++++++++
+>  linux-headers/asm-generic/mman.h           |  24 +++++++
+>  linux-headers/asm-mips/mman.h              | 108 +++++++++++++++++++++++++++++
+>  linux-headers/asm-powerpc/mman.h           |  39 +++++++++++
+>  linux-headers/asm-s390/mman.h              |   1 +
+>  linux-headers/asm-x86/mman.h               |  31 +++++++++
+>  linux-headers/linux/mman.h                 |  38 ++++++++++
+>  qemu-options.hx                            |   5 ++
+>  scripts/update-linux-headers.sh            |   6 +-
+>  util/mmap-alloc.c                          |  51 +++++++++++++-
+>  util/oslib-posix.c                         |   2 +-
+>  17 files changed, 460 insertions(+), 11 deletions(-)
+>  create mode 100644 linux-headers/asm-arm/mman.h
+>  create mode 100644 linux-headers/asm-arm64/mman.h
+>  create mode 100644 linux-headers/asm-generic/hugetlb_encode.h
+>  create mode 100644 linux-headers/asm-generic/mman-common.h
+>  create mode 100644 linux-headers/asm-generic/mman.h
+>  create mode 100644 linux-headers/asm-mips/mman.h
+>  create mode 100644 linux-headers/asm-powerpc/mman.h
+>  create mode 100644 linux-headers/asm-s390/mman.h
+>  create mode 100644 linux-headers/asm-x86/mman.h
+>  create mode 100644 linux-headers/linux/mman.h
+> 
 > -- 
 > 2.7.4
