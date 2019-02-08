@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47108)
+Received: from eggs.gnu.org ([209.51.188.92]:48149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gs2ls-0003dj-Hj
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:48:34 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gs2s0-0004tj-9E
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gs2lo-0005O5-Tp
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:48:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34646)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gs2lo-0005NR-FW
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:48:28 -0500
-Date: Fri, 8 Feb 2019 09:48:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190208094818.GA2608@work-vm>
-References: <2932080.UxbmD43V0u@neil>
-	<20190208062441.GF16257@stefanha-x1.localdomain>
+	(envelope-from <cohuck@redhat.com>) id 1gs2rz-0007i7-CX
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:54:52 -0500
+Date: Fri, 8 Feb 2019 10:54:38 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190208105438.001db484.cohuck@redhat.com>
+In-Reply-To: <370c3eaa-a348-b6c8-a772-94b4ab24e2a6@redhat.com>
+References: <20190202005610.24048-1-crosa@redhat.com>
+	<20190202005610.24048-3-crosa@redhat.com>
+	<20190206153639.61a5411c.cohuck@redhat.com>
+	<85b0f519-38d8-cf7d-a22a-537dab8470a7@redhat.com>
+	<20190206182043.49a18542.cohuck@redhat.com>
+	<12a1b55d-bb0b-8a5d-20ba-9777172144c3@redhat.com>
+	<20190207112554.6368595d.cohuck@redhat.com>
+	<370c3eaa-a348-b6c8-a772-94b4ab24e2a6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190208062441.GF16257@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [regression] Clock jump on VM migration
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/20] Acceptance tests: show avocado
+ test execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Neil Skrypuch <neil@tembosocial.com>, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> On Thu, Feb 07, 2019 at 05:33:25PM -0500, Neil Skrypuch wrote:
-> 
-> Thanks for your email!
-> 
-> Please post your QEMU command-line.
-> 
-> > The clock jump numbers above are from NTP, but you can see that they are quite 
-> > close to the amount of time spent in raw_co_invalidate_cache. So, it looks 
-> > like flushing the cache is just taking a long time and stalling the guest, 
-> > which causes the clock jump. This isn't too surprising as the entire disk 
-> > image was just written as part of the block mirror and would likely still be 
-> > in the cache.
+On Thu, 7 Feb 2019 13:32:54 -0500
+Cleber Rosa <crosa@redhat.com> wrote:
+
+> On 2/7/19 5:25 AM, Cornelia Huck wrote:
+> > On Wed, 6 Feb 2019 12:36:23 -0500
+> > Cleber Rosa <crosa@redhat.com> wrote:
+> >   
+> >> On 2/6/19 12:20 PM, Cornelia Huck wrote:  
+> >>> So, to summarize:
+> >>> - add 'make check-acceptance-quick' that excludes tests marked as 'slow'    
+> >>
+> >> Yes... with one caveat: since the default is to have functional tests
+> >> that are not necessarily quick, the other approach has been used.  Tests
+> >> that are known to be quick are currently marked as such.
+> >>
+> >> Anyway, this task is being tracked here:
+> >>
+> >> https://trello.com/c/9HZWfKeE/79-add-a-make-check-acceptance-quick-target  
 > > 
-> > I see the use case for this feature, but I don't think it applies here, as 
-> > we're not technically using shared storage. I believe an option to toggle this 
-> > behaviour on/off and/or some sort of heuristic to guess whether or not it 
-> > should be enabled by default would be in order here.
+> > Yes, that sounds good as well.
+> >   
+> >>  
+> >>> - use the avocado command line interface to further narrow down
+> >>>   architectures and machines, if wanted
+> >>> ?
+> >>>     
+> >>
+> >> Yes.  Do you think this deserves a section in the docs?  
+> > 
+> > I know that I'll find myself searching the docs for that info at some
+> > point in the future, so yes :)
+> >   
 > 
-> It would be good to figure out how to perform the flush without
-> affecting guest time at all.  The clock jump will also inconvenience
-> users who do need the flush, so I rather not work around the clock jump
-> for a subset of users only.
+> Sure thing, tracking it here:
+> 
+> https://trello.com/c/7Fxbtx6F/80-document-how-to-use-the-avocado-command-line-and-tags
 
-One thing that makes Neil's setup different is that having the source
-and destination on the same host, that fadvise is bound to drop pages
-that are actually in use by the source on the same host.
-
-But I'm also curious at what point in the migration we call the
-invalidate and so which threads get held up, in which state.
-
-Neil: Another printf would also be interesting, between the
-bdrv_co_flush and the posix_fadvise;  I'm assuming it's the
-bdrv_co_flush that's taking the time but it would be good to check.
-
-Dave
-
-> Stefan
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Great, thanks!
