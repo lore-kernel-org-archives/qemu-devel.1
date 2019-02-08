@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58999)
+Received: from eggs.gnu.org ([209.51.188.92]:33178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs6YV-0000RL-Uo
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:51:00 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gs6jV-0005hh-C5
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:02:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs6YT-0005sn-TU
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:59 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri,  8 Feb 2019 14:49:50 +0100
-Message-Id: <20190208134950.187665-7-sgarzare@redhat.com>
-In-Reply-To: <20190208134950.187665-1-sgarzare@redhat.com>
-References: <20190208134950.187665-1-sgarzare@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1gs6jU-0003LM-I0
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:02:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gs6jU-0003Kt-CJ
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:02:20 -0500
+References: <20190201160653.13829-1-peter.maydell@linaro.org>
+	<20190201160653.13829-44-peter.maydell@linaro.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <767a2e82-acf4-d282-30a2-a3f5889c01f9@redhat.com>
+Date: Fri, 8 Feb 2019 15:02:15 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 6/6] tests/virtio-blk: add test for
- WRITE_ZEROES command
+In-Reply-To: <20190201160653.13829-44-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 43/47] target/arm: fix AArch64 virtual
+ address space size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,94 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Remi Denis-Courmont <remi.denis.courmont@huawei.com>, Richard Henderson <richard.henderson@linaro.org>
 
-If the WRITE_ZEROES feature is enabled, we check this command
-in the test_basic().
+On 01/02/2019 17:06, Peter Maydell wrote:
+> From: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
+> 
+> Since QEMU does not support the ARMv8.2-LVA, Large Virtual Address,
+> extension (yet), the VA address space is 48-bits plus a sign bit. User
+> mode can only handle the positive half of the address space, so that
+> makes a limit of 48 bits.
+> 
+> (With LVA, it would be 53 and 52 bits respectively.)
+> 
+> The incorrectly large address space conflicts with PAuth instructions,
+> which use bits 48-54 and 56-63 for the pointer authentication code. This
+> also conflicts with (as yet unsupported by QEMU) data tagging and with
+> the ARMv8.5-MTE extension.
+> 
+> Signed-off-by: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 63934a200ad..a68bcc9fedb 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2512,7 +2512,7 @@ bool write_cpustate_to_list(ARMCPU *cpu);
+>  
+>  #if defined(TARGET_AARCH64)
+>  #  define TARGET_PHYS_ADDR_SPACE_BITS 48
+> -#  define TARGET_VIRT_ADDR_SPACE_BITS 64
+> +#  define TARGET_VIRT_ADDR_SPACE_BITS 48
+>  #else
+>  #  define TARGET_PHYS_ADDR_SPACE_BITS 40
+>  #  define TARGET_VIRT_ADDR_SPACE_BITS 32
+> 
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tests/virtio-blk-test.c | 60 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+This change breaks qemu-aarch64 (using LTP test suite):
 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 0739498da7..35bd92dbfc 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -244,6 +244,66 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
-ocator *alloc,
-=20
-     guest_free(alloc, req_addr);
-=20
-+    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        void *expected;
-+
-+        /*
-+         * WRITE_ZEROES request on the same sector of previous test wher=
-e
-+         * we wrote "TEST".
-+         */
-+        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
-+        req.data =3D (char *) &dwz_hdr;
-+        dwz_hdr.sector =3D 0;
-+        dwz_hdr.num_sectors =3D 1;
-+        dwz_hdr.flags =3D 0;
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
-));
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
-+        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
-se);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        guest_free(alloc, req_addr);
-+
-+        /* Read request to check if the sector contains all zeroes */
-+        req.type =3D VIRTIO_BLK_T_IN;
-+        req.ioprio =3D 1;
-+        req.sector =3D 0;
-+        req.data =3D g_malloc0(512);
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
-+        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 528);
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        data =3D g_malloc(512);
-+        expected =3D g_malloc0(512);
-+        memread(req_addr + 16, data, 512);
-+        g_assert_cmpmem(data, 512, expected, 512);
-+        g_free(expected);
-+        g_free(data);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
-         /* Write and read with 2 descriptor layout */
-         /* Write request */
---=20
-2.20.1
+# chroot chroot/arm64/bionic /opt/ltp/testcases/bin/access03
+tst_test.c:1015: INFO: Timeout per run is 0h 05m 00s
+qemu-aarch64: .../qemu/accel/tcg/translate-all.c:2522: page_check_range: Assertion `start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
+qemu:handle_cpu_signal received signal outside vCPU context @ pc=0x60001554
+
+Any idea?
+Thanks,
+Laurent
