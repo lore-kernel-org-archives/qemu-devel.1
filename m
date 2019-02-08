@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55353)
+Received: from eggs.gnu.org ([209.51.188.92]:55929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gs8LX-0004YI-Io
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:45:47 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gs8Nd-0005f3-Uz
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gs8LW-0001E5-LL
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:45:43 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gs8Nd-0002Y7-7v
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:47:53 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 8 Feb 2019 15:47:26 +0000
+Message-ID: <b30c8b23-a2ca-23eb-cab7-6d2b4dc8237d@virtuozzo.com>
 References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1549638368-530182-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5b4693e9-ac04-22b0-11e8-176f023f70c1@redhat.com>
-Date: Fri, 8 Feb 2019 09:45:17 -0600
+	<3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
+In-Reply-To: <3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <37FB8EAC71F9274B81D04018D9ACDCA5@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1549638368-530182-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4VMad1ESXQO98OtdULMkQAudbvvSQjkER"
-Subject: Re: [Qemu-devel] [PATCH v14 3/3] qcow2: list of bitmaps new test 242
+Subject: Re: [Qemu-devel] [PATCH v14 0/3] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4VMad1ESXQO98OtdULMkQAudbvvSQjkER
-From: Eric Blake <eblake@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com,
- berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
-Message-ID: <5b4693e9-ac04-22b0-11e8-176f023f70c1@redhat.com>
-Subject: Re: [PATCH v14 3/3] qcow2: list of bitmaps new test 242
-References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1549638368-530182-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1549638368-530182-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/8/19 9:06 AM, Andrey Shinkevich wrote:
-> A new test file 242 added to the qemu-iotests set. It checks
-> the format of qcow2 specific information for the new added
-> section that lists details of bitmaps.
->=20
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  tests/qemu-iotests/242     | 103 ++++++++++++++++++++++++++++
->  tests/qemu-iotests/242.out | 165 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 269 insertions(+)
->  create mode 100755 tests/qemu-iotests/242
->  create mode 100644 tests/qemu-iotests/242.out
->=20
-
-> +
-> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
-> +
-> +disk =3D file_path('disk')
-> +chunk =3D 256*1024
-> +bitmap_flag_unknown =3D 1 << 2
-> +#flag_offset =3D 5*cluster_size + flag_offset_in_bitmap_directory_entr=
-y
-
-pep8 didn't like the comment (missing space after #). I guess it doesn't
-care about spaces or lack of spaces around binary operators (I might
-have pug spaces around * in the assignment to chunk, but since pep8
-didn't complain, I didn't change it).
-
-As mentioned in the cover letter, adding:
-
-log('Test complete')
-
-at the end of 242, and adjusting 242.out accordingly, silences the
-checkpatch warning. So with that change, I've now queued your series for
-my next NBD pull request, probably on Monday.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---4VMad1ESXQO98OtdULMkQAudbvvSQjkER
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxdpA0ACgkQp6FrSiUn
-Q2oRDQf+L3u8Go07lYZvez02Emht7X8sByKZwqt3afd0wRe3tvylSS+1++pkSPGz
-8fWPUoy7LedY1Srxd/10BQ0s9tuG/W+KdhSVIzVcnOuCzJNAlrocsC+qDW/icvPU
-W8J7U0Zx2nKFwsSIwyQjWzqVq5YIjdHKoMGM27aXgS0Y7efkSdA212Uqw9v1WdsY
-bVhas1AeD/PV4+vc7EPL02l7AlZ6SdcaSjs8ZtNjIaDBIXMvLOKyfa+NXTOePjVD
-RvuKy08DWAi9zMjBrjQF7+ZTvDuzMawRfRu/od4dpAATJJAwNtMrg36VdkS0o60F
-ziBNcBw0FEcRZgwOoJ/dsojRnlztag==
-=jSFy
------END PGP SIGNATURE-----
-
---4VMad1ESXQO98OtdULMkQAudbvvSQjkER--
+MDguMDIuMjAxOSAxODoyNSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi84LzE5IDk6MDYgQU0s
+IEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4gdjE0Og0KPj4gVGhlIHRlc3QgMjQyIHdhcyBh
+bWVuZGVkIHRvIGJlIHNhZmVyIGFnYWluc3QgY2hhbmdlcyBpbiB0aGUgYml0bWFwIGFsbG9jYXRp
+b24NCj4+IGFsZ29yaXRobSBiZWNhdXNlIHRoZSBiaXRtYXAgZGlyZWN0b3J5IGlzIHJlYWxsb2Nh
+dGVkIG9uIFZNIHNodXRkb3duLg0KPj4gVW5mb3J0dW5hdGVseSwgYW4gZW1wdHkgbGluZSBhdCB0
+aGUgZW5kIG9mIHRoZSBiZW5jaG1hcmsgZmlsZSAyNDIub3V0IHBlcnNpc3RzLg0KPiANCj4gRWFz
+eSBzb2x1dGlvbjogaW4gMjQyLCBhZGQgYW4gZXh0cmEgbG9nKCJUZXN0IGNvbXBsZXRlIikgb3Ig
+c2ltaWxhcg0KPiBhZnRlciB0aGUgb3V0cHV0IHRoYXQgcHJvZHVjZXMgdGhlIGJsYW5rIGxpbmUs
+IHRoZW4gMjQyLm91dCB3aWxsIG5vDQo+IGxvbmdlciBoYXZlIGEgdHJhaWxpbmcgYmxhbmsgbGlu
+ZS4NCj4gDQoNCndpdGggdGhpcyBmaXhlZDoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRz
+b3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpCZXN0IHJl
+Z2FyZHMsDQpWbGFkaW1pcg0K
