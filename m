@@ -1,43 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60204)
+Received: from eggs.gnu.org ([209.51.188.92]:60637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gs8h3-0007ha-P3
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:07:58 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gs8j6-0000fR-01
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:10:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gs8h2-0005rE-Lo
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:07:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32850
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gs8j5-0006vT-5j
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:10:03 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:47240
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gs8h2-0005bH-Gd
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:07:56 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x18G3gX1133684
-	for <qemu-devel@nongnu.org>; Fri, 8 Feb 2019 11:07:29 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qhbay5au5-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 11:07:29 -0500
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Fri, 8 Feb 2019 16:07:28 -0000
-Reply-To: jjherne@linux.ibm.com
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
-	<18fcb6cc-01aa-3461-6595-85e946b77bc7@linux.ibm.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Fri, 8 Feb 2019 11:07:23 -0500
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gs8j3-0006te-BZ
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:10:03 -0500
+References: <20190103154810.GB32032@Red>
+	<3a375dc6-f0ba-c3f0-6e86-2fd5cdf3ee35@ilande.co.uk>
+	<8c302745-5097-afed-5c7e-9a992da03cf6@ilande.co.uk>
+	<20190205091115.GA27918@Red>
+	<2a85b239-7117-71aa-b921-86c42a54aeba@ilande.co.uk>
+	<20190206072850.GA4295@Red>
+	<8da59b77-eef2-4897-5254-0f6fb22539a6@ilande.co.uk>
+	<20190206193824.GA1909@Red>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <8be18f45-9ee1-c8b3-d818-efc808cbfa1c@ilande.co.uk>
+Date: Fri, 8 Feb 2019 16:09:52 +0000
 MIME-Version: 1.0
-In-Reply-To: <18fcb6cc-01aa-3461-6595-85e946b77bc7@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <863ebc1f-e9c8-1513-27ea-d65fed789e8e@linux.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 01/15] s390 vfio-ccw: Add bootindex
- property and IPLB data
+In-Reply-To: <20190206193824.GA1909@Red>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] sparc: crash when using initrd > 5M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,66 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: sparclinux@vger.kernel.org, qemu-devel@nongnu.org
 
-T24gMS8zMC8xOSA1OjIxIFBNLCBGYXJoYW4gQWxpIHdyb3RlOg0KPj4gLi4uDQo+PiBkaWZm
-IC0tZ2l0IGEvaHcvczM5MHgvaXBsLmMgYi9ody9zMzkweC9pcGwuYw0KPj4gaW5kZXggMjFm
-NjRhZC4uYTk5M2Y2NSAxMDA2NDQNCj4+IC0tLSBhL2h3L3MzOTB4L2lwbC5jDQo+PiArKysg
-Yi9ody9zMzkweC9pcGwuYw0KPj4gQEAgLTE5LDYgKzE5LDcgQEANCj4+IMKgICNpbmNsdWRl
-ICJody9sb2FkZXIuaCINCj4+IMKgICNpbmNsdWRlICJody9ib2FyZHMuaCINCj4+IMKgICNp
-bmNsdWRlICJody9zMzkweC92aXJ0aW8tY2N3LmgiDQo+PiArI2luY2x1ZGUgImh3L3MzOTB4
-L3ZmaW8tY2N3LmgiDQo+PiDCoCAjaW5jbHVkZSAiaHcvczM5MHgvY3NzLmgiDQo+PiDCoCAj
-aW5jbHVkZSAiaHcvczM5MHgvZWJjZGljLmgiDQo+PiDCoCAjaW5jbHVkZSAiaXBsLmgiDQo+
-PiBAQCAtMzExLDggKzMxMiwxMiBAQCBzdGF0aWMgQ2N3RGV2aWNlICpzMzkwX2dldF9jY3df
-ZGV2aWNlKERldmljZVN0YXRlICpkZXZfc3QpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgVmly
-dGlvQ2N3RGV2aWNlICp2aXJ0aW9fY2N3X2RldiA9IChWaXJ0aW9DY3dEZXZpY2UgKikNCj4+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG9iamVjdF9keW5hbWljX2Nhc3QoT0JKRUNU
-KHFkZXZfZ2V0X3BhcmVudF9idXMoZGV2X3N0KS0+cGFyZW50KSwNCj4+IMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBUWVBFX1ZJUlRJT19DQ1dfREVWSUNFKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBWRklPQ0NX
-RGV2aWNlICp2ZmlvX2Njd19kZXYgPSAoVkZJT0NDV0RldmljZSAqKQ0KPj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgb2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2X3N0KSwgVFlQ
-RV9WRklPX0NDVyk7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHZpcnRpb19jY3dfZGV2
-KSB7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjY3dfZGV2ID0gQ0NXX0RFVklD
-RSh2aXJ0aW9fY2N3X2Rldik7DQo+PiArwqDCoMKgwqDCoMKgwqAgfSBlbHNlIGlmICh2Zmlv
-X2Njd19kZXYpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNjd19kZXYgPSBDQ1df
-REVWSUNFKHZmaW9fY2N3X2Rldik7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgfSBlbHNlIHsN
-Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFNDU0lEZXZpY2UgKnNkID0gKFNDU0lE
-ZXZpY2UgKikNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb2JqZWN0
-X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2X3N0KSwNCj4+IEBAIC0zNDcsNiArMzUyLDggQEAg
-c3RhdGljIGJvb2wgczM5MF9nZW5faW5pdGlhbF9pcGxiKFMzOTBJUExTdGF0ZSAqaXBsKQ0K
-Pj4gwqDCoMKgwqDCoCBpZiAoY2N3X2Rldikgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIFND
-U0lEZXZpY2UgKnNkID0gKFNDU0lEZXZpY2UgKikgb2JqZWN0X2R5bmFtaWNfY2FzdChPQkpF
-Q1QoZGV2X3N0KSwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFRZUEVfU0NTSV9ERVZJQ0UpOw0KPj4g
-K8KgwqDCoMKgwqDCoMKgIFZGSU9DQ1dEZXZpY2UgKnZjID0gKFZGSU9DQ1dEZXZpY2UgKikN
-Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG9iamVjdF9keW5hbWljX2Nhc3QoT0JKRUNU
-KGRldl9zdCksIFRZUEVfVkZJT19DQ1cpOw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChz
-ZCkgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaXBsLT5pcGxiLmxlbiA9IGNw
-dV90b19iZTMyKFMzOTBfSVBMQl9NSU5fUUVNVV9TQ1NJX0xFTik7DQo+PiBAQCAtMzU4LDYg
-KzM2NSwxMyBAQCBzdGF0aWMgYm9vbCBzMzkwX2dlbl9pbml0aWFsX2lwbGIoUzM5MElQTFN0
-YXRlICppcGwpDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpcGwtPmlwbGIuc2Nz
-aS5jaGFubmVsID0gY3B1X3RvX2JlMTYoc2QtPmNoYW5uZWwpOw0KPj4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgaXBsLT5pcGxiLnNjc2kuZGV2bm8gPSBjcHVfdG9fYmUxNihjY3df
-ZGV2LT5zY2gtPmRldm5vKTsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlwbC0+
-aXBsYi5zY3NpLnNzaWQgPSBjY3dfZGV2LT5zY2gtPnNzaWQgJiAzOw0KPj4gK8KgwqDCoMKg
-wqDCoMKgIH0gZWxzZSBpZiAodmMpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIENj
-d0RldmljZSAqY2N3X2RldiA9IENDV19ERVZJQ0UodmMpOw0KPiANCj4gRG8gd2UgbmVlZCB0
-aGlzIGxpbmUgaGVyZT8gSSB0aG91Z2ggY2N3X2RldiB3YXMgYWxyZWFkeSBjb3JyZWN0bHkg
-Y2FzdGVkIGluIA0KPiBzMzkwX2dldF9jY3dfZGV2aWNlPw0KPiANCj4+ICsNCj4+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGlwbC0+aXBsYi5sZW4gPSBjcHVfdG9fYmUzMihTMzkwX0lQ
-TEJfTUlOX0NDV19MRU4pOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaXBsLT5pcGxi
-LnBidCA9IFMzOTBfSVBMX1RZUEVfQ0NXOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-aXBsLT5pcGxiLmNjdy5kZXZubyA9IGNwdV90b19iZTE2KGNjd19kZXYtPnNjaC0+ZGV2bm8p
-Ow0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaXBsLT5pcGxiLmNjdy5zc2lkID0gY2N3
-X2Rldi0+c2NoLT5zc2lkICYgMzsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB9IGVsc2Ugew0K
-Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgVmlydElPTmV0ICp2biA9IChWaXJ0SU9O
-ZXQgKikgb2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2X3N0KSwNCj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBUWVBFX1ZJUlRJT19ORVQpOw0KPiANCg0KR29vZCBjYXRjaCwgd2UgZG9u
-J3QgbmVlZCB0aGUgZXh0cmEgY2FzdC4gVGhpcyBpcyBhIHJlbGljIG9mIGFuIG9sZGVyIHdh
-eSBvZiBoYW5kbGluZyB0aGUgDQpkYXRhLiBJIHNob3VsZCBoYXZlIHJlbW92ZWQgaXQgd2hl
-biBJIHNpbXBsaWZpZWQgdGhlIGNvZGUgYWZ0ZXIgdGhlIFJGQyB2ZXJzaW9uLg0KDQotLSAN
-Ci0tIEphc29uIEouIEhlcm5lIChqamhlcm5lQGxpbnV4LmlibS5jb20pDQoNCg==
+On 06/02/2019 19:38, Corentin Labbe wrote:
+
+> On Wed, Feb 06, 2019 at 07:37:29AM +0000, Mark Cave-Ayland wrote:
+>> On 06/02/2019 07:28, Corentin Labbe wrote:
+>>
+>>>>> Hello
+>>>>>
+>>>>> Sorry even with the patch I still hit the issue.
+>>>>>
+>>>>> I have added some debug and at least qemu set initrd_size correctly now.
+>>>>>
+>>>>> I have tried to compile openbios-sparc32 for debugging but fail with
+>>>>> arch/sparc32/context.c:116:5: error: PIC register clobbered by 'l7' in 'asm'
+>>>>>      asm __volatile__ ("\n\tcall __switch_context"
+>>>>>      ^~~
+>>>>> make[1]: *** [rules.mak:219: target/arch/sparc32/context.o] Error 1
+>>>>> (gcc 7.2 and gc 6.4 with binutils 2.30)
+>>>>
+>>>> Hmmm. One other thing I've noticed is that newer kernels tend need a minimum of 256M
+>>>> RAM to start up - does it work if you add -m 256 to your command line?
+>>>>
+>>>>
+>>>
+>>> I have already set 256M of RAM. (and tried 512)
+>>
+>> I wonder then if this is being triggered by a recent kernel change? I tend to test
+>> using the latest Debian ports ISOs which are currently running 4.9 and that booted
+>> fine when I was testing the patches above.
+>>
+>> Can you try with a few older kernels to see if this is the case?
+>>
+> 
+> Hello
+> 
+> In fact the problem was due to .config since a defconfig works fine on next-20190205
+> After lots of diff I found that CONFIG_LOG_BUF_SHIFT=18 cause this behaviour.
+> 
+> Note that values of 16,17 cause also the same problem.
+
+Okay, thanks for the feedback. I will aim to merge the OpenBIOS/QEMU patches before
+the upcoming QEMU 4.0 release since even if it happens to work now, not passing the
+memory allocations/translations via the DT seems a little fragile.
+
+
+ATB,
+
+Mark.
