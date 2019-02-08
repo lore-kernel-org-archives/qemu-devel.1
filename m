@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55929)
+Received: from eggs.gnu.org ([209.51.188.92]:56107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gs8Nd-0005f3-Uz
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:47:54 -0500
+	(envelope-from <pagupta@redhat.com>) id 1gs8OI-00065l-Gi
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gs8Nd-0002Y7-7v
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:47:53 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 8 Feb 2019 15:47:26 +0000
-Message-ID: <b30c8b23-a2ca-23eb-cab7-6d2b4dc8237d@virtuozzo.com>
-References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
-In-Reply-To: <3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <37FB8EAC71F9274B81D04018D9ACDCA5@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pagupta@redhat.com>) id 1gs8OH-00037F-Fc
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:48:34 -0500
+Date: Fri, 8 Feb 2019 10:48:29 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1900994795.70706540.1549640909215.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190208134950.187665-1-sgarzare@redhat.com>
+References: <20190208134950.187665-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v14 0/3] qcow2: Add list of bitmaps to
- ImageInfoSpecificQCow2
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +23,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MDguMDIuMjAxOSAxODoyNSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi84LzE5IDk6MDYgQU0s
-IEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4gdjE0Og0KPj4gVGhlIHRlc3QgMjQyIHdhcyBh
-bWVuZGVkIHRvIGJlIHNhZmVyIGFnYWluc3QgY2hhbmdlcyBpbiB0aGUgYml0bWFwIGFsbG9jYXRp
-b24NCj4+IGFsZ29yaXRobSBiZWNhdXNlIHRoZSBiaXRtYXAgZGlyZWN0b3J5IGlzIHJlYWxsb2Nh
-dGVkIG9uIFZNIHNodXRkb3duLg0KPj4gVW5mb3J0dW5hdGVseSwgYW4gZW1wdHkgbGluZSBhdCB0
-aGUgZW5kIG9mIHRoZSBiZW5jaG1hcmsgZmlsZSAyNDIub3V0IHBlcnNpc3RzLg0KPiANCj4gRWFz
-eSBzb2x1dGlvbjogaW4gMjQyLCBhZGQgYW4gZXh0cmEgbG9nKCJUZXN0IGNvbXBsZXRlIikgb3Ig
-c2ltaWxhcg0KPiBhZnRlciB0aGUgb3V0cHV0IHRoYXQgcHJvZHVjZXMgdGhlIGJsYW5rIGxpbmUs
-IHRoZW4gMjQyLm91dCB3aWxsIG5vDQo+IGxvbmdlciBoYXZlIGEgdHJhaWxpbmcgYmxhbmsgbGlu
-ZS4NCj4gDQoNCndpdGggdGhpcyBmaXhlZDoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRz
-b3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpCZXN0IHJl
-Z2FyZHMsDQpWbGFkaW1pcg0K
+
+> 
+> This series adds the support of DISCARD and WRITE_ZEROES commands
+> and extends the virtio-blk-test to test WRITE_ZEROES command when
+> the feature is enabled.
+> 
+> v4:
+> - fixed error with mingw compiler in patch 4
+>   gcc and clang want %lu, but mingw wants %llu for BDRV_REQUEST_MAX_SECTORS.
+>   Since is less than INT_MAX, I casted it to integer and I used %d in the
+>   format string of error_setg. (mingw now is happy)
+> 
+> v3:
+> - rebased on master (I removed Based-on tag since the new virtio headers from
+>   linux v5.0-rc1 are merged)
+> - added patch 2 to add host_features field (as in virtio-net) [Michael]
+> - fixed patch 3 (previously 2/5) using the new host_features field
+> - fixed patch 4 (previously 3/5) following the Stefan's comments:
+>                 - fixed name of functions and fields
+>                 - used vdev and s pointers
+>                 - removed "wz-may-unmap" property
+>                 - split "dwz-max-sectors" in two properties
+> 
+> v2:
+> - added patch 1 to use virtio_blk_handle_rw_error() with discard operation
+> - added patch 2 to make those new features machine-type dependent (thanks
+> David)
+> - fixed patch 3 (previously patch 1/2) adding more checks, block_acct_start()
+>                 for WRITE_ZEROES requests, and configurable parameters to
+>                 initialize the limits (max_sectors, wzeroes_may_unmap).
+>                 (thanks Stefan)
+>                 I moved in a new function the code to handle a single
+>                 segment,
+>                 in order to simplify the support of multiple segments in the
+>                 future.
+> - added patch 4 to change the assert on data_size following the discussion
+> with
+>                 Thomas, Changpeng, Michael, and Stefan (thanks all)
+> - fixed patch 5 (previously patch 2/2) using local dwz_hdr variable instead
+> of
+>                 dynamic allocation (thanks Thomas)
+> 
+> Thanks,
+> Stefano
+> 
+> Stefano Garzarella (6):
+>   virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
+>   virtio-blk: add host_features field in VirtIOBlock
+>   virtio-blk: add "discard" and "write-zeroes" properties
+>   virtio-blk: add DISCARD and WRITE_ZEROES features
+>   tests/virtio-blk: change assert on data_size in virtio_blk_request()
+>   tests/virtio-blk: add test for WRITE_ZEROES command
+> 
+>  hw/block/virtio-blk.c          | 214 +++++++++++++++++++++++++++++++--
+>  hw/core/machine.c              |   2 +
+>  include/hw/virtio/virtio-blk.h |   5 +-
+>  tests/virtio-blk-test.c        |  75 +++++++++++-
+>  4 files changed, 282 insertions(+), 14 deletions(-)
+> 
+> --
+> 2.20.1
+
+Don't know all of the details of qemu block related 
+stuff. But overall patch series look good to me.
+ 
+Acked-by: Pankaj Gupta <pagupta@redhat.com>
+
+> 
+> 
+> 
