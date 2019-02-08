@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44319)
+Received: from eggs.gnu.org ([209.51.188.92]:47108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gs2Ym-0000lo-5U
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:35:01 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gs2ls-0003dj-Hj
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:48:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gs2Yk-0008QT-98
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:35:00 -0500
-Received: from fanzine.igalia.com ([91.117.99.155]:50659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1gs2Yj-0008Mx-O9
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:34:58 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190207142649.GL19438@redhat.com>
-References: <cover.1549545591.git.berto@igalia.com>
-	<f404632bb16afed8ae9e5f3cfe4032b718a00491.1549545591.git.berto@igalia.com>
-	<20190207142649.GL19438@redhat.com>
-Date: Fri, 08 Feb 2019 10:34:53 +0100
-Message-ID: <w51va1u8vya.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gs2lo-0005O5-Tp
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:48:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34646)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gs2lo-0005NR-FW
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 04:48:28 -0500
+Date: Fri, 8 Feb 2019 09:48:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190208094818.GA2608@work-vm>
+References: <2932080.UxbmD43V0u@neil>
+	<20190208062441.GF16257@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] char-socket: Lock tcp_chr_disconnect()
- and socket_reconnect_timeout()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190208062441.GF16257@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [regression] Clock jump on VM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Neil Skrypuch <neil@tembosocial.com>, qemu-devel@nongnu.org
 
-On Thu 07 Feb 2019 03:26:49 PM CET, Daniel P. Berrang=C3=A9 wrote:
->> @@ -457,11 +469,12 @@ static void tcp_chr_disconnect(Chardev *chr)
->>      }
->>      update_disconnected_filename(s);
->>      if (emit_close) {
->> -        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
->> +        qemu_idle_add(tcp_chr_be_event_closed, chr, chr->gcontext);
->
-> I'm a little concerned that this change might trigger some unexpected
-> interactions with the qemu_chr_wait_connected() function. I added some
-> more testing around that code, so if it passes the new tests I have in:
->
->   https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05962.html
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> On Thu, Feb 07, 2019 at 05:33:25PM -0500, Neil Skrypuch wrote:
+> 
+> Thanks for your email!
+> 
+> Please post your QEMU command-line.
+> 
+> > The clock jump numbers above are from NTP, but you can see that they are quite 
+> > close to the amount of time spent in raw_co_invalidate_cache. So, it looks 
+> > like flushing the cache is just taking a long time and stalling the guest, 
+> > which causes the clock jump. This isn't too surprising as the entire disk 
+> > image was just written as part of the block mirror and would likely still be 
+> > in the cache.
+> > 
+> > I see the use case for this feature, but I don't think it applies here, as 
+> > we're not technically using shared storage. I believe an option to toggle this 
+> > behaviour on/off and/or some sort of heuristic to guess whether or not it 
+> > should be enabled by default would be in order here.
+> 
+> It would be good to figure out how to perform the flush without
+> affecting guest time at all.  The clock jump will also inconvenience
+> users who do need the flush, so I rather not work around the clock jump
+> for a subset of users only.
 
-Forget my previous e-mail, there was a mistake on my side. The test does
-pass after rebasing my series on top of that one.
+One thing that makes Neil's setup different is that having the source
+and destination on the same host, that fadvise is bound to drop pages
+that are actually in use by the source on the same host.
 
-> and also works with the vhostuser reconnect device, then we are
-> probably ok.
+But I'm also curious at what point in the migration we call the
+invalidate and so which threads get held up, in which state.
 
-How do I test this?
+Neil: Another printf would also be interesting, between the
+bdrv_co_flush and the posix_fadvise;  I'm assuming it's the
+bdrv_co_flush that's taking the time but it would be good to check.
 
-Berto
+Dave
+
+> Stefan
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
