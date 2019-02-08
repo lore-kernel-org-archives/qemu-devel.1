@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37175)
+Received: from eggs.gnu.org ([209.51.188.92]:38805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs74V-0003bF-Qx
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:24:04 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gs7E2-0005cz-Dc
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs74U-00065f-0t
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:24:03 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri,  8 Feb 2019 15:23:47 +0100
-Message-Id: <20190208142347.214815-1-sgarzare@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gs7Dz-0004P9-WD
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:33:54 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34836)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gs7Dy-0004N9-OI
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 09:33:51 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z18so3846096wrh.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 06:33:49 -0800 (PST)
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-71-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190130004811.27372-71-cota@braap.org>
+Date: Fri, 08 Feb 2019 14:33:46 +0000
+Message-ID: <871s4imjsl.fsf@zen.linaroharston>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] virtio-blk: cleanup using VirtIOBlock *s and
- VirtIODevice *vdev
+Subject: Re: [Qemu-devel] [PATCH v6 70/73] cpu: protect CPU state with
+ cpu->lock instead of the BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,106 +31,857 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-In several part we still using req->dev or VIRTIO_DEVICE(req->dev)
-when we have already defined s and vdev pointers:
-    VirtIOBlock *s =3D req->dev;
-    VirtIODevice *vdev =3D VIRTIO_DEVICE(s);
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- hw/block/virtio-blk.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+Emilio G. Cota <cota@braap.org> writes:
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 9a87b3bfac..843bb2bec8 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -63,9 +63,8 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
-, unsigned char status)
- static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
-     bool is_read)
- {
--    BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
--                                                   is_read, error);
-     VirtIOBlock *s =3D req->dev;
-+    BlockErrorAction action =3D blk_get_error_action(s->blk, is_read, er=
-ror);
-=20
-     if (action =3D=3D BLOCK_ERROR_ACTION_STOP) {
-         /* Break the link as the next request is going to be parsed from=
- the
-@@ -138,7 +137,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
-nt ret)
-     }
-=20
-     virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
--    block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
-+    block_acct_done(blk_get_stats(s->blk), &req->acct);
-     virtio_blk_free_request(req);
-=20
- out:
-@@ -513,7 +512,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *=
-req, MultiReqBuffer *mrb)
-               - sizeof(struct virtio_blk_inhdr);
-     iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
-=20
--    type =3D virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out.type);
-+    type =3D virtio_ldl_p(vdev, &req->out.type);
-=20
-     /* VIRTIO_BLK_T_OUT defines the command direction. VIRTIO_BLK_T_BARR=
-IER
-      * is an optional flag. Although a guest should not send this flag i=
-f
-@@ -522,8 +521,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *=
-req, MultiReqBuffer *mrb)
-     case VIRTIO_BLK_T_IN:
-     {
-         bool is_write =3D type & VIRTIO_BLK_T_OUT;
--        req->sector_num =3D virtio_ldq_p(VIRTIO_DEVICE(req->dev),
--                                       &req->out.sector);
-+        req->sector_num =3D virtio_ldq_p(vdev, &req->out.sector);
-=20
-         if (is_write) {
-             qemu_iovec_init_external(&req->qiov, out_iov, out_num);
-@@ -535,25 +533,23 @@ static int virtio_blk_handle_request(VirtIOBlockReq=
- *req, MultiReqBuffer *mrb)
-                                          req->qiov.size / BDRV_SECTOR_SI=
-ZE);
-         }
-=20
--        if (!virtio_blk_sect_range_ok(req->dev, req->sector_num,
--                                      req->qiov.size)) {
-+        if (!virtio_blk_sect_range_ok(s, req->sector_num, req->qiov.size=
-)) {
-             virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
--            block_acct_invalid(blk_get_stats(req->dev->blk),
-+            block_acct_invalid(blk_get_stats(s->blk),
-                                is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_=
-READ);
-             virtio_blk_free_request(req);
-             return 0;
-         }
-=20
--        block_acct_start(blk_get_stats(req->dev->blk),
--                         &req->acct, req->qiov.size,
-+        block_acct_start(blk_get_stats(s->blk), &req->acct, req->qiov.si=
-ze,
-                          is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ);
-=20
-         /* merge would exceed maximum number of requests or IO direction
-          * changes */
-         if (mrb->num_reqs > 0 && (mrb->num_reqs =3D=3D VIRTIO_BLK_MAX_ME=
-RGE_REQS ||
-                                   is_write !=3D mrb->is_write ||
--                                  !req->dev->conf.request_merging)) {
--            virtio_blk_submit_multireq(req->dev->blk, mrb);
-+                                  !s->conf.request_merging)) {
-+            virtio_blk_submit_multireq(s->blk, mrb);
-         }
-=20
-         assert(mrb->num_reqs < VIRTIO_BLK_MAX_MERGE_REQS);
---=20
-2.20.1
+> Use the per-CPU locks to protect the CPUs' state, instead of
+> using the BQL. These locks are uncontended (they are mostly
+> acquired by the corresponding vCPU thread), so acquiring them
+> is cheaper than acquiring the BQL, which particularly in
+> MTTCG can be contended at high core counts.
+>
+> In this conversion we drop qemu_cpu_cond and qemu_pause_cond,
+> and use cpu->cond instead.
+>
+> In qom/cpu.c we can finally remove the ugliness that
+> results from having to hold both the BQL and the CPU lock;
+> now we just have to grab the CPU lock.
+
+Ahh I see....
+
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/qom/cpu.h |  20 ++--
+>  cpus.c            | 280 ++++++++++++++++++++++++++++++++++------------
+>  qom/cpu.c         |  29 +----
+>  3 files changed, 225 insertions(+), 104 deletions(-)
+>
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 27a80bc113..30ed2fae0b 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -297,10 +297,6 @@ struct qemu_work_item;
+>   * valid under cpu_list_lock.
+>   * @created: Indicates whether the CPU thread has been successfully crea=
+ted.
+>   * @interrupt_request: Indicates a pending interrupt request.
+> - * @halted: Nonzero if the CPU is in suspended state.
+> - * @stop: Indicates a pending stop request.
+> - * @stopped: Indicates the CPU has been artificially stopped.
+> - * @unplug: Indicates a pending CPU unplug request.
+>   * @crash_occurred: Indicates the OS reported a crash (panic) for this C=
+PU
+>   * @singlestep_enabled: Flags for single-stepping.
+>   * @icount_extra: Instructions until next timer event.
+> @@ -329,6 +325,10 @@ struct qemu_work_item;
+>   * @lock: Lock to prevent multiple access to per-CPU fields.
+>   * @cond: Condition variable for per-CPU events.
+>   * @work_list: List of pending asynchronous work.
+> + * @halted: Nonzero if the CPU is in suspended state.
+> + * @stop: Indicates a pending stop request.
+> + * @stopped: Indicates the CPU has been artificially stopped.
+> + * @unplug: Indicates a pending CPU unplug request.
+>   * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all =
+changes
+>   *                        to @trace_dstate).
+>   * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask=
+).
+> @@ -352,12 +352,7 @@ struct CPUState {
+>  #endif
+>      int thread_id;
+>      bool running, has_waiter;
+> -    struct QemuCond *halt_cond;
+>      bool thread_kicked;
+> -    bool created;
+> -    bool stop;
+> -    bool stopped;
+> -    bool unplug;
+>      bool crash_occurred;
+>      bool exit_request;
+>      uint32_t cflags_next_tb;
+> @@ -371,7 +366,13 @@ struct CPUState {
+>      QemuMutex *lock;
+>      /* fields below protected by @lock */
+>      QemuCond cond;
+> +    QemuCond *halt_cond;
+>      QSIMPLEQ_HEAD(, qemu_work_item) work_list;
+> +    uint32_t halted;
+> +    bool created;
+> +    bool stop;
+> +    bool stopped;
+> +    bool unplug;
+>
+>      CPUAddressSpace *cpu_ases;
+>      int num_ases;
+> @@ -419,7 +420,6 @@ struct CPUState {
+>      /* TODO Move common fields from CPUArchState here. */
+>      int cpu_index;
+>      int cluster_index;
+> -    uint32_t halted;
+>      uint32_t can_do_io;
+>      int32_t exception_index;
+>
+> diff --git a/cpus.c b/cpus.c
+> index 0d255c2655..4f17fe25bf 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -181,24 +181,30 @@ bool cpu_mutex_locked(const CPUState *cpu)
+>      return test_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
+>  }
+>
+> -bool cpu_is_stopped(CPUState *cpu)
+> +/* Called with the CPU's lock held */
+> +static bool cpu_is_stopped_locked(CPUState *cpu)
+>  {
+>      return cpu->stopped || !runstate_is_running();
+>  }
+>
+> -static inline bool cpu_work_list_empty(CPUState *cpu)
+> +bool cpu_is_stopped(CPUState *cpu)
+>  {
+> -    bool ret;
+> +    if (!cpu_mutex_locked(cpu)) {
+> +        bool ret;
+>
+> -    cpu_mutex_lock(cpu);
+> -    ret =3D QSIMPLEQ_EMPTY(&cpu->work_list);
+> -    cpu_mutex_unlock(cpu);
+> -    return ret;
+> +        cpu_mutex_lock(cpu);
+> +        ret =3D cpu_is_stopped_locked(cpu);
+> +        cpu_mutex_unlock(cpu);
+> +        return ret;
+> +    }
+> +    return cpu_is_stopped_locked(cpu);
+>  }
+>
+>  static bool cpu_thread_is_idle(CPUState *cpu)
+>  {
+> -    if (cpu->stop || !cpu_work_list_empty(cpu)) {
+> +    g_assert(cpu_mutex_locked(cpu));
+> +
+> +    if (cpu->stop || !QSIMPLEQ_EMPTY(&cpu->work_list)) {
+>          return false;
+>      }
+>      if (cpu_is_stopped(cpu)) {
+> @@ -216,9 +222,17 @@ static bool qemu_tcg_rr_all_cpu_threads_idle(void)
+>      CPUState *cpu;
+>
+>      g_assert(qemu_is_tcg_rr());
+> +    g_assert(qemu_mutex_iothread_locked());
+> +    g_assert(no_cpu_mutex_locked());
+>
+>      CPU_FOREACH(cpu) {
+> -        if (!cpu_thread_is_idle(cpu)) {
+> +        bool is_idle;
+> +
+> +        cpu_mutex_lock(cpu);
+> +        is_idle =3D cpu_thread_is_idle(cpu);
+> +        cpu_mutex_unlock(cpu);
+> +
+> +        if (!is_idle) {
+>              return false;
+>          }
+>      }
+> @@ -780,6 +794,8 @@ void qemu_start_warp_timer(void)
+>
+>  static void qemu_account_warp_timer(void)
+>  {
+> +    g_assert(qemu_mutex_iothread_locked());
+> +
+>      if (!use_icount || !icount_sleep) {
+>          return;
+>      }
+> @@ -1090,6 +1106,7 @@ static void kick_tcg_thread(void *opaque)
+>  static void start_tcg_kick_timer(void)
+>  {
+>      assert(!mttcg_enabled);
+> +    g_assert(qemu_mutex_iothread_locked());
+>      if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+>          tcg_kick_vcpu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>                                             kick_tcg_thread, NULL);
+> @@ -1102,6 +1119,7 @@ static void start_tcg_kick_timer(void)
+>  static void stop_tcg_kick_timer(void)
+>  {
+>      assert(!mttcg_enabled);
+> +    g_assert(qemu_mutex_iothread_locked());
+>      if (tcg_kick_vcpu_timer && timer_pending(tcg_kick_vcpu_timer)) {
+>          timer_del(tcg_kick_vcpu_timer);
+>      }
+> @@ -1204,6 +1222,8 @@ int vm_shutdown(void)
+>
+>  static bool cpu_can_run(CPUState *cpu)
+>  {
+> +    g_assert(cpu_mutex_locked(cpu));
+> +
+>      if (cpu->stop) {
+>          return false;
+>      }
+> @@ -1276,16 +1296,9 @@ static void qemu_init_sigbus(void)
+>
+>  static QemuThread io_thread;
+>
+> -/* cpu creation */
+> -static QemuCond qemu_cpu_cond;
+> -/* system init */
+> -static QemuCond qemu_pause_cond;
+> -
+>  void qemu_init_cpu_loop(void)
+>  {
+>      qemu_init_sigbus();
+> -    qemu_cond_init(&qemu_cpu_cond);
+> -    qemu_cond_init(&qemu_pause_cond);
+>      qemu_mutex_init(&qemu_global_mutex);
+>
+>      qemu_thread_get_self(&io_thread);
+> @@ -1303,46 +1316,70 @@ static void qemu_tcg_destroy_vcpu(CPUState *cpu)
+>  {
+>  }
+>
+> -static void qemu_cpu_stop(CPUState *cpu, bool exit)
+> +static void qemu_cpu_stop_locked(CPUState *cpu, bool exit)
+>  {
+> +    g_assert(cpu_mutex_locked(cpu));
+>      g_assert(qemu_cpu_is_self(cpu));
+>      cpu->stop =3D false;
+>      cpu->stopped =3D true;
+>      if (exit) {
+>          cpu_exit(cpu);
+>      }
+> -    qemu_cond_broadcast(&qemu_pause_cond);
+> +    qemu_cond_broadcast(&cpu->cond);
+> +}
+> +
+> +static void qemu_cpu_stop(CPUState *cpu, bool exit)
+> +{
+> +    cpu_mutex_lock(cpu);
+> +    qemu_cpu_stop_locked(cpu, exit);
+> +    cpu_mutex_unlock(cpu);
+>  }
+>
+>  static void qemu_wait_io_event_common(CPUState *cpu)
+>  {
+> +    g_assert(cpu_mutex_locked(cpu));
+> +
+>      atomic_mb_set(&cpu->thread_kicked, false);
+>      if (cpu->stop) {
+> -        qemu_cpu_stop(cpu, false);
+> +        qemu_cpu_stop_locked(cpu, false);
+>      }
+> +    /*
+> +     * unlock+lock cpu_mutex, so that other vCPUs have a chance to grab =
+the
+> +     * lock and queue some work for this vCPU.
+> +     */
+> +    cpu_mutex_unlock(cpu);
+>      process_queued_cpu_work(cpu);
+> +    cpu_mutex_lock(cpu);
+>  }
+>
+>  static void qemu_tcg_rr_wait_io_event(void)
+>  {
+>      CPUState *cpu;
+>
+> +    g_assert(qemu_mutex_iothread_locked());
+> +    g_assert(no_cpu_mutex_locked());
+> +
+>      while (qemu_tcg_rr_all_cpu_threads_idle()) {
+>          stop_tcg_kick_timer();
+> -        qemu_cond_wait(first_cpu->halt_cond, &qemu_global_mutex);
+> +        qemu_cond_wait(first_cpu->halt_cond, first_cpu->lock);
+>      }
+>
+>      start_tcg_kick_timer();
+>
+>      CPU_FOREACH(cpu) {
+> +        cpu_mutex_lock(cpu);
+>          qemu_wait_io_event_common(cpu);
+> +        cpu_mutex_unlock(cpu);
+>      }
+>  }
+>
+>  static void qemu_wait_io_event(CPUState *cpu)
+>  {
+> +    g_assert(cpu_mutex_locked(cpu));
+> +    g_assert(!qemu_mutex_iothread_locked());
+> +
+>      while (cpu_thread_is_idle(cpu)) {
+> -        qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> +        qemu_cond_wait(cpu->halt_cond, cpu->lock);
+>      }
+>
+>  #ifdef _WIN32
+> @@ -1362,6 +1399,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>      rcu_register_thread();
+>
+>      qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+>      cpu->thread_id =3D qemu_get_thread_id();
+>      cpu->can_do_io =3D 1;
+> @@ -1374,14 +1412,20 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>      }
+>
+>      kvm_init_cpu_signals(cpu);
+> +    qemu_mutex_unlock_iothread();
+>
+>      /* signal CPU creation */
+>      cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_cond_signal(&cpu->cond);
+>
+>      do {
+>          if (cpu_can_run(cpu)) {
+> +            cpu_mutex_unlock(cpu);
+> +            qemu_mutex_lock_iothread();
+>              r =3D kvm_cpu_exec(cpu);
+> +            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_lock(cpu);
+> +
+>              if (r =3D=3D EXCP_DEBUG) {
+>                  cpu_handle_guest_debug(cpu);
+>              }
+> @@ -1389,10 +1433,16 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>          qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>
+> +    cpu_mutex_unlock(cpu);
+> +    qemu_mutex_lock_iothread();
+>      qemu_kvm_destroy_vcpu(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+>      qemu_mutex_unlock_iothread();
+> +
+> +    cpu_mutex_lock(cpu);
+> +    cpu->created =3D false;
+> +    qemu_cond_signal(&cpu->cond);
+> +    cpu_mutex_unlock(cpu);
+> +
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+> @@ -1409,7 +1459,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>
+>      rcu_register_thread();
+>
+> -    qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+>      cpu->thread_id =3D qemu_get_thread_id();
+>      cpu->can_do_io =3D 1;
+> @@ -1420,10 +1470,10 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>
+>      /* signal CPU creation */
+>      cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_cond_signal(&cpu->cond);
+>
+>      do {
+> -        qemu_mutex_unlock_iothread();
+> +        cpu_mutex_unlock(cpu);
+>          do {
+>              int sig;
+>              r =3D sigwait(&waitset, &sig);
+> @@ -1432,10 +1482,11 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>              perror("sigwait");
+>              exit(1);
+>          }
+> -        qemu_mutex_lock_iothread();
+> +        cpu_mutex_lock(cpu);
+>          qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug);
+>
+> +    cpu_mutex_unlock(cpu);
+>      rcu_unregister_thread();
+>      return NULL;
+>  #endif
+> @@ -1466,6 +1517,8 @@ static int64_t tcg_get_icount_limit(void)
+>  static void handle_icount_deadline(void)
+>  {
+>      assert(qemu_in_vcpu_thread());
+> +    g_assert(qemu_mutex_iothread_locked());
+> +
+>      if (use_icount) {
+>          int64_t deadline =3D
+>              qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
+> @@ -1546,12 +1599,15 @@ static void deal_with_unplugged_cpus(void)
+>      CPUState *cpu;
+>
+>      CPU_FOREACH(cpu) {
+> +        cpu_mutex_lock(cpu);
+>          if (cpu->unplug && !cpu_can_run(cpu)) {
+>              qemu_tcg_destroy_vcpu(cpu);
+>              cpu->created =3D false;
+> -            qemu_cond_signal(&qemu_cpu_cond);
+> +            qemu_cond_signal(&cpu->cond);
+> +            cpu_mutex_unlock(cpu);
+>              break;
+>          }
+> +        cpu_mutex_unlock(cpu);
+>      }
+>  }
+>
+> @@ -1572,24 +1628,36 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>      rcu_register_thread();
+>      tcg_register_thread();
+>
+> +    /*
+> +     * We call cpu_mutex_lock/unlock just to please the assertions in co=
+mmon
+> +     * code, since here cpu->lock is an alias to the BQL.
+> +     */
+>      qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+> -
+>      cpu->thread_id =3D qemu_get_thread_id();
+>      cpu->created =3D true;
+>      cpu->can_do_io =3D 1;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_cond_signal(&cpu->cond);
+> +    cpu_mutex_unlock(cpu);
+>
+>      /* wait for initial kick-off after machine start */
+> +    cpu_mutex_lock(first_cpu);
+>      while (first_cpu->stopped) {
+> -        qemu_cond_wait(first_cpu->halt_cond, &qemu_global_mutex);
+> +        qemu_cond_wait(first_cpu->halt_cond, first_cpu->lock);
+> +        cpu_mutex_unlock(first_cpu);
+>
+>          /* process any pending work */
+>          CPU_FOREACH(cpu) {
+>              current_cpu =3D cpu;
+> +            cpu_mutex_lock(cpu);
+>              qemu_wait_io_event_common(cpu);
+> +            cpu_mutex_unlock(cpu);
+>          }
+> +
+> +        cpu_mutex_lock(first_cpu);
+>      }
+> +    cpu_mutex_unlock(first_cpu);
+>
+>      start_tcg_kick_timer();
+>
+> @@ -1616,7 +1684,12 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>              cpu =3D first_cpu;
+>          }
+>
+> -        while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) {
+> +        while (cpu) {
+> +            cpu_mutex_lock(cpu);
+> +            if (!QSIMPLEQ_EMPTY(&cpu->work_list) || cpu->exit_request) {
+> +                cpu_mutex_unlock(cpu);
+> +                break;
+> +            }
+>
+>              atomic_mb_set(&tcg_current_rr_cpu, cpu);
+>              current_cpu =3D cpu;
+> @@ -1627,6 +1700,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>              if (cpu_can_run(cpu)) {
+>                  int r;
+>
+> +                cpu_mutex_unlock(cpu);
+>                  qemu_mutex_unlock_iothread();
+>                  prepare_icount_for_run(cpu);
+>
+> @@ -1634,11 +1708,14 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>
+>                  process_icount_data(cpu);
+>                  qemu_mutex_lock_iothread();
+> +                cpu_mutex_lock(cpu);
+>
+>                  if (r =3D=3D EXCP_DEBUG) {
+>                      cpu_handle_guest_debug(cpu);
+> +                    cpu_mutex_unlock(cpu);
+>                      break;
+>                  } else if (r =3D=3D EXCP_ATOMIC) {
+> +                    cpu_mutex_unlock(cpu);
+>                      qemu_mutex_unlock_iothread();
+>                      cpu_exec_step_atomic(cpu);
+>                      qemu_mutex_lock_iothread();
+> @@ -1648,11 +1725,15 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>                  if (cpu->unplug) {
+>                      cpu =3D CPU_NEXT(cpu);
+>                  }
+> +                cpu_mutex_unlock(current_cpu);
+>                  break;
+>              }
+>
+> +            cpu_mutex_unlock(cpu);
+>              cpu =3D CPU_NEXT(cpu);
+> -        } /* while (cpu && !cpu->exit_request).. */
+> +        } /* for (;;) .. */
+> +
+> +        g_assert(no_cpu_mutex_locked());
+>
+>          /* Does not need atomic_mb_set because a spurious wakeup is okay=
+.  */
+>          atomic_set(&tcg_current_rr_cpu, NULL);
+> @@ -1684,6 +1765,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>
+>      rcu_register_thread();
+>      qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+>
+>      cpu->thread_id =3D qemu_get_thread_id();
+> @@ -1692,11 +1774,17 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>      current_cpu =3D cpu;
+>
+>      hax_init_vcpu(cpu);
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_mutex_unlock_iothread();
+> +    qemu_cond_signal(&cpu->cond);
+>
+>      do {
+>          if (cpu_can_run(cpu)) {
+> +            cpu_mutex_unlock(cpu);
+> +            qemu_mutex_lock_iothread();
+>              r =3D hax_smp_cpu_exec(cpu);
+> +            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_lock(cpu);
+> +
+>              if (r =3D=3D EXCP_DEBUG) {
+>                  cpu_handle_guest_debug(cpu);
+>              }
+> @@ -1704,6 +1792,8 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>
+>          qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+> +
+> +    cpu_mutex_unlock(cpu);
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+> @@ -1721,6 +1811,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      rcu_register_thread();
+>
+>      qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+>
+>      cpu->thread_id =3D qemu_get_thread_id();
+> @@ -1728,14 +1819,20 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      current_cpu =3D cpu;
+>
+>      hvf_init_vcpu(cpu);
+> +    qemu_mutex_unlock_iothread();
+>
+>      /* signal CPU creation */
+>      cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_cond_signal(&cpu->cond);
+>
+>      do {
+>          if (cpu_can_run(cpu)) {
+> +            cpu_mutex_unlock(cpu);
+> +            qemu_mutex_lock_iothread();
+>              r =3D hvf_vcpu_exec(cpu);
+> +            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_lock(cpu);
+> +
+>              if (r =3D=3D EXCP_DEBUG) {
+>                  cpu_handle_guest_debug(cpu);
+>              }
+> @@ -1743,10 +1840,16 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>          qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>
+> +    cpu_mutex_unlock(cpu);
+> +    qemu_mutex_lock_iothread();
+>      hvf_vcpu_destroy(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+>      qemu_mutex_unlock_iothread();
+> +
+> +    cpu_mutex_lock(cpu);
+> +    cpu->created =3D false;
+> +    qemu_cond_signal(&cpu->cond);
+> +    cpu_mutex_unlock(cpu);
+> +
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+> @@ -1759,6 +1862,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>      rcu_register_thread();
+>
+>      qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+>      cpu->thread_id =3D qemu_get_thread_id();
+>      current_cpu =3D cpu;
+> @@ -1768,28 +1872,40 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>          fprintf(stderr, "whpx_init_vcpu failed: %s\n", strerror(-r));
+>          exit(1);
+>      }
+> +    qemu_mutex_unlock_iothread();
+>
+>      /* signal CPU creation */
+>      cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_cond_signal(&cpu->cond);
+>
+>      do {
+>          if (cpu_can_run(cpu)) {
+> +            cpu_mutex_unlock(cpu);
+> +            qemu_mutex_lock_iothread();
+>              r =3D whpx_vcpu_exec(cpu);
+> +            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_lock(cpu);
+> +
+>              if (r =3D=3D EXCP_DEBUG) {
+>                  cpu_handle_guest_debug(cpu);
+>              }
+>          }
+>          while (cpu_thread_is_idle(cpu)) {
+> -            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+> +            qemu_cond_wait(cpu->halt_cond, cpu->lock);
+>          }
+>          qemu_wait_io_event_common(cpu);
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>
+> +    cpu_mutex_unlock(cpu);
+> +    qemu_mutex_lock_iothread();
+>      whpx_destroy_vcpu(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+>      qemu_mutex_unlock_iothread();
+> +
+> +    cpu_mutex_lock(cpu);
+> +    cpu->created =3D false;
+> +    qemu_cond_signal(&cpu->cond);
+> +    cpu_mutex_unlock(cpu);
+> +
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+> @@ -1817,14 +1933,14 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      rcu_register_thread();
+>      tcg_register_thread();
+>
+> -    qemu_mutex_lock_iothread();
+> +    cpu_mutex_lock(cpu);
+>      qemu_thread_get_self(cpu->thread);
+>
+>      cpu->thread_id =3D qemu_get_thread_id();
+>      cpu->created =3D true;
+>      cpu->can_do_io =3D 1;
+>      current_cpu =3D cpu;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    qemu_cond_signal(&cpu->cond);
+>
+>      /* process any pending work */
+>      cpu->exit_request =3D 1;
+> @@ -1832,9 +1948,9 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      do {
+>          if (cpu_can_run(cpu)) {
+>              int r;
+> -            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_unlock(cpu);
+>              r =3D tcg_cpu_exec(cpu);
+> -            qemu_mutex_lock_iothread();
+> +            cpu_mutex_lock(cpu);
+>              switch (r) {
+>              case EXCP_DEBUG:
+>                  cpu_handle_guest_debug(cpu);
+> @@ -1850,9 +1966,9 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>                  g_assert(cpu_halted(cpu));
+>                  break;
+>              case EXCP_ATOMIC:
+> -                qemu_mutex_unlock_iothread();
+> +                cpu_mutex_unlock(cpu);
+>                  cpu_exec_step_atomic(cpu);
+> -                qemu_mutex_lock_iothread();
+> +                cpu_mutex_lock(cpu);
+>              default:
+>                  /* Ignore everything else? */
+>                  break;
+> @@ -1865,8 +1981,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>
+>      qemu_tcg_destroy_vcpu(cpu);
+>      cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> -    qemu_mutex_unlock_iothread();
+> +    qemu_cond_signal(&cpu->cond);
+> +    cpu_mutex_unlock(cpu);
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+> @@ -1966,54 +2082,69 @@ void qemu_mutex_unlock_iothread(void)
+>      }
+>  }
+>
+> -static bool all_vcpus_paused(void)
+> -{
+> -    CPUState *cpu;
+> -
+> -    CPU_FOREACH(cpu) {
+> -        if (!cpu->stopped) {
+> -            return false;
+> -        }
+> -    }
+> -
+> -    return true;
+> -}
+> -
+>  void pause_all_vcpus(void)
+>  {
+>      CPUState *cpu;
+>
+> +    g_assert(no_cpu_mutex_locked());
+> +
+>      qemu_clock_enable(QEMU_CLOCK_VIRTUAL, false);
+>      CPU_FOREACH(cpu) {
+> +        cpu_mutex_lock(cpu);
+>          if (qemu_cpu_is_self(cpu)) {
+>              qemu_cpu_stop(cpu, true);
+>          } else {
+>              cpu->stop =3D true;
+>              qemu_cpu_kick(cpu);
+>          }
+> +        cpu_mutex_unlock(cpu);
+>      }
+>
+> + drop_locks_and_stop_all_vcpus:
+>      /* We need to drop the replay_lock so any vCPU threads woken up
+>       * can finish their replay tasks
+>       */
+>      replay_mutex_unlock();
+> +    qemu_mutex_unlock_iothread();
+>
+> -    while (!all_vcpus_paused()) {
+> -        qemu_cond_wait(&qemu_pause_cond, &qemu_global_mutex);
+> -        CPU_FOREACH(cpu) {
+> +    CPU_FOREACH(cpu) {
+> +        cpu_mutex_lock(cpu);
+> +        if (!cpu->stopped) {
+> +            cpu->stop =3D true;
+>              qemu_cpu_kick(cpu);
+> +            qemu_cond_wait(&cpu->cond, cpu->lock);
+>          }
+> +        cpu_mutex_unlock(cpu);
+>      }
+>
+> -    qemu_mutex_unlock_iothread();
+>      replay_mutex_lock();
+>      qemu_mutex_lock_iothread();
+> +
+> +    /* a CPU might have been hot-plugged while we weren't holding the BQ=
+L */
+> +    CPU_FOREACH(cpu) {
+> +        bool stopped;
+> +
+> +        cpu_mutex_lock(cpu);
+> +        stopped =3D cpu->stopped;
+> +        cpu_mutex_unlock(cpu);
+> +
+> +        if (!stopped) {
+> +            goto drop_locks_and_stop_all_vcpus;
+> +        }
+> +    }
+>  }
+>
+>  void cpu_resume(CPUState *cpu)
+>  {
+> -    cpu->stop =3D false;
+> -    cpu->stopped =3D false;
+> +    if (cpu_mutex_locked(cpu)) {
+> +        cpu->stop =3D false;
+> +        cpu->stopped =3D false;
+> +    } else {
+> +        cpu_mutex_lock(cpu);
+> +        cpu->stop =3D false;
+> +        cpu->stopped =3D false;
+> +        cpu_mutex_unlock(cpu);
+> +    }
+>      qemu_cpu_kick(cpu);
+>  }
+>
+> @@ -2029,8 +2160,11 @@ void resume_all_vcpus(void)
+>
+>  void cpu_remove_sync(CPUState *cpu)
+>  {
+> +    cpu_mutex_lock(cpu);
+>      cpu->stop =3D true;
+>      cpu->unplug =3D true;
+> +    cpu_mutex_unlock(cpu);
+> +
+>      qemu_cpu_kick(cpu);
+>      qemu_mutex_unlock_iothread();
+>      qemu_thread_join(cpu->thread);
+> @@ -2211,9 +2345,15 @@ void qemu_init_vcpu(CPUState *cpu)
+>          qemu_dummy_start_vcpu(cpu);
+>      }
+>
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    cpu_mutex_lock(cpu);
+>      while (!cpu->created) {
+> -        qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
+> +        qemu_cond_wait(&cpu->cond, cpu->lock);
+>      }
+> +    cpu_mutex_unlock(cpu);
+> +
+> +    qemu_mutex_lock_iothread();
+>  }
+>
+>  void cpu_stop_current(void)
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index f2695be9b2..65b070a570 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -94,32 +94,13 @@ static void cpu_common_get_memory_mapping(CPUState *c=
+pu,
+>      error_setg(errp, "Obtaining memory mappings is unsupported on this C=
+PU.");
+>  }
+>
+> -/* Resetting the IRQ comes from across the code base so we take the
+> - * BQL here if we need to.  cpu_interrupt assumes it is held.*/
+>  void cpu_reset_interrupt(CPUState *cpu, int mask)
+>  {
+> -    bool has_bql =3D qemu_mutex_iothread_locked();
+> -    bool has_cpu_lock =3D cpu_mutex_locked(cpu);
+> -
+> -    if (has_bql) {
+> -        if (has_cpu_lock) {
+> -            atomic_set(&cpu->interrupt_request, cpu->interrupt_request &=
+ ~mask);
+> -        } else {
+> -            cpu_mutex_lock(cpu);
+> -            atomic_set(&cpu->interrupt_request, cpu->interrupt_request &=
+ ~mask);
+> -            cpu_mutex_unlock(cpu);
+> -        }
+> -        return;
+> -    }
+> -
+> -    if (has_cpu_lock) {
+> -        cpu_mutex_unlock(cpu);
+> -    }
+> -    qemu_mutex_lock_iothread();
+> -    cpu_mutex_lock(cpu);
+> -    atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~mask);
+> -    qemu_mutex_unlock_iothread();
+> -    if (!has_cpu_lock) {
+> +    if (cpu_mutex_locked(cpu)) {
+> +        atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~ma=
+sk);
+> +    } else {
+> +        cpu_mutex_lock(cpu);
+> +        atomic_set(&cpu->interrupt_request, cpu->interrupt_request & ~ma=
+sk);
+>          cpu_mutex_unlock(cpu);
+>      }
+>  }
+
+
+--
+Alex Benn=C3=A9e
