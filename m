@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58108)
+Received: from eggs.gnu.org ([209.51.188.92]:59122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gry2l-0000xO-9q
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:45:40 -0500
+	(envelope-from <pagupta@redhat.com>) id 1gry9M-0001zT-5l
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gry2i-0008In-13
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:45:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gry2d-0008Et-Um
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:45:33 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gry2c-0008RZ-Q5
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 04:45:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BCA492E8074
-	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 04:45:30 +0000 (UTC)
+	(envelope-from <pagupta@redhat.com>) id 1gry9K-0003rJ-Nh
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:52:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gry9K-0003qm-FA
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:52:26 -0500
+Date: Thu, 7 Feb 2019 23:52:24 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1845097359.70518038.1549601544255.JavaMail.zimbra@redhat.com>
+In-Reply-To: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
+References: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Feb 2019 04:35:49 -0000
-From: Thomas Huth <1815143@bugs.launchpad.net>
-Reply-To: Bug 1815143 <1815143@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154957727033.18791.11498118265359264370.malonedeb@soybean.canonical.com>
-Message-Id: <154960054911.22205.3656090242158834779.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815143] Re: qemu-system-s390x fails when running
- without kvm: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V13 0/5] support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,146 +27,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yi Zhang <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, richardw yang <richardw.yang@linux.intel.com>, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, qemu-devel@nongnu.org
 
-Which version of QEMU are you using here? I think this should be working
-fine with the latest version of QEMU (>=3D v2.10).
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
 
--- =
+> 
+> Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> files on ext4/xfs file system mounted with '-o dax').
+> 
+> A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+>     https://patchwork.kernel.org/patch/10028151/
+> 
+> In order to make sure that the file metadata is in sync after a fault
+> while we are writing a shared DAX supporting backend files, this
+> patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+> 
+> As the DAX vs DMA truncated issue was solved, we refined the code and
+> send out this feature for the v5 version.
+> 
+> We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
+> 'share=on' & 'pmem=on'.
+> Or QEMU will not pass this flag to mmap(2)
+> 
+> Test with below cases:
+> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+>    a: backend is a dax supporting file.
+>    1) start VM1 with options:
+>    -object
+>    memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+>    
+>    2) start VM2 with options:
+>    -object
+>    memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+> 
+>    3) live migrate from VM1 to VM2.
+>    
+>    4) Suddly let Host crash or power failure.
+> 
+>    5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
+> 
+>    b: backend is a regular file.
+>    1) start with options
+>    -object
+>    memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
+>    -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+> 
+>    will warning "failed to validate with mapping flags: Operation not
+>    supported"
+>    FILE_1 and FILE_2 random corrupt.
+> 
+> 2. Other cases:
+>    FILE_1 and FILE_2 random corrupt.
+> 
+> Changes in V13:
+>  * 4/5 Micheal: move the inlcude to mmap_alloc.c.
+>  * 4/5 Micheal: refine the warning message.
+>  * 5/5 Micheal: refine the Documentations.
+> 
+> Changes in V12:
+>  * 2/5: Micheal: Update update-linux-headers.sh
+>  * 3/5: Micheal: Use script update add linux/mman.h
+>  * 4/5: Pankaj,Micheal: 1) fallback to mmap without
+>         MAP_SYNC & MAP_SHARED_VALIDATE if sync not supported or failed
+> 	2) Replace the include with 3/5 added linux/mman.h
+>  * 5/5: Micheal: Refine the Documentations.
+> 
+> Changes in V11:
+>  * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
+>  * 2/3: Micheal: Fix the compatibility for old kernel.
+>  * 2/3&3/3: Micheal&Eduardo :Update the behavior below:
+>    Waning at no-dax and continue without MAP_SYNC.
+>    Test if fails again for compatibility, then remove the MAP_VALIDATE and
+>    silently proceed.
+> 
+> Changes in V10:
+>  * 4/4: refine the document.
+>  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
+>  * 2/4: Fix the wrong include header
+> 
+> Changes in V9:
+>  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG.
+>  since I don't have much knowledge about the sparse feature, @Micheal Could
+>  you
+>  add some documentation/commit message on this patch? Thank you very much.
+>  * 3/6: from 2/5: Eduardo: updated the commit message.
+>  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
+>  * 5/6: from 4/5: Eduardo: updated the commit message.
+>  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
+> 
+> Changes in v8:
+>  * Micheal: 3/5, remove the duplicated define in the os_dep.h
+>  * Micheal: 2/5, make type define safety.
+>  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
+>  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
+>    MAP_SYNC only worked with pmem=on.
+>  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to
+>  parse
+>    all the flags in one parameter.
+> 
+> Changes in v7:
+>  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm
+>  backend.(pmem=on)
+> 
+> Changes in v6:
+>  * Pankaj: 3/7 are squashed with 2/7
+>  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+>  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+>  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+>  * Stefan, 5/7 Add missing "munmap"
+>  * Stefan, 2/7 refine the shared/flag.
+> 
+> Changes in v5:
+>  * Add patch 1 to fix a memory leak issue.
+>  * Refine the patch 4-6
+>  * Remove the patch 3 as we already change the parameter from "shared" to
+>    "flags"
+> 
+> Changes in v4:
+>  * Add patch 1-3 to switch some functions to a single 'flags'
+>    parameters. (Michael S. Tsirkin)
+>  * v3 patch 1-3 become v4 patch 4-6.
+>  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+>    new header file under include/standard-headers/linux/. (Michael S.
+>    Tsirkin)
+>  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+> 
+> Changes in v3:
+>  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+>    cases, and add back the retry mechanism. MAP_SYNC will be ignored
+>    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+>  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+>    platforms in order to make qemu_ram_mmap() compile on those platforms.
+>  * Patch 2&3: include more information in error messages of
+>    memory-backend in hope to help user to identify the error.
+>    (Dr. David Alan Gilbert)
+>  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+> 
+> Changes in v2:
+>  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+>  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+>    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+>  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+>    to osdep.h. (Michael S. Tsirkin)
+> 
+> Zhang Yi (5):
+>   util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+>   scripts/update-linux-headers: add linux/mman.h
+>   linux-headers: add linux/mman.h.
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   docs: Added MAP_SYNC documentation
+> 
+> Zhang Yi (5):
+>   util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+>   scripts/update-linux-headers: add linux/mman.h
+>   linux-headers: add linux/mman.h.
+>   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+>   docs: Added MAP_SYNC documentation
+> 
+>  docs/nvdimm.txt                            |  25 ++++++-
+>  exec.c                                     |   2 +-
+>  include/qemu/mmap-alloc.h                  |  21 +++++-
+>  linux-headers/asm-arm/mman.h               |   4 ++
+>  linux-headers/asm-arm64/mman.h             |   1 +
+>  linux-headers/asm-generic/hugetlb_encode.h |  36 ++++++++++
+>  linux-headers/asm-generic/mman-common.h    |  77 ++++++++++++++++++++
+>  linux-headers/asm-generic/mman.h           |  24 +++++++
+>  linux-headers/asm-mips/mman.h              | 108
+>  +++++++++++++++++++++++++++++
+>  linux-headers/asm-powerpc/mman.h           |  39 +++++++++++
+>  linux-headers/asm-s390/mman.h              |   1 +
+>  linux-headers/asm-x86/mman.h               |  31 +++++++++
+>  linux-headers/linux/mman.h                 |  38 ++++++++++
+>  qemu-options.hx                            |   5 ++
+>  scripts/update-linux-headers.sh            |   6 +-
+>  util/mmap-alloc.c                          |  51 +++++++++++++-
+>  util/oslib-posix.c                         |   2 +-
+>  17 files changed, 460 insertions(+), 11 deletions(-)
+>  create mode 100644 linux-headers/asm-arm/mman.h
+>  create mode 100644 linux-headers/asm-arm64/mman.h
+>  create mode 100644 linux-headers/asm-generic/hugetlb_encode.h
+>  create mode 100644 linux-headers/asm-generic/mman-common.h
+>  create mode 100644 linux-headers/asm-generic/mman.h
+>  create mode 100644 linux-headers/asm-mips/mman.h
+>  create mode 100644 linux-headers/asm-powerpc/mman.h
+>  create mode 100644 linux-headers/asm-s390/mman.h
+>  create mode 100644 linux-headers/asm-x86/mman.h
+>  create mode 100644 linux-headers/linux/mman.h
+> 
+> --
+> 2.7.4
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815143
+This patch series look good to me. 
+With updated patch 5, feel free to add.
 
-Title:
-   qemu-system-s390x fails when running without kvm: fatal: EXECUTE on
-  instruction prefix 0x7f4 not implemented
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  just wondering if TCG implements instruction prefix 0x7f4
-
-  server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
-
-  --> starting qemu with kvm enabled works fine
-  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
-t/initrd -enable-kvm
-  Initializing cgroup subsys cpuset
-  Initializing cgroup subsys cpu
-  Initializing cgroup subsys cpuacct
-  Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 =
-(SUSE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
-  setup.289988: Linux is running under KVM in 64-bit mode
-  setup.b050d0: The maximum memory size is 128MB
-  numa.196305: NUMA mode: plain
-  Write protected kernel read-only data: 8692k
-  [...]
-
-  --> but starting qemu without kvm enabled works fails
-  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
-t/initrd =
-
-  qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
-
-  PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
-  R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=
-=3D0000000000000000
-  R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=
-=3D0000000000000000
-  R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=
-=3D0000000000000000
-  R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=
-=3D000000000000bef0
-  F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=
-=3D0000000000000000
-  F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=
-=3D0000000000000000
-  F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=
-=3D0000000000000000
-  F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=
-=3D0000000000000000
-  V00=3D00000000000000000000000000000000 V01=3D0000000000000000000000000000=
-0000
-  V02=3D00000000000000000000000000000000 V03=3D0000000000000000000000000000=
-0000
-  V04=3D00000000000000000000000000000000 V05=3D0000000000000000000000000000=
-0000
-  V06=3D00000000000000000000000000000000 V07=3D0000000000000000000000000000=
-0000
-  V08=3D00000000000000000000000000000000 V09=3D0000000000000000000000000000=
-0000
-  V10=3D00000000000000000000000000000000 V11=3D0000000000000000000000000000=
-0000
-  V12=3D00000000000000000000000000000000 V13=3D0000000000000000000000000000=
-0000
-  V14=3D00000000000000000000000000000000 V15=3D0000000000000000000000000000=
-0000
-  V16=3D00000000000000000000000000000000 V17=3D0000000000000000000000000000=
-0000
-  V18=3D00000000000000000000000000000000 V19=3D0000000000000000000000000000=
-0000
-  V20=3D00000000000000000000000000000000 V21=3D0000000000000000000000000000=
-0000
-  V22=3D00000000000000000000000000000000 V23=3D0000000000000000000000000000=
-0000
-  V24=3D00000000000000000000000000000000 V25=3D0000000000000000000000000000=
-0000
-  V26=3D00000000000000000000000000000000 V27=3D0000000000000000000000000000=
-0000
-  V28=3D00000000000000000000000000000000 V29=3D0000000000000000000000000000=
-0000
-  V30=3D00000000000000000000000000000000 V31=3D0000000000000000000000000000=
-0000
-  C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=
-=3D0000000000000000
-  C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=
-=3D0000000000000000
-  C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=
-=3D0000000000000000
-  C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=
-=3D0000000000000000
-
-  Aborted (core dumped)
-
-  =
-
-  server3:~ # lscpu
-  Architecture:          s390x
-  CPU op-mode(s):        32-bit, 64-bit
-  Byte Order:            Big Endian
-  CPU(s):                2
-  On-line CPU(s) list:   0,1
-  Thread(s) per core:    1
-  Core(s) per socket:    1
-  Socket(s) per book:    1
-  Book(s) per drawer:    1
-  Drawer(s):             2
-  NUMA node(s):          1
-  Vendor ID:             IBM/S390
-  Machine type:          2964
-  BogoMIPS:              20325.00
-  Hypervisor:            z/VM 6.4.0
-  Hypervisor vendor:     IBM
-  Virtualization type:   full
-  Dispatching mode:      horizontal
-  L1d cache:             128K
-  L1i cache:             96K
-  L2d cache:             2048K
-  L2i cache:             2048K
-  L3 cache:              65536K
-  L4 cache:              491520K
-  NUMA node0 CPU(s):     0-63
-  Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh h=
-ighgprs te vx sie
-  server3:~ # uname -a
-  Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (=
-9649989) s390x s390x s390x GNU/Linux
-  server3:~ #
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815143/+subscriptions
+> 
+> 
+> 
