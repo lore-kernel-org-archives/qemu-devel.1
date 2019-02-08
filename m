@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53632)
+Received: from eggs.gnu.org ([209.51.188.92]:53876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gsA3m-00071t-VV
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 12:35:33 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gsA5A-0007s6-AA
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 12:36:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gsA3m-0001C3-7I
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 12:35:30 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:47444
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gsA3l-0001BR-Rz
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 12:35:30 -0500
-References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-	<1549562254-41157-48-git-send-email-pbonzini@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ef86ffab-9dd7-869e-195f-2617ecb98b15@ilande.co.uk>
-Date: Fri, 8 Feb 2019 17:35:21 +0000
+	(envelope-from <alex.bennee@linaro.org>) id 1gsA58-0001l3-9B
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 12:36:56 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gsA56-0001hL-5S
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 12:36:52 -0500
+Received: by mail-wm1-x342.google.com with SMTP id f16so4312767wmh.4
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 09:36:46 -0800 (PST)
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-2-philmd@redhat.com>
+	<172d8017-c3db-f35a-4091-b9f1400c43bf@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <172d8017-c3db-f35a-4091-b9f1400c43bf@redhat.com>
+Date: Fri, 08 Feb 2019 17:36:44 +0000
+Message-ID: <87tvhekwr7.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <1549562254-41157-48-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 47/51] sparc64-softmmu.mak: express
- dependencies with Kconfig
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/18] tests/vm: Be verbose while
+ extracting compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +32,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, philmd@redhat.com
-
-On 07/02/2019 17:57, Paolo Bonzini wrote:
-
-> %-softmmu.mak only keep boards and optional device
-> definitions in Kconfig mode.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/sparc64-softmmu.mak | 23 ++++++++---------------
->  hw/sparc64/Kconfig                  | 13 +++++++++++++
->  2 files changed, 21 insertions(+), 15 deletions(-)
-> 
-> diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-> index 528af8f..e50030a 100644
-> --- a/default-configs/sparc64-softmmu.mak
-> +++ b/default-configs/sparc64-softmmu.mak
-> @@ -1,19 +1,12 @@
->  # Default configuration for sparc64-softmmu
->  
-> -CONFIG_PCI=y
-> -CONFIG_PCI_DEVICES=y
-> -CONFIG_M48T59=y
-> -CONFIG_SERIAL=y
-> -CONFIG_SERIAL_ISA=y
-> -CONFIG_PARALLEL=y
-> -CONFIG_PCKBD=y
-> -CONFIG_FDC=y
-> -CONFIG_IDE_CMD646=y
-> -CONFIG_PCI_SABRE=y
-> -CONFIG_SIMBA=y
-> -CONFIG_SUNHME=y
-> -CONFIG_MC146818RTC=y
-> -CONFIG_TEST_DEVICES=y
-> -CONFIG_SUN4V_RTC=y
-> +# Uncomment the following lines to disable these optional devices:
-> +#
-> +#CONFIG_PCI_DEVICES=n
-> +#CONFIG_SUNHME=n
-
-Again I'm not sure what you mean by optional? sunhme has been the default NIC for the
-sun4u machine for several QEMU releases now.
-
-> +#CONFIG_TEST_DEVICES=n
-> +
-> +# Boards:
-> +#
->  CONFIG_SUN4U=y
->  CONFIG_NIAGARA=y
-> diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
-> index 41f7295..4a8166e 100644
-> --- a/hw/sparc64/Kconfig
-> +++ b/hw/sparc64/Kconfig
-> @@ -1,6 +1,19 @@
->  config SUN4U
->      bool
-> +    imply PCI_DEVICES
-> +    imply SUNHME
-> +    imply TEST_DEVICES
-> +    select M48T59
->      select ISA_BUS
-> +    select FDC
-> +    select SERIAL_ISA
-> +    select PCI_SABRE
-> +    select IDE_CMD646
-> +    select PARALLEL
-> +    select PCKBD
-> +    select SIMBA
->  
->  config NIAGARA
->      bool
-> +    select EMPTY_SLOT
-> +    select SUN4V_RTC
-> 
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>
 
 
-ATB,
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Mark.
+> Hi Alex,
+>
+> Can you queue this patch?
+
+Done.
+
+>
+> On 1/29/19 6:53 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Depending of the host hardware, copying and extracting VM images can
+>> take up to few minutes. Add verbosity to avoid the user to worry about
+>> VMs hanging.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>  tests/vm/centos  | 3 ++-
+>>  tests/vm/freebsd | 3 ++-
+>>  tests/vm/netbsd  | 3 ++-
+>>  tests/vm/openbsd | 3 ++-
+>>  4 files changed, 8 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/tests/vm/centos b/tests/vm/centos
+>> index daa2dbca03..ba133ea429 100755
+>> --- a/tests/vm/centos
+>> +++ b/tests/vm/centos
+>> @@ -65,8 +65,9 @@ class CentosVM(basevm.BaseVM):
+>>      def build_image(self, img):
+>>          cimg =3D self._download_with_cache("https://cloud.centos.org/ce=
+ntos/7/images/CentOS-7-x86_64-GenericCloud-1802.qcow2.xz")
+>>          img_tmp =3D img + ".tmp"
+>> +        sys.stderr.write("Extracting the image...\n")
+>>          subprocess.check_call(["cp", "-f", cimg, img_tmp + ".xz"])
+>> -        subprocess.check_call(["xz", "-df", img_tmp + ".xz"])
+>> +        subprocess.check_call(["xz", "-dvf", img_tmp + ".xz"])
+>>          subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
+>>          self.boot(img_tmp, extra_args =3D ["-cdrom", self._gen_cloud_in=
+it_iso()])
+>>          self.wait_ssh()
+>> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+>> index 19a3729172..2007c495a8 100755
+>> --- a/tests/vm/freebsd
+>> +++ b/tests/vm/freebsd
+>> @@ -34,8 +34,9 @@ class FreeBSDVM(basevm.BaseVM):
+>>                  sha256sum=3D'adcb771549b37bc63826c501f05121a206ed3d9f55=
+f49145908f7e1432d65891')
+>>          img_tmp_xz =3D img + ".tmp.xz"
+>>          img_tmp =3D img + ".tmp"
+>> +        sys.stderr.write("Extracting the image...\n")
+>>          subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+>> -        subprocess.check_call(["xz", "-df", img_tmp_xz])
+>> +        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
+>>          if os.path.exists(img):
+>>              os.remove(img)
+>>          os.rename(img_tmp, img)
+>> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+>> index fac6a7ce51..93b267c292 100755
+>> --- a/tests/vm/netbsd
+>> +++ b/tests/vm/netbsd
+>> @@ -34,8 +34,9 @@ class NetBSDVM(basevm.BaseVM):
+>>                                           sha256sum=3D'b633d565b0eac3d02=
+015cd0c81440bd8a7a8df8512615ac1ee05d318be015732')
+>>          img_tmp_xz =3D img + ".tmp.xz"
+>>          img_tmp =3D img + ".tmp"
+>> +        sys.stderr.write("Extracting the image...\n")
+>>          subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+>> -        subprocess.check_call(["xz", "-df", img_tmp_xz])
+>> +        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
+>>          if os.path.exists(img):
+>>              os.remove(img)
+>>          os.rename(img_tmp, img)
+>> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+>> index cfe0572c59..2105c01a26 100755
+>> --- a/tests/vm/openbsd
+>> +++ b/tests/vm/openbsd
+>> @@ -35,8 +35,9 @@ class OpenBSDVM(basevm.BaseVM):
+>>                  sha256sum=3D'8c6cedc483e602cfee5e04f0406c64eb99138495e8=
+ca580bc0293bcf0640c1bf')
+>>          img_tmp_xz =3D img + ".tmp.xz"
+>>          img_tmp =3D img + ".tmp"
+>> +        sys.stderr.write("Extracting the image...\n")
+>>          subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+>> -        subprocess.check_call(["xz", "-df", img_tmp_xz])
+>> +        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
+>>          if os.path.exists(img):
+>>              os.remove(img)
+>>          os.rename(img_tmp, img)
+>>
+
+
+--
+Alex Benn=C3=A9e
