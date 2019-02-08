@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34439)
+Received: from eggs.gnu.org ([209.51.188.92]:38620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1grvME-0004Mp-HD
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:53:35 -0500
+	(envelope-from <no-reply@patchew.org>) id 1grvm8-0008St-LT
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:20:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1grvM5-0002tn-SE
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:53:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1grvM2-0002qM-DW
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:53:22 -0500
-Date: Fri, 8 Feb 2019 09:53:13 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190208015313.GA16257@stefanha-x1.localdomain>
-References: <20190204075023.GA15322@stefanha-x1.localdomain>
-	<CAPcyv4huSKQueADyF5wJPWxMdLAn6yvEqWyMZfWPVQ4vQ_X0RA@mail.gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1grvm6-0005Gc-Sb
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:20:20 -0500
+Resent-Message-Id: <E1grvm6-0005Gc-Sb@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21039)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1grvm6-0005Dj-G3
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:20:18 -0500
+Message-ID: <154958966394.29184.7292809794587460710@ebba9967afc0>
+In-Reply-To: <20190206112729.37761-1-sgarzare@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4huSKQueADyF5wJPWxMdLAn6yvEqWyMZfWPVQ4vQ_X0RA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Querying the size of devdax devices from userspace
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Feb 2019 17:34:25 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>, Jeff Moyer <jmoyer@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: sgarzare@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, mst@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-
---Qxx1br4bt0+wmkIi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Feb 04, 2019 at 12:06:32AM -0800, Dan Williams wrote:
-> On Sun, Feb 3, 2019 at 11:56 PM Stefan Hajnoczi <stefanha@redhat.com> wro=
-te:
-> >
-> > How can userspace applications query the size of devdax character
-> > devices?
-> >
-> > stat(1) doesn't know how large the device is:
-> >
-> >   # stat /dev/dax0.0
-> >     File: /dev/dax0.0
-> >     Size: 0             Blocks: 0          IO Block: 4096   character s=
-pecial file
-> >   Device: 6h/6d Inode: 56764       Links: 1     Device type: fa,d
-> >
-> > ndctl(1) finds out by digging in /sys:
-> >
-> >   # ndctl list
-> >   [
-> >     {
-> >       "dev":"namespace0.0",
-> >       "mode":"devdax",
-> >       "map":"dev",
-> >       "size":2111832064,
-> >       "uuid":"235acf4d-503f-46be-bf64-f26faf9777ef",
-> >       "chardev":"dax0.0"
-> >     }
-> >   ]
-> >
-> > I'm not sure how to do it without enumerating all nvdimms in /sys.  Is
-> > there a mapping from devdax major/minor number to a /sys path?
-> >
-> > The use case I have in mind is that QEMU currently takes the size as a
-> > command-line parameter.  The failure mode is ugly when users get this
-> > value wrong: the guest gets a softlockup and there is no error message
-> > on the host side.
-> >
-> > I'd like QEMU to detect the size or at least reject size values that are
-> > too large.  In order to do that userspace needs a convenient way of
-> > querying the size.  Any ideas?
->=20
-> You're looking for /sys/dev/char. That will wake you from major:minor
-> to sysfs. Perhaps borrow fio's implementation for the same:
->=20
->    http://git.kernel.dk/cgit/fio/tree/engines/dev-dax.c#n258
-
-Excellent, thanks!
-
-Stefan
-
---Qxx1br4bt0+wmkIi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcXOEJAAoJEJykq7OBq3PIp7gH/2N8132TeleBKZLsNiZfBrFH
-ug3Vj9gDR7xsSDjJX0NQkZGaQCF8+rQ4wcvR3ls+aWCkD6IbfISOzRwlzxYxpIIh
-jJAdTbp+ZryBxvivRFLCuOO0Y2QmuVDfxvbOK6KO9NhvFbD5vjcRV1lWh99oGDjQ
-0fdA0QbHaoRM7fN4XGzW6moTfyFTDeDamkz4T8+HrGSb4R8w0eHm9brbgGnn64Nt
-1RLR8Rsxwzu+rvDdiS5cEJ4arnE17yJ2FE9uybkJ5NyHognqdim721BPsf41c+Nc
-Unje4mQuthCq7CoN3UxP3uOcI9PVmgvrKREIgQnx61in4RK1xSNJPD76R4n9RQg=
-=+kVP
------END PGP SIGNATURE-----
-
---Qxx1br4bt0+wmkIi--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNjExMjcyOS4zNzc2
+MS0xLXNnYXJ6YXJlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgeDg2
+XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvaW50X2hlbHBlci5vCkluIGZpbGUgaW5jbHVkZWQgZnJv
+bSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjE1OgovdG1wL3FlbXUt
+dGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOiBJbiBmdW5jdGlvbiAndmlydGlvX2Jsa19k
+ZXZpY2VfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FhcGkvZXJyb3IuaDox
+NjY6MjU6IGVycm9yOiBmb3JtYXQgJyVsdScgZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25n
+IHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVudCA3IGhhcyB0eXBlICdsb25nIGxvbmcgdW5zaWdu
+ZWQgaW50JyBbLVdlcnJvcj1mb3JtYXQ9XQogICAgICAgICAgICAgICAgICAgICAgICAgKGZtdCks
+ICMjIF9fVkFfQVJHU19fKQogICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn4KL3RtcC9xZW11
+LXRlc3Qvc3JjL2h3L2Jsb2NrL3ZpcnRpby1ibGsuYzoxMTIxOjk6IG5vdGU6IGluIGV4cGFuc2lv
+biBvZiBtYWNybyAnZXJyb3Jfc2V0ZycKICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiaW52YWxp
+ZCBtYXgtZGlzY2FyZC1zZWN0b3JzIHByb3BlcnR5ICglIiBQUkl1MzIgIikiCiAgICAgICAgIF5+
+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWFwaS9lcnJvci5oOjE2NjoyNTog
+ZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWdu
+ZWQgaW50JywgYnV0IGFyZ3VtZW50IDcgaGFzIHR5cGUgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQn
+IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAgICAgICAgICAgICAgICAoZm10KSwgIyMgX19W
+QV9BUkdTX18pCiAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fgovdG1wL3FlbXUtdGVzdC9z
+cmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjExMzA6OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1h
+Y3JvICdlcnJvcl9zZXRnJwotLS0KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2F1
+eGJ1cy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2sv
+dmlydGlvLWJsay5jOjE1OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5j
+OiBJbiBmdW5jdGlvbiAndmlydGlvX2Jsa19kZXZpY2VfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0
+L3NyYy9pbmNsdWRlL3FhcGkvZXJyb3IuaDoxNjY6MjU6IGVycm9yOiBmb3JtYXQgJyVsdScgZXhw
+ZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVudCA3
+IGhhcyB0eXBlICdsb25nIGxvbmcgdW5zaWduZWQgaW50JyBbLVdlcnJvcj1mb3JtYXQ9XQogICAg
+ICAgICAgICAgICAgICAgICAgICAgKGZtdCksICMjIF9fVkFfQVJHU19fKQogICAgICAgICAgICAg
+ICAgICAgICAgICAgXn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Jsb2NrL3ZpcnRpby1ibGsu
+YzoxMTIxOjk6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnZXJyb3Jfc2V0ZycKICAgICAg
+ICAgZXJyb3Jfc2V0ZyhlcnJwLCAiaW52YWxpZCBtYXgtZGlzY2FyZC1zZWN0b3JzIHByb3BlcnR5
+ICglIiBQUkl1MzIgIikiCiAgICAgICAgIF5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2lu
+Y2x1ZGUvcWFwaS9lcnJvci5oOjE2NjoyNTogZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBlY3RzIGFy
+Z3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDcgaGFzIHR5
+cGUgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQnIFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAoZm10KSwgIyMgX19WQV9BUkdTX18pCiAgICAgICAgICAgICAgICAgICAg
+ICAgICBefn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjExMzA6
+OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvICdlcnJvcl9zZXRnJwoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDYxMTI3Mjku
+Mzc3NjEtMS1zZ2FyemFyZUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/
+dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
