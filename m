@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58478)
+Received: from eggs.gnu.org ([209.51.188.92]:59603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs19g-0000Ec-Ko
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 03:05:01 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gs1FU-0002Fs-NR
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 03:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gs19c-0004GF-My
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 03:04:58 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34209)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gs19R-00047v-Vg
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 03:04:47 -0500
-Received: by mail-wm1-f68.google.com with SMTP id y185so6158647wmd.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 00:04:44 -0800 (PST)
-Date: Fri, 8 Feb 2019 09:04:39 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190208080439.t4faukc4wcgb7fvp@steredhat>
-References: <20190206112729.37761-1-sgarzare@redhat.com>
-	<20190208060618.GE16257@stefanha-x1.localdomain>
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gs1FT-0000o0-QW
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 03:11:00 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 8 Feb 2019 08:10:49 +0000
+Message-ID: <9ac07445-c0ac-e9f1-f988-472f0cc894a9@virtuozzo.com>
+References: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1B634955B9C1C44A962C7005CB9E6FED@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190208060618.GE16257@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+Subject: Re: [Qemu-devel] [PATCH] block: skip initializer BDS on recursive
+ aio context attachment/detachment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Denis Lunev <den@virtuozzo.com>
 
-On Fri, Feb 08, 2019 at 02:06:18PM +0800, Stefan Hajnoczi wrote:
-> On Wed, Feb 06, 2019 at 12:27:23PM +0100, Stefano Garzarella wrote:
-> > This series adds the support of DISCARD and WRITE_ZEROES commands
-> > and extends the virtio-blk-test to test WRITE_ZEROES command when
-> > the feature is enabled.
-> > 
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Thanks Stefan!
-
-I'll send a v4 to fix the error with mingw compiler.
-
-Cheers,
-Stefano
+cGluZyBwaW5nIQ0KDQpPbiAyNC4wMS4yMDE5IDEwOjQ4LCBEZW5pcyBQbG90bmlrb3Ygd3JvdGU6
+DQo+IFdoZW4gdGhlcmUgaXMgYSBCYWNrdXAgQmxvY2sgSm9iIHJ1bm5pbmcgYW5kIHNodXRkb3du
+IGNvbW1hbmQgaXMgc2VudCB0bw0KPiBhIGd1ZXN0LCB0aGUgZ3Vlc3QgY3J1c2hlcyBkdWUgdG8g
+YXNzZXJ0KCFicy0+d2Fsa2luZ19haW9fbm90aWZpZXJzKS4NCj4gDQo+IENhbGwgc3RhY2s6DQo+
+IA0KPiAwICBfX0dJX3JhaXNlDQo+IDEgIF9fR0lfYWJvcnQNCj4gMiAgX19hc3NlcnRfZmFpbF9i
+YXNlDQo+IDMgIF9fR0lfX19hc3NlcnRfZmFpbA0KPiA0ICBiZHJ2X2RldGFjaF9haW9fY29udGV4
+dCAoYnM9MHg1NWY1NGQ2NWMwMDApICAgICAgPDw8DQo+IDUgIGJkcnZfZGV0YWNoX2Fpb19jb250
+ZXh0IChicz0weDU1ZjU0ZmM4YTgwMCkNCj4gNiAgYmRydl9zZXRfYWlvX2NvbnRleHQgKGJzPTB4
+NTVmNTRmYzhhODAwLCAuLi4pDQo+IDcgIGJsb2NrX2pvYl9hdHRhY2hlZF9haW9fY29udGV4dA0K
+PiA4ICBiZHJ2X2F0dGFjaF9haW9fY29udGV4dCAoYnM9MHg1NWY1NGQ2NWMwMDAsIC4uLikgPDw8
+DQo+IDkgIGJkcnZfc2V0X2Fpb19jb250ZXh0IChicz0weDU1ZjU0ZDY1YzAwMCkNCj4gMTAgYmxr
+X3NldF9haW9fY29udGV4dA0KPiAxMSB2aXJ0aW9fYmxrX2RhdGFfcGxhbmVfc3RvcA0KPiAxMiB2
+aXJ0aW9fYnVzX3N0b3BfaW9ldmVudGZkDQo+IDEzIHZpcnRpb192bXN0YXRlX2NoYW5nZQ0KPiAx
+NCB2bV9zdGF0ZV9ub3RpZnkgKHJ1bm5pbmc9MCwgc3RhdGU9UlVOX1NUQVRFX1NIVVRET1dOKQ0K
+PiAxNSBkb192bV9zdG9wIChzdGF0ZT1SVU5fU1RBVEVfU0hVVERPV04sIHNlbmRfc3RvcD10cnVl
+KQ0KPiAxNiB2bV9zdG9wIChzdGF0ZT1SVU5fU1RBVEVfU0hVVERPV04pDQo+IDE3IG1haW5fbG9v
+cF9zaG91bGRfZXhpdA0KPiAxOCBtYWluX2xvb3ANCj4gMTkgbWFpbg0KPiANCj4gVGhpcyBoYXBw
+ZW5zIGJlY2F1c2Ugb2YgIm5ldyIgY29udGV4dCBhdHRhY2htZW50IHRvIFZNIGRpc2sgYmRzLg0K
+PiBXaGVuIGF0dGFjaGluZyBhIG5ldyBjb250ZXh0IHRoZSBjb3JyZXNwb25kaW5nIGFpbyBjb250
+ZXh0IGhhbmRsZXIgaXMNCj4gY2FsbGVkIGZvciBlYWNoIG9mIGFpb19ub3RpZmllcnMgcmVnaXN0
+ZXJlZCBvbiB0aGUgVk0gZGlzayBiZHMgY29udGV4dC4NCj4gQW1vbmcgdGhvc2UgaGFuZGxlcnMg
+dGhlcmUgaXMgdGhlIGJsb2NrX2pvYl9hdHRhY2hlZF9haW9fY29udGV4dCBoYW5kbGVyDQo+IHdo
+aWNoIHNldHMgYSBuZXcgYWlvIGNvbnRleHQgZm9yIHRoZSBibG9jayBqb2IgYmRzLiBXaGVuIGRv
+aW5nIHNvLA0KPiB0aGUgb2xkIGNvbnRleHQgaXMgZGV0YWNoZWQgZnJvbSBhbGwgdGhlIGJsb2Nr
+IGpvYiBiZHMgY2hpbGRyZW4gYW5kIG9uZSBvZg0KPiB0aGVtIGlzIHRoZSBWTSBkaXNrIGJkcywg
+c2VydmluZyBhcyBiYWNraW5nIHN0b3JlIGZvciB0aGUgYmxvY2tqb2IgYmRzLA0KPiBhbHRob3Vn
+aCB0aGUgVk0gZGlzayBiZHMgaXMgYWN0dWFsbHkgdGhlIGluaXRpYWxpemVyIG9mIHRoYXQgcHJv
+Y2Vzcy4NCj4gU2luY2UgdGhlIFZNIGRpc2sgYmRzIGlzIHByb3RlY3RlZCB3aXRoIHdhbGtpbmdf
+YWlvX25vdGlmaWVycyBmbGFnDQo+IGZyb20gZG91YmxlIHByb2Nlc3NpbmcgaW4gcmVjdXJzaXZl
+IGNhbGxzLCB0aGUgYXNzZXJ0IGZpcmVzLg0KPiANCj4gVGhlIHBhdGNoIGZpeGVzIHRoZSBwcm9i
+bGVtIGJ5IHNraXBwaW5nIHRoZSBiZHMtZXMgaW4gcmVjdXJzaXZlIGNhbGxzDQo+IHdoaWNoIGhh
+dmUgc3RhcnRlZCBhdHRhY2htZW50L2RldGFjaG1lbnQgYWxyZWFkeS4NCj4gDQo+IFNpZ25lZC1v
+ZmYtYnk6IERlbmlzIFBsb3RuaWtvdiA8ZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tPg0KPiAtLS0N
+Cj4gICBibG9jay5jIHwgOCArKysrKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlv
+bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2suYyBiL2Jsb2Nr
+LmMNCj4gaW5kZXggOWIxYzVjNWVhZi4uMzVhMTlmZTFkZiAxMDA2NDQNCj4gLS0tIGEvYmxvY2su
+Yw0KPiArKysgYi9ibG9jay5jDQo+IEBAIC01MDY0LDcgKzUwNjQsOSBAQCB2b2lkIGJkcnZfZGV0
+YWNoX2Fpb19jb250ZXh0KEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgICAgICAgICAgYnMtPmRy
+di0+YmRydl9kZXRhY2hfYWlvX2NvbnRleHQoYnMpOw0KPiAgICAgICB9DQo+ICAgICAgIFFMSVNU
+X0ZPUkVBQ0goY2hpbGQsICZicy0+Y2hpbGRyZW4sIG5leHQpIHsNCj4gLSAgICAgICAgYmRydl9k
+ZXRhY2hfYWlvX2NvbnRleHQoY2hpbGQtPmJzKTsNCj4gKyAgICAgICAgaWYgKCFjaGlsZC0+YnMt
+PndhbGtpbmdfYWlvX25vdGlmaWVycykgew0KPiArICAgICAgICAgICAgYmRydl9kZXRhY2hfYWlv
+X2NvbnRleHQoY2hpbGQtPmJzKTsNCj4gKyAgICAgICAgfQ0KPiAgICAgICB9DQo+ICAgDQo+ICAg
+ICAgIGJzLT5haW9fY29udGV4dCA9IE5VTEw7DQo+IEBAIC01MDgzLDcgKzUwODUsOSBAQCB2b2lk
+IGJkcnZfYXR0YWNoX2Fpb19jb250ZXh0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICBi
+cy0+YWlvX2NvbnRleHQgPSBuZXdfY29udGV4dDsNCj4gICANCj4gICAgICAgUUxJU1RfRk9SRUFD
+SChjaGlsZCwgJmJzLT5jaGlsZHJlbiwgbmV4dCkgew0KPiAtICAgICAgICBiZHJ2X2F0dGFjaF9h
+aW9fY29udGV4dChjaGlsZC0+YnMsIG5ld19jb250ZXh0KTsNCj4gKyAgICAgICAgaWYgKCFjaGls
+ZC0+YnMtPndhbGtpbmdfYWlvX25vdGlmaWVycykgew0KPiArICAgICAgICAgICAgYmRydl9hdHRh
+Y2hfYWlvX2NvbnRleHQoY2hpbGQtPmJzLCBuZXdfY29udGV4dCk7DQo+ICsgICAgICAgIH0NCj4g
+ICAgICAgfQ0KPiAgICAgICBpZiAoYnMtPmRydi0+YmRydl9hdHRhY2hfYWlvX2NvbnRleHQpIHsN
+Cj4gICAgICAgICAgIGJzLT5kcnYtPmJkcnZfYXR0YWNoX2Fpb19jb250ZXh0KGJzLCBuZXdfY29u
+dGV4dCk7DQo+IA0KDQotLSANCkJlc3QsDQpEZW5pcw0K
