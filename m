@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57533)
+Received: from eggs.gnu.org ([209.51.188.92]:58108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grxyz-0008Gj-Q9
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:41:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1gry2l-0000xO-9q
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:45:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grxyt-0005Bd-Gp
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:41:41 -0500
-Received: from mga18.intel.com ([134.134.136.126]:4391)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1grxyl-000582-PE
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:41:33 -0500
-From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Fri,  8 Feb 2019 21:12:15 +0800
-Message-Id: <04efc939bd294677555deddd1b7ab68ef0fc278b.1549631480.git.yi.z.zhang@linux.intel.com>
-In-Reply-To: <cover.1549631480.git.yi.z.zhang@linux.intel.com>
-References: <cover.1549631480.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel]  [PATCH V13 5/5] docs: Added MAP_SYNC documentation
+	(envelope-from <bounces@canonical.com>) id 1gry2i-0008In-13
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:45:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gry2d-0008Et-Um
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:45:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gry2c-0008RZ-Q5
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 04:45:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BCA492E8074
+	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 04:45:30 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 Feb 2019 04:35:49 -0000
+From: Thomas Huth <1815143@bugs.launchpad.net>
+Reply-To: Bug 1815143 <1815143@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154957727033.18791.11498118265359264370.malonedeb@soybean.canonical.com>
+Message-Id: <154960054911.22205.3656090242158834779.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815143] Re: qemu-system-s390x fails when running
+ without kvm: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +37,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: qemu-devel@nongnu.org
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Which version of QEMU are you using here? I think this should be working
+fine with the latest version of QEMU (>=3D v2.10).
 
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
- docs/nvdimm.txt | 22 +++++++++++++++++++---
- qemu-options.hx |  5 +++++
- 2 files changed, 24 insertions(+), 3 deletions(-)
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 5f158a6..e70f28b 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -143,9 +143,25 @@ Guest Data Persistence
- ----------------------
- 
- Though QEMU supports multiple types of vNVDIMM backends on Linux,
--currently the only one that can guarantee the guest write persistence
--is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
--which all guest access do not involve any host-side kernel cache.
-+the only backend that can guarantee the guest write persistence is:
-+
-+A. DAX device (e.g., /dev/dax0.0, ) or
-+B. DAX file(mounted with dax option)
-+
-+When using B (A file supporting direct mapping of persistent memory)
-+as a backend, write persistence is guaranteed if the host kernel has
-+support for the MAP_SYNC flag in the mmap system call (available
-+since Linux 4.15 and on certain distro kernels) and additionally
-+both 'pmem' and 'share' flags are set to 'on' on the backend.
-+
-+If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-+are not set, if the backend file does not support DAX or if MAP_SYNC
-+is not supported by the host kernel, write persistence is not
-+guaranteed after a system crash. For compatibility reasons, these
-+conditions are silently ignored if not satisfied. Currently, no way
-+is provided to test for them.
-+For more details, please reference mmap(2) man page:
-+http://man7.org/linux/man-pages/man2/mmap.2.html.
- 
- When using other types of backends, it's suggested to set 'unarmed'
- option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08f8516..ef1da8f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4002,6 +4002,11 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
- If @option{pmem} is set to 'on', QEMU will take necessary operations to
- guarantee the persistence of its own writes to @option{mem-path}
- (e.g. in vNVDIMM label emulation and live migration).
-+Also, we will map the backend-file with MAP_SYNC flag, which ensures the
-+file metadata is in sync for @option{mem-path} in case of host crash
-+or a power failure. MAP_SYNC requires support from both the host kernel
-+(since Linux kernel 4.15) and the filesystem of @option{mem-path} mounted
-+with DAX option.
- 
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
--- 
-2.7.4
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815143
+
+Title:
+   qemu-system-s390x fails when running without kvm: fatal: EXECUTE on
+  instruction prefix 0x7f4 not implemented
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  just wondering if TCG implements instruction prefix 0x7f4
+
+  server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
+
+  --> starting qemu with kvm enabled works fine
+  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
+t/initrd -enable-kvm
+  Initializing cgroup subsys cpuset
+  Initializing cgroup subsys cpu
+  Initializing cgroup subsys cpuacct
+  Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 =
+(SUSE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
+  setup.289988: Linux is running under KVM in 64-bit mode
+  setup.b050d0: The maximum memory size is 128MB
+  numa.196305: NUMA mode: plain
+  Write protected kernel read-only data: 8692k
+  [...]
+
+  --> but starting qemu without kvm enabled works fails
+  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
+t/initrd =
+
+  qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
+
+  PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
+  R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=
+=3D0000000000000000
+  R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=
+=3D0000000000000000
+  R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=
+=3D0000000000000000
+  R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=
+=3D000000000000bef0
+  F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=
+=3D0000000000000000
+  F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=
+=3D0000000000000000
+  F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=
+=3D0000000000000000
+  F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=
+=3D0000000000000000
+  V00=3D00000000000000000000000000000000 V01=3D0000000000000000000000000000=
+0000
+  V02=3D00000000000000000000000000000000 V03=3D0000000000000000000000000000=
+0000
+  V04=3D00000000000000000000000000000000 V05=3D0000000000000000000000000000=
+0000
+  V06=3D00000000000000000000000000000000 V07=3D0000000000000000000000000000=
+0000
+  V08=3D00000000000000000000000000000000 V09=3D0000000000000000000000000000=
+0000
+  V10=3D00000000000000000000000000000000 V11=3D0000000000000000000000000000=
+0000
+  V12=3D00000000000000000000000000000000 V13=3D0000000000000000000000000000=
+0000
+  V14=3D00000000000000000000000000000000 V15=3D0000000000000000000000000000=
+0000
+  V16=3D00000000000000000000000000000000 V17=3D0000000000000000000000000000=
+0000
+  V18=3D00000000000000000000000000000000 V19=3D0000000000000000000000000000=
+0000
+  V20=3D00000000000000000000000000000000 V21=3D0000000000000000000000000000=
+0000
+  V22=3D00000000000000000000000000000000 V23=3D0000000000000000000000000000=
+0000
+  V24=3D00000000000000000000000000000000 V25=3D0000000000000000000000000000=
+0000
+  V26=3D00000000000000000000000000000000 V27=3D0000000000000000000000000000=
+0000
+  V28=3D00000000000000000000000000000000 V29=3D0000000000000000000000000000=
+0000
+  V30=3D00000000000000000000000000000000 V31=3D0000000000000000000000000000=
+0000
+  C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=
+=3D0000000000000000
+  C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=
+=3D0000000000000000
+  C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=
+=3D0000000000000000
+  C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=
+=3D0000000000000000
+
+  Aborted (core dumped)
+
+  =
+
+  server3:~ # lscpu
+  Architecture:          s390x
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Big Endian
+  CPU(s):                2
+  On-line CPU(s) list:   0,1
+  Thread(s) per core:    1
+  Core(s) per socket:    1
+  Socket(s) per book:    1
+  Book(s) per drawer:    1
+  Drawer(s):             2
+  NUMA node(s):          1
+  Vendor ID:             IBM/S390
+  Machine type:          2964
+  BogoMIPS:              20325.00
+  Hypervisor:            z/VM 6.4.0
+  Hypervisor vendor:     IBM
+  Virtualization type:   full
+  Dispatching mode:      horizontal
+  L1d cache:             128K
+  L1i cache:             96K
+  L2d cache:             2048K
+  L2i cache:             2048K
+  L3 cache:              65536K
+  L4 cache:              491520K
+  NUMA node0 CPU(s):     0-63
+  Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh h=
+ighgprs te vx sie
+  server3:~ # uname -a
+  Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (=
+9649989) s390x s390x s390x GNU/Linux
+  server3:~ #
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815143/+subscriptions
