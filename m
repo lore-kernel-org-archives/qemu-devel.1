@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41116)
+Received: from eggs.gnu.org ([209.51.188.92]:42341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1grzJ8-0001fL-JM
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:06:39 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1grzT1-0003BR-M9
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:16:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1grzJ6-0000fN-Dc
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:06:38 -0500
-Date: Fri, 8 Feb 2019 14:06:18 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190208060618.GE16257@stefanha-x1.localdomain>
-References: <20190206112729.37761-1-sgarzare@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1grzSz-0004yq-RW
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 01:16:51 -0500
+Date: Fri, 8 Feb 2019 16:34:19 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190208053417.GB12810@umbus.fritz.box>
+References: <20190126150102.7AABC74569F@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="QXO0/MSS4VvK6f+D"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BwCQnh7xodEAoBMC"
 Content-Disposition: inline
-In-Reply-To: <20190206112729.37761-1-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+In-Reply-To: <20190126150102.7AABC74569F@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fix msync to do what hardware
+ does
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---QXO0/MSS4VvK6f+D
+--BwCQnh7xodEAoBMC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 06, 2019 at 12:27:23PM +0100, Stefano Garzarella wrote:
-> This series adds the support of DISCARD and WRITE_ZEROES commands
-> and extends the virtio-blk-test to test WRITE_ZEROES command when
-> the feature is enabled.
+On Sat, Jan 26, 2019 at 03:50:28PM +0100, BALATON Zoltan wrote:
+> According to BookE docs, invalid bits (while undefined behaviour) should
+> not raise exception but be ignored. This seems to be implementation
+> dependent though and QEMU currently does what e500 CPUs do and raise
+> exception for invalid bits. Unfortunately some versions of libstdc++
+> (and so all programs compiled with it) have lwsync on PPC440 which is
+> invalid but on real hardware it's just executed as msync ignoring the
+> invalid bits (maybe that's why it got undetected) but they fail on QEMU.
+> This patch changes invalid mask of msync to allow these programs to run
+> but keep generating exception on e500 cores to follow what hardware does.
 >=20
-> v3:
-> - rebased on master (I removed Based-on tag since the new virtio headers =
-=66rom
->   linux v5.0-rc1 are merged)
-> - added patch 2 to add host_features field (as in virtio-net) [Michael]
-> - fixed patch 3 (previously 2/5) using the new host_features field
-> - fixed patch 4 (previously 3/5) following the Stefan's comments:
->                 - fixed name of functions and fields
->                 - used vdev and s pointers
->                 - removed "wz-may-unmap" property
->                 - split "dwz-max-sectors" in two properties
->=20
-> v2:
-> - added patch 1 to use virtio_blk_handle_rw_error() with discard operation
-> - added patch 2 to make those new features machine-type dependent (thanks=
- David)
-> - fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
-rt()
->                 for WRITE_ZEROES requests, and configurable parameters to
->                 initialize the limits (max_sectors, wzeroes_may_unmap).
->                 (thanks Stefan)
->                 I moved in a new function the code to handle a single seg=
-ment,
->                 in order to simplify the support of multiple segments in =
-the
->                 future.
-> - added patch 4 to change the assert on data_size following the discussio=
-n with
->                 Thomas, Changpeng, Michael, and Stefan (thanks all)
-> - fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
-ad of
->                 dynamic allocation (thanks Thomas)
->=20
-> Thanks,
-> Stefano
->=20
-> Stefano Garzarella (6):
->   virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
->   virtio-blk: add host_features field in VirtIOBlock
->   virtio-blk: add "discard" and "write-zeroes" properties
->   virtio-blk: add DISCARD and WRITE_ZEROES features
->   tests/virtio-blk: change assert on data_size in virtio_blk_request()
->   tests/virtio-blk: add test for WRITE_ZEROES command
->=20
->  hw/block/virtio-blk.c          | 213 +++++++++++++++++++++++++++++++--
->  hw/core/machine.c              |   2 +
->  include/hw/virtio/virtio-blk.h |   5 +-
->  tests/virtio-blk-test.c        |  75 +++++++++++-
->  4 files changed, 281 insertions(+), 14 deletions(-)
->=20
-> --=20
-> 2.20.1
->=20
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Applied to ppc-for-4.0, thanks.
 
---QXO0/MSS4VvK6f+D
+> ---
+>  target/ppc/translate.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index e169c43643..5429ceb1ab 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -6476,7 +6476,12 @@ static void gen_mbar(DisasContext *ctx)
+>  /* msync replaces sync on 440 */
+>  static void gen_msync_4xx(DisasContext *ctx)
+>  {
+> -    /* interpreted as no-op */
+> +    /* Only e500 seems to treat reserved bits as invalid */
+> +    if ((ctx->insns_flags2 & PPC2_BOOKE206) &&
+> +        (ctx->opcode & 0x03FFF801)) {
+> +        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+> +    }
+> +    /* otherwise interpreted as no-op */
+>  }
+> =20
+>  /* icbt */
+> @@ -7054,11 +7059,11 @@ GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01,=
+ PPC_WRTEE),
+>  GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
+>  GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
+>                PPC_BOOKE, PPC2_BOOKE206),
+> -GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
+> +GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x039FF801, PPC_BOOKE),
+>  GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
+>                 PPC_BOOKE, PPC2_BOOKE206),
+>  GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
+> -               PPC_440_SPEC),
+> +             PPC_440_SPEC),
+>  GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+>  GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+>  GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--BwCQnh7xodEAoBMC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcXRxaAAoJEJykq7OBq3PIW3kIAIKt5N3GP1sI3aaIEgMt1x3c
-yQmGtL44NjsKeoxdnGqwyFuA4Z0jNDhR0UPxCjpNy2aAGd2um5BIaLhgzp6CibfS
-fjF7rIc0VX4jAMQS7AOWpTFPAHjNkpOaMj04PeW+IGm3ybUNaKs8A4an+MSaBhs0
-6ayR1lAqNl16nI9y0cP8BXEAceGyPKfCa7r3MJ5KKEQoL6coTxCK4lgCuJkNYMGU
-OY39vMSY9lqr8sI5XLP4AHdi2ox2ajcUuB7iitqTBRnbaDF48uO2yH3SJB8JbQlj
-VY6L4X67vQ/EkFm8g/NhIz0ngjF1NWQM8hA6XXgbhVuuQmLoAyCv6Eg1zALPYm4=
-=Y5zg
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxdFNkACgkQbDjKyiDZ
+s5Lf0RAAnkC+da40G8+wVrf07kdbnviRc36x+6aXOLOQxUh/h9rCmsQpDrwIzIB9
+iCGE6cd8uK2jNBHQiy2a7me9WYSEYOIgQ5hXdh2r//gKY248NwxYkopYvhdljsJ0
+52l3mqjsfq4yQrdBwIHx+aZxX0Xype46EqTMLAAOaqfBjstvYRLaTKYfFu4mq6pb
+JuASYUhsOfRoi8CzKOg9+PvfuYD2TorNVuRhx9Vjnw6ShBmRJlnxK9YiGcenoyLG
+RNlIDY7m0aKESDNTfR4/r75dureNqpvMsLvXSL4wMtzKn7yEBKJG6YehQwaIFE05
+jnwdanR8VwaBsMX7TDPEoiISfTmhf/6/nW44OL3y0D857/oqVN6YhHxJLd7zW3Ht
+wL+QGtiLrLKB4ievflwlGZND7o0VbVC2r63ZddmomER4EcN9HKdQfCWjcBdiiP6W
+tU7d/79IjWwIkvjxgqqgvBAPSOT9ddu21M9UrbnZDdnNcjkvuYfndcsbzxVI+Ny4
+zoD9rk0OQPIBRQjLXDUyaYpCKiA7AKTlJDWP/BBqc+4IzoQZPliLtyLW8MZm3O25
+c4pU/Yr9HmxeL4R2qB/oQ/SNobZPkD8MXYiDd0Bf/ccaC0DCy88EApzzDwsvl6MM
+IqCIJGa1BWNWmM+lVXDxLccE9Fw6dG2eZwIIAewVhqg/DDUYswk=
+=W8nt
 -----END PGP SIGNATURE-----
 
---QXO0/MSS4VvK6f+D--
+--BwCQnh7xodEAoBMC--
