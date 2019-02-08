@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43947)
+Received: from eggs.gnu.org ([209.51.188.92]:45128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gs9Oc-0007BK-1j
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:52:58 -0500
+	(envelope-from <philmd@redhat.com>) id 1gs9UF-0000Dh-JN
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gs9Ob-0003Fw-7K
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:52:57 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42766)
+	(envelope-from <philmd@redhat.com>) id 1gs9U2-0007ma-Je
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:58:40 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gs9Oa-0003Et-GM
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:52:57 -0500
-Received: by mail-pl1-x644.google.com with SMTP id s1so1933435plp.9
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 08:52:55 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gs9U2-0007ln-B5
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:58:34 -0500
+Received: by mail-wr1-f66.google.com with SMTP id c8so4339610wrs.4
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 08:58:32 -0800 (PST)
 References: <20190208035551.3036-1-richard.henderson@linaro.org>
 	<9fb2cbe0-40ae-5734-56af-99765a59d0ec@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <cc2d9846-354d-aa86-a245-6cd9f6e5aa56@linaro.org>
-Date: Fri, 8 Feb 2019 08:52:51 -0800
+	<cc2d9846-354d-aa86-a245-6cd9f6e5aa56@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <94aeaec0-4632-a59d-4236-9d61101ebad0@redhat.com>
+Date: Fri, 8 Feb 2019 17:58:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <9fb2cbe0-40ae-5734-56af-99765a59d0ec@redhat.com>
+In-Reply-To: <cc2d9846-354d-aa86-a245-6cd9f6e5aa56@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -32,15 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org
 
-On 2/8/19 2:41 AM, Philippe Mathieu-Daudé wrote:
-> Not related to this patch content, but I'm wondering why, TCGLabels
-> never get freed?
+On 2/8/19 5:52 PM, Richard Henderson wrote:
+> On 2/8/19 2:41 AM, Philippe Mathieu-Daudé wrote:
+>> Not related to this patch content, but I'm wondering why, TCGLabels
+>> never get freed?
+> 
+> They are allocated with tcg_malloc, which is a pool allocator.  The entire pool
+> is freed after each TB is compiled.
 
-They are allocated with tcg_malloc, which is a pool allocator.  The entire pool
-is freed after each TB is compiled.
+Got it now, thanks!
 
-
-r~
+Phil.
