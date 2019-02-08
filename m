@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38620)
+Received: from eggs.gnu.org ([209.51.188.92]:39748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1grvm8-0008St-LT
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:20:21 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1grvvH-0001qr-Dq
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1grvm6-0005Gc-Sb
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:20:20 -0500
-Resent-Message-Id: <E1grvm6-0005Gc-Sb@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21039)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1grvm6-0005Dj-G3
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:20:18 -0500
-Message-ID: <154958966394.29184.7292809794587460710@ebba9967afc0>
-In-Reply-To: <20190206112729.37761-1-sgarzare@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <aik@ozlabs.ru>) id 1grvvG-0000ud-0n
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:29:47 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1grvvF-0000tV-PH
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:29:45 -0500
+Received: by mail-pf1-x442.google.com with SMTP id q1so956628pfi.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 18:29:44 -0800 (PST)
+References: <20190117025115.81178-1-aik@ozlabs.ru>
+	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
+	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
+	<20190207081830.4dcbb822@x1.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
+Date: Fri, 8 Feb 2019 13:29:37 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Feb 2019 17:34:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+In-Reply-To: <20190207081830.4dcbb822@x1.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
+ vfio: NVIDIA V100 + P9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sgarzare@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, mst@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNjExMjcyOS4zNzc2
-MS0xLXNnYXJ6YXJlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
-cmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgeDg2
-XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvaW50X2hlbHBlci5vCkluIGZpbGUgaW5jbHVkZWQgZnJv
-bSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjE1OgovdG1wL3FlbXUt
-dGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOiBJbiBmdW5jdGlvbiAndmlydGlvX2Jsa19k
-ZXZpY2VfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FhcGkvZXJyb3IuaDox
-NjY6MjU6IGVycm9yOiBmb3JtYXQgJyVsdScgZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25n
-IHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVudCA3IGhhcyB0eXBlICdsb25nIGxvbmcgdW5zaWdu
-ZWQgaW50JyBbLVdlcnJvcj1mb3JtYXQ9XQogICAgICAgICAgICAgICAgICAgICAgICAgKGZtdCks
-ICMjIF9fVkFfQVJHU19fKQogICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn4KL3RtcC9xZW11
-LXRlc3Qvc3JjL2h3L2Jsb2NrL3ZpcnRpby1ibGsuYzoxMTIxOjk6IG5vdGU6IGluIGV4cGFuc2lv
-biBvZiBtYWNybyAnZXJyb3Jfc2V0ZycKICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiaW52YWxp
-ZCBtYXgtZGlzY2FyZC1zZWN0b3JzIHByb3BlcnR5ICglIiBQUkl1MzIgIikiCiAgICAgICAgIF5+
-fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWFwaS9lcnJvci5oOjE2NjoyNTog
-ZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWdu
-ZWQgaW50JywgYnV0IGFyZ3VtZW50IDcgaGFzIHR5cGUgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQn
-IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAgICAgICAgICAgICAgICAoZm10KSwgIyMgX19W
-QV9BUkdTX18pCiAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fgovdG1wL3FlbXUtdGVzdC9z
-cmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjExMzA6OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1h
-Y3JvICdlcnJvcl9zZXRnJwotLS0KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2F1
-eGJ1cy5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2sv
-dmlydGlvLWJsay5jOjE1OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5j
-OiBJbiBmdW5jdGlvbiAndmlydGlvX2Jsa19kZXZpY2VfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0
-L3NyYy9pbmNsdWRlL3FhcGkvZXJyb3IuaDoxNjY6MjU6IGVycm9yOiBmb3JtYXQgJyVsdScgZXhw
-ZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVudCA3
-IGhhcyB0eXBlICdsb25nIGxvbmcgdW5zaWduZWQgaW50JyBbLVdlcnJvcj1mb3JtYXQ9XQogICAg
-ICAgICAgICAgICAgICAgICAgICAgKGZtdCksICMjIF9fVkFfQVJHU19fKQogICAgICAgICAgICAg
-ICAgICAgICAgICAgXn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Jsb2NrL3ZpcnRpby1ibGsu
-YzoxMTIxOjk6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnZXJyb3Jfc2V0ZycKICAgICAg
-ICAgZXJyb3Jfc2V0ZyhlcnJwLCAiaW52YWxpZCBtYXgtZGlzY2FyZC1zZWN0b3JzIHByb3BlcnR5
-ICglIiBQUkl1MzIgIikiCiAgICAgICAgIF5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2lu
-Y2x1ZGUvcWFwaS9lcnJvci5oOjE2NjoyNTogZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBlY3RzIGFy
-Z3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDcgaGFzIHR5
-cGUgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQnIFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAoZm10KSwgIyMgX19WQV9BUkdTX18pCiAgICAgICAgICAgICAgICAgICAg
-ICAgICBefn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjExMzA6
-OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvICdlcnJvcl9zZXRnJwoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDYxMTI3Mjku
-Mzc3NjEtMS1zZ2FyemFyZUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+
+On 08/02/2019 02:18, Alex Williamson wrote:
+> On Thu, 7 Feb 2019 15:43:18 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:
+>>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
+>>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
+>>> GPU:
+>>>
+>>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
+>>>
+>>>
+>>> In that thread, Alex raised concerns about allowing QEMU to freely lock
+>>> all the memory it wants. Is this an issue to be considered in the review
+>>> of this series here?
+>>>
+>>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
+>>> going to lock the KVM memory to populate the NUMA node with memory
+>>> of the GPU itself, so at first there is no risk of not taking over the
+>>> host RAM.
+>>> Am I missing something?  
+>>
+>>
+>> The GPU memory belongs to the device and not visible to the host as
+>> memory blocks and not covered by page structs, for the host it is more
+>> like MMIO which is passed through to the guest without that locked
+>> accounting, I'd expect libvirt to keep working as usual except that:
+>>
+>> when libvirt calculates the amount of memory needed for TCE tables
+>> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
+>> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
+>>
+>> FlatView #2
+>>  AS "memory", root: system
+>>  AS "cpu-memory-0", root: system
+>>  Root memory region: system
+>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
+>>
+>> So previously the DMA window would cover 0x7fffffff+1, now it has to
+>> cover 0x11fffffffff+1.
+> 
+> This looks like a chicken and egg problem, you're saying libvirt needs
+> to query mtree to understand the extent of the GPU layout, but we need
+> to specify the locked memory limits in order for QEMU to start?  Is
+> libvirt supposed to start the VM with unlimited locked memory and fix
+> it at some indeterminate point in the future?  Run a dummy VM with
+> unlimited locked memory in order to determine the limits for the real
+> VM?  Neither of these sound practical.  Thanks,
+
+
+QEMU maps GPU RAM at known locations (which only depends on the vPHB's
+index or can be set explicitely) and libvirt knows how many GPUs are
+passed so it is quite easy to calculate the required amount of memory.
+
+Here is the window start calculation:
+https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
+
+We do not exactly know the GPU RAM window size until QEMU reads it from
+VFIO/nvlink2 but we know that all existing hardware has a window of
+128GB (the adapters I have access to only have 16/32GB on board).
+
+
+-- 
+Alexey
