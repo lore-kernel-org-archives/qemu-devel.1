@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46928)
+Received: from eggs.gnu.org ([209.51.188.92]:48667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gs5K0-000680-S8
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 07:31:57 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gs5Ta-0007sa-Kk
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 07:41:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gs5Jx-0000sj-9S
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 07:31:55 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1546200557-774583-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1546200557-774583-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-Date: Fri, 08 Feb 2019 13:31:46 +0100
-Message-ID: <w51r2ci8nrh.fsf@maestria.local.igalia.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1gs5TV-0007OL-Cf
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 07:41:50 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:63458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gs5TL-0007Ad-SI
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 07:41:38 -0500
+Date: Fri, 8 Feb 2019 13:41:17 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190208072744.10687-1-kraxel@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1902081339360.66579@zero.eik.bme.hu>
+References: <20190208072744.10687-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 1/6] Stream block job
- involves copy-on-read filter driver
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] sdl2: drop qemu_input_event_send_key_qcode
+ call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jcody@redhat.com, armbru@redhat.com, dgilbert@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Sun 30 Dec 2018 09:09:12 PM CET, Andrey Shinkevich wrote:
-> +static BlockDriverState *child_file_bs(BlockDriverState *bs)
-> +{
-> +    return bs->file ? bs->file->bs : NULL;
-> +}
+On Fri, 8 Feb 2019, Gerd Hoffmann wrote:
+> qkbd_state_key_event() does that for us.
+>
+> Fixes: 07333e1ca3 kbd-state: use state tracker for sdl2
+> Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-In addition to Vladimir's comments, I wonder if it's useful to put this
-in block_int.h (together with backing_bs()). It seems that there's a
-couple of more places where this can be used.
+Fixes my problem.
 
-Berto
+Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Thank you,
+BALATON Zoltan
+
+> ---
+> ui/sdl2-input.c | 3 ---
+> 1 file changed, 3 deletions(-)
+>
+> diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
+> index 664364a5e5..fb345f45fb 100644
+> --- a/ui/sdl2-input.c
+> +++ b/ui/sdl2-input.c
+> @@ -54,8 +54,5 @@ void sdl2_process_key(struct sdl2_console *scon,
+>                 break;
+>             }
+>         }
+> -    } else {
+> -        qemu_input_event_send_key_qcode(con, qcode,
+> -                                        ev->type == SDL_KEYDOWN);
+>     }
+> }
+>
