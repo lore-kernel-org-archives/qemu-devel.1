@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57165)
+Received: from eggs.gnu.org ([209.51.188.92]:58078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gs8TX-0000ix-S0
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:54:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gs8Xd-0003Zu-WF
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:58:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gs8TX-0007d4-2y
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:53:59 -0500
-References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
-	<0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1be61aa6-c6ad-ac25-8a3f-37a7b48f04da@redhat.com>
-Date: Fri, 8 Feb 2019 09:53:54 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1gs8Xb-0003xD-T9
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:58:13 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gs8Xa-0003sh-0a
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:58:11 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z18so4145999wrh.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 07:58:09 -0800 (PST)
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-74-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190130004811.27372-74-cota@braap.org>
+Date: Fri, 08 Feb 2019 15:58:07 +0000
+Message-ID: <87womal1bk.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ"
-Subject: Re: [Qemu-devel] [PATCH v14 0/3] qcow2: Add list of bitmaps to
- ImageInfoSpecificQCow2
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 73/73] cputlb: queue async flush jobs
+ without the BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ
-From: Eric Blake <eblake@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev
- <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <1be61aa6-c6ad-ac25-8a3f-37a7b48f04da@redhat.com>
-Subject: Re: [PATCH v14 0/3] qcow2: Add list of bitmaps to
- ImageInfoSpecificQCow2
-References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
- <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
-In-Reply-To: <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/8/19 9:37 AM, Andrey Shinkevich wrote:
->=20
->=20
-> On 08/02/2019 18:25, Eric Blake wrote:
->> On 2/8/19 9:06 AM, Andrey Shinkevich wrote:
->>> v14:
->>> The test 242 was amended to be safer against changes in the bitmap al=
-location
->>> algorithm because the bitmap directory is reallocated on VM shutdown.=
-
->>> Unfortunately, an empty line at the end of the benchmark file 242.out=
- persists.
->>
->> Easy solution: in 242, add an extra log("Test complete") or similar
->> after the output that produces the blank line, then 242.out will no
->> longer have a trailing blank line.
->>
-> Thank you, Eric. It is going to be version 15.
-
-If that's the only change, then no need to post v15; you can check what
-I'm preparing to include in Monday's pull request:
-
-https://repo.or.cz/qemu/ericb.git/shortlog/refs/heads/nbd
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
 
---kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Emilio G. Cota <cota@braap.org> writes:
 
------BEGIN PGP SIGNATURE-----
+> This yields sizable scalability improvements, as the below results show.
+>
+> Host: Two Intel E5-2683 v3 14-core CPUs at 2.00 GHz (Haswell)
+>
+> Workload: Ubuntu 18.04 ppc64 compiling the linux kernel with
+> "make -j N", where N is the number of cores in the guest.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxdphIACgkQp6FrSiUn
-Q2pxpAf7BtVXkB8ft/cphMKPO1y5QbnbkDFN2c2YhVUIPCEtqQUii1rEoPQECEiF
-IEjOTzt0qrLUdUeu4y6Me3msFnz7pLwNLuxmfBoM32FD7GUPYXFIGHVzkCzy0cgL
-S6YJyt+botnSXGu3ZFAcdkmA9MnpkKJduyUkKh+N/E/iAvSIPTVIOY4uIfwabfOn
-oLJntzTdXgGFEIVlTQJM6PlpAIRnYgdu8t0iodhr11+NcUHUDLzg/6CP2w1sE1IU
-GQIziaiA8s/sz+cj5ewhjvhtVAfvsy4u3iy8BHg+0VFCPuwC4RSZOfoXEz9/Zr5C
-mS+xW1hOyzZ0G3gEtps55URQFQAFhw==
-=kE3O
------END PGP SIGNATURE-----
+I can verify my pigz benchmark starts levelling out at 12-14 guest vCPUs
+on the 36 core host box I'm testing on. Not super controlled environment
+but certainly showing how far MTTCG has come since it was first
+introduced. Good stuff.
 
---kWbdieXibtHUhDd6zNV8BV5ld0ruhqlFZ--
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index dad9b7796c..8491d36bcf 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -260,7 +260,7 @@ static void flush_all_helper(CPUState *src, run_on_cp=
+u_func fn,
+>
+>      CPU_FOREACH(cpu) {
+>          if (cpu !=3D src) {
+> -            async_run_on_cpu(cpu, fn, d);
+> +            async_run_on_cpu_no_bql(cpu, fn, d);
+>          }
+>      }
+>  }
+> @@ -336,8 +336,8 @@ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxm=
+ap)
+>      tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
+>
+>      if (cpu->created && !qemu_cpu_is_self(cpu)) {
+> -        async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
+> -                         RUN_ON_CPU_HOST_INT(idxmap));
+> +        async_run_on_cpu_no_bql(cpu, tlb_flush_by_mmuidx_async_work,
+> +                                RUN_ON_CPU_HOST_INT(idxmap));
+>      } else {
+>          tlb_flush_by_mmuidx_async_work(cpu, RUN_ON_CPU_HOST_INT(idxmap));
+>      }
+> @@ -481,8 +481,8 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_u=
+long addr, uint16_t idxmap)
+>      addr_and_mmu_idx |=3D idxmap;
+>
+>      if (!qemu_cpu_is_self(cpu)) {
+> -        async_run_on_cpu(cpu, tlb_flush_page_by_mmuidx_async_work,
+> -                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+> +        async_run_on_cpu_no_bql(cpu, tlb_flush_page_by_mmuidx_async_work,
+> +                                RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+>      } else {
+>          tlb_flush_page_by_mmuidx_async_work(
+>              cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+I think that brings my run through this patch series to a conclusion.
+Looking good all round.
+
+--
+Alex Benn=C3=A9e
