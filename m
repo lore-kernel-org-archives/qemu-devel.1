@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48325)
+Received: from eggs.gnu.org ([209.51.188.92]:52383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1grwoB-0002iE-UM
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:26:32 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1grxGg-00008h-Bt
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:55:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1grwo9-0002nS-4n
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:26:31 -0500
-Date: Thu, 7 Feb 2019 20:26:20 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190207202620.23e9c063@x1.home>
-In-Reply-To: <295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
-	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
-	<20190207081830.4dcbb822@x1.home>
-	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
- vfio: NVIDIA V100 + P9 passthrough
+	(envelope-from <richard.henderson@linaro.org>) id 1grxGf-0001AU-5H
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:55:58 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46417)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1grxGe-00018O-MT
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:55:57 -0500
+Received: by mail-pf1-x442.google.com with SMTP id c73so1023910pfe.13
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 19:55:56 -0800 (PST)
+Received: from cloudburst.twiddle.net (97-126-115-157.tukw.qwest.net.
+	[97.126.115.157])
+	by smtp.gmail.com with ESMTPSA id a13sm636729pgw.34.2019.02.07.19.55.52
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 07 Feb 2019 19:55:53 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu,  7 Feb 2019 19:55:51 -0800
+Message-Id: <20190208035551.3036-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] tcg: Diagnose referenced labels that have not
+ been emitted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +31,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Fri, 8 Feb 2019 13:29:37 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Currently, a jump to a label that is not defined anywhere will
+be emitted not be relocated.  This results in a jump to a random
+jump target.  With tcg debugging, print a diagnostic to the -d op
+file and abort.
 
-> On 08/02/2019 02:18, Alex Williamson wrote:
-> > On Thu, 7 Feb 2019 15:43:18 +1100
-> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >   
-> >> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:  
-> >>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
-> >>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
-> >>> GPU:
-> >>>
-> >>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
-> >>>
-> >>>
-> >>> In that thread, Alex raised concerns about allowing QEMU to freely lock
-> >>> all the memory it wants. Is this an issue to be considered in the review
-> >>> of this series here?
-> >>>
-> >>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
-> >>> going to lock the KVM memory to populate the NUMA node with memory
-> >>> of the GPU itself, so at first there is no risk of not taking over the
-> >>> host RAM.
-> >>> Am I missing something?    
-> >>
-> >>
-> >> The GPU memory belongs to the device and not visible to the host as
-> >> memory blocks and not covered by page structs, for the host it is more
-> >> like MMIO which is passed through to the guest without that locked
-> >> accounting, I'd expect libvirt to keep working as usual except that:
-> >>
-> >> when libvirt calculates the amount of memory needed for TCE tables
-> >> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
-> >> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
-> >>
-> >> FlatView #2
-> >>  AS "memory", root: system
-> >>  AS "cpu-memory-0", root: system
-> >>  Root memory region: system
-> >>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
-> >>
-> >> So previously the DMA window would cover 0x7fffffff+1, now it has to
-> >> cover 0x11fffffffff+1.  
-> > 
-> > This looks like a chicken and egg problem, you're saying libvirt needs
-> > to query mtree to understand the extent of the GPU layout, but we need
-> > to specify the locked memory limits in order for QEMU to start?  Is
-> > libvirt supposed to start the VM with unlimited locked memory and fix
-> > it at some indeterminate point in the future?  Run a dummy VM with
-> > unlimited locked memory in order to determine the limits for the real
-> > VM?  Neither of these sound practical.  Thanks,  
-> 
-> 
-> QEMU maps GPU RAM at known locations (which only depends on the vPHB's
-> index or can be set explicitely) and libvirt knows how many GPUs are
-> passed so it is quite easy to calculate the required amount of memory.
-> 
-> Here is the window start calculation:
-> https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
-> 
-> We do not exactly know the GPU RAM window size until QEMU reads it from
-> VFIO/nvlink2 but we know that all existing hardware has a window of
-> 128GB (the adapters I have access to only have 16/32GB on board).
+This could help debug or detect errors like
+c2d9644e6d ("target/arm: Fix crash on conditional instruction in an IT block")
 
-So you're asking that libvirt add 128GB per GPU with magic nvlink
-properties, which may be 8x what's actually necessary and libvirt
-determines which GPUs to apply this to how?  Does libvirt need to sort
-through device tree properties for this?  Thanks,
+Reported-by: Roman Kapl <code@rkapl.cz>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-op.h |  1 +
+ tcg/tcg.h    | 12 +++++++++---
+ tcg/tcg.c    | 23 +++++++++++++++++++++++
+ 3 files changed, 33 insertions(+), 3 deletions(-)
+---
+This detects errors earlier than the patch that Roman posted.
 
-Alex
+
+r~
+
+
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 2d98868d8f..d3e51b15af 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -255,6 +255,7 @@ static inline void tcg_gen_op6ii_i64(TCGOpcode opc, TCGv_i64 a1, TCGv_i64 a2,
+ 
+ static inline void gen_set_label(TCGLabel *l)
+ {
++    l->present = 1;
+     tcg_gen_op1(INDEX_op_set_label, label_arg(l));
+ }
+ 
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 045c24a357..32b7cf3489 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -244,16 +244,21 @@ typedef struct TCGRelocation {
+     intptr_t addend;
+ } TCGRelocation; 
+ 
+-typedef struct TCGLabel {
++typedef struct TCGLabel TCGLabel;
++struct TCGLabel {
++    unsigned present : 1;
+     unsigned has_value : 1;
+-    unsigned id : 15;
++    unsigned id : 14;
+     unsigned refs : 16;
+     union {
+         uintptr_t value;
+         tcg_insn_unit *value_ptr;
+         TCGRelocation *first_reloc;
+     } u;
+-} TCGLabel;
++#ifdef CONFIG_DEBUG_TCG
++    QSIMPLEQ_ENTRY(TCGLabel) next;
++#endif
++};
+ 
+ typedef struct TCGPool {
+     struct TCGPool *next;
+@@ -685,6 +690,7 @@ struct TCGContext {
+ #endif
+ 
+ #ifdef CONFIG_DEBUG_TCG
++    QSIMPLEQ_HEAD(, TCGLabel) labels;
+     int temps_in_use;
+     int goto_tb_issue_mask;
+ #endif
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 20a5d8f315..9b2bf7f439 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -305,6 +305,9 @@ TCGLabel *gen_new_label(void)
+     *l = (TCGLabel){
+         .id = s->nb_labels++
+     };
++#ifdef CONFIG_DEBUG_TCG
++    QSIMPLEQ_INSERT_TAIL(&s->labels, l, next);
++#endif
+ 
+     return l;
+ }
+@@ -1092,6 +1095,9 @@ void tcg_func_start(TCGContext *s)
+ 
+     QTAILQ_INIT(&s->ops);
+     QTAILQ_INIT(&s->free_ops);
++#ifdef CONFIG_DEBUG_TCG
++    QSIMPLEQ_INIT(&s->labels);
++#endif
+ }
+ 
+ static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
+@@ -3841,6 +3847,23 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     }
+ #endif
+ 
++#ifdef CONFIG_DEBUG_TCG
++    /* Ensure all labels referenced have been emitted.  */
++    {
++        TCGLabel *l;
++        bool error = false;
++
++        QSIMPLEQ_FOREACH(l, &s->labels, next) {
++            if (unlikely(!l->present) && l->refs) {
++                qemu_log_mask(CPU_LOG_TB_OP,
++                              "$L%d referenced but not present.\n", l->id);
++                error = true;
++            }
++        }
++        assert(!error);
++    }
++#endif
++
+ #ifdef CONFIG_PROFILER
+     atomic_set(&prof->opt_time, prof->opt_time - profile_getclock());
+ #endif
+-- 
+2.17.2
