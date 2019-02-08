@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53131)
+Received: from eggs.gnu.org ([209.51.188.92]:53559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gs0aA-0008Rw-V9
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:28:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1gs0cZ-0001R3-3H
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gs0a6-0001wi-Vv
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:28:17 -0500
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:44752)
+	(envelope-from <armbru@redhat.com>) id 1gs0cI-0002k9-TT
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:30:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40244)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gs0a6-0001up-8y
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:28:14 -0500
-Received: from player759.ha.ovh.net (unknown [10.109.143.18])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 8BF5321A81A
-	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 08:28:11 +0100 (CET)
-References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-2-clg@kaod.org>
-	<20190208054445.GD12810@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <dd7cd5b1-d57c-e4bd-e0ba-b725aa740db6@kaod.org>
-Date: Fri, 8 Feb 2019 08:28:07 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gs0cE-0002hI-Lu
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 02:30:27 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 08 Feb 2019 08:30:11 +0100
+Message-ID: <87d0o24u0s.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190208054445.GD12810@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/19] ppc/xive: hardwire the Physical CAM
- line of the thread context
+Subject: [Qemu-devel] Maintainers, please git-am -m
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,240 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Anthony PERARD <anthony.perard@citrix.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-On 2/8/19 6:44 AM, David Gibson wrote:
-> On Mon, Jan 28, 2019 at 10:46:07AM +0100, C=E9dric Le Goater wrote:
->> By default on P9, the HW CAM line (23bits) is hardwired to :
->>
->>       0x000||0b1||4Bit chip number||7Bit Thread number.
->>
->> When the block group mode is enabled at the controller level (PowerNV)=
-,
->> the CAM line is changed for CAM compares to :
->>
->>       4Bit chip number||0x001||7Bit Thread number
->>
->> This will require changes in xive_presenter_tctx_match() possibly.
->> This is a lowlevel functionality of the HW controller and it is not
->> strictly needed. Leave it for later.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/xive.h |  1 +
->>  hw/intc/xive.c        | 53 ++++++++++++++++++++++++++++++++++++++++--=
--
->>  hw/ppc/pnv_core.c     | 16 ++++++++-----
->>  3 files changed, 61 insertions(+), 9 deletions(-)
->>
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index ec3bb2aae45a..04d54e8315f7 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -319,6 +319,7 @@ typedef struct XiveTCTX {
->>      qemu_irq    output;
->> =20
->>      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
->> +    uint32_t    hw_cam;
->=20
-> I don't love the fact that the hw_cam field is mirroring something
-> that's in the regs structure.  Any way you can have the property poke
-> the right value directly into regs?  Or else split up regs so you can
-> set the pieces individually.
+Short story: please add
 
-We only need the PIR value to compute the HW CAM line. That's was the
-initial proposal :
+    [am]
+            messageid =3D true
 
-+static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx, bool block_group)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(tctx->cs);
-+    CPUPPCState *env =3D &cpu->env;
-+    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
-+
-+    return tctx_hw_cam_line(block_group, (pir >> 8) & 0xf, pir & 0x7f);
-+}
+to your .gitconfig.
 
-but you didn't like either because it peeked into the CPUPPCState.
+Long story.  git-am can add a Message-id: tag.  Looks like this:
 
-But I prefer the initial method. Less fuss.=20
+    commit 335dbb5de1e98c4dc73590349f17bb2a4d72596c
+    Author: Thomas Huth <thuth@redhat.com>
+    Date:   Mon Feb 4 09:25:43 2019 +0100
+    Commit:     Peter Maydell <peter.maydell@linaro.org>
+    CommitDate: Mon Feb 4 15:25:21 2019 +0000
 
-C.
+        tests/docker/test-mingw and docs: Remove --with-sdlabi=3D2.0
 
->=20
->>  } XiveTCTX;
->> =20
->>  /*
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 2e9b8efd4342..f5642f2338de 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -469,6 +469,12 @@ static void xive_tctx_realize(DeviceState *dev, E=
-rror **errp)
->>      Object *obj;
->>      Error *local_err =3D NULL;
->> =20
->> +    if (!tctx->hw_cam) {
->> +        error_setg(errp, "XIVE: HW CAM is not set for CPU %d",
->> +                   tctx->cs->cpu_index);
->> +        return;
->> +    }
->> +
->>      obj =3D object_property_get_link(OBJECT(dev), "cpu", &local_err);
->>      if (!obj) {
->>          error_propagate(errp, local_err);
->> @@ -509,11 +515,17 @@ static const VMStateDescription vmstate_xive_tct=
-x =3D {
->>      },
->>  };
->> =20
->> +static Property  xive_tctx_properties[] =3D {
->> +    DEFINE_PROP_UINT32("hw-cam", XiveTCTX, hw_cam, 0),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->>  static void xive_tctx_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->> =20
->>      dc->desc =3D "XIVE Interrupt Thread Context";
->> +    dc->props =3D xive_tctx_properties;
->>      dc->realize =3D xive_tctx_realize;
->>      dc->unrealize =3D xive_tctx_unrealize;
->>      dc->vmsd =3D &vmstate_xive_tctx;
->> @@ -526,8 +538,21 @@ static const TypeInfo xive_tctx_info =3D {
->>      .class_init    =3D xive_tctx_class_init,
->>  };
->> =20
->> +/*
->> + * The HW CAM line (23bits) is hardwired to :
->> + *
->> + *   0x000||0b1||4Bit chip number||7Bit Thread number.
->> + */
->> +static uint32_t hw_cam_line(uint8_t chip_id, uint8_t tid)
->> +{
->> +    return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
->> +}
->> +
->>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
->>  {
->> +    CPUPPCState *env =3D &POWERPC_CPU(cpu)->env;
->> +    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
->> +    uint32_t hw_cam =3D hw_cam_line((pir >> 8) & 0xf, pir & 0x7f);
->>      Error *local_err =3D NULL;
->>      Object *obj;
->> =20
->> @@ -535,6 +560,10 @@ Object *xive_tctx_create(Object *cpu, XiveRouter =
-*xrtr, Error **errp)
->>      object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort)=
-;
->>      object_unref(obj);
->>      object_property_add_const_link(obj, "cpu", cpu, &error_abort);
->> +    object_property_set_int(obj, hw_cam, "hw-cam", &local_err);
->> +    if (local_err) {
->> +        goto error;
->> +    }
->>      object_property_set_bool(obj, true, "realized", &local_err);
->>      if (local_err) {
->>          goto error;
->> @@ -1112,14 +1141,28 @@ XiveTCTX *xive_router_get_tctx(XiveRouter *xrt=
-r, CPUState *cs)
->>      return xrc->get_tctx(xrtr, cs);
->>  }
->> =20
->> +/*
->> + * When the block grouping is enabled, the CAM line is changed to :
->> + *
->> + *   4Bit chip number||0x001||7Bit Thread number.
->> + */
->> +static bool xive_presenter_tctx_match_hw(XiveRouter *xrtr, XiveTCTX *=
-tctx,
->> +                                         uint8_t nvt_blk, uint32_t nv=
-t_idx)
->> +{
->> +    /* TODO: block group support */
->> +    return tctx->hw_cam =3D=3D hw_cam_line(nvt_blk, nvt_idx);
->> +}
->> +
->>  /*
->>   * The thread context register words are in big-endian format.
->>   */
->> -static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
->> +static int xive_presenter_tctx_match(XiveRouter *xrtr,
->> +                                     XiveTCTX *tctx, uint8_t format,
->>                                       uint8_t nvt_blk, uint32_t nvt_id=
-x,
->>                                       bool cam_ignore, uint32_t logic_=
-serv)
->>  {
->>      uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
->> +    uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
->>      uint32_t qw2w2 =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
->>      uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
->>      uint32_t qw0w2 =3D xive_tctx_word2(&tctx->regs[TM_QW0_USER]);
->> @@ -1142,7 +1185,11 @@ static int xive_presenter_tctx_match(XiveTCTX *=
-tctx, uint8_t format,
->> =20
->>          /* F=3D0 & i=3D0: Specific NVT notification */
->> =20
->> -        /* TODO (PowerNV) : PHYS ring */
->> +        /* PHYS ring */
->> +        if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
->> +            xive_presenter_tctx_match_hw(xrtr, tctx, nvt_blk, nvt_idx=
-)) {
->> +            return TM_QW3_HV_PHYS;
->> +        }
->> =20
->>          /* HV POOL ring */
->>          if ((be32_to_cpu(qw2w2) & TM_QW2W2_VP) &&
->> @@ -1199,7 +1246,7 @@ static bool xive_presenter_match(XiveRouter *xrt=
-r, uint8_t format,
->>           * Check the thread context CAM lines and record matches. We
->>           * will handle CPU exception delivery later
->>           */
->> -        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt=
-_idx,
->> +        ring =3D xive_presenter_tctx_match(xrtr, tctx, format, nvt_bl=
-k, nvt_idx,
->>                                           cam_ignore, logic_serv);
->>          /*
->>           * Save the context and follow on to catch duplicates, that w=
-e
->> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
->> index 7c806da720c6..f035522b4ec9 100644
->> --- a/hw/ppc/pnv_core.c
->> +++ b/hw/ppc/pnv_core.c
->> @@ -114,12 +114,6 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, Pnv=
-Chip *chip, Error **errp)
->>          return;
->>      }
->> =20
->> -    pcc->intc_create(chip, cpu, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        return;
->> -    }
->> -
->>      core_pir =3D object_property_get_uint(OBJECT(cpu), "core-pir", &e=
-rror_abort);
->> =20
->>      /*
->> @@ -129,6 +123,16 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, Pnv=
-Chip *chip, Error **errp)
->>       */
->>      pir->default_value =3D core_pir + thread_index;
->> =20
->> +    /*
->> +     * On P9, the interrupt presenter needs to hardwire the PIR value
->> +     * in the thread interrupt context of the CPU.
->> +     */
->> +    pcc->intc_create(chip, cpu, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->>      /* Set time-base frequency to 512 MHz */
->>      cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
->> =20
->=20
+        Patchew currently reports failures with the mingw docker test - this
+        is due to --with-sdlabi=3D2.0 configure flag which does not exist a=
+nymore.
+        Remove this remainder from the docker test and the docs now.
+
+        Signed-off-by: Thomas Huth <thuth@redhat.com>
+        Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+        Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+        Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+        Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+--->    Message-id: 1549268743-18502-1-git-send-email-thuth@redhat.com
+        Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+The Message-id identifies the patch e-mail.  It makes finding the review
+thread easier and more reliable.  It's also a valid key on Patchew[*].
+
+Sadly, not all of our commits don't carry it.  Here's how top committers
+have been doing recently[**]:
+
+   with without
+    264      21 Peter Maydell <peter.maydell@linaro.org>
+     65       2 Gerd Hoffmann <kraxel@redhat.com>
+     64       0 Laurent Vivier <laurent@vivier.eu>
+     64       0 Eric Blake <eblake@redhat.com>
+     62       1 Eduardo Habkost <ehabkost@redhat.com>
+     56       0 Markus Armbruster <armbru@redhat.com>
+     29      72 Richard Henderson <richard.henderson@linaro.org>
+     24      24 Paolo Bonzini <pbonzini@redhat.com>
+     10      31 Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+      0     107 Kevin Wolf <kwolf@redhat.com>
+      0     106 David Gibson <david@gibson.dropbear.id.au>
+      0      93 Michael S. Tsirkin <mst@redhat.com>
+      0      81 Aleksandar Markovic <amarkovic@wavecomp.com>
+      0      69 Samuel Thibault <samuel.thibault@ens-lyon.org>
+      0      54 Alex Benn=C3=A9e <alex.bennee@linaro.org>
+      0      50 Thomas Huth <thuth@redhat.com>
+      0      29 Anthony PERARD <anthony.perard@citrix.com>
+      0      28 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Not bad, but there's room for improvement.
+
+
+[*] Try https://patchew.org/search?q=3Did%3A1549268743-18502-1-git-send-ema=
+il-thuth%40redhat.com
+
+[**] git-log master --no-merges --pretty=3Dfuller --since '3 months ago' | =
+gawk '/^Commit: / { if (c) h[c][m]++; c=3D$0; m=3D0 } /^    Message-[Ii]d: =
+/ { m=3D1 } END { for (c in h) if (h[c][0] + h[c][1] > 25) printf "%7d %7d =
+%s\n", h[c][1], h[c][0], substr(c,13) }' | sort -nr
