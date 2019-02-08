@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53592)
+Received: from eggs.gnu.org ([209.51.188.92]:55192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gs8Dw-0001XJ-HD
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:37:53 -0500
+	(envelope-from <berto@igalia.com>) id 1gs8LN-0004SY-4H
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:45:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gs8Dr-0003uu-TH
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:37:50 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Fri, 8 Feb 2019 15:37:34 +0000
-Message-ID: <0a20041f-e5b2-49d5-3f06-31d855d11fcb@virtuozzo.com>
-References: <1549638368-530182-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
-In-Reply-To: <3f708207-2172-3c09-e32b-8267e1be9fc1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E1893E05F4176F4F9345DBF16296083D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v14 0/3] qcow2: Add list of bitmaps to
- ImageInfoSpecificQCow2
+	(envelope-from <berto@igalia.com>) id 1gs8L7-0000xL-4Q
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 10:45:23 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri,  8 Feb 2019 17:44:53 +0200
+Message-Id: <20190208154453.25602-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qcow2: Assert that L2 table offsets fit in the
+ L1 table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,17 +18,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-DQoNCk9uIDA4LzAyLzIwMTkgMTg6MjUsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDIvOC8xOSA5
-OjA2IEFNLCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+IHYxNDoNCj4+IFRoZSB0ZXN0IDI0
-MiB3YXMgYW1lbmRlZCB0byBiZSBzYWZlciBhZ2FpbnN0IGNoYW5nZXMgaW4gdGhlIGJpdG1hcCBh
-bGxvY2F0aW9uDQo+PiBhbGdvcml0aG0gYmVjYXVzZSB0aGUgYml0bWFwIGRpcmVjdG9yeSBpcyBy
-ZWFsbG9jYXRlZCBvbiBWTSBzaHV0ZG93bi4NCj4+IFVuZm9ydHVuYXRlbHksIGFuIGVtcHR5IGxp
-bmUgYXQgdGhlIGVuZCBvZiB0aGUgYmVuY2htYXJrIGZpbGUgMjQyLm91dCBwZXJzaXN0cy4NCj4g
-DQo+IEVhc3kgc29sdXRpb246IGluIDI0MiwgYWRkIGFuIGV4dHJhIGxvZygiVGVzdCBjb21wbGV0
-ZSIpIG9yIHNpbWlsYXINCj4gYWZ0ZXIgdGhlIG91dHB1dCB0aGF0IHByb2R1Y2VzIHRoZSBibGFu
-ayBsaW5lLCB0aGVuIDI0Mi5vdXQgd2lsbCBubw0KPiBsb25nZXIgaGF2ZSBhIHRyYWlsaW5nIGJs
-YW5rIGxpbmUuDQo+IA0KVGhhbmsgeW91LCBFcmljLiBJdCBpcyBnb2luZyB0byBiZSB2ZXJzaW9u
-IDE1Lg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+L1 table entries have a field to store the offset of an L2 table.
+The rest of the bits of the entry are currently reserved except from
+bit 63, which stores the COPIED flag.
+
+The offset is always taken from the entry using L1E_OFFSET_MASK to
+ensure that we only use the bits that belong to that field.
+
+While that mask is used every time we read from the L1 table, it is
+never used when we write to it. Due to the limits set elsewhere in the
+code QEMU can never produce L2 table offsets that don't fit in that
+field so any such offset when allocating an L2 table would indicate a
+bug in QEMU.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-cluster.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 30eca26c47..179aa2c728 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -285,6 +285,9 @@ static int l2_allocate(BlockDriverState *bs, int l1_index)
+         goto fail;
+     }
+ 
++    /* The offset must fit in the offset field of the L1 table entry */
++    assert((l2_offset & L1E_OFFSET_MASK) == l2_offset);
++
+     /* If we're allocating the table at offset 0 then something is wrong */
+     if (l2_offset == 0) {
+         qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
+-- 
+2.11.0
