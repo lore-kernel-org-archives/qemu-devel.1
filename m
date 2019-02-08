@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60163)
+Received: from eggs.gnu.org ([209.51.188.92]:34166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gs3x0-0002KG-Fo
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:04:08 -0500
+	(envelope-from <groug@kaod.org>) id 1gs47q-0004cP-Ez
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gs3wx-0001AA-VR
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:04:06 -0500
-Date: Fri, 8 Feb 2019 12:03:30 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190208110330.GC4494@dhcp-200-176.str.redhat.com>
-References: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
+	(envelope-from <groug@kaod.org>) id 1gs47o-0001l7-Vl
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:15:18 -0500
+Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:44154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gs47o-0001XK-JI
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 06:15:16 -0500
+Received: from player159.ha.ovh.net (unknown [10.109.143.208])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A3D651D5752
+	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 12:15:13 +0100 (CET)
+Date: Fri, 8 Feb 2019 12:15:03 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190208121503.38e8c9ae@bahia.lan>
+In-Reply-To: <20190207230647.GC518@umbus.fritz.box>
+References: <154956051753.218871.1505640778712413716.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190207230647.GC518@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: skip initializer BDS on recursive
- aio context attachment/detachment
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_//CifRGEMIys8iGwEXCWJ9gn";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr_pci: Fix interrupt leak
+ in rtas_ibm_change_msi() error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com, vsementsov@virtuozzo.com, berto@igalia.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 
-Am 24.01.2019 um 08:48 hat Denis Plotnikov geschrieben:
-> When there is a Backup Block Job running and shutdown command is sent to
-> a guest, the guest crushes due to assert(!bs->walking_aio_notifiers).
-> 
-> Call stack:
-> 
-> 0  __GI_raise
-> 1  __GI_abort
-> 2  __assert_fail_base
-> 3  __GI___assert_fail
-> 4  bdrv_detach_aio_context (bs=0x55f54d65c000)      <<<
-> 5  bdrv_detach_aio_context (bs=0x55f54fc8a800)
-> 6  bdrv_set_aio_context (bs=0x55f54fc8a800, ...)
-> 7  block_job_attached_aio_context
-> 8  bdrv_attach_aio_context (bs=0x55f54d65c000, ...) <<<
-> 9  bdrv_set_aio_context (bs=0x55f54d65c000)
-> 10 blk_set_aio_context
-> 11 virtio_blk_data_plane_stop
-> 12 virtio_bus_stop_ioeventfd
-> 13 virtio_vmstate_change
-> 14 vm_state_notify (running=0, state=RUN_STATE_SHUTDOWN)
-> 15 do_vm_stop (state=RUN_STATE_SHUTDOWN, send_stop=true)
-> 16 vm_stop (state=RUN_STATE_SHUTDOWN)
-> 17 main_loop_should_exit
-> 18 main_loop
-> 19 main
-> 
-> This happens because of "new" context attachment to VM disk bds.
-> When attaching a new context the corresponding aio context handler is
-> called for each of aio_notifiers registered on the VM disk bds context.
-> Among those handlers there is the block_job_attached_aio_context handler
-> which sets a new aio context for the block job bds. When doing so,
-> the old context is detached from all the block job bds children and one of
-> them is the VM disk bds, serving as backing store for the blockjob bds,
-> although the VM disk bds is actually the initializer of that process.
-> Since the VM disk bds is protected with walking_aio_notifiers flag
-> from double processing in recursive calls, the assert fires.
-> 
-> The patch fixes the problem by skipping the bds-es in recursive calls
-> which have started attachment/detachment already.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+--Sig_//CifRGEMIys8iGwEXCWJ9gn
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I'm not sure if this fix is actually correct in more than just your
-special case. It assumes without checking that the nested attach is for
-the same context as the outer attach. (Of course, I'm not sure what you
-would do if they were for different contexts! It's a case to avoid, and
-it should fail very visibly instead of moving nodes to unexpected
-contexts.)
+On Fri, 8 Feb 2019 10:06:47 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-bdrv_set_aio_context() is pretty messy, so it may still turn out that
-leaving the greater problem unadressed and just fixing what breaks in
-practice is what we need to do.
+> On Thu, Feb 07, 2019 at 06:28:37PM +0100, Greg Kurz wrote:
+> > Now that IRQ allocation has been split in two (first allocate IRQ numbe=
+rs,
+> > then claim them), if the claiming fails, we must release the IRQs.
+> >=20
+> > Fixes: 4fe75a8ccd80 "spapr: split the IRQ allocation sequence"
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+>=20
+> Applied to ppc-for-4.0, thanks.
+>=20
 
-But did you consider just forbidding nested bdrv_set_aio_context()
-instead? Essentially, instead of your checks you would assert
-!walking_aio_notifiers. This would simplify the interface instead of
-adding more complexity.
+Oops I've just realized there's an off-by-one error...
 
-If I understand the code correctly, at the time of the nested call, the
-respective nodes have already been moved to the new context, so avoiding
-the nested calls might be as easy as adding a shortcut to
-bdrv_set_aio_context() for this case:
+> > ---
+> >  hw/ppc/spapr_pci.c |    6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 41d81f4a8500..6fe3c10c8d4c 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -393,6 +393,12 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
+PAPRMachineState *spapr,
+> >      for (i =3D 0; i < req_num; i++) {
+> >          spapr_irq_claim(spapr, irq + i, false, &err);
+> >          if (err) {
+> > +            if (i) {
+> > +                spapr_irq_free(spapr, irq, i + 1);
 
-    if (ctx == new_context) {
-        return;
-    }
+... here. It should actually be:
 
-Most importantly, though, please write a test case for this. We will
-probably need to rework bdrv_set_aio_context() fundamentally (as Berto
-recently noticed), and we will want to avoid regressing on this bug.
++                spapr_irq_free(spapr, irq, i);
 
-Kevin
+Can you fix this in your tree or should I post a v2 ?
+
+> > +            }
+> > +            if (!smc->legacy_irq_allocation) {
+> > +                spapr_irq_msi_free(spapr, irq, req_num);
+> > +            }
+> >              error_reportf_err(err, "Can't allocate MSIs for device %x:=
+ ",
+> >                                config_addr);
+> >              rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> >  =20
+>=20
+
+
+--Sig_//CifRGEMIys8iGwEXCWJ9gn
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlxdZLcACgkQcdTV5YIv
+c9aSdg//UDz9R57QJrMB+z1Hxzc6nZRO8dAoS7JLX85BKtY3M75XMnLSjqJO0pHu
++1vUcVfyBbCWQ3Cn9QXgrFnFHB3idw+TURs+05iT7Fm03Hp4BjFljOTuC2dVWzBI
+5R3nRYFXPR3CAeKzpgD5tQj5CKgSOqUSjojRNHBo3jaoCkDBKZ8L2vNsakMqa5Sp
+fIIKjMiHbngDuwaO2nXp7Vk2gpGldYHJQRbe+O7Yai5u6NSVeOzYKGYfab62c6rW
+fqArEMjWHWPwP0cOcNnXHyYJkZhy0/BOFGh2518yl2crRj+rL8WkhPPqYhZfwxfq
+vjYWmBZIK+feClCGV7qBQXrXPhEjZmBonKG2M4lhglZIF5brvTj5X0lP0dAXJv44
+AikooK/avsvSPfMp6w6R3YADOW6syEGfV16MuPFv88RJNwbjvBKIeyEZayqHX77h
+vU23FiezYTJrhxGOI6Rd67XSlYiZbBCptbdO4yu8TxtD3gyQgOr4GYS/PQmZJV3M
+APWwj6oziFcvn3nn98MQDyMTQfaC72FKIxIeTZxvGsxHue3JR2hsVcyeA5eckr3U
+y/RtegOgc5pnQc0wOwmdc7E5h5Qv7nrJJlHo0xnJR166DLijqm6UFYStcqD1DD0W
+6l7ybOn4Ru7Xzyn4Qz0+q8nje+9QmWVIAojy4EVmCfZSN+nnC0Y=
+=1DRw
+-----END PGP SIGNATURE-----
+
+--Sig_//CifRGEMIys8iGwEXCWJ9gn--
