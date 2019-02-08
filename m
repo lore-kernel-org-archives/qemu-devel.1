@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60787)
+Received: from eggs.gnu.org ([209.51.188.92]:34439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grvA4-0000oE-65
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:41:01 -0500
+	(envelope-from <stefanha@redhat.com>) id 1grvME-0004Mp-HD
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:53:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1grvA2-00057O-OV
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:41:00 -0500
-Received: from mga07.intel.com ([134.134.136.100]:7015)
+	(envelope-from <stefanha@redhat.com>) id 1grvM5-0002tn-SE
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:53:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1grvA2-00050U-FR
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:40:58 -0500
-From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Fri,  8 Feb 2019 18:11:23 +0800
-Message-Id: <42dd91019c7aa480cb0d26565fefcb1238c37dc8.1549555521.git.yi.z.zhang@linux.intel.com>
-In-Reply-To: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
-References: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel]  [PATCH V13 5/5] docs: Added MAP_SYNC documentation
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1grvM2-0002qM-DW
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:53:22 -0500
+Date: Fri, 8 Feb 2019 09:53:13 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190208015313.GA16257@stefanha-x1.localdomain>
+References: <20190204075023.GA15322@stefanha-x1.localdomain>
+	<CAPcyv4huSKQueADyF5wJPWxMdLAn6yvEqWyMZfWPVQ4vQ_X0RA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4huSKQueADyF5wJPWxMdLAn6yvEqWyMZfWPVQ4vQ_X0RA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Querying the size of devdax devices from userspace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Zhang Yi <yi.z.zhang@linux.intel.com>, Jeff Moyer <jmoyer@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@lists.01.org>
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
- docs/nvdimm.txt | 25 ++++++++++++++++++++++---
- qemu-options.hx |  5 +++++
- 2 files changed, 27 insertions(+), 3 deletions(-)
+--Qxx1br4bt0+wmkIi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 5f158a6..a168429 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -143,9 +143,28 @@ Guest Data Persistence
- ----------------------
- 
- Though QEMU supports multiple types of vNVDIMM backends on Linux,
--currently the only one that can guarantee the guest write persistence
--is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
--which all guest access do not involve any host-side kernel cache.
-+the only backend that can guarantee the guest write persistence is:
-+
-+A. DAX device (e.g., /dev/dax0.0, ) or
-+B. DAX file(mounted with dax option)
-+
-+both are use real NVDIMM device as backend, which supporting direct
-+access for files(no page cache).
-+
-+When using B (A file supporting direct mapping of persistent memory)
-+as a backend, write persistence is guaranteed if the host kernel has
-+support for the MAP_SYNC flag in the mmap system call (available
-+since Linux 4.15 and on certain distro kernels) and additionally
-+both 'pmem' and 'share' flags are set to 'on' on the backend.
-+
-+If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-+are not set, if the backend file does not support DAX or if MAP_SYNC
-+is not supported by the host kernel, write persistence is not
-+guaranteed after a system crash. For compatibility reasons, these
-+conditions are silently ignored if not satisfied. Currently, no way
-+is provided to test for them.
-+For more details, please reference mmap(2) man page:
-+http://man7.org/linux/man-pages/man2/mmap.2.html.
- 
- When using other types of backends, it's suggested to set 'unarmed'
- option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08f8516..ef1da8f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4002,6 +4002,11 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
- If @option{pmem} is set to 'on', QEMU will take necessary operations to
- guarantee the persistence of its own writes to @option{mem-path}
- (e.g. in vNVDIMM label emulation and live migration).
-+Also, we will map the backend-file with MAP_SYNC flag, which ensures the
-+file metadata is in sync for @option{mem-path} in case of host crash
-+or a power failure. MAP_SYNC requires support from both the host kernel
-+(since Linux kernel 4.15) and the filesystem of @option{mem-path} mounted
-+with DAX option.
- 
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
- 
--- 
-2.7.4
+On Mon, Feb 04, 2019 at 12:06:32AM -0800, Dan Williams wrote:
+> On Sun, Feb 3, 2019 at 11:56 PM Stefan Hajnoczi <stefanha@redhat.com> wro=
+te:
+> >
+> > How can userspace applications query the size of devdax character
+> > devices?
+> >
+> > stat(1) doesn't know how large the device is:
+> >
+> >   # stat /dev/dax0.0
+> >     File: /dev/dax0.0
+> >     Size: 0             Blocks: 0          IO Block: 4096   character s=
+pecial file
+> >   Device: 6h/6d Inode: 56764       Links: 1     Device type: fa,d
+> >
+> > ndctl(1) finds out by digging in /sys:
+> >
+> >   # ndctl list
+> >   [
+> >     {
+> >       "dev":"namespace0.0",
+> >       "mode":"devdax",
+> >       "map":"dev",
+> >       "size":2111832064,
+> >       "uuid":"235acf4d-503f-46be-bf64-f26faf9777ef",
+> >       "chardev":"dax0.0"
+> >     }
+> >   ]
+> >
+> > I'm not sure how to do it without enumerating all nvdimms in /sys.  Is
+> > there a mapping from devdax major/minor number to a /sys path?
+> >
+> > The use case I have in mind is that QEMU currently takes the size as a
+> > command-line parameter.  The failure mode is ugly when users get this
+> > value wrong: the guest gets a softlockup and there is no error message
+> > on the host side.
+> >
+> > I'd like QEMU to detect the size or at least reject size values that are
+> > too large.  In order to do that userspace needs a convenient way of
+> > querying the size.  Any ideas?
+>=20
+> You're looking for /sys/dev/char. That will wake you from major:minor
+> to sysfs. Perhaps borrow fio's implementation for the same:
+>=20
+>    http://git.kernel.dk/cgit/fio/tree/engines/dev-dax.c#n258
+
+Excellent, thanks!
+
+Stefan
+
+--Qxx1br4bt0+wmkIi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcXOEJAAoJEJykq7OBq3PIp7gH/2N8132TeleBKZLsNiZfBrFH
+ug3Vj9gDR7xsSDjJX0NQkZGaQCF8+rQ4wcvR3ls+aWCkD6IbfISOzRwlzxYxpIIh
+jJAdTbp+ZryBxvivRFLCuOO0Y2QmuVDfxvbOK6KO9NhvFbD5vjcRV1lWh99oGDjQ
+0fdA0QbHaoRM7fN4XGzW6moTfyFTDeDamkz4T8+HrGSb4R8w0eHm9brbgGnn64Nt
+1RLR8Rsxwzu+rvDdiS5cEJ4arnE17yJ2FE9uybkJ5NyHognqdim721BPsf41c+Nc
+Unje4mQuthCq7CoN3UxP3uOcI9PVmgvrKREIgQnx61in4RK1xSNJPD76R4n9RQg=
+=+kVP
+-----END PGP SIGNATURE-----
+
+--Qxx1br4bt0+wmkIi--
