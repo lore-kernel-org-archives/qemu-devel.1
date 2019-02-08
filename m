@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38611)
+Received: from eggs.gnu.org ([209.51.188.92]:43947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <remi@remlab.net>) id 1gs9A1-00006V-FY
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:37:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gs9Oc-0007BK-1j
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:52:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <remi@remlab.net>) id 1gs99s-0005MP-5R
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:37:48 -0500
-Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:44306
-	helo=ns207790.ip-94-23-215.eu) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <remi@remlab.net>) id 1gs99j-00051w-Rp
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:37:38 -0500
-Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
-	by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 88F365FD99
-	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 17:37:27 +0100 (CET)
-From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
-Date: Fri,  8 Feb 2019 18:37:27 +0200
-Message-Id: <20190208163727.13733-1-remi@remlab.net>
+	(envelope-from <richard.henderson@linaro.org>) id 1gs9Ob-0003Fw-7K
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:52:57 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gs9Oa-0003Et-GM
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 11:52:57 -0500
+Received: by mail-pl1-x644.google.com with SMTP id s1so1933435plp.9
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 08:52:55 -0800 (PST)
+References: <20190208035551.3036-1-richard.henderson@linaro.org>
+	<9fb2cbe0-40ae-5734-56af-99765a59d0ec@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cc2d9846-354d-aa86-a245-6cd9f6e5aa56@linaro.org>
+Date: Fri, 8 Feb 2019 08:52:51 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tcg: assert last byte is in guest space
+In-Reply-To: <9fb2cbe0-40ae-5734-56af-99765a59d0ec@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: Diagnose referenced labels that have
+ not been emitted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +32,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Rather than assert that the first byte of a checked range is within the
-guest address space, assert that the last byte is. The assertion is
-moved past the overflow check to ensure that the last byte is actually
-the one with the highest address.
+On 2/8/19 2:41 AM, Philippe Mathieu-Daudé wrote:
+> Not related to this patch content, but I'm wondering why, TCGLabels
+> never get freed?
 
-Signed-off-by: R=C3=A9mi Denis-Courmont <remi@remlab.net>
----
- accel/tcg/translate-all.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+They are allocated with tcg_malloc, which is a pool allocator.  The entire pool
+is freed after each TB is compiled.
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8f593b926f..ea0c96af71 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2515,13 +2515,6 @@ int page_check_range(target_ulong start, target_ul=
-ong len, int flags)
-     target_ulong end;
-     target_ulong addr;
-=20
--    /* This function should never be called with addresses outside the
--       guest address space.  If this assert fires, it probably indicates
--       a missing call to h2g_valid.  */
--#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
--    assert(start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
--#endif
--
-     if (len =3D=3D 0) {
-         return 0;
-     }
-@@ -2530,6 +2523,13 @@ int page_check_range(target_ulong start, target_ul=
-ong len, int flags)
-         return -1;
-     }
-=20
-+    /* This function should never be called with addresses outside the
-+       guest address space.  If this assert fires, it probably indicates
-+       a missing call to h2g_valid.  */
-+#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
-+    assert((start + len - 1) < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BIT=
-S));
-+#endif
-+
-     /* must do before we loose bits in the next step */
-     end =3D TARGET_PAGE_ALIGN(start + len);
-     start =3D start & TARGET_PAGE_MASK;
---=20
-2.20.1
+
+r~
