@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57941)
+Received: from eggs.gnu.org ([209.51.188.92]:58778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gs6UZ-0006th-HG
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:46:56 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gs6Xx-0008Nw-As
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gs6UX-0003Z5-L3
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:46:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gs6UX-0003Ra-D6
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:46:53 -0500
-References: <cover.1549545591.git.berto@igalia.com>
-	<f404632bb16afed8ae9e5f3cfe4032b718a00491.1549545591.git.berto@igalia.com>
-	<20190207142649.GL19438@redhat.com>
-	<w51va1u8vya.fsf@maestria.local.igalia.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3428f328-2418-d3f6-8236-0f96cf855fd9@redhat.com>
-Date: Fri, 8 Feb 2019 14:46:27 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1gs6Xw-0005Rs-HF
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 08:50:25 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri,  8 Feb 2019 14:49:44 +0100
+Message-Id: <20190208134950.187665-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <w51va1u8vya.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] char-socket: Lock tcp_chr_disconnect()
- and socket_reconnect_timeout()
+Subject: [Qemu-devel] [PATCH v4 0/6] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +20,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 08/02/19 10:34, Alberto Garcia wrote:
->> and also works with the vhostuser reconnect device, then we are
->> probably ok.
-> How do I test this?
+This series adds the support of DISCARD and WRITE_ZEROES commands
+and extends the virtio-blk-test to test WRITE_ZEROES command when
+the feature is enabled.
 
-QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 \
-  QTEST_VHOST_USER_FIXME=3D1 \
-  tests/vhost-user-test
+v4:
+- fixed error with mingw compiler in patch 4
+  gcc and clang want %lu, but mingw wants %llu for BDRV_REQUEST_MAX_SECTO=
+RS.
+  Since is less than INT_MAX, I casted it to integer and I used %d in the
+  format string of error_setg. (mingw now is happy)
 
-Paolo
+v3:
+- rebased on master (I removed Based-on tag since the new virtio headers =
+from
+  linux v5.0-rc1 are merged)
+- added patch 2 to add host_features field (as in virtio-net) [Michael]
+- fixed patch 3 (previously 2/5) using the new host_features field
+- fixed patch 4 (previously 3/5) following the Stefan's comments:
+                - fixed name of functions and fields
+                - used vdev and s pointers
+                - removed "wz-may-unmap" property
+                - split "dwz-max-sectors" in two properties
+
+v2:
+- added patch 1 to use virtio_blk_handle_rw_error() with discard operatio=
+n
+- added patch 2 to make those new features machine-type dependent (thanks=
+ David)
+- fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
+rt()
+                for WRITE_ZEROES requests, and configurable parameters to
+                initialize the limits (max_sectors, wzeroes_may_unmap).
+                (thanks Stefan)
+                I moved in a new function the code to handle a single seg=
+ment,
+                in order to simplify the support of multiple segments in =
+the
+                future.
+- added patch 4 to change the assert on data_size following the discussio=
+n with
+                Thomas, Changpeng, Michael, and Stefan (thanks all)
+- fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
+ad of
+                dynamic allocation (thanks Thomas)
+
+Thanks,
+Stefano
+
+Stefano Garzarella (6):
+  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
+  virtio-blk: add host_features field in VirtIOBlock
+  virtio-blk: add "discard" and "write-zeroes" properties
+  virtio-blk: add DISCARD and WRITE_ZEROES features
+  tests/virtio-blk: change assert on data_size in virtio_blk_request()
+  tests/virtio-blk: add test for WRITE_ZEROES command
+
+ hw/block/virtio-blk.c          | 214 +++++++++++++++++++++++++++++++--
+ hw/core/machine.c              |   2 +
+ include/hw/virtio/virtio-blk.h |   5 +-
+ tests/virtio-blk-test.c        |  75 +++++++++++-
+ 4 files changed, 282 insertions(+), 14 deletions(-)
+
+--=20
+2.20.1
