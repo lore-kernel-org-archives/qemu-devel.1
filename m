@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56186)
+Received: from eggs.gnu.org ([209.51.188.92]:58030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gs3bV-0005Yu-0S
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 05:41:53 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gs3lW-0007M2-S5
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 05:52:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gs3bT-0004aX-ON
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 05:41:52 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gs3bT-0004a4-Ig
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 05:41:51 -0500
-Received: by mail-wm1-f68.google.com with SMTP id r17so2860530wmh.5
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 02:41:51 -0800 (PST)
-References: <20190208035551.3036-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9fb2cbe0-40ae-5734-56af-99765a59d0ec@redhat.com>
-Date: Fri, 8 Feb 2019 11:41:44 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gs3lV-0008T0-Or
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 05:52:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gs3lV-0008Se-JG
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 05:52:13 -0500
+Date: Fri, 8 Feb 2019 11:52:02 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190208115202.6c88dd89.cohuck@redhat.com>
+In-Reply-To: <20190207180012.27303-4-crosa@redhat.com>
+References: <20190207180012.27303-1-crosa@redhat.com>
+	<20190207180012.27303-4-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190208035551.3036-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: Diagnose referenced labels that have
- not been emitted
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] Add "boot_linux" acceptance test
+ for x86_64 and pc machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Samuel Ortiz <sameo@linux.intel.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Richard,
+On Thu,  7 Feb 2019 13:00:12 -0500
+Cleber Rosa <crosa@redhat.com> wrote:
 
-On 2/8/19 4:55 AM, Richard Henderson wrote:
-> Currently, a jump to a label that is not defined anywhere will
-> be emitted not be relocated.  This results in a jump to a random
-> jump target.  With tcg debugging, print a diagnostic to the -d op
-> file and abort.
-> 
-> This could help debug or detect errors like
-> c2d9644e6d ("target/arm: Fix crash on conditional instruction in an IT block")
-> 
-> Reported-by: Roman Kapl <code@rkapl.cz>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tcg-op.h |  1 +
->  tcg/tcg.h    | 12 +++++++++---
->  tcg/tcg.c    | 23 +++++++++++++++++++++++
->  3 files changed, 33 insertions(+), 3 deletions(-)
-> ---
-> This detects errors earlier than the patch that Roman posted.
-> 
-> 
-> r~
-> 
-> 
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 2d98868d8f..d3e51b15af 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -255,6 +255,7 @@ static inline void tcg_gen_op6ii_i64(TCGOpcode opc, TCGv_i64 a1, TCGv_i64 a2,
->  
->  static inline void gen_set_label(TCGLabel *l)
->  {
-> +    l->present = 1;
->      tcg_gen_op1(INDEX_op_set_label, label_arg(l));
->  }
->  
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 045c24a357..32b7cf3489 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -244,16 +244,21 @@ typedef struct TCGRelocation {
->      intptr_t addend;
->  } TCGRelocation; 
->  
-> -typedef struct TCGLabel {
-> +typedef struct TCGLabel TCGLabel;
-> +struct TCGLabel {
-> +    unsigned present : 1;
->      unsigned has_value : 1;
-> -    unsigned id : 15;
-> +    unsigned id : 14;
->      unsigned refs : 16;
->      union {
->          uintptr_t value;
->          tcg_insn_unit *value_ptr;
->          TCGRelocation *first_reloc;
->      } u;
-> -} TCGLabel;
-> +#ifdef CONFIG_DEBUG_TCG
-> +    QSIMPLEQ_ENTRY(TCGLabel) next;
-> +#endif
-> +};
->  
->  typedef struct TCGPool {
->      struct TCGPool *next;
-> @@ -685,6 +690,7 @@ struct TCGContext {
->  #endif
->  
->  #ifdef CONFIG_DEBUG_TCG
-> +    QSIMPLEQ_HEAD(, TCGLabel) labels;
->      int temps_in_use;
->      int goto_tb_issue_mask;
->  #endif
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 20a5d8f315..9b2bf7f439 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -305,6 +305,9 @@ TCGLabel *gen_new_label(void)
 
-Not related to this patch content, but I'm wondering why, TCGLabels
-never get freed?
-
->      *l = (TCGLabel){
->          .id = s->nb_labels++
->      };
-> +#ifdef CONFIG_DEBUG_TCG
-> +    QSIMPLEQ_INSERT_TAIL(&s->labels, l, next);
-> +#endif
->  
->      return l;
->  }
-> @@ -1092,6 +1095,9 @@ void tcg_func_start(TCGContext *s)
->  
->      QTAILQ_INIT(&s->ops);
->      QTAILQ_INIT(&s->free_ops);
-> +#ifdef CONFIG_DEBUG_TCG
-> +    QSIMPLEQ_INIT(&s->labels);
-> +#endif
->  }
->  
->  static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
-> @@ -3841,6 +3847,23 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
->      }
->  #endif
->  
-> +#ifdef CONFIG_DEBUG_TCG
-> +    /* Ensure all labels referenced have been emitted.  */
-> +    {
-> +        TCGLabel *l;
-> +        bool error = false;
+> diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
+> new file mode 100644
+> index 0000000000..927fac2959
+> --- /dev/null
+> +++ b/tests/acceptance/boot_linux.py
+> @@ -0,0 +1,51 @@
+> +# Functional test that boots a complete Linux system via a cloud image
+> +#
+> +# Copyright (c) 2018-2019 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Cleber Rosa <crosa@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
 > +
-> +        QSIMPLEQ_FOREACH(l, &s->labels, next) {
-> +            if (unlikely(!l->present) && l->refs) {
-> +                qemu_log_mask(CPU_LOG_TB_OP,
-> +                              "$L%d referenced but not present.\n", l->id);
-> +                error = true;
-> +            }
-> +        }
-> +        assert(!error);
-> +    }
-> +#endif
+> +import os
 > +
->  #ifdef CONFIG_PROFILER
->      atomic_set(&prof->opt_time, prof->opt_time - profile_getclock());
->  #endif
-> 
+> +from avocado_qemu import Test
+> +
+> +from avocado.utils import cloudinit
+> +from avocado.utils import network
+> +from avocado.utils import vmimage
+> +
+> +
+> +class BootLinux(Test):
+> +    """
+> +    Boots a Linux system, checking for a successful initialization
+> +
+> +    :avocado: enable
+> +    """
+> +
+> +    timeout = 600
+> +
+> +    def test_x86_64_pc(self):
+> +        """
+> +        :avocado: tags=arch:x86_64
+> +        :avocado: tags=machine:pc
+> +        """
+> +        self.vm.set_machine('pc')
+> +        self.vm.add_args('-m', '1024')
+> +        boot = vmimage.get('fedora', arch='x86_64', version='29',
+> +                           cache_dir=self.cache_dirs[0],
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Somewhat related: I looked at
+https://avocado-framework.readthedocs.io/en/67.0/api/utils/avocado.utils.html#module-avocado.utils.vmimage
+to find out how caching works, but could not find it... does it match
+the checksum?
+
+I think we want to make this benign for people on a slow and/or
+data-capped network connection. 'make check-acceptance' downloading
+tons of stuff might come as a bad surprise, and it's probably best to
+avoid doing more of that than strictly necessary.
+
+> +                           snapshot_dir=self.workdir)
+> +        self.vm.add_args('-drive', 'file=%s' % boot.path)
+> +
+> +        cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
+> +        phone_home_port = network.find_free_port()
+> +        cloudinit.iso(cloudinit_iso, self.name,
+> +                      # QEMU's hard coded usermode router address
+> +                      phone_home_host='10.0.2.2',
+> +                      phone_home_port=phone_home_port)
+> +        self.vm.add_args('-drive', 'file=%s' % cloudinit_iso)
+> +
+> +        self.vm.launch()
+> +        self.log.info('VM launched, waiting for boot confirmation from guest')
+> +        cloudinit.wait_for_phone_home(('0.0.0.0', phone_home_port), self.name)
