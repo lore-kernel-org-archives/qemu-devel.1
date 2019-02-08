@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53489)
+Received: from eggs.gnu.org ([209.51.188.92]:56208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1grxPc-0002kB-UD
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:05:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1grxo6-0006AQ-Og
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:30:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1grxPb-0006EV-IV
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:05:12 -0500
-Resent-Message-Id: <E1grxPb-0006EV-IV@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1grxPb-0006D7-CV
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:05:11 -0500
-Message-ID: <154959870182.29184.3266804257350293211@ebba9967afc0>
-In-Reply-To: <20190208035551.3036-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1grxo4-0006xq-7F
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:30:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1grxnt-0006sf-7M
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 23:30:19 -0500
+References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+	<1549562254-41157-34-git-send-email-pbonzini@redhat.com>
+	<alpine.BSF.2.21.9999.1902080014070.97736@zero.eik.bme.hu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <be20ee93-a4c6-bb09-9296-50a962981f89@redhat.com>
+Date: Fri, 8 Feb 2019 05:30:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Feb 2019 20:05:02 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] tcg: Diagnose referenced labels that have
- not been emitted
+In-Reply-To: <alpine.BSF.2.21.9999.1902080014070.97736@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 33/51] ppc: Express dependencies of the
+ Sam460EX machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, philmd@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwODAzNTU1MS4zMDM2
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gdGNnOiBE
-aWFnbm9zZSByZWZlcmVuY2VkIGxhYmVscyB0aGF0IGhhdmUgbm90IGJlZW4gZW1pdHRlZApNZXNz
-YWdlLWlkOiAyMDE5MDIwODAzNTU1MS4zMDM2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
-ZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3
-IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwMjA4MDM1NTUxLjMwMzYtMS1yaWNoYXJkLmhlbmRl
-cnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAyMDgwMzU1NTEuMzAzNi0xLXJpY2hhcmQu
-aGVuZGVyc29uQGxpbmFyby5vcmcKU3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC9jYXBzdG9uZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpT
-dWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdkdGMnClN1Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBz
-Oi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9n
-aXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0Yn
-ClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0
-KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlv
-cycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRw
-czovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAncm9tcy9vcGVuaGFja3dhcmUnClN1Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRw
-czovL2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAncm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9n
-aXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9z
-ZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXRodWIuY29t
-L2hkZWxsZXIvc2VhYmlvcy1ocHBhLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFi
-aW9zLWhwcGEnClN1Ym1vZHVsZSAncm9tcy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L3NnYWJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1v
-ZHVsZSAncm9tcy9za2lib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0
-KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJv
-b3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
-cGF0aCAncm9tcy91LWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRw
-czovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
-cGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXkt
-c29mdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS1zb2Z0ZmxvYXQt
-MykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1
-Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5j
-b20vY290YS9iZXJrZWxleS10ZXN0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMv
-ZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0
-cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2tleWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ3VpL2tleWNvZGVtYXBkYicKQ2xvbmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxl
-IHBhdGggJ2NhcHN0b25lJzogY2hlY2tlZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2
-MTYwZTBhMzdiMDY2YmYnCkNsb25pbmcgaW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRj
-JzogY2hlY2tlZCBvdXQgJzg4ZjE4OTA5ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYn
-CkNsb25pbmcgaW50byAncm9tcy9RZW11TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3Jv
-bXMvUWVtdU1hY0RyaXZlcnMnOiBjaGVja2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVh
-ODY5ZGYxYzJkOWM4ZTI2NicKQ2xvbmluZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBw
-YXRoICdyb21zL1NMT0YnOiBjaGVja2VkIG91dCAnYTViNDI4ZTFjMWVhZTcwM2JkZDYyYTNmNTI3
-MjIzYzI5MWVlM2ZkYycKQ2xvbmluZyBpbnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRo
-ICdyb21zL2lweGUnOiBjaGVja2VkIG91dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNl
-ZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRvICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0
-aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNrZWQgb3V0ICc0NDFhODRkM2E2NDJhMTBiOTQ4MzY5YzYz
-ZjMyMzY3ZThmZjYzOTViJwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJt
-b2R1bGUgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVj
-NWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFs
-Y29kZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQg
-JzUxYzIzN2Q3ZTIwZDA1MTAwZWFjYWRlZTJmNjFhYmMxN2U2YmMwOTcnCkNsb25pbmcgaW50byAn
-cm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBv
-dXQgJ2E2OThjODk5NWZmYjI4MzgyOTZlYzI4NGZlM2M0YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50
-byAncm9tcy9zZWFiaW9zLWhwcGEnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBw
-YSc6IGNoZWNrZWQgb3V0ICcxZWY5OWEwMTU3MmMyNTgxYzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2Uw
-JwpDbG9uaW5nIGludG8gJ3JvbXMvc2dhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dh
-Ymlvcyc6IGNoZWNrZWQgb3V0ICdjYmFlZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkw
-MTVhJwpDbG9uaW5nIGludG8gJ3JvbXMvc2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
-c2tpYm9vdCc6IGNoZWNrZWQgb3V0ICdlMGVlMjRjMjdhMTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFj
-MTM0YmNjJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
-cy91LWJvb3QnOiBjaGVja2VkIG91dCAnZDg1Y2EwMjlmMjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEw
-MDNhOTk0MycKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxl
-IHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3
-YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1ODgnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2Vs
-ZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0
-ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5
-Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpT
-dWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91
-dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFhMTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRv
-ICd1aS9rZXljb2RlbWFwZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBj
-aGVja2VkIG91dCAnNmIzZDcxNmUyYjY0NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3MDJhMTUyIHRjZzogRGlhZ25vc2UgcmVmZXJl
-bmNlZCBsYWJlbHMgdGhhdCBoYXZlIG5vdCBiZWVuIGVtaXR0ZWQKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM5
-MDogRklMRTogdGNnL3RjZy5oOjI0OToKKyAgICB1bnNpZ25lZCBwcmVzZW50IDogMTsKICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAn
-OicgKGN0eDpXeFcpCiM5MzogRklMRTogdGNnL3RjZy5oOjI1MToKKyAgICB1bnNpZ25lZCBpZCA6
-IDE0OwogICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNzkg
-bGluZXMgY2hlY2tlZAoKQ29tbWl0IDcwMmExNTJmN2QwNiAodGNnOiBEaWFnbm9zZSByZWZlcmVu
-Y2VkIGxhYmVscyB0aGF0IGhhdmUgbm90IGJlZW4gZW1pdHRlZCkgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTAyMDgwMzU1NTEuMzAzNi0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 2019-02-08 00:16, BALATON Zoltan wrote:
+> On Thu, 7 Feb 2019, Paolo Bonzini wrote:
+>> From: Thomas Huth <thuth@redhat.com>
+>>
+>> Most of the dependencies are now directly selected by the SAM460EX
+>> switch. We can drop CONFIG_VGA_CIRRUS since this device is already
+>> selected automatically when CONFIG_PCI_DEVICES is set.
+>>
+>> Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>> default-configs/ppc-softmmu.mak |=C2=A0 8 --------
+>> hw/display/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
+>> hw/ppc/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 11 +++++++++++
+>> 3 files changed, 12 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/default-configs/ppc-softmmu.mak
+>> b/default-configs/ppc-softmmu.mak
+>> index caaff60..fb43cba 100644
+>> --- a/default-configs/ppc-softmmu.mak
+>> +++ b/default-configs/ppc-softmmu.mak
+>> @@ -25,14 +25,6 @@ CONFIG_PCI_EXPRESS=3Dy
+>>
+>> # For Sam460ex
+>> CONFIG_SAM460EX=3Dy
+>> -CONFIG_USB_EHCI_SYSBUS=3Dy
+>> -CONFIG_SM501=3Dy
+>> -CONFIG_IDE_SII3112=3Dy
+>> -CONFIG_AT24C=3Dy
+>> -CONFIG_BITBANG_I2C=3Dy
+>> -CONFIG_M41T80=3Dy
+>> -CONFIG_VGA_CIRRUS=3Dy
+>> -CONFIG_SMBUS_EEPROM=3Dy
+>>
+>> # For Macs
+>> CONFIG_MAC_OLDWORLD=3Dy
+>> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+>> index 0f659e9..69f8a7e 100644
+>> --- a/hw/display/Kconfig
+>> +++ b/hw/display/Kconfig
+>> @@ -29,6 +29,7 @@ config SII9022
+>> config SSD0303
+>> =C2=A0=C2=A0=C2=A0 bool
+>> =C2=A0=C2=A0=C2=A0 depends on I2C
+>> +=C2=A0=C2=A0=C2=A0 select DDC
+>=20
+> What's SSD0303? It's not something sam460ex needs. Are you sure this
+> hunk belongs to this patch?
+
+That looks like a rebase error, inded. The line should belong to SM501
+instead, see my original patch:
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg08244.html
+
+ Thomas
