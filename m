@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50435)
+Received: from eggs.gnu.org ([209.51.188.92]:54334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gru3e-0001dd-Vz
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:30:19 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gruSm-0000gb-7f
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:56:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gru3e-0005hd-7f
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:30:18 -0500
-Resent-Message-Id: <E1gru3e-0005hd-7f@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gru3c-0005gu-MQ
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:30:18 -0500
-Message-ID: <154958487553.29184.10064535579086714789@ebba9967afc0>
-In-Reply-To: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <alistair23@gmail.com>) id 1gruSl-0008QZ-CO
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:56:16 -0500
+Received: from mail-lj1-x22c.google.com ([2a00:1450:4864:20::22c]:46511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gruSl-0008Ph-5W
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:56:15 -0500
+Received: by mail-lj1-x22c.google.com with SMTP id v15-v6so1496929ljh.13
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 16:56:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Feb 2019 16:14:36 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v6 00/51] Support Kconfig in QEMU
+References: <154955529480.22127.1382747582342462477.malonedeb@chaenomeles.canonical.com>
+In-Reply-To: <154955529480.22127.1382747582342462477.malonedeb@chaenomeles.canonical.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 7 Feb 2019 16:55:32 -0800
+Message-ID: <CAKmqyKMkSYK99s0w_aGOSMGoqNyf0Qx5Q7XgzTrBXK2Fy0WZ7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Bug 1815078] [NEW] Qemu 3.1.0 risc-v mie.MEIE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, philmd@redhat.com, amarkovic@wavecomp.com
+To: Bug 1815078 <1815078@bugs.launchpad.net>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ5NTYyMjU0LTQxMTU3LTEt
-Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBm
-YWlsZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhl
-IHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9j
-a2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0
-OTU2MjI1NC00MTE1Ny0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20vdGVzdGlu
-Zy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Feb 7, 2019 at 8:19 AM RTOS Pharos <1815078@bugs.launchpad.net> wrote:
+>
+> Public bug reported:
+>
+> Hello all,
+>
+> There is a bug in qemu for Risc-v, related to the mie register: when we
+> try to set the MEIE bit (11) nothing is done, even when we are running
+> at machine mode.
+>
+> Li   a0 , 1 << 11
+> Csrs mie , a0
+>
+> And when we read mie it is as though nothing was done.
+>
+> Going through the qemu source code I was able to correct it: on file
+> op_helper.c, line 94, the variable all_ints should be initialized with:
+>
+> uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
+>
+> That is, the MIP_MEIP was missing.
+>
+> I've successfully triggered uart interrupts with this patch (virt
+> machine).
+
+Would you like to send a patch?
+
+Alistair
+
+>
+> All the best,
+> Pharos team
+>
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+> --
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1815078
+>
+> Title:
+>   Qemu 3.1.0 risc-v mie.MEIE
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Hello all,
+>
+>   There is a bug in qemu for Risc-v, related to the mie register: when
+>   we try to set the MEIE bit (11) nothing is done, even when we are
+>   running at machine mode.
+>
+>   Li   a0 , 1 << 11
+>   Csrs mie , a0
+>
+>   And when we read mie it is as though nothing was done.
+>
+>   Going through the qemu source code I was able to correct it: on file
+>   op_helper.c, line 94, the variable all_ints should be initialized
+>   with:
+>
+>   uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
+>
+>   That is, the MIP_MEIP was missing.
+>
+>   I've successfully triggered uart interrupts with this patch (virt
+>   machine).
+>
+>   All the best,
+>   Pharos team
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1815078/+subscriptions
+>
