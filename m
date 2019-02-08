@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39748)
+Received: from eggs.gnu.org ([209.51.188.92]:44115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1grvvH-0001qr-Dq
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:29:48 -0500
+	(envelope-from <mst@redhat.com>) id 1grwPR-0005k5-0k
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:00:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1grvvG-0000ud-0n
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:29:47 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38037)
+	(envelope-from <mst@redhat.com>) id 1grwPQ-000249-1G
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:00:56 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:46189)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1grvvF-0000tV-PH
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 21:29:45 -0500
-Received: by mail-pf1-x442.google.com with SMTP id q1so956628pfi.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 18:29:44 -0800 (PST)
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
-	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
-	<20190207081830.4dcbb822@x1.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
-Date: Fri, 8 Feb 2019 13:29:37 +1100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1grwPP-000225-Q7
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 22:00:55 -0500
+Received: by mail-ed1-f68.google.com with SMTP id o10so1556610edt.13
+	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 19:00:54 -0800 (PST)
+Date: Thu, 7 Feb 2019 22:00:46 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190207215556-mutt-send-email-mst@kernel.org>
+References: <cover.1549555521.git.yi.z.zhang@linux.intel.com>
+	<42dd91019c7aa480cb0d26565fefcb1238c37dc8.1549555521.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190207081830.4dcbb822@x1.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
- vfio: NVIDIA V100 + P9 passthrough
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42dd91019c7aa480cb0d26565fefcb1238c37dc8.1549555521.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V13 5/5] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-
-
-On 08/02/2019 02:18, Alex Williamson wrote:
-> On Thu, 7 Feb 2019 15:43:18 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Fri, Feb 08, 2019 at 06:11:23PM +0800, Zhang, Yi wrote:
+> From: Zhang Yi <yi.z.zhang@linux.intel.com>
 > 
->> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:
->>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
->>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
->>> GPU:
->>>
->>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
->>>
->>>
->>> In that thread, Alex raised concerns about allowing QEMU to freely lock
->>> all the memory it wants. Is this an issue to be considered in the review
->>> of this series here?
->>>
->>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
->>> going to lock the KVM memory to populate the NUMA node with memory
->>> of the GPU itself, so at first there is no risk of not taking over the
->>> host RAM.
->>> Am I missing something?  
->>
->>
->> The GPU memory belongs to the device and not visible to the host as
->> memory blocks and not covered by page structs, for the host it is more
->> like MMIO which is passed through to the guest without that locked
->> accounting, I'd expect libvirt to keep working as usual except that:
->>
->> when libvirt calculates the amount of memory needed for TCE tables
->> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
->> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
->>
->> FlatView #2
->>  AS "memory", root: system
->>  AS "cpu-memory-0", root: system
->>  Root memory region: system
->>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
->>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
->>
->> So previously the DMA window would cover 0x7fffffff+1, now it has to
->> cover 0x11fffffffff+1.
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> ---
+>  docs/nvdimm.txt | 25 ++++++++++++++++++++++---
+>  qemu-options.hx |  5 +++++
+>  2 files changed, 27 insertions(+), 3 deletions(-)
 > 
-> This looks like a chicken and egg problem, you're saying libvirt needs
-> to query mtree to understand the extent of the GPU layout, but we need
-> to specify the locked memory limits in order for QEMU to start?  Is
-> libvirt supposed to start the VM with unlimited locked memory and fix
-> it at some indeterminate point in the future?  Run a dummy VM with
-> unlimited locked memory in order to determine the limits for the real
-> VM?  Neither of these sound practical.  Thanks,
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 5f158a6..a168429 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -143,9 +143,28 @@ Guest Data Persistence
+>  ----------------------
+>  
+>  Though QEMU supports multiple types of vNVDIMM backends on Linux,
+> -currently the only one that can guarantee the guest write persistence
+> -is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+> -which all guest access do not involve any host-side kernel cache.
+> +the only backend that can guarantee the guest write persistence is:
+> +
+> +A. DAX device (e.g., /dev/dax0.0, ) or
+> +B. DAX file(mounted with dax option)
+> +
+> +both are use real NVDIMM device as backend, which supporting direct
+> +access for files(no page cache).
 
+So I would just drop above two lines.
 
-QEMU maps GPU RAM at known locations (which only depends on the vPHB's
-index or can be set explicitely) and libvirt knows how many GPUs are
-passed so it is quite easy to calculate the required amount of memory.
+How does one know that there's support for direct access?
+it's just a question of kernel right?
 
-Here is the window start calculation:
-https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
+And I don't think it matter wrt "real NVDIMM" - e.g. it
+could be vNVDIMM in a nested virt scenario.
+It will still survive host (i.e. L1 guest) crash.
 
-We do not exactly know the GPU RAM window size until QEMU reads it from
-VFIO/nvlink2 but we know that all existing hardware has a window of
-128GB (the adapters I have access to only have 16/32GB on board).
+Besides, the above two lines aren't grammatical.
 
-
--- 
-Alexey
+> +
+> +When using B (A file supporting direct mapping of persistent memory)
+> +as a backend, write persistence is guaranteed if the host kernel has
+> +support for the MAP_SYNC flag in the mmap system call (available
+> +since Linux 4.15 and on certain distro kernels) and additionally
+> +both 'pmem' and 'share' flags are set to 'on' on the backend.
+> +
+> +If these conditions are not satisfied i.e. if either 'pmem' or 'share'
+> +are not set, if the backend file does not support DAX or if MAP_SYNC
+> +is not supported by the host kernel, write persistence is not
+> +guaranteed after a system crash. For compatibility reasons, these
+> +conditions are silently ignored if not satisfied. Currently, no way
+> +is provided to test for them.
+> +For more details, please reference mmap(2) man page:
+> +http://man7.org/linux/man-pages/man2/mmap.2.html.
+>  
+>  When using other types of backends, it's suggested to set 'unarmed'
+>  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 08f8516..ef1da8f 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4002,6 +4002,11 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
+>  If @option{pmem} is set to 'on', QEMU will take necessary operations to
+>  guarantee the persistence of its own writes to @option{mem-path}
+>  (e.g. in vNVDIMM label emulation and live migration).
+> +Also, we will map the backend-file with MAP_SYNC flag, which ensures the
+> +file metadata is in sync for @option{mem-path} in case of host crash
+> +or a power failure. MAP_SYNC requires support from both the host kernel
+> +(since Linux kernel 4.15) and the filesystem of @option{mem-path} mounted
+> +with DAX option.
+>  
+>  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+>  
+> -- 
+> 2.7.4
