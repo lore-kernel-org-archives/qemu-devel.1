@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54334)
+Received: from eggs.gnu.org ([209.51.188.92]:57516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gruSm-0000gb-7f
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:56:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gruoq-00051W-4z
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:19:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gruSl-0008QZ-CO
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:56:16 -0500
-Received: from mail-lj1-x22c.google.com ([2a00:1450:4864:20::22c]:46511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1gruSl-0008Ph-5W
-	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 19:56:15 -0500
-Received: by mail-lj1-x22c.google.com with SMTP id v15-v6so1496929ljh.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Feb 2019 16:56:14 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gruop-00008O-4z
+	for qemu-devel@nongnu.org; Thu, 07 Feb 2019 20:19:04 -0500
+Resent-Message-Id: <E1gruop-00008O-4z@eggs.gnu.org>
+Message-ID: <154958871632.29184.17306116627389169635@ebba9967afc0>
+In-Reply-To: <20190206112729.37761-1-sgarzare@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <154955529480.22127.1382747582342462477.malonedeb@chaenomeles.canonical.com>
-In-Reply-To: <154955529480.22127.1382747582342462477.malonedeb@chaenomeles.canonical.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 7 Feb 2019 16:55:32 -0800
-Message-ID: <CAKmqyKMkSYK99s0w_aGOSMGoqNyf0Qx5Q7XgzTrBXK2Fy0WZ7g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 1815078] [NEW] Qemu 3.1.0 risc-v mie.MEIE
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Feb 2019 17:18:38 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1815078 <1815078@bugs.launchpad.net>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: sgarzare@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, mst@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On Thu, Feb 7, 2019 at 8:19 AM RTOS Pharos <1815078@bugs.launchpad.net> wrote:
->
-> Public bug reported:
->
-> Hello all,
->
-> There is a bug in qemu for Risc-v, related to the mie register: when we
-> try to set the MEIE bit (11) nothing is done, even when we are running
-> at machine mode.
->
-> Li   a0 , 1 << 11
-> Csrs mie , a0
->
-> And when we read mie it is as though nothing was done.
->
-> Going through the qemu source code I was able to correct it: on file
-> op_helper.c, line 94, the variable all_ints should be initialized with:
->
-> uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
->
-> That is, the MIP_MEIP was missing.
->
-> I've successfully triggered uart interrupts with this patch (virt
-> machine).
-
-Would you like to send a patch?
-
-Alistair
-
->
-> All the best,
-> Pharos team
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1815078
->
-> Title:
->   Qemu 3.1.0 risc-v mie.MEIE
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   Hello all,
->
->   There is a bug in qemu for Risc-v, related to the mie register: when
->   we try to set the MEIE bit (11) nothing is done, even when we are
->   running at machine mode.
->
->   Li   a0 , 1 << 11
->   Csrs mie , a0
->
->   And when we read mie it is as though nothing was done.
->
->   Going through the qemu source code I was able to correct it: on file
->   op_helper.c, line 94, the variable all_ints should be initialized
->   with:
->
->   uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
->
->   That is, the MIP_MEIP was missing.
->
->   I've successfully triggered uart interrupts with this patch (virt
->   machine).
->
->   All the best,
->   Pharos team
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1815078/+subscriptions
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNjExMjcyOS4zNzc2
+MS0xLXNnYXJ6YXJlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L21pc2MvdHotbXNjLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAv
+cWVtdS10ZXN0L3NyYy9ody9ibG9jay92aXJ0aW8tYmxrLmM6MTU6Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy9ody9ibG9jay92aXJ0aW8tYmxrLmM6IEluIGZ1bmN0aW9uICd2aXJ0aW9fYmxrX2RldmljZV9y
+ZWFsaXplJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWFwaS9lcnJvci5oOjE2NjoyNTog
+ZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWdu
+ZWQgaW50JywgYnV0IGFyZ3VtZW50IDcgaGFzIHR5cGUgJ2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQn
+IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAgICAgICAgICAgICAgICAoZm10KSwgIyMgX19W
+QV9BUkdTX18pCiAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fgovdG1wL3FlbXUtdGVzdC9z
+cmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjExMjE6OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1h
+Y3JvICdlcnJvcl9zZXRnJwogICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJpbnZhbGlkIG1heC1k
+aXNjYXJkLXNlY3RvcnMgcHJvcGVydHkgKCUiIFBSSXUzMiAiKSIKICAgICAgICAgXn5+fn5+fn5+
+fgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xYXBpL2Vycm9yLmg6MTY2OjI1OiBlcnJvcjog
+Zm9ybWF0ICclbHUnIGV4cGVjdHMgYXJndW1lbnQgb2YgdHlwZSAnbG9uZyB1bnNpZ25lZCBpbnQn
+LCBidXQgYXJndW1lbnQgNyBoYXMgdHlwZSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCcgWy1XZXJy
+b3I9Zm9ybWF0PV0KICAgICAgICAgICAgICAgICAgICAgICAgIChmbXQpLCAjIyBfX1ZBX0FSR1Nf
+XykKICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9i
+bG9jay92aXJ0aW8tYmxrLmM6MTEzMDo5OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ2Vy
+cm9yX3NldGcnCi0tLQogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvYXNwZWVkX3Nj
+dS5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmly
+dGlvLWJsay5jOjE1OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOiBJ
+biBmdW5jdGlvbiAndmlydGlvX2Jsa19kZXZpY2VfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy9pbmNsdWRlL3FhcGkvZXJyb3IuaDoxNjY6MjU6IGVycm9yOiBmb3JtYXQgJyVsdScgZXhwZWN0
+cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIHVuc2lnbmVkIGludCcsIGJ1dCBhcmd1bWVudCA3IGhh
+cyB0eXBlICdsb25nIGxvbmcgdW5zaWduZWQgaW50JyBbLVdlcnJvcj1mb3JtYXQ9XQogICAgICAg
+ICAgICAgICAgICAgICAgICAgKGZtdCksICMjIF9fVkFfQVJHU19fKQogICAgICAgICAgICAgICAg
+ICAgICAgICAgXn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Jsb2NrL3ZpcnRpby1ibGsuYzox
+MTIxOjk6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnZXJyb3Jfc2V0ZycKICAgICAgICAg
+ZXJyb3Jfc2V0ZyhlcnJwLCAiaW52YWxpZCBtYXgtZGlzY2FyZC1zZWN0b3JzIHByb3BlcnR5ICgl
+IiBQUkl1MzIgIikiCiAgICAgICAgIF5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1
+ZGUvcWFwaS9lcnJvci5oOjE2NjoyNTogZXJyb3I6IGZvcm1hdCAnJWx1JyBleHBlY3RzIGFyZ3Vt
+ZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDcgaGFzIHR5cGUg
+J2xvbmcgbG9uZyB1bnNpZ25lZCBpbnQnIFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAgICAg
+ICAgICAgICAgICAoZm10KSwgIyMgX19WQV9BUkdTX18pCiAgICAgICAgICAgICAgICAgICAgICAg
+ICBefn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYmxvY2svdmlydGlvLWJsay5jOjExMzA6OTog
+bm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvICdlcnJvcl9zZXRnJwoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDYxMTI3MjkuMzc3
+NjEtMS1zZ2FyemFyZUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
