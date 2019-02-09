@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40311)
+Received: from eggs.gnu.org ([209.51.188.92]:40550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gsSTY-0006dx-Kz
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:15:21 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gsSVH-0007IG-39
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gsSTY-0004Mu-0h
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:15:20 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51347)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gsSVG-0005VQ-Fm
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:17:07 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gsSTX-0004Ln-NF
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:15:19 -0500
-Received: by mail-wm1-x344.google.com with SMTP id b11so8388878wmj.1
-	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 05:15:19 -0800 (PST)
+	id 1gsSVG-0005Ta-8O
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:17:06 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a62so8367285wmh.4
+	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 05:17:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
-	<20181220141553.24098-11-marcandre.lureau@redhat.com>
-	<461252a9-b095-9441-054c-bb9dd00f8cf5@redhat.com>
-	<20190107094555.es7xunsor2aud3k7@sirius.home.kraxel.org>
-In-Reply-To: <20190107094555.es7xunsor2aud3k7@sirius.home.kraxel.org>
+References: <20190208181122.23393-1-marcandre.lureau@redhat.com>
+	<20190208181122.23393-5-marcandre.lureau@redhat.com>
+	<20190209114041.ibd3adln5vw4iky5@function>
+	<CAMxuvaxT-ULfE8-EmVbX1muCrTXyUPQ7V574R9J6gSy0uabg6w@mail.gmail.com>
+	<20190209131243.uiob7rzcwi3paw77@function>
+In-Reply-To: <20190209131243.uiob7rzcwi3paw77@function>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 9 Feb 2019 14:15:06 +0100
-Message-ID: <CAJ+F1CKxmZdycF8q83ziSUB5Bnwk=NFASgfjJkEDsjuQ7vcSww@mail.gmail.com>
+Date: Sat, 9 Feb 2019 14:16:53 +0100
+Message-ID: <CAJ+F1C+YcDgNvUnH5j5GdFLcMQDDoEVOdTwVL1R=TQrg0=X44w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/12] qapi: document DisplayType enum
+Subject: Re: [Qemu-devel] [PATCH slirp 4/5] slirp: add state saving/loading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
 Hi
 
-On Mon, Jan 7, 2019 at 10:46 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Sat, Feb 9, 2019 at 2:13 PM Samuel Thibault <samuel.thibault@gnu.org> wr=
+ote:
 >
-> On Thu, Dec 20, 2018 at 08:46:13AM -0600, Eric Blake wrote:
-> > On 12/20/18 8:15 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >   qapi/ui.json | 24 ++++++++++++++++++++++++
-> > >   1 file changed, 24 insertions(+)
+> Marc-Andr=C3=A9 Lureau, le sam. 09 f=C3=A9vr. 2019 14:09:02 +0100, a ecri=
+t:
+> > On Sat, Feb 9, 2019 at 12:40 PM Samuel Thibault <samuel.thibault@gnu.or=
+g> wrote:
 > > >
-> > > diff --git a/qapi/ui.json b/qapi/ui.json
-> > > index 5ad13248d5..3f2f662dca 100644
-> > > --- a/qapi/ui.json
-> > > +++ b/qapi/ui.json
-> > > @@ -1075,6 +1075,30 @@
-> > >   #
-> > >   # Display (user interface) type.
-> > >   #
-> > > +# @default: The default user interface.
+> > > marcandre.lureau@redhat.com, le ven. 08 f=C3=A9vr. 2019 19:11:21 +010=
+0, a ecrit:
+> > > > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > >
+> > > > Based on qemu vmstate serialization code. At this point it should
+> > > > produce the same result. However, with future state versions, slirp
+> > > > should be free to change its format, by bumping the reported state
+> > > > version.
+> > >
+> > > Mmm, then qemu needs to be taught to call slirp_state_save/load/versi=
+on?
 > >
-> > Any more hints on how this default is determined?  Is it a compile-time
-> > decision, based on what libraries were linked in?
+> > Yes, see "[Qemu-devel] [PATCH 1/1] RFC: net/slirp: link with libslirp"
 >
-> Basically yes.  A bit more complicated due to modules.  gtk, sdl and
-> cocoa are checked, in that order.  And if none of them is available the
-> vnc server is enabled.
+> Ah, I did have a look there but somehow missed it because burried within
+> file removals :)
+>
 
-
-Eric, should I cram this comment there?: "(gtk, sdl and
-cocoa are checked, in that order.  And if none of them is available the
-vnc server is enabled)"
-
-thanks
-
->
-> > Does the work on adding
-> > #if support to qapi make it introspectible what the default is?
->
-> Due to modules it isn't a compile time constant.  With a modular build
-> and gtk being packaged as separate sub-rpm the default depends on
-> whenever the sub-rpm is installed or not.
->
-> So I guess the answer is "no".
->
-> cheers,
->   Gerd
->
+Indeed, the original patch series was splited in 2, but I thought as
+an RFC it was easier to send a single patch. Bad choice I suppose.
 
 
 
