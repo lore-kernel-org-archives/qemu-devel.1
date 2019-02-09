@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43460)
+Received: from eggs.gnu.org ([209.51.188.92]:44109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMOk-0000IJ-Ig
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:45:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gsPbx-0004du-K5
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 05:11:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMOj-0000D8-CR
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:45:58 -0500
-References: <20190209063152.9490-1-richard.henderson@linaro.org>
-	<20190209063152.9490-3-richard.henderson@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <57696766-c20a-310b-a717-3bd00f3bf8ce@redhat.com>
-Date: Sat, 9 Feb 2019 07:45:24 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gsPbp-0002mZ-Az
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 05:11:46 -0500
+Resent-Message-Id: <E1gsPbp-0002mZ-Az@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21023)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gsPbm-0002e3-9L
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 05:11:39 -0500
+Message-ID: <154967910201.29184.5537071614047013306@ebba9967afc0>
+In-Reply-To: <20190208224020.GA4670@nyan>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190209063152.9490-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] This is a non-privileged
- instruction that was only implemented for system mode. However,
- the stck instruction is used by glibc,
- so this was causing SIGILL for programs run under debian stretch.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Feb 2019 18:25:03 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm2835_peripheral: add bcm283x
+ sp804-alike timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,153 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Giovanni Mascellani <gio@debian.org>
+To: alnyan@airmail.cc
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, f4bug@amsat.org, Andrew.Baumann@microsoft.comqemu-devel@nongnu.org
 
-On 2019-02-09 07:31, Richard Henderson wrote:
-
-Patch description somehow moved into the subject?
-
-Apart from that, the patch looks fine to me, so with a proper subject
-and the description moved into the right location:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/helper.h      |  2 +-
->  target/s390x/misc_helper.c | 34 ++++++++++++++++++++++------------
->  target/s390x/translate.c   |  2 ++
->  target/s390x/insn-data.def | 11 ++++++-----
->  4 files changed, 31 insertions(+), 18 deletions(-)
-> 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 018e9dd414..6260b50496 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
->  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
-> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->  
->  #ifndef CONFIG_USER_ONLY
->  DEF_HELPER_3(servc, i32, env, i64, i64)
->  DEF_HELPER_4(diag, void, env, i32, i32, i32)
->  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
-> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 52262f62df..ee67c1fa0c 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -30,6 +30,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "qapi/error.h"
->  #include "tcg_s390x.h"
-> +#include "s390-tod.h"
->  
->  #if !defined(CONFIG_USER_ONLY)
->  #include "sysemu/cpus.h"
-> @@ -76,8 +77,28 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
->  #endif
->  }
->  
-> -#ifndef CONFIG_USER_ONLY
-> +/* Store Clock */
-> +uint64_t HELPER(stck)(CPUS390XState *env)
-> +{
-> +#ifdef CONFIG_USER_ONLY
-> +    struct timespec ts;
-> +    uint64_t ns;
->  
-> +    clock_gettime(CLOCK_REALTIME, &ts);
-> +    ns = ts.tv_sec * NANOSECONDS_PER_SECOND + ts.tv_nsec;
-> +
-> +    return TOD_UNIX_EPOCH + time2tod(ns);
-> +#else
-> +    S390TODState *td = s390_get_todstate();
-> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-> +    S390TOD tod;
-> +
-> +    tdc->get(td, &tod, &error_abort);
-> +    return tod.low;
-> +#endif
-> +}
-> +
-> +#ifndef CONFIG_USER_ONLY
->  /* SCLP service call */
->  uint32_t HELPER(servc)(CPUS390XState *env, uint64_t r1, uint64_t r2)
->  {
-> @@ -138,17 +159,6 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
->      tlb_flush_page(cs, TARGET_PAGE_SIZE);
->  }
->  
-> -/* Store Clock */
-> -uint64_t HELPER(stck)(CPUS390XState *env)
-> -{
-> -    S390TODState *td = s390_get_todstate();
-> -    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-> -    S390TOD tod;
-> -
-> -    tdc->get(td, &tod, &error_abort);
-> -    return tod.low;
-> -}
-> -
->  static void update_ckc_timer(CPUS390XState *env)
->  {
->      S390TODState *td = s390_get_todstate();
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 639084af07..19072efec6 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -4060,6 +4060,7 @@ static DisasJumpType op_stap(DisasContext *s, DisasOps *o)
->      tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, core_id));
->      return DISAS_NEXT;
->  }
-> +#endif
->  
->  static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
->  {
-> @@ -4096,6 +4097,7 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
->      return DISAS_NEXT;
->  }
->  
-> +#ifndef CONFIG_USER_ONLY
->  static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
->  {
->      tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index dab805fd90..61582372ab 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -837,6 +837,12 @@
->      C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
->      C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
->  
-> +/* STORE CLOCK */
-> +    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
-> +    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
-> +/* STORE CLOCK EXTENDED */
-> +    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
-> +
->  /* STORE FACILITY LIST EXTENDED */
->      C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
->  /* STORE FPC */
-> @@ -1020,11 +1026,6 @@
->      F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
->  /* SIGNAL PROCESSOR */
->      F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
-> -/* STORE CLOCK */
-> -    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
-> -    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
-> -/* STORE CLOCK EXTENDED */
-> -    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
->  /* STORE CLOCK COMPARATOR */
->      F(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0, IF_PRIV)
->  /* STORE CONTROL */
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwODIyNDAyMC5HQTQ2
+NzBAbnlhbi8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0
+eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gaHcvYXJtL2JjbTI4MzVfcGVyaXBoZXJhbDogYWRk
+IGJjbTI4M3ggc3A4MDQtYWxpa2UgdGltZXIKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkw
+MjA4MjI0MDIwLkdBNDY3MEBueWFuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+IHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDEzMDIxMDM1MC4xNjc1Ny0x
+LWx1a2Uuci5uZWxzQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwMTMwMjEwMzUwLjE2NzU3LTEt
+bHVrZS5yLm5lbHNAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
+MjAxOTAyMDgyMjQwMjAuR0E0NjcwQG55YW4gLT4gcGF0Y2hldy8yMDE5MDIwODIyNDAyMC5HQTQ2
+NzBAbnlhbgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmExZTIzMzBkNGQgaHcvYXJt
+L2JjbTI4MzVfcGVyaXBoZXJhbDogYWRkIGJjbTI4M3ggc3A4MDQtYWxpa2UgdGltZXIKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CkFyZ3VtZW50ICJtIiBpc24ndCBudW1lcmljIGluIG51bWVyaWMgZXEg
+KD09KSBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBsaW5lIDI3NzEuCkFyZ3VtZW50ICJtIiBp
+c24ndCBudW1lcmljIGluIG51bWVyaWMgZXEgKD09KSBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCBsaW5lIDI3NzEuClVzZSBvZiB1bmluaXRpYWxpemVkIHZhbHVlICQxIGluIGNvbmNhdGVuYXRp
+b24gKC4pIG9yIHN0cmluZyBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBsaW5lIDI3NzIuCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTogRklMRTogaHcvYXJtL2JjbTI4MzVf
+cGVyaXBoZXJhbHMuYzoxMjI6CisgICAgb2JqZWN0X2luaXRpYWxpemUoJnMtPmJjbTI4M3hzcDgw
+NCwgc2l6ZW9mKHMtPmJjbTI4M3hzcDgwNCksIFRZUEVfQkNNMjgzeFNQODA0KTsKCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNjogRklMRTogaHcvYXJtL2JjbTI4MzVfcGVyaXBo
+ZXJhbHMuYzoxMjM6CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9jaGlsZChvYmosICJiY20yODN4
+c3A4MDQiLCBPQkpFQ1QoJnMtPmJjbTI4M3hzcDgwNCksIE5VTEwpOwoKV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNv
+bW1lbnRzCiM5MDogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjI3OgorICAgIGludCBw
+cmV2X2RpdjsgICAgICAgLy8gTm90IGltcGxlbWVudGVkCgpFUlJPUjogZG8gbm90IHVzZSBDOTkg
+Ly8gY29tbWVudHMKIzkxOiBGSUxFOiBody90aW1lci9iY20yODN4X3RpbWVyLmM6Mjg6CisgICAg
+aW50IGZyZWVfcnVuX2NudDsgICAvLyBOb3QgaW1wbGVtZW50ZWQKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiMxMTY6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzo1MzoK
+KyAgICAgICAgLyogVGhlIHJlZ2lzdGVyIGlzIHdyaXRlLW9ubHksIGJ1dCByZXR1cm5zIHJldmVy
+c2UgIkFSTVQiIHN0cmluZyBieXRlcyAqLwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
+IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTIxOiBGSUxFOiBody90aW1lci9iY20y
+ODN4X3RpbWVyLmM6NTg6CisgICAgICAgIGlmICgocy0+Y29udHJvbCAmIFRJTUVSX0NUUkxfSUUp
+ID09IDApClsuLi5dCgpFUlJPUjogc3dpdGNoIGFuZCBjYXNlIHNob3VsZCBiZSBhdCB0aGUgc2Ft
+ZSBpbmRlbnQKIzE0NjogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjgzOgorICAgIHN3
+aXRjaCAob2Zmc2V0ID4+IDIpIHsKKyAgICAgICAgY2FzZSAwOiAvKiBMb2FkIHJlZ2lzdGVyICov
+ClsuLi5dCisgICAgICAgIGNhc2UgMTogLyogVmFsdWUgcmVnaXN0ZXIgKi8KWy4uLl0KKyAgICAg
+ICAgY2FzZSAyOiAvKiBDb250cm9sIHJlZ2lzdGVyICovClsuLi5dCisgICAgICAgIGNhc2UgMzog
+LyogSVJRIGNsZWFyL0FDSyByZWdpc3RlciAqLwpbLi4uXQorICAgICAgICBjYXNlIDY6IC8qIFJl
+bG9hZCByZWdpc3RlciAqLwpbLi4uXQorICAgICAgICBkZWZhdWx0OgoKRVJST1I6IHRyYWlsaW5n
+IHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMTY0OiBGSUxFOiBody90aW1lci9i
+Y20yODN4X3RpbWVyLmM6MTAxOgorICAgICAgICAgICAgY2FzZSAxOiBmcmVxID4+PSA0OyBicmVh
+azsgLyogMTYgKi8KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0
+IGxpbmUKIzE2NTogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjEwMjoKKyAgICAgICAg
+ICAgIGNhc2UgMjogZnJlcSA+Pj0gODsgYnJlYWs7IC8qIDI1NiAqLwoKRVJST1I6IHVubmVjZXNz
+YXJ5IGNhc3QgbWF5IGhpZGUgYnVncywgdXNlIGdfbmV3MCBpbnN0ZWFkCiMyMTU6IEZJTEU6IGh3
+L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoxNTI6CisgICAgcyA9IChiY20yODN4X3RpbWVyX3N0YXRl
+ICopIGdfbWFsbG9jMChzaXplb2YoYmNtMjgzeF90aW1lcl9zdGF0ZSkpOwoKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyODogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5j
+OjE2NToKKy8qIFhYWDogQkNNJ3MgZGF0YXNoZWV0IGRvZXMgbm90IHNlZW0gdG8gcHJvdmlkZSB0
+aGVzZSB2YWx1ZXMgYW5kIHRoZXkgbWF5IGRpZmZlciAqLwoKV0FSTklORzogbGluZSBvdmVyIDgw
+IGNoYXJhY3RlcnMKIzI2MjogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjE5OToKKyAg
+ICAgICAgICAgICAgICAgICAgICAiJXM6IGludGVncmF0aW9uIHRlc3QgcmVnaXN0ZXJzIHVuaW1w
+bGVtZW50ZWRcbiIsIF9fZnVuY19fKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiMyNzE6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoyMDg6CitzdGF0aWMgdm9pZCBi
+Y20yODN4c3A4MDNfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIgb2Zmc2V0LCB1aW50NjRfdCB2
+YWx1ZSwgdW5zaWduZWQgc2l6ZSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMz
+MDY6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoyNDM6CisgICAgbWVtb3J5X3JlZ2lv
+bl9pbml0X2lvKCZzLT5pb21lbSwgb2JqLCAmYmNtMjgzeHNwODA0X29wcywgcywgImJjbTI4M3hz
+cDgwNCIsIDB4MTAwMCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzk1OiBG
+SUxFOiBpbmNsdWRlL2h3L3RpbWVyL2JjbTI4M3hfdGltZXIuaDoyMzoKKyNkZWZpbmUgQkNNMjgz
+eFNQODA0KG9iaikgT0JKRUNUX0NIRUNLKEJDTTI4M3hTUDgwNFN0YXRlLCAob2JqKSwgVFlQRV9C
+Q00yODN4U1A4MDQpCgp0b3RhbDogNyBlcnJvcnMsIDkgd2FybmluZ3MsIDM2NiBsaW5lcyBjaGVj
+a2VkCgpDb21taXQgYTFlMjMzMGQ0ZGUyIChody9hcm0vYmNtMjgzNV9wZXJpcGhlcmFsOiBhZGQg
+YmNtMjgzeCBzcDgwNC1hbGlrZSB0aW1lcikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
+dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDgy
+MjQwMjAuR0E0NjcwQG55YW4vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
