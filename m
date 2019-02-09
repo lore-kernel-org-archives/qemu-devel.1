@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42492)
+Received: from eggs.gnu.org ([209.51.188.92]:42567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJt-0004XW-7A
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMJu-0004Z2-Lu
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJr-0004XQ-PT
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMJt-0004aQ-44
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:58 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat,  9 Feb 2019 07:39:20 +0100
-Message-Id: <1549694366-1284-20-git-send-email-thuth@redhat.com>
+Date: Sat,  9 Feb 2019 07:39:22 +0100
+Message-Id: <1549694366-1284-22-git-send-email-thuth@redhat.com>
 In-Reply-To: <1549694366-1284-1-git-send-email-thuth@redhat.com>
 References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/25] hw/arm: Express dependencies of
- sabrelite with Kconfig
+Subject: [Qemu-devel] [PATCH 21/25] hw/arm: Express dependencies for
+ remaining IMX boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
 Cc: qemu-arm@nongnu.org, philmd@redhat.com
 
-Add Kconfig dependencies for the Sabrelite / iMX6 machine.
+IMX25, IMX7 and IMX6UL were still missing the Kconfig dependencies.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 4 +---
- hw/arm/Kconfig                  | 7 +++++++
- hw/arm/Makefile.objs            | 3 ++-
- 3 files changed, 10 insertions(+), 4 deletions(-)
+ default-configs/arm-softmmu.mak |  2 --
+ hw/arm/Kconfig                  | 20 ++++++++++++++++++++
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 20fcbcb..f6193b1 100644
+index 729e4b8..e0d1a00 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -29,6 +29,7 @@ CONFIG_NETDUINO2=y
- CONFIG_MPS2=y
- CONFIG_RASPI=y
- CONFIG_DIGIC=y
-+CONFIG_SABRELITE=y
+@@ -33,7 +33,6 @@ CONFIG_SABRELITE=y
+ CONFIG_MSF2=y
  
  CONFIG_VGA=y
- CONFIG_SSI_M25P80=y
-@@ -36,13 +37,10 @@ CONFIG_IMX_FEC=y
+-CONFIG_IMX_FEC=y
  
  CONFIG_NRF51_SOC=y
  
--CONFIG_FSL_IMX6=y
- CONFIG_FSL_IMX25=y
- CONFIG_FSL_IMX7=y
- CONFIG_FSL_IMX6UL=y
- 
--CONFIG_IMX_I2C=y
--
- CONFIG_PCIE_PORT=y
+@@ -45,4 +44,3 @@ CONFIG_PCIE_PORT=y
  CONFIG_XIO3130=y
  CONFIG_IOH3420=y
+ CONFIG_I82801B11=y
+-CONFIG_PCI_EXPRESS_DESIGNWARE=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 617a460..d98d39e 100644
+index 7823a16..c4b3cd2 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -184,6 +184,10 @@ config REALVIEW
-     select DS1338 # I2C RTC+NVRAM
-     select USB_OHCI
+@@ -297,6 +297,10 @@ config XLNX_VERSAL
  
-+config SABRELITE
-+    bool
-+    select FSL_IMX6
-+
- config STELLARIS
+ config FSL_IMX25
      bool
-     select ARM_V7M
-@@ -304,6 +308,9 @@ config FSL_IMX31
- 
- config FSL_IMX6
-     bool
-+    select A9MPCORE
 +    select IMX
++    select IMX_FEC
 +    select IMX_I2C
++    select DS1338
+ 
+ config FSL_IMX31
+     bool
+@@ -311,6 +315,8 @@ config FSL_IMX6
+     select A9MPCORE
+     select IMX
+     select IMX_I2C
++    select SDHCI
++    select PCI          # TODO: Currently required for SDHCI, remove this later
  
  config ASPEED_SOC
      bool
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index f17187f..ee9f5c6 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -22,6 +22,7 @@ obj-$(CONFIG_COLLIE) += collie.o
- obj-$(CONFIG_VERSATILE) += versatilepb.o
- obj-$(CONFIG_VEXPRESS) += vexpress.o
- obj-$(CONFIG_ZYNQ) += xilinx_zynq.o
-+obj-$(CONFIG_SABRELITE) += sabrelite.o
+@@ -350,12 +356,26 @@ config IOTKIT
  
- obj-$(CONFIG_ARM_V7M) += armv7m.o
- obj-$(CONFIG_EXYNOS4) += exynos4210.o
-@@ -36,7 +37,7 @@ obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
- obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o xlnx-versal-virt.o
- obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
- obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
--obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
-+obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
- obj-$(CONFIG_MPS2) += mps2-tz.o
+ config FSL_IMX7
+     bool
++    imply PCI_DEVICES
++    select A15MPCORE
++    select PCI
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select PCI_EXPRESS_DESIGNWARE
++    select SDHCI
+ 
+ config ARM_SMMUV3
+     bool
+ 
+ config FSL_IMX6UL
+     bool
++    select A15MPCORE
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select SDHCI
++    select PCI          # TODO: Currently required for SDHCI, remove this later
+ 
+ config NRF51_SOC
+     bool
 -- 
 1.8.3.1
