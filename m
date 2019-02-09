@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42394)
+Received: from eggs.gnu.org ([209.51.188.92]:42410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsJTi-0006dv-9g
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:38:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gsJTk-0006gB-LA
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:38:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsJTh-0000RL-Hx
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:38:54 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44915)
+	(envelope-from <richard.henderson@linaro.org>) id 1gsJTj-0000S4-SF
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:38:56 -0500
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:36884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsJTh-0000Qx-CP
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:38:53 -0500
-Received: by mail-pf1-x441.google.com with SMTP id u6so2564324pfh.11
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 19:38:53 -0800 (PST)
+	id 1gsJTj-0000Rm-MP
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:38:55 -0500
+Received: by mail-pf1-x42b.google.com with SMTP id y126so2586330pfb.4
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 19:38:55 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  8 Feb 2019 19:38:35 -0800
-Message-Id: <20190209033847.9014-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 00/12] target/arm: tcg vector cleanups
+Date: Fri,  8 Feb 2019 19:38:36 -0800
+Message-Id: <20190209033847.9014-2-richard.henderson@linaro.org>
+In-Reply-To: <20190209033847.9014-1-richard.henderson@linaro.org>
+References: <20190209033847.9014-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 01/12] target/arm: Rely on optimization
+ within tcg_gen_gvec_or
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +30,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Changes since v2:
-  * Fix some representational issues with FPSCR.
-  * Use host vector saturation for SQADD/UQADD.
-    This requires changing the internal representation of FPSR.QC.
-  * Fix a latent vector bug, noticed during the rest.
+Since we're now handling a == b generically, we no longer need
+to do it by hand within target/arm/.
 
-Correct RISU results depend on Mark C-A's patch from today,
-"tcg/i386: fix unsigned vector saturating arithmetic",
-which will be in my next tcg pull.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c |  6 +-----
+ target/arm/translate-sve.c |  6 +-----
+ target/arm/translate.c     | 12 +++---------
+ 3 files changed, 5 insertions(+), 19 deletions(-)
 
-
-r~
-
-
-Richard Henderson (12):
-  target/arm: Rely on optimization within tcg_gen_gvec_or
-  target/arm: Use vector minmax expanders for aarch64
-  target/arm: Use vector minmax expanders for aarch32
-  target/arm: Use tcg integer min/max primitives for neon
-  target/arm: Remove neon min/max helpers
-  target/arm: Fix vfp_gdb_get/set_reg vs FPSCR
-  target/arm: Fix arm_cpu_dump_state vs FPSCR
-  target/arm: Split out flags setting from vfp compares
-  target/arm: Fix set of bits kept in xregs[ARM_VFP_FPSCR]
-  target/arm: Split out FPSCR.QC to a vector field
-  target/arm: Use vector operations for saturation
-  target/arm: Add missing clear_tail calls
-
- target/arm/cpu.h           |   5 +-
- target/arm/helper.h        |  45 ++++++--
- target/arm/translate.h     |   4 +
- target/arm/helper.c        |  81 +++++++++-----
- target/arm/neon_helper.c   |  14 +--
- target/arm/translate-a64.c |  77 ++++++-------
- target/arm/translate-sve.c |   6 +-
- target/arm/translate.c     | 219 +++++++++++++++++++++++++++++--------
- target/arm/vec_helper.c    | 134 ++++++++++++++++++++++-
- 9 files changed, 433 insertions(+), 152 deletions(-)
-
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index e002251ac6..a12bfac719 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10648,11 +10648,7 @@ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
+         gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_andc, 0);
+         return;
+     case 2: /* ORR */
+-        if (rn == rm) { /* MOV */
+-            gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_mov, 0);
+-        } else {
+-            gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_or, 0);
+-        }
++        gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_or, 0);
+         return;
+     case 3: /* ORN */
+         gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_orc, 0);
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index b15b615ceb..3a2eb51566 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -280,11 +280,7 @@ static bool trans_AND_zzz(DisasContext *s, arg_rrr_esz *a)
+ 
+ static bool trans_ORR_zzz(DisasContext *s, arg_rrr_esz *a)
+ {
+-    if (a->rn == a->rm) { /* MOV */
+-        return do_mov_z(s, a->rd, a->rn);
+-    } else {
+-        return do_vector3_z(s, tcg_gen_gvec_or, 0, a->rd, a->rn, a->rm);
+-    }
++    return do_vector3_z(s, tcg_gen_gvec_or, 0, a->rd, a->rn, a->rm);
+ }
+ 
+ static bool trans_EOR_zzz(DisasContext *s, arg_rrr_esz *a)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 66cf28c8cb..9d2dba7ed2 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -6294,15 +6294,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 tcg_gen_gvec_andc(0, rd_ofs, rn_ofs, rm_ofs,
+                                   vec_size, vec_size);
+                 break;
+-            case 2:
+-                if (rn == rm) {
+-                    /* VMOV */
+-                    tcg_gen_gvec_mov(0, rd_ofs, rn_ofs, vec_size, vec_size);
+-                } else {
+-                    /* VORR */
+-                    tcg_gen_gvec_or(0, rd_ofs, rn_ofs, rm_ofs,
+-                                    vec_size, vec_size);
+-                }
++            case 2: /* VORR */
++                tcg_gen_gvec_or(0, rd_ofs, rn_ofs, rm_ofs,
++                                vec_size, vec_size);
+                 break;
+             case 3: /* VORN */
+                 tcg_gen_gvec_orc(0, rd_ofs, rn_ofs, rm_ofs,
 -- 
 2.17.2
