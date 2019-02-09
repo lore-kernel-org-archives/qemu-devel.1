@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39346)
+Received: from eggs.gnu.org ([209.51.188.92]:41979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsMBD-0000TA-GU
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:32:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMIy-0003YX-Re
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsMBC-0007Kw-8m
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:59 -0500
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:35560)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsMBC-0007K5-34
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:58 -0500
-Received: by mail-pg1-x533.google.com with SMTP id s198so2551326pgs.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 22:31:58 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  8 Feb 2019 22:31:52 -0800
-Message-Id: <20190209063152.9490-3-richard.henderson@linaro.org>
-In-Reply-To: <20190209063152.9490-1-richard.henderson@linaro.org>
-References: <20190209063152.9490-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 2/2] This is a non-privileged instruction
- that was only implemented for system mode. However,
- the stck instruction is used by glibc,
- so this was causing SIGILL for programs run under debian stretch.
+	(envelope-from <thuth@redhat.com>) id 1gsMIx-0003UF-77
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:00 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Sat,  9 Feb 2019 07:39:04 +0100
+Message-Id: <1549694366-1284-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1549694366-1284-1-git-send-email-thuth@redhat.com>
+References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 03/25] hw/arm: Express dependencies of
+ integratorcp with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +23,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, thuth@redhat.com
+To: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
+Cc: qemu-arm@nongnu.org, philmd@redhat.com
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
+e.
+his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/s390x/helper.h      |  2 +-
- target/s390x/misc_helper.c | 34 ++++++++++++++++++++++------------
- target/s390x/translate.c   |  2 ++
- target/s390x/insn-data.def | 11 ++++++-----
- 4 files changed, 31 insertions(+), 18 deletions(-)
+ default-configs/arm-softmmu.mak | 11 +----------
+ hw/arm/Kconfig                  |  9 +++++++++
+ hw/display/Kconfig              |  1 +
+ 3 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 018e9dd414..6260b50496 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
- DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
- DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
- DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
-+DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
- 
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
- DEF_HELPER_4(diag, void, env, i32, i32, i32)
- DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
- DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
--DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
- DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
- DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 52262f62df..ee67c1fa0c 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -30,6 +30,7 @@
- #include "exec/cpu_ldst.h"
- #include "qapi/error.h"
- #include "tcg_s390x.h"
-+#include "s390-tod.h"
- 
- #if !defined(CONFIG_USER_ONLY)
- #include "sysemu/cpus.h"
-@@ -76,8 +77,28 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
- #endif
- }
- 
--#ifndef CONFIG_USER_ONLY
-+/* Store Clock */
-+uint64_t HELPER(stck)(CPUS390XState *env)
-+{
-+#ifdef CONFIG_USER_ONLY
-+    struct timespec ts;
-+    uint64_t ns;
- 
-+    clock_gettime(CLOCK_REALTIME, &ts);
-+    ns = ts.tv_sec * NANOSECONDS_PER_SECOND + ts.tv_nsec;
-+
-+    return TOD_UNIX_EPOCH + time2tod(ns);
-+#else
-+    S390TODState *td = s390_get_todstate();
-+    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-+    S390TOD tod;
-+
-+    tdc->get(td, &tod, &error_abort);
-+    return tod.low;
-+#endif
-+}
-+
-+#ifndef CONFIG_USER_ONLY
- /* SCLP service call */
- uint32_t HELPER(servc)(CPUS390XState *env, uint64_t r1, uint64_t r2)
- {
-@@ -138,17 +159,6 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
-     tlb_flush_page(cs, TARGET_PAGE_SIZE);
- }
- 
--/* Store Clock */
--uint64_t HELPER(stck)(CPUS390XState *env)
--{
--    S390TODState *td = s390_get_todstate();
--    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
--    S390TOD tod;
--
--    tdc->get(td, &tod, &error_abort);
--    return tod.low;
--}
--
- static void update_ckc_timer(CPUS390XState *env)
- {
-     S390TODState *td = s390_get_todstate();
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 639084af07..19072efec6 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4060,6 +4060,7 @@ static DisasJumpType op_stap(DisasContext *s, DisasOps *o)
-     tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, core_id));
-     return DISAS_NEXT;
- }
-+#endif
- 
- static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
- {
-@@ -4096,6 +4097,7 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
-     return DISAS_NEXT;
- }
- 
-+#ifndef CONFIG_USER_ONLY
- static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
- {
-     tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index dab805fd90..61582372ab 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -837,6 +837,12 @@
-     C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
-     C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
- 
-+/* STORE CLOCK */
-+    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
-+    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
-+/* STORE CLOCK EXTENDED */
-+    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
-+
- /* STORE FACILITY LIST EXTENDED */
-     C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
- /* STORE FPC */
-@@ -1020,11 +1026,6 @@
-     F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
- /* SIGNAL PROCESSOR */
-     F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
--/* STORE CLOCK */
--    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
--    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
--/* STORE CLOCK EXTENDED */
--    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
- /* STORE CLOCK COMPARATOR */
-     F(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0, IF_PRIV)
- /* STORE CONTROL */
--- 
-2.17.2
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+index 59734ee..2033050 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -7,6 +7,7 @@ CONFIG_PCI_DEVICES=3Dy
+=20
+ CONFIG_EXYNOS4=3Dy
+ CONFIG_HIGHBANK=3Dy
++CONFIG_INTEGRATOR=3Dy
+=20
+ CONFIG_VGA=3Dy
+ CONFIG_NAND=3Dy
+@@ -31,7 +32,6 @@ CONFIG_ADS7846=3Dy
+ CONFIG_MAX111X=3Dy
+ CONFIG_SSI_SD=3Dy
+ CONFIG_SSI_M25P80=3Dy
+-CONFIG_SMC91C111=3Dy
+ CONFIG_ALLWINNER_EMAC=3Dy
+ CONFIG_IMX_FEC=3Dy
+ CONFIG_FTGMAC100=3Dy
+@@ -49,15 +49,8 @@ CONFIG_A15MPCORE=3Dy
+=20
+ CONFIG_NETDUINO2=3Dy
+=20
+-CONFIG_ARM_TIMER=3Dy
+-CONFIG_PL011=3Dy
+-CONFIG_PL022=3Dy
+-CONFIG_PL031=3Dy
+ CONFIG_PL041=3Dy
+-CONFIG_PL050=3Dy
+ CONFIG_PL080=3Dy
+-CONFIG_PL110=3Dy
+-CONFIG_PL181=3Dy
+ CONFIG_PL190=3Dy
+ CONFIG_PL330=3Dy
+ CONFIG_CADENCE=3Dy
+@@ -119,8 +112,6 @@ CONFIG_VFIO_XGMAC=3Dy
+ CONFIG_VFIO_AMD_XGBE=3Dy
+=20
+ CONFIG_SDHCI=3Dy
+-CONFIG_INTEGRATOR=3Dy
+-CONFIG_INTEGRATOR_DEBUG=3Dy
+=20
+ CONFIG_ALLWINNER_A10_PIT=3Dy
+ CONFIG_ALLWINNER_A10_PIC=3Dy
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 984de8a..c022b8d 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -33,6 +33,15 @@ config HIGHBANK
+=20
+ config INTEGRATOR
+     bool
++    select ARM_TIMER
++    select INTEGRATOR_DEBUG
++    select PL011 # UART
++    select PL031 # RTC
++    select PL050 # keyboard/mouse
++    select PL110 # pl111 LCD controller
++    select PL181 # display
++    select PCI
++    select SMC91C111
+=20
+ config MAINSTONE
+     bool
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index ee3acd9..34c8c12 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -21,6 +21,7 @@ config JAZZ_LED
+=20
+ config PL110
+     bool
++    select FRAMEBUFFER
+=20
+ config SII9022
+     bool
+--=20
+1.8.3.1
