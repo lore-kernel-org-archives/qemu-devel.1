@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42538)
+Received: from eggs.gnu.org ([209.51.188.92]:42567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsJUI-00079t-B9
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:31 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gsJUY-0007PR-5r
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsJUB-0000bu-A2
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:25 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:47021)
+	(envelope-from <richard.henderson@linaro.org>) id 1gsJUS-0000hn-CS
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:43 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34539)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsJU5-0000W4-Fp
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:19 -0500
-Received: by mail-pl1-x641.google.com with SMTP id o6so2584385pls.13
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 19:39:05 -0800 (PST)
+	id 1gsJUN-0000Wm-B5
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:37 -0500
+Received: by mail-pg1-x541.google.com with SMTP id d9so2432743pgl.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 19:39:07 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  8 Feb 2019 19:38:44 -0800
-Message-Id: <20190209033847.9014-10-richard.henderson@linaro.org>
+Date: Fri,  8 Feb 2019 19:38:45 -0800
+Message-Id: <20190209033847.9014-11-richard.henderson@linaro.org>
 In-Reply-To: <20190209033847.9014-1-richard.henderson@linaro.org>
 References: <20190209033847.9014-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 09/12] target/arm: Fix set of bits kept in
- xregs[ARM_VFP_FPSCR]
+Subject: [Qemu-devel] [PATCH v3 10/12] target/arm: Split out FPSCR.QC to a
+ vector field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Given that we mask bits properly on set, there is no reason
-to mask them again on get.  We failed to clear the exception
-status bits, 0x9f, which means that the wrong value would be
-returned on get.  Except in the (probably normal) case in which
-the set clears all of the bits.
-
-Simplify the code in set to also clear the RES0 bits.
+Change the representation of this field such that it is easy
+to set from vector code.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ target/arm/cpu.h         |  5 ++++-
+ target/arm/helper.c      | 19 +++++++++++++++----
+ target/arm/neon_helper.c |  2 +-
+ target/arm/vec_helper.c  |  2 +-
+ 4 files changed, 21 insertions(+), 7 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 47238e4245..b96463e8f1 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -577,11 +577,13 @@ typedef struct CPUARMState {
+         ARMPredicateReg preg_tmp;
+ #endif
+ 
+-        uint32_t xregs[16];
+         /* We store these fpcsr fields separately for convenience.  */
++        uint32_t qc[4] QEMU_ALIGNED(16);
+         int vec_len;
+         int vec_stride;
+ 
++        uint32_t xregs[16];
++
+         /* Scratch space for aa32 neon expansion.  */
+         uint32_t scratch[8];
+ 
+@@ -1427,6 +1429,7 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
+ #define FPCR_FZ16   (1 << 19)   /* ARMv8.2+, FP16 flush-to-zero */
+ #define FPCR_FZ     (1 << 24)   /* Flush-to-zero enable bit */
+ #define FPCR_DN     (1 << 25)   /* Default NaN enable bit */
++#define FPCR_QC     (1 << 27)   /* Cumulative saturation bit */
+ 
+ static inline uint32_t vfp_get_fpsr(CPUARMState *env)
+ {
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 51be3fa16f..af22274bd9 100644
+index af22274bd9..7ed9933663 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -12588,7 +12588,7 @@ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
-     int i;
-     uint32_t fpscr;
+@@ -12585,8 +12585,7 @@ static inline int vfp_exceptbits_from_host(int host_bits)
  
--    fpscr = (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
-+    fpscr = env->vfp.xregs[ARM_VFP_FPSCR]
-             | (env->vfp.vec_len << 16)
-             | (env->vfp.vec_stride << 20);
- 
-@@ -12630,7 +12630,7 @@ static inline int vfp_exceptbits_to_host(int target_bits)
- void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
  {
-     int i;
--    uint32_t changed;
-+    uint32_t changed = env->vfp.xregs[ARM_VFP_FPSCR];
+-    int i;
+-    uint32_t fpscr;
++    uint32_t i, fpscr;
  
-     /* When ARMv8.2-FP16 is not supported, FZ16 is RES0.  */
-     if (!cpu_isar_feature(aa64_fp16, arm_env_get_cpu(env))) {
-@@ -12639,12 +12639,13 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
- 
-     /*
-      * We don't implement trapped exception handling, so the
--     * trap enable bits are all RAZ/WI (not RES0!)
-+     * trap enable bits, IDE|IXE|UFE|OFE|DZE|IOE are all RAZ/WI (not RES0!)
-+     *
-+     * If we exclude the exception flags, IOC|DZC|OFC|UFC|IXC|IDC
-+     * (which are stored in fp_status), and the other RES0 bits
-+     * in between, then we clear all of the low 16 bits.
-      */
--    val &= ~(FPCR_IDE | FPCR_IXE | FPCR_UFE | FPCR_OFE | FPCR_DZE | FPCR_IOE);
+     fpscr = env->vfp.xregs[ARM_VFP_FPSCR]
+             | (env->vfp.vec_len << 16)
+@@ -12597,8 +12596,11 @@ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+     /* FZ16 does not generate an input denormal exception.  */
+     i |= (get_float_exception_flags(&env->vfp.fp_status_f16)
+           & ~float_flag_input_denormal);
 -
--    changed = env->vfp.xregs[ARM_VFP_FPSCR];
--    env->vfp.xregs[ARM_VFP_FPSCR] = (val & 0xffc8ffff);
-+    env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xffc80000;
+     fpscr |= vfp_exceptbits_from_host(i);
++
++    i = env->vfp.qc[0] | env->vfp.qc[1] | env->vfp.qc[2] | env->vfp.qc[3];
++    fpscr |= i ? FPCR_QC : 0;
++
+     return fpscr;
+ }
+ 
+@@ -12645,10 +12647,19 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+      * (which are stored in fp_status), and the other RES0 bits
+      * in between, then we clear all of the low 16 bits.
+      */
+-    env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xffc80000;
++    env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7c80000;
      env->vfp.vec_len = (val >> 16) & 7;
      env->vfp.vec_stride = (val >> 20) & 3;
  
++    /*
++     * The bit we set within fpscr_q is arbitrary; the register as a
++     * whole being zero/non-zero is what counts.
++     */
++    env->vfp.qc[0] = val & FPCR_QC;
++    env->vfp.qc[1] = 0;
++    env->vfp.qc[2] = 0;
++    env->vfp.qc[3] = 0;
++
+     changed ^= val;
+     if (changed & (3 << 22)) {
+         i = (val >> 22) & 3;
+diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
+index 3249005b62..ed1c6fc41c 100644
+--- a/target/arm/neon_helper.c
++++ b/target/arm/neon_helper.c
+@@ -15,7 +15,7 @@
+ #define SIGNBIT (uint32_t)0x80000000
+ #define SIGNBIT64 ((uint64_t)1 << 63)
+ 
+-#define SET_QC() env->vfp.xregs[ARM_VFP_FPSCR] |= CPSR_Q
++#define SET_QC() env->vfp.qc[0] = 1
+ 
+ #define NEON_TYPE1(name, type) \
+ typedef struct \
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 37f338732e..65a18af4e0 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -36,7 +36,7 @@
+ #define H4(x)  (x)
+ #endif
+ 
+-#define SET_QC() env->vfp.xregs[ARM_VFP_FPSCR] |= CPSR_Q
++#define SET_QC() env->vfp.qc[0] = 1
+ 
+ static void clear_tail(void *vd, uintptr_t opr_sz, uintptr_t max_sz)
+ {
 -- 
 2.17.2
