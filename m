@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49371)
+Received: from eggs.gnu.org ([209.51.188.92]:56615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsW8a-0005kz-4G
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 12:09:56 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gsZXn-0008Lk-6E
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 15:48:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsW8Y-0005Tb-5X
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 12:09:56 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42633)
+	(envelope-from <alex.bennee@linaro.org>) id 1gsZXl-000362-8c
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 15:48:10 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsW8V-0005Qu-SJ
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 12:09:52 -0500
-Received: by mail-pg1-x541.google.com with SMTP id d72so2947366pga.9
-	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 09:09:50 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gsZXi-00031C-R5
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 15:48:08 -0500
+Received: by mail-wm1-x341.google.com with SMTP id t200so9606952wmt.0
+	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 12:48:05 -0800 (PST)
 References: <20190209162745.12668-1-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <092ef5ac-15a7-8515-a220-0c9cb405b744@linaro.org>
-Date: Sat, 9 Feb 2019 09:09:45 -0800
+	<20190209162745.12668-2-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190209162745.12668-2-cota@braap.org>
+Date: Sat, 09 Feb 2019 20:48:02 +0000
+Message-ID: <877ee88z99.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190209162745.12668-1-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2]
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] exec-all: document that tlb_fill can
+ trigger a TLB resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,17 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-
-On 2/9/19 8:27 AM, Emilio G. Cota wrote:
-> Fix a bug introduced with dynamic TLB sizing -- we forgot to account
-> for possible TLB resizes during tlb_fill().
-> 
-> Max reported the bug and provided a reproducer here:
->   https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02283.html
-
-Thanks, queued.
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
 
 
-r~
+Emilio G. Cota <cota@braap.org> writes:
+
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/exec/exec-all.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index aa7b81aaf0..97b90cb0db 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -475,6 +475,11 @@ static inline void assert_no_pages_locked(void)
+>  struct MemoryRegionSection *iotlb_to_section(CPUState *cpu,
+>                                               hwaddr index, MemTxAttrs at=
+trs);
+>
+> +/*
+> + * Note: tlb_fill() can trigger a resize of the TLB. This means that all=
+ of the
+> + * caller's prior references to the TLB table (e.g. CPUTLBEntry pointers=
+) must
+> + * be discarded and looked up again (e.g. via tlb_entry()).
+> + */
+>  void tlb_fill(CPUState *cpu, target_ulong addr, int size,
+>                MMUAccessType access_type, int mmu_idx, uintptr_t retaddr);
+
+
+--
+Alex Benn=C3=A9e
