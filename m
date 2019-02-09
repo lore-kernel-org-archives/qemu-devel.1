@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46625)
+Received: from eggs.gnu.org ([209.51.188.92]:48237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gsJqA-00013h-C8
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:02:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gsJzy-0004BN-13
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:12:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gsJq9-0000O2-IA
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:02:06 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Date: Fri,  8 Feb 2019 23:01:32 -0500
-Message-Id: <20190209040132.25573-3-crosa@redhat.com>
-In-Reply-To: <20190209040132.25573-1-crosa@redhat.com>
-References: <20190209040132.25573-1-crosa@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gsJzv-0006aX-51
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:12:13 -0500
+Resent-Message-Id: <E1gsJzv-0006aX-51@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21024)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gsJzu-0006Zq-JZ
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:12:10 -0500
+Message-ID: <154968458605.29184.7724723105136230540@ebba9967afc0>
+In-Reply-To: <20190209033847.9014-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] qemu-iotests: add "make check-block" job
- to Travis
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Feb 2019 19:56:27 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] target/arm: tcg vector cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>, Cleber Rosa <crosa@redhat.com>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-I usually keep an eye if I'm breaking stuff by looking at Travis
-(too).  So it seems like a good idea to add a job that will do that.
-
-A few things deserve a better explanation:
-
-  * test 233 requires "--enable-gnutls", and fails without it
-
-  * QEMU seems unable to initialize sound devices on the environment
-    given by Travis, and that's why it's compiled without any audio
-    driver.
-
-  * The syntax for setting an empty list of audio drivers possibly
-    deserves some TLC (it's not currently possible to set it to an
-    empty list with quotes, resulting in something like "Unknown
-    driver '''' selected".
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- .travis.yml | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/.travis.yml b/.travis.yml
-index 87d9fa971c..6d60ae9762 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -196,6 +196,14 @@ matrix:
-           packages:
-             - python3-pip
-             - python3.5-venv
-+
-+
-+    # qemu-iotests
-+    - env:
-+        - CONFIG=3D"--target-list=3Dx86_64-softmmu --enable-gnutls --aud=
-io-drv-list=3D"
-+        - TEST_CMD=3D"make check-block"
-+
-+
-     # Using newer GCC with sanitizers
-     - addons:
-         apt:
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwOTAzMzg0Ny45MDE0
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8x
+Ml0gdGFyZ2V0L2FybTogdGNnIHZlY3RvciBjbGVhbnVwcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1p
+ZDogMjAxOTAyMDkwMzM4NDcuOTAxNC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
+ICBwYXRjaGV3LzIwMTkwMjA5MDMzODQ3LjkwMTQtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnIC0+IHBhdGNoZXcvMjAxOTAyMDkwMzM4NDcuOTAxNC0xLXJpY2hhcmQuaGVuZGVyc29uQGxp
+bmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxNGFiM2U0YjJkIHRhcmdl
+dC9hcm06IEFkZCBtaXNzaW5nIGNsZWFyX3RhaWwgY2FsbHMKNmUxZmYzZWRiMCB0YXJnZXQvYXJt
+OiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24KMGU0ZTkyMWE5MyB0YXJnZXQv
+YXJtOiBTcGxpdCBvdXQgRlBTQ1IuUUMgdG8gYSB2ZWN0b3IgZmllbGQKNDBiNTUyZDUwNCB0YXJn
+ZXQvYXJtOiBGaXggc2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXQozZWUx
+ZGE3MWUxIHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBh
+cmVzCjQxZTg2OTQzNjkgdGFyZ2V0L2FybTogRml4IGFybV9jcHVfZHVtcF9zdGF0ZSB2cyBGUFND
+UgoyMzYyOGMwM2FkIHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9zZXRfcmVnIHZzIEZQU0NS
+Cjc4MGRjMTNjMGUgdGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzCmZjNjM2
+ZDdjZGMgdGFyZ2V0L2FybTogVXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3Ig
+bmVvbgo4ZmY2NDkyZjYyIHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBm
+b3IgYWFyY2gzMgpkODZlYWEzNzkzIHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFu
+ZGVycyBmb3IgYWFyY2g2NApmYzBiODJjNGFiIHRhcmdldC9hcm06IFJlbHkgb24gb3B0aW1pemF0
+aW9uIHdpdGhpbiB0Y2dfZ2VuX2d2ZWNfb3IKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTIgQ2hl
+Y2tpbmcgY29tbWl0IGZjMGI4MmM0YWI3NCAodGFyZ2V0L2FybTogUmVseSBvbiBvcHRpbWl6YXRp
+b24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcikKMi8xMiBDaGVja2luZyBjb21taXQgZDg2ZWFhMzc5
+MzQzICh0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQp
+CjMvMTIgQ2hlY2tpbmcgY29tbWl0IDhmZjY0OTJmNjI4YiAodGFyZ2V0L2FybTogVXNlIHZlY3Rv
+ciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyKQo0LzEyIENoZWNraW5nIGNvbW1pdCBmYzYz
+NmQ3Y2RjOTQgKHRhcmdldC9hcm06IFVzZSB0Y2cgaW50ZWdlciBtaW4vbWF4IHByaW1pdGl2ZXMg
+Zm9yIG5lb24pCjUvMTIgQ2hlY2tpbmcgY29tbWl0IDc4MGRjMTNjMGVmOSAodGFyZ2V0L2FybTog
+UmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzKQo2LzEyIENoZWNraW5nIGNvbW1pdCAyMzYyOGMw
+M2FkMWIgKHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9zZXRfcmVnIHZzIEZQU0NSKQpFUlJP
+UjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMyMjogRklMRTog
+dGFyZ2V0L2FybS9oZWxwZXIuYzo4NDoKKyAgICBjYXNlIDE6IHN0bF9wKGJ1ZiwgdmZwX2dldF9m
+cHNjcihlbnYpKTsgcmV0dXJuIDQ7CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQg
+YmUgb24gbmV4dCBsaW5lCiMzMTogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMTA6CisgICAg
+Y2FzZSAxOiB2ZnBfc2V0X2Zwc2NyKGVudiwgbGRsX3AoYnVmKSk7IHJldHVybiA0OwoKdG90YWw6
+IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEyIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEyIENoZWNraW5nIGNvbW1pdCA0MWU4Njk0MzY5ZjAg
+KHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjgvMTIgQ2hlY2tp
+bmcgY29tbWl0IDNlZTFkYTcxZTEwZSAodGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdzIHNldHRp
+bmcgZnJvbSB2ZnAgY29tcGFyZXMpCjkvMTIgQ2hlY2tpbmcgY29tbWl0IDQwYjU1MmQ1MDQ5YiAo
+dGFyZ2V0L2FybTogRml4IHNldCBvZiBiaXRzIGtlcHQgaW4geHJlZ3NbQVJNX1ZGUF9GUFNDUl0p
+CjEwLzEyIENoZWNraW5nIGNvbW1pdCAwZTRlOTIxYTkzZTMgKHRhcmdldC9hcm06IFNwbGl0IG91
+dCBGUFNDUi5RQyB0byBhIHZlY3RvciBmaWVsZCkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDZlMWZm
+M2VkYjAwMSAodGFyZ2V0L2FybTogVXNlIHZlY3RvciBvcGVyYXRpb25zIGZvciBzYXR1cmF0aW9u
+KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzM1Nzog
+RklMRTogdGFyZ2V0L2FybS92ZWNfaGVscGVyLmM6Nzc0OgorICAgIFRZUEVOICpkID0gdmQsICpu
+ID0gdm47IFRZUEVNICptID0gdm07ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3
+YXJuaW5ncywgNDM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzEyIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgoxMi8xMiBDaGVja2luZyBjb21taXQgMTRhYjNlNGIyZGQwICh0YXJnZXQvYXJt
+OiBBZGQgbWlzc2luZyBjbGVhcl90YWlsIGNhbGxzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
+Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
+dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwOTAzMzg0Ny45MDE0LTEtcmljaGFyZC5o
+ZW5kZXJzb25AbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
+LmNvbQ==
