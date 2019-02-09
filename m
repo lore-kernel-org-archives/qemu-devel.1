@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42465)
+Received: from eggs.gnu.org ([209.51.188.92]:42499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsJTs-0006qx-Ej
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:05 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gsJU1-0006vV-QY
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsJTq-0000Ux-DX
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:04 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40294)
+	(envelope-from <richard.henderson@linaro.org>) id 1gsJTx-0000Xb-Te
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:11 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39183)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsJTo-0000UL-VV
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:01 -0500
-Received: by mail-pf1-x443.google.com with SMTP id i12so2572440pfo.7
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 19:39:00 -0800 (PST)
+	id 1gsJTs-0000V9-Cy
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 22:39:05 -0500
+Received: by mail-pf1-x441.google.com with SMTP id f132so2577963pfa.6
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 19:39:03 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  8 Feb 2019 19:38:40 -0800
-Message-Id: <20190209033847.9014-6-richard.henderson@linaro.org>
+Date: Fri,  8 Feb 2019 19:38:42 -0800
+Message-Id: <20190209033847.9014-8-richard.henderson@linaro.org>
 In-Reply-To: <20190209033847.9014-1-richard.henderson@linaro.org>
 References: <20190209033847.9014-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 05/12] target/arm: Remove neon min/max
- helpers
+Subject: [Qemu-devel] [PATCH v3 07/12] target/arm: Fix arm_cpu_dump_state vs
+ FPSCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +30,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-These are now unused.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h      | 12 ------------
- target/arm/neon_helper.c | 12 ------------
- 2 files changed, 24 deletions(-)
+ target/arm/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 53a38188c6..9874c35ea9 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -276,18 +276,6 @@ DEF_HELPER_2(neon_cge_s16, i32, i32, i32)
- DEF_HELPER_2(neon_cge_u32, i32, i32, i32)
- DEF_HELPER_2(neon_cge_s32, i32, i32, i32)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f0101d2788..9b426f4271 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -13641,7 +13641,7 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+                         i * 2 + 1, (uint32_t)(v >> 32),
+                         i, v);
+         }
+-        cpu_fprintf(f, "FPSCR: %08x\n", (int)env->vfp.xregs[ARM_VFP_FPSCR]);
++        cpu_fprintf(f, "FPSCR: %08x\n", vfp_get_fpscr(env));
+     }
+ }
  
--DEF_HELPER_2(neon_min_u8, i32, i32, i32)
--DEF_HELPER_2(neon_min_s8, i32, i32, i32)
--DEF_HELPER_2(neon_min_u16, i32, i32, i32)
--DEF_HELPER_2(neon_min_s16, i32, i32, i32)
--DEF_HELPER_2(neon_min_u32, i32, i32, i32)
--DEF_HELPER_2(neon_min_s32, i32, i32, i32)
--DEF_HELPER_2(neon_max_u8, i32, i32, i32)
--DEF_HELPER_2(neon_max_s8, i32, i32, i32)
--DEF_HELPER_2(neon_max_u16, i32, i32, i32)
--DEF_HELPER_2(neon_max_s16, i32, i32, i32)
--DEF_HELPER_2(neon_max_u32, i32, i32, i32)
--DEF_HELPER_2(neon_max_s32, i32, i32, i32)
- DEF_HELPER_2(neon_pmin_u8, i32, i32, i32)
- DEF_HELPER_2(neon_pmin_s8, i32, i32, i32)
- DEF_HELPER_2(neon_pmin_u16, i32, i32, i32)
-diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-index c2c6491a83..3249005b62 100644
---- a/target/arm/neon_helper.c
-+++ b/target/arm/neon_helper.c
-@@ -581,12 +581,6 @@ NEON_VOP(cge_u32, neon_u32, 1)
- #undef NEON_FN
- 
- #define NEON_FN(dest, src1, src2) dest = (src1 < src2) ? src1 : src2
--NEON_VOP(min_s8, neon_s8, 4)
--NEON_VOP(min_u8, neon_u8, 4)
--NEON_VOP(min_s16, neon_s16, 2)
--NEON_VOP(min_u16, neon_u16, 2)
--NEON_VOP(min_s32, neon_s32, 1)
--NEON_VOP(min_u32, neon_u32, 1)
- NEON_POP(pmin_s8, neon_s8, 4)
- NEON_POP(pmin_u8, neon_u8, 4)
- NEON_POP(pmin_s16, neon_s16, 2)
-@@ -594,12 +588,6 @@ NEON_POP(pmin_u16, neon_u16, 2)
- #undef NEON_FN
- 
- #define NEON_FN(dest, src1, src2) dest = (src1 > src2) ? src1 : src2
--NEON_VOP(max_s8, neon_s8, 4)
--NEON_VOP(max_u8, neon_u8, 4)
--NEON_VOP(max_s16, neon_s16, 2)
--NEON_VOP(max_u16, neon_u16, 2)
--NEON_VOP(max_s32, neon_s32, 1)
--NEON_VOP(max_u32, neon_u32, 1)
- NEON_POP(pmax_s8, neon_s8, 4)
- NEON_POP(pmax_u8, neon_u8, 4)
- NEON_POP(pmax_s16, neon_s16, 2)
 -- 
 2.17.2
