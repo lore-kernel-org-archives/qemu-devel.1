@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42088)
+Received: from eggs.gnu.org ([209.51.188.92]:42215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJ0-0003af-IR
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMJ9-0003ld-H6
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMIz-0003Xr-J0
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMJ8-0003h0-Qz
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:11 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat,  9 Feb 2019 07:39:13 +0100
-Message-Id: <1549694366-1284-13-git-send-email-thuth@redhat.com>
+Date: Sat,  9 Feb 2019 07:39:17 +0100
+Message-Id: <1549694366-1284-17-git-send-email-thuth@redhat.com>
 In-Reply-To: <1549694366-1284-1-git-send-email-thuth@redhat.com>
 References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/25] hw/arm: Express dependencies of the
- aspeed boards with Kconfig
+Subject: [Qemu-devel] [PATCH 16/25] hw/arm: Express dependencies of the MPS2
+ boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
 Cc: qemu-arm@nongnu.org, philmd@redhat.com
 
-Dependencies have been determined by looking at hw/arm/aspeed.c
+Add Kconfig dependencies for the mps2-an* machines.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak |  7 +------
- hw/arm/Kconfig                  | 10 ++++++++++
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ default-configs/arm-softmmu.mak | 19 +------------------
+ hw/arm/Kconfig                  | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 9851068..b2e31b3 100644
+index 28bb37f..b530a06 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -22,15 +22,12 @@ CONFIG_SPITZ=y
- CONFIG_TOSA=y
- CONFIG_Z2=y
+@@ -26,6 +26,7 @@ CONFIG_Z2=y
  CONFIG_COLLIE=y
-+CONFIG_ASPEED_SOC=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_NETDUINO2=y
++CONFIG_MPS2=y
  
  CONFIG_VGA=y
--CONFIG_TMP421=y
--CONFIG_PCA9552=y
  CONFIG_SSI_M25P80=y
- CONFIG_ALLWINNER_EMAC=y
- CONFIG_IMX_FEC=y
--CONFIG_FTGMAC100=y
--CONFIG_DS1338=y
- CONFIG_PLATFORM_BUS=y
- CONFIG_VIRTIO_MMIO=y
+@@ -34,27 +35,9 @@ CONFIG_IMX_FEC=y
+ CONFIG_FRAMEBUFFER=y
  
-@@ -90,8 +87,6 @@ CONFIG_I82801B11=y
- CONFIG_ACPI=y
- CONFIG_ARM_VIRT=y
- CONFIG_SMBIOS=y
--CONFIG_ASPEED_SOC=y
--CONFIG_SMBUS_EEPROM=y
- CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
- CONFIG_FW_CFG_DMA=y
+ CONFIG_DIGIC=y
+-CONFIG_MPS2=y
+ CONFIG_RASPI=y
+ CONFIG_NRF51_SOC=y
+ 
+-CONFIG_CMSDK_APB_TIMER=y
+-CONFIG_CMSDK_APB_DUALTIMER=y
+-CONFIG_CMSDK_APB_UART=y
+-CONFIG_CMSDK_APB_WATCHDOG=y
+-
+-CONFIG_MPS2_FPGAIO=y
+-CONFIG_MPS2_SCC=y
+-
+-CONFIG_TZ_MPC=y
+-CONFIG_TZ_MSC=y
+-CONFIG_TZ_PPC=y
+-CONFIG_ARMSSE=y
+-CONFIG_IOTKIT_SECCTL=y
+-CONFIG_IOTKIT_SYSCTL=y
+-CONFIG_IOTKIT_SYSINFO=y
+-CONFIG_ARMSSE_CPUID=y
+-
+ CONFIG_FSL_IMX6=y
+ CONFIG_FSL_IMX25=y
+ CONFIG_FSL_IMX7=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 39cbda9..a4fe2c8 100644
+index 3621d44..5765fe9 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -267,6 +267,16 @@ config FSL_IMX6
- 
- config ASPEED_SOC
-     bool
-+    select DS1338
-+    select FTGMAC100
-+    select I2C
-+    select PCA9552
-+    select SERIAL
-+    select SMBUS_EEPROM
-+    select SSI
-+    select SSI_M25P80
-+    select TMP105
-+    select TMP421
+@@ -315,6 +315,23 @@ config ASPEED_SOC
  
  config MPS2
+     bool
++    select ARMSSE
++    select ARMSSE_CPUID
++    select CMSDK_APB_TIMER
++    select CMSDK_APB_DUALTIMER
++    select CMSDK_APB_UART
++    select CMSDK_APB_WATCHDOG
++    select IOTKIT_SECCTL
++    select IOTKIT_SYSCTL
++    select IOTKIT_SYSINFO
++    select LAN9118
++    select MPS2_FPGAIO
++    select MPS2_SCC
++    select PL022    # Serial port
++    select PL080    # DMA controller
++    select TZ_MPC
++    select TZ_MSC
++    select TZ_PPC
+ 
+ config IOTKIT
      bool
 -- 
 1.8.3.1
