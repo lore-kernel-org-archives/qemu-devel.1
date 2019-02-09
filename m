@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42021)
+Received: from eggs.gnu.org ([209.51.188.92]:41942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMIz-0003Z6-Cj
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:02 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMIx-0003VH-SR
+	(envelope-from <thuth@redhat.com>) id 1gsMIy-0003Xo-5S
 	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:01 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <thuth@redhat.com>) id 1gsMIw-0003Tu-Rs
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:00 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat,  9 Feb 2019 07:39:06 +0100
-Message-Id: <1549694366-1284-6-git-send-email-thuth@redhat.com>
+Date: Sat,  9 Feb 2019 07:39:03 +0100
+Message-Id: <1549694366-1284-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1549694366-1284-1-git-send-email-thuth@redhat.com>
 References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/25] hw/arm: Express dependencies of musicpal
- with Kconfig
+Subject: [Qemu-devel] [PATCH 02/25] hw/arm: Express dependencies of the
+ highbank machines with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +26,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
 Cc: qemu-arm@nongnu.org, philmd@redhat.com
 
+Add Kconfig dependencies for the highbank machine (and the midway
+machine).
 This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
 e.
 his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 6 +-----
- hw/arm/Kconfig                  | 6 ++++++
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ default-configs/arm-softmmu.mak |  4 +---
+ hw/arm/Kconfig                  | 12 ++++++++++++
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 19d0ab0..fe7e306 100644
+index 3baafc4..59734ee 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -9,13 +9,13 @@ CONFIG_EXYNOS4=3Dy
- CONFIG_HIGHBANK=3Dy
- CONFIG_INTEGRATOR=3Dy
- CONFIG_FSL_IMX31=3Dy
-+CONFIG_MUSICPAL=3Dy
+@@ -6,6 +6,7 @@ CONFIG_ARM_V7M=3Dy
+ CONFIG_PCI_DEVICES=3Dy
+=20
+ CONFIG_EXYNOS4=3Dy
++CONFIG_HIGHBANK=3Dy
 =20
  CONFIG_VGA=3Dy
  CONFIG_NAND=3Dy
- CONFIG_ECC=3Dy
- CONFIG_SERIAL=3Dy
- CONFIG_MAX7310=3Dy
--CONFIG_WM8750=3Dy
- CONFIG_TWL92230=3Dy
- CONFIG_TSC2005=3Dy
- CONFIG_LM832X=3Dy
-@@ -38,7 +38,6 @@ CONFIG_IMX_FEC=3Dy
- CONFIG_FTGMAC100=3Dy
- CONFIG_DS1338=3Dy
- CONFIG_PFLASH_CFI01=3Dy
--CONFIG_PFLASH_CFI02=3Dy
- CONFIG_MICRODRIVE=3Dy
- CONFIG_USB_MUSB=3Dy
- CONFIG_PLATFORM_BUS=3Dy
-@@ -56,14 +55,12 @@ CONFIG_PL190=3Dy
+@@ -54,14 +55,12 @@ CONFIG_PL022=3Dy
+ CONFIG_PL031=3Dy
+ CONFIG_PL041=3Dy
+ CONFIG_PL050=3Dy
+-CONFIG_PL061=3Dy
+ CONFIG_PL080=3Dy
+ CONFIG_PL110=3Dy
+ CONFIG_PL181=3Dy
+ CONFIG_PL190=3Dy
  CONFIG_PL330=3Dy
  CONFIG_CADENCE=3Dy
+-CONFIG_XGMAC=3Dy
  CONFIG_PXA2XX=3Dy
--CONFIG_BITBANG_I2C=3Dy
+ CONFIG_BITBANG_I2C=3Dy
  CONFIG_FRAMEBUFFER=3Dy
- CONFIG_XILINX_SPIPS=3Dy
- CONFIG_ZYNQ_DEVCFG=3Dy
-=20
- CONFIG_ARM11SCU=3Dy
- CONFIG_DIGIC=3Dy
--CONFIG_MARVELL_88W8618=3Dy
- CONFIG_OMAP=3Dy
- CONFIG_TSC210X=3Dy
- CONFIG_BLIZZARD=3Dy
-@@ -140,7 +137,6 @@ CONFIG_XILINX_AXI=3Dy
+@@ -151,7 +150,6 @@ CONFIG_XILINX_AXI=3Dy
  CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
 =20
  CONFIG_STRONGARM=3Dy
--CONFIG_MUSICPAL=3Dy
+-CONFIG_HIGHBANK=3Dy
+ CONFIG_MUSICPAL=3Dy
 =20
  # for realview and versatilepb
- CONFIG_LSI_SCSI_PCI=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 3d0ee29..aeb0cf0 100644
+index 2850000..984de8a 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -48,7 +48,13 @@ config MAINSTONE
+@@ -18,6 +18,18 @@ config EXYNOS4
 =20
- config MUSICPAL
+ config HIGHBANK
      bool
-+    select BITBANG_I2C
-+    select MARVELL_88W8618
-     select PTIMER
-+    select PFLASH_CFI02
++    select A9MPCORE
++    select A15MPCORE
++    select AHCI
++    select ARM_TIMER # sp804
++    select ARM_V7M
 +    select PCI
-+    select SERIAL
-+    select WM8750
++    select PL011 # UART
++    select PL022 # Serial port
++    select PL031 # RTC
++    select PL061 # GPIO
++    select PL310 # cache controller
++    select XGMAC # ethernet
 =20
- config NETDUINO2
+ config INTEGRATOR
      bool
 --=20
 1.8.3.1
