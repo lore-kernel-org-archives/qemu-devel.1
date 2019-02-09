@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42483)
+Received: from eggs.gnu.org ([209.51.188.92]:42475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJs-0004XD-V4
+	(envelope-from <thuth@redhat.com>) id 1gsMJs-0004Wr-OM
 	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJr-0004XP-OA
+	(envelope-from <thuth@redhat.com>) id 1gsMJr-0004XE-P6
 	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:56 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat,  9 Feb 2019 07:39:21 +0100
-Message-Id: <1549694366-1284-21-git-send-email-thuth@redhat.com>
+Date: Sat,  9 Feb 2019 07:39:25 +0100
+Message-Id: <1549694366-1284-25-git-send-email-thuth@redhat.com>
 In-Reply-To: <1549694366-1284-1-git-send-email-thuth@redhat.com>
 References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 20/25] hw/arm: Express dependencies of the MSF2
- machine with Kconfig
+Subject: [Qemu-devel] [PATCH 24/25] hw/arm: Express dependencies of the
+ xlnx-versal-virt machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
 Cc: qemu-arm@nongnu.org, philmd@redhat.com
 
-Add Kconfig dependencies for the emcraft-sf2 machine.
+Dependencies have been determined with trial-and-error and by
+looking at the xlnx-versal.c source file.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 3 +--
- hw/arm/Kconfig                  | 4 ++++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ hw/arm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index f6193b1..729e4b8 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -30,9 +30,9 @@ CONFIG_MPS2=y
- CONFIG_RASPI=y
- CONFIG_DIGIC=y
- CONFIG_SABRELITE=y
-+CONFIG_MSF2=y
- 
- CONFIG_VGA=y
--CONFIG_SSI_M25P80=y
- CONFIG_IMX_FEC=y
- 
- CONFIG_NRF51_SOC=y
-@@ -45,5 +45,4 @@ CONFIG_PCIE_PORT=y
- CONFIG_XIO3130=y
- CONFIG_IOH3420=y
- CONFIG_I82801B11=y
--CONFIG_MSF2=y
- CONFIG_PCI_EXPRESS_DESIGNWARE=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index d98d39e..7823a16 100644
+index 3577550..d9150cd 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -362,7 +362,11 @@ config NRF51_SOC
+@@ -306,6 +306,10 @@ config XLNX_ZYNQMP_ARM
  
- config MSF2
+ config XLNX_VERSAL
      bool
-+    select ARM_V7M
-     select PTIMER
-+    select SERIAL
-+    select SSI
-+    select SSI_M25P80
++    select ARM_GIC
++    select PL011
++    select CADENCE
++    select VIRTIO_MMIO
  
- config ZAURUS
+ config FSL_IMX25
      bool
 -- 
 1.8.3.1
