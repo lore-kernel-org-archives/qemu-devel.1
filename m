@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48237)
+Received: from eggs.gnu.org ([209.51.188.92]:48787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gsJzy-0004BN-13
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:12:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1gsK3Q-0005DY-8V
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gsJzv-0006aX-51
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:12:13 -0500
-Resent-Message-Id: <E1gsJzv-0006aX-51@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21024)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gsJzu-0006Zq-JZ
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:12:10 -0500
-Message-ID: <154968458605.29184.7724723105136230540@ebba9967afc0>
-In-Reply-To: <20190209033847.9014-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bounces@canonical.com>) id 1gsK3L-0008PN-Hy
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:15:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45490)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gsK3H-0008JH-PA
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 23:15:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gsK3B-0005wr-Mw
+	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 04:15:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AB9102E80C7
+	for <qemu-devel@nongnu.org>; Sat,  9 Feb 2019 04:15:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Feb 2019 19:56:27 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] target/arm: tcg vector cleanups
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 09 Feb 2019 04:07:31 -0000
+From: Nathan Wallace <1815263@bugs.launchpad.net>
+Reply-To: Bug 1815263 <1815263@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154968525163.25022.16965396624156433331.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815263] [NEW] hvf accelerator crashes on quest
+ boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +36,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwOTAzMzg0Ny45MDE0
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8x
-Ml0gdGFyZ2V0L2FybTogdGNnIHZlY3RvciBjbGVhbnVwcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1p
-ZDogMjAxOTAyMDkwMzM4NDcuOTAxNC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
-ICBwYXRjaGV3LzIwMTkwMjA5MDMzODQ3LjkwMTQtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnIC0+IHBhdGNoZXcvMjAxOTAyMDkwMzM4NDcuOTAxNC0xLXJpY2hhcmQuaGVuZGVyc29uQGxp
-bmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxNGFiM2U0YjJkIHRhcmdl
-dC9hcm06IEFkZCBtaXNzaW5nIGNsZWFyX3RhaWwgY2FsbHMKNmUxZmYzZWRiMCB0YXJnZXQvYXJt
-OiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24KMGU0ZTkyMWE5MyB0YXJnZXQv
-YXJtOiBTcGxpdCBvdXQgRlBTQ1IuUUMgdG8gYSB2ZWN0b3IgZmllbGQKNDBiNTUyZDUwNCB0YXJn
-ZXQvYXJtOiBGaXggc2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXQozZWUx
-ZGE3MWUxIHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBh
-cmVzCjQxZTg2OTQzNjkgdGFyZ2V0L2FybTogRml4IGFybV9jcHVfZHVtcF9zdGF0ZSB2cyBGUFND
-UgoyMzYyOGMwM2FkIHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9zZXRfcmVnIHZzIEZQU0NS
-Cjc4MGRjMTNjMGUgdGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzCmZjNjM2
-ZDdjZGMgdGFyZ2V0L2FybTogVXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3Ig
-bmVvbgo4ZmY2NDkyZjYyIHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBm
-b3IgYWFyY2gzMgpkODZlYWEzNzkzIHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFu
-ZGVycyBmb3IgYWFyY2g2NApmYzBiODJjNGFiIHRhcmdldC9hcm06IFJlbHkgb24gb3B0aW1pemF0
-aW9uIHdpdGhpbiB0Y2dfZ2VuX2d2ZWNfb3IKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTIgQ2hl
-Y2tpbmcgY29tbWl0IGZjMGI4MmM0YWI3NCAodGFyZ2V0L2FybTogUmVseSBvbiBvcHRpbWl6YXRp
-b24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcikKMi8xMiBDaGVja2luZyBjb21taXQgZDg2ZWFhMzc5
-MzQzICh0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQp
-CjMvMTIgQ2hlY2tpbmcgY29tbWl0IDhmZjY0OTJmNjI4YiAodGFyZ2V0L2FybTogVXNlIHZlY3Rv
-ciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyKQo0LzEyIENoZWNraW5nIGNvbW1pdCBmYzYz
-NmQ3Y2RjOTQgKHRhcmdldC9hcm06IFVzZSB0Y2cgaW50ZWdlciBtaW4vbWF4IHByaW1pdGl2ZXMg
-Zm9yIG5lb24pCjUvMTIgQ2hlY2tpbmcgY29tbWl0IDc4MGRjMTNjMGVmOSAodGFyZ2V0L2FybTog
-UmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzKQo2LzEyIENoZWNraW5nIGNvbW1pdCAyMzYyOGMw
-M2FkMWIgKHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9zZXRfcmVnIHZzIEZQU0NSKQpFUlJP
-UjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMyMjogRklMRTog
-dGFyZ2V0L2FybS9oZWxwZXIuYzo4NDoKKyAgICBjYXNlIDE6IHN0bF9wKGJ1ZiwgdmZwX2dldF9m
-cHNjcihlbnYpKTsgcmV0dXJuIDQ7CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQg
-YmUgb24gbmV4dCBsaW5lCiMzMTogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMTA6CisgICAg
-Y2FzZSAxOiB2ZnBfc2V0X2Zwc2NyKGVudiwgbGRsX3AoYnVmKSk7IHJldHVybiA0OwoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEyIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEyIENoZWNraW5nIGNvbW1pdCA0MWU4Njk0MzY5ZjAg
-KHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjgvMTIgQ2hlY2tp
-bmcgY29tbWl0IDNlZTFkYTcxZTEwZSAodGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdzIHNldHRp
-bmcgZnJvbSB2ZnAgY29tcGFyZXMpCjkvMTIgQ2hlY2tpbmcgY29tbWl0IDQwYjU1MmQ1MDQ5YiAo
-dGFyZ2V0L2FybTogRml4IHNldCBvZiBiaXRzIGtlcHQgaW4geHJlZ3NbQVJNX1ZGUF9GUFNDUl0p
-CjEwLzEyIENoZWNraW5nIGNvbW1pdCAwZTRlOTIxYTkzZTMgKHRhcmdldC9hcm06IFNwbGl0IG91
-dCBGUFNDUi5RQyB0byBhIHZlY3RvciBmaWVsZCkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDZlMWZm
-M2VkYjAwMSAodGFyZ2V0L2FybTogVXNlIHZlY3RvciBvcGVyYXRpb25zIGZvciBzYXR1cmF0aW9u
-KQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzM1Nzog
-RklMRTogdGFyZ2V0L2FybS92ZWNfaGVscGVyLmM6Nzc0OgorICAgIFRZUEVOICpkID0gdmQsICpu
-ID0gdm47IFRZUEVNICptID0gdm07ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3
-YXJuaW5ncywgNDM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzEyIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgoxMi8xMiBDaGVja2luZyBjb21taXQgMTRhYjNlNGIyZGQwICh0YXJnZXQvYXJt
-OiBBZGQgbWlzc2luZyBjbGVhcl90YWlsIGNhbGxzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwOTAzMzg0Ny45MDE0LTEtcmljaGFyZC5o
-ZW5kZXJzb25AbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+Public bug reported:
+
+Host OS: macOS High Sierra (10.13.6)
+MacBook Pro (Retina, Mid 2015)
+Processor: 2.8GHz Intel Core i7
+Guest OS: OpenBSD 6.4 install media (install64.iso)
+Qemu 3.1.0 release, built with:
+./configure --prefix=3D/usr/local/Cellar/qemu/3.1.0_1 --cc=3Dclang
+      --host-cc=3Dclang
+      --disable-bsd-user
+      --disable-guest-agent
+      --enable-curses
+      --enable-libssh2
+      --enable-vde
+      --extra-cflags=3D-DNCURSES_WIDECHAR=3D1
+      --enable-cocoa
+      --disable-sdl
+      --disable-gtk
+      --enable-hvf
+      --target-list=3Dx86_64-softmmu
+      --enable-debug
+
+I invoke qemu like this:
+Last command had exit code: 0 at 22:58
+nwallace@nwallace-ltm3:~
+$ sudo qemu-system-x86_64 -M accel=3Dhvf -boot d -cdrom ~/Downloads/install=
+64.iso
+Password:
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
+80000001H:ECX.svm [bit 2]
+bad size
+
+Abort trap: 6
+Last command had exit code: 134 at 22:58
+nwallace@nwallace-ltm3:~
+$
+
+I ran qemu in lldb to get a stack trace and I get:
+Last command had exit code: 0 at 22:54
+nwallace@nwallace-ltm3:~/Downloads
+$ sudo lldb -- qemu-system-x86_64 -M accel=3Dhvf -boot d -cdrom /Users/nwal=
+lace/Downloads/install64.iso
+Password:
+(lldb) target create "qemu-system-x86_64"
+Current executable set to 'qemu-system-x86_64' (x86_64).
+(lldb) settings set -- target.run-args  "-M" "accel=3Dhvf" "-boot" "d" "-cd=
+rom" "/Users/nwallace/Downloads/install64.i
+so"
+(lldb) run
+Process 96474 launched: '/usr/local/bin/qemu-system-x86_64' (x86_64)
+Process 96474 stopped
+* thread #1, queue =3D 'com.apple.main-thread', stop reason =3D signal SIGU=
+SR2
+    frame #0: 0x00007fff5ef0c00a libsystem_kernel.dylib`__sigsuspend + 10
+libsystem_kernel.dylib`__sigsuspend:
+->  0x7fff5ef0c00a <+10>: jae    0x7fff5ef0c014            ; <+20>
+    0x7fff5ef0c00c <+12>: movq   %rax, %rdi
+    0x7fff5ef0c00f <+15>: jmp    0x7fff5ef02b0e            ; cerror
+    0x7fff5ef0c014 <+20>: retq
+Target 0: (qemu-system-x86_64) stopped.
+(lldb) process handle SIGUSR1 -n true -p true -s false
+NAME         PASS   STOP   NOTIFY
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=3D=
+=3D=3D=3D=3D
+SIGUSR1      true   false  true
+(lldb) process handle SIGUSR2 -n true -p true -s false
+NAME         PASS   STOP   NOTIFY
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=3D=
+=3D=3D=3D=3D
+SIGUSR2      true   false  true
+(lldb) c
+Process 96474 resuming
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
+80000001H:ECX.svm [bit 2]
+Process 96474 stopped and restarted: thread 9 received signal: SIGUSR2
+<line above repeats about 64 times or so>
+Process 96474 stopped and restarted: thread 9 received signal: SIGUSR2
+bad size
+
+Process 96474 stopped
+* thread #9, stop reason =3D signal SIGABRT
+    frame #0: 0x00007fff5ef0bb66 libsystem_kernel.dylib`__pthread_kill + 10
+libsystem_kernel.dylib`__pthread_kill:
+->  0x7fff5ef0bb66 <+10>: jae    0x7fff5ef0bb70            ; <+20>
+    0x7fff5ef0bb68 <+12>: movq   %rax, %rdi
+    0x7fff5ef0bb6b <+15>: jmp    0x7fff5ef02ae9            ; cerror_nocancel
+    0x7fff5ef0bb70 <+20>: retq
+Target 0: (qemu-system-x86_64) stopped.
+(lldb) bt
+* thread #9, stop reason =3D signal SIGABRT
+  * frame #0: 0x00007fff5ef0bb66 libsystem_kernel.dylib`__pthread_kill + 10
+    frame #1: 0x00007fff5f0d6080 libsystem_pthread.dylib`pthread_kill + 333
+    frame #2: 0x00007fff5ee671ae libsystem_c.dylib`abort + 127
+    frame #3: 0x000000010016b6ec qemu-system-x86_64`exec_cmps_single + 400
+    frame #4: 0x000000010016ada4 qemu-system-x86_64`exec_cmps + 65
+    frame #5: 0x0000000100169aaa qemu-system-x86_64`exec_instruction + 48
+    frame #6: 0x0000000100164eb2 qemu-system-x86_64`hvf_vcpu_exec + 2658
+    frame #7: 0x000000010005bed6 qemu-system-x86_64`qemu_hvf_cpu_thread_fn =
++ 200
+    frame #8: 0x00000001003ee531 qemu-system-x86_64`qemu_thread_start + 107
+    frame #9: 0x00007fff5f0d3661 libsystem_pthread.dylib`_pthread_body + 340
+    frame #10: 0x00007fff5f0d350d libsystem_pthread.dylib`_pthread_start + =
+377
+    frame #11: 0x00007fff5f0d2bf9 libsystem_pthread.dylib`thread_start + 13
+(lldb) quit
+Quitting LLDB will kill one or more processes. Do you really want to procee=
+d: [Y/n] Y
+Last command had exit code: 0 at 23:01
+nwallace@nwallace-ltm3:~/Downloads
+$
+
+
+I'm happy to work with someone more knowledgeable to reproduce this issue a=
+nd provide debugging assistance as I'm able.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815263
+
+Title:
+  hvf accelerator crashes on quest boot
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host OS: macOS High Sierra (10.13.6)
+  MacBook Pro (Retina, Mid 2015)
+  Processor: 2.8GHz Intel Core i7
+  Guest OS: OpenBSD 6.4 install media (install64.iso)
+  Qemu 3.1.0 release, built with:
+  ./configure --prefix=3D/usr/local/Cellar/qemu/3.1.0_1 --cc=3Dclang
+        --host-cc=3Dclang
+        --disable-bsd-user
+        --disable-guest-agent
+        --enable-curses
+        --enable-libssh2
+        --enable-vde
+        --extra-cflags=3D-DNCURSES_WIDECHAR=3D1
+        --enable-cocoa
+        --disable-sdl
+        --disable-gtk
+        --enable-hvf
+        --target-list=3Dx86_64-softmmu
+        --enable-debug
+
+  I invoke qemu like this:
+  Last command had exit code: 0 at 22:58
+  nwallace@nwallace-ltm3:~
+  $ sudo qemu-system-x86_64 -M accel=3Dhvf -boot d -cdrom ~/Downloads/insta=
+ll64.iso
+  Password:
+  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
+D.80000001H:ECX.svm [bit 2]
+  bad size
+
+  Abort trap: 6
+  Last command had exit code: 134 at 22:58
+  nwallace@nwallace-ltm3:~
+  $
+
+  I ran qemu in lldb to get a stack trace and I get:
+  Last command had exit code: 0 at 22:54
+  nwallace@nwallace-ltm3:~/Downloads
+  $ sudo lldb -- qemu-system-x86_64 -M accel=3Dhvf -boot d -cdrom /Users/nw=
+allace/Downloads/install64.iso
+  Password:
+  (lldb) target create "qemu-system-x86_64"
+  Current executable set to 'qemu-system-x86_64' (x86_64).
+  (lldb) settings set -- target.run-args  "-M" "accel=3Dhvf" "-boot" "d" "-=
+cdrom" "/Users/nwallace/Downloads/install64.i
+  so"
+  (lldb) run
+  Process 96474 launched: '/usr/local/bin/qemu-system-x86_64' (x86_64)
+  Process 96474 stopped
+  * thread #1, queue =3D 'com.apple.main-thread', stop reason =3D signal SI=
+GUSR2
+      frame #0: 0x00007fff5ef0c00a libsystem_kernel.dylib`__sigsuspend + 10
+  libsystem_kernel.dylib`__sigsuspend:
+  ->  0x7fff5ef0c00a <+10>: jae    0x7fff5ef0c014            ; <+20>
+      0x7fff5ef0c00c <+12>: movq   %rax, %rdi
+      0x7fff5ef0c00f <+15>: jmp    0x7fff5ef02b0e            ; cerror
+      0x7fff5ef0c014 <+20>: retq
+  Target 0: (qemu-system-x86_64) stopped.
+  (lldb) process handle SIGUSR1 -n true -p true -s false
+  NAME         PASS   STOP   NOTIFY
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=
+=3D=3D=3D=3D=3D
+  SIGUSR1      true   false  true
+  (lldb) process handle SIGUSR2 -n true -p true -s false
+  NAME         PASS   STOP   NOTIFY
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D  =3D=
+=3D=3D=3D=3D=3D
+  SIGUSR2      true   false  true
+  (lldb) c
+  Process 96474 resuming
+  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
+D.80000001H:ECX.svm [bit 2]
+  Process 96474 stopped and restarted: thread 9 received signal: SIGUSR2
+  <line above repeats about 64 times or so>
+  Process 96474 stopped and restarted: thread 9 received signal: SIGUSR2
+  bad size
+
+  Process 96474 stopped
+  * thread #9, stop reason =3D signal SIGABRT
+      frame #0: 0x00007fff5ef0bb66 libsystem_kernel.dylib`__pthread_kill + =
+10
+  libsystem_kernel.dylib`__pthread_kill:
+  ->  0x7fff5ef0bb66 <+10>: jae    0x7fff5ef0bb70            ; <+20>
+      0x7fff5ef0bb68 <+12>: movq   %rax, %rdi
+      0x7fff5ef0bb6b <+15>: jmp    0x7fff5ef02ae9            ; cerror_nocan=
+cel
+      0x7fff5ef0bb70 <+20>: retq
+  Target 0: (qemu-system-x86_64) stopped.
+  (lldb) bt
+  * thread #9, stop reason =3D signal SIGABRT
+    * frame #0: 0x00007fff5ef0bb66 libsystem_kernel.dylib`__pthread_kill + =
+10
+      frame #1: 0x00007fff5f0d6080 libsystem_pthread.dylib`pthread_kill + 3=
+33
+      frame #2: 0x00007fff5ee671ae libsystem_c.dylib`abort + 127
+      frame #3: 0x000000010016b6ec qemu-system-x86_64`exec_cmps_single + 400
+      frame #4: 0x000000010016ada4 qemu-system-x86_64`exec_cmps + 65
+      frame #5: 0x0000000100169aaa qemu-system-x86_64`exec_instruction + 48
+      frame #6: 0x0000000100164eb2 qemu-system-x86_64`hvf_vcpu_exec + 2658
+      frame #7: 0x000000010005bed6 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
+n + 200
+      frame #8: 0x00000001003ee531 qemu-system-x86_64`qemu_thread_start + 1=
+07
+      frame #9: 0x00007fff5f0d3661 libsystem_pthread.dylib`_pthread_body + =
+340
+      frame #10: 0x00007fff5f0d350d libsystem_pthread.dylib`_pthread_start =
++ 377
+      frame #11: 0x00007fff5f0d2bf9 libsystem_pthread.dylib`thread_start + =
+13
+  (lldb) quit
+  Quitting LLDB will kill one or more processes. Do you really want to proc=
+eed: [Y/n] Y
+  Last command had exit code: 0 at 23:01
+  nwallace@nwallace-ltm3:~/Downloads
+  $
+
+  =
+
+  I'm happy to work with someone more knowledgeable to reproduce this issue=
+ and provide debugging assistance as I'm able.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815263/+subscriptions
