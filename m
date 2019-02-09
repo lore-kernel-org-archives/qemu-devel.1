@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44109)
+Received: from eggs.gnu.org ([209.51.188.92]:54536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gsPbx-0004du-K5
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 05:11:50 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gsQtK-0002KA-5d
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 06:33:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gsPbp-0002mZ-Az
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 05:11:46 -0500
-Resent-Message-Id: <E1gsPbp-0002mZ-Az@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gsPbm-0002e3-9L
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 05:11:39 -0500
-Message-ID: <154967910201.29184.5537071614047013306@ebba9967afc0>
-In-Reply-To: <20190208224020.GA4670@nyan>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gsQtJ-000506-Ex
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 06:33:50 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:49850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gsQtJ-0004vh-7q
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 06:33:49 -0500
+Date: Sat, 9 Feb 2019 12:33:43 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190209113343.hspt6h4qetzucbd2@function>
+References: <20190208181122.23393-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Feb 2019 18:25:03 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm2835_peripheral: add bcm283x
- sp804-alike timer
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190208181122.23393-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH slirp 0/5] Make it a standalone project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +28,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alnyan@airmail.cc
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, f4bug@amsat.org, Andrew.Baumann@microsoft.comqemu-devel@nongnu.org
+To: marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwODIyNDAyMC5HQTQ2
-NzBAbnlhbi8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0
-eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gaHcvYXJtL2JjbTI4MzVfcGVyaXBoZXJhbDogYWRk
-IGJjbTI4M3ggc3A4MDQtYWxpa2UgdGltZXIKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkw
-MjA4MjI0MDIwLkdBNDY3MEBueWFuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-IHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDEzMDIxMDM1MC4xNjc1Ny0x
-LWx1a2Uuci5uZWxzQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwMTMwMjEwMzUwLjE2NzU3LTEt
-bHVrZS5yLm5lbHNAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcv
-MjAxOTAyMDgyMjQwMjAuR0E0NjcwQG55YW4gLT4gcGF0Y2hldy8yMDE5MDIwODIyNDAyMC5HQTQ2
-NzBAbnlhbgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmExZTIzMzBkNGQgaHcvYXJt
-L2JjbTI4MzVfcGVyaXBoZXJhbDogYWRkIGJjbTI4M3ggc3A4MDQtYWxpa2UgdGltZXIKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CkFyZ3VtZW50ICJtIiBpc24ndCBudW1lcmljIGluIG51bWVyaWMgZXEg
-KD09KSBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBsaW5lIDI3NzEuCkFyZ3VtZW50ICJtIiBp
-c24ndCBudW1lcmljIGluIG51bWVyaWMgZXEgKD09KSBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCBsaW5lIDI3NzEuClVzZSBvZiB1bmluaXRpYWxpemVkIHZhbHVlICQxIGluIGNvbmNhdGVuYXRp
-b24gKC4pIG9yIHN0cmluZyBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBsaW5lIDI3NzIuCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTogRklMRTogaHcvYXJtL2JjbTI4MzVf
-cGVyaXBoZXJhbHMuYzoxMjI6CisgICAgb2JqZWN0X2luaXRpYWxpemUoJnMtPmJjbTI4M3hzcDgw
-NCwgc2l6ZW9mKHMtPmJjbTI4M3hzcDgwNCksIFRZUEVfQkNNMjgzeFNQODA0KTsKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNjogRklMRTogaHcvYXJtL2JjbTI4MzVfcGVyaXBo
-ZXJhbHMuYzoxMjM6CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9jaGlsZChvYmosICJiY20yODN4
-c3A4MDQiLCBPQkpFQ1QoJnMtPmJjbTI4M3hzcDgwNCksIE5VTEwpOwoKV0FSTklORzogYWRkZWQs
-IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
-PwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNv
-bW1lbnRzCiM5MDogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjI3OgorICAgIGludCBw
-cmV2X2RpdjsgICAgICAgLy8gTm90IGltcGxlbWVudGVkCgpFUlJPUjogZG8gbm90IHVzZSBDOTkg
-Ly8gY29tbWVudHMKIzkxOiBGSUxFOiBody90aW1lci9iY20yODN4X3RpbWVyLmM6Mjg6CisgICAg
-aW50IGZyZWVfcnVuX2NudDsgICAvLyBOb3QgaW1wbGVtZW50ZWQKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMxMTY6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzo1MzoK
-KyAgICAgICAgLyogVGhlIHJlZ2lzdGVyIGlzIHdyaXRlLW9ubHksIGJ1dCByZXR1cm5zIHJldmVy
-c2UgIkFSTVQiIHN0cmluZyBieXRlcyAqLwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
-IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTIxOiBGSUxFOiBody90aW1lci9iY20y
-ODN4X3RpbWVyLmM6NTg6CisgICAgICAgIGlmICgocy0+Y29udHJvbCAmIFRJTUVSX0NUUkxfSUUp
-ID09IDApClsuLi5dCgpFUlJPUjogc3dpdGNoIGFuZCBjYXNlIHNob3VsZCBiZSBhdCB0aGUgc2Ft
-ZSBpbmRlbnQKIzE0NjogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjgzOgorICAgIHN3
-aXRjaCAob2Zmc2V0ID4+IDIpIHsKKyAgICAgICAgY2FzZSAwOiAvKiBMb2FkIHJlZ2lzdGVyICov
-ClsuLi5dCisgICAgICAgIGNhc2UgMTogLyogVmFsdWUgcmVnaXN0ZXIgKi8KWy4uLl0KKyAgICAg
-ICAgY2FzZSAyOiAvKiBDb250cm9sIHJlZ2lzdGVyICovClsuLi5dCisgICAgICAgIGNhc2UgMzog
-LyogSVJRIGNsZWFyL0FDSyByZWdpc3RlciAqLwpbLi4uXQorICAgICAgICBjYXNlIDY6IC8qIFJl
-bG9hZCByZWdpc3RlciAqLwpbLi4uXQorICAgICAgICBkZWZhdWx0OgoKRVJST1I6IHRyYWlsaW5n
-IHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMTY0OiBGSUxFOiBody90aW1lci9i
-Y20yODN4X3RpbWVyLmM6MTAxOgorICAgICAgICAgICAgY2FzZSAxOiBmcmVxID4+PSA0OyBicmVh
-azsgLyogMTYgKi8KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0
-IGxpbmUKIzE2NTogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjEwMjoKKyAgICAgICAg
-ICAgIGNhc2UgMjogZnJlcSA+Pj0gODsgYnJlYWs7IC8qIDI1NiAqLwoKRVJST1I6IHVubmVjZXNz
-YXJ5IGNhc3QgbWF5IGhpZGUgYnVncywgdXNlIGdfbmV3MCBpbnN0ZWFkCiMyMTU6IEZJTEU6IGh3
-L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoxNTI6CisgICAgcyA9IChiY20yODN4X3RpbWVyX3N0YXRl
-ICopIGdfbWFsbG9jMChzaXplb2YoYmNtMjgzeF90aW1lcl9zdGF0ZSkpOwoKV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyODogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5j
-OjE2NToKKy8qIFhYWDogQkNNJ3MgZGF0YXNoZWV0IGRvZXMgbm90IHNlZW0gdG8gcHJvdmlkZSB0
-aGVzZSB2YWx1ZXMgYW5kIHRoZXkgbWF5IGRpZmZlciAqLwoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzI2MjogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1lci5jOjE5OToKKyAg
-ICAgICAgICAgICAgICAgICAgICAiJXM6IGludGVncmF0aW9uIHRlc3QgcmVnaXN0ZXJzIHVuaW1w
-bGVtZW50ZWRcbiIsIF9fZnVuY19fKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiMyNzE6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoyMDg6CitzdGF0aWMgdm9pZCBi
-Y20yODN4c3A4MDNfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIgb2Zmc2V0LCB1aW50NjRfdCB2
-YWx1ZSwgdW5zaWduZWQgc2l6ZSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMz
-MDY6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoyNDM6CisgICAgbWVtb3J5X3JlZ2lv
-bl9pbml0X2lvKCZzLT5pb21lbSwgb2JqLCAmYmNtMjgzeHNwODA0X29wcywgcywgImJjbTI4M3hz
-cDgwNCIsIDB4MTAwMCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzk1OiBG
-SUxFOiBpbmNsdWRlL2h3L3RpbWVyL2JjbTI4M3hfdGltZXIuaDoyMzoKKyNkZWZpbmUgQkNNMjgz
-eFNQODA0KG9iaikgT0JKRUNUX0NIRUNLKEJDTTI4M3hTUDgwNFN0YXRlLCAob2JqKSwgVFlQRV9C
-Q00yODN4U1A4MDQpCgp0b3RhbDogNyBlcnJvcnMsIDkgd2FybmluZ3MsIDM2NiBsaW5lcyBjaGVj
-a2VkCgpDb21taXQgYTFlMjMzMGQ0ZGUyIChody9hcm0vYmNtMjgzNV9wZXJpcGhlcmFsOiBhZGQg
-YmNtMjgzeCBzcDgwNC1hbGlrZSB0aW1lcikgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDgy
-MjQwMjAuR0E0NjcwQG55YW4vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+Hello,
+
+marcandre.lureau@redhat.com, le ven. 08 f=C3=A9vr. 2019 19:11:17 +0100, a=
+ ecrit:
+> Where should this new project be hosted? (I suggest some gitlab
+> instance, because of the nice ui/CI/issues/milestone...)
+
+I'd say freedesktop's gitlab would make a lot of sense yes, I'd go for
+it https://www.freedesktop.org/wiki/NewProject/
+
+Samuel
