@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42215)
+Received: from eggs.gnu.org ([209.51.188.92]:42130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJ9-0003ld-H6
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMJ2-0003dv-97
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gsMJ8-0003h0-Qz
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1gsMJ1-0003a3-Eg
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:40:04 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Sat,  9 Feb 2019 07:39:17 +0100
-Message-Id: <1549694366-1284-17-git-send-email-thuth@redhat.com>
+Date: Sat,  9 Feb 2019 07:39:14 +0100
+Message-Id: <1549694366-1284-14-git-send-email-thuth@redhat.com>
 In-Reply-To: <1549694366-1284-1-git-send-email-thuth@redhat.com>
 References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/25] hw/arm: Express dependencies of the MPS2
- boards with Kconfig
+Subject: [Qemu-devel] [PATCH 13/25] hw/arm: Express dependencies of the virt
+ machine with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
 Cc: qemu-arm@nongnu.org, philmd@redhat.com
 
-Add Kconfig dependencies for the mps2-an* machines.
+Dependencies have been determined by looking at hw/arm/virt.c
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 19 +------------------
- hw/arm/Kconfig                  | 17 +++++++++++++++++
- 2 files changed, 18 insertions(+), 18 deletions(-)
+ default-configs/arm-softmmu.mak | 14 +-------------
+ hw/arm/Kconfig                  | 19 +++++++++++++++++++
+ hw/arm/Makefile.objs            |  3 ++-
+ 3 files changed, 22 insertions(+), 14 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 28bb37f..b530a06 100644
+index b2e31b3..9db6808 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -26,6 +26,7 @@ CONFIG_Z2=y
- CONFIG_COLLIE=y
- CONFIG_ASPEED_SOC=y
- CONFIG_NETDUINO2=y
-+CONFIG_MPS2=y
+@@ -3,6 +3,7 @@
+ # TODO: ARM_V7M is currently always required - make this more flexible!
+ CONFIG_ARM_V7M=y
  
- CONFIG_VGA=y
++CONFIG_ARM_VIRT=y
+ CONFIG_EXYNOS4=y
+ CONFIG_HIGHBANK=y
+ CONFIG_INTEGRATOR=y
+@@ -28,8 +29,6 @@ CONFIG_VGA=y
  CONFIG_SSI_M25P80=y
-@@ -34,27 +35,9 @@ CONFIG_IMX_FEC=y
- CONFIG_FRAMEBUFFER=y
+ CONFIG_ALLWINNER_EMAC=y
+ CONFIG_IMX_FEC=y
+-CONFIG_PLATFORM_BUS=y
+-CONFIG_VIRTIO_MMIO=y
  
- CONFIG_DIGIC=y
--CONFIG_MPS2=y
- CONFIG_RASPI=y
- CONFIG_NRF51_SOC=y
+ CONFIG_NETDUINO2=y
  
--CONFIG_CMSDK_APB_TIMER=y
--CONFIG_CMSDK_APB_DUALTIMER=y
--CONFIG_CMSDK_APB_UART=y
--CONFIG_CMSDK_APB_WATCHDOG=y
+@@ -63,12 +62,6 @@ CONFIG_IOTKIT_SYSCTL=y
+ CONFIG_IOTKIT_SYSINFO=y
+ CONFIG_ARMSSE_CPUID=y
+ 
+-CONFIG_PCI_EXPRESS=y
+-CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+-CONFIG_VFIO_PLATFORM=y
+-CONFIG_VFIO_XGMAC=y
+-CONFIG_VFIO_AMD_XGBE=y
 -
--CONFIG_MPS2_FPGAIO=y
--CONFIG_MPS2_SCC=y
--
--CONFIG_TZ_MPC=y
--CONFIG_TZ_MSC=y
--CONFIG_TZ_PPC=y
--CONFIG_ARMSSE=y
--CONFIG_IOTKIT_SECCTL=y
--CONFIG_IOTKIT_SYSCTL=y
--CONFIG_IOTKIT_SYSINFO=y
--CONFIG_ARMSSE_CPUID=y
--
- CONFIG_FSL_IMX6=y
- CONFIG_FSL_IMX25=y
- CONFIG_FSL_IMX7=y
+ CONFIG_ALLWINNER_A10_PIT=y
+ CONFIG_ALLWINNER_A10_PIC=y
+ CONFIG_ALLWINNER_A10=y
+@@ -84,10 +77,5 @@ CONFIG_PCIE_PORT=y
+ CONFIG_XIO3130=y
+ CONFIG_IOH3420=y
+ CONFIG_I82801B11=y
+-CONFIG_ACPI=y
+-CONFIG_ARM_VIRT=y
+-CONFIG_SMBIOS=y
+-CONFIG_GPIO_KEY=y
+ CONFIG_MSF2=y
+-CONFIG_FW_CFG_DMA=y
+ CONFIG_PCI_EXPRESS_DESIGNWARE=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 3621d44..5765fe9 100644
+index a4fe2c8..3d580fa 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -315,6 +315,23 @@ config ASPEED_SOC
- 
- config MPS2
+@@ -1,5 +1,23 @@
+ config ARM_VIRT
      bool
-+    select ARMSSE
-+    select ARMSSE_CPUID
-+    select CMSDK_APB_TIMER
-+    select CMSDK_APB_DUALTIMER
-+    select CMSDK_APB_UART
-+    select CMSDK_APB_WATCHDOG
-+    select IOTKIT_SECCTL
-+    select IOTKIT_SYSCTL
-+    select IOTKIT_SYSINFO
-+    select LAN9118
-+    select MPS2_FPGAIO
-+    select MPS2_SCC
-+    select PL022    # Serial port
-+    select PL080    # DMA controller
-+    select TZ_MPC
-+    select TZ_MSC
-+    select TZ_PPC
++    imply PCI_DEVICES
++    imply VFIO_AMD_XGBE
++    imply VFIO_XGMAC
++    select A15MPCORE
++    select ACPI
++    select ARM_SMMUV3
++    select GPIO_KEY
++    select FW_CFG_DMA
++    select PCI_EXPRESS
++    select PCI_EXPRESS_GENERIC_BRIDGE
++    select PFLASH_CFI01
++    select PL011 # UART
++    select PL031 # RTC
++    select PL061 # GPIO
++    select PLATFORM_BUS
++    select SMBIOS
++    select VIRTIO_MMIO
++    select VFIO_PLATFORM
  
- config IOTKIT
+ config CHEETAH
      bool
+@@ -314,6 +332,7 @@ config A9MPCORE
+ 
+ config A15MPCORE
+     bool
++    select ARM_GIC
+ 
+ config ARM11MPCORE
+     bool
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 053fcb6..f17187f 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -1,4 +1,5 @@
+-obj-y += boot.o sysbus-fdt.o
++obj-y += boot.o
++obj-$(CONFIG_PLATFORM_BUS) += sysbus-fdt.o
+ obj-$(CONFIG_ARM_VIRT) += virt.o
+ obj-$(CONFIG_ACPI) += virt-acpi-build.o
+ obj-$(CONFIG_DIGIC) += digic_boards.o
 -- 
 1.8.3.1
