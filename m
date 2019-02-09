@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49330)
+Received: from eggs.gnu.org ([209.51.188.92]:49361)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9369ea4ad=Alistair.Francis@wdc.com>)
-	id 1gsGzh-0004zf-Do
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 19:59:46 -0500
+	id 1gsGzl-00051k-DT
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 19:59:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9369ea4ad=Alistair.Francis@wdc.com>)
-	id 1gsGzd-00060v-JR
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 19:59:44 -0500
+	id 1gsGzh-00063o-DL
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 19:59:47 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Sat, 9 Feb 2019 00:59:29 +0000
-Message-ID: <8c6435dc844f00f14437dc1ef185ccd28e5cf0f9.1549673900.git.alistair.francis@wdc.com>
+Date: Sat, 9 Feb 2019 00:59:38 +0000
+Message-ID: <c2daf173b9313126c6cb0babc2728ad82053d668.1549673900.git.alistair.francis@wdc.com>
 References: <cover.1549673900.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1549673900.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 01/11] riscv: Ensure the kernel start
- address is correctly cast
+Subject: [Qemu-devel] [PATCH v1 02/11] riscv: pmp: Log pmp access errors as
+ guest errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +29,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-Cast the kernel start address to the target bit length.
-
-This ensures that we calculate the initrd offset to a valid address for
-the architecture.
-
-Steps to reproduce the original problem (reported by Alex):
-  Build U-Boot for the virt machine for riscv32. Then run it with
-
-    $ qemu-system-riscv32 -M virt -kernel u-boot -nographic -initrd <a file=
->
-
-  You can find the initrd address with
-
-    U-Boot# fdt addr $fdtcontroladdr
-    U-Boot# fdt ls /chosen
-
-  Then take a peek at that address:
-
-    U-Boot# md.b <addr>
-
-  and you will see that there is nothing there without this patch. The
-  reason is that the binary was loaded to a negative address.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Suggested-by: Alexander Graf <agraf@suse.de>
-Reported-by: Alexander Graf <agraf@suse.de>
 ---
-v3:
- - Add steps to reproduce
-v2:
- - Remove old comment
- hw/riscv/sifive_e.c | 2 +-
- hw/riscv/sifive_u.c | 2 +-
- hw/riscv/spike.c    | 2 +-
- hw/riscv/virt.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ target/riscv/pmp.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index bfc086609c..b1cd11363c 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -74,7 +74,7 @@ static const struct MemmapEntry {
-     [SIFIVE_E_DTIM] =3D     { 0x80000000,     0x4000 }
- };
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index 15a5366616..b11c4ae22f 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -113,10 +113,11 @@ static void pmp_write_cfg(CPURISCVState *env, uint32_=
+t pmp_index, uint8_t val)
+             env->pmp_state.pmp[pmp_index].cfg_reg =3D val;
+             pmp_update_rule(env, pmp_index);
+         } else {
+-            PMP_DEBUG("ignoring write - locked");
++            qemu_log_mask(LOG_GUEST_ERROR, "ignoring pmpcfg write - locked=
+\n");
+         }
+     } else {
+-        PMP_DEBUG("ignoring write - out of bounds");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpcfg write - out of bounds\n");
+     }
+ }
 =20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
+@@ -249,7 +250,8 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulon=
+g addr,
 =20
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 2730b25b60..7bc25820fe 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -65,7 +65,7 @@ static const struct MemmapEntry {
+         /* partially inside */
+         if ((s + e) =3D=3D 1) {
+-            PMP_DEBUG("pmp violation - access is partially inside");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "pmp violation - access is partially inside\n");
+             ret =3D 0;
+             break;
+         }
+@@ -306,7 +308,8 @@ void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_=
+index,
+         env->mhartid, reg_index, val);
 =20
- #define GEM_REVISION        0x10070109
+     if ((reg_index & 1) && (sizeof(target_ulong) =3D=3D 8)) {
+-        PMP_DEBUG("ignoring write - incorrect address");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpcfg write - incorrect address\n");
+         return;
+     }
 =20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
+@@ -353,10 +356,12 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t a=
+ddr_index,
+             env->pmp_state.pmp[addr_index].addr_reg =3D val;
+             pmp_update_rule(env, addr_index);
+         } else {
+-            PMP_DEBUG("ignoring write - locked");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "ignoring pmpaddr write - locked\n");
+         }
+     } else {
+-        PMP_DEBUG("ignoring write - out of bounds");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpaddr write - out of bounds\n");
+     }
+ }
 =20
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index c66ffc50cc..2a000a5800 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -53,7 +53,7 @@ static const struct MemmapEntry {
-     [SPIKE_DRAM] =3D     { 0x80000000,        0x0 },
- };
-=20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-=20
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 3e8b19c668..fc4c6b306e 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -62,7 +62,7 @@ static const struct MemmapEntry {
-     [VIRT_PCIE_ECAM] =3D   { 0x30000000,    0x10000000 },
- };
-=20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-=20
+@@ -372,7 +377,8 @@ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint3=
+2_t addr_index)
+     if (addr_index < MAX_RISCV_PMPS) {
+         return env->pmp_state.pmp[addr_index].addr_reg;
+     } else {
+-        PMP_DEBUG("ignoring read - out of bounds");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "ignoring pmpaddr read - out of bounds\n");
+         return 0;
+     }
+ }
 --=20
 2.20.1
