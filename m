@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33864)
+Received: from eggs.gnu.org ([209.51.188.92]:33622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gsFRv-0002wm-Cl
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 18:20:48 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gsIOb-0002QU-C3
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 21:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gsFRr-0006dQ-Oh
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 18:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gsFRp-0006Wg-QA
-	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 18:20:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gsFRk-000705-Rl
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 23:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CBA8F2E8050
-	for <qemu-devel@nongnu.org>; Fri,  8 Feb 2019 23:20:36 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1gsIOZ-0006py-Md
+	for qemu-devel@nongnu.org; Fri, 08 Feb 2019 21:29:33 -0500
+Resent-Message-Id: <E1gsIOZ-0006py-Md@eggs.gnu.org>
+Message-ID: <154967933717.29184.12300018039253584335@ebba9967afc0>
+In-Reply-To: <20190208224020.GA4670@nyan>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Feb 2019 23:06:39 -0000
-From: john <johnandersenpdx@gmail.com>
-Reply-To: Bug 1815252 <1815252@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154966719970.21699.16286451963680929757.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815252] [NEW] virtio-9p-pci passthrough fsync
- hang
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Feb 2019 18:28:58 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm2835_peripheral: add bcm283x
+ sp804-alike timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,229 +24,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: alnyan@airmail.cc
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, f4bug@amsat.org, Andrew.Baumann@microsoft.comqemu-devel@nongnu.org
 
-Public bug reported:
-
-Tested against QEMU: e47f81b617684c4546af286d307b69014a83538a
-
-and $qemu-system-x86_64 --version
-QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.9)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-+ exec sudo qemu-system-x86_64 -enable-kvm -bios /usr/share/ovmf/OVMF.fd -c=
-pu host -smp sockets=3D1,cpus=3D4,cores=3D2 -m 2048 -vga none -nographic -c=
-hardev socket,id=3Dchrtpm0,path=3D/tmp/clrwifi/swtpm2/tpm-sock -tpmdev emul=
-ator,id=3Dtpm0,chardev=3Dchrtpm0 -device tpm-tis,tpmdev=3Dtpm0 -device virt=
-io-rng-pci -netdev user,id=3Dmynet0,hostfwd=3Dtcp::10022-:22 -device virtio=
--net-pci,netdev=3Dmynet0 -kernel /home/.../Documents/c/iwd/tools/bzImage -a=
-ppend 'console=3DttyS0,115200n8 quiet kvm-intel.nested=3D1 init=3D/usr/bin/=
-bash initcall_debug tsc=3Dreliable no_timer_check noreplace-smp cryptomgr.n=
-otests rootfstype=3D9p root=3D/dev/root rootflags=3Dtrans=3Dvirtio,version=
-=3D9p2000.u rw' -fsdev local,id=3Dfsdev-root,path=3Dmnt,security_model=3Dpa=
-ssthrough -device virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root
-[    0.000000] Linux version 4.19.0-rc2 (...) (gcc version 7.3.0 (Ubuntu 7.=
-3.0-27ubuntu1~18.04)) #10 SMP Fri Feb 8 13:55:20 PST 2019
-[    0.000000] Command line: console=3DttyS0,115200n8 quiet kvm-intel.neste=
-d=3D1 init=3D/usr/bin/bash initcall_debug tsc=3Dreliable no_timer_check nor=
-eplace-smp cryptomgr.notests rootfstype=3D9p root=3D/dev/root rootflags=3Dt=
-rans=3Dvirtio,version=3D9p2000.u rw
-[    0.000000] KERNEL supported cpus:
-[    0.000000]   Intel GenuineIntel
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point=
- registers'
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
-[    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
-[    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 by=
-tes, using 'standard' format.
-[    0.000000] BIOS-provided physical RAM map:
-[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable
-[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff] usable
-[    0.000000] BIOS-e820: [mem 0x0000000000800000-0x0000000000807fff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x0000000000808000-0x000000000080ffff] usable
-[    0.000000] BIOS-e820: [mem 0x0000000000810000-0x00000000008fffff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x0000000000900000-0x000000007e87efff] usable
-[    0.000000] BIOS-e820: [mem 0x000000007e87f000-0x000000007e888fff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x000000007e889000-0x000000007e889fff] ACPI =
-data
-[    0.000000] BIOS-e820: [mem 0x000000007e88a000-0x000000007e88bfff] usable
-[    0.000000] BIOS-e820: [mem 0x000000007e88c000-0x000000007e88ffff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x000000007e890000-0x000000007e8a9fff] reser=
-ved
-[    0.000000] BIOS-e820: [mem 0x000000007e8aa000-0x000000007e8b9fff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x000000007e8ba000-0x000000007e8bafff] reser=
-ved
-[    0.000000] BIOS-e820: [mem 0x000000007e8bb000-0x000000007e9e5fff] usable
-[    0.000000] BIOS-e820: [mem 0x000000007e9e6000-0x000000007e9edfff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x000000007e9ee000-0x000000007eb1afff] reser=
-ved
-[    0.000000] BIOS-e820: [mem 0x000000007eb1b000-0x000000007fb9afff] usable
-[    0.000000] BIOS-e820: [mem 0x000000007fb9b000-0x000000007fbf2fff] reser=
-ved
-[    0.000000] BIOS-e820: [mem 0x000000007fbf3000-0x000000007fbfafff] ACPI =
-data
-[    0.000000] BIOS-e820: [mem 0x000000007fbfb000-0x000000007fbfefff] ACPI =
-NVS
-[    0.000000] BIOS-e820: [mem 0x000000007fbff000-0x000000007ff3ffff] usable
-[    0.000000] BIOS-e820: [mem 0x000000007ff40000-0x000000007ff5ffff] reser=
-ved
-[    0.000000] BIOS-e820: [mem 0x000000007ff60000-0x000000007fffffff] ACPI =
-NVS
-[    0.352469] acpiphp_ibm: ibm_acpiphp_init: acpi_walk_namespace failed
-Started bpfilter
-bash: cannot set terminal process group (-1): Inappropriate ioctl for device
-bash: no job control in this shell
-grep: /proc/cpuinfo: No such file or directory
-grep: /proc/cpuinfo: No such file or directory
-root@clr / # passwd
-...
-openat(AT_FDCWD, "/etc/nshadow", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 4
-umask(077)                              =3D 077
-openat(AT_FDCWD, "/etc/shadow", O_RDONLY|O_CREAT|O_CLOEXEC, 000) =3D 5
-fcntl(5, F_GETFL)                       =3D 0x8000 (flags O_RDONLY|O_LARGEF=
-ILE)
-fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-fchown(4, 0, 0)                         =3D 0
-fchmod(4, 0100644)                      =3D 0
-lseek(5, 0, SEEK_CUR)                   =3D 0
-fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-read(5, "", 8192)                       =3D 0
-close(5)                                =3D 0
-fstat(4, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-write(4, "root:$6$jihvB1NonG88C5Yt$kvDCqF7"..., 124) =3D 124
-fsync(4 <- hung here
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "Reproduce script"
-   https://bugs.launchpad.net/bugs/1815252/+attachment/5237111/+files/setup=
-.sh
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815252
-
-Title:
-  virtio-9p-pci passthrough fsync hang
-
-Status in QEMU:
-  New
-
-Bug description:
-  Tested against QEMU: e47f81b617684c4546af286d307b69014a83538a
-
-  and $qemu-system-x86_64 --version
-  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.9)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  + exec sudo qemu-system-x86_64 -enable-kvm -bios /usr/share/ovmf/OVMF.fd =
--cpu host -smp sockets=3D1,cpus=3D4,cores=3D2 -m 2048 -vga none -nographic =
--chardev socket,id=3Dchrtpm0,path=3D/tmp/clrwifi/swtpm2/tpm-sock -tpmdev em=
-ulator,id=3Dtpm0,chardev=3Dchrtpm0 -device tpm-tis,tpmdev=3Dtpm0 -device vi=
-rtio-rng-pci -netdev user,id=3Dmynet0,hostfwd=3Dtcp::10022-:22 -device virt=
-io-net-pci,netdev=3Dmynet0 -kernel /home/.../Documents/c/iwd/tools/bzImage =
--append 'console=3DttyS0,115200n8 quiet kvm-intel.nested=3D1 init=3D/usr/bi=
-n/bash initcall_debug tsc=3Dreliable no_timer_check noreplace-smp cryptomgr=
-.notests rootfstype=3D9p root=3D/dev/root rootflags=3Dtrans=3Dvirtio,versio=
-n=3D9p2000.u rw' -fsdev local,id=3Dfsdev-root,path=3Dmnt,security_model=3Dp=
-assthrough -device virtio-9p-pci,fsdev=3Dfsdev-root,mount_tag=3D/dev/root
-  [    0.000000] Linux version 4.19.0-rc2 (...) (gcc version 7.3.0 (Ubuntu =
-7.3.0-27ubuntu1~18.04)) #10 SMP Fri Feb 8 13:55:20 PST 2019
-  [    0.000000] Command line: console=3DttyS0,115200n8 quiet kvm-intel.nes=
-ted=3D1 init=3D/usr/bin/bash initcall_debug tsc=3Dreliable no_timer_check n=
-oreplace-smp cryptomgr.notests rootfstype=3D9p root=3D/dev/root rootflags=
-=3Dtrans=3Dvirtio,version=3D9p2000.u rw
-  [    0.000000] KERNEL supported cpus:
-  [    0.000000]   Intel GenuineIntel
-  [    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating poi=
-nt registers'
-  [    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
-  [    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
-  [    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
-  [    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 =
-bytes, using 'standard' format.
-  [    0.000000] BIOS-provided physical RAM map:
-  [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x0000000000800000-0x0000000000807fff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x0000000000808000-0x000000000080ffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x0000000000810000-0x00000000008fffff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x0000000000900000-0x000000007e87efff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007e87f000-0x000000007e888fff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e889000-0x000000007e889fff] ACP=
-I data
-  [    0.000000] BIOS-e820: [mem 0x000000007e88a000-0x000000007e88bfff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007e88c000-0x000000007e88ffff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e890000-0x000000007e8a9fff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007e8aa000-0x000000007e8b9fff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e8ba000-0x000000007e8bafff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007e8bb000-0x000000007e9e5fff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007e9e6000-0x000000007e9edfff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007e9ee000-0x000000007eb1afff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007eb1b000-0x000000007fb9afff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007fb9b000-0x000000007fbf2fff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007fbf3000-0x000000007fbfafff] ACP=
-I data
-  [    0.000000] BIOS-e820: [mem 0x000000007fbfb000-0x000000007fbfefff] ACP=
-I NVS
-  [    0.000000] BIOS-e820: [mem 0x000000007fbff000-0x000000007ff3ffff] usa=
-ble
-  [    0.000000] BIOS-e820: [mem 0x000000007ff40000-0x000000007ff5ffff] res=
-erved
-  [    0.000000] BIOS-e820: [mem 0x000000007ff60000-0x000000007fffffff] ACP=
-I NVS
-  [    0.352469] acpiphp_ibm: ibm_acpiphp_init: acpi_walk_namespace failed
-  Started bpfilter
-  bash: cannot set terminal process group (-1): Inappropriate ioctl for dev=
-ice
-  bash: no job control in this shell
-  grep: /proc/cpuinfo: No such file or directory
-  grep: /proc/cpuinfo: No such file or directory
-  root@clr / # passwd
-  ...
-  openat(AT_FDCWD, "/etc/nshadow", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 4
-  umask(077)                              =3D 077
-  openat(AT_FDCWD, "/etc/shadow", O_RDONLY|O_CREAT|O_CLOEXEC, 000) =3D 5
-  fcntl(5, F_GETFL)                       =3D 0x8000 (flags O_RDONLY|O_LARG=
-EFILE)
-  fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-  fchown(4, 0, 0)                         =3D 0
-  fchmod(4, 0100644)                      =3D 0
-  lseek(5, 0, SEEK_CUR)                   =3D 0
-  fstat(5, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-  read(5, "", 8192)                       =3D 0
-  close(5)                                =3D 0
-  fstat(4, {st_mode=3DS_IFREG|0644, st_size=3D0, ...}) =3D 0
-  write(4, "root:$6$jihvB1NonG88C5Yt$kvDCqF7"..., 124) =3D 124
-  fsync(4 <- hung here
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815252/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwODIyNDAyMC5HQTQ2
+NzBAbnlhbi8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0
+eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gaHcvYXJtL2JjbTI4MzVfcGVyaXBoZXJhbDogYWRk
+IGJjbTI4M3ggc3A4MDQtYWxpa2UgdGltZXIKTWVzc2FnZS1pZDogMjAxOTAyMDgyMjQwMjAuR0E0
+NjcwQG55YW4KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MDEzMDIxMDM1MC4xNjc1Ny0xLWx1a2Uu
+ci5uZWxzQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwMTMwMjEwMzUwLjE2NzU3LTEtbHVrZS5y
+Lm5lbHNAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxOTAyMDgyMjQw
+MjAuR0E0NjcwQG55YW4gLT4gcGF0Y2hldy8yMDE5MDIwODIyNDAyMC5HQTQ2NzBAbnlhbgpTdWJt
+b2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2NhcHN0b25lLmdpdCkg
+cmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fwc3RvbmUnClN1Ym1vZHVsZSAnZHRjJyAoaHR0cHM6Ly9n
+aXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKU3VibW9k
+dWxlICdyb21zL1FlbXVNYWNEcml2ZXJzJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1FlbXVN
+YWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycycK
+U3VibW9kdWxlICdyb21zL1NMT0YnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvU0xPRi5naXQp
+IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xPRicKU3VibW9kdWxlICdyb21zL2lweGUnICho
+dHRwczovL2dpdC5xZW11Lm9yZy9naXQvaXB4ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Jv
+bXMvaXB4ZScKU3VibW9kdWxlICdyb21zL29wZW5iaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
+Z2l0L29wZW5iaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuYmlvcycKU3Vi
+bW9kdWxlICdyb21zL29wZW5oYWNrd2FyZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVu
+aGFja3dhcmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5oYWNrd2FyZScKU3Vi
+bW9kdWxlICdyb21zL3FlbXUtcGFsY29kZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9xZW11
+LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3FlbXUtcGFsY29kZScKU3Vi
+bW9kdWxlICdyb21zL3NlYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2VhYmlvcy5n
+aXQvKSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9z
+ZWFiaW9zLWhwcGEnIChodHRwczovL2dpdGh1Yi5jb20vaGRlbGxlci9zZWFiaW9zLWhwcGEuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScKU3VibW9kdWxlICdyb21z
+L3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlvcy5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21zL3NraWJvb3QnIChodHRw
+czovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Jv
+bXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdCcKU3VibW9k
+dWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJv
+b3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBl
+eCcKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0
+aHViLmNvbS9jb3RhL2JlcmtlbGV5LXNvZnRmbG9hdC0zKSByZWdpc3RlcmVkIGZvciBwYXRoICd0
+ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxl
+eS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5LXRlc3RmbG9h
+dC0zKSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycK
+U3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5
+Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9u
+aW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVja2Vk
+IG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmluZyBp
+bnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5MDlk
+YjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1FlbXVN
+YWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNoZWNr
+ZWQgb3V0ICc5MGM0ODhkNWY0YTQwNzM0MjI0N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9uaW5n
+IGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNrZWQg
+b3V0ICdhNWI0MjhlMWMxZWFlNzAzYmRkNjJhM2Y1MjcyMjNjMjkxZWUzZmRjJwpDbG9uaW5nIGlu
+dG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvaXB4ZSc6IGNoZWNrZWQgb3V0
+ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2ZTE3JwpDbG9uaW5nIGludG8g
+J3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5iaW9zJzogY2hlY2tl
+ZCBvdXQgJzQ0MWE4NGQzYTY0MmExMGI5NDgzNjljNjNmMzIzNjdlOGZmNjM5NWInCkNsb25pbmcg
+aW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5oYWNr
+d2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4ODI3YWY2ZjBiOTU0
+NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2RlJy4uLgpTdWJtb2R1bGUgcGF0aCAn
+cm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnNTFjMjM3ZDdlMjBkMDUxMDBlYWNhZGVl
+MmY2MWFiYzE3ZTZiYzA5NycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAnYTY5OGM4OTk1ZmZiMjgzODI5NmVj
+Mjg0ZmUzYzRhZDMzZGZjYTMwNycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MtaHBwYScuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzogY2hlY2tlZCBvdXQgJzFlZjk5YTAx
+NTcyYzI1ODFjMzBlMTZlNmZlNjllOWVhMmVmOTJjZTAnCkNsb25pbmcgaW50byAncm9tcy9zZ2Fi
+aW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9zJzogY2hlY2tlZCBvdXQgJ2NiYWVl
+NTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEnCkNsb25pbmcgaW50byAncm9tcy9z
+a2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2lib290JzogY2hlY2tlZCBvdXQgJ2Uw
+ZWUyNGMyN2ExNzJiY2Y0ODJmNmYyYmM5MDVlNjIxMWMxMzRiY2MnCkNsb25pbmcgaW50byAncm9t
+cy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdCc6IGNoZWNrZWQgb3V0ICdk
+ODVjYTAyOWYyNTdiNTNhOTZkYTZjMmZiNDIxZTc4YTAwM2E5OTQzJwpDbG9uaW5nIGludG8gJ3Jv
+bXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYw
+ZXgnOiBjaGVja2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1OTczYzVhNmRmNzcwNTViMmUzYTU4
+OCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycuLi4KU3VibW9k
+dWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hlY2tlZCBvdXQgJ2I2
+NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25pbmcgaW50byAndGVz
+dHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9i
+ZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1YTU5ZGNlYzE5MzI3Mzk2YTAxMWEx
+N2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3VpL2tleWNvZGVtYXBkYicuLi4KU3Vi
+bW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0ICc2YjNkNzE2ZTJiNjQ3
+MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCmExZTIzMzAgaHcvYXJtL2JjbTI4MzVfcGVyaXBoZXJhbDogYWRkIGJjbTI4M3ggc3A4MDQt
+YWxpa2UgdGltZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkFyZ3VtZW50ICJtIiBpc24ndCBudW1l
+cmljIGluIG51bWVyaWMgZXEgKD09KSBhdCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBsaW5lIDI3
+NzEuCkFyZ3VtZW50ICJtIiBpc24ndCBudW1lcmljIGluIG51bWVyaWMgZXEgKD09KSBhdCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCBsaW5lIDI3NzEuClVzZSBvZiB1bmluaXRpYWxpemVkIHZhbHVl
+ICQxIGluIGNvbmNhdGVuYXRpb24gKC4pIG9yIHN0cmluZyBhdCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCBsaW5lIDI3NzIuCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTogRklM
+RTogaHcvYXJtL2JjbTI4MzVfcGVyaXBoZXJhbHMuYzoxMjI6CisgICAgb2JqZWN0X2luaXRpYWxp
+emUoJnMtPmJjbTI4M3hzcDgwNCwgc2l6ZW9mKHMtPmJjbTI4M3hzcDgwNCksIFRZUEVfQkNNMjgz
+eFNQODA0KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNjogRklMRTogaHcv
+YXJtL2JjbTI4MzVfcGVyaXBoZXJhbHMuYzoxMjM6CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9j
+aGlsZChvYmosICJiY20yODN4c3A4MDQiLCBPQkpFQ1QoJnMtPmJjbTI4M3hzcDgwNCksIE5VTEwp
+OwoKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
+TkVSUyBuZWVkIHVwZGF0aW5nPwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGRv
+IG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM5MDogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1l
+ci5jOjI3OgorICAgIGludCBwcmV2X2RpdjsgICAgICAgLy8gTm90IGltcGxlbWVudGVkCgpFUlJP
+UjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzkxOiBGSUxFOiBody90aW1lci9iY20yODN4
+X3RpbWVyLmM6Mjg6CisgICAgaW50IGZyZWVfcnVuX2NudDsgICAvLyBOb3QgaW1wbGVtZW50ZWQK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTY6IEZJTEU6IGh3L3RpbWVyL2Jj
+bTI4M3hfdGltZXIuYzo1MzoKKyAgICAgICAgLyogVGhlIHJlZ2lzdGVyIGlzIHdyaXRlLW9ubHks
+IGJ1dCByZXR1cm5zIHJldmVyc2UgIkFSTVQiIHN0cmluZyBieXRlcyAqLwoKRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTIxOiBG
+SUxFOiBody90aW1lci9iY20yODN4X3RpbWVyLmM6NTg6CisgICAgICAgIGlmICgocy0+Y29udHJv
+bCAmIFRJTUVSX0NUUkxfSUUpID09IDApClsuLi5dCgpFUlJPUjogc3dpdGNoIGFuZCBjYXNlIHNo
+b3VsZCBiZSBhdCB0aGUgc2FtZSBpbmRlbnQKIzE0NjogRklMRTogaHcvdGltZXIvYmNtMjgzeF90
+aW1lci5jOjgzOgorICAgIHN3aXRjaCAob2Zmc2V0ID4+IDIpIHsKKyAgICAgICAgY2FzZSAwOiAv
+KiBMb2FkIHJlZ2lzdGVyICovClsuLi5dCisgICAgICAgIGNhc2UgMTogLyogVmFsdWUgcmVnaXN0
+ZXIgKi8KWy4uLl0KKyAgICAgICAgY2FzZSAyOiAvKiBDb250cm9sIHJlZ2lzdGVyICovClsuLi5d
+CisgICAgICAgIGNhc2UgMzogLyogSVJRIGNsZWFyL0FDSyByZWdpc3RlciAqLwpbLi4uXQorICAg
+ICAgICBjYXNlIDY6IC8qIFJlbG9hZCByZWdpc3RlciAqLwpbLi4uXQorICAgICAgICBkZWZhdWx0
+OgoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMTY0
+OiBGSUxFOiBody90aW1lci9iY20yODN4X3RpbWVyLmM6MTAxOgorICAgICAgICAgICAgY2FzZSAx
+OiBmcmVxID4+PSA0OyBicmVhazsgLyogMTYgKi8KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRz
+IHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzE2NTogRklMRTogaHcvdGltZXIvYmNtMjgzeF90aW1l
+ci5jOjEwMjoKKyAgICAgICAgICAgIGNhc2UgMjogZnJlcSA+Pj0gODsgYnJlYWs7IC8qIDI1NiAq
+LwoKRVJST1I6IHVubmVjZXNzYXJ5IGNhc3QgbWF5IGhpZGUgYnVncywgdXNlIGdfbmV3MCBpbnN0
+ZWFkCiMyMTU6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoxNTI6CisgICAgcyA9IChi
+Y20yODN4X3RpbWVyX3N0YXRlICopIGdfbWFsbG9jMChzaXplb2YoYmNtMjgzeF90aW1lcl9zdGF0
+ZSkpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyODogRklMRTogaHcvdGlt
+ZXIvYmNtMjgzeF90aW1lci5jOjE2NToKKy8qIFhYWDogQkNNJ3MgZGF0YXNoZWV0IGRvZXMgbm90
+IHNlZW0gdG8gcHJvdmlkZSB0aGVzZSB2YWx1ZXMgYW5kIHRoZXkgbWF5IGRpZmZlciAqLwoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI2MjogRklMRTogaHcvdGltZXIvYmNtMjgz
+eF90aW1lci5jOjE5OToKKyAgICAgICAgICAgICAgICAgICAgICAiJXM6IGludGVncmF0aW9uIHRl
+c3QgcmVnaXN0ZXJzIHVuaW1wbGVtZW50ZWRcbiIsIF9fZnVuY19fKTsKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzE6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoy
+MDg6CitzdGF0aWMgdm9pZCBiY20yODN4c3A4MDNfd3JpdGUodm9pZCAqb3BhcXVlLCBod2FkZHIg
+b2Zmc2V0LCB1aW50NjRfdCB2YWx1ZSwgdW5zaWduZWQgc2l6ZSkKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiMzMDY6IEZJTEU6IGh3L3RpbWVyL2JjbTI4M3hfdGltZXIuYzoyNDM6
+CisgICAgbWVtb3J5X3JlZ2lvbl9pbml0X2lvKCZzLT5pb21lbSwgb2JqLCAmYmNtMjgzeHNwODA0
+X29wcywgcywgImJjbTI4M3hzcDgwNCIsIDB4MTAwMCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMzk1OiBGSUxFOiBpbmNsdWRlL2h3L3RpbWVyL2JjbTI4M3hfdGltZXIuaDoy
+MzoKKyNkZWZpbmUgQkNNMjgzeFNQODA0KG9iaikgT0JKRUNUX0NIRUNLKEJDTTI4M3hTUDgwNFN0
+YXRlLCAob2JqKSwgVFlQRV9CQ00yODN4U1A4MDQpCgp0b3RhbDogNyBlcnJvcnMsIDkgd2Fybmlu
+Z3MsIDM2NiBsaW5lcyBjaGVja2VkCgpDb21taXQgYTFlMjMzMGQ0ZGUyIChody9hcm0vYmNtMjgz
+NV9wZXJpcGhlcmFsOiBhZGQgYmNtMjgzeCBzcDgwNC1hbGlrZSB0aW1lcikgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
+b3JnL2xvZ3MvMjAxOTAyMDgyMjQwMjAuR0E0NjcwQG55YW4vdGVzdGluZy5jaGVja3BhdGNoLz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
