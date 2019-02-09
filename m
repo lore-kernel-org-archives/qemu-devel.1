@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39289)
+Received: from eggs.gnu.org ([209.51.188.92]:39346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsMBB-0000S1-OX
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:58 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gsMBD-0000TA-GU
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:32:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsMBA-0007JS-U3
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:57 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42644)
+	(envelope-from <richard.henderson@linaro.org>) id 1gsMBC-0007Kw-8m
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:59 -0500
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:35560)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsMBA-0007IS-Mt
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:56 -0500
-Received: by mail-pg1-x544.google.com with SMTP id d72so2536690pga.9
-	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 22:31:56 -0800 (PST)
+	id 1gsMBC-0007K5-34
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 01:31:58 -0500
+Received: by mail-pg1-x533.google.com with SMTP id s198so2551326pgs.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Feb 2019 22:31:58 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  8 Feb 2019 22:31:50 -0800
-Message-Id: <20190209063152.9490-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 0/2] target/s390x: Implement STCK et al for
- CONFIG_USER_ONLY
+Date: Fri,  8 Feb 2019 22:31:52 -0800
+Message-Id: <20190209063152.9490-3-richard.henderson@linaro.org>
+In-Reply-To: <20190209063152.9490-1-richard.henderson@linaro.org>
+References: <20190209063152.9490-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 2/2] This is a non-privileged instruction
+ that was only implemented for system mode. However,
+ the stck instruction is used by glibc,
+ so this was causing SIGILL for programs run under debian stretch.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +32,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, thuth@redhat.com
 
-Changes since v1:
-  * Move more of hw/s390x/tod.h to a new header.
-  * Use time2tod.
-
-
-r~
-
-
-Richard Henderson (2):
-  target/s390x: Split out s390-tod.h
-  This is a non-privileged instruction that was only implemented for
-    system mode.  However, the stck instruction is used by glibc, so
-    this was causing SIGILL for programs run under debian stretch.
-
- include/hw/s390x/tod.h     | 16 +---------------
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
  target/s390x/helper.h      |  2 +-
- target/s390x/s390-tod.h    | 29 +++++++++++++++++++++++++++++
  target/s390x/misc_helper.c | 34 ++++++++++++++++++++++------------
  target/s390x/translate.c   |  2 ++
  target/s390x/insn-data.def | 11 ++++++-----
- 6 files changed, 61 insertions(+), 33 deletions(-)
- create mode 100644 target/s390x/s390-tod.h
+ 4 files changed, 31 insertions(+), 18 deletions(-)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 018e9dd414..6260b50496 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
+ DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+ DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
++DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ 
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+ DEF_HELPER_4(diag, void, env, i32, i32, i32)
+ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+ DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+-DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+ DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 52262f62df..ee67c1fa0c 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -30,6 +30,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "qapi/error.h"
+ #include "tcg_s390x.h"
++#include "s390-tod.h"
+ 
+ #if !defined(CONFIG_USER_ONLY)
+ #include "sysemu/cpus.h"
+@@ -76,8 +77,28 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
+ #endif
+ }
+ 
+-#ifndef CONFIG_USER_ONLY
++/* Store Clock */
++uint64_t HELPER(stck)(CPUS390XState *env)
++{
++#ifdef CONFIG_USER_ONLY
++    struct timespec ts;
++    uint64_t ns;
+ 
++    clock_gettime(CLOCK_REALTIME, &ts);
++    ns = ts.tv_sec * NANOSECONDS_PER_SECOND + ts.tv_nsec;
++
++    return TOD_UNIX_EPOCH + time2tod(ns);
++#else
++    S390TODState *td = s390_get_todstate();
++    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
++    S390TOD tod;
++
++    tdc->get(td, &tod, &error_abort);
++    return tod.low;
++#endif
++}
++
++#ifndef CONFIG_USER_ONLY
+ /* SCLP service call */
+ uint32_t HELPER(servc)(CPUS390XState *env, uint64_t r1, uint64_t r2)
+ {
+@@ -138,17 +159,6 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
+     tlb_flush_page(cs, TARGET_PAGE_SIZE);
+ }
+ 
+-/* Store Clock */
+-uint64_t HELPER(stck)(CPUS390XState *env)
+-{
+-    S390TODState *td = s390_get_todstate();
+-    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+-    S390TOD tod;
+-
+-    tdc->get(td, &tod, &error_abort);
+-    return tod.low;
+-}
+-
+ static void update_ckc_timer(CPUS390XState *env)
+ {
+     S390TODState *td = s390_get_todstate();
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 639084af07..19072efec6 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4060,6 +4060,7 @@ static DisasJumpType op_stap(DisasContext *s, DisasOps *o)
+     tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, core_id));
+     return DISAS_NEXT;
+ }
++#endif
+ 
+ static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
+ {
+@@ -4096,6 +4097,7 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
+     return DISAS_NEXT;
+ }
+ 
++#ifndef CONFIG_USER_ONLY
+ static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
+ {
+     tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index dab805fd90..61582372ab 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -837,6 +837,12 @@
+     C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
+     C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
+ 
++/* STORE CLOCK */
++    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
++    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
++/* STORE CLOCK EXTENDED */
++    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
++
+ /* STORE FACILITY LIST EXTENDED */
+     C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
+ /* STORE FPC */
+@@ -1020,11 +1026,6 @@
+     F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
+ /* SIGNAL PROCESSOR */
+     F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
+-/* STORE CLOCK */
+-    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
+-    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
+-/* STORE CLOCK EXTENDED */
+-    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
+ /* STORE CLOCK COMPARATOR */
+     F(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0, IF_PRIV)
+ /* STORE CONTROL */
 -- 
 2.17.2
