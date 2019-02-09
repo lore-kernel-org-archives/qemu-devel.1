@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40904)
+Received: from eggs.gnu.org ([209.51.188.92]:54051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gsSXg-0000La-P4
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:19:37 -0500
+	(envelope-from <alnyan@airmail.cc>) id 1gsTwH-0007eK-AI
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 09:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gsSXa-00073B-NO
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:19:34 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39916)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gsSXZ-0006zY-33
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 08:19:30 -0500
-Received: by mail-wm1-x344.google.com with SMTP id f16so8191573wmh.4
-	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 05:19:27 -0800 (PST)
+	(envelope-from <alnyan@airmail.cc>) id 1gsTwF-0005xd-KQ
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 09:49:05 -0500
+Date: Sat, 9 Feb 2019 16:49:20 +0200
+From: Mark <alnyan@airmail.cc>
+Message-ID: <20190209144918.GA14036@nyan>
 MIME-Version: 1.0
-References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20181220141553.24098-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 9 Feb 2019 14:19:13 +0100
-Message-ID: <CAJ+F1CLPOKu395m=_J07H4heAs4KFLC6gNnYZLQY29RjT8tu1Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] spice: add -display spice-app,
- setup and launch a Spice client
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [v2 PATCH] hw/arm/bcm2835_peripherals: add bcm283x
+ sp804-alike timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +21,433 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "open list:Raspberry Pi" <qemu-arm@nongnu.org>
 
-Hi
+Signed-off-by: Mark <alnyan@airmail.cc>
+---
+ hw/arm/bcm2835_peripherals.c         |  17 ++
+ hw/timer/Makefile.objs               |   2 +
+ hw/timer/bcm283x_timer.c             | 299 +++++++++++++++++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |   2 +
+ include/hw/timer/bcm283x_timer.h     |  38 ++++
+ 5 files changed, 358 insertions(+)
+ create mode 100644 hw/timer/bcm283x_timer.c
+ create mode 100644 include/hw/timer/bcm283x_timer.h
 
-On Thu, Dec 20, 2018 at 3:44 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Hi,
->
-> The QEMU GTK UI is quite featurful. Yet, it doesn't provide many of
-> the functionalities one can expect from a VM desktop application (USB
-> redirection, shared folders, drag and drop, better multimonitor
-> support etc.).
->
-> Spice is able to export many of the VM controls to a client, including
-> QMP monitor, serial ports etc... It's thus possible for a Spice client
-> to provide a similar experience as the QEMU GTK UI (while keeping
-> similar display performances locally) and more.
->
-> This series provides "-display spice-app" to setup a Spice server and
-> launch a client (associated with the spice+unix:// URI). With
-> virt-viewer series "Add QEMU-like UI: VT console & basic VM state"
-> (under review), the resulting user experience is close to what qemu
-> GTK UI provides.
->
-> v2:
-> - renamed -display app -> -display spice-app
-> - error if full-screen or window-close is provided (supports can be
->   added later)
-> - use a stable URI when -name is provided
-> - print the URI at start
-> - added "qapi: document DisplayType enum"
-> - added "spice: use a default name for the server"
-> - commit message tweaks
-> - include previously reviewed "configure: bump spice-server required
->   version to 0.12.5", to avoid conflicts
-> - rebased
->
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 6be7660e8c..fccdb9509b 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -117,6 +117,13 @@ static void bcm2835_peripherals_init(Object *obj)
+                                    OBJECT(&s->sdhci.sdbus), &error_abort);
+     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhost",
+                                    OBJECT(&s->sdhost.sdbus), &error_abort);
++
++    /* SP804-alike ARM Timer */
++    object_initialize(&s->bcm283xsp804, sizeof(s->bcm283xsp804),
++            TYPE_BCM283xSP804);
++    object_property_add_child(obj, "bcm283xsp804", OBJECT(&s->bcm283xsp804),
++            NULL);
++    qdev_set_parent_bus(DEVICE(&s->bcm283xsp804), sysbus_get_default());
+ }
 
-ping for reviews
+ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+@@ -334,6 +341,16 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
++
++    /* SP804-alike ARM Timer */
++    object_property_set_bool(OBJECT(&s->bcm283xsp804), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    memory_region_add_subregion(&s->peri_mr, ARMCTRL_TIMER0_1_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->bcm283xsp804), 0));
+ }
 
-(rebased version pushed on github https://github.com/elmarco/qemu/commits/s=
-pice)
+ static void bcm2835_peripherals_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f8..09a3706701 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -47,3 +47,5 @@ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+ common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
+ common-obj-$(CONFIG_MSF2) += mss-timer.o
++
++common-obj-$(CONFIG_RASPI) += bcm283x_timer.o
+diff --git a/hw/timer/bcm283x_timer.c b/hw/timer/bcm283x_timer.c
+new file mode 100644
+index 0000000000..55e8a68807
+--- /dev/null
++++ b/hw/timer/bcm283x_timer.c
+@@ -0,0 +1,299 @@
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/ptimer.h"
++#include "hw/timer/bcm283x_timer.h"
++#include "qemu/main-loop.h"
++#include "qemu/log.h"
++
++/* TODO: implement free-running timer as per BCM283x peripheral specification */
++
++#define TIMER_CTRL_32BIT    (1 << 1)
++#define TIMER_CTRL_DIV1     (0 << 2)
++#define TIMER_CTRL_DIV16    (1 << 2)
++#define TIMER_CTRL_DIV256   (2 << 2)
++#define TIMER_CTRL_IE       (1 << 5)
++#define TIMER_CTRL_ENABLE   (1 << 7)
++
++struct bcm283x_timer_state {
++    ptimer_state *timer;
++    uint32_t control;
++    uint32_t limit;
++    int freq;
++    int int_level;
++    qemu_irq irq;
++    /* Not implemented */
++    int prev_div;
++    /* Not implemented */
++    int free_run_cnt;
++};
++
++static void bcm283x_timer_update(bcm283x_timer_state *s)
++{
++    if (s->int_level && (s->control & TIMER_CTRL_IE)) {
++        qemu_irq_raise(s->irq);
++    } else {
++        qemu_irq_lower(s->irq);
++    }
++}
++
++static uint32_t bcm283x_timer_read(void *opaque, hwaddr offset)
++{
++    bcm283x_timer_state *s = (bcm283x_timer_state *) opaque;
++
++    switch (offset >> 2) {
++    case 0: /* Load register */
++    case 6: /* Reload register */
++        return s->limit;
++    case 1: /* Value register */
++        return ptimer_get_count(s->timer);
++    case 2: /* Control register */
++        return s->control;
++    case 3: /* IRQ clear/ACK register */
++        /*
++         * The register is write-only,
++         * but returns reverse "ARMT" string bytes
++         */
++        return 0x544D5241;
++    case 4: /* RAW IRQ register */
++        return s->int_level;
++    case 5: /* Masked IRQ register */
++        if ((s->control & TIMER_CTRL_IE) == 0) {
++            return 0;
++        }
++        return s->int_level;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset %x\n", __func__, (int) offset);
++        return 0;
++    }
++}
++
++static void bcm283x_timer_recalibrate(bcm283x_timer_state *s, int reload)
++{
++    uint32_t limit;
++
++    /* Consider timer periodic */
++    limit = s->limit;
++
++    ptimer_set_limit(s->timer, limit, reload);
++}
++
++static void bcm283x_timer_write(void *opaque, hwaddr offset, uint32_t value)
++{
++    bcm283x_timer_state *s = (bcm283x_timer_state *) opaque;
++    int freq;
++
++    switch (offset >> 2) {
++    case 0: /* Load register */
++        s->limit = value;
++        bcm283x_timer_recalibrate(s, 1);
++        break;
++    case 1: /* Value register */
++        /* Read only */
++        break;
++    case 2: /* Control register */
++        if (s->control & TIMER_CTRL_ENABLE) {
++            ptimer_stop(s->timer);
++        }
++
++        s->control = value;
++        freq = s->freq;
++
++        /* Set pre-scaler */
++        switch ((value >> 2) & 3) {
++        case 1: /* 16 */
++            freq >>= 4;
++            break;
++        case 2: /* 256 */
++            freq >>= 8;
++            break;
++        }
++
++        bcm283x_timer_recalibrate(s, s->control & TIMER_CTRL_ENABLE);
++        ptimer_set_freq(s->timer, freq);
++        if (s->control & TIMER_CTRL_ENABLE) {
++            ptimer_run(s->timer, 0);
++        }
++        break;
++    case 3: /* IRQ clear/ACK register */
++        s->int_level = 0;
++        break;
++    case 6: /* Reload register */
++        s->limit = value;
++        bcm283x_timer_recalibrate(s, 0);
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset %x\n", __func__, (int) offset);
++        break;
++    }
++
++    bcm283x_timer_update(s);
++}
++
++static void bcm283x_timer_tick(void *opaque)
++{
++    bcm283x_timer_state *s = (bcm283x_timer_state *) opaque;
++    s->int_level = 1;
++    bcm283x_timer_update(s);
++}
++
++static const VMStateDescription vmstate_bcm283x_timer = {
++    .name = "bcm283x_timer",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(control, bcm283x_timer_state),
++        VMSTATE_UINT32(limit, bcm283x_timer_state),
++        VMSTATE_INT32(int_level, bcm283x_timer_state),
++        VMSTATE_PTIMER(timer, bcm283x_timer_state),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bcm283x_timer_state *bcm283x_timer_init(uint32_t freq)
++{
++    bcm283x_timer_state *s;
++    QEMUBH *bh;
++
++    s = g_new0(bcm283x_timer_state, 1);
++    s->freq = freq;
++    s->control = TIMER_CTRL_IE;
++
++    bh = qemu_bh_new(bcm283x_timer_tick, s);
++    s->timer = ptimer_init(bh, PTIMER_POLICY_DEFAULT);
++    vmstate_register(NULL, -1, &vmstate_bcm283x_timer, s);
++
++    return s;
++}
++
++/* BCM283x's implementation of SP804 ARM timer */
++
++/*
++ * XXX: BCM's datasheet does not seem to
++ * provide these values and they may differ
++ */
++static const uint8_t bcm283xsp803_ids[] = {
++    /* Timer ID */
++    0x04, 0x18, 0x14, 0x00,
++    /* PrimeCell ID */
++    0x0D, 0xF0, 0x05, 0xB1
++};
++
++static void bcm283xsp804_set_irq(void *opaque, int irq, int level)
++{
++    BCM283xSP804State *s = (BCM283xSP804State *) opaque;
++
++    s->level = level;
++    qemu_set_irq(s->irq, s->level);
++}
++
++static uint64_t bcm283xsp804_read(void *opaque, hwaddr offset, unsigned size)
++{
++    BCM283xSP804State *s = (BCM283xSP804State *) opaque;
++
++    if (offset < 0x20) {
++        return bcm283x_timer_read(s->timer, offset);
++    }
++    /* No second timer (0x20 < offset < 0x40) */
++
++    if (offset >= 0xFE0 && offset <= 0xFFC) {
++        return bcm283xsp803_ids[(offset - 0xFE0) >> 2];
++    }
++
++    switch (offset) {
++    /* Unimplemented: integration test control registers */
++    case 0xF00:
++    case 0xF04:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: integration test registers unimplemented\n",
++                      __func__);
++        return 0;
++    }
++
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "%s: Bad offset %x\n", __func__, (int) offset);
++    return 0;
++}
++
++static void bcm283xsp803_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned size)
++{
++    BCM283xSP804State *s = (BCM283xSP804State *) opaque;
++
++    if (offset < 0x20) {
++        bcm283x_timer_write(s->timer, offset, value);
++    }
++    /* No second timer (0x20 < offset < 0x40) */
++
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "%s: Bad offset %x\n", __func__, (int) offset);
++}
++
++static const MemoryRegionOps bcm283xsp804_ops = {
++    .read = bcm283xsp804_read,
++    .write = bcm283xsp803_write,
++    .endianness = DEVICE_NATIVE_ENDIAN
++};
++
++static const VMStateDescription vmstate_bcm283xsp804 = {
++    .name = "bcm283xsp804",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(level, BCM283xSP804State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void bcm283xsp804_init(Object *obj)
++{
++    BCM283xSP804State *s = BCM283xSP804(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    sysbus_init_irq(sbd, &s->irq);
++    memory_region_init_io(&s->iomem, obj, &bcm283xsp804_ops, s,
++            "bcm283xsp804", 0x1000);
++
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static void bcm283xsp804_realize(DeviceState *dev, Error **errp)
++{
++    BCM283xSP804State *s = BCM283xSP804(dev);
++
++    s->timer = bcm283x_timer_init(s->freq0);
++    s->timer->irq = qemu_allocate_irq(bcm283xsp804_set_irq, s, 0);
++}
++
++static Property bcm283xsp804_properties[] = {
++    DEFINE_PROP_UINT32("freq0", BCM283xSP804State, freq0, 1000000),
++    DEFINE_PROP_END_OF_LIST()
++};
++
++static void bcm283xsp804_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *k = DEVICE_CLASS(klass);
++
++    k->realize = bcm283xsp804_realize;
++    k->props = bcm283xsp804_properties;
++    k->vmsd = &vmstate_bcm283xsp804;
++}
++
++static const TypeInfo bcm283xsp804_info = {
++    .name           = TYPE_BCM283xSP804,
++    .parent         = TYPE_SYS_BUS_DEVICE,
++    .instance_size  = sizeof(BCM283xSP804State),
++    .instance_init  = bcm283xsp804_init,
++    .class_init     = bcm283xsp804_class_init
++};
++
++static void bcm283x_timer_register_types(void)
++{
++    type_register_static(&bcm283xsp804_info);
++}
++
++type_init(bcm283x_timer_register_types)
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index f5b193f670..d13aad43cb 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -23,6 +23,7 @@
+ #include "hw/sd/sdhci.h"
+ #include "hw/sd/bcm2835_sdhost.h"
+ #include "hw/gpio/bcm2835_gpio.h"
++#include "hw/timer/bcm283x_timer.h"
 
-thanks
+ #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
+ #define BCM2835_PERIPHERALS(obj) \
+@@ -48,6 +49,7 @@ typedef struct BCM2835PeripheralState {
+     SDHCIState sdhci;
+     BCM2835SDHostState sdhost;
+     BCM2835GpioState gpio;
++    BCM283xSP804State bcm283xsp804;
+ } BCM2835PeripheralState;
 
-> Marc-Andr=C3=A9 Lureau (12):
->   configure: bump spice-server required version to 0.12.5
->   char/spice: trigger HUP event
->   char/spice: discard write() if backend is disconnected
->   spice: avoid spice runtime assert
->   spice: merge options lists
->   spice: do not stop spice if VM is paused
->   char: move SpiceChardev and open_spice_port() to spice.h header
->   char: register spice ports after spice started
->   build-sys: add gio-2.0 check
->   qapi: document DisplayType enum
->   spice: use a default name for the server
->   display: add -display spice-app launching a Spice client
->
->  qapi/ui.json            |  31 ++++++-
->  include/chardev/spice.h |  27 ++++++
->  include/ui/qemu-spice.h |   6 --
->  chardev/spice.c         |  70 +++++++-------
->  hw/display/qxl.c        |   2 -
->  ui/spice-app.c          | 200 ++++++++++++++++++++++++++++++++++++++++
->  ui/spice-core.c         |  21 +++--
->  chardev/trace-events    |   1 +
->  configure               |  17 +++-
->  qemu-options.hx         |   5 +
->  ui/Makefile.objs        |   5 +
->  11 files changed, 330 insertions(+), 55 deletions(-)
->  create mode 100644 include/chardev/spice.h
->  create mode 100644 ui/spice-app.c
->
-> --
-> 2.20.1.2.gb21ebb671b
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+ #endif /* BCM2835_PERIPHERALS_H */
+diff --git a/include/hw/timer/bcm283x_timer.h b/include/hw/timer/bcm283x_timer.h
+new file mode 100644
+index 0000000000..f5e8dcddfc
+--- /dev/null
++++ b/include/hw/timer/bcm283x_timer.h
+@@ -0,0 +1,38 @@
++/*
++ * Broadcom BCM283x ARM timer variant based on ARM SP804
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef HW_TIMER_BCM2835_TIMER_H
++#define HW_TIMER_BCM2835_TIMER_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_BCM283xSP804 "bcm283xsp804"
++#define BCM283xSP804(obj)
++    OBJECT_CHECK(BCM283xSP804State, (obj), TYPE_BCM283xSP804)
++
++typedef struct bcm283x_timer_state bcm283x_timer_state;
++
++typedef struct {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++    bcm283x_timer_state *timer;
++    uint32_t freq0;
++    int level;
++    qemu_irq irq;
++} BCM283xSP804State;
++
++#endif
+--
+2.20.1
