@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54358)
+Received: from eggs.gnu.org ([209.51.188.92]:54415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gsqYz-0003S1-AZ
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 09:58:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gsqZG-0003j6-LY
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 09:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gsqYr-0006BF-0x
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 09:58:29 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gsqZF-0006TV-Dr
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 09:58:50 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sun, 10 Feb 2019 15:57:33 +0100
-Message-Id: <20190210145736.1486-8-mreitz@redhat.com>
+Date: Sun, 10 Feb 2019 15:57:35 +0100
+Message-Id: <20190210145736.1486-10-mreitz@redhat.com>
 In-Reply-To: <20190210145736.1486-1-mreitz@redhat.com>
 References: <20190210145736.1486-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/10] iotests.py: Filter filename in any
- string value
+Subject: [Qemu-devel] [PATCH v3 09/10] iotests: Let 045 be run concurrently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +24,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-filter_qmp_testfiles() currently filters the filename only for specific
-keys.  However, there are more keys that take filenames (such as
-block-commit's @top and @base, or ssh's @path), and it does not make
-sense to list them all here.  "$TEST_DIR/$PID-" should have enough
-entropy not to appear anywhere randomly.
+Adding a telnet monitor for no real purpose on a fixed port is not so
+great.  Just use a null monitor instead.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/qemu.py        | 5 ++---
+ tests/qemu-iotests/045 | 2 +-
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 52fc77563c..cba91a9927 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -289,7 +289,7 @@ def filter_testfiles(msg):
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 0a5e02eb56..e642a55816 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -136,10 +136,9 @@ class QEMUMachine(object):
+         return False
 =20
- def filter_qmp_testfiles(qmsg):
-     def _filter(key, value):
--        if key =3D=3D 'filename' or key =3D=3D 'backing-file':
-+        if is_str(value):
-             return filter_testfiles(value)
-         return value
-     return filter_qmp(qmsg, _filter)
+     # This can be used to add an unused monitor instance.
+-    def add_monitor_telnet(self, ip, port):
+-        args =3D 'tcp:%s:%d,server,nowait,telnet' % (ip, port)
++    def add_monitor_null(self):
+         self._args.append('-monitor')
+-        self._args.append(args)
++        self._args.append('null')
+=20
+     def add_fd(self, fd, fdset, opaque, opts=3D''):
+         """
+diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
+index 55a5d31ca8..d5484a0ee1 100755
+--- a/tests/qemu-iotests/045
++++ b/tests/qemu-iotests/045
+@@ -132,7 +132,7 @@ class TestSCMFd(iotests.QMPTestCase):
+         qemu_img('create', '-f', iotests.imgfmt, image0, '128K')
+         # Add an unused monitor, to verify it works fine when two monito=
+r
+         # instances present
+-        self.vm.add_monitor_telnet("0",4445)
++        self.vm.add_monitor_null()
+         self.vm.launch()
+=20
+     def tearDown(self):
 --=20
 2.20.1
