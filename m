@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56615)
+Received: from eggs.gnu.org ([209.51.188.92]:56916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gsZXn-0008Lk-6E
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 15:48:11 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gscdT-0005TU-Ah
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 19:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gsZXl-000362-8c
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 15:48:10 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35457)
+	(envelope-from <richard.henderson@linaro.org>) id 1gscdS-0006Fq-Bh
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 19:06:15 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35531)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gsZXi-00031C-R5
-	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 15:48:08 -0500
-Received: by mail-wm1-x341.google.com with SMTP id t200so9606952wmt.0
-	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 12:48:05 -0800 (PST)
-References: <20190209162745.12668-1-cota@braap.org>
-	<20190209162745.12668-2-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190209162745.12668-2-cota@braap.org>
-Date: Sat, 09 Feb 2019 20:48:02 +0000
-Message-ID: <877ee88z99.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gscdR-0006F6-Sn
+	for qemu-devel@nongnu.org; Sat, 09 Feb 2019 19:06:14 -0500
+Received: by mail-pf1-x443.google.com with SMTP id z9so3457494pfi.2
+	for <qemu-devel@nongnu.org>; Sat, 09 Feb 2019 16:06:13 -0800 (PST)
+References: <20190114011122.5995-1-richard.henderson@linaro.org>
+	<20190114011122.5995-2-richard.henderson@linaro.org>
+	<CAFEAcA9Kj5fXB6fe_hJAGbqG0ftjh9+VrqQQEy4bEQ6iFB508A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <56022fc3-4061-4f5a-bb22-e9205e2fc34d@linaro.org>
+Date: Sat, 9 Feb 2019 16:06:08 -0800
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9Kj5fXB6fe_hJAGbqG0ftjh9+VrqQQEy4bEQ6iFB508A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] exec-all: document that tlb_fill can
- trigger a TLB resize
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/17] target/arm: Add MTE_ACTIVE to
+ tb_flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+
+On 2/5/19 11:06 AM, Peter Maydell wrote:
+> On Mon, 14 Jan 2019 at 01:11, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> When MTE is fully enabled, i.e. access to tags are enabled and
+>> tag checks affect the PE, then arrange to perform the check
+>> while stripping the TBI.
+>>
+>> The check is not yet implemented, just the plumbing to that point.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+>> @@ -0,0 +1,32 @@
+>> +/*
+>> + * ARM v8.5-MemTag Operations
+>> + *
+>> + * Copyright (c) 2019 Linaro, Ltd.
+>> + *
+>> + * This library is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU Lesser General Public
+>> + * License as published by the Free Software Foundation; either
+>> + * version 2 of the License, or (at your option) any later version.
+> 
+> Do you mean LGPL version 2.1 here, or GPL version 2?
+
+Exactly the same as all of the other Linaro contributed
+files -- a confused mix.  ;-)
+
+>> +uint64_t HELPER(mte_check)(CPUARMState *env, uint64_t ptr)
+>> +{
+>> +    /* Only unchecked implemented so far.  */
+>> +    return sextract64(ptr, 0, 55);
+> 
+> Are you sure this is right?
+
+Not exactly right, no.  I thought I had a fixme here, but that was the other
+one you point out later.  Will fix.
 
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  include/exec/exec-all.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index aa7b81aaf0..97b90cb0db 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -475,6 +475,11 @@ static inline void assert_no_pages_locked(void)
->  struct MemoryRegionSection *iotlb_to_section(CPUState *cpu,
->                                               hwaddr index, MemTxAttrs at=
-trs);
->
-> +/*
-> + * Note: tlb_fill() can trigger a resize of the TLB. This means that all=
- of the
-> + * caller's prior references to the TLB table (e.g. CPUTLBEntry pointers=
-) must
-> + * be discarded and looked up again (e.g. via tlb_entry()).
-> + */
->  void tlb_fill(CPUState *cpu, target_ulong addr, int size,
->                MMUAccessType access_type, int mmu_idx, uintptr_t retaddr);
-
-
---
-Alex Benn=C3=A9e
+r~
