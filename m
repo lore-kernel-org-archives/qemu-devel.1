@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42862)
+Received: from eggs.gnu.org ([209.51.188.92]:42866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gsyVV-0002pC-QT
+	(envelope-from <dgibson@ozlabs.org>) id 1gsyVV-0002pE-SM
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gsyVM-00034q-T7
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:27:25 -0500
-Date: Mon, 11 Feb 2019 10:16:30 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gsyVN-00035D-4X
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:27:26 -0500
+Date: Mon, 11 Feb 2019 10:24:38 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190210231629.GB7230@umbus.fritz.box>
-References: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20190210232437.GD7230@umbus.fritz.box>
+References: <20190208172201.29001-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5I6of5zJg18YgZEa"
+	protocol="application/pgp-signature"; boundary="Qrgsu6vtpU/OV/zm"
 Content-Disposition: inline
-In-Reply-To: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH] cuda: decrease time delay before raising
- VIA SR interrupt
+In-Reply-To: <20190208172201.29001-1-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH] mac_newworld: change default NIC to sungem
+ for mac99 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +28,37 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, hsp.cat7@gmail.com
 
 
---5I6of5zJg18YgZEa
+--Qrgsu6vtpU/OV/zm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 10, 2019 at 05:44:21PM +0000, Mark Cave-Ayland wrote:
-> In order to handle a race condition in MacOS 9, a delay was introduced wh=
-en
-> raising the VIA SR interrupt inspired by similar code in MacOnLinux.
->=20
-> During original testing of the MacOS 9 patches it was found that the 30us
-> delay used in MacOnLinux did not work reliably within QEMU, and a value of
-> 300us was required to function correctly.
->=20
-> Recent experiments have shown that the previous reliability issues are no
-> longer present, and this value can be reduced down to 20us with no appare=
-nt
-> ill effects in my local tests. This has the benefit of considerably impro=
-ving
-> the responsiveness of the ADB keyboard and mouse with the guest.
+On Fri, Feb 08, 2019 at 05:22:01PM +0000, Mark Cave-Ayland wrote:
+> This model brings out-of-the-box networking for all of Linux, MacOS 9 and=
+ OS X
+> without requiring the installation of additional drivers.
 >=20
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Applied to ppc-for-4.0, thanks.
+Applied, thanks.
 
 > ---
->  hw/misc/macio/cuda.c | 11 +----------
->  1 file changed, 1 insertion(+), 10 deletions(-)
+>  hw/ppc/mac_newworld.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-> index c4f7a2f39b..3febacdd1e 100644
-> --- a/hw/misc/macio/cuda.c
-> +++ b/hw/misc/macio/cuda.c
-> @@ -97,17 +97,8 @@ static void cuda_set_sr_int(void *opaque)
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 10be728c37..98461052ac 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -432,7 +432,7 @@ static void ppc_core99_init(MachineState *machine)
+>      }
 > =20
->  static void cuda_delay_set_sr_int(CUDAState *s)
->  {
-> -    MOS6522CUDAState *mcs =3D &s->mos6522_cuda;
-> -    MOS6522State *ms =3D MOS6522(mcs);
-> -    MOS6522DeviceClass *mdc =3D MOS6522_DEVICE_GET_CLASS(ms);
->      int64_t expire;
+>      for (i =3D 0; i < nb_nics; i++) {
+> -        pci_nic_init_nofail(&nd_table[i], pci_bus, "ne2k_pci", NULL);
+> +        pci_nic_init_nofail(&nd_table[i], pci_bus, "sungem", NULL);
+>      }
 > =20
-> -    if (ms->dirb =3D=3D 0xff || s->sr_delay_ns =3D=3D 0) {
-> -        /* Disabled or not in Mac OS, fire the IRQ directly */
-> -        mdc->set_sr_int(ms);
-> -        return;
-> -    }
-> -
->      trace_cuda_delay_set_sr_int();
-> =20
->      expire =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->sr_delay_ns;
-> @@ -542,7 +533,7 @@ static void cuda_realize(DeviceState *dev, Error **er=
-rp)
->      s->tick_offset =3D (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-> =20
->      s->sr_delay_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_i=
-nt, s);
-> -    s->sr_delay_ns =3D 300 * SCALE_US;
-> +    s->sr_delay_ns =3D 20 * SCALE_US;
-> =20
->      s->adb_poll_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_adb_poll=
-, s);
->      s->adb_poll_mask =3D 0xffff;
+>      /* The NewWorld NVRAM is not located in the MacIO device */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -98,24 +66,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---5I6of5zJg18YgZEa
+--Qrgsu6vtpU/OV/zm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxgsMsACgkQbDjKyiDZ
-s5K/ChAAvUOAnzdGCmCfk7dfJw+PkLgfZ74oQVYrgntk0SxUE2JqF8b2wt9x9JWb
-0yEfmd8Js/tZmEnSl09Z+Omt6T4KzPyWf8khFhE9XdUvhHy18zkl7Ck7LDoCj/3c
-BSZ9ch3X/ZdslJE6UjThiivcv1CQPsHTdF0KNmxsxMnTlsFJM3ObcPViEe/ujzOR
-aWXhFyrtXqMJWVmLIXMe8m5zqYLvVeEiA/FC0Rm+WO/LLEMUGFjDsjBxJ6kZ0Ji5
-Y3NYSzJI4Sv4/oRXZoWzCVRSvqJGBRuzuH06kSHGLsgHpFQ537YMHU3vu2YyeT1x
-8gVJBeBvE2/0i21z4X9UwTe5KdYJNG1jCCuuU8wWwCTsBs4VE2LMwwYXLhc0WgE4
-+pe/cGVIALOGfT1jSz1/7XPB5acpSWXtKVsI7JNR5A4OZb7Um1dLGIvYuXbHVLHP
-uHnTNJxLea6jIZr/SsPPzJKLgkAscJmkDL+mVX6fuJPsAYnvrBXnihxCwQzVdJOS
-hT5UMpxIvXxdpxBm20SAWyQYzDOh9nRaX4MdYjaByRq2iI2xmp2RXMcaPljdyIG3
-OHoaQtSP+S5zbbAv9DIyGfPs5pLQ6OPVWBDJHrdiq+flnvblObQhdN3Ur/VrFkoA
-JIZqBUqEFjN/E9eDYyxuWafhMwuNCdGDiut6KHe8OMyRlwCwtY8=
-=jYI1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxgsrQACgkQbDjKyiDZ
+s5JGQQ//ZztmJVSc/tU6kKvy0AJdWAszbUrlci6996I2LG/Kcf68fj2iNgZBJ1MB
+qUajhGRuntY9X0OqbkHS8nFzu2/EJ65pxwunXNStWBK7nsFwAc4X74p31lpxwrxz
+k2KyTGq5EAywJIbw8TkXEduiu/BFRo9Ma2zago979uxcwPG0HSvexXs8nEPH2URO
+7EgHyUxFsZqOMmhnlasPjxbNpzOsWlZ3V2R23R+F3ptQncBNPYR+ZRjI98+oSg5w
+2sPf+ljc7S1RNwr9Y/wukrVNfev2WMr6ryZuvMLfOrbuDr468FIOpytE8tJqkdzn
+D7l3j1oBFRt+x4NoWmpvgWC5RTtHby8M+to2+jdkkU38YQvJjE+4eMofF7/PoiLj
+MhSxqVEc4FMT1s2ckSZE6olN+uyTDaQ/xGe7ZzQyoTOYlcrvoZbV+GnAOaFqXWV3
+ceve1wI6Q1bo+wey7LciUo0NIUgnonbi8bobVBBNulhmk3EIXpYLVomp/U4F9SLK
+psof3oOMaJ/wXx6IWpmDgxFey+gUbuaZ/fDYmzw5wtbV85NQFIQE0W+bx3RrQMyT
+napTRjBYIWz6PMAncoc97ubD3gOTmPHz7GAdbppk8YJCfkNC9JXl9077Sc/LAeYL
+xp0ZnqEW1NBSkTpjhUQFH2gMeGBs9A52onT/+gzaYVDdVommEtI=
+=RCG9
 -----END PGP SIGNATURE-----
 
---5I6of5zJg18YgZEa--
+--Qrgsu6vtpU/OV/zm--
