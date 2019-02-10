@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43087)
+Received: from eggs.gnu.org ([209.51.188.92]:60274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1gsvbC-0004GM-C2
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 15:21:11 -0500
+	(envelope-from <hsp.cat7@gmail.com>) id 1gsxLD-0005zx-Tj
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 17:12:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lukas.auer@aisec.fraunhofer.de>) id 1gsvYm-00077g-Lm
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 15:18:42 -0500
-From: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
-Date: Sun, 10 Feb 2019 21:17:26 +0100
-Message-ID: <20190210201726.3567-1-lukas.auer@aisec.fraunhofer.de>
+	(envelope-from <hsp.cat7@gmail.com>) id 1gsxLA-0003an-T2
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 17:12:47 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:42705)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1gsxL5-0003GZ-K5
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 17:12:41 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id i5so3959283oto.9
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 14:12:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] hw/riscv/virt: re-add machine-specific
- compatible string to /soc/ node
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Sun, 10 Feb 2019 23:12:11 +0100
+Message-ID: <CABLmASFLwswYELUGHKjZct6XnEYb4tKn1XEuCAgwniN7NM110g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Bug: Lost slirp functionality on qemu-system-ppc build
+ for windows.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,44 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>, Alistair Francis <Alistair.Francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>, Michael Clark <mjc@sifive.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Re-add the previous compatible string "riscv-virtio-soc" to the soc
-device tree node to allow U-Boot and Linux to bind machine-specific
-drivers to it. The current compatible string "simple-bus" is retained.
+Hi,
 
-This is required by U-Boot to bind devices early, as part of the
-pre-relocation driver model.
+I just cross compiled Qemu-system-ppc for Windows on Fedora 29 and
+discovered slirp does not work anymore. Tap networking works fine.
+Bisecting got me here:
 
-Fixes: 53f54508dae6("hw/riscv/virtio: Set the soc device tree node as a
-simple-bus")
-Signed-off-by: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
----
+a9d8b3ec4385793815d7121785730422fa3dfb68 is the first bad commit
+commit a9d8b3ec4385793815d7121785730422fa3dfb68
+Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Date:   Thu Jan 17 15:43:52 2019 +0400
 
- hw/riscv/virt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+    slirp: replace remaining qemu headers dependency
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 3e8b19c668..c53bb905ff 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -157,6 +157,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     char *nodename;
-     uint32_t plic_phandle, phandle = 1;
-     int i;
-+    const char soc_compat[] = "riscv-virtio-soc\0simple-bus";
- 
-     fdt = s->fdt = create_device_tree(&s->fdt_size);
-     if (!fdt) {
-@@ -171,7 +172,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
- 
-     qemu_fdt_add_subnode(fdt, "/soc");
-     qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
--    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "simple-bus");
-+    qemu_fdt_setprop(fdt, "/soc", "compatible", soc_compat, sizeof(soc_compat));
-     qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-     qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
- 
--- 
-2.20.1
+    Except for the migration code which is gated by WITH_QEMU, only
+    include our own headers, so libslirp can be built standalone.
+
+    Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+    Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+:040000 040000 cd06df21ed96497cd12f2a20adb3d66cb0da8010
+ab5afd3f50910e39b2b700722cd47de8f0cf9e2c M    slirp
+
+
+Best,
+Howard
