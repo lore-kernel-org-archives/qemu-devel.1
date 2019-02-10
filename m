@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48990)
+Received: from eggs.gnu.org ([209.51.188.92]:54056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gst9x-0004X1-7n
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 12:44:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1gstib-0001oe-Ri
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 13:20:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gst9w-0007Oj-5a
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 12:44:53 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 10 Feb 2019 17:44:21 +0000
-Message-Id: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH] cuda: decrease time delay before raising VIA
- SR interrupt
+	(envelope-from <bounces@canonical.com>) id 1gstiZ-0004Kn-UF
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 13:20:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56186)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gstiW-0004Fc-EP
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 13:20:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gstiU-0002XF-Ms
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 18:20:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AA39E2E8037
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 18:20:34 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 10 Feb 2019 18:12:43 -0000
+From: Laurent Bigonville <bigon@bigon.be>
+Reply-To: Bug 1815371 <1815371@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154982236357.21816.7244935149831813819.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815371] [NEW] SPICE session's connection_id's
+ are not unique
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,55 +36,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, hsp.cat7@gmail.com
+To: qemu-devel@nongnu.org
 
-In order to handle a race condition in MacOS 9, a delay was introduced when
-raising the VIA SR interrupt inspired by similar code in MacOnLinux.
+Public bug reported:
 
-During original testing of the MacOS 9 patches it was found that the 30us
-delay used in MacOnLinux did not work reliably within QEMU, and a value of
-300us was required to function correctly.
+From: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D920897
 
-Recent experiments have shown that the previous reliability issues are no
-longer present, and this value can be reduced down to 20us with no apparent
-ill effects in my local tests. This has the benefit of considerably improving
-the responsiveness of the ADB keyboard and mouse with the guest.
+=3D=3D=3D=3D=3D
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/misc/macio/cuda.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+When creating a virtual machine with qemu (e.g. via libvirt) including a
+SPICE server, the client_id of the SPICE session is not unique. For
+example, starting multiple virtual machines on the same libvirtd, the
+client_id is the same for all virtual machine's SPICE sessions.
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index c4f7a2f39b..3febacdd1e 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -97,17 +97,8 @@ static void cuda_set_sr_int(void *opaque)
- 
- static void cuda_delay_set_sr_int(CUDAState *s)
- {
--    MOS6522CUDAState *mcs = &s->mos6522_cuda;
--    MOS6522State *ms = MOS6522(mcs);
--    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-     int64_t expire;
- 
--    if (ms->dirb == 0xff || s->sr_delay_ns == 0) {
--        /* Disabled or not in Mac OS, fire the IRQ directly */
--        mdc->set_sr_int(ms);
--        return;
--    }
--
-     trace_cuda_delay_set_sr_int();
- 
-     expire = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->sr_delay_ns;
-@@ -542,7 +533,7 @@ static void cuda_realize(DeviceState *dev, Error **errp)
-     s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
- 
-     s->sr_delay_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_int, s);
--    s->sr_delay_ns = 300 * SCALE_US;
-+    s->sr_delay_ns = 20 * SCALE_US;
- 
-     s->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
-     s->adb_poll_mask = 0xffff;
--- 
-2.11.0
+
+A description of the client_id can be found in
+
+https://www.spice-space.org/static/docs/spice_protocol.pdf under section
+2.11. c) :
+
+
+"UINT32 connection_id - In case of a new session (i.e., channel type is RED=
+_CHANNEL_MAIN) this field is set to zero, and in response the server will a=
+llocate session id and will send it via the RedLinkReply message. In case o=
+f all other channel types, this field will be equal to the allocated sessio=
+n id"
+
+
+The relevant code for generating client ids in libspice-server1 can be foun=
+d here: https://gitlab.freedesktop.org/spice/spice/blob/v0.12.8/server/reds=
+.c#L1614
+
+This uses rand() to generate the random id, but qemu (at least in the
+case of qemu-system-x86) fails to initialize the RNG seed (with e.g.
+srand()).
+
+
+The result is, that every SPICE session started (by e.g. libvirtd) has the =
+same client_id. Usually, this is not a problem, but running something like =
+a SPICE proxy, relying on the client_id to correctly route connections, thi=
+s creates problems.
+
+
+Adding something like 'srand(time(NULL));' to qemu (in vl.c) solves this is=
+sue. Related (as seen in some VNC patches, e.g. 'CVE-2017-15124/04-ui-avoid=
+-pointless-VNC-updates-if-framebuffer-isn-t-.patch/ui/vnc.c' ):  srand(time=
+(NULL)+getpid()+getpid()*987654+rand());
+
+
+Tested on Debian 9.7 with kernel  4.9.0-6-amd64 #1 SMP Debian 4.9.88-1+deb9=
+u1 (2018-05-07) x86_64 GNU/Linux.
+
+
+=3D=3D=3D=3D=3D
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Affects: qemu (Debian)
+     Importance: Unknown
+         Status: Unknown
+
+** Bug watch added: Debian Bug tracker #920897
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D920897
+
+** Also affects: qemu (Debian) via
+   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D920897
+   Importance: Unknown
+       Status: Unknown
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815371
+
+Title:
+   SPICE session's connection_id's are not unique
+
+Status in QEMU:
+  New
+Status in qemu package in Debian:
+  Unknown
+
+Bug description:
+  From: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D920897
+
+  =3D=3D=3D=3D=3D
+
+  When creating a virtual machine with qemu (e.g. via libvirt) including
+  a SPICE server, the client_id of the SPICE session is not unique. For
+  example, starting multiple virtual machines on the same libvirtd, the
+  client_id is the same for all virtual machine's SPICE sessions.
+
+  =
+
+  A description of the client_id can be found in
+
+  https://www.spice-space.org/static/docs/spice_protocol.pdf under
+  section 2.11. c) :
+
+  =
+
+  "UINT32 connection_id - In case of a new session (i.e., channel type is R=
+ED_CHANNEL_MAIN) this field is set to zero, and in response the server will=
+ allocate session id and will send it via the RedLinkReply message. In case=
+ of all other channel types, this field will be equal to the allocated sess=
+ion id"
+
+  =
+
+  The relevant code for generating client ids in libspice-server1 can be fo=
+und here: https://gitlab.freedesktop.org/spice/spice/blob/v0.12.8/server/re=
+ds.c#L1614
+
+  This uses rand() to generate the random id, but qemu (at least in the
+  case of qemu-system-x86) fails to initialize the RNG seed (with e.g.
+  srand()).
+
+  =
+
+  The result is, that every SPICE session started (by e.g. libvirtd) has th=
+e same client_id. Usually, this is not a problem, but running something lik=
+e a SPICE proxy, relying on the client_id to correctly route connections, t=
+his creates problems.
+
+  =
+
+  Adding something like 'srand(time(NULL));' to qemu (in vl.c) solves this =
+issue. Related (as seen in some VNC patches, e.g. 'CVE-2017-15124/04-ui-avo=
+id-pointless-VNC-updates-if-framebuffer-isn-t-.patch/ui/vnc.c' ):  srand(ti=
+me(NULL)+getpid()+getpid()*987654+rand());
+
+  =
+
+  Tested on Debian 9.7 with kernel  4.9.0-6-amd64 #1 SMP Debian 4.9.88-1+de=
+b9u1 (2018-05-07) x86_64 GNU/Linux.
+
+
+  =3D=3D=3D=3D=3D
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815371/+subscriptions
