@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51123)
+Received: from eggs.gnu.org ([209.51.188.92]:49514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gsizp-0006s3-AU
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 01:53:46 -0500
+	(envelope-from <david@redhat.com>) id 1gsmQr-0006V6-Re
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 05:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gsizl-0000G7-GF
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 01:53:43 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:51832)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gsizh-0000A7-E2
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 01:53:38 -0500
-From: Knut Omang <knut.omang@oracle.com>
-Date: Sun, 10 Feb 2019 07:52:58 +0100
-Message-Id: <cover.d651a232d750c6f53cbe8d483b665d638f7a0c0a.1549779509.git-series.knut.omang@oracle.com>
+	(envelope-from <david@redhat.com>) id 1gsmQo-0008P7-SP
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 05:33:52 -0500
+References: <20190209063152.9490-1-richard.henderson@linaro.org>
+	<20190209063152.9490-2-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8f8b0816-3423-abca-c20d-6d92174079fc@redhat.com>
+Date: Sun, 10 Feb 2019 11:33:33 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 0/2] pcie: Add simple ACS "support" to the
- generic PCIe root port
+In-Reply-To: <20190209063152.9490-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/2] target/s390x: Split
+ out s390-tod.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>, Knut Omang <knut.omang@oracle.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, thuth@redhat.com
 
-These two patches together implements a PCIe capability
-config space header for Access Control Services (ACS) for the
-new Qemu specific generic root port. ACS support in the
-associated root port is a prerequisite to be able to pass
-individual functions of a device populating the port through to
-an L2 guest from an unmodified kernel.
+On 09.02.19 07:31, Richard Henderson wrote:
+> We will need these from CONFIG_USER_ONLY as well,
+> which cannot access include/hw/.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/hw/s390x/tod.h  | 16 +---------------
+>  target/s390x/s390-tod.h | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 30 insertions(+), 15 deletions(-)
+>  create mode 100644 target/s390x/s390-tod.h
+> 
+> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+> index 47ef9de869..9c4a6000c3 100644
+> --- a/include/hw/s390x/tod.h
+> +++ b/include/hw/s390x/tod.h
+> @@ -12,6 +12,7 @@
+>  #define HW_S390_TOD_H
+>  
+>  #include "hw/qdev.h"
+> +#include "s390-tod.h"
+>  
+>  typedef struct S390TOD {
+>      uint8_t high;
+> @@ -50,21 +51,6 @@ typedef struct S390TODClass {
+>      void (*set)(S390TODState *td, const S390TOD *tod, Error **errp);
+>  } S390TODClass;
+>  
+> -/* The value of the TOD clock for 1.1.1970. */
+> -#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
+> -
+> -/* Converts ns to s390's clock format */
+> -static inline uint64_t time2tod(uint64_t ns)
+> -{
+> -    return (ns << 9) / 125 + (((ns & 0xff80000000000000ull) / 125) << 9);
+> -}
+> -
+> -/* Converts s390's clock format to ns */
+> -static inline uint64_t tod2time(uint64_t t)
+> -{
+> -    return ((t >> 9) * 125) + (((t & 0x1ff) * 125) >> 9);
+> -}
+> -
+>  void s390_init_tod(void);
+>  S390TODState *s390_get_todstate(void);
+>  
+> diff --git a/target/s390x/s390-tod.h b/target/s390x/s390-tod.h
+> new file mode 100644
+> index 0000000000..8b74d6a6d8
+> --- /dev/null
+> +++ b/target/s390x/s390-tod.h
+> @@ -0,0 +1,29 @@
+> +/*
+> + * TOD (Time Of Day) clock
+> + *
+> + * Copyright 2018 Red Hat, Inc.
+> + * Author(s): David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef TARGET_S390_TOD_H
+> +#define TARGET_S390_TOD_H
+> +
+> +/* The value of the TOD clock for 1.1.1970. */
+> +#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
+> +
+> +/* Converts ns to s390's clock format */
+> +static inline uint64_t time2tod(uint64_t ns)
+> +{
+> +    return (ns << 9) / 125 + (((ns & 0xff80000000000000ull) / 125) << 9);
+> +}
+> +
+> +/* Converts s390's clock format to ns */
+> +static inline uint64_t tod2time(uint64_t t)
+> +{
+> +    return ((t >> 9) * 125) + (((t & 0x1ff) * 125) >> 9);
+> +}
+> +
+> +#endif
+> 
 
-Without this, the IOMMU group the device belongs to will also
-include the root port itself, and all functions the device provides.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-It is necessary to support SR/IOV where the primary
-purpose is to be able to share out individual VFs to different
-guests, which will not be permitted by VFIO or the Windows Hyper-V equivalent
-unless ACS is supported by the root port.
-
-These patches can also be found as part of an updated version of
-my SR/IOV emulation patch set at
-
-  https://github.com/knuto/qemu/tree/sriov_patches_v11
-
-The patches' basic operation with VFIO and iommu groups have
-been tested with the above patch set and a rebased version of an
-in progress igb ethernet device, which needs some more care
-before I can let it go out.
-
-Changes from v2:
-----------------
-- rebased to the latest qemu master
-
-Incorporated further feedback from Alex:
-- Make sure slot/downstream capability bits are only set for slots.
-- Make acs reset callback do nothing if no acs capability exists
-- Set correct acs version
-- div simplification
-
-Changes from v1:
-----------------
-Incorporated feedback from Alex Williamson:
-- Make commit messages reflect a more correct understanding of how this
-  affects VFIO operation.
-- Implemented the CTRL register properly (reset callback + making non-implemented
-  capabilities RO, default value 0)
-- removed the egress ctrl vector parameter to the init function
-- Fixed some whitespace issues
-
-Knut Omang (2):
-  pcie: Add a simple PCIe ACS (Access Control Services) helper function
-  gen_pcie_root_port: Add ACS (Access Control Services) capability
-
- hw/pci-bridge/gen_pcie_root_port.c |  4 ++++
- hw/pci-bridge/pcie_root_port.c     |  4 ++++
- hw/pci/pcie.c                      | 29 +++++++++++++++++++++++++++++
- include/hw/pci/pcie.h              |  6 ++++++
- include/hw/pci/pcie_port.h         |  1 +
- include/hw/pci/pcie_regs.h         |  4 ++++
- 6 files changed, 48 insertions(+)
-
-base-commit: e47f81b617684c4546af286d307b69014a83538a
 -- 
-git-series 0.9.1
+
+Thanks,
+
+David / dhildenb
