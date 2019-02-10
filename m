@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54451)
+Received: from eggs.gnu.org ([209.51.188.92]:54691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gswoS-0004rg-1J
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 16:38:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gswps-0005dO-3i
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 16:40:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gswoP-0006OD-Mw
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 16:38:55 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:53858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gswoI-0006K2-D4
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 16:38:48 -0500
-Date: Sun, 10 Feb 2019 22:38:39 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190210213839.vfocl3mv2ivgz5h2@function>
-References: <20190208181122.23393-1-marcandre.lureau@redhat.com>
-	<CAFEAcA-P_vVy8dbti83Afm6CMNZBmr5FUzMeztCwp=NRXwn5qw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gswpn-0006zS-Sf
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 16:40:22 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gswpn-0006yq-NJ
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 16:40:19 -0500
+Received: by mail-ot1-x341.google.com with SMTP id 32so14345864ota.12
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 13:40:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-P_vVy8dbti83Afm6CMNZBmr5FUzMeztCwp=NRXwn5qw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH slirp 0/5] Make it a standalone project
+References: <20190114011122.5995-1-richard.henderson@linaro.org>
+	<20190114011122.5995-4-richard.henderson@linaro.org>
+	<CAFEAcA-BEfqu=BU-2y+8dUBdXsyC4n2zhZm5nZ1MofUj3cE2Lg@mail.gmail.com>
+	<c37e6649-b2f9-88cf-913d-d0394a635045@linaro.org>
+In-Reply-To: <c37e6649-b2f9-88cf-913d-d0394a635045@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 10 Feb 2019 21:40:06 +0000
+Message-ID: <CAFEAcA-TwEh74GuvafhqFUXP_xesqC9b1oixubj=ztNa8t4a2g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 03/17] target/arm: Add MTE system registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Hello,
+On Sun, 10 Feb 2019 at 01:23, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 2/5/19 11:27 AM, Peter Maydell wrote:
+> >> +++ b/target/arm/translate-a64.c
+> >> @@ -1668,6 +1668,17 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+> >>          s->base.is_jmp = DISAS_UPDATE;
+> >>          break;
+> >>
+> >> +    case 0x1c: /* TCO */
+> >> +        if (!dc_isar_feature(aa64_mte_insn_reg, s)) {
+> >> +            goto do_unallocated;
+> >> +        }
+> >> +        if (crm & 1) {
+> >> +            set_pstate_bits(PSTATE_TCO);
+> >> +        } else {
+> >> +            clear_pstate_bits(PSTATE_TCO);
+> >> +        }
+> >> +        break;
+> > Don't we need to break the TB here or something to pick up
+> > the new value of TCO when we generate code for a following
+> > load or store ? (TCO is self-synchronizing so there is no
+> > requirement for an ISB before it takes effect.)
+>
+> Actually, we already break the TB here by default.
 
-Peter Maydell, le dim. 10 f=C3=A9vr. 2019 21:35:37 +0000, a ecrit:
-> On Fri, 8 Feb 2019 at 20:58, <marcandre.lureau@redhat.com> wrote:
-> > As discussed earlier in "[PATCH for-3.2 00/41] RFC: slirp: make it
-> > again a standalone project" and other threads, it would be useful to
-> > make slirp a separate project (the submodule approach was discarded)
-> > for various projects to share.
->=20
-> > The following patches add meson build system (if necessary for older
-> > distros, autotools could be added - however I believe python & ninja
-> > are generally available on the QEMU supported platforms)
->=20
-> Do you really need to make QEMU add an extra build dependency
-> just to use a different build system?
+Do we? I didn't see any code (apart from the handling
+in the DAIFSet/Clear codepaths, which aren't used for TCO).
 
-AIUI, this patches series is meant for the slirp repository, not the
-QEMU repository. I.e. just to show how it'll look like, until a project
-it settled somewhere and the discussion can happen there.
-
-Samuel
+thanks
+-- PMM
