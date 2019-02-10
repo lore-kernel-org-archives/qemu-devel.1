@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52170)
+Received: from eggs.gnu.org ([209.51.188.92]:39583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gsmhR-0003Oe-EA
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 05:51:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1gsoj6-0000EW-FN
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 08:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gsmhQ-0000uw-Cb
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 05:51:01 -0500
-References: <20190209063152.9490-1-richard.henderson@linaro.org>
-	<20190209063152.9490-3-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <1e55bf4d-4e75-df96-de2e-effa3bb13402@redhat.com>
-Date: Sun, 10 Feb 2019 11:50:57 +0100
+	(envelope-from <bounces@canonical.com>) id 1gsoj5-0002Go-EI
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 08:00:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60460)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gsoj4-0002F2-Up
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 08:00:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gsoj0-0000uW-Ng
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 13:00:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B21F22E80C7
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 13:00:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190209063152.9490-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/2] This is a
- non-privileged instruction that was only implemented for system mode.
- However, the stck instruction is used by glibc,
- so this was causing SIGILL for programs run under debian stretch.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 10 Feb 2019 12:51:06 -0000
+From: Szabolcs Nagy <1813398@bugs.launchpad.net>
+Reply-To: Bug 1813398 <1813398@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154851076407.2082.8506477460504942900.malonedeb@wampee.canonical.com>
+Message-Id: <154980306668.22315.17803076820158101453.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813398] Re: qemu user calls malloc after fork in
+ multi-threaded process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,154 +37,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, thuth@redhat.com
+To: qemu-devel@nongnu.org
 
-On 09.02.19 07:31, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/helper.h      |  2 +-
->  target/s390x/misc_helper.c | 34 ++++++++++++++++++++++------------
->  target/s390x/translate.c   |  2 ++
->  target/s390x/insn-data.def | 11 ++++++-----
->  4 files changed, 31 insertions(+), 18 deletions(-)
-> 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 018e9dd414..6260b50496 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
->  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
-> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->  
->  #ifndef CONFIG_USER_ONLY
->  DEF_HELPER_3(servc, i32, env, i64, i64)
->  DEF_HELPER_4(diag, void, env, i32, i32, i32)
->  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
-> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 52262f62df..ee67c1fa0c 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -30,6 +30,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "qapi/error.h"
->  #include "tcg_s390x.h"
-> +#include "s390-tod.h"
->  
->  #if !defined(CONFIG_USER_ONLY)
->  #include "sysemu/cpus.h"
-> @@ -76,8 +77,28 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
->  #endif
->  }
->  
-> -#ifndef CONFIG_USER_ONLY
-> +/* Store Clock */
-> +uint64_t HELPER(stck)(CPUS390XState *env)
-> +{
-> +#ifdef CONFIG_USER_ONLY
-> +    struct timespec ts;
-> +    uint64_t ns;
->  
-> +    clock_gettime(CLOCK_REALTIME, &ts);
-> +    ns = ts.tv_sec * NANOSECONDS_PER_SECOND + ts.tv_nsec;
-> +
-> +    return TOD_UNIX_EPOCH + time2tod(ns);
-> +#else
-> +    S390TODState *td = s390_get_todstate();
-> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-> +    S390TOD tod;
-> +
-> +    tdc->get(td, &tod, &error_abort);
-> +    return tod.low;
-> +#endif
-> +}
-> +
-> +#ifndef CONFIG_USER_ONLY
->  /* SCLP service call */
->  uint32_t HELPER(servc)(CPUS390XState *env, uint64_t r1, uint64_t r2)
->  {
-> @@ -138,17 +159,6 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
->      tlb_flush_page(cs, TARGET_PAGE_SIZE);
->  }
->  
-> -/* Store Clock */
-> -uint64_t HELPER(stck)(CPUS390XState *env)
-> -{
-> -    S390TODState *td = s390_get_todstate();
-> -    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-> -    S390TOD tod;
-> -
-> -    tdc->get(td, &tod, &error_abort);
-> -    return tod.low;
-> -}
-> -
->  static void update_ckc_timer(CPUS390XState *env)
->  {
->      S390TODState *td = s390_get_todstate();
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 639084af07..19072efec6 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -4060,6 +4060,7 @@ static DisasJumpType op_stap(DisasContext *s, DisasOps *o)
->      tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, core_id));
->      return DISAS_NEXT;
->  }
-> +#endif
->  
->  static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
->  {
-> @@ -4096,6 +4097,7 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
->      return DISAS_NEXT;
->  }
->  
-> +#ifndef CONFIG_USER_ONLY
->  static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
->  {
->      tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index dab805fd90..61582372ab 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -837,6 +837,12 @@
->      C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
->      C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
->  
-> +/* STORE CLOCK */
-> +    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
-> +    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
-> +/* STORE CLOCK EXTENDED */
-> +    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
-> +
->  /* STORE FACILITY LIST EXTENDED */
->      C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
->  /* STORE FPC */
-> @@ -1020,11 +1026,6 @@
->      F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
->  /* SIGNAL PROCESSOR */
->      F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
-> -/* STORE CLOCK */
-> -    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
-> -    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
-> -/* STORE CLOCK EXTENDED */
-> -    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
->  /* STORE CLOCK COMPARATOR */
->      F(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0, IF_PRIV)
->  /* STORE CONTROL */
-> 
+note that the bug affects qemu-user on a glibc system too in case
+malloc is interposed: glibc can only take the internal locks of
+its own malloc implementation, any other malloc has the same issue
+as musl's after fork.
 
-Apart from what Thomas already said
+-- =
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813398
 
--- 
+Title:
+  qemu user calls malloc after fork in multi-threaded process
 
-Thanks,
+Status in QEMU:
+  New
 
-David / dhildenb
+Bug description:
+  qemu user may hang in malloc on a musl based system because
+  it calls malloc after fork (in a pthread_atfork handler)
+  in the child process.
+
+  this is undefined behaviour since the parent process is
+  multi-threaded and only as-safe functions may be called
+  in the child then. (if malloc/free is called concurrently
+  with fork the malloc state will be corrupted in the child,
+  it works on glibc because glibc takes the malloc locks
+  before the fork syscall, but that breaks the as-safety of
+  fork and thus non-conforming to posix)
+
+  discussed at
+  https://www.openwall.com/lists/musl/2019/01/26/1
+
+  the bug is hard to reproduce (requires the call_rcu thread
+  to call free concurrently with do_fork in the main thread),
+  this one is observed with qemu-arm 3.1.0 running on x86_64
+  executing an arm busybox sh:
+
+  (gdb) bt
+  #0  malloc (n=3D<optimized out>, n@entry=3D9) at src/malloc/malloc.c:306
+  #1  0x0000000060184ad3 in g_malloc (n_bytes=3Dn_bytes@entry=3D9) at gmem.=
+c:99
+  #2  0x000000006018bcab in g_strdup (str=3D<optimized out>, str@entry=3D0x=
+60200abf "call_rcu") at gstrfuncs.c:363
+  #3  0x000000006016e31d in qemu_thread_create (thread=3Dthread@entry=3D0x7=
+ffe367d1870, name=3Dname@entry=3D0x60200abf "call_rcu", =
+
+      start_routine=3Dstart_routine@entry=3D0x60174c00 <call_rcu_thread>, a=
+rg=3Darg@entry=3D0x0, mode=3Dmode@entry=3D1)
+      at /home/pmos/build/src/qemu-3.1.0/util/qemu-thread-posix.c:526
+  #4  0x0000000060174b99 in rcu_init_complete () at /home/pmos/build/src/qe=
+mu-3.1.0/util/rcu.c:327
+  #5  0x00000000601c4fac in __fork_handler (who=3D1) at src/thread/pthread_=
+atfork.c:26
+  #6  0x00000000601be8db in fork () at src/process/fork.c:33
+  #7  0x000000006009d191 in do_fork (env=3D0x627aaed0, flags=3Dflags@entry=
+=3D17, newsp=3Dnewsp@entry=3D0, parent_tidptr=3Dparent_tidptr@entry=3D0, =
+
+      newtls=3Dnewtls@entry=3D0, child_tidptr=3Dchild_tidptr@entry=3D0) at =
+/home/pmos/build/src/qemu-3.1.0/linux-user/syscall.c:5528
+  #8  0x00000000600af894 in do_syscall1 (cpu_env=3Dcpu_env@entry=3D0x627aae=
+d0, num=3Dnum@entry=3D2, arg1=3Darg1@entry=3D0, arg2=3Darg2@entry=3D-870019=
+2, =
+
+      arg3=3D<optimized out>, arg4=3D8, arg5=3D1015744, arg6=3D-74144, arg7=
+=3D0, arg8=3D0) at /home/pmos/build/src/qemu-3.1.0/linux-user/syscall.c:7042
+  #9  0x00000000600a835c in do_syscall (cpu_env=3Dcpu_env@entry=3D0x627aaed=
+0, num=3D2, arg1=3D0, arg2=3D-8700192, arg3=3D<optimized out>, =
+
+      arg4=3D<optimized out>, arg5=3D1015744, arg6=3D-74144, arg7=3D0, arg8=
+=3D0) at /home/pmos/build/src/qemu-3.1.0/linux-user/syscall.c:11533
+  #10 0x00000000600c265f in cpu_loop (env=3Denv@entry=3D0x627aaed0) at /hom=
+e/pmos/build/src/qemu-3.1.0/linux-user/arm/cpu_loop.c:360
+  #11 0x00000000600417a2 in main (argc=3D<optimized out>, argv=3D0x7ffe367d=
+57b8, envp=3D<optimized out>)
+      at /home/pmos/build/src/qemu-3.1.0/linux-user/main.c:819
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813398/+subscriptions
