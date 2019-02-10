@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42866)
+Received: from eggs.gnu.org ([209.51.188.92]:42863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gsyVV-0002pE-SM
+	(envelope-from <dgibson@ozlabs.org>) id 1gsyVV-0002pD-QR
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gsyVN-00035D-4X
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:27:26 -0500
-Date: Mon, 11 Feb 2019 10:24:38 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gsyVN-000358-4A
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:27:25 -0500
+Date: Mon, 11 Feb 2019 10:23:55 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190210232437.GD7230@umbus.fritz.box>
-References: <20190208172201.29001-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20190210232353.GC7230@umbus.fritz.box>
+References: <154964986747.291716.2679312373018476920.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Qrgsu6vtpU/OV/zm"
+	protocol="application/pgp-signature"; boundary="RIYY1s2vRbPFwWeW"
 Content-Disposition: inline
-In-Reply-To: <20190208172201.29001-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH] mac_newworld: change default NIC to sungem
- for mac99 machine
+In-Reply-To: <154964986747.291716.2679312373018476920.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Disallow unsupported kernel-irqchip
+ settings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, hsp.cat7@gmail.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---Qrgsu6vtpU/OV/zm
+--RIYY1s2vRbPFwWeW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 08, 2019 at 05:22:01PM +0000, Mark Cave-Ayland wrote:
-> This model brings out-of-the-box networking for all of Linux, MacOS 9 and=
- OS X
-> without requiring the installation of additional drivers.
+On Fri, Feb 08, 2019 at 07:17:47PM +0100, Greg Kurz wrote:
+> Split mode doesn't make sense on pseries, neither with XICS nor XIVE. But
+> passing kernel-irqchip=3Dsplit silently behaves like kernel-irqchip=3Don.
+> Other architectures that support kernel-irqchip do terminate QEMU when
+> split mode is requested but not available though. Do the same with pseries
+> for consistency.
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Similarly, passing kernel-irqchip=3Don,accel=3Dtcg starts the machine wit=
+h the
+> emulated interrupt controller, ie, behaves like kernel-irqchip=3Doff. How=
+ever,
+> when passing  kernel-irqchip=3Don,accel=3Dkvm, if we can't initialize the=
+ KVM
+> XICS for some reason, ie, xics_kvm_init() fails, then QEMU is terminated.
+> This is inconsistent. Terminate QEMU all the same when requesting the
+> in-kernel interrupt controller without KVM.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>=20
+> The odds for someone to have an existing pseries setup with split mode are
+> very low since this is really an x86 thingy. And I guess we don't really
+> care to break the silly kernel-irqchip=3Don,accel=3Dtcg case. But if we r=
+eally
+> need to stay bug compatible, the errors can be turned into warnings.
 
 Applied, thanks.
 
 > ---
->  hw/ppc/mac_newworld.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/ppc/spapr_irq.c |   13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 >=20
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 10be728c37..98461052ac 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -432,7 +432,7 @@ static void ppc_core99_init(MachineState *machine)
->      }
-> =20
->      for (i =3D 0; i < nb_nics; i++) {
-> -        pci_nic_init_nofail(&nd_table[i], pci_bus, "ne2k_pci", NULL);
-> +        pci_nic_init_nofail(&nd_table[i], pci_bus, "sungem", NULL);
->      }
-> =20
->      /* The NewWorld NVRAM is not located in the MacIO device */
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 2d7a7c163876..80b0083b8e38 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -600,6 +600,19 @@ sPAPRIrq spapr_irq_dual =3D {
+>   */
+>  void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
+>  {
+> +    MachineState *machine =3D MACHINE(spapr);
+> +
+> +    if (machine_kernel_irqchip_split(machine)) {
+> +        error_setg(errp, "kernel_irqchip split mode not supported on pse=
+ries");
+> +        return;
+> +    }
+> +
+> +    if (!kvm_enabled() && machine_kernel_irqchip_required(machine)) {
+> +        error_setg(errp,
+> +                   "kernel_irqchip requested but only available with KVM=
+");
+> +        return;
+> +    }
+> +
+>      /* Initialize the MSI IRQ allocator. */
+>      if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+>          spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -66,24 +99,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Qrgsu6vtpU/OV/zm
+--RIYY1s2vRbPFwWeW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxgsrQACgkQbDjKyiDZ
-s5JGQQ//ZztmJVSc/tU6kKvy0AJdWAszbUrlci6996I2LG/Kcf68fj2iNgZBJ1MB
-qUajhGRuntY9X0OqbkHS8nFzu2/EJ65pxwunXNStWBK7nsFwAc4X74p31lpxwrxz
-k2KyTGq5EAywJIbw8TkXEduiu/BFRo9Ma2zago979uxcwPG0HSvexXs8nEPH2URO
-7EgHyUxFsZqOMmhnlasPjxbNpzOsWlZ3V2R23R+F3ptQncBNPYR+ZRjI98+oSg5w
-2sPf+ljc7S1RNwr9Y/wukrVNfev2WMr6ryZuvMLfOrbuDr468FIOpytE8tJqkdzn
-D7l3j1oBFRt+x4NoWmpvgWC5RTtHby8M+to2+jdkkU38YQvJjE+4eMofF7/PoiLj
-MhSxqVEc4FMT1s2ckSZE6olN+uyTDaQ/xGe7ZzQyoTOYlcrvoZbV+GnAOaFqXWV3
-ceve1wI6Q1bo+wey7LciUo0NIUgnonbi8bobVBBNulhmk3EIXpYLVomp/U4F9SLK
-psof3oOMaJ/wXx6IWpmDgxFey+gUbuaZ/fDYmzw5wtbV85NQFIQE0W+bx3RrQMyT
-napTRjBYIWz6PMAncoc97ubD3gOTmPHz7GAdbppk8YJCfkNC9JXl9077Sc/LAeYL
-xp0ZnqEW1NBSkTpjhUQFH2gMeGBs9A52onT/+gzaYVDdVommEtI=
-=RCG9
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxgsokACgkQbDjKyiDZ
+s5I09xAAkex/q1Xit5WaAAROPAXEscdxm1Xc9vHttYtbyzEvl6AYycvF39fr96oG
+kiAeQGL8NgXrSELAhs63C4cY+wwuuQasnfrZmS3TZjj6CRKnXk2FeU4/8ppK33gY
+fIamflCLvLXIVQSY7qqy/Z9RSvrL22Wv+55MTGbGH6B3ll/9xwGPt/XUaFePNFCR
+XWFuoLJ9nlclgzN/7lAH8039+5JN8XR6V/Y4eRFegBa4RuHT15hBfoAQG/Wa1UQJ
+ivgxpY2dYvn1cidBreq40cJcDCVserRY6+FL4/lCPWYYKx5ZCghXy6bSovXudmUT
+16pSo8QhZi1/Lb84VwwrEBp12BXaWJuapF35kqb80+TvOSin6kSTb1XNUN3pAow3
+EDC8rAOLG45+V+VtNFfLI0BMfkVFI8TFACQ8b+FyXSZgA2d6hdjG3mKEZjFa4tW5
+5MkNAkJpGX8jsL4NuuOkwvvpT4f7sKNWlEg3Tb3Vp4ZHFEwpXzyj5ga+T8xkbXs+
+StK2RNV4hFOBCVq5GOEHsOzIxEPtJdoYhMexv+m932ONCKw4uOxX6g0ecXj2Fgj8
+meR8GaG0Gqd+Nwof8ZHrWfLlEOFsBkRA+3hzv5ttBBtivMwzS+n9n8OvpGbE0X4a
+JG1WORM7oANM2SPkaBkn44vcnAnOsu+Xt2u+OE1BxXgggNw9Q8c=
+=4LSM
 -----END PGP SIGNATURE-----
 
---Qrgsu6vtpU/OV/zm--
+--RIYY1s2vRbPFwWeW--
