@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37013)
+Received: from eggs.gnu.org ([209.51.188.92]:42550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsxtC-0004in-A1
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 17:47:55 -0500
+	(envelope-from <bounces@canonical.com>) id 1gsyTh-0002B2-Sk
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gsxtB-0005sW-H2
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 17:47:54 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46260)
+	(envelope-from <bounces@canonical.com>) id 1gsyTc-0001oe-92
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:25:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40224)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gsxtB-0005lE-98
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 17:47:53 -0500
-Received: by mail-pg1-x544.google.com with SMTP id w7so4074441pgp.13
-	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 14:47:42 -0800 (PST)
-References: <20190114011122.5995-1-richard.henderson@linaro.org>
-	<20190114011122.5995-4-richard.henderson@linaro.org>
-	<CAFEAcA-BEfqu=BU-2y+8dUBdXsyC4n2zhZm5nZ1MofUj3cE2Lg@mail.gmail.com>
-	<c37e6649-b2f9-88cf-913d-d0394a635045@linaro.org>
-	<CAFEAcA-TwEh74GuvafhqFUXP_xesqC9b1oixubj=ztNa8t4a2g@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <56abf739-b75a-025f-1c38-dd1cd254617f@linaro.org>
-Date: Sun, 10 Feb 2019 14:47:38 -0800
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gsyTc-0001nM-22
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 18:25:32 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gsyTa-0006kf-OA
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 23:25:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B22402E80C7
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 23:25:30 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-TwEh74GuvafhqFUXP_xesqC9b1oixubj=ztNa8t4a2g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/17] target/arm: Add MTE system registers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 10 Feb 2019 23:15:50 -0000
+From: Bug Watch Updater <1815371@bugs.launchpad.net>
+Reply-To: Bug 1815371 <1815371@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154982236357.21816.7244935149831813819.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154984055181.24274.15969435793897339611.launchpad@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815371] Re: SPICE session's connection_id's are
+ not unique
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 2/10/19 1:40 PM, Peter Maydell wrote:
->> Actually, we already break the TB here by default.
-> 
-> Do we? I didn't see any code (apart from the handling
-> in the DAIFSet/Clear codepaths, which aren't used for TCO).
+** Changed in: qemu (Debian)
+       Status: Unknown =3D> Confirmed
 
-At the start of the function:
+-- =
 
-    /* End the TB by default, chaining is ok.  */
-    s->base.is_jmp = DISAS_TOO_MANY;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815371
 
-Since the change to TCO is from an immediate, the change to MTE_ACTIVE is also
-constant, and so chaining will work.
+Title:
+   SPICE session's connection_id's are not unique
+
+Status in QEMU:
+  New
+Status in qemu package in Debian:
+  Confirmed
+
+Bug description:
+  From: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D920897
+
+  =3D=3D=3D=3D=3D
+
+  When creating a virtual machine with qemu (e.g. via libvirt) including
+  a SPICE server, the client_id of the SPICE session is not unique. For
+  example, starting multiple virtual machines on the same libvirtd, the
+  client_id is the same for all virtual machine's SPICE sessions.
+
+  =
+
+  A description of the client_id can be found in
+
+  https://www.spice-space.org/static/docs/spice_protocol.pdf under
+  section 2.11. c) :
+
+  =
+
+  "UINT32 connection_id - In case of a new session (i.e., channel type is R=
+ED_CHANNEL_MAIN) this field is set to zero, and in response the server will=
+ allocate session id and will send it via the RedLinkReply message. In case=
+ of all other channel types, this field will be equal to the allocated sess=
+ion id"
+
+  =
+
+  The relevant code for generating client ids in libspice-server1 can be fo=
+und here: https://gitlab.freedesktop.org/spice/spice/blob/v0.12.8/server/re=
+ds.c#L1614
+
+  This uses rand() to generate the random id, but qemu (at least in the
+  case of qemu-system-x86) fails to initialize the RNG seed (with e.g.
+  srand()).
+
+  =
+
+  The result is, that every SPICE session started (by e.g. libvirtd) has th=
+e same client_id. Usually, this is not a problem, but running something lik=
+e a SPICE proxy, relying on the client_id to correctly route connections, t=
+his creates problems.
+
+  =
+
+  Adding something like 'srand(time(NULL));' to qemu (in vl.c) solves this =
+issue. Related (as seen in some VNC patches, e.g. 'CVE-2017-15124/04-ui-avo=
+id-pointless-VNC-updates-if-framebuffer-isn-t-.patch/ui/vnc.c' ):  srand(ti=
+me(NULL)+getpid()+getpid()*987654+rand());
+
+  =
+
+  Tested on Debian 9.7 with kernel  4.9.0-6-amd64 #1 SMP Debian 4.9.88-1+de=
+b9u1 (2018-05-07) x86_64 GNU/Linux.
 
 
-r~
+  =3D=3D=3D=3D=3D
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815371/+subscriptions
