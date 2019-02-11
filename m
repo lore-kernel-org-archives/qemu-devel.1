@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50214)
+Received: from eggs.gnu.org ([209.51.188.92]:50787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gt9OK-0001Yw-5g
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:04:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1gt9Ps-0002QW-BJ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:06:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gt9OI-0008WK-5H
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:04:47 -0500
-Date: Mon, 11 Feb 2019 12:04:32 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190211120432.42373d08.cohuck@redhat.com>
-In-Reply-To: <746bc346-26ce-e096-d8a4-fe78bf7912c1@redhat.com>
-References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
-	<20190131185621.28815291.cohuck@redhat.com>
-	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
-	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
-	<aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
-	<cfe20aba-2f80-f8cb-66df-f9958bdf61f6@redhat.com>
-	<20190201092356.295925c2.cohuck@redhat.com>
-	<20190211114859.76109aa3.cohuck@redhat.com>
-	<746bc346-26ce-e096-d8a4-fe78bf7912c1@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gt9Pr-0000t8-5d
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:06:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gt9Pq-0000qq-DI
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:06:22 -0500
+Date: Mon, 11 Feb 2019 10:58:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190211105844.GN27585@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
- the pci stub file
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+Subject: Re: [Qemu-devel] should we try to stop using variable length arrays?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 11 Feb 2019 11:54:45 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 2019-02-11 11:48, Cornelia Huck wrote:
-> > On Fri, 1 Feb 2019 09:23:56 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> On Fri, 1 Feb 2019 07:46:40 +0100
-> >> Thomas Huth <thuth@redhat.com> wrote:  
-> >   
-> >>> So I see two options now:
-> >>>
-> >>> 1) Finally really make the device optional, at least for new machine
-> >>> types, so we can really disable CONFIG_PCI and get a working executable.
-> >>>
-> >>> 2) Scratch the idea completely to make this optional, always link the
-> >>> s390-pci-bus.o and s390-pci-inst.o files unconditionally, and remove the
-> >>> s390-pci-stub.c file.
-> >>>
-> >>> I assume options 2 is preferred, since we likely rather want to move
-> >>> into the PCI direction in the long run, instead of ignoring it...    
-> >>
-> >> I think both options are viable, but option 1 is of course more work.
-> >> The win there is that we could disable an entire subsystem.
-> >>
-> >> I guess that the basic questions are: How important is it that
-> >> subsystems can be compiled out, and do we see a use case for a pci-less
-> >> s390 machine in the future? We really don't want to spend much time on
-> >> something of dubious use...  
-> > 
-> > Any thoughts on this?
-> > 
-> > I'm currently tending towards option 2 (and can cook up a patch for
-> > that). Unless someone is already working on option 1 :)  
+On Thu, Feb 07, 2019 at 07:30:59PM +0000, Peter Maydell wrote:
+> Currently QEMU has 9 uses of variable length arrays
+> (found using -Wvla):
 > 
-> Since nobody currently has a need to completely disable PCI, I think we
-> should go with option 2.
+> hw/block/dataplane/virtio-blk.c:62:25: warning: variable length array
+> used [-Wvla]
+>     unsigned long bitmap[BITS_TO_LONGS(nvqs)];
+>                         ^
+> hw/i386/multiboot.c:364:18: warning: variable length array used [-Wvla]
+>     char kcmdline[strlen(kernel_filename) + strlen(kernel_cmdline) + 2];
+>                  ^
+> hw/i386/xen/xen-hvm.c:618:25: warning: variable length array used [-Wvla]
+>     unsigned long bitmap[DIV_ROUND_UP(npages, width)];
+>                         ^
+> hw/intc/xics.c:604:18: warning: variable length array used [-Wvla]
+>     uint8_t flags[ics->nr_irqs];
+>                  ^
+> hw/net/fsl_etsec/rings.c:383:18: warning: variable length array used [-Wvla]
+>     uint8_t  padd[etsec->rx_padding];
+>                  ^
+> hw/ppc/pnv.c:130:26: warning: variable length array used [-Wvla]
+>     uint32_t servers_prop[smt_threads];
+>                          ^
+> hw/ppc/spapr.c:162:26: warning: variable length array used [-Wvla]
+>     uint32_t servers_prop[smt_threads];
+>                          ^
+> hw/ppc/spapr.c:163:27: warning: variable length array used [-Wvla]
+>     uint32_t gservers_prop[smt_threads * 2];
+>                           ^
+> linux-user/syscall.c:3478:23: warning: variable length array used [-Wvla]
+>     struct sembuf sops[nsops];
+>                       ^
+> 
+> Should we be looking to get rid of these and turn on the -Wvla
+> warning? I know the Linux kernel has recently decided to do this
+> (some rationale at the start of https://lwn.net/Articles/749064/).
+> Now that doesn't necessarily apply to us as a userspace program,
+> but on the other hand if any of these were allowing the guest to
+> determine the size of an on-stack array that would not be great.
+> (The linux-user one is bogus in that way, though not a security issue
+> as the guest code there has full control anyway.)
+> 
+> Opinions? I admit that to some extent this is just my sense of
+> tidiness thinking that if we only have a handful of uses of
+> something we should squash that down to zero :-)
 
-Hm... I'm wondering if we also should move S390_FEAT_ZPCI from the max
-cpu model to the qemu cpu model (is there any reason not to turn it on
-by default in tcg?)
+I think we've got few enough uses of VLA that we would be justified in
+removing them so that we can compile time prevent use of the potentially
+dangerous feature, even if the current uses are safe.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
