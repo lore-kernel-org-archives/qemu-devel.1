@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44894)
+Received: from eggs.gnu.org ([209.51.188.92]:45777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gt8yi-0001q8-By
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:38:21 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gt945-0003QM-4b
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gt8yg-0002tU-KP
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:38:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gt8yg-0002se-DT
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:38:18 -0500
-Date: Mon, 11 Feb 2019 18:37:41 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190211103741.GH1011@xz-x1>
-References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	(envelope-from <cohuck@redhat.com>) id 1gt944-0007AK-Fn
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:43:53 -0500
+Date: Mon, 11 Feb 2019 11:43:29 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211114329.3c976cf6.cohuck@redhat.com>
+In-Reply-To: <1549456893-16589-1-git-send-email-thuth@redhat.com>
+References: <1549456893-16589-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
-Subject: Re: [Qemu-devel] [RFC v1 0/3] intel_iommu: support scalable mode
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x: Fix the confusing
+ contributions-after-2012 license statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Wed, Jan 30, 2019 at 01:09:10PM +0800, Yi Sun wrote:
-> Intel vt-d rev3.0 [1] introduces a new translation mode called
-> 'scalable mode', which enables PASID-granular translations for
-> first level, second level, nested and pass-through modes. The
-> vt-d scalable mode is the key ingredient to enable Scalable I/O
-> Virtualization (Scalable IOV) [2] [3], which allows sharing a
-> device in minimal possible granularity (ADI - Assignable Device
-> Interface). As a result, previous Extended Context (ECS) mode
-> is deprecated (no production ever implements ECS).
+On Wed,  6 Feb 2019 13:41:33 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> The license information in these files is rather confusing. The text
+> declares LGPL first, but then says that contributions after 2012 are
+> licensed under the GPL instead. How should the average user who just
+> downloaded the release tarball know which part is now GPL and which
+> is LGPL?
 > 
-> This patch set emulates a minimal capability set of VT-d scalable
-> mode, equivalent to what is available in VT-d legacy mode today:
->     1. Scalable mode root entry, context entry and PASID table
->     2. Seconds level translation under scalable mode
->     3. Queued invalidation (with 256 bits descriptor)
->     4. Pass-through mode
+> Looking at the text of the LGPL (see COPYING.LIB in the top directory),
+> the license clearly states how this should be done instead:
 > 
-> Corresponding intel-iommu driver support will be included in
-> kernel 5.0:
->     https://www.spinics.net/lists/kernel/msg2985279.html
+> "3. You may opt to apply the terms of the ordinary GNU General Public
+>  License instead of this License to a given copy of the Library. To do
+>  this, you must alter all the notices that refer to this License, so
+>  that they refer to the ordinary GNU General Public License, version 2,
+>  instead of to this License."
 > 
-> We will add emulation of full scalable mode capability along with
-> guest iommu driver progress later, e.g.:
->     1. First level translation
->     2. Nested translation
->     3. Per-PASID invalidation descriptors
->     4. Page request services for handling recoverable faults
+> Thus let's clean up the confusing statements and use the proper GPL
+> text only.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  linux-user/s390x/target_cpu.h | 19 ++++++++-----------
+>  target/s390x/cpu.c            | 19 ++++++++-----------
+>  target/s390x/cpu.h            | 19 ++++++++-----------
+>  target/s390x/kvm.c            | 19 ++++++++-----------
+>  4 files changed, 32 insertions(+), 44 deletions(-)
 
-Hi, YiSun/YiLiu,
-
-Have you tested against any existing usages of VT-d with this series
-applied?
-
-Thanks,
-
--- 
-Peter Xu
+Thanks, applied.
