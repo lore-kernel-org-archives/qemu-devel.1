@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44161)
+Received: from eggs.gnu.org ([209.51.188.92]:44154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCpA-00014W-L2
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCpA-00014U-Jx
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCp4-0000MR-I0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCp4-0000Nb-Uj
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:42 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 11 Feb 2019 17:44:13 +0300
-Message-Id: <20190211144421.106232-2-vsementsov@virtuozzo.com>
+Date: Mon, 11 Feb 2019 17:44:21 +0300
+Message-Id: <20190211144421.106232-10-vsementsov@virtuozzo.com>
 In-Reply-To: <20190211144421.106232-1-vsementsov@virtuozzo.com>
 References: <20190211144421.106232-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 1/9] qcow2.h: add missing include
+Subject: [Qemu-devel] [PATCH v4 9/9] qcow2: do encryption in threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,105 +22,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, berrange@redhat.com
 
-qcow2.h depends on block_int.h. Compilation isn't broken currently only
-due to block_int.h always included before qcow2.h. Though, it seems
-better to directly include block_int.h in qcow2.h.
+Do encryption/decryption in threads, like it is already done for
+compression. This improves asynchronous encrypted io.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.h          | 1 +
- block/qcow2-bitmap.c   | 1 -
- block/qcow2-cache.c    | 1 -
- block/qcow2-cluster.c  | 1 -
- block/qcow2-refcount.c | 1 -
- block/qcow2-snapshot.c | 1 -
- block/qcow2.c          | 1 -
- 7 files changed, 1 insertion(+), 6 deletions(-)
+ block/qcow2.h         |  8 ++++++
+ block/qcow2-cluster.c |  7 ++---
+ block/qcow2-threads.c | 65 +++++++++++++++++++++++++++++++++++++++++--
+ block/qcow2.c         | 22 +++++----------
+ 4 files changed, 81 insertions(+), 21 deletions(-)
 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 32cce9eee2..2e7c5d3e6b 100644
+index c8a87bfe6b..e7b819978c 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -28,6 +28,7 @@
- #include "crypto/block.h"
- #include "qemu/coroutine.h"
- #include "qemu/units.h"
-+#include "block/block_int.h"
+@@ -257,6 +257,8 @@ typedef struct Qcow2BitmapHeaderExt {
+     uint64_t bitmap_directory_offset;
+ } QEMU_PACKED Qcow2BitmapHeaderExt;
  
- //#define DEBUG_ALLOC
- //#define DEBUG_ALLOC2
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b946301429..79e67d22c3 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -29,7 +29,6 @@
- #include "qapi/error.h"
- #include "qemu/cutils.h"
++#define QCOW2_MAX_THREADS 4
++
+ typedef struct BDRVQcow2State {
+     int cluster_bits;
+     int cluster_size;
+@@ -704,5 +706,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+ ssize_t coroutine_fn
+ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+                     const void *src, size_t src_size);
++int coroutine_fn
++qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
++                 uint64_t offset, void *buf, size_t len);
++int coroutine_fn
++qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
++                 uint64_t offset, void *buf, size_t len);
  
--#include "block/block_int.h"
- #include "qcow2.h"
- 
- /* NOTICE: BME here means Bitmaps Extension and used as a namespace for
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index d9dafa31e5..00bbc4ce14 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -23,7 +23,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "block/block_int.h"
- #include "qemu-common.h"
- #include "qcow2.h"
- #include "trace.h"
+ #endif
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 30eca26c47..6d7b1f9796 100644
+index 6d7b1f9796..28b5273336 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -27,7 +27,6 @@
+@@ -467,13 +467,12 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+ {
+     if (bytes && bs->encrypted) {
+         BDRVQcow2State *s = bs->opaque;
+-        int64_t offset = (s->crypt_physical_offset ?
+-                          (cluster_offset + offset_in_cluster) :
+-                          (src_cluster_offset + offset_in_cluster));
+         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+         assert(s->crypto);
+-        if (qcrypto_block_encrypt(s->crypto, offset, buffer, bytes, NULL) < 0) {
++        if (qcow2_co_encrypt(bs, cluster_offset,
++                             src_cluster_offset + offset_in_cluster,
++                             buffer, bytes) < 0) {
+             return false;
+         }
+     }
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index e3066075da..0e20723a4b 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -30,8 +30,7 @@
  
- #include "qapi/error.h"
- #include "qemu-common.h"
--#include "block/block_int.h"
  #include "qcow2.h"
- #include "qemu/bswap.h"
- #include "trace.h"
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 6f13d470d3..29f09d824b 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -25,7 +25,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
--#include "block/block_int.h"
- #include "qcow2.h"
- #include "qemu/range.h"
- #include "qemu/bswap.h"
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index bb6a5b7516..733656fa00 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -24,7 +24,6 @@
+ #include "block/thread-pool.h"
+-
+-#define QCOW2_MAX_THREADS 4
++#include "crypto.h"
  
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "block/block_int.h"
- #include "qcow2.h"
- #include "qemu/bswap.h"
- #include "qemu/error-report.h"
+ static int coroutine_fn
+ qcow2_co_process(BlockDriverState *bs, ThreadPoolFunc *func, void *arg)
+@@ -205,3 +204,65 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+     return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+                                 qcow2_decompress);
+ }
++
++
++/*
++ * Cryptography
++ */
++
++/*
++ * Qcow2EncDecFunc: common prototype of qcrypto_block_encrypt() and
++ * qcrypto_block_decrypt() functions.
++ */
++typedef int (*Qcow2EncDecFunc)(QCryptoBlock *block, uint64_t offset,
++                               uint8_t *buf, size_t len, Error **errp);
++
++typedef struct Qcow2EncDecData {
++    QCryptoBlock *block;
++    uint64_t offset;
++    uint8_t *buf;
++    size_t len;
++
++    Qcow2EncDecFunc func;
++} Qcow2EncDecData;
++
++static int qcow2_encdec_pool_func(void *opaque)
++{
++    Qcow2EncDecData *data = opaque;
++
++    return data->func(data->block, data->offset, data->buf, data->len, NULL);
++}
++
++static int coroutine_fn
++qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
++                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
++{
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2EncDecData arg = {
++        .block = s->crypto,
++        .offset = s->crypt_physical_offset ?
++                      file_cluster_offset + offset_into_cluster(s, offset) :
++                      offset,
++        .buf = buf,
++        .len = len,
++        .func = func,
++    };
++
++    return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
++}
++
++int coroutine_fn
++qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
++                 uint64_t offset, void *buf, size_t len)
++{
++    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
++                             qcrypto_block_encrypt);
++}
++
++int coroutine_fn
++qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
++                 uint64_t offset, void *buf, size_t len)
++{
++    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
++                             qcrypto_block_decrypt);
++}
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 8c91b92865..6f60287244 100644
+index a6db2f0b34..b7a611e9b9 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -27,7 +27,6 @@
- #define ZLIB_CONST
- #include <zlib.h>
+@@ -296,7 +296,7 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+             }
+             s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
+                                            qcow2_crypto_hdr_read_func,
+-                                           bs, cflags, 1, errp);
++                                           bs, cflags, QCOW2_MAX_THREADS, errp);
+             if (!s->crypto) {
+                 return -EINVAL;
+             }
+@@ -1446,7 +1446,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+             s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
+-                                           NULL, NULL, cflags, 1, errp);
++                                           NULL, NULL, cflags,
++                                           QCOW2_MAX_THREADS, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -1965,13 +1966,8 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+                 assert(s->crypto);
+                 assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-                if (qcrypto_block_decrypt(s->crypto,
+-                                          (s->crypt_physical_offset ?
+-                                           cluster_offset + offset_in_cluster :
+-                                           offset),
+-                                          cluster_data,
+-                                          cur_bytes,
+-                                          NULL) < 0) {
++                if (qcow2_co_decrypt(bs, cluster_offset, offset,
++                                     cluster_data, cur_bytes) < 0) {
+                     ret = -EIO;
+                     goto fail;
+                 }
+@@ -2109,12 +2105,8 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
  
--#include "block/block_int.h"
- #include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
+-            if (qcrypto_block_encrypt(s->crypto,
+-                                      (s->crypt_physical_offset ?
+-                                       cluster_offset + offset_in_cluster :
+-                                       offset),
+-                                      cluster_data,
+-                                      cur_bytes, NULL) < 0) {
++            if (qcow2_co_encrypt(bs, cluster_offset, offset,
++                                 cluster_data, cur_bytes) < 0) {
+                 ret = -EIO;
+                 goto out_unlocked;
+             }
 -- 
 2.18.0
