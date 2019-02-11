@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52857)
+Received: from eggs.gnu.org ([209.51.188.92]:55756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGP6-0007MC-97
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:34:06 -0500
+	(envelope-from <bounces@canonical.com>) id 1gtGac-0006aD-9c
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGP3-0002Yy-Go
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:34:03 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 11 Feb 2019 18:33:31 +0000
-Message-ID: <c7a3b3a8-0748-e3fa-99c5-8b492b21a301@virtuozzo.com>
-References: <20181221165341.23736-1-vsementsov@virtuozzo.com>
-	<20181221165341.23736-2-vsementsov@virtuozzo.com>
-	<875zuznv5k.fsf@dusky.pond.sub.org>
-	<0b69aa1d-1a17-0ac6-52d4-a7ee7bd8eb75@virtuozzo.com>
-	<20190211175247.GH8135@linux.fritz.box>
-In-Reply-To: <20190211175247.GH8135@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8354B895113905489A774671CB30885C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gtGaa-00009h-KH
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:45:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gtGaa-0008SC-C5
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:45:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gtGaE-0003Ry-3g
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 18:45:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 148F22E80C7
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 18:45:34 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: move to QOM path for
- x-block-latency-histogram-set
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Feb 2019 18:39:02 -0000
+From: liang yan <lyan@suse.com>
+Reply-To: Bug 1815143 <1815143@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154957727033.18791.11498118265359264370.malonedeb@soybean.canonical.com>
+Message-Id: <154991034265.21143.10870114569711270496.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815143] Re: qemu-system-s390x fails when running
+ without kvm: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +37,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>
+To: qemu-devel@nongnu.org
 
-MTEuMDIuMjAxOSAyMDo1MiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDIuMjAxOSB1bSAx
-ODozOSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDA4
-LjAxLjIwMTkgMTY6MjAsIE1hcmt1cyBBcm1icnVzdGVyIHdyb3RlOg0KPj4+IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPj4+
-DQo+Pj4+IE1vdmUgdG8gd2F5IG9mIGRldmljZSBzZWxlY3RpbmcsIGhvd2V2ZXIgZmFsbCBiYWNr
-IHRvIGRldmljZSBuYW1lIGlmDQo+Pj4+IHBhdGggaXMgbm90IGZvdW5kLg0KPj4+Pg0KPj4+PiBT
-aWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZp
-cnR1b3p6by5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICBxYXBpL2Jsb2NrLWNvcmUuanNvbiB8ICA0
-ICsrLS0NCj4+Pj4gICAgYmxvY2tkZXYuYyAgICAgICAgICAgfCAyMiArKysrKysrKysrKysrKyst
-LS0tLS0tDQo+Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgOSBkZWxl
-dGlvbnMoLSkNCj4+Pj4NCj4+Pj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIv
-cWFwaS9ibG9jay1jb3JlLmpzb24NCj4+Pj4gaW5kZXggNzYyMDAwZjMxZi4uYmI3MGM1MWE1NyAx
-MDA2NDQNCj4+Pj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+Pj4gKysrIGIvcWFwaS9i
-bG9jay1jb3JlLmpzb24NCj4+Pj4gQEAgLTQ4OSw3ICs0ODksNyBAQA0KPj4+PiAgICAjIElmIG9u
-bHkgQGRldmljZSBwYXJhbWV0ZXIgaXMgc3BlY2lmaWVkLCByZW1vdmUgYWxsIHByZXNlbnQgbGF0
-ZW5jeSBoaXN0b2dyYW1zDQo+Pj4+ICAgICMgZm9yIHRoZSBkZXZpY2UuIE90aGVyd2lzZSwgYWRk
-L3Jlc2V0IHNvbWUgb2YgKG9yIGFsbCkgbGF0ZW5jeSBoaXN0b2dyYW1zLg0KPj4+PiAgICAjDQo+
-Pj4+IC0jIEBkZXZpY2U6IGRldmljZSBuYW1lIHRvIHNldCBsYXRlbmN5IGhpc3RvZ3JhbSBmb3Iu
-DQo+Pj4+ICsjIEBpZDogVGhlIFFPTSBwYXRoIG9yIG5hbWUgb2YgdGhlIGd1ZXN0IGRldmljZS4N
-Cj4+Pj4gICAgIw0KPj4+PiAgICAjIEBib3VuZGFyaWVzOiBsaXN0IG9mIGludGVydmFsIGJvdW5k
-YXJ5IHZhbHVlcyAoc2VlIGRlc2NyaXB0aW9uIGluDQo+Pj4+ICAgICMgICAgICAgICAgICAgIEJs
-b2NrTGF0ZW5jeUhpc3RvZ3JhbUluZm8gZGVmaW5pdGlvbikuIElmIHNwZWNpZmllZCwgYWxsDQo+
-Pj4NCj4+PiBJcyBzdWNoIG92ZXJsb2FkZWQgc2VtYW50aWNzIHdoYXQgd2Ugd2FudCBpbiBuZXcg
-aW50ZXJmYWNlcz8NCj4+Pg0KPj4+IEhtbSwgbG9va3MgbGlrZSB0aGVyZSdzIGFtcGxlIHByZWNl
-ZGVuY2UgZm9yIGl0LiAgRXNjYXBlZCBteSBncmVwIGF0DQo+Pj4gZmlyc3QgYmVjYXVzZSBpdHMg
-Y29tbW9ubHkgZG9jdW1lbnRlZCBhcyAiVGhlIG5hbWUgb3IgUU9NIHBhdGggb2YgdGhlDQo+Pj4g
-Z3Vlc3QgZGV2aWNlIi4gIFN1Z2dlc3QgdG8gc3RpY2sgdG8gdGhhdCBmb3IgY29uc2lzdGVuY3ku
-DQo+Pg0KPj4NCj4+IEludGVyZXN0aW5nLCB0aGF0IGluIGNhc2VzIHlvdSBtZWFuLCBkb2N1bWVu
-dGF0aW9uIHNlZW1zIHdyb25nOg0KPj4gaXQgZ29lcyB0aHJvdWdoIHFtcF9nZXRfYmxrLCB3aGlj
-aCB3b3JrcyBsaWtlIEBpZCBtYXkgYmUgb25seSBRT00gcGF0aCwgbm90IG5hbWUsDQo+PiBzbyBm
-b3IgdGhlIGl0IHNob3VsZCBiZSBAaWQ6IFRoZSBRT00gcGF0aC4NCj4gDQo+IEl0J3MgcmVhbGx5
-IGEgUU9NIHBhdGggcmVsYXRpdmUgdG8gL21hY2hpbmUvcGVyaXBoZXJhbCAoc2VlDQo+IGZpbmRf
-ZGV2aWNlX3N0YXRlKCkpLCB3aGljaCBpcyB3aGVyZSBuYW1lZCBkZXZpY2VzIGxpdmUsIGFjY2Vz
-c2libGUNCj4gdGhyb3VnaCB0aGVpciBpZC4gU28gcmVsYXRpdmUgcGF0aHMgYXJlIGJvdGggUU9N
-IHBhdGhzIGFuZCBuYW1lcyBvZg0KPiBndWVzdCBkZXZpY2VzLiAoUmVsYXRpdmUgcGF0aHMgYXJl
-bid0IGEgUU9NIGNvbmNlcHQsIHRob3VnaCwgd2hpY2gNCj4gcHJvdmlkZXMgb25seSBhYnNvbHV0
-ZSBhbmQgcGFydGlhbCBwYXRocy4gVGhlIHJlbGF0aXZlIHBhdGhzIGhhdmUgYQ0KPiBvbmUtb2Zm
-IGltcGxlbWVudGF0aW9uIGhlcmUuKQ0KPiANCj4gU28gaW4gdGhlIGVuZCwgSSB0aGluayB0aGUg
-ZGVzY3JpcHRpb24gaXMgYWN0dWFsbHkgY29ycmVjdCwganVzdCB3aXRoIGENCj4gaGlnaGVyIGxl
-dmVsIHBlcnNwZWN0aXZlLCBpZ25vcmluZyBhbGwgdGhlIGxvdy1sZXZlbCBkZXRhaWxzLg0KPiAN
-Cg0KSG1tIEkgdGhvdWdodCwgdGhhdCBuYW1lIGlzIGFuIGFyZ3VtZW50IG9mIGJsa19ieV9uYW1l
-KCkgYW5kIHBhdGggaXMgYW4NCmFyZ3VtZW50IG9mIGJsa19ieV9xZGV2X2lkLi4gQnV0IHlvdSBz
-YXkgdGhhdCBhcmd1bWVudCBvZiBibGtfYnlfcWRldl9pZA0KbWF5IGJlIGNvbnNpZGVyZWQgYXMg
-Im5hbWUiIHRvbywgYXQgbGVhc3QgZm9yIHVzZXIuIElmIHNvLCB0aGF0IGlzIG9rLi4NCg0KQ29u
-c2lkZXIgbW9yZSBjb250ZXh0Og0KDQogICAjIEBkZXZpY2U6IEJsb2NrIGRldmljZSBuYW1lIChk
-ZXByZWNhdGVkLCB1c2UgQGlkIGluc3RlYWQpDQogICAjDQogICAjIEBpZDogICAgIFRoZSBuYW1l
-IG9yIFFPTSBwYXRoIG9mIHRoZSBndWVzdCBkZXZpY2UgKHNpbmNlOiAyLjgpDQoNCg0Kc28sICJu
-YW1lIiBpbiBmaXJzdCBsaW5lIGFuZCAibmFtZSIgaW4gc2Vjb25kIGFyZSBkaWZmZXJlbnQga2lu
-ZHMgb2YgbmFtZT8NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+Hi, Thomas, you are right, I am using 2.9.1, and it does look OK in
+2.10. do you mind to point me which part of code fixed it? Thanks.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815143
+
+Title:
+   qemu-system-s390x fails when running without kvm: fatal: EXECUTE on
+  instruction prefix 0x7f4 not implemented
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  just wondering if TCG implements instruction prefix 0x7f4
+
+  server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
+
+  --> starting qemu with kvm enabled works fine
+  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
+t/initrd -enable-kvm
+  Initializing cgroup subsys cpuset
+  Initializing cgroup subsys cpu
+  Initializing cgroup subsys cpuacct
+  Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 =
+(SUSE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
+  setup.289988: Linux is running under KVM in 64-bit mode
+  setup.b050d0: The maximum memory size is 128MB
+  numa.196305: NUMA mode: plain
+  Write protected kernel read-only data: 8692k
+  [...]
+
+  --> but starting qemu without kvm enabled works fails
+  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
+t/initrd =
+
+  qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
+
+  PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
+  R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=
+=3D0000000000000000
+  R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=
+=3D0000000000000000
+  R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=
+=3D0000000000000000
+  R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=
+=3D000000000000bef0
+  F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=
+=3D0000000000000000
+  F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=
+=3D0000000000000000
+  F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=
+=3D0000000000000000
+  F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=
+=3D0000000000000000
+  V00=3D00000000000000000000000000000000 V01=3D0000000000000000000000000000=
+0000
+  V02=3D00000000000000000000000000000000 V03=3D0000000000000000000000000000=
+0000
+  V04=3D00000000000000000000000000000000 V05=3D0000000000000000000000000000=
+0000
+  V06=3D00000000000000000000000000000000 V07=3D0000000000000000000000000000=
+0000
+  V08=3D00000000000000000000000000000000 V09=3D0000000000000000000000000000=
+0000
+  V10=3D00000000000000000000000000000000 V11=3D0000000000000000000000000000=
+0000
+  V12=3D00000000000000000000000000000000 V13=3D0000000000000000000000000000=
+0000
+  V14=3D00000000000000000000000000000000 V15=3D0000000000000000000000000000=
+0000
+  V16=3D00000000000000000000000000000000 V17=3D0000000000000000000000000000=
+0000
+  V18=3D00000000000000000000000000000000 V19=3D0000000000000000000000000000=
+0000
+  V20=3D00000000000000000000000000000000 V21=3D0000000000000000000000000000=
+0000
+  V22=3D00000000000000000000000000000000 V23=3D0000000000000000000000000000=
+0000
+  V24=3D00000000000000000000000000000000 V25=3D0000000000000000000000000000=
+0000
+  V26=3D00000000000000000000000000000000 V27=3D0000000000000000000000000000=
+0000
+  V28=3D00000000000000000000000000000000 V29=3D0000000000000000000000000000=
+0000
+  V30=3D00000000000000000000000000000000 V31=3D0000000000000000000000000000=
+0000
+  C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=
+=3D0000000000000000
+  C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=
+=3D0000000000000000
+  C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=
+=3D0000000000000000
+  C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=
+=3D0000000000000000
+
+  Aborted (core dumped)
+
+  =
+
+  server3:~ # lscpu
+  Architecture:          s390x
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Big Endian
+  CPU(s):                2
+  On-line CPU(s) list:   0,1
+  Thread(s) per core:    1
+  Core(s) per socket:    1
+  Socket(s) per book:    1
+  Book(s) per drawer:    1
+  Drawer(s):             2
+  NUMA node(s):          1
+  Vendor ID:             IBM/S390
+  Machine type:          2964
+  BogoMIPS:              20325.00
+  Hypervisor:            z/VM 6.4.0
+  Hypervisor vendor:     IBM
+  Virtualization type:   full
+  Dispatching mode:      horizontal
+  L1d cache:             128K
+  L1i cache:             96K
+  L2d cache:             2048K
+  L2i cache:             2048K
+  L3 cache:              65536K
+  L4 cache:              491520K
+  NUMA node0 CPU(s):     0-63
+  Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh h=
+ighgprs te vx sie
+  server3:~ # uname -a
+  Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (=
+9649989) s390x s390x s390x GNU/Linux
+  server3:~ #
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815143/+subscriptions
