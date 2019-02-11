@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39383)
+Received: from eggs.gnu.org ([209.51.188.92]:42611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtLPV-0006ar-7w
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:50 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gtLT6-0001Aa-TQ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:58:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtLPM-0005ta-Mx
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:44 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtLPG-0005jL-Nt
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:35 -0500
-Received: by mail-wr1-f65.google.com with SMTP id f14so745796wrg.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:54:33 -0800 (PST)
-References: <cover.1549857716.git.balaton@eik.bme.hu>
-	<9f5f3187f0eff04efc2ec3639727a17bf8d36dce.1549857716.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <db8d6d0b-4ea5-4f99-f054-d6a397f3e967@redhat.com>
-Date: Tue, 12 Feb 2019 00:54:30 +0100
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gtLT5-0000Vk-4B
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:58:32 -0500
+Received: from mga05.intel.com ([192.55.52.43]:14039)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1gtLT4-0000SR-Qh
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:58:31 -0500
+Date: Tue, 12 Feb 2019 07:58:00 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190211235800.GA27403@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190211064629.20186-1-richardw.yang@linux.intel.com>
+	<20190211154307.203f8d35@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9f5f3187f0eff04efc2ec3639727a17bf8d36dce.1549857716.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] mips_fulong2e: Add on-board graphics
- chip
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190211154307.203f8d35@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] pc-dimm: use same mechanism for
+ [get|set]_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Huacai Chen <zltjiangshi@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
 
-On 2/11/19 5:01 AM, BALATON Zoltan wrote:
-> Add (partial) emulation of the on-board GPU of the machine. This
-> allows the PMON2000 firmware to run and should also work with Linux
-> console but probably not with X yet.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
-> Depends on hw/display: Add basic ATI VGA emulation
-> 
->  hw/mips/mips_fulong2e.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index eec6fd02c8..68bd030fc1 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machine)
->      I2CBus *smbus;
->      MIPSCPU *cpu;
->      CPUMIPSState *env;
-> +    DeviceState *dev;
->  
->      /* init CPUs */
->      cpu = MIPS_CPU(cpu_create(machine->cpu_type));
-> @@ -347,6 +348,11 @@ static void mips_fulong2e_init(MachineState *machine)
->      vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
->                                 &smbus, &isa_bus);
->  
-> +    /* GPU */
-> +    dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
+On Mon, Feb 11, 2019 at 03:43:07PM +0100, Igor Mammedov wrote:
+>On Mon, 11 Feb 2019 14:46:29 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
+>> [get|set]_addr are two counterpart to access PCDIMMDevice.addr.
+>> 
+>> Since we have already set up a property PC_DIMM_ADDR_PROP for this
+>> field and use this mechanism in set_addr, it would be more proper to use
+>> the same mechanism in get_addr.
+>> 
+>> This patch uses object_property_get_uint() to replace the direct memory
+>> access to make [get|set]_addr with the same mechanism.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>
+>Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>
 
-You missed in your cover:
-Based-on: 20190211040434.1C98674569F@zero.eik.bme.hu
+Thanks :-)
 
-Else testing we get:
-qemu-system-mips64el: Unknown device 'ati-vga' for bus 'PCI'
-Aborted (core dumped)
+>> 
+>> ---
+>> v2: replace NULL with error_abort to handle error properly
+>> ---
+>>  hw/mem/pc-dimm.c | 4 +---
+>>  1 file changed, 1 insertion(+), 3 deletions(-)
+>> 
+>> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+>> index 0c9b9e8292..152400b1fc 100644
+>> --- a/hw/mem/pc-dimm.c
+>> +++ b/hw/mem/pc-dimm.c
+>> @@ -204,9 +204,7 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+>>  
+>>  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+>>  {
+>> -    const PCDIMMDevice *dimm = PC_DIMM(md);
+>> -
+>> -    return dimm->addr;
+>> +    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, &error_abort);
+>>  }
+>>  
+>>  static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
 
-> +    qdev_prop_set_uint16(dev, "device_id", 0x5159);
-> +    qdev_init_nofail(dev);
-> +
->      /* Populate SPD eeprom data */
->      spd_data = spd_data_generate(DDR, ram_size, &err);
->      if (err) {
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+-- 
+Wei Yang
+Help you, Help me
