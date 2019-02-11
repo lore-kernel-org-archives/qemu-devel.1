@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46952)
+Received: from eggs.gnu.org ([209.51.188.92]:47658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gtCzH-0000JU-T4
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:55:12 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gtD1b-0002DY-Lu
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:57:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gtCzF-0004E6-P5
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:55:11 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon, 11 Feb 2019 14:54:55 +0000
-Message-ID: <96affe90-df67-41d7-e681-7c370a8513e0@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51sgwuv2ok.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CDA3E6CDCD8DE04BB164F1A11D5D2599@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1gtD1a-0002t4-D7
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:57:35 -0500
+Date: Mon, 11 Feb 2019 15:57:14 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211155714.0b657552.cohuck@redhat.com>
+In-Reply-To: <8d2c66ce-fdc6-d12b-256c-1760330c4360@de.ibm.com>
+References: <20190211113255.3837-1-cohuck@redhat.com>
+	<8d2c66ce-fdc6-d12b-256c-1760330c4360@de.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x: always provide pci support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Collin Walling <walling@linux.ibm.com>
 
-DQoNCk9uIDExLzAyLzIwMTkgMTc6MDcsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPiBPbiBGcmkg
-MDggRmViIDIwMTkgMDQ6Mjk6NDggUE0gQ0VULCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+
-IE9uIDA4LzAyLzIwMTkgMTY6MTMsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPj4+IE9uIFdlZCAy
-MyBKYW4gMjAxOSAxMjo1NDoyNCBQTSBDRVQsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+
-PiArc3RhdGljIEJsb2NrRHJpdmVyU3RhdGUgKmluc2VydF9maWx0ZXIoQmxvY2tEcml2ZXJTdGF0
-ZSAqYnMsIEVycm9yICoqZXJycCkNCj4+Pj4gK3sNCj4+Pj4gKyAgICBCbG9ja0RyaXZlclN0YXRl
-ICpjb3JfZmlsdGVyX2JzOw0KPj4+PiArICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4+
-PiArDQo+Pj4+ICsgICAgY29yX2ZpbHRlcl9icyA9IGNyZWF0ZV9maWx0ZXJfbm9kZShicywgZXJy
-cCk7DQo+Pj4+ICsgICAgaWYgKGNvcl9maWx0ZXJfYnMgPT0gTlVMTCkgew0KPj4+PiArICAgICAg
-ICBlcnJvcl9wcmVwZW5kKGVycnAsICJDb3VsZCBub3QgY3JlYXRlIGZpbHRlciBub2RlOiAiKTsN
-Cj4+Pj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+Pj4+ICsgICAgfQ0KPj4+PiArDQo+Pj4+ICsg
-ICAgYmRydl9zZXRfYWlvX2NvbnRleHQoY29yX2ZpbHRlcl9icywgYmRydl9nZXRfYWlvX2NvbnRl
-eHQoYnMpKTsNCj4+Pj4gKw0KPj4+PiArICAgIGJkcnZfZHJhaW5lZF9iZWdpbihicyk7DQo+Pj4+
-ICsgICAgYmRydl9yZXBsYWNlX25vZGUoYnMsIGNvcl9maWx0ZXJfYnMsICZsb2NhbF9lcnIpOw0K
-Pj4+PiArICAgIGJkcnZfZHJhaW5lZF9lbmQoYnMpOw0KPj4+DQo+Pj4gSSB0aGluayB0aGlzIHdh
-cyBhbHJlYWR5IGRpc2N1c3NlZCBpbiB0aGUgcHJldmlvdXMgdmVyc2lvbiBvZiB0aGlzDQo+Pj4g
-cGF0Y2g6IGlmIHlvdSBpbnNlcnQgYSBjb3B5LW9uLXJlYWQgZmlsdGVyIGhlcmUgdGhlbiBhbGwg
-Z3Vlc3QgcmVhZHMNCj4+PiB3aWxsIGNvcHkgdGhlIGRhdGEgZnJvbSB0aGUgYmFja2luZyBjaGFp
-biwgYnV0IHlvdSBkb24ndCB3YW50IHRvIGNvcHkNCj4+PiBhbnl0aGluZyBiZWxvdyB0aGUgJ2Jh
-c2UnIG5vZGUsIHNvIHRoZSBjb3B5LW9uLXJlYWQgZmlsdGVyIG5lZWRzIGENCj4+PiAnYmFzZScg
-cGFyYW1ldGVyLg0KPj4+DQo+PiBCZWZvcmUgdGhhdCwgd2Ugc3RpbGwgaGF2ZSB0aGUgdW5yZXNv
-bHZlZCBpc3N1ZSB3aXRoIGdldHRpbmcgdGhlDQo+PiBmaWx0ZXIgYXMgdGhlICdiYXNlJyBpbnB1
-dCBwYXJhbWV0ZXIuIFRoYXQgaGFwcGVucyBzb21ldGltZXMgYmVjYXVzZQ0KPj4gdGhlIGJhc2Ug
-aXMgYmVpbmcgc2VhcmNoZWQgYnkgdGhlIGZpbGUgbmFtZSwgd2hpY2ggaXMgdGhlIHNhbWUgdG8g
-dGhlDQo+PiBvbmUgb2YgdGhlIGZpbHRlciwgcmF0aGVyIHRoYW4gYnkgdGhlIG5vZGUgbmFtZSAo
-ISkNCj4gDQo+IEknbSBub3Qgc3VyZSBpZiBJIHVuZGVyc3RhbmQuIGJsb2NrLXN0cmVhbSBoYXMg
-J2Jhc2UnIGFuZCAnYmFzZS1ub2RlJw0KPiBwYXJhbWV0ZXJzLCBhbmQgaW4gdGhlIGZpcnN0IGNh
-c2UgeW91IHdvdWxkIGNvbnZlcnQgdGhlIGZpbGUgbmFtZSB0byBhDQo+IG5vZGUgbmFtZS4NCj4g
-DQo+IHN0cmVhbV9zdGFydCgpIGdldHMgdGhlIEJsb2NrRHJpdmVyU3RhdGUsIG5vdCB0aGUgZmls
-ZSBuYW1lLCBzbyB3aHkNCj4gY2FuJ3QgeW91IGdldCB0aGUgbm9kZSBuYW1lIGZyb20gdGhlcmUg
-YW5kIHBhc3MgaXQgdG8gdGhlIGNvcHktb24tcmVhZA0KPiBmaWx0ZXI/DQo+IA0KPiBCZXJ0bw0K
-PiANCldoZW4gdGhlIGJsb2NrLXN0cmVhbSBRTVAgY29tbWFuZCBpcyBydW4gd2l0aCBhIGJhc2Ug
-ZmlsZSBwYXRoIG5hbWUsDQpxbXBfYmxvY2tfc3RyZWFtKCkgaW52b2tlcyBiZHJ2X2xvb2t1cF9i
-cygpIHRvIGdldCB0aGUNCkJsb2NrRHJpdmVyU3RhdGUgYnkgdGhlIGZpbGUgbmFtZSBhbmQgdG8g
-cGFzcyBpdCBmdXJ0aGVyIHRvDQpzdHJlYW1fc3RhcnQoKSwgd2hpbGUgaGFzX2Jhc2Vfbm9kZSA9
-PSBmYWxzZS4NCkl0IHdvcmtzIHRoZSBzYW1lIHdheSBmb3IgdGhlIGNvcHktb24tcmVhZCBmaWx0
-ZXIgaW5zZXJ0ZWQgYWJvdmUgdGhlDQpRQ09XMiBub2RlIGJlY2F1c2UgdGhleSBib3RoIGhhdmUg
-dGhlIHNhbWUgYW5kIG9ubHkgZmlsZSBwYXRoIG5hbWUuDQpTbywgdGhlIEJsb2NrRHJpdmVyU3Rh
-dGUgb2YgdGhlIGZpbHRlciBpcyBwYXNzZWQgdG8gdGhlDQpzdHJlYW1fc3RhcnQoKSBhcyB0aGUg
-cGFyYW1ldGVyIGluc3RlYWQgb2YgdGhlIG9uZSBvZiB0aGUgUUNPVzIgYmFzZQ0Kbm9kZS4gSSBl
-bWFpbGVkIHRoZSB3b3JrYXJvdW5kIHBhdGNoIHRoYXQgc2tpcHMgdGhlIGZpbHRlciBCUyBwYXNz
-ZWQNCnRvIHRoZSBzdHJlYW1fc3RhcnQoKSBhcyB0aGUgcGFyYW1ldGVyLCBpZiBhbnkuDQpUaGVy
-ZSBpcyBhbiBpZGVhIG9mIFZsYWRpbWlyIHRvIHBhc3MgYW4gaW50ZXJtZWRpYXRlIG5vZGUgdGhh
-dCBoYXMNCnRoZSBiYXNlIG5vZGUgYXMgaXRzIGJhY2tpbmcgb25lIGluc3RlYWQuIElmIHlvdSBj
-YW4gc3VnZ2VzdCBhbm90aGVyDQppZGVhLCBpdCB3aWxsIGJlIGFwcHJlY2lhdGVkLg0KDQotLSAN
-CldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
+On Mon, 11 Feb 2019 15:05:46 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 11.02.2019 12:32, Cornelia Huck wrote:
+> > We tried to make pci support optional on s390x in the past;
+> > unfortunately, we still require the s390 phb to be created
+> > unconditionally due to backwards compatibility issues.
+> > 
+> > Instead of sinking more effort into this (including compat
+> > handling for older machines etc.) for non-obvious gains, let's
+> > just make CONFIG_PCI something that is always set on s390x.
+> > 
+> > Note that you can still fence off pci for the _guest_ if you
+> > provide a cpu model without the zpci feature.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
+> 
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> The previous attempts of making it configurable caused more  pain than
+> benefit.
+
+I think we've reaped all the benefits of the attempt already (making
+relevant instructions check for the zpci feature bit).
