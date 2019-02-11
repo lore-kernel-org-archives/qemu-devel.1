@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50031)
+Received: from eggs.gnu.org ([209.51.188.92]:50047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtGGF-0007nl-MZ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:56 -0500
+	(envelope-from <berrange@redhat.com>) id 1gtGGG-0007o0-0m
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtGGE-0007cx-Mk
+	(envelope-from <berrange@redhat.com>) id 1gtGGE-0007cl-LO
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42858)
+Received: from mx1.redhat.com ([209.132.183.28]:37794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtGGE-0007bQ-Df
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtGGE-0007aq-Bm
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:54 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 11 Feb 2019 18:24:27 +0000
-Message-Id: <20190211182442.8542-2-berrange@redhat.com>
-In-Reply-To: <20190211182442.8542-1-berrange@redhat.com>
-References: <20190211182442.8542-1-berrange@redhat.com>
+Date: Mon, 11 Feb 2019 18:24:26 +0000
+Message-Id: <20190211182442.8542-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 01/16] io: store reference to thread
- information in the QIOTask struct
+Subject: [Qemu-devel] [PATCH v3 00/16] chardev: refactoring & many bugfixes
+ related tcp_chr_wait_connected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +28,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Yongji Xie <elohimes@gmail.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-Currently the struct QIOTaskThreadData is only needed by the worker
-thread, but a subsequent patch will need to access it from another
-context.
+This is a followup to
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- io/task.c | 64 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 34 insertions(+), 30 deletions(-)
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.html
+  v2: http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg05947.ht=
+ml
 
-diff --git a/io/task.c b/io/task.c
-index 2886a2c1bc..396866b10f 100644
---- a/io/task.c
-+++ b/io/task.c
-@@ -24,6 +24,14 @@
- #include "qemu/thread.h"
- #include "trace.h"
-=20
-+struct QIOTaskThreadData {
-+    QIOTaskWorker worker;
-+    gpointer opaque;
-+    GDestroyNotify destroy;
-+    GMainContext *context;
-+};
-+
-+
- struct QIOTask {
-     Object *source;
-     QIOTaskFunc func;
-@@ -32,6 +40,7 @@ struct QIOTask {
-     Error *err;
-     gpointer result;
-     GDestroyNotify destroyResult;
-+    struct QIOTaskThreadData *thread;
- };
-=20
-=20
-@@ -57,6 +66,18 @@ QIOTask *qio_task_new(Object *source,
-=20
- static void qio_task_free(QIOTask *task)
- {
-+    if (task->thread) {
-+        if (task->thread->destroy) {
-+            task->thread->destroy(task->thread->opaque);
-+        }
-+
-+        if (task->thread->context) {
-+            g_main_context_unref(task->thread->context);
-+        }
-+
-+        g_free(task->thread);
-+    }
-+
-     if (task->destroy) {
-         task->destroy(task->opaque);
-     }
-@@ -72,31 +93,12 @@ static void qio_task_free(QIOTask *task)
- }
-=20
-=20
--struct QIOTaskThreadData {
--    QIOTask *task;
--    QIOTaskWorker worker;
--    gpointer opaque;
--    GDestroyNotify destroy;
--    GMainContext *context;
--};
--
--
- static gboolean qio_task_thread_result(gpointer opaque)
- {
--    struct QIOTaskThreadData *data =3D opaque;
-+    QIOTask *task =3D opaque;
-=20
--    trace_qio_task_thread_result(data->task);
--    qio_task_complete(data->task);
--
--    if (data->destroy) {
--        data->destroy(data->opaque);
--    }
--
--    if (data->context) {
--        g_main_context_unref(data->context);
--    }
--
--    g_free(data);
-+    trace_qio_task_thread_result(task);
-+    qio_task_complete(task);
-=20
-     return FALSE;
- }
-@@ -104,22 +106,23 @@ static gboolean qio_task_thread_result(gpointer opa=
-que)
-=20
- static gpointer qio_task_thread_worker(gpointer opaque)
- {
--    struct QIOTaskThreadData *data =3D opaque;
-+    QIOTask *task =3D opaque;
-     GSource *idle;
-=20
--    trace_qio_task_thread_run(data->task);
--    data->worker(data->task, data->opaque);
-+    trace_qio_task_thread_run(task);
-+
-+    task->thread->worker(task, task->thread->opaque);
-=20
-     /* We're running in the background thread, and must only
-      * ever report the task results in the main event loop
-      * thread. So we schedule an idle callback to report
-      * the worker results
-      */
--    trace_qio_task_thread_exit(data->task);
-+    trace_qio_task_thread_exit(task);
-=20
-     idle =3D g_idle_source_new();
--    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
--    g_source_attach(idle, data->context);
-+    g_source_set_callback(idle, qio_task_thread_result, task, NULL);
-+    g_source_attach(idle, task->thread->context);
-=20
-     return NULL;
- }
-@@ -138,17 +141,18 @@ void qio_task_run_in_thread(QIOTask *task,
-         g_main_context_ref(context);
-     }
-=20
--    data->task =3D task;
-     data->worker =3D worker;
-     data->opaque =3D opaque;
-     data->destroy =3D destroy;
-     data->context =3D context;
-=20
-+    task->thread =3D data;
-+
-     trace_qio_task_thread_start(task, worker, opaque);
-     qemu_thread_create(&thread,
-                        "io-task-worker",
-                        qio_task_thread_worker,
--                       data,
-+                       task,
-                        QEMU_THREAD_DETACHED);
- }
-=20
+This series comes out of a discussion between myself & Yongji Xie in:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01881.html
+
+I eventually understood that the problem faced was that
+tcp_chr_wait_connected was racing with the background connection attempt
+previously started, causing two connections to be established. This
+broke because some vhost user servers only allow a single connection.
+
+After messing around with the code alot the final solution was in fact
+very easy. We simply have to delay the first background connection
+attempt until the main loop is running. It will then automatically
+turn into a no-op if tcp_chr_wait_connected has been run. This is
+dealt with in the last patch in this series
+
+I believe this should solve the problem Yongji Xie faced, and thus not
+require us to add support for "nowait" option with client sockets at
+all. The reconnect=3D1 option effectively already implements nowait
+semantics, and now plays nicely with tcp_chr_wait_connected.
+
+In investigating this I found various other bugs that needed fixing and
+identified some useful refactoring to simplify / clarify the code, hence
+this very long series.
+
+This series passes make check-unit & check-qtest (for x86_64 target).
+
+I did a test with tests/vhost-user-bridge too, which was in fact already
+broken for the same reason Yongji Xie found - it only accepts a single
+connection. This series fixes use of reconnect=3D1 with vhost-user-bridge=
+.
+
+Changed in v3:
+
+ - Fix thread between qio_task_thread_worker unlocking mutex
+   and qio_task_thread_result free'ing mutex (Peter)
+ - Ensure tcp_chr_wait_connected destroys any pending
+   reconnect_timer GSource
+ - Use g_setenv/g_unsetenv instead of setenv/unsetenv for
+   platform portability
+
+Changed in v2:
+
+ - Rewrite the way we synchronize in tcp_chr_wait_connected again
+   to cope with chardev+device hotplug scenario
+ - Add extensive unit test coverage
+ - Resolve conflicts with git master
+
+Daniel P. Berrang=C3=A9 (16):
+  io: store reference to thread information in the QIOTask struct
+  io: add qio_task_wait_thread to join with a background thread
+  chardev: fix validation of options for QMP created chardevs
+  chardev: forbid 'reconnect' option with server sockets
+  chardev: forbid 'wait' option with client sockets
+  chardev: remove many local variables in qemu_chr_parse_socket
+  chardev: ensure qemu_chr_parse_compat reports missing driver error
+  chardev: remove unused 'sioc' variable & cleanup paths
+  chardev: split tcp_chr_wait_connected into two methods
+  chardev: split up qmp_chardev_open_socket connection code
+  chardev: use a state machine for socket connection state
+  chardev: honour the reconnect setting in tcp_chr_wait_connected
+  chardev: disallow TLS/telnet/websocket with tcp_chr_wait_connected
+  chardev: fix race with client connections in tcp_chr_wait_connected
+  tests: expand coverage of socket chardev test
+  chardev: ensure termios is fully initialized
+
+ chardev/char-serial.c          |   2 +-
+ chardev/char-socket.c          | 490 ++++++++++++++++++-------
+ chardev/char.c                 |   2 +
+ include/io/task.h              |  29 +-
+ io/task.c                      | 101 ++++--
+ io/trace-events                |   2 +
+ tests/ivshmem-test.c           |   2 +-
+ tests/libqtest.c               |   4 +-
+ tests/test-char.c              | 643 ++++++++++++++++++++++++---------
+ tests/test-filter-redirector.c |   4 +-
+ 10 files changed, 939 insertions(+), 340 deletions(-)
+
 --=20
 2.20.1
