@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56688)
+Received: from eggs.gnu.org ([209.51.188.92]:35589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gtK4i-0004B3-Ia
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:29:17 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtKNo-0008Dt-79
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:49:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gtK4h-0003mA-UA
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:29:16 -0500
-Received: from ipmail01.adl2.internode.on.net ([150.101.137.133]:54618)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gtK4h-0003d1-GK
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:29:15 -0500
-Date: Tue, 12 Feb 2019 09:29:07 +1100
-From: Dave Chinner <david@fromorbit.com>
-Message-ID: <20190211222907.GR14116@dastard>
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190204170515-mutt-send-email-mst@kernel.org>
-	<888328358.132676.1549870186945.JavaMail.zimbra@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gtKNm-0000Wa-RN
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:49:00 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52213)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtKNm-0000Rw-IR
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:48:58 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so954023wmj.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 14:48:51 -0800 (PST)
+References: <1549336101-17623-1-git-send-email-thuth@redhat.com>
+	<1549336101-17623-2-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cc4f3b8e-44f6-d157-362d-976bfbbd5a44@redhat.com>
+Date: Mon, 11 Feb 2019 23:48:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <888328358.132676.1549870186945.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] security implications of caching with virtio pmem
- (was Re: [PATCH v3 0/5] kvm "virtio pmem" device)
+In-Reply-To: <1549336101-17623-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] audio/sdlaudio: Remove the semaphore
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +31,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, dchinner@redhat.com, jack@suse.cz, kvm@vger.kernel.org, david@redhat.com, linux-nvdimm@ml01.01.org, jasowang@redhat.com, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org, Andrea Arcangeli <aarcange@redhat.com>, dave jiang <dave.jiang@intel.com>, darrick wong <darrick.wong@oracle.com>, vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com, kwolf@redhat.com, linux-ext4@vger.kernel.org, tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?= <dirty.ice.hu@gmail.com>
 
-On Mon, Feb 11, 2019 at 02:29:46AM -0500, Pankaj Gupta wrote:
-> Hello Dave,
-> Are we okay with this?
+On 2/5/19 4:08 AM, Thomas Huth wrote:
+> The semaphore code was only working with SDL1.2 - with SDL2, it causes
+> a deadlock. Since we've removed support for SDL1.2 recently, we can
+> now completely remove the semaphore code from sdlaudio.c.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Sure.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I'm not sure I agree with all the analysis presented, but, well, I
-haven't looked any deeper because I'm tired of being shouted at and
-being called argumentative for daring to ask hard questions about
-this topic....
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> ---
+>  audio/sdlaudio.c | 145 ++-----------------------------------------------------
+>  1 file changed, 5 insertions(+), 140 deletions(-)
+> 
+> diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+> index 9db5ac9..53bfdbf 100644
+> --- a/audio/sdlaudio.c
+> +++ b/audio/sdlaudio.c
+> @@ -38,14 +38,9 @@
+>  #define AUDIO_CAP "sdl"
+>  #include "audio_int.h"
+>  
+> -#define USE_SEMAPHORE (SDL_MAJOR_VERSION < 2)
+> -
+>  typedef struct SDLVoiceOut {
+>      HWVoiceOut hw;
+>      int live;
+> -#if USE_SEMAPHORE
+> -    int rpos;
+> -#endif
+>      int decr;
+>  } SDLVoiceOut;
+>  
+> @@ -57,10 +52,6 @@ static struct {
+>  
+>  static struct SDLAudioState {
+>      int exit;
+> -#if USE_SEMAPHORE
+> -    SDL_mutex *mutex;
+> -    SDL_sem *sem;
+> -#endif
+>      int initialized;
+>      bool driver_created;
+>  } glob_sdl;
+> @@ -77,66 +68,6 @@ static void GCC_FMT_ATTR (1, 2) sdl_logerr (const char *fmt, ...)
+>      AUD_log (AUDIO_CAP, "Reason: %s\n", SDL_GetError ());
+>  }
+>  
+> -static int sdl_lock (SDLAudioState *s, const char *forfn)
+> -{
+> -#if USE_SEMAPHORE
+> -    if (SDL_LockMutex (s->mutex)) {
+> -        sdl_logerr ("SDL_LockMutex for %s failed\n", forfn);
+> -        return -1;
+> -    }
+> -#else
+> -    SDL_LockAudio();
+> -#endif
+> -
+> -    return 0;
+> -}
+> -
+> -static int sdl_unlock (SDLAudioState *s, const char *forfn)
+> -{
+> -#if USE_SEMAPHORE
+> -    if (SDL_UnlockMutex (s->mutex)) {
+> -        sdl_logerr ("SDL_UnlockMutex for %s failed\n", forfn);
+> -        return -1;
+> -    }
+> -#else
+> -    SDL_UnlockAudio();
+> -#endif
+> -
+> -    return 0;
+> -}
+> -
+> -static int sdl_post (SDLAudioState *s, const char *forfn)
+> -{
+> -#if USE_SEMAPHORE
+> -    if (SDL_SemPost (s->sem)) {
+> -        sdl_logerr ("SDL_SemPost for %s failed\n", forfn);
+> -        return -1;
+> -    }
+> -#endif
+> -
+> -    return 0;
+> -}
+> -
+> -#if USE_SEMAPHORE
+> -static int sdl_wait (SDLAudioState *s, const char *forfn)
+> -{
+> -    if (SDL_SemWait (s->sem)) {
+> -        sdl_logerr ("SDL_SemWait for %s failed\n", forfn);
+> -        return -1;
+> -    }
+> -    return 0;
+> -}
+> -#endif
+> -
+> -static int sdl_unlock_and_post (SDLAudioState *s, const char *forfn)
+> -{
+> -    if (sdl_unlock (s, forfn)) {
+> -        return -1;
+> -    }
+> -
+> -    return sdl_post (s, forfn);
+> -}
+> -
+>  static int aud_to_sdlfmt (audfmt_e fmt)
+>  {
+>      switch (fmt) {
+> @@ -243,9 +174,9 @@ static int sdl_open (SDL_AudioSpec *req, SDL_AudioSpec *obt)
+>  static void sdl_close (SDLAudioState *s)
+>  {
+>      if (s->initialized) {
+> -        sdl_lock (s, "sdl_close");
+> +        SDL_LockAudio();
+>          s->exit = 1;
+> -        sdl_unlock_and_post (s, "sdl_close");
+> +        SDL_UnlockAudio();
+>          SDL_PauseAudio (1);
+>          SDL_CloseAudio ();
+>          s->initialized = 0;
+> @@ -267,30 +198,10 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+>          int to_mix, decr;
+>  
+>          /* dolog ("in callback samples=%d\n", samples); */
+> -#if USE_SEMAPHORE
+> -        sdl_wait (s, "sdl_callback");
+> -        if (s->exit) {
+> -            return;
+> -        }
+> -
+> -        if (sdl_lock (s, "sdl_callback")) {
+> -            return;
+> -        }
+> -
+> -        if (audio_bug(__func__, sdl->live < 0 || sdl->live > hw->samples)) {
+> -            dolog ("sdl->live=%d hw->samples=%d\n",
+> -                   sdl->live, hw->samples);
+> -            return;
+> -        }
+>  
+> -        if (!sdl->live) {
+> -            goto again;
+> -        }
+> -#else
+>          if (s->exit || !sdl->live) {
+>              break;
+>          }
+> -#endif
+>  
+>          /* dolog ("in callback live=%d\n", live); */
+>          to_mix = audio_MIN (samples, sdl->live);
+> @@ -301,33 +212,20 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+>  
+>              /* dolog ("in callback to_mix %d, chunk %d\n", to_mix, chunk); */
+>              hw->clip (buf, src, chunk);
+> -#if USE_SEMAPHORE
+> -            sdl->rpos = (sdl->rpos + chunk) % hw->samples;
+> -#else
+>              hw->rpos = (hw->rpos + chunk) % hw->samples;
+> -#endif
+>              to_mix -= chunk;
+>              buf += chunk << hw->info.shift;
+>          }
+>          samples -= decr;
+>          sdl->live -= decr;
+>          sdl->decr += decr;
+> -
+> -#if USE_SEMAPHORE
+> -    again:
+> -        if (sdl_unlock (s, "sdl_callback")) {
+> -            return;
+> -        }
+> -#endif
+>      }
+>      /* dolog ("done len=%d\n", len); */
+>  
+> -#if (SDL_MAJOR_VERSION >= 2)
+>      /* SDL2 does not clear the remaining buffer for us, so do it on our own */
+>      if (samples) {
+>          memset(buf, 0, samples << hw->info.shift);
+>      }
+> -#endif
+>  }
+>  
+>  static int sdl_write_out (SWVoiceOut *sw, void *buf, int len)
+> @@ -339,11 +237,8 @@ static int sdl_run_out (HWVoiceOut *hw, int live)
+>  {
+>      int decr;
+>      SDLVoiceOut *sdl = (SDLVoiceOut *) hw;
+> -    SDLAudioState *s = &glob_sdl;
+>  
+> -    if (sdl_lock (s, "sdl_run_out")) {
+> -        return 0;
+> -    }
+> +    SDL_LockAudio();
+>  
+>      if (sdl->decr > live) {
+>          ldebug ("sdl->decr %d live %d sdl->live %d\n",
+> @@ -355,19 +250,10 @@ static int sdl_run_out (HWVoiceOut *hw, int live)
+>      decr = audio_MIN (sdl->decr, live);
+>      sdl->decr -= decr;
+>  
+> -#if USE_SEMAPHORE
+> -    sdl->live = live - decr;
+> -    hw->rpos = sdl->rpos;
+> -#else
+>      sdl->live = live;
+> -#endif
+>  
+> -    if (sdl->live > 0) {
+> -        sdl_unlock_and_post (s, "sdl_run_out");
+> -    }
+> -    else {
+> -        sdl_unlock (s, "sdl_run_out");
+> -    }
+> +    SDL_UnlockAudio();
+> +
+>      return decr;
+>  }
+>  
+> @@ -449,23 +335,6 @@ static void *sdl_audio_init (void)
+>          return NULL;
+>      }
+>  
+> -#if USE_SEMAPHORE
+> -    s->mutex = SDL_CreateMutex ();
+> -    if (!s->mutex) {
+> -        sdl_logerr ("Failed to create SDL mutex\n");
+> -        SDL_QuitSubSystem (SDL_INIT_AUDIO);
+> -        return NULL;
+> -    }
+> -
+> -    s->sem = SDL_CreateSemaphore (0);
+> -    if (!s->sem) {
+> -        sdl_logerr ("Failed to create SDL semaphore\n");
+> -        SDL_DestroyMutex (s->mutex);
+> -        SDL_QuitSubSystem (SDL_INIT_AUDIO);
+> -        return NULL;
+> -    }
+> -#endif
+> -
+>      s->driver_created = true;
+>      return s;
+>  }
+> @@ -474,10 +343,6 @@ static void sdl_audio_fini (void *opaque)
+>  {
+>      SDLAudioState *s = opaque;
+>      sdl_close (s);
+> -#if USE_SEMAPHORE
+> -    SDL_DestroySemaphore (s->sem);
+> -    SDL_DestroyMutex (s->mutex);
+> -#endif
+>      SDL_QuitSubSystem (SDL_INIT_AUDIO);
+>      s->driver_created = false;
+>  }
+> 
