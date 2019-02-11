@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50568)
+Received: from eggs.gnu.org ([209.51.188.92]:50610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBHZ-0007S3-17
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:59 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHc-0007UG-VS
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBHO-00047D-1g
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:51 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:51606)
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHb-0004C4-1E
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:06:00 -0500
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:34174)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gtBHI-0003qO-FW
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:41 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id b11so17638349wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:20 -0800 (PST)
+	id 1gtBHZ-0003rV-9q
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:58 -0500
+Received: by mail-wm1-x32b.google.com with SMTP id y185so14539541wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:24 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 11 Feb 2019 13:04:59 +0000
-Message-Id: <20190211130507.8710-11-alex.bennee@linaro.org>
+Date: Mon, 11 Feb 2019 13:05:06 +0000
+Message-Id: <20190211130507.8710-18-alex.bennee@linaro.org>
 In-Reply-To: <20190211130507.8710-1-alex.bennee@linaro.org>
 References: <20190211130507.8710-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/18] tests: docker.py be even smarter with
- persistent binfmt_misc
+Subject: [Qemu-devel] [PULL 17/18] docs/devel/testing: Add -a option to
+ usermod command on docker setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,131 +31,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-trivial@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-If we have a persistent mapping we don't need the QEMU binary copied
-into the container as the kernel has already opened the file and will
-pass the fd in. However the support libraries will still need to be
-there.
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
+The option -G of usermod command will remove user from other groups
+not listed, i.e.: $USER will belong only to group 'docker' after
+following the documentation as is.
+
+>From usermod(8) manual page:
+
+    If the user is currently a member of a group which is not listed,
+    the user will be removed from the group. This behaviour can be
+    changed via the -a option, which appends the user to the current
+    supplementary group list.
+
+This patch improves the situation by adding the -a option to the
+usermod command, which will just append user to the supplementary
+group list.
+
+Cc: qemu-trivial@nongnu.org
+Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Message-Id: <20190207184346.6840-1-muriloo@linux.ibm.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 768728785f..a74338cb61 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -96,13 +96,22 @@ def _get_so_libs(executable):
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 18e2c0868a..135743a2bf 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -301,7 +301,7 @@ An alternative method to set up permissions is by adding the current user to
+ .. code::
  
-     return libs
+   $ sudo groupadd docker
+-  $ sudo usermod $USER -G docker
++  $ sudo usermod $USER -a -G docker
+   $ sudo chown :docker /var/run/docker.sock
  
--def _copy_binary_with_libs(src, dest_dir):
--    """Copy a binary executable and all its dependent libraries.
-+def _copy_binary_with_libs(src, bin_dest, dest_dir):
-+    """Maybe copy a binary and all its dependent libraries.
-+
-+    If bin_dest isn't set we only copy the support libraries because
-+    we don't need qemu in the docker path to run (due to persistent
-+    mapping). Indeed users may get confused if we aren't running what
-+    is in the image.
- 
-     This does rely on the host file-system being fairly multi-arch
--    aware so the file don't clash with the guests layout."""
-+    aware so the file don't clash with the guests layout.
-+    """
- 
--    _copy_with_mkdir(src, dest_dir, "/usr/bin")
-+    if bin_dest:
-+        _copy_with_mkdir(src, dest_dir, os.path.dirname(bin_dest))
-+    else:
-+        print("only copying support libraries for %s" % (src))
- 
-     libs = _get_so_libs(src)
-     if libs:
-@@ -116,21 +125,26 @@ def _check_binfmt_misc(executable):
- 
-     The details of setting up binfmt_misc are outside the scope of
-     this script but we should at least fail early with a useful
--    message if it won't work."""
-+    message if it won't work.
-+
-+    Returns the configured binfmt path and a valid flag. For
-+    persistent configurations we will still want to copy and dependent
-+    libraries.
-+    """
- 
-     binary = os.path.basename(executable)
-     binfmt_entry = "/proc/sys/fs/binfmt_misc/%s" % (binary)
- 
-     if not os.path.exists(binfmt_entry):
-         print ("No binfmt_misc entry for %s" % (binary))
--        return None
-+        return None, False
- 
-     with open(binfmt_entry) as x: entry = x.read()
- 
-     if re.search("flags:.*F.*\n", entry):
-         print("binfmt_misc for %s uses persistent(F) mapping to host binary\n" %
-               (binary))
--        return None
-+        return None, True
- 
-     m = re.search("interpreter (\S+)\n", entry)
-     interp = m.group(1)
-@@ -138,7 +152,8 @@ def _check_binfmt_misc(executable):
-         print("binfmt_misc for %s does not point to %s, using %s" %
-               (binary, executable, interp))
- 
--    return interp
-+    return interp, True
-+
- 
- def _read_qemu_dockerfile(img_name):
-     # special case for Debian linux-user images
-@@ -345,7 +360,8 @@ class BuildCommand(SubCommand):
- 
-             # Validate binfmt_misc will work
-             if args.include_executable:
--                if not _check_binfmt_misc(args.include_executable):
-+                qpath, enabled = _check_binfmt_misc(args.include_executable)
-+                if not enabled:
-                     return 1
- 
-             # Is there a .pre file to run in the build context?
-@@ -368,7 +384,9 @@ class BuildCommand(SubCommand):
-                 # FIXME: there is no checksum of this executable and the linked
-                 # libraries, once the image built any change of this executable
-                 # or any library won't trigger another build.
--                _copy_binary_with_libs(args.include_executable, docker_dir)
-+                _copy_binary_with_libs(args.include_executable,
-+                                       qpath, docker_dir)
-+
-             for filename in args.extra_files or []:
-                 _copy_with_mkdir(filename, docker_dir)
-                 cksum += [(filename, _file_checksum(filename))]
-@@ -400,14 +418,16 @@ class UpdateCommand(SubCommand):
-         tmp_tar = TarFile(fileobj=tmp, mode='w')
- 
-         # Add the executable to the tarball, using the current
--        # configured binfmt_misc path.
--        ff = _check_binfmt_misc(args.executable)
--        if not ff:
--            bn = os.path.basename(args.executable)
--            ff = "/usr/bin/%s" % bn
--            print ("No binfmt_misc configured: copied to %s" % (ff))
--
--        tmp_tar.add(args.executable, arcname=ff)
-+        # configured binfmt_misc path. If we don't get a path then we
-+        # only need the support libraries copied
-+        ff, enabled = _check_binfmt_misc(args.executable)
-+
-+        if not enabled:
-+            print("binfmt_misc not enabled, update disabled")
-+            return 1
-+
-+        if ff:
-+            tmp_tar.add(args.executable, arcname=ff)
- 
-         # Add any associated libraries
-         libs = _get_so_libs(args.executable)
+ Note that any one of above configurations makes it possible for the user to
 -- 
 2.20.1
