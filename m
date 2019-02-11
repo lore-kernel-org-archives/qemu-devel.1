@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37052)
+Received: from eggs.gnu.org ([209.51.188.92]:37102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05L-0005M9-61
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:36 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05Q-0005Ol-3i
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05K-0007wq-5j
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:35 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36789)
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05L-0007xn-5B
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:36 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gt05J-0007w3-KY
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:34 -0500
-Received: by mail-pl1-x643.google.com with SMTP id g9so4514584plo.3
-	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:08:33 -0800 (PST)
+	id 1gt05K-0007wg-UJ
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:35 -0500
+Received: by mail-pg1-x541.google.com with SMTP id z10so4201202pgp.7
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:08:34 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 10 Feb 2019 17:08:03 -0800
-Message-Id: <20190211010829.29869-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 00/26] target/arm: Implement ARMv8.5-MemTag
+Date: Sun, 10 Feb 2019 17:08:04 -0800
+Message-Id: <20190211010829.29869-2-richard.henderson@linaro.org>
+In-Reply-To: <20190211010829.29869-1-richard.henderson@linaro.org>
+References: <20190211010829.29869-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 01/26] target/arm: Split out arm_sctlr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +29,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Based-on: <20190204131228.25949-1-richard.henderson@linaro.org>
-aka "[PATCH v3 0/4] target/arm: Implement ARMv8.5-BTI".
+Minimize the number of places that will need updating when
+the virtual host extensions are added.
 
-The full tree is available at
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h    | 26 ++++++++++++++++----------
+ target/arm/helper.c |  8 ++------
+ 2 files changed, 18 insertions(+), 16 deletions(-)
 
-  https://github.org/rth7680/qemu.git tgt-arm-mte
-
-Changes since v1:
-
-* Updates to a newer revision of the spec.  I know there is still work to
-  do here: another argument to STG, ST2G, and a new STZGM insn.
-
-* User emulation adds an x-tagged-pages property.  Without that, all pages
-  are MemAttr != Tagged and so all accesses unchecked.  I am not turning
-  off SCTLR_EL1.ATA0, so even without x-tagged-pages the program has access
-  to tag generation (e.g. the IRG insn).
-
-* System emulation is new, though effectively untested.  I need to fiddle
-  around with the kernel to see what I can put together there.
-
-  What I can see is:
-
-  address-space: cpu-tag-memory-0
-    0000000000000000-07fffffffffffffe (prio 0, i/o): tag-memory
-      0000000002000000-0000000009ffffff (prio 0, ram): mach-virt.tag
-
-  address-space: cpu-memory-0
-    0000000000000000-ffffffffffffffff (prio 0, i/o): system
-      0000000040000000-000000013fffffff (prio 0, ram): mach-virt.ram
-
-* New checks for alignment and page permissions before allowing
-  access to the tag memory.
-
-
-r~
-
-
-Richard Henderson (26):
-  target/arm: Split out arm_sctlr
-  target/arm: Split helper_msr_i_pstate into 3
-  target/arm: Add clear_pstate_bits, share gen_ss_advance
-  target/arm: Add MTE_ACTIVE to tb_flags
-  target/arm: Extract TCMA with ARMVAParameters
-  target/arm: Add MTE system registers
-  target/arm: Assert no manual change to CACHED_PSTATE_BITS
-  target/arm: Fill in helper_mte_check
-  target/arm: Suppress tag check for sp+offset
-  target/arm: Implement the IRG instruction
-  target/arm: Implement ADDG, SUBG instructions
-  target/arm: Implement the GMI instruction
-  target/arm: Implement the SUBP instruction
-  target/arm: Define arm_cpu_do_unaligned_access for CONFIG_USER_ONLY
-  target/arm: Implement LDG, STG, ST2G instructions
-  target/arm: Implement the STGP instruction
-  target/arm: Implement the access tag cache flushes
-  target/arm: Implement data cache set allocation tags
-  target/arm: Set PSTATE.TCO on exception entry
-  tcg: Introduce target-specific page data for user-only
-  target/arm: Cache the Tagged bit for a page in MemTxAttrs
-  target/arm: Create tagged ram when MTE is enabled
-  target/arm: Add allocation tag storage for user mode
-  target/arm: Add allocation tag storage for system mode
-  target/arm: Enable MTE
-  tests/tcg/aarch64: Add mte smoke tests
-
- include/exec/cpu-all.h            |  10 +-
- target/arm/cpu.h                  |  52 ++-
- target/arm/helper-a64.h           |  15 +
- target/arm/helper.h               |   3 -
- target/arm/internals.h            |  37 +++
- target/arm/translate.h            |  36 ++
- accel/tcg/translate-all.c         |  28 ++
- hw/arm/virt.c                     |  33 ++
- linux-user/mmap.c                 |  10 +-
- linux-user/syscall.c              |   4 +-
- target/arm/cpu.c                  |  31 +-
- target/arm/cpu64.c                |  19 ++
- target/arm/helper-a64.c           |  30 ++
- target/arm/helper.c               | 208 ++++++++++--
- target/arm/mte_helper.c           | 529 ++++++++++++++++++++++++++++++
- target/arm/op_helper.c            |  80 +----
- target/arm/translate-a64.c        | 352 ++++++++++++++++----
- target/arm/translate.c            |  11 -
- tests/tcg/aarch64/mte-1.c         |  27 ++
- tests/tcg/aarch64/mte-2.c         |  39 +++
- target/arm/Makefile.objs          |   2 +-
- tests/tcg/aarch64/Makefile.target |   4 +
- 22 files changed, 1360 insertions(+), 200 deletions(-)
- create mode 100644 target/arm/mte_helper.c
- create mode 100644 tests/tcg/aarch64/mte-1.c
- create mode 100644 tests/tcg/aarch64/mte-2.c
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 29663a264d..20be9fb53a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2987,11 +2987,20 @@ static inline bool arm_sctlr_b(CPUARMState *env)
+         (env->cp15.sctlr_el[1] & SCTLR_B) != 0;
+ }
+ 
++static inline uint64_t arm_sctlr(CPUARMState *env, int el)
++{
++    if (el == 0) {
++        /* FIXME: ARMv8.1-VHE S2 translation regime.  */
++        return env->cp15.sctlr_el[1];
++    } else {
++        return env->cp15.sctlr_el[el];
++    }
++}
++
++
+ /* Return true if the processor is in big-endian mode. */
+ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+ {
+-    int cur_el;
+-
+     /* In 32bit endianness is determined by looking at CPSR's E bit */
+     if (!is_a64(env)) {
+         return
+@@ -3010,15 +3019,12 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+             arm_sctlr_b(env) ||
+ #endif
+                 ((env->uncached_cpsr & CPSR_E) ? 1 : 0);
++    } else {
++        int cur_el = arm_current_el(env);
++        uint64_t sctlr = arm_sctlr(env, cur_el);
++
++        return (sctlr & (cur_el ? SCTLR_EE : SCTLR_E0E)) != 0;
+     }
+-
+-    cur_el = arm_current_el(env);
+-
+-    if (cur_el == 0) {
+-        return (env->cp15.sctlr_el[1] & SCTLR_E0E) != 0;
+-    }
+-
+-    return (env->cp15.sctlr_el[cur_el] & SCTLR_EE) != 0;
+ }
+ 
+ #include "exec/cpu-all.h"
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 520ceea7a4..d4abbb5076 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -13796,12 +13796,8 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
+         }
+ 
+-        if (current_el == 0) {
+-            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
+-            sctlr = env->cp15.sctlr_el[1];
+-        } else {
+-            sctlr = env->cp15.sctlr_el[current_el];
+-        }
++        sctlr = arm_sctlr(env, current_el);
++
+         if (cpu_isar_feature(aa64_pauth, cpu)) {
+             /*
+              * In order to save space in flags, we record only whether
 -- 
 2.17.2
