@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47217)
+Received: from eggs.gnu.org ([209.51.188.92]:47747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gtG9J-0003JH-JB
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:17:46 -0500
+	(envelope-from <svens@stackframe.org>) id 1gtGBM-0004DF-IB
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:19:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gtG9I-0002Im-Gn
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:17:45 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33919)
+	(envelope-from <svens@stackframe.org>) id 1gtGBK-0003Te-9A
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:19:51 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:44185)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gtG9H-0002G0-Up
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:17:44 -0500
-Received: by mail-pg1-x544.google.com with SMTP id d9so5321389pgl.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 10:17:43 -0800 (PST)
-Date: Mon, 11 Feb 2019 10:17:41 -0800 (PST)
-In-Reply-To: <CAKmqyKOr5eX1hQXURdz6Y7qDgygGOwYyFeKKZCH83UuuRkuR9w@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-f2a3d61b-68dc-4842-a695-0eff3c6d81e4@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1gtGBE-0003Nc-Hj
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:19:46 -0500
+From: Sven Schnelle <svens@stackframe.org>
+Date: Mon, 11 Feb 2019 19:19:03 +0100
+Message-Id: <20190211181907.2219-2-svens@stackframe.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/5 v3] RISC-V: Add hooks to use the gdb
- xml files.
+Subject: [Qemu-devel] [PATCH 1/5] target/hppa: move GETPC to HELPER()
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: Jim Wilson <jimw@sifive.com>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 08 Feb 2019 11:28:48 PST (-0800), alistair23@gmail.com wrote:
-> On Fri, Feb 8, 2019 at 11:09 AM Jim Wilson <jimw@sifive.com> wrote:
->>
->> On Fri, Feb 8, 2019 at 10:17 AM Alistair Francis <alistair23@gmail.com> wrote:
->> > Can we just write a wrapper function then that sets and unsets the variable?
->> > Something like this:
->> >
->> > riscv_csrrw_debug(...) {
->> >     #if !defined(CONFIG_USER_ONLY)
->> >             env->debugger = true;
->> >     #endif
->> >             result = riscv_csrrw(env, ...);
->> >     #if !defined(CONFIG_USER_ONLY)
->> >             env->debugger = false;
->> >     #endif
->> > }
->>
->> Yes, that would work.  Do you want me to resubmit a fixed part 5 patch?
->
-> It's probably best to send out a new version of the whole series.
-> Include all the Reviewed-by tags and then that should be the last
-> version and Palmer can apply that series directly.
+When QEMU is compiled with -O0, these functions are inlined
+which will cause a wrong restart address generated for the TB.
 
-Ya, that's the best way to do it.  That way everyone is on the same page about 
-exactly what is going in.
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ target/hppa/op_helper.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 6bf478e7b0..268caaaa20 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -81,10 +81,8 @@ static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
+ }
+ 
+ static void do_stby_b(CPUHPPAState *env, target_ulong addr, target_ureg val,
+-                      bool parallel)
++                      bool parallel, uintptr_t ra)
+ {
+-    uintptr_t ra = GETPC();
+-
+     switch (addr & 3) {
+     case 3:
+         cpu_stb_data_ra(env, addr, val, ra);
+@@ -109,20 +107,18 @@ static void do_stby_b(CPUHPPAState *env, target_ulong addr, target_ureg val,
+ 
+ void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ureg val)
+ {
+-    do_stby_b(env, addr, val, false);
++    do_stby_b(env, addr, val, false, GETPC());
+ }
+ 
+ void HELPER(stby_b_parallel)(CPUHPPAState *env, target_ulong addr,
+                              target_ureg val)
+ {
+-    do_stby_b(env, addr, val, true);
++    do_stby_b(env, addr, val, true, GETPC());
+ }
+ 
+ static void do_stby_e(CPUHPPAState *env, target_ulong addr, target_ureg val,
+-                      bool parallel)
++                      bool parallel, uintptr_t ra)
+ {
+-    uintptr_t ra = GETPC();
+-
+     switch (addr & 3) {
+     case 3:
+         /* The 3 byte store must appear atomic.  */
+@@ -151,13 +147,13 @@ static void do_stby_e(CPUHPPAState *env, target_ulong addr, target_ureg val,
+ 
+ void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ureg val)
+ {
+-    do_stby_e(env, addr, val, false);
++    do_stby_e(env, addr, val, false, GETPC());
+ }
+ 
+ void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
+                              target_ureg val)
+ {
+-    do_stby_e(env, addr, val, true);
++    do_stby_e(env, addr, val, true, GETPC());
+ }
+ 
+ target_ureg HELPER(probe)(CPUHPPAState *env, target_ulong addr,
+-- 
+2.20.1
