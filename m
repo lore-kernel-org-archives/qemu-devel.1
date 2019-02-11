@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38521)
+Received: from eggs.gnu.org ([209.51.188.92]:38621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOf-0005or-9X
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:58 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOh-0005rM-58
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOe-0004xQ-6A
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:57 -0500
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:33569)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOf-00050u-CV
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:59 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46111)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtLOb-0004SF-5T
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:54 -0500
-Received: by mail-pl1-x631.google.com with SMTP id y10so347039plp.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:19 -0800 (PST)
+	id 1gtLOe-0004kH-Ub
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:57 -0500
+Received: by mail-pl1-x642.google.com with SMTP id o6so315373pls.13
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 15:52:43 -0800
-Message-Id: <20190211235258.542-14-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 15:52:57 -0800
+Message-Id: <20190211235258.542-28-richard.henderson@linaro.org>
 In-Reply-To: <20190211235258.542-1-richard.henderson@linaro.org>
 References: <20190211235258.542-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 13/28] target/arm: Implement the SUBP
- instruction
+Subject: [Qemu-devel] [PATCH v3 27/28] target/arm: Enable MTE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +29,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Fix extraction length.
----
- target/arm/translate-a64.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ target/arm/cpu.c   | 10 ++++++++++
+ target/arm/cpu64.c |  1 +
+ 2 files changed, 11 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 791bcc3b66..2339556320 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5139,19 +5139,39 @@ static void handle_crc32(DisasContext *s,
-  */
- static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
- {
--    unsigned int sf, rm, opcode, rn, rd;
-+    unsigned int sf, rm, opcode, rn, rd, setflag;
-     sf = extract32(insn, 31, 1);
-+    setflag = extract32(insn, 29, 1);
-     rm = extract32(insn, 16, 5);
-     opcode = extract32(insn, 10, 6);
-     rn = extract32(insn, 5, 5);
-     rd = extract32(insn, 0, 5);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index decf95de3e..a5599ae19f 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -206,6 +206,16 @@ static void arm_cpu_reset(CPUState *s)
+          * make no difference to the user-level emulation.
+          */
+         env->cp15.tcr_el[1].raw_tcr = (3ULL << 37);
++        /* Enable MTE allocation tags.  */
++        env->cp15.hcr_el2 |= HCR_ATA;
++        env->cp15.scr_el3 |= SCR_ATA;
++        env->cp15.sctlr_el[1] |= SCTLR_ATA0;
++        /* Enable synchronous tag check failures.  */
++        env->cp15.sctlr_el[1] |= 1ull << 38;
++#ifdef TARGET_AARCH64
++        /* Set MTE seed to non-zero value, otherwise RandomTag fails.  */
++        env->cp15.rgsr_el1 = 0x123400;
++#endif
+ #else
+         /* Reset into the highest available EL */
+         if (arm_feature(env, ARM_FEATURE_EL3)) {
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 53a7d92c95..7bd761b8f5 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -352,6 +352,7 @@ static void aarch64_max_initfn(Object *obj)
  
--    if (extract32(insn, 29, 1)) {
-+    if (setflag && opcode != 0) {
-         unallocated_encoding(s);
-         return;
-     }
+         t = cpu->isar.id_aa64pfr1;
+         t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
++        t = FIELD_DP64(t, ID_AA64PFR1, MTE, 2);
+         cpu->isar.id_aa64pfr1 = t;
  
-     switch (opcode) {
-+    case 0: /* SUBP(S) */
-+        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
-+            goto do_unallocated;
-+        } else {
-+            TCGv_i64 tcg_n, tcg_m, tcg_d;
-+
-+            tcg_n = read_cpu_reg_sp(s, rn, true);
-+            tcg_m = read_cpu_reg_sp(s, rm, true);
-+            tcg_gen_sextract_i64(tcg_n, tcg_n, 0, 56);
-+            tcg_gen_sextract_i64(tcg_m, tcg_m, 0, 56);
-+            tcg_d = cpu_reg(s, rd);
-+
-+            if (setflag) {
-+                gen_sub_CC(true, tcg_d, tcg_n, tcg_m);
-+            } else {
-+                tcg_gen_sub_i64(tcg_d, tcg_n, tcg_m);
-+            }
-+        }
-+        break;
-     case 2: /* UDIV */
-         handle_div(s, false, sf, rm, rn, rd);
-         break;
+         t = cpu->isar.id_aa64mmfr1;
 -- 
 2.17.2
