@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46816)
+Received: from eggs.gnu.org ([209.51.188.92]:46916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gt99A-0004ya-KE
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:09 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gt99W-00057U-Ca
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gt999-0001Ug-SS
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:08 -0500
-Date: Mon, 11 Feb 2019 11:48:59 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190211114859.76109aa3.cohuck@redhat.com>
-In-Reply-To: <20190201092356.295925c2.cohuck@redhat.com>
-References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
-	<20190131185621.28815291.cohuck@redhat.com>
-	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
-	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
-	<aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
-	<cfe20aba-2f80-f8cb-66df-f9958bdf61f6@redhat.com>
-	<20190201092356.295925c2.cohuck@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1gt99V-0001ge-Ae
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:30 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:38278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gt99V-0001au-4z
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:29 -0500
+Received: by mail-qt1-f193.google.com with SMTP id 2so11553416qtb.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 02:49:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
- the pci stub file
+References: <20190208181226.24052-1-marcandre.lureau@redhat.com>
+	<CAFEAcA9svK-RARyicVQbyBi+8py6-ZxOTFUjgB4L8Wg_DNTaqw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9svK-RARyicVQbyBi+8py6-ZxOTFUjgB4L8Wg_DNTaqw@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 11 Feb 2019 11:49:09 +0100
+Message-ID: <CAMxuvazBdkHYWwQRAj1aP4=oJwBhcFAGTeCmEVQ+kZyyUnQvJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] RFC: net/slirp: link with libslirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On Fri, 1 Feb 2019 09:23:56 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Hi
 
-> On Fri, 1 Feb 2019 07:46:40 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
+On Sun, Feb 10, 2019 at 10:37 PM Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+>
+> On Fri, 8 Feb 2019 at 20:44, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > Once libslirp has received its first release, we can link with the
+> > external libslirp library.
+> >
+> > The migration data should be compatible with current and older qemu
+> > versions (same compatibility as today). See "slirp: add state
+> > saving/loading" patch. However, the content should be treated as a
+> > blob, as the format may change eventually in the future.
+>
+> Could you elaborate a bit on what you mean by "the format
+> might change" ? It's not clear to me what libslirp's API/ABI
+> guarantees are here to ensure that QEMU can retain cross-QEMU-version
+> migration compatibility and that QEMU version X with libslirp
+> version Y can migrate both to and from QEMU version X with
+> libslirp version Z.
 
-> > So I see two options now:
-> > 
-> > 1) Finally really make the device optional, at least for new machine
-> > types, so we can really disable CONFIG_PCI and get a working executable.
-> > 
-> > 2) Scratch the idea completely to make this optional, always link the
-> > s390-pci-bus.o and s390-pci-inst.o files unconditionally, and remove the
-> > s390-pci-stub.c file.
-> > 
-> > I assume options 2 is preferred, since we likely rather want to move
-> > into the PCI direction in the long run, instead of ignoring it...  
-> 
-> I think both options are viable, but option 1 is of course more work.
-> The win there is that we could disable an entire subsystem.
-> 
-> I guess that the basic questions are: How important is it that
-> subsystems can be compiled out, and do we see a use case for a pci-less
-> s390 machine in the future? We really don't want to spend much time on
-> something of dubious use...
+So far, the migration code should be 1:1 with existing qemu code. It's
+tricky to tell the compatibility on existing code, but the saved
+bitstream version_id is 4, and it can load some older versions (I am
+not sure all the way down to original migration code).
 
-Any thoughts on this?
+QEMU bitstream version shouldn't be relevant here, as qemu will get
+and provide a binary blob.
 
-I'm currently tending towards option 2 (and can cook up a patch for
-that). Unless someone is already working on option 1 :)
+libslirp should aim at keeping compatibility with its own older
+bitstreams. A newer version will fail to be read with a library that
+doesn't support it.
 
-Of course, I can also apply the original patch, but the end result is
-not very useful...
+Does that sound correct?
+
+thanks
