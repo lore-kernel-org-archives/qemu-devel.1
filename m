@@ -1,21 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41780)
+Received: from eggs.gnu.org ([209.51.188.92]:42717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtFmf-0006sZ-UK
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:54:23 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtFqB-0008Cb-BS
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtFmf-0004eU-4L
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:54:21 -0500
-Date: Mon, 11 Feb 2019 18:54:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190211175410.GI8135@linux.fritz.box>
-References: <20181221165341.23736-1-vsementsov@virtuozzo.com>
-	<20181221165341.23736-2-vsementsov@virtuozzo.com>
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtFqA-0006e1-Ck
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:57:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36756
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gtFq8-0006ZF-Fw
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:57:56 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1BHnCrq134449
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 12:57:41 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qkc6f5hj2-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 12:57:41 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Mon, 11 Feb 2019 17:57:40 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-6-git-send-email-jjherne@linux.ibm.com>
+	<20190204114537.0ddb236a.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Mon, 11 Feb 2019 12:57:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221165341.23736-2-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: move to QOM path for
- x-block-latency-histogram-set
+In-Reply-To: <20190204114537.0ddb236a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <d6de7984-bd51-ebfb-a6eb-32759faeab12@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 05/15] s390-bios: Factor finding boot
+ device out of virtio code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +46,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, pizhenwei@bytedance.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Am 21.12.2018 um 17:53 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Move to way of device selecting, however fall back to device name if
-> path is not found.
+On 2/4/19 5:45 AM, Cornelia Huck wrote:
+> On Tue, 29 Jan 2019 08:29:12 -0500
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block-core.json |  4 ++--
->  blockdev.c           | 22 +++++++++++++++-------
->  2 files changed, 17 insertions(+), 9 deletions(-)
+>> Make a new routine find_boot_device to locate the boot device for all
+>> cases. not just virtio.
 > 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 762000f31f..bb70c51a57 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -489,7 +489,7 @@
->  # If only @device parameter is specified, remove all present latency histograms
->  # for the device. Otherwise, add/reset some of (or all) latency histograms.
->  #
-> -# @device: device name to set latency histogram for.
-> +# @id: The QOM path or name of the guest device.
->  #
->  # @boundaries: list of interval boundary values (see description in
->  #              BlockLatencyHistogramInfo definition). If specified, all
-> @@ -547,7 +547,7 @@
->  # <- { "return": {} }
->  ##
->  { 'command': 'x-block-latency-histogram-set',
-> -  'data': {'device': 'str',
-> +  'data': {'id': 'str',
->             '*boundaries': ['uint64'],
->             '*boundaries-read': ['uint64'],
->             '*boundaries-write': ['uint64'],
-> diff --git a/blockdev.c b/blockdev.c
-> index a6f71f9d83..ff0d8ded5e 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -4397,21 +4397,29 @@ void qmp_x_blockdev_set_iothread(const char *node_name, StrOrNull *iothread,
->  }
->  
->  void qmp_x_block_latency_histogram_set(
-> -    const char *device,
-> +    const char *id,
->      bool has_boundaries, uint64List *boundaries,
->      bool has_boundaries_read, uint64List *boundaries_read,
->      bool has_boundaries_write, uint64List *boundaries_write,
->      bool has_boundaries_flush, uint64List *boundaries_flush,
->      Error **errp)
->  {
-> -    BlockBackend *blk = blk_by_name(device);
->      BlockAcctStats *stats;
->      int ret;
-> +    Error *local_err = NULL;
-> +    BlockBackend *blk = blk_by_qdev_id(id, &local_err);
->  
->      if (!blk) {
-> -        error_setg(errp, "Device '%s' not found", device);
-> -        return;
-> +        blk = blk_by_name(id);
-> +        if (!blk) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        } else {
-> +            error_free(local_err);
-> +            local_err = NULL;
-> +        }
->      }
+> s/cases./cases,/
+> 
+>>
+>> In one case no boot device is specified and a suitable boot device can not
+>> be auto detected. The error message for this case was specific to virtio
+>> devices. We update this message to remove virtio specific wording.
+> 
+> "The error message for the case where no boot device has been specified
+> and a suitable boot device cannot be auto detected was specific to
+> virtio devices. We update..."
+> 
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/main.c  | 87 ++++++++++++++++++++++++++----------------------
+>>   tests/boot-serial-test.c |  2 +-
+>>   2 files changed, 49 insertions(+), 40 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>> index 7e3f65e..2457752 100644
+>> --- a/pc-bios/s390-ccw/main.c
+>> +++ b/pc-bios/s390-ccw/main.c
+>> @@ -55,17 +55,18 @@ unsigned int get_loadparm_index(void)
+>>    * NOTE: The global variable blk_schid is updated to contain the subchannel
+>>    * information.
+>>    */
+>> -static bool find_dev(Schib *schib, int dev_no)
+>> +static bool find_subch(int dev_no)
+> 
+> I'm wondering why you drop passing in the schib here? But OTOH, the
+> usage of global variables or not is a bit confused in the bios anyway...
+> 
 
-Why don't you use qmp_get_blk() here?
+I dropped it as an argument because the schib was never used outside of find_dev. Seems to 
+make sense to make it a local variable in this case.
 
-Kevin
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
