@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37321)
+Received: from eggs.gnu.org ([209.51.188.92]:37307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05l-0005iu-9Q
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05l-0005ie-5M
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05i-0008Nk-Ed
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:01 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33991)
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05i-0008Np-G5
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:59 -0500
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:44318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gt05i-00083e-2s
+	id 1gt05i-0008Em-2E
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:08:58 -0500
-Received: by mail-pf1-x444.google.com with SMTP id j18so4472061pfe.1
-	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:08:39 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id p4so4492102plq.11
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:08:50 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 10 Feb 2019 17:08:08 -0800
-Message-Id: <20190211010829.29869-6-richard.henderson@linaro.org>
+Date: Sun, 10 Feb 2019 17:08:16 -0800
+Message-Id: <20190211010829.29869-14-richard.henderson@linaro.org>
 In-Reply-To: <20190211010829.29869-1-richard.henderson@linaro.org>
 References: <20190211010829.29869-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 05/26] target/arm: Extract TCMA with
- ARMVAParameters
+Subject: [Qemu-devel] [PATCH v2 13/26] target/arm: Implement the SUBP
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +33,56 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/internals.h | 1 +
- target/arm/helper.c    | 8 ++++++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+v2: Fix extraction length.
+---
+ target/arm/translate-a64.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 6c018e773c..2922324f63 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -959,6 +959,7 @@ typedef struct ARMVAParameters {
-     bool tbid       : 1;
-     bool epd        : 1;
-     bool hpd        : 1;
-+    bool tcma       : 1;
-     bool using16k   : 1;
-     bool using64k   : 1;
- } ARMVAParameters;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index e73bdbf041..cbe3500f78 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10447,7 +10447,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 2e0d797294..3e46ee6f69 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -5132,19 +5132,39 @@ static void handle_crc32(DisasContext *s,
+  */
+ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
  {
-     uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
-     uint32_t el = regime_el(env, mmu_idx);
--    bool tbi, tbid, epd, hpd, using16k, using64k;
-+    bool tbi, tbid, epd, hpd, tcma, using16k, using64k;
-     int select, tsz;
+-    unsigned int sf, rm, opcode, rn, rd;
++    unsigned int sf, rm, opcode, rn, rd, setflag;
+     sf = extract32(insn, 31, 1);
++    setflag = extract32(insn, 29, 1);
+     rm = extract32(insn, 16, 5);
+     opcode = extract32(insn, 10, 6);
+     rn = extract32(insn, 5, 5);
+     rd = extract32(insn, 0, 5);
  
-     /*
-@@ -10462,11 +10462,12 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         using16k = extract32(tcr, 15, 1);
-         if (mmu_idx == ARMMMUIdx_S2NS) {
-             /* VTCR_EL2 */
--            tbi = tbid = hpd = false;
-+            tbi = tbid = hpd = tcma = false;
-         } else {
-             tbi = extract32(tcr, 20, 1);
-             hpd = extract32(tcr, 24, 1);
-             tbid = extract32(tcr, 29, 1);
-+            tcma = extract32(tcr, 30, 1);
-         }
-         epd = false;
-     } else if (!select) {
-@@ -10477,6 +10478,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         tbi = extract64(tcr, 37, 1);
-         hpd = extract64(tcr, 41, 1);
-         tbid = extract64(tcr, 51, 1);
-+        tcma = extract64(tcr, 57, 1);
-     } else {
-         int tg = extract32(tcr, 30, 2);
-         using16k = tg == 1;
-@@ -10486,6 +10488,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         tbi = extract64(tcr, 38, 1);
-         hpd = extract64(tcr, 42, 1);
-         tbid = extract64(tcr, 52, 1);
-+        tcma = extract64(tcr, 58, 1);
+-    if (extract32(insn, 29, 1)) {
++    if (setflag && opcode != 0) {
+         unallocated_encoding(s);
+         return;
      }
-     tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
-     tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
-@@ -10497,6 +10500,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         .tbid = tbid,
-         .epd = epd,
-         .hpd = hpd,
-+        .tcma = tcma,
-         .using16k = using16k,
-         .using64k = using64k,
-     };
+ 
+     switch (opcode) {
++    case 0: /* SUBP(S) */
++        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
++            goto do_unallocated;
++        } else {
++            TCGv_i64 tcg_n, tcg_m, tcg_d;
++
++            tcg_n = read_cpu_reg_sp(s, rn, true);
++            tcg_m = read_cpu_reg_sp(s, rm, true);
++            tcg_gen_sextract_i64(tcg_n, tcg_n, 0, 56);
++            tcg_gen_sextract_i64(tcg_m, tcg_m, 0, 56);
++            tcg_d = cpu_reg(s, rd);
++
++            if (setflag) {
++                gen_sub_CC(true, tcg_d, tcg_n, tcg_m);
++            } else {
++                tcg_gen_sub_i64(tcg_d, tcg_n, tcg_m);
++            }
++        }
++        break;
+     case 2: /* UDIV */
+         handle_div(s, false, sf, rm, rn, rd);
+         break;
 -- 
 2.17.2
