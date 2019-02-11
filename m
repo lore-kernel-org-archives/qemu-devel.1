@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38730)
+Received: from eggs.gnu.org ([209.51.188.92]:38765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOj-0005u9-D6
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOk-0005uU-1r
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOf-00050M-7D
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOg-00054N-Dp
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:01 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:32788)
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46747)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtLOe-0004bZ-PO
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:56 -0500
-Received: by mail-pf1-x444.google.com with SMTP id c123so349286pfb.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:31 -0800 (PST)
+	id 1gtLOf-0004gJ-Ko
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:58 -0500
+Received: by mail-pf1-x442.google.com with SMTP id g6so313846pfh.13
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:33 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 15:52:52 -0800
-Message-Id: <20190211235258.542-23-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 15:52:54 -0800
+Message-Id: <20190211235258.542-25-richard.henderson@linaro.org>
 In-Reply-To: <20190211235258.542-1-richard.henderson@linaro.org>
 References: <20190211235258.542-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 22/28] tcg: Introduce target-specific page
- data for user-only
+Subject: [Qemu-devel] [PATCH v3 24/28] target/arm: Create tagged ram when
+ MTE is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,155 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-At the same time, remember MAP_SHARED as PAGE_SHARED.  When mapping
-new pages, make sure that old target-specific page data is removed.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-all.h    | 10 ++++++++--
- accel/tcg/translate-all.c | 28 ++++++++++++++++++++++++++++
- linux-user/mmap.c         | 10 ++++++++--
- linux-user/syscall.c      |  4 ++--
- 4 files changed, 46 insertions(+), 6 deletions(-)
+ target/arm/cpu.h |  4 ++++
+ hw/arm/virt.c    | 33 +++++++++++++++++++++++++++++++++
+ target/arm/cpu.c | 21 ++++++++++++++++++---
+ 3 files changed, 55 insertions(+), 3 deletions(-)
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index b16c9ec513..e88ecad0b3 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -244,10 +244,14 @@ extern intptr_t qemu_host_page_mask;
- #define PAGE_WRITE_ORG 0x0010
- /* Invalidate the TLB entry immediately, helpful for s390x
-  * Low-Address-Protection. Used with PAGE_WRITE in tlb_set_page_with_attrs() */
--#define PAGE_WRITE_INV 0x0040
-+#define PAGE_WRITE_INV 0x0020
-+/* Page is mapped shared.  */
-+#define PAGE_SHARED    0x0040
-+/* For use with page_set_flags: page is being replaced; target_data cleared. */
-+#define PAGE_RESET     0x0080
- #if defined(CONFIG_BSD) && defined(CONFIG_USER_ONLY)
- /* FIXME: Code that sets/uses this is broken and needs to go away.  */
--#define PAGE_RESERVED  0x0020
-+#define PAGE_RESERVED  0x0100
- #endif
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ca32939483..2626af4a9c 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -768,6 +768,9 @@ struct ARMCPU {
+     /* MemoryRegion to use for secure physical accesses */
+     MemoryRegion *secure_memory;
  
- #if defined(CONFIG_USER_ONLY)
-@@ -260,6 +264,8 @@ int walk_memory_regions(void *, walk_memory_regions_fn);
- int page_get_flags(target_ulong address);
- void page_set_flags(target_ulong start, target_ulong end, int flags);
- int page_check_range(target_ulong start, target_ulong len, int flags);
-+void *page_get_target_data(target_ulong address);
-+void *page_alloc_target_data(target_ulong address, size_t size);
- #endif
++    /* MemoryRegion to use for allocation tag accesses */
++    MemoryRegion *tag_memory;
++
+     /* For v8M, pointer to the IDAU interface provided by board/SoC */
+     Object *idau;
  
- CPUArchState *cpu_copy(CPUArchState *env);
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8f593b926f..6cc266428d 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -107,6 +107,7 @@ typedef struct PageDesc {
-     unsigned int code_write_count;
- #else
-     unsigned long flags;
-+    void *target_data;
- #endif
- #ifndef CONFIG_USER_ONLY
-     QemuSpin lock;
-@@ -2476,6 +2477,7 @@ int page_get_flags(target_ulong address)
- void page_set_flags(target_ulong start, target_ulong end, int flags)
- {
-     target_ulong addr, len;
-+    bool reset_target_data;
+@@ -2850,6 +2853,7 @@ int cpu_mmu_index(CPUARMState *env, bool ifetch);
+ typedef enum ARMASIdx {
+     ARMASIdx_NS = 0,
+     ARMASIdx_S = 1,
++    ARMASIdx_TAG = 2,
+ } ARMASIdx;
  
-     /* This function should never be called with addresses outside the
-        guest address space.  If this assert fires, it probably indicates
-@@ -2492,6 +2494,8 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
-     if (flags & PAGE_WRITE) {
-         flags |= PAGE_WRITE_ORG;
-     }
-+    reset_target_data = !(flags & PAGE_VALID) || (flags & PAGE_RESET);
-+    flags &= ~PAGE_RESET;
- 
-     for (addr = start, len = end - start;
-          len != 0;
-@@ -2505,10 +2509,34 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
-             p->first_tb) {
-             tb_invalidate_phys_page(addr, 0);
-         }
-+        if (reset_target_data && p->target_data) {
-+            g_free(p->target_data);
-+            p->target_data = NULL;
-+        }
-         p->flags = flags;
-     }
+ /* Return the Exception Level targeted by debug exceptions. */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 99c2b6e60d..dccd1345a1 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1260,6 +1260,21 @@ static void create_secure_ram(VirtMachineState *vms,
+     g_free(nodename);
  }
  
-+void *page_get_target_data(target_ulong address)
++static void create_tag_ram(VirtMachineState *vms, MachineState *machine,
++                           MemoryRegion *tag_sysmem)
 +{
-+    PageDesc *p = page_find(address >> TARGET_PAGE_BITS);
-+    return p ? p->target_data : NULL;
++    MemoryRegion *tagram = g_new(MemoryRegion, 1);
++    hwaddr base = vms->memmap[VIRT_MEM].base / 32;
++    hwaddr size = machine->ram_size / 32;
++
++    memory_region_init_ram(tagram, NULL, "mach-virt.tag", size, &error_fatal);
++    memory_region_add_subregion(tag_sysmem, base, tagram);
++
++    /* ??? Do we really need an fdt entry, or is MemTag enabled sufficient.  */
++    /* ??? We appear to need secure tag mem to go with secure mem.  */
++    /* ??? Does that imply we need a fourth address space?  */
 +}
 +
-+void *page_alloc_target_data(target_ulong address, size_t size)
-+{
-+    PageDesc *p = page_find(address >> TARGET_PAGE_BITS);
-+    void *ret = NULL;
-+
-+    if (p) {
-+        ret = p->target_data;
-+        if (!ret && (p->flags & PAGE_VALID)) {
-+            p->target_data = ret = g_malloc0(size);
-+        }
-+    }
-+    return ret;
-+}
-+
- int page_check_range(target_ulong start, target_ulong len, int flags)
+ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
  {
-     PageDesc *p;
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index e0249efe4f..0b786b87a2 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -562,7 +562,11 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+     const VirtMachineState *board = container_of(binfo, VirtMachineState,
+@@ -1362,6 +1377,7 @@ static void machvirt_init(MachineState *machine)
+     qemu_irq pic[NUM_IRQS];
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *secure_sysmem = NULL;
++    MemoryRegion *tag_sysmem = NULL;
+     int n, virt_max_cpus;
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+@@ -1518,6 +1534,20 @@ static void machvirt_init(MachineState *machine)
+                                      "secure-memory", &error_abort);
          }
+ 
++        /*
++         * The cpu adds the property iff MemTag is supported.
++         * If it is, we must allocate the ram to back that up.
++         */
++        if (object_property_find(cpuobj, "tag-memory", NULL)) {
++            if (!tag_sysmem) {
++                tag_sysmem = g_new(MemoryRegion, 1);
++                memory_region_init(tag_sysmem, OBJECT(machine),
++                                   "tag-memory", UINT64_MAX / 32);
++            }
++            object_property_set_link(cpuobj, OBJECT(tag_sysmem),
++                                     "tag-memory", &error_abort);
++        }
++
+         object_property_set_bool(cpuobj, true, "realized", &error_fatal);
+         object_unref(cpuobj);
      }
-  the_end1:
--    page_set_flags(start, start + len, prot | PAGE_VALID);
-+    if ((flags & MAP_TYPE) == MAP_SHARED) {
-+        prot |= PAGE_SHARED;
+@@ -1540,6 +1570,9 @@ static void machvirt_init(MachineState *machine)
+         create_secure_ram(vms, secure_sysmem);
+         create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
+     }
++    if (tag_sysmem) {
++        create_tag_ram(vms, machine, tag_sysmem);
 +    }
-+    prot |= PAGE_RESET | PAGE_VALID;
-+    page_set_flags(start, start + len, prot);
-  the_end:
- #ifdef DEBUG_MMAP
-     printf("ret=0x" TARGET_ABI_FMT_lx "\n", start);
-@@ -754,9 +758,11 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-         new_addr = -1;
-     } else {
-         new_addr = h2g(host_addr);
-+        /* FIXME: Move page flags (and target_data?) for each page.  */
-         prot = page_get_flags(old_addr);
-         page_set_flags(old_addr, old_addr + old_size, 0);
--        page_set_flags(new_addr, new_addr + new_size, prot | PAGE_VALID);
-+        page_set_flags(new_addr, new_addr + new_size,
-+                       prot | PAGE_VALID | PAGE_RESET);
+ 
+     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
+ 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index edf6e0e1f1..decf95de3e 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -851,6 +851,18 @@ void arm_cpu_post_init(Object *obj)
+ 
+     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
+                              &error_abort);
++
++#ifndef CONFIG_USER_ONLY
++    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) &&
++        cpu_isar_feature(aa64_mte, cpu)) {
++        object_property_add_link(obj, "tag-memory",
++                                 TYPE_MEMORY_REGION,
++                                 (Object **)&cpu->tag_memory,
++                                 qdev_prop_allow_set_link_before_realize,
++                                 OBJ_PROP_LINK_STRONG,
++                                 &error_abort);
++    }
++#endif
+ }
+ 
+ static void arm_cpu_finalizefn(Object *obj)
+@@ -1164,16 +1176,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     init_cpreg_list(cpu);
+ 
+ #ifndef CONFIG_USER_ONLY
++    cs->num_ases = 1;
+     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+         cs->num_ases = 2;
+-
+         if (!cpu->secure_memory) {
+             cpu->secure_memory = cs->memory;
+         }
+         cpu_address_space_init(cs, ARMASIdx_S, "cpu-secure-memory",
+                                cpu->secure_memory);
+-    } else {
+-        cs->num_ases = 1;
++    }
++    if (cpu->tag_memory != NULL) {
++        cs->num_ases = 3;
++        cpu_address_space_init(cs, ARMASIdx_TAG, "cpu-tag-memory",
++                               cpu->tag_memory);
      }
-     tb_invalidate_phys_range(new_addr, new_addr + new_size);
-     mmap_unlock();
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5bbb72f3d5..9d89b40321 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -3884,8 +3884,8 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
-     raddr=h2g((unsigned long)host_raddr);
+     cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
  
-     page_set_flags(raddr, raddr + shm_info.shm_segsz,
--                   PAGE_VALID | PAGE_READ |
--                   ((shmflg & SHM_RDONLY)? 0 : PAGE_WRITE));
-+                   PAGE_VALID | PAGE_SHARED | PAGE_RESET | PAGE_READ |
-+                   (shmflg & SHM_RDONLY ? 0 : PAGE_WRITE));
- 
-     for (i = 0; i < N_SHM_REGIONS; i++) {
-         if (!shm_regions[i].in_use) {
 -- 
 2.17.2
