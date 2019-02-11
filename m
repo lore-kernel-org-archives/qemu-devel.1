@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59433)
+Received: from eggs.gnu.org ([209.51.188.92]:38093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robin.jarry@6wind.com>) id 1gtF8K-0001g1-38
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:12:40 -0500
+	(envelope-from <farman@linux.ibm.com>) id 1gtFWi-0000AO-Tz
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robin.jarry@6wind.com>) id 1gtF5b-0005Qm-BQ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:09:52 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:35537)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <robin.jarry@6wind.com>)
-	id 1gtF5a-0005HM-Ss
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:09:51 -0500
-Received: by mail-wr1-x433.google.com with SMTP id t18so1225294wrx.2
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:09:46 -0800 (PST)
-Date: Mon, 11 Feb 2019 18:09:24 +0100
-From: Robin Jarry <robin.jarry@6wind.com>
-Message-ID: <20190211170924.uw6a6xyvmznk7w72@6wind.com>
+	(envelope-from <farman@linux.ibm.com>) id 1gtFWh-0005Cj-PZ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33662
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+	id 1gtFWg-0004rL-NE
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:50 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1BHYBHi086056
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 12:37:30 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qkcq5bdef-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 12:37:29 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+	Mon, 11 Feb 2019 17:37:29 -0000
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190206150016.6fdfaf8f.cohuck@redhat.com>
+	<1981d9bc-e950-62ef-d2d2-66a17771c8f4@linux.ibm.com>
+	<20190211171354.40be0856.cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Mon, 11 Feb 2019 12:37:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] -device ipmi-bmc-sim attached to -netdev vde
+In-Reply-To: <20190211171354.40be0856.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <75c1f24b-204d-d464-8466-8453f7a0f89c@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +46,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Hi,
 
-I have several QEMU VMs connected via a vde_switch (with "-netdev vde"
-interfaces). I use this to create virtual network topologies without
-requiring root access (i.e. no tap + bridge on host). Performance is not
-a concern here. To emulate "real" platforms, I would like one of the VMs
-to control the others via remote IPMI over this "vde" link without any
-implication of the host.
 
-The current implementation in QEMU does not seem to support this. I only
-found ways to create a "local" (i.e. only reachable from the guest
-itself) IPMI interface with "isa-ipmi-kcs" or "isa-ipmi-bt" devices. Or
-"remote" IPMI interfaces by using an external daemon that runs on the
-host [1]. This makes communication from one of the VMs to the others
-quite complex.
+On 02/11/2019 11:13 AM, Cornelia Huck wrote:
+> On Fri, 8 Feb 2019 16:19:58 -0500
+> Eric Farman <farman@linux.ibm.com> wrote:
+>>
+>> FWIW, I've been running with both series for the last week or two, along
+>> with some host kernel traces to prove things got executed the way I
+>> thought, and it's seemed to be working well.  So that makes me
+>> optimistic for the later patches.
+> 
+> That's good news, thanks for testing. Do you have a special test load
+> that you run in the guest that you can share?
+> 
 
-I am enclined to try an develop another IPMI device that can be
-"attached" to a -netdev with a dedicated mac address + IP configuration
-to support my use case.
+Not really.  Lately it's just fio, run via some ancient scripts which 
+randomize the input parameters and distill the output data.  If I get 
+some time to make it less hack-y it might be worth sharing, but right 
+now there's more things commented out than actual script.  :)
 
-However, this would be my first steps into QEMU code and I have a few
-questions first:
-
-- Did I miss something and is that already possible with the current
-  code base?
-- Is there another way to do this or is my idea completely stupid?
-- I am aware that allowing to "attach" a simplistic bmc (without any
-  authentication) to a netdev may be a security problem. This is not
-  a concern for me at the moment.
-- Could someone point me to what would need to be added for this? Do
-  I need to implement a new ipmi device type that accepts
-  a "netdev=<id>" argument? If so, would that make sense for this new
-  device to also accept mac-address and ip configuration for this IPMI
-  interface? Or does that need to go elsewhere?
-
-Thanks in advance for your guidance.
-
-[1] https://github.com/Zexi/vbmc-qemu
-
--- 
-Robin
+  - Eric
