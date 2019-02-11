@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45932)
+Received: from eggs.gnu.org ([209.51.188.92]:46784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtEWo-0003DI-SL
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gtEYp-0004yY-4d
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:36:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtEWm-0003vI-BU
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:53 -0500
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:45715)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gtEWk-0003qs-7O
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:52 -0500
-Received: by mail-ot1-x333.google.com with SMTP id 32so18416955ota.12
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 08:33:38 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gtEYo-00051a-95
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:35:59 -0500
+Date: Mon, 11 Feb 2019 17:21:30 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190211162038.GF8135@linux.fritz.box>
+References: <cover.1537984851.git.jcody@redhat.com>
+	<f490aa41-270b-ac46-f9eb-32d330828e2d@virtuozzo.com>
 MIME-Version: 1.0
-References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8-Hst3Buax1Qrrm1SVbTtkE-8a_Vj0y3N4TvfPTqR_zw@mail.gmail.com>
-	<CAFEAcA9Yh=fCuBT602deTt0OJQux9ZMGXvGX3Bx_iXNiTskNSA@mail.gmail.com>
-	<3b62bab9-db61-f40e-da52-561a0cd9ee25@redhat.com>
-In-Reply-To: <3b62bab9-db61-f40e-da52-561a0cd9ee25@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Feb 2019 16:33:26 +0000
-Message-ID: <CAFEAcA8=cKCUSshf8URKJWiBj26NEiBb5zEbsGz-faM-41R1Qg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/76] misc patches for 2019-02-04
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f490aa41-270b-ac46-f9eb-32d330828e2d@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Maintainership changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +23,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-On Mon, 11 Feb 2019 at 16:29, David Hildenbrand <david@redhat.com> wrote:
->
-> On 05.02.19 21:05, Peter Maydell wrote:
-> > This part looks like the usual "foo-softmmu/config-devices.mak isn't updated
-> > if a file that's #included from default-configs/foo-softmmu.mak is
-> > changed" dependency bug -- I guess the fix for that isn't in this
-> > patchset ?  The mips stuff is probably the same.
-> >
-> > I'll delete the config-devices.mak files by hand, which should
-> > suffice to get the build to go through.
-> >
->
-> ../hw/acpi/piix4.o: In function `piix4_pm_realize':
-> /home/dhildenb/git/qemu/hw/acpi/piix4.c:515: undefined reference to
-> `pm_smbus_init'
-> ../hw/i2c/smbus_ich9.o: In function `ich9_smbus_realize':
-> /home/dhildenb/git/qemu/hw/i2c/smbus_ich9.c:89: undefined reference to
-> `pm_smbus_init'
-> ../hw/pci-host/piix.o: In function `i440fx_update_memory_mappings':
-> /home/dhildenb/git/qemu/hw/pci-host/piix.c:149: undefined reference to
-> `pam_update'
-> ../hw/pci-host/piix.o: In function `i440fx_init':
-> /home/dhildenb/git/qemu/hw/pci-host/piix.c:416: undefined reference to
-> `init_pam'
-> /home/dhildenb/git/qemu/hw/pci-host/piix.c:419: undefined reference to
-> `init_pam'
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [Makefile:207: qemu-system-x86_64] Error 1
-> make: *** [Makefile:432: subdir-x86_64-softmmu] Error 2
->
->
-> Even after make clean + configure. Which step am I missing?
+Am 11.02.2019 um 16:03 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Hi, is there a reason why it's not merged?
+> 
+> Address jcody@redhat.com is not present anymore, at least it should be dropped
+> from MAINTAINERS.
 
-The "delete the config-devices.mak files by hand" step, I expect.
-(This is working around a very long standing bug in our makefiles
-which will be removed in passing by the KConfig work.)
+I don't think there is a reason, so I applied it to the block branch
+now.
 
-thanks
--- PMM
+Kevin
