@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51376)
+Received: from eggs.gnu.org ([209.51.188.92]:51789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gtGJb-0002Vc-7Z
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:28:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1gtGL7-0003zn-AY
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:29:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gtGJZ-0000z0-CZ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:28:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35732)
+	(envelope-from <berrange@redhat.com>) id 1gtGL6-0001Mx-1J
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:29:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gtGJZ-0000yA-3V
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:28:21 -0500
-References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
-	<20181220141553.24098-11-marcandre.lureau@redhat.com>
-	<461252a9-b095-9441-054c-bb9dd00f8cf5@redhat.com>
-	<20190107094555.es7xunsor2aud3k7@sirius.home.kraxel.org>
-	<CAJ+F1CKxmZdycF8q83ziSUB5Bnwk=NFASgfjJkEDsjuQ7vcSww@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2384878a-e9a2-ac4b-372d-9fdd493db5a1@redhat.com>
-Date: Mon, 11 Feb 2019 12:28:12 -0600
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtGL5-0001MS-PL
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:29:55 -0500
+Date: Mon, 11 Feb 2019 18:29:46 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190211182946.GN27585@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
+	<CAFEAcA9hWXR6ynuX8CvFA6AspAgruYiUsQYM0pJ0nNG4b1281w@mail.gmail.com>
+	<20190211170313.GK27585@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CKxmZdycF8q83ziSUB5Bnwk=NFASgfjJkEDsjuQ7vcSww@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5OoZBO13BqbAqZus8yT6LWbp2wRtJ5PJl"
-Subject: Re: [Qemu-devel] [PATCH v2 10/12] qapi: document DisplayType enum
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190211170313.GK27585@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/18] Chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5OoZBO13BqbAqZus8yT6LWbp2wRtJ5PJl
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
-Message-ID: <2384878a-e9a2-ac4b-372d-9fdd493db5a1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 10/12] qapi: document DisplayType enum
-References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
- <20181220141553.24098-11-marcandre.lureau@redhat.com>
- <461252a9-b095-9441-054c-bb9dd00f8cf5@redhat.com>
- <20190107094555.es7xunsor2aud3k7@sirius.home.kraxel.org>
- <CAJ+F1CKxmZdycF8q83ziSUB5Bnwk=NFASgfjJkEDsjuQ7vcSww@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKxmZdycF8q83ziSUB5Bnwk=NFASgfjJkEDsjuQ7vcSww@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/9/19 7:15 AM, Marc-Andr=C3=A9 Lureau wrote:
-
->>>>   # Display (user interface) type.
->>>>   #
->>>> +# @default: The default user interface.
->>>
->>> Any more hints on how this default is determined?  Is it a compile-ti=
-me
->>> decision, based on what libraries were linked in?
->>
->> Basically yes.  A bit more complicated due to modules.  gtk, sdl and
->> cocoa are checked, in that order.  And if none of them is available th=
-e
->> vnc server is enabled.
+On Mon, Feb 11, 2019 at 05:03:13PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Feb 08, 2019 at 11:44:42AM +0000, Peter Maydell wrote:
+> > On Thu, 7 Feb 2019 at 16:06, Marc-Andr=C3=A9 Lureau
+> > <marcandre.lureau@redhat.com> wrote:
+> > >
+> > > The following changes since commit 632351e0e1a861f2eaf709b053c53f96=
+a1225825:
+> > >
+> > >   Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-requ=
+est' into staging (2019-02-07 14:20:46 +0000)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://github.com/elmarco/qemu.git tags/chardev-pull-request
+> > >
+> > > for you to fetch changes up to df3afdedd23ade0c9de55cadeb1d85055689=
+023f:
+> > >
+> > >   tests/test-char: add muxed chardev testing for open/close (2019-0=
+2-07 16:18:25 +0100)
+> > >
+> > > ----------------------------------------------------------------
+> > > Various chardev fixes
+> > >
+> > > ----------------------------------------------------------------
+> >=20
+> > This seems to result in 'make check' failures on some platforms.
+> > I saw this on s390 and aarch32, I think.
+> >=20
+> > MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> > tests/test-char -m=3Dquick -k --tap < /dev/null |
+> > ./scripts/tap-driver.pl --test-name=3D"test-char
+> > "
+> > PASS 1 test-char /char/null
+> > PASS 2 test-char /char/invalid
+> > PASS 3 test-char /char/ringbuf
+> > PASS 4 test-char /char/mux
+> > PASS 5 test-char /char/stdio
+> > PASS 6 test-char /char/pipe
+> > PASS 7 test-char /char/file
+> > PASS 8 test-char /char/file-fifo
+> > PASS 9 test-char /char/udp
+> > PASS 10 test-char /char/serial
+> > PASS 11 test-char /char/hotswap
+> > PASS 12 test-char /char/websocket
+> > PASS 13 test-char /char/socket/server/mainloop/tcp
+> > PASS 14 test-char /char/socket/server/mainloop/unix
+> > PASS 15 test-char /char/socket/server/wait-conn/tcp
+> > PASS 16 test-char /char/socket/server/wait-conn/unix
+> > PASS 17 test-char /char/socket/server/mainloop-fdpass/tcp
+> > PASS 18 test-char /char/socket/server/mainloop-fdpass/unix
+> > PASS 19 test-char /char/socket/server/wait-conn-fdpass/tcp
+> > PASS 20 test-char /char/socket/server/wait-conn-fdpass/unix
+> > PASS 21 test-char /char/socket/client/mainloop/tcp
+> > PASS 22 test-char /char/socket/client/mainloop/unix
+> > qemu: qemu_mutex_destroy: Device or resource busy
+> > PASS 23 test-char /char/socket/client/wait-conn/tcp
+> > PASS 24 test-char /char/socket/client/wait-conn/unix
+> > Aborted (core dumped)
+> > ERROR - too few tests run (expected 32, got 24)
+> >=20
+> > Here's a backtrace from running tests/test-char under gdb.
+> > Looks like a race condition between a thread trying to
+> > destroy a mutex and a different thread that is still
+> > using it.
 >=20
+> Thanks, that is very useful. I can see the race condition here
+> now between qio_task_thread_worker and qio_task_thread_result.
+> I need to acquire the mutex in qio_task_thread_result in order
+> to sycnhronize with completion of qio_task_thread_worker.
+
+In testing this first bug, I found a second bug hiding where
+tcp_chr_wait_connected forget to de-register the pending
+reconnect timer GSource, leading to a later crash. We would
+not have seen this in the test suite except for me adding
+a sleep(1) in the right place by chance :-)
+
+I've sent a v3 series for Marc-Andr=C3=A9 to queue for a new PULL
+
+> > On some other hosts I saw a similar
+> > "qemu: qemu_mutex_destroy: Device or resource busy" and core dump in =
+the
+> > migration tests, I think, which is probably the same underlying bug.
 >=20
-> Eric, should I cram this comment there?: "(gtk, sdl and
-> cocoa are checked, in that order.  And if none of them is available the=
+> Yes, I expect it is the same problem
 
-> vnc server is enabled)"
+I'm confident this is the first problem i mention now.
 
-If you think the end user will benefit from reading that, then it is
-worth adding.  Wordsmithing a bit:
-
-@default: The default user interface, selecting from the first available
-of gtk, sdl, cocoa, and vnc.
-
-
+Regards,
+Daniel
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---5OoZBO13BqbAqZus8yT6LWbp2wRtJ5PJl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxhvr0ACgkQp6FrSiUn
-Q2r2HwgAlumD8+CSGYuBWpR/VjGnMF5qOTiFw7mbwn1wXMku0i8rK2e839Ad9FcV
-3xp3asZWEPXr2iJ6RrOZMrZame/G0RO+n0dkIqUxrVycs99NeDvBhxxaD2h3wBRs
-dEF6HmSrn0QQJdjXlh67KYG5c6UC7CoXgd5a4/3JZRvxYJJJIp6XwBR3mUqZI/IW
-GmJ8tJoDgKi09sz7GxsyZw4mwdFdrRxnLiejkL7LbZNegoqIKTHBiV2oVyQAgms8
-LLnT6uIoQJq2iPKGpyLXG9oF3qp+SkLbze7UbXScniK5R8STvKCBJ144yPVnQ742
-ylZWOqSNYkO2p/dNLQi8yp6DvsLz1Q==
-=9oLa
------END PGP SIGNATURE-----
-
---5OoZBO13BqbAqZus8yT6LWbp2wRtJ5PJl--
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
