@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45777)
+Received: from eggs.gnu.org ([209.51.188.92]:46816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gt945-0003QM-4b
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:43:53 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gt99A-0004ya-KE
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gt944-0007AK-Fn
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:43:53 -0500
-Date: Mon, 11 Feb 2019 11:43:29 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gt999-0001Ug-SS
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:49:08 -0500
+Date: Mon, 11 Feb 2019 11:48:59 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190211114329.3c976cf6.cohuck@redhat.com>
-In-Reply-To: <1549456893-16589-1-git-send-email-thuth@redhat.com>
-References: <1549456893-16589-1-git-send-email-thuth@redhat.com>
+Message-ID: <20190211114859.76109aa3.cohuck@redhat.com>
+In-Reply-To: <20190201092356.295925c2.cohuck@redhat.com>
+References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
+	<20190131185621.28815291.cohuck@redhat.com>
+	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
+	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
+	<aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
+	<cfe20aba-2f80-f8cb-66df-f9958bdf61f6@redhat.com>
+	<20190201092356.295925c2.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: Fix the confusing
- contributions-after-2012 license statements
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
+ the pci stub file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +30,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
 
-On Wed,  6 Feb 2019 13:41:33 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+On Fri, 1 Feb 2019 09:23:56 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> The license information in these files is rather confusing. The text
-> declares LGPL first, but then says that contributions after 2012 are
-> licensed under the GPL instead. How should the average user who just
-> downloaded the release tarball know which part is now GPL and which
-> is LGPL?
-> 
-> Looking at the text of the LGPL (see COPYING.LIB in the top directory),
-> the license clearly states how this should be done instead:
-> 
-> "3. You may opt to apply the terms of the ordinary GNU General Public
->  License instead of this License to a given copy of the Library. To do
->  this, you must alter all the notices that refer to this License, so
->  that they refer to the ordinary GNU General Public License, version 2,
->  instead of to this License."
-> 
-> Thus let's clean up the confusing statements and use the proper GPL
-> text only.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  linux-user/s390x/target_cpu.h | 19 ++++++++-----------
->  target/s390x/cpu.c            | 19 ++++++++-----------
->  target/s390x/cpu.h            | 19 ++++++++-----------
->  target/s390x/kvm.c            | 19 ++++++++-----------
->  4 files changed, 32 insertions(+), 44 deletions(-)
+> On Fri, 1 Feb 2019 07:46:40 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
 
-Thanks, applied.
+> > So I see two options now:
+> > 
+> > 1) Finally really make the device optional, at least for new machine
+> > types, so we can really disable CONFIG_PCI and get a working executable.
+> > 
+> > 2) Scratch the idea completely to make this optional, always link the
+> > s390-pci-bus.o and s390-pci-inst.o files unconditionally, and remove the
+> > s390-pci-stub.c file.
+> > 
+> > I assume options 2 is preferred, since we likely rather want to move
+> > into the PCI direction in the long run, instead of ignoring it...  
+> 
+> I think both options are viable, but option 1 is of course more work.
+> The win there is that we could disable an entire subsystem.
+> 
+> I guess that the basic questions are: How important is it that
+> subsystems can be compiled out, and do we see a use case for a pci-less
+> s390 machine in the future? We really don't want to spend much time on
+> something of dubious use...
+
+Any thoughts on this?
+
+I'm currently tending towards option 2 (and can cook up a patch for
+that). Unless someone is already working on option 1 :)
+
+Of course, I can also apply the original patch, but the end result is
+not very useful...
