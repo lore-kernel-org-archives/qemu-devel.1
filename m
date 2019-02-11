@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39801)
+Received: from eggs.gnu.org ([209.51.188.92]:40951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtFdj-0003YT-EA
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:45:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1gtFjL-0004w5-NO
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtFdi-000096-MY
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:45:07 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51029)
+	(envelope-from <bounces@canonical.com>) id 1gtFjJ-0002om-Vh
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:50:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtFdi-00008h-FL
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:45:06 -0500
-Received: by mail-wm1-f68.google.com with SMTP id x7so126682wmj.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:45:06 -0800 (PST)
-References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
-	<1549694366-1284-19-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <89cf88a6-d3c4-3034-02c2-13f1d0636f0c@redhat.com>
-Date: Mon, 11 Feb 2019 18:45:03 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gtFjJ-0002je-Od
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:50:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gtFj2-0004pz-T6
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 17:50:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D90B12E80C7
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 17:50:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1549694366-1284-19-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 18/25] hw/arm: Express dependencies of
- canon-a1100 with Kconfig
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Feb 2019 17:38:47 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <154990672772.19204.9165836837549456033.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
+ emulation failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +37,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com, qemu-arm@nongnu.org, Antony Pavlov <antonynpavlov@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 2/9/19 7:39 AM, Thomas Huth wrote:
-> Add Kconfig dependencies for the DIGIC / canon-a1100 machine.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Hmm, I've also just hit this in a nest:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+KVM internal error. Suberror: 1
+emulation failure
+EAX=3D00000001 EBX=3D000f7874 ECX=3D00000002 EDX=3D00000001
+ESI=3D7ffbdca4 EDI=3D000069f2 EBP=3D000069b2 ESP=3D000a8000
+EIP=3D000fd099 EFL=3D00010046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HLT=
+=3D0
+ES =3D0010 00000000 ffffffff 00c09300
+CS =3D0000 00000000 00000fff 00809b00
+SS =3D0010 00000000 ffffffff 00c09300
+DS =3D0010 00000000 ffffffff 00c09300
+FS =3D0010 00000000 ffffffff 00c09300
+GS =3D0010 00000000 ffffffff 00c09300
+LDT=3D0000 00000000 0000ffff 00008200
+TR =3D0000 00000000 0000ffff 00008b00
+GDT=3D     10387cfe 0000fe6c
+IDT=3D     0010387c 00003810
+CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
+0000000000000000
+DR6=3D00000000ffffcffc DR7=3D000000000e1e0400
+EFER=3D0000000000000000
+Code=3Dcb 66 ba 8f d0 0f 00 e9 ce fe bc 00 80 0a 00 e8 24 4d ff ff <0f> aa =
+fa fc 66 ba a8 d0 0f 00 e9 b7 fe f3 90 f0 0f ba 2d 7c 4f 0f 00 00 72 f3 8b =
+25 78 4f
+^Cqemu-system-x86_64: terminating on signal 2
 
-> ---
->  default-configs/arm-softmmu.mak | 2 +-
->  hw/arm/Kconfig                  | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 6605786..20fcbcb 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -28,12 +28,12 @@ CONFIG_ASPEED_SOC=y
->  CONFIG_NETDUINO2=y
->  CONFIG_MPS2=y
->  CONFIG_RASPI=y
-> +CONFIG_DIGIC=y
->  
->  CONFIG_VGA=y
->  CONFIG_SSI_M25P80=y
->  CONFIG_IMX_FEC=y
->  
-> -CONFIG_DIGIC=y
->  CONFIG_NRF51_SOC=y
->  
->  CONFIG_FSL_IMX6=y
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 6b1522f..617a460 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -31,6 +31,7 @@ config CUBIEBOARD
->  config DIGIC
->      bool
->      select PTIMER
-> +    select PFLASH_CFI02
->  
->  config EXYNOS4
->      bool
-> 
+given thw EIP I suspect the address is actually in seabios.
+
+Host: Fedora 29, 4.20.5-200.fc29.x86_64, qemu 3.0.0 on i7-8650U
+L1: Fedora 29, 5.0.0-0.rc4.git2.2.fc30.x86_64 (and also 4.20), qemu head
+L2: Doesn't even seem to need a useful guest
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
+
+Title:
+  KVM internal error. Suberror: 1 emulation failure
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello Devs.
+
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
+
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+
+  Someone has an idea whats going wrong here?
+
+  thanks and cheers
+  t.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
