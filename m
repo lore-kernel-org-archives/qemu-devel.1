@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48128)
+Received: from eggs.gnu.org ([209.51.188.92]:48283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gtGCL-0004tV-3y
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGCP-0004wN-Uc
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gtGCI-0004XU-Um
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:52 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:59183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1gtGCI-00048A-Ku
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:50 -0500
-From: Sven Schnelle <svens@stackframe.org>
-Date: Mon, 11 Feb 2019 19:19:05 +0100
-Message-Id: <20190211181907.2219-4-svens@stackframe.org>
-In-Reply-To: <20190211181907.2219-2-svens@stackframe.org>
-References: <20190211181907.2219-2-svens@stackframe.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGCN-0004ed-DZ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:57 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 11 Feb 2019 18:20:18 +0000
+Message-ID: <fdd19ec1-beba-3ec1-e9f0-5d348b596ee3@virtuozzo.com>
+References: <20190131010136.12007-1-jsnow@redhat.com>
+	<bd72a7c8-e283-dd3a-66e8-ba50873a8717@virtuozzo.com>
+	<67cd0ccf-a9ce-9a72-0676-1ab6a33a7e03@redhat.com>
+In-Reply-To: <67cd0ccf-a9ce-9a72-0676-1ab6a33a7e03@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <439CFED6D2A25647BAFAB962F297D5C6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/5] target/hppa: fix log conditions
+Subject: Re: [Qemu-devel] [PATCH] block/dirty-bitmap: Documentation and
+ Comment fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Max Reitz <mreitz@redhat.com>
 
-Now that do_cond() uses sign overflow for some condition matches we
-need to roll our own version without sign overflow checks.
-
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
----
- target/hppa/translate.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
-
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 0e8cc8117a..bce8773b1a 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -996,12 +996,35 @@ static DisasCond do_sub_cond(unsigned cf, TCGv_reg res,
- 
- static DisasCond do_log_cond(unsigned cf, TCGv_reg res)
- {
-+    DisasCond cond;
-+    TCGv_reg tmp;
-+
-     switch (cf >> 1) {
--    case 4: case 5: case 6:
--        cf &= 1;
-+    case 0: /* never */
-+        cond = cond_make_f();
-+        break;
-+    case 1: /* = all bits are zero */
-+        cond = cond_make_0(TCG_COND_EQ, res);
-+        break;
-+    case 2: /* < leftmost bit is 1 */
-+        cond = cond_make_0(TCG_COND_LT, res);
-+        break;
-+    case 3: /* <= leftmost bit is 1 or all bits 0 */
-+        cond = cond_make_0(TCG_COND_LE, res);
-+        break;
-+    case 7: /* OD rightmost bit is 1 */
-+        tmp = tcg_temp_new();
-+        tcg_gen_andi_reg(tmp, res, 1);
-+        cond = cond_make_0(TCG_COND_NE, tmp);
-+        tcg_temp_free(tmp);
-+        break;
-+    default:
-         break;
-     }
--    return do_cond(cf, res, res, res);
-+    if (cf & 1) {
-+        cond.c = tcg_invert_cond(cond.c);
-+    }
-+    return cond;
- }
- 
- /* Similar, but for shift/extract/deposit conditions.  */
--- 
-2.20.1
+MDIuMDIuMjAxOSA0OjAxLCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMS8zMS8xOSAz
+OjI5IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4NCj4+IEFib3V0
+IEBmcm96ZW4gYW5kIEBsb2NrZWQsIHdlIGNhbiBhbHNvIG5vdGUgdGhhdCB0aGV5IGNhbid0IGJl
+IGV4cG9ydGVkIHRocm91Z2ggTkJELg0KPj4gV2UgY2FuIHN1bW1hcml6ZSwgdGhhdCBAZnJvemVu
+IGFuZCBAbG9ja2VkIG1lYW5zIHRoYXQgdXNlciBjYW4ndCB1c2UgdGhlbSBpbiBhbnkNCj4+IGNv
+bW1hbmQsIGFuZCB0aGUgb25seSBvcHRpb24gaXMgdG8gbGlzdCB0aGVtLiBIb3dldmVyIGV2ZW4g
+aW5mby0+Y291bnQgaW5mb3JtYXRpb24NCj4+IHNob3VsZCBub3QgYmUgY29uc2lkZXJlZCBhcyBz
+b21ldGhpbmcgbWVhbmluZ2Z1bCwgYXMgYml0bWFwcyBhcmUgdW5kZXIgc29tZSBvcGVyYXRpb25z
+Lg0KPj4gQW5kIHdlIGNhbiBhbHNvIHVzZSBzYW1lIHBhcmFncmFwaCBmb3IgQGZyb3plbiBhbmQg
+QGxvY2tlZCwgYXMgYSBmaXJzdCBzdGVwIHRvIEBmcm96ZW4NCj4+IGRlcHJlY2F0aW9uLg0KPiAN
+Cj4gVGhlcmUncyBhIHN1YnRsZSBkaWZmZXJlbmNlIGluIHRoZSB0d28sIG5hbWVseSB0aGF0Og0K
+PiANCj4gKDEpIEZyb3plbiBtYXkgb3IgbWF5IG5vdCByZWNvcmQgbmV3IHdyaXRlcywgYnV0IHRo
+ZXkgZG9uJ3QgInNob3cgdXAiDQo+IHVudGlsIGFmdGVyIHRoZSBvcGVyYXRpb24gaXMgb3Zlciwg
+YmVjYXVzZSBpdCdzIHVzaW5nIGEgc2Vjb25kIGJpdG1hcCBhcw0KPiBhIHRlbXBvcmFyeSBidWZm
+ZXIuDQo+IA0KPiAoMikgTG9ja2VkIG1heSBvciBtYXkgbm90IHJlY29yZCBuZXcgd3JpdGVzICpp
+bW1lZGlhdGVseSouDQo+IA0KPiBSZWdhcmRsZXNzLCBJJ20gcmVhbGl6aW5nIHRoYXQgZm9yIGJv
+dGggRnJvemVuIGFuZCBMb2NrZWQgYml0bWFwcyB3ZQ0KPiB3YW50IHRvIGFsbG93IHVzZXJzIHRv
+IGtub3cgaWYgdGhlIGJpdG1hcCBpcyByZWNvcmRpbmcgb3Igbm90LiAoQW5kDQo+IHBvc3NpYmx5
+IGlmIHRoZXJlIGlzIGEgdGVtcG9yYXJ5IHdyaXRlIGNhY2hlIG9yIG5vdCwgYnV0IG1heWJlIGl0
+J3Mgbm90DQo+IGltcG9ydGFudC4pDQo+IA0KPiBNYXliZSB3ZSB3YW50IHR3byBuZXcgZmllbGRz
+IG9uIHF1ZXJ5Og0KPiANCj4gUmVjb3JkaW5nL0VuYWJsZWQ6IFtUcnVlIHwgRmFsc2VdDQo+IEJ1
+c3kvTG9ja2VkOiAgICAgICBbVHJ1ZSB8IEZhbHNlXSAob3IgIkxvY2tlZCkNCj4gDQo+IHdoaWNo
+IHdpbGwgdGhlbiBkZXByZWNhdGUgdGhlIHN0YXR1cyBmaWVsZC4gVGhpcyBkb2Vzbid0IG1hbmFn
+ZSB0bw0KPiBjb21tdW5pY2F0ZSB0aGUgd3JpdGUgY2FjaGUgbnVhbmNlLCBidXQgbWF5YmUgd2Ug
+ZG9uJ3QgbmVlZCB0by4NCg0KQWdyZWUuDQoNCj4gDQo+IChJdCBhbHNvIGRvZXNuJ3QgaGVscCBl
+bHVjaWRhdGUgd2hldGhlciBvciBub3QgdGhlIHN1Y2Nlc3NvciBpcw0KPiBhY3RpdmUvZGlzYWJs
+ZWQsIGJ1dCBldmVuIGZvciBtaWdyYXRpb24gb25jZSB0aGUgZ3Vlc3QgaGFzIHN0YXJ0ZWQsIHRo
+ZQ0KPiBzdWNjZXNzb3JzIGFyZSBhbHdheXMgZW5hYmxlZCwgcmlnaHQ/KQ0KPiANCj4gVGhvdWdo
+dHM/DQo+IA0KDQpIbW1tLCBpdCdzIGFsbCByZWFsbHkgcXVlc3Rpb25hYmxlLg0KDQpXaGF0IHdl
+IHdhbnQgdG8gZXhwb3JvdCBhYm91dCBiaXRtYXBzPw0KDQpBLiBGb3Igbm90LWxvY2tlZCwgbm90
+LWZyb3plbjoNCg0KSXQncyBvYnZpb3VzIGVub3VnaDogd2Ugd2FudCB0byBzYXkgdGhhdCBiaXRt
+YXAgaXMgbm90IGxvY2tlZCBhbmQgYXZhaWxhYmxlIGZvcg0KYW55IG9wZXJhdGlvbiwgYW5kIGFs
+bCBpbmZvcm1hdGlvbiB3ZSBoYXZlLCBpcyBpdCBkaXNhYmxlZCBvciBub3QsIGRpcnR5IGNvdW50
+LCBldGMuDQoNClNvIHdlIGhhdmUgdHdvIHBvc3NpYmxlIHN0YXRlcyBoZXJlOg0KKG5vdC1sb2Nr
+ZWQsIGRpc2FibGVkKQ0KKG5vdC1sb2NrZWQsIGVuYWJsZWQpDQoNCkIuIEZvciBsb2NrZWQgb2Yg
+ZnJvemVuOg0KDQpGaXJzdHksIGRpcnR5LWNvdW50IHNlZW1zIG5vdCB1c2VmdWwgYW5kIG5vdCBy
+ZWxpYWJsZS4NCg0KRGlzYWJsZWQvZW5hYmxlZC4uIHdoYXQgaXQgbWVhbnMgZm9yIGxvY2tlZCBi
+aXRtYXBzPw0KDQoxLiBmb3IgZnJvemVuICh1c2VkIG9ubHkgaW4gYmFja3VwcyksIGVuYWJsZWQg
+bWVhbnMsIHRoYXQgd3JpdGVzIGFyZSB0cmFja2VkIGluIGNvbnRleHQNCm9mIHRoaXMgYml0bWFw
+cywgYW5kIGFmdGVyIG9wZXJhdGlvbiBmaW5pc2ggaW5mb3JtYXRpb24gYWJvdXQgZGlydGluZXNz
+IHdpbGwgYmUgYXZhaWxhYmxlDQpzb21laG93LiBCdXQgZGV0YWlscyBhYm91dCByZWNsYWltL2Fi
+ZGljYXRlIGFyZSByZWxhdGVkIHRvIHRoZSBvcGVyYXRpb24sIG5vdCB0byB0aGUgYml0bWFwDQpz
+dGF0dXMuDQoNCjIuIGZvciBsb2NrZWQgYml0bWFwLCBhZ2FpbiwgZW5hYmxlZCBtZWFucyB0aGF0
+IGl0IHRyYWNrcyBkaXJ0aW5lc3MuDQoNCi4uLg0KDQpTbywgeWVzLCBbcmVjb3JkaW5nLCBub3Qt
+cmVjb3JkaW5nXSB4IFtidXN5LCBub3QtYnVzeV0gd29ya3MuIEFuZCB3ZSBtYXkgZG9jdW1lbnQN
+CnJlY29yZGluZyBmb3IgYnVzeSBjYXNlIGxpa2UgImd1ZXN0IHdyaXRlcyBhcmUgdHJhY2tlZCBp
+biBjb250ZXh0IG9mIHRoZSBiaXRtYXAsIGJ1dA0KYXZhaWxhYmlsaXR5IG9mIHRyYWNrZWQgaW5m
+b3JtYXRpb24gYXMgd2VsbCBhcyBiaXRtYXAgc3RhdHVzIGFmdGVyIGhvbGRpbmcgb3BlcmF0aW9u
+DQpkZXBlbmRzIG9uIHRoZSBvcGVyYXRpb24gaXRzZWxmIg0KDQoNCi0tIA0KQmVzdCByZWdhcmRz
+LA0KVmxhZGltaXINCg==
