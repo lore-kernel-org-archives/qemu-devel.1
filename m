@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50697)
+Received: from eggs.gnu.org ([209.51.188.92]:50662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBHi-0007aB-Jm
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:06:08 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHg-0007Xr-Rw
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:06:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBHc-0004Cn-VP
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:06:06 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40108)
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHZ-0004B5-4S
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:06:04 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:40111)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gtBHb-0003qx-1E
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:59 -0500
-Received: by mail-wm1-x331.google.com with SMTP id q21so17151939wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:22 -0800 (PST)
+	id 1gtBHX-0003oz-32
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:55 -0500
+Received: by mail-wm1-x335.google.com with SMTP id q21so17151693wmc.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:18 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 11 Feb 2019 13:04:58 +0000
-Message-Id: <20190211130507.8710-10-alex.bennee@linaro.org>
+Date: Mon, 11 Feb 2019 13:04:56 +0000
+Message-Id: <20190211130507.8710-8-alex.bennee@linaro.org>
 In-Reply-To: <20190211130507.8710-1-alex.bennee@linaro.org>
 References: <20190211130507.8710-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/18] tests: make docker.py check for
- persistent configs
+Subject: [Qemu-devel] [PULL 07/18] docker: add debian-buster-arm64-cross
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +32,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-binfmt_misc configured with the "F" flag opens the interpreter at
-config time. This means it can use an already open file-descriptor to
-run QEMU so there is no point trying to copy the binary into a
-container.
+We can't build QEMU with this but we can use this image to build newer
+arm64 testcases which need more up to date tools.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 30f463af9f..768728785f 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -127,6 +127,11 @@ def _check_binfmt_misc(executable):
- 
-     with open(binfmt_entry) as x: entry = x.read()
- 
-+    if re.search("flags:.*F.*\n", entry):
-+        print("binfmt_misc for %s uses persistent(F) mapping to host binary\n" %
-+              (binary))
-+        return None
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 7032c68895..83d43c50e4 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -90,6 +90,7 @@ docker-image-debian-amd64: docker-image-debian9
+ docker-image-debian-armel-cross: docker-image-debian9
+ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-arm64-cross: docker-image-debian9
++docker-image-debian-buster-arm64-cross: docker-image-debian10
+ docker-image-debian-mips-cross: docker-image-debian9
+ docker-image-debian-mipsel-cross: docker-image-debian9
+ docker-image-debian-mips64el-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian-buster-arm64-cross.docker b/tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+new file mode 100644
+index 0000000000..33ada13806
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+@@ -0,0 +1,15 @@
++#
++# Docker arm64 cross-compiler target
++#
++# This docker target builds on the Debian's Buster base image. There
++# are no QEMU pre-requistes so this image can only be used to build
++# test cases.
++#
++FROM qemu:debian10
 +
-     m = re.search("interpreter (\S+)\n", entry)
-     interp = m.group(1)
-     if interp and interp != executable:
++# Add the foreign architecture we want and install dependencies
++RUN dpkg --add-architecture arm64
++RUN apt update
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        crossbuild-essential-arm64
+diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
+new file mode 100644
+index 0000000000..aeeb151b52
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian10.docker
+@@ -0,0 +1,31 @@
++#
++# Docker multiarch cross-compiler target
++#
++# This docker target is builds on Debian cross compiler targets to build distro
++# with a selection of cross compilers for building test binaries.
++#
++# On its own you can't build much but the docker-foo-cross targets
++# build on top of the base debian image.
++#
++FROM debian:buster-slim
++
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
++
++# Install common build utilities
++RUN apt update
++RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        clang \
++        flex \
++        gettext \
++        git \
++        pkg-config \
++        psmisc \
++        python \
++        texinfo \
++        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+diff --git a/tests/tcg/aarch64/Makefile.include b/tests/tcg/aarch64/Makefile.include
+index de32c91235..5d4e4c6f99 100644
+--- a/tests/tcg/aarch64/Makefile.include
++++ b/tests/tcg/aarch64/Makefile.include
+@@ -3,6 +3,6 @@
+ # We don't have any bigendian build tools so we only use this for AArch64
+ 
+ ifeq ($(TARGET_NAME),aarch64)
+-DOCKER_IMAGE=debian-arm64-cross
++DOCKER_IMAGE=debian-buster-arm64-cross
+ DOCKER_CROSS_COMPILER=aarch64-linux-gnu-gcc
+ endif
 -- 
 2.20.1
