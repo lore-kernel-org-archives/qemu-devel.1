@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40645)
+Received: from eggs.gnu.org ([209.51.188.92]:42070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtESN-0000PH-16
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:29:19 -0500
+	(envelope-from <berrange@redhat.com>) id 1gtEU3-0001Oi-NC
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtESM-0000ni-2O
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:29:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48220)
+	(envelope-from <berrange@redhat.com>) id 1gtETu-0001eR-Fb
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:31:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gtESL-0000n9-Qe
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:29:18 -0500
-References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8-Hst3Buax1Qrrm1SVbTtkE-8a_Vj0y3N4TvfPTqR_zw@mail.gmail.com>
-	<CAFEAcA9Yh=fCuBT602deTt0OJQux9ZMGXvGX3Bx_iXNiTskNSA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3b62bab9-db61-f40e-da52-561a0cd9ee25@redhat.com>
-Date: Mon, 11 Feb 2019 17:29:11 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtETu-0001cf-2a
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:30:54 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C5EF26696F
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 16:24:41 +0000 (UTC)
+Date: Mon, 11 Feb 2019 16:24:37 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190211162437.GI27585@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190211162052.13584-1-kchamart@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Yh=fCuBT602deTt0OJQux9ZMGXvGX3Bx_iXNiTskNSA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 00/76] misc patches for 2019-02-04
+Content-Disposition: inline
+In-Reply-To: <20190211162052.13584-1-kchamart@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] [qemu-web] Put version numbering details
+ in its own doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +34,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 05.02.19 21:05, Peter Maydell wrote:
-> On Tue, 5 Feb 2019 at 20:01, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> On Tue, 5 Feb 2019 at 18:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>
->>> The following changes since commit 1c3d45df5e94042d5fb2bb31416072563ab30e49:
->>>
->>>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-02-04' into staging (2019-02-05 12:46:18 +0000)
->>>
->>> are available in the git repository at:
->>>
->>>
->>>   git://github.com/bonzini/qemu.git tags/for-upstream
->>>
->>> for you to fetch changes up to 5ed76a4c63db9295c6c5d67895925810050d4a46:
->>>
->>>   queue: fix QTAILQ_FOREACH_REVERSE_SAFE (2019-02-05 16:50:21 +0100)
->>>
->>> ----------------------------------------------------------------
->>> * cpu-exec fixes (Emilio, Laurent)
->>> * TCG bugfix in queue.h (Paolo)
->>> * high address load for linuxboot (Zhijian)
->>> * PVH support (Liam, Stefano)
->>> * misc i386 changes (Paolo, Robert, Doug)
->>> * configure tweak for openpty (Thomas)
->>> * elf2dmp port to Windows (Viktor)
->>> * initial improvements to Makefile infrastructure (Yang + GSoC 2013)
->>>
->>> ----------------------------------------------------------------
->>
->> The build tree where I do 'make clean' then 'make' failed when
->> linking:
+On Mon, Feb 11, 2019 at 05:20:52PM +0100, Kashyap Chamarthy wrote:
+> Instead of burying the version numbering details under "Download QEMU"
+> page, place it in its own document.  And highlight its presence in the
+> website footer.
+
+I'm not sure I agree with saying it is "buried" on the download page.
+
+It is pretty clearly visible, and it is relevant information at the
+time you are downloading. If anything, moving it off into a separate
+page /is/ burying it IMHO, as now its not visible at time of download
+
+> While at it, add a concrete example of the version numbering scheme.
 > 
->> and
->>   LINK    aarch64-softmmu/qemu-system-aarch64
->> hw/arm/aspeed.o: In function `palmetto_bmc_i2c_init':
->> /home/petmay01/linaro/qemu-for-merges/hw/arm/aspeed.c:249: undefined
->> reference to `smbus_eeprom_init_one'
->> hw/arm/aspeed.o: In function `ast2500_evb_i2c_init':
->> /home/petmay01/linaro/qemu-for-merges/hw/arm/aspeed.c:266: undefined
->> reference to `smbus_eeprom_init_one'
->> hw/arm/aspeed.o: In function `witherspoon_bmc_i2c_init':
->> /home/petmay01/linaro/qemu-for-merges/hw/arm/aspeed.c:303: undefined
->> reference to `smbus_eeprom_init_one'
->> collect2: error: ld returned 1 exit status
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+>  _includes/footer.html |  1 +
+>  download.html         | 23 -----------------------
+>  version-numbering.md  | 26 ++++++++++++++++++++++++++
+>  3 files changed, 27 insertions(+), 23 deletions(-)
+>  create mode 100644 version-numbering.md
 > 
-> This part looks like the usual "foo-softmmu/config-devices.mak isn't updated
-> if a file that's #included from default-configs/foo-softmmu.mak is
-> changed" dependency bug -- I guess the fix for that isn't in this
-> patchset ?  The mips stuff is probably the same.
-> 
-> I'll delete the config-devices.mak files by hand, which should
-> suffice to get the build to go through.
-> 
+> diff --git a/_includes/footer.html b/_includes/footer.html
+> index 1669ef766cc18b0df3e27418038f9bf851b74c8a..0fb85feb564e3b23bc4ab78eb05359264d13bfa5 100644
+> --- a/_includes/footer.html
+> +++ b/_includes/footer.html
+> @@ -17,6 +17,7 @@
+>  			<li><a href="https://qemu.weilnetz.de/qemu-doc.html">Manual</a></li>
+>  			<li><a href="https://wiki.qemu.org/Category:Developer_documentation">Developer docs</a></li>
+>  			<li><a href="https://wiki.qemu.org/">Wiki</a></li>
+> +			<li><a href="/version-numbering">Version numbering</a></li>
+>  		</ul>
+>  		<ul class="style">
+>  			<li><a href="https://planet.virt-tools.org/">virt tools planet</a></li>
+> diff --git a/download.html b/download.html
+> index 3c2df66ff6757bba1246b5f0873b287fca600f11..e4c8bb5792aa6e6f7038a9fd2bdab3c432daa6ab 100644
+> --- a/download.html
+> +++ b/download.html
+> @@ -40,29 +40,6 @@ permalink: /download/
+>  </article>
+>  </div>
+>  
+> -<h2>Version numbering</h2>
+> -<div>
+> -  <p>
+> -  Since version 3.0.0, QEMU uses a time based version numbering scheme:
+> -  </p>
+> -<dl>
+> -<dt>major</dt>
+> -<dd>incremented by 1 for the first release of the year</dd>
+> -<dt>minor</dt>
+> -<dd>reset to 0 with every major increment, otherwise incremented by 1 for each release from git master</dd>
+> -<dt>micro</dt>
+> -<dd>always 0 for releases from git master, incremented by 1 for each stable branch release</dd>
+> -</dl>
+> -  <p>
+> -    The implication of this is that changes in major version number
+> -    <strong>do not</strong> have any bearing on the scope of changes
+> -    included in the release. Non-backward compatible changes may be made
+> -    in any master branch release, provided they have followed the
+> -    <a href="https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features">deprecation policy</a>
+> -    which calls for warnings to be emitted for a minimum of two releases
+> -    prior to the change.
+> -  </p>
+> -</div>
+>  <script>
+>  function animateOnClick(jqThis, slide) {
+>     $('.horiz-menu li').removeClass('active');
+> diff --git a/version-numbering.md b/version-numbering.md
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..9ace69128f76d7eb5b71e062ccdcb3ffd768ccc6
+> --- /dev/null
+> +++ b/version-numbering.md
+> @@ -0,0 +1,26 @@
+> +---
+> +title: QEMU version numbering
+> +permalink: /version-numbering/
+> +---
+> +
+> +Since version 3.0.0, QEMU uses a time based version numbering scheme:
+> +
+> +  - major: incremented by 1 for the first release of the year
+> +
+> +  - minor: reset to 0 with every major increment, otherwise
+> +    incremented by 1 for each release from git master
+> +
+> +  - micro: always 0 for releases from git master, incremented by 1 for
+> +    each stable branch release
+> +
+> +The implication of this is that changes in major version number *do not*
+> +have any bearing on the scope of changes included in the release.
+> +Non-backward compatible changes may be made in any master branch
+> +release, provided they have followed the [deprecation
+> +policy](https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features)
+> +which calls for warnings to be emitted for a minimum of two releases
+> +prior to the change.
+> +
+> +Example number scheme: in the year 2019, there will be 4.0.0, 4.1.0 and
+> +4.2.0 releases; following that, 5.0.0, 5.1.0, 5.2.0 releases in 2020,
+> +and so on.
 
-../hw/acpi/piix4.o: In function `piix4_pm_realize':
-/home/dhildenb/git/qemu/hw/acpi/piix4.c:515: undefined reference to
-`pm_smbus_init'
-../hw/i2c/smbus_ich9.o: In function `ich9_smbus_realize':
-/home/dhildenb/git/qemu/hw/i2c/smbus_ich9.c:89: undefined reference to
-`pm_smbus_init'
-../hw/pci-host/piix.o: In function `i440fx_update_memory_mappings':
-/home/dhildenb/git/qemu/hw/pci-host/piix.c:149: undefined reference to
-`pam_update'
-../hw/pci-host/piix.o: In function `i440fx_init':
-/home/dhildenb/git/qemu/hw/pci-host/piix.c:416: undefined reference to
-`init_pam'
-/home/dhildenb/git/qemu/hw/pci-host/piix.c:419: undefined reference to
-`init_pam'
-collect2: error: ld returned 1 exit status
-make[1]: *** [Makefile:207: qemu-system-x86_64] Error 1
-make: *** [Makefile:432: subdir-x86_64-softmmu] Error 2
 
-
-Even after make clean + configure. Which step am I missing?
-
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
