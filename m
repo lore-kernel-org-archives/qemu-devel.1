@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37620)
+Received: from eggs.gnu.org ([209.51.188.92]:37657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05v-0005ws-Lj
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05w-0005xX-9l
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05s-00008k-HK
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:11 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38626)
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05t-0000Aj-5r
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:12 -0500
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:34891)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gt05s-0008Ug-74
+	id 1gt05s-0008HQ-OM
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:08 -0500
-Received: by mail-pl1-x641.google.com with SMTP id e5so4510915plb.5
-	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:09:05 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id z9so4474374pfi.2
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:08:53 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 10 Feb 2019 17:08:28 -0800
-Message-Id: <20190211010829.29869-26-richard.henderson@linaro.org>
+Date: Sun, 10 Feb 2019 17:08:19 -0800
+Message-Id: <20190211010829.29869-17-richard.henderson@linaro.org>
 In-Reply-To: <20190211010829.29869-1-richard.henderson@linaro.org>
 References: <20190211010829.29869-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 25/26] target/arm: Enable MTE
+Subject: [Qemu-devel] [PATCH v2 16/26] target/arm: Implement the STGP
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +32,58 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c   | 10 ++++++++++
- target/arm/cpu64.c |  1 +
- 2 files changed, 11 insertions(+)
+ target/arm/translate-a64.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index decf95de3e..a5599ae19f 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -206,6 +206,16 @@ static void arm_cpu_reset(CPUState *s)
-          * make no difference to the user-level emulation.
-          */
-         env->cp15.tcr_el[1].raw_tcr = (3ULL << 37);
-+        /* Enable MTE allocation tags.  */
-+        env->cp15.hcr_el2 |= HCR_ATA;
-+        env->cp15.scr_el3 |= SCR_ATA;
-+        env->cp15.sctlr_el[1] |= SCTLR_ATA0;
-+        /* Enable synchronous tag check failures.  */
-+        env->cp15.sctlr_el[1] |= 1ull << 38;
-+#ifdef TARGET_AARCH64
-+        /* Set MTE seed to non-zero value, otherwise RandomTag fails.  */
-+        env->cp15.rgsr_el1 = 0x123400;
-+#endif
- #else
-         /* Reset into the highest available EL */
-         if (arm_feature(env, ARM_FEATURE_EL3)) {
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 53a7d92c95..7bd761b8f5 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -352,6 +352,7 @@ static void aarch64_max_initfn(Object *obj)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 539c25a80b..9bd68d522c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -2701,7 +2701,7 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
+  * +-----+-------+---+---+-------+---+-------+-------+------+------+
+  *
+  * opc: LDP/STP/LDNP/STNP        00 -> 32 bit, 10 -> 64 bit
+- *      LDPSW                    01
++ *      LDPSW/STGP               01
+  *      LDP/STP/LDNP/STNP (SIMD) 00 -> 32 bit, 01 -> 64 bit, 10 -> 128 bit
+  *   V: 0 -> GPR, 1 -> Vector
+  * idx: 00 -> signed offset with non-temporal hint, 01 -> post-index,
+@@ -2726,6 +2726,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     bool is_signed = false;
+     bool postindex = false;
+     bool wback = false;
++    bool set_tag = false;
  
-         t = cpu->isar.id_aa64pfr1;
-         t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
-+        t = FIELD_DP64(t, ID_AA64PFR1, MTE, 2);
-         cpu->isar.id_aa64pfr1 = t;
+     TCGv_i64 clean_addr, dirty_addr;
  
-         t = cpu->isar.id_aa64mmfr1;
+@@ -2738,6 +2739,14 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+ 
+     if (is_vector) {
+         size = 2 + opc;
++    } else if (opc == 1 && !is_load) {
++        /* STGP */
++        if (!dc_isar_feature(aa64_mte_insn_reg, s) || index == 0) {
++            unallocated_encoding(s);
++            return;
++        }
++        size = 3;
++        set_tag = true;
+     } else {
+         size = 2 + extract32(opc, 1, 1);
+         is_signed = extract32(opc, 0, 1);
+@@ -2788,7 +2797,12 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     if (!postindex) {
+         tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+     }
+-    clean_addr = clean_data_tbi(s, dirty_addr, wback || rn != 31);
++    if (set_tag) {
++        clean_addr = new_tmp_a64(s);
++        gen_helper_stg(clean_addr, cpu_env, dirty_addr);
++    } else {
++        clean_addr = clean_data_tbi(s, dirty_addr, wback || rn != 31);
++    }
+ 
+     if (is_vector) {
+         if (is_load) {
 -- 
 2.17.2
