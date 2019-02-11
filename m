@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48810)
+Received: from eggs.gnu.org ([209.51.188.92]:49186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gtD5u-0005qO-Al
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:02:11 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gtD7T-0006ou-Tm
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:03:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gtD5o-0006sQ-M4
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:02:02 -0500
-Date: Mon, 11 Feb 2019 16:01:23 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190211160123.1bb4feaf.cohuck@redhat.com>
-In-Reply-To: <20190211113255.3837-1-cohuck@redhat.com>
-References: <20190211113255.3837-1-cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: always provide pci support
+	(envelope-from <liam.merwick@oracle.com>) id 1gtD7N-0002mF-J3
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:03:39 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:48202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gtD7J-00028g-Pb
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:03:31 -0500
+From: Liam Merwick <liam.merwick@oracle.com>
+Date: Mon, 11 Feb 2019 15:03:05 +0000
+Message-Id: <1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
+In-Reply-To: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
+References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
+Subject: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string specifier in
+ tpm_tis_show_buffer()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Collin Walling <walling@linux.ibm.com>
+To: stefanb@linux.ibm.com, qemu-devel@nongnu.org
 
-On Mon, 11 Feb 2019 12:32:55 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+cppcheck reports:
 
-> We tried to make pci support optional on s390x in the past;
-> unfortunately, we still require the s390 phb to be created
-> unconditionally due to backwards compatibility issues.
-> 
-> Instead of sinking more effort into this (including compat
-> handling for older machines etc.) for non-obvious gains, let's
-> just make CONFIG_PCI something that is always set on s390x.
-> 
-> Note that you can still fence off pci for the _guest_ if you
-> provide a cpu model without the zpci feature.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> Follow-up patch to the discussion around "hw/s390x: Fix the function
-> arguments in the pci stub file". I've done a quick sanity test with
-> tcg only so far.
-> ---
->  hw/s390x/Makefile.objs      |  3 +-
->  hw/s390x/s390-pci-stub.c    | 77 -------------------------------------
->  hw/s390x/s390-virtio-ccw.c  |  4 --
->  target/s390x/cpu_models.c   |  5 ---
->  target/s390x/gen-features.c |  1 -
->  target/s390x/kvm.c          |  4 +-
->  6 files changed, 2 insertions(+), 92 deletions(-)
->  delete mode 100644 hw/s390x/s390-pci-stub.c
+[hw/tpm/tpm_tis.c:113]: (warning) %d in format string (no. 2) requires 'int' but the argument type is 'unsigned int'
 
-Queued to s390-next.
+Fix this by using %u instead of %d
+
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+---
+ hw/tpm/tpm_tis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 860c2ace7d99..395500e8a61d 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -110,7 +110,7 @@ static void tpm_tis_show_buffer(const unsigned char *buffer,
+     uint32_t len, i;
+ 
+     len = MIN(tpm_cmd_get_size(buffer), buffer_size);
+-    printf("tpm_tis: %s length = %d\n", string, len);
++    printf("tpm_tis: %s length = %u\n", string, len);
+     for (i = 0; i < len; i++) {
+         if (i && !(i % 16)) {
+             printf("\n");
+-- 
+1.8.3.1
