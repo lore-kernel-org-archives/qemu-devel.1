@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37757)
+Received: from eggs.gnu.org ([209.51.188.92]:37689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05z-000611-DO
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05w-0005yH-Oo
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gt05t-0000CE-E9
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:15 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:37846)
+	(envelope-from <richard.henderson@linaro.org>) id 1gt05s-00008Z-EZ
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:12 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gt05s-0008KR-Vi
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:09 -0500
-Received: by mail-pl1-x643.google.com with SMTP id b5so4516159plr.4
-	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:08:56 -0800 (PST)
+	id 1gt05s-0008T0-1d
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 20:09:08 -0500
+Received: by mail-pl1-x644.google.com with SMTP id e5so4510889plb.5
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 17:09:04 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 10 Feb 2019 17:08:21 -0800
-Message-Id: <20190211010829.29869-19-richard.henderson@linaro.org>
+Date: Sun, 10 Feb 2019 17:08:27 -0800
+Message-Id: <20190211010829.29869-25-richard.henderson@linaro.org>
 In-Reply-To: <20190211010829.29869-1-richard.henderson@linaro.org>
 References: <20190211010829.29869-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 18/26] target/arm: Implement data cache set
- allocation tags
+Subject: [Qemu-devel] [PATCH v2 24/26] target/arm: Add allocation tag
+ storage for system mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +30,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-This is DC GVA and DC GZVA.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Use allocation_tag_mem + memset.
----
- target/arm/cpu.h           |  4 +++-
- target/arm/helper-a64.h    |  1 +
- target/arm/helper.c        | 16 ++++++++++++++++
- target/arm/mte_helper.c    | 26 ++++++++++++++++++++++++++
- target/arm/translate-a64.c |  9 +++++++++
- 5 files changed, 55 insertions(+), 1 deletion(-)
+ target/arm/mte_helper.c | 96 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 87 insertions(+), 9 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 74633a7a78..ca32939483 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2160,7 +2160,9 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
- #define ARM_CP_NZCV              (ARM_CP_SPECIAL | 0x0300)
- #define ARM_CP_CURRENTEL         (ARM_CP_SPECIAL | 0x0400)
- #define ARM_CP_DC_ZVA            (ARM_CP_SPECIAL | 0x0500)
--#define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
-+#define ARM_CP_DC_GVA            (ARM_CP_SPECIAL | 0x0600)
-+#define ARM_CP_DC_GZVA           (ARM_CP_SPECIAL | 0x0700)
-+#define ARM_LAST_SPECIAL         ARM_CP_DC_GZVA
- #define ARM_CP_FPU               0x1000
- #define ARM_CP_SVE               0x2000
- #define ARM_CP_NO_GDB            0x4000
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index a00364fb4c..4ad900d36e 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -113,3 +113,4 @@ DEF_HELPER_FLAGS_2(stg, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_2(st2g, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_2(stg_parallel, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_2(st2g_parallel, TCG_CALL_NO_WG, i64, env, i64)
-+DEF_HELPER_FLAGS_2(dc_gva, TCG_CALL_NO_RWG, void, env, i64)
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 74bace81e4..9fac3628e5 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5820,6 +5820,22 @@ static const ARMCPRegInfo mte_reginfo[] = {
-     { .name = "CIGDVAC", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 14, .opc2 = 5,
-       .type = ARM_CP_NOP, .access = PL1_W },
-+    { .name = "GVA", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 4, .opc2 = 3,
-+      .access = PL0_W, .type = ARM_CP_DC_GVA,
-+#ifndef CONFIG_USER_ONLY
-+      /* Avoid overhead of an access check that always passes in user-mode */
-+      .accessfn = aa64_zva_access,
-+#endif
-+    },
-+    { .name = "GZVA", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 4, .opc2 = 4,
-+      .access = PL0_W, .type = ARM_CP_DC_GZVA,
-+#ifndef CONFIG_USER_ONLY
-+      /* Avoid overhead of an access check that always passes in user-mode */
-+      .accessfn = aa64_zva_access,
-+#endif
-+    },
-     REGINFO_SENTINEL
- };
- #endif
 diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 13befdbf86..93f7cccee2 100644
+index ad2902472d..3abed62018 100644
 --- a/target/arm/mte_helper.c
 +++ b/target/arm/mte_helper.c
-@@ -386,3 +386,29 @@ uint64_t HELPER(st2g_parallel)(CPUARMState *env, uint64_t ptr)
+@@ -53,19 +53,19 @@ static uint64_t strip_tbi(CPUARMState *env, uint64_t ptr)
+ static uint8_t *allocation_tag_mem(CPUARMState *env, uint64_t ptr,
+                                    bool write, uintptr_t ra)
  {
-     return do_st2g(env, ptr, GETPC(), store_tag1_parallel);
- }
+-#ifdef CONFIG_USER_ONLY
+     ARMCPU *cpu = arm_env_get_cpu(env);
++    CPUState *cs = CPU(cpu);
+     uint64_t clean_ptr = strip_tbi(env, ptr);
+     uint8_t *tags;
+     uintptr_t index;
+-    int flags;
+ 
+-    flags = page_get_flags(clean_ptr);
++#ifdef CONFIG_USER_ONLY
++    int flags = page_get_flags(clean_ptr);
+ 
+     if (!(flags & PAGE_VALID) || !(flags & (write ? PAGE_WRITE : PAGE_READ))) {
+         /* SIGSEGV */
+         env->exception.vaddress = ptr;
+-        cpu_restore_state(CPU(cpu), ra, true);
++        cpu_restore_state(cs, ra, true);
+         raise_exception(env, EXCP_DATA_ABORT, 0, 1);
+     }
+ 
+@@ -82,16 +82,94 @@ static uint8_t *allocation_tag_mem(CPUARMState *env, uint64_t ptr,
+     if (tags == NULL) {
+         size_t alloc_size = TARGET_PAGE_SIZE >> (LOG2_TAG_GRANULE + 1);
+         tags = page_alloc_target_data(clean_ptr, alloc_size);
+-        assert(tags != NULL);
++    }
++#else
++    int mmu_idx;
++    AddressSpace *as;
++    CPUTLBEntry *te;
++    CPUIOTLBEntry *iotlbentry;
++    MemoryRegionSection *section;
++    MemoryRegion *mr;
++    FlatView *fv;
++    hwaddr physaddr, tag_physaddr, tag_len, xlat;
 +
-+void HELPER(dc_gva)(CPUARMState *env, uint64_t ptr)
-+{
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-+    int el = arm_current_el(env);
-+    uint64_t sctlr = arm_sctlr(env, el);
-+    size_t blocklen = 4 << cpu->dcz_blocksize;
-+    uint8_t *mem;
-+    int rtag;
-+
-+    ptr = QEMU_ALIGN_DOWN(ptr, blocklen);
-+
-+    /* Trap if accessing an invalid page.  */
-+    mem = allocation_tag_mem(env, ptr, true, GETPC());
-+
-+    /* No action if page does not support tags, or if access is disabled.  */
-+    if (!mem || !allocation_tag_access_enabled(env, el, sctlr)) {
-+        return;
++    /*
++     * Find the TLB entry for this access.
++     * As a side effect, this also raises an exception for invalid access.
++     */
++    mmu_idx = cpu_mmu_index(env, false);
++    index = tlb_index(env, mmu_idx, clean_ptr);
++    te = tlb_entry(env, mmu_idx, clean_ptr);
++    if (!tlb_hit(write ? tlb_addr_write(te) : te->addr_read, clean_ptr)) {
++        /* ??? Expose VICTIM_TLB_HIT from accel/tcg/cputlb.c.  */
++        tlb_fill(cs, ptr, 16, write ? MMU_DATA_STORE : MMU_DATA_LOAD,
++                 mmu_idx, ra);
++        index = tlb_index(env, mmu_idx, clean_ptr);
++        te = tlb_entry(env, mmu_idx, clean_ptr);
+     }
+ 
++    /* If the virtual page MemAttr != Tagged, nothing to do.  */
++    iotlbentry = &env->iotlb[mmu_idx][index];
++    if (!iotlbentry->attrs.target_tlb_bit1) {
++        return NULL;
 +    }
 +
-+    rtag = allocation_tag_from_addr(ptr);
-+    rtag |= rtag << 4;
++    /* If the board did not allocate tag memory, nothing to do.  */
++    as = cpu_get_address_space(cs, ARMASIdx_TAG);
++    if (!as) {
++        return NULL;
++    }
 +
-+    assert(blocklen % (2 << LOG2_TAG_GRANULE) == 0);
-+    memset(mem, rtag, blocklen / (2 << LOG2_TAG_GRANULE));
-+}
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9bd68d522c..a3bd2e27ef 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1811,6 +1811,15 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
-         tcg_rt = cpu_reg(s, rt);
-         gen_helper_dc_zva(cpu_env, tcg_rt);
-         return;
-+    case ARM_CP_DC_GVA:
-+        tcg_rt = cpu_reg(s, rt);
-+        gen_helper_dc_gva(cpu_env, tcg_rt);
-+        return;
-+    case ARM_CP_DC_GZVA:
-+        tcg_rt = cpu_reg(s, rt);
-+        gen_helper_dc_zva(cpu_env, tcg_rt);
-+        gen_helper_dc_gva(cpu_env, tcg_rt);
-+        return;
-     default:
-         break;
-     }
++    /* Find the physical address for the virtual access.  */
++    section = iotlb_to_section(cs, iotlbentry->addr, iotlbentry->attrs);
++    physaddr = ((iotlbentry->addr & TARGET_PAGE_MASK) + clean_ptr
++                + section->offset_within_address_space
++                - section->offset_within_region);
++
++    /* Convert to the physical address in tag space.  */
++    tag_physaddr = physaddr >> (LOG2_TAG_GRANULE + 1);
++    tag_len = TARGET_PAGE_SIZE >> (LOG2_TAG_GRANULE + 1);
++
++    /*
++     * Find the tag physical address within the tag address space.
++     *
++     * ??? Create a new mmu_idx to cache the rest of this.
++     *
++     * ??? If we were assured of exactly one block of normal ram,
++     * and thus exactly one block of tag ram, then we could validate
++     * section->mr as ram, use the section offset vs cpu->tag_memory,
++     * and finish with memory_region_get_ram_ptr.
++     */
++    rcu_read_lock();
++    fv = address_space_to_flatview(as);
++    mr = flatview_translate(fv, tag_physaddr, &xlat, &tag_len,
++                            write, MEMTXATTRS_UNSPECIFIED);
++    if (!memory_access_is_direct(mr, write)) {
++        /*
++         * This would seem to imply that the guest has marked a
++         * virtual page as Tagged when the physical page is not RAM.
++         * Should this raise some sort of bus error?
++         */
++        rcu_read_unlock();
++        qemu_log_mask(LOG_GUEST_ERROR, "Tagged virtual page 0x%" PRIx64
++                      " maps to physical page 0x%" PRIx64 " without RAM\n",
++                      clean_ptr, physaddr);
++        return NULL;
++    }
++    rcu_read_unlock();
++
++    /* The board should have created tag ram sized correctly.  */
++    assert(tag_len == TARGET_PAGE_SIZE >> (LOG2_TAG_GRANULE + 1));
++
++    /* FIXME: Mark the tag page dirty for migration.  */
++
++    tags = qemu_map_ram_ptr(mr->ram_block, xlat);
++#endif
++
++    assert(tags != NULL);
+     index = extract32(clean_ptr, LOG2_TAG_GRANULE + 1,
+                       TARGET_PAGE_BITS - LOG2_TAG_GRANULE - 1);
+     return tags + index;
+-#else
+-    /* Tag storage not implemented.  */
+-    return NULL;
+-#endif
+ }
+ 
+ static int get_allocation_tag(CPUARMState *env, uint64_t ptr, uintptr_t ra)
 -- 
 2.17.2
