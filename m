@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37244)
+Received: from eggs.gnu.org ([209.51.188.92]:40696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gt3FL-0003N9-5i
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:31:07 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gt3du-0002Lq-Ks
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:56:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gt32C-0006Bh-QD
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:17:34 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:41257)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gt326-0005qd-18
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:17:27 -0500
-Message-Id: <9f5f3187f0eff04efc2ec3639727a17bf8d36dce.1549857716.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1549857716.git.balaton@eik.bme.hu>
-References: <cover.1549857716.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 11 Feb 2019 05:01:56 +0100
-Subject: [Qemu-devel] [PATCH 4/4] mips_fulong2e: Add on-board graphics chip
+	(envelope-from <aik@ozlabs.ru>) id 1gt3dt-00006F-AX
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:56:30 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gt3ds-0008W1-Ip
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:56:29 -0500
+Received: by mail-pf1-x443.google.com with SMTP id j3so4683075pfi.12
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 20:56:25 -0800 (PST)
+References: <20181214025849.84274-1-aik@ozlabs.ru>
+	<8727c6e5-006c-20e5-cb6b-be525154e184@redhat.com>
+	<bda42f7c-9068-3c4d-d839-7f6c52561cc9@ozlabs.ru>
+	<69a29694-b777-721a-eafd-4ff38c457f6d@redhat.com>
+	<db36d006-3bdc-47fe-9987-519440446c4e@ozlabs.ru>
+	<20190103173753.GJ2316@work-vm>
+	<d4b8695c-3d37-ba92-d62b-e067b77274c8@ozlabs.ru>
+	<20190207114953.GB2773@work-vm>
+	<16486ff4-eb62-b4f2-78f8-a1ec7e3fbb0b@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <30a5a208-249f-106e-f885-94caf9b82970@ozlabs.ru>
+Date: Mon, 11 Feb 2019 15:56:19 +1100
+MIME-Version: 1.0
+In-Reply-To: <16486ff4-eb62-b4f2-78f8-a1ec7e3fbb0b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2] hmp: Print if memory section is
+ registered with an accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +38,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <zltjiangshi@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Add (partial) emulation of the on-board GPU of the machine. This
-allows the PMON2000 firmware to run and should also work with Linux
-console but probably not with X yet.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
-Depends on hw/display: Add basic ATI VGA emulation
 
- hw/mips/mips_fulong2e.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+On 09/02/2019 04:26, Paolo Bonzini wrote:
+> On 07/02/19 12:49, Dr. David Alan Gilbert wrote:
+>>  //#define DEBUG_UNASSIGNED
+>> @@ -2924,6 +2926,8 @@ struct FlatViewInfo {
+>>      int counter;
+>>      bool dispatch_tree;
+>>      bool owner;
+>> +    AccelClass *ac;
+>> +    const char *ac_name;
+>>  };
+>>  
+>>  static void mtree_print_flatview(gpointer key, gpointer value,
+>> @@ -2939,6 +2943,7 @@ static void mtree_print_flatview(gpointer key, gpointer value,
+>>      int n = view->nr;
+>>      int i;
+>>      AddressSpace *as;
+>> +    bool system_as = false;
+>>  
+>>      p(f, "FlatView #%d\n", fvi->counter);
+>>      ++fvi->counter;
+>> @@ -2950,6 +2955,9 @@ static void mtree_print_flatview(gpointer key, gpointer value,
+>>              p(f, ", alias %s", memory_region_name(as->root->alias));
+>>          }
+>>          p(f, "\n");
+>> +        if (as == &address_space_memory) {
+>> +            system_as = true;
+>> +        }
+>>      }
+>>  
+>>      p(f, " Root memory region: %s\n",
+>> @@ -2985,6 +2993,13 @@ static void mtree_print_flatview(gpointer key, gpointer value,
+>>          if (fvi->owner) {
+>>              mtree_print_mr_owner(p, f, mr);
+>>          }
+>> +
+>> +        if (system_as && fvi->ac &&
+>> +            fvi->ac->has_memory(current_machine,
+>> +                                int128_get64(range->addr.start),
+>> +                                MR_SIZE(range->addr.size) + 1)) {
+>> +            p(f, " %s", fvi->ac_name);
+> 
+> I don't understand this.  This doesn't check that the memory range
+> actually matches the memory registered with the accelerator, only that
+> there is something in that range. 
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index eec6fd02c8..68bd030fc1 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     I2CBus *smbus;
-     MIPSCPU *cpu;
-     CPUMIPSState *env;
-+    DeviceState *dev;
- 
-     /* init CPUs */
-     cpu = MIPS_CPU(cpu_create(machine->cpu_type));
-@@ -347,6 +348,11 @@ static void mips_fulong2e_init(MachineState *machine)
-     vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
-                                &smbus, &isa_bus);
- 
-+    /* GPU */
-+    dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
-+    qdev_prop_set_uint16(dev, "device_id", 0x5159);
-+    qdev_init_nofail(dev);
-+
-     /* Populate SPD eeprom data */
-     spd_data = spd_data_generate(DDR, ram_size, &err);
-     if (err) {
+
+It is checking that a flat range (i.e. what actually works) has a
+corresponding KVM slot:
+https://git.qemu.org/?p=qemu.git;a=blob;f=accel/kvm/kvm-all.c;h=4e1de942ce554c734ac2673030031c228a752ac9;hb=HEAD#l201
+
+
+> Why isn't it enough to use "info
+> mtree" and look at the KVM address space?
+
+
+There is no such thing in my QEMU, did you mean "KVM-SMRAM" (which is
+missing on spapr)? I am not sure I understand its purpose for the task -
+it prints all same ranges on my x86 laptop, not just ones which we told
+KVM about.
+
+My task is that if let's say "0000:00:1a.0 BAR 0 mmaps[0]" is split into
+several sections because MSIX happens to be in a middle of that BAR and
+it is not system page size aligned, then it is going to be several
+ranges with no clear indication whether or not these were registered as
+KVM slots. A memory chunk can be "ram" and not a KVM slot if it is 4K on
+PPC with 64K system pages, for example.
+
+
+FlatView #0
+ AS "memory", root: system
+ AS "cpu-memory-0", root: system
+ AS "cpu-memory-1", root: system
+ AS "cpu-memory-2", root: system
+ AS "cpu-memory-3", root: system
+ AS "piix3-ide", root: bus master container
+ AS "virtio-net-pci", root: bus master container
+ AS "vfio-pci", root: bus master container
+ Root memory region: system
+  0000000000000000-00000000000bffff (prio 0, ram): pc.ram kvm
+  00000000000c0000-00000000000c0fff (prio 0, rom): pc.ram
+@00000000000c0000 kvm
+  00000000000c1000-00000000000c3fff (prio 0, ram): pc.ram
+@00000000000c1000 kvm
+  00000000000c4000-00000000000e7fff (prio 0, rom): pc.ram
+@00000000000c4000 kvm
+  00000000000e8000-00000000000effff (prio 0, ram): pc.ram
+@00000000000e8000 kvm
+  00000000000f0000-00000000000fffff (prio 0, rom): pc.ram
+@00000000000f0000 kvm
+  0000000000100000-00000000bfffffff (prio 0, ram): pc.ram
+@0000000000100000 kvm
+  00000000febc0000-00000000febc0fff (prio 0, ramd): 0000:00:1a.0 BAR 0
+mmaps[0] kvm
+  00000000febc1000-00000000febc102f (prio 0, i/o): msix-table
+  00000000febc1800-00000000febc1807 (prio 0, i/o): msix-pba
+  00000000febfc000-00000000febfcfff (prio 0, i/o): virtio-pci-common
+  00000000febfd000-00000000febfdfff (prio 0, i/o): virtio-pci-isr
+  00000000febfe000-00000000febfefff (prio 0, i/o): virtio-pci-device
+  00000000febff000-00000000febfffff (prio 0, i/o): virtio-pci-notify
+  00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+  00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+  00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+  00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios kvm
+  0000000100000000-000000013fffffff (prio 0, ram): pc.ram
+@00000000c0000000 kvm
+
+
+
+FlatView #3
+ AS "KVM-SMRAM", root: mem-container-smram
+ Root memory region: mem-container-smram
+  0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+  00000000000c0000-00000000000c0fff (prio 0, rom): pc.ram @00000000000c0000
+  00000000000c1000-00000000000c3fff (prio 0, ram): pc.ram @00000000000c1000
+  00000000000c4000-00000000000e7fff (prio 0, rom): pc.ram @00000000000c4000
+  00000000000e8000-00000000000effff (prio 0, ram): pc.ram @00000000000e8000
+  00000000000f0000-00000000000fffff (prio 0, rom): pc.ram @00000000000f0000
+  0000000000100000-00000000bfffffff (prio 0, ram): pc.ram @0000000000100000
+  00000000febc0000-00000000febc0fff (prio 0, ramd): 0000:00:1a.0 BAR 0
+mmaps[0]
+  00000000febc1000-00000000febc102f (prio 0, i/o): msix-table
+  00000000febc1800-00000000febc1807 (prio 0, i/o): msix-pba
+  00000000febfc000-00000000febfcfff (prio 0, i/o): virtio-pci-common
+  00000000febfd000-00000000febfdfff (prio 0, i/o): virtio-pci-isr
+  00000000febfe000-00000000febfefff (prio 0, i/o): virtio-pci-device
+  00000000febff000-00000000febfffff (prio 0, i/o): virtio-pci-notify
+  00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+  00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+  00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+  00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+  0000000100000000-000000013fffffff (prio 0, ram): pc.ram @00000000c0000000
+
+
+
+
+> Perhaps you could add instead an argument to "info mtree" that prints
+> only the AddressSpace with a given name?
+
+Nah, this is not what it is about.
+
+
 -- 
-2.13.7
+Alexey
