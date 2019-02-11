@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49994)
+Received: from eggs.gnu.org ([209.51.188.92]:51153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gt4Vc-0002Y1-MC
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:52:01 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gt4a2-0006Q7-KT
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:56:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gt4Va-0002yu-SS
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:52:00 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gt4a1-0005Cs-Ea
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:56:34 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 11 Feb 2019 13:50:40 +0800
-Message-Id: <20190211055040.13528-10-stefanha@redhat.com>
-In-Reply-To: <20190211055040.13528-1-stefanha@redhat.com>
-References: <20190211055040.13528-1-stefanha@redhat.com>
+Date: Mon, 11 Feb 2019 13:50:31 +0800
+Message-Id: <20190211055040.13528-1-stefanha@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 9/9] tests/virtio-blk: add test for WRITE_ZEROES
- command
+Subject: [Qemu-devel] [PULL 0/9] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +21,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+The following changes since commit e47f81b617684c4546af286d307b69014a8353=
+8a:
 
-If the WRITE_ZEROES feature is enabled, we check this command
-in the test_basic().
+  Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' in=
+to staging (2019-02-07 18:53:25 +0000)
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Acked-by: Pankaj Gupta <pagupta@redhat.com>
-Message-id: 20190208134950.187665-7-sgarzare@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/virtio-blk-test.c | 60 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+are available in the Git repository at:
 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 0739498da7..35bd92dbfc 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -244,6 +244,66 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
-ocator *alloc,
-=20
-     guest_free(alloc, req_addr);
-=20
-+    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        void *expected;
-+
-+        /*
-+         * WRITE_ZEROES request on the same sector of previous test wher=
-e
-+         * we wrote "TEST".
-+         */
-+        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
-+        req.data =3D (char *) &dwz_hdr;
-+        dwz_hdr.sector =3D 0;
-+        dwz_hdr.num_sectors =3D 1;
-+        dwz_hdr.flags =3D 0;
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
-));
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
-+        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
-se);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        guest_free(alloc, req_addr);
-+
-+        /* Read request to check if the sector contains all zeroes */
-+        req.type =3D VIRTIO_BLK_T_IN;
-+        req.ioprio =3D 1;
-+        req.sector =3D 0;
-+        req.data =3D g_malloc0(512);
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
-+        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 528);
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        data =3D g_malloc(512);
-+        expected =3D g_malloc0(512);
-+        memread(req_addr + 16, data, 512);
-+        g_assert_cmpmem(data, 512, expected, 512);
-+        g_free(expected);
-+        g_free(data);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
-         /* Write and read with 2 descriptor layout */
-         /* Write request */
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 55140166667bb555c5d05165b93b25557d2e6397:
+
+  tests/virtio-blk: add test for WRITE_ZEROES command (2019-02-11 11:58:1=
+7 +0800)
+
+----------------------------------------------------------------
+Pull request
+
+User-visible changes:
+
+ * virtio-blk: DISCARD and WRITE_ZEROES support
+
+----------------------------------------------------------------
+
+Peter Xu (1):
+  iothread: fix iothread hang when stop too soon
+
+Stefano Garzarella (7):
+  virtio-blk: cleanup using VirtIOBlock *s and VirtIODevice *vdev
+  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
+  virtio-blk: add host_features field in VirtIOBlock
+  virtio-blk: add "discard" and "write-zeroes" properties
+  virtio-blk: add DISCARD and WRITE_ZEROES features
+  tests/virtio-blk: change assert on data_size in virtio_blk_request()
+  tests/virtio-blk: add test for WRITE_ZEROES command
+
+Vladimir Sementsov-Ogievskiy (1):
+  qemugdb/coroutine: fix arch_prctl has unknown return type
+
+ include/hw/virtio/virtio-blk.h |   5 +-
+ hw/block/virtio-blk.c          | 236 +++++++++++++++++++++++++++++----
+ hw/core/machine.c              |   2 +
+ iothread.c                     |   6 +-
+ tests/virtio-blk-test.c        |  75 ++++++++++-
+ scripts/qemugdb/coroutine.py   |   2 +-
+ 6 files changed, 297 insertions(+), 29 deletions(-)
+
 --=20
 2.20.1
