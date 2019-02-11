@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48359)
+Received: from eggs.gnu.org ([209.51.188.92]:48670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gt6ql-0003jq-I2
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:22:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gt6sZ-0004a6-6f
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:23:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gt6qi-0005k2-GQ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:21:57 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:43606)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1gt6qi-0005ho-3u
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:21:56 -0500
-Date: Mon, 11 Feb 2019 09:21:50 +0100
-From: Sven Schnelle <svens@stackframe.org>
-Message-ID: <20190211082150.GA10540@t470p.stackframe.org>
-References: <20190207115400.647-1-richard.henderson@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1gt6sY-0006rz-EV
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:23:51 -0500
+Date: Mon, 11 Feb 2019 09:23:39 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211092339.054706bb.cohuck@redhat.com>
+In-Reply-To: <20190208221111.25237-1-walling@linux.ibm.com>
+References: <20190208221111.25237-1-walling@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190207115400.647-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 00/19] target/hppa: Convert to decodetree
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/cpumodel: default enable mepoch
+ for z14 and later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, deller@gmx.de
+To: Collin Walling <walling@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, david@redhat.com, borntraeger@de.ibm.com, pasic@linux.ibm.com, rth@twiddle.net
 
-Hi Richard,
+On Fri,  8 Feb 2019 17:11:10 -0500
+Collin Walling <walling@linux.ibm.com> wrote:
 
-On Thu, Feb 07, 2019 at 11:53:41AM +0000, Richard Henderson wrote:
+> Latest systems and host kernels support mepoch, which is a
+> feature that was meant to be supported for z14 GA1 from the
+> get-go. Let's copy it to the z14 GA1 default CPU model.
 
-> Helge or Sven, if you have a chance to do a bit more testing in
-> the next week, I would appreciate it.  Otherwise we can fix any
-> other minor problems on mainline.
+Do older kernels simply not support it, or was there something actively
+missing? IOW, is it fine to turn this on with older kernels?
 
-I tested this during the weekend with my HP-UX branch and found no
-problems. Feel free to add
+[It's probably all good, although I like to wait for David's ack for
+any cpu model patches :)]
 
-Tested-by: Sven Schnelle <svens@stackframe.org>
-
-Regards
-Sven
+> 
+> Machines s390-ccw-virtio-3.1 and older will retain the old CPU
+> models and will not provide this bit in the default model.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c  | 1 +
+>  target/s390x/gen-features.c | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index fd9d0b0542..32c5027345 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -757,6 +757,7 @@ DEFINE_CCW_MACHINE(4_0, "4.0", true);
+>  static void ccw_machine_3_1_instance_options(MachineState *machine)
+>  {
+>      ccw_machine_4_0_instance_options(machine);
+> +    s390_cpudef_featoff_greater(14, 1, S390_FEAT_MULTIPLE_EPOCH);
+>  }
+>  
+>  static void ccw_machine_3_1_class_options(MachineClass *mc)
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index 70015eaaf5..d258d67dca 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -550,6 +550,7 @@ static uint16_t default_GEN14_GA1[] = {
+>      S390_FEAT_GROUP_MSA_EXT_6,
+>      S390_FEAT_GROUP_MSA_EXT_7,
+>      S390_FEAT_GROUP_MSA_EXT_8,
+> +    S390_FEAT_MULTIPLE_EPOCH,
+>  };
+>  
+>  /* QEMU (CPU model) features */
