@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50520)
+Received: from eggs.gnu.org ([209.51.188.92]:50561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBHD-0007A2-Vn
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHV-0007On-Sx
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBH9-0003yL-C3
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:35 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:42109)
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHO-00047H-1o
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:47 -0500
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:38833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gtBGw-0003kg-Dp
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:21 -0500
-Received: by mail-wr1-x429.google.com with SMTP id q18so4602206wrx.9
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:13 -0800 (PST)
+	id 1gtBHI-0003qe-D1
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:41 -0500
+Received: by mail-wm1-x330.google.com with SMTP id v26so17165442wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:21 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 11 Feb 2019 13:04:53 +0000
-Message-Id: <20190211130507.8710-5-alex.bennee@linaro.org>
+Date: Mon, 11 Feb 2019 13:05:00 +0000
+Message-Id: <20190211130507.8710-12-alex.bennee@linaro.org>
 In-Reply-To: <20190211130507.8710-1-alex.bennee@linaro.org>
 References: <20190211130507.8710-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/18] .travis.yml: fold --disable-tcg into
- alternate coroutine builds
+Subject: [Qemu-devel] [PULL 11/18] tests: PEP8 cleanup of docker.py,
+ mostly white space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +33,225 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The alternate coroutine builds are really only of interest to people
-running KVM (although I think you could use them for TCG if you really
-tried). As they tend to run long lets kill two birds with one stone
-and fold the --disable-tcg build into them.
+My editor keeps putting squiggly lines under a bunch of the python
+lines to remind me how non-PEP8 compliant it is. Clean that up so it's
+easier to spot new errors.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/.travis.yml b/.travis.yml
-index 652be702ac..baa06b976a 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -97,12 +97,16 @@ matrix:
-         - CONFIG="--enable-modules --disable-linux-user"
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index a74338cb61..53a8c9c801 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -30,7 +30,7 @@ except ImportError:
+     from io import StringIO
+ from shutil import copy, rmtree
+ from pwd import getpwuid
+-from datetime import datetime,timedelta
++from datetime import datetime, timedelta
  
  
-+    # Alternate coroutines implementations are only really of interest to KVM users
-+    # However we can't test against KVM on Travis so we can only run unit tests
-     - env:
--        - CONFIG="--with-coroutine=ucontext --disable-linux-user"
-+        - CONFIG="--with-coroutine=ucontext --disable-tcg"
-+        - TEST_CMD="make check-unit -j3 V=1"
+ FILTERED_ENV_NAMES = ['ftp_proxy', 'http_proxy', 'https_proxy']
+@@ -43,9 +43,11 @@ def _text_checksum(text):
+     """Calculate a digest string unique to the text content"""
+     return hashlib.sha1(text).hexdigest()
+ 
++
+ def _file_checksum(filename):
+     return _text_checksum(open(filename, 'rb').read())
+ 
++
+ def _guess_docker_command():
+     """ Guess a working docker command or raise exception if not found"""
+     commands = [["docker"], ["sudo", "-n", "docker"]]
+@@ -59,9 +61,10 @@ def _guess_docker_command():
+         except OSError:
+             pass
+     commands_txt = "\n".join(["  " + " ".join(x) for x in commands])
+-    raise Exception("Cannot find working docker command. Tried:\n%s" % \
++    raise Exception("Cannot find working docker command. Tried:\n%s" %
+                     commands_txt)
+ 
++
+ def _copy_with_mkdir(src, root_dir, sub_path='.'):
+     """Copy src into root_dir, creating sub_path as needed."""
+     dest_dir = os.path.normpath("%s/%s" % (root_dir, sub_path))
+@@ -96,6 +99,7 @@ def _get_so_libs(executable):
+ 
+     return libs
+ 
++
+ def _copy_binary_with_libs(src, bin_dest, dest_dir):
+     """Maybe copy a binary and all its dependent libraries.
+ 
+@@ -117,7 +121,7 @@ def _copy_binary_with_libs(src, bin_dest, dest_dir):
+     if libs:
+         for l in libs:
+             so_path = os.path.dirname(l)
+-            _copy_with_mkdir(l , dest_dir, so_path)
++            _copy_with_mkdir(l, dest_dir, so_path)
  
  
-     - env:
--        - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
-+        - CONFIG="--with-coroutine=sigaltstack --disable-tcg"
-+        - TEST_CMD="make check-unit -j3 V=1"
+ def _check_binfmt_misc(executable):
+@@ -142,7 +146,7 @@ def _check_binfmt_misc(executable):
+     with open(binfmt_entry) as x: entry = x.read()
  
+     if re.search("flags:.*F.*\n", entry):
+-        print("binfmt_misc for %s uses persistent(F) mapping to host binary\n" %
++        print("binfmt_misc for %s uses persistent(F) mapping to host binary" %
+               (binary))
+         return None, True
  
-     # Check we can build docs and tools
-@@ -162,11 +166,6 @@ matrix:
-         - TEST_CMD=""
+@@ -164,6 +168,7 @@ def _read_qemu_dockerfile(img_name):
+                       img_name + ".docker")
+     return open(df, "r").read()
  
++
+ def _dockerfile_preprocess(df):
+     out = ""
+     for l in df.splitlines():
+@@ -181,6 +186,7 @@ def _dockerfile_preprocess(df):
+         out += l + "\n"
+     return out
  
--    - env:
--        - CONFIG="--disable-tcg"
--        - TEST_CMD=""
--
--
-     # MacOSX builds
-     - env:
-         - CONFIG="--target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
++
+ class Docker(object):
+     """ Running Docker commands """
+     def __init__(self):
+@@ -248,7 +254,7 @@ class Docker(object):
+ 
+     def build_image(self, tag, docker_dir, dockerfile,
+                     quiet=True, user=False, argv=None, extra_files_cksum=[]):
+-        if argv == None:
++        if argv is None:
+             argv = []
+ 
+         tmp_df = tempfile.NamedTemporaryFile(dir=docker_dir, suffix=".docker")
+@@ -269,7 +275,7 @@ class Docker(object):
+ 
+         tmp_df.flush()
+ 
+-        self._do_check(["build", "-t", tag, "-f", tmp_df.name] + argv + \
++        self._do_check(["build", "-t", tag, "-f", tmp_df.name] + argv +
+                        [docker_dir],
+                        quiet=quiet)
+ 
+@@ -299,9 +305,11 @@ class Docker(object):
+     def command(self, cmd, argv, quiet):
+         return self._do([cmd] + argv, quiet=quiet)
+ 
++
+ class SubCommand(object):
+     """A SubCommand template base class"""
+-    name = None # Subcommand name
++    name = None  # Subcommand name
++
+     def shared_args(self, parser):
+         parser.add_argument("--quiet", action="store_true",
+                             help="Run quietly unless an error occurred")
+@@ -309,6 +317,7 @@ class SubCommand(object):
+     def args(self, parser):
+         """Setup argument parser"""
+         pass
++
+     def run(self, args, argv):
+         """Run command.
+         args: parsed argument by argument parser.
+@@ -316,18 +325,23 @@ class SubCommand(object):
+         """
+         pass
+ 
++
+ class RunCommand(SubCommand):
+     """Invoke docker run and take care of cleaning up"""
+     name = "run"
++
+     def args(self, parser):
+         parser.add_argument("--keep", action="store_true",
+                             help="Don't remove image when command completes")
++
+     def run(self, args, argv):
+         return Docker().run(argv, args.keep, quiet=args.quiet)
+ 
++
+ class BuildCommand(SubCommand):
+-    """ Build docker image out of a dockerfile. Arguments: <tag> <dockerfile>"""
++    """ Build docker image out of a dockerfile. Arg: <tag> <dockerfile>"""
+     name = "build"
++
+     def args(self, parser):
+         parser.add_argument("--include-executable", "-e",
+                             help="""Specify a binary that will be copied to the
+@@ -392,8 +406,8 @@ class BuildCommand(SubCommand):
+                 cksum += [(filename, _file_checksum(filename))]
+ 
+             argv += ["--build-arg=" + k.lower() + "=" + v
+-                        for k, v in os.environ.iteritems()
+-                        if k.lower() in FILTERED_ENV_NAMES]
++                     for k, v in os.environ.iteritems()
++                     if k.lower() in FILTERED_ENV_NAMES]
+             dkr.build_image(tag, docker_dir, dockerfile,
+                             quiet=args.quiet, user=args.user, argv=argv,
+                             extra_files_cksum=cksum)
+@@ -402,9 +416,11 @@ class BuildCommand(SubCommand):
+ 
+         return 0
+ 
++
+ class UpdateCommand(SubCommand):
+-    """ Update a docker image with new executables. Arguments: <tag> <executable>"""
++    """ Update a docker image with new executables. Args: <tag> <executable>"""
+     name = "update"
++
+     def args(self, parser):
+         parser.add_argument("tag",
+                             help="Image Tag")
+@@ -457,16 +473,20 @@ class UpdateCommand(SubCommand):
+ 
+         return 0
+ 
++
+ class CleanCommand(SubCommand):
+     """Clean up docker instances"""
+     name = "clean"
++
+     def run(self, args, argv):
+         Docker().clean()
+         return 0
+ 
++
+ class ImagesCommand(SubCommand):
+     """Run "docker images" command"""
+     name = "images"
++
+     def run(self, args, argv):
+         return Docker().command("images", argv, args.quiet)
+ 
+@@ -539,7 +559,7 @@ class CheckCommand(SubCommand):
+ 
+         try:
+             dkr = Docker()
+-        except:
++        except subprocess.CalledProcessError:
+             print("Docker not set up")
+             return 1
+ 
+@@ -578,7 +598,8 @@ class CheckCommand(SubCommand):
+ 
+ def main():
+     parser = argparse.ArgumentParser(description="A Docker helper",
+-            usage="%s <subcommand> ..." % os.path.basename(sys.argv[0]))
++                                     usage="%s <subcommand> ..." %
++                                     os.path.basename(sys.argv[0]))
+     subparsers = parser.add_subparsers(title="subcommands", help=None)
+     for cls in SubCommand.__subclasses__():
+         cmd = cls()
+@@ -589,5 +610,6 @@ def main():
+     args, argv = parser.parse_known_args()
+     return args.cmdobj.run(args, argv)
+ 
++
+ if __name__ == "__main__":
+     sys.exit(main())
 -- 
 2.20.1
