@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58054)
+Received: from eggs.gnu.org ([209.51.188.92]:34892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtGk2-0000ww-Fm
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:55:44 -0500
+	(envelope-from <svens@stackframe.org>) id 1gtH8Y-0005NP-FR
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 14:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtGk0-0004jJ-8d
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:55:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49284)
+	(envelope-from <svens@stackframe.org>) id 1gtH8X-0000lo-Fh
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 14:21:02 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:51202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gtGk0-0004hm-2Z
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:55:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gtGjv-0004l8-Rm
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 18:55:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D06D12E80CD
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 18:55:35 +0000 (UTC)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1gtH8X-0000ky-3N
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 14:21:01 -0500
+From: Sven Schnelle <svens@stackframe.org>
+Date: Mon, 11 Feb 2019 20:20:39 +0100
+Message-Id: <20190211192039.5457-1-svens@stackframe.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Feb 2019 18:50:06 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <154991100617.18956.6046660476631562075.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
- emulation failure
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/hppa: forward requests to CPU HPA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,124 +25,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 
-This is related to SMM usage in SeaBIOS. The QEMU register dump states
-SMM=3D1, plus "<0f> aa" from the dumped code stands for the RSM
-instruction (0F AA -- RSM=E2=80=94Resume from System Management Mode, see i=
-t in
-the Intel SDM.)
+HP-UX 10.20 uses busmaster writes to the CPU EIR to signal
+interrupts from the SCSI constroller. (Similar to what is known
+as MSI on x86)
 
-In RHEL7 downstream, we disabled SMM usage in SeaBIOS.
-- https://bugzilla.redhat.com/show_bug.cgi?id=3D1378006
-- https://bugzilla.redhat.com/show_bug.cgi?id=3D1464654#c21
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ hw/hppa/dino.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-It's conceivable that the upstream host kernel suffered a regression
-4.19 and 4.20; in particular when it comes to nesting. For example, Ladi
-fixed <https://bugzilla.redhat.com/show_bug.cgi?id=3D1488203> in
-<https://www.spinics.net/lists/kvm/msg156709.html>:
-
-0234bf885236 KVM: x86: introduce ISA specific SMM entry/exit callbacks
-72d7b374b14d KVM: x86: introduce ISA specific smi_allowed callback
-21f2d5511838 KVM: nVMX: set IDTR and GDTR limits when loading L1 host state
-72e9cbdb4338 KVM: nVMX: fix SMI injection in guest mode
-c26340651b75 KVM: nSVM: refactor nested_svm_vmrun
-05cade71cf3b KVM: nSVM: fix SMI injection in guest mode
-
-These were part of v4.15. But, based on
-<https://bugzilla.redhat.com/show_bug.cgi?id=3D1661979>, more recent
-kernels may have regressed those fixes.
-
-(Bunch of non-public BZ references above; sorry about that, I can't open
-them up.)
-
-** Bug watch added: Red Hat Bugzilla #1378006
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1378006
-
-** Bug watch added: Red Hat Bugzilla #1464654
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1464654
-
-** Bug watch added: Red Hat Bugzilla #1488203
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1488203
-
-** Bug watch added: Red Hat Bugzilla #1661979
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1661979
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813165
-
-Title:
-  KVM internal error. Suberror: 1 emulation failure
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello Devs.
-
-  Having problems getting VM to run with qemu 3.1.0. I should mention
-  it's a nested configuration.
-
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-
-  Someone has an idea whats going wrong here?
-
-  thanks and cheers
-  t.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
+diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+index 31e09942b5..360716de57 100644
+--- a/hw/hppa/dino.c
++++ b/hw/hppa/dino.c
+@@ -105,6 +105,7 @@ typedef struct DinoState {
+     MemoryRegion bm;
+     MemoryRegion bm_ram_alias;
+     MemoryRegion bm_pci_alias;
++    MemoryRegion bm_cpu_alias;
+ 
+     MemoryRegion cpu0_eir_mem;
+ } DinoState;
+@@ -473,12 +474,17 @@ PCIBus *dino_init(MemoryRegion *addr_space,
+     memory_region_init_alias(&s->bm_pci_alias, OBJECT(s),
+                              "bm-pci", &s->pci_mem,
+                              0xf0000000 + DINO_MEM_CHUNK_SIZE,
+-                             31 * DINO_MEM_CHUNK_SIZE);
++                             30 * DINO_MEM_CHUNK_SIZE);
++    memory_region_init_alias(&s->bm_cpu_alias, OBJECT(s),
++                             "bm-cpu", addr_space, 0xfff00000,
++                             0xfffff);
+     memory_region_add_subregion(&s->bm, 0,
+                                 &s->bm_ram_alias);
+     memory_region_add_subregion(&s->bm,
+                                 0xf0000000 + DINO_MEM_CHUNK_SIZE,
+                                 &s->bm_pci_alias);
++    memory_region_add_subregion(&s->bm, 0xfff00000,
++                                &s->bm_cpu_alias);
+     address_space_init(&s->bm_as, &s->bm, "pci-bm");
+     pci_setup_iommu(b, dino_pcihost_set_iommu, s);
+ 
+-- 
+2.20.1
