@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42611)
+Received: from eggs.gnu.org ([209.51.188.92]:43382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gtLT6-0001Aa-TQ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:58:33 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtLUD-0002Am-2s
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:59:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gtLT5-0000Vk-4B
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:58:32 -0500
-Received: from mga05.intel.com ([192.55.52.43]:14039)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1gtLT4-0000SR-Qh
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:58:31 -0500
-Date: Tue, 12 Feb 2019 07:58:00 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190211235800.GA27403@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190211064629.20186-1-richardw.yang@linux.intel.com>
-	<20190211154307.203f8d35@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gtLU1-0001YO-7k
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:59:34 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtLTt-0001ML-19
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:59:23 -0500
+Received: by mail-wm1-f65.google.com with SMTP id j125so1096840wmj.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:59:16 -0800 (PST)
+References: <cover.1549857716.git.balaton@eik.bme.hu>
+	<4ba510e2c7771808fa5061e14526f313c1ac3817.1549857716.git.balaton@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <843d579b-9eb3-f96a-bc53-17c16b7cec65@redhat.com>
+Date: Tue, 12 Feb 2019 00:59:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190211154307.203f8d35@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] pc-dimm: use same mechanism for
- [get|set]_addr
+In-Reply-To: <4ba510e2c7771808fa5061e14526f313c1ac3817.1549857716.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] mips_fulong2e: Fix bios flash size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: Huacai Chen <zltjiangshi@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Mon, Feb 11, 2019 at 03:43:07PM +0100, Igor Mammedov wrote:
->On Mon, 11 Feb 2019 14:46:29 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->
->> [get|set]_addr are two counterpart to access PCDIMMDevice.addr.
->> 
->> Since we have already set up a property PC_DIMM_ADDR_PROP for this
->> field and use this mechanism in set_addr, it would be more proper to use
->> the same mechanism in get_addr.
->> 
->> This patch uses object_property_get_uint() to replace the direct memory
->> access to make [get|set]_addr with the same mechanism.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->
->Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->
+On 2/11/19 5:01 AM, BALATON Zoltan wrote:
+> According to both the specifications on linux-mips.org referenced in a
 
-Thanks :-)
+This link: https://www.linux-mips.org/wiki/Fulong#Front:
 
->> 
->> ---
->> v2: replace NULL with error_abort to handle error properly
->> ---
->>  hw/mem/pc-dimm.c | 4 +---
->>  1 file changed, 1 insertion(+), 3 deletions(-)
->> 
->> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
->> index 0c9b9e8292..152400b1fc 100644
->> --- a/hw/mem/pc-dimm.c
->> +++ b/hw/mem/pc-dimm.c
->> @@ -204,9 +204,7 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
->>  
->>  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
->>  {
->> -    const PCDIMMDevice *dimm = PC_DIMM(md);
->> -
->> -    return dimm->addr;
->> +    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, &error_abort);
->>  }
->>  
->>  static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
+> comment at the beginning of the file and the flash chip part number
+> the bios size should be 512k not 1M.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
--- 
-Wei Yang
-Help you, Help me
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  hw/mips/mips_fulong2e.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index 02549d5c7e..10e6ed585a 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/units.h"
+>  #include "qapi/error.h"
+> +#include "cpu.h"
+>  #include "hw/hw.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/dma/i8257.h"
+> @@ -35,7 +36,6 @@
+>  #include "audio/audio.h"
+>  #include "qemu/log.h"
+>  #include "hw/loader.h"
+> -#include "hw/mips/bios.h"
+>  #include "hw/ide.h"
+>  #include "elf.h"
+>  #include "hw/isa/vt82c686.h"
+> @@ -51,6 +51,8 @@
+>  #define ENVP_NB_ENTRIES	 	16
+>  #define ENVP_ENTRY_SIZE	 	256
+>  
+> +/* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
+> +#define BIOS_SIZE (512 * KiB)
+>  #define MAX_IDE_BUS 2
+>  
+>  /*
+> @@ -307,12 +309,9 @@ static void mips_fulong2e_init(MachineState *machine)
+>      /* fulong 2e has 256M ram. */
+>      ram_size = 256 * MiB;
+>  
+> -    /* fulong 2e has a 1M flash.Winbond W39L040AP70Z */
+> -    bios_size = 1 * MiB;
+> -
+>      /* allocate RAM */
+>      memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram", ram_size);
+> -    memory_region_init_ram(bios, NULL, "fulong2e.bios", bios_size,
+> +    memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
+>                             &error_fatal);
+>      memory_region_set_readonly(bios, true);
+>  
+> 
