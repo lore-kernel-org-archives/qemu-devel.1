@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49420)
+Received: from eggs.gnu.org ([209.51.188.92]:55040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gtD8c-0007jB-ML
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:04:51 -0500
+	(envelope-from <agraf@suse.de>) id 1gtDS1-0005Mu-B1
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:24:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gtD8Y-0005z2-JX
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:04:50 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:35516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gtD8J-0002HS-DS
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:04:37 -0500
-From: Liam Merwick <liam.merwick@oracle.com>
-Date: Mon, 11 Feb 2019 15:03:04 +0000
-Message-Id: <1549897385-10091-2-git-send-email-liam.merwick@oracle.com>
-In-Reply-To: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
-References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] tpm_tis: assert valid addr passed to
- tpm_tis_locality_from_addr()
+	(envelope-from <agraf@suse.de>) id 1gtDS0-0002IV-9z
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:24:53 -0500
+References: <1549456893-16589-1-git-send-email-thuth@redhat.com>
+	<20190206135840.60a2a49f.cohuck@redhat.com>
+	<52b3de29-6918-952d-9d91-abdfb6dba25b@vivier.eu>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <6de44209-a135-0894-5407-4f6af7a0965e@suse.de>
+Date: Mon, 11 Feb 2019 16:24:48 +0100
+MIME-Version: 1.0
+In-Reply-To: <52b3de29-6918-952d-9d91-abdfb6dba25b@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] s390x: Fix the confusing
+ contributions-after-2012 license statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanb@linux.ibm.com, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Defensive check to prevent future caller passing incorrect address
-or catch if the MMIO address parameters were not all changed together.
+On 02/06/2019 02:02 PM, Laurent Vivier wrote:
+> On 06/02/2019 13:58, Cornelia Huck wrote:
+>> On Wed,  6 Feb 2019 13:41:33 +0100
+>> Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>> The license information in these files is rather confusing. The text
+>>> declares LGPL first, but then says that contributions after 2012 are
+>>> licensed under the GPL instead. How should the average user who just
+>>> downloaded the release tarball know which part is now GPL and which
+>>> is LGPL?
+>> FWIW, that statement was added in ccb084d3f0ec ("s390: new
+>> contributions GPLv2 or later").
+>>
+>>> Looking at the text of the LGPL (see COPYING.LIB in the top directory),
+>>> the license clearly states how this should be done instead:
+>>>
+>>> "3. You may opt to apply the terms of the ordinary GNU General Public
+>>>   License instead of this License to a given copy of the Library. To do
+>>>   this, you must alter all the notices that refer to this License, so
+>>>   that they refer to the ordinary GNU General Public License, version 2,
+>>>   instead of to this License."
+>> Hm. This talks about GPL v2, not GPL v2-or-later...
+>>
+>>> Thus let's clean up the confusing statements and use the proper GPL
+>>> text only.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>   linux-user/s390x/target_cpu.h | 19 ++++++++-----------
+>>>   target/s390x/cpu.c            | 19 ++++++++-----------
+>>>   target/s390x/cpu.h            | 19 ++++++++-----------
+>>>   target/s390x/kvm.c            | 19 ++++++++-----------
+>> BTW: Is the original author of the code still around?
+> For the linux-user/s390x/target_cpu.h, it seems this code has been pushed by Alex Graf:
+>
+> commit 10ec51174ca69a4c3c5149b0b3baaa6ccba66273
+> Author: Alexander Graf <agraf@suse.de>
+> Date:   Sat Dec 5 12:44:21 2009 +0100
+>
+>      S/390 CPU fake emulation
+>      
+>      Because Qemu currently requires a TCG target to exist and there are quite some
+>      useful helpers here to lay the groundwork for out KVM target, let's create a
+>      stub TCG emulation target for S390X CPUs.
+>      
+>      This is required to make tcg happy. The emulation target itself won't work
+>      though.
+>      
+>      Signed-off-by: Alexander Graf <agraf@suse.de>
+>      Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+>
+> But the "(c) 2009 Ulrich Hecht" is confusing.
 
-Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
----
+Why? Ulrich was the one that started the port, I then cleaned it up, 
+improved it, added system emulation and upstreamed it.
 
-I've been running static analysis tools on QEMU and one reports this check.
-While it's just theoretically correct (impossible to hit with current code),
-fixing this helps minimise noise and find other issues using those static
-analyzers as well as defending against the addition of future bugs.
+What problem exactly are you trying to solve?
 
- hw/tpm/tpm_tis.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 61a130beef35..860c2ace7d99 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -100,6 +100,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
- 
- static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
- {
-+    assert(addr < TPM_TIS_ADDR_SIZE);
-     return (uint8_t)((addr >> TPM_TIS_LOCALITY_SHIFT) & 0x7);
- }
- 
--- 
-1.8.3.1
+Alex
