@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40951)
+Received: from eggs.gnu.org ([209.51.188.92]:40948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtFjL-0004w5-NO
+	(envelope-from <bounces@canonical.com>) id 1gtFjL-0004w4-QG
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtFjJ-0002om-Vh
+	(envelope-from <bounces@canonical.com>) id 1gtFjJ-0002oh-VH
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:50:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33192)
+Received: from indium.canonical.com ([91.189.90.7]:33218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gtFjJ-0002je-Od
+	id 1gtFjJ-0002jp-OQ
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:50:53 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gtFj2-0004pz-T6
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 17:50:36 +0000
+	id 1gtFj3-0004pw-DL
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 17:50:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D90B12E80C7
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 17:50:36 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 63FEA2E80CB
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 17:50:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Feb 2019 17:38:47 -0000
+Date: Mon, 11 Feb 2019 17:41:31 -0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <154990672772.19204.9165836837549456033.malone@soybean.canonical.com>
+Message-Id: <154990689198.21025.12423231771970348348.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
  emulation failure
@@ -39,39 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hmm, I've also just hit this in a nest:
-
-KVM internal error. Suberror: 1
-emulation failure
-EAX=3D00000001 EBX=3D000f7874 ECX=3D00000002 EDX=3D00000001
-ESI=3D7ffbdca4 EDI=3D000069f2 EBP=3D000069b2 ESP=3D000a8000
-EIP=3D000fd099 EFL=3D00010046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HLT=
-=3D0
-ES =3D0010 00000000 ffffffff 00c09300
-CS =3D0000 00000000 00000fff 00809b00
-SS =3D0010 00000000 ffffffff 00c09300
-DS =3D0010 00000000 ffffffff 00c09300
-FS =3D0010 00000000 ffffffff 00c09300
-GS =3D0010 00000000 ffffffff 00c09300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     10387cfe 0000fe6c
-IDT=3D     0010387c 00003810
-CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffffcffc DR7=3D000000000e1e0400
-EFER=3D0000000000000000
-Code=3Dcb 66 ba 8f d0 0f 00 e9 ce fe bc 00 80 0a 00 e8 24 4d ff ff <0f> aa =
-fa fc 66 ba a8 d0 0f 00 e9 b7 fe f3 90 f0 0f ba 2d 7c 4f 0f 00 00 72 f3 8b =
-25 78 4f
-^Cqemu-system-x86_64: terminating on signal 2
-
-given thw EIP I suspect the address is actually in seabios.
-
-Host: Fedora 29, 4.20.5-200.fc29.x86_64, qemu 3.0.0 on i7-8650U
-L1: Fedora 29, 5.0.0-0.rc4.git2.2.fc30.x86_64 (and also 4.20), qemu head
-L2: Doesn't even seem to need a useful guest
+Note the error here is on stderr of L1's qemu; there's nothing in dmesg
+on host or L1 and nothing in the libvirt log.
 
 -- =
 
