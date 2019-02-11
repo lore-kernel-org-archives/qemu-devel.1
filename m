@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56525)
+Received: from eggs.gnu.org ([209.51.188.92]:33570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1gt7X9-0006Fs-Jf
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:05:48 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gt83F-0003Vr-1l
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:38:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1gt7X7-0002Av-TP
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:05:47 -0500
-Received: from mout.gmx.net ([212.227.17.21]:58829)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1gt7X7-00021F-IL
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:05:45 -0500
-References: <20190207115400.647-1-richard.henderson@linaro.org>
-	<20190211082150.GA10540@t470p.stackframe.org>
-From: Helge Deller <deller@gmx.de>
-Message-ID: <5792ec5e-9c0e-e174-d2cb-2e6b41eba580@gmx.de>
-Date: Mon, 11 Feb 2019 10:05:30 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190211082150.GA10540@t470p.stackframe.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gt83E-0007DX-5a
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:38:56 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 11 Feb 2019 09:38:37 +0000
+Message-ID: <c861c023-c783-57f6-85ae-52ecba971636@virtuozzo.com>
+References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
+	<20190211034231.GD18083@stefanha-x1.localdomain>
+In-Reply-To: <20190211034231.GD18083@stefanha-x1.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/19] target/hppa: Convert to decodetree
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <B56D4D26371FFD46A366B37CB62EED11@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
+ wrapper code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>
 
-On 11.02.19 09:21, Sven Schnelle wrote:
-> Hi Richard,
-> 
-> On Thu, Feb 07, 2019 at 11:53:41AM +0000, Richard Henderson wrote:
-> 
->> Helge or Sven, if you have a chance to do a bit more testing in
->> the next week, I would appreciate it.  Otherwise we can fix any
->> other minor problems on mainline.
-> 
-> I tested this during the weekend with my HP-UX branch and found no
-> problems. Feel free to add
-> 
-> Tested-by: Sven Schnelle <svens@stackframe.org>
+11.02.2019 6:42, Stefan Hajnoczi wrote:
+> On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogievskiy wr=
+ote:
+>> Hi all!
+>>
+>> We have a very frequent pattern of wrapping a coroutine_fn function
+>> to be called from non-coroutine context:
+>>
+>>    - create structure to pack parameters
+>>    - create function to call original function taking parameters from
+>>      struct
+>>    - create wrapper, which in case of non-coroutine context will
+>>      create a coroutine, enter it and start poll-loop.
+>>
+>> Here is a draft of template code + example how it can be used to drop a
+>> lot of similar code.
+>>
+>> Hope someone like it except me)
+>=20
+> My 2 cents.  Cons:
+>=20
+>   * Synchronous poll loops are an anti-pattern.  They block all of QEMU
+>     with the big mutex held.  Making them easier to write is
+>     questionable because we should aim to have as few of these as
+>     possible.
 
-No issues found here either:
-Tested-by: Helge Deller <deller@gmx.de>
+Understand. Do we have a concept or a kind of target for a future to get ri=
+d of
+these a lot of poll-loops? What is the right way? At least for block-layer?
 
-Thanks!
-Helge
+>=20
+>   * Code generation makes the code easier to write but harder to read.
+>     Code is read more than written.  In this case I think open coding
+>     isn't too bad and I prefer it to reading a code generation script to
+>     understand how it works.
+
+But you can read generated code in same way. You only need to read generato=
+r
+script if it generates something wrong, but should be rare.
+
+>=20
+> If we were planning to add lots more of these then I agree code
+> generation would help.  But in this case I'd rather not.
+>=20
+
+What do you think at least of generating code to create a coroutine from a =
+function
+with multiple arguments?
+
+--=20
+Best regards,
+Vladimir
