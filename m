@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51789)
+Received: from eggs.gnu.org ([209.51.188.92]:51934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtGL7-0003zn-AY
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:29:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGLx-0004tf-8q
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:30:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtGL6-0001Mx-1J
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:29:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53162)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtGL5-0001MS-PL
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:29:55 -0500
-Date: Mon, 11 Feb 2019 18:29:46 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190211182946.GN27585@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
-	<CAFEAcA9hWXR6ynuX8CvFA6AspAgruYiUsQYM0pJ0nNG4b1281w@mail.gmail.com>
-	<20190211170313.GK27585@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGLr-0001gV-9o
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:30:45 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 11 Feb 2019 18:30:26 +0000
+Message-ID: <77422700-9c39-7b8a-33d0-efe666c4242d@virtuozzo.com>
+References: <20181221165341.23736-1-vsementsov@virtuozzo.com>
+	<20181221165341.23736-2-vsementsov@virtuozzo.com>
+	<20190211175410.GI8135@linux.fritz.box>
+In-Reply-To: <20190211175410.GI8135@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <15569765F4A9E1438F984F0F60B939C4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190211170313.GK27585@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/18] Chardev patches
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: move to QOM path for
+ x-block-latency-histogram-set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>
 
-On Mon, Feb 11, 2019 at 05:03:13PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Feb 08, 2019 at 11:44:42AM +0000, Peter Maydell wrote:
-> > On Thu, 7 Feb 2019 at 16:06, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@redhat.com> wrote:
-> > >
-> > > The following changes since commit 632351e0e1a861f2eaf709b053c53f96=
-a1225825:
-> > >
-> > >   Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-requ=
-est' into staging (2019-02-07 14:20:46 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://github.com/elmarco/qemu.git tags/chardev-pull-request
-> > >
-> > > for you to fetch changes up to df3afdedd23ade0c9de55cadeb1d85055689=
-023f:
-> > >
-> > >   tests/test-char: add muxed chardev testing for open/close (2019-0=
-2-07 16:18:25 +0100)
-> > >
-> > > ----------------------------------------------------------------
-> > > Various chardev fixes
-> > >
-> > > ----------------------------------------------------------------
-> >=20
-> > This seems to result in 'make check' failures on some platforms.
-> > I saw this on s390 and aarch32, I think.
-> >=20
-> > MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> > tests/test-char -m=3Dquick -k --tap < /dev/null |
-> > ./scripts/tap-driver.pl --test-name=3D"test-char
-> > "
-> > PASS 1 test-char /char/null
-> > PASS 2 test-char /char/invalid
-> > PASS 3 test-char /char/ringbuf
-> > PASS 4 test-char /char/mux
-> > PASS 5 test-char /char/stdio
-> > PASS 6 test-char /char/pipe
-> > PASS 7 test-char /char/file
-> > PASS 8 test-char /char/file-fifo
-> > PASS 9 test-char /char/udp
-> > PASS 10 test-char /char/serial
-> > PASS 11 test-char /char/hotswap
-> > PASS 12 test-char /char/websocket
-> > PASS 13 test-char /char/socket/server/mainloop/tcp
-> > PASS 14 test-char /char/socket/server/mainloop/unix
-> > PASS 15 test-char /char/socket/server/wait-conn/tcp
-> > PASS 16 test-char /char/socket/server/wait-conn/unix
-> > PASS 17 test-char /char/socket/server/mainloop-fdpass/tcp
-> > PASS 18 test-char /char/socket/server/mainloop-fdpass/unix
-> > PASS 19 test-char /char/socket/server/wait-conn-fdpass/tcp
-> > PASS 20 test-char /char/socket/server/wait-conn-fdpass/unix
-> > PASS 21 test-char /char/socket/client/mainloop/tcp
-> > PASS 22 test-char /char/socket/client/mainloop/unix
-> > qemu: qemu_mutex_destroy: Device or resource busy
-> > PASS 23 test-char /char/socket/client/wait-conn/tcp
-> > PASS 24 test-char /char/socket/client/wait-conn/unix
-> > Aborted (core dumped)
-> > ERROR - too few tests run (expected 32, got 24)
-> >=20
-> > Here's a backtrace from running tests/test-char under gdb.
-> > Looks like a race condition between a thread trying to
-> > destroy a mutex and a different thread that is still
-> > using it.
->=20
-> Thanks, that is very useful. I can see the race condition here
-> now between qio_task_thread_worker and qio_task_thread_result.
-> I need to acquire the mutex in qio_task_thread_result in order
-> to sycnhronize with completion of qio_task_thread_worker.
-
-In testing this first bug, I found a second bug hiding where
-tcp_chr_wait_connected forget to de-register the pending
-reconnect timer GSource, leading to a later crash. We would
-not have seen this in the test suite except for me adding
-a sleep(1) in the right place by chance :-)
-
-I've sent a v3 series for Marc-Andr=C3=A9 to queue for a new PULL
-
-> > On some other hosts I saw a similar
-> > "qemu: qemu_mutex_destroy: Device or resource busy" and core dump in =
-the
-> > migration tests, I think, which is probably the same underlying bug.
->=20
-> Yes, I expect it is the same problem
-
-I'm confident this is the first problem i mention now.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+MTEuMDIuMjAxOSAyMDo1NCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjEuMTIuMjAxOCB1bSAx
+Nzo1MyBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IE1v
+dmUgdG8gd2F5IG9mIGRldmljZSBzZWxlY3RpbmcsIGhvd2V2ZXIgZmFsbCBiYWNrIHRvIGRldmlj
+ZSBuYW1lIGlmDQo+PiBwYXRoIGlzIG5vdCBmb3VuZC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBW
+bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+
+PiAtLS0NCj4+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24gfCAgNCArKy0tDQo+PiAgIGJsb2NrZGV2
+LmMgICAgICAgICAgIHwgMjIgKysrKysrKysrKysrKysrLS0tLS0tLQ0KPj4gICAyIGZpbGVzIGNo
+YW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdp
+dCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IGluZGV4
+IDc2MjAwMGYzMWYuLmJiNzBjNTFhNTcgMTAwNjQ0DQo+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUu
+anNvbg0KPj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IEBAIC00ODksNyArNDg5LDcg
+QEANCj4+ICAgIyBJZiBvbmx5IEBkZXZpY2UgcGFyYW1ldGVyIGlzIHNwZWNpZmllZCwgcmVtb3Zl
+IGFsbCBwcmVzZW50IGxhdGVuY3kgaGlzdG9ncmFtcw0KPj4gICAjIGZvciB0aGUgZGV2aWNlLiBP
+dGhlcndpc2UsIGFkZC9yZXNldCBzb21lIG9mIChvciBhbGwpIGxhdGVuY3kgaGlzdG9ncmFtcy4N
+Cj4+ICAgIw0KPj4gLSMgQGRldmljZTogZGV2aWNlIG5hbWUgdG8gc2V0IGxhdGVuY3kgaGlzdG9n
+cmFtIGZvci4NCj4+ICsjIEBpZDogVGhlIFFPTSBwYXRoIG9yIG5hbWUgb2YgdGhlIGd1ZXN0IGRl
+dmljZS4NCj4+ICAgIw0KPj4gICAjIEBib3VuZGFyaWVzOiBsaXN0IG9mIGludGVydmFsIGJvdW5k
+YXJ5IHZhbHVlcyAoc2VlIGRlc2NyaXB0aW9uIGluDQo+PiAgICMgICAgICAgICAgICAgIEJsb2Nr
+TGF0ZW5jeUhpc3RvZ3JhbUluZm8gZGVmaW5pdGlvbikuIElmIHNwZWNpZmllZCwgYWxsDQo+PiBA
+QCAtNTQ3LDcgKzU0Nyw3IEBADQo+PiAgICMgPC0geyAicmV0dXJuIjoge30gfQ0KPj4gICAjIw0K
+Pj4gICB7ICdjb21tYW5kJzogJ3gtYmxvY2stbGF0ZW5jeS1oaXN0b2dyYW0tc2V0JywNCj4+IC0g
+ICdkYXRhJzogeydkZXZpY2UnOiAnc3RyJywNCj4+ICsgICdkYXRhJzogeydpZCc6ICdzdHInLA0K
+Pj4gICAgICAgICAgICAgICcqYm91bmRhcmllcyc6IFsndWludDY0J10sDQo+PiAgICAgICAgICAg
+ICAgJypib3VuZGFyaWVzLXJlYWQnOiBbJ3VpbnQ2NCddLA0KPj4gICAgICAgICAgICAgICcqYm91
+bmRhcmllcy13cml0ZSc6IFsndWludDY0J10sDQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2tkZXYuYyBi
+L2Jsb2NrZGV2LmMNCj4+IGluZGV4IGE2ZjcxZjlkODMuLmZmMGQ4ZGVkNWUgMTAwNjQ0DQo+PiAt
+LS0gYS9ibG9ja2Rldi5jDQo+PiArKysgYi9ibG9ja2Rldi5jDQo+PiBAQCAtNDM5NywyMSArNDM5
+NywyOSBAQCB2b2lkIHFtcF94X2Jsb2NrZGV2X3NldF9pb3RocmVhZChjb25zdCBjaGFyICpub2Rl
+X25hbWUsIFN0ck9yTnVsbCAqaW90aHJlYWQsDQo+PiAgIH0NCj4+ICAgDQo+PiAgIHZvaWQgcW1w
+X3hfYmxvY2tfbGF0ZW5jeV9oaXN0b2dyYW1fc2V0KA0KPj4gLSAgICBjb25zdCBjaGFyICpkZXZp
+Y2UsDQo+PiArICAgIGNvbnN0IGNoYXIgKmlkLA0KPj4gICAgICAgYm9vbCBoYXNfYm91bmRhcmll
+cywgdWludDY0TGlzdCAqYm91bmRhcmllcywNCj4+ICAgICAgIGJvb2wgaGFzX2JvdW5kYXJpZXNf
+cmVhZCwgdWludDY0TGlzdCAqYm91bmRhcmllc19yZWFkLA0KPj4gICAgICAgYm9vbCBoYXNfYm91
+bmRhcmllc193cml0ZSwgdWludDY0TGlzdCAqYm91bmRhcmllc193cml0ZSwNCj4+ICAgICAgIGJv
+b2wgaGFzX2JvdW5kYXJpZXNfZmx1c2gsIHVpbnQ2NExpc3QgKmJvdW5kYXJpZXNfZmx1c2gsDQo+
+PiAgICAgICBFcnJvciAqKmVycnApDQo+PiAgIHsNCj4+IC0gICAgQmxvY2tCYWNrZW5kICpibGsg
+PSBibGtfYnlfbmFtZShkZXZpY2UpOw0KPj4gICAgICAgQmxvY2tBY2N0U3RhdHMgKnN0YXRzOw0K
+Pj4gICAgICAgaW50IHJldDsNCj4+ICsgICAgRXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7DQo+PiAr
+ICAgIEJsb2NrQmFja2VuZCAqYmxrID0gYmxrX2J5X3FkZXZfaWQoaWQsICZsb2NhbF9lcnIpOw0K
+Pj4gICANCj4+ICAgICAgIGlmICghYmxrKSB7DQo+PiAtICAgICAgICBlcnJvcl9zZXRnKGVycnAs
+ICJEZXZpY2UgJyVzJyBub3QgZm91bmQiLCBkZXZpY2UpOw0KPj4gLSAgICAgICAgcmV0dXJuOw0K
+Pj4gKyAgICAgICAgYmxrID0gYmxrX2J5X25hbWUoaWQpOw0KPj4gKyAgICAgICAgaWYgKCFibGsp
+IHsNCj4+ICsgICAgICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgbG9jYWxfZXJyKTsNCj4+
+ICsgICAgICAgICAgICByZXR1cm47DQo+PiArICAgICAgICB9IGVsc2Ugew0KPj4gKyAgICAgICAg
+ICAgIGVycm9yX2ZyZWUobG9jYWxfZXJyKTsNCj4+ICsgICAgICAgICAgICBsb2NhbF9lcnIgPSBO
+VUxMOw0KPj4gKyAgICAgICAgfQ0KPj4gICAgICAgfQ0KPiANCj4gV2h5IGRvbid0IHlvdSB1c2Ug
+cW1wX2dldF9ibGsoKSBoZXJlPw0KPiANCg0KcW1wX2dldF9ibGsgaXMgdXNlZCBmb3IgY2FzZXMg
+d2hlbiB3ZSBoYXZlIGJvdGggQGRldmljZSBhbmQgQGlkIHBhcmFtZXRlcnMsIHdoZXJlIEBkZXZp
+Y2UgaXMgZGVwcmVjYXRlZC4NCg0KQW5kIG9uZSBvZiBwcmV2aW91cyBpdGVyYXRpb24gd2FzIGEg
+dHJ5IHRvIGRvIGl0IGluIHRoaXMgd2F5IChoYXZlIGJvdGggQGlkIGFuZCBAZGV2aWNlKS4gQnV0
+IGl0IHdhcw0KY29uc2lkZXJlZCB0byBiZSBiYWQgaWRlYSBmb3IgYSBuZXcgY29tbWFuZCwgd2hp
+Y2ggZG9uJ3QgbmVlZCBhbnkgYmFja3dhcmQgY29tcGF0aWJpbGl0eS4gQW5kIHdlIGRlY2lkZWQN
+CnRvIG1lcmdlIHR3byB2YXJpYW50cyBpbiBAaWQuDQoNClNvLCBkbyB5b3Ugc3VnZ2VzdCB0byBk
+cm9wIGJsa19ieV9uYW1lKCkgdmFyaWFudCBhdCBhbGwsIGFuZCBnbyB0aHJvdWdoIHFtcF9nZXRf
+YmxrKE5VTEwsIGlkKSwgd2hpY2gNCndpbGwgY2FsbCBibGtfYnlfcWRldl9pZCgpIGFuZCBmYWls
+IGlmIG5vdCBmb3VuZD8NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
