@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38692)
+Received: from eggs.gnu.org ([209.51.188.92]:38670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOi-0005tB-K2
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOi-0005ss-8Z
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOg-000533-4I
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOg-00053O-6W
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:00 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:35021)
+Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:33354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtLOf-0004T5-Ct
+	id 1gtLOf-0004Z9-Dw
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:57 -0500
-Received: by mail-pf1-x441.google.com with SMTP id z9so344620pfi.2
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:20 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id c123so349260pfb.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:29 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 15:52:44 -0800
-Message-Id: <20190211235258.542-15-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 15:52:51 -0800
+Message-Id: <20190211235258.542-22-richard.henderson@linaro.org>
 In-Reply-To: <20190211235258.542-1-richard.henderson@linaro.org>
 References: <20190211235258.542-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 14/28] target/arm: Define
- arm_cpu_do_unaligned_access for CONFIG_USER_ONLY
+Subject: [Qemu-devel] [PATCH v3 21/28] target/arm: Set PSTATE.TCO on
+ exception entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +30,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-We will need this to raise unaligned exceptions from user mode.
+R0085 specifies that exception handlers begin with tag checks overridden.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/op_helper.c | 33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
+v2: Only set if MTE feature present.
+---
+ target/arm/helper.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 8698b4dc83..d3cf362e4b 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -87,8 +87,6 @@ uint32_t HELPER(neon_tbl)(uint32_t ireg, uint32_t def, void *vn,
-     return val;
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f17e045706..b979ca0255 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9476,6 +9476,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+     target_ulong addr = env->cp15.vbar_el[new_el];
+     unsigned int new_mode = aarch64_pstate_mode(new_el, true);
+     unsigned int cur_el = arm_current_el(env);
++    unsigned int new_pstate;
  
--#if !defined(CONFIG_USER_ONLY)
--
- static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-                                             unsigned int target_el,
-                                             bool same_el, bool ea,
-@@ -179,6 +177,22 @@ static void deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
-     raise_exception(env, exc, syn, target_el);
- }
+     /*
+      * Note that new_el can never be 0.  If cur_el is 0, then
+@@ -9569,7 +9570,11 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+     qemu_log_mask(CPU_LOG_INT, "...with ELR 0x%" PRIx64 "\n",
+                   env->elr_el[new_el]);
  
-+/* Raise a data fault alignment exception for the specified virtual address */
-+void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-+                                 MMUAccessType access_type,
-+                                 int mmu_idx, uintptr_t retaddr)
-+{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    ARMMMUFaultInfo fi = {};
-+
-+    /* now we have a real cpu fault */
-+    cpu_restore_state(cs, retaddr, true);
-+
-+    fi.type = ARMFault_Alignment;
-+    deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
-+}
-+
-+#ifndef CONFIG_USER_ONLY
- /* try to fill the TLB and return an exception if error. If retaddr is
-  * NULL, it means that the function was called in C code (i.e. not
-  * from generated code or from helper.c)
-@@ -200,21 +214,6 @@ void tlb_fill(CPUState *cs, target_ulong addr, int size,
-     }
- }
+-    pstate_write(env, PSTATE_DAIF | new_mode);
++    new_pstate = new_mode | PSTATE_DAIF;
++    if (cpu_isar_feature(aa64_mte, cpu)) {
++        new_pstate |= PSTATE_TCO;
++    }
++    pstate_write(env, new_pstate);
+     env->aarch64 = 1;
+     aarch64_restore_sp(env, new_el);
  
--/* Raise a data fault alignment exception for the specified virtual address */
--void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
--                                 MMUAccessType access_type,
--                                 int mmu_idx, uintptr_t retaddr)
--{
--    ARMCPU *cpu = ARM_CPU(cs);
--    ARMMMUFaultInfo fi = {};
--
--    /* now we have a real cpu fault */
--    cpu_restore_state(cs, retaddr, true);
--
--    fi.type = ARMFault_Alignment;
--    deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
--}
--
- /* arm_cpu_do_transaction_failed: handle a memory system error response
-  * (eg "no device/memory present at address") by raising an external abort
-  * exception
 -- 
 2.17.2
