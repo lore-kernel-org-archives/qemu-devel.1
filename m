@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37667)
+Received: from eggs.gnu.org ([209.51.188.92]:37791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLNo-0004zz-V7
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLNr-00051I-NT
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLNn-0004EL-HW
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:04 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41243)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLNq-0004Io-5J
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:07 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33735)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtLNn-0004CM-7k
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:03 -0500
-Received: by mail-pl1-x643.google.com with SMTP id k15so327256pls.8
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:02 -0800 (PST)
+	id 1gtLNp-0004H3-RI
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:06 -0500
+Received: by mail-pg1-x543.google.com with SMTP id z11so335240pgu.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:05 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 15:52:30 -0800
-Message-Id: <20190211235258.542-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 00/28] target/arm: Implement ARMv8.5-MemTag
+Date: Mon, 11 Feb 2019 15:52:32 -0800
+Message-Id: <20190211235258.542-3-richard.henderson@linaro.org>
+In-Reply-To: <20190211235258.542-1-richard.henderson@linaro.org>
+References: <20190211235258.542-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 02/28] target/arm: Split helper_msr_i_pstate
+ into 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,110 +30,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Based-on: <20190204131228.25949-1-richard.henderson@linaro.org>
-aka "[PATCH v3 0/4] target/arm: Implement ARMv8.5-BTI".
+The EL0+UMA check is unique to DAIF.  While SPSel had avoided the
+check by nature of already checking EL >= 1, the other post v8.0
+extensions to MSR (imm) allow EL0 and do not require UMA.  Avoid
+the unconditional write to pc and use raise_exception_ra to unwind.
 
-The full tree is available at
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper-a64.h    |  3 +++
+ target/arm/helper.h        |  1 -
+ target/arm/internals.h     | 15 ++++++++++++++
+ target/arm/helper-a64.c    | 30 +++++++++++++++++++++++++++
+ target/arm/op_helper.c     | 42 --------------------------------------
+ target/arm/translate-a64.c | 41 ++++++++++++++++++++++---------------
+ 6 files changed, 73 insertions(+), 59 deletions(-)
 
-  https://github.org/rth7680/qemu.git tgt-arm-mte
-
-Major changes since v2:
-
-* LDG, STG, ST2G, LDGM, STGM STZGM instructions updated.
-
-  The new definition of these functions allows me to clean TBI
-  within the translator, without having to have the helpers dig
-  back down into TCR to determine this.  Removing strip_tbi from
-  mte_helper.c does make things a bit cleaner.
-
-* Add GMID_EL1, trap MTE register accesses to EL[23] as required.
-
-Major changes since v1:
-
-* Updates to a newer revision of the spec.  I know there is still work to
-  do here: another argument to STG, ST2G, and a new STZGM insn.
-
-* User emulation adds an x-tagged-pages property.  Without that, all pages
-  are MemAttr != Tagged and so all accesses unchecked.  I am not turning
-  off SCTLR_EL1.ATA0, so even without x-tagged-pages the program has access
-  to tag generation (e.g. the IRG insn).
-
-* System emulation is new, though effectively untested.  I need to fiddle
-  around with the kernel to see what I can put together there.
-
-  What I can see is:
-
-  address-space: cpu-tag-memory-0
-    0000000000000000-07fffffffffffffe (prio 0, i/o): tag-memory
-      0000000002000000-0000000009ffffff (prio 0, ram): mach-virt.tag
-
-  address-space: cpu-memory-0
-    0000000000000000-ffffffffffffffff (prio 0, i/o): system
-      0000000040000000-000000013fffffff (prio 0, ram): mach-virt.ram
-
-* New checks for alignment and page permissions before allowing
-  access to the tag memory.
-
-
-r~
-
-
-Richard Henderson (28):
-  target/arm: Split out arm_sctlr
-  target/arm: Split helper_msr_i_pstate into 3
-  target/arm: Add clear_pstate_bits, share gen_ss_advance
-  target/arm: Add MTE_ACTIVE to tb_flags
-  target/arm: Extract TCMA with ARMVAParameters
-  target/arm: Add MTE system registers
-  target/arm: Assert no manual change to CACHED_PSTATE_BITS
-  target/arm: Add helper_mte_check{1,2}
-  target/arm: Suppress tag check for sp+offset
-  target/arm: Implement the IRG instruction
-  target/arm: Implement ADDG, SUBG instructions
-  target/arm: Implement the GMI instruction
-  target/arm: Implement the SUBP instruction
-  target/arm: Define arm_cpu_do_unaligned_access for CONFIG_USER_ONLY
-  target/arm: Implement LDG, STG, ST2G instructions
-  target/arm: Implement the STGP instruction
-  target/arm: Implement the LDGM and STGM instructions
-  target/arm: Implement the access tag cache flushes
-  target/arm: Clean address for DC ZVA
-  target/arm: Implement data cache set allocation tags
-  target/arm: Set PSTATE.TCO on exception entry
-  tcg: Introduce target-specific page data for user-only
-  target/arm: Cache the Tagged bit for a page in MemTxAttrs
-  target/arm: Create tagged ram when MTE is enabled
-  target/arm: Add allocation tag storage for user mode
-  target/arm: Add allocation tag storage for system mode
-  target/arm: Enable MTE
-  tests/tcg/aarch64: Add mte smoke tests
-
- include/exec/cpu-all.h            |  10 +-
- target/arm/cpu.h                  |  52 ++-
- target/arm/helper-a64.h           |  19 +
- target/arm/helper.h               |   3 -
- target/arm/internals.h            |  44 +++
- target/arm/translate.h            |  36 ++
- accel/tcg/translate-all.c         |  28 ++
- hw/arm/virt.c                     |  33 ++
- linux-user/mmap.c                 |  10 +-
- linux-user/syscall.c              |   4 +-
- target/arm/cpu.c                  |  31 +-
- target/arm/cpu64.c                |  19 +
- target/arm/helper-a64.c           |  30 ++
- target/arm/helper.c               | 229 +++++++++--
- target/arm/mte_helper.c           | 617 ++++++++++++++++++++++++++++++
- target/arm/op_helper.c            |  80 +---
- target/arm/translate-a64.c        | 390 +++++++++++++++----
- target/arm/translate.c            |  11 -
- tests/tcg/aarch64/mte-1.c         |  27 ++
- tests/tcg/aarch64/mte-2.c         |  39 ++
- target/arm/Makefile.objs          |   2 +-
- tests/tcg/aarch64/Makefile.target |   4 +
- 22 files changed, 1517 insertions(+), 201 deletions(-)
- create mode 100644 target/arm/mte_helper.c
- create mode 100644 tests/tcg/aarch64/mte-1.c
- create mode 100644 tests/tcg/aarch64/mte-2.c
-
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index aff8d6c9f3..a915c1247f 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -19,6 +19,9 @@
+ DEF_HELPER_FLAGS_2(udiv64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(sdiv64, TCG_CALL_NO_RWG_SE, s64, s64, s64)
+ DEF_HELPER_FLAGS_1(rbit64, TCG_CALL_NO_RWG_SE, i64, i64)
++DEF_HELPER_2(msr_i_spsel, void, env, i32)
++DEF_HELPER_2(msr_i_daifset, void, env, i32)
++DEF_HELPER_2(msr_i_daifclear, void, env, i32)
+ DEF_HELPER_3(vfp_cmph_a64, i64, f16, f16, ptr)
+ DEF_HELPER_3(vfp_cmpeh_a64, i64, f16, f16, ptr)
+ DEF_HELPER_3(vfp_cmps_a64, i64, f32, f32, ptr)
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 53a38188c6..28b1dd6252 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -77,7 +77,6 @@ DEF_HELPER_2(get_cp_reg, i32, env, ptr)
+ DEF_HELPER_3(set_cp_reg64, void, env, ptr, i64)
+ DEF_HELPER_2(get_cp_reg64, i64, env, ptr)
+ 
+-DEF_HELPER_3(msr_i_pstate, void, env, i32, i32)
+ DEF_HELPER_1(clear_pstate_ss, void, env)
+ 
+ DEF_HELPER_2(get_r13_banked, i32, env, i32)
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index a4bd1becb7..587a1ddf58 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -968,4 +968,19 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+ ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
+                                    ARMMMUIdx mmu_idx, bool data);
+ 
++static inline int exception_target_el(CPUARMState *env)
++{
++    int target_el = MAX(1, arm_current_el(env));
++
++    /*
++     * No such thing as secure EL1 if EL3 is aarch32,
++     * so update the target EL to EL3 in this case.
++     */
++    if (arm_is_secure(env) && !arm_el_is_aa64(env, 3) && target_el == 1) {
++        target_el = 3;
++    }
++
++    return target_el;
++}
++
+ #endif
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 101fa6d3ea..87b8f36122 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -61,6 +61,36 @@ uint64_t HELPER(rbit64)(uint64_t x)
+     return revbit64(x);
+ }
+ 
++void HELPER(msr_i_spsel)(CPUARMState *env, uint32_t imm)
++{
++    update_spsel(env, imm);
++}
++
++static void daif_check(CPUARMState *env, uint32_t op,
++                       uint32_t imm, uintptr_t ra)
++{
++    /* DAIF update to PSTATE. This is OK from EL0 only if UMA is set.  */
++    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UMA)) {
++        raise_exception_ra(env, EXCP_UDEF,
++                           syn_aa64_sysregtrap(0, extract32(op, 0, 3),
++                                               extract32(op, 3, 3), 4,
++                                               imm, 0x1f, 0),
++                           exception_target_el(env), ra);
++    }
++}
++
++void HELPER(msr_i_daifset)(CPUARMState *env, uint32_t imm)
++{
++    daif_check(env, 0x1e, imm, GETPC());
++    env->daif |= (imm << 6) & PSTATE_DAIF;
++}
++
++void HELPER(msr_i_daifclear)(CPUARMState *env, uint32_t imm)
++{
++    daif_check(env, 0x1f, imm, GETPC());
++    env->daif &= ~((imm << 6) & PSTATE_DAIF);
++}
++
+ /* Convert a softfloat float_relation_ (as returned by
+  * the float*_compare functions) to the correct ARM
+  * NZCV flag state.
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index c998eadfaa..c5721a866d 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -68,20 +68,6 @@ void raise_exception_ra(CPUARMState *env, uint32_t excp, uint32_t syndrome,
+     cpu_loop_exit_restore(cs, ra);
+ }
+ 
+-static int exception_target_el(CPUARMState *env)
+-{
+-    int target_el = MAX(1, arm_current_el(env));
+-
+-    /* No such thing as secure EL1 if EL3 is aarch32, so update the target EL
+-     * to EL3 in this case.
+-     */
+-    if (arm_is_secure(env) && !arm_el_is_aa64(env, 3) && target_el == 1) {
+-        target_el = 3;
+-    }
+-
+-    return target_el;
+-}
+-
+ uint32_t HELPER(neon_tbl)(uint32_t ireg, uint32_t def, void *vn,
+                           uint32_t maxindex)
+ {
+@@ -875,34 +861,6 @@ uint64_t HELPER(get_cp_reg64)(CPUARMState *env, void *rip)
+     return res;
+ }
+ 
+-void HELPER(msr_i_pstate)(CPUARMState *env, uint32_t op, uint32_t imm)
+-{
+-    /* MSR_i to update PSTATE. This is OK from EL0 only if UMA is set.
+-     * Note that SPSel is never OK from EL0; we rely on handle_msr_i()
+-     * to catch that case at translate time.
+-     */
+-    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UMA)) {
+-        uint32_t syndrome = syn_aa64_sysregtrap(0, extract32(op, 0, 3),
+-                                                extract32(op, 3, 3), 4,
+-                                                imm, 0x1f, 0);
+-        raise_exception(env, EXCP_UDEF, syndrome, exception_target_el(env));
+-    }
+-
+-    switch (op) {
+-    case 0x05: /* SPSel */
+-        update_spsel(env, imm);
+-        break;
+-    case 0x1e: /* DAIFSet */
+-        env->daif |= (imm << 6) & PSTATE_DAIF;
+-        break;
+-    case 0x1f: /* DAIFClear */
+-        env->daif &= ~((imm << 6) & PSTATE_DAIF);
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
+-}
+-
+ void HELPER(clear_pstate_ss)(CPUARMState *env)
+ {
+     env->pstate &= ~PSTATE_SS;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 27b90d5778..13e010d27b 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1647,29 +1647,38 @@ static void handle_sync(DisasContext *s, uint32_t insn,
+ static void handle_msr_i(DisasContext *s, uint32_t insn,
+                          unsigned int op1, unsigned int op2, unsigned int crm)
+ {
++    TCGv_i32 t1;
+     int op = op1 << 3 | op2;
++
++    /* End the TB by default, chaining is ok.  */
++    s->base.is_jmp = DISAS_TOO_MANY;
++
+     switch (op) {
+     case 0x05: /* SPSel */
+         if (s->current_el == 0) {
+-            unallocated_encoding(s);
+-            return;
++            goto do_unallocated;
+         }
+-        /* fall through */
+-    case 0x1e: /* DAIFSet */
+-    case 0x1f: /* DAIFClear */
+-    {
+-        TCGv_i32 tcg_imm = tcg_const_i32(crm);
+-        TCGv_i32 tcg_op = tcg_const_i32(op);
+-        gen_a64_set_pc_im(s->pc - 4);
+-        gen_helper_msr_i_pstate(cpu_env, tcg_op, tcg_imm);
+-        tcg_temp_free_i32(tcg_imm);
+-        tcg_temp_free_i32(tcg_op);
+-        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
+-        gen_a64_set_pc_im(s->pc);
+-        s->base.is_jmp = (op == 0x1f ? DISAS_EXIT : DISAS_JUMP);
++        t1 = tcg_const_i32(crm & PSTATE_SP);
++        gen_helper_msr_i_spsel(cpu_env, t1);
++        tcg_temp_free_i32(t1);
+         break;
+-    }
++
++    case 0x1e: /* DAIFSet */
++        t1 = tcg_const_i32(crm);
++        gen_helper_msr_i_daifset(cpu_env, t1);
++        tcg_temp_free_i32(t1);
++        break;
++
++    case 0x1f: /* DAIFClear */
++        t1 = tcg_const_i32(crm);
++        gen_helper_msr_i_daifclear(cpu_env, t1);
++        tcg_temp_free_i32(t1);
++        /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
++        s->base.is_jmp = DISAS_UPDATE;
++        break;
++
+     default:
++    do_unallocated:
+         unallocated_encoding(s);
+         return;
+     }
 -- 
 2.17.2
