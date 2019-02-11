@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38765)
+Received: from eggs.gnu.org ([209.51.188.92]:38639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOk-0005uU-1r
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:07 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOh-0005s5-Ih
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtLOg-00054N-Dp
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:54:01 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46747)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtLOf-0004zw-0G
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:59 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37775)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtLOf-0004gJ-Ko
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:58 -0500
-Received: by mail-pf1-x442.google.com with SMTP id g6so313846pfh.13
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:33 -0800 (PST)
+	id 1gtLOe-0004Rn-Ju
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 18:53:56 -0500
+Received: by mail-pf1-x443.google.com with SMTP id y126so337556pfb.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 15:53:18 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 15:52:54 -0800
-Message-Id: <20190211235258.542-25-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 15:52:41 -0800
+Message-Id: <20190211235258.542-12-richard.henderson@linaro.org>
 In-Reply-To: <20190211235258.542-1-richard.henderson@linaro.org>
 References: <20190211235258.542-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 24/28] target/arm: Create tagged ram when
- MTE is enabled
+Subject: [Qemu-devel] [PATCH v3 11/28] target/arm: Implement ADDG,
+ SUBG instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +30,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h |  4 ++++
- hw/arm/virt.c    | 33 +++++++++++++++++++++++++++++++++
- target/arm/cpu.c | 21 ++++++++++++++++++---
- 3 files changed, 55 insertions(+), 3 deletions(-)
+v2: Shift offset in translate; use extract32.
+---
+ target/arm/helper-a64.h    |  2 ++
+ target/arm/internals.h     |  4 +++
+ target/arm/mte_helper.c    | 32 +++++++++++++++++
+ target/arm/translate-a64.c | 71 ++++++++++++++++++++++++++------------
+ 4 files changed, 86 insertions(+), 23 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ca32939483..2626af4a9c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -768,6 +768,9 @@ struct ARMCPU {
-     /* MemoryRegion to use for secure physical accesses */
-     MemoryRegion *secure_memory;
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 0f6e78c77e..6ad23bf9ee 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -106,3 +106,5 @@ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ DEF_HELPER_FLAGS_2(mte_check1, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_3(mte_check2, TCG_CALL_NO_WG, i64, env, i64, i32)
+ DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_4(addg, TCG_CALL_NO_RWG_SE, i64, env, i64, i32, i32)
++DEF_HELPER_FLAGS_4(subg, TCG_CALL_NO_RWG_SE, i64, env, i64, i32, i32)
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index fbfa770c23..8d1a81df8c 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -1008,4 +1008,8 @@ static inline bool allocation_tag_access_enabled(CPUARMState *env, int el,
+  */
+ #define GMID_EL1_BS  6
  
-+    /* MemoryRegion to use for allocation tag accesses */
-+    MemoryRegion *tag_memory;
++/* We associate one allocation tag per 16 bytes, the minimum.  */
++#define LOG2_TAG_GRANULE 4
++#define TAG_GRANULE      (1 << LOG2_TAG_GRANULE)
 +
-     /* For v8M, pointer to the IDAU interface provided by board/SoC */
-     Object *idau;
+ #endif
+diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
+index cd04e4954b..7aca5b074f 100644
+--- a/target/arm/mte_helper.c
++++ b/target/arm/mte_helper.c
+@@ -188,3 +188,35 @@ uint64_t HELPER(irg)(CPUARMState *env, uint64_t rn, uint64_t rm)
  
-@@ -2850,6 +2853,7 @@ int cpu_mmu_index(CPUARMState *env, bool ifetch);
- typedef enum ARMASIdx {
-     ARMASIdx_NS = 0,
-     ARMASIdx_S = 1,
-+    ARMASIdx_TAG = 2,
- } ARMASIdx;
- 
- /* Return the Exception Level targeted by debug exceptions. */
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 99c2b6e60d..dccd1345a1 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1260,6 +1260,21 @@ static void create_secure_ram(VirtMachineState *vms,
-     g_free(nodename);
+     return address_with_allocation_tag(rn, rtag);
  }
- 
-+static void create_tag_ram(VirtMachineState *vms, MachineState *machine,
-+                           MemoryRegion *tag_sysmem)
++
++uint64_t HELPER(addg)(CPUARMState *env, uint64_t ptr,
++                      uint32_t offset, uint32_t tag_offset)
 +{
-+    MemoryRegion *tagram = g_new(MemoryRegion, 1);
-+    hwaddr base = vms->memmap[VIRT_MEM].base / 32;
-+    hwaddr size = machine->ram_size / 32;
++    int el = arm_current_el(env);
++    uint64_t sctlr = arm_sctlr(env, el);
++    int rtag = 0;
 +
-+    memory_region_init_ram(tagram, NULL, "mach-virt.tag", size, &error_fatal);
-+    memory_region_add_subregion(tag_sysmem, base, tagram);
++    if (allocation_tag_access_enabled(env, el, sctlr)) {
++        int start_tag = allocation_tag_from_addr(ptr);
++        uint16_t exclude = extract32(env->cp15.gcr_el1, 0, 16);
++        rtag = choose_nonexcluded_tag(start_tag, tag_offset, exclude);
++    }
 +
-+    /* ??? Do we really need an fdt entry, or is MemTag enabled sufficient.  */
-+    /* ??? We appear to need secure tag mem to go with secure mem.  */
-+    /* ??? Does that imply we need a fourth address space?  */
++    return address_with_allocation_tag(ptr + offset, rtag);
 +}
 +
- static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
++uint64_t HELPER(subg)(CPUARMState *env, uint64_t ptr,
++                      uint32_t offset, uint32_t tag_offset)
++{
++    int el = arm_current_el(env);
++    uint64_t sctlr = arm_sctlr(env, el);
++    int rtag = 0;
++
++    if (allocation_tag_access_enabled(env, el, sctlr)) {
++        int start_tag = allocation_tag_from_addr(ptr);
++        uint16_t exclude = extract32(env->cp15.gcr_el1, 0, 16);
++        rtag = choose_nonexcluded_tag(start_tag, tag_offset, exclude);
++    }
++
++    return address_with_allocation_tag(ptr - offset, rtag);
++}
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 141a03a88f..8e322bd6a0 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -3679,7 +3679,9 @@ static void disas_pc_rel_adr(DisasContext *s, uint32_t insn)
+  *    sf: 0 -> 32bit, 1 -> 64bit
+  *    op: 0 -> add  , 1 -> sub
+  *     S: 1 -> set flags
+- * shift: 00 -> LSL imm by 0, 01 -> LSL imm by 12
++ * shift: 00 -> LSL imm by 0,
++ *        01 -> LSL imm by 12
++ *        10 -> ADDG, SUBG
+  */
+ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
  {
-     const VirtMachineState *board = container_of(binfo, VirtMachineState,
-@@ -1362,6 +1377,7 @@ static void machvirt_init(MachineState *machine)
-     qemu_irq pic[NUM_IRQS];
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *secure_sysmem = NULL;
-+    MemoryRegion *tag_sysmem = NULL;
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-@@ -1518,6 +1534,20 @@ static void machvirt_init(MachineState *machine)
-                                      "secure-memory", &error_abort);
-         }
+@@ -3690,10 +3692,10 @@ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
+     bool setflags = extract32(insn, 29, 1);
+     bool sub_op = extract32(insn, 30, 1);
+     bool is_64bit = extract32(insn, 31, 1);
++    bool is_tag = false;
  
-+        /*
-+         * The cpu adds the property iff MemTag is supported.
-+         * If it is, we must allocate the ram to back that up.
-+         */
-+        if (object_property_find(cpuobj, "tag-memory", NULL)) {
-+            if (!tag_sysmem) {
-+                tag_sysmem = g_new(MemoryRegion, 1);
-+                memory_region_init(tag_sysmem, OBJECT(machine),
-+                                   "tag-memory", UINT64_MAX / 32);
+     TCGv_i64 tcg_rn = cpu_reg_sp(s, rn);
+     TCGv_i64 tcg_rd = setflags ? cpu_reg(s, rd) : cpu_reg_sp(s, rd);
+-    TCGv_i64 tcg_result;
+ 
+     switch (shift) {
+     case 0x0:
+@@ -3701,35 +3703,58 @@ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
+     case 0x1:
+         imm <<= 12;
+         break;
++    case 0x2:
++        /* ADDG, SUBG */
++        if (!is_64bit || setflags || (imm & 0x30) ||
++            !dc_isar_feature(aa64_mte_insn_reg, s)) {
++            goto do_unallocated;
++        }
++        is_tag = true;
++        break;
+     default:
++    do_unallocated:
+         unallocated_encoding(s);
+         return;
+     }
+ 
+-    tcg_result = tcg_temp_new_i64();
+-    if (!setflags) {
+-        if (sub_op) {
+-            tcg_gen_subi_i64(tcg_result, tcg_rn, imm);
+-        } else {
+-            tcg_gen_addi_i64(tcg_result, tcg_rn, imm);
+-        }
+-    } else {
+-        TCGv_i64 tcg_imm = tcg_const_i64(imm);
+-        if (sub_op) {
+-            gen_sub_CC(is_64bit, tcg_result, tcg_rn, tcg_imm);
+-        } else {
+-            gen_add_CC(is_64bit, tcg_result, tcg_rn, tcg_imm);
+-        }
+-        tcg_temp_free_i64(tcg_imm);
+-    }
++    if (is_tag) {
++        TCGv_i32 tag_offset = tcg_const_i32(imm & 15);
++        TCGv_i32 offset = tcg_const_i32((imm >> 6) << LOG2_TAG_GRANULE);
+ 
+-    if (is_64bit) {
+-        tcg_gen_mov_i64(tcg_rd, tcg_result);
++        if (sub_op) {
++            gen_helper_subg(tcg_rd, cpu_env, tcg_rn, offset, tag_offset);
++        } else {
++            gen_helper_addg(tcg_rd, cpu_env, tcg_rn, offset, tag_offset);
++        }
++        tcg_temp_free_i32(tag_offset);
++        tcg_temp_free_i32(offset);
+     } else {
+-        tcg_gen_ext32u_i64(tcg_rd, tcg_result);
+-    }
++        TCGv_i64 tcg_result;
+ 
+-    tcg_temp_free_i64(tcg_result);
++        if (!setflags) {
++            tcg_result = tcg_rd;
++            if (sub_op) {
++                tcg_gen_subi_i64(tcg_result, tcg_rn, imm);
++            } else {
++                tcg_gen_addi_i64(tcg_result, tcg_rn, imm);
 +            }
-+            object_property_set_link(cpuobj, OBJECT(tag_sysmem),
-+                                     "tag-memory", &error_abort);
++        } else {
++            TCGv_i64 tcg_imm = tcg_const_i64(imm);
++            tcg_result = new_tmp_a64(s);
++            if (sub_op) {
++                gen_sub_CC(is_64bit, tcg_result, tcg_rn, tcg_imm);
++            } else {
++                gen_add_CC(is_64bit, tcg_result, tcg_rn, tcg_imm);
++            }
++            tcg_temp_free_i64(tcg_imm);
 +        }
 +
-         object_property_set_bool(cpuobj, true, "realized", &error_fatal);
-         object_unref(cpuobj);
-     }
-@@ -1540,6 +1570,9 @@ static void machvirt_init(MachineState *machine)
-         create_secure_ram(vms, secure_sysmem);
-         create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
-     }
-+    if (tag_sysmem) {
-+        create_tag_ram(vms, machine, tag_sysmem);
++        if (is_64bit) {
++            tcg_gen_mov_i64(tcg_rd, tcg_result);
++        } else {
++            tcg_gen_ext32u_i64(tcg_rd, tcg_result);
++        }
 +    }
- 
-     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
- 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index edf6e0e1f1..decf95de3e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -851,6 +851,18 @@ void arm_cpu_post_init(Object *obj)
- 
-     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
-                              &error_abort);
-+
-+#ifndef CONFIG_USER_ONLY
-+    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) &&
-+        cpu_isar_feature(aa64_mte, cpu)) {
-+        object_property_add_link(obj, "tag-memory",
-+                                 TYPE_MEMORY_REGION,
-+                                 (Object **)&cpu->tag_memory,
-+                                 qdev_prop_allow_set_link_before_realize,
-+                                 OBJ_PROP_LINK_STRONG,
-+                                 &error_abort);
-+    }
-+#endif
  }
  
- static void arm_cpu_finalizefn(Object *obj)
-@@ -1164,16 +1176,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     init_cpreg_list(cpu);
- 
- #ifndef CONFIG_USER_ONLY
-+    cs->num_ases = 1;
-     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-         cs->num_ases = 2;
--
-         if (!cpu->secure_memory) {
-             cpu->secure_memory = cs->memory;
-         }
-         cpu_address_space_init(cs, ARMASIdx_S, "cpu-secure-memory",
-                                cpu->secure_memory);
--    } else {
--        cs->num_ases = 1;
-+    }
-+    if (cpu->tag_memory != NULL) {
-+        cs->num_ases = 3;
-+        cpu_address_space_init(cs, ARMASIdx_TAG, "cpu-tag-memory",
-+                               cpu->tag_memory);
-     }
-     cpu_address_space_init(cs, ARMASIdx_NS, "cpu-memory", cs->memory);
- 
+ /* The input should be a value in the bottom e bits (with higher
 -- 
 2.17.2
