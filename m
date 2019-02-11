@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45458)
+Received: from eggs.gnu.org ([209.51.188.92]:45512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtEVz-0002WD-JV
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:04 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gtEW1-0002Xu-Q4
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtEVx-0003YB-Hs
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:03 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gtEVx-0003Ia-Aj
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:01 -0500
-Received: by mail-ot1-x344.google.com with SMTP id n71so3915364ota.10
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 08:32:23 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gtEVz-0003Yx-Kl
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:33:05 -0500
+Date: Mon, 11 Feb 2019 17:13:54 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211171354.40be0856.cohuck@redhat.com>
+In-Reply-To: <1981d9bc-e950-62ef-d2d2-66a17771c8f4@linux.ibm.com>
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190206150016.6fdfaf8f.cohuck@redhat.com>
+	<1981d9bc-e950-62ef-d2d2-66a17771c8f4@linux.ibm.com>
 MIME-Version: 1.0
-References: <1548985244-24523-1-git-send-email-catherine.hecx@gmail.com>
-	<eeb0f275-b262-25db-337a-b6c78b29c124@linaro.org>
-In-Reply-To: <eeb0f275-b262-25db-337a-b6c78b29c124@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Feb 2019 16:19:20 +0000
-Message-ID: <CAFEAcA9u_FYk40QyC=_R-VMVN74A5kTWYKCSgH-Kzya1_Pqzdw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: Fix int128_make128 lo,
- hi order in paired_cmpxchg64_be
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Catherine Ho <catherine.hecx@gmail.com>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Mon, 11 Feb 2019 at 16:11, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 1/31/19 5:40 PM, Catherine Ho wrote:
-> > The lo,hi order is different from the comments. And in commit
-> > 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128"), it changes
-> > the original code logic. So just restore the old code logic before this
-> > commit:
-> > do_paired_cmpxchg64_be():
-> >     cmpv = int128_make128(env->exclusive_high, env->exclusive_val);
-> >     newv = int128_make128(new_hi, new_lo);
-> >
-> > Fixes: 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128")
-> >
-> > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> > ---
->
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Fri, 8 Feb 2019 16:19:58 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Thanks. Richard: is this effectively a bugfix for big-endian guest code ?
+> On 02/06/2019 09:00 AM, Cornelia Huck wrote:
+> > On Wed, 30 Jan 2019 14:22:06 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> >> [This is the Linux kernel part, git tree is available at
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps-v3  
+> > 
+> > I've pushed out the changes I've made so far (patch 1) to
+> > vfio-ccw-eagain-caps-v3.5. I'll wait a bit for more comments before
+> > sending a new version.
+> >   
+> 
+> Thanks for that branch...  For patch 1 in v3.5:
+> 
+> Reviewed-by: Eric Farman <farman@linux.ibm.com>
 
--- PMM
+Thanks!
+
+> 
+> >>
+> >> The companion QEMU patches are available at
+> >> https://github.com/cohuck/qemu vfio-ccw-caps
+> >> This is the previously posted v2 version, which should continue to work.]  
+> > 
+> > I would not mind if somebody looked at those as well :)  
+> 
+> Not precluding anyone else from doing so :) ... I'd planned on looking 
+> at them as I get into the meat of patches 4-6 on the kernel side, where 
+> the overlap occurs.  I'm getting close.  :)
+
+Cool :) I'll wait a bit more before resending, then. (I'll probably
+rebase the QEMU side as well when I do resend.)
+
+> 
+> FWIW, I've been running with both series for the last week or two, along 
+> with some host kernel traces to prove things got executed the way I 
+> thought, and it's seemed to be working well.  So that makes me 
+> optimistic for the later patches.
+
+That's good news, thanks for testing. Do you have a special test load
+that you run in the guest that you can share?
