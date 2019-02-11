@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35600)
+Received: from eggs.gnu.org ([209.51.188.92]:37277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1gt304-0001Ep-IO
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:15:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1gt3F4-0003PO-SB
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1gt303-00053T-Hi
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:15:20 -0500
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Mon, 11 Feb 2019 04:15:11 +0000
-Message-ID: <BN6PR21MB07857DF2253F6D7380B85F239E640@BN6PR21MB0785.namprd21.prod.outlook.com>
-References: <20190210165735.GA23862@nyan>
-In-Reply-To: <20190210165735.GA23862@nyan>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gt3F0-0003Ju-Q5
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:30:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43500)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gt3Ev-0003BT-AC
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:30:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gt3Er-0001oa-4W
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 04:30:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1F9F32E8050
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 04:30:37 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [v3 PATCH] hw/arm/bcm2835_peripherals: add bcm283x
- sp804-alike timer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Feb 2019 04:17:27 -0000
+From: Launchpad Bug Tracker <1528214@bugs.launchpad.net>
+Reply-To: Bug 1528214 <1528214@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151221131340.12068.65353.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154985864803.4674.6373132737028405918.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1528214] Re: qemu 1.7.0 vhost_net crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,20 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark <alnyan@airmail.cc>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, "open
-	list:Raspberry Pi" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-SGkgTWFyaywNCg0KPiBGcm9tOiBNYXJrIDxhbG55YW5AYWlybWFpbC5jYz4NCj4gU2VudDogU3Vu
-ZGF5LCAxMCBGZWJydWFyeSAyMDE5IDA4OjU4DQo+IFN1YmplY3Q6IFt2MyBQQVRDSF0gaHcvYXJt
-L2JjbTI4MzVfcGVyaXBoZXJhbHM6IGFkZCBiY20yODN4IHNwODA0LWFsaWtlDQo+IHRpbWVyDQoN
-ClRoYW5rcyBmb3IgdGhlIHBhdGNoLiBUaGUgaW50ZWdyYXRpb24gd2l0aCBiY20yODM1X3Blcmlw
-aGVyYWxzIGxvb2tzIGdvb2QsIGJ1dCBob3BlZnVsbHkgb25lIG9mIHRoZSBRRU1VIG1haW50YWlu
-ZXJzIGNhbiBnaXZlIHlvdSBhIHJldmlldyBvZiB0aGUgdGltZXIgaW1wbGVtZW50YXRpb24gYXMg
-SSdtIHJlYWxseSBzaG9ydCBvbiB0aW1lIGF0IHRoZSBtb21lbnQuDQoNCklmIHlvdSBkaWRuJ3Qg
-YWxyZWFkeSBzZWUgaXQsIHlvdSBtYXkgd2FudCB0byBjb21wYXJlIHdpdGggdGhlIGltcGxlbWVu
-dGF0aW9uIGhlcmUsIHdoaWNoIG9yaWdpbmF0ZXMgZnJvbSBHcmVnb3J5IEVzdHJhZGU6DQpodHRw
-czovL2dpdGh1Yi5jb20vMHhhYnUvcWVtdS9ibG9iL3Jhc3BpL2h3L3RpbWVyL2JjbTI4MzVfdGlt
-ZXIuYw0KLi4uIHNhZGx5IEkgbmV2ZXIgZ290IGFyb3VuZCB0byBtZXJnaW5nIGl0IHVwc3RyZWFt
-IHdpdGggdGhlIHJlc3Qgb2YgdGhlIHJhc3BpIGVtdWxhdGlvbi4g4pi5DQoNCkNoZWVycywNCkFu
-ZHJldw0KDQo=
+[Expired for QEMU because there has been no activity for 60 days.]
+
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1528214
+
+Title:
+  qemu 1.7.0 vhost_net crash
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  i find the crash in  /var/crash =
+
+  the crash content is :
+  <4>Pid: 6949, comm: qemu-system-x86 Not tainted 2.6.32-431.el6.x86_64 #1 =
+Powerleader PR2530G2/SC612DI-8F
+  <4>RIP: 0010:[<ffffffff8118a849>]  [<ffffffff8118a849>] fput+0x9/0x30
+  <4>RSP: 0018:ffff88015b601d98  EFLAGS: 00010292
+  <4>RAX: 0000000000000382 RBX: ffff881e46590000 RCX: 00000000000001c3
+  <4>RDX: 0000000000000000 RSI: ffff881e46590130 RDI: 0000000000000000
+  <4>RBP: ffff88015b601d98 R08: ffff881e46598518 R09: 0000000000000000
+  <4>R10: 0000000000000000 R11: 0000000000000246 R12: ffff881e46590010
+  <4>R13: 0000000000000000 R14: ffff880c29812748 R15: 0000000000000000
+  <4>FS:  00007f6a74d20700(0000) GS:ffff8810b8840000(0000) knlGS:0000000000=
+000000
+  <4>CS:  0010 DS: 002b ES: 002b CR0: 000000008005003b
+  <4>CR2: 0000000000000030 CR3: 0000001c544cc000 CR4: 00000000001427e0
+  <4>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+  <4>DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+  <4>Process qemu-system-x86 (pid: 6949, threadinfo ffff88015b600000, task =
+ffff880c1ed9c040)
+  <4>Stack:
+  <4> ffff88015b601e58 ffffffffa02ac3c8 ffff881e46590000 0000000000000000
+  <4><d> ffff881e46590080 ffff881e46590078 ffff88015b601e38 0000000000000286
+  <4><d> ffffffff00000000 0000000000000001 ffff88015b601e58 0000000000000282
+  <4>Call Trace:
+  <4> [<ffffffffa02ac3c8>] vhost_net_ioctl+0x328/0x5d0 [vhost_net]
+  <4> [<ffffffff8119db42>] vfs_ioctl+0x22/0xa0
+  <4> [<ffffffff8119dce4>] do_vfs_ioctl+0x84/0x580
+  <4> [<ffffffff8118a7d1>] ? __fput+0x1a1/0x210
+  <4> [<ffffffff8119e261>] sys_ioctl+0x81/0xa0
+  <4> [<ffffffff810e1e5e>] ? __audit_syscall_exit+0x25e/0x290
+  <4> [<ffffffff8100b072>] system_call_fastpath+0x16/0x1b
+  <4>Code: fe ff ff 31 d2 48 89 de 83 cf ff ff d0 e9 da fe ff ff 48 89 df e=
+8 28 64 04 00 e9 bb fe ff ff 0f 1f 00 55 48 89 e5 0f 1f 44 00 00 <f0> 48 ff=
+ 4f 30 0f 94 c0 84 c0 75 0b c9 c3 66 0f 1f
+  84 00 00 00 =
+
+  <1>RIP  [<ffffffff8118a849>] fput+0x9/0x30
+  <4> RSP <ffff88015b601d98>
+  <4>CR2: 0000000000000030
+
+  how the bug occure
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1528214/+subscriptions
