@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36938)
+Received: from eggs.gnu.org ([209.51.188.92]:38713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gt8Ky-0001BW-7p
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:57:16 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gt8UG-0003U0-1e
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gt8Kw-0000P3-Td
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 04:57:15 -0500
-MIME-Version: 1.0
-References: <20190206174328.9736-1-marcandre.lureau@redhat.com>
-	<20190206174328.9736-4-marcandre.lureau@redhat.com>
-	<20190207181415.07d0d7ae.cohuck@redhat.com>
-	<20190211071235.GE1011@xz-x1>
-In-Reply-To: <20190211071235.GE1011@xz-x1>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 11 Feb 2019 10:57:01 +0100
-Message-ID: <CAJ+F1CJ_ND3u4jZTOJSbsS=ZwvzR-y9NYYkCX5HdoKDDRKwKvw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] terminal3270: do not use backend
- timer sources
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gt8UF-0005r0-BQ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:06:52 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:47082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gt8UD-0005ox-DH
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:06:49 -0500
+Received: by mail-lf1-x142.google.com with SMTP id f5so7216415lfc.13
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 02:06:48 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon, 11 Feb 2019 02:06:31 -0800
+Message-Id: <20190211100631.5263-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: get rid of gen_callw[i]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "open list:S390" <qemu-s390x@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Hi
+Merge gen_callwi and gen_callw into their only users, translate_callw
+and translate_callxw. Extract jump slot adjustment logic into a separate
+function and use it in gen_jumpi and translate_callw.
 
-On Mon, Feb 11, 2019 at 8:13 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Thu, Feb 07, 2019 at 06:14:15PM +0100, Cornelia Huck wrote:
-> > On Wed,  6 Feb 2019 18:43:25 +0100
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> >
-> > > terminal3270 uses the front-end side of the chardev. It shouldn't
-> > > create sources from backend side context (with backend
-> > > functions).
-> > >
-> > > send_timing_mark_cb calls qemu_chr_fe_write_all() which should be
-> > > thread safe.
-> > >
-> > > This partially reverts changes from commit
-> > > 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
-> > >
-> > > CC: Peter Xu <peterx@redhat.com>
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  hw/char/terminal3270.c | 15 ++++++---------
-> > >  1 file changed, 6 insertions(+), 9 deletions(-)
-> >
-> > I've verified that 3270 continues to work as before.
-> >
-> > Acked-by: Cornelia Huck <cohuck@redhat.com>
->
-> A pure question: is it broken before this patch?
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ target/xtensa/translate.c | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
 
-No
-
->
-> Asked since I don't understand this patch and what it tries to fix...
-
-A front-end shouldn't use backend functions.
-
-> E.g., in terminal_init(), qemu_chr_fe_set_handlers() is always passing
-> NULL as chardev context so AFAICT this patch changes nothing from
-> functional-wise for now.  Meanwhile, if we pass in some non-NULL into
-> it in the future, IMHO this patch would break it instead of fixing
-> anything... anything I've missed?
->
-
-If the frontend switches the context and creates timers with this
-context, it should do it without using the backend functions.
-
-thanks
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 6e4f0ad44c80..62283cd1ccc8 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -387,13 +387,19 @@ static void gen_jump(DisasContext *dc, TCGv dest)
+     gen_jump_slot(dc, dest, -1);
+ }
+ 
+-static void gen_jumpi(DisasContext *dc, uint32_t dest, int slot)
++static int adjust_jump_slot(DisasContext *dc, uint32_t dest, int slot)
+ {
+-    TCGv_i32 tmp = tcg_const_i32(dest);
+     if (((dc->base.pc_first ^ dest) & TARGET_PAGE_MASK) != 0) {
+-        slot = -1;
++        return -1;
++    } else {
++        return slot;
+     }
+-    gen_jump_slot(dc, tmp, slot);
++}
++
++static void gen_jumpi(DisasContext *dc, uint32_t dest, int slot)
++{
++    TCGv_i32 tmp = tcg_const_i32(dest);
++    gen_jump_slot(dc, tmp, adjust_jump_slot(dc, dest, slot));
+     tcg_temp_free(tmp);
+ }
+ 
+@@ -410,21 +416,6 @@ static void gen_callw_slot(DisasContext *dc, int callinc, TCGv_i32 dest,
+     gen_jump_slot(dc, dest, slot);
+ }
+ 
+-static void gen_callw(DisasContext *dc, int callinc, TCGv_i32 dest)
+-{
+-    gen_callw_slot(dc, callinc, dest, -1);
+-}
+-
+-static void gen_callwi(DisasContext *dc, int callinc, uint32_t dest, int slot)
+-{
+-    TCGv_i32 tmp = tcg_const_i32(dest);
+-    if (((dc->base.pc_first ^ dest) & TARGET_PAGE_MASK) != 0) {
+-        slot = -1;
+-    }
+-    gen_callw_slot(dc, callinc, tmp, slot);
+-    tcg_temp_free(tmp);
+-}
+-
+ static bool gen_check_loop_end(DisasContext *dc, int slot)
+ {
+     if (dc->base.pc_next == dc->lend) {
+@@ -1477,7 +1468,9 @@ static void translate_call0(DisasContext *dc, const uint32_t arg[],
+ static void translate_callw(DisasContext *dc, const uint32_t arg[],
+                             const uint32_t par[])
+ {
+-    gen_callwi(dc, par[0], arg[0], 0);
++    TCGv_i32 tmp = tcg_const_i32(arg[0]);
++    gen_callw_slot(dc, par[0], tmp, adjust_jump_slot(dc, arg[0], 0));
++    tcg_temp_free(tmp);
+ }
+ 
+ static void translate_callx0(DisasContext *dc, const uint32_t arg[],
+@@ -1496,7 +1489,7 @@ static void translate_callxw(DisasContext *dc, const uint32_t arg[],
+     TCGv_i32 tmp = tcg_temp_new_i32();
+ 
+     tcg_gen_mov_i32(tmp, cpu_R[arg[0]]);
+-    gen_callw(dc, par[0], tmp);
++    gen_callw_slot(dc, par[0], tmp, -1);
+     tcg_temp_free(tmp);
+ }
+ 
+-- 
+2.11.0
