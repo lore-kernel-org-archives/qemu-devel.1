@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37277)
+Received: from eggs.gnu.org ([209.51.188.92]:37146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gt3FH-0003PO-53
+	(envelope-from <balaton@eik.bme.hu>) id 1gt3FH-0003MO-8g
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gt32F-0006Ie-5U
+	(envelope-from <balaton@eik.bme.hu>) id 1gt32F-0006IZ-5J
 	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:17:37 -0500
-Date: Mon, 11 Feb 2019 12:17:18 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190211041718.GF18083@stefanha-x1.localdomain>
-References: <20190208134950.187665-1-sgarzare@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GV0iVqYguTV4Q9ER"
-Content-Disposition: inline
-In-Reply-To: <20190208134950.187665-1-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 0/6] virtio-blk: add
- DISCARD and WRITE_ZEROES features
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:41250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gt327-0005pG-UA
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 23:17:30 -0500
+Message-Id: <e26ca956807437844403d835cb2d67bf306244fd.1549857716.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1549857716.git.balaton@eik.bme.hu>
+References: <cover.1549857716.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Mon, 11 Feb 2019 05:01:56 +0100
+Subject: [Qemu-devel] [PATCH 1/4] hw/pci-host/bonito.c: Add PCI mem region
+ mapped at the correct address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <zltjiangshi@gmail.com>
 
+Stop using system memory as PCI memory otherwise devices such as VGA
+that have regions mapped to PCI memory clash with RAM. Use a separate
+memory region for PCI memory and map it to the correct address in
+system memory which allows PCI mem regions to show at the correct
+address where clients expect them.
 
---GV0iVqYguTV4Q9ER
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/pci-host/bonito.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On Fri, Feb 08, 2019 at 02:49:44PM +0100, Stefano Garzarella wrote:
-> This series adds the support of DISCARD and WRITE_ZEROES commands
-> and extends the virtio-blk-test to test WRITE_ZEROES command when
-> the feature is enabled.
->=20
-> v4:
-> - fixed error with mingw compiler in patch 4
->   gcc and clang want %lu, but mingw wants %llu for BDRV_REQUEST_MAX_SECTO=
-RS.
->   Since is less than INT_MAX, I casted it to integer and I used %d in the
->   format string of error_setg. (mingw now is happy)
->=20
-> v3:
-> - rebased on master (I removed Based-on tag since the new virtio headers =
-=66rom
->   linux v5.0-rc1 are merged)
-> - added patch 2 to add host_features field (as in virtio-net) [Michael]
-> - fixed patch 3 (previously 2/5) using the new host_features field
-> - fixed patch 4 (previously 3/5) following the Stefan's comments:
->                 - fixed name of functions and fields
->                 - used vdev and s pointers
->                 - removed "wz-may-unmap" property
->                 - split "dwz-max-sectors" in two properties
->=20
-> v2:
-> - added patch 1 to use virtio_blk_handle_rw_error() with discard operation
-> - added patch 2 to make those new features machine-type dependent (thanks=
- David)
-> - fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
-rt()
->                 for WRITE_ZEROES requests, and configurable parameters to
->                 initialize the limits (max_sectors, wzeroes_may_unmap).
->                 (thanks Stefan)
->                 I moved in a new function the code to handle a single seg=
-ment,
->                 in order to simplify the support of multiple segments in =
-the
->                 future.
-> - added patch 4 to change the assert on data_size following the discussio=
-n with
->                 Thomas, Changpeng, Michael, and Stefan (thanks all)
-> - fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
-ad of
->                 dynamic allocation (thanks Thomas)
->=20
-> Thanks,
-> Stefano
->=20
-> Stefano Garzarella (6):
->   virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
->   virtio-blk: add host_features field in VirtIOBlock
->   virtio-blk: add "discard" and "write-zeroes" properties
->   virtio-blk: add DISCARD and WRITE_ZEROES features
->   tests/virtio-blk: change assert on data_size in virtio_blk_request()
->   tests/virtio-blk: add test for WRITE_ZEROES command
->=20
->  hw/block/virtio-blk.c          | 214 +++++++++++++++++++++++++++++++--
->  hw/core/machine.c              |   2 +
->  include/hw/virtio/virtio-blk.h |   5 +-
->  tests/virtio-blk-test.c        |  75 +++++++++++-
->  4 files changed, 282 insertions(+), 14 deletions(-)
->=20
-> --=20
-> 2.20.1
->=20
->=20
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---GV0iVqYguTV4Q9ER
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcYPdOAAoJEJykq7OBq3PINnwH/R4XZi7A0ZZvOyl6RL6Cc5cZ
-NO+cMd6gg5gmpLgZsMnu5DHgvlP2WmQLN6hSu//d8hD8S2l0yNbcGFTSZ1+JGqUW
-IhNimbea3wenswX70wm32BYsiBSDywPmL2wRbPqs9aO7J9msZOUTwWs6dAkimxHK
-lWrpkeQ1U90WZ27s0yBGXrY8HYWIYslf6gKXGJrQZ375MUs5NFhIRFQP8AlcbrXO
-JyYndwP0ZiCq2ZNquYlJuD5OdrZuGVEx5mcNS3AOB9WtZW/CaWvpYuE4YnShbZ8a
-GUh4OenTptxBzc+Q6DxRpO1nz4qUNji0MT/D1HinwjO45UQkww04VF0Xc4fAupQ=
-=bkZ3
------END PGP SIGNATURE-----
-
---GV0iVqYguTV4Q9ER--
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 9f33582706..c940ec6e48 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -598,11 +598,14 @@ static const VMStateDescription vmstate_bonito = {
+ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
++    MemoryRegion *mr = g_new0(MemoryRegion, 1);
+ 
++    memory_region_init(mr, OBJECT(dev), "pci.mem", BONITO_PCILO_SIZE);
+     phb->bus = pci_register_root_bus(DEVICE(dev), "pci",
+                                      pci_bonito_set_irq, pci_bonito_map_irq,
+-                                     dev, get_system_memory(), get_system_io(),
++                                     dev, mr, get_system_io(),
+                                      0x28, 32, TYPE_PCI_BUS);
++    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE, mr);
+ }
+ 
+ static void bonito_realize(PCIDevice *dev, Error **errp)
+-- 
+2.13.7
