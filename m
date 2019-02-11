@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49681)
+Received: from eggs.gnu.org ([209.51.188.92]:49755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gt4Ui-0001ut-O4
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gt4Ux-00021L-4a
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gt4Uh-0002TJ-MH
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gt4Uh-0002SM-Gw
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:03 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gt4Uw-0002gs-9d
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:19 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 11 Feb 2019 13:50:33 +0800
-Message-Id: <20190211055040.13528-3-stefanha@redhat.com>
+Date: Mon, 11 Feb 2019 13:50:35 +0800
+Message-Id: <20190211055040.13528-5-stefanha@redhat.com>
 In-Reply-To: <20190211055040.13528-1-stefanha@redhat.com>
 References: <20190211055040.13528-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/9] qemugdb/coroutine: fix arch_prctl has
- unknown return type
+Subject: [Qemu-devel] [PULL 4/9] virtio-blk: add acct_failed param to
+ virtio_blk_handle_rw_error()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +23,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-qemu coroutine command results in following error output:
+We add acct_failed param in order to use virtio_blk_handle_rw_error()
+also when is not required to call block_acct_failed(). (eg. a discard
+operation is failed)
 
-Python Exception <class 'gdb.error'> 'arch_prctl' has unknown return
-type; cast the call to its declared return type: Error occurred in
-Python command: 'arch_prctl' has unknown return type; cast the call to
-its declared return type
-
-Fix it by giving it what it wants: arch_prctl return type.
-
-Information on the topic:
-   https://sourceware.org/gdb/onlinedocs/gdb/Calling.html
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190206151425.105871-1-vsementsov@virtuozzo.com
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Acked-by: Pankaj Gupta <pagupta@redhat.com>
+Message-id: 20190208134950.187665-2-sgarzare@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- scripts/qemugdb/coroutine.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/block/virtio-blk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
-index ab699794ab..81f811ac00 100644
---- a/scripts/qemugdb/coroutine.py
-+++ b/scripts/qemugdb/coroutine.py
-@@ -22,7 +22,7 @@ def get_fs_base():
-        pthread_self().'''
-     # %rsp - 120 is scratch space according to the SystemV ABI
-     old =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
--    gdb.execute('call arch_prctl(0x1003, $rsp - 120)', False, True)
-+    gdb.execute('call (int)arch_prctl(0x1003, $rsp - 120)', False, True)
-     fs_base =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
-     gdb.execute('set *(uint64_t*)($rsp - 120) =3D %s' % old, False, True=
-)
-     return fs_base
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 843bb2bec8..c95a6f4c9b 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -61,7 +61,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
+, unsigned char status)
+ }
+=20
+ static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
+-    bool is_read)
++    bool is_read, bool acct_failed)
+ {
+     VirtIOBlock *s =3D req->dev;
+     BlockErrorAction action =3D blk_get_error_action(s->blk, is_read, er=
+ror);
+@@ -74,7 +74,9 @@ static int virtio_blk_handle_rw_error(VirtIOBlockReq *r=
+eq, int error,
+         s->rq =3D req;
+     } else if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
+         virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
+-        block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        if (acct_failed) {
++            block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        }
+         virtio_blk_free_request(req);
+     }
+=20
+@@ -112,7 +114,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
+ret)
+              * the memory until the request is completed (which will
+              * happen on the other side of the migration).
+              */
+-            if (virtio_blk_handle_rw_error(req, -ret, is_read)) {
++            if (virtio_blk_handle_rw_error(req, -ret, is_read, true)) {
+                 continue;
+             }
+         }
+@@ -131,7 +133,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
+nt ret)
+=20
+     aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
+     if (ret) {
+-        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
++        if (virtio_blk_handle_rw_error(req, -ret, 0, true)) {
+             goto out;
+         }
+     }
 --=20
 2.20.1
