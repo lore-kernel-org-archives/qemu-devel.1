@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48156)
+Received: from eggs.gnu.org ([209.51.188.92]:50031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gtGCM-0004uW-9g
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1gtGGF-0007nl-MZ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gtGCI-0004XJ-SW
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:54 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:54998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1gtGCI-00047G-Kt
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:20:50 -0500
-From: Sven Schnelle <svens@stackframe.org>
-Date: Mon, 11 Feb 2019 19:19:04 +0100
-Message-Id: <20190211181907.2219-3-svens@stackframe.org>
-In-Reply-To: <20190211181907.2219-2-svens@stackframe.org>
-References: <20190211181907.2219-2-svens@stackframe.org>
+	(envelope-from <berrange@redhat.com>) id 1gtGGE-0007cx-Mk
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtGGE-0007bQ-Df
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:24:54 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 11 Feb 2019 18:24:27 +0000
+Message-Id: <20190211182442.8542-2-berrange@redhat.com>
+In-Reply-To: <20190211182442.8542-1-berrange@redhat.com>
+References: <20190211182442.8542-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/5] target/hppa: fix '</<=' conditions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 01/16] io: store reference to thread
+ information in the QIOTask struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +28,149 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
+Cc: Yongji Xie <elohimes@gmail.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-These condition include the signed overflow bit. See Page 5-3 of
-the Parisc 1.1 Architecture Reference manual for details.
+Currently the struct QIOTaskThreadData is only needed by the worker
+thread, but a subsequent patch will need to access it from another
+context.
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- target/hppa/translate.c | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+ io/task.c | 64 +++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 34 insertions(+), 30 deletions(-)
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 51bfd9849d..0e8cc8117a 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -404,6 +404,11 @@ static DisasCond cond_make_n(void)
-     };
- }
- 
-+static bool cond_need_sv(int c)
-+{
-+        return c == 2 || c == 3 || c == 6;
-+}
+diff --git a/io/task.c b/io/task.c
+index 2886a2c1bc..396866b10f 100644
+--- a/io/task.c
++++ b/io/task.c
+@@ -24,6 +24,14 @@
+ #include "qemu/thread.h"
+ #include "trace.h"
+=20
++struct QIOTaskThreadData {
++    QIOTaskWorker worker;
++    gpointer opaque;
++    GDestroyNotify destroy;
++    GMainContext *context;
++};
 +
- static DisasCond cond_make_0(TCGCond c, TCGv_reg a0)
++
+ struct QIOTask {
+     Object *source;
+     QIOTaskFunc func;
+@@ -32,6 +40,7 @@ struct QIOTask {
+     Error *err;
+     gpointer result;
+     GDestroyNotify destroyResult;
++    struct QIOTaskThreadData *thread;
+ };
+=20
+=20
+@@ -57,6 +66,18 @@ QIOTask *qio_task_new(Object *source,
+=20
+ static void qio_task_free(QIOTask *task)
  {
-     DisasCond r = { .c = c, .a1 = NULL, .a1_is_0 = true };
-@@ -910,11 +915,17 @@ static DisasCond do_cond(unsigned cf, TCGv_reg res,
-     case 1: /* = / <>        (Z / !Z) */
-         cond = cond_make_0(TCG_COND_EQ, res);
-         break;
--    case 2: /* < / >=        (N / !N) */
--        cond = cond_make_0(TCG_COND_LT, res);
-+    case 2: /* < / >=        (N ^ V / !(N ^ V)) */
-+        tmp = tcg_temp_new();
-+        tcg_gen_xor_reg(tmp, res, sv);
-+        cond = cond_make_0(TCG_COND_LT, tmp);
-+        tcg_temp_free(tmp);
-         break;
-     case 3: /* <= / >        (N | Z / !N & !Z) */
--        cond = cond_make_0(TCG_COND_LE, res);
-+        tmp = tcg_temp_new();
-+        tcg_gen_xor_reg(tmp, res, sv);
-+        cond = cond_make_0(TCG_COND_LE, tmp);
-+        tcg_temp_free(tmp);
-         break;
-     case 4: /* NUV / UV      (!C / C) */
-         cond = cond_make_0(TCG_COND_EQ, cb_msb);
-@@ -1159,7 +1170,7 @@ static DisasJumpType do_add(DisasContext *ctx, unsigned rt, TCGv_reg in1,
- 
-     /* Compute signed overflow if required.  */
-     sv = NULL;
--    if (is_tsv || c == 6) {
-+    if (is_tsv || cond_need_sv(c)) {
-         sv = do_add_sv(ctx, dest, in1, in2);
-         if (is_tsv) {
-             /* ??? Need to include overflow from shift.  */
-@@ -1223,7 +1234,7 @@ static DisasJumpType do_sub(DisasContext *ctx, unsigned rt, TCGv_reg in1,
- 
-     /* Compute signed overflow if required.  */
-     sv = NULL;
--    if (is_tsv || c == 6) {
-+    if (is_tsv || cond_need_sv(c)) {
-         sv = do_sub_sv(ctx, dest, in1, in2);
-         if (is_tsv) {
-             gen_helper_tsv(cpu_env, sv);
-@@ -1263,13 +1274,14 @@ static DisasJumpType do_cmpclr(DisasContext *ctx, unsigned rt, TCGv_reg in1,
++    if (task->thread) {
++        if (task->thread->destroy) {
++            task->thread->destroy(task->thread->opaque);
++        }
++
++        if (task->thread->context) {
++            g_main_context_unref(task->thread->context);
++        }
++
++        g_free(task->thread);
++    }
++
+     if (task->destroy) {
+         task->destroy(task->opaque);
+     }
+@@ -72,31 +93,12 @@ static void qio_task_free(QIOTask *task)
+ }
+=20
+=20
+-struct QIOTaskThreadData {
+-    QIOTask *task;
+-    QIOTaskWorker worker;
+-    gpointer opaque;
+-    GDestroyNotify destroy;
+-    GMainContext *context;
+-};
+-
+-
+ static gboolean qio_task_thread_result(gpointer opaque)
  {
-     TCGv_reg dest, sv;
-     DisasCond cond;
-+    int c = cf >> 1;
- 
-     dest = tcg_temp_new();
-     tcg_gen_sub_reg(dest, in1, in2);
- 
-     /* Compute signed overflow if required.  */
-     sv = NULL;
--    if ((cf >> 1) == 6) {
-+    if (cond_need_sv(c)) {
-         sv = do_sub_sv(ctx, dest, in1, in2);
+-    struct QIOTaskThreadData *data =3D opaque;
++    QIOTask *task =3D opaque;
+=20
+-    trace_qio_task_thread_result(data->task);
+-    qio_task_complete(data->task);
+-
+-    if (data->destroy) {
+-        data->destroy(data->opaque);
+-    }
+-
+-    if (data->context) {
+-        g_main_context_unref(data->context);
+-    }
+-
+-    g_free(data);
++    trace_qio_task_thread_result(task);
++    qio_task_complete(task);
+=20
+     return FALSE;
+ }
+@@ -104,22 +106,23 @@ static gboolean qio_task_thread_result(gpointer opa=
+que)
+=20
+ static gpointer qio_task_thread_worker(gpointer opaque)
+ {
+-    struct QIOTaskThreadData *data =3D opaque;
++    QIOTask *task =3D opaque;
+     GSource *idle;
+=20
+-    trace_qio_task_thread_run(data->task);
+-    data->worker(data->task, data->opaque);
++    trace_qio_task_thread_run(task);
++
++    task->thread->worker(task, task->thread->opaque);
+=20
+     /* We're running in the background thread, and must only
+      * ever report the task results in the main event loop
+      * thread. So we schedule an idle callback to report
+      * the worker results
+      */
+-    trace_qio_task_thread_exit(data->task);
++    trace_qio_task_thread_exit(task);
+=20
+     idle =3D g_idle_source_new();
+-    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
+-    g_source_attach(idle, data->context);
++    g_source_set_callback(idle, qio_task_thread_result, task, NULL);
++    g_source_attach(idle, task->thread->context);
+=20
+     return NULL;
+ }
+@@ -138,17 +141,18 @@ void qio_task_run_in_thread(QIOTask *task,
+         g_main_context_ref(context);
      }
- 
-@@ -2808,7 +2820,7 @@ static DisasJumpType trans_ds(DisasContext *ctx, uint32_t insn,
-     /* Install the new nullification.  */
-     if (cf) {
-         TCGv_reg sv = NULL;
--        if (cf >> 1 == 6) {
-+        if (cond_need_sv(cf >> 1)) {
-             /* ??? The lshift is supposed to contribute to overflow.  */
-             sv = do_add_sv(ctx, dest, add1, add2);
-         }
-@@ -3369,7 +3381,7 @@ static DisasJumpType trans_cmpb(DisasContext *ctx, uint32_t insn,
-     tcg_gen_sub_reg(dest, in1, in2);
- 
-     sv = NULL;
--    if (c == 6) {
-+    if (cond_need_sv(c)) {
-         sv = do_sub_sv(ctx, dest, in1, in2);
-     }
- 
-@@ -3409,6 +3421,8 @@ static DisasJumpType trans_addb(DisasContext *ctx, uint32_t insn,
-         tcg_gen_movi_reg(cb_msb, 0);
-         tcg_gen_add2_reg(dest, cb_msb, in1, cb_msb, in2, cb_msb);
-         break;
-+    case 2:
-+    case 3:
-     case 6:
-         tcg_gen_add_reg(dest, in1, in2);
-         sv = do_add_sv(ctx, dest, in1, in2);
--- 
+=20
+-    data->task =3D task;
+     data->worker =3D worker;
+     data->opaque =3D opaque;
+     data->destroy =3D destroy;
+     data->context =3D context;
+=20
++    task->thread =3D data;
++
+     trace_qio_task_thread_start(task, worker, opaque);
+     qemu_thread_create(&thread,
+                        "io-task-worker",
+                        qio_task_thread_worker,
+-                       data,
++                       task,
+                        QEMU_THREAD_DETACHED);
+ }
+=20
+--=20
 2.20.1
