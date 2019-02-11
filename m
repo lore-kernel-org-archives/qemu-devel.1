@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36687)
+Received: from eggs.gnu.org ([209.51.188.92]:37550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gtCFm-0007vO-UO
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:08:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gtCKI-0000hD-5m
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:12:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gtCFm-0006sH-3N
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:08:10 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-Date: Mon, 11 Feb 2019 15:07:39 +0100
-Message-ID: <w51sgwuv2ok.fsf@maestria.local.igalia.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gtCKG-0000yG-Ol
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:12:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:64364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gtCK9-0000sr-JP
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:12:44 -0500
+References: <cover.1549406119.git.jag.raman@oracle.com>
+	<59572a7353830be4b7aa57d79ccb7ad6b72f0dda.1549406119.git.jag.raman@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bc2da3f4-fcc1-cd45-f009-842d9fdde63d@redhat.com>
+Date: Mon, 11 Feb 2019 15:12:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+In-Reply-To: <59572a7353830be4b7aa57d79ccb7ad6b72f0dda.1549406119.git.jag.raman@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: Do not update coalesced IO range
+ in the case of NOP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Jagannathan Raman <jag.raman@oracle.com>, qemu-devel@nongnu.org
 
-On Fri 08 Feb 2019 04:29:48 PM CET, Andrey Shinkevich wrote:
-> On 08/02/2019 16:13, Alberto Garcia wrote:
->> On Wed 23 Jan 2019 12:54:24 PM CET, Andrey Shinkevich wrote:
->>> +static BlockDriverState *insert_filter(BlockDriverState *bs, Error **errp)
->>> +{
->>> +    BlockDriverState *cor_filter_bs;
->>> +    Error *local_err = NULL;
->>> +
->>> +    cor_filter_bs = create_filter_node(bs, errp);
->>> +    if (cor_filter_bs == NULL) {
->>> +        error_prepend(errp, "Could not create filter node: ");
->>> +        return NULL;
->>> +    }
->>> +
->>> +    bdrv_set_aio_context(cor_filter_bs, bdrv_get_aio_context(bs));
->>> +
->>> +    bdrv_drained_begin(bs);
->>> +    bdrv_replace_node(bs, cor_filter_bs, &local_err);
->>> +    bdrv_drained_end(bs);
->> 
->> I think this was already discussed in the previous version of this
->> patch: if you insert a copy-on-read filter here then all guest reads
->> will copy the data from the backing chain, but you don't want to copy
->> anything below the 'base' node, so the copy-on-read filter needs a
->> 'base' parameter.
->> 
-> Before that, we still have the unresolved issue with getting the
-> filter as the 'base' input parameter. That happens sometimes because
-> the base is being searched by the file name, which is the same to the
-> one of the filter, rather than by the node name (!)
+On 05/02/19 23:50, Jagannathan Raman wrote:
+> Do not add/del coalesced IO ranges in the case where the
+> same FlatRanges are present in both old and new FlatViews
+> 
+> Fixes: 3ac7d43a6fbb ("memory: update coalesced_range on transaction_commit")
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> ---
+>  memory.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/memory.c b/memory.c
+> index 61d66e4..e49369d 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -932,9 +932,7 @@ static void address_space_update_topology_pass(AddressSpace *as,
+>          } else if (frold && frnew && flatrange_equal(frold, frnew)) {
+>              /* In both and unchanged (except logging may have changed) */
+>  
+> -            if (!adding) {
+> -                flat_range_coalesced_io_del(frold, as);
+> -            } else {
+> +            if (adding) {
+>                  MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, region_nop);
+>                  if (frnew->dirty_log_mask & ~frold->dirty_log_mask) {
+>                      MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, log_start,
+> @@ -946,7 +944,6 @@ static void address_space_update_topology_pass(AddressSpace *as,
+>                                                    frold->dirty_log_mask,
+>                                                    frnew->dirty_log_mask);
+>                  }
+> -                flat_range_coalesced_io_add(frnew, as);
+>              }
+>  
+>              ++iold;
+> 
 
-I'm not sure if I understand. block-stream has 'base' and 'base-node'
-parameters, and in the first case you would convert the file name to a
-node name.
+Queued, thanks.
 
-stream_start() gets the BlockDriverState, not the file name, so why
-can't you get the node name from there and pass it to the copy-on-read
-filter?
-
-Berto
+Paolo
