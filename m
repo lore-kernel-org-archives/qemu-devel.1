@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44137)
+Received: from eggs.gnu.org ([209.51.188.92]:44693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gt8wB-0000wH-VY
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:35:44 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gt8yP-0001fM-3W
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gt8wA-0001SD-So
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:35:43 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gt8yL-0002bn-CM
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:37:59 -0500
+Date: Mon, 11 Feb 2019 11:37:26 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211113726.62d2e1d5.cohuck@redhat.com>
+In-Reply-To: <ce43fc8a-b494-c5ad-d14a-3c3fc1badf34@redhat.com>
+References: <20190208221111.25237-1-walling@linux.ibm.com>
+	<20190211092339.054706bb.cohuck@redhat.com>
+	<4441a5a6-6c26-0e2c-8b95-40af98b2962c@de.ibm.com>
+	<ce43fc8a-b494-c5ad-d14a-3c3fc1badf34@redhat.com>
 MIME-Version: 1.0
-References: <20190206174328.9736-1-marcandre.lureau@redhat.com>
-	<20190206174328.9736-4-marcandre.lureau@redhat.com>
-	<20190207181415.07d0d7ae.cohuck@redhat.com>
-	<20190211071235.GE1011@xz-x1>
-	<CAJ+F1CJ_ND3u4jZTOJSbsS=ZwvzR-y9NYYkCX5HdoKDDRKwKvw@mail.gmail.com>
-	<20190211102713.GG1011@xz-x1>
-In-Reply-To: <20190211102713.GG1011@xz-x1>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 11 Feb 2019 11:35:28 +0100
-Message-ID: <CAJ+F1CKQk8qhJ8b6o=h53fiZ5_7R4LXJu1=NbyyeP_AFidcNSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] terminal3270: do not use backend
- timer sources
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/cpumodel: default enable mepoch
+ for z14 and later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +26,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "open list:S390" <qemu-s390x@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, rth@twiddle.net
 
-Hi
+On Mon, 11 Feb 2019 09:55:25 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On Mon, Feb 11, 2019 at 11:27 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Mon, Feb 11, 2019 at 10:57:01AM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Mon, Feb 11, 2019 at 8:13 AM Peter Xu <peterx@redhat.com> wrote:
-> > >
-> > > On Thu, Feb 07, 2019 at 06:14:15PM +0100, Cornelia Huck wrote:
-> > > > On Wed,  6 Feb 2019 18:43:25 +0100
-> > > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > > >
-> > > > > terminal3270 uses the front-end side of the chardev. It shouldn't
-> > > > > create sources from backend side context (with backend
-> > > > > functions).
-> > > > >
-> > > > > send_timing_mark_cb calls qemu_chr_fe_write_all() which should be
-> > > > > thread safe.
-> > > > >
-> > > > > This partially reverts changes from commit
-> > > > > 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
-> > > > >
-> > > > > CC: Peter Xu <peterx@redhat.com>
-> > > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-> > > > > ---
-> > > > >  hw/char/terminal3270.c | 15 ++++++---------
-> > > > >  1 file changed, 6 insertions(+), 9 deletions(-)
-> > > >
-> > > > I've verified that 3270 continues to work as before.
-> > > >
-> > > > Acked-by: Cornelia Huck <cohuck@redhat.com>
-> > >
-> > > A pure question: is it broken before this patch?
-> >
-> > No
-> >
-> > >
-> > > Asked since I don't understand this patch and what it tries to fix...
-> >
-> > A front-end shouldn't use backend functions.
-> >
-> > > E.g., in terminal_init(), qemu_chr_fe_set_handlers() is always passin=
-g
-> > > NULL as chardev context so AFAICT this patch changes nothing from
-> > > functional-wise for now.  Meanwhile, if we pass in some non-NULL into
-> > > it in the future, IMHO this patch would break it instead of fixing
-> > > anything... anything I've missed?
-> > >
-> >
-> > If the frontend switches the context and creates timers with this
-> > context, it should do it without using the backend functions.
->
-> I see your point (assuming that concurrent writes are safe).  But IMHO
-> we should first discuss on how to fix the existing multi-threading
-> issues (since it's not really safe yet).  After all this patch offers
+> On 11.02.19 09:28, Christian Borntraeger wrote:
+> > 
+> > 
+> > On 11.02.2019 09:23, Cornelia Huck wrote:  
+> >> On Fri,  8 Feb 2019 17:11:10 -0500
+> >> Collin Walling <walling@linux.ibm.com> wrote:
+> >>  
+> >>> Latest systems and host kernels support mepoch, which is a
+> >>> feature that was meant to be supported for z14 GA1 from the
+> >>> get-go. Let's copy it to the z14 GA1 default CPU model.  
+> >>
+> >> Do older kernels simply not support it, or was there something actively
+> >> missing? IOW, is it fine to turn this on with older kernels?  
+> > 
+> > Older kernels will not provide the necessary implementation, so mepoch will not
+> > work with such older kernel. (So worst case would be that a new qemu+old kernel
+> > requires to add mepoch=off to -cpu z14)  
+> 
+> Or use a compat machine.
+> 
+> > The idea of this patch is to update QEMU in accordance with newer kernels to use
+> > more features by default if people use -cpu z14.  
+> 
+> Agreed, this was the original purpose of the default models. Can "break"
+> on old kernels, but the compat machines can help for these users, so it
+> does not really "break".
 
-Yes, various people are looking at this problem. We need to fix it.
+That seems fine then.
 
-> nothing real for us for now, and if one day we want to run the chardev
-> in a single thread again then this will just break again unnoticed.
->
+> 
+> > 
+> > Now that I look a 2nd time: shall we also add 
+> > S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF ?  
+> 
+> I think so.
+> 
+> > 
+> >   
+> >>
+> >> [It's probably all good, although I like to wait for David's ack for
+> >> any cpu model patches :)]  
+> 
+> I'm fine with this :)
+> 
+> With S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF also added
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I assume you are not speaking about that patch in particular, when you
-say it will "break again unnoticed".
+Ok, can I please get a v2 with that added as well?
 
-This patch helps when you do whole-tree code review or change over a
-particular aspect of the backend code. In my case, I wrote this patch
-because I did a review of all the backend context users. And this one
-is a "bad" user, I think you agree by now. So let's apply this change.
-And let's focus on multi-thread bugs in respective threads.
-
-thanks
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+> 
+> >>  
+> >>>
+> >>> Machines s390-ccw-virtio-3.1 and older will retain the old CPU
+> >>> models and will not provide this bit in the default model.
+> >>>
+> >>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> >>> ---
+> >>>  hw/s390x/s390-virtio-ccw.c  | 1 +
+> >>>  target/s390x/gen-features.c | 1 +
+> >>>  2 files changed, 2 insertions(+)
+> >>>
+> >>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> >>> index fd9d0b0542..32c5027345 100644
+> >>> --- a/hw/s390x/s390-virtio-ccw.c
+> >>> +++ b/hw/s390x/s390-virtio-ccw.c
+> >>> @@ -757,6 +757,7 @@ DEFINE_CCW_MACHINE(4_0, "4.0", true);
+> >>>  static void ccw_machine_3_1_instance_options(MachineState *machine)
+> >>>  {
+> >>>      ccw_machine_4_0_instance_options(machine);
+> >>> +    s390_cpudef_featoff_greater(14, 1, S390_FEAT_MULTIPLE_EPOCH);
+> >>>  }
+> >>>  
+> >>>  static void ccw_machine_3_1_class_options(MachineClass *mc)
+> >>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> >>> index 70015eaaf5..d258d67dca 100644
+> >>> --- a/target/s390x/gen-features.c
+> >>> +++ b/target/s390x/gen-features.c
+> >>> @@ -550,6 +550,7 @@ static uint16_t default_GEN14_GA1[] = {
+> >>>      S390_FEAT_GROUP_MSA_EXT_6,
+> >>>      S390_FEAT_GROUP_MSA_EXT_7,
+> >>>      S390_FEAT_GROUP_MSA_EXT_8,
+> >>> +    S390_FEAT_MULTIPLE_EPOCH,
+> >>>  };
+> >>>  
+> >>>  /* QEMU (CPU model) features */  
+> >>  
+> >   
+> 
+> 
