@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37417)
+Received: from eggs.gnu.org ([209.51.188.92]:38019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1gtE0v-0001fp-FE
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:00:59 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtE2w-0002UD-VP
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:03:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1gtE0t-0001oo-NH
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:00:57 -0500
-References: <1549456893-16589-1-git-send-email-thuth@redhat.com>
-	<20190206135840.60a2a49f.cohuck@redhat.com>
-	<52b3de29-6918-952d-9d91-abdfb6dba25b@vivier.eu>
-	<6de44209-a135-0894-5407-4f6af7a0965e@suse.de>
-	<20190211163102.0a99b023.cohuck@redhat.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <1906740a-1bea-abc1-6258-9c9f1ed79246@suse.de>
-Date: Mon, 11 Feb 2019 17:00:32 +0100
+	(envelope-from <philmd@redhat.com>) id 1gtE2w-0003Yq-0N
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:03:02 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:51167)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtE2t-0003Sb-Ut
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:03:01 -0500
+Received: by mail-wm1-f65.google.com with SMTP id x7so2377477wmj.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 08:02:50 -0800 (PST)
+References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
+	<1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <13b4d86c-0af3-12b9-fce5-92f1eb0fe95d@redhat.com>
+Date: Mon, 11 Feb 2019 17:02:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190211163102.0a99b023.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] s390x: Fix the confusing
- contributions-after-2012 license statements
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string
+ specifier in tpm_tis_show_buffer()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Liam Merwick <liam.merwick@oracle.com>, stefanb@linux.ibm.com, qemu-devel@nongnu.org
 
-On 02/11/2019 04:31 PM, Cornelia Huck wrote:
-> On Mon, 11 Feb 2019 16:24:48 +0100
-> Alexander Graf <agraf@suse.de> wrote:
->
->> On 02/06/2019 02:02 PM, Laurent Vivier wrote:
->>> On 06/02/2019 13:58, Cornelia Huck wrote:
->>>> On Wed,  6 Feb 2019 13:41:33 +0100
->>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>   
->>>>> The license information in these files is rather confusing. The text
->>>>> declares LGPL first, but then says that contributions after 2012 are
->>>>> licensed under the GPL instead. How should the average user who just
->>>>> downloaded the release tarball know which part is now GPL and which
->>>>> is LGPL?
->>>> FWIW, that statement was added in ccb084d3f0ec ("s390: new
->>>> contributions GPLv2 or later").
->>>>   
->>>>> Looking at the text of the LGPL (see COPYING.LIB in the top directory),
->>>>> the license clearly states how this should be done instead:
->>>>>
->>>>> "3. You may opt to apply the terms of the ordinary GNU General Public
->>>>>    License instead of this License to a given copy of the Library. To do
->>>>>    this, you must alter all the notices that refer to this License, so
->>>>>    that they refer to the ordinary GNU General Public License, version 2,
->>>>>    instead of to this License."
->>>> Hm. This talks about GPL v2, not GPL v2-or-later...
->>>>   
->>>>> Thus let's clean up the confusing statements and use the proper GPL
->>>>> text only.
->>>>>
->>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>> ---
->>>>>    linux-user/s390x/target_cpu.h | 19 ++++++++-----------
->>>>>    target/s390x/cpu.c            | 19 ++++++++-----------
->>>>>    target/s390x/cpu.h            | 19 ++++++++-----------
->>>>>    target/s390x/kvm.c            | 19 ++++++++-----------
->>>> BTW: Is the original author of the code still around?
->>> For the linux-user/s390x/target_cpu.h, it seems this code has been pushed by Alex Graf:
->>>
->>> commit 10ec51174ca69a4c3c5149b0b3baaa6ccba66273
->>> Author: Alexander Graf <agraf@suse.de>
->>> Date:   Sat Dec 5 12:44:21 2009 +0100
->>>
->>>       S/390 CPU fake emulation
->>>       
->>>       Because Qemu currently requires a TCG target to exist and there are quite some
->>>       useful helpers here to lay the groundwork for out KVM target, let's create a
->>>       stub TCG emulation target for S390X CPUs.
->>>       
->>>       This is required to make tcg happy. The emulation target itself won't work
->>>       though.
->>>       
->>>       Signed-off-by: Alexander Graf <agraf@suse.de>
->>>       Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
->>>
->>> But the "(c) 2009 Ulrich Hecht" is confusing.
->> Why? Ulrich was the one that started the port, I then cleaned it up,
->> improved it, added system emulation and upstreamed it.
-> It's just a bit confusing that Ulrich does not show up in the sign-off
-> chain.
->
->> What problem exactly are you trying to solve?
-> The confusing license statements?
->
-> I thought I'd ask whether the original author had any thoughts; if you
-> think this patch is problematic, I can dequeue it again.
+Hi Liam,
 
-You can always combine LGPL and GPL code and the result becomes GPL 
-only, so I see little problem? :)
+On 2/11/19 4:03 PM, Liam Merwick wrote:
+> cppcheck reports:
+> 
+> [hw/tpm/tpm_tis.c:113]: (warning) %d in format string (no. 2) requires 'int' but the argument type is 'unsigned int'
+> 
+> Fix this by using %u instead of %d
+> 
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+> ---
+>  hw/tpm/tpm_tis.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 860c2ace7d99..395500e8a61d 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -110,7 +110,7 @@ static void tpm_tis_show_buffer(const unsigned char *buffer,
+>      uint32_t len, i;
 
-Alex
+If you want to clean this, use a size_t here instead of u32.
+
+>  
+>      len = MIN(tpm_cmd_get_size(buffer), buffer_size);
+> -    printf("tpm_tis: %s length = %d\n", string, len);
+> +    printf("tpm_tis: %s length = %u\n", string, len);
+
+So here the format is '%zu'.
+However in code cleanup we try go get ride of printf() calls and replace
+them with trace points.
+
+>      for (i = 0; i < len; i++) {
+>          if (i && !(i % 16)) {
+>              printf("\n");
+> 
