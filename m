@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39714)
+Received: from eggs.gnu.org ([209.51.188.92]:41576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gtCUB-0003EM-Oh
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:23:04 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gtCdG-0005CW-5u
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:32:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gtCUA-0006MJ-Ji
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:23:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55858)
+	(envelope-from <kwolf@redhat.com>) id 1gtCd8-0001iD-4e
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:32:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gtCUA-0006La-9a
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:23:02 -0500
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Mon, 11 Feb 2019 15:15:09 +0100
-Message-Id: <20190211141509.26964-1-lhrazky@redhat.com>
-In-Reply-To: <20190205094628.632m4avyszuevktp@sirius.home.kraxel.org>
-References: <20190205094628.632m4avyszuevktp@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gtCd2-0001gs-P9
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:32:13 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EC41CC01DDE0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 14:32:10 +0000 (UTC)
+Date: Mon, 11 Feb 2019 15:32:08 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190211143208.GD8135@linux.fritz.box>
+References: <20181206215026.7716-1-pbonzini@redhat.com>
+	<20181206215026.7716-3-pbonzini@redhat.com>
+	<20190208124844.GE4494@dhcp-200-176.str.redhat.com>
+	<d9b84d67-dfb8-6dd7-dc77-9ea442bc9c5c@redhat.com>
+	<20190208160013.GA4441@dhcp-200-176.str.redhat.com>
+	<fffb008e-c16c-5db9-14bf-c779b7b08ae1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spice: set device address and device display
- ID in QXL interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fffb008e-c16c-5db9-14bf-c779b7b08ae1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] test: replace gtester with a TAP driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,185 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: spice-devel@lists.freedesktop.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com
 
-Calls the new SPICE QXL interface function spice_qxl_set_device_info to
-set the hardware address of the graphics device represented by the QXL
-interface (e.g. a PCI path) and the device display IDs (the IDs of the
-device's monitors that belong to this QXL interface).
+Am 08.02.2019 um 18:16 hat Paolo Bonzini geschrieben:
+> On 08/02/19 17:00, Kevin Wolf wrote:
+> > Am 08.02.2019 um 14:46 hat Paolo Bonzini geschrieben:
+> >> On 08/02/19 13:48, Kevin Wolf wrote:
+> >>> I just wanted to work on a unit test and found that a simple 'make
+> >>> check-tests/test-bdrv-drain' (which used to build and run the test with
+> >>> a single command) doesn't work any more.
+> >>>
+> >>> git bisect points to this commit.
+> >>
+> >> What's wrong with "tests/test-bdrv-drain"?  (Before there were some
+> >> differences in test environment, but not now).
+> > 
+> > It runs the old version without building the source I just modified.
+> 
+> Oh.  Since it wasn't documented, it seemed to be just an implementation
+> detail rather than something that would be used by people...  So
+> basically something like this?
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 048cf5639c..6ac3f2c7eb 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -861,6 +861,9 @@ check-unit: $(check-unit-y)
+>  check-speed: $(check-speed-y)
+>  	$(call do_test_human, $^)
+> 
+> +$(patsubst %, check-%, $(check-unit-y) $(check-speed-y): check-%: %
+> +        $<
 
-Also stops using the deprecated spice_qxl_set_max_monitors, the new
-interface function replaces it.
+Apart from the missing closing bracket. :-)
 
-Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
----
-Hi,
+The old rule seems to have been like this:
 
-I've fixed the undefined reference by checking the parent_dev pointer
-directly instead of through pci_bus_is_root(), that was the only
-function needed that's not built with PCI_CONFIG=3Dn. Added a comment to
-explain it too.
+.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
+$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
+    $(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+    $(call quiet-command, \
+        MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+        gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
+    $(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
+      echo Gcov report for $$f:;\
+      $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
+    done,)
 
-Changes since v2:
-* Check the parent_dev pointer directly instead of calling
-  pci_bus_is_root().
+So it used quiet-command (but I'm okay with changing this) and it set
+MALLOC_PERTURB_ (I think this would still be nice to have). Not sure how
+relevant the gcov stuff is, I never used this.
 
-Cheers,
-Lukas
+I think the minimal change for this commit would have been to just
+remove 'gtester $(GTESTER_OPTIONS) -m=$(SPEED)' and leave everything
+else in place.
 
-
- hw/display/qxl.c           | 14 ++++++++++-
- include/ui/spice-display.h |  4 ++++
- ui/spice-core.c            | 49 ++++++++++++++++++++++++++++++++++++++
- ui/spice-display.c         | 11 +++++++++
- 4 files changed, 77 insertions(+), 1 deletion(-)
-
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index da8fd5a40a..c8ce5781e0 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -276,7 +276,8 @@ static void qxl_spice_monitors_config_async(PCIQXLDev=
-ice *qxl, int replay)
-                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
-                     0));
-     } else {
--#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
-+/* >=3D release 0.12.6, < release 0.14.2 */
-+#if SPICE_SERVER_VERSION >=3D 0x000c06 && SPICE_SERVER_VERSION < 0x000e0=
-2
-         if (qxl->max_outputs) {
-             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
-         }
-@@ -2188,6 +2189,17 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
-Error **errp)
-                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
-;
-         return;
-     }
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(qxl->vga.con, device_address, 256=
-)) {
-+        spice_qxl_set_device_info(&qxl->ssd.qxl,
-+                                  device_address,
-+                                  0,
-+                                  qxl->max_outputs);
-+    }
-+#endif
-+
-     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
-=20
-     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 87a84a59d4..53c3612c32 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -179,3 +179,7 @@ void qemu_spice_wakeup(SimpleSpiceDisplay *ssd);
- void qemu_spice_display_start(void);
- void qemu_spice_display_stop(void);
- int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd);
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con,
-+                                    char *device_address,
-+                                    size_t size);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a40fb2c00d..a2f8e15030 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -34,6 +34,7 @@
- #include "qemu/option.h"
- #include "migration/misc.h"
- #include "hw/hw.h"
-+#include "hw/pci/pci_bus.h"
- #include "ui/spice-display.h"
-=20
- /* core bits */
-@@ -863,6 +864,54 @@ bool qemu_spice_have_display_interface(QemuConsole *=
-con)
-     return false;
- }
-=20
-+/*
-+ * Recursively (in reverse order) appends addresses of PCI devices as it=
- moves
-+ * up in the PCI hierarchy.
-+ *
-+ * @returns true on success, false when the buffer wasn't large enough
-+ */
-+static bool append_pci_address(char *buf, size_t buf_size, const PCIDevi=
-ce *pci)
-+{
-+    PCIBus *bus =3D pci_get_bus(pci);
-+    // equivalent to if (!pci_bus_is_root(bus)), but the function is not=
- built
-+    // with PCI_CONFIG=3Dn, avoid using an #ifdef by checking directly
-+    if (bus->parent_dev !=3D NULL) {
-+        append_pci_address(buf, buf_size, bus->parent_dev);
-+    }
-+
-+    size_t len =3D strlen(buf);
-+    ssize_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
-+        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
-+
-+    return written > 0 && written < buf_size - len;
-+}
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con,
-+                                    char *device_address,
-+                                    size_t size)
-+{
-+    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con),
-+                                                       "device",
-+                                                       &error_abort));
-+    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev),
-+                                                       TYPE_PCI_DEVICE);
-+
-+    if (pci =3D=3D NULL) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+                    "Not a PCI device.");
-+        return false;
-+    }
-+
-+    strncpy(device_address, "pci/0000", size);
-+    if (!append_pci_address(device_address, size, pci)) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+            "Too many PCI devices in the chain.");
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
-n)
- {
-     if (g_slist_find(spice_consoles, con)) {
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index aea6f6ebce..a5e26479a8 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -1147,6 +1147,17 @@ static void qemu_spice_display_init_one(QemuConsol=
-e *con)
-=20
-     ssd->qxl.base.sif =3D &dpy_interface.base;
-     qemu_spice_add_display_interface(&ssd->qxl, con);
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(con, device_address, 256)) {
-+        spice_qxl_set_device_info(&ssd->qxl,
-+                                  device_address,
-+                                  qemu_console_get_head(con),
-+                                  1);
-+    }
-+#endif
-+
-     qemu_spice_create_host_memslot(ssd);
-=20
-     register_displaychangelistener(&ssd->dcl);
---=20
-2.20.1
+Kevin
