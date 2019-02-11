@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56209)
+Received: from eggs.gnu.org ([209.51.188.92]:59463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gt2FI-000854-Ko
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 22:27:01 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gt2ZQ-000344-T2
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 22:47:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gt2FG-0006cG-Ow
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 22:27:00 -0500
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:45545)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gt2FF-0006PP-GO
-	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 22:26:58 -0500
-Received: by mail-pf1-x434.google.com with SMTP id j3so4587360pfi.12
-	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 19:26:43 -0800 (PST)
-Date: Mon, 11 Feb 2019 11:26:38 +0800
+	(envelope-from <stefanha@gmail.com>) id 1gt2ZN-0006df-7k
+	for qemu-devel@nongnu.org; Sun, 10 Feb 2019 22:47:47 -0500
+Date: Mon, 11 Feb 2019 11:42:31 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190211032638.GC18083@stefanha-x1.localdomain>
-References: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
+Message-ID: <20190211034231.GD18083@stefanha-x1.localdomain>
+References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="UPT3ojh+0CqEDtpF"
+	protocol="application/pgp-signature"; boundary="TybLhxa8M7aNoW+V"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA88+A2oCkQnxKDEdpmfCZSmPzWMBg01wDDV68bMZoY5Jg@mail.gmail.com>
-Subject: Re: [Qemu-devel] should we try to stop using variable length arrays?
+In-Reply-To: <20190208141122.53046-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
+ wrapper code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com
 
 
---UPT3ojh+0CqEDtpF
+--TybLhxa8M7aNoW+V
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 07, 2019 at 07:30:59PM +0000, Peter Maydell wrote:
-> Should we be looking to get rid of these and turn on the -Wvla
-> warning? I know the Linux kernel has recently decided to do this
-> (some rationale at the start of https://lwn.net/Articles/749064/).
+On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> We have a very frequent pattern of wrapping a coroutine_fn function
+> to be called from non-coroutine context:
+>=20
+>   - create structure to pack parameters
+>   - create function to call original function taking parameters from
+>     struct
+>   - create wrapper, which in case of non-coroutine context will
+>     create a coroutine, enter it and start poll-loop.
+>
+> Here is a draft of template code + example how it can be used to drop a
+> lot of similar code.
+>=20
+> Hope someone like it except me)
 
-I'm in favor of avoiding variable-length arrays just so reviewers don't
-need to catch instances where the size comes from the untrusted guest.
+My 2 cents.  Cons:
 
-Stefan
+ * Synchronous poll loops are an anti-pattern.  They block all of QEMU
+   with the big mutex held.  Making them easier to write is
+   questionable because we should aim to have as few of these as
+   possible.
 
---UPT3ojh+0CqEDtpF
+ * Code generation makes the code easier to write but harder to read.
+   Code is read more than written.  In this case I think open coding
+   isn't too bad and I prefer it to reading a code generation script to
+   understand how it works.
+
+If we were planning to add lots more of these then I agree code
+generation would help.  But in this case I'd rather not.
+
+--TybLhxa8M7aNoW+V
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcYOtuAAoJEJykq7OBq3PIS+4IAIwpZskPpBCEIA7rxV2wmpYT
-P8Gm4wIU618MF/grSbO8q8jUnh3YIBlgEjFSRXU/vPJHLY63aVKFj1hLZs4sYyPr
-XsepnlP0NK29V+FdIYtrS5fwo5Ft7J0ydB4z7GhPqNpeoekM4Gz3dxb871G3XJYh
-22yhggtalvA8fL1gNJGFJkMCRQK0zJaxAGUyIorWlyspj2+fh0F+/CxIIN+ROAyf
-+Le+1FSkZ0l/iG/cJaaBjxX+wPridzHilX7xxuc2KnEIiMkgm5mVh/cf+09x6dIm
-RA67QYK4HTGyyHTVQgPY51xJXkyHDxqAXTWqx7kRY5vNh/TZTx9yARTcw2fkupY=
-=F/Rh
+iQEcBAEBAgAGBQJcYO8nAAoJEJykq7OBq3PIl5kH/3BLSvY7fH7RJ6B3r03WzNWB
+hRTXd2Y5KnpnCSxEmYpvETyxRHhljoRZycuSVkhTMcCzKS1KHz/oTQWUhigZZSoH
+zrJjqQIaLT1nxMBnk2xOSLGiOa+1rVNq7xKhNBLNZQBcFCH0NQf1VoQZ/epI7g2V
+8K55MGMluQiOCFVs2axLIgGu7FxwLLLDvBwSkp0AOtJMonT+ks2FzX5fngOhInvi
+us/axViMcrKfLSfhJHuRLi0AZjl0dYyeeYH4z3XW+rIMcDKhWEMEVf/x01TMUukF
+4ASpYY292g4Gi2cJIA+5hsI2WlXN/VPrHjtEeqy6j23SO6cA9H2mtpq9ms8Ulfw=
+=0X5o
 -----END PGP SIGNATURE-----
 
---UPT3ojh+0CqEDtpF--
+--TybLhxa8M7aNoW+V--
