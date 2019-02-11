@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52411)
+Received: from eggs.gnu.org ([209.51.188.92]:54427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtEnQ-00007I-Kl
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:51:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gtErC-00036G-Bg
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtEnN-0001LB-St
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:51:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtEnN-00011i-Kk
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:51:01 -0500
-Date: Mon, 11 Feb 2019 16:50:26 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190211165026.GJ27585@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gtErA-0004vc-Ql
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:54:58 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38937)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gtEr8-0004rO-DG
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:54:56 -0500
+Received: by mail-ot1-x344.google.com with SMTP id n8so18620109otl.6
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 08:54:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190207160617.1142-1-marcandre.lureau@redhat.com>
+References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
+	<20190211165026.GJ27585@redhat.com>
+In-Reply-To: <20190211165026.GJ27585@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Feb 2019 16:54:40 +0000
+Message-ID: <CAFEAcA-B4cm7aQkBnp5Uj_9gO2brxJXxo7j225OddopwGEyBWw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PULL 00/18] Chardev patches
 List-Id: <qemu-devel.nongnu.org>
@@ -28,40 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Feb 07, 2019 at 05:05:59PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> The following changes since commit 632351e0e1a861f2eaf709b053c53f96a122=
+On Mon, 11 Feb 2019 at 16:50, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> On Thu, Feb 07, 2019 at 05:05:59PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> > The following changes since commit 632351e0e1a861f2eaf709b053c53f96a122=
 5825:
->=20
->   Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request'=
+> >
+> >   Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request'=
  into staging (2019-02-07 14:20:46 +0000)
->=20
-> are available in the Git repository at:
->=20
->   https://github.com/elmarco/qemu.git tags/chardev-pull-request
->=20
-> for you to fetch changes up to df3afdedd23ade0c9de55cadeb1d85055689023f=
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/elmarco/qemu.git tags/chardev-pull-request
+> >
+> > for you to fetch changes up to df3afdedd23ade0c9de55cadeb1d85055689023f=
 :
->=20
->   tests/test-char: add muxed chardev testing for open/close (2019-02-07=
+> >
+> >   tests/test-char: add muxed chardev testing for open/close (2019-02-07=
  16:18:25 +0100)
->=20
-> ----------------------------------------------------------------
-> Various chardev fixes
->=20
-> ----------------------------------------------------------------
+> >
+> > ----------------------------------------------------------------
+> > Various chardev fixes
+> >
+> > ----------------------------------------------------------------
+>
+> BTW, I think as the maintainer sending the PULL request you are expected
+> to have added your own S-o-B to every patch, rather than just a R-B.
 
-BTW, I think as the maintainer sending the PULL request you are expected
-to have added your own S-o-B to every patch, rather than just a R-B.
+Yes, indeed. Thanks for catching that.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- PMM
