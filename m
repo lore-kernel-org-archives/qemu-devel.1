@@ -1,19 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34778)
+Received: from eggs.gnu.org ([209.51.188.92]:36211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtCAL-0004jJ-PB
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:02:37 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1gtCDt-0007Ax-4O
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtC8k-0002jz-Sj
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:01:01 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1gtCDq-0005pP-I4
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:06:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48380
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1gtCDq-0005gX-BG
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:06:10 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1BDrsIO152672
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:05:54 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qk9q8jmms-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:05:54 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 11 Feb 2019 14:05:52 -0000
 References: <20190211113255.3837-1-cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0028a4e1-a961-4bcc-2b27-ed9132b03d83@redhat.com>
-Date: Mon, 11 Feb 2019 14:51:07 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 11 Feb 2019 15:05:46 +0100
 MIME-Version: 1.0
 In-Reply-To: <20190211113255.3837-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Message-Id: <8d2c66ce-fdc6-d12b-256c-1760330c4360@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH] s390x: always provide pci support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,9 +43,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Collin Walling <walling@linux.ibm.com>
+Cc: Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Collin Walling <walling@linux.ibm.com>
 
-On 11.02.19 12:32, Cornelia Huck wrote:
+
+
+On 11.02.2019 12:32, Cornelia Huck wrote:
 > We tried to make pci support optional on s390x in the past;
 > unfortunately, we still require the s390 phb to be created
 > unconditionally due to backwards compatibility issues.
@@ -39,6 +60,11 @@ On 11.02.19 12:32, Cornelia Huck wrote:
 > provide a cpu model without the zpci feature.
 > 
 > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+The previous attempts of making it configurable caused more  pain than
+benefit.
 > ---
 > Follow-up patch to the discussion around "hw/s390x: Fix the function
 > arguments in the pci stub file". I've done a quick sanity test with
@@ -209,14 +235,3 @@ On 11.02.19 12:32, Cornelia Huck wrote:
 >  
 >      if (s390_known_cpu_type(cpu_type)) {
 > 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
-I'll send a patch that moves zPCI into the default qemu model as I'll be
-touching the qemu cpu model either way.
-
--- 
-
-Thanks,
-
-David / dhildenb
