@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51333)
+Received: from eggs.gnu.org ([209.51.188.92]:54596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gt4aP-0006ku-JG
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:56:59 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gt4tk-0003Dq-56
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:16:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gt4aO-0005RU-IM
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:56:57 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 11 Feb 2019 13:50:32 +0800
-Message-Id: <20190211055040.13528-2-stefanha@redhat.com>
-In-Reply-To: <20190211055040.13528-1-stefanha@redhat.com>
-References: <20190211055040.13528-1-stefanha@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1gt4ti-0002hP-QC
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:16:56 -0500
+Date: Sun, 10 Feb 2019 23:07:11 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190210230711.29e88264@x1.home>
+In-Reply-To: <45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
+References: <20190117025115.81178-1-aik@ozlabs.ru>
+	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
+	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
+	<20190207081830.4dcbb822@x1.home>
+	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
+	<20190207202620.23e9c063@x1.home>
+	<20190208052849.GB6434@umbus.fritz.box>
+	<45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/9] iothread: fix iothread hang when stop too
- soon
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
+ vfio: NVIDIA V100 + P9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
 
-From: Peter Xu <peterx@redhat.com>
+On Mon, 11 Feb 2019 14:49:49 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-Lukas reported an hard to reproduce QMP iothread hang on s390 that
-QEMU might hang at pthread_join() of the QMP monitor iothread before
-quitting:
+> On 08/02/2019 16:28, David Gibson wrote:
+> > On Thu, Feb 07, 2019 at 08:26:20PM -0700, Alex Williamson wrote:  
+> >> On Fri, 8 Feb 2019 13:29:37 +1100
+> >> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >>  
+> >>> On 08/02/2019 02:18, Alex Williamson wrote:  
+> >>>> On Thu, 7 Feb 2019 15:43:18 +1100
+> >>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >>>>     
+> >>>>> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:    
+> >>>>>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
+> >>>>>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
+> >>>>>> GPU:
+> >>>>>>
+> >>>>>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
+> >>>>>>
+> >>>>>>
+> >>>>>> In that thread, Alex raised concerns about allowing QEMU to freely lock
+> >>>>>> all the memory it wants. Is this an issue to be considered in the review
+> >>>>>> of this series here?
+> >>>>>>
+> >>>>>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
+> >>>>>> going to lock the KVM memory to populate the NUMA node with memory
+> >>>>>> of the GPU itself, so at first there is no risk of not taking over the
+> >>>>>> host RAM.
+> >>>>>> Am I missing something?      
+> >>>>>
+> >>>>>
+> >>>>> The GPU memory belongs to the device and not visible to the host as
+> >>>>> memory blocks and not covered by page structs, for the host it is more
+> >>>>> like MMIO which is passed through to the guest without that locked
+> >>>>> accounting, I'd expect libvirt to keep working as usual except that:
+> >>>>>
+> >>>>> when libvirt calculates the amount of memory needed for TCE tables
+> >>>>> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
+> >>>>> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
+> >>>>>
+> >>>>> FlatView #2
+> >>>>>  AS "memory", root: system
+> >>>>>  AS "cpu-memory-0", root: system
+> >>>>>  Root memory region: system
+> >>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >>>>>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
+> >>>>>
+> >>>>> So previously the DMA window would cover 0x7fffffff+1, now it has to
+> >>>>> cover 0x11fffffffff+1.    
+> >>>>
+> >>>> This looks like a chicken and egg problem, you're saying libvirt needs
+> >>>> to query mtree to understand the extent of the GPU layout, but we need
+> >>>> to specify the locked memory limits in order for QEMU to start?  Is
+> >>>> libvirt supposed to start the VM with unlimited locked memory and fix
+> >>>> it at some indeterminate point in the future?  Run a dummy VM with
+> >>>> unlimited locked memory in order to determine the limits for the real
+> >>>> VM?  Neither of these sound practical.  Thanks,    
+> >>>
+> >>>
+> >>> QEMU maps GPU RAM at known locations (which only depends on the vPHB's
+> >>> index or can be set explicitely) and libvirt knows how many GPUs are
+> >>> passed so it is quite easy to calculate the required amount of memory.
+> >>>
+> >>> Here is the window start calculation:
+> >>> https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
+> >>>
+> >>> We do not exactly know the GPU RAM window size until QEMU reads it from
+> >>> VFIO/nvlink2 but we know that all existing hardware has a window of
+> >>> 128GB (the adapters I have access to only have 16/32GB on board).  
+> >>
+> >> So you're asking that libvirt add 128GB per GPU with magic nvlink
+> >> properties, which may be 8x what's actually necessary and libvirt
+> >> determines which GPUs to apply this to how?  Does libvirt need to sort
+> >> through device tree properties for this?  Thanks,  
+> > 
+> > Hm.  If the GPU memory is really separate from main RAM, which it
+> > sounds like, I don't think it makes sense to account it against the
+> > same locked memory limit as regular RAM.  
+> 
+> 
+> This is accounting for TCE table to cover GPU RAM, not for GPU RAM itself.
+> 
+> So I am asking libvirt to add 128GB/64k*8=16MB to the locked_vm. It
+> already does so for the guest RAM.
 
-  Thread 1
-  #0  0x000003ffad10932c in pthread_join
-  #1  0x0000000109e95750 in qemu_thread_join
-      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
-  #2  0x0000000109c95a1c in iothread_stop
-  #3  0x0000000109bb0874 in monitor_cleanup
-  #4  0x0000000109b55042 in main
+Why do host internal data structures count against the user's locked
+memory limit?  We don't include IOMMU page tables or type1 accounting
+structures on other archs.  Thanks,
 
-While the iothread is still in the main loop:
-
-  Thread 4
-  #0  0x000003ffad0010e4 in ??
-  #1  0x000003ffad553958 in g_main_context_iterate.isra.19
-  #2  0x000003ffad553d90 in g_main_loop_run
-  #3  0x0000000109c9585a in iothread_run
-      at /home/thuth/devel/qemu/iothread.c:74
-  #4  0x0000000109e94752 in qemu_thread_start
-      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
-  #5  0x000003ffad10825a in start_thread
-  #6  0x000003ffad00dcf2 in thread_start
-
-IMHO it's because there's a race between the main thread and iothread
-when stopping the thread in following sequence:
-
-    main thread                       iothread
-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                                      aio_poll()
-    iothread_get_g_main_context
-      set iothread->worker_context
-    iothread_stop
-      schedule iothread_stop_bh
-                                        execute iothread_stop_bh [1]
-                                          set iothread->running=3Dfalse
-                                          (since main_loop=3D=3DNULL so
-                                           skip to quit main loop.
-                                           Note: although main_loop is
-                                           NULL but worker_context is
-                                           not!)
-                                      atomic_read(&iothread->worker_conte=
-xt) [2]
-                                        create main_loop object
-                                        g_main_loop_run() [3]
-    pthread_join() [4]
-
-We can see that when execute iothread_stop_bh() at [1] it's possible
-that main_loop is still NULL because it's only created until the first
-check of the worker_context later at [2].  Then the iothread will hang
-in the main loop [3] and it'll starve the main thread too [4].
-
-Here the simple solution should be that we check again the "running"
-variable before check against worker_context.
-
-CC: Thomas Huth <thuth@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20190129051432.22023-1-peterx@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- iothread.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/iothread.c b/iothread.c
-index 2fb1cdf55d..e615b7ae52 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -63,7 +63,11 @@ static void *iothread_run(void *opaque)
-     while (iothread->running) {
-         aio_poll(iothread->ctx, true);
-=20
--        if (atomic_read(&iothread->worker_context)) {
-+        /*
-+         * We must check the running state again in case it was
-+         * changed in previous aio_poll()
-+         */
-+        if (iothread->running && atomic_read(&iothread->worker_context))=
- {
-             GMainLoop *loop;
-=20
-             g_main_context_push_thread_default(iothread->worker_context)=
-;
---=20
-2.20.1
+Alex
