@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46812)
+Received: from eggs.gnu.org ([209.51.188.92]:46952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gtCz0-00005I-Ql
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:54:55 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gtCzH-0000JU-T4
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:55:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gtCyz-0003Pg-SO
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:54:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gtCyz-0002Io-KC
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:54:53 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 258F9E6A62
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 14:54:31 +0000 (UTC)
-References: <20181206215026.7716-1-pbonzini@redhat.com>
-	<20181206215026.7716-3-pbonzini@redhat.com>
-	<20190208124844.GE4494@dhcp-200-176.str.redhat.com>
-	<d9b84d67-dfb8-6dd7-dc77-9ea442bc9c5c@redhat.com>
-	<20190208160013.GA4441@dhcp-200-176.str.redhat.com>
-	<fffb008e-c16c-5db9-14bf-c779b7b08ae1@redhat.com>
-	<20190211143208.GD8135@linux.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20ef34db-5dfd-e269-9a92-ebe981df076b@redhat.com>
-Date: Mon, 11 Feb 2019 15:54:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190211143208.GD8135@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gtCzF-0004E6-P5
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:55:11 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Mon, 11 Feb 2019 14:54:55 +0000
+Message-ID: <96affe90-df67-41d7-e681-7c370a8513e0@virtuozzo.com>
+References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w51o97m8ltv.fsf@maestria.local.igalia.com>
+	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
+	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51sgwuv2ok.fsf@maestria.local.igalia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] test: replace gtester with a TAP driver
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CDA3E6CDCD8DE04BB164F1A11D5D2599@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
+ involves copy-on-read filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,23 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com
+To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 11/02/19 15:32, Kevin Wolf wrote:
-> $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
->     $(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->     $(call quiet-command, \
->         MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
->         gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
->     $(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
->       echo Gcov report for $$f:;\
->       $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
->     done,)
-> 
-> So it used quiet-command (but I'm okay with changing this) and it set
-> MALLOC_PERTURB_ (I think this would still be nice to have).
-
-Yes, of course.  I'll send a real patch.
-
-Paolo
+DQoNCk9uIDExLzAyLzIwMTkgMTc6MDcsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPiBPbiBGcmkg
+MDggRmViIDIwMTkgMDQ6Mjk6NDggUE0gQ0VULCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+
+IE9uIDA4LzAyLzIwMTkgMTY6MTMsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPj4+IE9uIFdlZCAy
+MyBKYW4gMjAxOSAxMjo1NDoyNCBQTSBDRVQsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+
+PiArc3RhdGljIEJsb2NrRHJpdmVyU3RhdGUgKmluc2VydF9maWx0ZXIoQmxvY2tEcml2ZXJTdGF0
+ZSAqYnMsIEVycm9yICoqZXJycCkNCj4+Pj4gK3sNCj4+Pj4gKyAgICBCbG9ja0RyaXZlclN0YXRl
+ICpjb3JfZmlsdGVyX2JzOw0KPj4+PiArICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4+
+PiArDQo+Pj4+ICsgICAgY29yX2ZpbHRlcl9icyA9IGNyZWF0ZV9maWx0ZXJfbm9kZShicywgZXJy
+cCk7DQo+Pj4+ICsgICAgaWYgKGNvcl9maWx0ZXJfYnMgPT0gTlVMTCkgew0KPj4+PiArICAgICAg
+ICBlcnJvcl9wcmVwZW5kKGVycnAsICJDb3VsZCBub3QgY3JlYXRlIGZpbHRlciBub2RlOiAiKTsN
+Cj4+Pj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+Pj4+ICsgICAgfQ0KPj4+PiArDQo+Pj4+ICsg
+ICAgYmRydl9zZXRfYWlvX2NvbnRleHQoY29yX2ZpbHRlcl9icywgYmRydl9nZXRfYWlvX2NvbnRl
+eHQoYnMpKTsNCj4+Pj4gKw0KPj4+PiArICAgIGJkcnZfZHJhaW5lZF9iZWdpbihicyk7DQo+Pj4+
+ICsgICAgYmRydl9yZXBsYWNlX25vZGUoYnMsIGNvcl9maWx0ZXJfYnMsICZsb2NhbF9lcnIpOw0K
+Pj4+PiArICAgIGJkcnZfZHJhaW5lZF9lbmQoYnMpOw0KPj4+DQo+Pj4gSSB0aGluayB0aGlzIHdh
+cyBhbHJlYWR5IGRpc2N1c3NlZCBpbiB0aGUgcHJldmlvdXMgdmVyc2lvbiBvZiB0aGlzDQo+Pj4g
+cGF0Y2g6IGlmIHlvdSBpbnNlcnQgYSBjb3B5LW9uLXJlYWQgZmlsdGVyIGhlcmUgdGhlbiBhbGwg
+Z3Vlc3QgcmVhZHMNCj4+PiB3aWxsIGNvcHkgdGhlIGRhdGEgZnJvbSB0aGUgYmFja2luZyBjaGFp
+biwgYnV0IHlvdSBkb24ndCB3YW50IHRvIGNvcHkNCj4+PiBhbnl0aGluZyBiZWxvdyB0aGUgJ2Jh
+c2UnIG5vZGUsIHNvIHRoZSBjb3B5LW9uLXJlYWQgZmlsdGVyIG5lZWRzIGENCj4+PiAnYmFzZScg
+cGFyYW1ldGVyLg0KPj4+DQo+PiBCZWZvcmUgdGhhdCwgd2Ugc3RpbGwgaGF2ZSB0aGUgdW5yZXNv
+bHZlZCBpc3N1ZSB3aXRoIGdldHRpbmcgdGhlDQo+PiBmaWx0ZXIgYXMgdGhlICdiYXNlJyBpbnB1
+dCBwYXJhbWV0ZXIuIFRoYXQgaGFwcGVucyBzb21ldGltZXMgYmVjYXVzZQ0KPj4gdGhlIGJhc2Ug
+aXMgYmVpbmcgc2VhcmNoZWQgYnkgdGhlIGZpbGUgbmFtZSwgd2hpY2ggaXMgdGhlIHNhbWUgdG8g
+dGhlDQo+PiBvbmUgb2YgdGhlIGZpbHRlciwgcmF0aGVyIHRoYW4gYnkgdGhlIG5vZGUgbmFtZSAo
+ISkNCj4gDQo+IEknbSBub3Qgc3VyZSBpZiBJIHVuZGVyc3RhbmQuIGJsb2NrLXN0cmVhbSBoYXMg
+J2Jhc2UnIGFuZCAnYmFzZS1ub2RlJw0KPiBwYXJhbWV0ZXJzLCBhbmQgaW4gdGhlIGZpcnN0IGNh
+c2UgeW91IHdvdWxkIGNvbnZlcnQgdGhlIGZpbGUgbmFtZSB0byBhDQo+IG5vZGUgbmFtZS4NCj4g
+DQo+IHN0cmVhbV9zdGFydCgpIGdldHMgdGhlIEJsb2NrRHJpdmVyU3RhdGUsIG5vdCB0aGUgZmls
+ZSBuYW1lLCBzbyB3aHkNCj4gY2FuJ3QgeW91IGdldCB0aGUgbm9kZSBuYW1lIGZyb20gdGhlcmUg
+YW5kIHBhc3MgaXQgdG8gdGhlIGNvcHktb24tcmVhZA0KPiBmaWx0ZXI/DQo+IA0KPiBCZXJ0bw0K
+PiANCldoZW4gdGhlIGJsb2NrLXN0cmVhbSBRTVAgY29tbWFuZCBpcyBydW4gd2l0aCBhIGJhc2Ug
+ZmlsZSBwYXRoIG5hbWUsDQpxbXBfYmxvY2tfc3RyZWFtKCkgaW52b2tlcyBiZHJ2X2xvb2t1cF9i
+cygpIHRvIGdldCB0aGUNCkJsb2NrRHJpdmVyU3RhdGUgYnkgdGhlIGZpbGUgbmFtZSBhbmQgdG8g
+cGFzcyBpdCBmdXJ0aGVyIHRvDQpzdHJlYW1fc3RhcnQoKSwgd2hpbGUgaGFzX2Jhc2Vfbm9kZSA9
+PSBmYWxzZS4NCkl0IHdvcmtzIHRoZSBzYW1lIHdheSBmb3IgdGhlIGNvcHktb24tcmVhZCBmaWx0
+ZXIgaW5zZXJ0ZWQgYWJvdmUgdGhlDQpRQ09XMiBub2RlIGJlY2F1c2UgdGhleSBib3RoIGhhdmUg
+dGhlIHNhbWUgYW5kIG9ubHkgZmlsZSBwYXRoIG5hbWUuDQpTbywgdGhlIEJsb2NrRHJpdmVyU3Rh
+dGUgb2YgdGhlIGZpbHRlciBpcyBwYXNzZWQgdG8gdGhlDQpzdHJlYW1fc3RhcnQoKSBhcyB0aGUg
+cGFyYW1ldGVyIGluc3RlYWQgb2YgdGhlIG9uZSBvZiB0aGUgUUNPVzIgYmFzZQ0Kbm9kZS4gSSBl
+bWFpbGVkIHRoZSB3b3JrYXJvdW5kIHBhdGNoIHRoYXQgc2tpcHMgdGhlIGZpbHRlciBCUyBwYXNz
+ZWQNCnRvIHRoZSBzdHJlYW1fc3RhcnQoKSBhcyB0aGUgcGFyYW1ldGVyLCBpZiBhbnkuDQpUaGVy
+ZSBpcyBhbiBpZGVhIG9mIFZsYWRpbWlyIHRvIHBhc3MgYW4gaW50ZXJtZWRpYXRlIG5vZGUgdGhh
+dCBoYXMNCnRoZSBiYXNlIG5vZGUgYXMgaXRzIGJhY2tpbmcgb25lIGluc3RlYWQuIElmIHlvdSBj
+YW4gc3VnZ2VzdCBhbm90aGVyDQppZGVhLCBpdCB3aWxsIGJlIGFwcHJlY2lhdGVkLg0KDQotLSAN
+CldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
