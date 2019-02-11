@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46229)
+Received: from eggs.gnu.org ([209.51.188.92]:46395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gt6ij-0008Re-19
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:13:41 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gt6jB-0000Qz-Dy
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gt6ii-00007I-89
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:13:41 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51590)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gt6j9-0000NB-Pc
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:14:09 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40158)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gt6ih-00004v-VG
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:13:40 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b11so15727270wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 00:13:39 -0800 (PST)
+	id 1gt6j9-0000Mh-Ix
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:14:07 -0500
+Received: by mail-wm1-x343.google.com with SMTP id q21so15177113wmc.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 00:14:07 -0800 (PST)
 References: <20190210104537.1488-1-yuval.shaia@oracle.com>
-	<20190210104537.1488-9-yuval.shaia@oracle.com>
+	<20190210104537.1488-10-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <dd45a1a5-df73-8413-4e1b-6fef345044bb@gmail.com>
-Date: Mon, 11 Feb 2019 10:14:06 +0200
+Message-ID: <53e8beec-7d4d-269a-ec45-d4babf4cfe82@gmail.com>
+Date: Mon, 11 Feb 2019 10:14:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190210104537.1488-9-yuval.shaia@oracle.com>
+In-Reply-To: <20190210104537.1488-10-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v1 8/9] hw/pvrdma: Delete pvrdma_exit
- function
+Subject: Re: [Qemu-devel] [PATCH v1 9/9] hw/pvrdma: Unregister from shutdown
+ notifier when device goes down
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +37,28 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com
 
 
 On 2/10/19 12:45 PM, Yuval Shaia wrote:
-> This hook is not called and was implemented by mistake.
+> This hook was installed to close the device when VM is going down.
+> After the device is closed there is no need to be informed on VM
+> shutdown.
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/vmw/pvrdma_main.c | 6 ------
->   1 file changed, 6 deletions(-)
+>   hw/rdma/vmw/pvrdma_main.c | 2 ++
+>   1 file changed, 2 insertions(+)
 >
 > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 90dc9b191b..8b379c6435 100644
+> index 8b379c6435..1177c0822f 100644
 > --- a/hw/rdma/vmw/pvrdma_main.c
 > +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -701,18 +701,12 @@ out:
->       }
->   }
->   
-> -static void pvrdma_exit(PCIDevice *pdev)
-> -{
-> -    pvrdma_fini(pdev);
-> -}
-> -
->   static void pvrdma_class_init(ObjectClass *klass, void *data)
+> @@ -359,6 +359,8 @@ static void pvrdma_fini(PCIDevice *pdev)
 >   {
->       DeviceClass *dc = DEVICE_CLASS(klass);
->       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>       PVRDMADev *dev = PVRDMA_DEV(pdev);
 >   
->       k->realize = pvrdma_realize;
-> -    k->exit = pvrdma_exit;
->       k->vendor_id = PCI_VENDOR_ID_VMWARE;
->       k->device_id = PCI_DEVICE_ID_VMWARE_PVRDMA;
->       k->revision = 0x00;
+> +    notifier_remove(&dev->shutdown_notifier);
+> +
+>       pvrdma_qp_ops_fini();
+>   
+>       rdma_backend_stop(&dev->backend_dev);
 
 
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
