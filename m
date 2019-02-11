@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50499)
+Received: from eggs.gnu.org ([209.51.188.92]:50513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBH9-00074O-Bs
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:37 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBHA-00075X-Tz
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtBGq-0003kj-QX
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:21 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43778)
+	(envelope-from <alex.bennee@linaro.org>) id 1gtBGw-0003pX-Hf
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:24 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35432)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gtBGo-0003iM-Iz
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:11 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id r2so4577632wrv.10
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:10 -0800 (PST)
+	id 1gtBGs-0003kL-Km
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 08:05:16 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id t18so269388wrx.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 05:05:12 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 11 Feb 2019 13:04:49 +0000
-Message-Id: <20190211130507.8710-1-alex.bennee@linaro.org>
+Date: Mon, 11 Feb 2019 13:04:52 +0000
+Message-Id: <20190211130507.8710-4-alex.bennee@linaro.org>
+In-Reply-To: <20190211130507.8710-1-alex.bennee@linaro.org>
+References: <20190211130507.8710-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/18] testing updates:
- travis/cirrus/vm-test/binfmt
+Subject: [Qemu-devel] [PULL 03/18] .travis.yml: separate tools and docs into
+ another entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +31,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-The following changes since commit e47f81b617684c4546af286d307b69014a83538a:
+Re-building the tools and documents by default is a little wasteful as
+they are not really affected by the main build options. Split tools
+and documents into their own task with a minimal softmmu and
+linux-user target list just to check they don't interact badly.
 
-  Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2019-02-07 18:53:25 +0000)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-are available in the Git repository at:
-
-  https://github.com/stsquad/qemu.git tags/pull-testing-next-110219-1
-
-for you to fetch changes up to 920fff9093db26f3e74858e3d4182b74a6da7496:
-
-  tests/vm: Be verbose while extracting compressed images (2019-02-11 12:47:08 +0000)
-
-----------------------------------------------------------------
-Testing updates:
-
-  - .travis.yml tweaks and optimisations
-  - .cirrus.yml enabled for FreeBSD CI
-  - docker.py clean-ups for binfmt_misc
-  - more control of vm-test builds
-
-----------------------------------------------------------------
-Alex Bennée (11):
-      .travis.yml: separate tools and docs into another entry
-      .travis.yml: fold --disable-tcg into alternate coroutine builds
-      docker: add debian-buster-arm64-cross
-      tests: make docker.py update use configured binfmt path
-      tests: make docker.py check for persistent configs
-      tests: docker.py be even smarter with persistent binfmt_misc
-      tests: PEP8 cleanup of docker.py, mostly white space
-      tests/vm: call make check directly for netbsd/freebsd/ubuntu.i386
-      tests/vm: add --build-target option
-      tests/vm: expose BUILD_TARGET, TARGET_LIST and EXTRA_CONFIGURE_OPTS
-      scripts/qemu.py: allow arches use KVM for their 32bit cousins
-
-Daniel P. Berrangé (1):
-      .travis.yml: stop requesting libffi & gettext from homebrew
-
-Ed Maste (1):
-      .cirrus.yml: basic compile and test for FreeBSD
-
-Gerd Hoffmann (1):
-      tests/vm: move images to $HOME/.cache/qemu-vm/images
-
-Murilo Opsfelder Araujo (1):
-      docs/devel/testing: Add -a option to usermod command on docker setup
-
-Philippe Mathieu-Daudé (3):
-      MAINTAINERS: Add an entry for scripts/archive-source.sh
-      archive-source.sh: Clone the submodules locally
-      tests/vm: Be verbose while extracting compressed images
-
- .cirrus.yml                                        |  16 +++
- .travis.yml                                        |  31 +++---
- MAINTAINERS                                        |   9 ++
- docs/devel/testing.rst                             |   2 +-
- scripts/archive-source.sh                          |   7 ++
- scripts/qemu.py                                    |  12 ++-
- tests/docker/Makefile.include                      |   1 +
- tests/docker/docker.py                             | 110 +++++++++++++++------
- .../dockerfiles/debian-buster-arm64-cross.docker   |  15 +++
- tests/docker/dockerfiles/debian10.docker           |  31 ++++++
- tests/tcg/aarch64/Makefile.include                 |   2 +-
- tests/vm/Makefile.include                          |  22 +++--
- tests/vm/basevm.py                                 |   3 +
- tests/vm/centos                                    |   3 +-
- tests/vm/freebsd                                   |   6 +-
- tests/vm/netbsd                                    |   6 +-
- tests/vm/openbsd                                   |   3 +-
- tests/vm/ubuntu.i386                               |   3 +-
- 18 files changed, 222 insertions(+), 60 deletions(-)
- create mode 100644 .cirrus.yml
- create mode 100644 tests/docker/dockerfiles/debian-buster-arm64-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian10.docker
-
---
+diff --git a/.travis.yml b/.travis.yml
+index beea941408..652be702ac 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -59,6 +59,7 @@ env:
+   global:
+     - SRC_DIR="."
+     - BUILD_DIR="."
++    - BASE_CONFIG="--disable-docs --disable-tools"
+     - TEST_CMD="make check -j3 V=1"
+ 
+ 
+@@ -69,7 +70,7 @@ git:
+ 
+ before_script:
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+-  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
++  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+ script:
+   - make -j3 && ${TEST_CMD}
+ 
+@@ -104,6 +105,17 @@ matrix:
+         - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
+ 
+ 
++    # Check we can build docs and tools
++    - env:
++        - BASE_CONFIG="--enable-tools --enable-docs"
++        - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
++      addons:
++        apt:
++          packages:
++            - python-sphinx
++            - texinfo
++            - perl
++
+     # Test out-of-tree builds
+     - env:
+         - CONFIG="--enable-debug --enable-debug-tcg"
+@@ -241,5 +253,5 @@ matrix:
+ 
+ 
+     - env:
+-        - CONFIG="--disable-system --disable-docs"
++        - CONFIG="--disable-system"
+         - TEST_CMD="make -j3 check-tcg V=1"
+-- 
 2.20.1
