@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44207)
+Received: from eggs.gnu.org ([209.51.188.92]:44210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCpE-00017i-BS
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:49 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCpE-00017l-CZ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCpA-0000Yj-Fb
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:46 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtCpA-0000ZH-LB
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 09:44:48 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 11 Feb 2019 17:44:12 +0300
-Message-Id: <20190211144421.106232-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 0/9] qcow2: encryption threads
+Date: Mon, 11 Feb 2019 17:44:14 +0300
+Message-Id: <20190211144421.106232-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190211144421.106232-1-vsementsov@virtuozzo.com>
+References: <20190211144421.106232-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 2/9] qcow2: add separate file for threaded
+ data processing functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,115 +23,448 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, berrange@redhat.com
 
-Hi all!
+Move compression-on-threads to separate file. Encryption will be in it
+too.
 
-The series brings threads to qcow2 encryption/decryption path,
-like it is already done for compression.
-
-v4:
-add r-b's to most of patches
-04: add r-b by Alberto and Paolo.
-    Paolo asked to add some information to the commit message.
-    I don't have good understanding of moving from
-    "AioContext lock usage" to other locks, so I just added
-    "Drop dependence on AioContext lock.", not being sure that
-    it is correct or make sense. And, in the same time take both
-    r-b's. So, hope maintainers will adjust commit message if
-    needed.
-06: add r-b by Alberto
-    drop comment 'No sense in releasing the lock' [Alberto]
-
-
-v3:
-01: drop 'include block_int.h' lines not needed more [Alberto]
-02: fix comments style (open/close on separate line), add Alberto's r-b
-03: improve commit message, add Alberto's r-b
-04: new, follows Paolo's comment
-
-
-v2: (not very careful change list)
-    - multiple cipher inside QCryptoBlock instead of multiple
-      blocks inside qcow2, as suggested by Daniel, and it is
-      done in separate series
-    - use threaded encryption in do_perform_cow_encrypt() too
-    - some renaming and refactoring and simplifications
-
-
-== Performance testing (not updated for v4, as there are no actual changes) ==
-
-Hmm, do we have something like tests/qemu-iotests, but for performance?
-
-[root@kvm up-qcow2-encrypt-threads]# cat test.sh 
-    #!/bin/bash
-
-    size=1G
-    src=/ssd/src.raw
-    dst=/ssd/dst.enc.qcow2
-
-    # create source for tests
-    ./qemu-img create -f raw "$src" $size > /dev/null
-    ./qemu-io -f raw -c "write -P 0xa 0 $size" "$src" > /dev/null
-
-    for w in "" "-W"; do
-        echo -e "Test with additional paramter for qemu-img: '$w'"
-
-        # create target
-        ./qemu-img create -f qcow2 --object secret,id=sec0,data=test -o encrypt.format=luks,encrypt.key-secret=sec0 "$dst" $size > /dev/null
-
-        time ./qemu-img convert $w -f raw --object secret,id=sec0,data=test --target-image-opts -n "$src" "driver=qcow2,file.filename=$dst,encrypt.key-secret=sec0"
-        echo
-    done
-
-
-before the series:
-    Test with additional paramter for qemu-img: ''
-
-    real    0m14.318s
-    user    0m13.637s
-    sys     0m0.881s
-
-    Test with additional paramter for qemu-img: '-W'
-
-    real    0m13.962s
-    user    0m13.681s
-    sys     0m1.156s
-
-
-after the series:
-    Test with additional paramter for qemu-img: ''
-
-    real    0m14.382s
-    user    0m13.735s
-    sys     0m0.835s
-
-    Test with additional paramter for qemu-img: '-W'
-
-    real    0m5.696s
-    user    0m15.931s
-    sys     0m1.144s
-
-Vladimir Sementsov-Ogievskiy (9):
-  qcow2.h: add missing include
-  qcow2: add separate file for threaded data processing functions
-  qcow2-threads: use thread_pool_submit_co
-  qcow2-threads: qcow2_co_do_compress: protect queuing by mutex
-  qcow2-threads: split out generic path
-  qcow2: qcow2_co_preadv: improve locking
-  qcow2: qcow2_co_preadv: skip using hd_qiov when possible
-  qcow2: bdrv_co_pwritev: move encryption code out of the lock
-  qcow2: do encryption in threads
-
- block/qcow2.h          |  20 ++-
- block/qcow2-bitmap.c   |   1 -
- block/qcow2-cache.c    |   1 -
- block/qcow2-cluster.c  |   8 +-
- block/qcow2-refcount.c |   1 -
- block/qcow2-snapshot.c |   1 -
- block/qcow2-threads.c  | 268 +++++++++++++++++++++++++++++++++++++++
- block/qcow2.c          | 275 ++++++++---------------------------------
- block/Makefile.objs    |   2 +-
- 9 files changed, 341 insertions(+), 236 deletions(-)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2.h         |   7 ++
+ block/qcow2-threads.c | 201 ++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c         | 169 -----------------------------------
+ block/Makefile.objs   |   2 +-
+ 4 files changed, 209 insertions(+), 170 deletions(-)
  create mode 100644 block/qcow2-threads.c
 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 2e7c5d3e6b..ca9f8ce093 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -698,4 +698,11 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+                                           const char *name,
+                                           Error **errp);
+ 
++ssize_t coroutine_fn
++qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
++                  const void *src, size_t src_size);
++ssize_t coroutine_fn
++qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
++                    const void *src, size_t src_size);
++
+ #endif
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+new file mode 100644
+index 0000000000..dea9ac431c
+--- /dev/null
++++ b/block/qcow2-threads.c
+@@ -0,0 +1,201 @@
++/*
++ * Threaded data processing for Qcow2: compression, encryption
++ *
++ * Copyright (c) 2004-2006 Fabrice Bellard
++ * Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++
++#define ZLIB_CONST
++#include <zlib.h>
++
++#include "qcow2.h"
++#include "block/thread-pool.h"
++
++#define MAX_COMPRESS_THREADS 4
++
++typedef ssize_t (*Qcow2CompressFunc)(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size);
++typedef struct Qcow2CompressData {
++    void *dest;
++    size_t dest_size;
++    const void *src;
++    size_t src_size;
++    ssize_t ret;
++
++    Qcow2CompressFunc func;
++} Qcow2CompressData;
++
++/*
++ * qcow2_compress()
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: compressed size on success
++ *          -1 destination buffer is not enough to store compressed data
++ *          -2 on any other error
++ */
++static ssize_t qcow2_compress(void *dest, size_t dest_size,
++                              const void *src, size_t src_size)
++{
++    ssize_t ret;
++    z_stream strm;
++
++    /* best compression, small window, no zlib header */
++    memset(&strm, 0, sizeof(strm));
++    ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
++                       -12, 9, Z_DEFAULT_STRATEGY);
++    if (ret != Z_OK) {
++        return -2;
++    }
++
++    /*
++     * strm.next_in is not const in old zlib versions, such as those used on
++     * OpenBSD/NetBSD, so cast the const away
++     */
++    strm.avail_in = src_size;
++    strm.next_in = (void *) src;
++    strm.avail_out = dest_size;
++    strm.next_out = dest;
++
++    ret = deflate(&strm, Z_FINISH);
++    if (ret == Z_STREAM_END) {
++        ret = dest_size - strm.avail_out;
++    } else {
++        ret = (ret == Z_OK ? -1 : -2);
++    }
++
++    deflateEnd(&strm);
++
++    return ret;
++}
++
++/*
++ * qcow2_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes.
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          -1 on fail
++ */
++static ssize_t qcow2_decompress(void *dest, size_t dest_size,
++                                const void *src, size_t src_size)
++{
++    int ret = 0;
++    z_stream strm;
++
++    memset(&strm, 0, sizeof(strm));
++    strm.avail_in = src_size;
++    strm.next_in = (void *) src;
++    strm.avail_out = dest_size;
++    strm.next_out = dest;
++
++    ret = inflateInit2(&strm, -12);
++    if (ret != Z_OK) {
++        return -1;
++    }
++
++    ret = inflate(&strm, Z_FINISH);
++    if ((ret != Z_STREAM_END && ret != Z_BUF_ERROR) || strm.avail_out != 0) {
++        /*
++         * We approve Z_BUF_ERROR because we need @dest buffer to be filled, but
++         * @src buffer may be processed partly (because in qcow2 we know size of
++         * compressed data with precision of one sector)
++         */
++        ret = -1;
++    }
++
++    inflateEnd(&strm);
++
++    return ret;
++}
++
++static int qcow2_compress_pool_func(void *opaque)
++{
++    Qcow2CompressData *data = opaque;
++
++    data->ret = data->func(data->dest, data->dest_size,
++                           data->src, data->src_size);
++
++    return 0;
++}
++
++static void qcow2_compress_complete(void *opaque, int ret)
++{
++    qemu_coroutine_enter(opaque);
++}
++
++static ssize_t coroutine_fn
++qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
++                     const void *src, size_t src_size, Qcow2CompressFunc func)
++{
++    BDRVQcow2State *s = bs->opaque;
++    BlockAIOCB *acb;
++    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
++    Qcow2CompressData arg = {
++        .dest = dest,
++        .dest_size = dest_size,
++        .src = src,
++        .src_size = src_size,
++        .func = func,
++    };
++
++    while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
++        qemu_co_queue_wait(&s->compress_wait_queue, NULL);
++    }
++
++    s->nb_compress_threads++;
++    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
++                                 qcow2_compress_complete,
++                                 qemu_coroutine_self());
++
++    if (!acb) {
++        s->nb_compress_threads--;
++        return -EINVAL;
++    }
++    qemu_coroutine_yield();
++    s->nb_compress_threads--;
++    qemu_co_queue_next(&s->compress_wait_queue);
++
++    return arg.ret;
++}
++
++ssize_t coroutine_fn
++qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
++                  const void *src, size_t src_size)
++{
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
++                                qcow2_compress);
++}
++
++ssize_t coroutine_fn
++qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
++                    const void *src, size_t src_size)
++{
++    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
++                                qcow2_decompress);
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6f60287244..d08f2e921a 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -24,9 +24,6 @@
+ 
+ #include "qemu/osdep.h"
+ 
+-#define ZLIB_CONST
+-#include <zlib.h>
+-
+ #include "block/qdict.h"
+ #include "sysemu/block-backend.h"
+ #include "qemu/module.h"
+@@ -43,7 +40,6 @@
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qapi-visit-block-core.h"
+ #include "crypto.h"
+-#include "block/thread-pool.h"
+ 
+ /*
+   Differences with QCOW:
+@@ -3720,171 +3716,6 @@ fail:
+     return ret;
+ }
+ 
+-/*
+- * qcow2_compress()
+- *
+- * @dest - destination buffer, @dest_size bytes
+- * @src - source buffer, @src_size bytes
+- *
+- * Returns: compressed size on success
+- *          -1 destination buffer is not enough to store compressed data
+- *          -2 on any other error
+- */
+-static ssize_t qcow2_compress(void *dest, size_t dest_size,
+-                              const void *src, size_t src_size)
+-{
+-    ssize_t ret;
+-    z_stream strm;
+-
+-    /* best compression, small window, no zlib header */
+-    memset(&strm, 0, sizeof(strm));
+-    ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
+-                       -12, 9, Z_DEFAULT_STRATEGY);
+-    if (ret != Z_OK) {
+-        return -2;
+-    }
+-
+-    /* strm.next_in is not const in old zlib versions, such as those used on
+-     * OpenBSD/NetBSD, so cast the const away */
+-    strm.avail_in = src_size;
+-    strm.next_in = (void *) src;
+-    strm.avail_out = dest_size;
+-    strm.next_out = dest;
+-
+-    ret = deflate(&strm, Z_FINISH);
+-    if (ret == Z_STREAM_END) {
+-        ret = dest_size - strm.avail_out;
+-    } else {
+-        ret = (ret == Z_OK ? -1 : -2);
+-    }
+-
+-    deflateEnd(&strm);
+-
+-    return ret;
+-}
+-
+-/*
+- * qcow2_decompress()
+- *
+- * Decompress some data (not more than @src_size bytes) to produce exactly
+- * @dest_size bytes.
+- *
+- * @dest - destination buffer, @dest_size bytes
+- * @src - source buffer, @src_size bytes
+- *
+- * Returns: 0 on success
+- *          -1 on fail
+- */
+-static ssize_t qcow2_decompress(void *dest, size_t dest_size,
+-                                const void *src, size_t src_size)
+-{
+-    int ret = 0;
+-    z_stream strm;
+-
+-    memset(&strm, 0, sizeof(strm));
+-    strm.avail_in = src_size;
+-    strm.next_in = (void *) src;
+-    strm.avail_out = dest_size;
+-    strm.next_out = dest;
+-
+-    ret = inflateInit2(&strm, -12);
+-    if (ret != Z_OK) {
+-        return -1;
+-    }
+-
+-    ret = inflate(&strm, Z_FINISH);
+-    if ((ret != Z_STREAM_END && ret != Z_BUF_ERROR) || strm.avail_out != 0) {
+-        /* We approve Z_BUF_ERROR because we need @dest buffer to be filled, but
+-         * @src buffer may be processed partly (because in qcow2 we know size of
+-         * compressed data with precision of one sector) */
+-        ret = -1;
+-    }
+-
+-    inflateEnd(&strm);
+-
+-    return ret;
+-}
+-
+-#define MAX_COMPRESS_THREADS 4
+-
+-typedef ssize_t (*Qcow2CompressFunc)(void *dest, size_t dest_size,
+-                                     const void *src, size_t src_size);
+-typedef struct Qcow2CompressData {
+-    void *dest;
+-    size_t dest_size;
+-    const void *src;
+-    size_t src_size;
+-    ssize_t ret;
+-
+-    Qcow2CompressFunc func;
+-} Qcow2CompressData;
+-
+-static int qcow2_compress_pool_func(void *opaque)
+-{
+-    Qcow2CompressData *data = opaque;
+-
+-    data->ret = data->func(data->dest, data->dest_size,
+-                           data->src, data->src_size);
+-
+-    return 0;
+-}
+-
+-static void qcow2_compress_complete(void *opaque, int ret)
+-{
+-    qemu_coroutine_enter(opaque);
+-}
+-
+-static ssize_t coroutine_fn
+-qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+-                     const void *src, size_t src_size, Qcow2CompressFunc func)
+-{
+-    BDRVQcow2State *s = bs->opaque;
+-    BlockAIOCB *acb;
+-    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
+-    Qcow2CompressData arg = {
+-        .dest = dest,
+-        .dest_size = dest_size,
+-        .src = src,
+-        .src_size = src_size,
+-        .func = func,
+-    };
+-
+-    while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
+-        qemu_co_queue_wait(&s->compress_wait_queue, NULL);
+-    }
+-
+-    s->nb_compress_threads++;
+-    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
+-                                 qcow2_compress_complete,
+-                                 qemu_coroutine_self());
+-
+-    if (!acb) {
+-        s->nb_compress_threads--;
+-        return -EINVAL;
+-    }
+-    qemu_coroutine_yield();
+-    s->nb_compress_threads--;
+-    qemu_co_queue_next(&s->compress_wait_queue);
+-
+-    return arg.ret;
+-}
+-
+-static ssize_t coroutine_fn
+-qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+-                  const void *src, size_t src_size)
+-{
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_compress);
+-}
+-
+-static ssize_t coroutine_fn
+-qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+-                    const void *src, size_t src_size)
+-{
+-    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
+-                                qcow2_decompress);
+-}
+-
+ /* XXX: put compressed sectors first, then all the cluster aligned
+    tables to avoid losing bytes in alignment */
+ static coroutine_fn int
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 7a81892a52..ae11605c9f 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -6,7 +6,7 @@ block-obj-$(CONFIG_BOCHS) += bochs.o
+ block-obj-$(CONFIG_VVFAT) += vvfat.o
+ block-obj-$(CONFIG_DMG) += dmg.o
+ 
+-block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o qcow2-bitmap.o
++block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o qcow2-bitmap.o qcow2-threads.o
+ block-obj-$(CONFIG_QED) += qed.o qed-l2-cache.o qed-table.o qed-cluster.o
+ block-obj-$(CONFIG_QED) += qed-check.o
+ block-obj-y += vhdx.o vhdx-endian.o vhdx-log.o
 -- 
 2.18.0
