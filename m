@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45840)
+Received: from eggs.gnu.org ([209.51.188.92]:53794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gtJfy-0001FT-GS
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:03:43 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gtJyF-00013R-8w
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:22:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gtJfp-0003T2-Qc
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:03:35 -0500
-References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
-	<20190211125601.86533-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dcf92fc1-21d9-ea3b-5267-6c76f747cbc0@redhat.com>
-Date: Mon, 11 Feb 2019 16:02:42 -0600
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gtJyE-0007Ca-1E
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:22:35 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:36864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gtJyD-00077Q-L2
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 17:22:33 -0500
+Date: Mon, 11 Feb 2019 23:22:27 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190211222227.npdkrikdjxpzqxkn@function>
+References: <20190208181226.24052-1-marcandre.lureau@redhat.com>
+	<20190211110907.GP27585@redhat.com>
+	<CAMxuvaz4w75CmN1o0E4y4+pTLk5cks-oGu+FnyUWUbvBqC-jUA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190211125601.86533-5-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JJFlNLFuT1NesO4624NDF1e5G2lGgrckY"
-Subject: Re: [Qemu-devel] [PATCH 4/4] block/nbd-client: use non-blocking io
- channel for nbd negotiation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAMxuvaz4w75CmN1o0E4y4+pTLk5cks-oGu+FnyUWUbvBqC-jUA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] RFC: net/slirp: link with libslirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JJFlNLFuT1NesO4624NDF1e5G2lGgrckY
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <dcf92fc1-21d9-ea3b-5267-6c76f747cbc0@redhat.com>
-Subject: Re: [PATCH 4/4] block/nbd-client: use non-blocking io channel for nbd
- negotiation
-References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
- <20190211125601.86533-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20190211125601.86533-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/11/19 6:56 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Now negotiation is done in coroutine, so to take benefit of it let's
-> use non-blocking model.
+Marc-Andr=C3=A9 Lureau, le lun. 11 f=C3=A9vr. 2019 12:34:47 +0100, a ecri=
+t:
+> On Mon, Feb 11, 2019 at 12:09 PM Daniel P. Berrang=C3=A9 <berrange@redh=
+at.com> wrote:
+> >
+> > On Fri, Feb 08, 2019 at 07:12:26PM +0100, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Once libslirp has received its first release, we can link with the
+> > > external libslirp library.
+> > >
+> > > The migration data should be compatible with current and older qemu
+> > > versions (same compatibility as today). See "slirp: add state
+> > > saving/loading" patch. However, the content should be treated as a
+> > > blob, as the format may change eventually in the future.
+> >
+> > How are we going to manage live migration compat if libslirp changes
+> > the blob content ?
+> >
+> > Bear in mind that we need to support all existing QEMU releases live
+> > migrating to effectively all future QEMU releases, with all future
+> > libslirp releases, in *both* directions. ie arbitrarily newer
+> > libslirp needs to be able to emit a blob format that can be read
+> > by arbitrarily older slirp inside QEMU.
 >=20
-> Note that QIOChannel handle synchronous io calls correctly anyway, so
-
-s/handle/handles/
-
-> it's not a problem to send final NBD_CMD_DISC to non-blocking channel
-> but using sync qio interface, even not in coroutine.
-
-s/not in/when not in a/
-
+> Right, this is all supported currently with the proposed patch set,
+> since it is effectively the same code.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/nbd-client.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
-
-This fixes qemu as NBD client for use in block devices, but what about
-qemu as NBD client in qemu-nbd?  Does that need any updates?  Then
-again, your observation about QIO doing the right thing for both
-blocking (qemu-nbd) and non-blocking (block layer) channels seems to
-cover that.
-
-> @@ -1072,9 +1072,6 @@ static int nbd_client_connect(BlockDriverState *b=
-s,
->          object_ref(OBJECT(client->ioc));
->      }
-> =20
-> -    /* Now that we're connected, set the socket to be non-blocking and=
-
-> -     * kick the reply mechanism.  */
-> -    qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
->      client->connection_co =3D qemu_coroutine_create(nbd_connection_ent=
-ry, client);
->      nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
-> =20
-> @@ -1083,9 +1080,8 @@ static int nbd_client_connect(BlockDriverState *b=
-s,
-> =20
->   fail:
->      /*
-> -     * We have connected, but must fail for other reasons. The
-> -     * connection is still blocking; send NBD_CMD_DISC as a courtesy
-> -     * to the server.
-> +     * We have connected, but must fail for other reasons.
-> +     * Send NBD_CMD_DISC as a courtesy to the server.
->       */
->      {
->          NBDRequest request =3D { .type =3D NBD_CMD_DISC };
+> So register_savevm_live() get passed slirp_state_version() (currently =3D=
+=3D 4)
 >=20
+> & slirp_state_load() get the version_id from QEMU.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Mmm, but do we guarantee that the current version of slirp will be able
+to read blobs produced by future versions of slirp?
 
+Future extensions of the format would have to be so that the current
+version could discard their content without issues.
 
---JJFlNLFuT1NesO4624NDF1e5G2lGgrckY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Perhaps qemu should actually explicitly pass 4 to
+register_savevm_live(), for that function to only record that format
+(and thus get compatibility of course) and only bump to greater values
+when qemu is modified to make use of a functionality which requires
+extending the blob format, which then makes it unreadable by older qemu
+releases, but that is fine for qemu.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxh8QIACgkQp6FrSiUn
-Q2p0Kwf7BW6Y9RGUGz8uLjGVqfuJD/mnkg1HjKnromfJbMts5g+lpOxQx9xIqPnx
-UmQekzczEavQ8UOPWJ2jr++yMPQx+30MOI6qIWMsbv2PVumzCd64NSdHQZJEbKBL
-D3oVRKMr63FXK9nto+CnMzAHtATuTG9apZD7gfhrJ2Tsmj0qGIHz/q+MD/ttqTqE
-ZwTu6lhHXc7GZ5ik4y83aVgovozsbK/1YNYc516+HWppVTzEeNlnvakILhkUjFvP
-+SgxfHVfi4cQUGXF2EfRhAH3x302imrZmextiNu+Kn5rMyYuPfyZDhYqEs6nYVDT
-t9xExspTyM3cJzwdWQ5aQLwJ/O6xuw==
-=cnPq
------END PGP SIGNATURE-----
-
---JJFlNLFuT1NesO4624NDF1e5G2lGgrckY--
+Samuel
