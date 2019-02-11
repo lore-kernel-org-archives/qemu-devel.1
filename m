@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53643)
+Received: from eggs.gnu.org ([209.51.188.92]:53642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gtIYX-0007C5-1d
+	(envelope-from <eblake@redhat.com>) id 1gtIYX-0007C4-5D
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gtIYK-0006eQ-FD
+	(envelope-from <eblake@redhat.com>) id 1gtIYK-0006eP-F9
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:51:49 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Feb 2019 14:51:26 -0600
-Message-Id: <20190211205128.27146-3-eblake@redhat.com>
+Date: Mon, 11 Feb 2019 14:51:27 -0600
+Message-Id: <20190211205128.27146-4-eblake@redhat.com>
 In-Reply-To: <20190211205128.27146-1-eblake@redhat.com>
 References: <20190211205128.27146-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] bdrv_query_image_info Error parameter added
+Subject: [Qemu-devel] [PULL 3/4] qcow2: Add list of bitmaps to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,198 +23,263 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
 
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-Inform a user in case qcow2_get_specific_info fails to obtain
-QCOW2 image specific information. This patch is preliminary to
-the one "qcow2: Add list of bitmaps to ImageInfoSpecificQCow2".
+In the 'Format specific information' section of the 'qemu-img info'
+command output, the supplemental information about existing QCOW2
+bitmaps will be shown, such as a bitmap name, flags and granularity:
+
+image: /vz/vmprivate/VM1/harddisk.hdd
+file format: qcow2
+virtual size: 64G (68719476736 bytes)
+disk size: 3.0M
+cluster_size: 1048576
+Format specific information:
+    compat: 1.1
+    lazy refcounts: true
+    bitmaps:
+        [0]:
+            flags:
+                [0]: in-use
+                [1]: auto
+            name: back-up1
+            granularity: 65536
+        [1]:
+            flags:
+                [0]: in-use
+                [1]: auto
+            name: back-up2
+            granularity: 65536
+    refcount bits: 16
+    corrupt: false
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <1549638368-530182-2-git-send-email-andrey.shinkevich@virtuoz=
+Message-Id: <1549638368-530182-3-git-send-email-andrey.shinkevich@virtuoz=
 zo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/block.h     |  3 ++-
- include/block/block_int.h |  3 ++-
- block.c                   |  5 +++--
- block/crypto.c            |  9 +++------
- block/qapi.c              |  7 ++++++-
- block/qcow2.c             | 10 ++++++++--
- block/vmdk.c              |  3 ++-
- qemu-io-cmds.c            |  7 ++++++-
- 8 files changed, 32 insertions(+), 15 deletions(-)
+ qapi/block-core.json | 41 +++++++++++++++++++++++-
+ block/qcow2.h        |  2 ++
+ block/qcow2-bitmap.c | 76 ++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c        | 11 ++++++-
+ 4 files changed, 128 insertions(+), 2 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 57233cf2c0c..73357c6c250 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -478,7 +478,8 @@ const char *bdrv_get_device_name(const BlockDriverSta=
-te *bs);
- const char *bdrv_get_device_or_node_name(const BlockDriverState *bs);
- int bdrv_get_flags(BlockDriverState *bs);
- int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi);
--ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs);
-+ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs,
-+                                          Error **errp);
- void bdrv_round_to_clusters(BlockDriverState *bs,
-                             int64_t offset, int64_t bytes,
-                             int64_t *cluster_offset,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f605622216d..0075bafd105 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -319,7 +319,8 @@ struct BlockDriver {
-                                   const char *name,
-                                   Error **errp);
-     int (*bdrv_get_info)(BlockDriverState *bs, BlockDriverInfo *bdi);
--    ImageInfoSpecific *(*bdrv_get_specific_info)(BlockDriverState *bs);
-+    ImageInfoSpecific *(*bdrv_get_specific_info)(BlockDriverState *bs,
-+                                                 Error **errp);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 5f17d67d714..0f349d46033 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -69,6 +69,8 @@
+ # @encrypt: details about encryption parameters; only set if image
+ #           is encrypted (since 2.10)
+ #
++# @bitmaps: A list of qcow2 bitmap details (since 4.0)
++#
+ # Since: 1.7
+ ##
+ { 'struct': 'ImageInfoSpecificQCow2',
+@@ -77,7 +79,8 @@
+       '*lazy-refcounts': 'bool',
+       '*corrupt': 'bool',
+       'refcount-bits': 'int',
+-      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
++      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
++      '*bitmaps': ['Qcow2BitmapInfo']
+   } }
 
-     int coroutine_fn (*bdrv_save_vmstate)(BlockDriverState *bs,
-                                           QEMUIOVector *qiov,
-diff --git a/block.c b/block.c
-index b67d9b7b657..4ad0e90d7e3 100644
---- a/block.c
-+++ b/block.c
-@@ -4462,11 +4462,12 @@ int bdrv_get_info(BlockDriverState *bs, BlockDriv=
-erInfo *bdi)
-     return drv->bdrv_get_info(bs, bdi);
+ ##
+@@ -453,6 +456,42 @@
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
+            'status': 'DirtyBitmapStatus'} }
+
++##
++# @Qcow2BitmapInfoFlags:
++#
++# An enumeration of flags that a bitmap can report to the user.
++#
++# @in-use: This flag is set by any process actively modifying the qcow2 =
+file,
++#          and cleared when the updated bitmap is flushed to the qcow2 i=
+mage.
++#          The presence of this flag in an offline image means that the =
+bitmap
++#          was not saved correctly after its last usage, and may contain
++#          inconsistent data.
++#
++# @auto: The bitmap must reflect all changes of the virtual disk by any
++#        application that would write to this qcow2 file.
++#
++# Since: 4.0
++##
++{ 'enum': 'Qcow2BitmapInfoFlags',
++  'data': ['in-use', 'auto'] }
++
++##
++# @Qcow2BitmapInfo:
++#
++# Qcow2 bitmap information.
++#
++# @name: the name of the bitmap
++#
++# @granularity: granularity of the bitmap in bytes
++#
++# @flags: flags of the bitmap
++#
++# Since: 4.0
++##
++{ 'struct': 'Qcow2BitmapInfo',
++  'data': {'name': 'str', 'granularity': 'uint32',
++           'flags': ['Qcow2BitmapInfoFlags'] } }
++
+ ##
+ # @BlockLatencyHistogramInfo:
+ #
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 32cce9eee22..9dd02df831c 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -684,6 +684,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *b=
+s, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                                Error **errp);
+ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_upda=
+ted,
+                                  Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index b9463014292..3ee524da4b5 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1006,6 +1006,82 @@ fail:
+     return false;
  }
 
--ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs)
-+ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs,
-+                                          Error **errp)
- {
-     BlockDriver *drv =3D bs->drv;
-     if (drv && drv->bdrv_get_specific_info) {
--        return drv->bdrv_get_specific_info(bs);
-+        return drv->bdrv_get_specific_info(bs, errp);
-     }
-     return NULL;
- }
-diff --git a/block/crypto.c b/block/crypto.c
-index f0a5f6b9873..d5b1da66a1d 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -594,20 +594,17 @@ static int block_crypto_get_info_luks(BlockDriverSt=
-ate *bs,
- }
-
- static ImageInfoSpecific *
--block_crypto_get_specific_info_luks(BlockDriverState *bs)
-+block_crypto_get_specific_info_luks(BlockDriverState *bs, Error **errp)
- {
-     BlockCrypto *crypto =3D bs->opaque;
-     ImageInfoSpecific *spec_info;
-     QCryptoBlockInfo *info;
-
--    info =3D qcrypto_block_get_info(crypto->block, NULL);
-+    info =3D qcrypto_block_get_info(crypto->block, errp);
-     if (!info) {
-         return NULL;
-     }
--    if (info->format !=3D Q_CRYPTO_BLOCK_FORMAT_LUKS) {
--        qapi_free_QCryptoBlockInfo(info);
--        return NULL;
--    }
-+    assert(info->format =3D=3D Q_CRYPTO_BLOCK_FORMAT_LUKS);
-
-     spec_info =3D g_new(ImageInfoSpecific, 1);
-     spec_info->type =3D IMAGE_INFO_SPECIFIC_KIND_LUKS;
-diff --git a/block/qapi.c b/block/qapi.c
-index c66f949db83..00291f91059 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -282,7 +282,12 @@ void bdrv_query_image_info(BlockDriverState *bs,
-         info->dirty_flag =3D bdi.is_dirty;
-         info->has_dirty_flag =3D true;
-     }
--    info->format_specific     =3D bdrv_get_specific_info(bs);
-+    info->format_specific =3D bdrv_get_specific_info(bs, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        qapi_free_ImageInfo(info);
-+        goto out;
++
++static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
++{
++    Qcow2BitmapInfoFlagsList *list =3D NULL;
++    Qcow2BitmapInfoFlagsList **plist =3D &list;
++    int i;
++
++    static const struct {
++        int bme;  /* Bitmap directory entry flags */
++        int info; /* The flags to report to the user */
++    } map[] =3D {
++        { BME_FLAG_IN_USE, QCOW2_BITMAP_INFO_FLAGS_IN_USE },
++        { BME_FLAG_AUTO,   QCOW2_BITMAP_INFO_FLAGS_AUTO },
++    };
++
++    int map_size =3D ARRAY_SIZE(map);
++
++    for (i =3D 0; i < map_size; ++i) {
++        if (flags & map[i].bme) {
++            Qcow2BitmapInfoFlagsList *entry =3D
++                g_new0(Qcow2BitmapInfoFlagsList, 1);
++            entry->value =3D map[i].info;
++            *plist =3D entry;
++            plist =3D &entry->next;
++            flags &=3D ~map[i].bme;
++        }
 +    }
-     info->has_format_specific =3D info->format_specific !=3D NULL;
-
-     backing_filename =3D bs->backing_file;
++    /* Check if the BME_* mapping above is complete */
++    assert(!flags);
++
++    return list;
++}
++
++/*
++ * qcow2_get_bitmap_info_list()
++ * Returns a list of QCOW2 bitmap details.
++ * In case of no bitmaps, the function returns NULL and
++ * the @errp parameter is not set.
++ * When bitmap information can not be obtained, the function returns
++ * NULL and the @errp parameter is set.
++ */
++Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                                Error **errp)
++{
++    BDRVQcow2State *s =3D bs->opaque;
++    Qcow2BitmapList *bm_list;
++    Qcow2Bitmap *bm;
++    Qcow2BitmapInfoList *list =3D NULL;
++    Qcow2BitmapInfoList **plist =3D &list;
++
++    if (s->nb_bitmaps =3D=3D 0) {
++        return NULL;
++    }
++
++    bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
++                               s->bitmap_directory_size, errp);
++    if (bm_list =3D=3D NULL) {
++        return NULL;
++    }
++
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        Qcow2BitmapInfo *info =3D g_new0(Qcow2BitmapInfo, 1);
++        Qcow2BitmapInfoList *obj =3D g_new0(Qcow2BitmapInfoList, 1);
++        info->granularity =3D 1U << bm->granularity_bits;
++        info->name =3D g_strdup(bm->name);
++        info->flags =3D get_bitmap_info_flags(bm->flags & ~BME_RESERVED_=
+FLAGS);
++        obj->value =3D info;
++        *plist =3D obj;
++        plist =3D &obj->next;
++    }
++
++    bitmap_list_free(bm_list);
++
++    return list;
++}
++
+ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_upda=
+ted,
+                                  Error **errp)
+ {
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 8c91b928653..bcb80d0270c 100644
+index bcb80d0270c..65a54c9ac65 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -4368,14 +4368,20 @@ static int qcow2_get_info(BlockDriverState *bs, B=
-lockDriverInfo *bdi)
-     return 0;
- }
-
--static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-+static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-+                                                  Error **errp)
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     ImageInfoSpecific *spec_info;
-     QCryptoBlockInfo *encrypt_info =3D NULL;
-+    Error *local_err =3D NULL;
-
-     if (s->crypto !=3D NULL) {
--        encrypt_info =3D qcrypto_block_get_info(s->crypto, &error_abort)=
-;
-+        encrypt_info =3D qcrypto_block_get_info(s->crypto, &local_err);
+@@ -4387,7 +4387,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(B=
+lockDriverState *bs,
+     spec_info =3D g_new(ImageInfoSpecific, 1);
+     *spec_info =3D (ImageInfoSpecific){
+         .type  =3D IMAGE_INFO_SPECIFIC_KIND_QCOW2,
+-        .u.qcow2.data =3D g_new(ImageInfoSpecificQCow2, 1),
++        .u.qcow2.data =3D g_new0(ImageInfoSpecificQCow2, 1),
+     };
+     if (s->qcow_version =3D=3D 2) {
+         *spec_info->u.qcow2.data =3D (ImageInfoSpecificQCow2){
+@@ -4395,6 +4395,13 @@ static ImageInfoSpecific *qcow2_get_specific_info(=
+BlockDriverState *bs,
+             .refcount_bits      =3D s->refcount_bits,
+         };
+     } else if (s->qcow_version =3D=3D 3) {
++        Qcow2BitmapInfoList *bitmaps;
++        bitmaps =3D qcow2_get_bitmap_info_list(bs, &local_err);
 +        if (local_err) {
 +            error_propagate(errp, local_err);
++            qapi_free_ImageInfoSpecific(spec_info);
 +            return NULL;
 +        }
-     }
-
-     spec_info =3D g_new(ImageInfoSpecific, 1);
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 682ad93aa1e..096e8eb6627 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2543,7 +2543,8 @@ static int coroutine_fn vmdk_co_check(BlockDriverSt=
-ate *bs,
-     return ret;
- }
-
--static ImageInfoSpecific *vmdk_get_specific_info(BlockDriverState *bs)
-+static ImageInfoSpecific *vmdk_get_specific_info(BlockDriverState *bs,
-+                                                 Error **errp)
- {
-     int i;
-     BDRVVmdkState *s =3D bs->opaque;
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index ee8f56e46ae..b9f189f09bb 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1661,6 +1661,7 @@ static int info_f(BlockBackend *blk, int argc, char=
- **argv)
-     BlockDriverState *bs =3D blk_bs(blk);
-     BlockDriverInfo bdi;
-     ImageInfoSpecific *spec_info;
-+    Error *local_err =3D NULL;
-     char s1[64], s2[64];
-     int ret;
-
-@@ -1682,7 +1683,11 @@ static int info_f(BlockBackend *blk, int argc, cha=
-r **argv)
-     printf("cluster size: %s\n", s1);
-     printf("vm state offset: %s\n", s2);
-
--    spec_info =3D bdrv_get_specific_info(bs);
-+    spec_info =3D bdrv_get_specific_info(bs, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return -EIO;
-+    }
-     if (spec_info) {
-         printf("Format specific information:\n");
-         bdrv_image_info_specific_dump(fprintf, stdout, spec_info);
+         *spec_info->u.qcow2.data =3D (ImageInfoSpecificQCow2){
+             .compat             =3D g_strdup("1.1"),
+             .lazy_refcounts     =3D s->compatible_features &
+@@ -4404,6 +4411,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(B=
+lockDriverState *bs,
+                                   QCOW2_INCOMPAT_CORRUPT,
+             .has_corrupt        =3D true,
+             .refcount_bits      =3D s->refcount_bits,
++            .has_bitmaps        =3D !!bitmaps,
++            .bitmaps            =3D bitmaps,
+         };
+     } else {
+         /* if this assertion fails, this probably means a new version wa=
+s
 --=20
 2.20.1
