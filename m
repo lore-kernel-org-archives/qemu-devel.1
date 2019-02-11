@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59433)
+Received: from eggs.gnu.org ([209.51.188.92]:59785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gtF8d-0001g1-KQ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:13:00 -0500
+	(envelope-from <berrange@redhat.com>) id 1gtF8m-0001yY-A0
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:13:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gtF0p-0002fg-He
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:04:56 -0500
-Received: from fallback18.mail.ru ([185.5.136.250]:54666)
+	(envelope-from <berrange@redhat.com>) id 1gtEzI-0001zT-JQ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:03:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:31216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gtF0o-0002bn-PY
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:04:55 -0500
-References: <20190131202637.4062-1-jusual@mail.ru>
-	<d21f68cf-31fa-db62-1d20-66f75e5a05b4@redhat.com>
-	<20190211155106.GF27585@redhat.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <f45e14e3-5866-b2fa-9ed8-aa7d8e33d478@mail.ru>
-Date: Mon, 11 Feb 2019 19:15:58 +0300
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtEzI-0001v6-AX
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:03:20 -0500
+Date: Mon, 11 Feb 2019 17:03:13 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190211170313.GK27585@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190207160617.1142-1-marcandre.lureau@redhat.com>
+	<CAFEAcA9hWXR6ynuX8CvFA6AspAgruYiUsQYM0pJ0nNG4b1281w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190211155106.GF27585@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
- commands
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9hWXR6ynuX8CvFA6AspAgruYiUsQYM0pJ0nNG4b1281w@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/18] Chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+
+On Fri, Feb 08, 2019 at 11:44:42AM +0000, Peter Maydell wrote:
+> On Thu, 7 Feb 2019 at 16:06, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > The following changes since commit 632351e0e1a861f2eaf709b053c53f96a1=
+225825:
+> >
+> >   Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-reques=
+t' into staging (2019-02-07 14:20:46 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/elmarco/qemu.git tags/chardev-pull-request
+> >
+> > for you to fetch changes up to df3afdedd23ade0c9de55cadeb1d8505568902=
+3f:
+> >
+> >   tests/test-char: add muxed chardev testing for open/close (2019-02-=
+07 16:18:25 +0100)
+> >
+> > ----------------------------------------------------------------
+> > Various chardev fixes
+> >
+> > ----------------------------------------------------------------
+>=20
+> This seems to result in 'make check' failures on some platforms.
+> I saw this on s390 and aarch32, I think.
+>=20
+> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> tests/test-char -m=3Dquick -k --tap < /dev/null |
+> ./scripts/tap-driver.pl --test-name=3D"test-char
+> "
+> PASS 1 test-char /char/null
+> PASS 2 test-char /char/invalid
+> PASS 3 test-char /char/ringbuf
+> PASS 4 test-char /char/mux
+> PASS 5 test-char /char/stdio
+> PASS 6 test-char /char/pipe
+> PASS 7 test-char /char/file
+> PASS 8 test-char /char/file-fifo
+> PASS 9 test-char /char/udp
+> PASS 10 test-char /char/serial
+> PASS 11 test-char /char/hotswap
+> PASS 12 test-char /char/websocket
+> PASS 13 test-char /char/socket/server/mainloop/tcp
+> PASS 14 test-char /char/socket/server/mainloop/unix
+> PASS 15 test-char /char/socket/server/wait-conn/tcp
+> PASS 16 test-char /char/socket/server/wait-conn/unix
+> PASS 17 test-char /char/socket/server/mainloop-fdpass/tcp
+> PASS 18 test-char /char/socket/server/mainloop-fdpass/unix
+> PASS 19 test-char /char/socket/server/wait-conn-fdpass/tcp
+> PASS 20 test-char /char/socket/server/wait-conn-fdpass/unix
+> PASS 21 test-char /char/socket/client/mainloop/tcp
+> PASS 22 test-char /char/socket/client/mainloop/unix
+> qemu: qemu_mutex_destroy: Device or resource busy
+> PASS 23 test-char /char/socket/client/wait-conn/tcp
+> PASS 24 test-char /char/socket/client/wait-conn/unix
+> Aborted (core dumped)
+> ERROR - too few tests run (expected 32, got 24)
+>=20
+> Here's a backtrace from running tests/test-char under gdb.
+> Looks like a race condition between a thread trying to
+> destroy a mutex and a different thread that is still
+> using it.
+
+Thanks, that is very useful. I can see the race condition here
+now between qio_task_thread_worker and qio_task_thread_result.
+I need to acquire the mutex in qio_task_thread_result in order
+to sycnhronize with completion of qio_task_thread_worker.
+
+>=20
+> On some other hosts I saw a similar
+> "qemu: qemu_mutex_destroy: Device or resource busy" and core dump in th=
+e
+> migration tests, I think, which is probably the same underlying bug.
+
+Yes, I expect it is the same problem
 
 
-
-On 11.02.2019 18:51, Daniel P. Berrangé wrote:
-> On Thu, Jan 31, 2019 at 03:03:21PM -0600, Eric Blake wrote:
->> On 1/31/19 2:26 PM, Julia Suvorova via Qemu-devel wrote:
->>> The whitelist option allows to run a reduced monitor with a subset of
->>> QMP commands. This allows the monitor to run in secure mode, which is
->>> convenient for sending commands via the WebSocket monitor using the
->>> web UI. This is planned to be done on micro:bit board.
->>>
->>> The list of allowed commands should be written to a file, one per line.
->>> The command line will look like this:
->>>      -mon chardev_name,mode=control,whitelist=path_to_file
->>>
->>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->>> ---
->>
->>>   
->>> -void monitor_init(Chardev *chr, int flags)
->>> +static void process_whitelist_file(Monitor *mon, const char *whitelist_file)
->>> +{
->>> +    char cmd_name[256];
->>> +    FILE *fd = fopen(whitelist_file, "r");
->>
->> If you use qemu_open() here (followed by fdopen if you still prefer
->> fscanf over read), then you can support "/dev/fdset/NNN" to
->> auto-magically support someone passing in the whitelist via an inherited
->> file descriptor, rather than having to be somewhere on disk that qemu
->> can directly open().
->>
->>> +
->>> +    if (fd == NULL) {
->>> +        error_report("Could not open whitelist file: %s", strerror(errno));
->>> +        exit(1);
->>> +    }
->>> +
->>> +    mon->whitelist = g_hash_table_new_full(g_str_hash,
->>> +                                           g_str_equal,
->>> +                                           g_free,
->>> +                                           NULL);
->>> +
->>> +    g_hash_table_add(mon->whitelist, g_strdup("qmp_capabilities"));
->>> +    g_hash_table_add(mon->whitelist, g_strdup("query-commands"));
->>> +
->>> +    while (fscanf(fd, "%255s", cmd_name) == 1) {
->>
->> %255s fits your cmd_name array declaration and stops consuming at either
->> 255 bytes or at the first whitespace encountered, but where do you check
->> for overflow from a file that passes more than 255 non-whitespace bytes
->> without a newline?  Also, this is a bit sloppy in that it skips all
->> leading whitespace, rather than ensuring that the user actually passed
->> newline-separated command names.  Does glib provide any interfaces for
->> more easily reading in an array of lines from a file?
-> 
-> With glib, normally you'd use:
-> 
->    char *content;
->    gsize len;
->    GError *err = NULL;
->    char **lines;
-> 
->    g_file_get_contents(filename, &contnet, &len, &err)
-
-With g_file_get_contents() I won't be able to do qemu_open() and support
-"/dev/fdset/NNN". The workaround seems to me unnecessarily complex.
-
->    lines = g_str_split(content, "\n", 0);
-> 
->    g_free(content);
-> 
->    ...do something with lines
-> 
->    g_strfreev(lines);
-> 
-> 
-> The GIO library provides higher level functions for I/O but we don't
-> use that in QEMU
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
