@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35279)
+Received: from eggs.gnu.org ([209.51.188.92]:35278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gtDt3-0005gA-Mm
+	(envelope-from <pmathieu@redhat.com>) id 1gtDt3-0005g9-Mo
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:52:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gtDt1-0004fT-JL
+	(envelope-from <pmathieu@redhat.com>) id 1gtDt1-0004fe-KR
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:52:49 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
-	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
-Date: Mon, 11 Feb 2019 16:52:31 +0100
-Message-ID: <w51mun2uxts.fsf@maestria.local.igalia.com>
+Received: from mail-wm1-f42.google.com ([209.85.128.42]:33522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gtDsz-0004Jp-J3
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 10:52:47 -0500
+Received: by mail-wm1-f42.google.com with SMTP id h22so154567wmb.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 07:52:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+References: <20190205170510.21984-1-peter.maydell@linaro.org>
+	<20190205170510.21984-12-peter.maydell@linaro.org>
+In-Reply-To: <20190205170510.21984-12-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Mon, 11 Feb 2019 16:52:24 +0100
+Message-ID: <CAP+75-Xsn5VvHLung5V03YZLQOiqP+VSugzj6d2c3ovkyKsCKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 11/22] tests/tcg/aarch64: Add pauth smoke
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon 11 Feb 2019 03:51:33 PM CET, Vladimir Sementsov-Ogievskiy wrote:
->>>> I think this was already discussed in the previous version of this
->>>> patch: if you insert a copy-on-read filter here then all guest
->>>> reads will copy the data from the backing chain, but you don't want
->>>> to copy anything below the 'base' node, so the copy-on-read filter
->>>> needs a 'base' parameter.
->>>>
->>> Before that, we still have the unresolved issue with getting the
->>> filter as the 'base' input parameter. That happens sometimes because
->>> the base is being searched by the file name, which is the same to
->>> the one of the filter, rather than by the node name (!)
->> 
->> I'm not sure if I understand. block-stream has 'base' and 'base-node'
->> parameters, and in the first case you would convert the file name to
->> a node name.
->> 
->> stream_start() gets the BlockDriverState, not the file name, so why
->> can't you get the node name from there and pass it to the
->> copy-on-read filter?
+On Tue, Feb 5, 2019 at 6:28 PM Peter Maydell <peter.maydell@linaro.org> wro=
+te:
 >
-> The problem is in the concept of "base" node. The code written in
-> manner that base is not changed during block job. However, job don't
-> own base and there is no guarantee that it will not change during the
-> job.
+> From: Richard Henderson <richard.henderson@linaro.org>
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Message-id: 20190201195404.30486-3-richard.henderson@linaro.org
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  tests/tcg/aarch64/Makefile.target |  6 +++++-
+>  tests/tcg/aarch64/pauth-1.c       | 23 +++++++++++++++++++++++
+>  2 files changed, 28 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/tcg/aarch64/pauth-1.c
+>
+> diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefi=
+le.target
+> index 08c45b8470c..2bb914975be 100644
+> --- a/tests/tcg/aarch64/Makefile.target
+> +++ b/tests/tcg/aarch64/Makefile.target
+> @@ -8,10 +8,14 @@ VPATH                 +=3D $(AARCH64_SRC)
+>  # we don't build any of the ARM tests
+>  AARCH64_TESTS=3D$(filter-out $(ARM_TESTS), $(TESTS))
+>  AARCH64_TESTS+=3Dfcvt
+> -TESTS:=3D$(AARCH64_TESTS)
+>
+>  fcvt: LDFLAGS+=3D-lm
+>
+>  run-fcvt: fcvt
+>         $(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
+>         $(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
+> +
+> +AARCH64_TESTS +=3D pauth-1
+> +run-pauth-%: QEMU +=3D -cpu max
+> +
+> +TESTS:=3D$(AARCH64_TESTS)
+> diff --git a/tests/tcg/aarch64/pauth-1.c b/tests/tcg/aarch64/pauth-1.c
+> new file mode 100644
+> index 00000000000..ae6dc05c2b1
+> --- /dev/null
+> +++ b/tests/tcg/aarch64/pauth-1.c
+> @@ -0,0 +1,23 @@
+> +#include <assert.h>
+> +#include <sys/prctl.h>
+> +
+> +asm(".arch armv8.4-a");
+> +
+> +#ifndef PR_PAC_RESET_KEYS
+> +#define PR_PAC_RESET_KEYS  54
+> +#define PR_PAC_APDAKEY     (1 << 2)
+> +#endif
+> +
+> +int main()
+> +{
+> +    int x;
+> +    void *p0 =3D &x, *p1, *p2;
+> +
+> +    asm volatile("pacdza %0" : "=3Dr"(p1) : "0"(p0));
+> +    prctl(PR_PAC_RESET_KEYS, PR_PAC_APDAKEY, 0, 0, 0);
+> +    asm volatile("pacdza %0" : "=3Dr"(p2) : "0"(p0));
+> +
+> +    assert(p1 !=3D p0);
+> +    assert(p1 !=3D p2);
+> +    return 0;
+> +}
+> --
+> 2.20.1
 
-But if that's the case then we have a problem already, because 'base' is
-a member of StreamBlockJob and is used in the existing stream_run()
-code.
+Travis-CI is getting an error with this test:
 
-So if there's a way to make 'base' disappear during the job (how?) then
-we could protect it with block_job_add_bdrv().
-
-Berto
+tests/docker/docker.py cc --user 2000 --cc aarch64-linux-gnu-gcc -i
+qemu:debian-arm64-cross -s . --   -Wall -O0 -g -fno-strict-aliasing
+tests/tcg/aarch64/pauth-1.c -o pauth-1  -static
+/tmp/ccHrAqV2.s: Assembler messages:
+/tmp/ccHrAqV2.s:7: Error: unknown architecture `armv8.4-a'
+/tmp/ccHrAqV2.s:41: Error: selected processor does not support `pacdza x0'
+/tmp/ccHrAqV2.s:56: Error: selected processor does not support `pacdza x0'
+tests/tcg/Makefile:79: recipe for target 'pauth-1' failed
+make[2]: *** [pauth-1] Error 1
+make[2]: Leaving directory 'aarch64-linux-user/tests'
+tests/tcg/Makefile.include:52: recipe for target
+'docker-build-guest-tests' failed
+make[1]: *** [docker-build-guest-tests] Error 2
+make[1]: Leaving directory 'aarch64-linux-user'
+tests/Makefile.include:1030: recipe for target
+'build-tcg-tests-aarch64-linux-user' failed
+make: *** [build-tcg-tests-aarch64-linux-user] Error 2
