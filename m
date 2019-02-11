@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38312)
+Received: from eggs.gnu.org ([209.51.188.92]:38681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gtE4Y-0003LM-TQ
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:04:44 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gtE5e-0004D1-8q
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:05:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gtE4W-0004N7-CU
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:04:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gtE4U-0004CI-Cg
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:04:40 -0500
-Date: Mon, 11 Feb 2019 16:03:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190211160357.GK2627@work-vm>
-References: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
+	(envelope-from <cohuck@redhat.com>) id 1gtE5Q-00052f-FZ
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 11:05:42 -0500
+Date: Mon, 11 Feb 2019 17:05:24 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211170524.4cda16cd.cohuck@redhat.com>
+In-Reply-To: <1906740a-1bea-abc1-6258-9c9f1ed79246@suse.de>
+References: <1549456893-16589-1-git-send-email-thuth@redhat.com>
+	<20190206135840.60a2a49f.cohuck@redhat.com>
+	<52b3de29-6918-952d-9d91-abdfb6dba25b@vivier.eu>
+	<6de44209-a135-0894-5407-4f6af7a0965e@suse.de>
+	<20190211163102.0a99b023.cohuck@redhat.com>
+	<1906740a-1bea-abc1-6258-9c9f1ed79246@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Add ignore-external migration
- capability
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x: Fix the confusing
+ contributions-after-2012 license statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>, qemu-devel@lists.ewheeler.net, jiangshanlai@gmail.com, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, wrfsh@yandex-team.ru
+To: Alexander Graf <agraf@suse.de>
+Cc: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> Hi,
-> 
-> The series adds a migration capability, which allows to skip shared RAM blocks
-> during the migration. It's useful for fast local migration. E.g. to update QEMU
-> for the running guests.
-> 
-> Usage example:
-> 1. Start source VM:
->    qemu-system-x86 \
->      -m 4G \
->      -object memory-backend-file,id=mem0,size=4G,share=on,mem-path=/dev/shm/mem0 \
->      -numa node,memdev=mem0 \
->      -qmp unix:/tmp/qemu-qmp-1.sock,server,nowait \
-> 
-> 2. Start target VM:
->    qemu-system-x86 \
->      -m 4G \
->      -object memory-backend-file,id=mem0,size=4G,share=on,mem-path=/dev/shm/mem0 \
->      -numa node,memdev=mem0 \
->      -qmp unix:/tmp/qemu-qmp-2.sock,server,nowait \
->      -incoming defer
-> 
-> 3. Enable ignore-external capability on both VMs:
->    { "execute": "migrate-set-capabilities" , "arguments":
->      { "capabilities": [ { "capability": "x-ignore-external", "state": true } ] } }
-> 
-> 4. Start migration.
-> 
-> Another use case I keep in mind is to migrate to file. Usage is very similar.
+On Mon, 11 Feb 2019 17:00:32 +0100
+Alexander Graf <agraf@suse.de> wrote:
 
-Hi,
-  I've cc'd in Eric, Lai and Peter, all who were asking for something
-similar last year;  can you all confirm this patch does what you need or
-can work with what you needed to do?
+> On 02/11/2019 04:31 PM, Cornelia Huck wrote:
+> > On Mon, 11 Feb 2019 16:24:48 +0100
+> > Alexander Graf <agraf@suse.de> wrote:
+> >  
+> >> On 02/06/2019 02:02 PM, Laurent Vivier wrote:  
+> >>> On 06/02/2019 13:58, Cornelia Huck wrote:  
+> >>>> On Wed,  6 Feb 2019 13:41:33 +0100
+> >>>> Thomas Huth <thuth@redhat.com> wrote:
+> >>>>     
+> >>>>> The license information in these files is rather confusing. The text
+> >>>>> declares LGPL first, but then says that contributions after 2012 are
+> >>>>> licensed under the GPL instead. How should the average user who just
+> >>>>> downloaded the release tarball know which part is now GPL and which
+> >>>>> is LGPL?  
+> >>>> FWIW, that statement was added in ccb084d3f0ec ("s390: new
+> >>>> contributions GPLv2 or later").
+> >>>>     
+> >>>>> Looking at the text of the LGPL (see COPYING.LIB in the top directory),
+> >>>>> the license clearly states how this should be done instead:
+> >>>>>
+> >>>>> "3. You may opt to apply the terms of the ordinary GNU General Public
+> >>>>>    License instead of this License to a given copy of the Library. To do
+> >>>>>    this, you must alter all the notices that refer to this License, so
+> >>>>>    that they refer to the ordinary GNU General Public License, version 2,
+> >>>>>    instead of to this License."  
+> >>>> Hm. This talks about GPL v2, not GPL v2-or-later...
+> >>>>     
+> >>>>> Thus let's clean up the confusing statements and use the proper GPL
+> >>>>> text only.
+> >>>>>
+> >>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >>>>> ---
+> >>>>>    linux-user/s390x/target_cpu.h | 19 ++++++++-----------
+> >>>>>    target/s390x/cpu.c            | 19 ++++++++-----------
+> >>>>>    target/s390x/cpu.h            | 19 ++++++++-----------
+> >>>>>    target/s390x/kvm.c            | 19 ++++++++-----------  
+> >>>> BTW: Is the original author of the code still around?  
+> >>> For the linux-user/s390x/target_cpu.h, it seems this code has been pushed by Alex Graf:
+> >>>
+> >>> commit 10ec51174ca69a4c3c5149b0b3baaa6ccba66273
+> >>> Author: Alexander Graf <agraf@suse.de>
+> >>> Date:   Sat Dec 5 12:44:21 2009 +0100
+> >>>
+> >>>       S/390 CPU fake emulation
+> >>>       
+> >>>       Because Qemu currently requires a TCG target to exist and there are quite some
+> >>>       useful helpers here to lay the groundwork for out KVM target, let's create a
+> >>>       stub TCG emulation target for S390X CPUs.
+> >>>       
+> >>>       This is required to make tcg happy. The emulation target itself won't work
+> >>>       though.
+> >>>       
+> >>>       Signed-off-by: Alexander Graf <agraf@suse.de>
+> >>>       Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> >>>
+> >>> But the "(c) 2009 Ulrich Hecht" is confusing.  
+> >> Why? Ulrich was the one that started the port, I then cleaned it up,
+> >> improved it, added system emulation and upstreamed it.  
+> > It's just a bit confusing that Ulrich does not show up in the sign-off
+> > chain.
+> >  
+> >> What problem exactly are you trying to solve?  
+> > The confusing license statements?
+> >
+> > I thought I'd ask whether the original author had any thoughts; if you
+> > think this patch is problematic, I can dequeue it again.  
+> 
+> You can always combine LGPL and GPL code and the result becomes GPL 
+> only, so I see little problem? :)
 
-Dave
-
-> V1 to V2:
-> * Keep migration stream compatibility
-> * Reuse the existing code to ignore unwanted RAMBlocks
-> * Add capability validation feature
-> * ignore-external -> ignore-shared
-> 
-> Regards,
-> Yury
-> 
-> Yury Kotov (5):
->   exec: Change RAMBlockIterFunc definition
->   migration: Move qemu_ram_foreach_migratable_block to migration code
->   migration: Introduce ignore-shared capability
->   tests/migration-test: Add a test for ignore-shared capability
->   migration: Add capabilities validation
-> 
->  exec.c                    |  38 ++++++-------
->  include/exec/cpu-common.h |   7 +--
->  migration/migration.c     |   9 ++++
->  migration/migration.h     |  11 +++-
->  migration/postcopy-ram.c  |  48 +++++++++--------
->  migration/ram.c           |  86 ++++++++++++++++++++++++++----
->  migration/rdma.c          |   9 ++--
->  migration/savevm.c        | 101 +++++++++++++++++++++++++++++++++++
->  qapi/migration.json       |   5 +-
->  stubs/ram-block.c         |  15 ++++++
->  tests/migration-test.c    | 109 +++++++++++++++++++++++++++++++-------
->  util/vfio-helpers.c       |   6 +--
->  12 files changed, 361 insertions(+), 83 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+That was the conclusion, I think :)
