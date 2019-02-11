@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59846)
+Received: from eggs.gnu.org ([209.51.188.92]:59931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtF9E-00020I-Rx
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:13:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtF9I-00024i-Fq
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:13:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtExk-0000tk-8o
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:01:47 -0500
-Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:43702)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtExk-0000tb-4V
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:01:45 -0500
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:46948)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtExi-0000s1-AA
+	id 1gtExi-0000qj-Ar
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:01:42 -0500
-Received: by mail-pl1-x62d.google.com with SMTP id f90so5336280plb.10
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:01:41 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id g6so1609990pfh.13
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:01:40 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 09:01:33 -0800
-Message-Id: <20190211170136.18680-2-richard.henderson@linaro.org>
-In-Reply-To: <20190211170136.18680-1-richard.henderson@linaro.org>
-References: <20190211170136.18680-1-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 09:01:32 -0800
+Message-Id: <20190211170136.18680-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/4] tcg: Diagnose referenced labels that have
- not been emitted
+Subject: [Qemu-devel] [PULL 0/4] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,119 +30,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Currently, a jump to a label that is not defined anywhere will
-be emitted not be relocated.  This results in a jump to a random
-jump target.  With tcg debugging, print a diagnostic to the -d op
-file and abort.
+The following changes since commit a044e3de2917d54b95f1211f4d14ec30cac9a59f:
 
-This could help debug or detect errors like
-c2d9644e6d ("target/arm: Fix crash on conditional instruction in an IT block")
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-next-110219-1' into staging (2019-02-11 14:47:44 +0000)
 
-Reported-by: Roman Kapl <code@rkapl.cz>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op.h |  1 +
- tcg/tcg.h    | 12 +++++++++---
- tcg/tcg.c    | 23 +++++++++++++++++++++++
- 3 files changed, 33 insertions(+), 3 deletions(-)
+are available in the Git repository at:
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 2d98868d8f..d3e51b15af 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -255,6 +255,7 @@ static inline void tcg_gen_op6ii_i64(TCGOpcode opc, TCGv_i64 a1, TCGv_i64 a2,
- 
- static inline void gen_set_label(TCGLabel *l)
- {
-+    l->present = 1;
-     tcg_gen_op1(INDEX_op_set_label, label_arg(l));
- }
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 045c24a357..32b7cf3489 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -244,16 +244,21 @@ typedef struct TCGRelocation {
-     intptr_t addend;
- } TCGRelocation; 
- 
--typedef struct TCGLabel {
-+typedef struct TCGLabel TCGLabel;
-+struct TCGLabel {
-+    unsigned present : 1;
-     unsigned has_value : 1;
--    unsigned id : 15;
-+    unsigned id : 14;
-     unsigned refs : 16;
-     union {
-         uintptr_t value;
-         tcg_insn_unit *value_ptr;
-         TCGRelocation *first_reloc;
-     } u;
--} TCGLabel;
-+#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_ENTRY(TCGLabel) next;
-+#endif
-+};
- 
- typedef struct TCGPool {
-     struct TCGPool *next;
-@@ -685,6 +690,7 @@ struct TCGContext {
- #endif
- 
- #ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_HEAD(, TCGLabel) labels;
-     int temps_in_use;
-     int goto_tb_issue_mask;
- #endif
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 20a5d8f315..9b2bf7f439 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -305,6 +305,9 @@ TCGLabel *gen_new_label(void)
-     *l = (TCGLabel){
-         .id = s->nb_labels++
-     };
-+#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_INSERT_TAIL(&s->labels, l, next);
-+#endif
- 
-     return l;
- }
-@@ -1092,6 +1095,9 @@ void tcg_func_start(TCGContext *s)
- 
-     QTAILQ_INIT(&s->ops);
-     QTAILQ_INIT(&s->free_ops);
-+#ifdef CONFIG_DEBUG_TCG
-+    QSIMPLEQ_INIT(&s->labels);
-+#endif
- }
- 
- static inline TCGTemp *tcg_temp_alloc(TCGContext *s)
-@@ -3841,6 +3847,23 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-     }
- #endif
- 
-+#ifdef CONFIG_DEBUG_TCG
-+    /* Ensure all labels referenced have been emitted.  */
-+    {
-+        TCGLabel *l;
-+        bool error = false;
-+
-+        QSIMPLEQ_FOREACH(l, &s->labels, next) {
-+            if (unlikely(!l->present) && l->refs) {
-+                qemu_log_mask(CPU_LOG_TB_OP,
-+                              "$L%d referenced but not present.\n", l->id);
-+                error = true;
-+            }
-+        }
-+        assert(!error);
-+    }
-+#endif
-+
- #ifdef CONFIG_PROFILER
-     atomic_set(&prof->opt_time, prof->opt_time - profile_getclock());
- #endif
--- 
-2.17.2
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190211
+
+for you to fetch changes up to 6d967cb86d5b4a60ba15b497126b621ce9ca6609:
+
+  cputlb: update TLB entry/index after tlb_fill (2019-02-11 08:52:44 -0800)
+
+----------------------------------------------------------------
+Fix dynamic tlb resize
+Fix x86 host vector saturation
+Diagnose missing tcg labels
+
+----------------------------------------------------------------
+Emilio G. Cota (2):
+      exec-all: document that tlb_fill can trigger a TLB resize
+      cputlb: update TLB entry/index after tlb_fill
+
+Mark Cave-Ayland (1):
+      tcg/i386: fix unsigned vector saturating arithmetic
+
+Richard Henderson (1):
+      tcg: Diagnose referenced labels that have not been emitted
+
+ accel/tcg/softmmu_template.h |  8 ++++++++
+ include/exec/exec-all.h      |  5 +++++
+ tcg/tcg-op.h                 |  1 +
+ tcg/tcg.h                    | 12 +++++++++---
+ accel/tcg/cputlb.c           |  4 ++++
+ tcg/i386/tcg-target.inc.c    |  4 ++--
+ tcg/tcg.c                    | 23 +++++++++++++++++++++++
+ 7 files changed, 52 insertions(+), 5 deletions(-)
