@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50279)
+Received: from eggs.gnu.org ([209.51.188.92]:50289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtGGh-0008GA-JM
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:25:24 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGGi-0008GX-0h
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtGGg-0007wf-Qq
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtGGh-0007wq-4o
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:25:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtGGg-0007wW-Kv
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 13:25:22 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 11 Feb 2019 18:24:33 +0000
-Message-Id: <20190211182442.8542-8-berrange@redhat.com>
-In-Reply-To: <20190211182442.8542-1-berrange@redhat.com>
-References: <20190211182442.8542-1-berrange@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 11 Feb 2019 18:25:21 +0000
+Message-ID: <c874e28d-05fc-caf7-1415-a8e67507d3a2@virtuozzo.com>
+References: <20190202011048.12343-1-jsnow@redhat.com>
+	<6d3a1905-db14-cbbc-bdad-2f6da9dfaec5@redhat.com>
+	<993f7476-a9f3-c587-01b1-7486a72904b8@redhat.com>
+In-Reply-To: <993f7476-a9f3-c587-01b1-7486a72904b8@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9C0AA04F5AF2034F8CE9F76CD3FB94B7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/16] chardev: ensure qemu_chr_parse_compat
- reports missing driver error
+Subject: Re: [Qemu-devel] [PATCH v2] block/dirty-bitmap: Documentation and
+ Comment fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yongji Xie <elohimes@gmail.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
 
-If no valid char driver was identified the qemu_chr_parse_compat method
-was silent, leaving callers no clue what failed.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- chardev/char.c    | 2 ++
- tests/test-char.c | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/chardev/char.c b/chardev/char.c
-index ccba36bafb..b99f3692f7 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -490,6 +490,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, co=
-nst char *filename,
-         return opts;
-     }
-=20
-+    error_report("'%s' is not a valid char driver", filename);
-+
- fail:
-     qemu_opts_del(opts);
-     return NULL;
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 19c3efad72..89c43e4ada 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -856,9 +856,10 @@ static void char_null_test(void)
- static void char_invalid_test(void)
- {
-     Chardev *chr;
--
-+    g_setenv("QTEST_SILENT_ERRORS", "1", 1);
-     chr =3D qemu_chr_new("label-invalid", "invalid");
-     g_assert_null(chr);
-+    g_unsetenv("QTEST_SILENT_ERRORS");
- }
-=20
- static int chardev_change(void *opaque)
---=20
-2.20.1
+MDQuMDIuMjAxOSAyMjoyNiwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDIvNC8xOSAx
+MDowMCBBTSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDIvMS8xOSA3OjEwIFBNLCBKb2huIFNu
+b3cgd3JvdGU6DQo+Pj4gVGhlIG1lYW5pbmcgb2YgdGhlIHN0YXRlcyBoYXMgY2hhbmdlZCBzdWJ0
+bHkgb3ZlciB0aW1lLA0KPj4+IHRoaXMgc2hvdWxkIGJyaW5nIHRoZSB1bmRlcnN0YW5kaW5nIG1v
+cmUgaW4tbGluZSB3aXRoIHRoZQ0KPj4+IGN1cnJlbnQsIGFjdHVhbCB1c2FnZXMuDQo+Pj4NCj4+
+PiBSZXBvcnRlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+Pj4gU2lnbmVk
+LW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPj4+DQo+Pj4gLS0tDQo+Pj4g
+VjI6IEFtZW5kZWQgc29tZSB3b3JkaW5ncywgdGhvdWdoIHRoaXMgaXMgYSBsaXR0bGUgY2hhdHR5
+IG5vdy4NCj4+PiAgICAgIEhvcGVmdWxseSBpdCdzIGNsZWFyZXIsIHRob3VnaC4NCj4+PiAtLS0N
+Cj4+DQo+Pj4gICAvKioNCj4+PiAtICogQSBCZHJ2RGlydHlCaXRtYXAgY2FuIGJlIGluIHRocmVl
+IHBvc3NpYmxlIHN0YXRlczoNCj4+PiAtICogKDEpIHN1Y2Nlc3NvciBpcyBOVUxMIGFuZCBkaXNh
+YmxlZCBpcyBmYWxzZTogZnVsbCByL3cgbW9kZQ0KPj4+IC0gKiAoMikgc3VjY2Vzc29yIGlzIE5V
+TEwgYW5kIGRpc2FibGVkIGlzIHRydWU6IHJlYWQgb25seSBtb2RlICgiZGlzYWJsZWQiKQ0KPj4+
+IC0gKiAoMykgc3VjY2Vzc29yIGlzIHNldDogZnJvemVuIG1vZGUuDQo+Pj4gLSAqICAgICBBIGZy
+b3plbiBiaXRtYXAgY2Fubm90IGJlIHJlbmFtZWQsIGRlbGV0ZWQsIGFub255bWl6ZWQsIGNsZWFy
+ZWQsIHNldCwNCj4+PiAtICogICAgIG9yIGVuYWJsZWQuIEEgZnJvemVuIGJpdG1hcCBjYW4gb25s
+eSBhYmRpY2F0ZSgpIG9yIHJlY2xhaW0oKS4NCj4+PiArICogQSBCZHJ2RGlydHlCaXRtYXAgY2Fu
+IGJlIGluIGZvdXIgcG9zc2libGUgdXNlci12aXNpYmxlIHN0YXRlczoNCj4+PiArICogKDEpIEFj
+dGl2ZTogICBzdWNjZXNzb3IgaXMgTlVMTCwgYW5kIGRpc2FibGVkIGlzIGZhbHNlOiBmdWxsIHIv
+dyBtb2RlDQo+Pj4gKyAqICgyKSBEaXNhYmxlZDogc3VjY2Vzc29yIGlzIE5VTEwsIGFuZCBkaXNh
+YmxlZCBpcyB0cnVlOiBxdWFsaWZpZWQgci93IG1vZGUsDQo+Pj4gKyAqICAgICAgICAgICAgICAg
+Z3Vlc3Qgd3JpdGVzIGFyZSBkcm9wcGVkLCBidXQgbW9uaXRvciB3cml0ZXMgYXJlIHBvc3NpYmxl
+LA0KPj4+ICsgKiAgICAgICAgICAgICAgIHRocm91Z2ggY29tbWFuZHMgbGlrZSBtZXJnZSBhbmQg
+Y2xlYXIuDQo+Pj4gKyAqICgzKSBGcm96ZW46ICAgc3VjY2Vzc29yIGlzIG5vdCBOVUxMLg0KPj4+
+ICsgKiAgICAgICAgICAgICAgIEEgZnJvemVuIGJpdG1hcCBjYW5ub3QgYmUgcmVuYW1lZCwgZGVs
+ZXRlZCwgY2xlYXJlZCwgc2V0LA0KPj4+ICsgKiAgICAgICAgICAgICAgIGVuYWJsZWQsIG1lcmdl
+ZCB0bywgZXRjLiBBIGZyb3plbiBiaXRtYXAgY2FuIG9ubHkgYWJkaWNhdGUoKQ0KPj4+ICsgKiAg
+ICAgICAgICAgICAgIG9yIHJlY2xhaW0oKS4NCj4+PiArICogICAgICAgICAgICAgICBJbiB0aGlz
+IHN0YXRlLCB0aGUgYW5vbnltb3VzIHN1Y2Nlc3NvciBiaXRtYXAgbWF5IGJlIGVpdGhlcg0KPj4+
+ICsgKiAgICAgICAgICAgICAgIEFjdGl2ZSBhbmQgcmVjb3JkaW5nIHdyaXRlcyBmcm9tIHRoZSBn
+dWVzdCAoZS5nLiBiYWNrdXAgam9icyksDQo+Pj4gKyAqICAgICAgICAgICAgICAgYnV0IGl0IGNh
+biBiZSBEaXNhYmxlZCBhbmQgbm90IHJlY29yZGluZyB3cml0ZXMuDQo+Pg0KPj4gcy9idXQvb3Iv
+DQo+Pg0KPiANCj4gSSdsbCB0b3VjaCB0aGF0IHVwLg0KPiANCj4+PiArICogKDQpIExvY2tlZDog
+ICBXaGV0aGVyIEFjdGl2ZSBvciBEaXNhYmxlZCwgdGhlIHVzZXIgY2Fubm90IG1vZGlmeSB0aGlz
+IGJpdG1hcA0KPj4+ICsgKiAgICAgICAgICAgICAgIGluIGFueSB3YXkgZnJvbSB0aGUgbW9uaXRv
+ci4NCj4+DQo+PiBXb3J0aCBhIHBhcmVudGhldGljYWwgY29tbWVudCBtZW50aW9uaW5nIE5CRCBl
+eHBvcnQgYXMgYSBwb3NzaWJsZSByZWFzb24NCj4+IGZvciBMb2NrZWQgdG8gYmUgdmlzaWJsZT8N
+Cj4+DQo+IA0KPiBTaW5jZSB0aGlzIGlzIGVmZmVjdGl2ZWx5IGRldmVsb3BlciBkb2N1bWVudGF0
+aW9uLCB5ZXMuIEhvdyBhYm91dDoNCj4gDQo+ICJXaGV0aGVyIEFjdGl2ZSBvciBEaXNhYmxlZCwg
+dGhlIHVzZXIgY2Fubm90IG1vZGlmeSB0aGlzIGJpdG1hcCBpbiBhbnkNCj4gd2F5IGZyb20gdGhl
+IG1vbml0b3IuIFRoaXMgbW9kZSBpcyB1c2VkIHRvIGFjaGlldmUgYSBzdWNjZXNzb3ItbGVzcw0K
+PiBsb2NraW5nIG9mIGEgYml0bWFwIGZvciBvcGVyYXRpb25zIGxpa2UgcG9pbnQtaW4tdGltZSBO
+QkQgZXhwb3J0IG9yIGZvcg0KPiBpbmNvbWluZyBtaWdyYXRpb24gZGF0YS4iDQo+IA0KPj4gV2l0
+aCB0aGUgb25lIHdvcmQgZml4LA0KPj4gUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2UgPGVibGFrZUBy
+ZWRoYXQuY29tPg0KPj4NCj4gDQo+IElmIFZsYWRpbWlyIGFncmVlcyB3aXRoIHRoZXNlIHBocmFz
+aW5ncyBJJ2xsIHN0YWdlIGl0Lg0KPiANCg0KT29vcHMsIHNvcnJ5IGZvciB0aGUgbG9uZyBkZWxh
+eS4NCg0KSG9uZXN0bHksIEkgc3RpbGwgZG9uJ3QgbGlrZSBpdCB2ZXJ5IG11Y2gsIGFzIGlzIHdv
+cmRlZCBpbiBtYW5uZXIgdGhhdCBiaXRtYXANCm1heSBiZSBpbiB0d28gc3RhdGVzIChBY3RpdmUg
+YW5kIExvY2tlZCksIGFuZCBpdCBpcyBub3QgdmVyeSBnb29kIGZvciBzb21ldGhpbmcNCmNhbGxl
+ZCAic3RhdGUiLi4gQnV0IGFueXdheSBpdCBpcyB1bmRlcnN0YW5kYWJsZSBhbmQgYSBsb3QgYmV0
+dGVyIHRoYW4gd2hhdCBpdCB3YXMsIHNvOg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50
+c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCBy
+ZWdhcmRzLA0KVmxhZGltaXINCg==
