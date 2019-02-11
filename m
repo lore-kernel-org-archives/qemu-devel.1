@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47861)
+Received: from eggs.gnu.org ([209.51.188.92]:49200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gt9El-0006cy-LS
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:54:56 -0500
+	(envelope-from <berrange@redhat.com>) id 1gt9LS-0000Z0-OK
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gt9Ej-0003jE-2g
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 05:54:55 -0500
-References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
-	<20190131185621.28815291.cohuck@redhat.com>
-	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
-	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
-	<aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
-	<cfe20aba-2f80-f8cb-66df-f9958bdf61f6@redhat.com>
-	<20190201092356.295925c2.cohuck@redhat.com>
-	<20190211114859.76109aa3.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <746bc346-26ce-e096-d8a4-fe78bf7912c1@redhat.com>
-Date: Mon, 11 Feb 2019 11:54:45 +0100
+	(envelope-from <berrange@redhat.com>) id 1gt9LQ-0007J8-LT
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:01:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gt9LO-0007Cm-JT
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 06:01:46 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FF5E7F6C8
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 11:01:25 +0000 (UTC)
+Date: Mon, 11 Feb 2019 11:01:02 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190211110102.GO27585@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190208112357.31615-1-marcandre.lureau@redhat.com>
+	<20190208112357.31615-7-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190211114859.76109aa3.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
- the pci stub file
+Content-Disposition: inline
+In-Reply-To: <20190208112357.31615-7-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 06/13] Add vhost-user-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +35,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 2019-02-11 11:48, Cornelia Huck wrote:
-> On Fri, 1 Feb 2019 09:23:56 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
->> On Fri, 1 Feb 2019 07:46:40 +0100
->> Thomas Huth <thuth@redhat.com> wrote:
-> 
->>> So I see two options now:
->>>
->>> 1) Finally really make the device optional, at least for new machine
->>> types, so we can really disable CONFIG_PCI and get a working executable.
->>>
->>> 2) Scratch the idea completely to make this optional, always link the
->>> s390-pci-bus.o and s390-pci-inst.o files unconditionally, and remove the
->>> s390-pci-stub.c file.
->>>
->>> I assume options 2 is preferred, since we likely rather want to move
->>> into the PCI direction in the long run, instead of ignoring it...  
->>
->> I think both options are viable, but option 1 is of course more work.
->> The win there is that we could disable an entire subsystem.
->>
->> I guess that the basic questions are: How important is it that
->> subsystems can be compiled out, and do we see a use case for a pci-less
->> s390 machine in the future? We really don't want to spend much time on
->> something of dubious use...
-> 
-> Any thoughts on this?
-> 
-> I'm currently tending towards option 2 (and can cook up a patch for
-> that). Unless someone is already working on option 1 :)
+On Fri, Feb 08, 2019 at 12:23:50PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Create a vhost-user-backend object that holds a connection to a
+> vhost-user backend and can be referenced from virtio devices that
+> support it. See later patches for input & gpu usage.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/sysemu/vhost-user-backend.h |  60 ++++++++
+>  backends/vhost-user.c               | 213 ++++++++++++++++++++++++++++
+>  MAINTAINERS                         |   2 +
+>  backends/Makefile.objs              |   3 +-
+>  4 files changed, 277 insertions(+), 1 deletion(-)
+>  create mode 100644 include/sysemu/vhost-user-backend.h
+>  create mode 100644 backends/vhost-user.c
+>=20
+> diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost=
+-user-backend.h
+> new file mode 100644
+> index 0000000000..60f811cae7
+> --- /dev/null
+> +++ b/include/sysemu/vhost-user-backend.h
+> @@ -0,0 +1,60 @@
+> +/*
+> + * QEMU vhost-user backend
+> + *
+> + * Copyright (C) 2018 Red Hat Inc
+> + *
+> + * Authors:
+> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef QEMU_VHOST_USER_BACKEND_H
+> +#define QEMU_VHOST_USER_BACKEND_H
+> +
+> +#include "qom/object.h"
+> +#include "exec/memory.h"
+> +#include "qemu/option.h"
+> +#include "qemu/bitmap.h"
+> +#include "hw/virtio/vhost.h"
+> +#include "hw/virtio/vhost-user.h"
+> +#include "chardev/char-fe.h"
+> +#include "io/channel.h"
+> +
+> +#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
+> +#define VHOST_USER_BACKEND(obj) \
+> +    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
+> +#define VHOST_USER_BACKEND_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BAC=
+KEND)
+> +#define VHOST_USER_BACKEND_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER=
+_BACKEND)
+> +
+> +typedef struct VhostUserBackend VhostUserBackend;
+> +typedef struct VhostUserBackendClass VhostUserBackendClass;
+> +
+> +struct VhostUserBackendClass {
+> +    ObjectClass parent_class;
+> +};
+> +
+> +struct VhostUserBackend {
+> +    /* private */
+> +    Object parent;
+> +
+> +    char *cmd;
 
-Since nobody currently has a need to completely disable PCI, I think we
-should go with option 2.
+This field doesn't appear to be used any more
 
- Thomas
+> +    char *chr_name;
+> +
+> +    CharBackend chr;
+> +    VhostUserState vhost_user;
+> +    struct vhost_dev dev;
+> +    QIOChannel *child;
+> +    VirtIODevice *vdev;
+> +    bool started;
+> +    bool completed;
+> +};
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
