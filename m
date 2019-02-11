@@ -1,43 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38093)
+Received: from eggs.gnu.org ([209.51.188.92]:38129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1gtFWi-0000AO-Tz
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:53 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtFWj-0000AY-W3
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1gtFWh-0005Cj-PZ
+	(envelope-from <philmd@redhat.com>) id 1gtFWj-0005Dy-4D
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:53 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54279)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtFWi-0004uG-Kh
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:52 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33662
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1gtFWg-0004rL-NE
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 12:37:50 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1BHYBHi086056
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 12:37:30 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qkcq5bdef-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 12:37:29 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Mon, 11 Feb 2019 17:37:29 -0000
-References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190206150016.6fdfaf8f.cohuck@redhat.com>
-	<1981d9bc-e950-62ef-d2d2-66a17771c8f4@linux.ibm.com>
-	<20190211171354.40be0856.cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Mon, 11 Feb 2019 12:37:23 -0500
+Received: by mail-wm1-f68.google.com with SMTP id a62so73157wmh.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 09:37:35 -0800 (PST)
+References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
+	<1549694366-1284-23-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3d8e2191-12b2-ebdf-7e35-594d160653ec@redhat.com>
+Date: Mon, 11 Feb 2019 18:37:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190211171354.40be0856.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1549694366-1284-23-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <75c1f24b-204d-d464-8466-8453f7a0f89c@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] vfio-ccw: support hsch/csch (kernel
- part)
+Subject: Re: [Qemu-devel] [PATCH 22/25] hw/arm: Express dependencies of
+ nrf51 Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,27 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com, pbonzini@redhat.com, qemu-arm@nongnu.org
 
+Hi Thomas,
 
-
-On 02/11/2019 11:13 AM, Cornelia Huck wrote:
-> On Fri, 8 Feb 2019 16:19:58 -0500
-> Eric Farman <farman@linux.ibm.com> wrote:
->>
->> FWIW, I've been running with both series for the last week or two, along
->> with some host kernel traces to prove things got executed the way I
->> thought, and it's seemed to be working well.  So that makes me
->> optimistic for the later patches.
+On 2/9/19 7:39 AM, Thomas Huth wrote:
+> Add Kconfig dependencies for the NRF51 / microbit machine.
 > 
-> That's good news, thanks for testing. Do you have a special test load
-> that you run in the guest that you can share?
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/arm/Kconfig | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index c4b3cd2..aad2dd3 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -379,6 +379,8 @@ config FSL_IMX6UL
+>  
+>  config NRF51_SOC
+>      bool
+> +    select I2C
+> +    select ARM_V7M
 
-Not really.  Lately it's just fio, run via some ancient scripts which 
-randomize the input parameters and distill the output data.  If I get 
-some time to make it less hack-y it might be worth sharing, but right 
-now there's more things commented out than actual script.  :)
+Don't we need a microbit config too?
 
-  - Eric
+config MICROBIT
+    bool
+    select NRF51_SOC
+
+>  
+>  config MSF2
+>      bool
+> 
