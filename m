@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54596)
+Received: from eggs.gnu.org ([209.51.188.92]:55359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gt4tk-0003Dq-56
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:16:57 -0500
+	(envelope-from <peterx@redhat.com>) id 1gt4zW-0004Pq-VT
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:22:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gt4ti-0002hP-QC
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:16:56 -0500
-Date: Sun, 10 Feb 2019 23:07:11 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190210230711.29e88264@x1.home>
-In-Reply-To: <45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
-	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
-	<20190207081830.4dcbb822@x1.home>
-	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
-	<20190207202620.23e9c063@x1.home>
-	<20190208052849.GB6434@umbus.fritz.box>
-	<45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
+	(envelope-from <peterx@redhat.com>) id 1gt4zU-0008E4-42
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:22:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gt4zT-0007zr-Sl
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 01:22:52 -0500
+Date: Mon, 11 Feb 2019 14:13:57 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190211061357.GD1011@xz-x1>
+References: <f10356c5-c6db-8019-62e4-8ef41e607bf1@redhat.com>
+	<aa77e2fd-d6ac-52a5-0a00-f69c90c27ded@redhat.com>
+	<41572c06-75f0-6dab-c544-6e6713824f48@redhat.com>
+	<CAJ+F1CL12WZc=JAMdprozM9cTDBNESAbUG7MEigUSQkURBuowA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
- vfio: NVIDIA V100 + P9 passthrough
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CL12WZc=JAMdprozM9cTDBNESAbUG7MEigUSQkURBuowA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Segfaults in chardev due to races
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, 11 Feb 2019 14:49:49 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Wed, Feb 06, 2019 at 07:38:18PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Wed, Jan 23, 2019 at 4:39 PM Max Reitz <mreitz@redhat.com> wrote:
+> >
+> > On 22.12.18 10:17, Paolo Bonzini wrote:
+> > > On 21/12/18 23:31, Max Reitz wrote:
+> > >> I suppose the issue is that QMP events are sent by one thread, and
+> > >> client disconnects are handled by a different one.  So if a QMP ev=
+ent is
+> > >> sent while a client disconnects concurrently, races may occur; and=
+ the
+> > >> only protection against concurrent access appears to be the
+> > >> chr_write_lock, which I don't think is enough.
+> > >
+> > > I think disconnection (tcp_chr_disconnect) has to take the
+> > > chr_write_lock too.
+> >
+> > That seems to fix the issue for me (can also be reproduced by running
+> > iotest 169 in parallel), but how should this be implemented?  I suppo=
+se
+> > tcp_chr_disconnect() can't really take the lock itself, because it's
+> > called by tcp_chr_write() which is invoked with the lock held.
+> >
+> > Max
+> >
+>=20
+> Is anybody fixing this? Paolo suggestion seems right in general, but
+> not easy to implement correctly for all chardevs. (C isn't helping!)
+>=20
+> I think this can be treated as a regression from commit
+> 8258292e18c39480b64eba9f3551ab772ce29b5d, OOB monitor is now enabled
+> by default (on socket chardev).
 
-> On 08/02/2019 16:28, David Gibson wrote:
-> > On Thu, Feb 07, 2019 at 08:26:20PM -0700, Alex Williamson wrote:  
-> >> On Fri, 8 Feb 2019 13:29:37 +1100
-> >> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >>  
-> >>> On 08/02/2019 02:18, Alex Williamson wrote:  
-> >>>> On Thu, 7 Feb 2019 15:43:18 +1100
-> >>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> >>>>     
-> >>>>> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:    
-> >>>>>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
-> >>>>>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
-> >>>>>> GPU:
-> >>>>>>
-> >>>>>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
-> >>>>>>
-> >>>>>>
-> >>>>>> In that thread, Alex raised concerns about allowing QEMU to freely lock
-> >>>>>> all the memory it wants. Is this an issue to be considered in the review
-> >>>>>> of this series here?
-> >>>>>>
-> >>>>>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
-> >>>>>> going to lock the KVM memory to populate the NUMA node with memory
-> >>>>>> of the GPU itself, so at first there is no risk of not taking over the
-> >>>>>> host RAM.
-> >>>>>> Am I missing something?      
-> >>>>>
-> >>>>>
-> >>>>> The GPU memory belongs to the device and not visible to the host as
-> >>>>> memory blocks and not covered by page structs, for the host it is more
-> >>>>> like MMIO which is passed through to the guest without that locked
-> >>>>> accounting, I'd expect libvirt to keep working as usual except that:
-> >>>>>
-> >>>>> when libvirt calculates the amount of memory needed for TCE tables
-> >>>>> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
-> >>>>> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
-> >>>>>
-> >>>>> FlatView #2
-> >>>>>  AS "memory", root: system
-> >>>>>  AS "cpu-memory-0", root: system
-> >>>>>  Root memory region: system
-> >>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-> >>>>>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
-> >>>>>
-> >>>>> So previously the DMA window would cover 0x7fffffff+1, now it has to
-> >>>>> cover 0x11fffffffff+1.    
-> >>>>
-> >>>> This looks like a chicken and egg problem, you're saying libvirt needs
-> >>>> to query mtree to understand the extent of the GPU layout, but we need
-> >>>> to specify the locked memory limits in order for QEMU to start?  Is
-> >>>> libvirt supposed to start the VM with unlimited locked memory and fix
-> >>>> it at some indeterminate point in the future?  Run a dummy VM with
-> >>>> unlimited locked memory in order to determine the limits for the real
-> >>>> VM?  Neither of these sound practical.  Thanks,    
-> >>>
-> >>>
-> >>> QEMU maps GPU RAM at known locations (which only depends on the vPHB's
-> >>> index or can be set explicitely) and libvirt knows how many GPUs are
-> >>> passed so it is quite easy to calculate the required amount of memory.
-> >>>
-> >>> Here is the window start calculation:
-> >>> https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
-> >>>
-> >>> We do not exactly know the GPU RAM window size until QEMU reads it from
-> >>> VFIO/nvlink2 but we know that all existing hardware has a window of
-> >>> 128GB (the adapters I have access to only have 16/32GB on board).  
-> >>
-> >> So you're asking that libvirt add 128GB per GPU with magic nvlink
-> >> properties, which may be 8x what's actually necessary and libvirt
-> >> determines which GPUs to apply this to how?  Does libvirt need to sort
-> >> through device tree properties for this?  Thanks,  
-> > 
-> > Hm.  If the GPU memory is really separate from main RAM, which it
-> > sounds like, I don't think it makes sense to account it against the
-> > same locked memory limit as regular RAM.  
-> 
-> 
-> This is accounting for TCE table to cover GPU RAM, not for GPU RAM itself.
-> 
-> So I am asking libvirt to add 128GB/64k*8=16MB to the locked_vm. It
-> already does so for the guest RAM.
+So far I see that only TCP implemented chr_disconnect, does it mean
+it's still doable?
 
-Why do host internal data structures count against the user's locked
-memory limit?  We don't include IOMMU page tables or type1 accounting
-structures on other archs.  Thanks,
+I'm uncertain on whether the response queue idea could help too since
+that idea is/was trying to keep all the chardev IO/control paths in
+the same thread.  When you wanted (and managed) to remove the response
+queue I was uncertain on things like this - because if with the
+response queues we're still making the chardev work very like single
+thread (we only offload some works that must be done in main thread,
+and let the two threads talk only via req/response queues, protected
+by mutexes).  Now we're doing it real multi-threading in many places.
+So IMHO we either fix all multi-thread safety, or may we fall back?  I
+don't know much on chardev enough to say what is required to prove
+100% multithread safety just like when I was working on oob, that's
+why I chose the response queue and tried to keep safe.  I'm unsure
+whether that's still an alternative.
 
-Alex
+Thanks,
+
+--=20
+Peter Xu
