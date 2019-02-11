@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38228)
+Received: from eggs.gnu.org ([209.51.188.92]:39674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gt6AL-0007d6-Df
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 02:38:10 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gt6Iq-0001K2-VH
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 02:46:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gt6AJ-0003Dj-Aq
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 02:38:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gt6AH-0003Bn-DY
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 02:38:05 -0500
-Date: Mon, 11 Feb 2019 02:29:46 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <888328358.132676.1549870186945.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190204170515-mutt-send-email-mst@kernel.org>
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190204170515-mutt-send-email-mst@kernel.org>
+	(envelope-from <aik@ozlabs.ru>) id 1gt6Ip-0006e0-3A
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 02:46:56 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35706)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gt6Io-0006Z8-IL
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 02:46:54 -0500
+Received: by mail-pf1-x442.google.com with SMTP id z9so4895161pfi.2
+	for <qemu-devel@nongnu.org>; Sun, 10 Feb 2019 23:46:38 -0800 (PST)
+References: <20190117025115.81178-1-aik@ozlabs.ru>
+	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
+	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
+	<20190207081830.4dcbb822@x1.home>
+	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
+	<20190207202620.23e9c063@x1.home>
+	<20190208052849.GB6434@umbus.fritz.box>
+	<45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
+	<20190210230711.29e88264@x1.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <3dc97339-58c4-b0ce-ff2f-38bb099ccb57@ozlabs.ru>
+Date: Mon, 11 Feb 2019 18:46:32 +1100
 MIME-Version: 1.0
+In-Reply-To: <20190210230711.29e88264@x1.home>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] security implications of caching with virtio pmem
- (was Re: [PATCH v3 0/5] kvm "virtio pmem" device)
+Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
+ vfio: NVIDIA V100 + P9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +38,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, dchinner@redhat.com
-Cc: jack@suse.cz, kvm@vger.kernel.org, david@redhat.com, linux-nvdimm@ml01.01.org, jasowang@redhat.com, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org, Andrea Arcangeli <aarcange@redhat.com>, dave jiang <dave.jiang@intel.com>, darrick wong <darrick.wong@oracle.com>, vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com, kwolf@redhat.com, linux-ext4@vger.kernel.org, tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
 
 
-Hi Michael, 
 
-Thanks for looking into this and summarizing in detail. 
+On 11/02/2019 17:07, Alex Williamson wrote:
+> On Mon, 11 Feb 2019 14:49:49 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 08/02/2019 16:28, David Gibson wrote:
+>>> On Thu, Feb 07, 2019 at 08:26:20PM -0700, Alex Williamson wrote:  
+>>>> On Fri, 8 Feb 2019 13:29:37 +1100
+>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>>  
+>>>>> On 08/02/2019 02:18, Alex Williamson wrote:  
+>>>>>> On Thu, 7 Feb 2019 15:43:18 +1100
+>>>>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>>>>     
+>>>>>>> On 07/02/2019 04:22, Daniel Henrique Barboza wrote:    
+>>>>>>>> Based on this series, I've sent a Libvirt patch to allow a QEMU process
+>>>>>>>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
+>>>>>>>> GPU:
+>>>>>>>>
+>>>>>>>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219.html
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> In that thread, Alex raised concerns about allowing QEMU to freely lock
+>>>>>>>> all the memory it wants. Is this an issue to be considered in the review
+>>>>>>>> of this series here?
+>>>>>>>>
+>>>>>>>> Reading the patches, specially patch 3/3, it seems to me that QEMU is
+>>>>>>>> going to lock the KVM memory to populate the NUMA node with memory
+>>>>>>>> of the GPU itself, so at first there is no risk of not taking over the
+>>>>>>>> host RAM.
+>>>>>>>> Am I missing something?      
+>>>>>>>
+>>>>>>>
+>>>>>>> The GPU memory belongs to the device and not visible to the host as
+>>>>>>> memory blocks and not covered by page structs, for the host it is more
+>>>>>>> like MMIO which is passed through to the guest without that locked
+>>>>>>> accounting, I'd expect libvirt to keep working as usual except that:
+>>>>>>>
+>>>>>>> when libvirt calculates the amount of memory needed for TCE tables
+>>>>>>> (which is guestRAM/64k*8), now it needs to use the end of the last GPU
+>>>>>>> RAM window as a guest RAM size. For example, in QEMU HMP "info mtree -f":
+>>>>>>>
+>>>>>>> FlatView #2
+>>>>>>>  AS "memory", root: system
+>>>>>>>  AS "cpu-memory-0", root: system
+>>>>>>>  Root memory region: system
+>>>>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>>>>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
+>>>>>>>
+>>>>>>> So previously the DMA window would cover 0x7fffffff+1, now it has to
+>>>>>>> cover 0x11fffffffff+1.    
+>>>>>>
+>>>>>> This looks like a chicken and egg problem, you're saying libvirt needs
+>>>>>> to query mtree to understand the extent of the GPU layout, but we need
+>>>>>> to specify the locked memory limits in order for QEMU to start?  Is
+>>>>>> libvirt supposed to start the VM with unlimited locked memory and fix
+>>>>>> it at some indeterminate point in the future?  Run a dummy VM with
+>>>>>> unlimited locked memory in order to determine the limits for the real
+>>>>>> VM?  Neither of these sound practical.  Thanks,    
+>>>>>
+>>>>>
+>>>>> QEMU maps GPU RAM at known locations (which only depends on the vPHB's
+>>>>> index or can be set explicitely) and libvirt knows how many GPUs are
+>>>>> passed so it is quite easy to calculate the required amount of memory.
+>>>>>
+>>>>> Here is the window start calculation:
+>>>>> https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf53092808b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
+>>>>>
+>>>>> We do not exactly know the GPU RAM window size until QEMU reads it from
+>>>>> VFIO/nvlink2 but we know that all existing hardware has a window of
+>>>>> 128GB (the adapters I have access to only have 16/32GB on board).  
+>>>>
+>>>> So you're asking that libvirt add 128GB per GPU with magic nvlink
+>>>> properties, which may be 8x what's actually necessary and libvirt
+>>>> determines which GPUs to apply this to how?  Does libvirt need to sort
+>>>> through device tree properties for this?  Thanks,  
+>>>
+>>> Hm.  If the GPU memory is really separate from main RAM, which it
+>>> sounds like, I don't think it makes sense to account it against the
+>>> same locked memory limit as regular RAM.  
+>>
+>>
+>> This is accounting for TCE table to cover GPU RAM, not for GPU RAM itself.
+>>
+>> So I am asking libvirt to add 128GB/64k*8=16MB to the locked_vm. It
+>> already does so for the guest RAM.
+> 
+> Why do host internal data structures count against the user's locked
+> memory limit?  We don't include IOMMU page tables or type1 accounting
+> structures on other archs.  Thanks,
 
-> >  This patch series has implementation for "virtio pmem".
-> >  "virtio pmem" is fake persistent memory(nvdimm) in guest
-> >  which allows to bypass the guest page cache. This also
-> >  implements a VIRTIO based asynchronous flush mechanism.
-> 
-> 
-> At Pankaj's request I looked at information leak implications of virtio
-> pmem in light of the recent page cache side channels paper
-> (https://arxiv.org/pdf/1901.01161.pdf) - to see what
-> kind of side channels it might create if any.  TLDR - I think that
-> depending on the host side implementation there could be some, but this
-> might be addressable by better documentation in both code and spec.
-> The fake dax approach backing the guest memory by a host page cache
-> does seem to have potential issues.
-> 
-> For clarity: we are talking about leaking information either to a VM, or
-> within a VM (I did not look into leaks to hypervisor in configurations
-> such as SEV) through host page cache.
-> 
-> Leaks into a VM: It seems clear that while pmem allows memory accesses
-> versus read/write with e.g. a block device, from host page cache point
-> of view this doesn't matter much: reads populate cache in the same way
-> as memory faults.  Thus ignoring presence of information leaks (which is
-> an interesting question e.g. in light of recent discard support) pmem
-> doesn't seem to be any better or worse for leaking information into a
-> VM.
-> 
-> Leaks within VM: Right now pmem seems to bypass the guest page cache
-> completely.  Whether pmem memory is then resident in a page cache would
-> be up to the device/host. Assuming that it is, the "Preventing
-> Efficient Eviction while Increasing the System Performance"
-> countermeasure for the page cache side channel attack would appear to
-> become ineffective with pmem. What is suggested is a per-process
-> management of the page cache, and host does not have visibility of
-> processes within a VM. Another possible countermeasure - not discussed
-> in the paper - could be modify the applications to lock the security
-> relevant pages in memory.  Again this becomes impractical with pmem as
-> host does not have visibility into that. However note that as long
-> as the only countermeasure linux uses is "Privileged Access"
-> (i.e. blocking mincore) nothing can be done as guest page cache
-> remains as vulnerable as host page cache.
-> 
-> 
-> Countermeasures: which host-side countermeasures can be designed would
-> depend on which countermeasures are used guest-side - we would need to
-> make sure they are not broken by pmem.  For "Preventing Efficient
-> Eviction while Increasing the System Performance" modifying the host
-> implementation to ensure that pmem device bypasses the host page cache
-> would seem to address the security problem.Similarly, ensuring that a
-> real memory device (e.g. DAX, RAM such as hugetlbfs, pmem for nested
-> virt) is used for pmem would make the memory locking countermeasure
-> work.  Whether with such limitations the device is still useful
-> performance wise is an open question.  These questions probably should
-> be addressed in the documentation, spec and possible qemu code.
-> 
-> 
-> 
-> Severity of the security implications: some people argue that the
-> security implications of the page cache leaks are minor.  I do not have
-> an opinion on this: the severity would seem to depend on the specific
-> configuration.
-> 
-> 
-> Other security implications: recent discussion seems to suggest there
-> are other concerns around e.g. resource management and thus DOS
-> potential. If that's so, it's a matter for a separate discussion
-> as I didn't look into that in depth.
-> 
-> Some or all of the above might be based on a misunderstanding of the
-> current pmem code, the whitepaper and linux page cache in general.
-> If so I apologise, do not hesitate to call out any mistakes.
 
-I agree similar to any guest VM(without virtio-pmem) or any host 
-userspace process, virtio-pmem may also have some security implications.
-We need to document these in virtio-pmem host device specification
-and in qemu code. This is to make sure while creating virtio-pmem
-device, we are aware of these implications and create/use 
-host side device backing file accordingly as per the use-case
-described by David here [1].
+Because pseries guests create DMA windows dynamically and the userspace
+can pass multiple devices to a guest, placing each on its own vPHB each
+of which most likely will create an additional 64bit DMA window which is
+backed with an IOMMU table => the userspace triggers these allocations.
+We account guest RAM once as it is shared among vPHBs but not the IOMMU
+tables.
 
-I will document these in next version of my patch series.
 
-Hello Dave,
-Are we okay with this?
-
-Thank you everyone for the discussion.
-
-[1] https://marc.info/?l=linux-kernel&m=154946989419403&w=2
-
-Best regards,
-Pankaj    
+-- 
+Alexey
