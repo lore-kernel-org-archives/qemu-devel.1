@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45645)
+Received: from eggs.gnu.org ([209.51.188.92]:49681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gt4EI-0006he-2y
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:34:06 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gt4Ui-0001ut-O4
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gt4EH-0007v2-7W
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:34:06 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:45594)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gt4EG-0007tN-V1
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:34:05 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <154937205518.29984.9188603364499998604.stgit@pasha-VirtualBox>
-In-Reply-To: <154937205518.29984.9188603364499998604.stgit@pasha-VirtualBox>
-Date: Mon, 11 Feb 2019 08:34:02 +0300
-Message-ID: <001c01d4c1cb$65a26390$30e72ab0$@ru>
+	(envelope-from <stefanha@redhat.com>) id 1gt4Uh-0002TJ-MH
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51488)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gt4Uh-0002SM-Gw
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 00:51:03 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 11 Feb 2019 13:50:33 +0800
+Message-Id: <20190211055040.13528-3-stefanha@redhat.com>
+In-Reply-To: <20190211055040.13528-1-stefanha@redhat.com>
+References: <20190211055040.13528-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] mips: implement qmp query-cpu-definitions
- command
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/9] qemugdb/coroutine: fix arch_prctl has
+ unknown return type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, natalia.fursova@ispras.ru, eblake@redhat.com, aurelien@aurel32.net
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Ping.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+qemu coroutine command results in following error output:
 
-Pavel Dovgalyuk
+Python Exception <class 'gdb.error'> 'arch_prctl' has unknown return
+type; cast the call to its declared return type: Error occurred in
+Python command: 'arch_prctl' has unknown return type; cast the call to
+its declared return type
 
-> -----Original Message-----
-> From: Pavel Dovgalyuk [mailto:Pavel.Dovgaluk@ispras.ru]
-> Sent: Tuesday, February 05, 2019 4:08 PM
-> To: qemu-devel@nongnu.org
-> Cc: pavel.dovgaluk@ispras.ru; arikalo@wavecomp.com; mdroth@linux.vnet.ibm.com;
-> armbru@redhat.com; dovgaluk@ispras.ru; natalia.fursova@ispras.ru; eblake@redhat.com;
-> aurelien@aurel32.net
-> Subject: [PATCH] mips: implement qmp query-cpu-definitions command
-> 
-> This patch enables QMP-based querying of the available CPU types for MIPS
-> and MIPS64 platforms.
-> 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> ---
->  monitor.c            |    2 +-
->  target/mips/helper.c |   33 +++++++++++++++++++++++++++++++++
->  2 files changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index c09fa63940..25d3b141ad 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1165,7 +1165,7 @@ static void qmp_unregister_commands_hack(void)
->      qmp_unregister_command(&qmp_commands, "query-cpu-model-comparison");
->  #endif
->  #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386) \
-> -    && !defined(TARGET_S390X)
-> +    && !defined(TARGET_S390X) && !defined(TARGET_MIPS)
->      qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
->  #endif
->  }
-> diff --git a/target/mips/helper.c b/target/mips/helper.c
-> index 8988452dbd..c84d056c09 100644
-> --- a/target/mips/helper.c
-> +++ b/target/mips/helper.c
-> @@ -24,6 +24,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "exec/log.h"
->  #include "hw/mips/cpudevs.h"
-> +#include "sysemu/arch_init.h"
-> 
->  enum {
->      TLBRET_XI = -6,
-> @@ -1472,3 +1473,35 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
-> 
->      cpu_loop_exit_restore(cs, pc);
->  }
-> +
-> +static void mips_cpu_add_definition(gpointer data, gpointer user_data)
-> +{
-> +    ObjectClass *oc = data;
-> +    CpuDefinitionInfoList **cpu_list = user_data;
-> +    CpuDefinitionInfoList *entry;
-> +    CpuDefinitionInfo *info;
-> +    const char *typename;
-> +
-> +    typename = object_class_get_name(oc);
-> +    info = g_malloc0(sizeof(*info));
-> +    info->name = g_strndup(typename,
-> +                           strlen(typename) - strlen("-" TYPE_MIPS_CPU));
-> +    info->q_typename = g_strdup(typename);
-> +
-> +    entry = g_malloc0(sizeof(*entry));
-> +    entry->value = info;
-> +    entry->next = *cpu_list;
-> +    *cpu_list = entry;
-> +}
-> +
-> +CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-> +{
-> +    CpuDefinitionInfoList *cpu_list = NULL;
-> +    GSList *list;
-> +
-> +    list = object_class_get_list(TYPE_MIPS_CPU, false);
-> +    g_slist_foreach(list, mips_cpu_add_definition, &cpu_list);
-> +    g_slist_free(list);
-> +
-> +    return cpu_list;
-> +}
+Fix it by giving it what it wants: arch_prctl return type.
+
+Information on the topic:
+   https://sourceware.org/gdb/onlinedocs/gdb/Calling.html
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190206151425.105871-1-vsementsov@virtuozzo.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ scripts/qemugdb/coroutine.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index ab699794ab..81f811ac00 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -22,7 +22,7 @@ def get_fs_base():
+        pthread_self().'''
+     # %rsp - 120 is scratch space according to the SystemV ABI
+     old =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
+-    gdb.execute('call arch_prctl(0x1003, $rsp - 120)', False, True)
++    gdb.execute('call (int)arch_prctl(0x1003, $rsp - 120)', False, True)
+     fs_base =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
+     gdb.execute('set *(uint64_t*)($rsp - 120) =3D %s' % old, False, True=
+)
+     return fs_base
+--=20
+2.20.1
