@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46665)
+Received: from eggs.gnu.org ([209.51.188.92]:46952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gt6k2-00010J-5n
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:15:07 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gt6kt-0001hX-AK
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gt6k1-0000na-AK
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:15:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gt6k0-0000ml-VG
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:15:01 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1B8DjpX137532
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 03:14:58 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qk322nubb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 03:14:58 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 11 Feb 2019 08:14:55 -0000
-References: <20190208221111.25237-1-walling@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 11 Feb 2019 09:14:50 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gt6kr-0001Hz-DR
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 03:15:55 -0500
+Date: Mon, 11 Feb 2019 09:15:39 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190211091539.465b0f69.cohuck@redhat.com>
+In-Reply-To: <dd56798a-e32f-d46f-4a5c-0f8728e64fbd@linux.ibm.com>
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
+	<e22e1a26-2dd7-cc4c-86cc-2a78adba409f@redhat.com>
+	<dd56798a-e32f-d46f-4a5c-0f8728e64fbd@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190208221111.25237-1-walling@linux.ibm.com>
-Content-Language: en-US
-Message-Id: <d39e1a4d-fd41-74fc-8ff2-72b964af3942@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/2] s390x/cpumodel: default
- enable mepoch for z14 and later
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 01/15] s390 vfio-ccw: Add
+ bootindex property and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,54 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: pasic@linux.ibm.com, rth@twiddle.net, cohuck@redhat.com, david@redhat.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
+On Fri, 8 Feb 2019 11:04:29 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
+> On 2/6/19 6:30 AM, Thomas Huth wrote:
+> > On 2019-01-29 14:29, Jason J. Herne wrote:  
 
-On 08.02.2019 23:11, Collin Walling wrote:
-> Latest systems and host kernels support mepoch, which is a
-> feature that was meant to be supported for z14 GA1 from the
-> get-go. Let's copy it to the z14 GA1 default CPU model.
-> 
-> Machines s390-ccw-virtio-3.1 and older will retain the old CPU
-> models and will not provide this bit in the default model.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> >> diff --git a/include/hw/s390x/vfio-ccw.h b/include/hw/s390x/vfio-ccw.h
+> >> new file mode 100644
+> >> index 0000000..a7d699d
+> >> --- /dev/null
+> >> +++ b/include/hw/s390x/vfio-ccw.h
+> >> @@ -0,0 +1,38 @@
+> >> +/*
+> >> + * vfio based subchannel assignment support
+> >> + *
+> >> + * Copyright 2018 IBM Corp.
+> >> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> >> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> >> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> >> + *
+> >> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> >> + * your option) any later version. See the COPYING file in the top-level
+> >> + * directory.
+> >> + */
+> >> +
+> >> +#ifndef HW_VFIO_CCW_H
+> >> +#define HW_VFIO_CCW_H
+> >> +
+> >> +#include "hw/vfio/vfio-common.h"
+> >> +#include "hw/s390x/s390-ccw.h"
+> >> +#include "hw/s390x/ccw-device.h"
+> >> +
+> >> +#define TYPE_VFIO_CCW "vfio-ccw"
+> >> +#define VFIO_CCW(obj) \
+> >> +        OBJECT_CHECK(VFIOCCWDevice, (obj), TYPE_VFIO_CCW)
+> >> +
+> >> +  
+> > 
+> > Remove one empty line, please.
+> >   
+> >> +#define TYPE_VFIO_CCW "vfio-ccw"
+> >> +typedef struct VFIOCCWDevice {
+> >> +    S390CCWDevice cdev;
+> >> +    VFIODevice vdev;
+> >> +    uint64_t io_region_size;
+> >> +    uint64_t io_region_offset;
+> >> +    struct ccw_io_region *io_region;
+> >> +    EventNotifier io_notifier;
+> >> +    bool force_orb_pfch;
+> >> +    bool warned_orb_pfch;
+> >> +} VFIOCCWDevice;  
+> > 
+> > Do you really need to make the whole structure public here? If not, I
+> > think it would be sufficient to only have the "anonymous" typedef here:
+> > 
+> > typedef struct VFIOCCWDevice VFIOCCWDevice;
+> > 
+> >   Thomas  
+> Perhaps the entire struct is not needed in ipl.c, and we could get by with only the 
+> typedef. But then the only thing in vfio-ccw.h will be the one line. Seems a little 
+> confusing to me. What do we gain by doing this?
 
-Yes, we missed that back then for the intial z14 version as the kernel
-and qemu parts were added later. 
+What parts of VFIOCCWDevice are, in general, interesting to other code
+parts? I believe most parts are not potentially useful to anything
+else...
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
-> ---
->  hw/s390x/s390-virtio-ccw.c  | 1 +
->  target/s390x/gen-features.c | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index fd9d0b0542..32c5027345 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -757,6 +757,7 @@ DEFINE_CCW_MACHINE(4_0, "4.0", true);
->  static void ccw_machine_3_1_instance_options(MachineState *machine)
->  {
->      ccw_machine_4_0_instance_options(machine);
-> +    s390_cpudef_featoff_greater(14, 1, S390_FEAT_MULTIPLE_EPOCH);
->  }
->  
->  static void ccw_machine_3_1_class_options(MachineClass *mc)
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 70015eaaf5..d258d67dca 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -550,6 +550,7 @@ static uint16_t default_GEN14_GA1[] = {
->      S390_FEAT_GROUP_MSA_EXT_6,
->      S390_FEAT_GROUP_MSA_EXT_7,
->      S390_FEAT_GROUP_MSA_EXT_8,
-> +    S390_FEAT_MULTIPLE_EPOCH,
->  };
->  
->  /* QEMU (CPU model) features */
-> 
+The ipl code needs this mainly to find out what kind of device it deals
+with. Would it make sense to define a helper function instead and keep
+the actual definition private to the vfio-ccw code? That also would
+make the intention more clear.
