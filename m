@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50058)
+Received: from eggs.gnu.org ([209.51.188.92]:53554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gtIJq-0002ln-T2
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:36:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1gtIYB-0006w5-7F
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:51:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gtIJg-0005th-Ly
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:36:40 -0500
-References: <20190202011048.12343-1-jsnow@redhat.com>
-	<6d3a1905-db14-cbbc-bdad-2f6da9dfaec5@redhat.com>
-	<993f7476-a9f3-c587-01b1-7486a72904b8@redhat.com>
-	<c874e28d-05fc-caf7-1415-a8e67507d3a2@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <11c01124-6db8-af0f-7157-56bba6d60fc4@redhat.com>
-Date: Mon, 11 Feb 2019 15:29:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1gtIYA-0006bW-9A
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:51:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gtIYA-0006b0-3a
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 15:51:34 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A223B89AC5
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:51:32 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-127.phx2.redhat.com [10.3.116.127])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 587FF57BF
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:51:32 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 11 Feb 2019 14:51:24 -0600
+Message-Id: <20190211205128.27146-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c874e28d-05fc-caf7-1415-a8e67507d3a2@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] block/dirty-bitmap: Documentation and
- Comment fixups
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] NBD patches for 2019-02-11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
+To: qemu-devel@nongnu.org
 
+The following changes since commit 22c5f446514a2a4bb0dbe1fea26713da92fc85=
+fa:
 
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190211' into =
+staging (2019-02-11 17:04:57 +0000)
 
-On 2/11/19 1:25 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 04.02.2019 22:26, John Snow wrote:
->>
->>
->> On 2/4/19 10:00 AM, Eric Blake wrote:
->>> On 2/1/19 7:10 PM, John Snow wrote:
->>>> The meaning of the states has changed subtly over time,
->>>> this should bring the understanding more in-line with the
->>>> current, actual usages.
->>>>
->>>> Reported-by: Eric Blake <eblake@redhat.com>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>>
->>>> ---
->>>> V2: Amended some wordings, though this is a little chatty now.
->>>>      Hopefully it's clearer, though.
->>>> ---
->>>
->>>>   /**
->>>> - * A BdrvDirtyBitmap can be in three possible states:
->>>> - * (1) successor is NULL and disabled is false: full r/w mode
->>>> - * (2) successor is NULL and disabled is true: read only mode ("disabled")
->>>> - * (3) successor is set: frozen mode.
->>>> - *     A frozen bitmap cannot be renamed, deleted, anonymized, cleared, set,
->>>> - *     or enabled. A frozen bitmap can only abdicate() or reclaim().
->>>> + * A BdrvDirtyBitmap can be in four possible user-visible states:
->>>> + * (1) Active:   successor is NULL, and disabled is false: full r/w mode
->>>> + * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
->>>> + *               guest writes are dropped, but monitor writes are possible,
->>>> + *               through commands like merge and clear.
->>>> + * (3) Frozen:   successor is not NULL.
->>>> + *               A frozen bitmap cannot be renamed, deleted, cleared, set,
->>>> + *               enabled, merged to, etc. A frozen bitmap can only abdicate()
->>>> + *               or reclaim().
->>>> + *               In this state, the anonymous successor bitmap may be either
->>>> + *               Active and recording writes from the guest (e.g. backup jobs),
->>>> + *               but it can be Disabled and not recording writes.
->>>
->>> s/but/or/
->>>
->>
->> I'll touch that up.
->>
->>>> + * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
->>>> + *               in any way from the monitor.
->>>
->>> Worth a parenthetical comment mentioning NBD export as a possible reason
->>> for Locked to be visible?
->>>
->>
->> Since this is effectively developer documentation, yes. How about:
->>
->> "Whether Active or Disabled, the user cannot modify this bitmap in any
->> way from the monitor. This mode is used to achieve a successor-less
->> locking of a bitmap for operations like point-in-time NBD export or for
->> incoming migration data."
->>
->>> With the one word fix,
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>
->>
->> If Vladimir agrees with these phrasings I'll stage it.
->>
-> 
-> Ooops, sorry for the long delay.
-> 
-> Honestly, I still don't like it very much, as is worded in manner that bitmap
-> may be in two states (Active and Locked), and it is not very good for something
-> called "state".. But anyway it is understandable and a lot better than what it was, so:
-> 
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> 
+are available in the Git repository at:
 
-Yeah, understood -- I think the phrasings here make it clear that we
-want to change how we track this. It's not ideal right now but I think
-this explains what we already have as best as I can summarize it.
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-02-11
 
-Thanks for your feedback.
+for you to fetch changes up to ddd113beedd22908e676d53803843d2f85bf91ab:
 
---js
+  qcow2: list of bitmaps new test 242 (2019-02-11 14:35:43 -0600)
+
+----------------------------------------------------------------
+nbd patches for 2019-02-11
+
+- Add qcow2 bitmap details to 'qemu-img info'
+
+----------------------------------------------------------------
+Andrey Shinkevich (3):
+      bdrv_query_image_info Error parameter added
+      qcow2: Add list of bitmaps to ImageInfoSpecificQCow2
+      qcow2: list of bitmaps new test 242
+
+Eric Blake (1):
+      nbd/server: Kill pointless shadowed variable
+
+ qapi/block-core.json       |  41 ++++++++++-
+ block/qcow2.h              |   2 +
+ include/block/block.h      |   3 +-
+ include/block/block_int.h  |   3 +-
+ block.c                    |   5 +-
+ block/crypto.c             |   9 +--
+ block/qapi.c               |   7 +-
+ block/qcow2-bitmap.c       |  76 +++++++++++++++++++++
+ block/qcow2.c              |  21 +++++-
+ block/vmdk.c               |   3 +-
+ nbd/server.c               |   1 -
+ qemu-io-cmds.c             |   7 +-
+ tests/qemu-iotests/242     | 104 ++++++++++++++++++++++++++++
+ tests/qemu-iotests/242.out | 166 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/group   |   1 +
+ 15 files changed, 431 insertions(+), 18 deletions(-)
+ create mode 100755 tests/qemu-iotests/242
+ create mode 100644 tests/qemu-iotests/242.out
+
+--=20
+2.20.1
