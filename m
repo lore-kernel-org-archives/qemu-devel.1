@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43247)
+Received: from eggs.gnu.org ([209.51.188.92]:47042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gtWLV-00016m-7T
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:35:26 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtWSp-0002Sk-Lz
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:43:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gtWLR-0004aT-Az
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:35:23 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
-	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
-	<w51mun2uxts.fsf@maestria.local.igalia.com>
-	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
-Date: Tue, 12 Feb 2019 12:35:13 +0100
-Message-ID: <w51mun18cjy.fsf@maestria.local.igalia.com>
+	(envelope-from <philmd@redhat.com>) id 1gtWSn-0000zm-Vy
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:42:59 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtWSn-0000ub-Is
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:42:57 -0500
+Received: by mail-wm1-f65.google.com with SMTP id q21so2657341wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 03:42:56 -0800 (PST)
+References: <20190212112347.1605-1-yuval.shaia@oracle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f2ab176a-bb9f-6a8b-c963-1190e96bea2c@redhat.com>
+Date: Tue, 12 Feb 2019 12:42:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+In-Reply-To: <20190212112347.1605-1-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] contrib/rdmacm-mux: Fix out-of-bounds risk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, sam.j.smith@oracle.com, richard.b.johnson@oracle.com
+Cc: qemu-stable@nongnu.org
 
-On Mon 11 Feb 2019 05:58:05 PM CET, Vladimir Sementsov-Ogievskiy wrote:
->>> The problem is in the concept of "base" node. The code written in
->>> manner that base is not changed during block job. However, job don't
->>> own base and there is no guarantee that it will not change during
->>> the job.
->> 
->> But if that's the case then we have a problem already, because 'base'
->> is a member of StreamBlockJob and is used in the existing
->> stream_run() code.
->
-> I think it should be possible to reproduce, using block-commit (which
-> already has filter) with block-stream in parallel, we'll try.
+On 2/12/19 12:23 PM, Yuval Shaia wrote:
+> The function get_fd extract context from the received MAD message and
+> uses it as a key to fetch the destination fd from the mapping table.
+> A context can be dgid in case of CM request message or comm_id in case
+> of CM SIDR response message.
+> 
+> When MAD message with a smaller size as expected for the message type
+> received we are hitting out-of-bounds where we are looking for the
+> context out of message boundaries.
+> 
+> Fix it by validating the message size.
+> 
 
-It's not possible to run block-stream and block-commit in parallel on
-the same nodes. See iotest 030 for a few examples.
+Cc: qemu-stable@nongnu.org
 
-So unless there's a bug it should be safe.
+> Reported-by Sam Smith <sam.j.smith@oracle.com>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 
->> So if there's a way to make 'base' disappear during the job (how?)
->> then we could protect it with block_job_add_bdrv().
->
-> I'm not sure this is correct. What is the reason for stream to own
-> base? It's not really interested in it.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-stream does not need to write or modify base, but it does need to keep a
-reference to it in order to now where to stop copying data.
-
-As I said earlier base is a member of StreamBlockJob, so it should not
-disappear during the job.
-
-Berto
+> ---
+>  contrib/rdmacm-mux/main.c | 35 +++++++++++++++++++++++++++++++++--
+>  1 file changed, 33 insertions(+), 2 deletions(-)
+> 
+> diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+> index ae88c77a1e..21cc804367 100644
+> --- a/contrib/rdmacm-mux/main.c
+> +++ b/contrib/rdmacm-mux/main.c
+> @@ -300,7 +300,7 @@ static void hash_tbl_remove_fd_ifid_pair(int fd)
+>      pthread_rwlock_unlock(&server.lock);
+>  }
+>  
+> -static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+> +static int get_fd(const char *mad, int umad_len, int *fd, __be64 *gid_ifid)
+>  {
+>      struct umad_hdr *hdr = (struct umad_hdr *)mad;
+>      char *data = (char *)hdr + sizeof(*hdr);
+> @@ -308,13 +308,35 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+>      uint16_t attr_id = be16toh(hdr->attr_id);
+>      int rc = 0;
+>  
+> +    if (umad_len <= sizeof(*hdr)) {
+> +        rc = -EINVAL;
+> +        syslog(LOG_DEBUG, "Ignoring MAD packets with header only\n");
+> +        goto out;
+> +    }
+> +
+>      switch (attr_id) {
+>      case UMAD_CM_ATTR_REQ:
+> +        if (unlikely(umad_len < sizeof(*hdr) + CM_REQ_DGID_POS +
+> +            sizeof(*gid_ifid))) {
+> +            rc = -EINVAL;
+> +            syslog(LOG_WARNING,
+> +                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
+> +                    attr_id);
+> +            goto out;
+> +        }
+>          memcpy(gid_ifid, data + CM_REQ_DGID_POS, sizeof(*gid_ifid));
+>          rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
+>          break;
+>  
+>      case UMAD_CM_ATTR_SIDR_REQ:
+> +        if (unlikely(umad_len < sizeof(*hdr) + CM_SIDR_REQ_DGID_POS +
+> +            sizeof(*gid_ifid))) {
+> +            rc = -EINVAL;
+> +            syslog(LOG_WARNING,
+> +                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
+> +                    attr_id);
+> +            goto out;
+> +        }
+>          memcpy(gid_ifid, data + CM_SIDR_REQ_DGID_POS, sizeof(*gid_ifid));
+>          rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
+>          break;
+> @@ -331,6 +353,13 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+>          data += sizeof(comm_id);
+>          /* Fall through */
+>      case UMAD_CM_ATTR_SIDR_REP:
+> +        if (unlikely(umad_len < sizeof(*hdr) + sizeof(comm_id))) {
+> +            rc = -EINVAL;
+> +            syslog(LOG_WARNING,
+> +                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
+> +                   attr_id);
+> +            goto out;
+> +        }
+>          memcpy(&comm_id, data, sizeof(comm_id));
+>          if (comm_id) {
+>              rc = hash_tbl_search_fd_by_comm_id(comm_id, fd, gid_ifid);
+> @@ -344,6 +373,7 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+>  
+>      syslog(LOG_DEBUG, "mad_to_vm: %d 0x%x 0x%x\n", *fd, attr_id, comm_id);
+>  
+> +out:
+>      return rc;
+>  }
+>  
+> @@ -372,7 +402,8 @@ static void *umad_recv_thread_func(void *args)
+>          } while (rc && server.run);
+>  
+>          if (server.run) {
+> -            rc = get_fd(msg.umad.mad, &fd, &msg.hdr.sgid.global.interface_id);
+> +            rc = get_fd(msg.umad.mad, msg.umad_len, &fd,
+> +                        &msg.hdr.sgid.global.interface_id);
+>              if (rc) {
+>                  continue;
+>              }
+> 
