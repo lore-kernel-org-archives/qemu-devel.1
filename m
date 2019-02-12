@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41079)
+Received: from eggs.gnu.org ([209.51.188.92]:41077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtZeS-00030j-5o
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 10:07:14 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtZeY-00030g-A4
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 10:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtZS6-0003gY-14
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:54:26 -0500
-Date: Tue, 12 Feb 2019 15:54:15 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190212145415.GD5283@localhost.localdomain>
-References: <cover.1547739122.git.berto@igalia.com>
-	<2da7b388a740d1f1b7f40e1182fc821f8abb8fbb.1547739122.git.berto@igalia.com>
+	(envelope-from <philmd@redhat.com>) id 1gtZRI-0002dh-Ha
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:53:38 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 12 Feb 2019 15:53:22 +0100
+Message-Id: <20190212145322.30974-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2da7b388a740d1f1b7f40e1182fc821f8abb8fbb.1547739122.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 02/13] block: Freeze the backing chain for
- the duration of the commit job
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] hw/dma/i8257: Use qemu_log_mask(UNIMP) instead
+ of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +21,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/commit.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/block/commit.c b/block/commit.c
-> index 53148e610b..8824d135e0 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -73,6 +73,8 @@ static int commit_prepare(Job *job)
->  {
->      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
->  
-> +    bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
-> +
->      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
->       * the normal backing chain can be restored. */
->      blk_unref(s->base);
-> @@ -89,6 +91,8 @@ static void commit_abort(Job *job)
->      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
->      BlockDriverState *top_bs = blk_bs(s->top);
->  
-> +    bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
+Avoid to clutter stdout until explicitly requested (with -d unimp):
 
-commit_abort() will run if commit_prepare() returned an error, so we may
-end up unfreezing twice. Maybe move it into the 'if (s->base)' block a
-few lines down.
+  $ qemu-system-mips64el -M fulong2e -bios pmon_2e.bin
+  dma: command df not supported
+  dma: command df not supported
+  dma: command df not supported
+  dma: command df not supported
 
->      /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
->      bdrv_ref(top_bs);
->      bdrv_ref(s->commit_top_bs);
-> @@ -336,6 +340,10 @@ void commit_start(const char *job_id, BlockDriverState *bs,
->          }
->      }
->  
-> +    if (bdrv_freeze_backing_chain(commit_top_bs, base, errp) < 0) {
-> +        goto fail;
-> +    }
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/dma/i8257.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Don't error paths need to unfreeze after this?
-
-Kevin
+diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+index 52675e97c9..3e1f13a4aa 100644
+--- a/hw/dma/i8257.c
++++ b/hw/dma/i8257.c
+@@ -26,6 +26,7 @@
+ #include "hw/isa/isa.h"
+ #include "hw/dma/i8257.h"
+ #include "qemu/main-loop.h"
++#include "qemu/log.h"
+ #include "trace.h"
+=20
+ #define I8257(obj) \
+@@ -185,7 +186,8 @@ static void i8257_write_cont(void *opaque, hwaddr npo=
+rt, uint64_t data,
+     switch (iport) {
+     case 0x00:                  /* command */
+         if ((data !=3D 0) && (data & CMD_NOT_SUPPORTED)) {
+-            dolog("command %"PRIx64" not supported\n", data);
++            qemu_log_mask(LOG_UNIMP, "%s: cmd 0x%02"PRIx64" not supporte=
+d\n",
++                          __func__, data);
+             return;
+         }
+         d->command =3D data;
+--=20
+2.20.1
