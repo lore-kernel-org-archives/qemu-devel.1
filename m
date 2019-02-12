@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36903)
+Received: from eggs.gnu.org ([209.51.188.92]:36837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gtTUy-0003gk-B0
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:33:01 -0500
+	(envelope-from <clg@kaod.org>) id 1gtTV0-0003cH-Ny
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:33:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gtTPc-0007eH-Un
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:27:34 -0500
-References: <20190212074840.13542-1-richard.henderson@linaro.org>
-	<20190212074840.13542-3-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <6de87786-3e4e-0d83-3699-ea073fa7bd7d@vivier.eu>
-Date: Tue, 12 Feb 2019 09:27:13 +0100
+	(envelope-from <clg@kaod.org>) id 1gtTO7-0005un-26
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:25:56 -0500
+Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:50787)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gtTO6-0005nd-44
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:25:54 -0500
+Received: from player778.ha.ovh.net (unknown [10.109.160.217])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3EB451D5D3C
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:25:49 +0100 (CET)
+References: <20190128094625.4428-1-clg@kaod.org>
+	<20190128094625.4428-4-clg@kaod.org>
+	<20190212043437.GK1884@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <680901eb-fb3e-dfad-37e2-324137197fec@kaod.org>
+Date: Tue, 12 Feb 2019 09:25:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190212074840.13542-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190212043437.GK1884@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] linux-user: Fix ELF_PLATFORM for
- aarch64_be-linux-user
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/19] xive: extend the XiveRouter
+ get_tctx() method with the page offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +33,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 12/02/2019 08:48, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/elfload.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index d796d51ec6..5aa0628ae9 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -537,7 +537,11 @@ static const char *get_elf_platform(void)
->  
->  #define ELF_ARCH        EM_AARCH64
->  #define ELF_CLASS       ELFCLASS64
-> -#define ELF_PLATFORM    "aarch64"
-> +#ifdef TARGET_WORDS_BIGENDIAN
-> +# define ELF_PLATFORM    "aarch64_be"
-> +#else
-> +# define ELF_PLATFORM    "aarch64"
-> +#endif
->  
->  static inline void init_thread(struct target_pt_regs *regs,
->                                 struct image_info *infop)
-> 
+On 2/12/19 5:34 AM, David Gibson wrote:
+> On Mon, Jan 28, 2019 at 10:46:09AM +0100, C=E9dric Le Goater wrote:
+>> The PowerNV machine can perform indirect loads and stores on the TIMA
+>> on behalf of another CPU. The PIR of the CPU is controlled by a set of
+>> 4 registers, one per TIMA page. To know which page is being accessed,
+>> we need to inform the controller model of the operation offset.
+>=20
+> This doesn't seem like the right place to handle this.  Shouldn't you
+> instead be passing a different CPUState in for "foreign" TCTX
+> accesses?
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+This patch only adds the page offset required to pick the correct=20
+register from the XIVE IC. May be I should have introduced this=20
+page offset extension in the baremetal patch. I might reorganize
+the patchset in the next round.=20
+
+
+Anyhow, we pass a different XiveTCTX instead. See the routines in=20
+PnvXive, xive_tm_indirect_read() and xive_tm_indirect_write().
+
+We don't pass a CPUState because we depend on the machine data  to=20
+retrieve the XiveTCTX and that would be problematic to do in the=20
+common XIVE routines.
+
+C.=20
+
+
+>=20
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h |  4 ++--
+>>  hw/intc/spapr_xive.c  |  3 ++-
+>>  hw/intc/xive.c        | 12 +++++++-----
+>>  3 files changed, 11 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index 04d54e8315f7..a1f5ea2d9143 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -352,7 +352,7 @@ typedef struct XiveRouterClass {
+>>                     XiveNVT *nvt);
+>>      int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
+idx,
+>>                       XiveNVT *nvt, uint8_t word_number);
+>> -    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
+>> +    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs, hwaddr offs=
+et);
+>>  } XiveRouterClass;
+>> =20
+>>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mo=
+n);
+>> @@ -367,7 +367,7 @@ int xive_router_get_nvt(XiveRouter *xrtr, uint8_t =
+nvt_blk, uint32_t nvt_idx,
+>>                          XiveNVT *nvt);
+>>  int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t=
+ nvt_idx,
+>>                            XiveNVT *nvt, uint8_t word_number);
+>> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
+>> +XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs, hwaddr=
+ offset);
+>> =20
+>>  /*
+>>   * XIVE END ESBs
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index a0f5ff929447..c41ee96c4c84 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -391,7 +391,8 @@ static int spapr_xive_write_nvt(XiveRouter *xrtr, =
+uint8_t nvt_blk,
+>>      g_assert_not_reached();
+>>  }
+>> =20
+>> -static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+>> +static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs,
+>> +                                     hwaddr offset)
+>>  {
+>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>> =20
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index f5642f2338de..39dff557fadc 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -320,7 +320,8 @@ static const XiveTmOp *xive_tm_find_op(hwaddr offs=
+et, unsigned size, bool write)
+>>  static void xive_tm_write(void *opaque, hwaddr offset,
+>>                            uint64_t value, unsigned size)
+>>  {
+>> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
+ent_cpu);
+>> +    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
+ent_cpu,
+>> +                                          offset);
+>>      const XiveTmOp *xto;
+>> =20
+>>      /*
+>> @@ -358,7 +359,8 @@ static void xive_tm_write(void *opaque, hwaddr off=
+set,
+>> =20
+>>  static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned si=
+ze)
+>>  {
+>> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
+ent_cpu);
+>> +    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
+ent_cpu,
+>> +                                          offset);
+>>      const XiveTmOp *xto;
+>> =20
+>>      /*
+>> @@ -1134,11 +1136,11 @@ int xive_router_write_nvt(XiveRouter *xrtr, ui=
+nt8_t nvt_blk, uint32_t nvt_idx,
+>>     return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
+>>  }
+>> =20
+>> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs)
+>> +XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs, hwaddr=
+ offset)
+>>  {
+>>      XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+>> =20
+>> -    return xrc->get_tctx(xrtr, cs);
+>> +    return xrc->get_tctx(xrtr, cs, offset);
+>>  }
+>> =20
+>>  /*
+>> @@ -1234,7 +1236,7 @@ static bool xive_presenter_match(XiveRouter *xrt=
+r, uint8_t format,
+>>       */
+>> =20
+>>      CPU_FOREACH(cs) {
+>> -        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+>> +        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs, 0);
+>>          int ring;
+>> =20
+>>          /*
+>=20
