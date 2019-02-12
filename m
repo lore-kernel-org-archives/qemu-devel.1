@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52971)
+Received: from eggs.gnu.org ([209.51.188.92]:53042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYmJ-0005sU-B3
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:11:16 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtYmd-00068y-Ci
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:11:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYmF-00038W-G9
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:11:15 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 22:03:25 +0800
-Message-Id: <20190212140330.1467-2-stefanha@redhat.com>
-In-Reply-To: <20190212140330.1467-1-stefanha@redhat.com>
-References: <20190212140330.1467-1-stefanha@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gtYma-0003Rd-W3
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:11:34 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:56293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtYmW-0003JX-QL
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:11:30 -0500
+Received: by mail-wm1-f67.google.com with SMTP id r17so3071960wmh.5
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 06:11:26 -0800 (PST)
+References: <20190212134758.10514-1-dgilbert@redhat.com>
+	<20190212134758.10514-3-dgilbert@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fa71e7e8-b5b4-2d30-2914-a79b15ba1bf3@redhat.com>
+Date: Tue, 12 Feb 2019 15:11:23 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PULL 1/6] virtio-blk: add acct_failed param to
- virtio_blk_handle_rw_error()
+In-Reply-To: <20190212134758.10514-3-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] HMP: Prepend errors with 'Error:'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-block@nongnu.org, sgarzare@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com, mst@redhat.com
+Cc: qemu-trivial@nongnu.org
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+On 2/12/19 2:47 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Always make error messages start with 'Error:' as a fallback
+> to make sure that anything parsing them can tell it failed.
+> 
+> Note: Some places don't use hmp_handle_error
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-We add acct_failed param in order to use virtio_blk_handle_rw_error()
-also when is not required to call block_acct_failed(). (eg. a discard
-operation is failed)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Acked-by: Pankaj Gupta <pagupta@redhat.com>
-Message-id: 20190208134950.187665-2-sgarzare@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/block/virtio-blk.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 9a87b3bfac..b2bb129efa 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -61,7 +61,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
-, unsigned char status)
- }
-=20
- static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
--    bool is_read)
-+    bool is_read, bool acct_failed)
- {
-     BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
-                                                    is_read, error);
-@@ -75,7 +75,9 @@ static int virtio_blk_handle_rw_error(VirtIOBlockReq *r=
-eq, int error,
-         s->rq =3D req;
-     } else if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
-         virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
--        block_acct_failed(blk_get_stats(s->blk), &req->acct);
-+        if (acct_failed) {
-+            block_acct_failed(blk_get_stats(s->blk), &req->acct);
-+        }
-         virtio_blk_free_request(req);
-     }
-=20
-@@ -113,7 +115,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
-ret)
-              * the memory until the request is completed (which will
-              * happen on the other side of the migration).
-              */
--            if (virtio_blk_handle_rw_error(req, -ret, is_read)) {
-+            if (virtio_blk_handle_rw_error(req, -ret, is_read, true)) {
-                 continue;
-             }
-         }
-@@ -132,7 +134,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
-nt ret)
-=20
-     aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
-     if (ret) {
--        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
-+        if (virtio_blk_handle_rw_error(req, -ret, 0, true)) {
-             goto out;
-         }
-     }
---=20
-2.20.1
+> ---
+>  hmp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index b2a2b1f84e..4d14718fea 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -62,7 +62,7 @@ static void hmp_handle_error(Monitor *mon, Error **errp)
+>  {
+>      assert(errp);
+>      if (*errp) {
+> -        error_report_err(*errp);
+> +        error_reportf_err(*errp, "Error: ");
+>      }
+>  }
+>  
+> 
