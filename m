@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42973)
+Received: from eggs.gnu.org ([209.51.188.92]:42806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtXHH-0005Ht-4h
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:35:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gtXHY-0005FE-7T
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:35:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtXDh-0005GB-IW
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:31:31 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45224)
+	(envelope-from <peter.maydell@linaro.org>) id 1gtX9Q-0006SH-Cm
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:27:02 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:35114)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtXDb-00057M-SI
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:31:22 -0500
-Received: by mail-wr1-f68.google.com with SMTP id w17so2442316wrn.12
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 04:31:19 -0800 (PST)
-References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
-	<1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
-	<13b4d86c-0af3-12b9-fce5-92f1eb0fe95d@redhat.com>
-	<0251e2fc-3dbd-937a-0649-71fcd64e2d14@linux.ibm.com>
-	<0b53df4a-7065-b3b7-c419-3f8e55cffdfd@oracle.com>
-	<bf1a6632-594c-cf05-e4cd-c70d9e1e2fbe@linux.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f7b55eef-68da-ef50-b060-05e86f659903@redhat.com>
-Date: Tue, 12 Feb 2019 13:31:15 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gtX9P-0006OL-PU
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:26:59 -0500
+Received: by mail-ot1-x331.google.com with SMTP id z19so4093837otm.2
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 04:26:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <bf1a6632-594c-cf05-e4cd-c70d9e1e2fbe@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string
- specifier in tpm_tis_show_buffer()
+References: <20190212040136.30371-1-stefanha@redhat.com>
+In-Reply-To: <20190212040136.30371-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Feb 2019 12:26:47 +0000
+Message-ID: <CAFEAcA-v63BhuFqdh+iEh4MCw4DVLBaEWwCZwwbFazxEU-nntw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.ibm.com>, Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 2/11/19 10:13 PM, Stefan Berger wrote:
-> On 2/11/19 3:09 PM, Liam Merwick wrote:
->> On 11/02/2019 19:56, Stefan Berger wrote:
->>> On 2/11/19 11:02 AM, Philippe Mathieu-Daudé wrote:
->>>> On 2/11/19 4:03 PM, Liam Merwick wrote:
-[...]
->>>>> -    printf("tpm_tis: %s length = %d\n", string, len);
->>>>> +    printf("tpm_tis: %s length = %u\n", string, len);
->>>> So here the format is '%zu'.
->>>> However in code cleanup we try go get ride of printf() calls and
->>>> replace them with trace points.
->>>
->>>
->>> This code is only used for debugging if DEBUG_TIS has been #defined.
->>> No need to add tracing here.
->>
->> I'd come up the attached change (but that seems like overkill).
-> 
-> 
-> I don't think we need tracing for this.
+On Tue, 12 Feb 2019 at 04:01, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The following changes since commit 22c5f446514a2a4bb0dbe1fea26713da92fc85fa:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190211' into staging (2019-02-11 17:04:57 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 9a6719d572e99a4e79f589d0b73f7475b86f982d:
+>
+>   virtio-blk: cleanup using VirtIOBlock *s and VirtIODevice *vdev (2019-02-12 11:49:17 +0800)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
 
-So if you think the code is mature enough, let's remove the DEBUG calls!
+Applied, thanks.
 
-Else we prefer to convert DEBUG printf to trace events because (at least):
-- no need to recompile to enable debugging
-- when compiled with debugging, you don't mess with STDIO which can be
-used as a chardev backend.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Thanks,
-
-Phil.
+-- PMM
