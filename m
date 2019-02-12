@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53269)
+Received: from eggs.gnu.org ([209.51.188.92]:56550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtXcf-0004cA-LS
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:57:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1gtXhF-0007Or-4R
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:02:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtXSx-0006xQ-HW
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:47:12 -0500
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a9633e15-13c7-70a5-17c2-2204dd174335@redhat.com>
-Date: Tue, 12 Feb 2019 13:47:05 +0100
+	(envelope-from <bounces@canonical.com>) id 1gtXhD-0001Kl-HA
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:01:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gtXhC-0000sT-SP
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:01:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gtXgg-0000nF-VW
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 13:01:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5F1DA2E80CE
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 13:01:22 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 08/15] s390-bios: Map low core
- memory
+Date: Tue, 12 Feb 2019 12:49:04 -0000
+From: Ali Sag <1808928@bugs.launchpad.net>
+Reply-To: Bug 1808928 <1808928@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154511858636.8591.3431958243733477284.malonedeb@gac.canonical.com>
+Message-Id: <154997574457.19600.14556342326906073783.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1808928] Re: Bitmap Extra data is not supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,170 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
 
-On 2019-01-29 14:29, Jason J. Herne wrote:
-> Create a new header for basic architecture specific definitions and add=
- a
-> mapping of low core memory. This mapping will be used by the real dasd =
-boot
-> process.
->=20
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/main.c      |   2 +
->  pc-bios/s390-ccw/s390-arch.h | 100 +++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 102 insertions(+)
->  create mode 100644 pc-bios/s390-ccw/s390-arch.h
->=20
-> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index 1bc61b5..fa90aa3 100644
-> --- a/pc-bios/s390-ccw/main.c
-> +++ b/pc-bios/s390-ccw/main.c
-> @@ -9,6 +9,7 @@
->   */
-> =20
->  #include "libc.h"
-> +#include "s390-arch.h"
->  #include "s390-ccw.h"
->  #include "cio.h"
->  #include "virtio.h"
-> @@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] =3D { 0, 0=
-, 0, 0, 0, 0, 0, 0, 0 };
->  QemuIplParameters qipl;
->  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
->  static bool have_iplb;
-> +const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
-> =20
->  #define LOADPARM_PROMPT "PROMPT  "
->  #define LOADPARM_EMPTY  "        "
-> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.=
-h
-> new file mode 100644
-> index 0000000..47eaa04
-> --- /dev/null
-> +++ b/pc-bios/s390-ccw/s390-arch.h
-> @@ -0,0 +1,100 @@
-> +/*
-> + * S390 Basic Architecture
-> + *
-> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
+as far as i know nothing happened. it had worked normally while instance
+was running. For a reason, instance is shutdown, then it never open
+again. i have some backups, i tried to return previous backups. But they
+also gave same error. Thanks to replication i could get it back. i
+copied image from replication site...
 
-2019 ?
+as i said "qemu-img" command completely unusable on that image. =
 
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-(at
-> + * your option) any later version. See the COPYING file in the top-lev=
-el
-> + * directory.
-> + */
-> +
-> +#ifndef S390_ARCH_H
-> +#define S390_ARCH_H
-> +
-> +typedef struct PSW {
-> +    uint64_t mask;
-> +    uint64_t addr;
-> +} __attribute__ ((packed, aligned(8))) PSW;
+There should be another mechanism. It blocks everything. =
 
-We've seen quite some trouble with "packed" in the past... See
-3b8afb41bc8e or 55281a2c53b884d0 for example ... This is only the
-s390-ccw bios code here, so it is likely ok, but still, since this
-structure is "naturally" packed, I'd rather go without that attribute
-here (even if it's only to allow the compiler to generate better code in
-some cases). You could still _Static_assert(sizeof(struct PSW) =3D=3D 16)
-afterwards, just to be sure.
+I try to edit header to remove extra data. But i could not find header info=
+rmation on website. =
 
-> +
-> +/* Older PSW format used by LPSW instruction */
-> +typedef struct PSWLegacy {
-> +    uint32_t mask;
-> +    uint32_t addr;
-> +} __attribute__ ((packed, aligned(8))) PSWLegacy;
 
-dito, I'd drop the packed attribute here.
+thanks
 
-> +/* s390 psw bit masks */
-> +#define PSW_MASK_IOINT      0x0200000000000000ULL
-> +#define PSW_MASK_WAIT       0x0002000000000000ULL
-> +#define PSW_MASK_EAMODE     0x0000000100000000ULL
-> +#define PSW_MASK_BAMODE     0x0000000080000000ULL
-> +#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-> +
-> +/* Low core mapping */
-> +typedef struct LowCore {
-> +    /* prefix area: defined by architecture */
-> +    uint64_t        ipl_psw;                  /* 0x000 */
+-- =
 
-No PSWLegacy here? ;-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1808928
 
-> +    uint32_t        ccw1[2];                  /* 0x008 */
-> +    uint32_t        ccw2[2];                  /* 0x010 */
-> +    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-> +    uint32_t        ext_params;               /* 0x080 */
-> +    uint16_t        cpu_addr;                 /* 0x084 */
-> +    uint16_t        ext_int_code;             /* 0x086 */
-> +    uint16_t        svc_ilen;                 /* 0x088 */
-> +    uint16_t        svc_code;                 /* 0x08a */
-> +    uint16_t        pgm_ilen;                 /* 0x08c */
-> +    uint16_t        pgm_code;                 /* 0x08e */
-> +    uint32_t        data_exc_code;            /* 0x090 */
-> +    uint16_t        mon_class_num;            /* 0x094 */
-> +    uint16_t        per_perc_atmid;           /* 0x096 */
-> +    uint64_t        per_address;              /* 0x098 */
-> +    uint8_t         exc_access_id;            /* 0x0a0 */
-> +    uint8_t         per_access_id;            /* 0x0a1 */
-> +    uint8_t         op_access_id;             /* 0x0a2 */
-> +    uint8_t         ar_access_id;             /* 0x0a3 */
-> +    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-> +    uint64_t        trans_exc_code;           /* 0x0a8 */
-> +    uint64_t        monitor_code;             /* 0x0b0 */
-> +    uint16_t        subchannel_id;            /* 0x0b8 */
-> +    uint16_t        subchannel_nr;            /* 0x0ba */
-> +    uint32_t        io_int_parm;              /* 0x0bc */
-> +    uint32_t        io_int_word;              /* 0x0c0 */
-> +    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-> +    uint32_t        stfl_fac_list;            /* 0x0c8 */
-> +    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-> +    uint64_t        mcic;                     /* 0x0e8 */
-> +    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-> +    uint32_t        external_damage_code;     /* 0x0f4 */
-> +    uint64_t        failing_storage_address;  /* 0x0f8 */
-> +    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-> +    uint64_t        per_breaking_event_addr;  /* 0x110 */
-> +    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-> +    PSW             restart_old_psw;          /* 0x120 */
-> +    PSW             external_old_psw;         /* 0x130 */
-> +    PSW             svc_old_psw;              /* 0x140 */
-> +    PSW             program_old_psw;          /* 0x150 */
-> +    PSW             mcck_old_psw;             /* 0x160 */
-> +    PSW             io_old_psw;               /* 0x170 */
-> +    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-> +    PSW             restart_new_psw;          /* 0x1a0 */
-> +    PSW             external_new_psw;         /* 0x1b0 */
-> +    PSW             svc_new_psw;              /* 0x1c0 */
-> +    PSW             program_new_psw;          /* 0x1d0 */
-> +    PSW             mcck_new_psw;             /* 0x1e0 */
-> +    PSW             io_new_psw;               /* 0x1f0 */
-> +    PSW             return_psw;               /* 0x200 */
-> +    uint8_t         irb[64];                  /* 0x210 */
-> +    uint64_t        sync_enter_timer;         /* 0x250 */
-> +    uint64_t        async_enter_timer;        /* 0x258 */
-> +    uint64_t        exit_timer;               /* 0x260 */
-> +    uint64_t        last_update_timer;        /* 0x268 */
-> +    uint64_t        user_timer;               /* 0x270 */
-> +    uint64_t        system_timer;             /* 0x278 */
-> +    uint64_t        last_update_clock;        /* 0x280 */
-> +    uint64_t        steal_clock;              /* 0x288 */
-> +    PSW             return_mcck_psw;          /* 0x290 */
-> +    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
-> +} __attribute__((packed, aligned(8192))) LowCore;
+Title:
+  Bitmap Extra data is not supported
 
-dito, please avoid packed, use _Static_assert instead.
+Status in QEMU:
+  New
 
-> +extern const LowCore *lowcore;
-> +
-> +#endif
+Bug description:
+  i am using dirty bitmaps and drive-backup. It works as aspected.
 
- Thomas
+  Lately, i encounter a disastrous error. There is not any information
+  about that situation. I cannot reach/open/attach/info or anything with
+  a qcow2 file.
+
+  virsh version
+  Compiled against library: libvirt 4.10.0
+  Using library: libvirt 4.10.0
+  Using API: QEMU 4.10.0
+  Running hypervisor: QEMU 2.12.0
+
+  "qemu-img: Could not open '/var/lib/libvirt/images/test.qcow2': Bitmap
+  extra data is not supported"
+
+  what is that mean? what should i do?
+  i cannot remove bitmap. i cannot open image or query.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1808928/+subscriptions
