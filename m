@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33334)
+Received: from eggs.gnu.org ([209.51.188.92]:37134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtPfo-0003Wx-NG
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:27:57 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtPiL-0004Vk-Jb
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtPfn-0000wR-7E
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:27:56 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34685)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtPiK-0003Kr-Eh
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:30:33 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtPfk-0000Zt-KG
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:27:54 -0500
-Received: by mail-pf1-x441.google.com with SMTP id j18so670083pfe.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:27:35 -0800 (PST)
+	id 1gtPiG-00037d-AO
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:30:30 -0500
+Received: by mail-pf1-x443.google.com with SMTP id c123so674671pfb.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:30:15 -0800 (PST)
 References: <20190211181907.2219-2-svens@stackframe.org>
-	<20190211181907.2219-5-svens@stackframe.org>
+	<20190211181907.2219-4-svens@stackframe.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0d209109-b242-45f2-2132-4d8e196898fc@linaro.org>
-Date: Mon, 11 Feb 2019 20:27:32 -0800
+Message-ID: <c43bc5ed-9107-9c1e-993e-0bebb5a39826@linaro.org>
+Date: Mon, 11 Feb 2019 20:30:11 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190211181907.2219-5-svens@stackframe.org>
+In-Reply-To: <20190211181907.2219-4-svens@stackframe.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] target/hppa: fix sed conditions
+Subject: Re: [Qemu-devel] [PATCH 3/5] target/hppa: fix log conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,12 +35,36 @@ To: Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
 Cc: deller@gmx.de, Richard Henderson <rth@twiddle.net>
 
 On 2/11/19 10:19 AM, Sven Schnelle wrote:
-> -    f = (orig & 4) / 4;
-> -
-> -    return do_log_cond(c * 2 + f, res);
+>      switch (cf >> 1) {
+> -    case 4: case 5: case 6:
+> -        cf &= 1;
+> +    case 0: /* never */
+> +        cond = cond_make_f();
+> +        break;
+> +    case 1: /* = all bits are zero */
+> +        cond = cond_make_0(TCG_COND_EQ, res);
+> +        break;
+> +    case 2: /* < leftmost bit is 1 */
+> +        cond = cond_make_0(TCG_COND_LT, res);
+> +        break;
+> +    case 3: /* <= leftmost bit is 1 or all bits 0 */
+> +        cond = cond_make_0(TCG_COND_LE, res);
+> +        break;
+> +    case 7: /* OD rightmost bit is 1 */
+> +        tmp = tcg_temp_new();
+> +        tcg_gen_andi_reg(tmp, res, 1);
+> +        cond = cond_make_0(TCG_COND_NE, tmp);
+> +        tcg_temp_free(tmp);
+> +        break;
+> +    default:
+>          break;
+>      }
 
-Given that this used to reference do_log_cond, and you've fixed do_log_cond,
-why is there any reason for a change here?
+You can't do nothing for cases 4,5,6.  That lets a bad guest crash qemu, since
+cond will be uninitialized.  Also, this patch has to be sorted before the
+previous, as otherwise you introduce a regression during bisection.
+
+I've fixed this up locally.
 
 
 r~
