@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58642)
+Received: from eggs.gnu.org ([209.51.188.92]:59271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtaix-0004wA-VA
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:15:58 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtaj3-0005X3-Sa
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:16:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtaZ0-0007ke-UO
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:05:40 -0500
-References: <1549694366-1284-1-git-send-email-thuth@redhat.com>
-	<1549694366-1284-24-git-send-email-thuth@redhat.com>
-	<de235124-9bea-6f22-ad15-34d3b98f500f@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a16e2d91-5a0b-e327-e74d-6b8b82baff2f@redhat.com>
-Date: Tue, 12 Feb 2019 17:05:21 +0100
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtaj1-0005CF-3x
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:16:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54936)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gtaiz-00056P-Ui
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:15:58 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 12 Feb 2019 17:09:51 +0100
+Message-Id: <20190212160953.29051-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <de235124-9bea-6f22-ad15-34d3b98f500f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 23/25] hw/arm: Express dependencies of the
- ZynqMP zcu102 machine with Kconfig
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] Fix slirp regression on win32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,17 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: qemu-arm@nongnu.org, philmd@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, hsp.cat7@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 2019-02-11 15:45, Paolo Bonzini wrote:
-> On 09/02/19 07:39, Thomas Huth wrote:
->> +    select PCI      # TODO: Currently required for SDHCI and AHCI, remove later
-> 
-> I think SDHCI and AHCI should select it instead, similar to how FDC
-> selects ISA_BUS (see patch 25 of the Kconfig series).
+Hi,
 
-Yes, that's likely the better way to work-around this issue. I'll add
-that in v2 ...
+QEMU wraps the socket functions in os-win32.h, but in commit
+a9d8b3ec4385793815d71217857304, the header inclusion was dropped,
+breaking slirp on Windows. Fix the regression by wrapping all the
+socket functions.
 
- Thomas
+thanks
+
+Marc-Andr=C3=A9 Lureau (2):
+  slirp: remove slirp_ prefix for socket wrappers
+  slirp: wrap the remaining socket functions
+
+ slirp/util.h     |  75 ++++++++++++++++++----
+ slirp/ip_icmp.c  |   4 +-
+ slirp/misc.c     |  14 ++--
+ slirp/slirp.c    |   2 +-
+ slirp/socket.c   |  14 ++--
+ slirp/tcp_subr.c |  10 +--
+ slirp/udp.c      |   2 +-
+ slirp/util.c     | 164 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 8 files changed, 246 insertions(+), 39 deletions(-)
+
+--=20
+2.21.0.rc0.1.g036caf7885
