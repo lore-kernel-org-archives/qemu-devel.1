@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55549)
+Received: from eggs.gnu.org ([209.51.188.92]:55926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gtf4o-0005Y9-Bz
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:54:47 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gtf4p-0005bq-11
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:54:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gtez5-0007Ui-14
+	(envelope-from <liam.merwick@oracle.com>) id 1gtez5-0007W6-Fu
 	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:48:55 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:56446)
+Received: from userp2120.oracle.com ([156.151.31.85]:42960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gteyz-0007Km-Oi
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:48:48 -0500
+	id 1gtez2-0007KQ-Rz
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:48:50 -0500
 From: Liam Merwick <liam.merwick@oracle.com>
-Date: Tue, 12 Feb 2019 20:48:19 +0000
-Message-Id: <1550004500-24485-2-git-send-email-liam.merwick@oracle.com>
-In-Reply-To: <1550004500-24485-1-git-send-email-liam.merwick@oracle.com>
-References: <1550004500-24485-1-git-send-email-liam.merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] tpm_tis: assert valid addr passed to
- tpm_tis_locality_from_addr()
+Date: Tue, 12 Feb 2019 20:48:18 +0000
+Message-Id: <1550004500-24485-1-git-send-email-liam.merwick@oracle.com>
+Subject: [Qemu-devel] [PATCH v3 1/3] tpm_tis: fix loop that cancels any
+ seizure by a lower locality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +26,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanb@linux.ibm.com, qemu-devel@nongnu.org
 Cc: liam.merwick@oracle.com, philmd@redhat.com
 
-Assert that the address passed in results in a valid locality value.
-Current callers pass a valid address so this is just a defensive check
-to prevent a future caller passing an incorrect address or catch if the
-MMIO address parameters were not all modified correctly.  This is to
-help static code analysis tools that report that no explicit checking
-is being done.
+In tpm_tis_mmio_write() if the requesting locality is seizing
+access, any seizure by a lower locality is cancelled.  However the
+loop doing the seizure had an off-by-one error and the locality
+immediately preceding the requesting locality was not being cleared.
+This is fixed by adjusting the test in the for loop to check the
+localities up to the requesting locality.
 
 Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- hw/tpm/tpm_tis.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/tpm/tpm_tis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 61a130beef35..772431f20874 100644
+index fd6bb9b59a96..61a130beef35 100644
 --- a/hw/tpm/tpm_tis.c
 +++ b/hw/tpm/tpm_tis.c
-@@ -100,7 +100,9 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
+@@ -624,7 +624,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+                 }
  
- static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
- {
--    return (uint8_t)((addr >> TPM_TIS_LOCALITY_SHIFT) & 0x7);
-+    uint8_t locty = (uint8_t)(addr >> TPM_TIS_LOCALITY_SHIFT);
-+    assert(TPM_TIS_IS_VALID_LOCTY(locty));
-+    return locty;
- }
+                 /* cancel any seize by a lower locality */
+-                for (l = 0; l < locty - 1; l++) {
++                for (l = 0; l < locty; l++) {
+                     s->loc[l].access &= ~TPM_TIS_ACCESS_SEIZE;
+                 }
  
- static void tpm_tis_show_buffer(const unsigned char *buffer,
 -- 
 1.8.3.1
