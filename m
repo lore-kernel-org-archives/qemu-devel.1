@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54805)
+Received: from eggs.gnu.org ([209.51.188.92]:34410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gtcCw-000506-0i
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:50:59 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gtcaj-0001yo-M9
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:15:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gtcCt-0006W8-TX
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:50:57 -0500
-References: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-	<442139a2-5ab2-9259-03a0-11d2f3c86c59@redhat.com>
-	<28a8cd58-51a9-6301-1d25-02289af8c81d@ilande.co.uk>
-	<alpine.BSF.2.21.9999.1902121157470.75929@zero.eik.bme.hu>
-	<971ba38d-d883-d51c-55b2-531639336ed4@ilande.co.uk>
-	<d78bc91b-efef-bb69-e443-6526ca433197@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <e8329ece-32a2-d591-2ffc-3cdb468d56aa@ilande.co.uk>
-Date: Tue, 12 Feb 2019 17:50:34 +0000
+	(envelope-from <sgarzare@redhat.com>) id 1gtca8-0006qP-1j
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:14:57 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:41886)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gtca7-0006i5-Rv
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:14:55 -0500
+Received: by mail-ot1-f68.google.com with SMTP id u16so6028842otk.8
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:14:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d78bc91b-efef-bb69-e443-6526ca433197@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] cuda: decrease time delay
- before raising VIA SR interrupt
+References: <20190212141234.2814-1-stefanha@redhat.com>
+	<CAFEAcA_3T9zVLm8DmOdFk=FddEMuQ4NzfTNhQhh5mB+swYyDvQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_3T9zVLm8DmOdFk=FddEMuQ4NzfTNhQhh5mB+swYyDvQ@mail.gmail.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 12 Feb 2019 19:14:37 +0100
+Message-ID: <CAGxU2F4H4DvAz8A3-zOJ3eeiKg-8+TZBiNK=JJe6cJasRA=YHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PULL 0/6] Block sgarzare test patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, hsp.cat7@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-On 12/02/2019 17:21, Philippe Mathieu-Daudé wrote:
+On Tue, Feb 12, 2019 at 6:04 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Tue, 12 Feb 2019 at 14:12, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > ----------------------------------------------------------------
+> > Block pull request for testing
+> >
+> > Peter hit a virtio-blk-test failure caused by the new DISCARD/WRITE_ZEROES
+> > patches that Stefano and I have been unable to reproduce.  Here are the patches
+> > so they can be tested again in Peter's environment.
+> >
+> > ----------------------------------------------------------------
+>
+> x86-64 host seems to be a bit random about whether it reproducibly
+> fails (it failed in the test merge builds but not when I run the
+> test program by hand) but aarch64 host seems more definitely
+> fails-every-time:
+>
+> pm215@gcc113:~/qemu/build/all$
+> QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 strace -tt -f -o
+> ~/strace.log  tests/virtio-blk-test
+> /ppc64/virtio/blk/pci/basic: **
+> ERROR:/home/pm215/qemu/tests/virtio-blk-test.c:272:test_basic:
+> assertion failed (status == 0): (1 == 0)
+> Aborted (core dumped)
+>
+> The strace.log from that is at
+> http://people.linaro.org/~peter.maydell/strace.log
+> (3.6MB file; the -f means it will have the trace for
+> both the test binary and the QEMU process it spawns).
+>
+> thanks
+> -- PMM
 
->>> If this delay is to prevent a bug which only happens in MacOS then that's the hack
->>> not the normal code path to run without the delay that you've just removed. So maybe
->>> this should be kept if possible to avoid unecessary delays for other guests.
->>> (Although if this only affects mac99,via=cuda but not mac99,via=pmu then I don't care
->>> much as long as pmu works.)
->>
->> Well the reality is that the detection above doesn't actually seem to work anyway -
->> at least a quick boot test with Linux, MacOS X and MacOS 9 with a printf() added into
->> the if() shows nothing firing once the kernel takes over. So the slow path with the
->> delay included was always being taken within the OS anyway.
->>
->> And indeed, the code doesn't affect pmu so you won't see any difference there.
->>
->>>> As a plus it also prevents a guest OS from accidentally triggering the hack whilst
->>>> programming the VIA port.
->>>
->>> That may be a problem though. What's the issue exactly? Why is the delay needed in
->>> the first place?
->>
->> It's some kind of racy polling with OS 9 (I wasn't involved in the technical details,
->> sorry) which causes OS 9 to hang on boot if the delay isn't present. And even better
->> the slow path that was previously always being taken has now been reduced from 300us
->> to 30us so whichever way you look at it, having this patch applied is a win.
-> 
-> Can you write a paragraph about this, that David can amend to your
-> patch? That would stop worrying me about looking at this patch in
-> various months...
+I found the error. I forgot the endianness in the test, so now it
+works on ppc64 guest and x86_64 host.
+Maybe the randomness of the fails was the different endianness between
+guest and host.
 
-Hmmmm well the existing description already describes the interrupt race in OS 9 so I
-guess the only part missing is the bit about the fast path. How about the revised
-text below for the patch description?
+I'll send a v5 of the series with the fix.
 
-
-    cuda: decrease time delay before raising VIA SR interrupt and remove fast path
-
-    In order to handle a race condition in the MacOS 9 CUDA driver, a delay was
-    introduced when raising the VIA SR interrupt inspired by similar code in
-    MacOnLinux.
-
-    During original testing of the MacOS 9 patches it was found that the 30us
-    delay used in MacOnLinux did not work reliably within QEMU, and a value of
-    300us was required to function correctly.
-
-    Recent experiments have shown two things: firstly when booting Linux, MacOS
-    9 and MacOS X the fast path which bypasses the delay is never triggered once the
-    OS kernel is loaded making it effectively useless. Rather than leave this code
-    in place where a guest could potentially enable it by accident and break itself,
-    we might as well just remove it.
-
-    Secondly the previous reliability issues are no longer present, and this value
-    can be reduced down to 20us with no apparent ill effects. This has the benefit of
-    considerably improving the responsiveness of the ADB keyboard and mouse within
-    the guest.
-
-    Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-
-ATB,
-
-Mark.
+Thanks and sorry for that,
+Stefano
