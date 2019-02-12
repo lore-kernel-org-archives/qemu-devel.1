@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58387)
+Received: from eggs.gnu.org ([209.51.188.92]:60209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtUAY-0004xg-Mi
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:16:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1gtUDl-00079Z-Un
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:19:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtUAX-0000iy-71
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:15:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gtUAW-0008Sh-QE
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:15:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gtUAD-0000YL-Rx
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:15:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D0AB12E80C7
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:15:37 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gtUDk-0008Hi-6R
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:19:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gtUDe-00081B-Dg
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:19:12 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <154935478086.7509.4349987292919289245.stgit@pasha-VirtualBox>
+	<002301d4c207$27d88d50$7789a7f0$@ru>
+	<87y36lpjfa.fsf@dusky.pond.sub.org>
+	<a44a588734f7101b8a9e1f76c1044e41@ispras.ru>
+Date: Tue, 12 Feb 2019 10:18:58 +0100
+In-Reply-To: <a44a588734f7101b8a9e1f76c1044e41@ispras.ru> (dovgaluk's message
+	of "Tue, 12 Feb 2019 10:18:15 +0300")
+Message-ID: <87mun1nz3x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Feb 2019 09:06:42 -0000
-From: Thomas Huth <1815143@bugs.launchpad.net>
-Reply-To: Bug 1815143 <1815143@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154957727033.18791.11498118265359264370.malonedeb@soybean.canonical.com>
-Message-Id: <154996240252.19096.731425402913458300.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815143] Re: qemu-system-s390x fails when running
- without kvm: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
+Subject: Re: [Qemu-devel] [PATCH v12 00/25] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,146 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: dovgaluk <dovgaluk@ispras.ru>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This should be the commit that fixed this issue:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D303c681a8f50eb88fbafc
+dovgaluk <dovgaluk@ispras.ru> writes:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+> Markus Armbruster =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2019-02-12 10:14:
+>> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> writes:
+>>
+>>> Ping?
+>>
+>> Are you pinging for more review, or for someone to merge this?
+>
+> From my point of view this patch set is ready.
 
--- =
+MAINTAINERS
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815143
+    Record/replay
+    M: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+    R: Paolo Bonzini <pbonzini@redhat.com>
 
-Title:
-   qemu-system-s390x fails when running without kvm: fatal: EXECUTE on
-  instruction prefix 0x7f4 not implemented
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  just wondering if TCG implements instruction prefix 0x7f4
-
-  server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
-
-  --> starting qemu with kvm enabled works fine
-  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
-t/initrd -enable-kvm
-  Initializing cgroup subsys cpuset
-  Initializing cgroup subsys cpu
-  Initializing cgroup subsys cpuacct
-  Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 =
-(SUSE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
-  setup.289988: Linux is running under KVM in 64-bit mode
-  setup.b050d0: The maximum memory size is 128MB
-  numa.196305: NUMA mode: plain
-  Write protected kernel read-only data: 8692k
-  [...]
-
-  --> but starting qemu without kvm enabled works fails
-  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
-t/initrd =
-
-  qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
-
-  PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
-  R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=
-=3D0000000000000000
-  R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=
-=3D0000000000000000
-  R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=
-=3D0000000000000000
-  R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=
-=3D000000000000bef0
-  F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=
-=3D0000000000000000
-  F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=
-=3D0000000000000000
-  F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=
-=3D0000000000000000
-  F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=
-=3D0000000000000000
-  V00=3D00000000000000000000000000000000 V01=3D0000000000000000000000000000=
-0000
-  V02=3D00000000000000000000000000000000 V03=3D0000000000000000000000000000=
-0000
-  V04=3D00000000000000000000000000000000 V05=3D0000000000000000000000000000=
-0000
-  V06=3D00000000000000000000000000000000 V07=3D0000000000000000000000000000=
-0000
-  V08=3D00000000000000000000000000000000 V09=3D0000000000000000000000000000=
-0000
-  V10=3D00000000000000000000000000000000 V11=3D0000000000000000000000000000=
-0000
-  V12=3D00000000000000000000000000000000 V13=3D0000000000000000000000000000=
-0000
-  V14=3D00000000000000000000000000000000 V15=3D0000000000000000000000000000=
-0000
-  V16=3D00000000000000000000000000000000 V17=3D0000000000000000000000000000=
-0000
-  V18=3D00000000000000000000000000000000 V19=3D0000000000000000000000000000=
-0000
-  V20=3D00000000000000000000000000000000 V21=3D0000000000000000000000000000=
-0000
-  V22=3D00000000000000000000000000000000 V23=3D0000000000000000000000000000=
-0000
-  V24=3D00000000000000000000000000000000 V25=3D0000000000000000000000000000=
-0000
-  V26=3D00000000000000000000000000000000 V27=3D0000000000000000000000000000=
-0000
-  V28=3D00000000000000000000000000000000 V29=3D0000000000000000000000000000=
-0000
-  V30=3D00000000000000000000000000000000 V31=3D0000000000000000000000000000=
-0000
-  C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=
-=3D0000000000000000
-  C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=
-=3D0000000000000000
-  C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=
-=3D0000000000000000
-  C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=
-=3D0000000000000000
-
-  Aborted (core dumped)
-
-  =
-
-  server3:~ # lscpu
-  Architecture:          s390x
-  CPU op-mode(s):        32-bit, 64-bit
-  Byte Order:            Big Endian
-  CPU(s):                2
-  On-line CPU(s) list:   0,1
-  Thread(s) per core:    1
-  Core(s) per socket:    1
-  Socket(s) per book:    1
-  Book(s) per drawer:    1
-  Drawer(s):             2
-  NUMA node(s):          1
-  Vendor ID:             IBM/S390
-  Machine type:          2964
-  BogoMIPS:              20325.00
-  Hypervisor:            z/VM 6.4.0
-  Hypervisor vendor:     IBM
-  Virtualization type:   full
-  Dispatching mode:      horizontal
-  L1d cache:             128K
-  L1i cache:             96K
-  L2d cache:             2048K
-  L2i cache:             2048K
-  L3 cache:              65536K
-  L4 cache:              491520K
-  NUMA node0 CPU(s):     0-63
-  Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh h=
-ighgprs te vx sie
-  server3:~ # uname -a
-  Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (=
-9649989) s390x s390x s390x GNU/Linux
-  server3:~ #
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815143/+subscriptions
+makes me think either Paolo should pick it up, or he should tell you to
+post a pull request yourself.
