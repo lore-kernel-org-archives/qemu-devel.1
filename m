@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49984)
+Received: from eggs.gnu.org ([209.51.188.92]:57330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gtTtI-0001fV-KV
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:58:10 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtU9D-00040I-L4
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:14:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gtTtH-0002gi-7f
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:58:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50610)
+	(envelope-from <thuth@redhat.com>) id 1gtU8Q-0004F7-0I
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:13:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49504)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gtTtC-0001rL-Pu
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:58:05 -0500
-Date: Tue, 12 Feb 2019 03:57:39 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <79078864.438088.1549961859428.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190212025241.5330-1-stefanha@redhat.com>
-References: <20190212025241.5330-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gtU8P-0004Ak-NE
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:13:45 -0500
+References: <20190211163829.10297-1-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <002847d1-732d-b777-394c-a784fd359130@redhat.com>
+Date: Tue, 12 Feb 2019 10:13:38 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190211163829.10297-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: reject invalid pmem file
- sizes
+Subject: Re: [Qemu-devel] [PATCH] Kconfig: add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,177 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Zhang Yi <yi.z.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, peter.maydell@linaro.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-
-Hi Stefan,
-
-> 
-> Guests started with NVDIMMs larger than the underlying host file produce
-> confusing errors inside the guest.  This happens because the guest
-> accesses pages beyond the end of the file.
-> 
-> Check the pmem file size on startup and print a clear error message if
-> the size is invalid.
-> 
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1669053
-> Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-> Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 2019-02-11 17:38, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/qemu/osdep.h    | 13 ++++++++++
->  backends/hostmem-file.c | 16 +++++++++++++
->  util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
->  util/oslib-win32.c      |  5 ++++
->  4 files changed, 87 insertions(+)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 840af09cb0..303d315c5d 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -570,6 +570,19 @@ void qemu_set_tty_echo(int fd, bool echo);
->  void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
->                       Error **errp);
->  
-> +/**
-> + * qemu_get_pmem_size:
-> + * @filename: path to a pmem file
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Determine the size of a persistent memory file.  Besides supporting files
-> on
-> + * DAX file systems, this function also supports Linux devdax character
-> + * devices.
-> + *
-> + * Returns: the size or 0 on failure
-> + */
-> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp);
-> +
->  /**
->   * qemu_get_pid_name:
->   * @pid: pid of a process
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index ba601ce940..325ab4aad9 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -46,6 +46,22 @@ file_backend_memory_alloc(HostMemoryBackend *backend,
-> Error **errp)
->      gchar *name;
->  #endif
->  
-> +    /*
-> +     * Verify pmem file size since starting a guest with an incorrect size
-> +     * leads to confusing failures inside the guest.
-> +     */
-> +    if (fb->is_pmem && fb->mem_path) {
-> +        uint64_t size;
-> +
-> +        size = qemu_get_pmem_size(fb->mem_path, NULL);
-> +        if (size && backend->size > size) {
-> +            error_setg(errp, "size property %" PRIu64 " is larger than "
-> +                       "pmem file \"%s\" size %" PRIu64, backend->size,
-> +                       fb->mem_path, size);
-> +            return;
-> +        }
-> +    }
-> +
->      if (!backend->size) {
->          error_setg(errp, "can't create backend with size 0");
->          return;
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 37c5854b9c..10d90d1783 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -500,6 +500,59 @@ void os_mem_prealloc(int fd, char *area, size_t memory,
-> int smp_cpus,
->      }
->  }
->  
-> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
-> +{
-> +    struct stat st;
-> +
-> +    if (stat(filename, &st) < 0) {
-> +        error_setg(errp, "unable to stat pmem file \"%s\"", filename);
-> +        return 0;
-> +    }
-> +
-> +#if defined(__linux__)
-> +    /* Special handling for devdax character devices */
-> +    if (S_ISCHR(st.st_mode)) {
-> +        char *subsystem_path = NULL;
-> +        char *subsystem = NULL;
-> +        char *size_path = NULL;
-> +        char *size_str = NULL;
-> +        uint64_t ret = 0;
-> +
-> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
-> +                                         major(st.st_rdev),
-> minor(st.st_rdev));
-> +        subsystem = g_file_read_link(subsystem_path, NULL);
-> +        if (!subsystem) {
-> +            error_setg(errp, "unable to read subsystem for pmem file
-> \"%s\"",
-> +                       filename);
-> +            goto devdax_err;
-> +        }
-> +
-> +        if (!g_str_has_suffix(subsystem, "/dax")) {
-> +            error_setg(errp, "pmem file \"%s\" is not a dax device",
-> filename);
-> +            goto devdax_err;
-> +        }
-> +
-> +        size_path = g_strdup_printf("/sys/dev/char/%d:%d/size",
-> +                                    major(st.st_rdev), minor(st.st_rdev));
-> +        if (!g_file_get_contents(size_path, &size_str, NULL, NULL)) {
-> +            error_setg(errp, "unable to read size for pmem file \"%s\"",
-> +                       size_path);
-> +            goto devdax_err;
-> +        }
-> +
-> +        ret = g_ascii_strtoull(size_str, NULL, 0);
-> +
-> +devdax_err:
-> +        g_free(size_str);
-> +        g_free(size_path);
-> +        g_free(subsystem);
-> +        g_free(subsystem_path);
-> +        return ret;
-> +    }
-> +#endif /* defined(__linux__) */
-> +
-> +    return st.st_size;
-> +}
->  
->  char *qemu_get_pid_name(pid_t pid)
->  {
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index b4c17f5dfa..bd633afab6 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -560,6 +560,11 @@ void os_mem_prealloc(int fd, char *area, size_t memory,
-> int smp_cpus,
->      }
->  }
->  
-> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
-> +{
-> +    error_setg(errp, "pmem support not available");
-> +    return 0;
-> +}
->  
->  char *qemu_get_pid_name(pid_t pid)
->  {
-> --
-> 2.20.1
+>  docs/devel/kconfig.rst | 284 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 284 insertions(+)
+>  create mode 100644 docs/devel/kconfig.rst
 
-This patch looks good to me.
+Thanks for writing this up - that's a really helpful text!
 
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+> diff --git a/docs/devel/kconfig.rst b/docs/devel/kconfig.rst
+> new file mode 100644
+> index 0000000000..b653c43b12
+> --- /dev/null
+> +++ b/docs/devel/kconfig.rst
+> @@ -0,0 +1,284 @@
+[...]
+> +Unlike Linux, there is no user interface to edit the configuration, which is instead
+> +specified in per-target files under the ``default-configs/`` directory of the
+> +QEMU source tree.  This is because, unlike Linux, configuration and dependencies can be
+> +treated as a black box when building QEMU; the default configuration that QEMU
+> +ships with should be okay in almost all cases.
 
-Thanks,
-Pankaj
+I'd like to suggest to replace "Linux" with "Linux-Kconfig".
+
+[...]
+> +**reverse dependencies**: ``select <symbol> [if <expr>]``
+> +
+> +  While ``depends on`` forces a symbol to false, reverse dependencies can be
+> +  used to force another symbol to true.  In the following example,
+> +  ``CONFIG_BAZ`` will be true whenever ``CONFIG_FOO`` is true::
+> +
+> +    config FOO
+> +      select BAZ
+> +
+> +  The optional expression will prevent ``select`` from having any effect
+> +  unless it is true.
+> +
+> +  Note that unlike Linux, QEMU will detect contradictions between ``depends on`` and
+
+dito
+
+ Thomas
