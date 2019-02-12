@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35419)
+Received: from eggs.gnu.org ([209.51.188.92]:35346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gte57-00040O-Jh
+	(envelope-from <ccarrara@redhat.com>) id 1gte57-0003zd-Mo
 	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gte27-00071F-Uw
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:47:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47078)
+	(envelope-from <ccarrara@redhat.com>) id 1gte0X-0005Xo-Fu
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:46:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gte27-0006u0-Mt
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:47:55 -0500
+	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gte0W-0005VV-Tg
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:46:17 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 80309E6A67
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 19:39:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A58D80F8D
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 19:39:00 +0000 (UTC)
 From: Caio Carrara <ccarrara@redhat.com>
-Date: Tue, 12 Feb 2019 17:38:54 -0200
-Message-Id: <20190212193855.13223-2-ccarrara@redhat.com>
-In-Reply-To: <20190212193855.13223-1-ccarrara@redhat.com>
-References: <20190212193855.13223-1-ccarrara@redhat.com>
+Date: Tue, 12 Feb 2019 17:38:53 -0200
+Message-Id: <20190212193855.13223-1-ccarrara@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/2] tests.acceptance: adds multi vm
- capability for acceptance tests
+Subject: [Qemu-devel] [PATCH v3 0/2] tests.acceptance: adds multi vm
+ capability and basic migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,128 +33,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Caio Carrara <ccarrara@redhat.com>
 
-This change adds the possibility to write acceptance tests with multi
-virtual machine support. It's done keeping the virtual machines objects
-stored in a test attribute (dictionary). This dictionary shouldn't be
-accessed directly but through the new method added `get_vm`. This new
-method accept a list of args (that will be added as virtual machine
-arguments) and an optional name argument. The name is the key that
-identify a single virtual machine along the test machines available. If
-a name without a machine is informed a new machine will be instantiated.
+This is the third attempt to add the multi vm capability to base class
+of acceptance tests.
 
-The current usage of vm in tests will not be broken by this change since
-it keeps a property called vm in the base test class. This property only
-calls the new method `get_vm` with default parameters (no args and
-'default' as machine name).
+The difference from first version is that in this current version a
+simple migration test was added (done by Cleber) so the new code that is
+being added is properly used and we're not adding "new dead code".
 
-Signed-off-by: Caio Carrara <ccarrara@redhat.com>
----
- docs/devel/testing.rst                    | 41 ++++++++++++++++++++++-
- tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
- 2 files changed, 61 insertions(+), 5 deletions(-)
+The difference from the second version is that in this current version
+the migration test being added was updated based on last reviews. It was
+added more status to consider the migration as finished and also
+assertions was added to check the migration success.
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 135743a2bf..9f86569b30 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -634,7 +634,46 @@ instance, available at ``self.vm``.  Because many te=
-sts will tweak the
- QEMU command line, launching the QEMUMachine (by using ``self.vm.launch(=
-)``)
- is left to the test writer.
-=20
--At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-+The base test class has also support for tests with more than one
-+QEMUMachine. The way to get machines is through the ``self.get_vm()``
-+method which will return a QEMUMachine instance. The ``self.get_vm()``
-+method accepts arguments that will be passed to the QEMUMachine creation
-+and also an optional `name` attribute so you can identify a specific
-+machine and get it more than once through the tests methods. A simple
-+and hypothetical example follows:
-+
-+.. code::
-+
-+  from avocado_qemu import Test
-+
-+
-+  class MultipleMachines(Test):
-+      """
-+      :avocado: enable
-+      """
-+      def test_multiple_machines(self):
-+          first_machine =3D self.get_vm()
-+          second_machine =3D self.get_vm()
-+          self.get_vm(name=3D'third_machine').launch()
-+
-+          first_machine.launch()
-+          second_machine.launch()
-+
-+          first_res =3D first_machine.command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          second_res =3D second_machine.command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          third_res =3D self.get_vm(name=3D'third_machine').command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          self.assertEquals(first_res, second_res, third_res)
-+
-+At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
- shutdown.
-=20
- QEMUMachine
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-index 1e54fd5932..4c9e27feda 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -10,6 +10,7 @@
-=20
- import os
- import sys
-+import uuid
-=20
- import avocado
-=20
-@@ -42,13 +43,29 @@ def pick_default_qemu_bin():
-=20
- class Test(avocado.Test):
-     def setUp(self):
--        self.vm =3D None
-+        self._vms =3D {}
-         self.qemu_bin =3D self.params.get('qemu_bin',
-                                         default=3Dpick_default_qemu_bin(=
-))
-         if self.qemu_bin is None:
-             self.cancel("No QEMU binary defined or found in the source t=
-ree")
--        self.vm =3D QEMUMachine(self.qemu_bin)
-+
-+    def _new_vm(self, *args):
-+        vm =3D QEMUMachine(self.qemu_bin)
-+        if args:
-+            vm.add_args(*args)
-+        return vm
-+
-+    @property
-+    def vm(self):
-+        return self.get_vm(name=3D'default')
-+
-+    def get_vm(self, *args, name=3DNone):
-+        if not name:
-+            name =3D str(uuid.uuid4())
-+        if self._vms.get(name) is None:
-+            self._vms[name] =3D self._new_vm(*args)
-+        return self._vms[name]
-=20
-     def tearDown(self):
--        if self.vm is not None:
--            self.vm.shutdown()
-+        for vm in self._vms.values():
-+            vm.shutdown()
+There are more tests and test cases that can be added, but I'm assuming
+this patch is complete enough and other series can be sent after
+covering the other cases.
+
+Caio Carrara (2):
+  tests.acceptance: adds multi vm capability for acceptance tests
+  tests.acceptance: adds simple migration test
+
+ docs/devel/testing.rst                    | 41 +++++++++++++++++-
+ tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++--
+ tests/acceptance/migration.py             | 53 +++++++++++++++++++++++
+ 3 files changed, 114 insertions(+), 5 deletions(-)
+ create mode 100644 tests/acceptance/migration.py
+
 --=20
 2.20.1
