@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53082)
+Received: from eggs.gnu.org ([209.51.188.92]:53269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gtXcb-0004bM-Ea
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:57:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtXcf-0004cA-LS
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:57:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gtXVE-0001H7-PV
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:49:35 -0500
-Received: from forwardcorp1g.cmail.yandex.net ([87.250.241.190]:43325)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1gtXVA-00017W-NQ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:49:31 -0500
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <20190211131731.GE2627@work-vm>
-References: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
-	<20190204130958.18904-4-yury-kotov@yandex-team.ru>
-	<20190211131731.GE2627@work-vm>
+	(envelope-from <thuth@redhat.com>) id 1gtXSx-0006xQ-HW
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:47:12 -0500
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a9633e15-13c7-70a5-17c2-2204dd174335@redhat.com>
+Date: Tue, 12 Feb 2019 13:47:05 +0100
 MIME-Version: 1.0
-Date: Tue, 12 Feb 2019 15:49:19 +0300
-Message-Id: <196271549975759@iva8-f16495710718.qloud-c.yandex.net>
+In-Reply-To: <1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] tests/migration-test: Add a test
- for ignore-shared capability
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 08/15] s390-bios: Map low core
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,380 +25,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-11.02.2019, 16:17, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
-> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
->> =C2=A0Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
->> =C2=A0---
->> =C2=A0=C2=A0tests/migration-test.c | 109 +++++++++++++++++++++++++++++=
-++++--------
->> =C2=A0=C2=A01 file changed, 89 insertions(+), 20 deletions(-)
->>
->> =C2=A0diff --git a/tests/migration-test.c b/tests/migration-test.c
->> =C2=A0index 8352612364..485f42b2d2 100644
->> =C2=A0--- a/tests/migration-test.c
->> =C2=A0+++ b/tests/migration-test.c
->> =C2=A0@@ -332,6 +332,13 @@ static void cleanup(const char *filename)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(path);
->> =C2=A0=C2=A0}
->>
->> =C2=A0+static char *get_shmem_opts(const char *mem_size, const char *s=
-hmem_path)
->> =C2=A0+{
->> =C2=A0+ return g_strdup_printf("-object memory-backend-file,id=3Dmem0,=
-size=3D%s"
->> =C2=A0+ ",mem-path=3D%s,share=3Don -numa node,memdev=3Dmem0",
->> =C2=A0+ mem_size, shmem_path);
->> =C2=A0+}
->> =C2=A0+
->> =C2=A0=C2=A0static void migrate_check_parameter(QTestState *who, const=
- char *parameter,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0long long value)
->> =C2=A0=C2=A0{
->> =C2=A0@@ -430,73 +437,91 @@ static void migrate_postcopy_start(QTestSt=
-ate *from, QTestState *to)
->> =C2=A0=C2=A0}
->>
->> =C2=A0=C2=A0static int test_migrate_start(QTestState **from, QTestStat=
-e **to,
->> =C2=A0- const char *uri, bool hide_stderr)
->> =C2=A0+ const char *uri, bool hide_stderr,
->> =C2=A0+ bool use_shmem)
->> =C2=A0=C2=A0{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gchar *cmd_src, *cmd_dst;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *bootpath =3D g_strdup_printf=
-("%s/bootsect", tmpfs);
->> =C2=A0+ char *extra_opts =3D NULL;
->> =C2=A0+ char *shmem_path =3D NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *arch =3D qtest_get_arc=
-h();
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const char *accel =3D "kvm:tcg";
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0got_stop =3D false;
->>
->> =C2=A0+ if (use_shmem) {
->> =C2=A0+ shmem_path =3D g_strdup_printf("/dev/shm/qemu-%d", getpid());
->> =C2=A0+ }
->
-> I think /dev/shm is non-portable; so I think you'll need to have a way
-> to skip the test on OSs that don't have it.
->
+On 2019-01-29 14:29, Jason J. Herne wrote:
+> Create a new header for basic architecture specific definitions and add=
+ a
+> mapping of low core memory. This mapping will be used by the real dasd =
+boot
+> process.
+>=20
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/main.c      |   2 +
+>  pc-bios/s390-ccw/s390-arch.h | 100 +++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 102 insertions(+)
+>  create mode 100644 pc-bios/s390-ccw/s390-arch.h
+>=20
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 1bc61b5..fa90aa3 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -9,6 +9,7 @@
+>   */
+> =20
+>  #include "libc.h"
+> +#include "s390-arch.h"
+>  #include "s390-ccw.h"
+>  #include "cio.h"
+>  #include "virtio.h"
+> @@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] =3D { 0, 0=
+, 0, 0, 0, 0, 0, 0, 0 };
+>  QemuIplParameters qipl;
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>  static bool have_iplb;
+> +const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+> =20
+>  #define LOADPARM_PROMPT "PROMPT  "
+>  #define LOADPARM_EMPTY  "        "
+> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.=
+h
+> new file mode 100644
+> index 0000000..47eaa04
+> --- /dev/null
+> +++ b/pc-bios/s390-ccw/s390-arch.h
+> @@ -0,0 +1,100 @@
+> +/*
+> + * S390 Basic Architecture
+> + *
+> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
 
-Ok, will fix in v3.
+2019 ?
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (strcmp(arch, "i386") =3D=3D 0 =
-|| strcmp(arch, "x86_64") =3D=3D 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0init_bootf=
-ile(bootpath, x86_bootsect);
->> =C2=A0+ extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) =
-: NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_src =3D=
- g_strdup_printf("-machine accel=3D%s -m 150M"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -n=
-ame source,debug-threads=3Don"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -s=
-erial file:%s/src_serial"
->> =C2=A0- " -drive file=3D%s,format=3Draw",
->> =C2=A0- accel, tmpfs, bootpath);
->> =C2=A0+ " -drive file=3D%s,format=3Draw %s",
->> =C2=A0+ accel, tmpfs, bootpath,
->> =C2=A0+ extra_opts ? extra_opts : "");
->
-> It's painful to have to use the ?: here as well as above where you set
-> extra_opts, but I guess you need to, to allow you to free extra_opts
-> below.
->
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+(at
+> + * your option) any later version. See the COPYING file in the top-lev=
+el
+> + * directory.
+> + */
+> +
+> +#ifndef S390_ARCH_H
+> +#define S390_ARCH_H
+> +
+> +typedef struct PSW {
+> +    uint64_t mask;
+> +    uint64_t addr;
+> +} __attribute__ ((packed, aligned(8))) PSW;
 
-I'll think how to write it more clear. May be it's better to g_strdup("")
-instead of NULL to eliminate some of ?:.
+We've seen quite some trouble with "packed" in the past... See
+3b8afb41bc8e or 55281a2c53b884d0 for example ... This is only the
+s390-ccw bios code here, so it is likely ok, but still, since this
+structure is "naturally" packed, I'd rather go without that attribute
+here (even if it's only to allow the compiler to generate better code in
+some cases). You could still _Static_assert(sizeof(struct PSW) =3D=3D 16)
+afterwards, just to be sure.
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_dst =3D=
- g_strdup_printf("-machine accel=3D%s -m 150M"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -n=
-ame target,debug-threads=3Don"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -s=
-erial file:%s/dest_serial"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -d=
-rive file=3D%s,format=3Draw"
->> =C2=A0- " -incoming %s",
->> =C2=A0- accel, tmpfs, bootpath, uri);
->> =C2=A0+ " -incoming %s %s",
->> =C2=A0+ accel, tmpfs, bootpath, uri,
->> =C2=A0+ extra_opts ? extra_opts : "");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0start_addr=
-ess =3D X86_TEST_MEM_START;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0end_addres=
-s =3D X86_TEST_MEM_END;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (g_str_equal(arch, "s390=
-x")) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0init_bootf=
-ile_s390x(bootpath);
->> =C2=A0+ extra_opts =3D use_shmem ? get_shmem_opts("128M", shmem_path) =
-: NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_src =3D=
- g_strdup_printf("-machine accel=3D%s -m 128M"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -n=
-ame source,debug-threads=3Don"
->> =C2=A0- " -serial file:%s/src_serial -bios %s",
->> =C2=A0- accel, tmpfs, bootpath);
->> =C2=A0+ " -serial file:%s/src_serial -bios %s %s",
->> =C2=A0+ accel, tmpfs, bootpath,
->> =C2=A0+ extra_opts ? extra_opts : "");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_dst =3D=
- g_strdup_printf("-machine accel=3D%s -m 128M"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -n=
-ame target,debug-threads=3Don"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -s=
-erial file:%s/dest_serial -bios %s"
->> =C2=A0- " -incoming %s",
->> =C2=A0- accel, tmpfs, bootpath, uri);
->> =C2=A0+ " -incoming %s %s",
->> =C2=A0+ accel, tmpfs, bootpath, uri,
->> =C2=A0+ extra_opts ? extra_opts : "");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0start_addr=
-ess =3D S390_TEST_MEM_START;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0end_addres=
-s =3D S390_TEST_MEM_END;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (strcmp(arch, "ppc64") =3D=
-=3D 0) {
->> =C2=A0+ extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) =
-: NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_src =3D=
- g_strdup_printf("-machine accel=3D%s -m 256M -nodefaults"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -n=
-ame source,debug-threads=3Don"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -s=
-erial file:%s/src_serial"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -p=
-rom-env 'use-nvramrc?=3Dtrue' -prom-env "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"'nv=
-ramrc=3Dhex .\" _\" begin %x %x "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"do =
-i c@ 1 + i c! 1000 +loop .\" B\" 0 "
->> =C2=A0- "until'", accel, tmpfs, end_address,
->> =C2=A0- start_address);
->> =C2=A0+ "until' %s", accel, tmpfs, end_address,
->> =C2=A0+ start_address, extra_opts ? extra_opts : "");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_dst =3D=
- g_strdup_printf("-machine accel=3D%s -m 256M"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -n=
-ame target,debug-threads=3Don"
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0" -s=
-erial file:%s/dest_serial"
->> =C2=A0- " -incoming %s",
->> =C2=A0- accel, tmpfs, uri);
->> =C2=A0+ " -incoming %s %s",
->> =C2=A0+ accel, tmpfs, uri,
->> =C2=A0+ extra_opts ? extra_opts : "");
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0start_addr=
-ess =3D PPC_TEST_MEM_START;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0end_addres=
-s =3D PPC_TEST_MEM_END;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else if (strcmp(arch, "aarch64")=
- =3D=3D 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0init_bootf=
-ile(bootpath, aarch64_kernel);
->> =C2=A0+ extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) =
-: NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_src =3D=
- g_strdup_printf("-machine virt,accel=3D%s,gic-version=3Dmax "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"-na=
-me vmsource,debug-threads=3Don -cpu max "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"-m =
-150M -serial file:%s/src_serial "
->> =C2=A0- "-kernel %s ",
->> =C2=A0- accel, tmpfs, bootpath);
->> =C2=A0+ "-kernel %s %s",
->> =C2=A0+ accel, tmpfs, bootpath,
->> =C2=A0+ extra_opts ? extra_opts : "");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cmd_dst =3D=
- g_strdup_printf("-machine virt,accel=3D%s,gic-version=3Dmax "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"-na=
-me vmdest,debug-threads=3Don -cpu max "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"-m =
-150M -serial file:%s/dest_serial "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"-ke=
-rnel %s "
->> =C2=A0- "-incoming %s ",
->> =C2=A0- accel, tmpfs, bootpath, uri);
->> =C2=A0+ "-incoming %s %s",
->> =C2=A0+ accel, tmpfs, bootpath, uri,
->> =C2=A0+ extra_opts ? extra_opts : "");
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0start_addr=
-ess =3D ARM_TEST_MEM_START;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0end_addres=
-s =3D ARM_TEST_MEM_END;
->> =C2=A0@@ -507,6 +532,7 @@ static int test_migrate_start(QTestState **f=
-rom, QTestState **to,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(bootpath);
->> =C2=A0+ g_free(extra_opts);
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (hide_stderr) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gchar *tmp=
-;
->> =C2=A0@@ -524,6 +550,16 @@ static int test_migrate_start(QTestState **=
-from, QTestState **to,
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*to =3D qtest_init(cmd_dst);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(cmd_dst);
->> =C2=A0+
->> =C2=A0+ /*
->> =C2=A0+ * Remove shmem file immediately to avoid memory leak in test f=
-ailed case.
->> =C2=A0+ * It's valid becase QEMU has already opened this file
->> =C2=A0+ */
->> =C2=A0+ if (use_shmem) {
->> =C2=A0+ unlink(shmem_path);
->> =C2=A0+ g_free(shmem_path);
->> =C2=A0+ }
->> =C2=A0+
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
->> =C2=A0=C2=A0}
->>
->> =C2=A0@@ -603,7 +639,7 @@ static int migrate_postcopy_prepare(QTestSta=
-te **from_ptr,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *uri =3D g_strdup_printf("uni=
-x:%s/migsocket", tmpfs);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QTestState *from, *to;
->>
->> =C2=A0- if (test_migrate_start(&from, &to, uri, hide_error)) {
->> =C2=A0+ if (test_migrate_start(&from, &to, uri, hide_error, false)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -1;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->>
->> =C2=A0@@ -720,7 +756,7 @@ static void test_baddest(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *status;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool failed;
->>
->> =C2=A0- if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
->> =C2=A0+ if (test_migrate_start(&from, &to, "tcp:0:0", true, false)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0migrate(from, "tcp:0:0", "{}");
->> =C2=A0@@ -745,7 +781,7 @@ static void test_precopy_unix(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char *uri =3D g_strdup_printf("uni=
-x:%s/migsocket", tmpfs);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QTestState *from, *to;
->>
->> =C2=A0- if (test_migrate_start(&from, &to, uri, false)) {
->> =C2=A0+ if (test_migrate_start(&from, &to, uri, false, false)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->>
->> =C2=A0@@ -781,6 +817,38 @@ static void test_precopy_unix(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(uri);
->> =C2=A0=C2=A0}
->>
->> =C2=A0+static void test_ignore_shared(void)
->> =C2=A0+{
->> =C2=A0+ char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
->> =C2=A0+ QTestState *from, *to;
->> =C2=A0+
->> =C2=A0+ if (test_migrate_start(&from, &to, uri, false, true)) {
->> =C2=A0+ return;
->> =C2=A0+ }
->> =C2=A0+
->> =C2=A0+ migrate_set_capability(from, "x-ignore-shared", true);
->> =C2=A0+ migrate_set_capability(to, "x-ignore-shared", true);
->> =C2=A0+
->> =C2=A0+ /* Wait for the first serial output from the source */
->> =C2=A0+ wait_for_serial("src_serial");
->> =C2=A0+
->> =C2=A0+ migrate(from, uri, "{}");
->> =C2=A0+
->> =C2=A0+ wait_for_migration_pass(from);
->> =C2=A0+
->> =C2=A0+ if (!got_stop) {
->> =C2=A0+ qtest_qmp_eventwait(from, "STOP");
->> =C2=A0+ }
->> =C2=A0+
->> =C2=A0+ qtest_qmp_eventwait(to, "RESUME");
->> =C2=A0+
->> =C2=A0+ wait_for_serial("dest_serial");
->> =C2=A0+ wait_for_migration_complete(from);
->> =C2=A0+
->> =C2=A0+ test_migrate_end(from, to, true);
->> =C2=A0+ g_free(uri);
->
-> Can we reliably look at the migration stats and see if we've
-> not transferred the shared data to make sure?
->
+> +
+> +/* Older PSW format used by LPSW instruction */
+> +typedef struct PSWLegacy {
+> +    uint32_t mask;
+> +    uint32_t addr;
+> +} __attribute__ ((packed, aligned(8))) PSWLegacy;
 
-Agree, it makes sense, I'll add this check in v3.
+dito, I'd drop the packed attribute here.
 
-> Dave
->
->> =C2=A0+}
->> =C2=A0+
->> =C2=A0=C2=A0int main(int argc, char **argv)
->> =C2=A0=C2=A0{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char template[] =3D "/tmp/migratio=
-n-test-XXXXXX";
->> =C2=A0@@ -832,6 +900,7 @@ int main(int argc, char **argv)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qtest_add_func("/migration/depreca=
-ted", test_deprecated);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qtest_add_func("/migration/bad_des=
-t", test_baddest);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qtest_add_func("/migration/precopy=
-/unix", test_precopy_unix);
->> =C2=A0+ qtest_add_func("/migration/ignore_shared", test_ignore_shared)=
-;
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D g_test_run();
->>
->> =C2=A0--
->> =C2=A02.20.1
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +/* s390 psw bit masks */
+> +#define PSW_MASK_IOINT      0x0200000000000000ULL
+> +#define PSW_MASK_WAIT       0x0002000000000000ULL
+> +#define PSW_MASK_EAMODE     0x0000000100000000ULL
+> +#define PSW_MASK_BAMODE     0x0000000080000000ULL
+> +#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
+> +
+> +/* Low core mapping */
+> +typedef struct LowCore {
+> +    /* prefix area: defined by architecture */
+> +    uint64_t        ipl_psw;                  /* 0x000 */
 
-Regards,
-Yury
+No PSWLegacy here? ;-)
+
+> +    uint32_t        ccw1[2];                  /* 0x008 */
+> +    uint32_t        ccw2[2];                  /* 0x010 */
+> +    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
+> +    uint32_t        ext_params;               /* 0x080 */
+> +    uint16_t        cpu_addr;                 /* 0x084 */
+> +    uint16_t        ext_int_code;             /* 0x086 */
+> +    uint16_t        svc_ilen;                 /* 0x088 */
+> +    uint16_t        svc_code;                 /* 0x08a */
+> +    uint16_t        pgm_ilen;                 /* 0x08c */
+> +    uint16_t        pgm_code;                 /* 0x08e */
+> +    uint32_t        data_exc_code;            /* 0x090 */
+> +    uint16_t        mon_class_num;            /* 0x094 */
+> +    uint16_t        per_perc_atmid;           /* 0x096 */
+> +    uint64_t        per_address;              /* 0x098 */
+> +    uint8_t         exc_access_id;            /* 0x0a0 */
+> +    uint8_t         per_access_id;            /* 0x0a1 */
+> +    uint8_t         op_access_id;             /* 0x0a2 */
+> +    uint8_t         ar_access_id;             /* 0x0a3 */
+> +    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
+> +    uint64_t        trans_exc_code;           /* 0x0a8 */
+> +    uint64_t        monitor_code;             /* 0x0b0 */
+> +    uint16_t        subchannel_id;            /* 0x0b8 */
+> +    uint16_t        subchannel_nr;            /* 0x0ba */
+> +    uint32_t        io_int_parm;              /* 0x0bc */
+> +    uint32_t        io_int_word;              /* 0x0c0 */
+> +    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
+> +    uint32_t        stfl_fac_list;            /* 0x0c8 */
+> +    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
+> +    uint64_t        mcic;                     /* 0x0e8 */
+> +    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
+> +    uint32_t        external_damage_code;     /* 0x0f4 */
+> +    uint64_t        failing_storage_address;  /* 0x0f8 */
+> +    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
+> +    uint64_t        per_breaking_event_addr;  /* 0x110 */
+> +    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
+> +    PSW             restart_old_psw;          /* 0x120 */
+> +    PSW             external_old_psw;         /* 0x130 */
+> +    PSW             svc_old_psw;              /* 0x140 */
+> +    PSW             program_old_psw;          /* 0x150 */
+> +    PSW             mcck_old_psw;             /* 0x160 */
+> +    PSW             io_old_psw;               /* 0x170 */
+> +    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
+> +    PSW             restart_new_psw;          /* 0x1a0 */
+> +    PSW             external_new_psw;         /* 0x1b0 */
+> +    PSW             svc_new_psw;              /* 0x1c0 */
+> +    PSW             program_new_psw;          /* 0x1d0 */
+> +    PSW             mcck_new_psw;             /* 0x1e0 */
+> +    PSW             io_new_psw;               /* 0x1f0 */
+> +    PSW             return_psw;               /* 0x200 */
+> +    uint8_t         irb[64];                  /* 0x210 */
+> +    uint64_t        sync_enter_timer;         /* 0x250 */
+> +    uint64_t        async_enter_timer;        /* 0x258 */
+> +    uint64_t        exit_timer;               /* 0x260 */
+> +    uint64_t        last_update_timer;        /* 0x268 */
+> +    uint64_t        user_timer;               /* 0x270 */
+> +    uint64_t        system_timer;             /* 0x278 */
+> +    uint64_t        last_update_clock;        /* 0x280 */
+> +    uint64_t        steal_clock;              /* 0x288 */
+> +    PSW             return_mcck_psw;          /* 0x290 */
+> +    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+> +} __attribute__((packed, aligned(8192))) LowCore;
+
+dito, please avoid packed, use _Static_assert instead.
+
+> +extern const LowCore *lowcore;
+> +
+> +#endif
+
+ Thomas
