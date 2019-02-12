@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53924)
+Received: from eggs.gnu.org ([209.51.188.92]:53945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYoE-0007Y4-J7
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtYoF-0007ZV-P4
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYoD-0005qV-4w
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:14 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtYoE-0005t9-Ee
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:15 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 22:12:33 +0800
-Message-Id: <20190212141234.2814-6-stefanha@redhat.com>
+Date: Tue, 12 Feb 2019 22:12:31 +0800
+Message-Id: <20190212141234.2814-4-stefanha@redhat.com>
 In-Reply-To: <20190212141234.2814-1-stefanha@redhat.com>
 References: <20190212141234.2814-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PULL 5/6] tests/virtio-blk: change assert on
- data_size in virtio_blk_request()
+Subject: [Qemu-devel] [RFC PULL 3/6] virtio-blk: add "discard" and
+ "write-zeroes" properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: sgarzare@redhat.com, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+Cc: sgarzare@redhat.com, qemu-block@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
 
 From: Stefano Garzarella <sgarzare@redhat.com>
 
-The size of data in the virtio_blk_request must be a multiple
-of 512 bytes for IN and OUT requests, or a multiple of the size
-of struct virtio_blk_discard_write_zeroes for DISCARD and
-WRITE_ZEROES requests.
+In order to avoid migration issues, we enable DISCARD and
+WRITE_ZEROES features only for machine type >=3D 4.0
 
+As discussed with Michael S. Tsirkin and Stefan Hajnoczi on the
+list [1], DISCARD operation should not have security implications
+(eg. page cache attacks), so we can enable it by default.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00504.html
+
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 Acked-by: Pankaj Gupta <pagupta@redhat.com>
-Message-id: 20190208134950.187665-6-sgarzare@redhat.com
+Message-id: 20190208134950.187665-4-sgarzare@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/virtio-blk-test.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ hw/block/virtio-blk.c | 4 ++++
+ hw/core/machine.c     | 2 ++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 04c608764b..0739498da7 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -144,7 +144,20 @@ static uint64_t virtio_blk_request(QGuestAllocator *=
-alloc, QVirtioDevice *d,
-     uint64_t addr;
-     uint8_t status =3D 0xFF;
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 938273c63c..6f2e86264d 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1026,6 +1026,10 @@ static Property virtio_blk_properties[] =3D {
+     DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHRE=
+AD,
+                      IOThread *),
++    DEFINE_PROP_BIT64("discard", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_DISCARD, true),
++    DEFINE_PROP_BIT64("write-zeroes", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_WRITE_ZEROES, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 =20
--    g_assert_cmpuint(data_size % 512, =3D=3D, 0);
-+    switch (req->type) {
-+    case VIRTIO_BLK_T_IN:
-+    case VIRTIO_BLK_T_OUT:
-+        g_assert_cmpuint(data_size % 512, =3D=3D, 0);
-+        break;
-+    case VIRTIO_BLK_T_DISCARD:
-+    case VIRTIO_BLK_T_WRITE_ZEROES:
-+        g_assert_cmpuint(data_size %
-+                         sizeof(struct virtio_blk_discard_write_zeroes),=
- =3D=3D, 0);
-+        break;
-+    default:
-+        g_assert_cmpuint(data_size, =3D=3D, 0);
-+    }
-+
-     addr =3D guest_alloc(alloc, sizeof(*req) + data_size);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 077fbd182a..766ca5899d 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -33,6 +33,8 @@ GlobalProperty hw_compat_3_1[] =3D {
+     { "usb-kbd", "serial", "42" },
+     { "usb-mouse", "serial", "42" },
+     { "usb-kbd", "serial", "42" },
++    { "virtio-blk-device", "discard", "false" },
++    { "virtio-blk-device", "write-zeroes", "false" },
+ };
+ const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
 =20
-     virtio_blk_fix_request(d, req);
 --=20
 2.20.1
