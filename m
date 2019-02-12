@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36483)
+Received: from eggs.gnu.org ([209.51.188.92]:41077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtZLm-0006B1-UG
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:47:58 -0500
+	(envelope-from <changpeng.liu@intel.com>) id 1gtZeD-00030g-2f
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 10:06:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtZLl-0000an-Mv
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:47:54 -0500
-Date: Tue, 12 Feb 2019 15:47:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190212144747.GC5283@localhost.localdomain>
-References: <cover.1547739122.git.berto@igalia.com>
-	<ae441a8c27cae1a80e57fb6d291fe95667da0c76.1547739122.git.berto@igalia.com>
+	(envelope-from <changpeng.liu@intel.com>) id 1gtZaI-0000HP-QE
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 10:02:57 -0500
+Received: from mga04.intel.com ([192.55.52.120]:20631)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1gtZaI-00008O-GG
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 10:02:54 -0500
+From: "Liu, Changpeng" <changpeng.liu@intel.com>
+Date: Tue, 12 Feb 2019 15:02:46 +0000
+Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B7B542A@SHSMSX103.ccr.corp.intel.com>
+References: <1549951304-26100-1-git-send-email-changpeng.liu@intel.com>
+	<20190212084531-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190212084531-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ae441a8c27cae1a80e57fb6d291fe95667da0c76.1547739122.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 01/13] block: Allow freezing BdrvChild links
+Subject: Re: [Qemu-devel] [PATCH v2] virtio-blk: set correct config size for
+ the host driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,143 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>, "sgarzare@redhat.com" <sgarzare@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "ldoktor@redhat.com" <ldoktor@redhat.com>
 
-Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
-> Our permission system is useful to define what operations are allowed
-> on a certain block node and includes things like BLK_PERM_WRITE or
-> BLK_PERM_RESIZE among others.
-> 
-> One of the permissions is BLK_PERM_GRAPH_MOD which allows "changing
-> the node that this BdrvChild points to". The exact meaning of this has
-> never been very clear, but it can be understood as "change any of the
-> links connected to the node". This can be used to prevent changing a
-> backing link, but it's too coarse.
-> 
-> This patch adds a new 'frozen' attribute to BdrvChild, which forbids
-> detaching the link from the node it points to, and new API to freeze
-> and unfreeze a backing chain.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block.c                   | 66 +++++++++++++++++++++++++++++++++++++++++++++++
->  include/block/block.h     |  5 ++++
->  include/block/block_int.h |  5 ++++
->  3 files changed, 76 insertions(+)
 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index f605622216..fd0e88d17a 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -661,6 +661,11 @@ struct BdrvChild {
->       */
->      uint64_t shared_perm;
->  
-> +    /*
-> +     * This link is frozen: the child cannot be detached from the parent.
-> +     */
-> +    bool frozen;
-> +
->      QLIST_ENTRY(BdrvChild) next;
->      QLIST_ENTRY(BdrvChild) next_parent;
->  };
 
-Is this enough, or should it prevent both detaching from the parent _and_
-changing the child node it points to?
-
-> diff --git a/block.c b/block.c
-> index 4f5ff2cc12..51fac086c7 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2062,6 +2062,8 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
->      BlockDriverState *old_bs = child->bs;
->      int i;
->  
-> +    assert(!child->frozen);
-> +
->      if (old_bs && new_bs) {
->          assert(bdrv_get_aio_context(old_bs) == bdrv_get_aio_context(new_bs));
->      }
-
-Okay, this does forbid both, so I think it's just the comment that needs
-to be changed in the hunk above.
-
-In order to avoid running into an assertion failure, we need to detect
-the situation in all callers, or audit that it can never happen:
-
-* bdrv_replace_child()
-    * bdrv_root_attach_child(): Creates a new BdrvChild, never frozen
-    * bdrv_detach_child()
-        * bdrv_root_unref_child()
-            * blk_remove_bs(): Not a backing child, safe
-            * block_job_remove_all_bdrv(): Not a backing child, safe
-            * bdrv_unref_child()
-                * bdrv_set_backing_hd(): Adds a check
-                * bdrv_close():  Not a backing child, safe
-                * bdrv_open_driver(): Not a backing child, safe
-    * bdrv_drop_intermediate(): Adds a check, though see below
-
-* bdrv_replace_node(): Missing check?
-    * bdrv_append()
-      For example, mirror_start_job() calls it to insert the
-      mirror_top_bs node above the source, which could be anywhere in
-      the graph. This may involve changing the target of backing links.
-    * Other callers looks questionable, too
-
-bdrv_replace_node() can return an error, so I think we should add a
-check there.
-
-For the bdrv_replace_child() call chain, the state looks better, but it
-was tedious to verify and future additions could easily forget to add
-the check. I wonder if we should allow some function there to return
-errors so that we don't have to add the checks in the outermost
-functions of the call chain.
-
-> @@ -3813,6 +3819,62 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
->  }
->  
->  /*
-> + * Return true if at least one of the backing links between @bs and
-> + * @base is frozen. @errp is set if that's the case.
-> + */
-> +bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-> +                                  Error **errp)
-> +{
-> +    BlockDriverState *i;
-> +
-> +    for (i = bs; i != base && i->backing; i = backing_bs(i)) {
-> +        if (i->backing->frozen) {
-> +            error_setg(errp, "Cannot remove link from '%s' to '%s'",
-
-Maybe s/remove/change/?
-
-Might also be worth including the BdrvChild name in the error message.
-
-> +                       i->node_name, backing_bs(i)->node_name);
-> +            return true;
-> +        }
-> +    }
-> +
-> +    return false;
-> +}
-
-> @@ -3861,6 +3923,10 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
->          goto exit;
->      }
->  
-> +    if (bdrv_is_backing_chain_frozen(top, base, NULL)) {
-> +        goto exit;
-> +    }
-> +
->      /* If 'base' recursively inherits from 'top' then we should set
->       * base->inherits_from to top->inherits_from after 'top' and all
->       * other intermediate nodes have been dropped.
-
-bdrv_drop_intermediate() doesn't change the links between in the chain
-between top and base, but the links between the parents of top and top
-are changed to point to base instead.
-
-I think this is checking the wrong thing.
-
-Kevin
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Tuesday, February 12, 2019 9:49 PM
+> To: Liu, Changpeng <changpeng.liu@intel.com>
+> Cc: qemu-devel@nongnu.org; stefanha@redhat.com; sgarzare@redhat.com;
+> dgilbert@redhat.com; ldoktor@redhat.com
+> Subject: Re: [PATCH v2] virtio-blk: set correct config size for the host =
+driver
+>=20
+> On Tue, Feb 12, 2019 at 02:01:44PM +0800, Changpeng Liu wrote:
+> > Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features supp=
+ort"
+> > introduced extra fields to existing struct virtio_blk_config, when
+> > migration was executed from older QEMU version to current head, it
+> > will break the migration.  While here, set the correct config size
+> > when initializing the host driver, for now, discard/write zeroes
+> > are not supported by virtio-blk host driver, so set the config
+> > size as before, users can change config size when adding the new
+> > feature bits support.
+> >
+> > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+>=20
+>=20
+> Pls rewrite commit log as suggested in this thread
+> and repost.
+Thanks, repost a v3 patch to address the commit message and your following =
+comments.
+>=20
+> > ---
+> >  hw/block/virtio-blk.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> > index 9a87b3b..846b7b9 100644
+> > --- a/hw/block/virtio-blk.c
+> > +++ b/hw/block/virtio-blk.c
+> > @@ -28,6 +28,9 @@
+> >  #include "hw/virtio/virtio-bus.h"
+> >  #include "hw/virtio/virtio-access.h"
+> >
+> > +#define VIRTIO_BLK_CFG_SIZE (offsetof(struct virtio_blk_config, num_qu=
+eues)
+> + \
+> > +                             sizeof_field(struct virtio_blk_config, nu=
+m_queues))
+> > +
+>=20
+> I would just do offsetof(max_discard_sectors)
+> with a comment "we don't support discard yet, hide associated config
+> fields".
+>=20
+> >  static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
+> >                                      VirtIOBlockReq *req)
+> >  {
+> > @@ -761,7 +764,7 @@ static void virtio_blk_update_config(VirtIODevice *=
+vdev,
+> uint8_t *config)
+> >      blkcfg.alignment_offset =3D 0;
+> >      blkcfg.wce =3D blk_enable_write_cache(s->blk);
+> >      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
+> > -    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
+> > +    memcpy(config, &blkcfg, VIRTIO_BLK_CFG_SIZE);
+>=20
+>=20
+> Let's add QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE <=3D sizeof(struct
+> virtio_blk_config)) just for documentation purposes.
+>=20
+> >  }
+> >
+> >  static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *c=
+onfig)
+> > @@ -769,7 +772,7 @@ static void virtio_blk_set_config(VirtIODevice *vde=
+v,
+> const uint8_t *config)
+> >      VirtIOBlock *s =3D VIRTIO_BLK(vdev);
+> >      struct virtio_blk_config blkcfg;
+> >
+> > -    memcpy(&blkcfg, config, sizeof(blkcfg));
+> > +    memcpy(&blkcfg, config, VIRTIO_BLK_CFG_SIZE);
+>=20
+>=20
+> Here too, QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE <=3D sizeof(blkcfg))
+>=20
+> >
+> >      aio_context_acquire(blk_get_aio_context(s->blk));
+> >      blk_set_enable_write_cache(s->blk, blkcfg.wce !=3D 0);
+> > @@ -952,8 +955,7 @@ static void virtio_blk_device_realize(DeviceState *=
+dev,
+> Error **errp)
+> >          return;
+> >      }
+> >
+> > -    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+> > -                sizeof(struct virtio_blk_config));
+> > +    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, VIRTIO_BLK_CFG_SI=
+ZE);
+> >
+> >      s->blk =3D conf->conf.blk;
+> >      s->rq =3D NULL;
+> > --
+> > 1.9.3
