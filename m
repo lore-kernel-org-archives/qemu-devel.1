@@ -1,18 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51555)
+Received: from eggs.gnu.org ([209.51.188.92]:55731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gtWb1-0004tE-8u
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:51:28 -0500
+	(envelope-from <stefanb@linux.ibm.com>) id 1gtWmH-0006ik-M7
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:03:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gtWat-0007x0-Il
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:51:22 -0500
-From: P J P <ppandit@redhat.com>
-Date: Tue, 12 Feb 2019 17:09:29 +0530
-Message-Id: <20190212113929.31390-1-ppandit@redhat.com>
+	(envelope-from <stefanb@linux.ibm.com>) id 1gtWmG-00049H-Rg
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:03:05 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44124
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1gtWmG-00046S-Ig
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:03:04 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1CC0afr103294
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 07:03:03 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qkwpwgctf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 07:03:02 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Tue, 12 Feb 2019 12:03:02 -0000
+References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
+	<1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Tue, 12 Feb 2019 07:02:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] ppc: add host-serial and host-model machine
- attributes
+In-Reply-To: <1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-MW
+Message-Id: <396d72fd-890d-dd08-d431-93ba1a18297f@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string
+ specifier in tpm_tis_show_buffer()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,244 +44,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P . Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
-
-On ppc hosts, hypervisor shares following system attributes
-
-  - /proc/device-tree/system-id
-  - /proc/device-tree/model
-
-with a guest. This could lead to information leakage and misuse.[*]
-Add machine attributes to control such system information exposure
-to a guest.
-
-[*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
-
-Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/core/machine.c   | 46 +++++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr.c      | 36 +++++++++++++++++++++++++++++------
- include/hw/boards.h |  2 ++
- qemu-options.hx     | 10 +++++++++-
- util/qemu-config.c  |  8 ++++++++
- 5 files changed, 95 insertions(+), 7 deletions(-)
-
-Update v2: add backward compatible properties
-  -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00593.html
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 2629515363..2d5a52476a 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -476,6 +476,38 @@ static void machine_set_memory_encryption(Object *ob=
-j, const char *value,
-     ms->memory_encryption =3D g_strdup(value);
- }
-=20
-+static char *machine_get_host_serial(Object *obj, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    return g_strdup(ms->host_serial);
-+}
-+
-+static void machine_set_host_serial(Object *obj, const char *value,
-+                                    Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    g_free(ms->host_serial);
-+    ms->host_serial =3D g_strdup(value);
-+}
-+
-+static char *machine_get_host_model(Object *obj, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    return g_strdup(ms->host_model);
-+}
-+
-+static void machine_set_host_model(Object *obj, const char *value,
-+                                   Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    g_free(ms->host_model);
-+    ms->host_model =3D g_strdup(value);
-+}
-+
- void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char=
- *type)
- {
-     strList *item =3D g_new0(strList, 1);
-@@ -760,6 +792,18 @@ static void machine_class_init(ObjectClass *oc, void=
- *data)
-         &error_abort);
-     object_class_property_set_description(oc, "memory-encryption",
-         "Set memory encryption object to use", &error_abort);
-+
-+    object_class_property_add_str(oc, "host-serial",
-+        machine_get_host_serial, machine_set_host_serial,
-+        &error_abort);
-+    object_class_property_set_description(oc, "host-serial",
-+        "Set host's system-id to use", &error_abort);
-+
-+    object_class_property_add_str(oc, "host-model",
-+        machine_get_host_model, machine_set_host_model,
-+        &error_abort);
-+    object_class_property_set_description(oc, "host-model",
-+        "Set host's model-id to use", &error_abort);
- }
-=20
- static void machine_class_base_init(ObjectClass *oc, void *data)
-@@ -785,6 +829,8 @@ static void machine_initfn(Object *obj)
-     ms->dump_guest_core =3D true;
-     ms->mem_merge =3D true;
-     ms->enable_graphics =3D true;
-+    ms->host_serial =3D NULL;
-+    ms->host_model =3D NULL;
-=20
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify =3D machine_init_notify;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0942f35bf8..a70667d72d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1249,13 +1249,31 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-      * Add info to guest to indentify which host is it being run on
-      * and what is the uuid of the guest
-      */
--    if (kvmppc_get_host_model(&buf)) {
--        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
--        g_free(buf);
-+    if (machine->host_model && !g_str_equal(machine->host_model, "none")=
-) {
-+        if (g_str_equal(machine->host_model, "passthrough")) {
-+            /* -M host-model=3Dpassthrough */
-+            if (kvmppc_get_host_model(&buf)) {
-+                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-+                g_free(buf);
-+            }
-+        } else {
-+            /* -M host-model=3D<user-string> */
-+            _FDT(fdt_setprop_string(fdt, 0, "host-model", machine->host_=
-model));
-+        }
-     }
--    if (kvmppc_get_host_serial(&buf)) {
--        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
--        g_free(buf);
-+
-+    if (machine->host_serial && !g_str_equal(machine->host_serial, "none=
-")) {
-+        if (g_str_equal(machine->host_serial, "passthrough")) {
-+            /* -M host-serial=3Dpassthrough */
-+            if (kvmppc_get_host_serial(&buf)) {
-+                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-+                g_free(buf);
-+            }
-+        } else {
-+            /* -M host-serial=3D<user-string> */
-+            _FDT(fdt_setprop_string(fdt, 0,
-+                                    "host-serial", machine->host_serial)=
-);
-+        }
-     }
-=20
-     buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-@@ -4080,9 +4098,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
- static void spapr_machine_3_1_class_options(MachineClass *mc)
- {
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+    static GlobalProperty compat[] =3D {
-+        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-+        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-+    };
-=20
-     spapr_machine_4_0_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
-;
-+    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled =3D false;
- }
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 02f114085f..3e63dc4501 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -257,6 +257,8 @@ struct MachineState {
-     bool enforce_config_section;
-     bool enable_graphics;
-     char *memory_encryption;
-+    char *host_serial;
-+    char *host_model;
-     DeviceMemoryState *device_memory;
-=20
-     ram_addr_t ram_size;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 521511ec13..67ac1a9959 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -43,7 +43,9 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                suppress-vmdesc=3Don|off disables self-describing m=
-igration (default=3Doff)\n"
-     "                nvdimm=3Don|off controls NVDIMM support (default=3D=
-off)\n"
-     "                enforce-config-section=3Don|off enforce configurati=
-on section migration (default=3Doff)\n"
--    "                memory-encryption=3D@var{} memory encryption object=
- to use (default=3Dnone)\n",
-+    "                memory-encryption=3D@var{} memory encryption object=
- to use (default=3Dnone)\n"
-+    "                host-serial=3Dnone|passthrough|string controls host=
- systemd-id (default=3Dpassthrough)\n"
-+    "                host-model=3Dnone|passthrough|string controls host =
-model-id (default=3Dpassthrough)\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -machine [type=3D]@var{name}[,prop=3D@var{value}[,...]]
-@@ -103,6 +105,12 @@ NOTE: this parameter is deprecated. Please use @opti=
-on{-global}
- @option{migration.send-configuration}=3D@var{on|off} instead.
- @item memory-encryption=3D@var{}
- Memory encryption object to use. The default is none.
-+@item host-serial=3Dnone|passthrough|string
-+Pass 'system-id' parameter from host's device-tree to a guest. A user ma=
-y
-+disable it with 'none' or define a custom string for a guest.
-+@item host-model=3Dnone|passthrough|string
-+Pass 'model' paramter from host's device-tree to a guest. A user may dis=
-able
-+it with 'none' or define a custom string for a guest.
- @end table
- ETEXI
-=20
-diff --git a/util/qemu-config.c b/util/qemu-config.c
-index 9d2e278e29..86483ded34 100644
---- a/util/qemu-config.c
-+++ b/util/qemu-config.c
-@@ -238,6 +238,14 @@ static QemuOptsList machine_opts =3D {
-             .help =3D "Up to 8 chars in set of [A-Za-z0-9. ](lower case =
-chars"
-                     " converted to upper case) to pass to machine"
-                     " loader, boot manager, and guest kernel",
-+        },{
-+            .name =3D "host-serial",
-+            .type =3D QEMU_OPT_STRING,
-+            .help =3D "host's system-id seen by guest",
-+        },{
-+            .name =3D "host-model",
-+            .type =3D QEMU_OPT_STRING,
-+            .help =3D "host's model-id seen by guest",
-         },
-         { /* End of list */ }
-     }
---=20
-2.20.1
+On 2/11/19 10:03 AM, Liam Merwick wrote:
+> cppcheck reports:
+>
+> [hw/tpm/tpm_tis.c:113]: (warning) %d in format string (no. 2) requires 'int' but the argument type is 'unsigned int'
+>
+> Fix this by using %u instead of %d
+>
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+> ---
+>   hw/tpm/tpm_tis.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 860c2ace7d99..395500e8a61d 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -110,7 +110,7 @@ static void tpm_tis_show_buffer(const unsigned char *buffer,
+>       uint32_t len, i;
+>   
+>       len = MIN(tpm_cmd_get_size(buffer), buffer_size);
+> -    printf("tpm_tis: %s length = %d\n", string, len);
+> +    printf("tpm_tis: %s length = %u\n", string, len);
+>       for (i = 0; i < len; i++) {
+>           if (i && !(i % 16)) {
+>               printf("\n");
