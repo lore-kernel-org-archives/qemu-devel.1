@@ -1,25 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gtSSE-0006M0-SH
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:26:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1gtSSK-0006M0-G7
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gtSHR-0003GH-8H
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:14:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36446)
+	(envelope-from <armbru@redhat.com>) id 1gtSFm-0001vA-11
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:13:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gtSHQ-0003F3-VT
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:14:57 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gtSFl-0001s5-IF
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:13:13 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <154935478086.7509.4349987292919289245.stgit@pasha-VirtualBox>
-	<002301d4c207$27d88d50$7789a7f0$@ru>
-Date: Tue, 12 Feb 2019 08:14:49 +0100
-In-Reply-To: <002301d4c207$27d88d50$7789a7f0$@ru> (Pavel Dovgalyuk's message
-	of "Mon, 11 Feb 2019 15:41:47 +0300")
-Message-ID: <87y36lpjfa.fsf@dusky.pond.sub.org>
+References: <20190131202637.4062-1-jusual@mail.ru>
+	<87lg2zj2f2.fsf@dusky.pond.sub.org>
+	<d10b10d5-0600-515b-66d7-e6f448f42ced@mail.ru>
+Date: Tue, 12 Feb 2019 08:13:03 +0100
+In-Reply-To: <d10b10d5-0600-515b-66d7-e6f448f42ced@mail.ru> (Julia Suvorova
+	via Qemu-devel's message of "Mon, 11 Feb 2019 18:42:24 +0300")
+Message-ID: <8736otqy2o.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v12 00/25] Fixing record/replay and adding
- reverse debugging
+Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,11 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org>
+Cc: Julia Suvorova <jusual@mail.ru>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?utf-8?Q?G=C3=B6rtz?= <contrib@steffen-goertz.de>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
 
-"Pavel Dovgalyuk" <dovgaluk@ispras.ru> writes:
+Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org> writes:
 
-> Ping?
+> On 01.02.2019 12:14, Markus Armbruster wrote:
+>> Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org> writes:
+>>
+>>> The whitelist option allows to run a reduced monitor with a subset of
+>>> QMP commands. This allows the monitor to run in secure mode, which is
+>>
+>> For a value of "secure".  I'm not saying this can't be useful, just
+>> tempering expecations.  I guess you intend to use this to restrict the
+>> monitor to sufficiently harmless commands, such as commands that merely
+>> return information without changing anything.  However, even such
+>> commands can be abused for denial of service.  Whether that's an issue
+>> depends on your use case.
+>>
+>>> convenient for sending commands via the WebSocket monitor using the
+>>> web UI. This is planned to be done on micro:bit board.
+>>>
+>>> The list of allowed commands should be written to a file, one per line.
+>>> The command line will look like this:
+>>>      -mon chardev_name,mode=control,whitelist=path_to_file
+>>>
+>>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>>
+>> Please describe your intended use case in more detail, and provide at
+>> least a rough security analysis that includes the denial of service
+>> aspect.
+>
+> It is planned to use the web interface for micro:bit board, e.g. send a
+> button press as a QMP command and send a LED display changing as a QMP
+> event, and send them via WebSocket protocol from QEMU to a web page.
+> The monitor will also send commands from some other sensors, for
+> example, an accelerometer/magnetometer. Therefore, it is convenient to
+> limit the monitor so that it can send only these commands of
+> buttons/sensors.
 
-Are you pinging for more review, or for someone to merge this?
+Covers "describe your intended use case" nicely, thanks.  Still missing:
+"a rough security analysis that includes the denial of service aspect".
+Here are two questions to help you get started.  Is "the web interface"
+trusted?  If not, what if it floods QEMU with button presses?
