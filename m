@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56550)
+Received: from eggs.gnu.org ([209.51.188.92]:56880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtXhF-0007Or-4R
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:02:02 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gtXi6-0007kK-56
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:02:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtXhD-0001Kl-HA
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:01:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47986)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gtXhC-0000sT-SP
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:01:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gtXgg-0000nF-VW
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 13:01:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5F1DA2E80CE
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 13:01:22 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gtXi4-0002gP-J2
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:02:49 -0500
+Received: from mail-oln040092000046.outbound.protection.outlook.com
+	([40.92.0.46]:31874
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1gtXi4-0002WQ-3v
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:02:48 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Tue, 12 Feb 2019 13:02:42 +0000
+Message-ID: <RO1P152MB1483088A66FD63B63FD7279A97650@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Feb 2019 12:49:04 -0000
-From: Ali Sag <1808928@bugs.launchpad.net>
-Reply-To: Bug 1808928 <1808928@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154511858636.8591.3431958243733477284.malonedeb@gac.canonical.com>
-Message-Id: <154997574457.19600.14556342326906073783.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1808928] Re: Bitmap Extra data is not supported
+Content-ID: <5681F61CA5BB294ABA076C42349E0FB6@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] Key repeat is no longer working on TTY and grub menu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-as far as i know nothing happened. it had worked normally while instance
-was running. For a reason, instance is shutdown, then it never open
-again. i have some backups, i tried to return previous backups. But they
-also gave same error. Thanks to replication i could get it back. i
-copied image from replication site...
-
-as i said "qemu-img" command completely unusable on that image. =
-
-There should be another mechanism. It blocks everything. =
-
-I try to edit header to remove extra data. But i could not find header info=
-rmation on website. =
-
-
-thanks
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1808928
-
-Title:
-  Bitmap Extra data is not supported
-
-Status in QEMU:
-  New
-
-Bug description:
-  i am using dirty bitmaps and drive-backup. It works as aspected.
-
-  Lately, i encounter a disastrous error. There is not any information
-  about that situation. I cannot reach/open/attach/info or anything with
-  a qcow2 file.
-
-  virsh version
-  Compiled against library: libvirt 4.10.0
-  Using library: libvirt 4.10.0
-  Using API: QEMU 4.10.0
-  Running hypervisor: QEMU 2.12.0
-
-  "qemu-img: Could not open '/var/lib/libvirt/images/test.qcow2': Bitmap
-  extra data is not supported"
-
-  what is that mean? what should i do?
-  i cannot remove bitmap. i cannot open image or query.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1808928/+subscriptions
+SSBub3RpY2VkIHRoYXQgdGhlIGtleSBpbnB1dHMgYXJlIG5vIGxvbmdlciByZXBlYXRpbmcgd2hl
+biB1c2luZyBkZWZhdWx0DQpzZXR0aW5nIG9uIFFFTVUuIEZvciBleGFtcGxlLCBpZiBJIHByZXNz
+ICJhIiBhbmQga2VlcCBpdCBwcmVzc2VkIGl0IHdpbGwNCnByaW50IG9ubHkgb25lICJhIiBpbnN0
+ZWFkIG9mIHJlcGVhdGluZyB0aGVtLiBBbm90aGVyIGV4YW1wbGUgaXMgd2hlbg0KZGVsZXRpbmcg
+dGV4dDogaW5zdGVhZCBvZiBob2xkaW5nIGJhY2tzcGFjZSBwcmVzc2VkIGFuZCB0aGUgdGV4dCBp
+cw0KZGVsZXRlZCwgaXQncyBuZWVkZWQgdG8gcHJlc3MgYmFja3NwYWNlIG9uY2UgZm9yIGVhY2gg
+Y2hhcmFjdGVyLg0KDQpBcyB0aGlzIG1ha2VzIG1hbnkgdGFza3MgbXVjaCBzbG93ZXIsIHJlcXVp
+cmluZyBtYW55IGtleSBwcmVzc2VzIGZvcg0KdGFza3MgdGhhdCB3ZXJlIGRvbmUgaW4gYSBzaW5n
+bGUgcHJlc3MsIEkgZGlkIGEgYmlzZWN0IHRvIHNlZSB3aGVuIHRoaXMNCmNoYW5nZSBoYXBwZW5l
+ZC4gVGhlIHJlc3VsdCBpczoNCg0KMGMwZDQyNzM3ZGZkY2VhODcyYTk4N2VjYmE2ZWY1NTA0N2Rm
+ODg4MSBpcyB0aGUgZmlyc3QgYmFkIGNvbW1pdA0KY29tbWl0IDBjMGQ0MjczN2RmZGNlYTg3MmE5
+ODdlY2JhNmVmNTUwNDdkZjg4ODENCkF1dGhvcjogR2VyZCBIb2ZmbWFubiA8a3JheGVsQHJlZGhh
+dC5jb20+DQpEYXRlOiAgIFR1ZSBKYW4gMjIgMTA6Mjg6MTEgMjAxOSArMDEwMA0KDQogICAga2Jk
+LXN0YXRlOiB1c2Ugc3RhdGUgdHJhY2tlciBmb3IgZ3RrDQoNCiAgICBVc2UgdGhlIG5ldyBrZXli
+b2FyZCBzdGF0ZSB0cmFja2VkIGZvciBndGsuICBBbGxvd3MgdG8gZHJvcCB0aGUNCiAgICBndGst
+c3BlY2lmaWMgbW9kaWZpZXIgc3RhdGUgdHJhY2tpbmcgY29kZS4NCg0KICAgIFNpZ25lZC1vZmYt
+Ynk6IEdlcmQgSG9mZm1hbm4gPGtyYXhlbEByZWRoYXQuY29tPg0KICAgIFJldmlld2VkLWJ5OiBE
+YW5pZWwgUC4gQmVycmFuZ8OpIDxiZXJyYW5nZUByZWRoYXQuY29tPg0KICAgIE1lc3NhZ2UtaWQ6
+IDIwMTkwMTIyMDkyODE0LjE0OTE5LTYta3JheGVsQHJlZGhhdC5jb20NCg0KOjA0MDAwMCAwNDAw
+MDAgZTg4MmYxNDRiYWZjYTkwMjU3YTQ2MDRiNWU2MjQ4NmExY2EwMzhiMg0KMDEzOWFmZTFhZWUy
+NDI1NmMzZjcxMWMwODBiMDIzMGFiMTA0MDc0YSBNCWluY2x1ZGUNCjowNDAwMDAgMDQwMDAwIGMy
+NThlZmMwNjEwN2I5NDRiMDYyNzc5MmI5ZjIzNzc2MDAwMzMxMTgNCjRmZDAxYTI1YTNlMGQxZmNj
+Y2E3MmMzNWVjNThiMjA1YWE0ZmQ4ODIgTQl1aQ0KDQpJJ20gdXNpbmcgdGhlIEdUSyBpbnRlcmZh
+Y2UgYW5kIGFsbCBndWVzdHMgd2l0aG91dCBhIEdyYXBoaWNhbCBVc2VyDQpJbnRlcmZhY2UgKEdV
+SSkgYXJlIGFmZmVjdGVkIGJ5IHRoaXMuIFRoaXMgaGFwcGVucyBvbiBncnViIG1lbnUgYW5kIG9u
+DQpUVFkgb2YgbXVsdGlwbGUgTGludXggZ3Vlc3RzLg0KDQpXb3JrYXJvdW5kcyBmb3VuZCBmb3Ig
+dGhlIGtleSByZXBlYXQgaXNzdWU6DQoNCi1JbnN0YWxsaW5nIGEgR1VJIHRvIHNlcnZlciBzeXN0
+ZW1zOw0KLUFkZGluZyBhIHVzYi1rYmQgZGV2aWNlLCBidXQgdGhlbiB0aGUga2V5ICcvJyBpcyBs
+b3N0Lg0K
