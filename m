@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37094)
+Received: from eggs.gnu.org ([209.51.188.92]:37374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtWA0-00051Y-Jx
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:23:33 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtWAi-0005Yq-BU
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:24:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtW9z-0003SO-K8
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:23:32 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 12 Feb 2019 12:23:23 +0100
-Message-Id: <20190212112323.15904-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] s390x: add zPCI feature to "qemu" CPU model
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtWAV-00049z-Ly
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:24:08 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:50098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gtWAQ-00041g-Ue
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:23:59 -0500
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Date: Tue, 12 Feb 2019 13:23:47 +0200
+Message-Id: <20190212112347.1605-1-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH] contrib/rdmacm-mux: Fix out-of-bounds risk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,75 +22,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, sam.j.smith@oracle.com, richard.b.johnson@oracle.com
 
-As we now always have PCI support, let's add it to the "qemu" CPU model,
-taking care of backwards compatibility.
+The function get_fd extract context from the received MAD message and
+uses it as a key to fetch the destination fd from the mapping table.
+A context can be dgid in case of CM request message or comm_id in case
+of CM SIDR response message.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+When MAD message with a smaller size as expected for the message type
+received we are hitting out-of-bounds where we are looking for the
+context out of message boundaries.
+
+Fix it by validating the message size.
+
+Reported-by Sam Smith <sam.j.smith@oracle.com>
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
+ contrib/rdmacm-mux/main.c | 35 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
 
-v1 -> v2:
-- Use correct model identifiction of the z12 we emulate
-
- hw/s390x/s390-virtio-ccw.c  | 3 +++
- target/s390x/gen-features.c | 8 ++++++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 3fb5c88af9..1a3414b642 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -657,7 +657,10 @@ DEFINE_CCW_MACHINE(4_0, "4.0", true);
- 
- static void ccw_machine_3_1_instance_options(MachineState *machine)
- {
-+    static const S390FeatInit qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V3_1 };
-     ccw_machine_4_0_instance_options(machine);
-+
-+    s390_set_qemu_cpu_model(0x2827, 12, 2, qemu_cpu_feat);
+diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+index ae88c77a1e..21cc804367 100644
+--- a/contrib/rdmacm-mux/main.c
++++ b/contrib/rdmacm-mux/main.c
+@@ -300,7 +300,7 @@ static void hash_tbl_remove_fd_ifid_pair(int fd)
+     pthread_rwlock_unlock(&server.lock);
  }
  
- static void ccw_machine_3_1_class_options(MachineClass *mc)
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index b0e9b271e2..19bb8ac7f8 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -560,7 +560,7 @@ static uint16_t qemu_V2_11[] = {
-     S390_FEAT_ZARCH,
- };
+-static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
++static int get_fd(const char *mad, int umad_len, int *fd, __be64 *gid_ifid)
+ {
+     struct umad_hdr *hdr = (struct umad_hdr *)mad;
+     char *data = (char *)hdr + sizeof(*hdr);
+@@ -308,13 +308,35 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+     uint16_t attr_id = be16toh(hdr->attr_id);
+     int rc = 0;
  
--static uint16_t qemu_LATEST[] = {
-+static uint16_t qemu_V3_1[] = {
-     S390_FEAT_DAT_ENH,
-     S390_FEAT_IDTE_SEGMENT,
-     S390_FEAT_STFLE,
-@@ -592,13 +592,16 @@ static uint16_t qemu_LATEST[] = {
-     S390_FEAT_MSA_EXT_4,
- };
- 
-+static uint16_t qemu_LATEST[] = {
-+    S390_FEAT_ZPCI,
-+};
++    if (umad_len <= sizeof(*hdr)) {
++        rc = -EINVAL;
++        syslog(LOG_DEBUG, "Ignoring MAD packets with header only\n");
++        goto out;
++    }
 +
- /* add all new definitions before this point */
- static uint16_t qemu_MAX[] = {
-     /* z13+ features */
-     S390_FEAT_STFLE_53,
-     /* generates a dependency warning, leave it out for now */
-     S390_FEAT_MSA_EXT_5,
--    S390_FEAT_ZPCI,
- };
+     switch (attr_id) {
+     case UMAD_CM_ATTR_REQ:
++        if (unlikely(umad_len < sizeof(*hdr) + CM_REQ_DGID_POS +
++            sizeof(*gid_ifid))) {
++            rc = -EINVAL;
++            syslog(LOG_WARNING,
++                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
++                    attr_id);
++            goto out;
++        }
+         memcpy(gid_ifid, data + CM_REQ_DGID_POS, sizeof(*gid_ifid));
+         rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
+         break;
  
- /****** END FEATURE DEFS ******/
-@@ -708,6 +711,7 @@ static FeatGroupDefSpec FeatGroupDef[] = {
-  *******************************/
- static FeatGroupDefSpec QemuFeatDef[] = {
-     QEMU_FEAT_INITIALIZER(V2_11),
-+    QEMU_FEAT_INITIALIZER(V3_1),
-     QEMU_FEAT_INITIALIZER(LATEST),
-     QEMU_FEAT_INITIALIZER(MAX),
- };
+     case UMAD_CM_ATTR_SIDR_REQ:
++        if (unlikely(umad_len < sizeof(*hdr) + CM_SIDR_REQ_DGID_POS +
++            sizeof(*gid_ifid))) {
++            rc = -EINVAL;
++            syslog(LOG_WARNING,
++                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
++                    attr_id);
++            goto out;
++        }
+         memcpy(gid_ifid, data + CM_SIDR_REQ_DGID_POS, sizeof(*gid_ifid));
+         rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
+         break;
+@@ -331,6 +353,13 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+         data += sizeof(comm_id);
+         /* Fall through */
+     case UMAD_CM_ATTR_SIDR_REP:
++        if (unlikely(umad_len < sizeof(*hdr) + sizeof(comm_id))) {
++            rc = -EINVAL;
++            syslog(LOG_WARNING,
++                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
++                   attr_id);
++            goto out;
++        }
+         memcpy(&comm_id, data, sizeof(comm_id));
+         if (comm_id) {
+             rc = hash_tbl_search_fd_by_comm_id(comm_id, fd, gid_ifid);
+@@ -344,6 +373,7 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+ 
+     syslog(LOG_DEBUG, "mad_to_vm: %d 0x%x 0x%x\n", *fd, attr_id, comm_id);
+ 
++out:
+     return rc;
+ }
+ 
+@@ -372,7 +402,8 @@ static void *umad_recv_thread_func(void *args)
+         } while (rc && server.run);
+ 
+         if (server.run) {
+-            rc = get_fd(msg.umad.mad, &fd, &msg.hdr.sgid.global.interface_id);
++            rc = get_fd(msg.umad.mad, msg.umad_len, &fd,
++                        &msg.hdr.sgid.global.interface_id);
+             if (rc) {
+                 continue;
+             }
 -- 
 2.17.2
