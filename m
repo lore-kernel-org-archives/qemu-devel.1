@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35524)
+Received: from eggs.gnu.org ([209.51.188.92]:35737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtb2U-00059p-G1
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:36:08 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtb2V-0005PF-6k
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtash-0001Gp-8D
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:26:01 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:39476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gtasg-0001EZ-Sl
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:25:59 -0500
-Message-ID: <87444301667aa0ec379a0a6285ce55b63b3f2ed6.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Tue, 12 Feb 2019 17:25:46 +0100
-In-Reply-To: <20190212085921.3e25a2cb@x1.home>
-References: <cover.d651a232d750c6f53cbe8d483b665d638f7a0c0a.1549779509.git-series.knut.omang@oracle.com>
-	<636bd37834daa1cc4c42462aeccd0de17aa370bf.1549779509.git-series.knut.omang@oracle.com>
-	<20190211160910.2be92b59@w520.home>
-	<11bd769693e64619e3b1386797255b5a8e56bfd4.camel@oracle.com>
-	<20190212085921.3e25a2cb@x1.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtasW-0000y8-78
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:25:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gtasU-0000bJ-3e
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:25:46 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 12 Feb 2019 17:25:21 +0100
+Message-Id: <20190212162524.31504-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20190212162524.31504-1-marcandre.lureau@redhat.com>
+References: <20190212162524.31504-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 4/7] slirp: move sources to src/ subdirectory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,270 +27,476 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, peter.maydell@linaro.org
 
-On Tue, 2019-02-12 at 08:59 -0700, Alex Williamson wrote:
-> On Tue, 12 Feb 2019 09:07:43 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > On Mon, 2019-02-11 at 16:09 -0700, Alex Williamson wrote:
-> > > On Sun, 10 Feb 2019 07:52:59 +0100
-> > > Knut Omang <knut.omang@oracle.com> wrote:
-> > >   
-> > > > Add a helper function to add PCIe capability for Access Control Services
-> > > > (ACS)
-> > > > ACS support in the associated root port is a prerequisite to be able to
-> > > > do
-> > > > passthrough of individual functions of a device with VFIO
-> > > > without Alex Williamson's pcie_acs_override kernel patch or similar
-> > > > in the guest.  
-> > > 
-> > > This is still incorrect, the ACS override patch is only required for
-> > > separating multifunction endpoints or multifunction root ports.  Single
-> > > function endpoints are assignable without ACS simply by placing them
-> > > downstream of a single function root port or directly on the root
-> > > complex.  
-> > 
-> > Hmm - that was the intended meaning of the comment, but I'll see if I can
-> > make
-> > it more clear by saying it explicitly.
-> 
-> "ACS support... is a prerequisite".  Prerequisite: a thing that is
-> required as a prior condition for something else to happen or exist.
-> 
-> Assignment of individual functions exists today, as is, by using QEMU
-> to define a PCIe topology that allows the desired grouping.  The code
-> here enables specific topologies, it is clearly not a prerequisite.
-> 
-> > > > Endpoints may also implement an ACS capability, but with
-> > > > limited features.
-> > > > 
-> > > > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > > > ---
-> > > >  hw/pci/pcie.c              | 29 +++++++++++++++++++++++++++++
-> > > >  include/hw/pci/pcie.h      |  6 ++++++
-> > > >  include/hw/pci/pcie_regs.h |  4 ++++
-> > > >  3 files changed, 39 insertions(+)
-> > > > 
-> > > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > > > index 230478f..509632f 100644
-> > > > --- a/hw/pci/pcie.c
-> > > > +++ b/hw/pci/pcie.c
-> > > > @@ -742,6 +742,14 @@ bool pcie_cap_is_arifwd_enabled(const PCIDevice
-> > > > *dev)
-> > > >          PCI_EXP_DEVCTL2_ARI;
-> > > >  }
-> > > >  
-> > > > +/* Access Control Services (ACS) */
-> > > > +void pcie_cap_acs_reset(PCIDevice *dev)
-> > > > +{
-> > > > +    if (dev->exp.acs_cap) {
-> > > > +        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
-> > > > +    }
-> > > > +}
-> > > > +
-> > > >  /**********************************************************************
-> > > > ****
-> > > >   * pci express extended capability list management functions
-> > > >   * uint16_t ext_cap_id (16 bit)
-> > > > @@ -906,3 +914,24 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
-> > > >  
-> > > >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
-> > > >  }
-> > > > +
-> > > > +/* ACS (Access Control Services) */
-> > > > +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
-> > > > +{
-> > > > +    bool is_pcie_slot = !!object_dynamic_cast(OBJECT(dev),
-> > > > TYPE_PCIE_SLOT);
-> > > > +    uint16_t cap_bits = 0;
-> > > > +
-> > > > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
-> > > > +                        PCI_ACS_SIZEOF);
-> > > > +    dev->exp.acs_cap = offset;
-> > > > +
-> > > > +    if (is_pcie_slot) {
-> > > > +        /* Endpoints may also implement ACS, but these capabilities are
-> > > > */
-> > > > +        /* only valid for slots: */  
-> > > 
-> > > Not quite, SV, TB, and UF must not be implemented by endpoints, but RR
-> > > and CR must be implemented by multifunction endpoints that support p2p
-> > > if they provide an ACS capability.    
-> > 
-> > Hmm - are you ok with setting 0 here as I have done, just amending your 
-> > description to the comment? Then any future emulation that do support p2p 
-> > would have to set the needed bits after calling the init function.
-> 
-> The comment definitely needs work, but I don't know what to do about
-> single function, non-SR-IOV capable devices calling into this.  
+Prepare for making slirp/ a standalone project.
 
-I agree - I have only been thinking about multifunction devices, I should 
-probably assert on not multifunction (or SR/IOV with my SR/IOV patch set) 
-to avoid misuse.
+Remove some useless includes while at it.
 
-And what about someone passing a PF for SR/IOV through to a VM - 
-Has that use case showed up (yet) ? 
-I have so far only tested with my emulated SR/IOV.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ slirp/{ =3D> src}/bootp.h      |  0
+ slirp/{ =3D> src}/debug.h      |  0
+ slirp/{ =3D> src}/dhcpv6.h     |  0
+ slirp/{ =3D> src}/if.h         |  0
+ slirp/{ =3D> src}/ip.h         |  0
+ slirp/{ =3D> src}/ip6.h        |  0
+ slirp/{ =3D> src}/ip6_icmp.h   |  0
+ slirp/{ =3D> src}/ip_icmp.h    |  0
+ slirp/{ =3D> src}/libslirp.h   |  0
+ slirp/{ =3D> src}/main.h       |  0
+ slirp/{ =3D> src}/mbuf.h       |  0
+ slirp/{ =3D> src}/misc.h       |  0
+ slirp/{ =3D> src}/ncsi-pkt.h   |  0
+ slirp/{ =3D> src}/qtailq.h     |  0
+ slirp/{ =3D> src}/sbuf.h       |  0
+ slirp/{ =3D> src}/slirp.h      |  0
+ slirp/{ =3D> src}/socket.h     |  0
+ slirp/{ =3D> src}/state.h      |  0
+ slirp/{ =3D> src}/stream.h     |  0
+ slirp/{ =3D> src}/tcp.h        |  0
+ slirp/{ =3D> src}/tcp_timer.h  |  0
+ slirp/{ =3D> src}/tcp_var.h    |  0
+ slirp/{ =3D> src}/tcpip.h      |  0
+ slirp/{ =3D> src}/tftp.h       |  0
+ slirp/{ =3D> src}/udp.h        |  0
+ slirp/{ =3D> src}/util.h       |  0
+ slirp/{ =3D> src}/vmstate.h    |  0
+ net/slirp.c                  |  2 +-
+ slirp/{ =3D> src}/arp_table.c  |  0
+ slirp/{ =3D> src}/bootp.c      |  0
+ slirp/{ =3D> src}/cksum.c      |  0
+ slirp/{ =3D> src}/dhcpv6.c     |  0
+ slirp/{ =3D> src}/dnssearch.c  |  0
+ slirp/{ =3D> src}/if.c         |  0
+ slirp/{ =3D> src}/ip6_icmp.c   |  0
+ slirp/{ =3D> src}/ip6_input.c  |  0
+ slirp/{ =3D> src}/ip6_output.c |  0
+ slirp/{ =3D> src}/ip_icmp.c    |  0
+ slirp/{ =3D> src}/ip_input.c   |  0
+ slirp/{ =3D> src}/ip_output.c  |  0
+ slirp/{ =3D> src}/mbuf.c       |  0
+ slirp/{ =3D> src}/misc.c       |  0
+ slirp/{ =3D> src}/ncsi.c       |  0
+ slirp/{ =3D> src}/ndp_table.c  |  0
+ slirp/{ =3D> src}/sbuf.c       |  0
+ slirp/{ =3D> src}/slirp.c      |  0
+ slirp/{ =3D> src}/socket.c     |  0
+ slirp/{ =3D> src}/state.c      |  0
+ slirp/{ =3D> src}/stream.c     |  0
+ slirp/{ =3D> src}/tcp_input.c  |  0
+ slirp/{ =3D> src}/tcp_output.c |  0
+ slirp/{ =3D> src}/tcp_subr.c   |  0
+ slirp/{ =3D> src}/tcp_timer.c  |  0
+ slirp/{ =3D> src}/tftp.c       |  0
+ slirp/{ =3D> src}/udp.c        |  0
+ slirp/{ =3D> src}/udp6.c       |  0
+ slirp/{ =3D> src}/util.c       |  0
+ slirp/{ =3D> src}/vmstate.c    |  0
+ util/main-loop.c             |  2 --
+ vl.c                         |  3 --
+ slirp/Makefile.objs          | 60 ++++++++++++++++++------------------
+ 61 files changed, 31 insertions(+), 36 deletions(-)
+ rename slirp/{ =3D> src}/bootp.h (100%)
+ rename slirp/{ =3D> src}/debug.h (100%)
+ rename slirp/{ =3D> src}/dhcpv6.h (100%)
+ rename slirp/{ =3D> src}/if.h (100%)
+ rename slirp/{ =3D> src}/ip.h (100%)
+ rename slirp/{ =3D> src}/ip6.h (100%)
+ rename slirp/{ =3D> src}/ip6_icmp.h (100%)
+ rename slirp/{ =3D> src}/ip_icmp.h (100%)
+ rename slirp/{ =3D> src}/libslirp.h (100%)
+ rename slirp/{ =3D> src}/main.h (100%)
+ rename slirp/{ =3D> src}/mbuf.h (100%)
+ rename slirp/{ =3D> src}/misc.h (100%)
+ rename slirp/{ =3D> src}/ncsi-pkt.h (100%)
+ rename slirp/{ =3D> src}/qtailq.h (100%)
+ rename slirp/{ =3D> src}/sbuf.h (100%)
+ rename slirp/{ =3D> src}/slirp.h (100%)
+ rename slirp/{ =3D> src}/socket.h (100%)
+ rename slirp/{ =3D> src}/state.h (100%)
+ rename slirp/{ =3D> src}/stream.h (100%)
+ rename slirp/{ =3D> src}/tcp.h (100%)
+ rename slirp/{ =3D> src}/tcp_timer.h (100%)
+ rename slirp/{ =3D> src}/tcp_var.h (100%)
+ rename slirp/{ =3D> src}/tcpip.h (100%)
+ rename slirp/{ =3D> src}/tftp.h (100%)
+ rename slirp/{ =3D> src}/udp.h (100%)
+ rename slirp/{ =3D> src}/util.h (100%)
+ rename slirp/{ =3D> src}/vmstate.h (100%)
+ rename slirp/{ =3D> src}/arp_table.c (100%)
+ rename slirp/{ =3D> src}/bootp.c (100%)
+ rename slirp/{ =3D> src}/cksum.c (100%)
+ rename slirp/{ =3D> src}/dhcpv6.c (100%)
+ rename slirp/{ =3D> src}/dnssearch.c (100%)
+ rename slirp/{ =3D> src}/if.c (100%)
+ rename slirp/{ =3D> src}/ip6_icmp.c (100%)
+ rename slirp/{ =3D> src}/ip6_input.c (100%)
+ rename slirp/{ =3D> src}/ip6_output.c (100%)
+ rename slirp/{ =3D> src}/ip_icmp.c (100%)
+ rename slirp/{ =3D> src}/ip_input.c (100%)
+ rename slirp/{ =3D> src}/ip_output.c (100%)
+ rename slirp/{ =3D> src}/mbuf.c (100%)
+ rename slirp/{ =3D> src}/misc.c (100%)
+ rename slirp/{ =3D> src}/ncsi.c (100%)
+ rename slirp/{ =3D> src}/ndp_table.c (100%)
+ rename slirp/{ =3D> src}/sbuf.c (100%)
+ rename slirp/{ =3D> src}/slirp.c (100%)
+ rename slirp/{ =3D> src}/socket.c (100%)
+ rename slirp/{ =3D> src}/state.c (100%)
+ rename slirp/{ =3D> src}/stream.c (100%)
+ rename slirp/{ =3D> src}/tcp_input.c (100%)
+ rename slirp/{ =3D> src}/tcp_output.c (100%)
+ rename slirp/{ =3D> src}/tcp_subr.c (100%)
+ rename slirp/{ =3D> src}/tcp_timer.c (100%)
+ rename slirp/{ =3D> src}/tftp.c (100%)
+ rename slirp/{ =3D> src}/udp.c (100%)
+ rename slirp/{ =3D> src}/udp6.c (100%)
+ rename slirp/{ =3D> src}/util.c (100%)
+ rename slirp/{ =3D> src}/vmstate.c (100%)
 
-> Per the
-> spec, these devices cannot implement an ACS capability at all, but will
-> anyone care if they do?  Maybe endpoints need a different init
-> function.  Maybe the capability ID needs to be obscured until
-> additional functions or an SR-IOV capability are added.  I'm not really
-> concerned that this helper can only indicate lack of p2p between
-> functions for endpoints, other than the comments being wrong.
-
-Ok, I think I am in the clear then with my v4 comment :-)
-
-> > After your previous comments on this, I had a look at Mellanox CX4 and CX5
-> > which
-> > are the only devices I could find in the lab that are endpoints and
-> > implement an
-> > ACS capability, and neither seems to implement any extra capabilities:
-> > 
-> >         Capabilities: [230 v1] Access Control Services
-> >                 ACSCap: SrcValid- TransBlk- ReqRedir- CmpltRedir-
-> > UpstreamFwd- EgressCtrl- DirectTrans-
-> >                 ACSCtl: SrcValid- TransBlk- ReqRedir- CmpltRedir-
-> > UpstreamFwd- EgressCtrl- DirectTrans-
-> > 
-> > that was the reason for my choice of value here - after skimming through the
-> > spec (with my still very limited understanding of the details)
-> 
-> If the above device is a multifunction device or SR-IOV capable device,
-> this is the correct way to indicate there is no p2p between functions.
-> This takes advantage of the wording in the spec that certain
-> capabilities must be implemented by functions that support p2p
-> traffic.  Therefore if the capability is not implemented then p2p is
-> not supported and requires no control.
-
-I see, that makes sense, and corresponds with the way the device I know best 
-worked.
-
-> > > Linux therefore infers that if ACS
-> > > is supported by an endpoint and RR and CR are not implemented, the
-> > > device does not support p2p.    
-> > 
-> > Interesting - I thought the CX5 supported p2p, but I have not kept up with
-> > what
-> > happens on the RDMA list on that front.
-> 
-> ACS can only indicate p2p capabilities within the device reporting it.
-> The above example indicates that the device does not do p2p internally
-> between functions.  It does not preclude p2p between devices or even
-> functions, but it does require that the p2p traffic occurs on the link
-> and therefore allows routing to be managed through the ACS capabilities
-> of the interconnect components.
-> 
-> For instance if we have a multifunction endpoint with the above
-> capability, we know that a DMA from function 1 targeting an address
-> range on function 0 will not complete the DMA internally, it will go
-> through the egress port to the downstream port above the endpoint.  The
-> ACS capability on that downstream port then controls whether that DMA
-> request is redirected back to the ingress port of the endpoint or
-> forwarded upstream.  If a redirect occurs here then the IOMMU is not
-> fully in control of the IOVA space of the device and the IOMMU group is
-> extended to indicate this.
-
-Thanks, this definitely clarifies!
-
-> > > We could just say that nothing supports
-> > > p2p yet, but single function endpoints (except those implementing
-> > > SR-IOV) must not implement an ACS capability per the spec, which could
-> > > be difficult to exclude since the multifunction bit is handled
-> > > separately from the device model.  
-> > 
-> > Hmm - the older SR/IOV devices I know of, some Intel Ethernet devices and
-> > any of
-> > the older Mellanox devices, and our own cancelled Infiniband device, all
-> > seem
-> > not to implement ACS?
-> 
-> Linux effectively assumes that there is no p2p between VFs or between
-> the PF and VF, so the result is that a multifunction endpoint without
-> ACS supporting SR-IOV would have the PFs grouped together, but the VFs
-> would be grouped individually, assuming the upstream topology provides
-> isolation.  Intel has since provided verification that nearly none of
-> their multi-port NICs implement internal p2p and they now use quirks to
-> provide the ACS equivalent information for grouping for those older
-> devices.  Newer Intel NICs implement ACS capabilities as in your
-> example above to indicate this without the need for quirks.  Thanks,
-
-Yes, so for devices like the CX4 and CX5 which exposes more than one PF,
-they need the ACS capability to indicate that individual PFs are isolated from 
-each other, while the single PF SR/IOV devices can do without.
-
-Thanks for the excellent explanations, this makes it all much clearer!
-Knut
-
-> Alex
-> 
-> > > Also comment style:
-> > > https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE;#l127  
-> > 
-> > I see - will fix,
-> > 
-> > > > +        cap_bits =
-> > > > +            PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR |
-> > > > PCI_ACS_UF;
-> > > > +    }
-> > > > +
-> > > > +    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
-> > > > +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
-> > > > +}
-> > > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > > > index 5b82a0d..4c40711 100644
-> > > > --- a/include/hw/pci/pcie.h
-> > > > +++ b/include/hw/pci/pcie.h
-> > > > @@ -79,6 +79,9 @@ struct PCIExpressDevice {
-> > > >  
-> > > >      /* Offset of ATS capability in config space */
-> > > >      uint16_t ats_cap;
-> > > > +
-> > > > +    /* ACS */
-> > > > +    uint16_t acs_cap;
-> > > >  };
-> > > >  
-> > > >  #define COMPAT_PROP_PCP "power_controller_present"
-> > > > @@ -116,6 +119,8 @@ void pcie_cap_flr_init(PCIDevice *dev);
-> > > >  void pcie_cap_flr_write_config(PCIDevice *dev,
-> > > >                             uint32_t addr, uint32_t val, int len);
-> > > >  
-> > > > +void pcie_cap_acs_reset(PCIDevice *dev);
-> > > > +
-> > > >  /* ARI forwarding capability and control */
-> > > >  void pcie_cap_arifwd_init(PCIDevice *dev);
-> > > >  void pcie_cap_arifwd_reset(PCIDevice *dev);
-> > > > @@ -129,6 +134,7 @@ void pcie_add_capability(PCIDevice *dev,
-> > > >  void pcie_sync_bridge_lnk(PCIDevice *dev);
-> > > >  
-> > > >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
-> > > > +void pcie_acs_init(PCIDevice *dev, uint16_t offset);  
-> > > 
-> > > nit, why aren't the reset and init declarations together?  
-> > 
-> > Good point, will fix.
-> > 
-> > Thanks!
-> > Knut
-> > 
-> > > >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t
-> > > > ser_num);
-> > > >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
-> > > >  
-> > > > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-> > > > index ad4e780..1db86b0 100644
-> > > > --- a/include/hw/pci/pcie_regs.h
-> > > > +++ b/include/hw/pci/pcie_regs.h
-> > > > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
-> > > >                                           PCI_ERR_COR_INTERNAL
-> > > > |         \
-> > > >                                           PCI_ERR_COR_HL_OVERFLOW)
-> > > >  
-> > > > +/* ACS */
-> > > > +#define PCI_ACS_VER                     0x1
-> > > > +#define PCI_ACS_SIZEOF                  8
-> > > > +
-> > > >  #endif /* QEMU_PCIE_REGS_H */  
+diff --git a/slirp/bootp.h b/slirp/src/bootp.h
+similarity index 100%
+rename from slirp/bootp.h
+rename to slirp/src/bootp.h
+diff --git a/slirp/debug.h b/slirp/src/debug.h
+similarity index 100%
+rename from slirp/debug.h
+rename to slirp/src/debug.h
+diff --git a/slirp/dhcpv6.h b/slirp/src/dhcpv6.h
+similarity index 100%
+rename from slirp/dhcpv6.h
+rename to slirp/src/dhcpv6.h
+diff --git a/slirp/if.h b/slirp/src/if.h
+similarity index 100%
+rename from slirp/if.h
+rename to slirp/src/if.h
+diff --git a/slirp/ip.h b/slirp/src/ip.h
+similarity index 100%
+rename from slirp/ip.h
+rename to slirp/src/ip.h
+diff --git a/slirp/ip6.h b/slirp/src/ip6.h
+similarity index 100%
+rename from slirp/ip6.h
+rename to slirp/src/ip6.h
+diff --git a/slirp/ip6_icmp.h b/slirp/src/ip6_icmp.h
+similarity index 100%
+rename from slirp/ip6_icmp.h
+rename to slirp/src/ip6_icmp.h
+diff --git a/slirp/ip_icmp.h b/slirp/src/ip_icmp.h
+similarity index 100%
+rename from slirp/ip_icmp.h
+rename to slirp/src/ip_icmp.h
+diff --git a/slirp/libslirp.h b/slirp/src/libslirp.h
+similarity index 100%
+rename from slirp/libslirp.h
+rename to slirp/src/libslirp.h
+diff --git a/slirp/main.h b/slirp/src/main.h
+similarity index 100%
+rename from slirp/main.h
+rename to slirp/src/main.h
+diff --git a/slirp/mbuf.h b/slirp/src/mbuf.h
+similarity index 100%
+rename from slirp/mbuf.h
+rename to slirp/src/mbuf.h
+diff --git a/slirp/misc.h b/slirp/src/misc.h
+similarity index 100%
+rename from slirp/misc.h
+rename to slirp/src/misc.h
+diff --git a/slirp/ncsi-pkt.h b/slirp/src/ncsi-pkt.h
+similarity index 100%
+rename from slirp/ncsi-pkt.h
+rename to slirp/src/ncsi-pkt.h
+diff --git a/slirp/qtailq.h b/slirp/src/qtailq.h
+similarity index 100%
+rename from slirp/qtailq.h
+rename to slirp/src/qtailq.h
+diff --git a/slirp/sbuf.h b/slirp/src/sbuf.h
+similarity index 100%
+rename from slirp/sbuf.h
+rename to slirp/src/sbuf.h
+diff --git a/slirp/slirp.h b/slirp/src/slirp.h
+similarity index 100%
+rename from slirp/slirp.h
+rename to slirp/src/slirp.h
+diff --git a/slirp/socket.h b/slirp/src/socket.h
+similarity index 100%
+rename from slirp/socket.h
+rename to slirp/src/socket.h
+diff --git a/slirp/state.h b/slirp/src/state.h
+similarity index 100%
+rename from slirp/state.h
+rename to slirp/src/state.h
+diff --git a/slirp/stream.h b/slirp/src/stream.h
+similarity index 100%
+rename from slirp/stream.h
+rename to slirp/src/stream.h
+diff --git a/slirp/tcp.h b/slirp/src/tcp.h
+similarity index 100%
+rename from slirp/tcp.h
+rename to slirp/src/tcp.h
+diff --git a/slirp/tcp_timer.h b/slirp/src/tcp_timer.h
+similarity index 100%
+rename from slirp/tcp_timer.h
+rename to slirp/src/tcp_timer.h
+diff --git a/slirp/tcp_var.h b/slirp/src/tcp_var.h
+similarity index 100%
+rename from slirp/tcp_var.h
+rename to slirp/src/tcp_var.h
+diff --git a/slirp/tcpip.h b/slirp/src/tcpip.h
+similarity index 100%
+rename from slirp/tcpip.h
+rename to slirp/src/tcpip.h
+diff --git a/slirp/tftp.h b/slirp/src/tftp.h
+similarity index 100%
+rename from slirp/tftp.h
+rename to slirp/src/tftp.h
+diff --git a/slirp/udp.h b/slirp/src/udp.h
+similarity index 100%
+rename from slirp/udp.h
+rename to slirp/src/udp.h
+diff --git a/slirp/util.h b/slirp/src/util.h
+similarity index 100%
+rename from slirp/util.h
+rename to slirp/src/util.h
+diff --git a/slirp/vmstate.h b/slirp/src/vmstate.h
+similarity index 100%
+rename from slirp/vmstate.h
+rename to slirp/src/vmstate.h
+diff --git a/net/slirp.c b/net/slirp.c
+index bcd91475d2..b3bb1880c7 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -37,7 +37,7 @@
+ #include "monitor/monitor.h"
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+-#include "slirp/libslirp.h"
++#include "slirp/src/libslirp.h"
+ #include "chardev/char-fe.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/cutils.h"
+diff --git a/slirp/arp_table.c b/slirp/src/arp_table.c
+similarity index 100%
+rename from slirp/arp_table.c
+rename to slirp/src/arp_table.c
+diff --git a/slirp/bootp.c b/slirp/src/bootp.c
+similarity index 100%
+rename from slirp/bootp.c
+rename to slirp/src/bootp.c
+diff --git a/slirp/cksum.c b/slirp/src/cksum.c
+similarity index 100%
+rename from slirp/cksum.c
+rename to slirp/src/cksum.c
+diff --git a/slirp/dhcpv6.c b/slirp/src/dhcpv6.c
+similarity index 100%
+rename from slirp/dhcpv6.c
+rename to slirp/src/dhcpv6.c
+diff --git a/slirp/dnssearch.c b/slirp/src/dnssearch.c
+similarity index 100%
+rename from slirp/dnssearch.c
+rename to slirp/src/dnssearch.c
+diff --git a/slirp/if.c b/slirp/src/if.c
+similarity index 100%
+rename from slirp/if.c
+rename to slirp/src/if.c
+diff --git a/slirp/ip6_icmp.c b/slirp/src/ip6_icmp.c
+similarity index 100%
+rename from slirp/ip6_icmp.c
+rename to slirp/src/ip6_icmp.c
+diff --git a/slirp/ip6_input.c b/slirp/src/ip6_input.c
+similarity index 100%
+rename from slirp/ip6_input.c
+rename to slirp/src/ip6_input.c
+diff --git a/slirp/ip6_output.c b/slirp/src/ip6_output.c
+similarity index 100%
+rename from slirp/ip6_output.c
+rename to slirp/src/ip6_output.c
+diff --git a/slirp/ip_icmp.c b/slirp/src/ip_icmp.c
+similarity index 100%
+rename from slirp/ip_icmp.c
+rename to slirp/src/ip_icmp.c
+diff --git a/slirp/ip_input.c b/slirp/src/ip_input.c
+similarity index 100%
+rename from slirp/ip_input.c
+rename to slirp/src/ip_input.c
+diff --git a/slirp/ip_output.c b/slirp/src/ip_output.c
+similarity index 100%
+rename from slirp/ip_output.c
+rename to slirp/src/ip_output.c
+diff --git a/slirp/mbuf.c b/slirp/src/mbuf.c
+similarity index 100%
+rename from slirp/mbuf.c
+rename to slirp/src/mbuf.c
+diff --git a/slirp/misc.c b/slirp/src/misc.c
+similarity index 100%
+rename from slirp/misc.c
+rename to slirp/src/misc.c
+diff --git a/slirp/ncsi.c b/slirp/src/ncsi.c
+similarity index 100%
+rename from slirp/ncsi.c
+rename to slirp/src/ncsi.c
+diff --git a/slirp/ndp_table.c b/slirp/src/ndp_table.c
+similarity index 100%
+rename from slirp/ndp_table.c
+rename to slirp/src/ndp_table.c
+diff --git a/slirp/sbuf.c b/slirp/src/sbuf.c
+similarity index 100%
+rename from slirp/sbuf.c
+rename to slirp/src/sbuf.c
+diff --git a/slirp/slirp.c b/slirp/src/slirp.c
+similarity index 100%
+rename from slirp/slirp.c
+rename to slirp/src/slirp.c
+diff --git a/slirp/socket.c b/slirp/src/socket.c
+similarity index 100%
+rename from slirp/socket.c
+rename to slirp/src/socket.c
+diff --git a/slirp/state.c b/slirp/src/state.c
+similarity index 100%
+rename from slirp/state.c
+rename to slirp/src/state.c
+diff --git a/slirp/stream.c b/slirp/src/stream.c
+similarity index 100%
+rename from slirp/stream.c
+rename to slirp/src/stream.c
+diff --git a/slirp/tcp_input.c b/slirp/src/tcp_input.c
+similarity index 100%
+rename from slirp/tcp_input.c
+rename to slirp/src/tcp_input.c
+diff --git a/slirp/tcp_output.c b/slirp/src/tcp_output.c
+similarity index 100%
+rename from slirp/tcp_output.c
+rename to slirp/src/tcp_output.c
+diff --git a/slirp/tcp_subr.c b/slirp/src/tcp_subr.c
+similarity index 100%
+rename from slirp/tcp_subr.c
+rename to slirp/src/tcp_subr.c
+diff --git a/slirp/tcp_timer.c b/slirp/src/tcp_timer.c
+similarity index 100%
+rename from slirp/tcp_timer.c
+rename to slirp/src/tcp_timer.c
+diff --git a/slirp/tftp.c b/slirp/src/tftp.c
+similarity index 100%
+rename from slirp/tftp.c
+rename to slirp/src/tftp.c
+diff --git a/slirp/udp.c b/slirp/src/udp.c
+similarity index 100%
+rename from slirp/udp.c
+rename to slirp/src/udp.c
+diff --git a/slirp/udp6.c b/slirp/src/udp6.c
+similarity index 100%
+rename from slirp/udp6.c
+rename to slirp/src/udp6.c
+diff --git a/slirp/util.c b/slirp/src/util.c
+similarity index 100%
+rename from slirp/util.c
+rename to slirp/src/util.c
+diff --git a/slirp/vmstate.c b/slirp/src/vmstate.c
+similarity index 100%
+rename from slirp/vmstate.c
+rename to slirp/src/vmstate.c
+diff --git a/util/main-loop.c b/util/main-loop.c
+index d4a521caeb..e1e349ca5c 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -26,11 +26,9 @@
+ #include "qapi/error.h"
+ #include "qemu/cutils.h"
+ #include "qemu/timer.h"
+-#include "qemu/sockets.h"	// struct in_addr needed for libslirp.h
+ #include "sysemu/qtest.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/replay.h"
+-#include "slirp/libslirp.h"
+ #include "qemu/main-loop.h"
+ #include "block/aio.h"
+ #include "qemu/error-report.h"
+diff --git a/vl.c b/vl.c
+index 9e4dba7f92..33396da49a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -106,9 +106,6 @@ int main(int argc, char **argv)
+=20
+ #include "disas/disas.h"
+=20
+-
+-#include "slirp/libslirp.h"
+-
+ #include "trace-root.h"
+ #include "trace/control.h"
+ #include "qemu/queue.h"
+diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
+index e91daf0e91..0250229dfa 100644
+--- a/slirp/Makefile.objs
++++ b/slirp/Makefile.objs
+@@ -1,36 +1,36 @@
+ slirp-obj-y =3D slirp.mo
+=20
+ slirp.mo-objs =3D \
+-	arp_table.o \
+-	bootp.o \
+-	cksum.o \
+-	dhcpv6.o \
+-	dnssearch.o \
+-	if.o \
+-	ip6_icmp.o \
+-	ip6_input.o \
+-	ip6_output.o \
+-	ip_icmp.o \
+-	ip_input.o \
+-	ip_output.o \
+-	mbuf.o \
+-	misc.o \
+-	ncsi.o \
+-	ndp_table.o \
+-	sbuf.o \
+-	slirp.o \
+-	socket.o \
+-	state.o \
+-	stream.o \
+-	tcp_input.o \
+-	tcp_output.o \
+-	tcp_subr.o \
+-	tcp_timer.o \
+-	tftp.o \
+-	udp.o \
+-	udp6.o \
+-	util.o \
+-	vmstate.o \
++	src/arp_table.o \
++	src/bootp.o \
++	src/cksum.o \
++	src/dhcpv6.o \
++	src/dnssearch.o \
++	src/if.o \
++	src/ip6_icmp.o \
++	src/ip6_input.o \
++	src/ip6_output.o \
++	src/ip_icmp.o \
++	src/ip_input.o \
++	src/ip_output.o \
++	src/mbuf.o \
++	src/misc.o \
++	src/ncsi.o \
++	src/ndp_table.o \
++	src/sbuf.o \
++	src/slirp.o \
++	src/socket.o \
++	src/state.o \
++	src/stream.o \
++	src/tcp_input.o \
++	src/tcp_output.o \
++	src/tcp_subr.o \
++	src/tcp_timer.o \
++	src/tftp.o \
++	src/udp.o \
++	src/udp6.o \
++	src/util.o \
++	src/vmstate.o \
+ 	$(NULL)
+=20
+ slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\"
+--=20
+2.21.0.rc0.1.g036caf7885
