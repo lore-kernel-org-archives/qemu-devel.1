@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57492)
+Received: from eggs.gnu.org ([209.51.188.92]:58387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtU9p-0004BJ-TN
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:15:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gtUAY-0004xg-Mi
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtTzq-00008R-47
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:04:55 -0500
-References: <20190212011657.18324-1-walling@linux.ibm.com>
-	<20190212011657.18324-2-walling@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d9b74b0d-83f3-f7f1-3912-25739a931f41@redhat.com>
-Date: Tue, 12 Feb 2019 10:04:27 +0100
+	(envelope-from <bounces@canonical.com>) id 1gtUAX-0000iy-71
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:15:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gtUAW-0008Sh-QE
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:15:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gtUAD-0000YL-Rx
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:15:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D0AB12E80C7
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:15:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190212011657.18324-2-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] s390x/cpumodel: default enable
- mepoch for z14 and later
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Feb 2019 09:06:42 -0000
+From: Thomas Huth <1815143@bugs.launchpad.net>
+Reply-To: Bug 1815143 <1815143@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154957727033.18791.11498118265359264370.malonedeb@soybean.canonical.com>
+Message-Id: <154996240252.19096.731425402913458300.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815143] Re: qemu-system-s390x fails when running
+ without kvm: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +37,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, pasic@linux.ibm.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-On 12.02.19 02:16, Collin Walling wrote:
-> Latest systems and host kernels support mepoch, which is a
-> feature that was meant to be supported for z14 GA1 from the
-> get-go. Let's copy it to the z14 GA1 default CPU model.
-> 
-> Machines s390-ccw-virtio-3.1 and older will retain the old CPU
-> models and will not provide this bit nor the extended PTFF
-> functions in the default model.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
-> @Christian, @David: I elected to not add your r-b's to this
-> patch since I've added some code to disable feature groups.
-> I'd like to know what you both think :)
+This should be the commit that fixed this issue:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D303c681a8f50eb88fbafc
 
-Looks good to me!
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+-- =
 
-> ---
->  hw/s390x/s390-virtio-ccw.c  |  2 ++
->  target/s390x/cpu_models.c   | 24 ++++++++++++++++++++++++
->  target/s390x/cpu_models.h   |  2 ++
->  target/s390x/gen-features.c |  2 ++
->  4 files changed, 30 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index fd9d0b0542..643265f0b4 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -757,6 +757,8 @@ DEFINE_CCW_MACHINE(4_0, "4.0", true);
->  static void ccw_machine_3_1_instance_options(MachineState *machine)
->  {
->      ccw_machine_4_0_instance_options(machine);
-> +    s390_cpudef_featoff_greater(14, 1, S390_FEAT_MULTIPLE_EPOCH);
-> +    s390_cpudef_group_featoff_greater(14, 1, S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF);
->  }
->  
->  static void ccw_machine_3_1_class_options(MachineClass *mc)
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index b42b5fd327..d75a20e49d 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -117,6 +117,30 @@ void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat feat)
->      }
->  }
->  
-> +void s390_cpudef_group_featoff_greater(uint8_t gen, uint8_t ec_ga,
-> +                                       S390FeatGroup group)
-> +{
-> +    const S390FeatGroupDef *group_def = s390_feat_group_def(group);
-> +    S390FeatBitmap group_def_off;
-> +    int i;
-> +
-> +    bitmap_complement(group_def_off, group_def->feat, S390_FEAT_MAX);
-> +
-> +    for (i = 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
-> +        const S390CPUDef *cpu_def = &s390_cpu_defs[i];
-> +
-> +        if (cpu_def->gen < gen) {
-> +            continue;
-> +        }
-> +        if (cpu_def->gen == gen && cpu_def->ec_ga < ec_ga) {
-> +            continue;
-> +        }
-> +
-> +        bitmap_and((unsigned long *)&cpu_def->default_feat,
-> +                   cpu_def->default_feat, group_def_off, S390_FEAT_MAX);
-> +    }
-> +}
-> +
->  uint32_t s390_get_hmfai(void)
->  {
->      static S390CPU *cpu;
-> diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
-> index 11cf5386fb..174a99e561 100644
-> --- a/target/s390x/cpu_models.h
-> +++ b/target/s390x/cpu_models.h
-> @@ -75,6 +75,8 @@ struct S390CPUModel {
->  
->  void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat);
->  void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat feat);
-> +void s390_cpudef_group_featoff_greater(uint8_t gen, uint8_t ec_ga,
-> +                                       S390FeatGroup group);
->  uint32_t s390_get_hmfai(void);
->  uint8_t s390_get_mha_pow(void);
->  uint32_t s390_get_ibc_val(void);
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 70015eaaf5..4770f00105 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -550,6 +550,8 @@ static uint16_t default_GEN14_GA1[] = {
->      S390_FEAT_GROUP_MSA_EXT_6,
->      S390_FEAT_GROUP_MSA_EXT_7,
->      S390_FEAT_GROUP_MSA_EXT_8,
-> +    S390_FEAT_MULTIPLE_EPOCH,
-> +    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
->  };
->  
->  /* QEMU (CPU model) features */
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815143
 
+Title:
+   qemu-system-s390x fails when running without kvm: fatal: EXECUTE on
+  instruction prefix 0x7f4 not implemented
 
--- 
+Status in QEMU:
+  Fix Released
 
-Thanks,
+Bug description:
+  just wondering if TCG implements instruction prefix 0x7f4
 
-David / dhildenb
+  server3:~ # zcat /boot/vmlinux-4.4.162-94.72-default.gz > /tmp/kernel
+
+  --> starting qemu with kvm enabled works fine
+  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
+t/initrd -enable-kvm
+  Initializing cgroup subsys cpuset
+  Initializing cgroup subsys cpu
+  Initializing cgroup subsys cpuacct
+  Linux version 4.4.162-94.72-default (geeko@buildhost) (gcc version 4.8.5 =
+(SUSE Linux) ) #1 SMP Mon Nov 12 18:57:45 UTC 2018 (9de753f)
+  setup.289988: Linux is running under KVM in 64-bit mode
+  setup.b050d0: The maximum memory size is 128MB
+  numa.196305: NUMA mode: plain
+  Write protected kernel read-only data: 8692k
+  [...]
+
+  --> but starting qemu without kvm enabled works fails
+  server3:~ # qemu-system-s390x -nographic -kernel /tmp/kernel -initrd /boo=
+t/initrd =
+
+  qemu: fatal: EXECUTE on instruction prefix 0x7f4 not implemented
+
+  PSW=3Dmask 0000000180000000 addr 000000000067ed6e cc 00
+  R00=3D0000000080000000 R01=3D000000000067ed76 R02=3D0000000000000000 R03=
+=3D0000000000000000
+  R04=3D0000000000111548 R05=3D0000000000000000 R06=3D0000000000000000 R07=
+=3D0000000000000000
+  R08=3D00000000000100f6 R09=3D0000000000000000 R10=3D0000000000000000 R11=
+=3D0000000000000000
+  R12=3D0000000000ae2000 R13=3D0000000000681978 R14=3D0000000000111548 R15=
+=3D000000000000bef0
+  F00=3D0000000000000000 F01=3D0000000000000000 F02=3D0000000000000000 F03=
+=3D0000000000000000
+  F04=3D0000000000000000 F05=3D0000000000000000 F06=3D0000000000000000 F07=
+=3D0000000000000000
+  F08=3D0000000000000000 F09=3D0000000000000000 F10=3D0000000000000000 F11=
+=3D0000000000000000
+  F12=3D0000000000000000 F13=3D0000000000000000 F14=3D0000000000000000 F15=
+=3D0000000000000000
+  V00=3D00000000000000000000000000000000 V01=3D0000000000000000000000000000=
+0000
+  V02=3D00000000000000000000000000000000 V03=3D0000000000000000000000000000=
+0000
+  V04=3D00000000000000000000000000000000 V05=3D0000000000000000000000000000=
+0000
+  V06=3D00000000000000000000000000000000 V07=3D0000000000000000000000000000=
+0000
+  V08=3D00000000000000000000000000000000 V09=3D0000000000000000000000000000=
+0000
+  V10=3D00000000000000000000000000000000 V11=3D0000000000000000000000000000=
+0000
+  V12=3D00000000000000000000000000000000 V13=3D0000000000000000000000000000=
+0000
+  V14=3D00000000000000000000000000000000 V15=3D0000000000000000000000000000=
+0000
+  V16=3D00000000000000000000000000000000 V17=3D0000000000000000000000000000=
+0000
+  V18=3D00000000000000000000000000000000 V19=3D0000000000000000000000000000=
+0000
+  V20=3D00000000000000000000000000000000 V21=3D0000000000000000000000000000=
+0000
+  V22=3D00000000000000000000000000000000 V23=3D0000000000000000000000000000=
+0000
+  V24=3D00000000000000000000000000000000 V25=3D0000000000000000000000000000=
+0000
+  V26=3D00000000000000000000000000000000 V27=3D0000000000000000000000000000=
+0000
+  V28=3D00000000000000000000000000000000 V29=3D0000000000000000000000000000=
+0000
+  V30=3D00000000000000000000000000000000 V31=3D0000000000000000000000000000=
+0000
+  C00=3D0000000000000000 C01=3D0000000000000000 C02=3D0000000000000000 C03=
+=3D0000000000000000
+  C04=3D0000000000000000 C05=3D0000000000000000 C06=3D0000000000000000 C07=
+=3D0000000000000000
+  C08=3D0000000000000000 C09=3D0000000000000000 C10=3D0000000000000000 C11=
+=3D0000000000000000
+  C12=3D0000000000000000 C13=3D0000000000000000 C14=3D0000000000000000 C15=
+=3D0000000000000000
+
+  Aborted (core dumped)
+
+  =
+
+  server3:~ # lscpu
+  Architecture:          s390x
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Big Endian
+  CPU(s):                2
+  On-line CPU(s) list:   0,1
+  Thread(s) per core:    1
+  Core(s) per socket:    1
+  Socket(s) per book:    1
+  Book(s) per drawer:    1
+  Drawer(s):             2
+  NUMA node(s):          1
+  Vendor ID:             IBM/S390
+  Machine type:          2964
+  BogoMIPS:              20325.00
+  Hypervisor:            z/VM 6.4.0
+  Hypervisor vendor:     IBM
+  Virtualization type:   full
+  Dispatching mode:      horizontal
+  L1d cache:             128K
+  L1i cache:             96K
+  L2d cache:             2048K
+  L2i cache:             2048K
+  L3 cache:              65536K
+  L4 cache:              491520K
+  NUMA node0 CPU(s):     0-63
+  Flags:                 esan3 zarch stfle msa ldisp eimm dfp edat etf3eh h=
+ighgprs te vx sie
+  server3:~ # uname -a
+  Linux server3 4.4.126-94.22-default #1 SMP Wed Apr 11 07:45:03 UTC 2018 (=
+9649989) s390x s390x s390x GNU/Linux
+  server3:~ #
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815143/+subscriptions
