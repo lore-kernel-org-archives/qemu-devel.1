@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47847)
+Received: from eggs.gnu.org ([209.51.188.92]:54541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPHg-0005xS-Sm
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:03:01 -0500
+	(envelope-from <changpeng.liu@intel.com>) id 1gtPM1-00083C-EE
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPHZ-0003Ot-VK
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:57 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 12:01:36 +0800
-Message-Id: <20190212040136.30371-4-stefanha@redhat.com>
-In-Reply-To: <20190212040136.30371-1-stefanha@redhat.com>
-References: <20190212040136.30371-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/3] virtio-blk: cleanup using VirtIOBlock *s
- and VirtIODevice *vdev
+	(envelope-from <changpeng.liu@intel.com>) id 1gtPLk-0006qK-4P
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:13 -0500
+Received: from mga04.intel.com ([192.55.52.120]:43346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1gtPLj-0006hs-6F
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:11 -0500
+From: Changpeng Liu <changpeng.liu@intel.com>
+Date: Tue, 12 Feb 2019 12:25:16 +0800
+Message-Id: <1549945516-25643-1-git-send-email-changpeng.liu@intel.com>
+Subject: [Qemu-devel] [PATCH] virtio-blk: set correct config size for the
+ host driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +24,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <liam.merwick@oracle.com>
+Cc: mst@redhat.com, stefanha@redhat.com, sgarzare@redhat.com, dgilbert@redhat.com, ldoktor@redhat.com, changpeng.liu@intel.com
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features support"
+introduced extra fields to existing struct virtio_blk_config, when
+migration was executed from older QEMU version to current head, it
+will break the migration.  While here, set the correct config size
+when initializing the host driver, for now, discard/write zeroes
+are not supported by virtio-blk host driver, so set the config
+size as before, users can change config size when adding the new
+feature bits support.
 
-In several part we still using req->dev or VIRTIO_DEVICE(req->dev)
-when we have already defined s and vdev pointers:
-    VirtIOBlock *s =3D req->dev;
-    VirtIODevice *vdev =3D VIRTIO_DEVICE(s);
-
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Message-id: 20190208142347.214815-1-sgarzare@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 ---
- hw/block/virtio-blk.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+ hw/block/virtio-blk.c          | 15 +++++++++++----
+ include/hw/virtio/virtio-blk.h |  1 +
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 9a87b3bfac..843bb2bec8 100644
+index 9a87b3b..fac5d33 100644
 --- a/hw/block/virtio-blk.c
 +++ b/hw/block/virtio-blk.c
-@@ -63,9 +63,8 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
-, unsigned char status)
- static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
-     bool is_read)
- {
--    BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
--                                                   is_read, error);
-     VirtIOBlock *s =3D req->dev;
-+    BlockErrorAction action =3D blk_get_error_action(s->blk, is_read, er=
-ror);
-=20
-     if (action =3D=3D BLOCK_ERROR_ACTION_STOP) {
-         /* Break the link as the next request is going to be parsed from=
- the
-@@ -138,7 +137,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
-nt ret)
+@@ -761,7 +761,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+     blkcfg.alignment_offset = 0;
+     blkcfg.wce = blk_enable_write_cache(s->blk);
+     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
+-    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
++    memcpy(config, &blkcfg, s->config_size);
+ }
+ 
+ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
+@@ -769,7 +769,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
+     VirtIOBlock *s = VIRTIO_BLK(vdev);
+     struct virtio_blk_config blkcfg;
+ 
+-    memcpy(&blkcfg, config, sizeof(blkcfg));
++    memcpy(&blkcfg, config, s->config_size);
+ 
+     aio_context_acquire(blk_get_aio_context(s->blk));
+     blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
+@@ -847,6 +847,13 @@ static void virtio_blk_set_status(VirtIODevice *vdev, uint8_t status)
      }
-=20
-     virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
--    block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
-+    block_acct_done(blk_get_stats(s->blk), &req->acct);
-     virtio_blk_free_request(req);
-=20
- out:
-@@ -513,7 +512,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *=
-req, MultiReqBuffer *mrb)
-               - sizeof(struct virtio_blk_inhdr);
-     iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
-=20
--    type =3D virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out.type);
-+    type =3D virtio_ldl_p(vdev, &req->out.type);
-=20
-     /* VIRTIO_BLK_T_OUT defines the command direction. VIRTIO_BLK_T_BARR=
-IER
-      * is an optional flag. Although a guest should not send this flag i=
-f
-@@ -522,8 +521,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *=
-req, MultiReqBuffer *mrb)
-     case VIRTIO_BLK_T_IN:
-     {
-         bool is_write =3D type & VIRTIO_BLK_T_OUT;
--        req->sector_num =3D virtio_ldq_p(VIRTIO_DEVICE(req->dev),
--                                       &req->out.sector);
-+        req->sector_num =3D virtio_ldq_p(vdev, &req->out.sector);
-=20
-         if (is_write) {
-             qemu_iovec_init_external(&req->qiov, out_iov, out_num);
-@@ -535,25 +533,23 @@ static int virtio_blk_handle_request(VirtIOBlockReq=
- *req, MultiReqBuffer *mrb)
-                                          req->qiov.size / BDRV_SECTOR_SI=
-ZE);
-         }
-=20
--        if (!virtio_blk_sect_range_ok(req->dev, req->sector_num,
--                                      req->qiov.size)) {
-+        if (!virtio_blk_sect_range_ok(s, req->sector_num, req->qiov.size=
-)) {
-             virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
--            block_acct_invalid(blk_get_stats(req->dev->blk),
-+            block_acct_invalid(blk_get_stats(s->blk),
-                                is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_=
-READ);
-             virtio_blk_free_request(req);
-             return 0;
-         }
-=20
--        block_acct_start(blk_get_stats(req->dev->blk),
--                         &req->acct, req->qiov.size,
-+        block_acct_start(blk_get_stats(s->blk), &req->acct, req->qiov.si=
-ze,
-                          is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ);
-=20
-         /* merge would exceed maximum number of requests or IO direction
-          * changes */
-         if (mrb->num_reqs > 0 && (mrb->num_reqs =3D=3D VIRTIO_BLK_MAX_ME=
-RGE_REQS ||
-                                   is_write !=3D mrb->is_write ||
--                                  !req->dev->conf.request_merging)) {
--            virtio_blk_submit_multireq(req->dev->blk, mrb);
-+                                  !s->conf.request_merging)) {
-+            virtio_blk_submit_multireq(s->blk, mrb);
-         }
-=20
-         assert(mrb->num_reqs < VIRTIO_BLK_MAX_MERGE_REQS);
---=20
-2.20.1
+ }
+ 
++static void virtio_blk_set_config_size(VirtIOBlock *s)
++{
++    /* VIRTIO_BLK_F_MQ is supported by host driver */
++    s->config_size = offsetof(struct virtio_blk_config, num_queues) +
++                     sizeof_field(struct virtio_blk_config, num_queues);
++}
++
+ static void virtio_blk_save_device(VirtIODevice *vdev, QEMUFile *f)
+ {
+     VirtIOBlock *s = VIRTIO_BLK(vdev);
+@@ -952,8 +959,8 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+-                sizeof(struct virtio_blk_config));
++    virtio_blk_set_config_size(s);
++    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, s->config_size);
+ 
+     s->blk = conf->conf.blk;
+     s->rq = NULL;
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+index 5117431..9181a93 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -51,6 +51,7 @@ typedef struct VirtIOBlock {
+     void *rq;
+     QEMUBH *bh;
+     VirtIOBlkConf conf;
++    size_t config_size;
+     unsigned short sector_mask;
+     bool original_wce;
+     VMChangeStateEntry *change;
+-- 
+1.9.3
