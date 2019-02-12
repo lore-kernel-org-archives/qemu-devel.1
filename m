@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39710)
+Received: from eggs.gnu.org ([209.51.188.92]:39711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gthds-0005Qf-FB
+	(envelope-from <dgibson@ozlabs.org>) id 1gthds-0005Qg-Fa
 	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:39:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gthdr-0002zl-D5
+	(envelope-from <dgibson@ozlabs.org>) id 1gthdr-0002zU-7o
 	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:39:08 -0500
-Date: Tue, 12 Feb 2019 17:02:28 +1100
+Date: Tue, 12 Feb 2019 17:05:05 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190212060227.GO1884@umbus.fritz.box>
+Message-ID: <20190212060505.GP1884@umbus.fritz.box>
 References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-9-clg@kaod.org>
+	<20190128094625.4428-10-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YC8Ek3FeOE8ywfXk"
+	protocol="application/pgp-signature"; boundary="2uzDqHpccQJpqF2n"
 Content-Disposition: inline
-In-Reply-To: <20190128094625.4428-9-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 08/19] target/ppc: Fix nip on power
- management instructions
+In-Reply-To: <20190128094625.4428-10-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 09/19] target/ppc: Don't clobber MSR:EE on
+ PM instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +29,118 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---YC8Ek3FeOE8ywfXk
+--2uzDqHpccQJpqF2n
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 28, 2019 at 10:46:14AM +0100, C=E9dric Le Goater wrote:
+On Mon, Jan 28, 2019 at 10:46:15AM +0100, C=E9dric Le Goater wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> Those instructions currently raise an exception from within
-> the helper. This tends to result in a bogus nip value in
-> the env context (typically the beginning of the TB). Such
-> a helper needs a gen_update_nip() first.
+> When issuing a power management instruction, we set MSR:EE
+> to force ppc_hw_interrupt() into calling powerpc_excp()
+> to deal with the fact that on P7 and P8, the system reset
+> caused by the wakeup needs to be generated regardless of
+> the MSR:EE value (using LPCR only).
 >=20
-> This fixes it with a different approach which is to throw
-> the exception from translate.c instead of the helper using
-> gen_exception_nip() which does the right thing.
+> This however means that the OS will see a bogus SRR1:EE
+> value which is a problem. It also prevents properly
+> implementing P9 STOP "light".
+>=20
+> So fix this by instead putting some logic in ppc_hw_interrupt()
+> to decide whether to deliver or not by taking into account the
+> fact that we are waking up from sleep.
+>=20
+> The LPCR isn't checked as this is done in the has_work() test.
 >=20
 > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  target/ppc/excp_helper.c |  1 -
->  target/ppc/translate.c   | 12 ++++++++----
->  2 files changed, 8 insertions(+), 5 deletions(-)
+>  target/ppc/excp_helper.c | 27 +++++++++++++++------------
+>  1 file changed, 15 insertions(+), 12 deletions(-)
 >=20
 > diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 751d759fcc1d..8407e0ade938 100644
+> index 8407e0ade938..7c7c8d1b9dc6 100644
 > --- a/target/ppc/excp_helper.c
 > +++ b/target/ppc/excp_helper.c
-> @@ -958,7 +958,6 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
-t insn)
->       * but this doesn't seem to be a problem.
+> @@ -748,6 +748,7 @@ void ppc_cpu_do_interrupt(CPUState *cs)
+>  static void ppc_hw_interrupt(CPUPPCState *env)
+>  {
+>      PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> +    bool async_deliver;
+> =20
+>      /* External reset */
+>      if (env->pending_interrupts & (1 << PPC_INTERRUPT_RESET)) {
+> @@ -769,11 +770,20 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>          return;
+>      }
+>  #endif
+> +
+> +    /*
+> +     * For interrupts that gate on MSR:EE, we need to do something a
+> +     * bit more subtle, as we need to let them through even when EE is
+> +     * clear when coming out of some power management states (in order
+> +     * for them to become a 0x100).
+> +     */
+> +    async_deliver =3D (msr_ee !=3D 0) || env->in_pm_state;
+> +
+>      /* Hypervisor decrementer exception */
+>      if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDECR)) {
+>          /* LPCR will be clear when not supported so this will work */
+>          bool hdice =3D !!(env->spr[SPR_LPCR] & LPCR_HDICE);
+> -        if ((msr_ee !=3D 0 || msr_hv =3D=3D 0) && hdice) {
+> +        if ((async_deliver || msr_hv =3D=3D 0) && hdice) {
+>              /* HDEC clears on delivery */
+>              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+>              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_HDECR);
+> @@ -783,7 +793,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>      /* Extermal interrupt can ignore MSR:EE under some circumstances */
+>      if (env->pending_interrupts & (1 << PPC_INTERRUPT_EXT)) {
+>          bool lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
+> -        if (msr_ee !=3D 0 || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
+es0)) {
+> +        if (async_deliver || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
+es0)) {
+>              powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_EXTERNAL);
+>              return;
+>          }
+> @@ -795,7 +805,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>              return;
+>          }
+>      }
+> -    if (msr_ee !=3D 0) {
+> +    if (async_deliver !=3D 0) {
+>          /* Watchdog timer on embedded PowerPC */
+>          if (env->pending_interrupts & (1 << PPC_INTERRUPT_WDT)) {
+>              env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_WDT);
+> @@ -943,21 +953,14 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_ins=
+n_t insn)
+> =20
+>      cs =3D CPU(ppc_env_get_cpu(env));
+>      cs->halted =3D 1;
+> -    env->in_pm_state =3D true;
+> =20
+>      /* The architecture specifies that HDEC interrupts are
+>       * discarded in PM states
 >       */
->      env->msr |=3D (1ull << MSR_EE);
-> -    raise_exception(env, EXCP_HLT);
+>      env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+> =20
+> -    /* Technically, nap doesn't set EE, but if we don't set it
+> -     * then ppc_hw_interrupt() won't deliver. We could add some
+> -     * other tests there based on LPCR but it's simpler to just
+> -     * whack EE in. It will be cleared by the 0x100 at wakeup
+> -     * anyway. It will still be observable by the guest in SRR1
+> -     * but this doesn't seem to be a problem.
+> -     */
+> -    env->msr |=3D (1ull << MSR_EE);
+> +    /* Condition for waking up at 0x100 */
+> +    env->in_pm_state =3D true;
 >  }
 >  #endif /* defined(TARGET_PPC64) */
 > =20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 7d40a1fbe6bd..55281a8975e0 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -3571,7 +3571,8 @@ static void gen_doze(DisasContext *ctx)
->      t =3D tcg_const_i32(PPC_PM_DOZE);
->      gen_helper_pminsn(cpu_env, t);
->      tcg_temp_free_i32(t);
-> -    gen_stop_exception(ctx);
-> +    /* Stop translation, as the CPU is supposed to sleep from now */
-> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
-
-IIUC this also changes from EXCP_STOP to EXCP_HLT, is that intentional?
-
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
-> =20
-> @@ -3586,7 +3587,8 @@ static void gen_nap(DisasContext *ctx)
->      t =3D tcg_const_i32(PPC_PM_NAP);
->      gen_helper_pminsn(cpu_env, t);
->      tcg_temp_free_i32(t);
-> -    gen_stop_exception(ctx);
-> +    /* Stop translation, as the CPU is supposed to sleep from now */
-> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
-> =20
-> @@ -3606,7 +3608,8 @@ static void gen_sleep(DisasContext *ctx)
->      t =3D tcg_const_i32(PPC_PM_SLEEP);
->      gen_helper_pminsn(cpu_env, t);
->      tcg_temp_free_i32(t);
-> -    gen_stop_exception(ctx);
-> +    /* Stop translation, as the CPU is supposed to sleep from now */
-> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
-> =20
-> @@ -3621,7 +3624,8 @@ static void gen_rvwinkle(DisasContext *ctx)
->      t =3D tcg_const_i32(PPC_PM_RVWINKLE);
->      gen_helper_pminsn(cpu_env, t);
->      tcg_temp_free_i32(t);
-> -    gen_stop_exception(ctx);
-> +    /* Stop translation, as the CPU is supposed to sleep from now */
-> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->  #endif /* defined(CONFIG_USER_ONLY) */
->  }
->  #endif /* #if defined(TARGET_PPC64) */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -120,24 +148,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YC8Ek3FeOE8ywfXk
+--2uzDqHpccQJpqF2n
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxiYXMACgkQbDjKyiDZ
-s5KxtBAAkgKzuKjzHiWEO2Pi0y4g9fznmkZonye5ock6ZPCTCW2ulWJAQs/GHDRJ
-d1DSm8EgL3uM6EtWStf3RRmTVcfAjCpFVeQDwcN2TJzJoRbQ+8Z28IPW+6jxz5+b
-CDKUXc11QOO3EMUFvBIh0i/5xyKiWkxDyDaFsS7TNABxuuMEXfZuuQZvCaq+gENQ
-rHDqGLkcMNCLalXothRLFfvG3i4lYF12I3ykjXQKp4a843U+8TEDxwfdL1ucHLqA
-TqLnC/WIHpyRrysT3pjaVBbrGq4Su4n6eeAnU99b12Gy5FbKWB3m9txAWd13fdic
-RSI5SqOJvmDQpIJJla/MiKjj4n+IeH5q0OlvGrQTkG0PO9/zFA2GFGdwa/bXQA3h
-kaVsOlqDWLsXhT8BrCM5D6bh4Z8ExUszhd0gtaQni/zh/4peq0MmEIHmbo+kG7KN
-PEGlVnsnbRyynwa6gzTFaQ7RnNB6F2DQxnuVlWbHHzB884Tkir2bkYl2qZZG5v2x
-o33GNeyCgJ661rhpEkATjgkZB6gFApawBDs3QHfTDM5y/MmzT2zkb5kyI+UpH3aj
-GeZQjNdOjet+MIsGZS8mjxTab1OI7UqJw63WxDnd1P1X54oeCzLhOtW245ePjlid
-oO8oj/HYEj5RTJ9DX5Z0Eq5KdKKKU98JZXWe3UFzQCz1ZEaULi0=
-=fp2b
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxiYhEACgkQbDjKyiDZ
+s5JSXQ/6AlxlTBTI1ux8S4JP3zpi3p8RmXUk1pi2SR0V13U6Mmo1bfw+uSn22YM3
+ELtn5HZxzvnHSzSUXc1ACRU8yTl9/geXKKlVtv/itZUi5Of5flewiGG+djEt6JCB
+bfrC9kLvHcpxxBgZgB7E7cjM/bE1W7d379wb9HctHWiG6XM7od1DR1ZQCfJLwokB
+ORgzQ6tAQJ/cSoQlnWzjq+6hBzlguNs2XLFhU3XtTxY8aFE+myZ2Ni9ShKx/LL2U
+5PbYLQQOLHEMovV3Dl6w0fFkFjRF2H/RxVGSNP+mNrRMpjY/k30xhdvRQ9tY4HGU
+btdDzbOdTcbTNTDvs+1s//y5tFEthOKY02/oh5vv6ua7QZaSHzSmlwrOBG2QPFfa
+99kYfLSfhLB0P0QQVJtcP3aSwxStuDHI8nVXuyKHdbYYLOPiCDJCUBPbA6dlMWTU
+jOq00tYcRtYtWPv7rm3gRZdfecE38D/GwuJNwwPI6w4I8KBBUpuWPtxShHnBLsoJ
+JkuEJQi55S9zfuGS84blYuBGH/TXx/katDzQRGfrswZaAsHmW55jXpY4BDvQmhGG
+lJw7a+cBz94L7XGItGg76QgSvgd+EDbnQvOiYABNa7dYHPNelXMblc3NpdttIwDn
+FVEiN9jMWbIoSx14V0tdT210kXsEOQiIBoijq/aHOGrGJizQWQs=
+=SHpr
 -----END PGP SIGNATURE-----
 
---YC8Ek3FeOE8ywfXk--
+--2uzDqHpccQJpqF2n--
