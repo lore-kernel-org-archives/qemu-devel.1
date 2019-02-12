@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39013)
+Received: from eggs.gnu.org ([209.51.188.92]:47203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtPjg-0005N3-UB
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:31:58 -0500
+	(envelope-from <mst@redhat.com>) id 1gtPnP-0007XB-Ic
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:35:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtPjf-0004TV-K1
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:31:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40480)
+	(envelope-from <mst@redhat.com>) id 1gtPnN-0008Me-Fc
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:35:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtPje-0004Fg-Tn
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:31:55 -0500
-Date: Mon, 11 Feb 2019 23:31:28 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtPnK-0008Gl-UC
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:35:43 -0500
+Date: Mon, 11 Feb 2019 23:35:35 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190211232046-mutt-send-email-mst@kernel.org>
-References: <1549945516-25643-1-git-send-email-changpeng.liu@intel.com>
+Message-ID: <20190211233246-mutt-send-email-mst@kernel.org>
+References: <e6c30bdd-6cd0-ee9b-9fdf-cc8eaa54f7cc@yandex-team.ru>
+	<20190211095049-mutt-send-email-mst@kernel.org>
+	<20190212035505.GE28401@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1549945516-25643-1-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: set correct config size for
- the host driver
+In-Reply-To: <20190212035505.GE28401@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] Is IOThread for virtio-net a good idea?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, sgarzare@redhat.com, dgilbert@redhat.com, ldoktor@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Anton Kuchin <antonkuchin@yandex-team.ru>, jasowang@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Feb 12, 2019 at 12:25:16PM +0800, Changpeng Liu wrote:
-> Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features support"
-> introduced extra fields to existing struct virtio_blk_config, when
-> migration was executed from older QEMU version to current head, it
-> will break the migration.  While here, set the correct config size
-> when initializing the host driver, for now, discard/write zeroes
-> are not supported by virtio-blk host driver, so set the config
-> size as before, users can change config size when adding the new
-> feature bits support.
+On Tue, Feb 12, 2019 at 11:55:05AM +0800, Stefan Hajnoczi wrote:
+> On Mon, Feb 11, 2019 at 09:52:01AM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Feb 11, 2019 at 04:40:44PM +0300, Anton Kuchin wrote:
+> > > As far as I can see currently IOThread offloading is used only for block
+> > > devices and all others are emulated by main thread.
+> > > 
+> > > I expect that network devices can also benefit from processing in separate
+> > > thread but I couldn't find any recent work in this direction. I'm going to
+> > > implement a PoC but I want to ask if you know any previous attempts and do
+> > > you know why it can be a total waste of time. Are there fundamental
+> > > obstacles that prevent network emulation handling in IOThread?
+> > 
+> > No but vhost-net is there. Unlike block where you gain lots of
+> > functionality such as snapshots there seems to be little to
+> > be gained by doing it in userspace.
 > 
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> ---
->  hw/block/virtio-blk.c          | 15 +++++++++++----
->  include/hw/virtio/virtio-blk.h |  1 +
->  2 files changed, 12 insertions(+), 4 deletions(-)
+> Anthony Liguori tried virtio-net in a dedicated thread a long time ago
+> but it was never completed/merged.
 > 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 9a87b3b..fac5d33 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -761,7 +761,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
->      blkcfg.alignment_offset = 0;
->      blkcfg.wce = blk_enable_write_cache(s->blk);
->      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
-> -    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-> +    memcpy(config, &blkcfg, s->config_size);
->  }
->  
->  static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-> @@ -769,7 +769,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
->      VirtIOBlock *s = VIRTIO_BLK(vdev);
->      struct virtio_blk_config blkcfg;
->  
-> -    memcpy(&blkcfg, config, sizeof(blkcfg));
-> +    memcpy(&blkcfg, config, s->config_size);
->  
->      aio_context_acquire(blk_get_aio_context(s->blk));
->      blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
-> @@ -847,6 +847,13 @@ static void virtio_blk_set_status(VirtIODevice *vdev, uint8_t status)
->      }
->  }
->  
-> +static void virtio_blk_set_config_size(VirtIOBlock *s)
-> +{
-> +    /* VIRTIO_BLK_F_MQ is supported by host driver */
+> I think the argument for vhost-net in the kernel is that userspace
+> doesn't offer the same APIs as the kernel.  For example, is zero copy
+> possible from userspace?
 
-It can be disabled though.
+Esp with recent spectre/meltdown mitigations, with vhost we are looking
+for new ways to batch access checks and avoid overhead.
 
-It just so happens that only the addition of max_discard_seg
-crosses the next power of 2 boundary.
+If you are going to pass the packets back to kernel, you
+are better off with them never leaving the kernel.
 
+> Anton: If you want to do virtio-net in userspace, QEMU has
+> vhost-user-net support so you can perform emulation in a separate
+> process.
+> 
+> Stefan
 
-> +    s->config_size = offsetof(struct virtio_blk_config, num_queues) +
-> +                     sizeof_field(struct virtio_blk_config, num_queues);
-> +}
-> +
->  static void virtio_blk_save_device(VirtIODevice *vdev, QEMUFile *f)
->  {
->      VirtIOBlock *s = VIRTIO_BLK(vdev);
-> @@ -952,8 +959,8 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> -    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-> -                sizeof(struct virtio_blk_config));
-> +    virtio_blk_set_config_size(s);
-> +    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, s->config_size);
->  
->      s->blk = conf->conf.blk;
->      s->rq = NULL;
-> diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-> index 5117431..9181a93 100644
-> --- a/include/hw/virtio/virtio-blk.h
-> +++ b/include/hw/virtio/virtio-blk.h
-> @@ -51,6 +51,7 @@ typedef struct VirtIOBlock {
->      void *rq;
->      QEMUBH *bh;
->      VirtIOBlkConf conf;
-> +    size_t config_size;
->      unsigned short sector_mask;
->      bool original_wce;
->      VMChangeStateEntry *change;
-
-Well assuming you are looking for a minimal change,
-go further and drop config_size completely,
-replace with a macro.
-
-
-> -- 
-> 1.9.3
+And the main point of that is to use a userspace
+driver for a hardware nic so packets never end up in kernel.
