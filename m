@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49497)
+Received: from eggs.gnu.org ([209.51.188.92]:49442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8q-0002a2-Ep
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8p-0002Yy-6N
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8m-0001pV-7Z
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:55 -0500
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:35487)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8l-0001lj-1H
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:54 -0500
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:43256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtQ8l-0001UO-Hf
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:52 -0500
-Received: by mail-pl1-x633.google.com with SMTP id p8so699473plo.2
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:29 -0800 (PST)
+	id 1gtQ8c-0001Wy-L3
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:44 -0500
+Received: by mail-pf1-x42d.google.com with SMTP id q17so682572pfh.10
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:32 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 20:57:01 -0800
-Message-Id: <20190212045721.28041-5-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 20:57:03 -0800
+Message-Id: <20190212045721.28041-7-richard.henderson@linaro.org>
 In-Reply-To: <20190212045721.28041-1-richard.henderson@linaro.org>
 References: <20190212045721.28041-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 04/24] target/hppa: Convert remainder of system
+Subject: [Qemu-devel] [PULL 06/24] target/hppa: Convert memory management
  insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,239 +34,352 @@ Tested-by: Helge Deller <deller@gmx.de>
 Tested-by: Sven Schnelle <svens@stackframe.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 99 ++++++++++++++++++----------------------
- target/hppa/insns.decode | 12 +++++
- 2 files changed, 56 insertions(+), 55 deletions(-)
+ target/hppa/translate.c  | 162 ++++++++++++---------------------------
+ target/hppa/insns.decode |  38 +++++++++
+ 2 files changed, 89 insertions(+), 111 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 72cb7b477e..2ca0f5da10 100644
+index 6c2f560fc1..961b890153 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -278,6 +278,18 @@ typedef struct DisasContext {
-     bool psw_n_nonzero;
- } DisasContext;
+@@ -290,6 +290,12 @@ static int expand_sm_imm(int val)
+     return val;
+ }
  
-+/* Note that ssm/rsm instructions number PSW_W and PSW_E differently.  */
-+static int expand_sm_imm(int val)
++/* Inverted space register indicates 0 means sr0 not inferred from base.  */
++static int expand_sr3x(int val)
 +{
-+    if (val & PSW_SM_E) {
-+        val = (val & ~PSW_SM_E) | PSW_E;
-+    }
-+    if (val & PSW_SM_W) {
-+        val = (val & ~PSW_SM_W) | PSW_W;
-+    }
-+    return val;
++    return ~val;
 +}
 +
  /* Include the auto-generated decoder.  */
  #include "decode.inc.c"
  
-@@ -1996,7 +2008,7 @@ static bool trans_break(DisasContext *ctx, arg_break *a)
-     return gen_excp_iir(ctx, EXCP_BREAK);
+@@ -1997,7 +2003,7 @@ static void do_page_zero(DisasContext *ctx)
  }
- 
--static bool trans_sync(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_sync(DisasContext *ctx, arg_sync *a)
- {
-     /* No point in nullifying the memory barrier.  */
-     tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
-@@ -2178,86 +2190,67 @@ static bool trans_mtsarcm(DisasContext *ctx, arg_mtsarcm *a)
-     return true;
- }
- 
--static bool trans_ldsid(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_ldsid(DisasContext *ctx, arg_ldsid *a)
- {
--    unsigned rt = extract32(insn, 0, 5);
--    TCGv_reg dest = dest_gpr(ctx, rt);
-+    TCGv_reg dest = dest_gpr(ctx, a->t);
- 
- #ifdef CONFIG_USER_ONLY
-     /* We don't implement space registers in user mode. */
-     tcg_gen_movi_reg(dest, 0);
- #else
--    unsigned rb = extract32(insn, 21, 5);
--    unsigned sp = extract32(insn, 14, 2);
-     TCGv_i64 t0 = tcg_temp_new_i64();
- 
--    tcg_gen_mov_i64(t0, space_select(ctx, sp, load_gpr(ctx, rb)));
-+    tcg_gen_mov_i64(t0, space_select(ctx, a->sp, load_gpr(ctx, a->b)));
-     tcg_gen_shri_i64(t0, t0, 32);
-     tcg_gen_trunc_i64_reg(dest, t0);
- 
-     tcg_temp_free_i64(t0);
  #endif
--    save_gpr(ctx, rt, dest);
-+    save_gpr(ctx, a->t, dest);
  
+-static bool trans_nop(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_nop(DisasContext *ctx, arg_nop *a)
+ {
+     cond_free(&ctx->null_cond);
+     return true;
+@@ -2317,81 +2323,62 @@ static bool gen_hlt(DisasContext *ctx, int reset)
+ }
+ #endif /* !CONFIG_USER_ONLY */
+ 
+-static bool trans_base_idx_mod(DisasContext *ctx, uint32_t insn,
+-                               const DisasInsn *di)
++static bool trans_nop_addrx(DisasContext *ctx, arg_ldst *a)
+ {
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned rx = extract32(insn, 16, 5);
+-    TCGv_reg dest = dest_gpr(ctx, rb);
+-    TCGv_reg src1 = load_gpr(ctx, rb);
+-    TCGv_reg src2 = load_gpr(ctx, rx);
+-
+-    /* The only thing we need to do is the base register modification.  */
+-    tcg_gen_add_reg(dest, src1, src2);
+-    save_gpr(ctx, rb, dest);
++    if (a->m) {
++        TCGv_reg dest = dest_gpr(ctx, a->b);
++        TCGv_reg src1 = load_gpr(ctx, a->b);
++        TCGv_reg src2 = load_gpr(ctx, a->x);
+ 
++        /* The only thing we need to do is the base register modification.  */
++        tcg_gen_add_reg(dest, src1, src2);
++        save_gpr(ctx, a->b, dest);
++    }
      cond_free(&ctx->null_cond);
      return true;
  }
  
-+static bool trans_rsm(DisasContext *ctx, arg_rsm *a)
-+{
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
- #ifndef CONFIG_USER_ONLY
--/* Note that ssm/rsm instructions number PSW_W and PSW_E differently.  */
--static target_ureg extract_sm_imm(uint32_t insn)
--{
--    target_ureg val = extract32(insn, 16, 10);
--
--    if (val & PSW_SM_E) {
--        val = (val & ~PSW_SM_E) | PSW_E;
--    }
--    if (val & PSW_SM_W) {
--        val = (val & ~PSW_SM_W) | PSW_W;
--    }
--    return val;
--}
--
--static bool trans_rsm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
--{
+-static bool trans_probe(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_probe(DisasContext *ctx, arg_probe *a)
+ {
 -    unsigned rt = extract32(insn, 0, 5);
--    target_ureg sm = extract_sm_imm(insn);
-     TCGv_reg tmp;
+-    unsigned sp = extract32(insn, 14, 2);
+-    unsigned rr = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned is_write = extract32(insn, 6, 1);
+-    unsigned is_imm = extract32(insn, 13, 1);
+     TCGv_reg dest, ofs;
+     TCGv_i32 level, want;
+     TCGv_tl addr;
  
+     nullify_over(ctx);
+ 
+-    dest = dest_gpr(ctx, rt);
+-    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
++    dest = dest_gpr(ctx, a->t);
++    form_gva(ctx, &addr, &ofs, a->b, 0, 0, 0, a->sp, 0, false);
+ 
+-    if (is_imm) {
+-        level = tcg_const_i32(extract32(insn, 16, 2));
++    if (a->imm) {
++        level = tcg_const_i32(a->ri);
+     } else {
+         level = tcg_temp_new_i32();
+-        tcg_gen_trunc_reg_i32(level, load_gpr(ctx, rr));
++        tcg_gen_trunc_reg_i32(level, load_gpr(ctx, a->ri));
+         tcg_gen_andi_i32(level, level, 3);
+     }
+-    want = tcg_const_i32(is_write ? PAGE_WRITE : PAGE_READ);
++    want = tcg_const_i32(a->write ? PAGE_WRITE : PAGE_READ);
+ 
+     gen_helper_probe(dest, cpu_env, addr, level, want);
+ 
+     tcg_temp_free_i32(want);
+     tcg_temp_free_i32(level);
+ 
+-    save_gpr(ctx, rt, dest);
++    save_gpr(ctx, a->t, dest);
+     return nullify_end(ctx);
+ }
+ 
+-#ifndef CONFIG_USER_ONLY
+-static bool trans_ixtlbx(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_ixtlbx(DisasContext *ctx, arg_ixtlbx *a)
+ {
+-    unsigned sp;
+-    unsigned rr = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned is_data = insn & 0x1000;
+-    unsigned is_addr = insn & 0x40;
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++#ifndef CONFIG_USER_ONLY
+     TCGv_tl addr;
+     TCGv_reg ofs, reg;
+ 
+-    if (is_data) {
+-        sp = extract32(insn, 14, 2);
+-    } else {
+-        sp = ~assemble_sr3(insn);
+-    }
+-
 -    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
      nullify_over(ctx);
  
-     tmp = get_temp(ctx);
-     tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, psw));
--    tcg_gen_andi_reg(tmp, tmp, ~sm);
-+    tcg_gen_andi_reg(tmp, tmp, ~a->i);
-     gen_helper_swap_system_mask(tmp, cpu_env, tmp);
--    save_gpr(ctx, rt, tmp);
-+    save_gpr(ctx, a->t, tmp);
+-    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
+-    reg = load_gpr(ctx, rr);
+-    if (is_addr) {
++    form_gva(ctx, &addr, &ofs, a->b, 0, 0, 0, a->sp, 0, false);
++    reg = load_gpr(ctx, a->r);
++    if (a->addr) {
+         gen_helper_itlba(cpu_env, addr, reg);
+     } else {
+         gen_helper_itlbp(cpu_env, addr, reg);
+@@ -2399,80 +2386,67 @@ static bool trans_ixtlbx(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
  
-     /* Exit the TB to recognize new interrupts, e.g. PSW_M.  */
-     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
+     /* Exit TB for ITLB change if mmu is enabled.  This *should* not be
+        the case, since the OS TLB fill handler runs with mmu disabled.  */
+-    if (!is_data && (ctx->tb_flags & PSW_C)) {
++    if (!a->data && (ctx->tb_flags & PSW_C)) {
+         ctx->base.is_jmp = DISAS_IAQ_N_STALE;
+     }
      return nullify_end(ctx);
 +#endif
  }
  
--static bool trans_ssm(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool trans_ssm(DisasContext *ctx, arg_ssm *a)
+-static bool trans_pxtlbx(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_pxtlbx(DisasContext *ctx, arg_pxtlbx *a)
  {
--    unsigned rt = extract32(insn, 0, 5);
--    target_ureg sm = extract_sm_imm(insn);
+-    unsigned m = extract32(insn, 5, 1);
+-    unsigned sp;
+-    unsigned rx = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned is_data = insn & 0x1000;
+-    unsigned is_local = insn & 0x40;
 +    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
 +#ifndef CONFIG_USER_ONLY
-     TCGv_reg tmp;
+     TCGv_tl addr;
+     TCGv_reg ofs;
+ 
+-    if (is_data) {
+-        sp = extract32(insn, 14, 2);
+-    } else {
+-        sp = ~assemble_sr3(insn);
+-    }
+-
+-    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
+     nullify_over(ctx);
+ 
+-    form_gva(ctx, &addr, &ofs, rb, rx, 0, 0, sp, m, false);
+-    if (m) {
+-        save_gpr(ctx, rb, ofs);
++    form_gva(ctx, &addr, &ofs, a->b, a->x, 0, 0, a->sp, a->m, false);
++    if (a->m) {
++        save_gpr(ctx, a->b, ofs);
+     }
+-    if (is_local) {
++    if (a->local) {
+         gen_helper_ptlbe(cpu_env);
+     } else {
+         gen_helper_ptlb(cpu_env, addr);
+     }
+ 
+     /* Exit TB for TLB change if mmu is enabled.  */
+-    if (!is_data && (ctx->tb_flags & PSW_C)) {
++    if (!a->data && (ctx->tb_flags & PSW_C)) {
+         ctx->base.is_jmp = DISAS_IAQ_N_STALE;
+     }
+     return nullify_end(ctx);
++#endif
+ }
+ 
+-static bool trans_lpa(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_lpa(DisasContext *ctx, arg_ldst *a)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+-    unsigned m = extract32(insn, 5, 1);
+-    unsigned sp = extract32(insn, 14, 2);
+-    unsigned rx = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++#ifndef CONFIG_USER_ONLY
+     TCGv_tl vaddr;
+     TCGv_reg ofs, paddr;
  
 -    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
      nullify_over(ctx);
  
-     tmp = get_temp(ctx);
-     tcg_gen_ld_reg(tmp, cpu_env, offsetof(CPUHPPAState, psw));
--    tcg_gen_ori_reg(tmp, tmp, sm);
-+    tcg_gen_ori_reg(tmp, tmp, a->i);
-     gen_helper_swap_system_mask(tmp, cpu_env, tmp);
--    save_gpr(ctx, rt, tmp);
-+    save_gpr(ctx, a->t, tmp);
+-    form_gva(ctx, &vaddr, &ofs, rb, rx, 0, 0, sp, m, false);
++    form_gva(ctx, &vaddr, &ofs, a->b, a->x, 0, 0, a->sp, a->m, false);
  
-     /* Exit the TB to recognize new interrupts, e.g. PSW_I.  */
-     ctx->base.is_jmp = DISAS_IAQ_N_STALE_EXIT;
+     paddr = tcg_temp_new();
+     gen_helper_lpa(paddr, cpu_env, vaddr);
+ 
+     /* Note that physical address result overrides base modification.  */
+-    if (m) {
+-        save_gpr(ctx, rb, ofs);
++    if (a->m) {
++        save_gpr(ctx, a->b, ofs);
+     }
+-    save_gpr(ctx, rt, paddr);
++    save_gpr(ctx, a->t, paddr);
+     tcg_temp_free(paddr);
+ 
      return nullify_end(ctx);
 +#endif
+ }
+ 
+-static bool trans_lci(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_lci(DisasContext *ctx, arg_lci *a)
+ {
+-    unsigned rt = extract32(insn, 0, 5);
+     TCGv_reg ci;
+ 
+     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
+@@ -2482,43 +2456,12 @@ static bool trans_lci(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+        view of the cache.  Our implementation is to return 0 for all,
+        since the entire address space is coherent.  */
+     ci = tcg_const_reg(0);
+-    save_gpr(ctx, rt, ci);
++    save_gpr(ctx, a->t, ci);
+     tcg_temp_free(ci);
+ 
+     cond_free(&ctx->null_cond);
+     return true;
  }
 -#endif /* !CONFIG_USER_ONLY */
- 
- static bool trans_mtsm(DisasContext *ctx, arg_mtsm *a)
- {
-@@ -2276,15 +2269,13 @@ static bool trans_mtsm(DisasContext *ctx, arg_mtsm *a)
- #endif
- }
- 
--#ifndef CONFIG_USER_ONLY
--static bool trans_rfi(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-+static bool do_rfi(DisasContext *ctx, bool rfi_r)
- {
--    unsigned comp = extract32(insn, 5, 4);
 -
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+#ifndef CONFIG_USER_ONLY
-     nullify_over(ctx);
- 
--    if (comp == 5) {
-+    if (rfi_r) {
-         gen_helper_rfi_r(cpu_env);
-     } else {
-         gen_helper_rfi(cpu_env);
-@@ -2298,8 +2289,20 @@ static bool trans_rfi(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
-     ctx->base.is_jmp = DISAS_NORETURN;
- 
-     return nullify_end(ctx);
-+#endif
- }
- 
-+static bool trans_rfi(DisasContext *ctx, arg_rfi *a)
-+{
-+    return do_rfi(ctx, false);
-+}
-+
-+static bool trans_rfi_r(DisasContext *ctx, arg_rfi_r *a)
-+{
-+    return do_rfi(ctx, true);
-+}
-+
-+#ifndef CONFIG_USER_ONLY
- static bool gen_hlt(DisasContext *ctx, int reset)
- {
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-@@ -2314,17 +2317,6 @@ static bool gen_hlt(DisasContext *ctx, int reset)
- }
- #endif /* !CONFIG_USER_ONLY */
- 
--static const DisasInsn table_system[] = {
--    { 0x00000400u, 0xffffffffu, trans_sync },  /* sync */
--    { 0x00100400u, 0xffffffffu, trans_sync },  /* syncdma */
--    { 0x000010a0u, 0xfc1f3fe0u, trans_ldsid },
+-static const DisasInsn table_mem_mgmt[] = {
+-    { 0x04003280u, 0xfc003fffu, trans_nop },          /* fdc, disp */
+-    { 0x04001280u, 0xfc003fffu, trans_nop },          /* fdc, index */
+-    { 0x040012a0u, 0xfc003fffu, trans_base_idx_mod }, /* fdc, index, base mod */
+-    { 0x040012c0u, 0xfc003fffu, trans_nop },          /* fdce */
+-    { 0x040012e0u, 0xfc003fffu, trans_base_idx_mod }, /* fdce, base mod */
+-    { 0x04000280u, 0xfc001fffu, trans_nop },          /* fic 0a */
+-    { 0x040002a0u, 0xfc001fffu, trans_base_idx_mod }, /* fic 0a, base mod */
+-    { 0x040013c0u, 0xfc003fffu, trans_nop },          /* fic 4f */
+-    { 0x040013e0u, 0xfc003fffu, trans_base_idx_mod }, /* fic 4f, base mod */
+-    { 0x040002c0u, 0xfc001fffu, trans_nop },          /* fice */
+-    { 0x040002e0u, 0xfc001fffu, trans_base_idx_mod }, /* fice, base mod */
+-    { 0x04002700u, 0xfc003fffu, trans_nop },          /* pdc */
+-    { 0x04002720u, 0xfc003fffu, trans_base_idx_mod }, /* pdc, base mod */
+-    { 0x04001180u, 0xfc003fa0u, trans_probe },        /* probe */
+-    { 0x04003180u, 0xfc003fa0u, trans_probe },        /* probei */
 -#ifndef CONFIG_USER_ONLY
--    { 0x00000e60u, 0xfc00ffe0u, trans_rsm },
--    { 0x00000d60u, 0xfc00ffe0u, trans_ssm },
--    { 0x00000c00u, 0xfffffe1fu, trans_rfi },
+-    { 0x04000000u, 0xfc001fffu, trans_ixtlbx },       /* iitlbp */
+-    { 0x04000040u, 0xfc001fffu, trans_ixtlbx },       /* iitlba */
+-    { 0x04001000u, 0xfc001fffu, trans_ixtlbx },       /* idtlbp */
+-    { 0x04001040u, 0xfc001fffu, trans_ixtlbx },       /* idtlba */
+-    { 0x04000200u, 0xfc001fdfu, trans_pxtlbx },       /* pitlb */
+-    { 0x04000240u, 0xfc001fdfu, trans_pxtlbx },       /* pitlbe */
+-    { 0x04001200u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlb */
+-    { 0x04001240u, 0xfc001fdfu, trans_pxtlbx },       /* pdtlbe */
+-    { 0x04001340u, 0xfc003fc0u, trans_lpa },
+-    { 0x04001300u, 0xfc003fe0u, trans_lci },
 -#endif
 -};
--
- static bool trans_base_idx_mod(DisasContext *ctx, uint32_t insn,
-                                const DisasInsn *di)
+ 
+ static bool trans_add(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
  {
-@@ -4542,9 +4534,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+@@ -4544,9 +4487,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
  
      opc = extract32(insn, 26, 6);
      switch (opc) {
--    case 0x00: /* system op */
--        translate_table(ctx, insn, table_system);
+-    case 0x01:
+-        translate_table(ctx, insn, table_mem_mgmt);
 -        return;
-     case 0x01:
-         translate_table(ctx, insn, table_mem_mgmt);
+     case 0x02:
+         translate_table(ctx, insn, table_arith_log);
          return;
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index 047a9d01ec..16ea5e1b46 100644
+index 16ea5e1b46..41c999eeb8 100644
 --- a/target/hppa/insns.decode
 +++ b/target/hppa/insns.decode
-@@ -23,6 +23,8 @@
+@@ -22,9 +22,17 @@
+ ####
  
  %assemble_sr3   13:1 14:2
++%assemble_sr3x  13:1 14:2 !function=expand_sr3x
  
-+%sm_imm         16:10 !function=expand_sm_imm
+ %sm_imm         16:10 !function=expand_sm_imm
+ 
++####
++# Argument set definitions
++####
++
++# All insns that need to form a virtual address should use this set.
++&ldst           t b x disp sp m scale size
 +
  ####
  # System
  ####
-@@ -37,3 +39,13 @@ mtsm            000000 00000 r:5   000 11000011 00000
- mfia            000000 ----- 00000 ---   10100101 t:5
- mfsp            000000 ----- 00000 ...   00100101 t:5   sp=%assemble_sr3
- mfctl           000000 r:5   00000- e:1 -01000101 t:5
+@@ -49,3 +57,33 @@ ssm             000000 ..........  000 01101011 t:5     i=%sm_imm
+ 
+ rfi             000000 ----- ----- --- 01100000 00000
+ rfi_r           000000 ----- ----- --- 01100101 00000
 +
-+sync            000000 ----- ----- 000 00100000 00000   # sync, syncdma
++####
++# Memory Management
++####
 +
-+ldsid           000000 b:5   ----- sp:2 0 10000101 t:5
++@addrx          ...... b:5 x:5 .. ........ m:1 .....    \
++                &ldst disp=0 scale=0 t=0 sp=0 size=0
 +
-+rsm             000000 ..........  000 01110011 t:5     i=%sm_imm
-+ssm             000000 ..........  000 01101011 t:5     i=%sm_imm
++nop             000001 ----- ----- -- 11001010 0 -----         # fdc, disp
++nop_addrx       000001 ..... ..... -- 01001010 . -----  @addrx # fdc, index
++nop_addrx       000001 ..... ..... -- 01001011 . -----  @addrx # fdce
++nop_addrx       000001 ..... ..... --- 0001010 . -----  @addrx # fic 0x0a
++nop_addrx       000001 ..... ..... -- 01001111 . 00000  @addrx # fic 0x4f
++nop_addrx       000001 ..... ..... --- 0001011 . -----  @addrx # fice
++nop_addrx       000001 ..... ..... -- 01001110 . 00000  @addrx # pdc
 +
-+rfi             000000 ----- ----- --- 01100000 00000
-+rfi_r           000000 ----- ----- --- 01100101 00000
++probe           000001 b:5 ri:5 sp:2 imm:1 100011 write:1 0 t:5
++
++ixtlbx          000001 b:5 r:5 sp:2 0100000 addr:1 0 00000      data=1
++ixtlbx          000001 b:5 r:5 ... 000000 addr:1 0 00000        \
++                sp=%assemble_sr3x data=0
++
++pxtlbx          000001 b:5 x:5 sp:2 0100100 local:1 m:1 -----   data=1
++pxtlbx          000001 b:5 x:5 ... 000100 local:1 m:1 -----     \
++                sp=%assemble_sr3x data=0
++
++lpa             000001 b:5 x:5 sp:2 01001101 m:1 t:5    \
++                &ldst disp=0 scale=0 size=0
++
++lci             000001 ----- ----- -- 01001100 0 t:5
 -- 
 2.17.2
