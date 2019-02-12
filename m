@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38973)
+Received: from eggs.gnu.org ([209.51.188.92]:40882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1gtVPv-0003aw-2T
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:35:56 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtVTI-0006G3-W8
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:39:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1gtVPn-00027h-Ak
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:35:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1gtVPm-00021B-Gh
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:35:46 -0500
-Date: Tue, 12 Feb 2019 11:35:41 +0100
-From: Eduardo Otubo <otubo@redhat.com>
-Message-ID: <20190212103541.GB8193@vader>
-References: <1547732292-14021-1-git-send-email-thuth@redhat.com>
-	<1547732292-14021-4-git-send-email-thuth@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gtVTI-0000hc-8m
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:39:24 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtVTI-0000fz-1p
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:39:24 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l9so2047817wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 02:39:23 -0800 (PST)
+References: <20190204142638.27021-1-mst@redhat.com>
+	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
+	<20190204205105-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
+	<20190205110518-mutt-send-email-mst@kernel.org>
+	<20190212071114.GM1011@xz-x1>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bb1175b1-6b51-2df2-047d-b625413ea3dc@redhat.com>
+Date: Tue, 12 Feb 2019 11:39:21 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WYTEVAkct0FjGQmd"
-Content-Disposition: inline
-In-Reply-To: <1547732292-14021-4-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v3 26/28] seccomp: Work-around GCC 4.x bug
- in gnu99 mode
+In-Reply-To: <20190212071114.GM1011@xz-x1>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, clg@kaod.org, mst@redhat.com, Li Qiang <liq3ea@163.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, groug@kaod.org
+To: Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 2/12/19 8:11 AM, Peter Xu wrote:
+> On Tue, Feb 05, 2019 at 11:06:42AM -0500, Michael S. Tsirkin wrote:
+>>
+>> OK I reverted the whole part dealing with vhost-user and reposted.
+> 
+> I noticed that the merged pull request could possibly have squashed
+> the below two patches (in previous pull) into one super patch
+> (a56de056c91f87e1e):
+> 
+>         i386/kvm: ignore masked irqs when update msi routes
+>         contrib/vhost-user-blk: fix the compilation issue
+> 
+> Here, the first patch lost its commit message, and the last patch lost
+> its real author. ;)
 
---WYTEVAkct0FjGQmd
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 17/01/2019 - 14:38:12, Thomas Huth wrote:
-> We'd like to compile QEMU with -std=3Dgnu99, but GCC 4.8 currently
-> fails to compile qemu-seccomp.c in this mode:
->=20
-> qemu-seccomp.c:45:1: error: initializer element is not constant
->  };
->  ^
-> qemu-seccomp.c:45:1: error: (near initialization for =E2=80=98sched_setsc=
-heduler_arg[0]=E2=80=99)
->=20
-> This is due to a compiler bug which has just been fixed in GCC 5.0:
->=20
->  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D63567
->=20
-> Since we still want to support GCC 4.8 for a while and also want to use
-> gnu99 mode, work-around the issue by expanding the macro manually.
->=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  qemu-seccomp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-> index 5c73e6a..36d5829 100644
-> --- a/qemu-seccomp.c
-> +++ b/qemu-seccomp.c
-> @@ -41,7 +41,8 @@ struct QemuSeccompSyscall {
->  };
-> =20
->  const struct scmp_arg_cmp sched_setscheduler_arg[] =3D {
-> -    SCMP_A1(SCMP_CMP_NE, SCHED_IDLE)
-> +    /* was SCMP_A1(SCMP_CMP_NE, SCHED_IDLE), but expanded due to GCC 4.x=
- bug */
-> +    { .arg =3D 1, .op =3D SCMP_CMP_NE, .datum_a =3D SCHED_IDLE }
->  };
-> =20
->  static const struct QemuSeccompSyscall blacklist[] =3D {
-> --=20
-> 1.8.3.1
->=20
->=20
-
-Just noticed you already sent the pull request, sorry, my tree was outdated.
-Please ignore my previous email :)
-
---=20
-Eduardo Otubo
-
---WYTEVAkct0FjGQmd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcYqF9AAoJEN8y58Dw//miYCEH/jDkj5EGqSX3DIvQtVhOj38L
-/RE0eY1epJ5JizXb62iJSrc/2eg3RPchqANKmT9OkSmHaE85GBYzjS5Gbq6pvl4H
-5AGgC0Vx5gVP90C5eeFNy/J3/KQT+iWEWmX39FtTXi0FthhyHayw2y4si4Euh0jM
-4WWbAnRG4M9CtLQ+8BihIK0JQXglulsW/vudH9glXLU0wRfqVGpcj70jCXMf1WBV
-rqvDMnpQLa6FcixYYKHmoyylLESiNbvnwE7dSDm0XhrkX5S0RNENIAvsVh/tkbH/
-NT+9rAN7l+u97++i5wEUiZT8bzJTJr8hQUqxzvL5rK24ju8VhJJqDOpxffqgZwE=
-=LvoL
------END PGP SIGNATURE-----
-
---WYTEVAkct0FjGQmd--
+I suggest we revert a56de056c9 ASAP and reapply the both patches, this
+will ease cherry-picking/downstream workflow.
