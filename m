@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49343)
+Received: from eggs.gnu.org ([209.51.188.92]:49428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8n-0002Xy-AA
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:57 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8p-0002Yn-1Q
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8l-0001mD-37
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:52 -0500
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:38694)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8m-0001qB-Ew
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:54 -0500
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:35482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtQ8e-0001bf-Cw
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:46 -0500
-Received: by mail-pl1-x635.google.com with SMTP id e5so690842plb.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:36 -0800 (PST)
+	id 1gtQ8l-0001l9-UR
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:52 -0500
+Received: by mail-pl1-x62d.google.com with SMTP id p8so699870plo.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:50 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 20:57:06 -0800
-Message-Id: <20190212045721.28041-10-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 20:57:18 -0800
+Message-Id: <20190212045721.28041-22-richard.henderson@linaro.org>
 In-Reply-To: <20190212045721.28041-1-richard.henderson@linaro.org>
 References: <20190212045721.28041-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 09/24] target/hppa: Convert fp multiply-add
+Subject: [Qemu-devel] [PULL 21/24] target/hppa: Rearrange log conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,135 +29,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Tested-by: Helge Deller <deller@gmx.de>
-Tested-by: Sven Schnelle <svens@stackframe.org>
+We will be fixing do_cond vs signed overflow, which requires
+that do_log_cond not rely on do_cond.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 69 +++++++++++++++++++++++-----------------
- target/hppa/insns.decode | 12 +++++++
- 2 files changed, 52 insertions(+), 29 deletions(-)
+ target/hppa/translate.c | 56 +++++++++++++++++++++++++++++++++++------
+ 1 file changed, 49 insertions(+), 7 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 822d93fb23..2f4a50e113 100644
+index 6836fb6245..aae5714235 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -4255,37 +4255,54 @@ static inline int fmpyadd_s_reg(unsigned r)
-     return (r & 16) * 2 + 16 + (r & 15);
+@@ -432,6 +432,15 @@ static DisasCond cond_make_f(void)
+     };
  }
  
--static bool trans_fmpyadd(DisasContext *ctx, uint32_t insn, bool is_sub)
-+static bool do_fmpyadd_s(DisasContext *ctx, arg_mpyadd *a, bool is_sub)
++static DisasCond cond_make_t(void)
++{
++    return (DisasCond){
++        .c = TCG_COND_ALWAYS,
++        .a0 = NULL,
++        .a1 = NULL,
++    };
++}
++
+ static DisasCond cond_make_n(void)
  {
--    unsigned tm = extract32(insn, 0, 5);
--    unsigned f = extract32(insn, 5, 1);
--    unsigned ra = extract32(insn, 6, 5);
--    unsigned ta = extract32(insn, 11, 5);
--    unsigned rm2 = extract32(insn, 16, 5);
--    unsigned rm1 = extract32(insn, 21, 5);
-+    int tm = fmpyadd_s_reg(a->tm);
-+    int ra = fmpyadd_s_reg(a->ra);
-+    int ta = fmpyadd_s_reg(a->ta);
-+    int rm2 = fmpyadd_s_reg(a->rm2);
-+    int rm1 = fmpyadd_s_reg(a->rm1);
- 
-     nullify_over(ctx);
- 
--    /* Independent multiply & add/sub, with undefined behaviour
--       if outputs overlap inputs.  */
--    if (f == 0) {
--        tm = fmpyadd_s_reg(tm);
--        ra = fmpyadd_s_reg(ra);
--        ta = fmpyadd_s_reg(ta);
--        rm2 = fmpyadd_s_reg(rm2);
--        rm1 = fmpyadd_s_reg(rm1);
--        do_fop_weww(ctx, tm, rm1, rm2, gen_helper_fmpy_s);
--        do_fop_weww(ctx, ta, ta, ra,
--                    is_sub ? gen_helper_fsub_s : gen_helper_fadd_s);
--    } else {
--        do_fop_dedd(ctx, tm, rm1, rm2, gen_helper_fmpy_d);
--        do_fop_dedd(ctx, ta, ta, ra,
--                    is_sub ? gen_helper_fsub_d : gen_helper_fadd_d);
--    }
-+    do_fop_weww(ctx, tm, rm1, rm2, gen_helper_fmpy_s);
-+    do_fop_weww(ctx, ta, ta, ra,
-+                is_sub ? gen_helper_fsub_s : gen_helper_fadd_s);
- 
-     return nullify_end(ctx);
+     return (DisasCond){
+@@ -930,17 +939,50 @@ static DisasCond do_sub_cond(unsigned cf, TCGv_reg res,
+     return cond;
  }
  
-+static bool trans_fmpyadd_f(DisasContext *ctx, arg_mpyadd *a)
-+{
-+    return do_fmpyadd_s(ctx, a, false);
-+}
-+
-+static bool trans_fmpysub_f(DisasContext *ctx, arg_mpyadd *a)
-+{
-+    return do_fmpyadd_s(ctx, a, true);
-+}
-+
-+static bool do_fmpyadd_d(DisasContext *ctx, arg_mpyadd *a, bool is_sub)
-+{
-+    nullify_over(ctx);
-+
-+    do_fop_dedd(ctx, a->tm, a->rm1, a->rm2, gen_helper_fmpy_d);
-+    do_fop_dedd(ctx, a->ta, a->ta, a->ra,
-+                is_sub ? gen_helper_fsub_d : gen_helper_fadd_d);
-+
-+    return nullify_end(ctx);
-+}
-+
-+static bool trans_fmpyadd_d(DisasContext *ctx, arg_mpyadd *a)
-+{
-+    return do_fmpyadd_d(ctx, a, false);
-+}
-+
-+static bool trans_fmpysub_d(DisasContext *ctx, arg_mpyadd *a)
-+{
-+    return do_fmpyadd_d(ctx, a, true);
-+}
-+
- static bool trans_fmpyfadd_s(DisasContext *ctx, uint32_t insn,
-                              const DisasInsn *di)
- {
-@@ -4376,9 +4393,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+-/* Similar, but for logicals, where the carry and overflow bits are not
+-   computed, and use of them is undefined.  */
++/*
++ * Similar, but for logicals, where the carry and overflow bits are not
++ * computed, and use of them is undefined.
++ *
++ * Undefined or not, hardware does not trap.  It seems reasonable to
++ * assume hardware treats cases c={4,5,6} as if C=0 & V=0, since that's
++ * how cases c={2,3} are treated.
++ */
  
-     opc = extract32(insn, 26, 6);
-     switch (opc) {
--    case 0x06:
--        trans_fmpyadd(ctx, insn, false);
--        return;
-     case 0x08:
-         trans_ldil(ctx, insn);
-         return;
-@@ -4456,9 +4470,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
-     case 0x25:
-         trans_subi(ctx, insn);
-         return;
--    case 0x26:
--        trans_fmpyadd(ctx, insn, true);
--        return;
-     case 0x27:
-         trans_cmpb(ctx, insn, true, false, true);
-         return;
-diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index 38f5fb6be2..16a999b05f 100644
---- a/target/hppa/insns.decode
-+++ b/target/hppa/insns.decode
-@@ -153,3 +153,15 @@ lda             000011 ..... ..... .. . 1 -- 0110      ......   @ldim5 size=2
- lda             000011 ..... ..... .. . 0 -- 0110      ......   @ldstx size=2
- sta             000011 ..... ..... .. . 1 -- 1110      ......   @stim5 size=2
- stby            000011 b:5 r:5 sp:2 a:1 1 -- 1100 m:1   .....   disp=%im5_0
+ static DisasCond do_log_cond(unsigned cf, TCGv_reg res)
+ {
+-    switch (cf >> 1) {
+-    case 4: case 5: case 6:
+-        cf &= 1;
+-        break;
++    switch (cf) {
++    case 0:  /* never */
++    case 9:  /* undef, C */
++    case 11: /* undef, C & !Z */
++    case 12: /* undef, V */
++        return cond_make_f();
 +
-+####
-+# Floating-point Multiply Add
-+####
++    case 1:  /* true */
++    case 8:  /* undef, !C */
++    case 10: /* undef, !C | Z */
++    case 13: /* undef, !V */
++        return cond_make_t();
 +
-+&mpyadd         rm1 rm2 ta ra tm
-+@mpyadd         ...... rm1:5 rm2:5 ta:5 ra:5 . tm:5     &mpyadd
++    case 2:  /* == */
++        return cond_make_0(TCG_COND_EQ, res);
++    case 3:  /* <> */
++        return cond_make_0(TCG_COND_NE, res);
++    case 4:  /* < */
++        return cond_make_0(TCG_COND_LT, res);
++    case 5:  /* >= */
++        return cond_make_0(TCG_COND_GE, res);
++    case 6:  /* <= */
++        return cond_make_0(TCG_COND_LE, res);
++    case 7:  /* > */
++        return cond_make_0(TCG_COND_GT, res);
 +
-+fmpyadd_f       000110 ..... ..... ..... ..... 0 .....  @mpyadd
-+fmpyadd_d       000110 ..... ..... ..... ..... 1 .....  @mpyadd
-+fmpysub_f       100110 ..... ..... ..... ..... 0 .....  @mpyadd
-+fmpysub_d       100110 ..... ..... ..... ..... 1 .....  @mpyadd
++    case 14: /* OD */
++    case 15: /* EV */
++        return do_cond(cf, res, NULL, NULL);
++
++    default:
++        g_assert_not_reached();
+     }
+-    return do_cond(cf, res, res, res);
+ }
+ 
+ /* Similar, but for shift/extract/deposit conditions.  */
 -- 
 2.17.2
