@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43573)
+Received: from eggs.gnu.org ([209.51.188.92]:45569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gtg40-0002OC-EY
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:58:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1gtgAk-0005bb-8l
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 17:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gtg3y-0007KN-S9
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:58:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gtg3y-00074i-Jq
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:57:58 -0500
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 12 Feb 2019 22:48:27 +0100
-Message-Id: <20190212214827.30543-5-lvivier@redhat.com>
-In-Reply-To: <20190212214827.30543-1-lvivier@redhat.com>
-References: <20190212214827.30543-1-lvivier@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gtgAj-0001pb-0R
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 17:04:58 -0500
+References: <20190212200750.27521-1-jsnow@redhat.com>
+	<44d4452d-8b94-205a-dc28-c617be80c29c@redhat.com>
+	<87241634-5a14-f943-8446-07bd34f12aff@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <445f2f21-d769-14f5-2259-80b3ea6e9988@redhat.com>
+Date: Tue, 12 Feb 2019 16:04:31 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC 4/4] numa: check threads of the same core are on
- the same node
+In-Reply-To: <87241634-5a14-f943-8446-07bd34f12aff@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="b33FJip739WpUWkNsbwQjuxGLndZV9qgU"
+Subject: Re: [Qemu-devel] [PATCH v2] blockdev: acquire aio_context for
+ bitmap add/remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-A core cannot be split between two nodes.
-To check if a thread of the same core has already been assigned to a node=
-,
-this patch reverses the numa topology checking order and exits if the
-topology is not valid.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--b33FJip739WpUWkNsbwQjuxGLndZV9qgU
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com,
+ vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <445f2f21-d769-14f5-2259-80b3ea6e9988@redhat.com>
+Subject: Re: [PATCH v2] blockdev: acquire aio_context for bitmap add/remove
+References: <20190212200750.27521-1-jsnow@redhat.com>
+ <44d4452d-8b94-205a-dc28-c617be80c29c@redhat.com>
+ <87241634-5a14-f943-8446-07bd34f12aff@redhat.com>
+In-Reply-To: <87241634-5a14-f943-8446-07bd34f12aff@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Update test/numa-test accordingly.
+On 2/12/19 3:37 PM, John Snow wrote:
+>=20
+>=20
+> On 2/12/19 3:16 PM, Eric Blake wrote:
+>> On 2/12/19 2:07 PM, John Snow wrote:
+>>> When bitmaps are persistent, they may incur a disk read or write when=
+ bitmaps
+>>> are added or removed. For configurations like virtio-dataplane, faili=
+ng to
+>>> acquire this lock will abort QEMU when disk IO occurs.
+>>>
+>>> We used to acquire aio_context as part of the bitmap lookup, so re-in=
+troduce
+>>> the lock for just the cases that have an IO penalty.
+>>
+>> It would be nice to call out which commit id dropped the aio_context
+>> acquisition during bitmap lookup (making it easier to analyze how long=
 
-Fixes: 722387e78daf ("spapr: get numa node mapping from possible_cpus ins=
-tead of numa_get_node_for_cpu()")
-Cc: imammedo@redhat.com
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/core/machine.c | 27 ++++++++++++++++++++++++---
- tests/numa-test.c |  4 ++--
- 2 files changed, 26 insertions(+), 5 deletions(-)
+>> this has broken, and which downstream builds need the backport.
+>>
+>=20
+> OK, I will amend this.
+>=20
+> Looks like:
+>=20
+> commit 2119882c7eb7e2c612b24fc0c8d86f5887d6f1c3
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Mon Jun 5 14:39:03 2017 +0200
+>=20
+> since 2.10.
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index a2c29692b55e..c0a556b0dce7 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -602,6 +602,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
-     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     bool match =3D false;
-     int i;
-+    const CpuInstanceProperties *previous_props =3D NULL;
-=20
-     if (!mc->possible_cpu_arch_ids) {
-         error_setg(errp, "mapping of CPUs to NUMA node is not supported"=
-);
-@@ -634,18 +635,38 @@ void machine_set_cpu_numa_node(MachineState *machin=
-e,
-         }
-=20
-         /* skip slots with explicit mismatch */
--        if (props->has_thread_id && props->thread_id !=3D slot->props.th=
-read_id) {
-+        if (props->has_socket_id && props->socket_id !=3D slot->props.so=
-cket_id) {
-                 continue;
-         }
-=20
--        if (props->has_core_id && props->core_id !=3D slot->props.core_i=
-d) {
-+        if (props->has_core_id) {
-+            if (props->core_id !=3D slot->props.core_id) {
-                 continue;
-+            }
-+            if (slot->props.has_node_id) {
-+                /* we have a node where our core is already assigned */
-+                previous_props =3D &slot->props;
-+            }
-         }
-=20
--        if (props->has_socket_id && props->socket_id !=3D slot->props.so=
-cket_id) {
-+        if (props->has_thread_id && props->thread_id !=3D slot->props.th=
-read_id) {
-                 continue;
-         }
-=20
-+        /* check current thread matches node of the thread of the same c=
-ore */
-+        if (previous_props && previous_props->has_node_id &&
-+            previous_props->node_id !=3D props->node_id) {
-+            char *cpu_str =3D cpu_props_to_string(props);
-+            char *node_str =3D cpu_props_to_string(previous_props);
-+            error_setg(errp,  "Invalid node-id=3D%"PRIu64" of [%s]: core=
--id "
-+                              "[%s] is already assigned to node-id %"PRI=
-u64,
-+                              props->node_id, cpu_str,
-+                              node_str, previous_props->node_id);
-+            g_free(cpu_str);
-+            g_free(node_str);
-+            return;
-+        }
-+
-         /* reject assignment if slot is already assigned, for compatibil=
-ity
-          * of legacy cpu_index mapping with SPAPR core based mapping do =
-not
-          * error out if cpu thread and matched core have the same node-i=
-d */
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index 5280573fc992..a7c3c5b4dee8 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -112,7 +112,7 @@ static void pc_numa_cpu(const void *data)
-         "-numa cpu,node-id=3D1,socket-id=3D0 "
-         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
-         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
--        "-numa cpu,node-id=3D1,socket-id=3D1,core-id=3D1,thread-id=3D1")=
-;
-+        "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D1")=
-;
-     qtest_start(cli);
-     cpus =3D get_cpus(&resp);
-     g_assert(cpus);
-@@ -141,7 +141,7 @@ static void pc_numa_cpu(const void *data)
-         } else if (socket =3D=3D 1 && core =3D=3D 1 && thread =3D=3D 0) =
-{
-             g_assert_cmpint(node, =3D=3D, 0);
-         } else if (socket =3D=3D 1 && core =3D=3D 1 && thread =3D=3D 1) =
-{
--            g_assert_cmpint(node, =3D=3D, 1);
-+            g_assert_cmpint(node, =3D=3D, 0);
-         } else {
-             g_assert(false);
-         }
+Hmm. block-dirty-bitmap-add's "persistent":true parameter was also added
+in 2.10 in commit fd5ae4cc.  In fact, 2119882c was made at a time when
+there were not persistent bitmaps; so I guess that this means we have
+always been broken since fd5ae4cc.
+
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--b33FJip739WpUWkNsbwQjuxGLndZV9qgU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxjQu8ACgkQp6FrSiUn
+Q2o6SAf/eqTwF5W/m0rscZXHMLl9Si+CTvdFIsu8+fe8CHWJyhvnVVmziI1lhFVc
+1RapKkZkP/tPOBMHwOagZgL99wIZpqQhLt6d2tUmpniwrFYo64i96LmbbeHJjR5a
+oTmweFb1HpBrfWM8gGV+6NXnDUCZJVbWPkfOnzi0e65wip9p5ZosG+AJ4bxmiEzG
+rgxNXJDBzUdJhlbgOXqkHBJe3Jw7Fab7TNJB9/bcLvIFWTRRg7xdFIFhhLLyNYeW
+XZ+vam8pC+ILvJudqYrVfvvS4FpTxP+ffURCpx+PvJtt7P6VSNShVkutNK5ap6NC
+Dfull1G3gWOIWMBqlD4HYGwLGVSK+Q==
+=dIDc
+-----END PGP SIGNATURE-----
+
+--b33FJip739WpUWkNsbwQjuxGLndZV9qgU--
