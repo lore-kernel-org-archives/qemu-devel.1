@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38418)
+Received: from eggs.gnu.org ([209.51.188.92]:38445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtfnM-0000GK-0C
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:40:48 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gtfnt-0000Jc-I8
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:41:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtfnL-0005ry-2J
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:40:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gtfnK-0005qZ-RZ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:40:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gtfnJ-0005lk-4u
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 21:40:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2407C2E80C9
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 21:40:45 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1gtfjt-0002fr-0P
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 16:37:13 -0500
+References: <20190212200750.27521-1-jsnow@redhat.com>
+	<44d4452d-8b94-205a-dc28-c617be80c29c@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <87241634-5a14-f943-8446-07bd34f12aff@redhat.com>
+Date: Tue, 12 Feb 2019 16:37:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Feb 2019 21:34:17 -0000
-From: Richard Henderson <rth@twiddle.net>
-Reply-To: Bug 1813034 <1813034@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154825664980.17863.13835329741356483876.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155000725725.19204.10846055840278737276.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813034] Re: create_elf_tables() doesn't set
- AT_PLATFORM for 32bit ARM platforms
+In-Reply-To: <44d4452d-8b94-205a-dc28-c617be80c29c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] blockdev: acquire aio_context for
+ bitmap add/remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pbonzini@redhat.com, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Patches posted:
-https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02863.html
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Richard Henderson (rth)
 
--- =
+On 2/12/19 3:16 PM, Eric Blake wrote:
+> On 2/12/19 2:07 PM, John Snow wrote:
+>> When bitmaps are persistent, they may incur a disk read or write when bitmaps
+>> are added or removed. For configurations like virtio-dataplane, failing to
+>> acquire this lock will abort QEMU when disk IO occurs.
+>>
+>> We used to acquire aio_context as part of the bitmap lookup, so re-introduce
+>> the lock for just the cases that have an IO penalty.
+> 
+> It would be nice to call out which commit id dropped the aio_context
+> acquisition during bitmap lookup (making it easier to analyze how long
+> this has broken, and which downstream builds need the backport.
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813034
+OK, I will amend this.
 
-Title:
-  create_elf_tables() doesn't set AT_PLATFORM for 32bit ARM  platforms
+Looks like:
 
-Status in QEMU:
-  New
+commit 2119882c7eb7e2c612b24fc0c8d86f5887d6f1c3
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Mon Jun 5 14:39:03 2017 +0200
 
-Bug description:
-  The dynamic linker uses AT_PLATFORM from getauxval to substitute
-  $PLATFORM in certain places (man ld.so). It would be nice if it was
-  set to 'v6l', 'v7l' and whatever other platforms there are according
-  to the chosen CPU or via an environment variable. AT_PLATFORM is not
-  guaranteed to be set, so this isn't a major bug, but this is one case
-  where it makes things difficult.
+since 2.10.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813034/+subscriptions
+>>
+>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1672010
+>> Reported-By: Aihua Liang <aliang@redhat.com>
+>> ---
+>>  blockdev.c | 26 ++++++++++++++++++++------
+>>  1 file changed, 20 insertions(+), 6 deletions(-)
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
