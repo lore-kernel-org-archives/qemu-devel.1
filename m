@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34876)
+Received: from eggs.gnu.org ([209.51.188.92]:34440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtcbm-0002ZT-Oo
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:16:40 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtcbn-00025J-Bo
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:16:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtcOY-0003Tq-6G
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:02:59 -0500
-Date: Tue, 12 Feb 2019 19:02:31 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190212180231.GJ5283@localhost.localdomain>
-References: <cover.1547739122.git.berto@igalia.com>
-	<61bbfa3721938326edb03db58a6a246b384f3260.1547739122.git.berto@igalia.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gtcNa-00029K-NF
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:01:59 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gtcNa-0001oR-FA
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:01:58 -0500
+Received: by mail-pl1-x644.google.com with SMTP id r14so1641963pls.12
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:01:39 -0800 (PST)
+References: <20190212110308.13707-1-david@redhat.com>
+	<20190212110308.13707-3-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4cc9037e-de4d-b2fc-0329-3b97d2b289b9@linaro.org>
+Date: Tue, 12 Feb 2019 10:01:33 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <61bbfa3721938326edb03db58a6a246b384f3260.1547739122.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 09/13] block: Add 'runtime_opts' and
- 'mutable_opts' fields to BlockDriver
+In-Reply-To: <20190212110308.13707-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 01/15] s390x/tcg: Fix TEST DATA CLASS
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Am 17.01.2019 um 16:34 hat Alberto Garcia geschrieben:
-> This patch adds two new fields to BlockDriver:
-> 
->    - runtime_opts: list of runtime options for a particular block
->      driver. We'll use this list later to detect what options are
->      missing when we try to reopen a block device.
-> 
->    - mutable_opts: names of the runtime options that can be reset to
->      their default value after a block device has been added. This way
->      an option can not be reset by omitting it during reopen unless we
->      explicitly allow it.
-> 
-> This also sets runtime_opts (and mutable_opts where appropriate) in
-> all drivers that allow reopening.
+On 2/12/19 3:02 AM, David Hildenbrand wrote:
+> +static bool s390_tdc32(CPUS390XState *env, float32 f1, uint16_t dc_mask)
+> +{
+> +        const bool neg = float32_is_neg(f1);
+> +        const bool zero = float32_is_zero(f1);
+> +        const bool normal = float32_is_normal(f1);
+> +        const bool denormal = float32_is_denormal(f1);
+> +        const bool infinity = float32_is_infinity(f1);
+> +        const bool quiet_nan = float32_is_quiet_nan(f1, &env->fpu_status);
+> +        const bool sig_nan = float32_is_signaling_nan(f1, &env->fpu_status);
+> +
+> +        return (zero && test_dc_mask(dc_mask, 0, neg)) ||
+> +               (normal && test_dc_mask(dc_mask, 2, neg)) ||
+> +               (denormal && test_dc_mask(dc_mask, 4, neg)) ||
+> +               (infinity && test_dc_mask(dc_mask, 6, neg)) ||
+> +               (quiet_nan && test_dc_mask(dc_mask, 8, neg)) ||
+> +               (sig_nan && test_dc_mask(dc_mask, 10, neg));
+> +}
+> +
 
-qcow2 most certainly does support reopening, and is probably one of the
-few drivers that actually allow changing things at runtime. Still, it's
-missing from this patch.
+This is doing more work than necessary, since any one fp value can only be one
+of these.
 
-> Most of those drivers don't actually
-> support changing any of their options. If the user specifies a new
-> value for an option that can't be changed then we already detect that
-> and forbid it (in bdrv_reopen_prepare()). But if the user omits an
-> option in order to try to reset it to its default value we need to
-> detect that, so we'll use these two new fields for that.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+I think it would be better to structure this like the riscv helper_fclass_*:
 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index fd0e88d17a..e680dda86b 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -345,6 +345,13 @@ struct BlockDriver {
->  
->      /* List of options for creating images, terminated by name == NULL */
->      QemuOptsList *create_opts;
-> +    /* Runtime options for a block device, terminated by name == NULL */
-> +    QemuOptsList *runtime_opts;
+static inline uint32_t dcmask(int bit, bool neg)
+{
+    return 1 << (11 - bit - neg);
+}
 
-I'm not sure if using a QemuOptsList here is a good idea. Currently, we
-use QemuOptsLists for most options, but there are some drivers that use
-it only for part of their options, or not at all, using direct QDict
-accesses or QAPI objects for the rest.
+static uint32_t float32_dcmask(CPUS390XState *env, float32 f1)
+{
+    bool neg = float32_is_neg(f1);
 
-Especially the part with the QAPI objects is something that I'd hope to
-see more in the future, and tying things to QemuOpts might make this
-conversion harder.
+    /* Sorted by most common cases.  */
+    if (float32_is_normal(f1)) {
+        return dc_mask(2, neg);
+    } else if (float32_is_zero(f1)) {
+        return dc_mask(0, neg);
+    } else if (float32_is_zero_or_denormal(f1)) {
+        /* denormal, since zero is eliminated */
+        return dc_mask(4, neg);
+    } else if (float32_is_infinity(f1)) {
+        return dc_mask(6, neg);
+    } else if (float64_is_quiet_nan(f1, &env->fpu_status)) {
+        return dc_mask(8, neg);
+    } else {
+        /* signaling nan, as last remaining case */
+        return dc_mask(10, neg);
+    }
+}
 
-> +    /*
-> +     * Names of the runtime options that can be reset by omitting
-> +     * their value on reopen, NULL-terminated.
-> +     */
-> +    const char *const *mutable_opts;
->  
->      /*
->       * Returns 0 for completed check, -errno for internal errors.
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 8a1a9f4b6e..6de6112ce8 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -1231,6 +1231,7 @@ static QemuOptsList qemu_rbd_create_opts = {
->  static BlockDriver bdrv_rbd = {
->      .format_name            = "rbd",
->      .instance_size          = sizeof(BDRVRBDState),
-> +    .runtime_opts           = &runtime_opts,
->      .bdrv_parse_filename    = qemu_rbd_parse_filename,
->      .bdrv_refresh_limits    = qemu_rbd_refresh_limits,
->      .bdrv_file_open         = qemu_rbd_open,
+uint32_t HELPER(tceb)(CPUS390XState *env, uint64_t f1, uint64_t m2)
+{
+    return (m2 & float32_dcmask(env, f1)) != 0;
+}
 
-rbd is one of these drivers. In fact, its runtime_opts seems to be
-completely unused before this patch.
+You may or may not wish to macro-ise float32_dcmask for the float type.
 
-It has a comemnt 'server.* extracted manually, see qemu_rbd_mon_host()',
-but if you compare it to the schema, more options that have been added
-since are not covered in runtime_opts.
 
-> diff --git a/block/sheepdog.c b/block/sheepdog.c
-> index 90ab43baa4..6dd66d0b99 100644
-> --- a/block/sheepdog.c
-> +++ b/block/sheepdog.c
-> @@ -3288,6 +3288,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
->      .bdrv_attach_aio_context      = sd_attach_aio_context,
->  
->      .create_opts                  = &sd_create_opts,
-> +    .runtime_opts                 = &runtime_opts,
->  };
-
-Sheepdog is another driver where runtime_opts is incomplete (the
-'server' struct is missing).
-
-Kevin
+r~
