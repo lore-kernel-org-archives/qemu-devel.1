@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37374)
+Received: from eggs.gnu.org ([209.51.188.92]:39599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gtWAi-0005Yq-BU
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:24:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gtWEI-0007tp-Gf
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:27:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gtWAV-00049z-Ly
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:24:08 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:50098)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gtWAQ-00041g-Ue
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:23:59 -0500
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 12 Feb 2019 13:23:47 +0200
-Message-Id: <20190212112347.1605-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH] contrib/rdmacm-mux: Fix out-of-bounds risk
+	(envelope-from <pbonzini@redhat.com>) id 1gtWEH-0001I7-J3
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:27:58 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:33651)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gtWEF-00018F-6r
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:27:57 -0500
+Received: by mail-wm1-f66.google.com with SMTP id h22so1123649wmb.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 03:27:48 -0800 (PST)
+References: <20190211163829.10297-1-pbonzini@redhat.com>
+	<20190211181707.05e8596a.cohuck@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <36b82cce-a2e3-1c33-d8dd-c427274c8881@redhat.com>
+Date: Tue, 12 Feb 2019 12:27:46 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190211181707.05e8596a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Kconfig: add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,105 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, sam.j.smith@oracle.com, richard.b.johnson@oracle.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, armbru@redhat.com
 
-The function get_fd extract context from the received MAD message and
-uses it as a key to fetch the destination fd from the mapping table.
-A context can be dgid in case of CM request message or comm_id in case
-of CM SIDR response message.
+On 11/02/19 18:17, Cornelia Huck wrote:
+>> +
+>> +This domain-specific language is based on the Kconfig language that originated in the
+>> +Linux kernel, though it was heavily simplified and the handling of dependencies is
+>> +stricter in QEMU.
+>> +
+>> +Unlike Linux, there is no user interface to edit the configuration, which is instead
+>> +specified in per-target files under the ``default-configs/`` directory of the
+>> +QEMU source tree.  This is because, unlike Linux, configuration and dependencies can be
+>> +treated as a black box when building QEMU; the default configuration that QEMU
+>> +ships with should be okay in almost all cases.
+> So this is only about devices and friends, and not about cpu features
+> etc.?
+> 
 
-When MAD message with a smaller size as expected for the message type
-received we are hitting out-of-bounds where we are looking for the
-context out of message boundaries.
+For now it is...  Ideas are welcome on extensions to the mechanism; for
+now it is only about what default-configs/ has always covered, just
+better. :)
 
-Fix it by validating the message size.
-
-Reported-by Sam Smith <sam.j.smith@oracle.com>
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
----
- contrib/rdmacm-mux/main.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
-index ae88c77a1e..21cc804367 100644
---- a/contrib/rdmacm-mux/main.c
-+++ b/contrib/rdmacm-mux/main.c
-@@ -300,7 +300,7 @@ static void hash_tbl_remove_fd_ifid_pair(int fd)
-     pthread_rwlock_unlock(&server.lock);
- }
- 
--static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
-+static int get_fd(const char *mad, int umad_len, int *fd, __be64 *gid_ifid)
- {
-     struct umad_hdr *hdr = (struct umad_hdr *)mad;
-     char *data = (char *)hdr + sizeof(*hdr);
-@@ -308,13 +308,35 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
-     uint16_t attr_id = be16toh(hdr->attr_id);
-     int rc = 0;
- 
-+    if (umad_len <= sizeof(*hdr)) {
-+        rc = -EINVAL;
-+        syslog(LOG_DEBUG, "Ignoring MAD packets with header only\n");
-+        goto out;
-+    }
-+
-     switch (attr_id) {
-     case UMAD_CM_ATTR_REQ:
-+        if (unlikely(umad_len < sizeof(*hdr) + CM_REQ_DGID_POS +
-+            sizeof(*gid_ifid))) {
-+            rc = -EINVAL;
-+            syslog(LOG_WARNING,
-+                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
-+                    attr_id);
-+            goto out;
-+        }
-         memcpy(gid_ifid, data + CM_REQ_DGID_POS, sizeof(*gid_ifid));
-         rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
-         break;
- 
-     case UMAD_CM_ATTR_SIDR_REQ:
-+        if (unlikely(umad_len < sizeof(*hdr) + CM_SIDR_REQ_DGID_POS +
-+            sizeof(*gid_ifid))) {
-+            rc = -EINVAL;
-+            syslog(LOG_WARNING,
-+                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
-+                    attr_id);
-+            goto out;
-+        }
-         memcpy(gid_ifid, data + CM_SIDR_REQ_DGID_POS, sizeof(*gid_ifid));
-         rc = hash_tbl_search_fd_by_ifid(fd, gid_ifid);
-         break;
-@@ -331,6 +353,13 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
-         data += sizeof(comm_id);
-         /* Fall through */
-     case UMAD_CM_ATTR_SIDR_REP:
-+        if (unlikely(umad_len < sizeof(*hdr) + sizeof(comm_id))) {
-+            rc = -EINVAL;
-+            syslog(LOG_WARNING,
-+                   "Invalid MAD packet size (%d) for attr_id 0x%x\n", umad_len,
-+                   attr_id);
-+            goto out;
-+        }
-         memcpy(&comm_id, data, sizeof(comm_id));
-         if (comm_id) {
-             rc = hash_tbl_search_fd_by_comm_id(comm_id, fd, gid_ifid);
-@@ -344,6 +373,7 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
- 
-     syslog(LOG_DEBUG, "mad_to_vm: %d 0x%x 0x%x\n", *fd, attr_id, comm_id);
- 
-+out:
-     return rc;
- }
- 
-@@ -372,7 +402,8 @@ static void *umad_recv_thread_func(void *args)
-         } while (rc && server.run);
- 
-         if (server.run) {
--            rc = get_fd(msg.umad.mad, &fd, &msg.hdr.sgid.global.interface_id);
-+            rc = get_fd(msg.umad.mad, msg.umad_len, &fd,
-+                        &msg.hdr.sgid.global.interface_id);
-             if (rc) {
-                 continue;
-             }
--- 
-2.17.2
+Paolo
