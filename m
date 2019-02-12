@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55031)
+Received: from eggs.gnu.org ([209.51.188.92]:60692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPME-0008Cq-Q2
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:43 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gtPQO-0001KX-5d
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:12:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPM7-0007AD-VH
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:38 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 12:01:35 +0800
-Message-Id: <20190212040136.30371-3-stefanha@redhat.com>
-In-Reply-To: <20190212040136.30371-1-stefanha@redhat.com>
-References: <20190212040136.30371-1-stefanha@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1gtPQM-0001oS-Er
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:11:59 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gtPQL-0001l9-UT
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:11:58 -0500
+Received: by mail-pl1-x642.google.com with SMTP id w4so646340plz.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:11:56 -0800 (PST)
+Date: Tue, 12 Feb 2019 12:11:52 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190212041152.GF28401@stefanha-x1.localdomain>
+References: <20190211163829.10297-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/3] qemugdb/coroutine: fix arch_prctl has
- unknown return type
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Pql/uPZNXIm1JCle"
+Content-Disposition: inline
+In-Reply-To: <20190211163829.10297-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Kconfig: add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, armbru@redhat.com
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-qemu coroutine command results in following error output:
+--Pql/uPZNXIm1JCle
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Python Exception <class 'gdb.error'> 'arch_prctl' has unknown return
-type; cast the call to its declared return type: Error occurred in
-Python command: 'arch_prctl' has unknown return type; cast the call to
-its declared return type
+On Mon, Feb 11, 2019 at 05:38:29PM +0100, Paolo Bonzini wrote:
+> +The Kconfig language
+> +--------------------
+> +
+> +Kconfig defines configurable components in files named ``hw/*/Kconfig``.
+> +Note that configurable components are _not_ visible in C code as preprocessor symbols;
+> +they are only visible in the Makefile.  Each configurable components
 
-Fix it by giving it what it wants: arch_prctl return type.
+s/components/component/
 
-Information on the topic:
-   https://sourceware.org/gdb/onlinedocs/gdb/Calling.html
+--Pql/uPZNXIm1JCle
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190206151425.105871-1-vsementsov@virtuozzo.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- scripts/qemugdb/coroutine.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
-index ab699794ab..81f811ac00 100644
---- a/scripts/qemugdb/coroutine.py
-+++ b/scripts/qemugdb/coroutine.py
-@@ -22,7 +22,7 @@ def get_fs_base():
-        pthread_self().'''
-     # %rsp - 120 is scratch space according to the SystemV ABI
-     old =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
--    gdb.execute('call arch_prctl(0x1003, $rsp - 120)', False, True)
-+    gdb.execute('call (int)arch_prctl(0x1003, $rsp - 120)', False, True)
-     fs_base =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
-     gdb.execute('set *(uint64_t*)($rsp - 120) =3D %s' % old, False, True=
-)
-     return fs_base
---=20
-2.20.1
+iQEcBAEBAgAGBQJcYkeIAAoJEJykq7OBq3PIZnkIALLJEem+0I0DdtwZN23n9BDT
+PkEVTNipbLPwuB0+uzmu2bJHkn3EFKWQs7JPa97YUxJEmM31NCgssOlb/63OobyU
+Zf/424PGhrIWFOaYe7iuAUE3wb6ipBPIcOnTZbx84UYrNFX8NSARL57C3MArsnTK
+f98H1VVtS2HdhDJTZmSzHpNowI/SF88n/2UsIWf9OEutSDCWuv7TfBGO5u6A79je
+vRkd9P35PFwKw216XM8yO2d2arap8FdSOafCMyrrFyRxnkLB+WN6DTHAFULZvU00
+8wdbiuqAwAzwUevtFbJGDNjmOaEppty5juaEHRG9drzXlFxohoOJBWk2IGgyQ/0=
+=rlDj
+-----END PGP SIGNATURE-----
+
+--Pql/uPZNXIm1JCle--
