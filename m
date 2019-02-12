@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39599)
+Received: from eggs.gnu.org ([209.51.188.92]:43247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gtWEI-0007tp-Gf
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:27:59 -0500
+	(envelope-from <berto@igalia.com>) id 1gtWLV-00016m-7T
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:35:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gtWEH-0001I7-J3
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:27:58 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33651)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gtWEF-00018F-6r
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:27:57 -0500
-Received: by mail-wm1-f66.google.com with SMTP id h22so1123649wmb.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 03:27:48 -0800 (PST)
-References: <20190211163829.10297-1-pbonzini@redhat.com>
-	<20190211181707.05e8596a.cohuck@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <36b82cce-a2e3-1c33-d8dd-c427274c8881@redhat.com>
-Date: Tue, 12 Feb 2019 12:27:46 +0100
+	(envelope-from <berto@igalia.com>) id 1gtWLR-0004aT-Az
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:35:23 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
+References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w51o97m8ltv.fsf@maestria.local.igalia.com>
+	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
+	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
+	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
+	<w51mun2uxts.fsf@maestria.local.igalia.com>
+	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
+Date: Tue, 12 Feb 2019 12:35:13 +0100
+Message-ID: <w51mun18cjy.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190211181707.05e8596a.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Kconfig: add documentation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
+ involves copy-on-read filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, armbru@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 11/02/19 18:17, Cornelia Huck wrote:
->> +
->> +This domain-specific language is based on the Kconfig language that originated in the
->> +Linux kernel, though it was heavily simplified and the handling of dependencies is
->> +stricter in QEMU.
->> +
->> +Unlike Linux, there is no user interface to edit the configuration, which is instead
->> +specified in per-target files under the ``default-configs/`` directory of the
->> +QEMU source tree.  This is because, unlike Linux, configuration and dependencies can be
->> +treated as a black box when building QEMU; the default configuration that QEMU
->> +ships with should be okay in almost all cases.
-> So this is only about devices and friends, and not about cpu features
-> etc.?
-> 
+On Mon 11 Feb 2019 05:58:05 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+>>> The problem is in the concept of "base" node. The code written in
+>>> manner that base is not changed during block job. However, job don't
+>>> own base and there is no guarantee that it will not change during
+>>> the job.
+>> 
+>> But if that's the case then we have a problem already, because 'base'
+>> is a member of StreamBlockJob and is used in the existing
+>> stream_run() code.
+>
+> I think it should be possible to reproduce, using block-commit (which
+> already has filter) with block-stream in parallel, we'll try.
 
-For now it is...  Ideas are welcome on extensions to the mechanism; for
-now it is only about what default-configs/ has always covered, just
-better. :)
+It's not possible to run block-stream and block-commit in parallel on
+the same nodes. See iotest 030 for a few examples.
 
-Paolo
+So unless there's a bug it should be safe.
+
+>> So if there's a way to make 'base' disappear during the job (how?)
+>> then we could protect it with block_job_add_bdrv().
+>
+> I'm not sure this is correct. What is the reason for stream to own
+> base? It's not really interested in it.
+
+stream does not need to write or modify base, but it does need to keep a
+reference to it in order to now where to stop copying data.
+
+As I said earlier base is a member of StreamBlockJob, so it should not
+disappear during the job.
+
+Berto
