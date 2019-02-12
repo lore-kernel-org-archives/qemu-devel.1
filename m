@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46239)
+Received: from eggs.gnu.org ([209.51.188.92]:46944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPGi-0005Qy-0c
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:00 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtPGt-0005Vt-Rg
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPGg-0002VB-MH
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:01:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtPGr-0002o4-7d
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:10 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 12:01:33 +0800
-Message-Id: <20190212040136.30371-1-stefanha@redhat.com>
+Date: Tue, 12 Feb 2019 12:01:34 +0800
+Message-Id: <20190212040136.30371-2-stefanha@redhat.com>
+In-Reply-To: <20190212040136.30371-1-stefanha@redhat.com>
+References: <20190212040136.30371-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] Block patches
+Subject: [Qemu-devel] [PULL 1/3] iothread: fix iothread hang when stop too
+ soon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +24,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The following changes since commit 22c5f446514a2a4bb0dbe1fea26713da92fc85=
-fa:
+From: Peter Xu <peterx@redhat.com>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190211' into =
-staging (2019-02-11 17:04:57 +0000)
+Lukas reported an hard to reproduce QMP iothread hang on s390 that
+QEMU might hang at pthread_join() of the QMP monitor iothread before
+quitting:
 
-are available in the Git repository at:
+  Thread 1
+  #0  0x000003ffad10932c in pthread_join
+  #1  0x0000000109e95750 in qemu_thread_join
+      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
+  #2  0x0000000109c95a1c in iothread_stop
+  #3  0x0000000109bb0874 in monitor_cleanup
+  #4  0x0000000109b55042 in main
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+While the iothread is still in the main loop:
 
-for you to fetch changes up to 9a6719d572e99a4e79f589d0b73f7475b86f982d:
+  Thread 4
+  #0  0x000003ffad0010e4 in ??
+  #1  0x000003ffad553958 in g_main_context_iterate.isra.19
+  #2  0x000003ffad553d90 in g_main_loop_run
+  #3  0x0000000109c9585a in iothread_run
+      at /home/thuth/devel/qemu/iothread.c:74
+  #4  0x0000000109e94752 in qemu_thread_start
+      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
+  #5  0x000003ffad10825a in start_thread
+  #6  0x000003ffad00dcf2 in thread_start
 
-  virtio-blk: cleanup using VirtIOBlock *s and VirtIODevice *vdev (2019-0=
-2-12 11:49:17 +0800)
+IMHO it's because there's a race between the main thread and iothread
+when stopping the thread in following sequence:
 
-----------------------------------------------------------------
-Pull request
+    main thread                       iothread
+    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+                                      aio_poll()
+    iothread_get_g_main_context
+      set iothread->worker_context
+    iothread_stop
+      schedule iothread_stop_bh
+                                        execute iothread_stop_bh [1]
+                                          set iothread->running=3Dfalse
+                                          (since main_loop=3D=3DNULL so
+                                           skip to quit main loop.
+                                           Note: although main_loop is
+                                           NULL but worker_context is
+                                           not!)
+                                      atomic_read(&iothread->worker_conte=
+xt) [2]
+                                        create main_loop object
+                                        g_main_loop_run() [3]
+    pthread_join() [4]
 
-----------------------------------------------------------------
+We can see that when execute iothread_stop_bh() at [1] it's possible
+that main_loop is still NULL because it's only created until the first
+check of the worker_context later at [2].  Then the iothread will hang
+in the main loop [3] and it'll starve the main thread too [4].
 
-Peter Xu (1):
-  iothread: fix iothread hang when stop too soon
+Here the simple solution should be that we check again the "running"
+variable before check against worker_context.
 
-Stefano Garzarella (1):
-  virtio-blk: cleanup using VirtIOBlock *s and VirtIODevice *vdev
+CC: Thomas Huth <thuth@redhat.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20190129051432.22023-1-peterx@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ iothread.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Vladimir Sementsov-Ogievskiy (1):
-  qemugdb/coroutine: fix arch_prctl has unknown return type
-
- hw/block/virtio-blk.c        | 22 +++++++++-------------
- iothread.c                   |  6 +++++-
- scripts/qemugdb/coroutine.py |  2 +-
- 3 files changed, 15 insertions(+), 15 deletions(-)
-
+diff --git a/iothread.c b/iothread.c
+index 2fb1cdf55d..e615b7ae52 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -63,7 +63,11 @@ static void *iothread_run(void *opaque)
+     while (iothread->running) {
+         aio_poll(iothread->ctx, true);
+=20
+-        if (atomic_read(&iothread->worker_context)) {
++        /*
++         * We must check the running state again in case it was
++         * changed in previous aio_poll()
++         */
++        if (iothread->running && atomic_read(&iothread->worker_context))=
+ {
+             GMainLoop *loop;
+=20
+             g_main_context_push_thread_default(iothread->worker_context)=
+;
 --=20
 2.20.1
