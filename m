@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56120)
+Received: from eggs.gnu.org ([209.51.188.92]:58569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtWnA-00077P-Dz
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:04:01 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtWs3-0000Xp-8p
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:09:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtWn7-0005Wr-P9
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:04:00 -0500
-Date: Tue, 12 Feb 2019 12:58:40 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190212115840.GB5283@localhost.localdomain>
-References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
-	<20190211034231.GD18083@stefanha-x1.localdomain>
-	<c861c023-c783-57f6-85ae-52ecba971636@virtuozzo.com>
-	<20190212032242.GC28401@stefanha-x1.localdomain>
+	(envelope-from <philmd@redhat.com>) id 1gtWs2-0004PL-47
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:09:03 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtWs1-0004MK-Qt
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:09:02 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l9so2363054wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 04:09:01 -0800 (PST)
+References: <20190124132020.13571-1-kraxel@redhat.com>
+	<20190124132020.13571-2-kraxel@redhat.com>
+	<c0234a17-4e50-5fe2-4b88-6cf133c43347@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <78b29e41-f1fa-9e88-e124-e91f2a3d9dc4@redhat.com>
+Date: Tue, 12 Feb 2019 13:08:58 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pWyiEgJYm5f9v55/"
-Content-Disposition: inline
-In-Reply-To: <20190212032242.GC28401@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
- wrapper code
+In-Reply-To: <c0234a17-4e50-5fe2-4b88-6cf133c43347@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 1/7] audio: fix pc speaker init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +31,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>
+To: David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Brad Smith <brad@comstyle.com>
 
+Hi David,
 
---pWyiEgJYm5f9v55/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 2/12/19 12:47 PM, David Hildenbrand wrote:
+> On 24.01.19 14:20, Gerd Hoffmann wrote:
+>> Get rid of the pcspk_state global, allow pc speaker
+>> be added using "-device isa-pcspk".
+>>
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Message-id: 20190124110810.1040-1-kraxel@redhat.com
+>> ---
+>>  hw/audio/pcspk.c | 35 +++++++++++++++--------------------
+>>  1 file changed, 15 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+>> index 908696d483..b80a62ce90 100644
+>> --- a/hw/audio/pcspk.c
+>> +++ b/hw/audio/pcspk.c
+>> @@ -57,7 +57,6 @@ typedef struct {
+>>  } PCSpkState;
+>>  
+>>  static const char *s_spk = "pcspk";
+>> -static PCSpkState *pcspk_state;
+>>  
+>>  static inline void generate_samples(PCSpkState *s)
+>>  {
+>> @@ -111,22 +110,6 @@ static void pcspk_callback(void *opaque, int free)
+>>      }
+>>  }
+>>  
+>> -static int pcspk_audio_init(ISABus *bus)
+>> -{
+>> -    PCSpkState *s = pcspk_state;
+>> -    struct audsettings as = {PCSPK_SAMPLE_RATE, 1, AUD_FMT_U8, 0};
+>> -
+>> -    AUD_register_card(s_spk, &s->card);
+>> -
+>> -    s->voice = AUD_open_out(&s->card, s->voice, s_spk, s, pcspk_callback, &as);
+>> -    if (!s->voice) {
+>> -        AUD_log(s_spk, "Could not open voice\n");
+>> -        return -1;
+>> -    }
+>> -
+>> -    return 0;
+>> -}
+>> -
+>>  static uint64_t pcspk_io_read(void *opaque, hwaddr addr,
+>>                                unsigned size)
+>>  {
+>> @@ -179,12 +162,20 @@ static void pcspk_initfn(Object *obj)
+>>  
+>>  static void pcspk_realizefn(DeviceState *dev, Error **errp)
+>>  {
+>> +    struct audsettings as = {PCSPK_SAMPLE_RATE, 1, AUD_FMT_U8, 0};
+>>      ISADevice *isadev = ISA_DEVICE(dev);
+>>      PCSpkState *s = PC_SPEAKER(dev);
+>>  
+>>      isa_register_ioport(isadev, &s->ioport, s->iobase);
+>>  
+>> -    pcspk_state = s;
+>> +    AUD_register_card(s_spk, &s->card);
+>> +
+>> +    s->voice = AUD_open_out(&s->card, s->voice, s_spk, s, pcspk_callback, &as);
+>> +    if (!s->voice) {
+>> +        error_setg(errp, "Initializing audio voice failed");
+>> +        AUD_remove_card(&s->card);
+>> +        return;
+>> +    }
+>>  }
+>>  
+>>  static bool migrate_needed(void *opaque)
+>> @@ -221,8 +212,6 @@ static void pcspk_class_initfn(ObjectClass *klass, void *data)
+>>      set_bit(DEVICE_CATEGORY_SOUND, dc->categories);
+>>      dc->vmsd = &vmstate_spk;
+>>      dc->props = pcspk_properties;
+>> -    /* Reason: realize sets global pcspk_state */
+>> -    dc->user_creatable = false;
+>>  }
+>>  
+>>  static const TypeInfo pcspk_info = {
+>> @@ -233,6 +222,12 @@ static const TypeInfo pcspk_info = {
+>>      .class_init     = pcspk_class_initfn,
+>>  };
+>>  
+>> +static int pcspk_audio_init(ISABus *bus)
+>> +{
+>> +    isa_create_simple(bus, TYPE_PC_SPEAKER);
+>> +    return 0;
+>> +}
+>> +
+>>  static void pcspk_register(void)
+>>  {
+>>      type_register_static(&pcspk_info);
+>>
+> 
+> I suddenly get (under fedora 28)
+> 
+> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+> Connection refused
+> 
+> alsa: Could not initialize DAC
+> alsa: Failed to open `default':
+> alsa: Reason: Connection refused
+> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+> Connection refused
+> 
+> alsa: Could not initialize DAC
+> alsa: Failed to open `default':
+> alsa: Reason: Connection refused
 
-Am 12.02.2019 um 04:22 hat Stefan Hajnoczi geschrieben:
-> On Mon, Feb 11, 2019 at 09:38:37AM +0000, Vladimir Sementsov-Ogievskiy wr=
-ote:
-> > 11.02.2019 6:42, Stefan Hajnoczi wrote:
-> > > On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogievski=
-y wrote:
-> > >> Hi all!
-> > >>
-> > >> We have a very frequent pattern of wrapping a coroutine_fn function
-> > >> to be called from non-coroutine context:
-> > >>
-> > >>    - create structure to pack parameters
-> > >>    - create function to call original function taking parameters from
-> > >>      struct
-> > >>    - create wrapper, which in case of non-coroutine context will
-> > >>      create a coroutine, enter it and start poll-loop.
-> > >>
-> > >> Here is a draft of template code + example how it can be used to dro=
-p a
-> > >> lot of similar code.
-> > >>
-> > >> Hope someone like it except me)
-> > >=20
-> > > My 2 cents.  Cons:
-> > >=20
-> > >   * Synchronous poll loops are an anti-pattern.  They block all of QE=
-MU
-> > >     with the big mutex held.  Making them easier to write is
-> > >     questionable because we should aim to have as few of these as
-> > >     possible.
-> >=20
-> > Understand. Do we have a concept or a kind of target for a future to ge=
-t rid of
-> > these a lot of poll-loops? What is the right way? At least for block-la=
-yer?
->=20
-> It's non-trivial.  The nested event loop could be flattened if there was
-> a mechanism to stop further activity on a specific object only (e.g.
-> BlockDriverState).  That way the event loop can continue processing
-> events for other objects and device emulation could continue for other
-> objects.
+This ALSA problem seems on your side.
 
-The mechanism to stop activity on BlockDriverStates is bdrv_drain(). But
-I don't see how this is related. Nested event loops aren't for stopping
-concurrent activity (events related to async operations started earlier
-are still processed in nested event loops), but for making progress on
-the operation we're waiting for. They happen when synchronous code calls
-into asynchronous code.
+> audio: Failed to create voice `pcspk'
+> qemu-system-x86_64: Initialization of device isa-pcspk failed:
+> Initializing audio voice failed
 
-The way to get rid of them is making their callers async. I think we
-would come a long way if we ran QMP command handlers (at least the block
-related ones) and qemu-img operations in coroutines instead of blocking
-while we wait for the result.
+Previously the errors would be ignored and QEMU would start.
 
-> Unfortunately there are interactions between objects like in block jobs
-> that act on multiple BDSes, so it becomes even tricky.
->=20
-> A simple way of imagining this is to make each object an "actor"
-> coroutine.  The coroutine processes a single message (request) at a time
-> and yields when it needs to wait.  Callers send messages and expect
-> asynchronous responses.  This model is bad for efficiency (parallelism
-> is necessary) but at least it offers a sane way of thinking about
-> multiple asynchronous components coordinating together.  (It's another
-> way of saying, let's put everything into coroutines.)
->=20
-> The advantage of a flat event loop is that a hang in one object (e.g.
-> I/O getting stuck in one file) doesn't freeze the entire event loop.
+> 
+> 
+> With
+> 
+> sudo x86_64-softmmu/qemu-system-x86_64 \
+>     --enable-kvm \
+>     -m 4G,maxmem=40G,slots=2 \
+>     -smp sockets=2,cores=2 \
+>     -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
+>     -kernel /boot/vmlinuz-4.19.6-200.fc28.x86_64 \
+>     -append "console=ttyS0 rd.shell rd.luks=0 rd.lvm=0 rd.md=0 rd.dm=0" \
+>     -initrd /boot/initramfs-4.19.6-200.fc28.x86_64.img \
+>     -machine pc,nvdimm \
+>     -nographic \
+>     -nodefaults \
+>     -chardev stdio,id=serial \
+>     --trace events=to_trace \
+>     -device isa-serial,chardev=serial \
+>     -chardev socket,id=monitor,path=/var/tmp/monitor,server,nowait \
+>     -mon chardev=monitor,mode=readline
+> 
+> 
+> Could this be related to this patch? (or is maybe something about my
+> system messed up? will try rebooting, but other audio - e.g. via firefox
+> - works fine)
 
-I think this one is more theoretical because you'll still have
-dependencies between the components. blk_drain_all() isn't hanging
-because the code is designed suboptimally, but because its semantics is
-to wait until all requests have completed. And it's called because this
-semantics is required.
+Does your Firefox uses ALSA? The default install uses PulseAudio.
 
-Kevin
+I think the behavior change you are experiencing comes from the patch 7
+of this series "audio: probe audio drivers by default":
 
---pWyiEgJYm5f9v55/
-Content-Type: application/pgp-signature; name="signature.asc"
+@@ -879,7 +879,7 @@
+ Linux)
+-  audio_drv_list="oss"
++  audio_drv_list="try-pa try-alsa try-sdl oss"
 
------BEGIN PGP SIGNATURE-----
+Previously you were using OSS, and how the ./configure found via
+pkg-config that you have the ALSA libs installed, and use ALSA first.
 
-iQIcBAEBAgAGBQJcYrTvAAoJEH8JsnLIjy/WrRUP/1cWjQAf6Xo1YN6R118vtOXZ
-cc/HDQmOQm7TA8xl3ffkyGrKZMNJAnQaou2txkyF27iJG4QWu2OvDRNf3n15mLqo
-C8EcZgpPB9mCpVtf7/ItvGal41xxZBo46t1lkHdc3mUK61xBL1qAkmHhe++KkWad
-lZoP6iTZhKCnIiYaiaq5+yz59MsRki74vOpGCJGzfhARbrwGSIw9evrYiTGK3idl
-67tNCTvlTNOq5Qm/4TnmOJB6s6LLUv9SrI8kvzFAtBODbhek0qd5lXn0FRrBVTTA
-LgMLG/Zr1XiGWTyFhCKoYTM12Use9A62WnxcgVLcf26KTgkpDw0Jw7Yh76aZgSot
-xSepEdpzQN3QS/GDu/1Ax0zcUdDdYixgZS/Nijb13l3TkzyNjM9pD/wT/6X9YEUC
-6IDb5SxMQ4gt0Ogms9Lc4rSWkstxXEobWb7VB1AG3GpnFCKCpjAEdoVMTQqZ3g6q
-237jxlQfRLIOjRiiMfs7kjzHegPioAW1auRps/mZChpigZZoU0f5jRUxhPFjK1Ay
-kILfJlMUNr+R9dlSKOMMsPGnoF8N5IwXPDK/eY67BfNs8jgHb2Tk5JMFZUnIFOFp
-iMvprJeB1fNKGq4fDLR//B0rgwRuZLZUUKW3d//NwSQWAOyYZLmv8UyItrohX+hk
-do0QzOTv6rgvmFOBePJa
-=BDni
------END PGP SIGNATURE-----
+Can you share the relevant part of the ./configure output?
 
---pWyiEgJYm5f9v55/--
+Thanks,
+
+Phil.
