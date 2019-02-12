@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36626)
+Received: from eggs.gnu.org ([209.51.188.92]:41844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gtSSO-0006M0-DI
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:26:17 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtScP-0002Xl-1V
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:36:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gtSEO-00014U-Hy
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:11:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35612)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gtSEH-0000rb-Eh
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:11:44 -0500
-Date: Tue, 12 Feb 2019 15:11:14 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190212071114.GM1011@xz-x1>
-References: <20190204142638.27021-1-mst@redhat.com>
-	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
-	<20190204205105-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
-	<20190205110518-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190205110518-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
- features
+	(envelope-from <richard.henderson@linaro.org>) id 1gtScN-0002Sk-Vl
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:36:36 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gtScM-0002O1-TI
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:36:35 -0500
+Received: by mail-pl1-x641.google.com with SMTP id p8so903211plo.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 23:36:31 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 23:36:28 -0800
+Message-Id: <20190212073628.9665-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Add AT_PLATFORM for arm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, qemu-arm@nongnu.org, 1813034@bugs.launchpad.net
 
-On Tue, Feb 05, 2019 at 11:06:42AM -0500, Michael S. Tsirkin wrote:
-> On Tue, Feb 05, 2019 at 12:41:55PM +0000, Peter Maydell wrote:
-> > On Tue, 5 Feb 2019 at 01:52, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > So I think I fixed the build errors. And who knows maybe
-> > > that will fix the runtime ones somehow ..
-> > > Could you try pls? Re-pushed to same tag.
-> > 
-> > these failures still remain:
-> > 
-> > unused variable for OSX and the BSDs:
-> > 
-> > tests/vhost-user-test.c:942:17: warning: unused variable 'hugefs'
-> > [-Wunused-variable]
-> >     const char *hugefs;
-> >                 ^
-> > 
-> > Assertion failure on sparc, s390x and PPC64 hosts:
-> > 
-> > MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> > QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
-> > QTEST_QEMU_IMG=qemu-img tests/vhost-user-test -m=quick -k --tap <
-> > /dev/null | ./scripts/tap-driver.pl --test-name="vhost-user-test"
-> > qemu-system-i386: backend does not support LE vnet headers; falling
-> > back on userspace virtio
-> > qemu-system-i386: backend does not support LE vnet headers; falling
-> > back on userspace virtio
-> > **
-> > ERROR:/home/pm215/qemu/tests/vhost-user-test.c:243:wait_for_fds:
-> > assertion failed: (s->fds_num)
-> > ERROR - too few tests run (expected 4, got 0)
-> > 
-> > Given the set of hosts affected this is almost certainly
-> > a big-endian-host specific bug.
-> > 
-> > thanks
-> > -- PMM
-> 
-> You were right.
-> 
-> OK I reverted the whole part dealing with vhost-user and reposted.
+Fixes: https://bugs.launchpad.net/bugs/1813034
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/elfload.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-I noticed that the merged pull request could possibly have squashed
-the below two patches (in previous pull) into one super patch
-(a56de056c91f87e1e):
-
-        i386/kvm: ignore masked irqs when update msi routes
-        contrib/vhost-user-blk: fix the compilation issue
-
-Here, the first patch lost its commit message, and the last patch lost
-its real author. ;)
-
-Regards,
-
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 775a36ccdd..dde640a2ea 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -500,6 +500,35 @@ static uint32_t get_elf_hwcap2(void)
+ #undef GET_FEATURE
+ #undef GET_FEATURE_ID
+ 
++#define ELF_PLATFORM get_elf_platform()
++
++static const char *get_elf_platform(void)
++{
++    CPUARMState *env = thread_cpu->env_ptr;
++
++#ifdef TARGET_WORDS_BIGENDIAN
++# define END  "b"
++#else
++# define END  "l"
++#endif
++
++    if (arm_feature(env, ARM_FEATURE_V7)) {
++        if (arm_feature(env, ARM_FEATURE_M)) {
++            return "v7m" END;
++        } else {
++            return "v7" END;
++        }
++    } else if (arm_feature(env, ARM_FEATURE_V6)) {
++        return "v6" END;
++    } else if (arm_feature(env, ARM_FEATURE_V5)) {
++        return "v5" END;
++    } else {
++        return "v4" END;
++    }
++
++#undef END
++}
++
+ #else
+ /* 64 bit ARM definitions */
+ #define ELF_START_MMAP 0x80000000
 -- 
-Peter Xu
+2.17.2
