@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53463)
+Received: from eggs.gnu.org ([209.51.188.92]:53582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gtVql-0005ob-Dk
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:42 -0500
+	(envelope-from <david@redhat.com>) id 1gtVqp-0005qJ-Ie
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gtVqf-0002QT-1A
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:37 -0500
-Date: Tue, 12 Feb 2019 12:03:12 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <28a8cd58-51a9-6301-1d25-02289af8c81d@ilande.co.uk>
-Message-ID: <alpine.BSF.2.21.9999.1902121157470.75929@zero.eik.bme.hu>
-References: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-	<442139a2-5ab2-9259-03a0-11d2f3c86c59@redhat.com>
-	<28a8cd58-51a9-6301-1d25-02289af8c81d@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] cuda: decrease time delay
- before raising VIA SR interrupt
+	(envelope-from <david@redhat.com>) id 1gtVqn-0002cp-VR
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:43 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 12 Feb 2019 12:02:57 +0100
+Message-Id: <20190212110308.13707-6-david@redhat.com>
+In-Reply-To: <20190212110308.13707-1-david@redhat.com>
+References: <20190212110308.13707-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 04/15] s390x/tcg: Fix parts of IEEE
+ exception handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +20,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, hsp.cat7@gmail.com
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On Tue, 12 Feb 2019, Mark Cave-Ayland wrote:
-> On 11/02/2019 23:35, Philippe Mathieu-Daud=C3=A9 wrote:
->
->> Hi Mark,
->>
->> On 2/10/19 6:44 PM, Mark Cave-Ayland wrote:
->>> In order to handle a race condition in MacOS 9, a delay was introduce=
-d when
->>> raising the VIA SR interrupt inspired by similar code in MacOnLinux.
->>>
->>> During original testing of the MacOS 9 patches it was found that the =
-30us
->>> delay used in MacOnLinux did not work reliably within QEMU, and a val=
-ue of
->>> 300us was required to function correctly.
->>>
->>> Recent experiments have shown that the previous reliability issues ar=
-e no
->>> longer present, and this value can be reduced down to 20us with no ap=
-parent
->>> ill effects in my local tests. This has the benefit of considerably i=
-mproving
->>> the responsiveness of the ADB keyboard and mouse with the guest.
->>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> ---
->>>  hw/misc/macio/cuda.c | 11 +----------
->>>  1 file changed, 1 insertion(+), 10 deletions(-)
->>>
->>> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
->>> index c4f7a2f39b..3febacdd1e 100644
->>> --- a/hw/misc/macio/cuda.c
->>> +++ b/hw/misc/macio/cuda.c
->>> @@ -97,17 +97,8 @@ static void cuda_set_sr_int(void *opaque)
->>>
->>>  static void cuda_delay_set_sr_int(CUDAState *s)
->>>  {
->>> -    MOS6522CUDAState *mcs =3D &s->mos6522_cuda;
->>> -    MOS6522State *ms =3D MOS6522(mcs);
->>> -    MOS6522DeviceClass *mdc =3D MOS6522_DEVICE_GET_CLASS(ms);
->>>      int64_t expire;
->>>
->>> -    if (ms->dirb =3D=3D 0xff || s->sr_delay_ns =3D=3D 0) {
->>> -        /* Disabled or not in Mac OS, fire the IRQ directly */
->>> -        mdc->set_sr_int(ms);
->>> -        return;
->>> -    }
->>
->> The change of sr_delay_ns below is well explained, but I don't
->> understand why you remove the previous if().
->
-> IIRC it was a hack by Alex to try and restrict the delay on the interru=
-pt just to
-> MacOS instead of Linux, but with the reduced value it doesn't really ma=
-tter any more.
+Many things are wrong and some parts cannot be fixed yet. Fix what we
+can fix easily and add two FIXMEs:
 
-If this delay is to prevent a bug which only happens in MacOS then that's=
-=20
-the hack not the normal code path to run without the delay that you've=20
-just removed. So maybe this should be kept if possible to avoid unecessar=
-y=20
-delays for other guests. (Although if this only affects mac99,via=3Dcuda =
-but=20
-not mac99,via=3Dpmu then I don't care much as long as pmu works.)
+The fpc flags are not updated in case an exception is actually injected.
+Inexact exceptions have to be handled separately, as they are the only
+exceptions that can coexist with underflows and overflows.
 
-> As a plus it also prevents a guest OS from accidentally triggering the =
-hack whilst
-> programming the VIA port.
+I reread the horribly complicated chapters in the PoP at least 5 times
+and hope I got it right.
 
-That may be a problem though. What's the issue exactly? Why is the delay=20
-needed in the first place?
+For references:
+- z14 PoP, 9-18, "IEEE Exceptions"
+- z14 PoP, 19-9, Figure 19-8
 
-Regards,
-BALATON Zoltan
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/fpu_helper.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
+
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index 60f589608e..94680053f9 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -63,13 +63,39 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
+     env->fpu_status.float_exception_flags = 0;
+     s390_exc = s390_softfloat_exc_to_ieee(qemu_exc);
+ 
+-    /* Install the exceptions that we raised.  */
+-    env->fpc |= s390_exc << 16;
++    /*
++     * FIXME:
++     * 1. Right now, all inexact conditions are inidicated as
++     *    "truncated" (0) and never as "incremented" (1) in the DXC.
++     * 2. Only traps due to invalid/divbyzero are suppressing. Other traps
++     *    are completing, meaning the target register has to be written!
++     *    This, however will mean that we have to write the register before
++     *    triggering the trap - impossible right now.
++     */
++
++    /*
++     * invalid/divbyzero cannot coexist with other conditions.
++     * overflow/underflow however can coexist with inexact, we have to
++     * handle it separatly.
++     */
++    if (s390_exc & ~S390_IEEE_MASK_INEXACT) {
++        if (s390_exc & ~S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
++            /* trap condition - inexact reported along */
++            tcg_s390_data_exception(env, s390_exc, retaddr);
++        }
++        /* nontrap condition - inexact handled differently */
++        env->fpc |= (s390_exc & ~S390_IEEE_MASK_INEXACT) << 16;
++    }
+ 
+-    /* Send signals for enabled exceptions.  */
+-    s390_exc &= env->fpc >> 24;
+-    if (s390_exc) {
+-        tcg_s390_data_exception(env, s390_exc, retaddr);
++    /* inexact handling */
++    if (s390_exc & S390_IEEE_MASK_INEXACT) {
++        /* trap condition - overflow/underflow _not_ reported along */
++        if (s390_exc & S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
++            tcg_s390_data_exception(env, s390_exc & S390_IEEE_MASK_INEXACT,
++                                    retaddr);
++        }
++        /* nontrap condition */
++        env->fpc |= (s390_exc & S390_IEEE_MASK_INEXACT) << 16;
+     }
+ }
+ 
+-- 
+2.17.2
