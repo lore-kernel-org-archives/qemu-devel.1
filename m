@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37392)
+Received: from eggs.gnu.org ([209.51.188.92]:37540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtcgc-0006vh-Ps
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:21:40 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtchD-0007PO-NI
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:22:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtcgb-0007fi-9Y
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:21:38 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:32902)
+	(envelope-from <philmd@redhat.com>) id 1gtchC-0000BY-UL
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:22:15 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51939)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtcga-0007Wv-Tu
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:21:37 -0500
-Received: by mail-wr1-f66.google.com with SMTP id i12so3862836wrw.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:21:26 -0800 (PST)
-References: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-	<442139a2-5ab2-9259-03a0-11d2f3c86c59@redhat.com>
-	<28a8cd58-51a9-6301-1d25-02289af8c81d@ilande.co.uk>
-	<alpine.BSF.2.21.9999.1902121157470.75929@zero.eik.bme.hu>
-	<971ba38d-d883-d51c-55b2-531639336ed4@ilande.co.uk>
-	<d78bc91b-efef-bb69-e443-6526ca433197@redhat.com>
-	<e8329ece-32a2-d591-2ffc-3cdb468d56aa@ilande.co.uk>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtchC-0000AS-OK
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:22:14 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so4114915wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:22:14 -0800 (PST)
+References: <mvmimxprmn8.fsf@suse.de>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bff82e7a-2315-fd42-cdae-e7d0baa2fd08@redhat.com>
-Date: Tue, 12 Feb 2019 19:21:24 +0100
+Message-ID: <2d8b7d53-c384-4a8a-f7c7-23a66134ffce@redhat.com>
+Date: Tue, 12 Feb 2019 19:22:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <e8329ece-32a2-d591-2ffc-3cdb468d56aa@ilande.co.uk>
+In-Reply-To: <mvmimxprmn8.fsf@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] cuda: decrease time delay
- before raising VIA SR interrupt
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix recvmsg emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, hsp.cat7@gmail.com
+To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 2/12/19 6:50 PM, Mark Cave-Ayland wrote:
-> On 12/02/2019 17:21, Philippe Mathieu-Daudé wrote:
+On 2/12/19 5:34 PM, Andreas Schwab wrote:
+> Set msg_flags in the returned struct msghdr.
 > 
->>>> If this delay is to prevent a bug which only happens in MacOS then that's the hack
->>>> not the normal code path to run without the delay that you've just removed. So maybe
->>>> this should be kept if possible to avoid unecessary delays for other guests.
->>>> (Although if this only affects mac99,via=cuda but not mac99,via=pmu then I don't care
->>>> much as long as pmu works.)
->>>
->>> Well the reality is that the detection above doesn't actually seem to work anyway -
->>> at least a quick boot test with Linux, MacOS X and MacOS 9 with a printf() added into
->>> the if() shows nothing firing once the kernel takes over. So the slow path with the
->>> delay included was always being taken within the OS anyway.
->>>
->>> And indeed, the code doesn't affect pmu so you won't see any difference there.
->>>
->>>>> As a plus it also prevents a guest OS from accidentally triggering the hack whilst
->>>>> programming the VIA port.
->>>>
->>>> That may be a problem though. What's the issue exactly? Why is the delay needed in
->>>> the first place?
->>>
->>> It's some kind of racy polling with OS 9 (I wasn't involved in the technical details,
->>> sorry) which causes OS 9 to hang on boot if the delay isn't present. And even better
->>> the slow path that was previously always being taken has now been reduced from 300us
->>> to 30us so whichever way you look at it, having this patch applied is a win.
->>
->> Can you write a paragraph about this, that David can amend to your
->> patch? That would stop worrying me about looking at this patch in
->> various months...
-> 
-> Hmmmm well the existing description already describes the interrupt race in OS 9 so I
-> guess the only part missing is the bit about the fast path. How about the revised
-> text below for the patch description?
-> 
-> 
->     cuda: decrease time delay before raising VIA SR interrupt and remove fast path
-> 
->     In order to handle a race condition in the MacOS 9 CUDA driver, a delay was
->     introduced when raising the VIA SR interrupt inspired by similar code in
->     MacOnLinux.
-> 
->     During original testing of the MacOS 9 patches it was found that the 30us
->     delay used in MacOnLinux did not work reliably within QEMU, and a value of
->     300us was required to function correctly.
-> 
->     Recent experiments have shown two things: firstly when booting Linux, MacOS
->     9 and MacOS X the fast path which bypasses the delay is never triggered once the
->     OS kernel is loaded making it effectively useless. Rather than leave this code
->     in place where a guest could potentially enable it by accident and break itself,
->     we might as well just remove it.
-> 
->     Secondly the previous reliability issues are no longer present, and this value
->     can be reduced down to 20us with no apparent ill effects. This has the benefit of
->     considerably improving the responsiveness of the ADB keyboard and mouse within
->     the guest.
-> 
->     Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
 
-Thanks!
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Phil.
+> ---
+>  linux-user/syscall.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 90bfda3563..b6b566a6fa 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2797,6 +2797,7 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
+>              }
+>              if (!is_error(ret)) {
+>                  msgp->msg_namelen = tswap32(msg.msg_namelen);
+> +                msgp->msg_flags = tswap32(msg.msg_flags);
+>                  if (msg.msg_name != NULL && msg.msg_name != (void *)-1) {
+>                      ret = host_to_target_sockaddr(tswapal(msgp->msg_name),
+>                                      msg.msg_name, msg.msg_namelen);
+> 
