@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46653)
+Received: from eggs.gnu.org ([209.51.188.92]:53572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtUip-0008MI-V2
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:51:24 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtUyq-0002Ki-06
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gtUio-0005BN-PK
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:51:23 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtUub-0002ty-I9
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 05:03:35 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 12 Feb 2019 09:51:16 +0000
-Message-ID: <ea6d6775-6e46-22b2-3287-1d572f31dbe2@virtuozzo.com>
-References: <20181221165341.23736-1-vsementsov@virtuozzo.com>
-	<20181221165341.23736-2-vsementsov@virtuozzo.com>
-	<20190211175410.GI8135@linux.fritz.box>
-	<77422700-9c39-7b8a-33d0-efe666c4242d@virtuozzo.com>
-	<20190212090720.GA5283@localhost.localdomain>
-In-Reply-To: <20190212090720.GA5283@localhost.localdomain>
+Date: Tue, 12 Feb 2019 10:03:19 +0000
+Message-ID: <ba74c0e8-e5d0-fe43-278c-6ed1cd7bb195@virtuozzo.com>
+References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
+	<20190211034231.GD18083@stefanha-x1.localdomain>
+	<c861c023-c783-57f6-85ae-52ecba971636@virtuozzo.com>
+	<20190212032242.GC28401@stefanha-x1.localdomain>
+In-Reply-To: <20190212032242.GC28401@stefanha-x1.localdomain>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DE852D17660A464DA80BF59EC60F8691@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <0FEA900691574D4280C506AB47FB0689@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: move to QOM path for
- x-block-latency-histogram-set
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
+ wrapper code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>
 
-MTIuMDIuMjAxOSAxMjowNywgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDIuMjAxOSB1bSAx
-OTozMCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDEx
-LjAyLjIwMTkgMjA6NTQsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMjEuMTIuMjAxOCB1bSAx
-Nzo1MyBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
-TW92ZSB0byB3YXkgb2YgZGV2aWNlIHNlbGVjdGluZywgaG93ZXZlciBmYWxsIGJhY2sgdG8gZGV2
-aWNlIG5hbWUgaWYNCj4+Pj4gcGF0aCBpcyBub3QgZm91bmQuDQo+Pj4+DQo+Pj4+IFNpZ25lZC1v
-ZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpv
-LmNvbT4NCj4+Pj4gLS0tDQo+Pj4+ICAgIHFhcGkvYmxvY2stY29yZS5qc29uIHwgIDQgKystLQ0K
-Pj4+PiAgICBibG9ja2Rldi5jICAgICAgICAgICB8IDIyICsrKysrKysrKysrKysrKy0tLS0tLS0N
-Cj4+Pj4gICAgMiBmaWxlcyBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygt
-KQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Js
-b2NrLWNvcmUuanNvbg0KPj4+PiBpbmRleCA3NjIwMDBmMzFmLi5iYjcwYzUxYTU3IDEwMDY0NA0K
-Pj4+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+PiArKysgYi9xYXBpL2Jsb2NrLWNv
-cmUuanNvbg0KPj4+PiBAQCAtNDg5LDcgKzQ4OSw3IEBADQo+Pj4+ICAgICMgSWYgb25seSBAZGV2
-aWNlIHBhcmFtZXRlciBpcyBzcGVjaWZpZWQsIHJlbW92ZSBhbGwgcHJlc2VudCBsYXRlbmN5IGhp
-c3RvZ3JhbXMNCj4+Pj4gICAgIyBmb3IgdGhlIGRldmljZS4gT3RoZXJ3aXNlLCBhZGQvcmVzZXQg
-c29tZSBvZiAob3IgYWxsKSBsYXRlbmN5IGhpc3RvZ3JhbXMuDQo+Pj4+ICAgICMNCj4+Pj4gLSMg
-QGRldmljZTogZGV2aWNlIG5hbWUgdG8gc2V0IGxhdGVuY3kgaGlzdG9ncmFtIGZvci4NCj4+Pj4g
-KyMgQGlkOiBUaGUgUU9NIHBhdGggb3IgbmFtZSBvZiB0aGUgZ3Vlc3QgZGV2aWNlLg0KPj4+PiAg
-ICAjDQo+Pj4+ICAgICMgQGJvdW5kYXJpZXM6IGxpc3Qgb2YgaW50ZXJ2YWwgYm91bmRhcnkgdmFs
-dWVzIChzZWUgZGVzY3JpcHRpb24gaW4NCj4+Pj4gICAgIyAgICAgICAgICAgICAgQmxvY2tMYXRl
-bmN5SGlzdG9ncmFtSW5mbyBkZWZpbml0aW9uKS4gSWYgc3BlY2lmaWVkLCBhbGwNCj4+Pj4gQEAg
-LTU0Nyw3ICs1NDcsNyBAQA0KPj4+PiAgICAjIDwtIHsgInJldHVybiI6IHt9IH0NCj4+Pj4gICAg
-IyMNCj4+Pj4gICAgeyAnY29tbWFuZCc6ICd4LWJsb2NrLWxhdGVuY3ktaGlzdG9ncmFtLXNldCcs
-DQo+Pj4+IC0gICdkYXRhJzogeydkZXZpY2UnOiAnc3RyJywNCj4+Pj4gKyAgJ2RhdGEnOiB7J2lk
-JzogJ3N0cicsDQo+Pj4+ICAgICAgICAgICAgICAgJypib3VuZGFyaWVzJzogWyd1aW50NjQnXSwN
-Cj4+Pj4gICAgICAgICAgICAgICAnKmJvdW5kYXJpZXMtcmVhZCc6IFsndWludDY0J10sDQo+Pj4+
-ICAgICAgICAgICAgICAgJypib3VuZGFyaWVzLXdyaXRlJzogWyd1aW50NjQnXSwNCj4+Pj4gZGlm
-ZiAtLWdpdCBhL2Jsb2NrZGV2LmMgYi9ibG9ja2Rldi5jDQo+Pj4+IGluZGV4IGE2ZjcxZjlkODMu
-LmZmMGQ4ZGVkNWUgMTAwNjQ0DQo+Pj4+IC0tLSBhL2Jsb2NrZGV2LmMNCj4+Pj4gKysrIGIvYmxv
-Y2tkZXYuYw0KPj4+PiBAQCAtNDM5NywyMSArNDM5NywyOSBAQCB2b2lkIHFtcF94X2Jsb2NrZGV2
-X3NldF9pb3RocmVhZChjb25zdCBjaGFyICpub2RlX25hbWUsIFN0ck9yTnVsbCAqaW90aHJlYWQs
-DQo+Pj4+ICAgIH0NCj4+Pj4gICAgDQo+Pj4+ICAgIHZvaWQgcW1wX3hfYmxvY2tfbGF0ZW5jeV9o
-aXN0b2dyYW1fc2V0KA0KPj4+PiAtICAgIGNvbnN0IGNoYXIgKmRldmljZSwNCj4+Pj4gKyAgICBj
-b25zdCBjaGFyICppZCwNCj4+Pj4gICAgICAgIGJvb2wgaGFzX2JvdW5kYXJpZXMsIHVpbnQ2NExp
-c3QgKmJvdW5kYXJpZXMsDQo+Pj4+ICAgICAgICBib29sIGhhc19ib3VuZGFyaWVzX3JlYWQsIHVp
-bnQ2NExpc3QgKmJvdW5kYXJpZXNfcmVhZCwNCj4+Pj4gICAgICAgIGJvb2wgaGFzX2JvdW5kYXJp
-ZXNfd3JpdGUsIHVpbnQ2NExpc3QgKmJvdW5kYXJpZXNfd3JpdGUsDQo+Pj4+ICAgICAgICBib29s
-IGhhc19ib3VuZGFyaWVzX2ZsdXNoLCB1aW50NjRMaXN0ICpib3VuZGFyaWVzX2ZsdXNoLA0KPj4+
-PiAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4+PiAgICB7DQo+Pj4+IC0gICAgQmxvY2tCYWNrZW5k
-ICpibGsgPSBibGtfYnlfbmFtZShkZXZpY2UpOw0KPj4+PiAgICAgICAgQmxvY2tBY2N0U3RhdHMg
-KnN0YXRzOw0KPj4+PiAgICAgICAgaW50IHJldDsNCj4+Pj4gKyAgICBFcnJvciAqbG9jYWxfZXJy
-ID0gTlVMTDsNCj4+Pj4gKyAgICBCbG9ja0JhY2tlbmQgKmJsayA9IGJsa19ieV9xZGV2X2lkKGlk
-LCAmbG9jYWxfZXJyKTsNCj4+Pj4gICAgDQo+Pj4+ICAgICAgICBpZiAoIWJsaykgew0KPj4+PiAt
-ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJEZXZpY2UgJyVzJyBub3QgZm91bmQiLCBkZXZpY2Up
-Ow0KPj4+PiAtICAgICAgICByZXR1cm47DQo+Pj4+ICsgICAgICAgIGJsayA9IGJsa19ieV9uYW1l
-KGlkKTsNCj4+Pj4gKyAgICAgICAgaWYgKCFibGspIHsNCj4+Pj4gKyAgICAgICAgICAgIGVycm9y
-X3Byb3BhZ2F0ZShlcnJwLCBsb2NhbF9lcnIpOw0KPj4+PiArICAgICAgICAgICAgcmV0dXJuOw0K
-Pj4+PiArICAgICAgICB9IGVsc2Ugew0KPj4+PiArICAgICAgICAgICAgZXJyb3JfZnJlZShsb2Nh
-bF9lcnIpOw0KPj4+PiArICAgICAgICAgICAgbG9jYWxfZXJyID0gTlVMTDsNCj4+Pj4gKyAgICAg
-ICAgfQ0KPj4+PiAgICAgICAgfQ0KPj4+DQo+Pj4gV2h5IGRvbid0IHlvdSB1c2UgcW1wX2dldF9i
-bGsoKSBoZXJlPw0KPj4+DQo+Pg0KPj4gcW1wX2dldF9ibGsgaXMgdXNlZCBmb3IgY2FzZXMgd2hl
-biB3ZSBoYXZlIGJvdGggQGRldmljZSBhbmQgQGlkIHBhcmFtZXRlcnMsIHdoZXJlIEBkZXZpY2Ug
-aXMgZGVwcmVjYXRlZC4NCj4+DQo+PiBBbmQgb25lIG9mIHByZXZpb3VzIGl0ZXJhdGlvbiB3YXMg
-YSB0cnkgdG8gZG8gaXQgaW4gdGhpcyB3YXkgKGhhdmUgYm90aCBAaWQgYW5kIEBkZXZpY2UpLiBC
-dXQgaXQgd2FzDQo+PiBjb25zaWRlcmVkIHRvIGJlIGJhZCBpZGVhIGZvciBhIG5ldyBjb21tYW5k
-LCB3aGljaCBkb24ndCBuZWVkIGFueSBiYWNrd2FyZCBjb21wYXRpYmlsaXR5LiBBbmQgd2UgZGVj
-aWRlZA0KPj4gdG8gbWVyZ2UgdHdvIHZhcmlhbnRzIGluIEBpZC4NCj4gDQo+IEFoLCByaWdodCBJ
-IG1pc3NlZCB0aGF0IHlvdSBkcm9wcGVkIEBkZXZpY2UgYW5kIGp1c3Qgbm90aWNlZCB0aGF0IHRo
-aXMNCj4gbG9va3MgZGlmZmVyZW50IGZyb20gb3RoZXIgY29tbWFuZHMuIENhbGxpbmcgYmxrX2J5
-X3FkZXZfaWQoKSBkaXJlY3RseQ0KPiBtYWtlcyBzZW5zZSB0aGVuLg0KPiANCj4+IFNvLCBkbyB5
-b3Ugc3VnZ2VzdCB0byBkcm9wIGJsa19ieV9uYW1lKCkgdmFyaWFudCBhdCBhbGwsIGFuZCBnbyB0
-aHJvdWdoIHFtcF9nZXRfYmxrKE5VTEwsIGlkKSwgd2hpY2gNCj4+IHdpbGwgY2FsbCBibGtfYnlf
-cWRldl9pZCgpIGFuZCBmYWlsIGlmIG5vdCBmb3VuZD8NCj4gDQo+IFllcywgd2UgZG9uJ3QgbmVl
-ZCB0aGUgYmxrX2J5X25hbWUoKSBwYXRoLCBpdCdzIG9ubHkgZm9yIHRoZSBsZWdhY3kNCj4gQGRl
-dmljZSBvcHRpb25zLg0KPiANCj4gSW4gYW55IGNhc2UsIHlvdSBjYW4ndCB1c2UgdGhlIHNhbWUg
-b3B0aW9uIGZvciBibGtfYnlfbmFtZSgpIGFuZA0KPiBibGtfYnlfcWRldl9pZCgpLiBUaGV5IGFy
-ZSBzZXBhcmF0ZSBuYW1lc3BhY2VzIGFuZCB0aGUgbmFtZSBjb3VsZCBleGlzdA0KPiBpbiBib3Ro
-IG9mIHRoZW0uIFRoaXMgaXMgd2h5IHRoZSBvdGhlciBjb21tYW5kcyBoYXZlIGJvdGggQGlkIGFu
-ZA0KPiBAZGV2aWNlIGluc3RlYWQgb2YganVzdCBhIHNpbmdsZSBvcHRpb24uDQo+IA0KDQpPaywg
-dGhhbmsgeW91IGZvciBleHBsYW5hdGlvbi4gSSdsbCByZXNlbmQgdG9kYXkuDQoNCg0KLS0gDQpC
-ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+12.02.2019 6:22, Stefan Hajnoczi wrote:
+> On Mon, Feb 11, 2019 at 09:38:37AM +0000, Vladimir Sementsov-Ogievskiy wr=
+ote:
+>> 11.02.2019 6:42, Stefan Hajnoczi wrote:
+>>> On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogievskiy =
+wrote:
+>>>> Hi all!
+>>>>
+>>>> We have a very frequent pattern of wrapping a coroutine_fn function
+>>>> to be called from non-coroutine context:
+>>>>
+>>>>     - create structure to pack parameters
+>>>>     - create function to call original function taking parameters from
+>>>>       struct
+>>>>     - create wrapper, which in case of non-coroutine context will
+>>>>       create a coroutine, enter it and start poll-loop.
+>>>>
+>>>> Here is a draft of template code + example how it can be used to drop =
+a
+>>>> lot of similar code.
+>>>>
+>>>> Hope someone like it except me)
+>>>
+>>> My 2 cents.  Cons:
+>>>
+>>>    * Synchronous poll loops are an anti-pattern.  They block all of QEM=
+U
+>>>      with the big mutex held.  Making them easier to write is
+>>>      questionable because we should aim to have as few of these as
+>>>      possible.
+>>
+>> Understand. Do we have a concept or a kind of target for a future to get=
+ rid of
+>> these a lot of poll-loops? What is the right way? At least for block-lay=
+er?
+>=20
+> It's non-trivial.  The nested event loop could be flattened if there was
+> a mechanism to stop further activity on a specific object only (e.g.
+> BlockDriverState).  That way the event loop can continue processing
+> events for other objects and device emulation could continue for other
+> objects.
+>=20
+> Unfortunately there are interactions between objects like in block jobs
+> that act on multiple BDSes, so it becomes even tricky.
+>=20
+> A simple way of imagining this is to make each object an "actor"
+> coroutine.  The coroutine processes a single message (request) at a time
+> and yields when it needs to wait.  Callers send messages and expect
+> asynchronous responses.  This model is bad for efficiency (parallelism
+
+hmm, and with all these loops, where is parallelism?
+
+> is necessary) but at least it offers a sane way of thinking about
+> multiple asynchronous components coordinating together.  (It's another
+> way of saying, let's put everything into coroutines.)
+>=20
+> The advantage of a flat event loop is that a hang in one object (e.g.
+> I/O getting stuck in one file) doesn't freeze the entire event loop.
+>  >>>
+>>>    * Code generation makes the code easier to write but harder to read.
+>>>      Code is read more than written.  In this case I think open coding
+>>>      isn't too bad and I prefer it to reading a code generation script =
+to
+>>>      understand how it works.
+>>
+>> But you can read generated code in same way. You only need to read gener=
+ator
+>> script if it generates something wrong, but should be rare.
+>=20
+> Generated code isn't visible unless the code has been built and indexed
+> (if you're using ctags).  This makes it harder for people to navigate
+> the code.
+>=20
+>>>
+>>> If we were planning to add lots more of these then I agree code
+>>> generation would help.  But in this case I'd rather not.
+>>>
+>>
+>> What do you think at least of generating code to create a coroutine from=
+ a function
+>> with multiple arguments?
+>=20
+> If it's easy to read without requiring one to figure out how the magic
+> works, then I like it.
+>=20
+
+Ok, I'll think about it.
+
+
+--=20
+Best regards,
+Vladimir
