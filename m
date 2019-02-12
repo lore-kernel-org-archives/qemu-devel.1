@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50918)
+Received: from eggs.gnu.org ([209.51.188.92]:51112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtYgO-00018t-4e
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:05:08 -0500
+	(envelope-from <mst@redhat.com>) id 1gtYhF-0001Z9-Ij
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtYgM-0005H5-9N
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:05:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45151)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtYgM-0005Fe-2w
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:05:06 -0500
-Date: Tue, 12 Feb 2019 09:04:36 -0500
+	(envelope-from <mst@redhat.com>) id 1gtYhC-00069a-6O
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:00 -0500
+Date: Tue, 12 Feb 2019 09:05:47 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190212090418-mutt-send-email-mst@kernel.org>
-References: <CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
-	<20190204205105-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
-	<20190205110518-mutt-send-email-mst@kernel.org>
-	<20190212071114.GM1011@xz-x1>
-	<bb1175b1-6b51-2df2-047d-b625413ea3dc@redhat.com>
-	<20190212080349-mutt-send-email-mst@kernel.org>
-	<5716364b-da70-e134-4ed0-d3d136d9ba8a@redhat.com>
-	<20190212082336-mutt-send-email-mst@kernel.org>
-	<d9df015d-e462-4d89-8519-5cba29b5a5e1@redhat.com>
+Message-ID: <20190212090538-mutt-send-email-mst@kernel.org>
+References: <20190212134758.10514-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d9df015d-e462-4d89-8519-5cba29b5a5e1@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
- features
+In-Reply-To: <20190212134758.10514-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] a few trivials
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Changpeng Liu <changpeng.liu@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com, qemu-trivial@nongnu.org
 
-On Tue, Feb 12, 2019 at 02:53:16PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 2/12/19 2:24 PM, Michael S. Tsirkin wrote:
-> > On Tue, Feb 12, 2019 at 02:15:36PM +0100, Philippe Mathieu-Daud=E9 wr=
-ote:
-> >> On 2/12/19 2:04 PM, Michael S. Tsirkin wrote:
-> >>> On Tue, Feb 12, 2019 at 11:39:21AM +0100, Philippe Mathieu-Daud=E9 =
-wrote:
-> >>>> On 2/12/19 8:11 AM, Peter Xu wrote:
-> >>>>> On Tue, Feb 05, 2019 at 11:06:42AM -0500, Michael S. Tsirkin wrot=
-e:
-> >>>>>>
-> >>>>>> OK I reverted the whole part dealing with vhost-user and reposte=
-d.
-> >>>>>
-> >>>>> I noticed that the merged pull request could possibly have squash=
-ed
-> >>>>> the below two patches (in previous pull) into one super patch
-> >>>>> (a56de056c91f87e1e):
-> >>>>>
-> >>>>>         i386/kvm: ignore masked irqs when update msi routes
-> >>>>>         contrib/vhost-user-blk: fix the compilation issue
-> >>>>>
-> >>>>> Here, the first patch lost its commit message, and the last patch=
- lost
-> >>>>> its real author. ;)
-> >>>>
-> >>>> I suggest we revert a56de056c9 ASAP and reapply the both patches, =
-this
-> >>>> will ease cherry-picking/downstream workflow.
-> >>>
-> >>> I don't see why does it help upstream.
-> >>
-> >> I'd have suggested the same if I had no idea what 'downstream workfl=
-ow'
-> >> mean, simply to keep the tree clear and avoid to have unrelated chan=
-ges
-> >> squashed altogether.
-> >> Commit a56de056c9 really looks messy. MSI/MSIX changes described by =
-"fix
-> >> vhost-user-blk compilation".
-> >> Hopefully it won't trigger any problem which requires bisecting to i=
-t,
-> >> then contact Changpeng Liu asking him what he intented to do with hi=
-s
-> >> commit.
-> >> Your call anyway :)
-> >>
-> >> Regards,
-> >>
-> >> Phil.
-> >=20
-> >=20
-> > OK these are good points. I'm not sure what happened but it looks lik=
-e I
-> > screwed up when resolving some conflicts.  Care posting a patchset
-> > looking sane?
->=20
-> Yes, will do.
+On Tue, Feb 12, 2019 at 01:47:54PM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Just cleaning out my trivial pile; a few more traces and
+> a couple of error reporting tweaks.
+> 
+> Dave
 
-Thanks! Include the reverts in it pls.
+Looks sane
 
---=20
-MST
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> 
+> Dr. David Alan Gilbert (4):
+>   pckbd: Convert DPRINTF->trace
+>   HMP: Prepend errors with 'Error:'
+>   kvm: Add kvm_set_ioeventfd* traces
+>   wavcapture: Convert to error_report
+> 
+>  accel/kvm/kvm-all.c    |  3 +++
+>  accel/kvm/trace-events |  2 ++
+>  audio/wavcapture.c     | 39 +++++++++++++++++----------------------
+>  hmp.c                  |  2 +-
+>  hw/input/pckbd.c       | 19 ++++++-------------
+>  hw/input/trace-events  |  7 +++++++
+>  6 files changed, 36 insertions(+), 36 deletions(-)
+> 
+> -- 
+> 2.20.1
