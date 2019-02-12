@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57133)
+Received: from eggs.gnu.org ([209.51.188.92]:58281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gtS8v-0003H0-5J
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:06:12 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtSBB-0004BV-H9
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:08:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gtS8t-0005Rk-7N
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:06:08 -0500
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:47355)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gtS8s-0005LX-QQ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:06:07 -0500
-Received: from player692.ha.ovh.net (unknown [10.109.160.217])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 461E818423C
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 08:05:59 +0100 (CET)
-References: <20190107183946.7230-1-clg@kaod.org>
-	<20190107183946.7230-13-clg@kaod.org>
-	<20190212010643.GG1884@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <adcd2479-7a31-ba7d-50c6-cfa9af909f2e@kaod.org>
-Date: Tue, 12 Feb 2019 08:05:53 +0100
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtSB9-00078K-Ix
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:08:29 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:32994)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gtSB7-00073M-8T
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 02:08:25 -0500
+Date: Tue, 12 Feb 2019 09:08:09 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190212070808.GA3103@lap1>
+References: <20190210104537.1488-1-yuval.shaia@oracle.com>
+	<20190210104537.1488-3-yuval.shaia@oracle.com>
+	<19605c6a-56c4-6467-23b6-f59d7a79cf98@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190212010643.GG1884@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 12/13] spapr/xics: ignore the lower 4K in
- the IRQ number space
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <19605c6a-56c4-6467-23b6-f59d7a79cf98@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/9] hw/rdma: Introduce locked qlist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +29,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, eblake@redhat.com
 
-On 2/12/19 2:06 AM, David Gibson wrote:
-> On Mon, Jan 07, 2019 at 07:39:45PM +0100, C=E9dric Le Goater wrote:
->> The IRQ number space of the XIVE and XICS interrupt mode are aligned
->> when using the dual interrupt mode for the machine. This means that
->> the ICS offset is set to zero in QEMU and that the KVM XICS device
->> should be informed of this new value. Unfortunately, there is now way
->> to do so and KVM still maintains the XICS_IRQ_BASE (0x1000) offset.
->>
->> Ignore the lower 4K which are not used under the XICS interrupt
->> mode. These IRQ numbers are only claimed by XIVE for the CPU IPIs.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/xics_kvm.c | 18 ++++++++++++++++++
->>  1 file changed, 18 insertions(+)
->>
->> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
->> index 651bbfdf6966..1d21ff217b82 100644
->> --- a/hw/intc/xics_kvm.c
->> +++ b/hw/intc/xics_kvm.c
->> @@ -238,6 +238,15 @@ static void ics_get_kvm_state(ICSState *ics)
->>      for (i =3D 0; i < ics->nr_irqs; i++) {
->>          ICSIRQState *irq =3D &ics->irqs[i];
->> =20
->> +        /*
->> +         * The KVM XICS device considers that the IRQ numbers should
->> +         * start at XICS_IRQ_BASE (0x1000). Ignore the lower 4K
->> +         * numbers (only claimed by XIVE for the CPU IPIs).
->> +         */
->> +        if (i + ics->offset < XICS_IRQ_BASE) {
->> +            continue;
->> +        }
->> +
->=20
-> This seems bogus to me.  The guest-visible irq numbers need to line up
-> between xics and xive mode, yes, but that doesn't mean we need to keep
-> around a great big array of unused array of ICS irq states, even in
-> TCG mode.
+On Mon, Feb 11, 2019 at 10:10:56AM +0200, Marcel Apfelbaum wrote:
+> 
+> 
+> On 2/10/19 12:45 PM, Yuval Shaia wrote:
+> > To make code more readable move handling of locked list to a generic
+> > functions.
+> > 
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >   hw/rdma/rdma_backend.c      | 20 +++++--------------
+> >   hw/rdma/rdma_backend_defs.h |  8 ++------
+> >   hw/rdma/rdma_utils.c        | 39 +++++++++++++++++++++++++++++++++++++
+> >   hw/rdma/rdma_utils.h        |  9 +++++++++
+> >   4 files changed, 55 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> > index 5f60856d19..2f6372f8f0 100644
+> > --- a/hw/rdma/rdma_backend.c
+> > +++ b/hw/rdma/rdma_backend.c
+> > @@ -527,9 +527,7 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
+> >       bctx->up_ctx = ctx;
+> >       bctx->sge = *sge;
+> > -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> > -    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
+> > -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+> > +    rdma_locked_list_append_int64(&backend_dev->recv_mads_list, bctx_id);
+> >       return 0;
+> >   }
+> > @@ -913,23 +911,19 @@ static inline void build_mad_hdr(struct ibv_grh *grh, union ibv_gid *sgid,
+> >   static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
+> >                                        RdmaCmMuxMsg *msg)
+> >   {
+> > -    QObject *o_ctx_id;
+> >       unsigned long cqe_ctx_id;
+> >       BackendCtx *bctx;
+> >       char *mad;
+> >       trace_mad_message("recv", msg->umad.mad, msg->umad_len);
+> > -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> > -    o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
+> > -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+> > -    if (!o_ctx_id) {
+> > +    cqe_ctx_id = rdma_locked_list_pop_int64(&backend_dev->recv_mads_list);
+> > +    if (cqe_ctx_id == -ENOENT) {
+> >           rdma_warn_report("No more free MADs buffers, waiting for a while");
+> >           sleep(THR_POLL_TO);
+> >           return;
+> >       }
+> > -    cqe_ctx_id = qnum_get_uint(qobject_to(QNum, o_ctx_id));
+> >       bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
+> >       if (unlikely(!bctx)) {
+> >           rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
+> > @@ -994,8 +988,7 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
+> >           return -EIO;
+> >       }
+> > -    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
+> > -    backend_dev->recv_mads_list.list = qlist_new();
+> > +    rdma_locked_list_init(&backend_dev->recv_mads_list);
+> >       enable_rdmacm_mux_async(backend_dev);
+> > @@ -1010,10 +1003,7 @@ static void mad_fini(RdmaBackendDev *backend_dev)
+> >   {
+> >       disable_rdmacm_mux_async(backend_dev);
+> >       qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
+> > -    if (backend_dev->recv_mads_list.list) {
+> > -        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+> > -        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+> > -    }
+> > +    rdma_locked_list_destroy(&backend_dev->recv_mads_list);
+> >   }
+> >   int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+> > diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
+> > index 15ae8b970e..bec0457f25 100644
+> > --- a/hw/rdma/rdma_backend_defs.h
+> > +++ b/hw/rdma/rdma_backend_defs.h
+> > @@ -20,6 +20,7 @@
+> >   #include "chardev/char-fe.h"
+> >   #include <infiniband/verbs.h>
+> >   #include "contrib/rdmacm-mux/rdmacm-mux.h"
+> > +#include "rdma_utils.h"
+> >   typedef struct RdmaDeviceResources RdmaDeviceResources;
+> > @@ -30,11 +31,6 @@ typedef struct RdmaBackendThread {
+> >       bool is_running; /* Set by the thread to report its status */
+> >   } RdmaBackendThread;
+> > -typedef struct RecvMadList {
+> > -    QemuMutex lock;
+> > -    QList *list;
+> > -} RecvMadList;
+> > -
+> >   typedef struct RdmaCmMux {
+> >       CharBackend *chr_be;
+> >       int can_receive;
+> > @@ -48,7 +44,7 @@ typedef struct RdmaBackendDev {
+> >       struct ibv_context *context;
+> >       struct ibv_comp_channel *channel;
+> >       uint8_t port_num;
+> > -    RecvMadList recv_mads_list;
+> > +    LockedList recv_mads_list;
+> >       RdmaCmMux rdmacm_mux;
+> >   } RdmaBackendDev;
+> > diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
+> > index f1c980c6be..a2a4ea2a15 100644
+> > --- a/hw/rdma/rdma_utils.c
+> > +++ b/hw/rdma/rdma_utils.c
+> > @@ -14,6 +14,8 @@
+> >    */
+> >   #include "qemu/osdep.h"
+> > +#include "qapi/qmp/qlist.h"
+> > +#include "qapi/qmp/qnum.h"
+> >   #include "trace.h"
+> >   #include "rdma_utils.h"
+> > @@ -55,3 +57,40 @@ void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
+> >           pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
+> >       }
+> >   }
+> > +
+> > +void rdma_locked_list_init(LockedList *list)
+> > +{
+> > +    qemu_mutex_init(&list->lock);
+> > +    list->list = qlist_new();
+> > +}
+> > +
+> > +void rdma_locked_list_destroy(LockedList *list)
+> > +{
+> > +    if (list->list) {
+> > +        qlist_destroy_obj(QOBJECT(list->list));
+> > +        qemu_mutex_destroy(&list->lock);
+> > +        list->list = NULL;
+> > +    }
+> > +}
+> > +
+> > +void rdma_locked_list_append_int64(LockedList *list, int64_t value)
+> > +{
+> > +    qemu_mutex_lock(&list->lock);
+> > +    qlist_append_int(list->list, value);
+> > +    qemu_mutex_unlock(&list->lock);
+> > +}
+> > +
+> > +int64_t rdma_locked_list_pop_int64(LockedList *list)
+> > +{
+> > +    QObject *obj;
+> > +
+> > +    qemu_mutex_lock(&list->lock);
+> > +    obj = qlist_pop(list->list);
+> > +    qemu_mutex_unlock(&list->lock);
+> > +
+> > +    if (!obj) {
+> > +        return -ENOENT;
+> > +    }
+> > +
+> > +    return qnum_get_uint(qobject_to(QNum, obj));
+> > +}
+> > diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
+> > index acd148837f..4ba9956f81 100644
+> > --- a/hw/rdma/rdma_utils.h
+> > +++ b/hw/rdma/rdma_utils.h
+> > @@ -29,8 +29,17 @@
+> >   #define rdma_info_report(fmt, ...) \
+> >       info_report("%s: " fmt, "rdma", ## __VA_ARGS__)
+> > +typedef struct LockedList {
+> > +    QemuMutex lock;
+> > +    QList *list;
+> > +} LockedList;
+> 
+> I am still not sure about the naming, the list is not "locked",
+> is "synchronized", and also is not a 'generic' list since is located in the
+> rdma code.
+> 
+> Maybe RdmaSyncList?
+> 
+> Thanks,
+> Marcel
 
-This is because the qirqs[] array is under the machine and shared between=
-=20
-both interrupt modes, xics and xive.
+Sure, will rename it (to RdmaProtectedQList).
+Will do the same in patch #6
 
-C.
-
->=20
->>          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
->>                            i + ics->offset, &state, false, &error_fata=
-l);
->> =20
->> @@ -303,6 +312,15 @@ static int ics_set_kvm_state(ICSState *ics, int v=
-ersion_id)
->>          ICSIRQState *irq =3D &ics->irqs[i];
->>          int ret;
->> =20
->> +        /*
->> +         * The KVM XICS device considers that the IRQ numbers should
->> +         * start at XICS_IRQ_BASE (0x1000). Ignore the lower 4K
->> +         * numbers (only claimed by XIVE for the CPU IPIs).
->> +         */
->> +        if (i + ics->offset < XICS_IRQ_BASE) {
->> +            continue;
->> +        }
->> +
->>          state =3D irq->server;
->>          state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY=
-_MASK)
->>              << KVM_XICS_PRIORITY_SHIFT;
->=20
+> 
+> > +
+> >   void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
+> >   void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
+> > +void rdma_locked_list_init(LockedList *list);
+> > +void rdma_locked_list_destroy(LockedList *list);
+> > +void rdma_locked_list_append_int64(LockedList *list, int64_t value);
+> > +int64_t rdma_locked_list_pop_int64(LockedList *list);
+> >   static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
+> >   {
+> 
+> 
