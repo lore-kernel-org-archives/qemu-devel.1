@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42533)
+Received: from eggs.gnu.org ([209.51.188.92]:44050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gtYFh-0008Rs-OO
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:37:34 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gtYMj-0001At-U1
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:44:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gtYFd-0000Ot-NM
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:37:33 -0500
-Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:51038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gtYFb-0008Qn-D6
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:37:27 -0500
-Received: from player694.ha.ovh.net (unknown [10.109.160.253])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A483A213F7C
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 14:37:12 +0100 (CET)
-Date: Tue, 12 Feb 2019 14:37:00 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190212143700.444c2b86@bahia.lan>
-In-Reply-To: <1549951304-26100-1-git-send-email-changpeng.liu@intel.com>
-References: <1549951304-26100-1-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <liam.merwick@oracle.com>) id 1gtYMi-0001nT-LC
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:44:49 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:40918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gtYMi-0001m5-B2
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:44:48 -0500
+References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
+	<1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
+	<13b4d86c-0af3-12b9-fce5-92f1eb0fe95d@redhat.com>
+	<0251e2fc-3dbd-937a-0649-71fcd64e2d14@linux.ibm.com>
+	<0b53df4a-7065-b3b7-c419-3f8e55cffdfd@oracle.com>
+	<bf1a6632-594c-cf05-e4cd-c70d9e1e2fbe@linux.ibm.com>
+	<f7b55eef-68da-ef50-b060-05e86f659903@redhat.com>
+	<113577fd-71c8-972f-b658-635d3decd62d@linux.ibm.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <7339d38a-74b7-bac8-677f-a27b88226453@oracle.com>
+Date: Tue, 12 Feb 2019 13:43:54 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] virtio-blk: set correct config size for
- the host driver
+In-Reply-To: <113577fd-71c8-972f-b658-635d3decd62d@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string
+ specifier in tpm_tis_show_buffer()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, ldoktor@redhat.com, mst@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, sgarzare@redhat.com
+To: Stefan Berger <stefanb@linux.ibm.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, liam.merwick@oracle.com
 
-On Tue, 12 Feb 2019 14:01:44 +0800
-Changpeng Liu <changpeng.liu@intel.com> wrote:
+On 12/02/2019 13:27, Stefan Berger wrote:
+> On 2/12/19 7:31 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 2/11/19 10:13 PM, Stefan Berger wrote:
+>>> On 2/11/19 3:09 PM, Liam Merwick wrote:
+>>>> On 11/02/2019 19:56, Stefan Berger wrote:
+>>>>> On 2/11/19 11:02 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>>> On 2/11/19 4:03 PM, Liam Merwick wrote:
+>> [...]
+>>>>>>> -=C2=A0=C2=A0=C2=A0 printf("tpm_tis: %s length =3D %d\n", string,=
+ len);
+>>>>>>> +=C2=A0=C2=A0=C2=A0 printf("tpm_tis: %s length =3D %u\n", string,=
+ len);
+>>>>>> So here the format is '%zu'.
+>>>>>> However in code cleanup we try go get ride of printf() calls and
+>>>>>> replace them with trace points.
+>>>>>
+>>>>> This code is only used for debugging if DEBUG_TIS has been #defined.
+>>>>> No need to add tracing here.
+>>>> I'd come up the attached change (but that seems like overkill).
+>>>
+>>> I don't think we need tracing for this.
+>> So if you think the code is mature enough, let's remove the DEBUG call=
+s!
+>>
+>> Else we prefer to convert DEBUG printf to trace events because (at=20
+>> least):
+>> - no need to recompile to enable debugging
+>> - when compiled with debugging, you don't mess with STDIO which can be
+>> used as a chardev backend.
+> Fine. Then I withdraw my reviewed-by.
 
-> Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features support"
-> introduced extra fields to existing struct virtio_blk_config, when
-> migration was executed from older QEMU version to current head, it
 
-A hint about the breakage is often a good practice, as it helps
-people to find the fix if they hit the issue.
+I don't see a way of removing the DEBUG calls without adding the=20
+overhead of a call to tpm_tis_show_buffer() each time even if tracing is=20
+not enabled (the 3 trace calls are interdependent and need a for loop).
+Is there any example of a trace point that calls a function that then=20
+does non-trivial printing?
 
-> will break the migration.  While here, set the correct config size
+I could send a v3 with the patch I attached previously with the 3 printf=20
+calls changed to trace points but still wrapped in 'if (DEBUG_TIS)' and=20
+optimised out in non-debug.
 
-"While here" usually means that the corresponding change isn't strictly
-needed. I don't believe this is the case here since fixing the config
-size is precisely the goal of this patch.
-
-> when initializing the host driver, for now, discard/write zeroes
-> are not supported by virtio-blk host driver, so set the config
-
-As mentioned by Michael, there's no such thing as a "host driver".
-Just say virtio-blk.
-
-> size as before, users can change config size when adding the new
-> feature bits support.
-> 
-
-What about ?
-
-Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features
-support" added fields to struct virtio_blk_config. This changes
-the size of the config space and breaks migration from QEMU 3.1
-and older:
-
-qemu-system-ppc64: get_pci_config_device: Bad config data: i=0x10 read: 41 device: 1 cmask: ff wmask: 80 w1cmask:0
-qemu-system-ppc64: Failed to load PCIDevice:config
-qemu-system-ppc64: Failed to load virtio-blk:virtio
-qemu-system-ppc64: error while loading state for instance 0x0 of device 'pci@800000020000000:01.0/virtio-blk'
-qemu-system-ppc64: load of migration failed: Invalid argument
-
-Since virtio-blk doesn't support the "discard" and "write zeroes"
-features, it shouldn't even expose the associated fields in the
-config space actually. Just include all fields up to num_queues to
-match QEMU 3.1 and older.
-
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> ---
-
-LGTM
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Tested-by: Greg Kurz <groug@kaod.org>
-
->  hw/block/virtio-blk.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 9a87b3b..846b7b9 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -28,6 +28,9 @@
->  #include "hw/virtio/virtio-bus.h"
->  #include "hw/virtio/virtio-access.h"
->  
-> +#define VIRTIO_BLK_CFG_SIZE (offsetof(struct virtio_blk_config, num_queues) + \
-> +                             sizeof_field(struct virtio_blk_config, num_queues))
-> +
->  static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
->                                      VirtIOBlockReq *req)
->  {
-> @@ -761,7 +764,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
->      blkcfg.alignment_offset = 0;
->      blkcfg.wce = blk_enable_write_cache(s->blk);
->      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
-> -    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-> +    memcpy(config, &blkcfg, VIRTIO_BLK_CFG_SIZE);
->  }
->  
->  static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-> @@ -769,7 +772,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
->      VirtIOBlock *s = VIRTIO_BLK(vdev);
->      struct virtio_blk_config blkcfg;
->  
-> -    memcpy(&blkcfg, config, sizeof(blkcfg));
-> +    memcpy(&blkcfg, config, VIRTIO_BLK_CFG_SIZE);
->  
->      aio_context_acquire(blk_get_aio_context(s->blk));
->      blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
-> @@ -952,8 +955,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> -    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-> -                sizeof(struct virtio_blk_config));
-> +    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, VIRTIO_BLK_CFG_SIZE);
->  
->      s->blk = conf->conf.blk;
->      s->rq = NULL;
+Regards,
+Liam
