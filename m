@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49786)
+Received: from eggs.gnu.org ([209.51.188.92]:49781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ95-0002nO-JE
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ95-0002nJ-IS
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8q-00021j-G2
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8o-0001wX-HE
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:07 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45135)
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:32922)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtQ8m-0001nd-Qf
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:55 -0500
-Received: by mail-pf1-x444.google.com with SMTP id j3so677251pfi.12
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:52 -0800 (PST)
+	id 1gtQ8m-0001fU-JP
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:54 -0500
+Received: by mail-pf1-x431.google.com with SMTP id c123so707468pfb.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:41 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 20:57:19 -0800
-Message-Id: <20190212045721.28041-23-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 20:57:10 -0800
+Message-Id: <20190212045721.28041-14-richard.henderson@linaro.org>
 In-Reply-To: <20190212045721.28041-1-richard.henderson@linaro.org>
 References: <20190212045721.28041-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 22/24] target/hppa: Fix addition '</<='
- conditions
+Subject: [Qemu-devel] [PULL 13/24] target/hppa: Convert arithmetic immediate
+ insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,222 +28,337 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>
+Cc: peter.maydell@linaro.org
 
-From: Sven Schnelle <svens@stackframe.org>
-
-These conditions include the signed overflow bit.  See page 5-3
-of the Parisc 1.1 Architecture Reference Manual for details.
-
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-[rth: More changes for c == 3, to compute (N^V)|Z properly.]
+Tested-by: Helge Deller <deller@gmx.de>
+Tested-by: Sven Schnelle <svens@stackframe.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c | 95 +++++++++++++++++++++++++----------------
- 1 file changed, 58 insertions(+), 37 deletions(-)
+ target/hppa/translate.c  | 168 +++++++++++++++++----------------------
+ target/hppa/insns.decode |  21 +++++
+ 2 files changed, 96 insertions(+), 93 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index aae5714235..026ba5cb3e 100644
+index 26b5cd205b..7e4a65e0d5 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -452,15 +452,19 @@ static DisasCond cond_make_n(void)
-     };
+@@ -309,6 +309,12 @@ static int expand_shl2(int val)
+     return val << 2;
  }
  
-+static DisasCond cond_make_0_tmp(TCGCond c, TCGv_reg a0)
++/* Used for assemble_21.  */
++static int expand_shl11(int val)
 +{
-+    assert (c != TCG_COND_NEVER && c != TCG_COND_ALWAYS);
-+    return (DisasCond){
-+        .c = c, .a0 = a0, .a1_is_0 = true
-+    };
++    return val << 11;
 +}
 +
- static DisasCond cond_make_0(TCGCond c, TCGv_reg a0)
- {
--    DisasCond r = { .c = c, .a1 = NULL, .a1_is_0 = true };
+ 
+ /* Include the auto-generated decoder.  */
+ #include "decode.inc.c"
+@@ -895,16 +901,6 @@ static target_sreg assemble_16a(uint32_t insn)
+     return x << 2;
+ }
+ 
+-static target_sreg assemble_21(uint32_t insn)
+-{
+-    target_ureg x = -(target_ureg)(insn & 1);
+-    x = (x << 11) | extract32(insn, 1, 11);
+-    x = (x <<  2) | extract32(insn, 14, 2);
+-    x = (x <<  5) | extract32(insn, 16, 5);
+-    x = (x <<  2) | extract32(insn, 12, 2);
+-    return x << 11;
+-}
 -
--    assert (c != TCG_COND_NEVER && c != TCG_COND_ALWAYS);
--    r.a0 = tcg_temp_new();
--    tcg_gen_mov_reg(r.a0, a0);
--
--    return r;
-+    TCGv_reg tmp = tcg_temp_new();
-+    tcg_gen_mov_reg(tmp, a0);
-+    return cond_make_0_tmp(c, tmp);
+ /* The parisc documentation describes only the general interpretation of
+    the conditions, without describing their exact implementation.  The
+    interpretations do not stand up well when considering ADD,C and SUB,B.
+@@ -1219,6 +1215,20 @@ static bool do_add_reg(DisasContext *ctx, arg_rrr_cf_sh *a,
+     return nullify_end(ctx);
  }
  
- static DisasCond cond_make(TCGCond c, TCGv_reg a0, TCGv_reg a1)
-@@ -849,12 +853,20 @@ static void gen_goto_tb(DisasContext *ctx, int which,
-     }
- }
- 
--/* The parisc documentation describes only the general interpretation of
--   the conditions, without describing their exact implementation.  The
--   interpretations do not stand up well when considering ADD,C and SUB,B.
--   However, considering the Addition, Subtraction and Logical conditions
--   as a whole it would appear that these relations are similar to what
--   a traditional NZCV set of flags would produce.  */
-+static bool cond_need_sv(int c)
++static bool do_add_imm(DisasContext *ctx, arg_rri_cf *a,
++                       bool is_tsv, bool is_tc)
 +{
-+    return c == 2 || c == 3 || c == 6;
-+}
++    TCGv_reg tcg_im, tcg_r2;
 +
-+static bool cond_need_cb(int c)
-+{
-+    return c == 4 || c == 5;
-+}
-+
-+/*
-+ * Compute conditional for arithmetic.  See Page 5-3, Table 5-1, of
-+ * the Parisc 1.1 Architecture Reference Manual for details.
-+ */
- 
- static DisasCond do_cond(unsigned cf, TCGv_reg res,
-                          TCGv_reg cb_msb, TCGv_reg sv)
-@@ -863,17 +875,32 @@ static DisasCond do_cond(unsigned cf, TCGv_reg res,
-     TCGv_reg tmp;
- 
-     switch (cf >> 1) {
--    case 0: /* Never / TR */
-+    case 0: /* Never / TR    (0 / 1) */
-         cond = cond_make_f();
-         break;
-     case 1: /* = / <>        (Z / !Z) */
-         cond = cond_make_0(TCG_COND_EQ, res);
-         break;
--    case 2: /* < / >=        (N / !N) */
--        cond = cond_make_0(TCG_COND_LT, res);
-+    case 2: /* < / >=        (N ^ V / !(N ^ V) */
-+        tmp = tcg_temp_new();
-+        tcg_gen_xor_reg(tmp, res, sv);
-+        cond = cond_make_0_tmp(TCG_COND_LT, tmp);
-         break;
--    case 3: /* <= / >        (N | Z / !N & !Z) */
--        cond = cond_make_0(TCG_COND_LE, res);
-+    case 3: /* <= / >        (N ^ V) | Z / !((N ^ V) | Z) */
-+        /*
-+         * Simplify:
-+         *   (N ^ V) | Z
-+         *   ((res < 0) ^ (sv < 0)) | !res
-+         *   ((res ^ sv) < 0) | !res
-+         *   (~(res ^ sv) >= 0) | !res
-+         *   !(~(res ^ sv) >> 31) | !res
-+         *   !(~(res ^ sv) >> 31 & res)
-+         */
-+        tmp = tcg_temp_new();
-+        tcg_gen_eqv_reg(tmp, res, sv);
-+        tcg_gen_sari_reg(tmp, tmp, TARGET_REGISTER_BITS - 1);
-+        tcg_gen_and_reg(tmp, tmp, res);
-+        cond = cond_make_0_tmp(TCG_COND_EQ, tmp);
-         break;
-     case 4: /* NUV / UV      (!C / C) */
-         cond = cond_make_0(TCG_COND_EQ, cb_msb);
-@@ -882,8 +909,7 @@ static DisasCond do_cond(unsigned cf, TCGv_reg res,
-         tmp = tcg_temp_new();
-         tcg_gen_neg_reg(tmp, cb_msb);
-         tcg_gen_and_reg(tmp, tmp, res);
--        cond = cond_make_0(TCG_COND_EQ, tmp);
--        tcg_temp_free(tmp);
-+        cond = cond_make_0_tmp(TCG_COND_EQ, tmp);
-         break;
-     case 6: /* SV / NSV      (V / !V) */
-         cond = cond_make_0(TCG_COND_LT, sv);
-@@ -891,8 +917,7 @@ static DisasCond do_cond(unsigned cf, TCGv_reg res,
-     case 7: /* OD / EV */
-         tmp = tcg_temp_new();
-         tcg_gen_andi_reg(tmp, res, 1);
--        cond = cond_make_0(TCG_COND_NE, tmp);
--        tcg_temp_free(tmp);
-+        cond = cond_make_0_tmp(TCG_COND_NE, tmp);
-         break;
-     default:
-         g_assert_not_reached();
-@@ -930,7 +955,7 @@ static DisasCond do_sub_cond(unsigned cf, TCGv_reg res,
-         cond = cond_make(TCG_COND_LEU, in1, in2);
-         break;
-     default:
--        return do_cond(cf, res, sv, sv);
-+        return do_cond(cf, res, NULL, sv);
-     }
-     if (cf & 1) {
-         cond.c = tcg_invert_cond(cond.c);
-@@ -1129,7 +1154,7 @@ static void do_add(DisasContext *ctx, unsigned rt, TCGv_reg in1,
-         in1 = tmp;
-     }
- 
--    if (!is_l || c == 4 || c == 5) {
-+    if (!is_l || cond_need_cb(c)) {
-         TCGv_reg zero = tcg_const_reg(0);
-         cb_msb = get_temp(ctx);
-         tcg_gen_add2_reg(dest, cb_msb, in1, zero, in2, zero);
-@@ -1151,7 +1176,7 @@ static void do_add(DisasContext *ctx, unsigned rt, TCGv_reg in1,
- 
-     /* Compute signed overflow if required.  */
-     sv = NULL;
--    if (is_tsv || c == 6) {
-+    if (is_tsv || cond_need_sv(c)) {
-         sv = do_add_sv(ctx, dest, in1, in2);
-         if (is_tsv) {
-             /* ??? Need to include overflow from shift.  */
-@@ -1242,7 +1267,7 @@ static void do_sub(DisasContext *ctx, unsigned rt, TCGv_reg in1,
- 
-     /* Compute signed overflow if required.  */
-     sv = NULL;
--    if (is_tsv || c == 6) {
-+    if (is_tsv || cond_need_sv(c)) {
-         sv = do_sub_sv(ctx, dest, in1, in2);
-         if (is_tsv) {
-             gen_helper_tsv(cpu_env, sv);
-@@ -1314,7 +1339,7 @@ static void do_cmpclr(DisasContext *ctx, unsigned rt, TCGv_reg in1,
- 
-     /* Compute signed overflow if required.  */
-     sv = NULL;
--    if ((cf >> 1) == 6) {
-+    if (cond_need_sv(cf >> 1)) {
-         sv = do_sub_sv(ctx, dest, in1, in2);
-     }
- 
-@@ -2781,7 +2806,7 @@ static bool trans_ds(DisasContext *ctx, arg_rrr_cf *a)
-     /* Install the new nullification.  */
-     if (a->cf) {
-         TCGv_reg sv = NULL;
--        if (a->cf >> 1 == 6) {
-+        if (cond_need_sv(a->cf >> 1)) {
-             /* ??? The lshift is supposed to contribute to overflow.  */
-             sv = do_add_sv(ctx, dest, add1, add2);
-         }
-@@ -2982,7 +3007,7 @@ static bool do_cmpb(DisasContext *ctx, unsigned r, TCGv_reg in1,
-     tcg_gen_sub_reg(dest, in1, in2);
- 
-     sv = NULL;
--    if (c == 6) {
-+    if (cond_need_sv(c)) {
-         sv = do_sub_sv(ctx, dest, in1, in2);
-     }
- 
-@@ -3013,19 +3038,15 @@ static bool do_addb(DisasContext *ctx, unsigned r, TCGv_reg in1,
-     sv = NULL;
-     cb_msb = NULL;
- 
--    switch (c) {
--    default:
--        tcg_gen_add_reg(dest, in1, in2);
--        break;
--    case 4: case 5:
-+    if (cond_need_cb(c)) {
-         cb_msb = get_temp(ctx);
-         tcg_gen_movi_reg(cb_msb, 0);
-         tcg_gen_add2_reg(dest, cb_msb, in1, cb_msb, in2, cb_msb);
--        break;
--    case 6:
-+    } else {
-         tcg_gen_add_reg(dest, in1, in2);
++    if (a->cf) {
++        nullify_over(ctx);
 +    }
-+    if (cond_need_sv(c)) {
-         sv = do_add_sv(ctx, dest, in1, in2);
--        break;
++    tcg_im = load_const(ctx, a->i);
++    tcg_r2 = load_gpr(ctx, a->r);
++    do_add(ctx, a->t, tcg_im, tcg_r2, 0, 0, is_tsv, is_tc, 0, a->cf);
++    return nullify_end(ctx);
++}
++
+ static void do_sub(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+                    TCGv_reg in2, bool is_tsv, bool is_b,
+                    bool is_tc, unsigned cf)
+@@ -1299,6 +1309,19 @@ static bool do_sub_reg(DisasContext *ctx, arg_rrr_cf *a,
+     return nullify_end(ctx);
+ }
+ 
++static bool do_sub_imm(DisasContext *ctx, arg_rri_cf *a, bool is_tsv)
++{
++    TCGv_reg tcg_im, tcg_r2;
++
++    if (a->cf) {
++        nullify_over(ctx);
++    }
++    tcg_im = load_const(ctx, a->i);
++    tcg_r2 = load_gpr(ctx, a->r);
++    do_sub(ctx, a->t, tcg_im, tcg_r2, is_tsv, 0, 0, a->cf);
++    return nullify_end(ctx);
++}
++
+ static void do_cmpclr(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+                       TCGv_reg in2, unsigned cf)
+ {
+@@ -2760,62 +2783,47 @@ static bool trans_ds(DisasContext *ctx, arg_rrr_cf *a)
+     return nullify_end(ctx);
+ }
+ 
+-static bool trans_addi(DisasContext *ctx, uint32_t insn)
++static bool trans_addi(DisasContext *ctx, arg_rri_cf *a)
+ {
+-    target_sreg im = low_sextract(insn, 0, 11);
+-    unsigned e1 = extract32(insn, 11, 1);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn, 16, 5);
+-    unsigned r2 = extract32(insn, 21, 5);
+-    unsigned o1 = extract32(insn, 26, 1);
+-    TCGv_reg tcg_im, tcg_r2;
+-
+-    if (cf) {
+-        nullify_over(ctx);
+-    }
+-
+-    tcg_im = load_const(ctx, im);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_add(ctx, rt, tcg_im, tcg_r2, 0, false, e1, !o1, false, cf);
+-
+-    return nullify_end(ctx);
++    return do_add_imm(ctx, a, false, false);
+ }
+ 
+-static bool trans_subi(DisasContext *ctx, uint32_t insn)
++static bool trans_addi_tsv(DisasContext *ctx, arg_rri_cf *a)
+ {
+-    target_sreg im = low_sextract(insn, 0, 11);
+-    unsigned e1 = extract32(insn, 11, 1);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn, 16, 5);
+-    unsigned r2 = extract32(insn, 21, 5);
+-    TCGv_reg tcg_im, tcg_r2;
+-
+-    if (cf) {
+-        nullify_over(ctx);
+-    }
+-
+-    tcg_im = load_const(ctx, im);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_sub(ctx, rt, tcg_im, tcg_r2, e1, false, false, cf);
+-
+-    return nullify_end(ctx);
++    return do_add_imm(ctx, a, true, false);
+ }
+ 
+-static bool trans_cmpiclr(DisasContext *ctx, uint32_t insn)
++static bool trans_addi_tc(DisasContext *ctx, arg_rri_cf *a)
++{
++    return do_add_imm(ctx, a, false, true);
++}
++
++static bool trans_addi_tc_tsv(DisasContext *ctx, arg_rri_cf *a)
++{
++    return do_add_imm(ctx, a, true, true);
++}
++
++static bool trans_subi(DisasContext *ctx, arg_rri_cf *a)
++{
++    return do_sub_imm(ctx, a, false);
++}
++
++static bool trans_subi_tsv(DisasContext *ctx, arg_rri_cf *a)
++{
++    return do_sub_imm(ctx, a, true);
++}
++
++static bool trans_cmpiclr(DisasContext *ctx, arg_rri_cf *a)
+ {
+-    target_sreg im = low_sextract(insn, 0, 11);
+-    unsigned cf = extract32(insn, 12, 4);
+-    unsigned rt = extract32(insn, 16, 5);
+-    unsigned r2 = extract32(insn, 21, 5);
+     TCGv_reg tcg_im, tcg_r2;
+ 
+-    if (cf) {
++    if (a->cf) {
+         nullify_over(ctx);
      }
  
-     cond = do_cond(c * 2 + f, dest, cb_msb, sv);
+-    tcg_im = load_const(ctx, im);
+-    tcg_r2 = load_gpr(ctx, r2);
+-    do_cmpclr(ctx, rt, tcg_im, tcg_r2, cf);
++    tcg_im = load_const(ctx, a->i);
++    tcg_r2 = load_gpr(ctx, a->r);
++    do_cmpclr(ctx, a->t, tcg_im, tcg_r2, a->cf);
+ 
+     return nullify_end(ctx);
+ }
+@@ -2913,46 +2921,39 @@ static bool trans_sta(DisasContext *ctx, arg_ldst *a)
+     return true;
+ }
+ 
+-static bool trans_ldil(DisasContext *ctx, uint32_t insn)
++static bool trans_ldil(DisasContext *ctx, arg_ldil *a)
+ {
+-    unsigned rt = extract32(insn, 21, 5);
+-    target_sreg i = assemble_21(insn);
+-    TCGv_reg tcg_rt = dest_gpr(ctx, rt);
++    TCGv_reg tcg_rt = dest_gpr(ctx, a->t);
+ 
+-    tcg_gen_movi_reg(tcg_rt, i);
+-    save_gpr(ctx, rt, tcg_rt);
++    tcg_gen_movi_reg(tcg_rt, a->i);
++    save_gpr(ctx, a->t, tcg_rt);
+     cond_free(&ctx->null_cond);
+     return true;
+ }
+ 
+-static bool trans_addil(DisasContext *ctx, uint32_t insn)
++static bool trans_addil(DisasContext *ctx, arg_addil *a)
+ {
+-    unsigned rt = extract32(insn, 21, 5);
+-    target_sreg i = assemble_21(insn);
+-    TCGv_reg tcg_rt = load_gpr(ctx, rt);
++    TCGv_reg tcg_rt = load_gpr(ctx, a->r);
+     TCGv_reg tcg_r1 = dest_gpr(ctx, 1);
+ 
+-    tcg_gen_addi_reg(tcg_r1, tcg_rt, i);
++    tcg_gen_addi_reg(tcg_r1, tcg_rt, a->i);
+     save_gpr(ctx, 1, tcg_r1);
+     cond_free(&ctx->null_cond);
+     return true;
+ }
+ 
+-static bool trans_ldo(DisasContext *ctx, uint32_t insn)
++static bool trans_ldo(DisasContext *ctx, arg_ldo *a)
+ {
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned rt = extract32(insn, 16, 5);
+-    target_sreg i = assemble_16(insn);
+-    TCGv_reg tcg_rt = dest_gpr(ctx, rt);
++    TCGv_reg tcg_rt = dest_gpr(ctx, a->t);
+ 
+     /* Special case rb == 0, for the LDI pseudo-op.
+        The COPY pseudo-op is handled for free within tcg_gen_addi_tl.  */
+-    if (rb == 0) {
+-        tcg_gen_movi_reg(tcg_rt, i);
++    if (a->b == 0) {
++        tcg_gen_movi_reg(tcg_rt, a->i);
+     } else {
+-        tcg_gen_addi_reg(tcg_rt, cpu_gr[rb], i);
++        tcg_gen_addi_reg(tcg_rt, cpu_gr[a->b], a->i);
+     }
+-    save_gpr(ctx, rt, tcg_rt);
++    save_gpr(ctx, a->t, tcg_rt);
+     cond_free(&ctx->null_cond);
+     return true;
+ }
+@@ -4288,24 +4289,15 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+ 
+     opc = extract32(insn, 26, 6);
+     switch (opc) {
+-    case 0x08:
+-        trans_ldil(ctx, insn);
+-        return;
+     case 0x09:
+         trans_copr_w(ctx, insn);
+         return;
+-    case 0x0A:
+-        trans_addil(ctx, insn);
+-        return;
+     case 0x0B:
+         trans_copr_dw(ctx, insn);
+         return;
+     case 0x0C:
+         translate_table(ctx, insn, table_float_0c);
+         return;
+-    case 0x0D:
+-        trans_ldo(ctx, insn);
+-        return;
+     case 0x0E:
+         translate_table(ctx, insn, table_float_0e);
+         return;
+@@ -4347,16 +4339,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+         trans_store_w(ctx, insn);
+         return;
+ 
+-    case 0x24:
+-        trans_cmpiclr(ctx, insn);
+-        return;
+-    case 0x25:
+-        trans_subi(ctx, insn);
+-        return;
+-    case 0x2C:
+-    case 0x2D:
+-        trans_addi(ctx, insn);
+-        return;
+     case 0x2E:
+         translate_table(ctx, insn, table_fp_fused);
+         return;
+diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
+index 09e3f288a7..3e774ae1ad 100644
+--- a/target/hppa/insns.decode
++++ b/target/hppa/insns.decode
+@@ -28,6 +28,11 @@
+ %assemble_17    0:s1 16:5 2:1 3:10   !function=expand_shl2
+ %assemble_22    0:s1 16:10 2:1 3:10  !function=expand_shl2
+ 
++%assemble_21    0:s1 1:11 14:2 16:5 12:2  !function=expand_shl11
++
++%lowsign_11     0:s1 1:10
++%lowsign_14     0:s1 1:13
++
+ %sm_imm         16:10 !function=expand_sm_imm
+ 
+ %im5_0          0:s1 1:4
+@@ -44,6 +49,7 @@
+ &rr_cf          t r cf
+ &rrr_cf         t r1 r2 cf
+ &rrr_cf_sh      t r1 r2 cf sh
++&rri_cf         t r i cf
+ 
+ &rrb_c_f        disp n c f r1 r2
+ &rib_c_f        disp n c f r i
+@@ -56,6 +62,7 @@
+ @rrr_cf         ...... r2:5 r1:5 cf:4 ....... t:5       &rrr_cf
+ @rrr_cf_sh      ...... r2:5 r1:5 cf:4 .... sh:2 . t:5   &rrr_cf_sh
+ @rrr_cf_sh0     ...... r2:5 r1:5 cf:4 ....... t:5       &rrr_cf_sh sh=0
++@rri_cf         ...... r:5  t:5  cf:4 . ...........     &rri_cf i=%lowsign_11
+ 
+ @rrb_cf         ...... r2:5 r1:5 c:3 ........... n:1 .  \
+                 &rrb_c_f disp=%assemble_12
+@@ -146,6 +153,20 @@ sub_tsv_tc      000010 ..... ..... .... 110011 0 .....  @rrr_cf
+ sub_b           000010 ..... ..... .... 010100 0 .....  @rrr_cf
+ sub_b_tsv       000010 ..... ..... .... 110100 0 .....  @rrr_cf
+ 
++ldil            001000 t:5 .....................        i=%assemble_21
++addil           001010 r:5 .....................        i=%assemble_21
++ldo             001101 b:5 t:5 -- ..............        i=%lowsign_14
++
++addi            101101 ..... ..... .... 0 ...........   @rri_cf
++addi_tsv        101101 ..... ..... .... 1 ...........   @rri_cf
++addi_tc         101100 ..... ..... .... 0 ...........   @rri_cf
++addi_tc_tsv     101100 ..... ..... .... 1 ...........   @rri_cf
++
++subi            100101 ..... ..... .... 0 ...........   @rri_cf
++subi_tsv        100101 ..... ..... .... 1 ...........   @rri_cf
++
++cmpiclr         100100 ..... ..... .... 0 ...........   @rri_cf
++
+ ####
+ # Index Mem
+ ####
 -- 
 2.17.2
