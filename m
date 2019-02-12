@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46108)
+Received: from eggs.gnu.org ([209.51.188.92]:45985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQi2-0004HG-5y
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 00:34:19 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gtQiL-00041X-Rp
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 00:34:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQel-00075j-6t
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 00:30:56 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45272)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtQek-00068w-HT
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 00:30:54 -0500
-Received: by mail-pf1-x442.google.com with SMTP id j3so718255pfi.12
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 21:30:47 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 21:30:42 -0800
-Message-Id: <20190212053044.29015-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 0/2] target/s390x: Implement STCK et al for
- CONFIG_USER_ONLY
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gtQXD-0003VZ-Lg
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 00:23:08 -0500
+Date: Tue, 12 Feb 2019 13:22:24 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190212052224.GA4839@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190130000653.16267-1-richardw.yang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com, laurent@vivier.eu, imammedo@redhat.com, philmd@redhat.com
 
-Changes since v2:
-  * Fix botched subject line, include r-b tags.
+On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
+>There are several functions/variable which are not used anymore.
+>
+>This serials just remove those without functional change.
+>
+>v3: add ack and repost in a new thread
+>v2: change commit log from "is now used in no place" to "in not used anymore"
 
-Changes since v1:
-  * Move more of hw/s390x/tod.h to a new header.
-  * Use time2tod.
+Michael,
 
+Looks this serials is not merged yet.
 
-r~
+Is there any problem I need to fix?
 
-
-Richard Henderson (2):
-  target/s390x: Split out s390-tod.h
-  target/s390x: Implement STCK et al for CONFIG_USER_ONLY
-
- include/hw/s390x/tod.h     | 16 +---------------
- target/s390x/helper.h      |  2 +-
- target/s390x/s390-tod.h    | 29 +++++++++++++++++++++++++++++
- target/s390x/misc_helper.c | 34 ++++++++++++++++++++++------------
- target/s390x/translate.c   |  2 ++
- target/s390x/insn-data.def | 11 ++++++-----
- 6 files changed, 61 insertions(+), 33 deletions(-)
- create mode 100644 target/s390x/s390-tod.h
+>
+>Wei Yang (3):
+>  hw/i386/pc.c: remove unused function pc_acpi_init()
+>  hw/acpi: remove unused function acpi_table_add_builtin()
+>  hw/acpi: remove unnecessary variable acpi_table_builtin
+>
+> hw/acpi/core.c         | 10 +---------
+> hw/i386/pc.c           | 27 ---------------------------
+> include/hw/acpi/acpi.h |  1 -
+> include/hw/i386/pc.h   |  1 -
+> 4 files changed, 1 insertion(+), 38 deletions(-)
+>
+>-- 
+>2.19.1
 
 -- 
-2.17.2
+Wei Yang
+Help you, Help me
