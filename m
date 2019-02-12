@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42901)
+Received: from eggs.gnu.org ([209.51.188.92]:43106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gteKr-0008Pn-QQ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:07:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gteLb-0000WW-9x
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gteKq-00068q-W3
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:07:17 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gteKq-00066h-FI
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:07:16 -0500
-Received: by mail-pf1-x443.google.com with SMTP id z15so1070186pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 12:07:16 -0800 (PST)
-References: <20190212110308.13707-1-david@redhat.com>
-	<20190212110308.13707-13-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ed4fe0f2-411d-70fb-d08a-f387e3d80a41@linaro.org>
-Date: Tue, 12 Feb 2019 12:07:12 -0800
-MIME-Version: 1.0
-In-Reply-To: <20190212110308.13707-13-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 11/15] s390x/tcg: Prepare for
- IEEE-inexact-exception control (XxC)
+	(envelope-from <jsnow@redhat.com>) id 1gteLZ-00079q-EG
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:08:03 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Tue, 12 Feb 2019 15:07:50 -0500
+Message-Id: <20190212200750.27521-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] blockdev: acquire aio_context for bitmap
+ add/remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +18,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 2/12/19 3:03 AM, David Hildenbrand wrote:
-> Some instructions allow to suppress IEEE inexact exceptions.
-> 
-> z14 PoP, 9-23, "Suppression of Certain IEEE Exceptions"
->     IEEE-inexact-exception control (XxC): Bit 1 of
->     the M4 field is the XxC bit. If XxC is zero, recogni-
->     tion of IEEE-inexact exception is not suppressed;
->     if XxC is one, recognition of IEEE-inexact excep-
->     tion is suppressed.
-> 
-> Especially, handling for overflow/unerflow remains as is, inexact is
-> reported along
-> 
-> z14 PoP, 9-23, "Suppression of Certain IEEE Exceptions"
->     For example, the IEEE-inexact-exception control (XxC)
->     has no effect on the DXC; that is, the DXC for IEEE-
->     overflow or IEEE-underflow exceptions along with the
->     detail for exact, inexact and truncated, or inexact and
->     incremented, is reported according to the actual con-
->     dition.
-> 
-> Follow up patches will wire it correctly up for the applicable
-> instructions.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/fpu_helper.c | 112 +++++++++++++++++++-------------------
->  1 file changed, 56 insertions(+), 56 deletions(-)
+When bitmaps are persistent, they may incur a disk read or write when bitmaps
+are added or removed. For configurations like virtio-dataplane, failing to
+acquire this lock will abort QEMU when disk IO occurs.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+We used to acquire aio_context as part of the bitmap lookup, so re-introduce
+the lock for just the cases that have an IO penalty.
 
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1672010
+Reported-By: Aihua Liang <aliang@redhat.com>
+---
+ blockdev.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-r~
+diff --git a/blockdev.c b/blockdev.c
+index fb18e9c975..790b0e0ac8 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2820,6 +2820,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+ {
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
++    AioContext *aio_context = NULL;
+ 
+     if (!name || name[0] == '\0') {
+         error_setg(errp, "Bitmap name cannot be empty");
+@@ -2854,15 +2855,17 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+         disabled = false;
+     }
+ 
+-    if (persistent &&
+-        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
+-    {
+-        return;
++    if (persistent) {
++        aio_context = bdrv_get_aio_context(bs);
++        aio_context_acquire(aio_context);
++        if (!bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp)) {
++            goto out;
++        }
+     }
+ 
+     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
+     if (bitmap == NULL) {
+-        return;
++        goto out
+     }
+ 
+     if (disabled) {
+@@ -2870,6 +2873,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     }
+ 
+     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++ out:
++    if (aio_context) {
++        aio_context_release(aio_context);
++    }
+ }
+ 
+ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+@@ -2878,6 +2885,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
+     Error *local_err = NULL;
++    AioContext *aio_context = NULL;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
+     if (!bitmap || !bs) {
+@@ -2892,14 +2900,20 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     }
+ 
+     if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
++        aio_context = bdrv_get_aio_context(bs);
++        aio_context_acquire(aio_context);
+         bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+         if (local_err != NULL) {
+             error_propagate(errp, local_err);
+-            return;
++            goto out;
+         }
+     }
+ 
+     bdrv_release_dirty_bitmap(bs, bitmap);
++ out:
++    if (aio_context) {
++        aio_context_release(aio_context);
++    }
+ }
+ 
+ /**
+-- 
+2.17.2
