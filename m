@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46944)
+Received: from eggs.gnu.org ([209.51.188.92]:47847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPGt-0005Vt-Rg
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtPHg-0005xS-Sm
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:03:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtPGr-0002o4-7d
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:10 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtPHZ-0003Ot-VK
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:02:57 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 12:01:34 +0800
-Message-Id: <20190212040136.30371-2-stefanha@redhat.com>
+Date: Tue, 12 Feb 2019 12:01:36 +0800
+Message-Id: <20190212040136.30371-4-stefanha@redhat.com>
 In-Reply-To: <20190212040136.30371-1-stefanha@redhat.com>
 References: <20190212040136.30371-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/3] iothread: fix iothread hang when stop too
- soon
+Subject: [Qemu-devel] [PULL 3/3] virtio-blk: cleanup using VirtIOBlock *s
+ and VirtIODevice *vdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +23,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <liam.merwick@oracle.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Lukas reported an hard to reproduce QMP iothread hang on s390 that
-QEMU might hang at pthread_join() of the QMP monitor iothread before
-quitting:
+In several part we still using req->dev or VIRTIO_DEVICE(req->dev)
+when we have already defined s and vdev pointers:
+    VirtIOBlock *s =3D req->dev;
+    VirtIODevice *vdev =3D VIRTIO_DEVICE(s);
 
-  Thread 1
-  #0  0x000003ffad10932c in pthread_join
-  #1  0x0000000109e95750 in qemu_thread_join
-      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
-  #2  0x0000000109c95a1c in iothread_stop
-  #3  0x0000000109bb0874 in monitor_cleanup
-  #4  0x0000000109b55042 in main
-
-While the iothread is still in the main loop:
-
-  Thread 4
-  #0  0x000003ffad0010e4 in ??
-  #1  0x000003ffad553958 in g_main_context_iterate.isra.19
-  #2  0x000003ffad553d90 in g_main_loop_run
-  #3  0x0000000109c9585a in iothread_run
-      at /home/thuth/devel/qemu/iothread.c:74
-  #4  0x0000000109e94752 in qemu_thread_start
-      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
-  #5  0x000003ffad10825a in start_thread
-  #6  0x000003ffad00dcf2 in thread_start
-
-IMHO it's because there's a race between the main thread and iothread
-when stopping the thread in following sequence:
-
-    main thread                       iothread
-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                                      aio_poll()
-    iothread_get_g_main_context
-      set iothread->worker_context
-    iothread_stop
-      schedule iothread_stop_bh
-                                        execute iothread_stop_bh [1]
-                                          set iothread->running=3Dfalse
-                                          (since main_loop=3D=3DNULL so
-                                           skip to quit main loop.
-                                           Note: although main_loop is
-                                           NULL but worker_context is
-                                           not!)
-                                      atomic_read(&iothread->worker_conte=
-xt) [2]
-                                        create main_loop object
-                                        g_main_loop_run() [3]
-    pthread_join() [4]
-
-We can see that when execute iothread_stop_bh() at [1] it's possible
-that main_loop is still NULL because it's only created until the first
-check of the worker_context later at [2].  Then the iothread will hang
-in the main loop [3] and it'll starve the main thread too [4].
-
-Here the simple solution should be that we check again the "running"
-variable before check against worker_context.
-
-CC: Thomas Huth <thuth@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20190129051432.22023-1-peterx@redhat.com
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Message-id: 20190208142347.214815-1-sgarzare@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- iothread.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/block/virtio-blk.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/iothread.c b/iothread.c
-index 2fb1cdf55d..e615b7ae52 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -63,7 +63,11 @@ static void *iothread_run(void *opaque)
-     while (iothread->running) {
-         aio_poll(iothread->ctx, true);
-=20
--        if (atomic_read(&iothread->worker_context)) {
-+        /*
-+         * We must check the running state again in case it was
-+         * changed in previous aio_poll()
-+         */
-+        if (iothread->running && atomic_read(&iothread->worker_context))=
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 9a87b3bfac..843bb2bec8 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -63,9 +63,8 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
+, unsigned char status)
+ static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
+     bool is_read)
  {
-             GMainLoop *loop;
+-    BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
+-                                                   is_read, error);
+     VirtIOBlock *s =3D req->dev;
++    BlockErrorAction action =3D blk_get_error_action(s->blk, is_read, er=
+ror);
 =20
-             g_main_context_push_thread_default(iothread->worker_context)=
-;
+     if (action =3D=3D BLOCK_ERROR_ACTION_STOP) {
+         /* Break the link as the next request is going to be parsed from=
+ the
+@@ -138,7 +137,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
+nt ret)
+     }
+=20
+     virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
+-    block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
++    block_acct_done(blk_get_stats(s->blk), &req->acct);
+     virtio_blk_free_request(req);
+=20
+ out:
+@@ -513,7 +512,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *=
+req, MultiReqBuffer *mrb)
+               - sizeof(struct virtio_blk_inhdr);
+     iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
+=20
+-    type =3D virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out.type);
++    type =3D virtio_ldl_p(vdev, &req->out.type);
+=20
+     /* VIRTIO_BLK_T_OUT defines the command direction. VIRTIO_BLK_T_BARR=
+IER
+      * is an optional flag. Although a guest should not send this flag i=
+f
+@@ -522,8 +521,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *=
+req, MultiReqBuffer *mrb)
+     case VIRTIO_BLK_T_IN:
+     {
+         bool is_write =3D type & VIRTIO_BLK_T_OUT;
+-        req->sector_num =3D virtio_ldq_p(VIRTIO_DEVICE(req->dev),
+-                                       &req->out.sector);
++        req->sector_num =3D virtio_ldq_p(vdev, &req->out.sector);
+=20
+         if (is_write) {
+             qemu_iovec_init_external(&req->qiov, out_iov, out_num);
+@@ -535,25 +533,23 @@ static int virtio_blk_handle_request(VirtIOBlockReq=
+ *req, MultiReqBuffer *mrb)
+                                          req->qiov.size / BDRV_SECTOR_SI=
+ZE);
+         }
+=20
+-        if (!virtio_blk_sect_range_ok(req->dev, req->sector_num,
+-                                      req->qiov.size)) {
++        if (!virtio_blk_sect_range_ok(s, req->sector_num, req->qiov.size=
+)) {
+             virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
+-            block_acct_invalid(blk_get_stats(req->dev->blk),
++            block_acct_invalid(blk_get_stats(s->blk),
+                                is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_=
+READ);
+             virtio_blk_free_request(req);
+             return 0;
+         }
+=20
+-        block_acct_start(blk_get_stats(req->dev->blk),
+-                         &req->acct, req->qiov.size,
++        block_acct_start(blk_get_stats(s->blk), &req->acct, req->qiov.si=
+ze,
+                          is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ);
+=20
+         /* merge would exceed maximum number of requests or IO direction
+          * changes */
+         if (mrb->num_reqs > 0 && (mrb->num_reqs =3D=3D VIRTIO_BLK_MAX_ME=
+RGE_REQS ||
+                                   is_write !=3D mrb->is_write ||
+-                                  !req->dev->conf.request_merging)) {
+-            virtio_blk_submit_multireq(req->dev->blk, mrb);
++                                  !s->conf.request_merging)) {
++            virtio_blk_submit_multireq(s->blk, mrb);
+         }
+=20
+         assert(mrb->num_reqs < VIRTIO_BLK_MAX_MERGE_REQS);
 --=20
 2.20.1
