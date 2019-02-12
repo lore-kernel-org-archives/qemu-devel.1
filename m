@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49756)
+Received: from eggs.gnu.org ([209.51.188.92]:49787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ95-0002mx-9x
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ95-0002nP-JQ
 	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8n-0001ub-Rr
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:01 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:32961)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtQ8p-00020G-Sa
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:58:07 -0500
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:38695)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtQ8m-0001iU-6H
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:53 -0500
-Received: by mail-pl1-x642.google.com with SMTP id y10so705793plp.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:45 -0800 (PST)
+	id 1gtQ8n-0001eo-84
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:57:55 -0500
+Received: by mail-pl1-x636.google.com with SMTP id e5so690904plb.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 20:57:40 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Feb 2019 20:57:14 -0800
-Message-Id: <20190212045721.28041-18-richard.henderson@linaro.org>
+Date: Mon, 11 Feb 2019 20:57:09 -0800
+Message-Id: <20190212045721.28041-13-richard.henderson@linaro.org>
 In-Reply-To: <20190212045721.28041-1-richard.henderson@linaro.org>
 References: <20190212045721.28041-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 17/24] target/hppa: Convert fp fused
- multiply-add insns
+Subject: [Qemu-devel] [PULL 12/24] target/hppa: Convert direct and indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,158 +34,307 @@ Tested-by: Helge Deller <deller@gmx.de>
 Tested-by: Sven Schnelle <svens@stackframe.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/translate.c  | 77 +++++++++++++---------------------------
- target/hppa/insns.decode | 12 +++++++
- 2 files changed, 36 insertions(+), 53 deletions(-)
+ target/hppa/translate.c  | 131 +++++++++------------------------------
+ target/hppa/insns.decode |  34 +++++++++-
+ 2 files changed, 63 insertions(+), 102 deletions(-)
 
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index c73a7ab3db..3889851109 100644
+index 83d898212e..26b5cd205b 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -876,14 +876,6 @@ static unsigned assemble_rb64(uint32_t insn)
-     return r1 * 32 + r0;
+@@ -895,15 +895,6 @@ static target_sreg assemble_16a(uint32_t insn)
+     return x << 2;
  }
  
--static unsigned assemble_rc64(uint32_t insn)
+-static target_sreg assemble_17(uint32_t insn)
 -{
--    unsigned r2 = extract32(insn, 8, 1);
--    unsigned r1 = extract32(insn, 13, 3);
--    unsigned r0 = extract32(insn, 9, 2);
--    return r2 * 32 + r1 * 4 + r0;
+-    target_ureg x = -(target_ureg)(insn & 1);
+-    x = (x <<  5) | extract32(insn, 16, 5);
+-    x = (x <<  1) | extract32(insn, 2, 1);
+-    x = (x << 10) | extract32(insn, 3, 10);
+-    return x << 2;
 -}
 -
- static inline unsigned assemble_sr3(uint32_t insn)
+ static target_sreg assemble_21(uint32_t insn)
  {
-     unsigned s2 = extract32(insn, 13, 1);
-@@ -4041,67 +4033,50 @@ static bool trans_fmpysub_d(DisasContext *ctx, arg_mpyadd *a)
-     return do_fmpyadd_d(ctx, a, true);
+     target_ureg x = -(target_ureg)(insn & 1);
+@@ -914,15 +905,6 @@ static target_sreg assemble_21(uint32_t insn)
+     return x << 11;
  }
  
--static bool trans_fmpyfadd_s(DisasContext *ctx, uint32_t insn,
--                             const DisasInsn *di)
-+static bool trans_fmpyfadd_f(DisasContext *ctx, arg_fmpyfadd_f *a)
+-static target_sreg assemble_22(uint32_t insn)
+-{
+-    target_ureg x = -(target_ureg)(insn & 1);
+-    x = (x << 10) | extract32(insn, 16, 10);
+-    x = (x <<  1) | extract32(insn, 2, 1);
+-    x = (x << 10) | extract32(insn, 3, 10);
+-    return x << 2;
+-}
+-
+ /* The parisc documentation describes only the general interpretation of
+    the conditions, without describing their exact implementation.  The
+    interpretations do not stand up well when considering ADD,C and SUB,B.
+@@ -3546,11 +3528,8 @@ static bool trans_depwi_sar(DisasContext *ctx, arg_depwi_sar *a)
+     return do_depw_sar(ctx, a->t, a->c, a->nz, a->clen, load_const(ctx, a->i));
+ }
+ 
+-static bool trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
++static bool trans_be(DisasContext *ctx, arg_be *a)
  {
--    unsigned rt = assemble_rt64(insn);
--    unsigned neg = extract32(insn, 5, 1);
--    unsigned rm1 = assemble_ra64(insn);
--    unsigned rm2 = assemble_rb64(insn);
--    unsigned ra3 = assemble_rc64(insn);
--    TCGv_i32 a, b, c;
-+    TCGv_i32 x, y, z;
+-    unsigned n = extract32(insn, 1, 1);
+-    unsigned b = extract32(insn, 21, 5);
+-    target_sreg disp = assemble_17(insn);
+     TCGv_reg tmp;
  
-     nullify_over(ctx);
--    a = load_frw0_i32(rm1);
--    b = load_frw0_i32(rm2);
--    c = load_frw0_i32(ra3);
-+    x = load_frw0_i32(a->rm1);
-+    y = load_frw0_i32(a->rm2);
-+    z = load_frw0_i32(a->ra3);
- 
--    if (neg) {
--        gen_helper_fmpynfadd_s(a, cpu_env, a, b, c);
-+    if (a->neg) {
-+        gen_helper_fmpynfadd_s(x, cpu_env, x, y, z);
-     } else {
--        gen_helper_fmpyfadd_s(a, cpu_env, a, b, c);
-+        gen_helper_fmpyfadd_s(x, cpu_env, x, y, z);
+ #ifdef CONFIG_USER_ONLY
+@@ -3562,29 +3541,28 @@ static bool trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+     /* Since we don't implement spaces, just branch.  Do notice the special
+        case of "be disp(*,r0)" using a direct branch to disp, so that we can
+        goto_tb to the TB containing the syscall.  */
+-    if (b == 0) {
+-        return do_dbranch(ctx, disp, is_l ? 31 : 0, n);
++    if (a->b == 0) {
++        return do_dbranch(ctx, a->disp, a->l, a->n);
      }
- 
--    tcg_temp_free_i32(b);
--    tcg_temp_free_i32(c);
--    save_frw_i32(rt, a);
--    tcg_temp_free_i32(a);
-+    tcg_temp_free_i32(y);
-+    tcg_temp_free_i32(z);
-+    save_frw_i32(a->t, x);
-+    tcg_temp_free_i32(x);
-     return nullify_end(ctx);
- }
- 
--static bool trans_fmpyfadd_d(DisasContext *ctx, uint32_t insn,
--                             const DisasInsn *di)
-+static bool trans_fmpyfadd_d(DisasContext *ctx, arg_fmpyfadd_d *a)
- {
--    unsigned rt = extract32(insn, 0, 5);
--    unsigned neg = extract32(insn, 5, 1);
--    unsigned rm1 = extract32(insn, 21, 5);
--    unsigned rm2 = extract32(insn, 16, 5);
--    unsigned ra3 = assemble_rc64(insn);
--    TCGv_i64 a, b, c;
-+    TCGv_i64 x, y, z;
- 
+ #else
+-    int sp = assemble_sr3(insn);
      nullify_over(ctx);
--    a = load_frd0(rm1);
--    b = load_frd0(rm2);
--    c = load_frd0(ra3);
-+    x = load_frd0(a->rm1);
-+    y = load_frd0(a->rm2);
-+    z = load_frd0(a->ra3);
+ #endif
  
--    if (neg) {
--        gen_helper_fmpynfadd_d(a, cpu_env, a, b, c);
-+    if (a->neg) {
-+        gen_helper_fmpynfadd_d(x, cpu_env, x, y, z);
-     } else {
--        gen_helper_fmpyfadd_d(a, cpu_env, a, b, c);
-+        gen_helper_fmpyfadd_d(x, cpu_env, x, y, z);
+     tmp = get_temp(ctx);
+-    tcg_gen_addi_reg(tmp, load_gpr(ctx, b), disp);
++    tcg_gen_addi_reg(tmp, load_gpr(ctx, a->b), a->disp);
+     tmp = do_ibranch_priv(ctx, tmp);
+ 
+ #ifdef CONFIG_USER_ONLY
+-    return do_ibranch(ctx, tmp, is_l ? 31 : 0, n);
++    return do_ibranch(ctx, tmp, a->l, a->n);
+ #else
+     TCGv_i64 new_spc = tcg_temp_new_i64();
+ 
+-    load_spr(ctx, new_spc, sp);
+-    if (is_l) {
++    load_spr(ctx, new_spc, a->sp);
++    if (a->l) {
+         copy_iaoq_entry(cpu_gr[31], ctx->iaoq_n, ctx->iaoq_n_var);
+         tcg_gen_mov_i64(cpu_sr[0], cpu_iasq_f);
      }
- 
--    tcg_temp_free_i64(b);
--    tcg_temp_free_i64(c);
--    save_frd(rt, a);
--    tcg_temp_free_i64(a);
-+    tcg_temp_free_i64(y);
-+    tcg_temp_free_i64(z);
-+    save_frd(a->t, x);
-+    tcg_temp_free_i64(x);
-     return nullify_end(ctx);
+-    if (n && use_nullify_skip(ctx)) {
++    if (a->n && use_nullify_skip(ctx)) {
+         tcg_gen_mov_reg(cpu_iaoq_f, tmp);
+         tcg_gen_addi_reg(cpu_iaoq_b, cpu_iaoq_f, 4);
+         tcg_gen_mov_i64(cpu_iasq_f, new_spc);
+@@ -3596,7 +3574,7 @@ static bool trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+         }
+         tcg_gen_mov_reg(cpu_iaoq_b, tmp);
+         tcg_gen_mov_i64(cpu_iasq_b, new_spc);
+-        nullify_set(ctx, n);
++        nullify_set(ctx, a->n);
+     }
+     tcg_temp_free_i64(new_spc);
+     tcg_gen_lookup_and_goto_ptr();
+@@ -3605,22 +3583,14 @@ static bool trans_be(DisasContext *ctx, uint32_t insn, bool is_l)
+ #endif
  }
  
--static const DisasInsn table_fp_fused[] = {
--    { 0xb8000000u, 0xfc000800u, trans_fmpyfadd_s },
--    { 0xb8000800u, 0xfc0019c0u, trans_fmpyfadd_d }
+-static bool trans_bl(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_bl(DisasContext *ctx, arg_bl *a)
+ {
+-    unsigned n = extract32(insn, 1, 1);
+-    unsigned link = extract32(insn, 21, 5);
+-    target_sreg disp = assemble_17(insn);
+-
+-    do_dbranch(ctx, iaoq_dest(ctx, disp), link, n);
+-    return true;
++    return do_dbranch(ctx, iaoq_dest(ctx, a->disp), a->l, a->n);
+ }
+ 
+-static bool trans_b_gate(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_b_gate(DisasContext *ctx, arg_b_gate *a)
+ {
+-    unsigned n = extract32(insn, 1, 1);
+-    unsigned link = extract32(insn, 21, 5);
+-    target_sreg disp = assemble_17(insn);
+-    target_ureg dest = iaoq_dest(ctx, disp);
++    target_ureg dest = iaoq_dest(ctx, a->disp);
+ 
+     /* Make sure the caller hasn't done something weird with the queue.
+      * ??? This is not quite the same as the PSW[B] bit, which would be
+@@ -3659,65 +3629,44 @@ static bool trans_b_gate(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     }
+ #endif
+ 
+-    do_dbranch(ctx, dest, link, n);
+-    return true;
++    return do_dbranch(ctx, dest, a->l, a->n);
+ }
+ 
+-static bool trans_bl_long(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_blr(DisasContext *ctx, arg_blr *a)
+ {
+-    unsigned n = extract32(insn, 1, 1);
+-    target_sreg disp = assemble_22(insn);
+-
+-    do_dbranch(ctx, iaoq_dest(ctx, disp), 2, n);
+-    return true;
+-}
+-
+-static bool trans_blr(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+-{
+-    unsigned n = extract32(insn, 1, 1);
+-    unsigned rx = extract32(insn, 16, 5);
+-    unsigned link = extract32(insn, 21, 5);
+     TCGv_reg tmp = get_temp(ctx);
+ 
+-    tcg_gen_shli_reg(tmp, load_gpr(ctx, rx), 3);
++    tcg_gen_shli_reg(tmp, load_gpr(ctx, a->x), 3);
+     tcg_gen_addi_reg(tmp, tmp, ctx->iaoq_f + 8);
+     /* The computation here never changes privilege level.  */
+-    do_ibranch(ctx, tmp, link, n);
+-    return true;
++    return do_ibranch(ctx, tmp, a->l, a->n);
+ }
+ 
+-static bool trans_bv(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_bv(DisasContext *ctx, arg_bv *a)
+ {
+-    unsigned n = extract32(insn, 1, 1);
+-    unsigned rx = extract32(insn, 16, 5);
+-    unsigned rb = extract32(insn, 21, 5);
+     TCGv_reg dest;
+ 
+-    if (rx == 0) {
+-        dest = load_gpr(ctx, rb);
++    if (a->x == 0) {
++        dest = load_gpr(ctx, a->b);
+     } else {
+         dest = get_temp(ctx);
+-        tcg_gen_shli_reg(dest, load_gpr(ctx, rx), 3);
+-        tcg_gen_add_reg(dest, dest, load_gpr(ctx, rb));
++        tcg_gen_shli_reg(dest, load_gpr(ctx, a->x), 3);
++        tcg_gen_add_reg(dest, dest, load_gpr(ctx, a->b));
+     }
+     dest = do_ibranch_priv(ctx, dest);
+-    do_ibranch(ctx, dest, 0, n);
+-    return true;
++    return do_ibranch(ctx, dest, 0, a->n);
+ }
+ 
+-static bool trans_bve(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
++static bool trans_bve(DisasContext *ctx, arg_bve *a)
+ {
+-    unsigned n = extract32(insn, 1, 1);
+-    unsigned rb = extract32(insn, 21, 5);
+-    unsigned link = extract32(insn, 13, 1) ? 2 : 0;
+     TCGv_reg dest;
+ 
+ #ifdef CONFIG_USER_ONLY
+-    dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
+-    do_ibranch(ctx, dest, link, n);
++    dest = do_ibranch_priv(ctx, load_gpr(ctx, a->b));
++    return do_ibranch(ctx, dest, a->l, a->n);
+ #else
+     nullify_over(ctx);
+-    dest = do_ibranch_priv(ctx, load_gpr(ctx, rb));
++    dest = do_ibranch_priv(ctx, load_gpr(ctx, a->b));
+ 
+     copy_iaoq_entry(cpu_iaoq_f, ctx->iaoq_b, cpu_iaoq_b);
+     if (ctx->iaoq_b == -1) {
+@@ -3725,26 +3674,16 @@ static bool trans_bve(DisasContext *ctx, uint32_t insn, const DisasInsn *di)
+     }
+     copy_iaoq_entry(cpu_iaoq_b, -1, dest);
+     tcg_gen_mov_i64(cpu_iasq_b, space_select(ctx, 0, dest));
+-    if (link) {
+-        copy_iaoq_entry(cpu_gr[link], ctx->iaoq_n, ctx->iaoq_n_var);
++    if (a->l) {
++        copy_iaoq_entry(cpu_gr[a->l], ctx->iaoq_n, ctx->iaoq_n_var);
+     }
+-    nullify_set(ctx, n);
++    nullify_set(ctx, a->n);
+     tcg_gen_lookup_and_goto_ptr();
+     ctx->base.is_jmp = DISAS_NORETURN;
+     return nullify_end(ctx);
+ #endif
+-    return true;
+ }
+ 
+-static const DisasInsn table_branch[] = {
+-    { 0xe8000000u, 0xfc006000u, trans_bl }, /* B,L and B,L,PUSH */
+-    { 0xe800a000u, 0xfc00e000u, trans_bl_long },
+-    { 0xe8004000u, 0xfc00fffdu, trans_blr },
+-    { 0xe800c000u, 0xfc00fffdu, trans_bv },
+-    { 0xe800d000u, 0xfc00dffcu, trans_bve },
+-    { 0xe8002000u, 0xfc00e000u, trans_b_gate },
 -};
 -
- static void translate_table_int(DisasContext *ctx, uint32_t insn,
-                                 const DisasInsn table[], size_t n)
+ static bool trans_fop_wew_0c(DisasContext *ctx, uint32_t insn,
+                              const DisasInsn *di)
  {
-@@ -4137,10 +4112,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
-     case 0x0E:
-         translate_table(ctx, insn, table_float_0e);
+@@ -4422,16 +4361,6 @@ static void translate_one(DisasContext *ctx, uint32_t insn)
+         translate_table(ctx, insn, table_fp_fused);
          return;
--
--    case 0x2E:
--        translate_table(ctx, insn, table_fp_fused);
+ 
+-    case 0x38:
+-        trans_be(ctx, insn, false);
 -        return;
-     }
-     gen_illegal(ctx);
- }
+-    case 0x39:
+-        trans_be(ctx, insn, true);
+-        return;
+-    case 0x3A:
+-        translate_table(ctx, insn, table_branch);
+-        return;
+-
+     case 0x04: /* spopn */
+     case 0x05: /* diag */
+     case 0x0F: /* product specific */
 diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index f564e54f1d..1c8102f76e 100644
+index 987cb8738b..09e3f288a7 100644
 --- a/target/hppa/insns.decode
 +++ b/target/hppa/insns.decode
-@@ -39,6 +39,10 @@
+@@ -24,7 +24,9 @@
+ %assemble_sr3   13:1 14:2
+ %assemble_sr3x  13:1 14:2 !function=expand_sr3x
  
- %rm64           1:1 16:5
- %rt64           6:1 0:5
-+%ra64           7:1 21:5
-+%rb64           12:1 16:5
-+%rc64           8:1 13:3 9:2
-+%rc32           13:3 9:2
+-%assemble_12    0:s1 2:1 3:10  !function=expand_shl2
++%assemble_12    0:s1 2:1 3:10        !function=expand_shl2
++%assemble_17    0:s1 16:5 2:1 3:10   !function=expand_shl2
++%assemble_22    0:s1 16:10 2:1 3:10  !function=expand_shl2
  
- %im5_0          0:s1 1:4
- %im5_16         16:s1 17:4
-@@ -338,3 +342,11 @@ blr             111010 l:5   x:5   010 00000000000 n:1 0
- bv              111010 b:5   x:5   110 00000000000 n:1 0
- bve             111010 b:5   00000 110 10000000000 n:1 -        l=0
- bve             111010 b:5   00000 111 10000000000 n:1 -        l=2
+ %sm_imm         16:10 !function=expand_sm_imm
+ 
+@@ -210,3 +212,33 @@ depw_sar        110101 t:5 r:5   c:3 00 nz:1 00000  clen:5
+ depw_imm        110101 t:5 r:5   c:3 01 nz:1 cpos:5 clen:5
+ depwi_sar       110101 t:5 ..... c:3 10 nz:1 00000  clen:5      i=%im5_16
+ depwi_imm       110101 t:5 ..... c:3 11 nz:1 cpos:5 clen:5      i=%im5_16
 +
 +####
-+# FP Fused Multiple-Add
++# Branch External
 +####
 +
-+fmpyfadd_f      101110 ..... ..... ... . 0 ... . . neg:1 ..... \
-+                rm1=%ra64 rm2=%rb64 ra3=%rc64 t=%rt64
-+fmpyfadd_d      101110 rm1:5 rm2:5 ... 0 1 ..0 0 0 neg:1 t:5    ra3=%rc32
++&be             b l n disp sp
++@be             ...... b:5 ..... ... ........... n:1 .  \
++                &be disp=%assemble_17 sp=%assemble_sr3
++
++be              111000 ..... ..... ... ........... . .  @be l=0
++be              111001 ..... ..... ... ........... . .  @be l=31
++
++####
++# Branch
++####
++
++&bl             l n disp
++@bl             ...... l:5 ..... ... ........... n:1 .  &bl disp=%assemble_17
++
++# B,L and B,L,PUSH
++bl              111010 ..... ..... 000 ........... .   .        @bl
++bl              111010 ..... ..... 100 ........... .   .        @bl
++# B,L (long displacement)
++bl              111010 ..... ..... 101 ........... n:1 .        &bl l=2 \
++                disp=%assemble_22
++b_gate          111010 ..... ..... 001 ........... .   .        @bl
++blr             111010 l:5   x:5   010 00000000000 n:1 0
++bv              111010 b:5   x:5   110 00000000000 n:1 0
++bve             111010 b:5   00000 110 10000000000 n:1 -        l=0
++bve             111010 b:5   00000 111 10000000000 n:1 -        l=2
 -- 
 2.17.2
