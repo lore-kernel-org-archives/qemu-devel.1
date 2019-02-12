@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42357)
+Received: from eggs.gnu.org ([209.51.188.92]:48342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gtMVY-0004nN-Lf
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 20:05:14 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gtMaK-0007uk-Go
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 20:10:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gtMVU-0001IR-Lq
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 20:05:06 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gtMaI-0006QU-Lv
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 20:10:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gtMaI-0006Oe-9l
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 20:10:02 -0500
+References: <154917314614.27692.2830748026894633212.malonedeb@soybean.canonical.com>
+	<ec5e1ddc-9eac-193e-8937-c4146fe56a8f@redhat.com>
+	<cf6efb63-6542-1157-38a3-f880bbad7373@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 11 Feb 2019 20:02:48 -0500
-Message-Id: <20190212010248.11056-6-jsnow@redhat.com>
-In-Reply-To: <20190212010248.11056-1-jsnow@redhat.com>
-References: <20190212010248.11056-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] block/dirty-bitmaps: unify qmp_locked and
- user_locked calls
+Message-ID: <aca37b29-ef0c-abba-76ec-7bb15b4de17f@redhat.com>
+Date: Mon, 11 Feb 2019 20:10:00 -0500
+MIME-Version: 1.0
+In-Reply-To: <cf6efb63-6542-1157-38a3-f880bbad7373@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug 1814418] [NEW] persistent bitmap will be
+ inconsistent when qemu crash,
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,330 +30,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>, eblake@redhat.com, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, Bug 1814418 <1814418@bugs.launchpad.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-These mean the same thing now. Unify them and rename the merged call
-bdrv_dirty_bitmap_busy to indicate semantically what we are describing,
-as well as help disambiguate from the various _locked and _unlocked
-versions of bitmap helpers that refer to mutex locks.
----
- block/dirty-bitmap.c           | 41 +++++++++++++++-------------------
- blockdev.c                     | 18 +++++++--------
- include/block/dirty-bitmap.h   |  5 ++---
- migration/block-dirty-bitmap.c |  6 ++---
- nbd/server.c                   |  6 ++---
- 5 files changed, 35 insertions(+), 41 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 22c4a9e0fe..43141dc540 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -48,9 +48,9 @@ struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
-     HBitmap *bitmap;            /* Dirty bitmap implementation */
-     HBitmap *meta;              /* Meta dirty bitmap */
--    bool qmp_locked;            /* Bitmap is locked, it can't be modified
--                                   through QMP */
--    BdrvDirtyBitmap *successor; /* Anonymous child; implies user_locked state */
-+    bool busy;                  /* Bitmap is busy, it can't be modified through
-+                                   QMP */
-+    BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
-     char *name;                 /* Optional non-empty unique ID */
-     int64_t size;               /* Size of the bitmap, in bytes */
-     bool disabled;              /* Bitmap is disabled. It ignores all writes to
-@@ -188,22 +188,17 @@ bool bdrv_dirty_bitmap_has_successor(BdrvDirtyBitmap *bitmap)
-     return bitmap->successor;
- }
- 
--bool bdrv_dirty_bitmap_user_locked(BdrvDirtyBitmap *bitmap) {
--    return bdrv_dirty_bitmap_qmp_locked(bitmap);
-+bool bdrv_dirty_bitmap_busy(BdrvDirtyBitmap *bitmap) {
-+    return bitmap->busy;
- }
- 
--void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked)
-+void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy)
- {
-     qemu_mutex_lock(bitmap->mutex);
--    bitmap->qmp_locked = qmp_locked;
-+    bitmap->busy = busy;
-     qemu_mutex_unlock(bitmap->mutex);
- }
- 
--bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
--{
--    return bitmap->qmp_locked;
--}
--
- /* Called with BQL taken.  */
- bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
- {
-@@ -215,7 +210,7 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
- {
-     if (bdrv_dirty_bitmap_has_successor(bitmap)) {
-         return DIRTY_BITMAP_STATUS_FROZEN;
--    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
-+    } else if (bdrv_dirty_bitmap_busy(bitmap)) {
-         return DIRTY_BITMAP_STATUS_LOCKED;
-     } else if (!bdrv_dirty_bitmap_enabled(bitmap)) {
-         return DIRTY_BITMAP_STATUS_DISABLED;
-@@ -247,7 +242,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
-                    "has one");
-         return -1;
-     }
--    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp, "Cannot create a successor for a bitmap that is in-use "
-                    "by an operation.");
-         return -1;
-@@ -266,7 +261,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
- 
-     /* Install the successor and lock the parent */
-     bitmap->successor = child;
--    bitmap->qmp_locked = true;
-+    bitmap->busy = true;
-     return 0;
- }
- 
-@@ -288,7 +283,7 @@ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
- static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
- {
-     assert(!bitmap->active_iterators);
--    assert(!bdrv_dirty_bitmap_user_locked(bitmap));
-+    assert(!bdrv_dirty_bitmap_busy(bitmap));
-     assert(!bitmap->meta);
-     QLIST_REMOVE(bitmap, list);
-     hbitmap_free(bitmap->bitmap);
-@@ -320,7 +315,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
-     bitmap->successor = NULL;
-     successor->persistent = bitmap->persistent;
-     bitmap->persistent = false;
--    bitmap->qmp_locked = false;
-+    bitmap->busy = false;
-     bdrv_release_dirty_bitmap(bs, bitmap);
- 
-     return successor;
-@@ -329,7 +324,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
- /**
-  * In cases of failure where we can no longer safely delete the parent,
-  * we may wish to re-join the parent and child/successor.
-- * The merged parent will not be user_locked, but not explicitly re-enabled.
-+ * The merged parent will not be busy, but not explicitly re-enabled.
-  * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
-  */
- BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-@@ -349,7 +344,7 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-     }
- 
-     parent->disabled = successor->disabled;
--    parent->qmp_locked = false;
-+    parent->busy = false;
-     bdrv_release_dirty_bitmap_locked(successor);
-     parent->successor = NULL;
- 
-@@ -380,7 +375,7 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
- 
-     bdrv_dirty_bitmaps_lock(bs);
-     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
--        assert(!bdrv_dirty_bitmap_user_locked(bitmap));
-+        assert(!bdrv_dirty_bitmap_busy(bitmap));
-         assert(!bitmap->active_iterators);
-         hbitmap_truncate(bitmap->bitmap, bytes);
-         bitmap->size = bytes;
-@@ -398,7 +393,7 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
- 
- /**
-  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
-- * There must not be any user_locked bitmaps attached.
-+ * There must not be any busy bitmaps attached.
-  * This function does not remove persistent bitmaps from the storage.
-  * Called with BQL taken.
-  */
-@@ -462,7 +457,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
-         info->name = g_strdup(bm->name);
-         info->status = bdrv_dirty_bitmap_status(bm);
-         info->recording = bdrv_dirty_bitmap_recording(bm);
--        info->busy = bdrv_dirty_bitmap_user_locked(bm);
-+        info->busy = bdrv_dirty_bitmap_busy(bm);
-         info->persistent = bm->persistent;
-         entry->value = info;
-         *plist = entry;
-@@ -770,7 +765,7 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
- 
-     qemu_mutex_lock(dest->mutex);
- 
--    if (bdrv_dirty_bitmap_user_locked(dest)) {
-+    if (bdrv_dirty_bitmap_busy(dest)) {
-         error_setg(errp, "Bitmap '%s' is currently in use by another"
-         " operation and cannot be modified", dest->name);
-         goto out;
-diff --git a/blockdev.c b/blockdev.c
-index fb18e9c975..23a4bf136e 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2008,7 +2008,7 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(state->bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(state->bitmap)) {
-         error_setg(errp, "Cannot modify a bitmap in use by another operation");
-         return;
-     } else if (bdrv_dirty_bitmap_readonly(state->bitmap)) {
-@@ -2057,7 +2057,7 @@ static void block_dirty_bitmap_enable_prepare(BlkActionState *common,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(state->bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(state->bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently in use by another operation"
-                    " and cannot be enabled", action->name);
-@@ -2098,7 +2098,7 @@ static void block_dirty_bitmap_disable_prepare(BlkActionState *common,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(state->bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(state->bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently in use by another operation"
-                    " and cannot be disabled", action->name);
-@@ -2884,7 +2884,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently in use by another operation and"
-                    " cannot be removed", name);
-@@ -2917,7 +2917,7 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently in use by another operation"
-                    " and cannot be cleared", name);
-@@ -2941,7 +2941,7 @@ void qmp_block_dirty_bitmap_enable(const char *node, const char *name,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently in use by another operation"
-                    " and cannot be enabled", name);
-@@ -2962,7 +2962,7 @@ void qmp_block_dirty_bitmap_disable(const char *node, const char *name,
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
-+    if (bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp,
-                    "Bitmap '%s' is currently in use by another operation"
-                    " and cannot be disabled", name);
-@@ -3538,7 +3538,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
-             bdrv_unref(target_bs);
-             goto out;
-         }
--        if (bdrv_dirty_bitmap_user_locked(bmap)) {
-+        if (bdrv_dirty_bitmap_busy(bmap)) {
-             error_setg(errp,
-                        "Bitmap '%s' is currently in use by another operation"
-                        " and cannot be used for backup", backup->bitmap);
-@@ -3651,7 +3651,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
-             error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
-             goto out;
-         }
--        if (bdrv_dirty_bitmap_user_locked(bmap)) {
-+        if (bdrv_dirty_bitmap_busy(bmap)) {
-             error_setg(errp,
-                        "Bitmap '%s' is currently in use by another operation"
-                        " and cannot be used for backup", backup->bitmap);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index cdbb4dfefd..ba8477b73f 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -68,7 +68,7 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
- void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
-                                        bool persistent);
--void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
-+void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy);
- void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
-                              HBitmap **backup, Error **errp);
- void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migration);
-@@ -91,8 +91,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
- bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
- bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
--bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap);
--bool bdrv_dirty_bitmap_user_locked(BdrvDirtyBitmap *bitmap);
-+bool bdrv_dirty_bitmap_busy(BdrvDirtyBitmap *bitmap);
- bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index ac6954142f..7057fff242 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -261,7 +261,7 @@ static void dirty_bitmap_mig_cleanup(void)
- 
-     while ((dbms = QSIMPLEQ_FIRST(&dirty_bitmap_mig_state.dbms_list)) != NULL) {
-         QSIMPLEQ_REMOVE_HEAD(&dirty_bitmap_mig_state.dbms_list, entry);
--        bdrv_dirty_bitmap_set_qmp_locked(dbms->bitmap, false);
-+        bdrv_dirty_bitmap_set_busy(dbms->bitmap, false);
-         bdrv_unref(dbms->bs);
-         g_free(dbms);
-     }
-@@ -301,7 +301,7 @@ static int init_dirty_bitmap_migration(void)
-                 goto fail;
-             }
- 
--            if (bdrv_dirty_bitmap_user_locked(bitmap)) {
-+            if (bdrv_dirty_bitmap_busy(bitmap)) {
-                 error_report("Can't migrate a bitmap that is in use by another operation: '%s'",
-                              bdrv_dirty_bitmap_name(bitmap));
-                 goto fail;
-@@ -314,7 +314,7 @@ static int init_dirty_bitmap_migration(void)
-             }
- 
-             bdrv_ref(bs);
--            bdrv_dirty_bitmap_set_qmp_locked(bitmap, true);
-+            bdrv_dirty_bitmap_set_busy(bitmap, true);
- 
-             dbms = g_new0(DirtyBitmapMigBitmapState, 1);
-             dbms->bs = bs;
-diff --git a/nbd/server.c b/nbd/server.c
-index 838c150d8c..0bc64de677 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1519,12 +1519,12 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
-             goto fail;
-         }
- 
--        if (bdrv_dirty_bitmap_user_locked(bm)) {
-+        if (bdrv_dirty_bitmap_busy(bm)) {
-             error_setg(errp, "Bitmap '%s' is in use", bitmap);
-             goto fail;
-         }
- 
--        bdrv_dirty_bitmap_set_qmp_locked(bm, true);
-+        bdrv_dirty_bitmap_set_busy(bm, true);
-         exp->export_bitmap = bm;
-         exp->export_bitmap_context = g_strdup_printf("qemu:dirty-bitmap:%s",
-                                                      bitmap);
-@@ -1642,7 +1642,7 @@ void nbd_export_put(NBDExport *exp)
-         }
- 
-         if (exp->export_bitmap) {
--            bdrv_dirty_bitmap_set_qmp_locked(exp->export_bitmap, false);
-+            bdrv_dirty_bitmap_set_busy(exp->export_bitmap, false);
-             g_free(exp->export_bitmap_context);
-         }
- 
--- 
-2.17.2
+
+On 2/4/19 11:22 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 04.02.2019 17:55, Eric Blake wrote:
+>> On 2/2/19 11:52 PM, Cheng Chen wrote:
+>>> Public bug reported:
+>>>
+>>> Follow these steps to reappear the bug:
+>>>
+>>> 1. start qemu
+>>> 2. add persistent bitmap: '{ "execute": "block-dirty-bitmap-add", "arguments": {"node": "drive-virtio-disk1","name": "bitmap0", "persistent":true }}'
+>>> 3. kill -9 qemu (simulate Host crash, eg. lose power)
+>>> 4. restart qemu
+>>>
+>>> Now, the '{ "execute": "query-block" }' can't find the bitmap0. I can
+>>> understand at this point, because the bitmap0 has not been synchronized
+>>> yet.
+>>
+>> This matches my observations here:
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07700.html
+>>
+>> I'm of the opinion that updating the qcow2 headers any time a persistent
+>> bitmap is created or destroyed is worthwhile, even if the headers must
+>> still mark the bitmap as in-use.  True, the crash will leave the bitmap
+>> as inconsistent, which is no different than if the bitmap is never
+>> written to the qcow2 header (when booting a new qemu, an inconsistent
+>> bitmap on disk has the same status as a missing bitmap - both imply that
+>> an incremental backup is not possible, and so a full backup is needed
+>> instead).  But the creation of bitmaps is not a common occasion, and
+>> having the metadata track that a persistent bitmap has been requested
+>> seems like it would be useful information during a debugging session.
+> 
+> Even if we store them, following query-block will not show them, as
+> in-use bitmaps are not loaded on open (or, we should load them too).
+> 
+>>
+>>
+>>>
+>>> But, when I try to add persistent bitmap0 again: '{ "execute": "block-
+>>> dirty-bitmap-add", "arguments": {"node": "drive-virtio-disk1","name":
+>>> "bitmap0", "persistent":true }}', It failed:
+>>>
+>>> {"id":"libvirt-42","error":{"class":"GenericError","desc":"Can't make
+>>> bitmap 'bitmap0' persistent in 'drive-virtio-disk1': Bitmap with the
+>>> same name is already stored"}}
+>>>
+>>> In other word, when qemu crash, the qcow2 image remain the incomplete
+>>> persistent bitmap.
+> 
+> Yes (if it was stored at least once, may be on previous qemu run).
+> 
+>>
+>> Does Andrey's proposed patch adding persistent bitmap details to
+>> 'qemu-img info' show anything after you first kill qemu?
+>>
+>> /me goes and tests...
+>>
+>> Oh weird - with Andrey's patch, we get semi-duplicated information
+>> during query-block (at least, after an initial clean shutdown prior to
+>> attempting an abrupt shutdown):
+>>
+>> {"return": [{"io-status": "ok", "device": "ide0-hd0", "locked": false,
+>> "removable": false, "inserted": {"iops_rd": 0, "detect_zeroes": "off",
+>> "image": {"virtual-size": 104857600, "filename": "file5",
+>> "cluster-size": 65536, "format": "qcow2", "actual-size": 208896,
+>> "format-specific": {"type": "qcow2", "data": {"compat": "1.1",
+>> "lazy-refcounts": false, "bitmaps": [{"flags": ["in-use", "auto"],
+>> "name": "b2", "granularity": 65536}], "refcount-bits": 16, "corrupt":
+>> false}}, "dirty-flag": false}, "iops_wr": 0, "ro": false, "node-name":
+>> "#block172", "backing_file_depth": 0, "drv": "qcow2", "iops": 0,
+>> "bps_wr": 0, "write_threshold": 0, "encrypted": false, "bps": 0,
+>> "bps_rd": 0, "cache": {"no-flush": false, "direct": false, "writeback":
+>> true}, "file": "file5", "encryption_key_missing": false}, "qdev":
+>> "/machine/unattached/device[18]", "dirty-bitmaps": [{"name": "b2",
+>> "status": "active", "granularity": 65536, "count": 0}, {"name": "b",
+>> "status": "active", "granularity": 65536, "count": 0}], "type": "unknown"}]}
+>>
+>> Note that the "format-specific" listing has a "bitmaps" entry resulting
+>> from Andrey's patch (which shows "auto" as one of the "flags" for any
+>> persistent bitmap) showing the state of the persistent bitmaps on disk;
+>> as well as the "dirty-bitmaps" entry that shows the state of the bitmaps
+>> in memory. Annoyingly, the "dirty-bitmaps" section does NOT state which
+>> bitmaps are persistent, and if a persistent bitmap has not yet been
+>> flushed to disk, then there is NO way to quickly determine which bitmaps
+>> are persistent and which are transient.
+>>
+>> At any rate, with qemu.git master + Andrey's patches for qemu-img info,
+>> I was able to reproduce a related oddity: attempting to
+>> block-dirty-bitmap-add a transient bitmap that has the same name as an
+>> existing in-use persistent bitmap succeeds; when it should have failed:
+>>
+>> $ qemu-img create -f qcow2 file5 100m
+>> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
+>> file5
+>> {'execute':'qmp_capabilities'}
+>> {'execute':'query-block'} # learn the node name...
+>> {'execute':'block-dirty-bitmap-add','arguments':{'node':'#block111','name':'b1','persistent':true}}
+>> {'execute':'quit'}
+>> $ ./qemu-img info -U file5
+>> image: file5
+>> file format: qcow2
+>> virtual size: 100M (104857600 bytes)
+>> disk size: 204K
+>> cluster_size: 65536
+>> Format specific information:
+>>      compat: 1.1
+>>      lazy refcounts: false
+>>      bitmaps:
+>>          [0]:
+>>              flags:
+>>                  [0]: auto
+>>              name: b1
+>>              granularity: 65536
+>>      refcount bits: 16
+>>      corrupt: false
+>> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
+>> file5
+>> {'execute':'qmp_capabilities'}
+>> {'execute':'query-block'}
+>> {"return": [{"io-status": "ok", "device": "ide0-hd0", "locked": false,
+>> "removable": false, "inserted": {"iops_rd": 0, "detect_zeroes": "off",
+>> "image": {"virtual-size": 104857600, "filename": "file5",
+>> "cluster-size": 65536, "format": "qcow2", "actual-size": 208896,
+>> "format-specific": {"type": "qcow2", "data": {"compat": "1.1",
+>> "lazy-refcounts": false, "bitmaps": [{"flags": ["in-use", "auto"],
+>> "name": "b1", "granularity": 65536}], "refcount-bits": 16, "corrupt":
+>> false}}, "dirty-flag": false}, "iops_wr": 0, "ro": false, "node-name":
+>> "#block157", "backing_file_depth": 0, "drv": "qcow2", "iops": 0,
+>> "bps_wr": 0, "write_threshold": 0, "encrypted": false, "bps": 0,
+>> "bps_rd": 0, "cache": {"no-flush": false, "direct": false, "writeback":
+>> true}, "file": "file5", "encryption_key_missing": false}, "qdev":
+>> "/machine/unattached/device[18]", "dirty-bitmaps": [{"name": "b1",
+>> "status": "active", "granularity": 65536, "count": 0}], "type": "unknown"}]}
+>> $ kill -9 $qemupid
+>> $ ./qemu-img info -U file5
+>> image: file5
+>> file format: qcow2
+>> virtual size: 100M (104857600 bytes)
+>> disk size: 204K
+>> cluster_size: 65536
+>> Format specific information:
+>>      compat: 1.1
+>>      lazy refcounts: false
+>>      bitmaps:
+>>          [0]:
+>>              flags:
+>>                  [0]: in-use
+>>                  [1]: auto
+>>              name: b1
+>>              granularity: 65536
+>>      refcount bits: 16
+>>      corrupt: false
+>> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
+>> file5
+>> {'execute':'qmp_capabilities'}
+>> {'execute':'query-block'}
+>> {"return": [{"io-status": "ok", "device": "ide0-hd0", "locked": false,
+>> "removable": false, "inserted": {"iops_rd": 0, "detect_zeroes": "off",
+>> "image": {"virtual-size": 104857600, "filename": "file5",
+>> "cluster-size": 65536, "format": "qcow2", "actual-size": 208896,
+>> "format-specific": {"type": "qcow2", "data": {"compat": "1.1",
+>> "lazy-refcounts": false, "bitmaps": [{"flags": ["in-use", "auto"],
+>> "name": "b1", "granularity": 65536}], "refcount-bits": 16, "corrupt":
+>> false}}, "dirty-flag": false}, "iops_wr": 0, "ro": false, "node-name":
+>> "#block141", "backing_file_depth": 0, "drv": "qcow2", "iops": 0,
+>> "bps_wr": 0, "write_threshold": 0, "encrypted": false, "bps": 0,
+>> "bps_rd": 0, "cache": {"no-flush": false, "direct": false, "writeback":
+>> true}, "file": "file5", "encryption_key_missing": false}, "qdev":
+>> "/machine/unattached/device[18]", "type": "unknown"}]}
+>>
+>> Note - after the unclean death, the "dirty-bitmaps" entry in query-block
+>> is NOT present, and as a result:
+>>
+>> {'execute':'block-dirty-bitmap-add','arguments':{'node':'#block141','name':'b1'}}
+>> {"return": {}}
+>>
+>> Oops - we were able to add a temporary bitmap that overrides the still
+>> in-use persistent bitmap (which we properly ignored on loading, because
+>> it was marked in-use).
+> 
+> Yes, but you will not be able to create persistent bitmap with the same name as
+> in-use bitmap in the image, so, there is no actual collision.. But is not good
+> too.
+> 
+> In-use bitmaps in the image may appear only after some kind of qemu crash. Isn't
+> it a good reason to call qemu-img check? So, haw about just forbid to start qemu
+> if there are any in-use bitmaps?
+> 
+
+I have wondered this recently.
+
+I am against just silently loading and deleting the bitmaps because I
+don't want any chance for data corruption if the bitmap gets lost
+accidentally. I like the loud failure.
+
+I kind of like the idea of just failing to load the image at all,
+because it does necessitate user action, but it feels a little user hostile.
+
+Maybe we can do some kind of soft-load for corrupted bitmaps where they
+will remain "locked" and cannot be re-written to disk until the user
+issues a clear command to reset them -- so the user knows full well the
+backup chain is broken. Maybe this is a good solution to the problem?
+
+What do you think?
+
+--js
