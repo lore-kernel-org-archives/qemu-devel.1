@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35905)
+Received: from eggs.gnu.org ([209.51.188.92]:36483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtZL3-0005do-KM
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:47:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gtZLm-0006B1-UG
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:47:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtZ6s-0002bx-2K
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:32:32 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54285)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtZ6r-0002ZQ-QY
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:32:30 -0500
-Received: by mail-wm1-f66.google.com with SMTP id a62so3192118wmh.4
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 06:32:29 -0800 (PST)
-References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
-	<1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
-	<13b4d86c-0af3-12b9-fce5-92f1eb0fe95d@redhat.com>
-	<0251e2fc-3dbd-937a-0649-71fcd64e2d14@linux.ibm.com>
-	<0b53df4a-7065-b3b7-c419-3f8e55cffdfd@oracle.com>
-	<bf1a6632-594c-cf05-e4cd-c70d9e1e2fbe@linux.ibm.com>
-	<f7b55eef-68da-ef50-b060-05e86f659903@redhat.com>
-	<113577fd-71c8-972f-b658-635d3decd62d@linux.ibm.com>
-	<7339d38a-74b7-bac8-677f-a27b88226453@oracle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3db74195-1a59-29c6-51e7-80802028def5@redhat.com>
-Date: Tue, 12 Feb 2019 15:32:26 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gtZLl-0000an-Mv
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:47:54 -0500
+Date: Tue, 12 Feb 2019 15:47:47 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190212144747.GC5283@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<ae441a8c27cae1a80e57fb6d291fe95667da0c76.1547739122.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <7339d38a-74b7-bac8-677f-a27b88226453@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string
- specifier in tpm_tis_show_buffer()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae441a8c27cae1a80e57fb6d291fe95667da0c76.1547739122.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 01/13] block: Allow freezing BdrvChild links
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,51 +23,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>, Stefan Berger <stefanb@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 2/12/19 2:43 PM, Liam Merwick wrote:
-> On 12/02/2019 13:27, Stefan Berger wrote:
->> On 2/12/19 7:31 AM, Philippe Mathieu-Daudé wrote:
->>> On 2/11/19 10:13 PM, Stefan Berger wrote:
->>>> On 2/11/19 3:09 PM, Liam Merwick wrote:
->>>>> On 11/02/2019 19:56, Stefan Berger wrote:
->>>>>> On 2/11/19 11:02 AM, Philippe Mathieu-Daudé wrote:
->>>>>>> On 2/11/19 4:03 PM, Liam Merwick wrote:
->>> [...]
->>>>>>>> -    printf("tpm_tis: %s length = %d\n", string, len);
->>>>>>>> +    printf("tpm_tis: %s length = %u\n", string, len);
->>>>>>> So here the format is '%zu'.
->>>>>>> However in code cleanup we try go get ride of printf() calls and
->>>>>>> replace them with trace points.
->>>>>>
->>>>>> This code is only used for debugging if DEBUG_TIS has been #defined.
->>>>>> No need to add tracing here.
->>>>> I'd come up the attached change (but that seems like overkill).
->>>>
->>>> I don't think we need tracing for this.
->>> So if you think the code is mature enough, let's remove the DEBUG calls!
->>>
->>> Else we prefer to convert DEBUG printf to trace events because (at
->>> least):
->>> - no need to recompile to enable debugging
->>> - when compiled with debugging, you don't mess with STDIO which can be
->>> used as a chardev backend.
->> Fine. Then I withdraw my reviewed-by.
+Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
+> Our permission system is useful to define what operations are allowed
+> on a certain block node and includes things like BLK_PERM_WRITE or
+> BLK_PERM_RESIZE among others.
 > 
+> One of the permissions is BLK_PERM_GRAPH_MOD which allows "changing
+> the node that this BdrvChild points to". The exact meaning of this has
+> never been very clear, but it can be understood as "change any of the
+> links connected to the node". This can be used to prevent changing a
+> backing link, but it's too coarse.
 > 
-> I don't see a way of removing the DEBUG calls without adding the
-> overhead of a call to tpm_tis_show_buffer() each time even if tracing is
-> not enabled (the 3 trace calls are interdependent and need a for loop).
-> Is there any example of a trace point that calls a function that then
-> does non-trivial printing?
+> This patch adds a new 'frozen' attribute to BdrvChild, which forbids
+> detaching the link from the node it points to, and new API to freeze
+> and unfreeze a backing chain.
 > 
-> I could send a v3 with the patch I attached previously with the 3 printf
-> calls changed to trace points but still wrapped in 'if (DEBUG_TIS)' and
-> optimised out in non-debug.
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block.c                   | 66 +++++++++++++++++++++++++++++++++++++++++++++++
+>  include/block/block.h     |  5 ++++
+>  include/block/block_int.h |  5 ++++
+>  3 files changed, 76 insertions(+)
 
-You can look at commit 56853498648.
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index f605622216..fd0e88d17a 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -661,6 +661,11 @@ struct BdrvChild {
+>       */
+>      uint64_t shared_perm;
+>  
+> +    /*
+> +     * This link is frozen: the child cannot be detached from the parent.
+> +     */
+> +    bool frozen;
+> +
+>      QLIST_ENTRY(BdrvChild) next;
+>      QLIST_ENTRY(BdrvChild) next_parent;
+>  };
 
-Thanks!
+Is this enough, or should it prevent both detaching from the parent _and_
+changing the child node it points to?
 
-Phil.
+> diff --git a/block.c b/block.c
+> index 4f5ff2cc12..51fac086c7 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2062,6 +2062,8 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
+>      BlockDriverState *old_bs = child->bs;
+>      int i;
+>  
+> +    assert(!child->frozen);
+> +
+>      if (old_bs && new_bs) {
+>          assert(bdrv_get_aio_context(old_bs) == bdrv_get_aio_context(new_bs));
+>      }
+
+Okay, this does forbid both, so I think it's just the comment that needs
+to be changed in the hunk above.
+
+In order to avoid running into an assertion failure, we need to detect
+the situation in all callers, or audit that it can never happen:
+
+* bdrv_replace_child()
+    * bdrv_root_attach_child(): Creates a new BdrvChild, never frozen
+    * bdrv_detach_child()
+        * bdrv_root_unref_child()
+            * blk_remove_bs(): Not a backing child, safe
+            * block_job_remove_all_bdrv(): Not a backing child, safe
+            * bdrv_unref_child()
+                * bdrv_set_backing_hd(): Adds a check
+                * bdrv_close():  Not a backing child, safe
+                * bdrv_open_driver(): Not a backing child, safe
+    * bdrv_drop_intermediate(): Adds a check, though see below
+
+* bdrv_replace_node(): Missing check?
+    * bdrv_append()
+      For example, mirror_start_job() calls it to insert the
+      mirror_top_bs node above the source, which could be anywhere in
+      the graph. This may involve changing the target of backing links.
+    * Other callers looks questionable, too
+
+bdrv_replace_node() can return an error, so I think we should add a
+check there.
+
+For the bdrv_replace_child() call chain, the state looks better, but it
+was tedious to verify and future additions could easily forget to add
+the check. I wonder if we should allow some function there to return
+errors so that we don't have to add the checks in the outermost
+functions of the call chain.
+
+> @@ -3813,6 +3819,62 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
+>  }
+>  
+>  /*
+> + * Return true if at least one of the backing links between @bs and
+> + * @base is frozen. @errp is set if that's the case.
+> + */
+> +bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
+> +                                  Error **errp)
+> +{
+> +    BlockDriverState *i;
+> +
+> +    for (i = bs; i != base && i->backing; i = backing_bs(i)) {
+> +        if (i->backing->frozen) {
+> +            error_setg(errp, "Cannot remove link from '%s' to '%s'",
+
+Maybe s/remove/change/?
+
+Might also be worth including the BdrvChild name in the error message.
+
+> +                       i->node_name, backing_bs(i)->node_name);
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+
+> @@ -3861,6 +3923,10 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+>          goto exit;
+>      }
+>  
+> +    if (bdrv_is_backing_chain_frozen(top, base, NULL)) {
+> +        goto exit;
+> +    }
+> +
+>      /* If 'base' recursively inherits from 'top' then we should set
+>       * base->inherits_from to top->inherits_from after 'top' and all
+>       * other intermediate nodes have been dropped.
+
+bdrv_drop_intermediate() doesn't change the links between in the chain
+between top and base, but the links between the parents of top and top
+are changed to point to base instead.
+
+I think this is checking the wrong thing.
+
+Kevin
