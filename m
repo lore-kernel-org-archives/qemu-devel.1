@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48208)
+Received: from eggs.gnu.org ([209.51.188.92]:49472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtbk8-000409-Ka
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:21:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gtbqo-00069a-IA
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtbk7-0001w3-29
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:21:12 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53505)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtbk6-0001uB-Sr
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:21:10 -0500
-Received: by mail-wm1-f67.google.com with SMTP id d15so3878924wmb.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:21:10 -0800 (PST)
-References: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-	<442139a2-5ab2-9259-03a0-11d2f3c86c59@redhat.com>
-	<28a8cd58-51a9-6301-1d25-02289af8c81d@ilande.co.uk>
-	<alpine.BSF.2.21.9999.1902121157470.75929@zero.eik.bme.hu>
-	<971ba38d-d883-d51c-55b2-531639336ed4@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d78bc91b-efef-bb69-e443-6526ca433197@redhat.com>
-Date: Tue, 12 Feb 2019 18:21:07 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gtbqn-0003cR-19
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:28:06 -0500
+Date: Tue, 12 Feb 2019 18:27:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190212172756.GI5283@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<dc004f69efb6631e17d4934635be21e3bf2cc9a3.1547739122.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <971ba38d-d883-d51c-55b2-531639336ed4@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] cuda: decrease time delay
- before raising VIA SR interrupt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dc004f69efb6631e17d4934635be21e3bf2cc9a3.1547739122.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 08/13] block: Allow changing the backing
+ file on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +24,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-ppc@nongnu.org, hsp.cat7@gmail.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 2/12/19 5:51 PM, Mark Cave-Ayland wrote:
-> On 12/02/2019 11:03, BALATON Zoltan wrote:
+Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
+> This patch allows the user to change the backing file of an image that
+> is being reopened. Here's what it does:
 > 
->> On Tue, 12 Feb 2019, Mark Cave-Ayland wrote:
->>> On 11/02/2019 23:35, Philippe Mathieu-Daudé wrote:
->>>
->>>> Hi Mark,
->>>>
->>>> On 2/10/19 6:44 PM, Mark Cave-Ayland wrote:
->>>>> In order to handle a race condition in MacOS 9, a delay was introduced when
->>>>> raising the VIA SR interrupt inspired by similar code in MacOnLinux.
->>>>>
->>>>> During original testing of the MacOS 9 patches it was found that the 30us
->>>>> delay used in MacOnLinux did not work reliably within QEMU, and a value of
->>>>> 300us was required to function correctly.
->>>>>
->>>>> Recent experiments have shown that the previous reliability issues are no
->>>>> longer present, and this value can be reduced down to 20us with no apparent
->>>>> ill effects in my local tests. This has the benefit of considerably improving
->>>>> the responsiveness of the ADB keyboard and mouse with the guest.
->>>>>
->>>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>>> ---
->>>>>  hw/misc/macio/cuda.c | 11 +----------
->>>>>  1 file changed, 1 insertion(+), 10 deletions(-)
->>>>>
->>>>> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
->>>>> index c4f7a2f39b..3febacdd1e 100644
->>>>> --- a/hw/misc/macio/cuda.c
->>>>> +++ b/hw/misc/macio/cuda.c
->>>>> @@ -97,17 +97,8 @@ static void cuda_set_sr_int(void *opaque)
->>>>>
->>>>>  static void cuda_delay_set_sr_int(CUDAState *s)
->>>>>  {
->>>>> -    MOS6522CUDAState *mcs = &s->mos6522_cuda;
->>>>> -    MOS6522State *ms = MOS6522(mcs);
->>>>> -    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
->>>>>      int64_t expire;
->>>>>
->>>>> -    if (ms->dirb == 0xff || s->sr_delay_ns == 0) {
->>>>> -        /* Disabled or not in Mac OS, fire the IRQ directly */
->>>>> -        mdc->set_sr_int(ms);
->>>>> -        return;
->>>>> -    }
->>>>
->>>> The change of sr_delay_ns below is well explained, but I don't
->>>> understand why you remove the previous if().
->>>
->>> IIRC it was a hack by Alex to try and restrict the delay on the interrupt just to
->>> MacOS instead of Linux, but with the reduced value it doesn't really matter any more.
->>
->> If this delay is to prevent a bug which only happens in MacOS then that's the hack
->> not the normal code path to run without the delay that you've just removed. So maybe
->> this should be kept if possible to avoid unecessary delays for other guests.
->> (Although if this only affects mac99,via=cuda but not mac99,via=pmu then I don't care
->> much as long as pmu works.)
+>  - In bdrv_reopen_prepare(): check that the value of 'backing' points
+>    to an existing node or is null. If it points to an existing node it
+>    also needs to make sure that replacing the backing file will not
+>    create a cycle in the node graph (i.e. you cannot reach the parent
+>    from the new backing file).
 > 
-> Well the reality is that the detection above doesn't actually seem to work anyway -
-> at least a quick boot test with Linux, MacOS X and MacOS 9 with a printf() added into
-> the if() shows nothing firing once the kernel takes over. So the slow path with the
-> delay included was always being taken within the OS anyway.
-> 
-> And indeed, the code doesn't affect pmu so you won't see any difference there.
-> 
->>> As a plus it also prevents a guest OS from accidentally triggering the hack whilst
->>> programming the VIA port.
->>
->> That may be a problem though. What's the issue exactly? Why is the delay needed in
->> the first place?
-> 
-> It's some kind of racy polling with OS 9 (I wasn't involved in the technical details,
-> sorry) which causes OS 9 to hang on boot if the delay isn't present. And even better
-> the slow path that was previously always being taken has now been reduced from 300us
-> to 30us so whichever way you look at it, having this patch applied is a win.
+>  - In bdrv_reopen_commit(): perform the actual node replacement by
+>    calling bdrv_set_backing_hd(). It may happen that there are
+>    temporary implicit nodes between the BDS that we are reopening and
+>    the backing file that we want to replace (e.g. a commit fiter node),
+>    so we must skip them.
 
-Can you write a paragraph about this, that David can amend to your
-patch? That would stop worrying me about looking at this patch in
-various months...
+Hmm... I really dislike getting into the business of dealing with
+implicit nodes here. If you want to manage the block graph at the node
+level, you should manage all of it and just avoid getting implicit
+nodes in the first place. Otherwise, we'd have to guess where in the
+implicit chain you really want to add or remove nodes, and we're bound
+to guess wrong for some users.
 
-Thanks!
+There is one problem with not skipping implicit nodes, though: Even if
+you don't want to manage things at the node level, we already force you
+to specify 'backing'. If there are implicit nodes, you don't knwo the
+real node name of the first backing child.
 
-Phil.
+So I suggest that we allow skipping implicit nodes for the purpose of
+leaving the backing link unchanged; but we return an error if you want
+to change the backing link and there are implicit nodes in the way.
+
+> Although x-blockdev-reopen is meant to be used like blockdev-add,
+> there's an important thing that must be taken into account: the only
+> way to set a new backing file is by using a reference to an existing
+> node (previously added with e.g. blockdev-add).  If 'backing' contains
+> a dictionary with a new set of options ({"driver": "qcow2", "file": {
+> ... }}) then it is interpreted that the _existing_ backing file must
+> be reopened with those options.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 122 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block.c b/block.c
+> index 897c8b85cd..10847416b2 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2909,6 +2909,27 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+>  }
+>  
+>  /*
+> + * Returns true if @child can be reached recursively from @bs
+> + */
+> +static bool bdrv_recurse_has_child(BlockDriverState *bs,
+> +                                   BlockDriverState *child)
+> +{
+> +    BdrvChild *c;
+> +
+> +    if (bs == child) {
+> +        return true;
+> +    }
+> +
+> +    QLIST_FOREACH(c, &bs->children, next) {
+> +        if (bdrv_recurse_has_child(c->bs, child)) {
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+> +
+> +/*
+>   * Adds a BlockDriverState to a simple queue for an atomic, transactional
+>   * reopen of multiple devices.
+>   *
+> @@ -3217,6 +3238,63 @@ static void bdrv_reopen_perm(BlockReopenQueue *q, BlockDriverState *bs,
+>  }
+>  
+>  /*
+> + * Return 0 if the 'backing' option of @bs can be replaced with
+> + * @value, otherwise return < 0 and set @errp.
+> + */
+> +static int bdrv_reopen_parse_backing(BlockDriverState *bs, QObject *value,
+> +                                     Error **errp)
+> +{
+> +    BlockDriverState *overlay_bs, *new_backing_bs;
+> +    const char *str;
+> +
+> +    switch (qobject_type(value)) {
+> +    case QTYPE_QNULL:
+> +        new_backing_bs = NULL;
+> +        break;
+> +    case QTYPE_QSTRING:
+> +        str = qobject_get_try_str(value);
+> +        new_backing_bs = bdrv_lookup_bs(NULL, str, errp);
+> +        if (new_backing_bs == NULL) {
+> +            return -EINVAL;
+> +        } else if (bdrv_recurse_has_child(new_backing_bs, bs)) {
+> +            error_setg(errp, "Making '%s' a backing file of '%s' "
+> +                       "would create a cycle", str, bs->node_name);
+> +            return -EINVAL;
+> +        }
+> +        break;
+> +    default:
+> +        /* 'backing' does not allow any other data type */
+> +        g_assert_not_reached();
+> +    }
+> +
+> +    if (new_backing_bs) {
+> +        if (bdrv_get_aio_context(new_backing_bs) != bdrv_get_aio_context(bs)) {
+> +            error_setg(errp, "Cannot use a new backing file "
+> +                       "with a different AioContext");
+> +            return -EINVAL;
+> +        }
+> +    }
+
+This is okay for a first version, but in reality, you'd usually want to
+just move the backing file into the right AioContext. Of course, this is
+only correct if the backing file doesn't have other users in different
+AioContexts. To get a good implementation for this, we'd probably need
+to store the AioContext in BdrvChild, like we already concluded for
+other use cases.
+
+Maybe document this as one of the problems to be solved before we can
+remove the x- prefix.
+
+> +
+> +    /*
+> +     * Skip all links that point to an implicit node, if any
+> +     * (e.g. a commit filter node). We don't want to change those.
+> +     */
+> +    overlay_bs = bs;
+> +    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit) {
+> +        overlay_bs = backing_bs(overlay_bs);
+> +    }
+> +
+> +    if (new_backing_bs != backing_bs(overlay_bs)) {
+> +        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overlay_bs),
+> +                                         errp)) {
+> +            return -EPERM;
+> +        }
+> +    }
+
+Should this function check new_backing_bs->drv->supports_backing, too?
+
+> +    return 0;
+> +}
+> +
+> +/*
+>   * Prepares a BlockDriverState for reopen. All changes are staged in the
+>   * 'opaque' field of the BDRVReopenState, which is used and allocated by
+>   * the block driver layer .bdrv_reopen_prepare()
+> @@ -3359,6 +3437,19 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>              QObject *new = entry->value;
+>              QObject *old = qdict_get(reopen_state->bs->options, entry->key);
+>  
+> +            /*
+> +             * Allow changing the 'backing' option. The new value can be
+> +             * either a reference to an existing node (using its node name)
+> +             * or NULL to simply detach the current backing file.
+> +             */
+> +            if (!strcmp(entry->key, "backing")) {
+> +                ret = bdrv_reopen_parse_backing(reopen_state->bs, new, errp);
+> +                if (ret < 0) {
+> +                    goto error;
+> +                }
+> +                continue; /* 'backing' option processed, go to the next one */
+> +            }
+> +
+>              /* Allow child references (child_name=node_name) as long as they
+>               * point to the current child (i.e. everything stays the same). */
+>              if (qobject_type(new) == QTYPE_QSTRING) {
+> @@ -3437,9 +3528,10 @@ error:
+>  void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>  {
+>      BlockDriver *drv;
+> -    BlockDriverState *bs;
+> +    BlockDriverState *bs, *new_backing_bs;
+>      BdrvChild *child;
+> -    bool old_can_write, new_can_write;
+> +    bool old_can_write, new_can_write, change_backing_bs;
+> +    QObject *qobj;
+>  
+>      assert(reopen_state != NULL);
+>      bs = reopen_state->bs;
+> @@ -3464,6 +3556,15 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+>      bs->detect_zeroes      = reopen_state->detect_zeroes;
+>  
+> +    qobj = qdict_get(bs->options, "backing");
+> +    change_backing_bs = (qobj != NULL);
+> +    if (change_backing_bs) {
+> +        const char *str = qobject_get_try_str(qobj);
+> +        new_backing_bs = str ? bdrv_find_node(str) : NULL;
+> +        qdict_del(bs->explicit_options, "backing");
+> +        qdict_del(bs->options, "backing");
+> +    }
+> +
+>      /* Remove child references from bs->options and bs->explicit_options.
+>       * Child options were already removed in bdrv_reopen_queue_child() */
+>      QLIST_FOREACH(child, &bs->children, next) {
+> @@ -3471,6 +3572,25 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>          qdict_del(bs->options, child->name);
+>      }
+>  
+> +    /*
+> +     * Change the backing file if a new one was specified. We do this
+> +     * after updating bs->options, so bdrv_refresh_filename() (called
+> +     * from bdrv_set_backing_hd()) has the new values.
+> +     */
+> +    if (change_backing_bs) {
+> +        BlockDriverState *overlay = bs;
+> +        /*
+> +         * Skip all links that point to an implicit node, if any
+> +         * (e.g. a commit filter node). We don't want to change those.
+> +         */
+> +        while (backing_bs(overlay) && backing_bs(overlay)->implicit) {
+> +            overlay = backing_bs(overlay);
+> +        }
+> +        if (new_backing_bs != backing_bs(overlay)) {
+> +            bdrv_set_backing_hd(overlay, new_backing_bs, &error_abort);
+
+I'm afraid we can't use &error_abort here because bdrv_attach_child()
+could still fail due to permission conflicts.
+
+> +        }
+> +    }
+> +
+>      bdrv_refresh_limits(bs, NULL);
+>  
+>      bdrv_set_perm(reopen_state->bs, reopen_state->perm,
+
+Hm... Does bdrv_set_perm() work correctly when between bdrv_check_perm()
+and here the graph was changed?
+
+Kevin
