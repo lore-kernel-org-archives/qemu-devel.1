@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53395)
+Received: from eggs.gnu.org ([209.51.188.92]:53501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVqd-0005hp-3j
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:31 -0500
+	(envelope-from <david@redhat.com>) id 1gtVqn-0005p7-GM
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVqN-0001yz-5B
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:24 -0500
+	(envelope-from <david@redhat.com>) id 1gtVql-0002Z2-DI
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:03:41 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 12 Feb 2019 12:02:52 +0100
-Message-Id: <20190212110308.13707-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] s390x: Add floating-point extension
- facility to "qemu" cpu model
+Date: Tue, 12 Feb 2019 12:02:59 +0100
+Message-Id: <20190212110308.13707-8-david@redhat.com>
+In-Reply-To: <20190212110308.13707-1-david@redhat.com>
+References: <20190212110308.13707-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 06/15] s390x/tcg: Refactor SET FPC AND
+ SIGNAL handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +23,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-The floating-point extension facility implemented certain changes to
-BFP, HFP and DFP instructions.
+We can directly work on the uint64_t value, no need for a temporary
+uint32_t value.
 
-As we don't implement HFP/DFP, we can ignore those completely. Related
-to BFP, the changes include
-- SET BFP ROUNDING MODE (SRNMB) instruction
-- BFP-rounding-mode field in the FPC register is changed to 3 bits
-- CONVERT FROM LOGICAL instructions
-- CONVERT TO LOGICAL instructions
-- Changes (rounding mode + XxC) added to
--- CONVERT TO FIXED
--- CONVERT FROM FIXED
--- LOAD FP INTEGER
--- LOAD ROUNDED
--- DIVIDE TO INTEGER
-
-For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
-implement, so skip that. Also, as we don't implement PFPO, we can skip
-changes to that as well. The other parts are now implemented, we can
-indicate the facility.
-
-z14 PoP mentiones that "The floating-point extension facility is installed
-in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
-also one.", meaning that the DFP (decimal-floating-point) facility also
-has to be inidicated. We can ignore that for now.
+Also cleanup and shorten the comments.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/gen-features.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/s390x/fpu_helper.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 19bb8ac7f8..02f6e9f475 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -593,6 +593,11 @@ static uint16_t qemu_V3_1[] = {
- };
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index 2e690073ea..7c39829352 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -820,21 +820,23 @@ void HELPER(sfpc)(CPUS390XState *env, uint64_t fpc)
+ }
  
- static uint16_t qemu_LATEST[] = {
+ /* set fpc and signal */
+-void HELPER(sfas)(CPUS390XState *env, uint64_t val)
++void HELPER(sfas)(CPUS390XState *env, uint64_t fpc)
+ {
+     uint32_t signalling = env->fpc;
+-    uint32_t source = val;
+     uint32_t s390_exc;
+ 
+-    /* The contents of the source operand are placed in the FPC register;
+-       then the flags in the FPC register are set to the logical OR of the
+-       signalling flags and the source flags.  */
+-    env->fpc = source | (signalling & 0x00ff0000);
+-    set_float_rounding_mode(fpc_to_rnd[source & 3], &env->fpu_status);
 +    /*
-+     * Only BFP bits are implemented (HFP, DFP, PFPO and DIVIDE TO INTEGER not
-+     * implemented yet).
++     * FPC is set to the FPC operand with a bitwise OR of the signalling
++     * flags.
 +     */
-+    S390_FEAT_FLOATING_POINT_EXT,
-     S390_FEAT_ZPCI,
- };
++    env->fpc = fpc | (signalling & 0x00ff0000);
++    set_float_rounding_mode(fpc_to_rnd[fpc & 3], &env->fpu_status);
  
+-    /* If any signalling flag is 1 and the corresponding source mask
+-       is also 1, a simulated-iee-exception trap occurs.  */
+-    s390_exc = (signalling >> 16) & (source >> 24);
++    /*
++     * If any signaling flag is enabled in the new FPC mask, a
++     * simulated-iee-exception exception occurs.
++     */
++    s390_exc = (signalling >> 16) & (fpc >> 24);
+     if (s390_exc) {
+         tcg_s390_data_exception(env, s390_exc | 3, GETPC());
+     }
 -- 
 2.17.2
