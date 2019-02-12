@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57330)
+Received: from eggs.gnu.org ([209.51.188.92]:57342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtU9D-00040I-L4
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:14:36 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gtU9T-00040P-4j
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:14:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtU8Q-0004F7-0I
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:13:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49504)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gtU8P-0004Ak-NE
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:13:45 -0500
-References: <20190211163829.10297-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <002847d1-732d-b777-394c-a784fd359130@redhat.com>
-Date: Tue, 12 Feb 2019 10:13:38 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gtU61-0006ot-Ju
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 04:11:21 -0500
+Date: Tue, 12 Feb 2019 10:11:00 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190212101100.1d62b04e.cohuck@redhat.com>
+In-Reply-To: <20190212053044.29015-1-richard.henderson@linaro.org>
+References: <20190212053044.29015-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190211163829.10297-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Kconfig: add documentation
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] target/s390x: Implement STCK et al
+ for CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, peter.maydell@linaro.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On 2019-02-11 17:38, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  docs/devel/kconfig.rst | 284 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 284 insertions(+)
->  create mode 100644 docs/devel/kconfig.rst
+On Mon, 11 Feb 2019 21:30:42 -0800
+Richard Henderson <richard.henderson@linaro.org> wrote:
 
-Thanks for writing this up - that's a really helpful text!
+> Changes since v2:
+>   * Fix botched subject line, include r-b tags.
+> 
+> Changes since v1:
+>   * Move more of hw/s390x/tod.h to a new header.
+>   * Use time2tod.
+> 
+> 
+> r~
+> 
+> 
+> Richard Henderson (2):
+>   target/s390x: Split out s390-tod.h
+>   target/s390x: Implement STCK et al for CONFIG_USER_ONLY
+> 
+>  include/hw/s390x/tod.h     | 16 +---------------
+>  target/s390x/helper.h      |  2 +-
+>  target/s390x/s390-tod.h    | 29 +++++++++++++++++++++++++++++
+>  target/s390x/misc_helper.c | 34 ++++++++++++++++++++++------------
+>  target/s390x/translate.c   |  2 ++
+>  target/s390x/insn-data.def | 11 ++++++-----
+>  6 files changed, 61 insertions(+), 33 deletions(-)
+>  create mode 100644 target/s390x/s390-tod.h
+> 
 
-> diff --git a/docs/devel/kconfig.rst b/docs/devel/kconfig.rst
-> new file mode 100644
-> index 0000000000..b653c43b12
-> --- /dev/null
-> +++ b/docs/devel/kconfig.rst
-> @@ -0,0 +1,284 @@
-[...]
-> +Unlike Linux, there is no user interface to edit the configuration, which is instead
-> +specified in per-target files under the ``default-configs/`` directory of the
-> +QEMU source tree.  This is because, unlike Linux, configuration and dependencies can be
-> +treated as a black box when building QEMU; the default configuration that QEMU
-> +ships with should be okay in almost all cases.
-
-I'd like to suggest to replace "Linux" with "Linux-Kconfig".
-
-[...]
-> +**reverse dependencies**: ``select <symbol> [if <expr>]``
-> +
-> +  While ``depends on`` forces a symbol to false, reverse dependencies can be
-> +  used to force another symbol to true.  In the following example,
-> +  ``CONFIG_BAZ`` will be true whenever ``CONFIG_FOO`` is true::
-> +
-> +    config FOO
-> +      select BAZ
-> +
-> +  The optional expression will prevent ``select`` from having any effect
-> +  unless it is true.
-> +
-> +  Note that unlike Linux, QEMU will detect contradictions between ``depends on`` and
-
-dito
-
- Thomas
+Thanks, applied.
