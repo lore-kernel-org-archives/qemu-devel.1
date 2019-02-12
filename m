@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54541)
+Received: from eggs.gnu.org ([209.51.188.92]:55031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1gtPM1-00083C-EE
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtPME-0008Cq-Q2
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1gtPLk-0006qK-4P
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:13 -0500
-Received: from mga04.intel.com ([192.55.52.120]:43346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1gtPLj-0006hs-6F
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:11 -0500
-From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Tue, 12 Feb 2019 12:25:16 +0800
-Message-Id: <1549945516-25643-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH] virtio-blk: set correct config size for the
- host driver
+	(envelope-from <stefanha@redhat.com>) id 1gtPM7-0007AD-VH
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 23:07:38 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 12 Feb 2019 12:01:35 +0800
+Message-Id: <20190212040136.30371-3-stefanha@redhat.com>
+In-Reply-To: <20190212040136.30371-1-stefanha@redhat.com>
+References: <20190212040136.30371-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/3] qemugdb/coroutine: fix arch_prctl has
+ unknown return type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +23,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, stefanha@redhat.com, sgarzare@redhat.com, dgilbert@redhat.com, ldoktor@redhat.com, changpeng.liu@intel.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features support"
-introduced extra fields to existing struct virtio_blk_config, when
-migration was executed from older QEMU version to current head, it
-will break the migration.  While here, set the correct config size
-when initializing the host driver, for now, discard/write zeroes
-are not supported by virtio-blk host driver, so set the config
-size as before, users can change config size when adding the new
-feature bits support.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+qemu coroutine command results in following error output:
+
+Python Exception <class 'gdb.error'> 'arch_prctl' has unknown return
+type; cast the call to its declared return type: Error occurred in
+Python command: 'arch_prctl' has unknown return type; cast the call to
+its declared return type
+
+Fix it by giving it what it wants: arch_prctl return type.
+
+Information on the topic:
+   https://sourceware.org/gdb/onlinedocs/gdb/Calling.html
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190206151425.105871-1-vsementsov@virtuozzo.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/block/virtio-blk.c          | 15 +++++++++++----
- include/hw/virtio/virtio-blk.h |  1 +
- 2 files changed, 12 insertions(+), 4 deletions(-)
+ scripts/qemugdb/coroutine.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 9a87b3b..fac5d33 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -761,7 +761,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-     blkcfg.alignment_offset = 0;
-     blkcfg.wce = blk_enable_write_cache(s->blk);
-     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
--    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-+    memcpy(config, &blkcfg, s->config_size);
- }
- 
- static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-@@ -769,7 +769,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-     VirtIOBlock *s = VIRTIO_BLK(vdev);
-     struct virtio_blk_config blkcfg;
- 
--    memcpy(&blkcfg, config, sizeof(blkcfg));
-+    memcpy(&blkcfg, config, s->config_size);
- 
-     aio_context_acquire(blk_get_aio_context(s->blk));
-     blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
-@@ -847,6 +847,13 @@ static void virtio_blk_set_status(VirtIODevice *vdev, uint8_t status)
-     }
- }
- 
-+static void virtio_blk_set_config_size(VirtIOBlock *s)
-+{
-+    /* VIRTIO_BLK_F_MQ is supported by host driver */
-+    s->config_size = offsetof(struct virtio_blk_config, num_queues) +
-+                     sizeof_field(struct virtio_blk_config, num_queues);
-+}
-+
- static void virtio_blk_save_device(VirtIODevice *vdev, QEMUFile *f)
- {
-     VirtIOBlock *s = VIRTIO_BLK(vdev);
-@@ -952,8 +959,8 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
--                sizeof(struct virtio_blk_config));
-+    virtio_blk_set_config_size(s);
-+    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, s->config_size);
- 
-     s->blk = conf->conf.blk;
-     s->rq = NULL;
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-index 5117431..9181a93 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -51,6 +51,7 @@ typedef struct VirtIOBlock {
-     void *rq;
-     QEMUBH *bh;
-     VirtIOBlkConf conf;
-+    size_t config_size;
-     unsigned short sector_mask;
-     bool original_wce;
-     VMChangeStateEntry *change;
--- 
-1.9.3
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index ab699794ab..81f811ac00 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -22,7 +22,7 @@ def get_fs_base():
+        pthread_self().'''
+     # %rsp - 120 is scratch space according to the SystemV ABI
+     old =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
+-    gdb.execute('call arch_prctl(0x1003, $rsp - 120)', False, True)
++    gdb.execute('call (int)arch_prctl(0x1003, $rsp - 120)', False, True)
+     fs_base =3D gdb.parse_and_eval('*(uint64_t*)($rsp - 120)')
+     gdb.execute('set *(uint64_t*)($rsp - 120) =3D %s' % old, False, True=
+)
+     return fs_base
+--=20
+2.20.1
