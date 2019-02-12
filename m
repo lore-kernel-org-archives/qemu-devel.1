@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51112)
+Received: from eggs.gnu.org ([209.51.188.92]:51195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtYhF-0001Z9-Ij
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:04 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtYhK-0001cZ-O3
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtYhC-00069a-6O
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:00 -0500
-Date: Tue, 12 Feb 2019 09:05:47 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190212090538-mutt-send-email-mst@kernel.org>
-References: <20190212134758.10514-1-dgilbert@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1gtYhJ-0006I5-SS
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:06 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 12 Feb 2019 22:03:24 +0800
+Message-Id: <20190212140330.1467-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190212134758.10514-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] a few trivials
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PULL 0/6] Block pull request for testing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +19,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-block@nongnu.org, sgarzare@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, Feb 12, 2019 at 01:47:54PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Just cleaning out my trivial pile; a few more traces and
-> a couple of error reporting tweaks.
-> 
-> Dave
+Peter hit a virtio-blk-test failure caused by the new DISCARD/WRITE_ZEROE=
+S
+patches that Stefano and I have been unable to reproduce.  Here are the p=
+atches
+so they can be tested again in Peter's environment.
 
-Looks sane
+Stefano Garzarella (6):
+  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
+  virtio-blk: add host_features field in VirtIOBlock
+  virtio-blk: add "discard" and "write-zeroes" properties
+  virtio-blk: add DISCARD and WRITE_ZEROES features
+  tests/virtio-blk: change assert on data_size in virtio_blk_request()
+  tests/virtio-blk: add test for WRITE_ZEROES command
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+ include/hw/virtio/virtio-blk.h |   5 +-
+ hw/block/virtio-blk.c          | 214 +++++++++++++++++++++++++++++++--
+ hw/core/machine.c              |   2 +
+ tests/virtio-blk-test.c        |  75 +++++++++++-
+ 4 files changed, 282 insertions(+), 14 deletions(-)
 
-> 
-> Dr. David Alan Gilbert (4):
->   pckbd: Convert DPRINTF->trace
->   HMP: Prepend errors with 'Error:'
->   kvm: Add kvm_set_ioeventfd* traces
->   wavcapture: Convert to error_report
-> 
->  accel/kvm/kvm-all.c    |  3 +++
->  accel/kvm/trace-events |  2 ++
->  audio/wavcapture.c     | 39 +++++++++++++++++----------------------
->  hmp.c                  |  2 +-
->  hw/input/pckbd.c       | 19 ++++++-------------
->  hw/input/trace-events  |  7 +++++++
->  6 files changed, 36 insertions(+), 36 deletions(-)
-> 
-> -- 
-> 2.20.1
+--=20
+2.20.1
