@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54658)
+Received: from eggs.gnu.org ([209.51.188.92]:54662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVs8-0006xP-66
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:06 -0500
+	(envelope-from <david@redhat.com>) id 1gtVs8-0006xS-BV
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVs6-0004d3-GO
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:03 -0500
-References: <20190212110308.13707-1-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gtVs6-0004dP-JU
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:04 -0500
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <ff61e018-af71-a275-7332-0ac4c01ddc75@redhat.com>
-Date: Tue, 12 Feb 2019 12:04:35 +0100
-MIME-Version: 1.0
+Date: Tue, 12 Feb 2019 12:03:08 +0100
+Message-Id: <20190212110308.13707-17-david@redhat.com>
 In-Reply-To: <20190212110308.13707-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x: Add floating-point extension
+References: <20190212110308.13707-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 15/15] s390x: Add floating-point extension
  facility to "qemu" cpu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,41 +21,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On 12.02.19 12:02, David Hildenbrand wrote:
-> The floating-point extension facility implemented certain changes to
-> BFP, HFP and DFP instructions.
-> 
-> As we don't implement HFP/DFP, we can ignore those completely. Related
-> to BFP, the changes include
-> - SET BFP ROUNDING MODE (SRNMB) instruction
-> - BFP-rounding-mode field in the FPC register is changed to 3 bits
-> - CONVERT FROM LOGICAL instructions
-> - CONVERT TO LOGICAL instructions
-> - Changes (rounding mode + XxC) added to
-> -- CONVERT TO FIXED
-> -- CONVERT FROM FIXED
-> -- LOAD FP INTEGER
-> -- LOAD ROUNDED
-> -- DIVIDE TO INTEGER
-> 
-> For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
-> implement, so skip that. Also, as we don't implement PFPO, we can skip
-> changes to that as well. The other parts are now implemented, we can
-> indicate the facility.
-> 
-> z14 PoP mentiones that "The floating-point extension facility is installed
-> in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
-> also one.", meaning that the DFP (decimal-floating-point) facility also
-> has to be inidicated. We can ignore that for now.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+The floating-point extension facility implemented certain changes to
+BFP, HFP and DFP instructions.
 
-This is the same patch as 15/15, refer to 0/15 as cover letter instead.
+As we don't implement HFP/DFP, we can ignore those completely. Related
+to BFP, the changes include
+- SET BFP ROUNDING MODE (SRNMB) instruction
+- BFP-rounding-mode field in the FPC register is changed to 3 bits
+- CONVERT FROM LOGICAL instructions
+- CONVERT TO LOGICAL instructions
+- Changes (rounding mode + XxC) added to
+-- CONVERT TO FIXED
+-- CONVERT FROM FIXED
+-- LOAD FP INTEGER
+-- LOAD ROUNDED
+-- DIVIDE TO INTEGER
 
+For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
+implement, so skip that. Also, as we don't implement PFPO, we can skip
+changes to that as well. The other parts are now implemented, we can
+indicate the facility.
+
+z14 PoP mentiones that "The floating-point extension facility is installed
+in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
+also one.", meaning that the DFP (decimal-floating-point) facility also
+has to be inidicated. We can ignore that for now.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/gen-features.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 19bb8ac7f8..02f6e9f475 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -593,6 +593,11 @@ static uint16_t qemu_V3_1[] = {
+ };
+ 
+ static uint16_t qemu_LATEST[] = {
++    /*
++     * Only BFP bits are implemented (HFP, DFP, PFPO and DIVIDE TO INTEGER not
++     * implemented yet).
++     */
++    S390_FEAT_FLOATING_POINT_EXT,
+     S390_FEAT_ZPCI,
+ };
+ 
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.2
