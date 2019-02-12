@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58696)
+Received: from eggs.gnu.org ([209.51.188.92]:58626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtaiT-0004xl-Gi
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:15:27 -0500
+	(envelope-from <berto@igalia.com>) id 1gtaiw-0004w1-OA
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtag4-0000v7-O8
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:12:58 -0500
-References: <20190212153025.25425-1-cohuck@redhat.com>
-	<40c87a8e-88d1-7113-1d33-2869234e767e@redhat.com>
-	<20190212165841.7d9d7017.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ac8a0dc5-ab3d-46cd-bb95-18b8589bfae6@redhat.com>
-Date: Tue, 12 Feb 2019 17:12:33 +0100
+	(envelope-from <berto@igalia.com>) id 1gtaaA-0000Ir-Tx
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:06:53 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190212151558.GE5283@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<5c04485949b8cc3f63c6500b2bf6f70f4faaba4a.1547739122.git.berto@igalia.com>
+	<20190212151558.GE5283@localhost.localdomain>
+Date: Tue, 12 Feb 2019 17:06:17 +0100
+Message-ID: <w51k1i58006.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190212165841.7d9d7017.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] s390x/kvm: add tracepoint to ioeventfd
- interface
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 04/13] block: Freeze the backing chain for
+ the duration of the stream job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 12.02.19 16:58, Cornelia Huck wrote:
-> On Tue, 12 Feb 2019 16:52:09 +0100
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->=20
->> Hi Cornelia,
->>
->> On 2/12/19 4:30 PM, Cornelia Huck wrote:
->>> Trace when assigning/unassigning.
->>>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>  target/s390x/kvm.c        | 2 ++
->>>  target/s390x/trace-events | 1 +
->>>  2 files changed, 3 insertions(+)
->>>
->>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>> index 15fdc168e1c5..7d61bd109092 100644
->>> --- a/target/s390x/kvm.c
->>> +++ b/target/s390x/kvm.c
->>> @@ -1886,6 +1886,8 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifi=
-er *notifier, uint32_t sch,
->>>          .addr =3D sch,
->>>          .len =3D 8,
->>>      };
->>> +    trace_kvm_s390_assign_subch_ioeventfd(kick.fd, kick.addr, assign=
-,
->>> +                                          kick.datamatch);
->>>      if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
->>>          return -ENOSYS;
->>>      }
->>> diff --git a/target/s390x/trace-events b/target/s390x/trace-events
->>> index a84e316e4937..bdc22f42cdbb 100644
->>> --- a/target/s390x/trace-events
->>> +++ b/target/s390x/trace-events
->>> @@ -14,6 +14,7 @@ ioinst_chsc_cmd(uint16_t cmd, uint16_t len) "IOINST=
-: chsc command 0x%04x, len 0x
->>>  kvm_enable_cmma(int rc) "CMMA: enabling with result code %d"
->>>  kvm_clear_cmma(int rc) "CMMA: clearing with result code %d"
->>>  kvm_failed_cpu_state_set(int cpu_index, uint8_t state, const char *m=
-sg) "Warning: Unable to set cpu %d state %" PRIu8 " to KVM: %s"
->>> +kvm_s390_assign_subch_ioeventfd(int fd, uint32_t addr, bool assign, =
-int datamatch) "fd: %d sch: @0x%x assign: %d vq: %d" =20
->>
->> I noticed all s390x related trace events don't specify 's390' in the
->> event name, maybe you can simply strip it. If you agree, feel free to
->> apply that change directly yourself, no need for v2 ;)
->=20
-> Yeah; not exactly sure why the other events do that, though... I can
-> strip it if others agree.
+On Tue 12 Feb 2019 04:15:58 PM CET, Kevin Wolf wrote:
+> Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block/stream.c | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>> 
+>> diff --git a/block/stream.c b/block/stream.c
+>> index 7a49ac0992..39a2e10892 100644
+>> --- a/block/stream.c
+>> +++ b/block/stream.c
+>> @@ -54,6 +54,14 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
+>>      return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
+>>  }
+>>  
+>> +static void stream_abort(Job *job)
+>> +{
+>> +    StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+>> +    BlockJob *bjob = &s->common;
+>> +
+>> +    bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->base);
+>> +}
+>
+> Like in commit, you can get a double unfreeze here if .abort is called
+> after .prepare returned an error.
 
-Yes, let's keep it consistent. Or if you feel like crafting patches,
-rename the others ;)
+You're right, I'll fix it
 
->=20
->>
->> Regardless the name used:
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> Thanks!
->=20
->>
->>> =20
->>>  # target/s390x/cpu.c
->>>  cpu_set_state(int cpu_index, uint8_t state) "setting cpu %d state to=
- %" PRIu8
->>>  =20
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+Berto
