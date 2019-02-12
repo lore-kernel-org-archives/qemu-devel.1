@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51574)
+Received: from eggs.gnu.org ([209.51.188.92]:51639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYhy-00028Q-Vz
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:53 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtYiE-0002N4-PT
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYhx-0006z5-25
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:46 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 22:03:30 +0800
-Message-Id: <20190212140330.1467-7-stefanha@redhat.com>
-In-Reply-To: <20190212140330.1467-1-stefanha@redhat.com>
-References: <20190212140330.1467-1-stefanha@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gtYi4-00076h-OF
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:07:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtYi4-00073d-IB
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:06:52 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 12 Feb 2019 15:06:20 +0100
+Message-Id: <20190212140621.17009-3-philmd@redhat.com>
+In-Reply-To: <20190212140621.17009-1-philmd@redhat.com>
+References: <20190212140621.17009-1-philmd@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PULL 6/6] tests/virtio-blk: add test for
- WRITE_ZEROES command
+Subject: [Qemu-devel] [PATCH 2/3] contrib/vhost-user-blk: fix the
+ compilation issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,99 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-block@nongnu.org, sgarzare@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Changpeng Liu <changpeng.liu@intel.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Changpeng Liu <changpeng.liu@intel.com>
 
-If the WRITE_ZEROES feature is enabled, we check this command
-in the test_basic().
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Acked-by: Pankaj Gupta <pagupta@redhat.com>
-Message-id: 20190208134950.187665-7-sgarzare@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <1547615970-23545-2-git-send-email-changpeng.liu@intel.com>
+[PMD: this patch was first (incorrectly) introduced as a56de056c91f8]
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/virtio-blk-test.c | 60 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ contrib/vhost-user-blk/vhost-user-blk.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 0739498da7..35bd92dbfc 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -244,6 +244,66 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
-ocator *alloc,
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
+-blk/vhost-user-blk.c
+index 5c2092e13a..43583f2659 100644
+--- a/contrib/vhost-user-blk/vhost-user-blk.c
++++ b/contrib/vhost-user-blk/vhost-user-blk.c
+@@ -20,6 +20,10 @@
+ #include "contrib/libvhost-user/libvhost-user-glib.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
 =20
-     guest_free(alloc, req_addr);
++#if defined(__linux__)
++#include <linux/fs.h>
++#include <sys/ioctl.h>
++#endif
 =20
-+    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        void *expected;
-+
-+        /*
-+         * WRITE_ZEROES request on the same sector of previous test wher=
-e
-+         * we wrote "TEST".
-+         */
-+        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
-+        req.data =3D (char *) &dwz_hdr;
-+        dwz_hdr.sector =3D 0;
-+        dwz_hdr.num_sectors =3D 1;
-+        dwz_hdr.flags =3D 0;
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
-));
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
-+        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
-se);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        guest_free(alloc, req_addr);
-+
-+        /* Read request to check if the sector contains all zeroes */
-+        req.type =3D VIRTIO_BLK_T_IN;
-+        req.ioprio =3D 1;
-+        req.sector =3D 0;
-+        req.data =3D g_malloc0(512);
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
-+        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 528);
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        data =3D g_malloc(512);
-+        expected =3D g_malloc0(512);
-+        memread(req_addr + 16, data, 512);
-+        g_assert_cmpmem(data, 512, expected, 512);
-+        g_free(expected);
-+        g_free(data);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
-         /* Write and read with 2 descriptor layout */
-         /* Write request */
+ struct virtio_blk_inhdr {
+     unsigned char status;
+@@ -521,7 +525,7 @@ vub_get_blocksize(int fd)
+=20
+ #if defined(__linux__) && defined(BLKSSZGET)
+     if (ioctl(fd, BLKSSZGET, &blocksize) =3D=3D 0) {
+-        return blocklen;
++        return blocksize;
+     }
+ #endif
+=20
 --=20
 2.20.1
