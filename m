@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34352)
+Received: from eggs.gnu.org ([209.51.188.92]:42801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtX0s-0002qC-Td
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:18:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtXHF-0005FD-7E
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:35:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtX0q-00018W-Vm
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:18:10 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40437)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtX0l-0000vx-86
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:18:05 -0500
-Received: by mail-wm1-f66.google.com with SMTP id q21so2774086wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 04:18:02 -0800 (PST)
-References: <20190204231815.29661-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e3dc8b86-6f4e-97e9-3ae2-81d996850fbe@redhat.com>
-Date: Tue, 12 Feb 2019 13:17:59 +0100
+	(envelope-from <thuth@redhat.com>) id 1gtXEU-0006K6-8b
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 07:32:15 -0500
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-7-git-send-email-jjherne@linux.ibm.com>
+	<20190204114801.2699c9a0.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <62dd4d03-a37f-b90b-29dd-7c2dd295cb3d@redhat.com>
+Date: Tue, 12 Feb 2019 13:32:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190204231815.29661-1-philmd@redhat.com>
+In-Reply-To: <20190204114801.2699c9a0.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] hw: Remove "hw/devices.h"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 06/15] s390-bios: Clean up
+ cio.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Jan Kiszka <jan.kiszka@web.de>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Michael Walle <michael@walle.cc>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Beniamino Galvani <b.galvani@gmail.com>, BALATON Zoltan <balaton@eik.bme.hu>, Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Joel Stanley <joel@jms.id.au>, Andrzej Zaborowski <balrogg@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>, Rob Herring <robh@kernel.org>
+To: Cornelia Huck <cohuck@redhat.com>, "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, alifm@linux.ibm.com, qemu-devel@nongnu.org
 
-On 2/5/19 12:18 AM, Philippe Mathieu-Daudé wrote:
-> Hi,
+On 2019-02-04 11:48, Cornelia Huck wrote:
+> On Tue, 29 Jan 2019 08:29:13 -0500
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 > 
-> As his first comment describes itself, the "hw/devices.h" contains
-> declarations for "Devices that have nowhere better to go."
-> This series remove it, creating new headers for devices covered there.
-> MAINTAINERS is updated.
-> I also included 2 cleanups while working on this, in "qemu/typedefs.h"
-> and "hw/net/ne2000-isa.h" header guard.
+>> Add proper typedefs to all structs and modify all bit fields to use consistent
+>> formatting.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  pc-bios/s390-ccw/cio.h      | 86 ++++++++++++++++++++++-----------------------
+>>  pc-bios/s390-ccw/s390-ccw.h |  8 -----
+>>  2 files changed, 43 insertions(+), 51 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+>> index 1a0795f..a48eee5 100644
+>> --- a/pc-bios/s390-ccw/cio.h
+>> +++ b/pc-bios/s390-ccw/cio.h
+>> @@ -53,12 +53,12 @@ struct schib_config {
+>>      __u64 mba;
+>>      __u32 intparm;
+>>      __u16 mbi;
+>> -    __u32 isc:3;
+>> -    __u32 ena:1;
+>> -    __u32 mme:2;
+>> -    __u32 mp:1;
+>> -    __u32 csense:1;
+>> -    __u32 mbfc:1;
+>> +    __u32 isc    : 3;
+>> +    __u32 ena    : 1;
+>> +    __u32 mme    : 2;
+>> +    __u32 mp     : 1;
+>> +    __u32 csense : 1;
+>> +    __u32 mbfc   : 1;
+>>  } __attribute__ ((packed));
 > 
-> v2:
-> - added R-b, T-b tags
-> - addressed many review comments from Thomas
-> 
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00611.html
+> This seems to make checkpatch unhappy... maybe consolidate to the other
+> formatting instead?
 
-ping?
+Yeah, you get lots of these errors this way:
 
-Since it is mostly touch (old) ARM boards, Peter can you do a quick
-review and give your Ack-by, so it can go via the Trivial/Misc tree?
-Half of the series is already reviewed by Thomas.
+ERROR: spaces prohibited around that ':' (ctx:WxW)
+#141: FILE: pc-bios/s390-ccw/cio.h:56:
++    __u32 isc    : 3;
+                  ^
 
-Thanks,
+ERROR: spaces prohibited around that ':' (ctx:WxW)
+#142: FILE: pc-bios/s390-ccw/cio.h:57:
++    __u32 ena    : 1;
+                  ^
 
-Phil.
+ERROR: spaces prohibited around that ':' (ctx:WxW)
+#143: FILE: pc-bios/s390-ccw/cio.h:58:
++    __u32 mme    : 2;
+                  ^
+...
+
+Not sure whether it's a checkpatch warning or really our official coding
+style, but anyway, I'd rather prefer to keep checkpatch calm here and
+thus no spaces around the ':' please.
+
+ Thomas
