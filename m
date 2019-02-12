@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56114)
+Received: from eggs.gnu.org ([209.51.188.92]:36880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtTAj-00089k-9L
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:12:06 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gtTUu-0003gj-IT
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:32:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtT6q-0003hk-8y
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:08:05 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:42434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gtT6p-0003d4-Uy
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:08:04 -0500
-Message-ID: <11bd769693e64619e3b1386797255b5a8e56bfd4.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Tue, 12 Feb 2019 09:07:43 +0100
-In-Reply-To: <20190211160910.2be92b59@w520.home>
-References: <cover.d651a232d750c6f53cbe8d483b665d638f7a0c0a.1549779509.git-series.knut.omang@oracle.com>
-	<636bd37834daa1cc4c42462aeccd0de17aa370bf.1549779509.git-series.knut.omang@oracle.com>
-	<20190211160910.2be92b59@w520.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <laurent@vivier.eu>) id 1gtTTx-0003jB-Qu
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:31:58 -0500
+References: <20190212074840.13542-1-richard.henderson@linaro.org>
+	<20190212074840.13542-2-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <dc08d748-eb29-ccb1-ae1b-62b7ad0d6ffd@vivier.eu>
+Date: Tue, 12 Feb 2019 09:31:20 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190212074840.13542-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] linux-user: Add ELF_PLATFORM for arm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,175 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
 
-On Mon, 2019-02-11 at 16:09 -0700, Alex Williamson wrote:
-> On Sun, 10 Feb 2019 07:52:59 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
+On 12/02/2019 08:48, Richard Henderson wrote:
+> The 32-bit kernel has strings for v4, v5, v6, v7, v7m.
+> The 64-bit kernel, in compat mode, has strings for v8.
 > 
-> > Add a helper function to add PCIe capability for Access Control Services
-> > (ACS)
-> > ACS support in the associated root port is a prerequisite to be able to do
-> > passthrough of individual functions of a device with VFIO
-> > without Alex Williamson's pcie_acs_override kernel patch or similar
-> > in the guest.
+> Fixes: https://bugs.launchpad.net/bugs/1813034
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v2: Include v8.
+> ---
+>  linux-user/elfload.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
 > 
-> This is still incorrect, the ACS override patch is only required for
-> separating multifunction endpoints or multifunction root ports.  Single
-> function endpoints are assignable without ACS simply by placing them
-> downstream of a single function root port or directly on the root
-> complex.
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 775a36ccdd..d796d51ec6 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -500,6 +500,37 @@ static uint32_t get_elf_hwcap2(void)
+>  #undef GET_FEATURE
+>  #undef GET_FEATURE_ID
+>  
+> +#define ELF_PLATFORM get_elf_platform()
+> +
+> +static const char *get_elf_platform(void)
+> +{
+> +    CPUARMState *env = thread_cpu->env_ptr;
+> +
+> +#ifdef TARGET_WORDS_BIGENDIAN
+> +# define END  "b"
+> +#else
+> +# define END  "l"
+> +#endif
+> +
+> +    if (arm_feature(env, ARM_FEATURE_V8)) {
+> +        return "v8" END;
+> +    } else if (arm_feature(env, ARM_FEATURE_V7)) {
+> +        if (arm_feature(env, ARM_FEATURE_M)) {
+> +            return "v7m" END;
+> +        } else {
+> +            return "v7" END;
+> +        }
+> +    } else if (arm_feature(env, ARM_FEATURE_V6)) {
+> +        return "v6" END;
+> +    } else if (arm_feature(env, ARM_FEATURE_V5)) {
+> +        return "v5" END;
+> +    } else {
+> +        return "v4" END;
+> +    }
 
-Hmm - that was the intended meaning of the comment, but I'll see if I can make
-it more clear by saying it explicitly.
+I know nothing about ARM, but in kernel we have also a "v5t"
+(cpu_elf_name) and in QEMU we have a ARM_FEATURE_V4T which is set with
+ARM_FEATURE_V5. Is it related?
 
-> > Endpoints may also implement an ACS capability, but with
-> > limited features.
-> > 
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > ---
-> >  hw/pci/pcie.c              | 29 +++++++++++++++++++++++++++++
-> >  include/hw/pci/pcie.h      |  6 ++++++
-> >  include/hw/pci/pcie_regs.h |  4 ++++
-> >  3 files changed, 39 insertions(+)
-> > 
-> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > index 230478f..509632f 100644
-> > --- a/hw/pci/pcie.c
-> > +++ b/hw/pci/pcie.c
-> > @@ -742,6 +742,14 @@ bool pcie_cap_is_arifwd_enabled(const PCIDevice *dev)
-> >          PCI_EXP_DEVCTL2_ARI;
-> >  }
-> >  
-> > +/* Access Control Services (ACS) */
-> > +void pcie_cap_acs_reset(PCIDevice *dev)
-> > +{
-> > +    if (dev->exp.acs_cap) {
-> > +        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
-> > +    }
-> > +}
-> > +
-> >  /**************************************************************************
-> >   * pci express extended capability list management functions
-> >   * uint16_t ext_cap_id (16 bit)
-> > @@ -906,3 +914,24 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
-> >  
-> >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
-> >  }
-> > +
-> > +/* ACS (Access Control Services) */
-> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
-> > +{
-> > +    bool is_pcie_slot = !!object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT);
-> > +    uint16_t cap_bits = 0;
-> > +
-> > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
-> > +                        PCI_ACS_SIZEOF);
-> > +    dev->exp.acs_cap = offset;
-> > +
-> > +    if (is_pcie_slot) {
-> > +        /* Endpoints may also implement ACS, but these capabilities are */
-> > +        /* only valid for slots: */
-> 
-> Not quite, SV, TB, and UF must not be implemented by endpoints, but RR
-> and CR must be implemented by multifunction endpoints that support p2p
-> if they provide an ACS capability.  
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-Hmm - are you ok with setting 0 here as I have done, just amending your 
-description to the comment? Then any future emulation that do support p2p 
-would have to set the needed bits after calling the init function.
-
-After your previous comments on this, I had a look at Mellanox CX4 and CX5 which
-are the only devices I could find in the lab that are endpoints and implement an
-ACS capability, and neither seems to implement any extra capabilities:
-
-        Capabilities: [230 v1] Access Control Services
-                ACSCap: SrcValid- TransBlk- ReqRedir- CmpltRedir- UpstreamFwd- EgressCtrl- DirectTrans-
-                ACSCtl: SrcValid- TransBlk- ReqRedir- CmpltRedir- UpstreamFwd- EgressCtrl- DirectTrans-
-
-that was the reason for my choice of value here - after skimming through the
-spec (with my still very limited understanding of the details)
-
-> Linux therefore infers that if ACS
-> is supported by an endpoint and RR and CR are not implemented, the
-> device does not support p2p.  
-
-Interesting - I thought the CX5 supported p2p, but I have not kept up with what
-happens on the RDMA list on that front.
-
-> We could just say that nothing supports
-> p2p yet, but single function endpoints (except those implementing
-> SR-IOV) must not implement an ACS capability per the spec, which could
-> be difficult to exclude since the multifunction bit is handled
-> separately from the device model.
-
-Hmm - the older SR/IOV devices I know of, some Intel Ethernet devices and any of
-the older Mellanox devices, and our own cancelled Infiniband device, all seem
-not to implement ACS?
-
-> Also comment style:
-> https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE;#l127
-
-I see - will fix,
-
-> > +        cap_bits =
-> > +            PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF;
-> > +    }
-> > +
-> > +    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
-> > +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
-> > +}
-> > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > index 5b82a0d..4c40711 100644
-> > --- a/include/hw/pci/pcie.h
-> > +++ b/include/hw/pci/pcie.h
-> > @@ -79,6 +79,9 @@ struct PCIExpressDevice {
-> >  
-> >      /* Offset of ATS capability in config space */
-> >      uint16_t ats_cap;
-> > +
-> > +    /* ACS */
-> > +    uint16_t acs_cap;
-> >  };
-> >  
-> >  #define COMPAT_PROP_PCP "power_controller_present"
-> > @@ -116,6 +119,8 @@ void pcie_cap_flr_init(PCIDevice *dev);
-> >  void pcie_cap_flr_write_config(PCIDevice *dev,
-> >                             uint32_t addr, uint32_t val, int len);
-> >  
-> > +void pcie_cap_acs_reset(PCIDevice *dev);
-> > +
-> >  /* ARI forwarding capability and control */
-> >  void pcie_cap_arifwd_init(PCIDevice *dev);
-> >  void pcie_cap_arifwd_reset(PCIDevice *dev);
-> > @@ -129,6 +134,7 @@ void pcie_add_capability(PCIDevice *dev,
-> >  void pcie_sync_bridge_lnk(PCIDevice *dev);
-> >  
-> >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
-> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset);
-> 
-> nit, why aren't the reset and init declarations together?
-
-Good point, will fix.
-
-Thanks!
-Knut
-
-> >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t
-> > ser_num);
-> >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
-> >  
-> > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-> > index ad4e780..1db86b0 100644
-> > --- a/include/hw/pci/pcie_regs.h
-> > +++ b/include/hw/pci/pcie_regs.h
-> > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
-> >                                           PCI_ERR_COR_INTERNAL |         \
-> >                                           PCI_ERR_COR_HL_OVERFLOW)
-> >  
-> > +/* ACS */
-> > +#define PCI_ACS_VER                     0x1
-> > +#define PCI_ACS_SIZEOF                  8
-> > +
-> >  #endif /* QEMU_PCIE_REGS_H */
+Thanks,
+Laurent
