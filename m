@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34440)
+Received: from eggs.gnu.org ([209.51.188.92]:35575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtcbn-00025J-Bo
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:16:41 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gtcc7-0003I9-Jw
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:17:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtcNa-00029K-NF
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:01:59 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtcNa-0001oR-FA
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:01:58 -0500
-Received: by mail-pl1-x644.google.com with SMTP id r14so1641963pls.12
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:01:39 -0800 (PST)
-References: <20190212110308.13707-1-david@redhat.com>
-	<20190212110308.13707-3-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4cc9037e-de4d-b2fc-0329-3b97d2b289b9@linaro.org>
-Date: Tue, 12 Feb 2019 10:01:33 -0800
+	(envelope-from <jsnow@redhat.com>) id 1gtcc3-0001GY-DG
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:16:57 -0500
+References: <20190212010248.11056-1-jsnow@redhat.com>
+	<04ac803b-1faa-f184-2fd8-10a202bd6042@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <721b8aef-fbf6-0a30-7034-abcdc7036721@redhat.com>
+Date: Tue, 12 Feb 2019 13:15:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190212110308.13707-3-david@redhat.com>
+In-Reply-To: <04ac803b-1faa-f184-2fd8-10a202bd6042@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 01/15] s390x/tcg: Fix TEST DATA CLASS
- instructions
+Subject: Re: [Qemu-devel] [PATCH 0/5] dirty-bitmaps: deprecate @status field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
-
-On 2/12/19 3:02 AM, David Hildenbrand wrote:
-> +static bool s390_tdc32(CPUS390XState *env, float32 f1, uint16_t dc_mask)
-> +{
-> +        const bool neg = float32_is_neg(f1);
-> +        const bool zero = float32_is_zero(f1);
-> +        const bool normal = float32_is_normal(f1);
-> +        const bool denormal = float32_is_denormal(f1);
-> +        const bool infinity = float32_is_infinity(f1);
-> +        const bool quiet_nan = float32_is_quiet_nan(f1, &env->fpu_status);
-> +        const bool sig_nan = float32_is_signaling_nan(f1, &env->fpu_status);
-> +
-> +        return (zero && test_dc_mask(dc_mask, 0, neg)) ||
-> +               (normal && test_dc_mask(dc_mask, 2, neg)) ||
-> +               (denormal && test_dc_mask(dc_mask, 4, neg)) ||
-> +               (infinity && test_dc_mask(dc_mask, 6, neg)) ||
-> +               (quiet_nan && test_dc_mask(dc_mask, 8, neg)) ||
-> +               (sig_nan && test_dc_mask(dc_mask, 10, neg));
-> +}
-> +
-
-This is doing more work than necessary, since any one fp value can only be one
-of these.
-
-I think it would be better to structure this like the riscv helper_fclass_*:
-
-static inline uint32_t dcmask(int bit, bool neg)
-{
-    return 1 << (11 - bit - neg);
-}
-
-static uint32_t float32_dcmask(CPUS390XState *env, float32 f1)
-{
-    bool neg = float32_is_neg(f1);
-
-    /* Sorted by most common cases.  */
-    if (float32_is_normal(f1)) {
-        return dc_mask(2, neg);
-    } else if (float32_is_zero(f1)) {
-        return dc_mask(0, neg);
-    } else if (float32_is_zero_or_denormal(f1)) {
-        /* denormal, since zero is eliminated */
-        return dc_mask(4, neg);
-    } else if (float32_is_infinity(f1)) {
-        return dc_mask(6, neg);
-    } else if (float64_is_quiet_nan(f1, &env->fpu_status)) {
-        return dc_mask(8, neg);
-    } else {
-        /* signaling nan, as last remaining case */
-        return dc_mask(10, neg);
-    }
-}
-
-uint32_t HELPER(tceb)(CPUS390XState *env, uint64_t f1, uint64_t m2)
-{
-    return (m2 & float32_dcmask(env, f1)) != 0;
-}
-
-You may or may not wish to macro-ise float32_dcmask for the float type.
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
-r~
+
+On 2/12/19 1:12 PM, Eric Blake wrote:
+> On 2/11/19 7:02 PM, John Snow wrote:
+>> The current internal meanings of "locked", "user_locked",
+>> "qmp_locked", "frozen", "enabled", and "disabled" are all
+>> a little muddled.
+>>
+>> Deprecate the @status field in favor of two new booleans
+>> that carry very specific meanings. Then, rename and rework
+>> some of the internal semantics to help make the API a bit
+>> more clear and easier to read.
+> 
+> So far, my libvirt patches are not relying on the contents of the status
+> field, so deprecating things should not hurt libvirt. Using the full
+> 2-cycle process is still probably wise for other users, though, even if
+> it means for some awkward back-compat computation of status for a while
+> longer.
+> 
+
+I didn't fully remove it, either. I will leave it there for the normal
+deprecation period -- it doesn't hurt to keep it around.
+
+>>
+>> Well, in my opinion.
+>>
+>> Based on my current bitmaps branch (includes Eric's patch
+>> and my documentation update patch.)
+>>
+>> John Snow (5):
+>>   block/dirty-bitmap: add recording and busy properties
+>>   block/dirty-bitmaps: rename frozen predicate helper
+>>   block/dirty-bitmap: change semantics of enabled predicate
+>>   block/dirty-bitmap: explicitly lock bitmaps with successors
+>>   block/dirty-bitmaps: unify qmp_locked and user_locked calls
+>>
+>>  block/dirty-bitmap.c           | 74 +++++++++++++++++++---------------
+>>  blockdev.c                     | 18 ++++-----
+>>  include/block/dirty-bitmap.h   |  7 ++--
+>>  migration/block-dirty-bitmap.c |  8 ++--
+>>  nbd/server.c                   |  6 +--
+>>  qapi/block-core.json           |  9 ++++-
+>>  tests/qemu-iotests/236.out     | 28 +++++++++++++
+>>  7 files changed, 96 insertions(+), 54 deletions(-)
+> 
+> No change to qemu-deprecated.texi to start the clock ticking, so we can
+> remove the old field?
+> 
+
+I was counting on having to send a v2, I just didn't add the RFC tag
+because I wanted to trick people into reviewing it.
+
+If this passes the sniff test for you, I will document it in the .texi.
+
+--js
