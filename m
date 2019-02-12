@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54315)
+Received: from eggs.gnu.org ([209.51.188.92]:54658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVre-0006VD-Ri
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:04:37 -0500
+	(envelope-from <david@redhat.com>) id 1gtVs8-0006xP-66
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVrL-0003fn-Ek
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:04:27 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 12 Feb 2019 12:03:07 +0100
-Message-Id: <20190212110308.13707-16-david@redhat.com>
-In-Reply-To: <20190212110308.13707-1-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gtVs6-0004d3-GO
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:03 -0500
 References: <20190212110308.13707-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 14/15] s390x/tcg: Handle all rounding modes
- overwritten by BFP instructions
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <ff61e018-af71-a275-7332-0ac4c01ddc75@redhat.com>
+Date: Tue, 12 Feb 2019 12:04:35 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190212110308.13707-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x: Add floating-point extension
+ facility to "qemu" cpu model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,74 +25,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-PoP describes "Round to nearest with ties away from 0" as
-  "The candidate nearest to the input value is selected. In case of a tie,
-   the candidate selected is the one that is larger in magnitude."
+On 12.02.19 12:02, David Hildenbrand wrote:
+> The floating-point extension facility implemented certain changes to
+> BFP, HFP and DFP instructions.
+> 
+> As we don't implement HFP/DFP, we can ignore those completely. Related
+> to BFP, the changes include
+> - SET BFP ROUNDING MODE (SRNMB) instruction
+> - BFP-rounding-mode field in the FPC register is changed to 3 bits
+> - CONVERT FROM LOGICAL instructions
+> - CONVERT TO LOGICAL instructions
+> - Changes (rounding mode + XxC) added to
+> -- CONVERT TO FIXED
+> -- CONVERT FROM FIXED
+> -- LOAD FP INTEGER
+> -- LOAD ROUNDED
+> -- DIVIDE TO INTEGER
+> 
+> For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
+> implement, so skip that. Also, as we don't implement PFPO, we can skip
+> changes to that as well. The other parts are now implemented, we can
+> indicate the facility.
+> 
+> z14 PoP mentiones that "The floating-point extension facility is installed
+> in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
+> also one.", meaning that the DFP (decimal-floating-point) facility also
+> has to be inidicated. We can ignore that for now.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-While float_round_ties_away is according to the introducing commit
-f9288a76f181 ("softfloat: Add support for ties-away rounding")
-  "roundTiesToAway: the floating-point number nearest to the infinitely
-   precise result shall be delivered; if the two nearest floating-point
-   numbers bracketing an unrepresentable infinitely precise result are
-   equally near, the one with larger magnitude shall be delivered."
+This is the same patch as 15/15, refer to 0/15 as cover letter instead.
 
-So this could be it if we're lucky ;)
-
-Handle "round to prepare for shorter precision" just as when setting it
-via SET FLOATING POINT and friends.
-
-As all instructions properly check for valid rounding modes in translate.c
-we can add an assert. Fix one missing empty line.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/fpu_helper.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 8ef3d2f0e4..748edcc0f0 100644
---- a/target/s390x/fpu_helper.c
-+++ b/target/s390x/fpu_helper.c
-@@ -385,14 +385,26 @@ uint32_t HELPER(cxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3)
- {
-     int ret = env->fpu_status.float_rounding_mode;
-+
-     switch (m3) {
-     case 0:
-         /* current mode */
-         break;
-     case 1:
--        /* biased round no nearest */
-+        /* round to nearest with ties away from 0 */
-+        set_float_rounding_mode(float_round_ties_away, &env->fpu_status);
-+        break;
-+    case 3:
-+        /*
-+         * round to prepare for shorter precision
-+         *
-+         * FIXME: we actually want something like round_to_odd, but that
-+         * does not support all data types yet.
-+         */
-+        set_float_rounding_mode(float_round_to_zero, &env->fpu_status);
-+        break;
-     case 4:
--        /* round to nearest */
-+        /* round to nearest with ties to even */
-         set_float_rounding_mode(float_round_nearest_even, &env->fpu_status);
-         break;
-     case 5:
-@@ -407,6 +419,8 @@ int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3)
-         /* round to -inf */
-         set_float_rounding_mode(float_round_down, &env->fpu_status);
-         break;
-+    default:
-+        g_assert_not_reached();
-     }
-     return ret;
- }
 -- 
-2.17.2
+
+Thanks,
+
+David / dhildenb
