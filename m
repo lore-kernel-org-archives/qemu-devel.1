@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39722)
+Received: from eggs.gnu.org ([209.51.188.92]:40953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtcm6-0003Oe-3y
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:27:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gtcpf-0006jl-Bh
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:31:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtcm4-0006PQ-Ot
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:27:17 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gtcm4-0006OV-94
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:27:16 -0500
-Received: by mail-ot1-x341.google.com with SMTP id s5so6099242oth.7
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:27:15 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1gtcpe-0005wD-Au
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:30:59 -0500
+References: <20190212010248.11056-1-jsnow@redhat.com>
+	<20190212010248.11056-3-jsnow@redhat.com>
+	<987e83f6-2a6f-9547-a6d2-afe7a323181d@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <bb72e892-fcaf-f1b9-1c07-12a740478de3@redhat.com>
+Date: Tue, 12 Feb 2019 13:30:44 -0500
 MIME-Version: 1.0
-References: <20190212181917.8322-1-peter.maydell@linaro.org>
-	<fdf9bc20-2694-107e-4e27-d5db7616a367@redhat.com>
-In-Reply-To: <fdf9bc20-2694-107e-4e27-d5db7616a367@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Feb 2019 18:27:03 +0000
-Message-ID: <CAFEAcA85ErU5oKR2_2nOgf82ZSqJBogXY-krtJ8z=Yb0f83b5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/intc/armv7m_nvic: Allow byte accesses
- to SHPR1
+In-Reply-To: <987e83f6-2a6f-9547-a6d2-afe7a323181d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] block/dirty-bitmaps: rename frozen
+ predicate helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Julia Suvorova <jusual@mail.ru>, "patches@linaro.org" <patches@linaro.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, 12 Feb 2019 at 18:25, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Hi Peter,
->
-> On 2/12/19 7:19 PM, Peter Maydell wrote:
-> > The code for handling the NVIC SHPR1 register intends to permit
-> > byte and halfword accesses (as the architecture requires). However
-> > the 'case' line for it only lists the base address of the
-> > register, so attempts to access bytes other than the first one
-> > end up in the "bad write" default logic. This bug was added
-> > accidentally when we split out the SHPR1 logic from SHPR2 and
-> > SHPR3 to support v6M.
-> >
-> > Fixes: 7c9140afd594 ("nvic: Handle ARMv6-M SCS reserved registers")
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> > The Zephyr RTOS happens to access SHPR1 byte at a time,
-> > which is how I spotted this.
-> > ---
-> >  hw/intc/armv7m_nvic.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> > index 790a3d95849..2fd40f9dc4c 100644
-> > --- a/hw/intc/armv7m_nvic.c
-> > +++ b/hw/intc/armv7m_nvic.c
-> > @@ -1956,7 +1956,7 @@ static MemTxResult nvic_sysreg_write(void *opaque=
-, hwaddr addr,
-> >          }
-> >          nvic_irq_update(s);
-> >          return MEMTX_OK;
-> > -    case 0xd18: /* System Handler Priority (SHPR1) */
-> > +    case 0xd18 ... 0xd1b: /* System Handler Priority (SHPR1) */
->
-> Can you fix the nvic_sysreg_read() case too?
->
-> With that:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Thanks for the catch -- careless of me not to check the read code too.
 
--- PMM
+On 2/12/19 1:26 PM, Eric Blake wrote:
+> On 2/11/19 7:02 PM, John Snow wrote:
+>> "Frozen" was a good description a long time ago, but it isn't adequate now.
+>> Rename the frozen predicate to has_successor to make the semantics of the
+>> predicate more clear to outside callers.
+>>
+>> In the process, remove some calls to frozen() that no longer semantically
+>> make sense. For enabled and disabled in particular, it's actually okay for
+>> the internals to do this but only forbidden for users to invoke them, and
+>> all of the QMP entry uses already check against qmp_locked.
+>>
+>> Several other assertions really want to check that the bitmap isn't in-use
+>> by another operation -- use the qmp_locked function for this instead, which
+>> presently also checks for has_successor.
+>> ---
+> 
+> Missing S-o-b on entire series, so you have to send v2 anyway :)
+> 
+>> @@ -244,12 +244,16 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+>>      uint64_t granularity;
+>>      BdrvDirtyBitmap *child;
+>>  
+>> -    if (bdrv_dirty_bitmap_frozen(bitmap)) {
+>> -        error_setg(errp, "Cannot create a successor for a bitmap that is "
+>> -                   "currently frozen");
+>> +    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
+>> +        error_setg(errp, "Cannot create a successor for a bitmap that already "
+>> +                   "has one");
+>> +        return -1;
+>> +    }
+>> +    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
+>> +        error_setg(errp, "Cannot create a successor for a bitmap that is in-use "
+>> +                   "by an operation.");
+>>          return -1;
+> 
+> No trailing dot in error_setg().
+> 
+
+D'oh. I need to re-enable checkpatch, obviously.
+
+> Should these two errors be swapped (check for locked before
+> has_successor)?  After all, having a successor is an internal detail,
+> whereas being in use by something I already triggered is fairly
+> straightforward to understand.
+> 
+
+Good point. Will do.
+
+> 
+>> @@ -325,7 +328,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+>>  /**
+>>   * In cases of failure where we can no longer safely delete the parent,
+>>   * we may wish to re-join the parent and child/successor.
+>> - * The merged parent will be un-frozen, but not explicitly re-enabled.
+>> + * The merged parent will not be user_locked, but not explicitly re-enabled.
+> 
+> s/but not/nor/
+> 
+
+I was trying to draw a contrast between "We will forcibly set locked =
+false, but make no guaranteed about enable/disable."
+
+I guess nor still works in that case.
