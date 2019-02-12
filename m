@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35590)
+Received: from eggs.gnu.org ([209.51.188.92]:35419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gte57-00041n-8P
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:51:02 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1gte57-00040O-Jh
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gte38-0008Dj-QO
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:49:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39597)
+	(envelope-from <ccarrara@redhat.com>) id 1gte27-00071F-Uw
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:47:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gte38-0007wT-HW
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:48:58 -0500
+	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gte27-0006u0-Mt
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:47:55 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DAF5E59445
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 19:39:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80309E6A67
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 19:39:03 +0000 (UTC)
 From: Caio Carrara <ccarrara@redhat.com>
-Date: Tue, 12 Feb 2019 17:38:55 -0200
-Message-Id: <20190212193855.13223-3-ccarrara@redhat.com>
+Date: Tue, 12 Feb 2019 17:38:54 -0200
+Message-Id: <20190212193855.13223-2-ccarrara@redhat.com>
 In-Reply-To: <20190212193855.13223-1-ccarrara@redhat.com>
 References: <20190212193855.13223-1-ccarrara@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/2] tests.acceptance: adds simple migration
- test
+Subject: [Qemu-devel] [PATCH v3 1/2] tests.acceptance: adds multi vm
+ capability for acceptance tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Caio Carrara <ccarrara@redhat.com>
 
-This change adds the simplest possible migration test. Beyond the test
-purpose itself it's also useful to exercise the multi virtual machines
-capabilities from base avocado qemu test class.
+This change adds the possibility to write acceptance tests with multi
+virtual machine support. It's done keeping the virtual machines objects
+stored in a test attribute (dictionary). This dictionary shouldn't be
+accessed directly but through the new method added `get_vm`. This new
+method accept a list of args (that will be added as virtual machine
+arguments) and an optional name argument. The name is the key that
+identify a single virtual machine along the test machines available. If
+a name without a machine is informed a new machine will be instantiated.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+The current usage of vm in tests will not be broken by this change since
+it keeps a property called vm in the base test class. This property only
+calls the new method `get_vm` with default parameters (no args and
+'default' as machine name).
+
 Signed-off-by: Caio Carrara <ccarrara@redhat.com>
 ---
- tests/acceptance/migration.py | 53 +++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
- create mode 100644 tests/acceptance/migration.py
+ docs/devel/testing.rst                    | 41 ++++++++++++++++++++++-
+ tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
+ 2 files changed, 61 insertions(+), 5 deletions(-)
 
-diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
-y
-new file mode 100644
-index 0000000000..6115cf6c24
---- /dev/null
-+++ b/tests/acceptance/migration.py
-@@ -0,0 +1,53 @@
-+# Migration test
-+#
-+# Copyright (c) 2019 Red Hat, Inc.
-+#
-+# Authors:
-+#  Cleber Rosa <crosa@redhat.com>
-+#  Caio Carrara <ccarrara@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 135743a2bf..9f86569b30 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -634,7 +634,46 @@ instance, available at ``self.vm``.  Because many te=
+sts will tweak the
+ QEMU command line, launching the QEMUMachine (by using ``self.vm.launch(=
+)``)
+ is left to the test writer.
+=20
+-At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
++The base test class has also support for tests with more than one
++QEMUMachine. The way to get machines is through the ``self.get_vm()``
++method which will return a QEMUMachine instance. The ``self.get_vm()``
++method accepts arguments that will be passed to the QEMUMachine creation
++and also an optional `name` attribute so you can identify a specific
++machine and get it more than once through the tests methods. A simple
++and hypothetical example follows:
++
++.. code::
++
++  from avocado_qemu import Test
 +
 +
-+from avocado_qemu import Test
++  class MultipleMachines(Test):
++      """
++      :avocado: enable
++      """
++      def test_multiple_machines(self):
++          first_machine =3D self.get_vm()
++          second_machine =3D self.get_vm()
++          self.get_vm(name=3D'third_machine').launch()
 +
-+from avocado.utils import network
-+from avocado.utils import wait
++          first_machine.launch()
++          second_machine.launch()
 +
++          first_res =3D first_machine.command(
++              'human-monitor-command',
++              command_line=3D'info version')
 +
-+class Migration(Test):
-+    """
-+    :avocado: enable
-+    """
++          second_res =3D second_machine.command(
++              'human-monitor-command',
++              command_line=3D'info version')
 +
-+    timeout =3D 10
++          third_res =3D self.get_vm(name=3D'third_machine').command(
++              'human-monitor-command',
++              command_line=3D'info version')
 +
-+    @staticmethod
-+    def migration_finished(vm):
-+        return vm.command('query-migrate')['status'] in ('completed', 'f=
-ailed')
++          self.assertEquals(first_res, second_res, third_res)
 +
-+    def _get_free_port(self):
-+        port =3D network.find_free_port()
-+        if port is None:
-+            self.cancel('Failed to find a free port')
-+        return port
++At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
+ shutdown.
+=20
+ QEMUMachine
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+index 1e54fd5932..4c9e27feda 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -10,6 +10,7 @@
+=20
+ import os
+ import sys
++import uuid
+=20
+ import avocado
+=20
+@@ -42,13 +43,29 @@ def pick_default_qemu_bin():
+=20
+ class Test(avocado.Test):
+     def setUp(self):
+-        self.vm =3D None
++        self._vms =3D {}
+         self.qemu_bin =3D self.params.get('qemu_bin',
+                                         default=3Dpick_default_qemu_bin(=
+))
+         if self.qemu_bin is None:
+             self.cancel("No QEMU binary defined or found in the source t=
+ree")
+-        self.vm =3D QEMUMachine(self.qemu_bin)
 +
++    def _new_vm(self, *args):
++        vm =3D QEMUMachine(self.qemu_bin)
++        if args:
++            vm.add_args(*args)
++        return vm
 +
-+    def test_migration_with_tcp_localhost(self):
-+        source_vm =3D self.get_vm()
-+        dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
-+        dest_vm =3D self.get_vm('-incoming', dest_uri)
-+        dest_vm.launch()
-+        source_vm.launch()
-+        source_vm.qmp('migrate', uri=3Ddest_uri)
-+        wait.wait_for(
-+            self.migration_finished,
-+            timeout=3Dself.timeout,
-+            step=3D0.1,
-+            args=3D(source_vm,)
-+        )
-+        self.assertEqual(dest_vm.command('query-migrate')['status'], 'co=
-mpleted')
-+        self.assertEqual(source_vm.command('query-migrate')['status'], '=
-completed')
-+        self.assertEqual(dest_vm.command('query-status')['status'], 'run=
-ning')
-+        self.assertEqual(source_vm.command('query-status')['status'], 'p=
-ostmigrate')
++    @property
++    def vm(self):
++        return self.get_vm(name=3D'default')
++
++    def get_vm(self, *args, name=3DNone):
++        if not name:
++            name =3D str(uuid.uuid4())
++        if self._vms.get(name) is None:
++            self._vms[name] =3D self._new_vm(*args)
++        return self._vms[name]
+=20
+     def tearDown(self):
+-        if self.vm is not None:
+-            self.vm.shutdown()
++        for vm in self._vms.values():
++            vm.shutdown()
 --=20
 2.20.1
