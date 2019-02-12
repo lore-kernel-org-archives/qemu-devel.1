@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35908)
+Received: from eggs.gnu.org ([209.51.188.92]:37075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gthNI-00018J-QZ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:22:02 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gthRA-00036R-E8
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:26:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gthNH-0004cx-D8
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:22:00 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:43687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gthNH-0004bK-6s
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:21:59 -0500
-Received: by mail-pl1-x644.google.com with SMTP id f90so193852plb.10
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 15:21:58 -0800 (PST)
-Date: Tue, 12 Feb 2019 15:21:56 -0800 (PST)
-In-Reply-To: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-0fc7cd00-deda-4e41-abb3-c78657c4f0f1@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/35] target/riscv: Convert to
- decodetree
+	(envelope-from <alistair23@gmail.com>) id 1gthR8-0001IT-PN
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 18:26:00 -0500
+MIME-Version: 1.0
+References: <CAFyWVabfDYU+2+iDYOeFMBL4+hVFL5q=fSR7Pb=VX1af5xsTNg@mail.gmail.com>
+	<20190212230926.9273-1-jimw@sifive.com>
+In-Reply-To: <20190212230926.9273-1-jimw@sifive.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 12 Feb 2019 15:24:59 -0800
+Message-ID: <CAKmqyKNO4A6X6m73ibNyt4PM=kqEsSXdFMZYekRB506+QEqm9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] RISC-V: Add hooks to use the gdb
+ xml files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +23,445 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sagark@eecs.berkeley.edu, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
+To: Jim Wilson <jimw@sifive.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:RISC-V" <qemu-riscv@nongnu.org>
 
-On Wed, 23 Jan 2019 01:25:03 PST (-0800), Bastian Koppelmann wrote:
-> Hi,
+On Tue, Feb 12, 2019 at 3:10 PM Jim Wilson <jimw@sifive.com> wrote:
 >
-> this patchset converts the RISC-V decoder to decodetree in four major steps:
+> The gdb CSR xml file has registers in documentation order, not numerical
+> order, so we need a table to map the register numbers.  This also adds
+> fairly standard gdb hooks to access xml specified registers.
 >
-> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
->     Many of the gen_* functions are called by the decode functions for 16-bit
->     and 32-bit functions. If we move translation code from the gen_*
->     functions to the generated trans_* functions of decode-tree, we get a lot of
->     duplication. Therefore, we mostly generate calls to the old gen_* function
->     which are properly replaced after step 2).
->
->     Each of the trans_ functions are grouped into files corresponding to their
->     ISA extension, e.g. addi which is in RV32I is translated in the file
->     'trans_rvi.inc.c'.
->
-> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
->     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
->     we convert the arguments in the 16 bit trans_ function to the arguments of
->     the corresponding 32 bit instruction and call the 32 bit trans_ function.
->
-> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
->     this move all manual translation code into the trans_* instructions of
->     decode tree, such that we can remove the old decode_* functions.
->
-> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
->    by Richard. [Patch 31-35]
->
-> full tree available at
-> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v6
->
-> Cheers,
-> Bastian
->
-> v5 -> v6:
->     - fixed funky indentation
->
->
-> Bastian Koppelmann (35):
->   target/riscv: Move CPURISCVState pointer to DisasContext
->   target/riscv: Activate decodetree and implemnt LUI & AUIPC
->   target/riscv: Convert RVXI branch insns to decodetree
->   target/riscv: Convert RV32I load/store insns to decodetree
->   target/riscv: Convert RV64I load/store insns to decodetree
->   target/riscv: Convert RVXI arithmetic insns to decodetree
->   target/riscv: Convert RVXI fence insns to decodetree
->   target/riscv: Convert RVXI csr insns to decodetree
->   target/riscv: Convert RVXM insns to decodetree
->   target/riscv: Convert RV32A insns to decodetree
->   target/riscv: Convert RV64A insns to decodetree
->   target/riscv: Convert RV32F insns to decodetree
->   target/riscv: Convert RV64F insns to decodetree
->   target/riscv: Convert RV32D insns to decodetree
->   target/riscv: Convert RV64D insns to decodetree
->   target/riscv: Convert RV priv insns to decodetree
->   target/riscv: Convert quadrant 0 of RVXC insns to decodetree
->   target/riscv: Convert quadrant 1 of RVXC insns to decodetree
->   target/riscv: Convert quadrant 2 of RVXC insns to decodetree
->   target/riscv: Remove gen_jalr()
->   target/riscv: Remove manual decoding from gen_branch()
->   target/riscv: Remove manual decoding from gen_load()
->   target/riscv: Remove manual decoding from gen_store()
->   target/riscv: Move gen_arith_imm() decoding into trans_* functions
->   target/riscv: make ADD/SUB/OR/XOR/AND insn use arg lists
->   target/riscv: Remove shift and slt insn manual decoding
->   target/riscv: Remove manual decoding of RV32/64M insn
->   target/riscv: Rename trans_arith to gen_arith
->   target/riscv: Remove gen_system()
->   target/riscv: Remove decode_RV32_64G()
->   target/riscv: Convert @cs_2 insns to share translation functions
->   target/riscv: Convert @cl_d, @cl_w, @cs_d, @cs_w insns
->   target/riscv: Splice fsw_sd and flw_ld for riscv32 vs riscv64
->   target/riscv: Splice remaining compressed insn pairs for riscv32 vs
->     riscv64
->   target/riscv: Remaining rvc insn reuse 32 bit translators
->
->  target/riscv/Makefile.objs                    |   22 +
->  target/riscv/insn16-32.decode                 |   31 +
->  target/riscv/insn16-64.decode                 |   33 +
->  target/riscv/insn16.decode                    |  114 ++
->  target/riscv/insn32-64.decode                 |   72 +
->  target/riscv/insn32.decode                    |  203 ++
->  .../riscv/insn_trans/trans_privileged.inc.c   |  110 +
->  target/riscv/insn_trans/trans_rva.inc.c       |  207 ++
->  target/riscv/insn_trans/trans_rvc.inc.c       |  149 ++
->  target/riscv/insn_trans/trans_rvd.inc.c       |  388 ++++
->  target/riscv/insn_trans/trans_rvf.inc.c       |  388 ++++
->  target/riscv/insn_trans/trans_rvi.inc.c       |  568 ++++++
->  target/riscv/insn_trans/trans_rvm.inc.c       |  107 +
->  target/riscv/translate.c                      | 1781 ++---------------
->  14 files changed, 2611 insertions(+), 1562 deletions(-)
->  create mode 100644 target/riscv/insn16-32.decode
->  create mode 100644 target/riscv/insn16-64.decode
->  create mode 100644 target/riscv/insn16.decode
->  create mode 100644 target/riscv/insn32-64.decode
->  create mode 100644 target/riscv/insn32.decode
->  create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvd.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvi.inc.c
->  create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
+> Signed-off-by: Jim Wilson <jimw@sifive.com>
 
-Do you, by any chance, have a v7?  It looks like there's quite a few merge 
-conflicts here, and while I'm OK fixing them I don't want to do it if you 
-already have.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
+> ---
+>  target/riscv/cpu.c     |   9 +-
+>  target/riscv/cpu.h     |   2 +
+>  target/riscv/gdbstub.c | 348 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 347 insertions(+), 12 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 28d7e53..c23bd01 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -311,6 +311,8 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>
+> +    riscv_cpu_register_gdb_regs_for_features(cs);
+> +
+>      qemu_init_vcpu(cs);
+>      cpu_reset(cs);
+>
+> @@ -351,7 +353,12 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
+>      cc->synchronize_from_tb = riscv_cpu_synchronize_from_tb;
+>      cc->gdb_read_register = riscv_cpu_gdb_read_register;
+>      cc->gdb_write_register = riscv_cpu_gdb_write_register;
+> -    cc->gdb_num_core_regs = 65;
+> +    cc->gdb_num_core_regs = 33;
+> +#if defined(TARGET_RISCV32)
+> +    cc->gdb_core_xml_file = "riscv-32bit-cpu.xml";
+> +#elif defined(TARGET_RISCV64)
+> +    cc->gdb_core_xml_file = "riscv-64bit-cpu.xml";
+> +#endif
+>      cc->gdb_stop_before_watchpoint = true;
+>      cc->disas_set_info = riscv_cpu_disas_set_info;
+>  #ifdef CONFIG_USER_ONLY
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 04a050e..c10e86c 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -329,6 +329,8 @@ typedef struct {
+>  void riscv_get_csr_ops(int csrno, riscv_csr_operations *ops);
+>  void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
+>
+> +void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
+> +
+>  #include "exec/cpu-all.h"
+>
+>  #endif /* RISCV_CPU_H */
+> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+> index 3cabb21..621206d 100644
+> --- a/target/riscv/gdbstub.c
+> +++ b/target/riscv/gdbstub.c
+> @@ -21,6 +21,255 @@
+>  #include "exec/gdbstub.h"
+>  #include "cpu.h"
+>
+> +/*
+> + * The GDB CSR xml files list them in documentation order, not numerical order,
+> + * and are missing entries for unnamed CSRs.  So we need to map the gdb numbers
+> + * to the hardware numbers.
+> + */
+> +
+> +static int csr_register_map[] = {
+> +    CSR_USTATUS,
+> +    CSR_UIE,
+> +    CSR_UTVEC,
+> +    CSR_USCRATCH,
+> +    CSR_UEPC,
+> +    CSR_UCAUSE,
+> +    CSR_UTVAL,
+> +    CSR_UIP,
+> +    CSR_FFLAGS,
+> +    CSR_FRM,
+> +    CSR_FCSR,
+> +    CSR_CYCLE,
+> +    CSR_TIME,
+> +    CSR_INSTRET,
+> +    CSR_HPMCOUNTER3,
+> +    CSR_HPMCOUNTER4,
+> +    CSR_HPMCOUNTER5,
+> +    CSR_HPMCOUNTER6,
+> +    CSR_HPMCOUNTER7,
+> +    CSR_HPMCOUNTER8,
+> +    CSR_HPMCOUNTER9,
+> +    CSR_HPMCOUNTER10,
+> +    CSR_HPMCOUNTER11,
+> +    CSR_HPMCOUNTER12,
+> +    CSR_HPMCOUNTER13,
+> +    CSR_HPMCOUNTER14,
+> +    CSR_HPMCOUNTER15,
+> +    CSR_HPMCOUNTER16,
+> +    CSR_HPMCOUNTER17,
+> +    CSR_HPMCOUNTER18,
+> +    CSR_HPMCOUNTER19,
+> +    CSR_HPMCOUNTER20,
+> +    CSR_HPMCOUNTER21,
+> +    CSR_HPMCOUNTER22,
+> +    CSR_HPMCOUNTER23,
+> +    CSR_HPMCOUNTER24,
+> +    CSR_HPMCOUNTER25,
+> +    CSR_HPMCOUNTER26,
+> +    CSR_HPMCOUNTER27,
+> +    CSR_HPMCOUNTER28,
+> +    CSR_HPMCOUNTER29,
+> +    CSR_HPMCOUNTER30,
+> +    CSR_HPMCOUNTER31,
+> +    CSR_CYCLEH,
+> +    CSR_TIMEH,
+> +    CSR_INSTRETH,
+> +    CSR_HPMCOUNTER3H,
+> +    CSR_HPMCOUNTER4H,
+> +    CSR_HPMCOUNTER5H,
+> +    CSR_HPMCOUNTER6H,
+> +    CSR_HPMCOUNTER7H,
+> +    CSR_HPMCOUNTER8H,
+> +    CSR_HPMCOUNTER9H,
+> +    CSR_HPMCOUNTER10H,
+> +    CSR_HPMCOUNTER11H,
+> +    CSR_HPMCOUNTER12H,
+> +    CSR_HPMCOUNTER13H,
+> +    CSR_HPMCOUNTER14H,
+> +    CSR_HPMCOUNTER15H,
+> +    CSR_HPMCOUNTER16H,
+> +    CSR_HPMCOUNTER17H,
+> +    CSR_HPMCOUNTER18H,
+> +    CSR_HPMCOUNTER19H,
+> +    CSR_HPMCOUNTER20H,
+> +    CSR_HPMCOUNTER21H,
+> +    CSR_HPMCOUNTER22H,
+> +    CSR_HPMCOUNTER23H,
+> +    CSR_HPMCOUNTER24H,
+> +    CSR_HPMCOUNTER25H,
+> +    CSR_HPMCOUNTER26H,
+> +    CSR_HPMCOUNTER27H,
+> +    CSR_HPMCOUNTER28H,
+> +    CSR_HPMCOUNTER29H,
+> +    CSR_HPMCOUNTER30H,
+> +    CSR_HPMCOUNTER31H,
+> +    CSR_SSTATUS,
+> +    CSR_SEDELEG,
+> +    CSR_SIDELEG,
+> +    CSR_SIE,
+> +    CSR_STVEC,
+> +    CSR_SCOUNTEREN,
+> +    CSR_SSCRATCH,
+> +    CSR_SEPC,
+> +    CSR_SCAUSE,
+> +    CSR_STVAL,
+> +    CSR_SIP,
+> +    CSR_SATP,
+> +    CSR_MVENDORID,
+> +    CSR_MARCHID,
+> +    CSR_MIMPID,
+> +    CSR_MHARTID,
+> +    CSR_MSTATUS,
+> +    CSR_MISA,
+> +    CSR_MEDELEG,
+> +    CSR_MIDELEG,
+> +    CSR_MIE,
+> +    CSR_MTVEC,
+> +    CSR_MCOUNTEREN,
+> +    CSR_MSCRATCH,
+> +    CSR_MEPC,
+> +    CSR_MCAUSE,
+> +    CSR_MTVAL,
+> +    CSR_MIP,
+> +    CSR_PMPCFG0,
+> +    CSR_PMPCFG1,
+> +    CSR_PMPCFG2,
+> +    CSR_PMPCFG3,
+> +    CSR_PMPADDR0,
+> +    CSR_PMPADDR1,
+> +    CSR_PMPADDR2,
+> +    CSR_PMPADDR3,
+> +    CSR_PMPADDR4,
+> +    CSR_PMPADDR5,
+> +    CSR_PMPADDR6,
+> +    CSR_PMPADDR7,
+> +    CSR_PMPADDR8,
+> +    CSR_PMPADDR9,
+> +    CSR_PMPADDR10,
+> +    CSR_PMPADDR11,
+> +    CSR_PMPADDR12,
+> +    CSR_PMPADDR13,
+> +    CSR_PMPADDR14,
+> +    CSR_PMPADDR15,
+> +    CSR_MCYCLE,
+> +    CSR_MINSTRET,
+> +    CSR_MHPMCOUNTER3,
+> +    CSR_MHPMCOUNTER4,
+> +    CSR_MHPMCOUNTER5,
+> +    CSR_MHPMCOUNTER6,
+> +    CSR_MHPMCOUNTER7,
+> +    CSR_MHPMCOUNTER8,
+> +    CSR_MHPMCOUNTER9,
+> +    CSR_MHPMCOUNTER10,
+> +    CSR_MHPMCOUNTER11,
+> +    CSR_MHPMCOUNTER12,
+> +    CSR_MHPMCOUNTER13,
+> +    CSR_MHPMCOUNTER14,
+> +    CSR_MHPMCOUNTER15,
+> +    CSR_MHPMCOUNTER16,
+> +    CSR_MHPMCOUNTER17,
+> +    CSR_MHPMCOUNTER18,
+> +    CSR_MHPMCOUNTER19,
+> +    CSR_MHPMCOUNTER20,
+> +    CSR_MHPMCOUNTER21,
+> +    CSR_MHPMCOUNTER22,
+> +    CSR_MHPMCOUNTER23,
+> +    CSR_MHPMCOUNTER24,
+> +    CSR_MHPMCOUNTER25,
+> +    CSR_MHPMCOUNTER26,
+> +    CSR_MHPMCOUNTER27,
+> +    CSR_MHPMCOUNTER28,
+> +    CSR_MHPMCOUNTER29,
+> +    CSR_MHPMCOUNTER30,
+> +    CSR_MHPMCOUNTER31,
+> +    CSR_MCYCLEH,
+> +    CSR_MINSTRETH,
+> +    CSR_MHPMCOUNTER3H,
+> +    CSR_MHPMCOUNTER4H,
+> +    CSR_MHPMCOUNTER5H,
+> +    CSR_MHPMCOUNTER6H,
+> +    CSR_MHPMCOUNTER7H,
+> +    CSR_MHPMCOUNTER8H,
+> +    CSR_MHPMCOUNTER9H,
+> +    CSR_MHPMCOUNTER10H,
+> +    CSR_MHPMCOUNTER11H,
+> +    CSR_MHPMCOUNTER12H,
+> +    CSR_MHPMCOUNTER13H,
+> +    CSR_MHPMCOUNTER14H,
+> +    CSR_MHPMCOUNTER15H,
+> +    CSR_MHPMCOUNTER16H,
+> +    CSR_MHPMCOUNTER17H,
+> +    CSR_MHPMCOUNTER18H,
+> +    CSR_MHPMCOUNTER19H,
+> +    CSR_MHPMCOUNTER20H,
+> +    CSR_MHPMCOUNTER21H,
+> +    CSR_MHPMCOUNTER22H,
+> +    CSR_MHPMCOUNTER23H,
+> +    CSR_MHPMCOUNTER24H,
+> +    CSR_MHPMCOUNTER25H,
+> +    CSR_MHPMCOUNTER26H,
+> +    CSR_MHPMCOUNTER27H,
+> +    CSR_MHPMCOUNTER28H,
+> +    CSR_MHPMCOUNTER29H,
+> +    CSR_MHPMCOUNTER30H,
+> +    CSR_MHPMCOUNTER31H,
+> +    CSR_MHPMEVENT3,
+> +    CSR_MHPMEVENT4,
+> +    CSR_MHPMEVENT5,
+> +    CSR_MHPMEVENT6,
+> +    CSR_MHPMEVENT7,
+> +    CSR_MHPMEVENT8,
+> +    CSR_MHPMEVENT9,
+> +    CSR_MHPMEVENT10,
+> +    CSR_MHPMEVENT11,
+> +    CSR_MHPMEVENT12,
+> +    CSR_MHPMEVENT13,
+> +    CSR_MHPMEVENT14,
+> +    CSR_MHPMEVENT15,
+> +    CSR_MHPMEVENT16,
+> +    CSR_MHPMEVENT17,
+> +    CSR_MHPMEVENT18,
+> +    CSR_MHPMEVENT19,
+> +    CSR_MHPMEVENT20,
+> +    CSR_MHPMEVENT21,
+> +    CSR_MHPMEVENT22,
+> +    CSR_MHPMEVENT23,
+> +    CSR_MHPMEVENT24,
+> +    CSR_MHPMEVENT25,
+> +    CSR_MHPMEVENT26,
+> +    CSR_MHPMEVENT27,
+> +    CSR_MHPMEVENT28,
+> +    CSR_MHPMEVENT29,
+> +    CSR_MHPMEVENT30,
+> +    CSR_MHPMEVENT31,
+> +    CSR_TSELECT,
+> +    CSR_TDATA1,
+> +    CSR_TDATA2,
+> +    CSR_TDATA3,
+> +    CSR_DCSR,
+> +    CSR_DPC,
+> +    CSR_DSCRATCH,
+> +    CSR_HSTATUS,
+> +    CSR_HEDELEG,
+> +    CSR_HIDELEG,
+> +    CSR_HIE,
+> +    CSR_HTVEC,
+> +    CSR_HSCRATCH,
+> +    CSR_HEPC,
+> +    CSR_HCAUSE,
+> +    CSR_HBADADDR,
+> +    CSR_HIP,
+> +    CSR_MBASE,
+> +    CSR_MBOUND,
+> +    CSR_MIBASE,
+> +    CSR_MIBOUND,
+> +    CSR_MDBASE,
+> +    CSR_MDBOUND,
+> +    CSR_MUCOUNTEREN,
+> +    CSR_MSCOUNTEREN,
+> +    CSR_MHCOUNTEREN,
+> +};
+> +
+>  int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+>  {
+>      RISCVCPU *cpu = RISCV_CPU(cs);
+> @@ -30,13 +279,6 @@ int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+>          return gdb_get_regl(mem_buf, env->gpr[n]);
+>      } else if (n == 32) {
+>          return gdb_get_regl(mem_buf, env->pc);
+> -    } else if (n < 65) {
+> -        return gdb_get_reg64(mem_buf, env->fpr[n - 33]);
+> -    } else if (n < 4096 + 65) {
+> -        target_ulong val = 0;
+> -        if (riscv_csrrw(env, n - 65, &val, 0, 0) == 0) {
+> -            return gdb_get_regl(mem_buf, val);
+> -        }
+>      }
+>      return 0;
+>  }
+> @@ -55,14 +297,98 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+>      } else if (n == 32) {
+>          env->pc = ldtul_p(mem_buf);
+>          return sizeof(target_ulong);
+> -    } else if (n < 65) {
+> -        env->fpr[n - 33] = ldq_p(mem_buf); /* always 64-bit */
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+> +{
+> +    if (n < 32) {
+> +        return gdb_get_reg64(mem_buf, env->fpr[n]);
+> +    } else if (n < 35) {
+> +        target_ulong val = 0;
+> +        int result;
+> +        /*
+> +         * CSR_FFLAGS is 0x001, and gdb says it is FP register 32, so we
+> +         * subtract 31 to map the gdb FP register number to the CSR number.
+> +         * This also works for CSR_FRM and CSR_FCSR.
+> +         */
+> +        result = riscv_csrrw_debug(env, n - 31, &val, 0, 0);
+> +        if (result == 0) {
+> +            return gdb_get_regl(mem_buf, val);
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int riscv_gdb_set_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
+> +{
+> +    if (n < 32) {
+> +        env->fpr[n] = ldq_p(mem_buf); /* always 64-bit */
+>          return sizeof(uint64_t);
+> -    } else if (n < 4096 + 65) {
+> +    } else if (n < 35) {
+>          target_ulong val = ldtul_p(mem_buf);
+> -        if (riscv_csrrw(env, n - 65, NULL, val, -1) == 0) {
+> +        int result;
+> +        /*
+> +         * CSR_FFLAGS is 0x001, and gdb says it is FP register 32, so we
+> +         * subtract 31 to map the gdb FP register number to the CSR number.
+> +         * This also works for CSR_FRM and CSR_FCSR.
+> +         */
+> +        result = riscv_csrrw_debug(env, n - 31, NULL, val, -1);
+> +        if (result == 0) {
+>              return sizeof(target_ulong);
+>          }
+>      }
+>      return 0;
+>  }
+> +
+> +static int riscv_gdb_get_csr(CPURISCVState *env, uint8_t *mem_buf, int n)
+> +{
+> +    if (n < ARRAY_SIZE(csr_register_map)) {
+> +        target_ulong val = 0;
+> +        int result;
+> +
+> +        result = riscv_csrrw_debug(env, csr_register_map[n], &val, 0, 0);
+> +        if (result == 0) {
+> +            return gdb_get_regl(mem_buf, val);
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int riscv_gdb_set_csr(CPURISCVState *env, uint8_t *mem_buf, int n)
+> +{
+> +    if (n < ARRAY_SIZE(csr_register_map)) {
+> +        target_ulong val = ldtul_p(mem_buf);
+> +        int result;
+> +
+> +        result = riscv_csrrw_debug(env, csr_register_map[n], NULL, val, -1);
+> +        if (result == 0) {
+> +            return sizeof(target_ulong);
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+> +void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+> +{
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
+> +#if defined(TARGET_RISCV32)
+> +    if (env->misa & RVF) {
+> +        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+> +                                 35, "riscv-32bit-fpu.xml", 0);
+> +    }
+> +
+> +    gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+> +                             4096, "riscv-32bit-csr.xml", 0);
+> +#elif defined(TARGET_RISCV64)
+> +    if (env->misa & RVF) {
+> +        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+> +                                 35, "riscv-64bit-fpu.xml", 0);
+> +    }
+> +
+> +    gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+> +                             4096, "riscv-64bit-csr.xml", 0);
+> +#endif
+> +}
+> --
+> 2.7.4
+>
+>
