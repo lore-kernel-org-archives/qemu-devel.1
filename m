@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54662)
+Received: from eggs.gnu.org ([209.51.188.92]:55076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVs8-0006xS-BV
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:10 -0500
+	(envelope-from <philmd@redhat.com>) id 1gtVsP-0007Bf-8p
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVs6-0004dP-JU
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:04 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 12 Feb 2019 12:03:08 +0100
-Message-Id: <20190212110308.13707-17-david@redhat.com>
-In-Reply-To: <20190212110308.13707-1-david@redhat.com>
-References: <20190212110308.13707-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 15/15] s390x: Add floating-point extension
- facility to "qemu" cpu model
+	(envelope-from <philmd@redhat.com>) id 1gtVsN-00057H-Hn
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:21 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtVsN-00055B-2A
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:05:19 -0500
+Received: by mail-wm1-f65.google.com with SMTP id j125so2562209wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 03:05:18 -0800 (PST)
+References: <20190212105201.13795-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1df0da56-7abd-4688-0fed-6dc2bf10ebb6@redhat.com>
+Date: Tue, 12 Feb 2019 12:05:16 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190212105201.13795-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/armsse: Fix miswiring of expansion
+ IRQs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-The floating-point extension facility implemented certain changes to
-BFP, HFP and DFP instructions.
+On 2/12/19 11:52 AM, Peter Maydell wrote:
+> In commit 91c1e9fcbd7548db368 where we added dual-CPU support to
+> the ARMSSE, we set up the wiring of the expansion IRQs via nested
+> loops: the outer loop on 'i' loops for each CPU, and the inner loop
+> on 'j' loops for each interrupt. Fix a typo which meant we were
+> wiring every expansion IRQ line to external IRQ 0 on CPU 0 and
+> to external IRQ 1 on CPU 1.
+> 
+> Fixes: 91c1e9fcbd7548db368 ("hw/arm/armsse: Support dual-CPU configuration")
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-As we don't implement HFP/DFP, we can ignore those completely. Related
-to BFP, the changes include
-- SET BFP ROUNDING MODE (SRNMB) instruction
-- BFP-rounding-mode field in the FPC register is changed to 3 bits
-- CONVERT FROM LOGICAL instructions
-- CONVERT TO LOGICAL instructions
-- Changes (rounding mode + XxC) added to
--- CONVERT TO FIXED
--- CONVERT FROM FIXED
--- LOAD FP INTEGER
--- LOAD ROUNDED
--- DIVIDE TO INTEGER
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
-implement, so skip that. Also, as we don't implement PFPO, we can skip
-changes to that as well. The other parts are now implemented, we can
-indicate the facility.
+> ---
+> It turns out that the ARM-TFM image I was using to test that
+> I hadn't broken the mps2-an505 doesn't actually rely on any
+> interrupts from the external devices...
 
-z14 PoP mentiones that "The floating-point extension facility is installed
-in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
-also one.", meaning that the DFP (decimal-floating-point) facility also
-has to be inidicated. We can ignore that for now.
+How did you notice that, simply reviewing? Via 'info qtree'?
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/gen-features.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 19bb8ac7f8..02f6e9f475 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -593,6 +593,11 @@ static uint16_t qemu_V3_1[] = {
- };
- 
- static uint16_t qemu_LATEST[] = {
-+    /*
-+     * Only BFP bits are implemented (HFP, DFP, PFPO and DIVIDE TO INTEGER not
-+     * implemented yet).
-+     */
-+    S390_FEAT_FLOATING_POINT_EXT,
-     S390_FEAT_ZPCI,
- };
- 
--- 
-2.17.2
+> 
+>  hw/arm/armsse.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+> index 5d53071a5a0..9a8c49547db 100644
+> --- a/hw/arm/armsse.c
+> +++ b/hw/arm/armsse.c
+> @@ -565,7 +565,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+>          /* Connect EXP_IRQ/EXP_CPUn_IRQ GPIOs to the NVIC's lines 32 and up */
+>          s->exp_irqs[i] = g_new(qemu_irq, s->exp_numirq);
+>          for (j = 0; j < s->exp_numirq; j++) {
+> -            s->exp_irqs[i][j] = qdev_get_gpio_in(cpudev, i + 32);
+> +            s->exp_irqs[i][j] = qdev_get_gpio_in(cpudev, j + 32);
+>          }
+>          if (i == 0) {
+>              gpioname = g_strdup("EXP_IRQ");
+> 
