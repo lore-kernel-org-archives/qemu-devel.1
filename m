@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46181)
+Received: from eggs.gnu.org ([209.51.188.92]:48535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gtRll-0004e1-IL
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 01:42:14 -0500
+	(envelope-from <peterx@redhat.com>) id 1gtRqM-0005vY-9X
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 01:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gtRlk-0002kx-MF
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 01:42:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58818)
+	(envelope-from <peterx@redhat.com>) id 1gtRqK-0006ak-9w
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 01:46:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gtRli-0002bU-NP
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 01:42:11 -0500
-References: <e6c30bdd-6cd0-ee9b-9fdf-cc8eaa54f7cc@yandex-team.ru>
-	<20190211095049-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b775d7dc-4def-6d7c-ebff-d0b18169c52b@redhat.com>
-Date: Tue, 12 Feb 2019 14:41:51 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gtRqJ-0006Oc-SX
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 01:46:56 -0500
+Date: Tue, 12 Feb 2019 14:46:29 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190212064629.GL1011@xz-x1>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-4-git-send-email-yi.y.sun@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190211095049-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Is IOThread for virtio-net a good idea?
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1548824953-23413-4-git-send-email-yi.y.sun@linux.intel.com>
+Subject: Re: [Qemu-devel] [RFC v1 3/3] intel_iommu: add scalable-mode option
+ to make scalable mode work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Anton Kuchin <antonkuchin@yandex-team.ru>
-Cc: qemu-devel@nongnu.org
+To: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
+On Wed, Jan 30, 2019 at 01:09:13PM +0800, Yi Sun wrote:
+> This patch adds an option to provide flexibility for user to expose
+> Scalable Mode to guest. User could expose Scalable Mode to guest by
+> the config as below:
+> 
+> "-device intel-iommu,caching-mode=on,scalable-mode=on"
+> 
+> The Linux iommu driver has supported scalable mode. Please refer below
+> patch set:
+> 
+>     https://www.spinics.net/lists/kernel/msg2985279.html
+> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 22 ++++++++++++++++++++++
+>  hw/i386/intel_iommu_internal.h |  6 ++++++
+>  include/hw/i386/intel_iommu.h  |  3 ++-
+>  3 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 3664a00..447fdf3 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2492,6 +2492,17 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+>          }
+>          break;
+>  
+> +    /*
+> +     * TODO: the entity of below two cases will be implemented in future series.
+> +     * To make guest (which integrates scalable mode support patch set in
+> +     * iommu driver) work, just return true is enough so far.
 
-On 2019/2/11 =E4=B8=8B=E5=8D=8810:52, Michael S. Tsirkin wrote:
-> On Mon, Feb 11, 2019 at 04:40:44PM +0300, Anton Kuchin wrote:
->> As far as I can see currently IOThread offloading is used only for blo=
-ck
->> devices and all others are emulated by main thread.
->>
->> I expect that network devices can also benefit from processing in sepa=
-rate
->> thread but I couldn't find any recent work in this direction. I'm goin=
-g to
->> implement a PoC but I want to ask if you know any previous attempts an=
-d do
->> you know why it can be a total waste of time. Are there fundamental
->> obstacles that prevent network emulation handling in IOThread?
-> No but vhost-net is there. Unlike block where you gain lots of
-> functionality such as snapshots there seems to be little to
-> be gained by doing it in userspace.
+When you repost, could you mention about what tests have you done?  I
+can think of some general usages:
 
+Device matrix:
 
-I think all the three (vhost-net, vhost-user, vhost-dataplane) have=20
-their own advantages. E.g compared to vhost-user, vhost dataplane in=20
-qemu has the following advantages:
+- virtio-net, vhost=on|off
+- device assignment
 
-- Qemu dataplane could be much safer, e.g there's no need to share all=20
-its memory to another process.
+Configuration matrix:
 
-- Easy to develop, there's no need for the backend to know anything=20
-about virtio. This will reduce the pain of maintaining compatibility,=20
-version etc. New features was limited to the changes of qemu itself.
+- legacy/scalable
+- passthrough=on|off
 
-- Faster access of VM metadata, Device IOTLB and RSS/Steering could be=20
-function calls instead of complex vhost-user protocol. I'm pretty sure=20
-we will hit more similar issues in the future.
+I believe smoke test (like netperf a few seconds, or even ping) would
+be enough, cover some (or all, which would be very nice to have :) of
+above scenarios.
 
-And I can consider some use cases:
+> +     */
+> +    case VTD_INV_DESC_PC:
+> +        break;
+> +
+> +    case VTD_INV_DESC_PIOTLB:
+> +        break;
+> +
+>      case VTD_INV_DESC_WAIT:
+>          trace_vtd_inv_desc("wait", inv_desc.val[1], inv_desc.val[0]);
+>          if (!vtd_process_wait_desc(s, &inv_desc)) {
+> @@ -3051,6 +3062,7 @@ static Property vtd_properties[] = {
+>      DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+>                        VTD_HOST_ADDRESS_WIDTH),
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+> +    DEFINE_PROP_BOOL("scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
 
-- link dpdk to qemu
+Let's start with x-scalable-mode?  Less burden for all.
 
-- implement fast userspace backend like AF_XDP, netmap, packet socket or=20
-other (or even achieve this through dpdk pmd)
+>      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> @@ -3583,6 +3595,16 @@ static void vtd_init(IntelIOMMUState *s)
+>          s->cap |= VTD_CAP_CM;
+>      }
+>  
+> +    /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+> +    if (s->scalable_mode) {
+> +        if (!s->caching_mode) {
+> +            error_report("Need to set caching-mode for scalable mode");
 
-Thanks
+Could I ask why?
+
+> +            exit(1);
+> +        }
+> +        s->cap |= VTD_CAP_DWD | VTD_CAP_DRD;
+
+Draining is supported now so this line is not needed.
+
+> +        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +    }
+> +
+>      vtd_reset_caches(s);
+>  
+>      /* Define registers with default values and bit semantics */
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index 2a753c5..b01953a 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -190,7 +190,9 @@
+>  #define VTD_ECAP_EIM                (1ULL << 4)
+>  #define VTD_ECAP_PT                 (1ULL << 6)
+>  #define VTD_ECAP_MHMV               (15ULL << 20)
+> +#define VTD_ECAP_SRS                (1ULL << 31)
+>  #define VTD_ECAP_SMTS               (1ULL << 43)
+> +#define VTD_ECAP_SLTS               (1ULL << 46)
+>  
+>  /* CAP_REG */
+>  /* (offset >> 4) << 24 */
+> @@ -209,6 +211,8 @@
+>  #define VTD_CAP_DRAIN_READ          (1ULL << 55)
+>  #define VTD_CAP_DRAIN               (VTD_CAP_DRAIN_READ | VTD_CAP_DRAIN_WRITE)
+>  #define VTD_CAP_CM                  (1ULL << 7)
+> +#define VTD_CAP_DWD                 (1ULL << 54)
+> +#define VTD_CAP_DRD                 (1ULL << 55)
+
+These can be dropped too (see VTD_CAP_DRAIN above).
+
+>  
+>  /* Supported Adjusted Guest Address Widths */
+>  #define VTD_CAP_SAGAW_SHIFT         8
+> @@ -340,6 +344,8 @@ typedef union VTDInvDesc VTDInvDesc;
+>  #define VTD_INV_DESC_IEC                0x4 /* Interrupt Entry Cache
+>                                                 Invalidate Descriptor */
+>  #define VTD_INV_DESC_WAIT               0x5 /* Invalidation Wait Descriptor */
+> +#define VTD_INV_DESC_PIOTLB             0x6 /* PASID-IOTLB Invalidate Desc */
+> +#define VTD_INV_DESC_PC                 0x7 /* PASID-cache Invalidate Desc */
+>  #define VTD_INV_DESC_NONE               0   /* Not an Invalidate Descriptor */
+>  
+>  /* Masks for Invalidation Wait Descriptor*/
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index a5da139..a04fad6 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -219,7 +219,8 @@ struct IntelIOMMUState {
+>      uint8_t womask[DMAR_REG_SIZE];  /* WO (write only - read returns 0) */
+>      uint32_t version;
+>  
+> -    bool caching_mode;          /* RO - is cap CM enabled? */
+> +    bool caching_mode;              /* RO - is cap CM enabled? */
+> +    bool scalable_mode;             /* RO - is Scalable Mode supported? */
+>  
+>      dma_addr_t root;                /* Current root table pointer */
+>      bool root_extended;             /* Type of root table (extended or not) */
+> -- 
+> 1.9.1
+> 
+
+Regards,
+
+-- 
+Peter Xu
