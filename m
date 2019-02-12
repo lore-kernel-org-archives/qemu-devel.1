@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44572)
+Received: from eggs.gnu.org ([209.51.188.92]:45977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtbTz-0005pQ-45
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:04:32 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gtbZH-000103-6D
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtbTp-0005wz-1d
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:04:22 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:32962)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gtbTo-0005vE-M1
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:04:20 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i20so5712604otl.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:04:20 -0800 (PST)
+	(envelope-from <laurent@vivier.eu>) id 1gtbZE-0008R3-Rd
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:09:59 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:42829)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gtbZE-0008OV-Fw
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 12:09:56 -0500
+References: <mvmimxprmn8.fsf@suse.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <0115d826-3e42-5821-15f8-77841fc851a8@vivier.eu>
+Date: Tue, 12 Feb 2019 18:09:43 +0100
 MIME-Version: 1.0
-References: <20190212141234.2814-1-stefanha@redhat.com>
-In-Reply-To: <20190212141234.2814-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Feb 2019 17:04:07 +0000
-Message-ID: <CAFEAcA_3T9zVLm8DmOdFk=FddEMuQ4NzfTNhQhh5mB+swYyDvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PULL 0/6] Block sgarzare test patches
+In-Reply-To: <mvmimxprmn8.fsf@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix recvmsg emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefano Garzarella <sgarzare@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-On Tue, 12 Feb 2019 at 14:12, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> ----------------------------------------------------------------
-> Block pull request for testing
->
-> Peter hit a virtio-blk-test failure caused by the new DISCARD/WRITE_ZEROES
-> patches that Stefano and I have been unable to reproduce.  Here are the patches
-> so they can be tested again in Peter's environment.
->
-> ----------------------------------------------------------------
+On 12/02/2019 17:34, Andreas Schwab wrote:
+> Set msg_flags in the returned struct msghdr.
+> 
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
+> ---
+>  linux-user/syscall.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 90bfda3563..b6b566a6fa 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2797,6 +2797,7 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
+>              }
+>              if (!is_error(ret)) {
+>                  msgp->msg_namelen = tswap32(msg.msg_namelen);
+> +                msgp->msg_flags = tswap32(msg.msg_flags);
+>                  if (msg.msg_name != NULL && msg.msg_name != (void *)-1) {
+>                      ret = host_to_target_sockaddr(tswapal(msgp->msg_name),
+>                                      msg.msg_name, msg.msg_namelen);
+> 
 
-x86-64 host seems to be a bit random about whether it reproducibly
-fails (it failed in the test merge builds but not when I run the
-test program by hand) but aarch64 host seems more definitely
-fails-every-time:
-
-pm215@gcc113:~/qemu/build/all$
-QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 strace -tt -f -o
-~/strace.log  tests/virtio-blk-test
-/ppc64/virtio/blk/pci/basic: **
-ERROR:/home/pm215/qemu/tests/virtio-blk-test.c:272:test_basic:
-assertion failed (status == 0): (1 == 0)
-Aborted (core dumped)
-
-The strace.log from that is at
-http://people.linaro.org/~peter.maydell/strace.log
-(3.6MB file; the -f means it will have the trace for
-both the test binary and the QEMU process it spawns).
-
-thanks
--- PMM
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
