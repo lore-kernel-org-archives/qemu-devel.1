@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53657)
+Received: from eggs.gnu.org ([209.51.188.92]:53811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYo4-0007Og-C6
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtYoB-0007Um-D4
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtYo2-0005dO-P3
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:04 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtYo9-0005jd-23
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 09:13:11 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 12 Feb 2019 22:12:32 +0800
-Message-Id: <20190212141234.2814-5-stefanha@redhat.com>
+Date: Tue, 12 Feb 2019 22:12:30 +0800
+Message-Id: <20190212141234.2814-3-stefanha@redhat.com>
 In-Reply-To: <20190212141234.2814-1-stefanha@redhat.com>
 References: <20190212141234.2814-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PULL 4/6] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+Subject: [Qemu-devel] [RFC PULL 2/6] virtio-blk: add host_features field in
+ VirtIOBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,298 +27,106 @@ Cc: sgarzare@redhat.com, qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redha
 
 From: Stefano Garzarella <sgarzare@redhat.com>
 
-This patch adds the support of DISCARD and WRITE_ZEROES commands,
-that have been introduced in the virtio-blk protocol to have
-better performance when using SSD backend.
+Since configurable features for virtio-blk are growing, this patch
+adds host_features field in the struct VirtIOBlock. (as in virtio-net)
+In this way, we can avoid to add new fields for new properties and
+we can directly set VIRTIO_BLK_F* flags in the host_features.
 
-We support only one segment per request since multiple segments
-are not widely used and there are no userspace APIs that allow
-applications to submit multiple segments in a single call.
+We update "config-wce" and "scsi" property definition to use the new
+host_features field without change the behaviour.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 Acked-by: Pankaj Gupta <pagupta@redhat.com>
-Message-id: 20190208134950.187665-5-sgarzare@redhat.com
+Message-id: 20190208134950.187665-3-sgarzare@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/hw/virtio/virtio-blk.h |   2 +
- hw/block/virtio-blk.c          | 184 +++++++++++++++++++++++++++++++++
- 2 files changed, 186 insertions(+)
+ include/hw/virtio/virtio-blk.h |  3 +--
+ hw/block/virtio-blk.c          | 16 +++++++++-------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
 k.h
-index f7345b0511..015b523fe0 100644
+index 5117431d96..f7345b0511 100644
 --- a/include/hw/virtio/virtio-blk.h
 +++ b/include/hw/virtio/virtio-blk.h
-@@ -38,6 +38,8 @@ struct VirtIOBlkConf
+@@ -35,8 +35,6 @@ struct VirtIOBlkConf
+     BlockConf conf;
+     IOThread *iothread;
+     char *serial;
+-    uint32_t scsi;
+-    uint32_t config_wce;
      uint32_t request_merging;
      uint16_t num_queues;
      uint16_t queue_size;
-+    uint32_t max_discard_sectors;
-+    uint32_t max_write_zeroes_sectors;
- };
+@@ -57,6 +55,7 @@ typedef struct VirtIOBlock {
+     bool dataplane_disabled;
+     bool dataplane_started;
+     struct VirtIOBlockDataPlane *dataplane;
++    uint64_t host_features;
+ } VirtIOBlock;
 =20
- struct VirtIOBlockDataPlane;
+ typedef struct VirtIOBlockReq {
 diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 6f2e86264d..5d1b823b66 100644
+index b2bb129efa..938273c63c 100644
 --- a/hw/block/virtio-blk.c
 +++ b/hw/block/virtio-blk.c
-@@ -147,6 +147,30 @@ out:
-     aio_context_release(blk_get_aio_context(s->conf.conf.blk));
- }
+@@ -242,7 +242,7 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq =
+*req)
+      */
+     scsi =3D (void *)elem->in_sg[elem->in_num - 2].iov_base;
 =20
-+static void virtio_blk_discard_write_zeroes_complete(void *opaque, int r=
-et)
-+{
-+    VirtIOBlockReq *req =3D opaque;
-+    VirtIOBlock *s =3D req->dev;
-+    bool is_write_zeroes =3D (virtio_ldl_p(VIRTIO_DEVICE(s), &req->out.t=
-ype) &
-+                            ~VIRTIO_BLK_T_BARRIER) =3D=3D VIRTIO_BLK_T_W=
-RITE_ZEROES;
+-    if (!blk->conf.scsi) {
++    if (!virtio_has_feature(blk->host_features, VIRTIO_BLK_F_SCSI)) {
+         status =3D VIRTIO_BLK_S_UNSUPP;
+         goto fail;
+     }
+@@ -783,12 +783,15 @@ static uint64_t virtio_blk_get_features(VirtIODevic=
+e *vdev, uint64_t features,
+ {
+     VirtIOBlock *s =3D VIRTIO_BLK(vdev);
+=20
++    /* Firstly sync all virtio-blk possible supported features */
++    features |=3D s->host_features;
 +
-+    aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
-+    if (ret) {
-+        if (virtio_blk_handle_rw_error(req, -ret, false, is_write_zeroes=
-)) {
-+            goto out;
-+        }
-+    }
-+
-+    virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
-+    if (is_write_zeroes) {
-+        block_acct_done(blk_get_stats(s->blk), &req->acct);
-+    }
-+    virtio_blk_free_request(req);
-+
-+out:
-+    aio_context_release(blk_get_aio_context(s->conf.conf.blk));
-+}
-+
+     virtio_add_feature(&features, VIRTIO_BLK_F_SEG_MAX);
+     virtio_add_feature(&features, VIRTIO_BLK_F_GEOMETRY);
+     virtio_add_feature(&features, VIRTIO_BLK_F_TOPOLOGY);
+     virtio_add_feature(&features, VIRTIO_BLK_F_BLK_SIZE);
+     if (virtio_has_feature(features, VIRTIO_F_VERSION_1)) {
+-        if (s->conf.scsi) {
++        if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_SCSI)) {
+             error_setg(errp, "Please set scsi=3Doff for virtio-blk devic=
+es in order to use virtio 1.0");
+             return 0;
+         }
+@@ -797,9 +800,6 @@ static uint64_t virtio_blk_get_features(VirtIODevice =
+*vdev, uint64_t features,
+         virtio_add_feature(&features, VIRTIO_BLK_F_SCSI);
+     }
+=20
+-    if (s->conf.config_wce) {
+-        virtio_add_feature(&features, VIRTIO_BLK_F_CONFIG_WCE);
+-    }
+     if (blk_enable_write_cache(s->blk)) {
+         virtio_add_feature(&features, VIRTIO_BLK_F_WCE);
+     }
+@@ -1014,9 +1014,11 @@ static Property virtio_blk_properties[] =3D {
+     DEFINE_BLOCK_ERROR_PROPERTIES(VirtIOBlock, conf.conf),
+     DEFINE_BLOCK_CHS_PROPERTIES(VirtIOBlock, conf.conf),
+     DEFINE_PROP_STRING("serial", VirtIOBlock, conf.serial),
+-    DEFINE_PROP_BIT("config-wce", VirtIOBlock, conf.config_wce, 0, true)=
+,
++    DEFINE_PROP_BIT64("config-wce", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_CONFIG_WCE, true),
  #ifdef __linux__
-=20
- typedef struct {
-@@ -480,6 +504,84 @@ static bool virtio_blk_sect_range_ok(VirtIOBlock *de=
-v,
-     return true;
- }
-=20
-+static uint8_t virtio_blk_handle_discard_write_zeroes(VirtIOBlockReq *re=
-q,
-+    struct virtio_blk_discard_write_zeroes *dwz_hdr, bool is_write_zeroe=
-s)
-+{
-+    VirtIOBlock *s =3D req->dev;
-+    VirtIODevice *vdev =3D VIRTIO_DEVICE(s);
-+    uint64_t sector;
-+    uint32_t num_sectors, flags, max_sectors;
-+    uint8_t err_status;
-+    int bytes;
-+
-+    sector =3D virtio_ldq_p(vdev, &dwz_hdr->sector);
-+    num_sectors =3D virtio_ldl_p(vdev, &dwz_hdr->num_sectors);
-+    flags =3D virtio_ldl_p(vdev, &dwz_hdr->flags);
-+    max_sectors =3D is_write_zeroes ? s->conf.max_write_zeroes_sectors :
-+                  s->conf.max_discard_sectors;
-+
-+    /*
-+     * max_sectors is at most BDRV_REQUEST_MAX_SECTORS, this check
-+     * make us sure that "num_sectors << BDRV_SECTOR_BITS" can fit in
-+     * the integer variable.
-+     */
-+    if (unlikely(num_sectors > max_sectors)) {
-+        err_status =3D VIRTIO_BLK_S_IOERR;
-+        goto err;
-+    }
-+
-+    bytes =3D num_sectors << BDRV_SECTOR_BITS;
-+
-+    if (unlikely(!virtio_blk_sect_range_ok(s, sector, bytes))) {
-+        err_status =3D VIRTIO_BLK_S_IOERR;
-+        goto err;
-+    }
-+
-+    /*
-+     * The device MUST set the status byte to VIRTIO_BLK_S_UNSUPP for di=
-scard
-+     * and write zeroes commands if any unknown flag is set.
-+     */
-+    if (unlikely(flags & ~VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP)) {
-+        err_status =3D VIRTIO_BLK_S_UNSUPP;
-+        goto err;
-+    }
-+
-+    if (is_write_zeroes) { /* VIRTIO_BLK_T_WRITE_ZEROES */
-+        int blk_aio_flags =3D 0;
-+
-+        if (flags & VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP) {
-+            blk_aio_flags |=3D BDRV_REQ_MAY_UNMAP;
-+        }
-+
-+        block_acct_start(blk_get_stats(s->blk), &req->acct, bytes,
-+                         BLOCK_ACCT_WRITE);
-+
-+        blk_aio_pwrite_zeroes(s->blk, sector << BDRV_SECTOR_BITS,
-+                              bytes, blk_aio_flags,
-+                              virtio_blk_discard_write_zeroes_complete, =
-req);
-+    } else { /* VIRTIO_BLK_T_DISCARD */
-+        /*
-+         * The device MUST set the status byte to VIRTIO_BLK_S_UNSUPP fo=
-r
-+         * discard commands if the unmap flag is set.
-+         */
-+        if (unlikely(flags & VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP)) {
-+            err_status =3D VIRTIO_BLK_S_UNSUPP;
-+            goto err;
-+        }
-+
-+        blk_aio_pdiscard(s->blk, sector << BDRV_SECTOR_BITS, bytes,
-+                         virtio_blk_discard_write_zeroes_complete, req);
-+    }
-+
-+    return VIRTIO_BLK_S_OK;
-+
-+err:
-+    if (is_write_zeroes) {
-+        block_acct_invalid(blk_get_stats(s->blk), BLOCK_ACCT_WRITE);
-+    }
-+    return err_status;
-+}
-+
- static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer=
- *mrb)
- {
-     uint32_t type;
-@@ -584,6 +686,47 @@ static int virtio_blk_handle_request(VirtIOBlockReq =
-*req, MultiReqBuffer *mrb)
-         virtio_blk_free_request(req);
-         break;
-     }
-+    /*
-+     * VIRTIO_BLK_T_DISCARD and VIRTIO_BLK_T_WRITE_ZEROES are defined wi=
-th
-+     * VIRTIO_BLK_T_OUT flag set. We masked this flag in the switch stat=
-ement,
-+     * so we must mask it for these requests, then we will check if it i=
-s set.
-+     */
-+    case VIRTIO_BLK_T_DISCARD & ~VIRTIO_BLK_T_OUT:
-+    case VIRTIO_BLK_T_WRITE_ZEROES & ~VIRTIO_BLK_T_OUT:
-+    {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        size_t out_len =3D iov_size(out_iov, out_num);
-+        bool is_write_zeroes =3D (type & ~VIRTIO_BLK_T_BARRIER) =3D=3D
-+                               VIRTIO_BLK_T_WRITE_ZEROES;
-+        uint8_t err_status;
-+
-+        /*
-+         * Unsupported if VIRTIO_BLK_T_OUT is not set or the request con=
-tains
-+         * more than one segment.
-+         */
-+        if (unlikely(!(type & VIRTIO_BLK_T_OUT) ||
-+                     out_len > sizeof(dwz_hdr))) {
-+            virtio_blk_req_complete(req, VIRTIO_BLK_S_UNSUPP);
-+            virtio_blk_free_request(req);
-+            return 0;
-+        }
-+
-+        if (unlikely(iov_to_buf(out_iov, out_num, 0, &dwz_hdr,
-+                                sizeof(dwz_hdr)) !=3D sizeof(dwz_hdr))) =
-{
-+            virtio_error(vdev, "virtio-blk discard/write_zeroes header"
-+                         " too short");
-+            return -1;
-+        }
-+
-+        err_status =3D virtio_blk_handle_discard_write_zeroes(req, &dwz_=
-hdr,
-+                                                            is_write_zer=
-oes);
-+        if (err_status !=3D VIRTIO_BLK_S_OK) {
-+            virtio_blk_req_complete(req, err_status);
-+            virtio_blk_free_request(req);
-+        }
-+
-+        break;
-+    }
-     default:
-         virtio_blk_req_complete(req, VIRTIO_BLK_S_UNSUPP);
-         virtio_blk_free_request(req);
-@@ -763,6 +906,24 @@ static void virtio_blk_update_config(VirtIODevice *v=
-dev, uint8_t *config)
-     blkcfg.alignment_offset =3D 0;
-     blkcfg.wce =3D blk_enable_write_cache(s->blk);
-     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
-+    if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_DISCARD)) {
-+        virtio_stl_p(vdev, &blkcfg.max_discard_sectors,
-+                     s->conf.max_discard_sectors);
-+        virtio_stl_p(vdev, &blkcfg.discard_sector_alignment,
-+                     blk_size >> BDRV_SECTOR_BITS);
-+        /*
-+         * We support only one segment per request since multiple segmen=
-ts
-+         * are not widely used and there are no userspace APIs that allo=
-w
-+         * applications to submit multiple segments in a single call.
-+         */
-+        virtio_stl_p(vdev, &blkcfg.max_discard_seg, 1);
-+    }
-+    if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_WRITE_ZEROES))=
- {
-+        virtio_stl_p(vdev, &blkcfg.max_write_zeroes_sectors,
-+                     s->conf.max_write_zeroes_sectors);
-+        blkcfg.write_zeroes_may_unmap =3D 1;
-+        virtio_stl_p(vdev, &blkcfg.max_write_zeroes_seg, 1);
-+    }
-     memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
- }
-=20
-@@ -954,6 +1115,25 @@ static void virtio_blk_device_realize(DeviceState *=
-dev, Error **errp)
-         return;
-     }
-=20
-+    if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_DISCARD) &&
-+        (!conf->max_discard_sectors ||
-+         conf->max_discard_sectors > BDRV_REQUEST_MAX_SECTORS)) {
-+        error_setg(errp, "invalid max-discard-sectors property (%" PRIu3=
-2 ")"
-+                   ", must be between 1 and %d",
-+                   conf->max_discard_sectors, (int)BDRV_REQUEST_MAX_SECT=
-ORS);
-+        return;
-+    }
-+
-+    if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_WRITE_ZEROES) =
-&&
-+        (!conf->max_write_zeroes_sectors ||
-+         conf->max_write_zeroes_sectors > BDRV_REQUEST_MAX_SECTORS)) {
-+        error_setg(errp, "invalid max-write-zeroes-sectors property (%" =
-PRIu32
-+                   "), must be between 1 and %d",
-+                   conf->max_write_zeroes_sectors,
-+                   (int)BDRV_REQUEST_MAX_SECTORS);
-+        return;
-+    }
-+
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-                 sizeof(struct virtio_blk_config));
-=20
-@@ -1030,6 +1210,10 @@ static Property virtio_blk_properties[] =3D {
-                       VIRTIO_BLK_F_DISCARD, true),
-     DEFINE_PROP_BIT64("write-zeroes", VirtIOBlock, host_features,
-                       VIRTIO_BLK_F_WRITE_ZEROES, true),
-+    DEFINE_PROP_UINT32("max-discard-sectors", VirtIOBlock,
-+                       conf.max_discard_sectors, BDRV_REQUEST_MAX_SECTOR=
-S),
-+    DEFINE_PROP_UINT32("max-write-zeroes-sectors", VirtIOBlock,
-+                       conf.max_write_zeroes_sectors, BDRV_REQUEST_MAX_S=
-ECTORS),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
+-    DEFINE_PROP_BIT("scsi", VirtIOBlock, conf.scsi, 0, false),
++    DEFINE_PROP_BIT64("scsi", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_SCSI, false),
+ #endif
+     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging=
+, 0,
+                     true),
 --=20
 2.20.1
