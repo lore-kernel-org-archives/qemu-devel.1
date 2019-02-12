@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36837)
+Received: from eggs.gnu.org ([209.51.188.92]:49984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gtTV0-0003cH-Ny
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:33:06 -0500
+	(envelope-from <pagupta@redhat.com>) id 1gtTtI-0001fV-KV
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:58:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gtTO7-0005un-26
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:25:56 -0500
-Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:50787)
+	(envelope-from <pagupta@redhat.com>) id 1gtTtH-0002gi-7f
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:58:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50610)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gtTO6-0005nd-44
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:25:54 -0500
-Received: from player778.ha.ovh.net (unknown [10.109.160.217])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3EB451D5D3C
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 09:25:49 +0100 (CET)
-References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-4-clg@kaod.org>
-	<20190212043437.GK1884@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <680901eb-fb3e-dfad-37e2-324137197fec@kaod.org>
-Date: Tue, 12 Feb 2019 09:25:44 +0100
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gtTtC-0001rL-Pu
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 03:58:05 -0500
+Date: Tue, 12 Feb 2019 03:57:39 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <79078864.438088.1549961859428.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190212025241.5330-1-stefanha@redhat.com>
+References: <20190212025241.5330-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190212043437.GK1884@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/19] xive: extend the XiveRouter
- get_tctx() method with the page offset
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hostmem-file: reject invalid pmem file
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,143 +27,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-
-On 2/12/19 5:34 AM, David Gibson wrote:
-> On Mon, Jan 28, 2019 at 10:46:09AM +0100, C=E9dric Le Goater wrote:
->> The PowerNV machine can perform indirect loads and stores on the TIMA
->> on behalf of another CPU. The PIR of the CPU is controlled by a set of
->> 4 registers, one per TIMA page. To know which page is being accessed,
->> we need to inform the controller model of the operation offset.
->=20
-> This doesn't seem like the right place to handle this.  Shouldn't you
-> instead be passing a different CPUState in for "foreign" TCTX
-> accesses?
-
-This patch only adds the page offset required to pick the correct=20
-register from the XIVE IC. May be I should have introduced this=20
-page offset extension in the baremetal patch. I might reorganize
-the patchset in the next round.=20
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Zhang Yi <yi.z.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
 
 
-Anyhow, we pass a different XiveTCTX instead. See the routines in=20
-PnvXive, xive_tm_indirect_read() and xive_tm_indirect_write().
+Hi Stefan,
 
-We don't pass a CPUState because we depend on the machine data  to=20
-retrieve the XiveTCTX and that would be problematic to do in the=20
-common XIVE routines.
+> 
+> Guests started with NVDIMMs larger than the underlying host file produce
+> confusing errors inside the guest.  This happens because the guest
+> accesses pages beyond the end of the file.
+> 
+> Check the pmem file size on startup and print a clear error message if
+> the size is invalid.
+> 
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1669053
+> Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+> Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  include/qemu/osdep.h    | 13 ++++++++++
+>  backends/hostmem-file.c | 16 +++++++++++++
+>  util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
+>  util/oslib-win32.c      |  5 ++++
+>  4 files changed, 87 insertions(+)
+> 
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 840af09cb0..303d315c5d 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -570,6 +570,19 @@ void qemu_set_tty_echo(int fd, bool echo);
+>  void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
+>                       Error **errp);
+>  
+> +/**
+> + * qemu_get_pmem_size:
+> + * @filename: path to a pmem file
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Determine the size of a persistent memory file.  Besides supporting files
+> on
+> + * DAX file systems, this function also supports Linux devdax character
+> + * devices.
+> + *
+> + * Returns: the size or 0 on failure
+> + */
+> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp);
+> +
+>  /**
+>   * qemu_get_pid_name:
+>   * @pid: pid of a process
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index ba601ce940..325ab4aad9 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -46,6 +46,22 @@ file_backend_memory_alloc(HostMemoryBackend *backend,
+> Error **errp)
+>      gchar *name;
+>  #endif
+>  
+> +    /*
+> +     * Verify pmem file size since starting a guest with an incorrect size
+> +     * leads to confusing failures inside the guest.
+> +     */
+> +    if (fb->is_pmem && fb->mem_path) {
+> +        uint64_t size;
+> +
+> +        size = qemu_get_pmem_size(fb->mem_path, NULL);
+> +        if (size && backend->size > size) {
+> +            error_setg(errp, "size property %" PRIu64 " is larger than "
+> +                       "pmem file \"%s\" size %" PRIu64, backend->size,
+> +                       fb->mem_path, size);
+> +            return;
+> +        }
+> +    }
+> +
+>      if (!backend->size) {
+>          error_setg(errp, "can't create backend with size 0");
+>          return;
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 37c5854b9c..10d90d1783 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -500,6 +500,59 @@ void os_mem_prealloc(int fd, char *area, size_t memory,
+> int smp_cpus,
+>      }
+>  }
+>  
+> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
+> +{
+> +    struct stat st;
+> +
+> +    if (stat(filename, &st) < 0) {
+> +        error_setg(errp, "unable to stat pmem file \"%s\"", filename);
+> +        return 0;
+> +    }
+> +
+> +#if defined(__linux__)
+> +    /* Special handling for devdax character devices */
+> +    if (S_ISCHR(st.st_mode)) {
+> +        char *subsystem_path = NULL;
+> +        char *subsystem = NULL;
+> +        char *size_path = NULL;
+> +        char *size_str = NULL;
+> +        uint64_t ret = 0;
+> +
+> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
+> +                                         major(st.st_rdev),
+> minor(st.st_rdev));
+> +        subsystem = g_file_read_link(subsystem_path, NULL);
+> +        if (!subsystem) {
+> +            error_setg(errp, "unable to read subsystem for pmem file
+> \"%s\"",
+> +                       filename);
+> +            goto devdax_err;
+> +        }
+> +
+> +        if (!g_str_has_suffix(subsystem, "/dax")) {
+> +            error_setg(errp, "pmem file \"%s\" is not a dax device",
+> filename);
+> +            goto devdax_err;
+> +        }
+> +
+> +        size_path = g_strdup_printf("/sys/dev/char/%d:%d/size",
+> +                                    major(st.st_rdev), minor(st.st_rdev));
+> +        if (!g_file_get_contents(size_path, &size_str, NULL, NULL)) {
+> +            error_setg(errp, "unable to read size for pmem file \"%s\"",
+> +                       size_path);
+> +            goto devdax_err;
+> +        }
+> +
+> +        ret = g_ascii_strtoull(size_str, NULL, 0);
+> +
+> +devdax_err:
+> +        g_free(size_str);
+> +        g_free(size_path);
+> +        g_free(subsystem);
+> +        g_free(subsystem_path);
+> +        return ret;
+> +    }
+> +#endif /* defined(__linux__) */
+> +
+> +    return st.st_size;
+> +}
+>  
+>  char *qemu_get_pid_name(pid_t pid)
+>  {
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index b4c17f5dfa..bd633afab6 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -560,6 +560,11 @@ void os_mem_prealloc(int fd, char *area, size_t memory,
+> int smp_cpus,
+>      }
+>  }
+>  
+> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
+> +{
+> +    error_setg(errp, "pmem support not available");
+> +    return 0;
+> +}
+>  
+>  char *qemu_get_pid_name(pid_t pid)
+>  {
+> --
+> 2.20.1
 
-C.=20
+This patch looks good to me.
 
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 
->=20
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/xive.h |  4 ++--
->>  hw/intc/spapr_xive.c  |  3 ++-
->>  hw/intc/xive.c        | 12 +++++++-----
->>  3 files changed, 11 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 04d54e8315f7..a1f5ea2d9143 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -352,7 +352,7 @@ typedef struct XiveRouterClass {
->>                     XiveNVT *nvt);
->>      int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
-idx,
->>                       XiveNVT *nvt, uint8_t word_number);
->> -    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
->> +    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs, hwaddr offs=
-et);
->>  } XiveRouterClass;
->> =20
->>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mo=
-n);
->> @@ -367,7 +367,7 @@ int xive_router_get_nvt(XiveRouter *xrtr, uint8_t =
-nvt_blk, uint32_t nvt_idx,
->>                          XiveNVT *nvt);
->>  int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t=
- nvt_idx,
->>                            XiveNVT *nvt, uint8_t word_number);
->> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
->> +XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs, hwaddr=
- offset);
->> =20
->>  /*
->>   * XIVE END ESBs
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index a0f5ff929447..c41ee96c4c84 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -391,7 +391,8 @@ static int spapr_xive_write_nvt(XiveRouter *xrtr, =
-uint8_t nvt_blk,
->>      g_assert_not_reached();
->>  }
->> =20
->> -static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
->> +static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs,
->> +                                     hwaddr offset)
->>  {
->>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> =20
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index f5642f2338de..39dff557fadc 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -320,7 +320,8 @@ static const XiveTmOp *xive_tm_find_op(hwaddr offs=
-et, unsigned size, bool write)
->>  static void xive_tm_write(void *opaque, hwaddr offset,
->>                            uint64_t value, unsigned size)
->>  {
->> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
-ent_cpu);
->> +    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
-ent_cpu,
->> +                                          offset);
->>      const XiveTmOp *xto;
->> =20
->>      /*
->> @@ -358,7 +359,8 @@ static void xive_tm_write(void *opaque, hwaddr off=
-set,
->> =20
->>  static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned si=
-ze)
->>  {
->> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
-ent_cpu);
->> +    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
-ent_cpu,
->> +                                          offset);
->>      const XiveTmOp *xto;
->> =20
->>      /*
->> @@ -1134,11 +1136,11 @@ int xive_router_write_nvt(XiveRouter *xrtr, ui=
-nt8_t nvt_blk, uint32_t nvt_idx,
->>     return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
->>  }
->> =20
->> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs)
->> +XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs, hwaddr=
- offset)
->>  {
->>      XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
->> =20
->> -    return xrc->get_tctx(xrtr, cs);
->> +    return xrc->get_tctx(xrtr, cs, offset);
->>  }
->> =20
->>  /*
->> @@ -1234,7 +1236,7 @@ static bool xive_presenter_match(XiveRouter *xrt=
-r, uint8_t format,
->>       */
->> =20
->>      CPU_FOREACH(cs) {
->> -        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
->> +        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs, 0);
->>          int ring;
->> =20
->>          /*
->=20
+Thanks,
+Pankaj
