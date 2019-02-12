@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54022)
+Received: from eggs.gnu.org ([209.51.188.92]:60110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtP6s-00037m-Ui
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:51:51 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gtPA9-00048F-Ip
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:55:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtP6f-0008Fs-Gf
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:51:42 -0500
-Date: Tue, 12 Feb 2019 11:51:18 +0800
+	(envelope-from <stefanha@gmail.com>) id 1gtPA7-0003CM-O6
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:55:13 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40568)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gtPA6-00037B-E8
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:55:11 -0500
+Received: by mail-pl1-x642.google.com with SMTP id bj4so609950plb.7
+	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 19:55:09 -0800 (PST)
+Date: Tue, 12 Feb 2019 11:55:05 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190212035118.GD28401@stefanha-x1.localdomain>
-References: <20190211055040.13528-1-stefanha@redhat.com>
-	<CAFEAcA-pkOanLBVCry15tSH3dMp-Kuby675LYd6wGidh6E1Wig@mail.gmail.com>
+Message-ID: <20190212035505.GE28401@stefanha-x1.localdomain>
+References: <e6c30bdd-6cd0-ee9b-9fdf-cc8eaa54f7cc@yandex-team.ru>
+	<20190211095049-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cHMo6Wbp1wrKhbfi"
+	protocol="application/pgp-signature"; boundary="ryJZkp9/svQ58syV"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-pkOanLBVCry15tSH3dMp-Kuby675LYd6wGidh6E1Wig@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PULL 0/9] Block patches
+In-Reply-To: <20190211095049-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] Is IOThread for virtio-net a good idea?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sgarzare@redhat.com
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Anton Kuchin <antonkuchin@yandex-team.ru>, jasowang@redhat.com, qemu-devel@nongnu.org
 
 
---cHMo6Wbp1wrKhbfi
+--ryJZkp9/svQ58syV
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 11, 2019 at 11:42:14AM +0000, Peter Maydell wrote:
-> On Mon, 11 Feb 2019 at 05:50, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> >
-> > The following changes since commit e47f81b617684c4546af286d307b69014a83=
-538a:
-> >
-> >   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' =
-into staging (2019-02-07 18:53:25 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/stefanha/qemu.git tags/block-pull-request
-> >
-> > for you to fetch changes up to 55140166667bb555c5d05165b93b25557d2e6397:
-> >
-> >   tests/virtio-blk: add test for WRITE_ZEROES command (2019-02-11 11:58=
-:17 +0800)
-> >
-> > ----------------------------------------------------------------
-> > Pull request
-> >
-> > User-visible changes:
-> >
-> >  * virtio-blk: DISCARD and WRITE_ZEROES support
+On Mon, Feb 11, 2019 at 09:52:01AM -0500, Michael S. Tsirkin wrote:
+> On Mon, Feb 11, 2019 at 04:40:44PM +0300, Anton Kuchin wrote:
+> > As far as I can see currently IOThread offloading is used only for block
+> > devices and all others are emulated by main thread.
+> >=20
+> > I expect that network devices can also benefit from processing in separ=
+ate
+> > thread but I couldn't find any recent work in this direction. I'm going=
+ to
+> > implement a PoC but I want to ask if you know any previous attempts and=
+ do
+> > you know why it can be a total waste of time. Are there fundamental
+> > obstacles that prevent network emulation handling in IOThread?
 >=20
-> Hi; this fails to pass "make check" (all platforms):
->=20
-> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> QTEST_QEMU_BINARY=3Darm-softmmu/qemu-system-arm QTEST_QEMU_IMG=3Dqemu-img
-> tests/virtio-blk-test -m
-> =3Dquick -k --tap < /dev/null | ./scripts/tap-driver.pl
-> --test-name=3D"virtio-blk-test"
-> **
-> ERROR:/home/pm215/qemu/tests/virtio-blk-test.c:272:test_basic:
-> assertion failed (status =3D=3D 0): (1 =3D=3D 0)
-> ERROR - too few tests run (expected 1, got 0)
+> No but vhost-net is there. Unlike block where you gain lots of
+> functionality such as snapshots there seems to be little to
+> be gained by doing it in userspace.
 
-Stefano, I'm dropping the virtio-blk DISCARD/WRITE_ZEROES series.
-Please debug this failure.
+Anthony Liguori tried virtio-net in a dedicated thread a long time ago
+but it was never completed/merged.
 
-I cannot reproduce it on a Linux host so maybe it's related to macOS.
-First I thought it's because write zeroes is not supported on macOS, but
-QEMU should fall back to writing a bounce buffer of zeroes.
+I think the argument for vhost-net in the kernel is that userspace
+doesn't offer the same APIs as the kernel.  For example, is zero copy
+possible from userspace?
+
+Anton: If you want to do virtio-net in userspace, QEMU has
+vhost-user-net support so you can perform emulation in a separate
+process.
 
 Stefan
 
---cHMo6Wbp1wrKhbfi
+--ryJZkp9/svQ58syV
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcYkK2AAoJEJykq7OBq3PIwQwH/1Q9+QF2qq3sj2/EV4ejIwJD
-xRIzVO6xi+3aQ7T5VXwIYumrQDHnhHu+gaP9V2yQfFHi3vjHM1uwXRRy/3YsDzky
-wmWj5aOgvoJGO27lK7kxwOIGdhXiG288iwgnBKrHjPqYXemQySNLN6TIlguc7CRA
-j60cA6Nu9wRntmub1gXyjyvU5rYhCFmGSaN5Tg+N9TOpgPHonFTtzpMBkC3ksY5P
-RRcb+NMmljScgK5RfBlViephPC6m/umwyQbuqJpT49X/d7IRoRpnLDF6L4EC/Fvv
-x4WRqUubhf872GpL/zUEegIqjc+cDt7SEvH1El9r51/X006f7csvvry9hbPCBVg=
-=yA/4
+iQEcBAEBAgAGBQJcYkOZAAoJEJykq7OBq3PIBIsIAMeDgWgeVdjkKv59yMkXS96W
+VDCQpjBBZeCyBVpU2N80NknvajC3BSaikyqjcgNtD1gpn9EoYTBmnjnRaYDSZ/U6
+k6XI9o3/GYy7jr/k3FotT5O9GIhB6POsqnODIf2sN4cxSDfYynyMYr12xF59y9ni
+kFrvd+lSIVLNQrfDcn3ghQLcWgPX7RkujqX7kqodldIkwENow/vciaqGN3U6Qcdj
+AQu1d6TNTfob7T+3nJ9hHwwe+BmZqnVpvaPkpFo2DXfc5jewWeuX4Uh0riAmFsPG
+e305CBrTVfsm4I3+KGNyKl9JolT124VYMxFT+5vR+MtocLfUmQa3LTs5anOk0cE=
+=a6gf
 -----END PGP SIGNATURE-----
 
---cHMo6Wbp1wrKhbfi--
+--ryJZkp9/svQ58syV--
