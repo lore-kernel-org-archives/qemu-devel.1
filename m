@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43154)
+Received: from eggs.gnu.org ([209.51.188.92]:46344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gteLk-0000ZR-NZ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:08:14 -0500
+	(envelope-from <clg@kaod.org>) id 1gteVc-0005qe-1h
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:18:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gteLj-0007OC-4h
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:08:12 -0500
-Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:37042)
+	(envelope-from <clg@kaod.org>) id 1gteVY-0004OO-3B
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:18:23 -0500
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:42065)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gteLi-0007IH-8n
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:08:10 -0500
-Received: from player795.ha.ovh.net (unknown [10.109.160.143])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 97FC4EE2EB
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 21:08:06 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gteVX-0004Fm-KO
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 15:18:19 -0500
+Received: from player756.ha.ovh.net (unknown [10.109.143.238])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id DB3A4F1CBE
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 21:18:16 +0100 (CET)
 References: <154999583316.690774.15072605479770041782.stgit@bahia.lan>
-	<154999583999.690774.9854440646408554397.stgit@bahia.lan>
+	<154999585315.690774.7586633403635165044.stgit@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <66446de7-ea20-4b55-8d99-04b27e26d789@kaod.org>
-Date: Tue, 12 Feb 2019 21:07:41 +0100
+Message-ID: <d1f04423-d737-b7eb-a3d1-37863fac226a@kaod.org>
+Date: Tue, 12 Feb 2019 21:17:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <154999583999.690774.9854440646408554397.stgit@bahia.lan>
+In-Reply-To: <154999585315.690774.7586633403635165044.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 01/15] spapr_irq: Add an @xics_offset
- field to sPAPRIrq
+Subject: Re: [Qemu-devel] [PATCH v4 03/15] spapr_irq: Set LSIs at interrupt
+ controller init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,22 +36,46 @@ To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 On 2/12/19 7:24 PM, Greg Kurz wrote:
-> Only pseries machines, either recent ones started with ic-mode=3Dxics
-> or older ones using the legacy irq allocation scheme, need to set the
-> @offset of the ICS to XICS_IRQ_BASE. Recent pseries started with
-> ic-mode=3Ddual set it to 0 and powernv machines set it to some other
-> value at runtime.
+> The pseries machine only uses LSIs to support legacy PCI devices. Every
+> PHB claims 4 LSIs at realize time. When using in-kernel XICS (or upcomi=
+ng
+> in-kernel XIVE), QEMU synchronizes the state of all irqs, including the=
+se
+> LSIs, later on at machine reset.
 >=20
-> It thus doesn't really help to set the default value of the ICS offset
-> to XICS_IRQ_BASE in ics_base_instance_init().
+> In order to support PHB hotplug, we need a way to tell KVM about the LS=
+Is
+> that doesn't require a machine reset.
+>
+> Since recent machine types allocate all these LSIs in a fixed range for
+> the machine lifetime, identify them when initializing the interrupt
+> controller, long before they get passed to KVM.
 >=20
-> Drop that code from XICS and let the pseries code set the offset
-> explicitely for clarity.
+> In order to do that, first disintricate interrupt typing and allocation=
+.
+> Since the vast majority of interrupts are MSIs, make that the default
+> and have only the LSI users to explicitely set the type.
+>=20
+> It is rather straight forward for XIVE. XICS needs some extra care
+> though: allocation state and type are mixed up in the same bits of the
+> flags field within the interrupt state. Setting the LSI bit there at
+> init time would mean the interrupt is de facto allocated, even if no
+> device asked for it. Introduce a bitmap to track LSIs at the ICS level.
+> In order to keep the patch minimal, the bitmap is only used when writin=
+g
+> the source state to KVM and when the interrupt is claimed, so that the
+> code that checks the interrupt type through the flags stays untouched.
+>=20
+> With older pseries machine using the XICS legacy IRQ allocation scheme,
+> all interrupt numbers come from a common pool and there's no such thing
+> as a fixed range for LSIs. Introduce an helper so that these older
+> machine types can continue to set the type when allocating the LSI.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Looks OK to me. I would have call it 'offset' and not 'xics_offset'=20
-though, because we might want to create an sPAPR IRQ XIVE device with
-some offset one day. There is still some work to be done before that
-is possible. Anyhow,
+There are multiple changes in this patch but having them all at once=20
+makes the overall picture clearer. Having a set_lsi method would=20
+probably help for the "Identify the PCI LSIs" section.
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
@@ -59,157 +83,388 @@ Thanks,
 
 C.
 
-
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/intc/xics.c             |    8 --------
->  hw/ppc/spapr_irq.c         |   33 ++++++++++++++++++++-------------
->  include/hw/ppc/spapr_irq.h |    1 +
->  3 files changed, 21 insertions(+), 21 deletions(-)
+>  hw/intc/spapr_xive.c        |    7 +------
+>  hw/intc/xics.c              |   10 ++++++++--
+>  hw/intc/xics_kvm.c          |    2 +-
+>  hw/ppc/pnv_psi.c            |    3 ++-
+>  hw/ppc/spapr_events.c       |    4 ++--
+>  hw/ppc/spapr_irq.c          |   42 ++++++++++++++++++++++++++++++++---=
+-------
+>  hw/ppc/spapr_pci.c          |    6 ++++--
+>  hw/ppc/spapr_vio.c          |    2 +-
+>  include/hw/ppc/spapr_irq.h  |    5 +++--
+>  include/hw/ppc/spapr_xive.h |    2 +-
+>  include/hw/ppc/xics.h       |    4 +++-
+>  11 files changed, 58 insertions(+), 29 deletions(-)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 16e8ffa2aaf7..7cac138067e2 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -638,13 +638,6 @@ static void ics_base_realize(DeviceState *dev, Err=
-or **errp)
->      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->  }
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 290a290e43a5..815263ca72ab 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -480,18 +480,13 @@ static void spapr_xive_register_types(void)
 > =20
-> -static void ics_base_instance_init(Object *obj)
-> -{
-> -    ICSState *ics =3D ICS_BASE(obj);
-> -
-> -    ics->offset =3D XICS_IRQ_BASE;
-> -}
-> -
->  static int ics_base_dispatch_pre_save(void *opaque)
+>  type_init(spapr_xive_register_types)
+> =20
+> -bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi)
+> +bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn)
 >  {
->      ICSState *ics =3D opaque;
-> @@ -720,7 +713,6 @@ static const TypeInfo ics_base_info =3D {
->      .parent =3D TYPE_DEVICE,
->      .abstract =3D true,
->      .instance_size =3D sizeof(ICSState),
-> -    .instance_init =3D ics_base_instance_init,
->      .class_init =3D ics_base_class_init,
->      .class_size =3D sizeof(ICSStateClass),
->  };
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 80b0083b8e38..8217e0215411 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -68,10 +68,11 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
-> =20
->  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
->                                    const char *type_ics,
-> -                                  int nr_irqs, Error **errp)
-> +                                  int nr_irqs, int offset, Error **err=
-p)
->  {
->      Error *local_err =3D NULL;
->      Object *obj;
-> +    ICSState *ics;
-> =20
->      obj =3D object_new(type_ics);
->      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort)=
-;
-> @@ -86,7 +87,10 @@ static ICSState *spapr_ics_create(sPAPRMachineState =
-*spapr,
->          goto error;
+> -    XiveSource *xsrc =3D &xive->source;
+> -
+>      if (lisn >=3D xive->nr_irqs) {
+>          return false;
 >      }
 > =20
-> -    return ICS_BASE(obj);
-> +    ics =3D ICS_BASE(obj);
-> +    ics->offset =3D offset;
-> +
-> +    return ics;
+>      xive->eat[lisn].w |=3D cpu_to_be64(EAS_VALID);
+> -    if (lsi) {
+> -        xive_source_irq_set_lsi(xsrc, lisn);
+> -    }
+>      return true;
+>  }
 > =20
->  error:
->      error_propagate(errp, local_err);
-> @@ -104,6 +108,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
-spapr, Error **errp)
->              !xics_kvm_init(spapr, &local_err)) {
->              spapr->icp_type =3D TYPE_KVM_ICP;
->              spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_ir=
-qs,
-> +                                          spapr->irq->xics_offset,
->                                            &local_err);
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 7cac138067e2..26e8940d7329 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -636,6 +636,7 @@ static void ics_base_realize(DeviceState *dev, Erro=
+r **errp)
+>          return;
+>      }
+>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+> +    ics->lsi_map =3D bitmap_new(ics->nr_irqs);
+>  }
+> =20
+>  static int ics_base_dispatch_pre_save(void *opaque)
+> @@ -733,12 +734,17 @@ ICPState *xics_icp_get(XICSFabric *xi, int server=
+)
+>      return xic->icp_get(xi, server);
+>  }
+> =20
+> -void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
+> +void ics_set_lsi(ICSState *ics, int srcno)
+> +{
+> +    set_bit(srcno, ics->lsi_map);
+> +}
+> +
+> +void ics_claim_irq(ICSState *ics, int srcno)
+>  {
+>      assert(!(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK));
+> =20
+>      ics->irqs[srcno].flags |=3D
+> -        lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
+> +        test_bit(srcno, ics->lsi_map) ? XICS_FLAGS_IRQ_LSI : XICS_FLAG=
+S_IRQ_MSI;
+>  }
+> =20
+>  static void xics_register_types(void)
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index dff13300504c..e63979abc7fc 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -271,7 +271,7 @@ static int ics_set_kvm_state(ICSState *ics, int ver=
+sion_id)
+>              state |=3D KVM_XICS_MASKED;
 >          }
->          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
-> @@ -119,6 +124,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
+> =20
+> -        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
+> +        if (test_bit(i, ics->lsi_map)) {
+>              state |=3D KVM_XICS_LEVEL_SENSITIVE;
+>              if (irq->status & XICS_STATUS_ASSERTED) {
+>                  state |=3D KVM_XICS_PENDING;
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index 8ced09506321..e6089e1035c0 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -487,7 +487,8 @@ static void pnv_psi_realize(DeviceState *dev, Error=
+ **errp)
+>      }
+> =20
+>      for (i =3D 0; i < ics->nr_irqs; i++) {
+> -        ics_set_irq_type(ics, i, true);
+> +        ics_set_lsi(ics, i);
+> +        ics_claim_irq(ics, i);
+>      }
+> =20
+>      psi->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr=
+_irqs);
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index b9c7ecb9e987..559026d0981c 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -713,7 +713,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>          epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>      }
+> =20
+> -    spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
+> +    spapr_irq_claim(spapr, epow_irq, &error_fatal);
+> =20
+>      QTAILQ_INIT(&spapr->pending_events);
+> =20
+> @@ -737,7 +737,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>              hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>          }
+> =20
+> -        spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
+> +        spapr_irq_claim(spapr, hp_irq, &error_fatal);
+> =20
+>          spapr_event_sources_register(spapr->event_sources, EVENT_CLASS=
+_HOT_PLUG,
+>                                       hp_irq);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 8217e0215411..3fc34d7c8a43 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -16,10 +16,13 @@
+>  #include "hw/ppc/spapr_xive.h"
+>  #include "hw/ppc/xics.h"
+>  #include "hw/ppc/xics_spapr.h"
+> +#include "hw/pci-host/spapr.h"
+>  #include "sysemu/kvm.h"
+> =20
+>  #include "trace.h"
+> =20
+> +#define SPAPR_IRQ_PCI_LSI_NR     (SPAPR_MAX_PHBS * PCI_NUM_PINS)
+> +
+>  void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_msis)
+>  {
+>      spapr->irq_map_nr =3D nr_msis;
+> @@ -102,6 +105,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
 spapr, Error **errp)
->          xics_spapr_init(spapr);
->          spapr->icp_type =3D TYPE_ICP;
->          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irq=
-s,
-> +                                      spapr->irq->xics_offset,
+>      MachineState *machine =3D MACHINE(spapr);
+>      int nr_irqs =3D spapr->irq->nr_irqs;
+>      Error *local_err =3D NULL;
+> +    int i;
+> =20
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+> @@ -128,6 +132,14 @@ static void spapr_irq_init_xics(sPAPRMachineState =
+*spapr, Error **errp)
 >                                        &local_err);
 >      }
 > =20
-> @@ -246,6 +252,7 @@ sPAPRIrq spapr_irq_xics =3D {
->      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
->      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
->      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
-> +    .xics_offset =3D XICS_IRQ_BASE,
+> +    /* Identify the PCI LSIs */
+> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        for (i =3D 0; i < SPAPR_IRQ_PCI_LSI_NR; ++i) {
+> +            ics_set_lsi(spapr->ics,
+> +                        i + SPAPR_IRQ_PCI_LSI - spapr->irq->xics_offse=
+t);
+> +        }
+> +    }
+> +
+>  error:
+>      error_propagate(errp, local_err);
+>  }
+> @@ -135,7 +147,7 @@ error:
+>  #define ICS_IRQ_FREE(ics, srcno)   \
+>      (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
 > =20
->      .init        =3D spapr_irq_init_xics,
->      .claim       =3D spapr_irq_claim_xics,
-> @@ -451,17 +458,6 @@ static void spapr_irq_init_dual(sPAPRMachineState =
-*spapr, Error **errp)
->          return;
+> -static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq, boo=
+l lsi,
+> +static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq,
+>                                  Error **errp)
+>  {
+>      ICSState *ics =3D spapr->ics;
+> @@ -152,7 +164,7 @@ static int spapr_irq_claim_xics(sPAPRMachineState *=
+spapr, int irq, bool lsi,
+>          return -1;
 >      }
 > =20
-> -    /*
-> -     * Align the XICS and the XIVE IRQ number space under QEMU.
-> -     *
-> -     * However, the XICS KVM device still considers that the IRQ
-> -     * numbers should start at XICS_IRQ_BASE (0x1000). Either we
-> -     * should introduce a KVM device ioctl to set the offset or ignore
-> -     * the lower 4K numbers when using the get/set ioctl of the XICS
-> -     * KVM device. The second option seems the least intrusive.
-> -     */
-> -    spapr->ics->offset =3D 0;
-> -
->      spapr_irq_xive.init(spapr, &local_err);
+> -    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> +    ics_claim_irq(ics, irq - ics->offset);
+>      return 0;
+>  }
+> =20
+> @@ -296,16 +308,21 @@ static void spapr_irq_init_xive(sPAPRMachineState=
+ *spapr, Error **errp)
+> =20
+>      /* Enable the CPU IPIs */
+>      for (i =3D 0; i < nr_servers; ++i) {
+> -        spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, false);
+> +        spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i);
+> +    }
+> +
+> +    /* Identify the PCI LSIs */
+> +    for (i =3D 0; i < SPAPR_IRQ_PCI_LSI_NR; ++i) {
+> +        xive_source_irq_set_lsi(&spapr->xive->source, SPAPR_IRQ_PCI_LS=
+I + i);
+>      }
+> =20
+>      spapr_xive_hcall_init(spapr);
+>  }
+> =20
+> -static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, boo=
+l lsi,
+> +static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq,
+>                                  Error **errp)
+>  {
+> -    if (!spapr_xive_irq_claim(spapr->xive, irq, lsi)) {
+> +    if (!spapr_xive_irq_claim(spapr->xive, irq)) {
+>          error_setg(errp, "IRQ %d is invalid", irq);
+>          return -1;
+>      }
+> @@ -465,19 +482,19 @@ static void spapr_irq_init_dual(sPAPRMachineState=
+ *spapr, Error **errp)
+>      }
+>  }
+> =20
+> -static int spapr_irq_claim_dual(sPAPRMachineState *spapr, int irq, boo=
+l lsi,
+> +static int spapr_irq_claim_dual(sPAPRMachineState *spapr, int irq,
+>                                  Error **errp)
+>  {
+>      Error *local_err =3D NULL;
+>      int ret;
+> =20
+> -    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
+> +    ret =3D spapr_irq_xics.claim(spapr, irq, &local_err);
 >      if (local_err) {
 >          error_propagate(errp, local_err);
-> @@ -582,6 +578,16 @@ sPAPRIrq spapr_irq_dual =3D {
->      .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
->      .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
->      .ov5         =3D SPAPR_OV5_XIVE_BOTH,
-> +    /*
-> +     * Align the XICS and the XIVE IRQ number space under QEMU.
-> +     *
-> +     * However, the XICS KVM device still considers that the IRQ
-> +     * numbers should start at XICS_IRQ_BASE (0x1000). Either we
-> +     * should introduce a KVM device ioctl to set the offset or ignore
-> +     * the lower 4K numbers when using the get/set ioctl of the XICS
-> +     * KVM device. The second option seems the least intrusive.
-> +     */
-> +    .xics_offset =3D 0,
+>          return ret;
+>      }
 > =20
->      .init        =3D spapr_irq_init_dual,
->      .claim       =3D spapr_irq_claim_dual,
-> @@ -712,6 +718,7 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
->      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
->      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
->      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
-> +    .xics_offset =3D XICS_IRQ_BASE,
+> -    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
+> +    ret =3D spapr_irq_xive.claim(spapr, irq, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return ret;
+> @@ -630,9 +647,9 @@ void spapr_irq_init(sPAPRMachineState *spapr, Error=
+ **errp)
+>                                        spapr->irq->nr_irqs);
+>  }
 > =20
->      .init        =3D spapr_irq_init_xics,
->      .claim       =3D spapr_irq_claim_xics,
+> -int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error=
+ **errp)
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, Error **errp)
+>  {
+> -    return spapr->irq->claim(spapr, irq, lsi, errp);
+> +    return spapr->irq->claim(spapr, irq, errp);
+>  }
+> =20
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> @@ -712,6 +729,11 @@ int spapr_irq_find(sPAPRMachineState *spapr, int n=
+um, bool align, Error **errp)
+>      return first + ics->offset;
+>  }
+> =20
+> +void spapr_irq_set_lsi_legacy(sPAPRMachineState *spapr, int irq)
+> +{
+> +    ics_set_lsi(spapr->ics, irq - spapr->irq->xics_offset);
+> +}
+> +
+>  #define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     0x400
+> =20
+>  sPAPRIrq spapr_irq_xics_legacy =3D {
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index c3fb0ac884b0..d68595531d5a 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -391,7 +391,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sP=
+APRMachineState *spapr,
+>      }
+> =20
+>      for (i =3D 0; i < req_num; i++) {
+> -        spapr_irq_claim(spapr, irq + i, false, &err);
+> +        spapr_irq_claim(spapr, irq + i, &err);
+>          if (err) {
+>              if (i) {
+>                  spapr_irq_free(spapr, irq, i);
+> @@ -1742,9 +1742,11 @@ static void spapr_phb_realize(DeviceState *dev, =
+Error **errp)
+>                                          "can't allocate LSIs: ");
+>                  return;
+>              }
+> +
+> +            spapr_irq_set_lsi_legacy(spapr, irq);
+>          }
+> =20
+> -        spapr_irq_claim(spapr, irq, true, &local_err);
+> +        spapr_irq_claim(spapr, irq, &local_err);
+>          if (local_err) {
+>              error_propagate_prepend(errp, local_err, "can't allocate L=
+SIs: ");
+>              return;
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index 2b7e7ecac57f..b1beefc24be5 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -512,7 +512,7 @@ static void spapr_vio_busdev_realize(DeviceState *q=
+dev, Error **errp)
+>          }
+>      }
+> =20
+> -    spapr_irq_claim(spapr, dev->irq, false, &local_err);
+> +    spapr_irq_claim(spapr, dev->irq, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
 > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 14b02c3aca33..5e30858dc22a 100644
+> index 5e30858dc22a..0e6c65d55430 100644
 > --- a/include/hw/ppc/spapr_irq.h
 > +++ b/include/hw/ppc/spapr_irq.h
-> @@ -34,6 +34,7 @@ typedef struct sPAPRIrq {
->      uint32_t    nr_irqs;
->      uint32_t    nr_msis;
->      uint8_t     ov5;
-> +    uint32_t    xics_offset;
+> @@ -37,7 +37,7 @@ typedef struct sPAPRIrq {
+>      uint32_t    xics_offset;
 > =20
 >      void (*init)(sPAPRMachineState *spapr, Error **errp);
->      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **=
+> -    int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **=
 errp);
+> +    int (*claim)(sPAPRMachineState *spapr, int irq, Error **errp);
+>      void (*free)(sPAPRMachineState *spapr, int irq, int num);
+>      qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
+>      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+> @@ -56,7 +56,7 @@ extern sPAPRIrq spapr_irq_xive;
+>  extern sPAPRIrq spapr_irq_dual;
+> =20
+>  void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
+> -int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error=
+ **errp);
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, Error **errp);
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+>  int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
+> @@ -67,5 +67,6 @@ void spapr_irq_reset(sPAPRMachineState *spapr, Error =
+**errp);
+>   */
+>  int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Erro=
+r **errp);
+>  #define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false,=
+ errp)
+> +void spapr_irq_set_lsi_legacy(sPAPRMachineState *spapr, int irq);
+> =20
+>  #endif
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 9bec9192e4a0..885ca169cb29 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -37,7 +37,7 @@ typedef struct sPAPRXive {
+>      MemoryRegion  tm_mmio;
+>  } sPAPRXive;
+> =20
+> -bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+> +bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn);
+>  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+> =20
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index fad786e8b22d..18b083fe2aec 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -133,6 +133,7 @@ struct ICSState {
+>      uint32_t offset;
+>      ICSIRQState *irqs;
+>      XICSFabric *xics;
+> +    unsigned long *lsi_map;
+>  };
+> =20
+>  #define ICS_PROP_XICS "xics"
+> @@ -193,7 +194,8 @@ void ics_simple_write_xive(ICSState *ics, int nr, i=
+nt server,
+>  void ics_simple_set_irq(void *opaque, int srcno, int val);
+>  void ics_kvm_set_irq(void *opaque, int srcno, int val);
+> =20
+> -void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+> +void ics_set_lsi(ICSState *ics, int srcno);
+> +void ics_claim_irq(ICSState *ics, int srcno);
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon);
+>  void ics_pic_print_info(ICSState *ics, Monitor *mon);
+> =20
 >=20
