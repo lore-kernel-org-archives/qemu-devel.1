@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35713)
+Received: from eggs.gnu.org ([209.51.188.92]:37157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtb2Z-0005OV-Q9
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:36:12 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gtb5N-0007hY-5l
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:39:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtasU-0000uO-20
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:25:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtasS-0000cC-4u
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:25:44 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 12 Feb 2019 17:25:22 +0100
-Message-Id: <20190212162524.31504-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20190212162524.31504-1-marcandre.lureau@redhat.com>
-References: <20190212162524.31504-1-marcandre.lureau@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gtb5L-0005ld-Nu
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 11:39:04 -0500
+Date: Tue, 12 Feb 2019 17:38:53 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190212163853.GG5283@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<6ec504767392cb91591542c416f0c2ae52f847f8.1547739122.git.berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 5/7] slirp: add a standalone Makefile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ec504767392cb91591542c416f0c2ae52f847f8.1547739122.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 07/13] block: Allow omitting the 'backing'
+ option in certain cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: samuel.thibault@ens-lyon.org, peter.maydell@linaro.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Add a simple Makefile to build libslirp.a, a static library version of
-libslirp, to be used by QEMU during a transition period, until a
-shared library is available.
+Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
+> Of all options of type BlockdevRef used to specify children in
+> BlockdevOptions, 'backing' is the only one that is optional.
+> 
+> For "x-blockdev-reopen" we want that if an option is omitted then it
+> must be reset to its default value. The default value of 'backing'
+> means that QEMU opens the backing file specified in the image
+> metadata, but this is not something that we want to support for the
+> reopen operation.
+> 
+> Because of this the 'backing' option has to be specified during
+> reopen, pointing to the existing backing file if we want to keep it,
+> or pointing to a different one (or NULL) if we want to replace it (to
+> be implemented in a subsequent patch).
+> 
+> In order to simplify things a bit and not to require that the user
+> passes the 'backing' option to every single block device even when
+> it's clearly not necessary, this patch allows omitting this option if
+> the block device being reopened doesn't have a backing file attached
+> _and_ no default backing file is specified in the image metadata.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block.c b/block.c
+> index fd51f1cd35..897c8b85cd 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3336,7 +3336,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>  
+>      drv_prepared = true;
+>  
+> -    if (reopen_state->backing_missing) {
+> +    /*
+> +     * We must provide the 'backing' option if the BDS has a backing
+> +     * file or if the image file has a backing file name as part of
+> +     * its metadata. Otherwise the 'backing' option can be omitted.
+> +     */
+> +    if (reopen_state->backing_missing &&
+> +        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_file[0])) {
+>          error_setg(errp, "backing is missing for '%s'",
+>                     reopen_state->bs->node_name);
+>          ret = -EINVAL;
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- slirp/Makefile | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
- create mode 100644 slirp/Makefile
+Okay, this should be enough to fix drivers without support for backing
+files again. Might be worth mentioning in the commit message of this and
+the previous patch.
 
-diff --git a/slirp/Makefile b/slirp/Makefile
-new file mode 100644
-index 0000000000..6d48f626ba
---- /dev/null
-+++ b/slirp/Makefile
-@@ -0,0 +1,47 @@
-+ROOT_DIR :=3D $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-+BUILD_DIR ?=3D .
-+
-+LIBSLIRP =3D $(BUILD_DIR)/libslirp.a
-+
-+all: $(LIBSLIRP)
-+
-+SRCS :=3D $(wildcard src/*.c)
-+OBJS :=3D $(SRCS:%.c=3D$(BUILD_DIR)/%.o)
-+DEPS :=3D $(OBJS:%.o=3D%.d)
-+
-+INC_DIRS :=3D $(BUILD_DIR)/src
-+INC_FLAGS :=3D $(addprefix -I,$(INC_DIRS))
-+
-+override CFLAGS +=3D					\
-+	-DG_LOG_DOMAIN=3D'"Slirp"'			\
-+	$(shell $(PKG_CONFIG) --cflags glib-2.0)	\
-+	$(INC_FLAGS)					\
-+	-MMD -MP
-+override LDFLAGS +=3D $(shell $(PKG_CONFIG) --libs glib-2.0)
-+
-+$(LIBSLIRP): $(OBJS)
-+
-+.PHONY: clean
-+
-+clean:
-+	rm -r $(OBJS) $(DEPS) $(LIBSLIRP)
-+
-+$(BUILD_DIR)/src/%.o: $(ROOT_DIR)/src/%.c
-+	@$(MKDIR_P) $(dir $@)
-+	$(call quiet-command,$(CC) $(CFLAGS) -c -o $@ $<,"CC","$@")
-+
-+%.a:
-+	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$@")
-+
-+PKG_CONFIG ?=3D pkg-config
-+MKDIR_P ?=3D mkdir -p
-+quiet-command-run =3D $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && )=
-)$1
-+quiet-@ =3D $(if $(V),,@)
-+quiet-command =3D $(quiet-@)$(call quiet-command-run,$1,$2,$3)
-+
-+print-%:
-+	@echo '$*=3D$($*)'
-+
-+.SUFFIXES:
-+
-+-include $(DEPS)
---=20
-2.21.0.rc0.1.g036caf7885
+Normally, I would suggest merging this into the previous patch to keep
+things bisectable, but keep_old_opts == false isn't used yet, so this
+isn't a concern in this case.
+
+Kevin
