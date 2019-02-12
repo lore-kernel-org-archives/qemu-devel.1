@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54137)
+Received: from eggs.gnu.org ([209.51.188.92]:54271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVrA-0006AZ-Hr
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:04:12 -0500
+	(envelope-from <david@redhat.com>) id 1gtVrV-0006Nv-KU
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:04:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtVr5-0003GJ-UM
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:04:04 -0500
+	(envelope-from <david@redhat.com>) id 1gtVrA-0003Pe-Lg
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 06:04:09 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 12 Feb 2019 12:03:04 +0100
-Message-Id: <20190212110308.13707-13-david@redhat.com>
+Date: Tue, 12 Feb 2019 12:03:06 +0100
+Message-Id: <20190212110308.13707-15-david@redhat.com>
 In-Reply-To: <20190212110308.13707-1-david@redhat.com>
 References: <20190212110308.13707-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 11/15] s390x/tcg: Prepare for
- IEEE-inexact-exception control (XxC)
+Subject: [Qemu-devel] [PATCH v1 13/15] s390x/tcg: Implement rounding mode
+ and XxC for LOAD ROUNDED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,540 +23,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Some instructions allow to suppress IEEE inexact exceptions.
+With the floating-point extension facility, LOAD ROUNDED has
+a rounding mode specification and the inexact-exception control (XxC).
 
-z14 PoP, 9-23, "Suppression of Certain IEEE Exceptions"
-    IEEE-inexact-exception control (XxC): Bit 1 of
-    the M4 field is the XxC bit. If XxC is zero, recogni-
-    tion of IEEE-inexact exception is not suppressed;
-    if XxC is one, recognition of IEEE-inexact excep-
-    tion is suppressed.
-
-Especially, handling for overflow/unerflow remains as is, inexact is
-reported along
-
-z14 PoP, 9-23, "Suppression of Certain IEEE Exceptions"
-    For example, the IEEE-inexact-exception control (XxC)
-    has no effect on the DXC; that is, the DXC for IEEE-
-    overflow or IEEE-underflow exceptions along with the
-    detail for exact, inexact and truncated, or inexact and
-    incremented, is reported according to the actual con-
-    dition.
-
-Follow up patches will wire it correctly up for the applicable
-instructions.
+Handle them just like e.g. LOAD FP INTEGER.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/fpu_helper.c | 112 +++++++++++++++++++-------------------
- 1 file changed, 56 insertions(+), 56 deletions(-)
+ target/s390x/fpu_helper.c  | 22 ++++++++++++++++------
+ target/s390x/helper.h      |  6 +++---
+ target/s390x/insn-data.def |  6 +++---
+ target/s390x/translate.c   | 30 +++++++++++++++++++++++++++---
+ 4 files changed, 49 insertions(+), 15 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 518fb6365a..5136147da6 100644
+index a0501b9ee5..8ef3d2f0e4 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -50,7 +50,7 @@ uint8_t s390_softfloat_exc_to_ieee(unsigned int exc)
+@@ -306,10 +306,14 @@ uint64_t HELPER(ldeb)(CPUS390XState *env, uint64_t f2)
  }
  
- /* Should be called after any operation that may raise IEEE exceptions.  */
--static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
-+static void handle_exceptions(CPUS390XState *env, bool XxC, uintptr_t retaddr)
+ /* convert 128-bit float to 64-bit float */
+-uint64_t HELPER(ldxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
++uint64_t HELPER(ldxb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint32_t m)
  {
-     unsigned s390_exc, qemu_exc;
- 
-@@ -101,7 +101,7 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
-     }
- 
-     /* inexact handling */
--    if (s390_exc & S390_IEEE_MASK_INEXACT) {
-+    if (s390_exc & S390_IEEE_MASK_INEXACT && !XxC) {
-         /* trap condition - overflow/underflow _not_ reported along */
-         if (s390_exc & S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
-             tcg_s390_data_exception(env, s390_exc & S390_IEEE_MASK_INEXACT,
-@@ -174,7 +174,7 @@ uint32_t set_cc_nz_f128(float128 v)
- uint64_t HELPER(aeb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float32 ret = float32_add(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -182,7 +182,7 @@ uint64_t HELPER(aeb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- uint64_t HELPER(adb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float64 ret = float64_add(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -193,7 +193,7 @@ uint64_t HELPER(axb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     float128 ret = float128_add(make_float128(ah, al),
-                                 make_float128(bh, bl),
-                                 &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -201,7 +201,7 @@ uint64_t HELPER(axb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- uint64_t HELPER(seb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float32 ret = float32_sub(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -209,7 +209,7 @@ uint64_t HELPER(seb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- uint64_t HELPER(sdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float64 ret = float64_sub(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -220,7 +220,7 @@ uint64_t HELPER(sxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     float128 ret = float128_sub(make_float128(ah, al),
-                                 make_float128(bh, bl),
-                                 &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -228,7 +228,7 @@ uint64_t HELPER(sxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- uint64_t HELPER(deb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float32 ret = float32_div(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -236,7 +236,7 @@ uint64_t HELPER(deb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- uint64_t HELPER(ddb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float64 ret = float64_div(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -247,7 +247,7 @@ uint64_t HELPER(dxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     float128 ret = float128_div(make_float128(ah, al),
-                                 make_float128(bh, bl),
-                                 &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -255,7 +255,7 @@ uint64_t HELPER(dxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- uint64_t HELPER(meeb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float32 ret = float32_mul(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -263,7 +263,7 @@ uint64_t HELPER(meeb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- uint64_t HELPER(mdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float64 ret = float64_mul(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -272,7 +272,7 @@ uint64_t HELPER(mdeb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     float64 ret = float32_to_float64(f2, &env->fpu_status);
-     ret = float64_mul(f1, ret, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -283,7 +283,7 @@ uint64_t HELPER(mxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     float128 ret = float128_mul(make_float128(ah, al),
-                                 make_float128(bh, bl),
-                                 &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -293,7 +293,7 @@ uint64_t HELPER(mxdb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- {
-     float128 ret = float64_to_float128(f2, &env->fpu_status);
-     ret = float128_mul(make_float128(ah, al), ret, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -301,7 +301,7 @@ uint64_t HELPER(mxdb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- uint64_t HELPER(ldeb)(CPUS390XState *env, uint64_t f2)
- {
-     float64 ret = float32_to_float64(f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -309,7 +309,7 @@ uint64_t HELPER(ldeb)(CPUS390XState *env, uint64_t f2)
- uint64_t HELPER(ldxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
- {
++    int old_mode = s390_swap_bfp_rounding_mode(env, m & 0xf);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
      float64 ret = float128_to_float64(make_float128(ah, al), &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
+-    handle_exceptions(env, false, GETPC());
++    s390_restore_bfp_rounding_mode(env, old_mode);
++    handle_exceptions(env, (m >> 8) & 1, GETPC());
      return ret;
  }
  
-@@ -317,7 +317,7 @@ uint64_t HELPER(ldxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
- uint64_t HELPER(lxdb)(CPUS390XState *env, uint64_t f2)
- {
-     float128 ret = float64_to_float128(f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
+@@ -330,18 +334,24 @@ uint64_t HELPER(lxeb)(CPUS390XState *env, uint64_t f2)
  }
  
-@@ -325,7 +325,7 @@ uint64_t HELPER(lxdb)(CPUS390XState *env, uint64_t f2)
- uint64_t HELPER(lxeb)(CPUS390XState *env, uint64_t f2)
+ /* convert 64-bit float to 32-bit float */
+-uint64_t HELPER(ledb)(CPUS390XState *env, uint64_t f2)
++uint64_t HELPER(ledb)(CPUS390XState *env, uint64_t f2, uint32_t m)
  {
-     float128 ret = float32_to_float128(f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -333,7 +333,7 @@ uint64_t HELPER(lxeb)(CPUS390XState *env, uint64_t f2)
- uint64_t HELPER(ledb)(CPUS390XState *env, uint64_t f2)
- {
++    int old_mode = s390_swap_bfp_rounding_mode(env, m & 0xf);
      float32 ret = float64_to_float32(f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
+-    handle_exceptions(env, false, GETPC());
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
++    handle_exceptions(env, (m >> 8) & 1, GETPC());
      return ret;
  }
  
-@@ -341,7 +341,7 @@ uint64_t HELPER(ledb)(CPUS390XState *env, uint64_t f2)
- uint64_t HELPER(lexb)(CPUS390XState *env, uint64_t ah, uint64_t al)
+ /* convert 128-bit float to 32-bit float */
+-uint64_t HELPER(lexb)(CPUS390XState *env, uint64_t ah, uint64_t al)
++uint64_t HELPER(lexb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint32_t m)
  {
++    int old_mode = s390_swap_bfp_rounding_mode(env, m & 0xf);
      float32 ret = float128_to_float32(make_float128(ah, al), &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
+-    handle_exceptions(env, false, GETPC());
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
++    handle_exceptions(env, (m >> 8) & 1, GETPC());
      return ret;
  }
  
-@@ -349,7 +349,7 @@ uint64_t HELPER(lexb)(CPUS390XState *env, uint64_t ah, uint64_t al)
- uint32_t HELPER(ceb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 179c942fc8..b92e5c5e40 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -53,11 +53,11 @@ DEF_HELPER_FLAGS_3(mdb, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_5(mxb, TCG_CALL_NO_WG, i64, env, i64, i64, i64, i64)
+ DEF_HELPER_FLAGS_4(mxdb, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(ldeb, TCG_CALL_NO_WG, i64, env, i64)
+-DEF_HELPER_FLAGS_3(ldxb, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_4(ldxb, TCG_CALL_NO_WG, i64, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_2(lxdb, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_2(lxeb, TCG_CALL_NO_WG, i64, env, i64)
+-DEF_HELPER_FLAGS_2(ledb, TCG_CALL_NO_WG, i64, env, i64)
+-DEF_HELPER_FLAGS_3(lexb, TCG_CALL_NO_WG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_3(ledb, TCG_CALL_NO_WG, i64, env, i64, i32)
++DEF_HELPER_FLAGS_4(lexb, TCG_CALL_NO_WG, i64, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_3(ceb, TCG_CALL_NO_WG_SE, i32, env, i64, i64)
+ DEF_HELPER_FLAGS_3(cdb, TCG_CALL_NO_WG_SE, i32, env, i64, i64)
+ DEF_HELPER_FLAGS_5(cxb, TCG_CALL_NO_WG_SE, i32, env, i64, i64, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 7ef230029e..39117c0fd4 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -599,9 +599,9 @@
+     F(0xed05, LXDB,    RXE,   Z,   0, m2_64, new_P, x1, lxdb, 0, IF_BFP)
+     F(0xed06, LXEB,    RXE,   Z,   0, m2_32u, new_P, x1, lxeb, 0, IF_BFP)
+ /* LOAD ROUNDED */
+-    F(0xb344, LEDBR,   RRE,   Z,   0, f2, new, e1, ledb, 0, IF_BFP)
+-    F(0xb345, LDXBR,   RRE,   Z,   x2h, x2l, new, f1, ldxb, 0, IF_BFP)
+-    F(0xb346, LEXBR,   RRE,   Z,   x2h, x2l, new, e1, lexb, 0, IF_BFP)
++    F(0xb344, LEDBR,   RRF_e, Z,   0, f2, new, e1, ledb, 0, IF_BFP)
++    F(0xb345, LDXBR,   RRF_e, Z,   x2h, x2l, new, f1, ldxb, 0, IF_BFP)
++    F(0xb346, LEXBR,   RRF_e, Z,   x2h, x2l, new, e1, lexb, 0, IF_BFP)
+ 
+ /* LOAD MULTIPLE */
+     C(0x9800, LM,      RS_a,  Z,   0, a2, 0, 0, lm32, 0)
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index e7cfc80131..d1fbd0cde1 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2806,19 +2806,43 @@ static DisasJumpType op_ldeb(DisasContext *s, DisasOps *o)
+ 
+ static DisasJumpType op_ledb(DisasContext *s, DisasOps *o)
  {
-     int cmp = float32_compare_quiet(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return float_comp_to_cc(env, cmp);
+-    gen_helper_ledb(o->out, cpu_env, o->in2);
++    TCGv_i32 m;
++
++    if (!valid_bfp_rounding_mode(get_field(s->fields, m3))) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++    m = tcg_const_i32(get_fields2(s->fields, m3, m4));
++    gen_helper_ledb(o->out, cpu_env, o->in2, m);
++    tcg_temp_free_i32(m);
+     return DISAS_NEXT;
  }
  
-@@ -357,7 +357,7 @@ uint32_t HELPER(ceb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- uint32_t HELPER(cdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
+ static DisasJumpType op_ldxb(DisasContext *s, DisasOps *o)
  {
-     int cmp = float64_compare_quiet(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return float_comp_to_cc(env, cmp);
+-    gen_helper_ldxb(o->out, cpu_env, o->in1, o->in2);
++    TCGv_i32 m;
++
++    if (!valid_bfp_rounding_mode(get_field(s->fields, m3))) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++    m = tcg_const_i32(get_fields2(s->fields, m3, m4));
++    gen_helper_ldxb(o->out, cpu_env, o->in1, o->in2, m);
++    tcg_temp_free_i32(m);
+     return DISAS_NEXT;
  }
  
-@@ -368,7 +368,7 @@ uint32_t HELPER(cxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     int cmp = float128_compare_quiet(make_float128(ah, al),
-                                      make_float128(bh, bl),
-                                      &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return float_comp_to_cc(env, cmp);
- }
- 
-@@ -413,7 +413,7 @@ uint64_t HELPER(cegb)(CPUS390XState *env, int64_t v2, uint32_t m3)
- 
-     float32 ret = int64_to_float32(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -424,7 +424,7 @@ uint64_t HELPER(cdgb)(CPUS390XState *env, int64_t v2, uint32_t m3)
- 
-     float64 ret = int64_to_float64(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -435,7 +435,7 @@ uint64_t HELPER(cxgb)(CPUS390XState *env, int64_t v2, uint32_t m3)
- 
-     float128 ret = int64_to_float128(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -446,7 +446,7 @@ uint64_t HELPER(celgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
- 
-     float32 ret = uint64_to_float32(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -457,7 +457,7 @@ uint64_t HELPER(cdlgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
- 
-     float64 ret = uint64_to_float64(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -468,7 +468,7 @@ uint64_t HELPER(cxlgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
- 
-     float128 ret = uint64_to_float128(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -479,7 +479,7 @@ uint64_t HELPER(cgeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     int64_t ret = float32_to_int64(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -490,7 +490,7 @@ uint64_t HELPER(cgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     int64_t ret = float64_to_int64(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -502,7 +502,7 @@ uint64_t HELPER(cgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
-     int64_t ret = float128_to_int64(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -513,7 +513,7 @@ uint64_t HELPER(cfeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     int32_t ret = float32_to_int32(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -524,7 +524,7 @@ uint64_t HELPER(cfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     int32_t ret = float64_to_int32(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -537,7 +537,7 @@ uint64_t HELPER(cfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
-     int32_t ret = float128_to_int32(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -550,7 +550,7 @@ uint64_t HELPER(clgeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     v2 = float32_to_float64(v2, &env->fpu_status);
-     ret = float64_to_uint64(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -561,7 +561,7 @@ uint64_t HELPER(clgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
- 
-     uint64_t ret = float64_to_uint64(v2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -572,7 +572,7 @@ uint64_t HELPER(clgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
-     uint64_t ret = float128_to_uint64(make_float128(h, l), &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -583,7 +583,7 @@ uint64_t HELPER(clfeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     uint32_t ret = float32_to_uint32(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -594,7 +594,7 @@ uint64_t HELPER(clfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
-     uint32_t ret = float64_to_uint32(v2, &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -605,7 +605,7 @@ uint64_t HELPER(clfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
-     uint32_t ret = float128_to_uint32(make_float128(h, l), &env->fpu_status);
- 
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -616,7 +616,7 @@ uint64_t HELPER(fieb)(CPUS390XState *env, uint64_t f2, uint32_t m3)
- 
-     float32 ret = float32_round_to_int(f2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -627,7 +627,7 @@ uint64_t HELPER(fidb)(CPUS390XState *env, uint64_t f2, uint32_t m3)
- 
-     float64 ret = float64_round_to_int(f2, &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -639,7 +639,7 @@ uint64_t HELPER(fixb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint32_t m3)
-     float128 ret = float128_round_to_int(make_float128(ah, al),
-                                          &env->fpu_status);
-     s390_restore_bfp_rounding_mode(env, old_mode);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
- }
- 
-@@ -647,7 +647,7 @@ uint64_t HELPER(fixb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint32_t m3)
- uint32_t HELPER(keb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
+ static DisasJumpType op_lexb(DisasContext *s, DisasOps *o)
  {
-     int cmp = float32_compare(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return float_comp_to_cc(env, cmp);
- }
- 
-@@ -655,7 +655,7 @@ uint32_t HELPER(keb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- uint32_t HELPER(kdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
- {
-     int cmp = float64_compare(f1, f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return float_comp_to_cc(env, cmp);
- }
- 
-@@ -666,7 +666,7 @@ uint32_t HELPER(kxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     int cmp = float128_compare(make_float128(ah, al),
-                                make_float128(bh, bl),
-                                &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return float_comp_to_cc(env, cmp);
- }
- 
-@@ -675,7 +675,7 @@ uint64_t HELPER(maeb)(CPUS390XState *env, uint64_t f1,
-                       uint64_t f2, uint64_t f3)
- {
-     float32 ret = float32_muladd(f2, f3, f1, 0, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -684,7 +684,7 @@ uint64_t HELPER(madb)(CPUS390XState *env, uint64_t f1,
-                       uint64_t f2, uint64_t f3)
- {
-     float64 ret = float64_muladd(f2, f3, f1, 0, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -694,7 +694,7 @@ uint64_t HELPER(mseb)(CPUS390XState *env, uint64_t f1,
- {
-     float32 ret = float32_muladd(f2, f3, f1, float_muladd_negate_c,
-                                  &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -704,7 +704,7 @@ uint64_t HELPER(msdb)(CPUS390XState *env, uint64_t f1,
- {
-     float64 ret = float64_muladd(f2, f3, f1, float_muladd_negate_c,
-                                  &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -809,7 +809,7 @@ uint32_t HELPER(tcxb)(CPUS390XState *env, uint64_t ah,
- uint64_t HELPER(sqeb)(CPUS390XState *env, uint64_t f2)
- {
-     float32 ret = float32_sqrt(f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -817,7 +817,7 @@ uint64_t HELPER(sqeb)(CPUS390XState *env, uint64_t f2)
- uint64_t HELPER(sqdb)(CPUS390XState *env, uint64_t f2)
- {
-     float64 ret = float64_sqrt(f2, &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return ret;
- }
- 
-@@ -825,7 +825,7 @@ uint64_t HELPER(sqdb)(CPUS390XState *env, uint64_t f2)
- uint64_t HELPER(sqxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
- {
-     float128 ret = float128_sqrt(make_float128(ah, al), &env->fpu_status);
--    handle_exceptions(env, GETPC());
-+    handle_exceptions(env, false, GETPC());
-     return RET128(ret);
+-    gen_helper_lexb(o->out, cpu_env, o->in1, o->in2);
++    TCGv_i32 m;
++
++    if (!valid_bfp_rounding_mode(get_field(s->fields, m3))) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++    m = tcg_const_i32(get_fields2(s->fields, m3, m4));
++    gen_helper_lexb(o->out, cpu_env, o->in1, o->in2, m);
++    tcg_temp_free_i32(m);
+     return DISAS_NEXT;
  }
  
 -- 
