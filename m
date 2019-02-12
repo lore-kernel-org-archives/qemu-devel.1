@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39409)
+Received: from eggs.gnu.org ([209.51.188.92]:39564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gte8v-0007Bm-Ro
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:54:58 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gte9E-0007UU-2h
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gte8u-0000LI-Sw
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:54:57 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:44892 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gte9C-0000zy-0C
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:55:15 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:44879 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gte8u-0006pN-LF
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:54:56 -0500
+	id 1gte9A-0006mg-J9
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:55:13 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 12 Feb 2019 20:53:24 +0100
-Message-Id: <1550001205-7883-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 12 Feb 2019 20:53:23 +0100
+Message-Id: <1550001205-7883-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550001205-7883-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550001205-7883-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 4/5] tests/tcg: target/mips: Add a header with
- test utilities
+Subject: [Qemu-devel] [PATCH 3/5] tests/tcg: target/mips: Add a header with
+ MSA wrappers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +30,24 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, alex.ben
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add a header that contains test utilities. For now, it contains
-only a function for checking and printing test results for bit
-counting and similar MSA instructions.
+Add a header that contains wrappers around MSA instructions assembler
+invocations. For now, only bit counting instructions (NLOC, NLZC, and
+PCNT; each in four data format flavors) are supported.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/include/test_utils.h | 84 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
- create mode 100644 tests/tcg/mips/include/test_utils.h
+ tests/tcg/mips/include/wrappers_msa.h | 57 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+ create mode 100644 tests/tcg/mips/include/wrappers_msa.h
 
-diff --git a/tests/tcg/mips/include/test_utils.h b/tests/tcg/mips/include/test_utils.h
+diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
 new file mode 100644
-index 0000000..03f3191
+index 0000000..8f8d00b
 --- /dev/null
-+++ b/tests/tcg/mips/include/test_utils.h
-@@ -0,0 +1,84 @@
++++ b/tests/tcg/mips/include/wrappers_msa.h
+@@ -0,0 +1,57 @@
 +/*
-+ *  Header file for test utilities
++ *  Header file for wrappers around MSA instructions assembler invocations
 + *
 + *  Copyright (C) 2018  Wave Computing, Inc.
 + *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
@@ -67,67 +67,40 @@ index 0000000..03f3191
 + *
 + */
 +
-+#ifndef TEST_UTILS_H
-+#define TEST_UTILS_H
++#ifndef WRAPPERS_MSA_H
++#define WRAPPERS_MSA_H
 +
-+#include <stdio.h>
-+#include <stdint.h>
-+#include <inttypes.h>
-+#include <string.h>
 +
-+#define PRINT_RESULTS 0
-+
-+static inline int32_t check_results(char *instruction_name,
-+                                    uint32_t test_count,
-+                                    double elapsed_time,
-+                                    uint64_t *b128_result,
-+                                    uint64_t *b128_expect)
-+{
-+#if PRINT_RESULTS
-+
-+    uint32_t i;
-+    printf("\n");
-+    for (i = 0; i < test_count; i++) {
-+        uint64_t a, b;
-+        memcpy(&a, (b128_result + 2 * i), 8);
-+        memcpy(&b, (b128_result + 2 * i + 1), 8);
-+        if (i % 8 != 0) {
-+            printf("        { 0x%016llxULL, 0x%016llxULL, },\n", a, b);
-+        } else {
-+            printf("        { 0x%016llxULL, 0x%016llxULL, },    /* %3d  */\n",
-+                   a, b, i);
-+        }
-+    }
-+    printf("\n");
-+
-+    return 0;
-+
-+#else
-+
-+    uint32_t i;
-+    uint32_t pass_count = 0;
-+    uint32_t fail_count = 0;
-+
-+    printf("%s:   ", instruction_name);
-+    for (i = 0; i < test_count; i++) {
-+        if (b128_result[i] == b128_expect[i]) {
-+            pass_count++;
-+        } else {
-+            fail_count++;
-+        }
-+    }
-+
-+    printf("PASS: %3d   FAIL: %3d   elapsed time: %5.2f ms\n",
-+           pass_count, fail_count, elapsed_time);
-+
-+    if (fail_count > 0) {
-+        return -1;
-+    } else {
-+        return 0;
-+    }
-+
-+#endif
++#define DO_MSA__WD__WS(suffix, mnemonic)                               \
++static inline void do_msa_##suffix(void *input, void *output)          \
++{                                                                      \
++   __asm__ volatile (                                                  \
++      "move $t0, %0\n\t"                                               \
++      "ld.d $w11, 0($t0)\n\t"                                          \
++      #mnemonic " $w10, $w11\n\t"                                      \
++      "move $t0, %1\n\t"                                               \
++      "st.d $w10, 0($t0)\n\t"                                          \
++      :                                                                \
++      : "r" (input), "r" (output)                                      \
++      : "t0", "memory"                                                 \
++   );                                                                  \
 +}
++
++DO_MSA__WD__WS(NLOC_B, nloc.b)
++DO_MSA__WD__WS(NLOC_H, nloc.h)
++DO_MSA__WD__WS(NLOC_W, nloc.w)
++DO_MSA__WD__WS(NLOC_D, nloc.d)
++
++DO_MSA__WD__WS(NLZC_B, nlzc.b)
++DO_MSA__WD__WS(NLZC_H, nlzc.h)
++DO_MSA__WD__WS(NLZC_W, nlzc.w)
++DO_MSA__WD__WS(NLZC_D, nlzc.d)
++
++DO_MSA__WD__WS(PCNT_B, pcnt.b)
++DO_MSA__WD__WS(PCNT_H, pcnt.h)
++DO_MSA__WD__WS(PCNT_W, pcnt.w)
++DO_MSA__WD__WS(PCNT_D, pcnt.d)
++
 +
 +#endif
 -- 
