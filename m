@@ -1,46 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39424)
+Received: from eggs.gnu.org ([209.51.188.92]:39509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gtY79-0004Lp-ED
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:28:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gtY7G-0004Qp-Ql
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gtY6N-00056h-8g
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:27:56 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43562
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
-	id 1gtY6N-00051v-2t
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:27:55 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1CDPKHM027581
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 08:27:50 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qkvrfpn67-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 08:27:50 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
-	Tue, 12 Feb 2019 13:27:49 -0000
-References: <1549897385-10091-1-git-send-email-liam.merwick@oracle.com>
-	<1549897385-10091-3-git-send-email-liam.merwick@oracle.com>
-	<13b4d86c-0af3-12b9-fce5-92f1eb0fe95d@redhat.com>
-	<0251e2fc-3dbd-937a-0649-71fcd64e2d14@linux.ibm.com>
-	<0b53df4a-7065-b3b7-c419-3f8e55cffdfd@oracle.com>
-	<bf1a6632-594c-cf05-e4cd-c70d9e1e2fbe@linux.ibm.com>
-	<f7b55eef-68da-ef50-b060-05e86f659903@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Date: Tue, 12 Feb 2019 08:27:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gtXv4-0006bc-5D
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:16:15 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:45957)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gtXv0-0006FY-1T
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:16:12 -0500
+Received: by mail-ot1-x334.google.com with SMTP id 32so4162291ota.12
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 05:16:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f7b55eef-68da-ef50-b060-05e86f659903@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <113577fd-71c8-972f-b658-635d3decd62d@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tpm_tis: fix format string
- specifier in tpm_tis_show_buffer()
+References: <20190212045721.28041-1-richard.henderson@linaro.org>
+In-Reply-To: <20190212045721.28041-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Feb 2019 13:15:54 +0000
+Message-ID: <CAFEAcA_Oc4fTfcC-RFmV3zi7RnAbjDv=xWG8uPb_AT9buGnAcQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/24] target/hppa patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,37 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 2/12/19 7:31 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/11/19 10:13 PM, Stefan Berger wrote:
->> On 2/11/19 3:09 PM, Liam Merwick wrote:
->>> On 11/02/2019 19:56, Stefan Berger wrote:
->>>> On 2/11/19 11:02 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> On 2/11/19 4:03 PM, Liam Merwick wrote:
-> [...]
->>>>>> -    printf("tpm_tis: %s length =3D %d\n", string, len);
->>>>>> +    printf("tpm_tis: %s length =3D %u\n", string, len);
->>>>> So here the format is '%zu'.
->>>>> However in code cleanup we try go get ride of printf() calls and
->>>>> replace them with trace points.
->>>>
->>>> This code is only used for debugging if DEBUG_TIS has been #defined.
->>>> No need to add tracing here.
->>> I'd come up the attached change (but that seems like overkill).
->>
->> I don't think we need tracing for this.
-> So if you think the code is mature enough, let's remove the DEBUG calls=
-!
+On Tue, 12 Feb 2019 at 04:57, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Else we prefer to convert DEBUG printf to trace events because (at leas=
-t):
-> - no need to recompile to enable debugging
-> - when compiled with debugging, you don't mess with STDIO which can be
-> used as a chardev backend.
-Fine. Then I withdraw my reviewed-by.
-> Thanks,
+> The following changes since commit 22c5f446514a2a4bb0dbe1fea26713da92fc85fa:
 >
-> Phil.
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190211' into staging (2019-02-11 17:04:57 +0000)
 >
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-hppa-20190211
+>
+> for you to fetch changes up to 23e76627deba013509b5f1a1e1c53e8e111145aa:
+>
+>   hw/hppa: forward requests to CPU HPA (2019-02-11 20:49:06 -0800)
+>
+> ----------------------------------------------------------------
+> Convert to decodetree.
+> Fix signed overflow conditions.
+> Fix dcor.
+> Add CPU MIE to PCI address space.
+
+Hi -- clang compiles fail with:
+
+In file included from
+/home/petmay01/linaro/qemu-for-merges/target/hppa/translate.c:337:
+target/hppa/decode.inc.c:471:16: error: redefinition of typedef
+'arg_be' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_be arg_be;
+               ^
+target/hppa/decode.inc.c:9:3: note: previous definition is here
+} arg_be;
+  ^
+target/hppa/decode.inc.c:473:16: error: redefinition of typedef
+'arg_bl' is a C11 feature [-Werror,-Wtypedef-redefinition]
+typedef arg_bl arg_bl;
+               ^
+target/hppa/decode.inc.c:15:3: note: previous definition is here
+} arg_bl;
+  ^
+
+thanks
+-- PMM
