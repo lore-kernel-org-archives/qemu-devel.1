@@ -1,25 +1,33 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtY7G-0004Qp-Ql
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:28:52 -0500
+	(envelope-from <mst@redhat.com>) id 1gtY7I-0004Qp-P3
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:28:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gtXv4-0006bc-5D
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:16:15 -0500
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:45957)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gtXv0-0006FY-1T
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:16:12 -0500
-Received: by mail-ot1-x334.google.com with SMTP id 32so4162291ota.12
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 05:16:07 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gtY3j-0001xF-Hr
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:25:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57070)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtY3h-0001r2-Ed
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 08:25:10 -0500
+Date: Tue, 12 Feb 2019 08:24:54 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190212082336-mutt-send-email-mst@kernel.org>
+References: <20190204142638.27021-1-mst@redhat.com>
+	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
+	<20190204205105-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_m8Ebz8NTKM19FV-APQCOJpXVwyWm48uHRdfdKsHu7Bg@mail.gmail.com>
+	<20190205110518-mutt-send-email-mst@kernel.org>
+	<20190212071114.GM1011@xz-x1>
+	<bb1175b1-6b51-2df2-047d-b625413ea3dc@redhat.com>
+	<20190212080349-mutt-send-email-mst@kernel.org>
+	<5716364b-da70-e134-4ed0-d3d136d9ba8a@redhat.com>
 MIME-Version: 1.0
-References: <20190212045721.28041-1-richard.henderson@linaro.org>
-In-Reply-To: <20190212045721.28041-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Feb 2019 13:15:54 +0000
-Message-ID: <CAFEAcA_Oc4fTfcC-RFmV3zi7RnAbjDv=xWG8uPb_AT9buGnAcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/24] target/hppa patch queue
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <5716364b-da70-e134-4ed0-d3d136d9ba8a@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Changpeng Liu <changpeng.liu@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 
-On Tue, 12 Feb 2019 at 04:57, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit 22c5f446514a2a4bb0dbe1fea26713da92fc85fa:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190211' into staging (2019-02-11 17:04:57 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-hppa-20190211
->
-> for you to fetch changes up to 23e76627deba013509b5f1a1e1c53e8e111145aa:
->
->   hw/hppa: forward requests to CPU HPA (2019-02-11 20:49:06 -0800)
->
-> ----------------------------------------------------------------
-> Convert to decodetree.
-> Fix signed overflow conditions.
-> Fix dcor.
-> Add CPU MIE to PCI address space.
+On Tue, Feb 12, 2019 at 02:15:36PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 2/12/19 2:04 PM, Michael S. Tsirkin wrote:
+> > On Tue, Feb 12, 2019 at 11:39:21AM +0100, Philippe Mathieu-Daud=E9 wr=
+ote:
+> >> On 2/12/19 8:11 AM, Peter Xu wrote:
+> >>> On Tue, Feb 05, 2019 at 11:06:42AM -0500, Michael S. Tsirkin wrote:
+> >>>>
+> >>>> OK I reverted the whole part dealing with vhost-user and reposted.
+> >>>
+> >>> I noticed that the merged pull request could possibly have squashed
+> >>> the below two patches (in previous pull) into one super patch
+> >>> (a56de056c91f87e1e):
+> >>>
+> >>>         i386/kvm: ignore masked irqs when update msi routes
+> >>>         contrib/vhost-user-blk: fix the compilation issue
+> >>>
+> >>> Here, the first patch lost its commit message, and the last patch l=
+ost
+> >>> its real author. ;)
+> >>
+> >> I suggest we revert a56de056c9 ASAP and reapply the both patches, th=
+is
+> >> will ease cherry-picking/downstream workflow.
+> >=20
+> > I don't see why does it help upstream.
+>=20
+> I'd have suggested the same if I had no idea what 'downstream workflow'
+> mean, simply to keep the tree clear and avoid to have unrelated changes
+> squashed altogether.
+> Commit a56de056c9 really looks messy. MSI/MSIX changes described by "fi=
+x
+> vhost-user-blk compilation".
+> Hopefully it won't trigger any problem which requires bisecting to it,
+> then contact Changpeng Liu asking him what he intented to do with his
+> commit.
+> Your call anyway :)
+>=20
+> Regards,
+>=20
+> Phil.
 
-Hi -- clang compiles fail with:
 
-In file included from
-/home/petmay01/linaro/qemu-for-merges/target/hppa/translate.c:337:
-target/hppa/decode.inc.c:471:16: error: redefinition of typedef
-'arg_be' is a C11 feature [-Werror,-Wtypedef-redefinition]
-typedef arg_be arg_be;
-               ^
-target/hppa/decode.inc.c:9:3: note: previous definition is here
-} arg_be;
-  ^
-target/hppa/decode.inc.c:473:16: error: redefinition of typedef
-'arg_bl' is a C11 feature [-Werror,-Wtypedef-redefinition]
-typedef arg_bl arg_bl;
-               ^
-target/hppa/decode.inc.c:15:3: note: previous definition is here
-} arg_bl;
-  ^
+OK these are good points. I'm not sure what happened but it looks like I
+screwed up when resolving some conflicts.  Care posting a patchset
+looking sane?
 
-thanks
--- PMM
+--=20
+MST
