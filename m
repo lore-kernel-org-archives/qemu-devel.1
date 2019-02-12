@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45538)
+Received: from eggs.gnu.org ([209.51.188.92]:56480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtOG8-00039u-Qc
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 21:57:21 -0500
+	(envelope-from <mst@redhat.com>) id 1gtOdN-0005yF-GY
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtOFz-0005Cp-SE
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 21:57:13 -0500
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:35710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gtOFx-00058g-5R
-	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 21:57:10 -0500
-Received: by mail-pf1-x430.google.com with SMTP id z9so558703pfi.2
-	for <qemu-devel@nongnu.org>; Mon, 11 Feb 2019 18:57:04 -0800 (PST)
-Date: Tue, 12 Feb 2019 10:56:58 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190212025658.GB28401@stefanha-x1.localdomain>
-References: <2932080.UxbmD43V0u@neil>
-	<20190208062441.GF16257@stefanha-x1.localdomain>
-	<20190208094818.GA2608@work-vm> <1808957.OXY5YYl177@neil>
+	(envelope-from <mst@redhat.com>) id 1gtOdK-0005eO-ND
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:21:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtOdH-0005av-7S
+	for qemu-devel@nongnu.org; Mon, 11 Feb 2019 22:21:17 -0500
+Date: Mon, 11 Feb 2019 22:21:10 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190211222053-mutt-send-email-mst@kernel.org>
+References: <20190211165756.GN2627@work-vm>
+	<20190211122058-mutt-send-email-mst@kernel.org>
+	<FF7FC980937D6342B9D289F5F3C7C2625B7B4E39@SHSMSX103.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1808957.OXY5YYl177@neil>
-Subject: Re: [Qemu-devel] [regression] Clock jump on VM migration
+In-Reply-To: <FF7FC980937D6342B9D289F5F3C7C2625B7B4E39@SHSMSX103.ccr.corp.intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] virtio-blk io bar size changed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Neil Skrypuch <neil@tembosocial.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Liu, Changpeng" <changpeng.liu@intel.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>, "ldoktor@redhat.com" <ldoktor@redhat.com>
 
+On Tue, Feb 12, 2019 at 01:59:38AM +0000, Liu, Changpeng wrote:
+>=20
+>=20
+> > -----Original Message-----
+> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > Sent: Tuesday, February 12, 2019 1:23 AM
+> > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Cc: qemu-devel@nongnu.org; Liu, Changpeng <changpeng.liu@intel.com>;
+> > stefanha@redhat.com; ldoktor@redhat.com
+> > Subject: Re: virtio-blk io bar size changed
+> >=20
+> > On Mon, Feb 11, 2019 at 04:58:19PM +0000, Dr. David Alan Gilbert wrot=
+e:
+> > > Hi,
+> > >   Luk=C3=A1=C5=A1 reported that there's a migration breakage betwee=
+n 3.1 and
+> > > current head with virtio-blk;   it looks like the io bar changes fr=
+om 64
+> > > to 128 bytes and my bisect suggests it's:
+> > >
+> > > commit caa1ee43131c060347b32893abd41fe4865eaa2e (HEAD, refs/bisect/=
+bad)
+> > > Author: Changpeng Liu <changpeng.liu@intel.com>
+> > > Date:   Wed Jan 16 13:19:30 2019 +0800
+> > >
+> > >     vhost-user-blk: add discard/write zeroes features support
+> > >
+> > >
+> > > How do we fix that?
+> > >
+> > > Dave
+> >=20
+> > Quickly :)
+> >=20
+> > See the logic around virtio_net_set_config_size
+> > and static VirtIOFeature feature_sizes - we need to
+> > add something similar to virtio blk now.
+> Correct, after this commit the BAR config size is changed, I will submi=
+t a patch to fix this.
 
---FkmkrVfFsRoUs1wW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks!
 
-Hi Neil,
-I'll return to this issue on Monday.
-
-Stefan
-
---FkmkrVfFsRoUs1wW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcYjX6AAoJEJykq7OBq3PIDAkH/0tJL4rJhod5XaiXNLTB37oY
-s67aQZIsVRTf+iQtAfwTGYVXwCnk2nolYgAGEkQ/VT28gYThEZjBapNfk9Z1kWjx
-I7kjLyzpHmMH/sZ92NNAy4aUygMv20LQwtaHXlZT0PxDh4DznoeSgi+ltMlNtEvW
-ECRVoKJjFaQqK5Z6C7D0TyyMOTUNM/Dfb/6l4864Ly7fv0r2ynQT8bYtf64iMkwj
-ZrF3cAxKdWQlsbrYrm+xhB4ilVQBRXMD+wGkeZbCOeiOwUBgAfG1snGAGy2Jijmp
-D+roI05y1JuuXc37csUZI1yCbOyqnxRc7U0m4InuGDB3OWxB/bgz4PmNddP0IuI=
-=EHSt
------END PGP SIGNATURE-----
-
---FkmkrVfFsRoUs1wW--
+> >=20
+> >=20
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
