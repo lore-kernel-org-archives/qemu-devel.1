@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49555)
+Received: from eggs.gnu.org ([209.51.188.92]:54539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtdEa-0007u1-SU
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:56:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gtdaM-0002Kw-0f
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gtdEY-00081n-U5
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:56:44 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:35906)
+	(envelope-from <richard.henderson@linaro.org>) id 1gtdPP-0003ed-Ak
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:07:56 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37682)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gtdEW-0007oS-Sc
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 13:56:42 -0500
-Received: by mail-pf1-x441.google.com with SMTP id n22so1729949pfa.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 10:56:25 -0800 (PST)
+	id 1gtdPN-0003V8-RQ
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 14:07:55 -0500
+Received: by mail-pg1-x541.google.com with SMTP id q206so1687223pgq.4
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 11:07:48 -0800 (PST)
 References: <20190212110308.13707-1-david@redhat.com>
-	<20190212110308.13707-9-david@redhat.com>
+	<20190212110308.13707-10-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <447f1f9f-b0e7-6328-9981-9c4d1989629c@linaro.org>
-Date: Tue, 12 Feb 2019 10:56:22 -0800
+Message-ID: <43fda672-487e-fef9-17c8-ce0657f27dbe@linaro.org>
+Date: Tue, 12 Feb 2019 11:07:44 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190212110308.13707-9-david@redhat.com>
+In-Reply-To: <20190212110308.13707-10-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 07/15] s390x/tcg: Fix simulated-IEEE
- exceptions
+Subject: Re: [Qemu-devel] [PATCH v1 08/15] s390x/tcg: Handle SET FPC AND
+ LOAD FPC 3-bit BFP rounding modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,17 +36,45 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
 On 2/12/19 3:03 AM, David Hildenbrand wrote:
-> The trap is triggered based on priority of the enabled signaling flags.
-> Only overflow and underflow allow a concurrent inexact exception.
+> We already forward the 3 bits correctly in the translation functions. We
+> also have to handle them properly and check for specification
+> exceptions.
 > 
-> z14 PoP, 9-33, Figure 9-21
+> Setting an invalid rounding mode (BFP only, all DFP rounding modes)
+> results in a specification exception. Setting unassigned bits in the
+> fpc, results in a specification exception.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/fpu_helper.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+> This fixes LOAD FPC (AND SIGNAL), SET FPC (AND SIGNAL). Also for,
+> SET BFP ROUNDING MODE, 3-bit rounding mode is now explicitly checked.
+> 
+> Notes:
+> 1. Use "float_round_to_zero" for now to handle "Round to prepare for
+>    shorter precision". Looking at the PoP "Summary of Rounding and Range
+>    Actions" for BFP. They differ when it comes to tiny values.
+> 2. TCG_CALL_NO_WG is required for sfpc handler, as we now inject
+>    exceptions.
+> 
+> We won't be modeling abscence of the "floating-point extension facility"
+> for now, not necessary as most take the facility for granted without
+> checking.
+> 
+> z14 PoP, 9-23, "LOAD FPC"
+>     When the floating-point extension facility is
+>     installed, bits 29-31 of the second operand must
+>     specify a valid BFP rounding mode and bits 6-7,
+>     14-15, 24, and 28 must be zero; otherwise, a
+>     specification exception is recognized.
+
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> +    /*
+> +     * FIXME: we actually want something like round_to_odd, but that does not
+> +     * support all data types yet.
+> +     */
+> +    float_round_to_zero,
+
+Yes, you want round_to_odd.  I suppose that's not valid for float128 right now?
 
 
 r~
