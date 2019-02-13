@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49963)
+Received: from eggs.gnu.org ([209.51.188.92]:50106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.y.sun@linux.intel.com>) id 1gtnVU-00007K-LY
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:54:53 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gtnVb-0000Cs-0b
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.y.sun@linux.intel.com>) id 1gtnRj-00007w-9o
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:51:01 -0500
-Received: from mga05.intel.com ([192.55.52.43]:31242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
-	id 1gtnRd-0006Ez-N2
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:50:55 -0500
-Date: Wed, 13 Feb 2019 13:46:28 +0800
-From: Yi Sun <yi.y.sun@linux.intel.com>
-Message-ID: <20190213054628.GD16968@yi.y.sun>
-References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
-	<20190211103741.GH1011@xz-x1>
+	(envelope-from <dovgaluk@ispras.ru>) id 1gtnOv-0003JU-03
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:48:05 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:53296)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gtnOt-0003Fo-SE
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:48:04 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+	<154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
+	<20190111104923.GD5010@dhcp-200-186.str.redhat.com>
+	<001001d4abf9$b6ea93e0$24bfbba0$@ru>
+	<20190114113520.GC6837@linux.fritz.box>
+In-Reply-To: <20190114113520.GC6837@linux.fritz.box>
+Date: Wed, 13 Feb 2019 08:47:57 +0300
+Message-ID: <001801d4c35f$ac572a10$05057e30$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190211103741.GH1011@xz-x1>
-Subject: Re: [Qemu-devel] [RFC v1 0/3] intel_iommu: support scalable mode
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v9 19/21] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-On 19-02-11 18:37:41, Peter Xu wrote:
-> On Wed, Jan 30, 2019 at 01:09:10PM +0800, Yi Sun wrote:
-> > Intel vt-d rev3.0 [1] introduces a new translation mode called
-> > 'scalable mode', which enables PASID-granular translations for
-> > first level, second level, nested and pass-through modes. The
-> > vt-d scalable mode is the key ingredient to enable Scalable I/O
-> > Virtualization (Scalable IOV) [2] [3], which allows sharing a
-> > device in minimal possible granularity (ADI - Assignable Device
-> > Interface). As a result, previous Extended Context (ECS) mode
-> > is deprecated (no production ever implements ECS).
-> > 
-> > This patch set emulates a minimal capability set of VT-d scalable
-> > mode, equivalent to what is available in VT-d legacy mode today:
-> >     1. Scalable mode root entry, context entry and PASID table
-> >     2. Seconds level translation under scalable mode
-> >     3. Queued invalidation (with 256 bits descriptor)
-> >     4. Pass-through mode
-> > 
-> > Corresponding intel-iommu driver support will be included in
-> > kernel 5.0:
-> >     https://www.spinics.net/lists/kernel/msg2985279.html
-> > 
-> > We will add emulation of full scalable mode capability along with
-> > guest iommu driver progress later, e.g.:
-> >     1. First level translation
-> >     2. Nested translation
-> >     3. Per-PASID invalidation descriptors
-> >     4. Page request services for handling recoverable faults
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Am 14.01.2019 um 12:10 hat Pavel Dovgalyuk geschrieben:
+> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > Am 09.01.2019 um 13:13 hat Pavel Dovgalyuk geschrieben:
+> > > > Replay is capable of recording normal BH events, but sometimes
+> > > > there are single use callbacks scheduled with aio_bh_schedule_oneshot
+> > > > function. This patch enables recording and replaying such callbacks.
+> > > > Block layer uses these events for calling the completion function.
+> > > > Replaying these calls makes the execution deterministic.
+> > > >
+> > > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > >
+> > > This still doesn't come even close to catching all BHs that need to be
+> > > caught. While you managed to show a few BHs that actually don't need to
+> > > be considered for recording when I asked for this in v7, most BHs in the
+> > > block layer can in some way lead to device callbacks and must therefore
+> > > be recorded.
+> >
+> > Let's have a brief review. I can change all the places, but how
+> > should I make a test case to be sure, that all of them are working ok?
 > 
-> Hi, YiSun/YiLiu,
-> 
-> Have you tested against any existing usages of VT-d with this series
-> applied?
-> 
-Thanks for the review!
+> The list is changing all the time. This is why I am so concerned about
+> special-casing a few callers instead of having a generic solution. I
+> don't know how we could make sure that we call the right function
+> everywhere.
 
-With kernel/qemu scalable mode enabling patch sets applied, I tested
-kernel build/data copy/netperf on guest under both "scalable-mode"
-enabled and "scalable-mode" disabled scenarios.
+I changed all oneshot invocations in the block layer in the new version.
+Can you review it and other block-related patches?
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
+Pavel Dovgalyuk
