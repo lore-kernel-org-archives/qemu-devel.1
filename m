@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33443)
+Received: from eggs.gnu.org ([209.51.188.92]:33563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtodJ-0003Sd-7L
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:07:02 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gtodO-0003Vq-GD
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:07:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtoXm-00035f-Rr
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:01:19 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:46109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gtoXm-00034I-A4
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:01:18 -0500
-Received: by mail-pl1-x643.google.com with SMTP id o6so722748pls.13
-	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 23:01:18 -0800 (PST)
-Date: Wed, 13 Feb 2019 15:01:12 +0800
+	(envelope-from <stefanha@gmail.com>) id 1gtoVR-0000Zi-H1
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:58:55 -0500
+Date: Wed, 13 Feb 2019 14:58:30 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190213070112.GB26332@stefanha-x1.localdomain>
-References: <20190212025241.5330-1-stefanha@redhat.com>
-	<20190212154446.17b7febd@redhat.com>
+Message-ID: <20190213065830.GA26332@stefanha-x1.localdomain>
+References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
+	<20190211034231.GD18083@stefanha-x1.localdomain>
+	<c861c023-c783-57f6-85ae-52ecba971636@virtuozzo.com>
+	<20190212032242.GC28401@stefanha-x1.localdomain>
+	<20190212115840.GB5283@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="QTprm0S8XgL7H0Dt"
+	protocol="application/pgp-signature"; boundary="azLHFNyN32YCQGCU"
 Content-Disposition: inline
-In-Reply-To: <20190212154446.17b7febd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hostmem-file: reject invalid pmem file
- sizes
+In-Reply-To: <20190212115840.GB5283@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
+ wrapper code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Weil <sw@weilnetz.de>, Zhang Yi <yi.z.zhang@linux.intel.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>
 
 
---QTprm0S8XgL7H0Dt
+--azLHFNyN32YCQGCU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 12, 2019 at 03:44:46PM +0100, Igor Mammedov wrote:
-> > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> > index ba601ce940..325ab4aad9 100644
-> > --- a/backends/hostmem-file.c
-> > +++ b/backends/hostmem-file.c
-> > @@ -46,6 +46,22 @@ file_backend_memory_alloc(HostMemoryBackend *backend=
-, Error **errp)
-> >      gchar *name;
-> >  #endif
-> > =20
-> > +    /*
-> > +     * Verify pmem file size since starting a guest with an incorrect =
-size
-> > +     * leads to confusing failures inside the guest.
-> > +     */
-> > +    if (fb->is_pmem && fb->mem_path) {
-> > +        uint64_t size;
-> > +
-> > +        size =3D qemu_get_pmem_size(fb->mem_path, NULL);
->                                                    ^^^^
-> Did you ignore error intentionally?
+On Tue, Feb 12, 2019 at 12:58:40PM +0100, Kevin Wolf wrote:
+> Am 12.02.2019 um 04:22 hat Stefan Hajnoczi geschrieben:
+> > On Mon, Feb 11, 2019 at 09:38:37AM +0000, Vladimir Sementsov-Ogievskiy =
+wrote:
+> > > 11.02.2019 6:42, Stefan Hajnoczi wrote:
+> > > > On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogievs=
+kiy wrote:
+> > > >> Hi all!
+> > > >>
+> > > >> We have a very frequent pattern of wrapping a coroutine_fn function
+> > > >> to be called from non-coroutine context:
+> > > >>
+> > > >>    - create structure to pack parameters
+> > > >>    - create function to call original function taking parameters f=
+rom
+> > > >>      struct
+> > > >>    - create wrapper, which in case of non-coroutine context will
+> > > >>      create a coroutine, enter it and start poll-loop.
+> > > >>
+> > > >> Here is a draft of template code + example how it can be used to d=
+rop a
+> > > >> lot of similar code.
+> > > >>
+> > > >> Hope someone like it except me)
+> > > >=20
+> > > > My 2 cents.  Cons:
+> > > >=20
+> > > >   * Synchronous poll loops are an anti-pattern.  They block all of =
+QEMU
+> > > >     with the big mutex held.  Making them easier to write is
+> > > >     questionable because we should aim to have as few of these as
+> > > >     possible.
+> > >=20
+> > > Understand. Do we have a concept or a kind of target for a future to =
+get rid of
+> > > these a lot of poll-loops? What is the right way? At least for block-=
+layer?
+> >=20
+> > It's non-trivial.  The nested event loop could be flattened if there was
+> > a mechanism to stop further activity on a specific object only (e.g.
+> > BlockDriverState).  That way the event loop can continue processing
+> > events for other objects and device emulation could continue for other
+> > objects.
+>=20
+> The mechanism to stop activity on BlockDriverStates is bdrv_drain(). But
+> I don't see how this is related. Nested event loops aren't for stopping
+> concurrent activity (events related to async operations started earlier
+> are still processed in nested event loops), but for making progress on
+> the operation we're waiting for. They happen when synchronous code calls
+> into asynchronous code.
+>=20
+> The way to get rid of them is making their callers async. I think we
+> would come a long way if we ran QMP command handlers (at least the block
+> related ones) and qemu-img operations in coroutines instead of blocking
+> while we wait for the result.
 
-Hmm...I think I can now propagate the error.  Originally the function
-only handled devdax chardevs so it would fail for a regular file on a
-DAX file system and that shouldn't stop QEMU startup.  But now that it
-supports regular files too I can't think of inputs that lead to a false
-positive.
+A difficult caller is device reset, where we need to drain all requests.
+But even converting some sync code paths to async is a win because it
+removes places where QEMU can get stuck.
 
-Will fix in v2.
+Regarding block QMP handlers, do you mean suspending the monitor when
+a command yields?  The monitor will be unresponsive to the outside
+world, so this doesn't solve the problem from the QMP client's
+perspective.  This is why async QMP and jobs are interesting but it's a
+lot of work both inside QEMU and for clients like libvirt.
+
+>=20
+> > Unfortunately there are interactions between objects like in block jobs
+> > that act on multiple BDSes, so it becomes even tricky.
+> >=20
+> > A simple way of imagining this is to make each object an "actor"
+> > coroutine.  The coroutine processes a single message (request) at a time
+> > and yields when it needs to wait.  Callers send messages and expect
+> > asynchronous responses.  This model is bad for efficiency (parallelism
+> > is necessary) but at least it offers a sane way of thinking about
+> > multiple asynchronous components coordinating together.  (It's another
+> > way of saying, let's put everything into coroutines.)
+> >=20
+> > The advantage of a flat event loop is that a hang in one object (e.g.
+> > I/O getting stuck in one file) doesn't freeze the entire event loop.
+>=20
+> I think this one is more theoretical because you'll still have
+> dependencies between the components. blk_drain_all() isn't hanging
+> because the code is designed suboptimally, but because its semantics is
+> to wait until all requests have completed. And it's called because this
+> semantics is required.
+
+If we try to convert everything to async there will be two cases:
+1. Accidental sync code which can be made async.  (Rare nowadays?)
+2. Fundamental synchronization points that require waiting.
+
+When you reach a point that hangs there is still the possibility of a
+timeout or an explicit cancel.  Today QEMU supports neither, so a
+command that gets stuck will hang QEMU for as long as it takes.
+
+If QMP clients want timeouts or cancel then making everything async is
+necessary.  If not, then we can leave it as is and simply audit the code
+for accidental sync code (there used to be a lot of this but it's rarer
+now) and convert it.
 
 Stefan
 
---QTprm0S8XgL7H0Dt
+--azLHFNyN32YCQGCU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcY8C4AAoJEJykq7OBq3PI+XoIALomTPtMZko22iaEMKO4iV4z
-orls2isiayBXKZxBvCtGByt9mU3Y8Om+Z46+rOEp1ty+QH1hl/YUpHRmZ7ZD/Dvv
-RznPRsPxHkbi9Ve+9dwaPDIc3ZxcEBCzIubpHvS0UBri2BwycxuPbREplFREh56g
-4xFpDZ4vUN/5J4uooAJwO+QtoqqkcHUme53DICD+bMgmnep+wpwXeZSv9MWmeaN+
-xbDSxw+m7mzu73jj7Xa9i0MOR/mPoAd2OCZ+KApGeZtTY1ZVVJgS6rf6Vay473CK
-0IHqEp5uRKlKjUbCFJ1tldz+w3aghqppIRaO6Al2h008kQobdub/FhjG4smdurI=
-=vSrc
+iQEcBAEBAgAGBQJcY8AWAAoJEJykq7OBq3PIqTYH/i65Lvpso68KnudxIeWqst4Y
+z0g2EbPn/GqCZtYNutGVguV76SZSwZ45zMPsiK7iz3Oeo0SDLcm0zx3O6hRds2Iv
+5e2VzVR9Eoyih7HJmmTw5xXUT4tOk9OXxE5fXm2f19hZV2twx3gIUMxjFq/xD31T
+6o41i4sWl0KGidE0u3lgbRbofIbm6EvNUw/uKrbCVcQ2Azl5rp7fi76AJ+46LMpI
+o0Ju4B29b89GU2hYxUv7QYUzALpN3OUvE4Bzwkb5QicG4qJ8Vum/pZhvfP37q08W
+aetBE+t9tSakNqRUvEXEMMLv8mJwlXGaQXv/PMM1rNZukc1rAUz+3WghG02mw64=
+=l2ta
 -----END PGP SIGNATURE-----
 
---QTprm0S8XgL7H0Dt--
+--azLHFNyN32YCQGCU--
