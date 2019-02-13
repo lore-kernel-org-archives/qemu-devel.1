@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39604)
+Received: from eggs.gnu.org ([209.51.188.92]:39652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbi-0008Oe-Lp
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:51 -0500
+	(envelope-from <david@redhat.com>) id 1gtvbp-000055-Bi
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:34:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbh-0002G8-ME
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:50 -0500
+	(envelope-from <david@redhat.com>) id 1gtvbn-0002KK-Fa
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:57 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Feb 2019 15:33:16 +0100
-Message-Id: <20190213143322.31371-10-david@redhat.com>
+Date: Wed, 13 Feb 2019 15:33:17 +0100
+Message-Id: <20190213143322.31371-11-david@redhat.com>
 In-Reply-To: <20190213143322.31371-1-david@redhat.com>
 References: <20190213143322.31371-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 09/15] s390x/tcg: Check for exceptions in
- SET BFP ROUNDING MODE
+Subject: [Qemu-devel] [PATCH v2 10/15] s390x/tcg: Refactor saving/restoring
+ the bfp rounding mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,137 +23,329 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Let's split handling of BFP/DFP rounding mode configuration. Also,
-let's not reuse the sfpc handler, use a separate handler so we can
-properly check for specification exceptions for SRNMB.
+We want to reuse this in the context of vector instructions. So use
+better matching names and introduce s390_restore_bfp_rounding_mode().
+
+While at it, add proper newlines.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/fpu_helper.c  | 11 ++++++++
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  6 ++--
- target/s390x/translate.c   | 56 ++++++++++++++++----------------------
- 4 files changed, 39 insertions(+), 35 deletions(-)
+ target/s390x/fpu_helper.c | 112 +++++++++++++++++++++++---------------
+ target/s390x/internal.h   |   2 +
+ 2 files changed, 71 insertions(+), 43 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index a779cfada6..70fa053e8d 100644
+index 70fa053e8d..0cd6e19ce8 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -823,3 +823,14 @@ void HELPER(sfas)(CPUS390XState *env, uint64_t fpc)
-         tcg_s390_data_exception(env, s390_exc | 3, GETPC());
-     }
+@@ -372,7 +372,7 @@ uint32_t HELPER(cxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
+     return float_comp_to_cc(env, cmp);
  }
-+
-+/* set bfp rounding mode */
-+void HELPER(srnm)(CPUS390XState *env, uint64_t rnd)
-+{
-+    if (rnd > 0x7 || fpc_to_rnd[rnd & 0x7] == -1) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, GETPC());
-+    }
-+
-+    env->fpc = deposit32(env->fpc, 0, 3, rnd);
-+    set_float_rounding_mode(fpc_to_rnd[rnd & 0x7], &env->fpu_status);
-+}
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index a99b067c9c..d287d5dac0 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -106,6 +106,7 @@ DEF_HELPER_4(cksm, i64, env, i64, i64, i64)
- DEF_HELPER_FLAGS_5(calc_cc, TCG_CALL_NO_RWG_SE, i32, env, i32, i64, i64, i64)
- DEF_HELPER_FLAGS_2(sfpc, TCG_CALL_NO_WG, void, env, i64)
- DEF_HELPER_FLAGS_2(sfas, TCG_CALL_NO_WG, void, env, i64)
-+DEF_HELPER_FLAGS_2(srnm, TCG_CALL_NO_WG, void, env, i64)
- DEF_HELPER_FLAGS_1(popcnt, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_2(stfle, i32, env, i64)
- DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 61582372ab..2c9ae503c5 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -759,10 +759,10 @@
- /* SET FPC AND SIGNAL */
-     F(0xb385, SFASR,   RRE,   IEEEE_SIM, 0, r1_o, 0, 0, sfas, 0, IF_DFP)
- /* SET BFP ROUNDING MODE */
--    F(0xb299, SRNM,    S,     Z,   0, 0, 0, 0, srnm, 0, IF_BFP)
--    F(0xb2b8, SRNMB,   S,     FPE, 0, 0, 0, 0, srnm, 0, IF_BFP)
-+    F(0xb299, SRNM,    S,     Z,   la2, 0, 0, 0, srnm, 0, IF_BFP)
-+    F(0xb2b8, SRNMB,   S,     FPE, la2, 0, 0, 0, srnmb, 0, IF_BFP)
- /* SET DFP ROUNDING MODE */
--    F(0xb2b9, SRNMT,   S,     DFPR, 0, 0, 0, 0, srnm, 0, IF_DFP)
-+    F(0xb2b9, SRNMT,   S,     DFPR, la2, 0, 0, 0, srnmt, 0, IF_DFP)
- /* SET PROGRAM MASK */
-     C(0x0400, SPM,     RR_a,  Z,   r1, 0, 0, 0, spm, 0)
  
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 19072efec6..c2645891e8 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3955,41 +3955,33 @@ static DisasJumpType op_sfas(DisasContext *s, DisasOps *o)
- 
- static DisasJumpType op_srnm(DisasContext *s, DisasOps *o)
+-static int swap_round_mode(CPUS390XState *env, int m3)
++int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3)
  {
--    int b2 = get_field(s->fields, b2);
--    int d2 = get_field(s->fields, d2);
--    TCGv_i64 t1 = tcg_temp_new_i64();
--    TCGv_i64 t2 = tcg_temp_new_i64();
--    int mask, pos, len;
-+    /* Bits other than 62 and 63 are ignored. Bit 29 is set to zero. */
-+    tcg_gen_andi_i64(o->addr1, o->addr1, 0x3ull);
-+    gen_helper_srnm(cpu_env, o->addr1);
-+    return DISAS_NEXT;
-+}
- 
--    switch (s->fields->op2) {
--    case 0x99: /* SRNM */
--        pos = 0, len = 2;
--        break;
--    case 0xb8: /* SRNMB */
--        pos = 0, len = 3;
--        break;
--    case 0xb9: /* SRNMT */
--        pos = 4, len = 3;
--        break;
--    default:
--        tcg_abort();
--    }
--    mask = (1 << len) - 1;
-+static DisasJumpType op_srnmb(DisasContext *s, DisasOps *o)
-+{
-+    /* Bits 0-55 are are ignored. */
-+    tcg_gen_andi_i64(o->addr1, o->addr1, 0xffull);
-+    gen_helper_srnm(cpu_env, o->addr1);
-+    return DISAS_NEXT;
-+}
- 
--    /* Insert the value into the appropriate field of the FPC.  */
--    if (b2 == 0) {
--        tcg_gen_movi_i64(t1, d2 & mask);
--    } else {
--        tcg_gen_addi_i64(t1, regs[b2], d2);
--        tcg_gen_andi_i64(t1, t1, mask);
--    }
--    tcg_gen_ld32u_i64(t2, cpu_env, offsetof(CPUS390XState, fpc));
--    tcg_gen_deposit_i64(t2, t2, t1, pos, len);
--    tcg_temp_free_i64(t1);
-+static DisasJumpType op_srnmt(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i64 tmp = tcg_temp_new_i64();
- 
--    /* Then install the new FPC to set the rounding mode in fpu_status.  */
--    gen_helper_sfpc(cpu_env, t2);
--    tcg_temp_free_i64(t2);
-+    /* Bits other than 61-63 are ignored. */
-+    tcg_gen_andi_i64(o->addr1, o->addr1, 0x7ull);
-+
-+    /* No need to call a helper, we don't implement dfp */
-+    tcg_gen_ld32u_i64(tmp, cpu_env, offsetof(CPUS390XState, fpc));
-+    tcg_gen_deposit_i64(tmp, tmp, o->addr1, 4, 3);
-+    tcg_gen_st32_i64(tmp, cpu_env, offsetof(CPUS390XState, fpc));
-+
-+    tcg_temp_free_i64(tmp);
-     return DISAS_NEXT;
+     int ret = env->fpu_status.float_rounding_mode;
+     switch (m3) {
+@@ -401,12 +401,18 @@ static int swap_round_mode(CPUS390XState *env, int m3)
+     return ret;
  }
  
++void s390_restore_bfp_rounding_mode(CPUS390XState *env, int old_mode)
++{
++    set_float_rounding_mode(old_mode, &env->fpu_status);
++}
++
+ /* convert 64-bit int to 32-bit float */
+ uint64_t HELPER(cegb)(CPUS390XState *env, int64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float32 ret = int64_to_float32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -414,9 +420,10 @@ uint64_t HELPER(cegb)(CPUS390XState *env, int64_t v2, uint32_t m3)
+ /* convert 64-bit int to 64-bit float */
+ uint64_t HELPER(cdgb)(CPUS390XState *env, int64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float64 ret = int64_to_float64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -424,9 +431,10 @@ uint64_t HELPER(cdgb)(CPUS390XState *env, int64_t v2, uint32_t m3)
+ /* convert 64-bit int to 128-bit float */
+ uint64_t HELPER(cxgb)(CPUS390XState *env, int64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float128 ret = int64_to_float128(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return RET128(ret);
+ }
+@@ -434,9 +442,10 @@ uint64_t HELPER(cxgb)(CPUS390XState *env, int64_t v2, uint32_t m3)
+ /* convert 64-bit uint to 32-bit float */
+ uint64_t HELPER(celgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float32 ret = uint64_to_float32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -444,9 +453,10 @@ uint64_t HELPER(celgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 64-bit uint to 64-bit float */
+ uint64_t HELPER(cdlgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float64 ret = uint64_to_float64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -454,9 +464,10 @@ uint64_t HELPER(cdlgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 64-bit uint to 128-bit float */
+ uint64_t HELPER(cxlgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float128 ret = uint64_to_float128(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return RET128(ret);
+ }
+@@ -464,9 +475,10 @@ uint64_t HELPER(cxlgb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 32-bit float to 64-bit int */
+ uint64_t HELPER(cgeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     int64_t ret = float32_to_int64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -474,9 +486,10 @@ uint64_t HELPER(cgeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 64-bit float to 64-bit int */
+ uint64_t HELPER(cgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     int64_t ret = float64_to_int64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -484,10 +497,11 @@ uint64_t HELPER(cgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 128-bit float to 64-bit int */
+ uint64_t HELPER(cgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float128 v2 = make_float128(h, l);
+     int64_t ret = float128_to_int64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -495,9 +509,10 @@ uint64_t HELPER(cgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ /* convert 32-bit float to 32-bit int */
+ uint64_t HELPER(cfeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     int32_t ret = float32_to_int32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -505,9 +520,10 @@ uint64_t HELPER(cfeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 64-bit float to 32-bit int */
+ uint64_t HELPER(cfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     int32_t ret = float64_to_int32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -515,10 +531,11 @@ uint64_t HELPER(cfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 128-bit float to 32-bit int */
+ uint64_t HELPER(cfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float128 v2 = make_float128(h, l);
+     int32_t ret = float128_to_int32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -526,11 +543,12 @@ uint64_t HELPER(cfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ /* convert 32-bit float to 64-bit uint */
+ uint64_t HELPER(clgeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     uint64_t ret;
++
+     v2 = float32_to_float64(v2, &env->fpu_status);
+     ret = float64_to_uint64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -538,9 +556,10 @@ uint64_t HELPER(clgeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 64-bit float to 64-bit uint */
+ uint64_t HELPER(clgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     uint64_t ret = float64_to_uint64(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -548,9 +567,10 @@ uint64_t HELPER(clgdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 128-bit float to 64-bit uint */
+ uint64_t HELPER(clgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     uint64_t ret = float128_to_uint64(make_float128(h, l), &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -558,9 +578,10 @@ uint64_t HELPER(clgxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ /* convert 32-bit float to 32-bit uint */
+ uint64_t HELPER(clfeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     uint32_t ret = float32_to_uint32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -568,9 +589,10 @@ uint64_t HELPER(clfeb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 64-bit float to 32-bit uint */
+ uint64_t HELPER(clfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     uint32_t ret = float64_to_uint32(v2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -578,9 +600,10 @@ uint64_t HELPER(clfdb)(CPUS390XState *env, uint64_t v2, uint32_t m3)
+ /* convert 128-bit float to 32-bit uint */
+ uint64_t HELPER(clfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     uint32_t ret = float128_to_uint32(make_float128(h, l), &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -588,9 +611,10 @@ uint64_t HELPER(clfxb)(CPUS390XState *env, uint64_t h, uint64_t l, uint32_t m3)
+ /* round to integer 32-bit */
+ uint64_t HELPER(fieb)(CPUS390XState *env, uint64_t f2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float32 ret = float32_round_to_int(f2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -598,9 +622,10 @@ uint64_t HELPER(fieb)(CPUS390XState *env, uint64_t f2, uint32_t m3)
+ /* round to integer 64-bit */
+ uint64_t HELPER(fidb)(CPUS390XState *env, uint64_t f2, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
+     float64 ret = float64_round_to_int(f2, &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return ret;
+ }
+@@ -608,10 +633,11 @@ uint64_t HELPER(fidb)(CPUS390XState *env, uint64_t f2, uint32_t m3)
+ /* round to integer 128-bit */
+ uint64_t HELPER(fixb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint32_t m3)
+ {
+-    int hold = swap_round_mode(env, m3);
++    int old_mode = s390_swap_bfp_rounding_mode(env, m3);
++
+     float128 ret = float128_round_to_int(make_float128(ah, al),
+                                          &env->fpu_status);
+-    set_float_rounding_mode(hold, &env->fpu_status);
++    s390_restore_bfp_rounding_mode(env, old_mode);
+     handle_exceptions(env, GETPC());
+     return RET128(ret);
+ }
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index e1c0b1bd3b..122fe037bc 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -315,6 +315,8 @@ uint32_t set_cc_nz_f128(float128 v);
+ #define S390_IEEE_MASK_INEXACT   0x08
+ #define S390_IEEE_MASK_QUANTUM   0x04
+ uint8_t s390_softfloat_exc_to_ieee(unsigned int exc);
++int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3);
++void s390_restore_bfp_rounding_mode(CPUS390XState *env, int old_mode);
+ 
+ 
+ /* gdbstub.c */
 -- 
 2.17.2
