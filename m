@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45416)
+Received: from eggs.gnu.org ([209.51.188.92]:45521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtn6T-0008Gf-OH
+	(envelope-from <dgibson@ozlabs.org>) id 1gtn6T-0008Hp-Nx
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtmwg-0005yw-VD
+	(envelope-from <dgibson@ozlabs.org>) id 1gtmwg-0005yQ-UQ
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:18:56 -0500
-Date: Wed, 13 Feb 2019 16:08:49 +1100
+Date: Wed, 13 Feb 2019 16:16:37 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213050849.GO1884@umbus.fritz.box>
+Message-ID: <20190213051637.GS1884@umbus.fritz.box>
 References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-14-clg@kaod.org>
+	<20190128094625.4428-18-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9rRS2CJFk/mxouRY"
+	protocol="application/pgp-signature"; boundary="HKLejDDV6gCqJAZ/"
 Content-Disposition: inline
-In-Reply-To: <20190128094625.4428-14-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 13/19] target/ppc: Rename "in_pm_state" to
- "resume_as_sreset"
+In-Reply-To: <20190128094625.4428-18-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 17/19] target/ppc: Add POWER9 external
+ interrupt model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,177 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---9rRS2CJFk/mxouRY
+--HKLejDDV6gCqJAZ/
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 28, 2019 at 10:46:19AM +0100, C=E9dric Le Goater wrote:
+On Mon, Jan 28, 2019 at 10:46:23AM +0100, C=E9dric Le Goater wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> To better reflect what this does, as it's specific to some of the
-> P7/P8/P9 PM states, not generic.
+> Adds support for the Hypervisor directed interrupts in addition to the
+> OS ones.
 >=20
 > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
->  target/ppc/cpu.h         | 6 +++---
->  hw/ppc/ppc.c             | 2 +-
->  target/ppc/excp_helper.c | 8 ++++----
->  3 files changed, 8 insertions(+), 8 deletions(-)
+>  include/hw/ppc/ppc.h            |  2 ++
+>  target/ppc/cpu-qom.h            |  2 ++
+>  target/ppc/cpu.h                |  7 +++++++
+>  hw/intc/xics.c                  |  1 +
+>  hw/intc/xive.c                  |  2 +-
+>  hw/ppc/ppc.c                    | 14 ++++++++++++++
+>  target/ppc/translate_init.inc.c |  4 ++--
+>  7 files changed, 29 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 7ff65c804b57..b69410ea2541 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1116,10 +1116,10 @@ struct CPUPPCState {
-> =20
->      /*
->       * On P7/P8/P9, set when in PM state, we need to handle resume in
-> -     * a special way (such as routing some resume causes to 0x100), so
-> -     * flag this here.
-> +     * a special way (such as routing some resume causes to 0x100, ie,
-> +     * sreset), so flag this here.
->       */
-> -    bool in_pm_state;
-> +    bool resume_as_sreset;
+> diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
+> index daaa04a22dbf..4bdcb8bacd4e 100644
+> --- a/include/hw/ppc/ppc.h
+> +++ b/include/hw/ppc/ppc.h
+> @@ -74,6 +74,7 @@ static inline void ppc40x_irq_init(PowerPCCPU *cpu) {}
+>  static inline void ppc6xx_irq_init(PowerPCCPU *cpu) {}
+>  static inline void ppc970_irq_init(PowerPCCPU *cpu) {}
+>  static inline void ppcPOWER7_irq_init(PowerPCCPU *cpu) {}
+> +static inline void ppcPOWER9_irq_init(PowerPCCPU *cpu) {}
+>  static inline void ppce500_irq_init(PowerPCCPU *cpu) {}
+>  #else
+>  void ppc40x_irq_init(PowerPCCPU *cpu);
+> @@ -81,6 +82,7 @@ void ppce500_irq_init(PowerPCCPU *cpu);
+>  void ppc6xx_irq_init(PowerPCCPU *cpu);
+>  void ppc970_irq_init(PowerPCCPU *cpu);
+>  void ppcPOWER7_irq_init(PowerPCCPU *cpu);
+> +void ppcPOWER9_irq_init(PowerPCCPU *cpu);
 >  #endif
 > =20
->      /* Those resources are used only during code translation */
+>  /* PPC machines for OpenBIOS */
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index 7ff8b2d68632..079fbb9d8718 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -142,6 +142,8 @@ enum powerpc_input_t {
+>      PPC_FLAGS_INPUT_970,
+>      /* PowerPC POWER7 bus               */
+>      PPC_FLAGS_INPUT_POWER7,
+> +    /* PowerPC POWER9 bus               */
+> +    PPC_FLAGS_INPUT_POWER9,
+>      /* PowerPC 401 bus                  */
+>      PPC_FLAGS_INPUT_401,
+>      /* Freescale RCPU bus               */
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 385d33bd37ff..cc41ae6f3017 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -2322,6 +2322,13 @@ enum {
+>       * them */
+>      POWER7_INPUT_NB,
+>  };
+> +
+> +enum {
+> +    /* POWER9 input pins */
+> +    POWER9_INPUT_INT        =3D 0, /* Must match POWER7_INPUT_INT */
+
+Rather than having this vital comment here...
+
+> +    POWER9_INPUT_HINT       =3D 1,
+> +    POWER9_INPUT_NB,
+> +};
+>  #endif
+> =20
+>  /* Hardware exceptions definitions */
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 16e8ffa2aaf7..1f786175168f 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -342,6 +342,7 @@ static void icp_realize(DeviceState *dev, Error **err=
+p)
+>      env =3D &cpu->env;
+>      switch (PPC_INPUT(env)) {
+>      case PPC_FLAGS_INPUT_POWER7:
+> +    case PPC_FLAGS_INPUT_POWER9: /* For SPAPR xics emulation */
+
+=2E. you could just split the cases here.  It's a little more verbose,
+but it's more robust.
+
+>          icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
+>          break;
+> =20
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 0e0e1dc9c1b7..119bb02d345d 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -553,7 +553,7 @@ static void xive_tctx_realize(DeviceState *dev, Error=
+ **errp)
+> =20
+>      env =3D &cpu->env;
+>      switch (PPC_INPUT(env)) {
+> -    case PPC_FLAGS_INPUT_POWER7:
+> +    case PPC_FLAGS_INPUT_POWER9:
+
+And here, of course.
+
+>          tctx->output =3D env->irq_inputs[POWER7_INPUT_INT];
+>          break;
+> =20
 > diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-> index 9292f986eba7..608405f6f2ca 100644
+> index 608405f6f2ca..1a5e087c9b1e 100644
 > --- a/hw/ppc/ppc.c
 > +++ b/hw/ppc/ppc.c
-> @@ -722,7 +722,7 @@ static inline void cpu_ppc_hdecr_excp(PowerPCCPU *cpu)
->       * interrupts in a PM state. Not only they don't cause a
->       * wakeup but they also get effectively discarded.
->       */
-> -    if (!env->in_pm_state) {
-> +    if (!env->resume_as_sreset) {
->          ppc_set_irq(cpu, PPC_INTERRUPT_HDECR, 1);
->      }
+> @@ -289,6 +289,12 @@ static void power7_set_irq(void *opaque, int pin, in=
+t level)
+>                  __func__, level);
+>          ppc_set_irq(cpu, PPC_INTERRUPT_EXT, level);
+>          break;
+> +    case POWER9_INPUT_HINT:
+
+Having a POWER9 specific case in a function named for power7 is pretty
+odd.  Best to split these as well, I think.
+
+> +        /* Level sensitive - active high */
+> +        LOG_IRQ("%s: set the external IRQ state to %d\n",
+> +                __func__, level);
+> +        ppc_set_irq(cpu, PPC_INTERRUPT_HVIRT, level);
+> +        break;
+>      default:
+>          /* Unknown pin - do nothing */
+>          LOG_IRQ("%s: unknown IRQ pin %d\n", __func__, pin);
+> @@ -308,6 +314,14 @@ void ppcPOWER7_irq_init(PowerPCCPU *cpu)
+>      env->irq_inputs =3D (void **)qemu_allocate_irqs(&power7_set_irq, cpu,
+>                                                    POWER7_INPUT_NB);
 >  }
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 489a54f51b90..7536620a4133 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -69,7 +69,7 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
-te *env, int excp,
->                                  target_ulong *msr)
->  {
->      /* We no longer are in a PM state */
-> -    env->in_pm_state =3D false;
-> +    env->resume_as_sreset =3D false;
-> =20
->      /* Pretend to be returning from doze always as we don't lose state */
->      *msr |=3D (0x1ull << (63 - 47));
-> @@ -141,7 +141,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
->       * check for special resume at 0x100 from doze/nap/sleep/winkle on
->       * P7/P8/P9
->       */
-> -    if (env->in_pm_state) {
-> +    if (env->resume_as_sreset) {
->          excp =3D powerpc_reset_wakeup(cs, env, excp, &msr);
->      }
-> =20
-> @@ -787,7 +787,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
->       * clear when coming out of some power management states (in order
->       * for them to become a 0x100).
->       */
-> -    async_deliver =3D (msr_ee !=3D 0) || env->in_pm_state;
-> +    async_deliver =3D (msr_ee !=3D 0) || env->resume_as_sreset;
-> =20
->      /* Hypervisor decrementer exception */
->      if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDECR)) {
-> @@ -970,7 +970,7 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
-t insn)
->      env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
-> =20
->      /* Condition for waking up at 0x100 */
-> -    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
-> +    env->resume_as_sreset =3D (insn !=3D PPC_PM_STOP) ||
->          (env->spr[SPR_PSSCR] & PSSCR_EC);
->  }
+> +
+> +void ppcPOWER9_irq_init(PowerPCCPU *cpu)
+> +{
+> +    CPUPPCState *env =3D &cpu->env;
+> +
+> +    env->irq_inputs =3D (void **)qemu_allocate_irqs(&power7_set_irq, cpu,
+> +                                                  POWER9_INPUT_NB);
+> +}
 >  #endif /* defined(TARGET_PPC64) */
+> =20
+>  /* PowerPC 40x internal IRQ controller */
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 6ffa4a8fe0fa..7f25215f0192 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8793,7 +8793,7 @@ static void init_proc_POWER9(CPUPPCState *env)
+> =20
+>      /* Allocate hardware IRQ controller */
+>      init_excp_POWER9(env);
+> -    ppcPOWER7_irq_init(ppc_env_get_cpu(env));
+> +    ppcPOWER9_irq_init(ppc_env_get_cpu(env));
+>  }
+> =20
+>  static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)
+> @@ -8920,7 +8920,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>      pcc->radix_page_info =3D &POWER9_radix_page_info;
+>  #endif
+>      pcc->excp_model =3D POWERPC_EXCP_POWER9;
+> -    pcc->bus_model =3D PPC_FLAGS_INPUT_POWER7;
+> +    pcc->bus_model =3D PPC_FLAGS_INPUT_POWER9;
+>      pcc->bfd_mach =3D bfd_mach_ppc64;
+>      pcc->flags =3D POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
+>                   POWERPC_FLAG_BE | POWERPC_FLAG_PMM |
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -132,24 +207,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---9rRS2CJFk/mxouRY
+--HKLejDDV6gCqJAZ/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjpmAACgkQbDjKyiDZ
-s5JI0BAArnQXPsUNjUN3F5w4dbZDwGNn8TpStJen6+oelQNFbQR8r8KWTGbTchqs
-s3B7KLbCm643bF0lgxlzFozBSjmmZN+AMnWHWvDOVEqfefGkOVB8ZPxNzpB5QOtQ
-Ip4POImzkFQU3K7XH91W9qbLdpKy/kklL/e3qf1/LPEMa0irBHT8PboxJ0WYKWZH
-RIJzgFsUcbP5aUlJ/D76VhqQ+DS1nmLT6EQ2Yjyw7d5lJDlCpOidP3tgiAzA1v3V
-yvXTqcX/x9tzI/TpS24NCMq9B2EPZSy+zvWWTGYIs2gjsEjVGOvQ2oa21w72pVRW
-KqSpizAxPgfff16mkCjbXcuX9DCPMcVRKpROmb2BEWgVvJpA+v6eyEM2vwKTwpnU
-WmOkpuiLcA04K59sCuOj/Fj5/tsYnlZ0ts/AvxNAnhKSHfI7cnu5tOlaeqq1tdwF
-NZsV4yfBOQjRIYfQlkgMKzR6HcQ8a+k23+oHFyT63lt3P4JoBOh6UQnKIfAtKPXL
-imGzjuMKIiI/DB/83fewBT3AQjsVdtbgbF5Cy+DcCav3WjuHgu3K6oPt1dC8aRi1
-xNqyWfOJHrN0mYre5l1v4vLlMaHgpuoLQgEboN2GI5VtRSunmuxSejejRO70+1uJ
-h4N6zMNppKDpUd4cCqbTcu1mjVnQH4LP5n1dmWgS0fTWEKpo2Vk=
-=rtLB
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjqDUACgkQbDjKyiDZ
+s5ILQxAAq9x41AC7MFQ7ZKl+HfJ5HoCPDyrAOvWnKeDwYsblnjfJqyJMh0mptzXG
+B5pSB4Ec5bFnvbORFTOfWkhEjiCA0V7o+sUMQvG17pNddz7A3JeJtIbxlxXYi9UY
+qzO4hkmfN+9aq4pFlb9ThzUOUbdRM34gaeD6Ew3V+ZxA1OgqzOM8KhwyQRfWICrR
+WmCZTAbzb3JJqZEi3vS0Zm0olrEF01IFmKATs9zXRKXHLkTE9xNBm8GLJR8FKYvM
+U8dwsRRTbw3k4XWOad6IgGkdKDPKzwWu0lM4Ioxv3Nr168xekfApmPJISnChcbrb
+psVjee6RKE/v6MQiWOrxjTnzGourWZv2nTSAzVPWQa/OBugjbUloXUGiT5dRTp9b
+HVb5OkQfU9oUW4MIMPH1tkDaW3ZZPZwc4/5QDIs3XYsm0JN6NzKvUEO62N1PwqzK
+1WjdtrOx13ImiHxMYkBYWo7ObP46LzPZKdclVTT73QNrOCvVFeuukrd6o8WYi5zQ
+Ixll+GOLNistqtcX++wN+ESeBgB/G52nTxQSlNvPBw0iq0jXzYFb0WdjA8NWVBe9
+UYwyQ3090d/ztKRFOyxZ1FyE7MmrfXJ39jZ8rukeX+xjokQbTQid6YuH4nGZGLGt
+dpQKe2stbqx3f3DQBmjWKBpRvnv1sjo4oxRRa1KAj8sc5FC1J00=
+=ofih
 -----END PGP SIGNATURE-----
 
---9rRS2CJFk/mxouRY--
+--HKLejDDV6gCqJAZ/--
