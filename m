@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45583)
+Received: from eggs.gnu.org ([209.51.188.92]:45416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtn6T-0008KE-Ov
+	(envelope-from <dgibson@ozlabs.org>) id 1gtn6T-0008Gf-OH
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtmwh-00063j-KY
+	(envelope-from <dgibson@ozlabs.org>) id 1gtmwg-0005yw-VD
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:18:56 -0500
-Date: Wed, 13 Feb 2019 16:17:38 +1100
+Date: Wed, 13 Feb 2019 16:08:49 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213051738.GT1884@umbus.fritz.box>
+Message-ID: <20190213050849.GO1884@umbus.fritz.box>
 References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-19-clg@kaod.org>
+	<20190128094625.4428-14-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="QgvTbcZPsSS/HkXe"
+	protocol="application/pgp-signature"; boundary="9rRS2CJFk/mxouRY"
 Content-Disposition: inline
-In-Reply-To: <20190128094625.4428-19-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 18/19] ppc/xive: Make XIVE generate the
- proper interrupt types
+In-Reply-To: <20190128094625.4428-14-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 13/19] target/ppc: Rename "in_pm_state" to
+ "resume_as_sreset"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +29,16 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---QgvTbcZPsSS/HkXe
+--9rRS2CJFk/mxouRY
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 28, 2019 at 10:46:24AM +0100, C=E9dric Le Goater wrote:
+On Mon, Jan 28, 2019 at 10:46:19AM +0100, C=E9dric Le Goater wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> It should be generic Hypervisor Virtualization interrupts for HV
-> directed rings and traditional External Interrupts for the OS directed
-> ring.
->=20
-> Don't generate anything for the user ring as it isn't actually
-> supported.
+> To better reflect what this does, as it's specific to some of the
+> P7/P8/P9 PM states, not generic.
 >=20
 > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
@@ -50,79 +46,85 @@ On Mon, Jan 28, 2019 at 10:46:24AM +0100, C=E9dric Le Goater wrote:
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  include/hw/ppc/xive.h |  3 ++-
->  hw/intc/xive.c        | 22 +++++++++++++++++++---
->  2 files changed, 21 insertions(+), 4 deletions(-)
+>  target/ppc/cpu.h         | 6 +++---
+>  hw/ppc/ppc.c             | 2 +-
+>  target/ppc/excp_helper.c | 8 ++++----
+>  3 files changed, 8 insertions(+), 8 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 2bad8526221b..82e9aef677c5 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -316,7 +316,8 @@ typedef struct XiveTCTX {
->      DeviceState parent_obj;
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 7ff65c804b57..b69410ea2541 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1116,10 +1116,10 @@ struct CPUPPCState {
 > =20
->      CPUState    *cs;
-> -    qemu_irq    output;
-> +    qemu_irq    hv_output;
-> +    qemu_irq    os_output;
+>      /*
+>       * On P7/P8/P9, set when in PM state, we need to handle resume in
+> -     * a special way (such as routing some resume causes to 0x100), so
+> -     * flag this here.
+> +     * a special way (such as routing some resume causes to 0x100, ie,
+> +     * sreset), so flag this here.
+>       */
+> -    bool in_pm_state;
+> +    bool resume_as_sreset;
+>  #endif
 > =20
->      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
->      uint32_t    hw_cam;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 119bb02d345d..14b854181ab7 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -61,13 +61,28 @@ static uint8_t exception_mask(uint8_t ring)
+>      /* Those resources are used only during code translation */
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index 9292f986eba7..608405f6f2ca 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -722,7 +722,7 @@ static inline void cpu_ppc_hdecr_excp(PowerPCCPU *cpu)
+>       * interrupts in a PM state. Not only they don't cause a
+>       * wakeup but they also get effectively discarded.
+>       */
+> -    if (!env->in_pm_state) {
+> +    if (!env->resume_as_sreset) {
+>          ppc_set_irq(cpu, PPC_INTERRUPT_HDECR, 1);
 >      }
 >  }
-> =20
-> +static qemu_irq xive_tctx_output(XiveTCTX *tctx, uint8_t ring)
-> +{
-> +        switch (ring) {
-> +        case TM_QW0_USER:
-> +                return 0; /* Not supported */
-> +        case TM_QW1_OS:
-> +                return tctx->os_output;
-> +        case TM_QW2_HV_POOL:
-> +        case TM_QW3_HV_PHYS:
-> +                return tctx->hv_output;
-> +        default:
-> +                return 0;
-> +        }
-> +}
-> +
->  static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 489a54f51b90..7536620a4133 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -69,7 +69,7 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
+te *env, int excp,
+>                                  target_ulong *msr)
 >  {
->      uint8_t *regs =3D &tctx->regs[ring];
->      uint8_t nsr =3D regs[TM_NSR];
->      uint8_t mask =3D exception_mask(ring);
+>      /* We no longer are in a PM state */
+> -    env->in_pm_state =3D false;
+> +    env->resume_as_sreset =3D false;
 > =20
-> -    qemu_irq_lower(tctx->output);
-> +    qemu_irq_lower(xive_tctx_output(tctx, ring));
-> =20
->      if (regs[TM_NSR] & mask) {
->          uint8_t cppr =3D regs[TM_PIPR];
-> @@ -100,7 +115,7 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t =
-ring)
->          default:
->              g_assert_not_reached();
->          }
-> -        qemu_irq_raise(tctx->output);
-> +        qemu_irq_raise(xive_tctx_output(tctx, ring));
+>      /* Pretend to be returning from doze always as we don't lose state */
+>      *msr |=3D (0x1ull << (63 - 47));
+> @@ -141,7 +141,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+excp_model, int excp)
+>       * check for special resume at 0x100 from doze/nap/sleep/winkle on
+>       * P7/P8/P9
+>       */
+> -    if (env->in_pm_state) {
+> +    if (env->resume_as_sreset) {
+>          excp =3D powerpc_reset_wakeup(cs, env, excp, &msr);
 >      }
+> =20
+> @@ -787,7 +787,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>       * clear when coming out of some power management states (in order
+>       * for them to become a 0x100).
+>       */
+> -    async_deliver =3D (msr_ee !=3D 0) || env->in_pm_state;
+> +    async_deliver =3D (msr_ee !=3D 0) || env->resume_as_sreset;
+> =20
+>      /* Hypervisor decrementer exception */
+>      if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDECR)) {
+> @@ -970,7 +970,7 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
+t insn)
+>      env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+> =20
+>      /* Condition for waking up at 0x100 */
+> -    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
+> +    env->resume_as_sreset =3D (insn !=3D PPC_PM_STOP) ||
+>          (env->spr[SPR_PSSCR] & PSSCR_EC);
 >  }
-> =20
-> @@ -554,7 +569,8 @@ static void xive_tctx_realize(DeviceState *dev, Error=
- **errp)
->      env =3D &cpu->env;
->      switch (PPC_INPUT(env)) {
->      case PPC_FLAGS_INPUT_POWER9:
-> -        tctx->output =3D env->irq_inputs[POWER7_INPUT_INT];
-> +        tctx->hv_output =3D env->irq_inputs[POWER9_INPUT_HINT];
-> +        tctx->os_output =3D env->irq_inputs[POWER9_INPUT_INT];
->          break;
-> =20
->      default:
+>  #endif /* defined(TARGET_PPC64) */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -130,24 +132,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---QgvTbcZPsSS/HkXe
+--9rRS2CJFk/mxouRY
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjqHEACgkQbDjKyiDZ
-s5IeSBAAuSRTAxDuqYYrj1J0Iut5cqm9VkiaD0A6dJBGhUKbNgkuWlyeGTeL7c/L
-kwNHCjHdEWkgyHPuVe8hIhrYzNsp1lLLHss55+67OPR3Cwztq/Ts1HVt0hqXWgIY
-WzC1cmPWKibTzsnihr06s5VHUcHCGlE9psjJkGk6TGmHo8SV1aRAkTQ26y5RYn3y
-6oNB6q/TxNKqfst7+Phr/B7sFZqhpnNh/4hvPL0idfwWm7l63kAck6m7fxp/qJti
-kfDZbG7ochPSoW0hWemOCTFvResoqV82ZB1wWdVS2KUKXho3F1GSJlt7R9hf6Q+c
-uSTW3V27upP59P6xMCHA8WVGd+6Cdg4/ZpnuGNiwhMTT6C6UlypVeQ8ywC0orHME
-tqLrsaQfb+T9u/mvIf53EJSoI/nzGWa45RdF5DircuQD597GIHVVQe6Z1ALaZhU4
-XK5JmbVN/GleRs6FdCCf0aMqpcdZrAcZ+cPfqlBcf1gs2sJ3CPkBJoVpduFI7hqU
-WUB9CHLm/Q+QTgLNEmORoYEzJvIcA2Gyx7SxXby/iHJUMkvtLLIYmEHF7aY3n50z
-SzeXrt3JtinnTw+iSpJFtYEqmJ6G8T0ZF29pkKNYraTGAze+i/JiDDnFOZwLvTBy
-Chycc3bo4pOI4Sb+I0iB8XH8RwXIyEcvY2SsSAOCwZ00UMtQ6pw=
-=cl47
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjpmAACgkQbDjKyiDZ
+s5JI0BAArnQXPsUNjUN3F5w4dbZDwGNn8TpStJen6+oelQNFbQR8r8KWTGbTchqs
+s3B7KLbCm643bF0lgxlzFozBSjmmZN+AMnWHWvDOVEqfefGkOVB8ZPxNzpB5QOtQ
+Ip4POImzkFQU3K7XH91W9qbLdpKy/kklL/e3qf1/LPEMa0irBHT8PboxJ0WYKWZH
+RIJzgFsUcbP5aUlJ/D76VhqQ+DS1nmLT6EQ2Yjyw7d5lJDlCpOidP3tgiAzA1v3V
+yvXTqcX/x9tzI/TpS24NCMq9B2EPZSy+zvWWTGYIs2gjsEjVGOvQ2oa21w72pVRW
+KqSpizAxPgfff16mkCjbXcuX9DCPMcVRKpROmb2BEWgVvJpA+v6eyEM2vwKTwpnU
+WmOkpuiLcA04K59sCuOj/Fj5/tsYnlZ0ts/AvxNAnhKSHfI7cnu5tOlaeqq1tdwF
+NZsV4yfBOQjRIYfQlkgMKzR6HcQ8a+k23+oHFyT63lt3P4JoBOh6UQnKIfAtKPXL
+imGzjuMKIiI/DB/83fewBT3AQjsVdtbgbF5Cy+DcCav3WjuHgu3K6oPt1dC8aRi1
+xNqyWfOJHrN0mYre5l1v4vLlMaHgpuoLQgEboN2GI5VtRSunmuxSejejRO70+1uJ
+h4N6zMNppKDpUd4cCqbTcu1mjVnQH4LP5n1dmWgS0fTWEKpo2Vk=
+=rtLB
 -----END PGP SIGNATURE-----
 
---QgvTbcZPsSS/HkXe--
+--9rRS2CJFk/mxouRY--
