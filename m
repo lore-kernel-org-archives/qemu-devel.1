@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46529)
+Received: from eggs.gnu.org ([209.51.188.92]:48098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gtxci-0006gq-62
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:43:01 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gtxhl-0002gA-AA
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:48:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gtxcg-0002mN-FE
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:43:00 -0500
-From: Max Reitz <mreitz@redhat.com>
-References: <20180809223117.7846-1-mreitz@redhat.com>
-	<20180809223117.7846-4-mreitz@redhat.com>
-	<e855b03b-67e0-d822-d9fe-dedc1456011e@redhat.com>
-	<f5d4e779-26c3-fd93-cae9-7d202242fd8c@redhat.com>
-Message-ID: <2f3a2dc2-f074-064f-d3f2-c167555ddd05@redhat.com>
-Date: Wed, 13 Feb 2019 17:42:49 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gtxhk-0007GU-4o
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:48:13 -0500
+Resent-Message-Id: <E1gtxhk-0007GU-4o@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gtxhj-0007Bt-SO
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:48:12 -0500
+Message-ID: <155007554232.7770.7902282730740577620@ebba9967afc0>
+In-Reply-To: <20190212160953.29051-1-marcandre.lureau@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <f5d4e779-26c3-fd93-cae9-7d202242fd8c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tleedLCsT0VmtREyOyaEyCSewSIi2IWwQ"
-Subject: Re: [Qemu-devel] [PATCH v2 03/11] block: Filtered children access
- functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 13 Feb 2019 08:32:23 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix slirp regression on win32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: marcandre.lureau@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, hsp.cat7@gmail.com, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tleedLCsT0VmtREyOyaEyCSewSIi2IWwQ
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <2f3a2dc2-f074-064f-d3f2-c167555ddd05@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 03/11] block: Filtered children access
- functions
-References: <20180809223117.7846-1-mreitz@redhat.com>
- <20180809223117.7846-4-mreitz@redhat.com>
- <e855b03b-67e0-d822-d9fe-dedc1456011e@redhat.com>
- <f5d4e779-26c3-fd93-cae9-7d202242fd8c@redhat.com>
-In-Reply-To: <f5d4e779-26c3-fd93-cae9-7d202242fd8c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 14.11.18 20:52, Max Reitz wrote:
-> On 12.11.18 23:17, Eric Blake wrote:
->> On 8/9/18 5:31 PM, Max Reitz wrote:
-
-[...]
-
->>> +++ b/block/io.c
->>> @@ -120,6 +120,7 @@ static void bdrv_merge_limits(BlockLimits *dst,
->>> const BlockLimits *src)
->>> =C2=A0 void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->>> =C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriver *drv =3D bs->drv;
->>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *cow_bs =3D bdrv_filtered_cow_bs=
-(bs);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(&bs->bl, 0, sizeof(bs->b=
-l));
->>> @@ -148,13 +149,13 @@ void bdrv_refresh_limits(BlockDriverState *bs,
->>> Error **errp)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->bl.max_iov=
- =3D IOV_MAX;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (bs->backing) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_limits(bs->b=
-acking->bs, &local_err);
->>> +=C2=A0=C2=A0=C2=A0 if (cow_bs) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_limits(cow_b=
-s, &local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err)=
- {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 error_propagate(errp, local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 return;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_merge_limits(&bs->bl=
-, &bs->backing->bs->bl);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_merge_limits(&bs->bl=
-, &cow_bs->bl);
->>
->> Is this doing the right things with blkdebug?
->=20
-> First, blkdebug doesn't have a COW child, does it?
->=20
-> Second, we still always invoke the driver's implementation (if there is=
-
-> one).  All of the code at the beginning of the function just chooses
-> some defaults.  So blkdebug can still override everything.
->=20
-> But there is indeed something wrong here.  And that is: What is with R/=
-W
-> filter drivers that use bs->backing?  After this patch, they won't get
-> any defaults.
-
-Hm, yeah, but after the next one they're alright because
-bdrv_storage_bs() returns filtered children.  So the issue is just the
-span in between...
-
-I suppose I can solve this by assigning bs->file to storage_bs, or
-bs->backing if both bs->file and cow_bs are NULL.  And then put a FIXME
-behind it that the next patch will solve.
-
-Max
-
-
---tleedLCsT0VmtREyOyaEyCSewSIi2IWwQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxkSQkACgkQ9AfbAGHV
-z0AvRAgAk5neoW+GSo4YsxkZX4dZO+sbJJysoUEKxyuJ6gZ1/dL2S7NkwRiFhzMK
-8MAeu3rkKKuQBgHR9KAny3zyFkKa4artqGqZH+w9lMnyxKQXikz/3gQdThv2mmEa
-7q40Q6Onp9zJI+sqzAqMPL+3dzTe6BtLIw28bbsfjT5uhLhzIi/3Pjc5efk8odzB
-QkTWx1RZdwLfw6If+Sn0b4PoTfoGmUheY9iibhxROGo9QxIujbqd5F4kMAV81zHf
-E1LSplVFyHo7D+fIzmmFG1eyLU8RqkigRLX0IKQaseYXWAQCMeUaW/YNr38xA9e6
-U1Zg8Bmk6jG4U4HLYtPAeh/YbedBfQ==
-=sIJw
------END PGP SIGNATURE-----
-
---tleedLCsT0VmtREyOyaEyCSewSIi2IWwQ--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMjE2MDk1My4yOTA1
+MS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJdIEZp
+eCBzbGlycCByZWdyZXNzaW9uIG9uIHdpbjMyClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5
+MDIxMjE2MDk1My4yOTA1MS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKOGVmYTI1MDBmZSBzbGlycDogd3JhcCB0aGUgcmVtYWluaW5nIHNvY2tldCBm
+dW5jdGlvbnMKNmRiNjkwNjM3ZiBzbGlycDogcmVtb3ZlIHNsaXJwXyBwcmVmaXggZm9yIHNvY2tl
+dCB3cmFwcGVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yIENoZWNraW5nIGNvbW1pdCA2ZGI2
+OTA2MzdmNDggKHNsaXJwOiByZW1vdmUgc2xpcnBfIHByZWZpeCBmb3Igc29ja2V0IHdyYXBwZXJz
+KQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMTU6IEZJTEU6IHNs
+aXJwL3NvY2tldC5jOjE4ODoKK15Jbm4gPSByZWN2KHNvLT5zLCBpb3ZbMF0uaW92X2Jhc2UsIGlv
+dlswXS5pb3ZfbGVuLDApOyQKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
+Y3R4OlZ4VikKIzExNTogRklMRTogc2xpcnAvc29ja2V0LmM6MTg4OgorICAgICAgIG5uID0gcmVj
+dihzby0+cywgaW92WzBdLmlvdl9iYXNlLCBpb3ZbMF0uaW92X2xlbiwwKTsKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjQ6IEZJTEU6IHNsaXJwL3NvY2tldC5j
+OjIwNDoKK15JXkleSV5JXklnZXRzb2Nrb3B0KHNvLT5zLCBTT0xfU09DS0VULCBTT19FUlJPUiwk
+CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMzM6IEZJ
+TEU6IHNsaXJwL3NvY2tldC5jOjIzNDoKKyAgICAgICAgICAgIHJldCA9IHJlY3Yoc28tPnMsIGlv
+dlsxXS5pb3ZfYmFzZSwgaW92WzFdLmlvdl9sZW4sMCk7CiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQyOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo1NTU6
+CiteSSAgaW9jdGxzb2NrZXQoc28tPnMsIEZJT05SRUFELCAmbik7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3Mzg6
+CiteSXNldHNvY2tvcHQocywgU09MX1NPQ0tFVCwgU09fT09CSU5MSU5FLCAmb3B0LCBzaXplb2Yo
+aW50KSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYzOiBG
+SUxFOiBzbGlycC9zb2NrZXQuYzo3NDA6CiteSXNldHNvY2tvcHQocywgSVBQUk9UT19UQ1AsIFRD
+UF9OT0RFTEFZLCAmb3B0LCBzaXplb2YoaW50KSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojMTc2OiBGSUxFOiBzbGlycC90Y3Bfc3Vici5jOjM0MDoKK15JY2xv
+c2Vzb2NrZXQoc28tPnMpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzIxOTogRklMRTogc2xpcnAvdWRwLmM6Mjk1OgorXkljbG9zZXNvY2tldChzby0+cyk7JAoK
+dG90YWw6IDkgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMTIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8y
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDhlZmEyNTAw
+ZmViYiAoc2xpcnA6IHdyYXAgdGhlIHJlbWFpbmluZyBzb2NrZXQgZnVuY3Rpb25zKQo9PT0gT1VU
+UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxMjE2MDk1
+My4yOTA1MS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
