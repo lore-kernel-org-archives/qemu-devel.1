@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50098)
+Received: from eggs.gnu.org ([209.51.188.92]:50079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu4HC-0002Wo-TW
+	(envelope-from <jsnow@redhat.com>) id 1gu4HC-0002VC-2D
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu4HB-0003dR-Nc
+	(envelope-from <jsnow@redhat.com>) id 1gu4HA-0003cq-Uz
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35662)
+Received: from mx1.redhat.com ([209.132.183.28]:34900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gu4HB-0003cl-FK
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:13 -0500
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gu4HA-0003cQ-Mv
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:12 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 13 Feb 2019 18:49:07 -0500
-Message-Id: <20190213234907.24173-4-jsnow@redhat.com>
+Date: Wed, 13 Feb 2019 18:49:06 -0500
+Message-Id: <20190213234907.24173-3-jsnow@redhat.com>
 In-Reply-To: <20190213234907.24173-1-jsnow@redhat.com>
 References: <20190213234907.24173-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] blockdev: acquire aio_context for bitmap
- add/remove
+Subject: [Qemu-devel] [PULL 2/3] block/dirty-bitmap: Documentation and
+ Comment fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, jsnow@redhat.com
 
-When bitmaps are persistent, they may incur a disk read or write when bitmaps
-are added or removed. For configurations like virtio-dataplane, failing to
-acquire this lock will abort QEMU when disk IO occurs.
+The meaning of the states has changed subtly over time,
+this should bring the understanding more in-line with the
+current, actual usages.
 
-We used to acquire aio_context as part of the bitmap lookup, so re-introduce
-the lock for just the cases that have an IO penalty. Commit 2119882c removed
-these locks, and I failed to notice this when we committed fd5ae4cc, so this
-has been broken since persistent bitmaps were introduced.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1672010
-Reported-By: Aihua Liang <aliang@redhat.com>
+Reported-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20190213195501.7790-2-jsnow@redhat.com
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190202011048.12343-1-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ block/dirty-bitmap.c | 20 ++++++++++++++------
+ qapi/block-core.json | 32 ++++++++++++++++++++++++--------
+ 2 files changed, 38 insertions(+), 14 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index fb18e9c975..790b0e0ac8 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2820,6 +2820,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
- {
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
-+    AioContext *aio_context = NULL;
- 
-     if (!name || name[0] == '\0') {
-         error_setg(errp, "Bitmap name cannot be empty");
-@@ -2854,15 +2855,17 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         disabled = false;
-     }
- 
--    if (persistent &&
--        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
--    {
--        return;
-+    if (persistent) {
-+        aio_context = bdrv_get_aio_context(bs);
-+        aio_context_acquire(aio_context);
-+        if (!bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp)) {
-+            goto out;
-+        }
-     }
- 
-     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
-     if (bitmap == NULL) {
--        return;
-+        goto out
-     }
- 
-     if (disabled) {
-@@ -2870,6 +2873,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     }
- 
-     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+ out:
-+    if (aio_context) {
-+        aio_context_release(aio_context);
-+    }
- }
- 
- void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-@@ -2878,6 +2885,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
-     Error *local_err = NULL;
-+    AioContext *aio_context = NULL;
- 
-     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-     if (!bitmap || !bs) {
-@@ -2892,14 +2900,20 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-     }
- 
-     if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
-+        aio_context = bdrv_get_aio_context(bs);
-+        aio_context_acquire(aio_context);
-         bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-         if (local_err != NULL) {
-             error_propagate(errp, local_err);
--            return;
-+            goto out;
-         }
-     }
- 
-     bdrv_release_dirty_bitmap(bs, bitmap);
-+ out:
-+    if (aio_context) {
-+        aio_context_release(aio_context);
-+    }
- }
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index e46f72b346..c6d4acebfa 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -29,12 +29,20 @@
+ #include "block/blockjob.h"
  
  /**
+- * A BdrvDirtyBitmap can be in three possible states:
+- * (1) successor is NULL and disabled is false: full r/w mode
+- * (2) successor is NULL and disabled is true: read only mode ("disabled")
+- * (3) successor is set: frozen mode.
+- *     A frozen bitmap cannot be renamed, deleted, anonymized, cleared, set,
+- *     or enabled. A frozen bitmap can only abdicate() or reclaim().
++ * A BdrvDirtyBitmap can be in four possible user-visible states:
++ * (1) Active:   successor is NULL, and disabled is false: full r/w mode
++ * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
++ *               guest writes are dropped, but monitor writes are possible,
++ *               through commands like merge and clear.
++ * (3) Frozen:   successor is not NULL.
++ *               A frozen bitmap cannot be renamed, deleted, cleared, set,
++ *               enabled, merged to, etc. A frozen bitmap can only abdicate()
++ *               or reclaim().
++ *               In this state, the anonymous successor bitmap may be either
++ *               Active and recording writes from the guest (e.g. backup jobs),
++ *               but it can be Disabled and not recording writes.
++ * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
++ *               in any way from the monitor.
+  */
+ struct BdrvDirtyBitmap {
+     QemuMutex *mutex;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7e8656d04c..8f23f2ebb8 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -420,17 +420,27 @@
+ #
+ # An enumeration of possible states that a dirty bitmap can report to the user.
+ #
+-# @frozen: The bitmap is currently in-use by a backup operation or block job,
+-#          and is immutable.
++# @frozen: The bitmap is currently in-use by some operation and is immutable.
++#          If the bitmap was @active prior to the operation, new writes by the
++#          guest are being recorded in a temporary buffer, and will not be lost.
++#          Generally, bitmaps are cleared on successful use in an operation and
++#          the temporary buffer is committed into the bitmap. On failure, the
++#          temporary buffer is merged back into the bitmap without first
++#          clearing it.
++#          Please refer to the documentation for each bitmap-using operation,
++#          See also @blockdev-backup, @drive-backup.
+ #
+-# @disabled: The bitmap is currently in-use by an internal operation and is
+-#            read-only. It can still be deleted.
++# @disabled: The bitmap is not currently recording new writes by the guest.
++#            This is requested explicitly via @block-dirty-bitmap-disable.
++#            It can still be cleared, deleted, or used for backup operations.
+ #
+ # @active: The bitmap is actively monitoring for new writes, and can be cleared,
+ #          deleted, or used for backup operations.
+ #
+-# @locked: The bitmap is currently in-use by some operation and can not be
+-#          cleared, deleted, or used for backup operations. (Since 2.12)
++# @locked: The bitmap is currently in-use by some operation and is immutable.
++#          If the bitmap was @active prior to the operation, it is still
++#          recording new writes. If the bitmap was @disabled, it is not
++#          recording new writes. (Since 2.12)
+ #
+ # Since: 2.4
+ ##
+@@ -2094,9 +2104,15 @@
+ # @block-dirty-bitmap-merge:
+ #
+ # Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
+-# The @bitmaps dirty bitmaps are unchanged.
++# Dirty bitmaps in @bitmaps will be unchanged, except if it also appears
++# as the @target bitmap. Any bits already set in @target will still be
++# set after the merge, i.e., this operation does not clear the target.
+ # On error, @target is unchanged.
+ #
++# The resulting bitmap will count as dirty any clusters that were dirty in any
++# of the source bitmaps. This can be used to achieve backup checkpoints, or in
++# simpler usages, to copy bitmaps.
++#
+ # Returns: nothing on success
+ #          If @node is not a valid block device, DeviceNotFound
+ #          If any bitmap in @bitmaps or @target is not found, GenericError
+@@ -2131,7 +2147,7 @@
+ ##
+ # @x-debug-block-dirty-bitmap-sha256:
+ #
+-# Get bitmap SHA256
++# Get bitmap SHA256.
+ #
+ # Returns: BlockDirtyBitmapSha256 on success
+ #          If @node is not a valid block device, DeviceNotFound
 -- 
 2.17.2
