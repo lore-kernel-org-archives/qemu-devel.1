@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46969)
+Received: from eggs.gnu.org ([209.51.188.92]:47163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gtrzJ-0002eN-Is
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:41:58 -0500
+	(envelope-from <peterx@redhat.com>) id 1gtrzy-0002wQ-O4
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:42:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gtrzI-0007kz-Og
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:41:57 -0500
-Date: Wed, 13 Feb 2019 11:41:45 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190213114145.728f52b0.cohuck@redhat.com>
-In-Reply-To: <ac8a0dc5-ab3d-46cd-bb95-18b8589bfae6@redhat.com>
-References: <20190212153025.25425-1-cohuck@redhat.com>
-	<40c87a8e-88d1-7113-1d33-2869234e767e@redhat.com>
-	<20190212165841.7d9d7017.cohuck@redhat.com>
-	<ac8a0dc5-ab3d-46cd-bb95-18b8589bfae6@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1gtrzx-00087p-SL
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:42:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gtrzx-00087E-Ld
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:42:37 -0500
+Date: Wed, 13 Feb 2019 18:42:24 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190213104224.GA4405@xz-x1>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-3-git-send-email-yi.y.sun@linux.intel.com>
+	<20190212062728.GK1011@xz-x1> <20190213090041.GF16968@yi.y.sun>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] s390x/kvm: add tracepoint to ioeventfd
- interface
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190213090041.GF16968@yi.y.sun>
+Subject: Re: [Qemu-devel] [RFC v1 2/3] intel_iommu: add 256 bits qi_desc
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-On Tue, 12 Feb 2019 17:12:33 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, Feb 13, 2019 at 05:00:41PM +0800, Yi Sun wrote:
 
-> On 12.02.19 16:58, Cornelia Huck wrote:
-> > On Tue, 12 Feb 2019 16:52:09 +0100
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> >  =20
-> >> Hi Cornelia,
-> >>
-> >> On 2/12/19 4:30 PM, Cornelia Huck wrote: =20
-> >>> Trace when assigning/unassigning.
-> >>>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>  target/s390x/kvm.c        | 2 ++
-> >>>  target/s390x/trace-events | 1 +
-> >>>  2 files changed, 3 insertions(+)
-> >>>
-> >>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> >>> index 15fdc168e1c5..7d61bd109092 100644
-> >>> --- a/target/s390x/kvm.c
-> >>> +++ b/target/s390x/kvm.c
-> >>> @@ -1886,6 +1886,8 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifi=
-er *notifier, uint32_t sch,
-> >>>          .addr =3D sch,
-> >>>          .len =3D 8,
-> >>>      };
-> >>> +    trace_kvm_s390_assign_subch_ioeventfd(kick.fd, kick.addr, assign,
-> >>> +                                          kick.datamatch);
-> >>>      if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
-> >>>          return -ENOSYS;
-> >>>      }
-> >>> diff --git a/target/s390x/trace-events b/target/s390x/trace-events
-> >>> index a84e316e4937..bdc22f42cdbb 100644
-> >>> --- a/target/s390x/trace-events
-> >>> +++ b/target/s390x/trace-events
-> >>> @@ -14,6 +14,7 @@ ioinst_chsc_cmd(uint16_t cmd, uint16_t len) "IOINST=
-: chsc command 0x%04x, len 0x
-> >>>  kvm_enable_cmma(int rc) "CMMA: enabling with result code %d"
-> >>>  kvm_clear_cmma(int rc) "CMMA: clearing with result code %d"
-> >>>  kvm_failed_cpu_state_set(int cpu_index, uint8_t state, const char *m=
-sg) "Warning: Unable to set cpu %d state %" PRIu8 " to KVM: %s"
-> >>> +kvm_s390_assign_subch_ioeventfd(int fd, uint32_t addr, bool assign, =
-int datamatch) "fd: %d sch: @0x%x assign: %d vq: %d"   =20
-> >>
-> >> I noticed all s390x related trace events don't specify 's390' in the
-> >> event name, maybe you can simply strip it. If you agree, feel free to
-> >> apply that change directly yourself, no need for v2 ;) =20
-> >=20
-> > Yeah; not exactly sure why the other events do that, though... I can
-> > strip it if others agree. =20
->=20
-> Yes, let's keep it consistent. Or if you feel like crafting patches,
-> rename the others ;)
+[...]
 
-I just went with the path of least resistance and removed the 's390' :)
+> > >  
+> > >  /* context entry operations */
+> > >  #define vtd_get_ce_size(s, ce) \
+> > > @@ -65,6 +66,9 @@
+> > >  #define vtd_pe_get_slpt_base(pe) ((pe)->val[0] & VTD_SM_PASID_ENTRY_SLPTPTR)
+> > >  #define vtd_pe_get_domain_id(pe) VTD_SM_PASID_ENTRY_DID((pe)->val[1])
+> > >  
+> > > +/* invalidation desc */
+> > > +#define vtd_get_inv_desc_width(s) ((s)->iq_dw ? 32 : 16)
+> > 
+> > Nit: I'll prefer dropping all the "get" wordings in these macros to be
+> > "vtd_inv_desc_width" since that "get" doesn't help much on
+> > understanding its meanings.  But it's personal preference too.
+> > 
+> That is fine.
+> 
+> > And since you've already have the iq_dw variable - why not store the
+> > width directly into it?  An uint8_t would suffice.
+> > 
+> iq_dw corresponds to VTD_IQA_DW_MASK (Descriptor Width defined in IQA
+> register). 1 means 256-bit descriptor, 0 means 128-bit descriptor.
+> 
+> It is also used in vtd_handle_gcmd_qie() and VTD_IQT_QT() by checking if
+> its value is 1.
+> 
+> So, I would prefer to keep the original design.
 
-Any acks before I queue this?
+It's ok.   But please make it a boolean.  Now iq_dw can be 0x800.
+
+[...]
+
+> > >  /* Fetch an Invalidation Descriptor from the Invalidation Queue */
+> > > -static bool vtd_get_inv_desc(dma_addr_t base_addr, uint32_t offset,
+> > > +static bool vtd_get_inv_desc(IntelIOMMUState *s,
+> > >                               VTDInvDesc *inv_desc)
+> > >  {
+> > > -    dma_addr_t addr = base_addr + offset * sizeof(*inv_desc);
+> > > -    if (dma_memory_read(&address_space_memory, addr, inv_desc,
+> > > -        sizeof(*inv_desc))) {
+> > > -        error_report_once("Read INV DESC failed");
+> > > -        inv_desc->lo = 0;
+> > > -        inv_desc->hi = 0;
+> > > +    dma_addr_t base_addr = s->iq;
+> > > +    uint32_t offset = s->iq_head;
+> > > +    uint32_t dw = vtd_get_inv_desc_width(s);
+> > > +    dma_addr_t addr = base_addr + offset * dw;
+> > > +
+> > > +    /* init */
+> > > +    inv_desc->val[0] = 0;
+> > > +    inv_desc->val[1] = 0;
+> > > +    inv_desc->val[2] = 0;
+> > > +    inv_desc->val[3] = 0;
+> > 
+> > No need?
+> > 
+> This is necessary. Per my test, the val[] are not 0 by default.
+
+I agree, it's a stack variable. However...
+
+> That makes bug happen.
+
+... could you explain the bug?
+
+Regards,
+
+-- 
+Peter Xu
