@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39454)
+Received: from eggs.gnu.org ([209.51.188.92]:39456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbZ-0008Ij-LA
+	(envelope-from <david@redhat.com>) id 1gtvbZ-0008J1-PN
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbY-000299-Qi
+	(envelope-from <david@redhat.com>) id 1gtvbY-00029F-SL
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:41 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Feb 2019 15:33:12 +0100
-Message-Id: <20190213143322.31371-6-david@redhat.com>
+Date: Wed, 13 Feb 2019 15:33:11 +0100
+Message-Id: <20190213143322.31371-5-david@redhat.com>
 In-Reply-To: <20190213143322.31371-1-david@redhat.com>
 References: <20190213143322.31371-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/15] s390x/tcg: Hide IEEE underflows in
- some scenarios
+Subject: [Qemu-devel] [PATCH v2 04/15] s390x/tcg: Fix parts of IEEE
+ exception handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-IEEE underflows are not reported when the mask bit is off and we don't
-also have an inexact exception.
+Many things are wrong and some parts cannot be fixed yet. Fix what we
+can fix easily and add two FIXMEs:
 
-z14 PoP, 9-20, "IEEE Underflow":
-    An IEEE-underflow exception is recognized for an
-    IEEE target when the tininess condition exists and
-    either: (1) the IEEE-underflow mask bit in the FPC
-    register is zero and the result value is inexact, or (2)
-    the IEEE-underflow mask bit in the FPC register is
-    one.
+The fpc flags are not updated in case an exception is actually injected.
+Inexact exceptions have to be handled separately, as they are the only
+exceptions that can coexist with underflows and overflows.
+
+I reread the horribly complicated chapters in the PoP at least 5 times
+and hope I got it right.
+
+For references:
+- z14 PoP, 9-18, "IEEE Exceptions"
+- z14 PoP, 19-9, Figure 19-8
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/fpu_helper.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ target/s390x/fpu_helper.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index dcad9c367a..64efab72a4 100644
+index de02cf792d..dcad9c367a 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -63,6 +63,19 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
+@@ -63,13 +63,39 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
      env->fpu_status.float_exception_flags = 0;
      s390_exc = s390_softfloat_exc_to_ieee(qemu_exc);
  
+-    /* Install the exceptions that we raised.  */
+-    env->fpc |= s390_exc << 16;
 +    /*
-+     * IEEE-Underflow exception recognition exists if a tininess condition
-+     * (underflow) exists and
-+     * - The mask bit in the FPC is zero and the result is inexact
-+     * - The mask bit in the FPC is one
-+     * So tininess conditions that are not inexact don't trigger any
-+     * underflow action in case the mask bit is not one.
++     * FIXME:
++     * 1. Right now, all inexact conditions are inidicated as
++     *    "truncated" (0) and never as "incremented" (1) in the DXC.
++     * 2. Only traps due to invalid/divbyzero are suppressing. Other traps
++     *    are completing, meaning the target register has to be written!
++     *    This, however will mean that we have to write the register before
++     *    triggering the trap - impossible right now.
 +     */
-+    if (!(s390_exc & S390_IEEE_MASK_INEXACT) &&
-+        !((env->fpc >> 24) & S390_IEEE_MASK_UNDERFLOW)) {
-+        s390_exc &= ~S390_IEEE_MASK_UNDERFLOW;
-+    }
 +
-     /*
-      * FIXME:
-      * 1. Right now, all inexact conditions are inidicated as
++    /*
++     * invalid/divbyzero cannot coexist with other conditions.
++     * overflow/underflow however can coexist with inexact, we have to
++     * handle it separatly.
++     */
++    if (s390_exc & ~S390_IEEE_MASK_INEXACT) {
++        if (s390_exc & ~S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
++            /* trap condition - inexact reported along */
++            tcg_s390_data_exception(env, s390_exc, retaddr);
++        }
++        /* nontrap condition - inexact handled differently */
++        env->fpc |= (s390_exc & ~S390_IEEE_MASK_INEXACT) << 16;
++    }
+ 
+-    /* Send signals for enabled exceptions.  */
+-    s390_exc &= env->fpc >> 24;
+-    if (s390_exc) {
+-        tcg_s390_data_exception(env, s390_exc, retaddr);
++    /* inexact handling */
++    if (s390_exc & S390_IEEE_MASK_INEXACT) {
++        /* trap condition - overflow/underflow _not_ reported along */
++        if (s390_exc & S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
++            tcg_s390_data_exception(env, s390_exc & S390_IEEE_MASK_INEXACT,
++                                    retaddr);
++        }
++        /* nontrap condition */
++        env->fpc |= (s390_exc & S390_IEEE_MASK_INEXACT) << 16;
+     }
+ }
+ 
 -- 
 2.17.2
