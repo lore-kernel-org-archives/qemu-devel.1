@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36470)
+Received: from eggs.gnu.org ([209.51.188.92]:36567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gttTH-00019W-Tp
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:01 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gttTd-0001Jk-IV
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gttTG-0002zL-R7
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:16:59 -0500
-Date: Wed, 13 Feb 2019 13:16:46 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190213131646.72641f94@redhat.com>
-In-Reply-To: <0a8d418d-61e3-f958-c73f-f7dd9ab7b7bb@redhat.com>
-References: <20190212214827.30543-1-lvivier@redhat.com>
-	<20190212214827.30543-2-lvivier@redhat.com>
-	<20190213012544.GS1884@umbus.fritz.box>
-	<20190213094259.37f78c6f@redhat.com>
-	<0a8d418d-61e3-f958-c73f-f7dd9ab7b7bb@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gttTc-0003Rk-8n
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:21 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34378)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gttTa-0003Ej-7g
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:20 -0500
+Received: by mail-wr1-f67.google.com with SMTP id f14so2270024wrg.1
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 04:17:08 -0800 (PST)
+Date: Wed, 13 Feb 2019 13:17:03 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190213121703.zmzpgl4fvvsfg4pf@steredhat>
+References: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
+	<20190213080143.GE26332@stefanha-x1.localdomain>
+	<20190213083227.xkih3ckbtiromd2v@steredhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/4] numa,
- spapr: add thread-id in the possible_cpus list
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190213083227.xkih3ckbtiromd2v@steredhat>
+Subject: Re: [Qemu-devel] [PATCH v4] virtio-blk: set correct config size for
+ the host driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +31,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Changpeng Liu <changpeng.liu@intel.com>, mst@redhat.com
+Cc: qemu-devel@nongnu.org, ldoktor@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Greg Kurz <groug@kaod.org>
 
-On Wed, 13 Feb 2019 10:08:24 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
-
-> On 13/02/2019 09:42, Igor Mammedov wrote:
-> > On Wed, 13 Feb 2019 12:25:45 +1100
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >   
-> >> On Tue, Feb 12, 2019 at 10:48:24PM +0100, Laurent Vivier wrote:  
-> >>> spapr_possible_cpu_arch_ids() counts only cores, and so
-> >>> the number of available CPUs is the number of vCPU divided
-> >>> by smp_threads.
-> >>>
-> >>> ... -smp 4,maxcpus=8,cores=2,threads=2,sockets=2 -numa node,cpus=0,cpus=1 \
-> >>>                                                   -numa node,cpus=3,cpus=4 \
-> >>>                                                   -numa node -numa node
-> >>>
-> >>> This generates (info hotpluggable-cpus)
-> >>>
-> >>>    node-id: 0 core-id: 0 thread-id: 0 [thread-id: 1]
-> >>>    node-id: 0 core-id: 6 thread-id: 0 [thread-id: 1]
-> >>>    node-id: 1 core-id: 2 thread-id: 0 [thread-id: 1]
-> >>>    node-id: 1 core-id: 4 thread-id: 0 [thread-id: 1]
-> >>>
-> >>> And this command line generates the following error:
-> >>>
-> >>>    CPU(s) not present in any NUMA nodes: CPU 3 [core-id: 6]
-> >>>
-> >>> That is wrong because CPU 3 [core-id: 6] is assigned to node-id 0
-> >>> Moreover "cpus=4" is not valid, because it means core-id 8 but
-> >>> maxcpus is 8.
-> >>>
-> >>> With this patch we have now:
-> >>>
-> >>>    node-id: 0 core-id: 0 thread-id: 0
-> >>>    node-id: 0 core-id: 0 thread-id: 1
-> >>>    node-id: 0 core-id: 1 thread-id: 0
-> >>>    node-id: 1 core-id: 1 thread-id: 1
-> >>>    node-id: 0 core-id: 2 thread-id: 1
-> >>>    node-id: 1 core-id: 2 thread-id: 0
-> >>>    node-id: 0 core-id: 3 thread-id: 1
-> >>>    node-id: 0 core-id: 3 thread-id: 0  
-> >>
-> >> I'm afraid this is not the right solution.  The point of the
-> >> hotpluggable cpus table is that it has exactly one entry for each
-> >> hotpluggable unit.  For PAPR that's a core, not a thread.
-> >>
-> >> So, the problem is with how the NUMA configuration code is
-> >> interpreting possible-cpus, not how the machine is building the table.  
+On Wed, Feb 13, 2019 at 09:32:27AM +0100, Stefano Garzarella wrote:
+> On Wed, Feb 13, 2019 at 04:01:43PM +0800, Stefan Hajnoczi wrote:
+> > On Wed, Feb 13, 2019 at 09:48:57AM +0800, Changpeng Liu wrote:
+> > > Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features
+> > > support" added fields to struct virtio_blk_config. This changes
+> > > the size of the config space and breaks migration from QEMU 3.1
+> > > and older:
+> > > 
+> > > qemu-system-ppc64: get_pci_config_device: Bad config data: i=0x10 read: 41 device: 1 cmask: ff wmask: 80 w1cmask:0
+> > > qemu-system-ppc64: Failed to load PCIDevice:config
+> > > qemu-system-ppc64: Failed to load virtio-blk:virtio
+> > > qemu-system-ppc64: error while loading state for instance 0x0 of device 'pci@800000020000000:01.0/virtio-blk'
+> > > qemu-system-ppc64: load of migration failed: Invalid argument
+> > > 
+> > > Since virtio-blk doesn't support the "discard" and "write zeroes"
+> > > features, it shouldn't even expose the associated fields in the
+> > > config space actually. Just include all fields up to num_queues to
+> > > match QEMU 3.1 and older.
+> > > 
+> > > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> > > ---
+> > >  hw/block/virtio-blk.c | 13 +++++++++----
+> > >  1 file changed, 9 insertions(+), 4 deletions(-)
 > > 
-> > I'd suggest to deprecate/remove 'cpus' suboption in -numa.
-> > One should use '-numa cpu' instead, which is written with
-> > possible_cpus in mind.  
+> > Stefano: Please rebase your DISCARD/WRITE_ZEROES series onto this and
+> > check that the config space is correctly sized.  Machine types before
+> > 4.0 shouldn't have these fields so that the config space size remains
+> > unchanged.
 > 
-> I agree.
+> Sure!
 > 
-> Should I keep the patch to remove the incomplete CPU mapping support?
-Considering code path didn't go through deprecation process (we didn't have it back then), lets keep it for now and deprecate option properly first.
-Once deprecation period ends we well remove all related code at once.
+> Since I should set a correct config size checking if new features are
+> enabled or not at runtime, should be better to add a variable and an array
+> of sizes like in virtio-net?
 
-Maybe amend affected/add error messages that it's been deprecated
-and will be removed soon and point out to replacement option.
+In my series "[PATCH v4 0/6] virtio-blk: add DISCARD and WRITE_ZEROES"
+I'm adding the host_features field in VirtIOBlock. Then, I could add
+something like the following patch (proof of concept) inspired by the
+virtio-net approach, that would be simplest to maintain when we will add
+new features.
+
+What do you think?
+
+Thanks,
+Stefano
 
 
-
-> Thanks,
-> Laurent
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 843bb2bec8..84dcc1406c 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -28,6 +28,51 @@
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
+ 
++/*
++ * Calculate the number of bytes up to and including the given 'field' of
++ * 'container'.
++ */
++#define endof(container, field) \
++    (offsetof(container, field) + sizeof_field(container, field))
++
++typedef struct VirtIOFeature {
++    uint64_t flags;
++    size_t end;
++} VirtIOFeature;
++
++static VirtIOFeature feature_sizes[] = {
++    {.flags = 1ULL << VIRTIO_NET_F_SIZE_MAX,
++     .end = endof(struct virtio_blk_config, size_max)},
++    {.flags = 1ULL << VIRTIO_NET_F_SEG_MAX,
++     .end = endof(struct virtio_blk_config, seg_max)},
++    {.flags = 1ULL << VIRTIO_NET_F_GEOMETRY,
++     .end = endof(struct virtio_blk_config, geometry)},
++    {.flags = 1ULL << VIRTIO_NET_F_BLK_SIZE,
++     .end = endof(struct virtio_blk_config, blk_size)},
++    {.flags = 1ULL << VIRTIO_NET_F_TOPOLOGY,
++     .end = endof(struct virtio_blk_config, opt_io_size)},
++    {.flags = 1ULL << VIRTIO_NET_F_CONFIG_WCE,
++     .end = endof(struct virtio_blk_config, wce)},
++    {.flags = 1ULL << VIRTIO_NET_F_MQ,
++     .end = endof(struct virtio_blk_config, num_queues)},
++    {}
++};
++
++static void virtio_blk_set_config_size(VirtIOBlock *s, uint64_t host_features)
++{
++    int i, config_size;
++
++    config_size = endof(struct virtio_blk_config, capacity);
++
++    for (i = 0; feature_sizes[i].flags != 0; i++) {
++        if (host_features & feature_sizes[i].flags) {
++            config_size = MAX(feature_sizes[i].end, config_size);
++        }
++    }
++
++    s->config_size = config_size;
++}
++
+ static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
+                                     VirtIOBlockReq *req)
+ {
+@@ -757,7 +802,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+     blkcfg.alignment_offset = 0;
+     blkcfg.wce = blk_enable_write_cache(s->blk);
+     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
+-    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
++    memcpy(config, &blkcfg, s->config_size);
+ }
+ 
+ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
+@@ -765,7 +810,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
+     VirtIOBlock *s = VIRTIO_BLK(vdev);
+     struct virtio_blk_config blkcfg;
+ 
+-    memcpy(&blkcfg, config, sizeof(blkcfg));
++    memcpy(&blkcfg, config, s->config_size);
+ 
+     aio_context_acquire(blk_get_aio_context(s->blk));
+     blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
+@@ -948,8 +993,9 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+-                sizeof(struct virtio_blk_config));
++    virtio_blk_set_config_size(s, s->host_features);
++
++    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, s->config_size);
+ 
+     s->blk = conf->conf.blk;
+     s->rq = NULL;
