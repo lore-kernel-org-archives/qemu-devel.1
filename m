@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54073)
+Received: from eggs.gnu.org ([209.51.188.92]:48318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gu2Po-0002ee-UH
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:50:02 -0500
+	(envelope-from <thomas.petazzoni@bootlin.com>) id 1gu1vQ-000782-D6
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gu2CP-0003Sr-LI
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:36:10 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40294)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gu2CP-0003PN-Ej
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:36:09 -0500
-Received: by mail-ot1-x342.google.com with SMTP id s5so6929408oth.7
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 13:36:09 -0800 (PST)
+	(envelope-from <thomas.petazzoni@bootlin.com>) id 1gu1vP-0002tI-MV
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:18:36 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:40297)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thomas.petazzoni@bootlin.com>)
+	id 1gu1vP-0002qb-33
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:18:35 -0500
+From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Date: Wed, 13 Feb 2019 22:18:27 +0100
+Message-Id: <20190213211827.20300-1-thomas.petazzoni@bootlin.com>
 MIME-Version: 1.0
-References: <20190212173839.31587-1-chouteau@adacore.com>
-	<CAKmqyKOAVDbJQ6avwWgDHP1fHD_EXdZmi+Sjucm05ZqNkQoUog@mail.gmail.com>
-	<CAFEAcA_5jYqTWVBiTFjumkAHEEwvDkt_f_LHAo=00gkEfoY9sA@mail.gmail.com>
-	<49bd9805-2f40-7d5d-8814-e0a59a9c5be1@redhat.com>
-In-Reply-To: <49bd9805-2f40-7d5d-8814-e0a59a9c5be1@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Feb 2019 21:35:56 +0000
-Message-ID: <CAFEAcA9GD+Cr_nAgz1CxfrWi7OuEZHrz=Gnh1PLrFJo6-BkOtw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] SiFive RISC-V GPIO Device
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] configure: improve usbfs check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alistair Francis <alistair23@gmail.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Fabien Chouteau <chouteau@adacore.com>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 
-On Wed, 13 Feb 2019 at 18:54, Thomas Huth <thuth@redhat.com> wrote:
->
-> On 2019-02-13 18:14, Peter Maydell wrote:
-> > On Wed, 13 Feb 2019 at 00:13, Alistair Francis <alistair23@gmail.com> w=
-rote:
-> >> I know the other RISC-V files don't do it, but this should go in the
-> >> hw/gpio directory instead of hw/riscv.
-> >
-> > It might be nice to move those existing riscv devices into
-> > their proper places at some point: should be a fairly easy
-> > cleanup patch if somebody wants to take it on. (Advice
-> > on what should live where available on request.)
->
-> If devices only work on riscv, they should IMHO stay in hw/riscv/. I
-> think hw/gpio/ and friends should primarily be used if a device is
-> shared between architectures. If they stay in hw/riscv/ it is way easier
-> to match the devices with wildcards in the MAINTAINERS file. Just my
-> 0.02 =E2=82=AC only, of course.
+The current check to test if usbfs support should be compiled or not
+solely relies on the presence of <linux/usbdevice_fs.h>, without
+actually checking that all definition used by Qemu are provided by
+this header file.
 
-This is not the way we generally arrange the source tree,
-at least not the parts I'm familiar with. The rule of
-thumb I use is that devices of type X go in hw/X, and
-hw/$ARCH is only for board models and SoC container objects.
-I think the model for this is the Linux kernel, which
-splits drivers for devices into directories by device
-family, rather than putting them all in arch/whatever.
-A split that puts all the architecture-specific device
-models in hw/$ARCH has the significant disadvantage that
-it would put a huge number of files in hw/arm ...
+With sufficiently old kernel headers, <linux/usbdevice_fs.h> may be
+present, but some of the definitions needed by Qemu may not be
+available.
 
-(More generally, I don't think the exact way we split
-the source files between directories matters much, but
-I do think it helps if we try to be consistent about it.)
+This commit improves the check by building a small program that
+actually tests whether the necessary definitions are available.
 
-thanks
--- PMM
+In addition, it fixes a bug where have_usbfs was set to "yes"
+regardless of the result of the test.
+
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+---
+ configure | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 3d89870d99..799c8e3b08 100755
+--- a/configure
++++ b/configure
+@@ -4266,10 +4266,25 @@ fi
+ # check for usbfs
+ have_usbfs=no
+ if test "$linux_user" = "yes"; then
+-  if check_include linux/usbdevice_fs.h; then
++  cat > $TMPC << EOF
++#include <linux/usbdevice_fs.h>
++
++#ifndef USBDEVFS_GET_CAPABILITIES
++#error "USBDEVFS_GET_CAPABILITIES undefined"
++#endif
++
++#ifndef USBDEVFS_DISCONNECT_CLAIM
++#error "USBDEVFS_DISCONNECT_CLAIM undefined"
++#endif
++
++int main(void)
++{
++    return 0;
++}
++EOF
++  if compile_prog "" ""; then
+     have_usbfs=yes
+   fi
+-  have_usbfs=yes
+ fi
+ 
+ # check for fallocate
+-- 
+2.20.1
