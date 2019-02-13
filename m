@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41072)
+Received: from eggs.gnu.org ([209.51.188.92]:41054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtpMN-00023p-Nw
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:53:36 -0500
+	(envelope-from <bounces@canonical.com>) id 1gtpMc-00023i-A5
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtpLi-0005fs-7i
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:52:55 -0500
-Date: Wed, 13 Feb 2019 15:52:47 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190213075247.GC26332@stefanha-x1.localdomain>
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+	(envelope-from <bounces@canonical.com>) id 1gtpEq-0004cN-EK
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:45:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gtpEm-0004KG-UB
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:45:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gtpEh-0000eX-Nt
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:45:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AFF9F2E804F
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:45:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="oTHb8nViIGeoXxdp"
-Content-Disposition: inline
-In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/17] block: local qiov helper
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 Feb 2019 07:37:04 -0000
+From: RTOS Pharos <1815721@bugs.launchpad.net>
+Reply-To: Bug 1815721 <1815721@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155004342499.19242.14077661245921319117.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815721] [NEW] RISC-V PLIC enable interrupt for
+ multicore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
---oTHb8nViIGeoXxdp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hello all,
 
-On Thu, Feb 07, 2019 at 01:24:28PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Hi all!
->=20
-> Here is a new simple helper for a very often patter
-> around qemu_iovec_init_external, when we need simple qiov with only
-> one iov, initialized from external buffer.
->=20
-> v3:
->   01-02: tiny improvements, described in patch-emails
->   03-17: new patches
->=20
->   Note: only hw/scsi/scsi-disk.c not updated, as it has too tricky
->         logic around @iov fields of structures. So, it is simpler to
->         keep it as is.
->=20
-> Previous series version was "[PATCH v2 0/2] block: local qiov helper: par=
-t I"
-> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01610.html
->=20
-> Vladimir Sementsov-Ogievskiy (17):
->   block: enhance QEMUIOVector structure
->   block/io: use qemu_iovec_init_buf
->   block/block-backend: use QEMU_IOVEC_INIT_BUF
->   block/backup: use qemu_iovec_init_buf
->   block/commit: use QEMU_IOVEC_INIT_BUF
->   block/stream: use QEMU_IOVEC_INIT_BUF
->   block/parallels: use QEMU_IOVEC_INIT_BUF
->   block/qcow: use qemu_iovec_init_buf
->   block/qcow2: use qemu_iovec_init_buf
->   block/qed: use qemu_iovec_init_buf
->   block/vmdk: use qemu_iovec_init_buf
->   qemu-img: use qemu_iovec_init_buf
->   migration/block: use qemu_iovec_init_buf
->   tests/test-bdrv-drain: use QEMU_IOVEC_INIT_BUF
->   hw/ide: drop iov field from IDEState
->   hw/ide: drop iov field from IDEBufferedRequest
->   hw/ide: drop iov field from IDEDMA
->=20
->  include/hw/ide/internal.h |  3 --
->  include/qemu/iov.h        | 64 +++++++++++++++++++++++++++-
->  block/backup.c            |  5 +--
->  block/block-backend.c     | 13 +-----
->  block/commit.c            |  7 +--
->  block/io.c                | 89 +++++++++------------------------------
->  block/parallels.c         | 13 +++---
->  block/qcow.c              | 21 ++-------
->  block/qcow2.c             | 12 +-----
->  block/qed-table.c         | 16 ++-----
->  block/qed.c               | 31 ++++----------
->  block/stream.c            |  7 +--
->  block/vmdk.c              |  7 +--
->  hw/ide/atapi.c            | 14 +++---
->  hw/ide/core.c             | 19 ++++-----
->  migration/block.c         | 10 ++---
->  qemu-img.c                | 10 +----
->  tests/test-bdrv-drain.c   | 29 ++-----------
->  18 files changed, 134 insertions(+), 236 deletions(-)
->=20
-> --=20
-> 2.18.0
+There is a bug in Qemu related to the enabling of external interrupts
+for multicores (Virt machine).
 
-I made the changes suggested by Eric in Patch 1.
+After correcting Qemu as described in #1815078
+(https://bugs.launchpad.net/qemu/+bug/1815078), when we try to enable
+interrupts for core 1 at address 0x0C00_2080 we don't seem to be able to
+trigger an external interrupt  (e.g. UART0).
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+This works perfectly for core 0, but fore core 1 it does not work at
+all. I assume that given bug #1815078 does not enable any external
+interrupt then this feature has not been tested. I tried to look at the
+qemu source code but with no luck so far.
 
-Stefan
+I guess the problem is related to function parse_hart_config (in
+sfive_plic.c) that initializes incorrectly the
+plic->addr_config[addrid].hartid, which is later on read in
+sifive_plic_update. But this is a guess.
 
---oTHb8nViIGeoXxdp
-Content-Type: application/pgp-signature; name="signature.asc"
+Best regards,
+Pharos team
 
------BEGIN PGP SIGNATURE-----
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-iQEcBAEBAgAGBQJcY8zOAAoJEJykq7OBq3PI+OwIAMDBXYCghUBGFLRCaI5MZlcI
-yEdN/QbxUvdS0scyfxDhJwYBWsaVh+uS4z5XNcoXXKwwPG2HP75D9L7X07oJaJTi
-8kMj3ZGaHgM+mswwVWB2zEKtX/kBO7FYh17GoVC2Kaq5aO7i7jtZeimUCOBBecj4
-dU/iCqwyiH3MpsGapCiIkmzrY43Bh/EdQH0jj469hdpjpTZz81zvIKWPQCbaWiJH
-ci06D0rFVcZJSc9gU2wgT1BviatC9rXCBg5yO/PydEl2eN3ox81ZEKKbUNAK/Ubj
-SqQlPPRRt6DAvioWwrljB+0EClpv0ZA/a9DnDm3iZMTnxtlnWbaoMl2tGv47/vo=
-=BKSR
------END PGP SIGNATURE-----
+-- =
 
---oTHb8nViIGeoXxdp--
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815721
+
+Title:
+  RISC-V PLIC enable interrupt for multicore
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello all,
+
+  There is a bug in Qemu related to the enabling of external interrupts
+  for multicores (Virt machine).
+
+  After correcting Qemu as described in #1815078
+  (https://bugs.launchpad.net/qemu/+bug/1815078), when we try to enable
+  interrupts for core 1 at address 0x0C00_2080 we don't seem to be able
+  to trigger an external interrupt  (e.g. UART0).
+
+  This works perfectly for core 0, but fore core 1 it does not work at
+  all. I assume that given bug #1815078 does not enable any external
+  interrupt then this feature has not been tested. I tried to look at
+  the qemu source code but with no luck so far.
+
+  I guess the problem is related to function parse_hart_config (in
+  sfive_plic.c) that initializes incorrectly the
+  plic->addr_config[addrid].hartid, which is later on read in
+  sifive_plic_update. But this is a guess.
+
+  Best regards,
+  Pharos team
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815721/+subscriptions
