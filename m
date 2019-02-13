@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36567)
+Received: from eggs.gnu.org ([209.51.188.92]:38852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gttTd-0001Jk-IV
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:22 -0500
+	(envelope-from <groug@kaod.org>) id 1gttiq-0003fn-VQ
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:33:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gttTc-0003Rk-8n
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:21 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34378)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gttTa-0003Ej-7g
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:17:20 -0500
-Received: by mail-wr1-f67.google.com with SMTP id f14so2270024wrg.1
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 04:17:08 -0800 (PST)
-Date: Wed, 13 Feb 2019 13:17:03 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190213121703.zmzpgl4fvvsfg4pf@steredhat>
-References: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
-	<20190213080143.GE26332@stefanha-x1.localdomain>
-	<20190213083227.xkih3ckbtiromd2v@steredhat>
+	(envelope-from <groug@kaod.org>) id 1gttaI-0000be-I1
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:24:15 -0500
+Received: from 6.mo7.mail-out.ovh.net ([188.165.39.218]:39722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gttaI-0000Xb-BP
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:24:14 -0500
+Received: from player731.ha.ovh.net (unknown [10.109.146.1])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 57141100A41
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 13:24:10 +0100 (CET)
+Date: Wed, 13 Feb 2019 13:23:52 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190213132352.77670675@bahia.lan>
+In-Reply-To: <20190213032601.GZ1884@umbus.fritz.box>
+References: <154999583316.690774.15072605479770041782.stgit@bahia.lan>
+	<154999583999.690774.9854440646408554397.stgit@bahia.lan>
+	<20190213032601.GZ1884@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190213083227.xkih3ckbtiromd2v@steredhat>
-Subject: Re: [Qemu-devel] [PATCH v4] virtio-blk: set correct config size for
- the host driver
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/dDi0szLJtI7q2JUGOXQ7DBn";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v4 01/15] spapr_irq: Add an @xics_offset
+ field to sPAPRIrq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,139 +33,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Changpeng Liu <changpeng.liu@intel.com>, mst@redhat.com
-Cc: qemu-devel@nongnu.org, ldoktor@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Feb 13, 2019 at 09:32:27AM +0100, Stefano Garzarella wrote:
-> On Wed, Feb 13, 2019 at 04:01:43PM +0800, Stefan Hajnoczi wrote:
-> > On Wed, Feb 13, 2019 at 09:48:57AM +0800, Changpeng Liu wrote:
-> > > Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features
-> > > support" added fields to struct virtio_blk_config. This changes
-> > > the size of the config space and breaks migration from QEMU 3.1
-> > > and older:
-> > > 
-> > > qemu-system-ppc64: get_pci_config_device: Bad config data: i=0x10 read: 41 device: 1 cmask: ff wmask: 80 w1cmask:0
-> > > qemu-system-ppc64: Failed to load PCIDevice:config
-> > > qemu-system-ppc64: Failed to load virtio-blk:virtio
-> > > qemu-system-ppc64: error while loading state for instance 0x0 of device 'pci@800000020000000:01.0/virtio-blk'
-> > > qemu-system-ppc64: load of migration failed: Invalid argument
-> > > 
-> > > Since virtio-blk doesn't support the "discard" and "write zeroes"
-> > > features, it shouldn't even expose the associated fields in the
-> > > config space actually. Just include all fields up to num_queues to
-> > > match QEMU 3.1 and older.
-> > > 
-> > > Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> > > ---
-> > >  hw/block/virtio-blk.c | 13 +++++++++----
-> > >  1 file changed, 9 insertions(+), 4 deletions(-)
-> > 
-> > Stefano: Please rebase your DISCARD/WRITE_ZEROES series onto this and
-> > check that the config space is correctly sized.  Machine types before
-> > 4.0 shouldn't have these fields so that the config space size remains
-> > unchanged.
-> 
-> Sure!
-> 
-> Since I should set a correct config size checking if new features are
-> enabled or not at runtime, should be better to add a variable and an array
-> of sizes like in virtio-net?
+--Sig_/dDi0szLJtI7q2JUGOXQ7DBn
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-In my series "[PATCH v4 0/6] virtio-blk: add DISCARD and WRITE_ZEROES"
-I'm adding the host_features field in VirtIOBlock. Then, I could add
-something like the following patch (proof of concept) inspired by the
-virtio-net approach, that would be simplest to maintain when we will add
-new features.
+On Wed, 13 Feb 2019 14:26:01 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-What do you think?
+> On Tue, Feb 12, 2019 at 07:24:00PM +0100, Greg Kurz wrote:
+> > Only pseries machines, either recent ones started with ic-mode=3Dxics
+> > or older ones using the legacy irq allocation scheme, need to set the
+> > @offset of the ICS to XICS_IRQ_BASE. Recent pseries started with
+> > ic-mode=3Ddual set it to 0 and powernv machines set it to some other
+> > value at runtime.
+> >=20
+> > It thus doesn't really help to set the default value of the ICS offset
+> > to XICS_IRQ_BASE in ics_base_instance_init().
+> >=20
+> > Drop that code from XICS and let the pseries code set the offset
+> > explicitely for clarity.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+>=20
+> So this actually relates to a discussion I've had on some of C=C3=A9dric's
+> more recent patches.  Changing the ics offset in ic-mode=3Ddual doesn't
+> make sense to me.  The global (guest) interrupt numbers need to match
+> between XICS and XIVE, but the global interrupt numbers don't have to
+> match the ICS source numbers, which is what ics->offset is about.
+>=20
 
-Thanks,
-Stefano
+Yeah. We'll see what comes out of the discussion at:
+
+    https://patchwork.ozlabs.org/patch/1021496/
+
+> > ---
+> >  hw/intc/xics.c             |    8 --------
+> >  hw/ppc/spapr_irq.c         |   33 ++++++++++++++++++++-------------
+> >  include/hw/ppc/spapr_irq.h |    1 +
+> >  3 files changed, 21 insertions(+), 21 deletions(-)
+> >=20
+> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> > index 16e8ffa2aaf7..7cac138067e2 100644
+> > --- a/hw/intc/xics.c
+> > +++ b/hw/intc/xics.c
+> > @@ -638,13 +638,6 @@ static void ics_base_realize(DeviceState *dev, Err=
+or **errp)
+> >      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+> >  }
+> > =20
+> > -static void ics_base_instance_init(Object *obj)
+> > -{
+> > -    ICSState *ics =3D ICS_BASE(obj);
+> > -
+> > -    ics->offset =3D XICS_IRQ_BASE;
+> > -}
+> > -
+> >  static int ics_base_dispatch_pre_save(void *opaque)
+> >  {
+> >      ICSState *ics =3D opaque;
+> > @@ -720,7 +713,6 @@ static const TypeInfo ics_base_info =3D {
+> >      .parent =3D TYPE_DEVICE,
+> >      .abstract =3D true,
+> >      .instance_size =3D sizeof(ICSState),
+> > -    .instance_init =3D ics_base_instance_init,
+> >      .class_init =3D ics_base_class_init,
+> >      .class_size =3D sizeof(ICSStateClass),
+> >  };
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index 80b0083b8e38..8217e0215411 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -68,10 +68,11 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+> > =20
+> >  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> >                                    const char *type_ics,
+> > -                                  int nr_irqs, Error **errp)
+> > +                                  int nr_irqs, int offset, Error **err=
+p)
+> >  {
+> >      Error *local_err =3D NULL;
+> >      Object *obj;
+> > +    ICSState *ics;
+> > =20
+> >      obj =3D object_new(type_ics);
+> >      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+> > @@ -86,7 +87,10 @@ static ICSState *spapr_ics_create(sPAPRMachineState =
+*spapr,
+> >          goto error;
+> >      }
+> > =20
+> > -    return ICS_BASE(obj);
+> > +    ics =3D ICS_BASE(obj);
+> > +    ics->offset =3D offset;
+> > +
+> > +    return ics;
+> > =20
+> >  error:
+> >      error_propagate(errp, local_err);
+> > @@ -104,6 +108,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
+spapr, Error **errp)
+> >              !xics_kvm_init(spapr, &local_err)) {
+> >              spapr->icp_type =3D TYPE_KVM_ICP;
+> >              spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_ir=
+qs,
+> > +                                          spapr->irq->xics_offset,
+> >                                            &local_err);
+> >          }
+> >          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> > @@ -119,6 +124,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
+spapr, Error **errp)
+> >          xics_spapr_init(spapr);
+> >          spapr->icp_type =3D TYPE_ICP;
+> >          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irq=
+s,
+> > +                                      spapr->irq->xics_offset,
+> >                                        &local_err);
+> >      }
+> > =20
+> > @@ -246,6 +252,7 @@ sPAPRIrq spapr_irq_xics =3D {
+> >      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
+> >      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
+> > +    .xics_offset =3D XICS_IRQ_BASE,
+> > =20
+> >      .init        =3D spapr_irq_init_xics,
+> >      .claim       =3D spapr_irq_claim_xics,
+> > @@ -451,17 +458,6 @@ static void spapr_irq_init_dual(sPAPRMachineState =
+*spapr, Error **errp)
+> >          return;
+> >      }
+> > =20
+> > -    /*
+> > -     * Align the XICS and the XIVE IRQ number space under QEMU.
+> > -     *
+> > -     * However, the XICS KVM device still considers that the IRQ
+> > -     * numbers should start at XICS_IRQ_BASE (0x1000). Either we
+> > -     * should introduce a KVM device ioctl to set the offset or ignore
+> > -     * the lower 4K numbers when using the get/set ioctl of the XICS
+> > -     * KVM device. The second option seems the least intrusive.
+> > -     */
+> > -    spapr->ics->offset =3D 0;
+> > -
+> >      spapr_irq_xive.init(spapr, &local_err);
+> >      if (local_err) {
+> >          error_propagate(errp, local_err);
+> > @@ -582,6 +578,16 @@ sPAPRIrq spapr_irq_dual =3D {
+> >      .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
+> >      .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_BOTH,
+> > +    /*
+> > +     * Align the XICS and the XIVE IRQ number space under QEMU.
+> > +     *
+> > +     * However, the XICS KVM device still considers that the IRQ
+> > +     * numbers should start at XICS_IRQ_BASE (0x1000). Either we
+> > +     * should introduce a KVM device ioctl to set the offset or ignore
+> > +     * the lower 4K numbers when using the get/set ioctl of the XICS
+> > +     * KVM device. The second option seems the least intrusive.
+> > +     */
+> > +    .xics_offset =3D 0,
+> > =20
+> >      .init        =3D spapr_irq_init_dual,
+> >      .claim       =3D spapr_irq_claim_dual,
+> > @@ -712,6 +718,7 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+> >      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> >      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
+> > +    .xics_offset =3D XICS_IRQ_BASE,
+> > =20
+> >      .init        =3D spapr_irq_init_xics,
+> >      .claim       =3D spapr_irq_claim_xics,
+> > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> > index 14b02c3aca33..5e30858dc22a 100644
+> > --- a/include/hw/ppc/spapr_irq.h
+> > +++ b/include/hw/ppc/spapr_irq.h
+> > @@ -34,6 +34,7 @@ typedef struct sPAPRIrq {
+> >      uint32_t    nr_irqs;
+> >      uint32_t    nr_msis;
+> >      uint8_t     ov5;
+> > +    uint32_t    xics_offset;
+> > =20
+> >      void (*init)(sPAPRMachineState *spapr, Error **errp);
+> >      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **=
+errp);
+> >  =20
+>=20
 
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 843bb2bec8..84dcc1406c 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -28,6 +28,51 @@
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
- 
-+/*
-+ * Calculate the number of bytes up to and including the given 'field' of
-+ * 'container'.
-+ */
-+#define endof(container, field) \
-+    (offsetof(container, field) + sizeof_field(container, field))
-+
-+typedef struct VirtIOFeature {
-+    uint64_t flags;
-+    size_t end;
-+} VirtIOFeature;
-+
-+static VirtIOFeature feature_sizes[] = {
-+    {.flags = 1ULL << VIRTIO_NET_F_SIZE_MAX,
-+     .end = endof(struct virtio_blk_config, size_max)},
-+    {.flags = 1ULL << VIRTIO_NET_F_SEG_MAX,
-+     .end = endof(struct virtio_blk_config, seg_max)},
-+    {.flags = 1ULL << VIRTIO_NET_F_GEOMETRY,
-+     .end = endof(struct virtio_blk_config, geometry)},
-+    {.flags = 1ULL << VIRTIO_NET_F_BLK_SIZE,
-+     .end = endof(struct virtio_blk_config, blk_size)},
-+    {.flags = 1ULL << VIRTIO_NET_F_TOPOLOGY,
-+     .end = endof(struct virtio_blk_config, opt_io_size)},
-+    {.flags = 1ULL << VIRTIO_NET_F_CONFIG_WCE,
-+     .end = endof(struct virtio_blk_config, wce)},
-+    {.flags = 1ULL << VIRTIO_NET_F_MQ,
-+     .end = endof(struct virtio_blk_config, num_queues)},
-+    {}
-+};
-+
-+static void virtio_blk_set_config_size(VirtIOBlock *s, uint64_t host_features)
-+{
-+    int i, config_size;
-+
-+    config_size = endof(struct virtio_blk_config, capacity);
-+
-+    for (i = 0; feature_sizes[i].flags != 0; i++) {
-+        if (host_features & feature_sizes[i].flags) {
-+            config_size = MAX(feature_sizes[i].end, config_size);
-+        }
-+    }
-+
-+    s->config_size = config_size;
-+}
-+
- static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
-                                     VirtIOBlockReq *req)
- {
-@@ -757,7 +802,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-     blkcfg.alignment_offset = 0;
-     blkcfg.wce = blk_enable_write_cache(s->blk);
-     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
--    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-+    memcpy(config, &blkcfg, s->config_size);
- }
- 
- static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-@@ -765,7 +810,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-     VirtIOBlock *s = VIRTIO_BLK(vdev);
-     struct virtio_blk_config blkcfg;
- 
--    memcpy(&blkcfg, config, sizeof(blkcfg));
-+    memcpy(&blkcfg, config, s->config_size);
- 
-     aio_context_acquire(blk_get_aio_context(s->blk));
-     blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
-@@ -948,8 +993,9 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
--                sizeof(struct virtio_blk_config));
-+    virtio_blk_set_config_size(s, s->host_features);
-+
-+    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, s->config_size);
- 
-     s->blk = conf->conf.blk;
-     s->rq = NULL;
+--Sig_/dDi0szLJtI7q2JUGOXQ7DBn
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlxkDFgACgkQcdTV5YIv
+c9b7KRAAw4D5SPhVD9bY20f3qHgOOe0XW2+oXT+DZozGBC+FdC1vla3ZsFvf8HSy
+oBtQ1BFk8/cvGoOKy6LWgkt/JJh4CrRmNMNBQET2xIyKK01qjEWxem89GSiLkwYg
++w26alrtKvByb+wd7R/LdbvtGcv3pLrN9p8OVT5e/XubhdNP5I6NborC/E17WJVI
+WO5oGpQhNQlzo+4yIcfi427lPSmobpJatUFilAeF7KeV3DZclhWPjV/MK8Wq63y4
+0Yweh/R1N3fzqqCxeN9MuU2HG3S+jo1AwkN90NltN+d8hUXOdyC3m3jTWC4hjg9l
+gvnoIqYmIqx5zplNIntuBJP4ENOtsl7AT5zM3Sr7vKtdaTlB7mAXeCf2aCYH+xME
+k5t+bpU+B+RUFiZD2H4iFgGyP/8ngdQXE34cHdm2dJIgFpulEgQoFRFefNXW3Jir
+HZrJj8oNiLhqYxk/XdOOQjL9N7GZOKL+2suZPltOiHzPxkmOFp/L5qtzbCKPQcba
+nqaVQ/UQ6OVY3+eiQCv0Atofayjghi3lIDhNwU+ZaDG670D/MOXwwf/9w07hBxQ3
+unarWDuzE+j2vbtXyV9+tH3DNb5Q4UUxDPO2R2sgN5/umbb9/nRSsFQMeCKSO/NS
+894N4LUUg7/ge3J5kRSeVyBq2OEHVhLWtkw3qMQG+3Zc5i4q144=
+=jZC2
+-----END PGP SIGNATURE-----
+
+--Sig_/dDi0szLJtI7q2JUGOXQ7DBn--
