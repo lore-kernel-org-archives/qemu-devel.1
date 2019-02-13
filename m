@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43130)
+Received: from eggs.gnu.org ([209.51.188.92]:43343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtpUS-0006VW-Ug
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:01:57 -0500
+	(envelope-from <peterx@redhat.com>) id 1gtpVo-00079N-ES
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gtpUN-0000xt-4F
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:01:56 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44943)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gtpUM-0000tf-Q9
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:01:50 -0500
-Received: by mail-pl1-x642.google.com with SMTP id p4so792602plq.11
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 00:01:48 -0800 (PST)
-Date: Wed, 13 Feb 2019 16:01:43 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190213080143.GE26332@stefanha-x1.localdomain>
-References: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <peterx@redhat.com>) id 1gtpVn-0002ET-IQ
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gtpVn-0002BW-82
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:19 -0500
+Date: Wed, 13 Feb 2019 16:03:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190213080305.GA6228@xz-x1>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-2-git-send-email-yi.y.sun@linux.intel.com>
+	<20190211101213.GF1011@xz-x1> <20190213073855.GE16968@yi.y.sun>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2hMgfIw2X+zgXrFs"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4] virtio-blk: set correct config size for
- the host driver
+In-Reply-To: <20190213073855.GE16968@yi.y.sun>
+Subject: Re: [Qemu-devel] [RFC v1 1/3] intel_iommu: scalable mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, ldoktor@redhat.com, mst@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, sgarzare@redhat.com
+To: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
+On Wed, Feb 13, 2019 at 03:38:55PM +0800, Yi Sun wrote:
 
---2hMgfIw2X+zgXrFs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[...]
 
-On Wed, Feb 13, 2019 at 09:48:57AM +0800, Changpeng Liu wrote:
-> Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features
-> support" added fields to struct virtio_blk_config. This changes
-> the size of the config space and breaks migration from QEMU 3.1
-> and older:
->=20
-> qemu-system-ppc64: get_pci_config_device: Bad config data: i=3D0x10 read:=
- 41 device: 1 cmask: ff wmask: 80 w1cmask:0
-> qemu-system-ppc64: Failed to load PCIDevice:config
-> qemu-system-ppc64: Failed to load virtio-blk:virtio
-> qemu-system-ppc64: error while loading state for instance 0x0 of device '=
-pci@800000020000000:01.0/virtio-blk'
-> qemu-system-ppc64: load of migration failed: Invalid argument
->=20
-> Since virtio-blk doesn't support the "discard" and "write zeroes"
-> features, it shouldn't even expose the associated fields in the
-> config space actually. Just include all fields up to num_queues to
-> match QEMU 3.1 and older.
->=20
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> ---
->  hw/block/virtio-blk.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > index 8b72735..396ac8e 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -37,6 +37,34 @@
+> > >  #include "kvm_i386.h"
+> > >  #include "trace.h"
+> > >  
+> > > +#define vtd_devfn_check(devfn) ((devfn & VTD_DEVFN_CHECK_MASK) ? true : false)
+> > 
+> > "vtd_devfn_check(devfn)" is merely as long as "devfn &
+> > VTD_DEVFN_CHECK_MASK", isn't it? :)
+> > 
+> > I would just drop the macro.
+> > 
+> There are two places to call this macro. Is that valuable to keep it?
 
-Stefano: Please rebase your DISCARD/WRITE_ZEROES series onto this and
-check that the config space is correctly sized.  Machine types before
-4.0 shouldn't have these fields so that the config space size remains
-unchanged.
+The point here is "A ? true : false" is exactly "A" when used in
+condition checks.  So IMHO it's clean enough to write:
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+  if (devfn & VTD_DEVFN_CHECK_MASK) {
+    ...
+  }
 
-Stefan
+Comparing to:
 
---2hMgfIw2X+zgXrFs
-Content-Type: application/pgp-signature; name="signature.asc"
+  if (vtd_devfn_check(devfn)) {
+    ...
+  }
 
------BEGIN PGP SIGNATURE-----
+And imho actually the name "check"/"mask" is confusing itself
+already...  So maybe even dropping both vtd_devfn_check() and
+VTD_DEVFN_CHECK_MASK (note: there's nothing about any validity checks,
+and it's not a mask at all!) and simply:
 
-iQEcBAEBAgAGBQJcY87nAAoJEJykq7OBq3PILZYIAIbmgcrfZQQjKOx6My7jcma3
-MKL++Z4j80AVKv5evZ+mRc+HY6SEpB6ugwU+sbrMq3vS+9zUBdKMyj9T9C2q9XNQ
-2G/FexRCd8oVU5KG+uDpjUil4Q1EN1vYd2JuY/mkgm8k59eWE+HmH6kPvSa5OdME
-QDkMMwVIVQjSBGp7xarcCE48aTxB3Xaj55my69avrg8hqB96bKqoIXWFjA65lahO
-vwcQwE/+OkSeYMXAVKRDtGg52/iC5M3LSHfI7Cix4hdomrLORlLCbwyFNHmjqrhn
-H9ax4k076nvx1Y8IxAJdMStP2XYZoQLMZWEgHoeGjYFhTPjlLWLzhmkU1aKTQ/4=
-=VJR9
------END PGP SIGNATURE-----
+  if (devfn >= UINT8_MAX / 2)
 
---2hMgfIw2X+zgXrFs--
+That's even clearer to me that it's splitted into two halves.
+
+[...]
+
+> > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> > > index a321cc9..ff13ff27 100644
+> > > --- a/include/hw/i386/intel_iommu.h
+> > > +++ b/include/hw/i386/intel_iommu.h
+> > > @@ -66,11 +66,12 @@ typedef struct VTDIOTLBEntry VTDIOTLBEntry;
+> > >  typedef struct VTDBus VTDBus;
+> > >  typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+> > >  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+> > > +typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+> > > +typedef struct VTDPASIDEntry VTDPASIDEntry;
+> > >  
+> > >  /* Context-Entry */
+> > >  struct VTDContextEntry {
+> > > -    uint64_t lo;
+> > > -    uint64_t hi;
+> > > +    uint64_t val[4];
+> > 
+> > You can actually make it an enum, two benefits:
+> > 
+> Thanks for the suggestion! DYM 'union'?
+
+Yes. :)
+
+Regards,
+
+-- 
+Peter Xu
