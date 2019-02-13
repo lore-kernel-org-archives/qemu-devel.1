@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56173)
+Received: from eggs.gnu.org ([209.51.188.92]:56457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gture-00026l-1d
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:46:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gtusR-0002dR-DO
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:47:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gturY-0008By-9R
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:46:14 -0500
-References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
-	<20190212052224.GA4839@richard>
-	<20190212003414-mutt-send-email-mst@kernel.org>
-	<4d6f639b-fe11-7048-3975-ee1c1875b8d3@vivier.eu>
-	<3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1gtusQ-0000gk-QT
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:47:03 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:46039)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gtusQ-0000f8-Dq
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:47:02 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
-Date: Wed, 13 Feb 2019 14:45:01 +0100
+References: <20190118213122.22865-1-richard.henderson@linaro.org>
+	<20190118213122.22865-48-richard.henderson@linaro.org>
+	<86bae9b3-75c8-64df-92d1-b4efc35b646c@vivier.eu>
+Message-ID: <c1dc5dbc-cbc7-16a3-9d14-c93b52c362fd@vivier.eu>
+Date: Wed, 13 Feb 2019 14:46:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
+In-Reply-To: <86bae9b3-75c8-64df-92d1-b4efc35b646c@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 48/49] linux-user: Split out ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
-> Hi Laurent,
+On 13/02/2019 14:09, Laurent Vivier wrote:
+> Hi,
 > 
-> On 2/13/19 9:49 AM, Laurent Vivier wrote:
->> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
->>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
->>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
->>>>> There are several functions/variable which are not used anymore.
->>>>>
->>>>> This serials just remove those without functional change.
->>>>>
->>>>> v3: add ack and repost in a new thread
->>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
->>>>
->>>> Michael,
->>>>
->>>> Looks this serials is not merged yet.
->>>>
->>>> Is there any problem I need to fix?
->>>
->>> Yes pls repost with fixed reviewed-by tags.
->>
->> Or I can take the series through the trivial branch and update manually
->> Philippe's lastname?
+> this one is really a cut'n'paste but it introduces a problem with 
+> qemu-alpha, I don't know how/why:
 > 
-> I appreciate the help with manual update, however Wei is not the only
-> one having this problem (other developpers has non-ASCII in their name,
-> and use such tags).
-> I'd rather prefer we find a proper configuration setup to help the
-> community.
+>   $ sudo unshare --ipc --uts --pid --fork --kill-child --mount chroot chroot/alpha/sid/
+>   Unsupported ioctl: cmd=0x80047476
+> 
+> And then it hangs.
+> 
+> I'll try to debug.
 
-I'm wondering if it can be a problem with cut'n'paste rather than with
-git-sendemail.
+In fact it happens with sid, with ppc64 too, but not with m68k and sh4.
 
-I think the following tags should cover Latin and Chinese characters:
+And only with "unshare --pid --fork".
 
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Without "unshare", the result is:
+
+  Unsupported ioctl: cmd=0x80047476
+  bash: cannot set terminal process group (11507): Function not implemented
+  bash: no job control in this shell
+  Unsupported ioctl: cmd=0x80087467
+  Unsupported ioctl: cmd=0x80087467
+  Unsupported ioctl: cmd=0x802c7415
 
 Thanks,
 Laurent
