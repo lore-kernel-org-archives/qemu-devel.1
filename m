@@ -1,43 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:43707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gtvtF-0003NW-JF
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:51:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gtvtV-0003NW-KJ
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gtviA-0002eU-QL
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:40:31 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56480
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gtviA-0002WD-Jp
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:40:30 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1DEX2PM071332
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:40:27 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qmmywgtr1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:40:27 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Wed, 13 Feb 2019 14:40:26 -0000
-Reply-To: jjherne@linux.ibm.com
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-8-git-send-email-jjherne@linux.ibm.com>
-	<20190204115758.765941f1.cohuck@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Wed, 13 Feb 2019 09:40:18 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gtvdj-0003y4-69
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:35:57 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gtvdh-0003Wm-7b
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:35:53 -0500
+Received: by mail-wr1-f67.google.com with SMTP id l9so2695842wrt.13
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 06:35:33 -0800 (PST)
+References: <20190206174328.9736-1-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9891ca3c-6a6f-d189-6b03-ed624d5c402b@redhat.com>
+Date: Wed, 13 Feb 2019 15:35:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190204115758.765941f1.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190206174328.9736-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <40fc0f74-8987-2808-7ad9-fd5e3d54a0be@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 07/15] s390-bios: Decouple channel i/o
- logic from virtio
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] chardev: various cleanups and
+ improvements (resend)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,101 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On 2/4/19 5:57 AM, Cornelia Huck wrote:
-> On Tue, 29 Jan 2019 08:29:14 -0500
-> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+On 06/02/19 18:43, Marc-André Lureau wrote:
+> Hi,
 > 
->> Create a separate library for channel i/o related code. This decouples
->> channel i/o operations from virtio and allows us to make use of them for
->> the real dasd boot path.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> ---
->>   pc-bios/s390-ccw/Makefile        |  2 +-
->>   pc-bios/s390-ccw/cio.c           | 41 ++++++++++++++++++++++++++++++++++++++++
->>   pc-bios/s390-ccw/cio.h           |  3 +++
->>   pc-bios/s390-ccw/main.c          |  1 +
->>   pc-bios/s390-ccw/netboot.mak     |  2 +-
->>   pc-bios/s390-ccw/netmain.c       |  1 +
->>   pc-bios/s390-ccw/s390-ccw.h      |  1 -
->>   pc-bios/s390-ccw/virtio-blkdev.c |  1 +
->>   pc-bios/s390-ccw/virtio.c        | 27 ++------------------------
->>   9 files changed, 51 insertions(+), 28 deletions(-)
->>   create mode 100644 pc-bios/s390-ccw/cio.c
->>
+> Some chardev-related patches I have accumulated.
+> Please review, thanks!
 > 
->> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
->> new file mode 100644
->> index 0000000..095f79b
->> --- /dev/null
->> +++ b/pc-bios/s390-ccw/cio.c
->> @@ -0,0 +1,41 @@
->> +/*
->> + * S390 Channel I/O
->> + *
->> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
+> v2:
+> - rebased
+> - update commit messages
 > 
-> Not sure that copyright header is correct. You moved some code that
-> probably should be copyright IBM (although that was never added to the
-> header in the first place...) Also not sure if Alex has some copyrights
-> on the code you moved, or if that is only trivial stuff. (Don't want to
-> be difficult, but we should try to get this right.)
+> Marc-André Lureau (6):
+>   char: update the mux handlers in class callback
+>   char-fe: set_handlers() needs an associated chardev
+>   terminal3270: do not use backend timer sources
+>   chardev: add a note about frontend sources and context switch
+>   char-pty: remove the check for connection on write
+>   char-pty: remove write_lock usage
 > 
->> +
->> +#include "libc.h"
->> +#include "s390-ccw.h"
->> +#include "cio.h"
->> +
->> +static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
->> +
->> +int enable_mss_facility(void)
->> +{
->> +    int ret;
->> +    ChscAreaSda *sda_area = (ChscAreaSda *) chsc_page;
->> +
->> +    memset(sda_area, 0, PAGE_SIZE);
->> +    sda_area->request.length = 0x0400;
->> +    sda_area->request.code = 0x0031;
->> +    sda_area->operation_code = 0x2;
->> +
->> +    ret = chsc(sda_area);
->> +    if ((ret == 0) && (sda_area->response.code == 0x0001)) {
->> +        return 0;
->> +    }
->> +    return -EIO;
->> +}
->> +
->> +void enable_subchannel(SubChannelId schid)
->> +{
->> +    Schib schib;
->> +
->> +    stsch_err(schid, &schib);
->> +    schib.pmcw.ena = 1;
->> +    msch(schid, &schib);
->> +}
+>  include/chardev/char-fe.h  |  5 ++--
+>  include/chardev/char-mux.h |  1 -
+>  chardev/char-fe.c          | 11 +-------
+>  chardev/char-mux.c         |  5 ++--
+>  chardev/char-pty.c         | 56 +++-----------------------------------
+>  hw/char/terminal3270.c     | 15 ++++------
+>  6 files changed, 17 insertions(+), 76 deletions(-)
 > 
-> (...)
-> 
->> diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
->> index 11c5626..d2e7fcd 100644
->> --- a/pc-bios/s390-ccw/virtio-blkdev.c
->> +++ b/pc-bios/s390-ccw/virtio-blkdev.c
->> @@ -10,6 +10,7 @@
->>   
->>   #include "libc.h"
->>   #include "s390-ccw.h"
->> +#include "cio.h"
-> 
-> Not sure why you need to add this here?
 
-Hmmm... I removed it and the code compiles cleanly... I was *sure* I needed this a while 
-go. Perhaps something changed? --
--- Jason J. Herne (jjherne@linux.ibm.com)
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks!
+
+Paolo
