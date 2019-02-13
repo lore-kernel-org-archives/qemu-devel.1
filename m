@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51882)
+Received: from eggs.gnu.org ([209.51.188.92]:51947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gtqFo-00023s-At
+	(envelope-from <imammedo@redhat.com>) id 1gtqFo-00025E-Bt
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gtq8N-0000le-T4
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:43:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gtq8N-0000kV-Jp
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:43:11 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <cae4cdd7-2693-275b-5a54-e419e914d0a2@redhat.com>
-Date: Wed, 13 Feb 2019 09:37:59 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gtq8F-0000ej-LX
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:43:04 -0500
+Date: Wed, 13 Feb 2019 09:42:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190213094259.37f78c6f@redhat.com>
+In-Reply-To: <20190213012544.GS1884@umbus.fritz.box>
+References: <20190212214827.30543-1-lvivier@redhat.com>
+	<20190212214827.30543-2-lvivier@redhat.com>
+	<20190213012544.GS1884@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] nonzero LUN on USB Bulk Only Transfer fails with
- QEMU+edk2
+Subject: Re: [Qemu-devel] [RFC 1/4] numa,
+ spapr: add thread-id in the possible_cpus list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,176 +25,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Ray Ni <ray.ni@intel.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, edk2-devel-01 <edk2-devel@lists.01.org>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi,
+On Wed, 13 Feb 2019 12:25:45 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-using QEMU, when I specify a nonzero LUN for the hard disk that sits on
-the "SCSI bus" that embodies the USB Bulk Only Transfer device, then
-UsbMassStorageDxe fails to recognize the hard disk.
+> On Tue, Feb 12, 2019 at 10:48:24PM +0100, Laurent Vivier wrote:
+> > spapr_possible_cpu_arch_ids() counts only cores, and so
+> > the number of available CPUs is the number of vCPU divided
+> > by smp_threads.
+> > 
+> > ... -smp 4,maxcpus=8,cores=2,threads=2,sockets=2 -numa node,cpus=0,cpus=1 \
+> >                                                  -numa node,cpus=3,cpus=4 \
+> >                                                  -numa node -numa node
+> > 
+> > This generates (info hotpluggable-cpus)
+> > 
+> >   node-id: 0 core-id: 0 thread-id: 0 [thread-id: 1]
+> >   node-id: 0 core-id: 6 thread-id: 0 [thread-id: 1]
+> >   node-id: 1 core-id: 2 thread-id: 0 [thread-id: 1]
+> >   node-id: 1 core-id: 4 thread-id: 0 [thread-id: 1]
+> > 
+> > And this command line generates the following error:
+> > 
+> >   CPU(s) not present in any NUMA nodes: CPU 3 [core-id: 6]
+> > 
+> > That is wrong because CPU 3 [core-id: 6] is assigned to node-id 0
+> > Moreover "cpus=4" is not valid, because it means core-id 8 but
+> > maxcpus is 8.
+> > 
+> > With this patch we have now:
+> > 
+> >   node-id: 0 core-id: 0 thread-id: 0
+> >   node-id: 0 core-id: 0 thread-id: 1
+> >   node-id: 0 core-id: 1 thread-id: 0
+> >   node-id: 1 core-id: 1 thread-id: 1
+> >   node-id: 0 core-id: 2 thread-id: 1
+> >   node-id: 1 core-id: 2 thread-id: 0
+> >   node-id: 0 core-id: 3 thread-id: 1
+> >   node-id: 0 core-id: 3 thread-id: 0  
+> 
+> I'm afraid this is not the right solution.  The point of the
+> hotpluggable cpus table is that it has exactly one entry for each
+> hotpluggable unit.  For PAPR that's a core, not a thread.
+> 
+> So, the problem is with how the NUMA configuration code is
+> interpreting possible-cpus, not how the machine is building the table.
 
-(1) Consider the following QEMU command line snippet:
+I'd suggest to deprecate/remove 'cpus' suboption in -numa.
+One should use '-numa cpu' instead, which is written with
+possible_cpus in mind.
 
-  -drive id=disk1,if=none,format=raw,readonly,file=$APPDISK \
-  -device qemu-xhci,id=xhci1,p3=15,addr=02.0 \
-  -device usb-bot,bus=xhci1.0,port=3,id=bot1 \
-  -device scsi-hd,drive=disk1,bus=bot1.0,lun=0,bootindex=1 \
-
-For this (i.e., lun=0), I see the following INQUIRY exchange between
-UsbMassStorageDxe and QEMU:
-
-> Lun=0 InquiryCmd {
-> Lun=0 InquiryCmd 000000 12 00 00 00 24 00 00 00 00 00 00 00
-> Lun=0 InquiryCmd }
-> Lun=0 InquiryData {
-> Lun=0 InquiryData 000000 00 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
-> Lun=0 InquiryData 000010 51 45 4D 55 20 48 41 52 44 44 49 53 4B 20 20 20
-> Lun=0 InquiryData 000020 32 2E 35 2B
-> Lun=0 InquiryData }
-
-The vendor and product ID fields translate to "QEMU____" and
-"QEMU_HARDDISK___", respectively. (For easier reading, I replaced the
-space characters with underscores, for the sake of better
-readability/wrapping.)
-
-In this case, edk2 recognizes the disk and things work fine.
-
-(In fact, for lun=0, the QemuBootOrderLib pattern matching / translation
-works fine as well -- verifying which was my original goal, before I ran
-into the issues below, for nonzero LUNs. But, I digress.)
-
-
-(2) If I change the cmdline to "lun=5", then the exchange is:
-
-> Lun=0 InquiryCmd {
-> Lun=0 InquiryCmd 000000 12 00 00 00 24 00 00 00 00 00 00 00
-> Lun=0 InquiryCmd }
-> Lun=0 InquiryData {
-> Lun=0 InquiryData 000000 3F 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
-> Lun=0 InquiryData 000010 51 45 4D 55 20 54 41 52 47 45 54 20 20 20 20 20
-> Lun=0 InquiryData 000020 32 2E 35 00
-> Lun=0 InquiryData }
-
-Here the product ID is unchanged, but the vendor ID becomes
-"QEMU_TARGET_____".
-
-And, edk2 fails to recognize the device:
-
-> UsbBootGetParams: Found an unsupported peripheral type[31]
-> UsbMassInitMedia: UsbBootGetParams (Unsupported)
-> UsbMassInitNonLun: UsbMassInitMedia (Unsupported)
-> USBMassDriverBindingStart: UsbMassInitNonLun (Unsupported)
-
-This happens because the first byte in the response is 0x3F. QEMU sets
-this byte in
-
->         r->buf[0] = TYPE_NOT_PRESENT | TYPE_INACTIVE;
-
-in function scsi_target_emulate_inquiry(), file "hw/scsi/scsi-bus.c".
-
-And edk2 parses the byte in UsbBootInquiry() and UsbBootGetParams()
-(file "MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassBoot.c"):
-
-> typedef struct {
->   UINT8             Pdt;            ///< Peripheral Device Type (low 5 bits)
->   UINT8             Removable;      ///< Removable Media (highest bit)
->   UINT8             Reserved0[2];
->   UINT8             AddLen;         ///< Additional length
->   UINT8             Reserved1[3];
->   UINT8             VendorID[8];
->   UINT8             ProductID[16];
->   UINT8             ProductRevision[4];
-> } USB_BOOT_INQUIRY_DATA;
-
-> #define USB_BOOT_PDT(Pdt)           ((Pdt) & 0x1f)
-
->   UsbMass->Pdt          = (UINT8) (USB_BOOT_PDT (UsbMass->InquiryData.Pdt));
-
->   //
->   // According to USB Mass Storage Specification for Bootability, only following
->   // 4 Peripheral Device Types are in spec.
->   //
->   if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) &&
->        (UsbMass->Pdt != USB_PDT_CDROM) &&
->        (UsbMass->Pdt != USB_PDT_OPTICAL) &&
->        (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
->     DEBUG ((EFI_D_ERROR, "UsbBootGetParams: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
->     return EFI_UNSUPPORTED;
->   }
-
-It looks likely that at least one of edk2 and QEMU has a bug. Which one
-is it?
-
-Or is the command line incorrect perhaps? (I.e., is it invalid to
-specify *only* lun=5? Does the LUN space have to be contiguous?)
-
-
-(3) Starting again from the original command line, if I change "lun=0"
-to "lun=1" (rather than to "lun=5"), then OVMF even hangs, with the
-following log:
-
-> UsbMassInitMultiLun: Start to initialize No.0 logic unit
-> Lun=0 InquiryCmd {
-> Lun=0 InquiryCmd 000000 12 00 00 00 24 00 00 00 00 00 00 00
-> Lun=0 InquiryCmd }
-> Lun=0 InquiryData {
-> Lun=0 InquiryData 000000 3F 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
-> Lun=0 InquiryData 000010 51 45 4D 55 20 54 41 52 47 45 54 20 20 20 20 20
-> Lun=0 InquiryData 000020 32 2E 35 00
-> Lun=0 InquiryData }
-> UsbBootGetParams: Found an unsupported peripheral type[31]
-> UsbMassInitMedia: UsbBootGetParams (Unsupported)
-> UsbMassInitMultiLun: UsbMassInitMedia (Unsupported)
-> UsbMassInitMultiLun: Start to initialize No.1 logic unit
-> Lun=32 InquiryCmd {
-> Lun=32 InquiryCmd 000000 12 20 00 00 24 00 00 00 00 00 00 00
-> Lun=32 InquiryCmd }
-> Lun=32 InquiryData {
-> Lun=32 InquiryData 000000 00 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
-> Lun=32 InquiryData 000010 51 45 4D 55 20 48 41 52 44 44 49 53 4B 20 20 20
-> Lun=32 InquiryData 000020 32 2E 35 2B
-> Lun=32 InquiryData }
-> UsbBootExecCmd: Success to Exec 0x0 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbMassInitMedia: UsbBootGetParams (Media changed)
-> InstallProtocolInterface: 09576E91-6D3F-11D2-8E39-00A0C969723B 3DC7DD98
-> InstallProtocolInterface: 964E5B21-6459-11D2-8E39-00A0C969723B 3DBFA6B8
-> InstallProtocolInterface: D432A67F-14DC-484B-B3BB-3F0291849327 3DBFA730
-> UsbMassInitMultiLun: Success to initialize No.1 logic unit
-> InstallProtocolInterface: CE345171-BA0B-11D2-8E4F-00A0C969723B 3DBFA2A0
->  BlockSize : 512
->  LastBlock : 136B
-> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
-> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
-> UsbMassReadBlocks: UsbBootReadBlocks (Invalid Parameter) -> Reset
-> XhcUsbPortReset!
-> XhcSetRootHubPortFeature: status Success
-> XhcClearRootHubPortFeature: status Success
-> XhcClearRootHubPortFeature: status Success
-> Disable device slot 1!
-> Enable Slot Successfully, The Slot ID = 0x1
->     Address 1 assigned successfully
-> UsbIoPortReset: device is now ADDRESSED at 1
-> ASSERT MdeModulePkg/Bus/Pci/XhciDxe/XhciSched.c(1915): TrsRing != ((void *) 0)
-
-In this case, edk2 seems to recognize that a nonzero LUN is available on
-the target, but the initialization never completes, and then an
-assertion fails, apparently in the lower-level XHCI transport code.
-
-
-The information that I'm primarily looking for here is which bug tracker
-I should file these under, the edk2 bugzilla, or the QEMU launchpad.
-
-Thanks,
-Laszlo
+> 
+> > CPUs 0 (core-id: 0 thread-id: 0) and 1 (core-id: 0 thread-id: 1) are
+> > correctly assigned to node-id 0, CPUs 3 (core-id: 1 thread-id: 1) and
+> >  4 (core-id: 2 thread-id: 0) are correctly assigned to node-id 1.
+> > All other CPUs are assigned to node-id 0 by default.
+> > 
+> > And the error message is also correct:
+> > 
+> >   CPU(s) not present in any NUMA nodes: CPU 2 [core-id: 1, thread-id: 0], \
+> >                                         CPU 5 [core-id: 2, thread-id: 1], \
+> >                                         CPU 6 [core-id: 3, thread-id: 0], \
+> >                                         CPU 7 [core-id: 3, thread-id: 1]
+> > 
+> > Fixes: ec78f8114bc4 ("numa: use possible_cpus for not mapped CPUs check")
+> > Cc: imammedo@redhat.com
+> > 
+> > Before commit ec78f8114bc4, output was correct:
+> > 
+> >   CPU(s) not present in any NUMA nodes: 2 5 6 7
+> > 
+> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> > ---
+> >  hw/ppc/spapr.c | 33 +++++++++++++--------------------
+> >  1 file changed, 13 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 332cba89d425..7196ba09da34 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2404,15 +2404,13 @@ static void spapr_validate_node_memory(MachineState *machine, Error **errp)
+> >  /* find cpu slot in machine->possible_cpus by core_id */
+> >  static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id, int *idx)
+> >  {
+> > -    int index = id / smp_threads;
+> > -
+> > -    if (index >= ms->possible_cpus->len) {
+> > +    if (id >= ms->possible_cpus->len) {
+> >          return NULL;
+> >      }
+> >      if (idx) {
+> > -        *idx = index;
+> > +        *idx = id;
+> >      }
+> > -    return &ms->possible_cpus->cpus[index];
+> > +    return &ms->possible_cpus->cpus[id];
+> >  }
+> >  
+> >  static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+> > @@ -2514,7 +2512,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+> >              error_report("This machine version does not support CPU hotplug");
+> >              exit(1);
+> >          }
+> > -        boot_cores_nr = possible_cpus->len;
+> > +        boot_cores_nr = possible_cpus->len / smp_threads;
+> >      }
+> >  
+> >      if (smc->pre_2_10_has_unused_icps) {
+> > @@ -2528,7 +2526,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+> >          }
+> >      }
+> >  
+> > -    for (i = 0; i < possible_cpus->len; i++) {
+> > +    for (i = 0; i < possible_cpus->len / smp_threads; i++) {
+> >          int core_id = i * smp_threads;
+> >  
+> >          if (mc->has_hotpluggable_cpus) {
+> > @@ -3795,21 +3793,16 @@ spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
+> >  
+> >  static int64_t spapr_get_default_cpu_node_id(const MachineState *ms, int idx)
+> >  {
+> > -    return idx / smp_cores % nb_numa_nodes;
+> > +    return idx / (smp_cores * smp_threads) % nb_numa_nodes;
+> >  }
+> >  
+> >  static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
+> >  {
+> >      int i;
+> >      const char *core_type;
+> > -    int spapr_max_cores = max_cpus / smp_threads;
+> > -    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> >  
+> > -    if (!mc->has_hotpluggable_cpus) {
+> > -        spapr_max_cores = QEMU_ALIGN_UP(smp_cpus, smp_threads) / smp_threads;
+> > -    }
+> >      if (machine->possible_cpus) {
+> > -        assert(machine->possible_cpus->len == spapr_max_cores);
+> > +        assert(machine->possible_cpus->len == max_cpus);
+> >          return machine->possible_cpus;
+> >      }
+> >  
+> > @@ -3820,16 +3813,16 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
+> >      }
+> >  
+> >      machine->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+> > -                             sizeof(CPUArchId) * spapr_max_cores);
+> > -    machine->possible_cpus->len = spapr_max_cores;
+> > +                             sizeof(CPUArchId) * max_cpus);
+> > +    machine->possible_cpus->len = max_cpus;
+> >      for (i = 0; i < machine->possible_cpus->len; i++) {
+> > -        int core_id = i * smp_threads;
+> > -
+> >          machine->possible_cpus->cpus[i].type = core_type;
+> >          machine->possible_cpus->cpus[i].vcpus_count = smp_threads;
+> > -        machine->possible_cpus->cpus[i].arch_id = core_id;
+> > +        machine->possible_cpus->cpus[i].arch_id = i;
+> >          machine->possible_cpus->cpus[i].props.has_core_id = true;
+> > -        machine->possible_cpus->cpus[i].props.core_id = core_id;
+> > +        machine->possible_cpus->cpus[i].props.core_id = i / smp_threads;
+> > +        machine->possible_cpus->cpus[i].props.has_thread_id = true;
+> > +        machine->possible_cpus->cpus[i].props.thread_id = i % smp_threads;
+> >      }
+> >      return machine->possible_cpus;
+> >  }  
+> 
