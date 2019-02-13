@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34158)
+Received: from eggs.gnu.org ([209.51.188.92]:37346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gtoeh-0004cZ-72
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:08:28 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gtoxW-00070L-UB
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gtoeY-00013J-T6
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:08:22 -0500
-References: <20190210174421.22062-1-mark.cave-ayland@ilande.co.uk>
-	<442139a2-5ab2-9259-03a0-11d2f3c86c59@redhat.com>
-	<28a8cd58-51a9-6301-1d25-02289af8c81d@ilande.co.uk>
-	<alpine.BSF.2.21.9999.1902121157470.75929@zero.eik.bme.hu>
-	<971ba38d-d883-d51c-55b2-531639336ed4@ilande.co.uk>
-	<d78bc91b-efef-bb69-e443-6526ca433197@redhat.com>
-	<e8329ece-32a2-d591-2ffc-3cdb468d56aa@ilande.co.uk>
-	<bff82e7a-2315-fd42-cdae-e7d0baa2fd08@redhat.com>
-	<de84d0a5-1942-5a22-b71e-e9bf888a0fc1@ilande.co.uk>
-	<20190213002118.GR1884@umbus.fritz.box>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3b91465d-b5bd-e9ba-bc3d-871a9d8269e2@ilande.co.uk>
-Date: Wed, 13 Feb 2019 07:08:08 +0000
+	(envelope-from <stefanha@redhat.com>) id 1gtokD-00055T-1b
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:14:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gtokC-000552-PO
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:14:08 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 13 Feb 2019 15:14:01 +0800
+Message-Id: <20190213071401.11544-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190213002118.GR1884@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] cuda: decrease time delay
- before raising VIA SR interrupt
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] hostmem-file: reject invalid pmem file sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +23,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, hsp.cat7@gmail.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-On 13/02/2019 00:21, David Gibson wrote:
+Guests started with NVDIMMs larger than the underlying host file produce
+confusing errors inside the guest.  This happens because the guest
+accesses pages beyond the end of the file.
 
-> On Tue, Feb 12, 2019 at 08:01:22PM +0000, Mark Cave-Ayland wrote:
->> On 12/02/2019 18:21, Philippe Mathieu-Daudé wrote:
->>
->>> On 2/12/19 6:50 PM, Mark Cave-Ayland wrote:
->>>> On 12/02/2019 17:21, Philippe Mathieu-Daudé wrote:
->>>>
->>>>>>> If this delay is to prevent a bug which only happens in MacOS then that's the hack
->>>>>>> not the normal code path to run without the delay that you've just removed. So maybe
->>>>>>> this should be kept if possible to avoid unecessary delays for other guests.
->>>>>>> (Although if this only affects mac99,via=cuda but not mac99,via=pmu then I don't care
->>>>>>> much as long as pmu works.)
->>>>>>
->>>>>> Well the reality is that the detection above doesn't actually seem to work anyway -
->>>>>> at least a quick boot test with Linux, MacOS X and MacOS 9 with a printf() added into
->>>>>> the if() shows nothing firing once the kernel takes over. So the slow path with the
->>>>>> delay included was always being taken within the OS anyway.
->>>>>>
->>>>>> And indeed, the code doesn't affect pmu so you won't see any difference there.
->>>>>>
->>>>>>>> As a plus it also prevents a guest OS from accidentally triggering the hack whilst
->>>>>>>> programming the VIA port.
->>>>>>>
->>>>>>> That may be a problem though. What's the issue exactly? Why is the delay needed in
->>>>>>> the first place?
->>>>>>
->>>>>> It's some kind of racy polling with OS 9 (I wasn't involved in the technical details,
->>>>>> sorry) which causes OS 9 to hang on boot if the delay isn't present. And even better
->>>>>> the slow path that was previously always being taken has now been reduced from 300us
->>>>>> to 30us so whichever way you look at it, having this patch applied is a win.
->>>>>
->>>>> Can you write a paragraph about this, that David can amend to your
->>>>> patch? That would stop worrying me about looking at this patch in
->>>>> various months...
->>>>
->>>> Hmmmm well the existing description already describes the interrupt race in OS 9 so I
->>>> guess the only part missing is the bit about the fast path. How about the revised
->>>> text below for the patch description?
->>>>
->>>>
->>>>     cuda: decrease time delay before raising VIA SR interrupt and remove fast path
->>>>
->>>>     In order to handle a race condition in the MacOS 9 CUDA driver, a delay was
->>>>     introduced when raising the VIA SR interrupt inspired by similar code in
->>>>     MacOnLinux.
->>>>
->>>>     During original testing of the MacOS 9 patches it was found that the 30us
->>>>     delay used in MacOnLinux did not work reliably within QEMU, and a value of
->>>>     300us was required to function correctly.
->>>>
->>>>     Recent experiments have shown two things: firstly when booting Linux, MacOS
->>>>     9 and MacOS X the fast path which bypasses the delay is never triggered once the
->>>>     OS kernel is loaded making it effectively useless. Rather than leave this code
->>>>     in place where a guest could potentially enable it by accident and break itself,
->>>>     we might as well just remove it.
->>>>
->>>>     Secondly the previous reliability issues are no longer present, and this value
->>>>     can be reduced down to 20us with no apparent ill effects. This has the benefit of
->>>>     considerably improving the responsiveness of the ADB keyboard and mouse within
->>>>     the guest.
->>>>
->>>>     Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>>
->>>
->>> Thanks!
->>>
->>> Phil.
->>
->> No worries. David, are you able to update the commit message in your ppc-for-4.0
->> branch accordingly?
-> 
-> Done.
+Check the pmem file size on startup and print a clear error message if
+the size is invalid.
 
-Great, thanks!
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1669053
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v2:
+ * Propagate qemu_get_pmem_size() errors [Igor]
 
+ include/qemu/osdep.h    | 13 ++++++++++
+ backends/hostmem-file.c | 22 +++++++++++++++++
+ util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
+ util/oslib-win32.c      |  5 ++++
+ 4 files changed, 93 insertions(+)
 
-ATB,
-
-Mark.
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 840af09cb0..303d315c5d 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -570,6 +570,19 @@ void qemu_set_tty_echo(int fd, bool echo);
+ void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
+                      Error **errp);
+=20
++/**
++ * qemu_get_pmem_size:
++ * @filename: path to a pmem file
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Determine the size of a persistent memory file.  Besides supporting f=
+iles on
++ * DAX file systems, this function also supports Linux devdax character
++ * devices.
++ *
++ * Returns: the size or 0 on failure
++ */
++uint64_t qemu_get_pmem_size(const char *filename, Error **errp);
++
+ /**
+  * qemu_get_pid_name:
+  * @pid: pid of a process
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index ba601ce940..d62689179b 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -46,6 +46,28 @@ file_backend_memory_alloc(HostMemoryBackend *backend, =
+Error **errp)
+     gchar *name;
+ #endif
+=20
++    /*
++     * Verify pmem file size since starting a guest with an incorrect si=
+ze
++     * leads to confusing failures inside the guest.
++     */
++    if (fb->is_pmem && fb->mem_path) {
++        Error *local_err =3D NULL;
++        uint64_t size;
++
++        size =3D qemu_get_pmem_size(fb->mem_path, &local_err);
++        if (!size) {
++            error_propagate(errp, local_err);
++            return;
++        }
++
++        if (backend->size > size) {
++            error_setg(errp, "size property %" PRIu64 " is larger than "
++                       "pmem file \"%s\" size %" PRIu64, backend->size,
++                       fb->mem_path, size);
++            return;
++        }
++    }
++
+     if (!backend->size) {
+         error_setg(errp, "can't create backend with size 0");
+         return;
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 37c5854b9c..10d90d1783 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -500,6 +500,59 @@ void os_mem_prealloc(int fd, char *area, size_t memo=
+ry, int smp_cpus,
+     }
+ }
+=20
++uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
++{
++    struct stat st;
++
++    if (stat(filename, &st) < 0) {
++        error_setg(errp, "unable to stat pmem file \"%s\"", filename);
++        return 0;
++    }
++
++#if defined(__linux__)
++    /* Special handling for devdax character devices */
++    if (S_ISCHR(st.st_mode)) {
++        char *subsystem_path =3D NULL;
++        char *subsystem =3D NULL;
++        char *size_path =3D NULL;
++        char *size_str =3D NULL;
++        uint64_t ret =3D 0;
++
++        subsystem_path =3D g_strdup_printf("/sys/dev/char/%d:%d/subsyste=
+m",
++                                         major(st.st_rdev), minor(st.st_=
+rdev));
++        subsystem =3D g_file_read_link(subsystem_path, NULL);
++        if (!subsystem) {
++            error_setg(errp, "unable to read subsystem for pmem file \"%=
+s\"",
++                       filename);
++            goto devdax_err;
++        }
++
++        if (!g_str_has_suffix(subsystem, "/dax")) {
++            error_setg(errp, "pmem file \"%s\" is not a dax device", fil=
+ename);
++            goto devdax_err;
++        }
++
++        size_path =3D g_strdup_printf("/sys/dev/char/%d:%d/size",
++                                    major(st.st_rdev), minor(st.st_rdev)=
+);
++        if (!g_file_get_contents(size_path, &size_str, NULL, NULL)) {
++            error_setg(errp, "unable to read size for pmem file \"%s\"",
++                       size_path);
++            goto devdax_err;
++        }
++
++        ret =3D g_ascii_strtoull(size_str, NULL, 0);
++
++devdax_err:
++        g_free(size_str);
++        g_free(size_path);
++        g_free(subsystem);
++        g_free(subsystem_path);
++        return ret;
++    }
++#endif /* defined(__linux__) */
++
++    return st.st_size;
++}
+=20
+ char *qemu_get_pid_name(pid_t pid)
+ {
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index b4c17f5dfa..bd633afab6 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -560,6 +560,11 @@ void os_mem_prealloc(int fd, char *area, size_t memo=
+ry, int smp_cpus,
+     }
+ }
+=20
++uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
++{
++    error_setg(errp, "pmem support not available");
++    return 0;
++}
+=20
+ char *qemu_get_pid_name(pid_t pid)
+ {
+--=20
+2.20.1
