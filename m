@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50079)
+Received: from eggs.gnu.org ([209.51.188.92]:50076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu4HC-0002VC-2D
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:15 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu4HA-0003cq-Uz
+	(envelope-from <jsnow@redhat.com>) id 1gu4HB-0002Uk-OM
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34900)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jsnow@redhat.com>) id 1gu4HA-0003ch-Na
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gu4HA-0003cQ-Mv
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gu4HA-0003cK-FM
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:49:12 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 13 Feb 2019 18:49:06 -0500
-Message-Id: <20190213234907.24173-3-jsnow@redhat.com>
+Date: Wed, 13 Feb 2019 18:49:05 -0500
+Message-Id: <20190213234907.24173-2-jsnow@redhat.com>
 In-Reply-To: <20190213234907.24173-1-jsnow@redhat.com>
 References: <20190213234907.24173-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] block/dirty-bitmap: Documentation and
- Comment fixups
+Subject: [Qemu-devel] [PULL 1/3] dirty-bitmap: Expose persistent flag to
+ 'query-block'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +25,177 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, jsnow@redhat.com
+Cc: peter.maydell@linaro.org, jsnow@redhat.com, Eric Blake <eblake@redhat.com>
 
-The meaning of the states has changed subtly over time,
-this should bring the understanding more in-line with the
-current, actual usages.
+From: Eric Blake <eblake@redhat.com>
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Since qemu currently doesn't flush persistent bitmaps to disk until
+shutdown (which might be MUCH later), it's useful if 'query-block'
+at least shows WHICH bitmaps will (eventually) make it to persistent
+storage.  Update affected iotests.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190202011048.12343-1-jsnow@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20190204210512.27458-1-eblake@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c | 20 ++++++++++++++------
- qapi/block-core.json | 32 ++++++++++++++++++++++++--------
- 2 files changed, 38 insertions(+), 14 deletions(-)
+ block/dirty-bitmap.c       |  1 +
+ qapi/block-core.json       |  5 ++++-
+ tests/qemu-iotests/124     |  1 +
+ tests/qemu-iotests/236.out | 14 ++++++++++++++
+ 4 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index e46f72b346..c6d4acebfa 100644
+index 00ea36f554..e46f72b346 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -29,12 +29,20 @@
- #include "block/blockjob.h"
- 
- /**
-- * A BdrvDirtyBitmap can be in three possible states:
-- * (1) successor is NULL and disabled is false: full r/w mode
-- * (2) successor is NULL and disabled is true: read only mode ("disabled")
-- * (3) successor is set: frozen mode.
-- *     A frozen bitmap cannot be renamed, deleted, anonymized, cleared, set,
-- *     or enabled. A frozen bitmap can only abdicate() or reclaim().
-+ * A BdrvDirtyBitmap can be in four possible user-visible states:
-+ * (1) Active:   successor is NULL, and disabled is false: full r/w mode
-+ * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
-+ *               guest writes are dropped, but monitor writes are possible,
-+ *               through commands like merge and clear.
-+ * (3) Frozen:   successor is not NULL.
-+ *               A frozen bitmap cannot be renamed, deleted, cleared, set,
-+ *               enabled, merged to, etc. A frozen bitmap can only abdicate()
-+ *               or reclaim().
-+ *               In this state, the anonymous successor bitmap may be either
-+ *               Active and recording writes from the guest (e.g. backup jobs),
-+ *               but it can be Disabled and not recording writes.
-+ * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
-+ *               in any way from the monitor.
-  */
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
+@@ -440,6 +440,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+         info->has_name = !!bm->name;
+         info->name = g_strdup(bm->name);
+         info->status = bdrv_dirty_bitmap_status(bm);
++        info->persistent = bm->persistent;
+         entry->value = info;
+         *plist = entry;
+         plist = &entry->next;
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7e8656d04c..8f23f2ebb8 100644
+index 0f349d4603..7e8656d04c 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -420,17 +420,27 @@
+@@ -450,11 +450,14 @@
  #
- # An enumeration of possible states that a dirty bitmap can report to the user.
+ # @status: current status of the dirty bitmap (since 2.4)
  #
--# @frozen: The bitmap is currently in-use by a backup operation or block job,
--#          and is immutable.
-+# @frozen: The bitmap is currently in-use by some operation and is immutable.
-+#          If the bitmap was @active prior to the operation, new writes by the
-+#          guest are being recorded in a temporary buffer, and will not be lost.
-+#          Generally, bitmaps are cleared on successful use in an operation and
-+#          the temporary buffer is committed into the bitmap. On failure, the
-+#          temporary buffer is merged back into the bitmap without first
-+#          clearing it.
-+#          Please refer to the documentation for each bitmap-using operation,
-+#          See also @blockdev-backup, @drive-backup.
- #
--# @disabled: The bitmap is currently in-use by an internal operation and is
--#            read-only. It can still be deleted.
-+# @disabled: The bitmap is not currently recording new writes by the guest.
-+#            This is requested explicitly via @block-dirty-bitmap-disable.
-+#            It can still be cleared, deleted, or used for backup operations.
- #
- # @active: The bitmap is actively monitoring for new writes, and can be cleared,
- #          deleted, or used for backup operations.
- #
--# @locked: The bitmap is currently in-use by some operation and can not be
--#          cleared, deleted, or used for backup operations. (Since 2.12)
-+# @locked: The bitmap is currently in-use by some operation and is immutable.
-+#          If the bitmap was @active prior to the operation, it is still
-+#          recording new writes. If the bitmap was @disabled, it is not
-+#          recording new writes. (Since 2.12)
- #
- # Since: 2.4
- ##
-@@ -2094,9 +2104,15 @@
- # @block-dirty-bitmap-merge:
- #
- # Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
--# The @bitmaps dirty bitmaps are unchanged.
-+# Dirty bitmaps in @bitmaps will be unchanged, except if it also appears
-+# as the @target bitmap. Any bits already set in @target will still be
-+# set after the merge, i.e., this operation does not clear the target.
- # On error, @target is unchanged.
- #
-+# The resulting bitmap will count as dirty any clusters that were dirty in any
-+# of the source bitmaps. This can be used to achieve backup checkpoints, or in
-+# simpler usages, to copy bitmaps.
++# @persistent: true if the bitmap will eventually be flushed to persistent
++#              storage (since 4.0)
 +#
- # Returns: nothing on success
- #          If @node is not a valid block device, DeviceNotFound
- #          If any bitmap in @bitmaps or @target is not found, GenericError
-@@ -2131,7 +2147,7 @@
+ # Since: 1.3
  ##
- # @x-debug-block-dirty-bitmap-sha256:
- #
--# Get bitmap SHA256
-+# Get bitmap SHA256.
- #
- # Returns: BlockDirtyBitmapSha256 on success
- #          If @node is not a valid block device, DeviceNotFound
+ { 'struct': 'BlockDirtyInfo',
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
+-           'status': 'DirtyBitmapStatus'} }
++           'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+ 
+ ##
+ # @Qcow2BitmapInfoFlags:
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+index 9f189e3b54..5aa1bf1bd6 100755
+--- a/tests/qemu-iotests/124
++++ b/tests/qemu-iotests/124
+@@ -350,6 +350,7 @@ class TestIncrementalBackup(TestIncrementalBackupBase):
+         self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/count', 458752)
+         self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/granularity', 65536)
+         self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/status', 'active')
++        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/persistent', False)
+ 
+         # Prepare a cluster_size=128k backup target without a backing file.
+         (target, _) = bitmap0.new_target()
+diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
+index bb2d71ea5e..5006f7bca1 100644
+--- a/tests/qemu-iotests/236.out
++++ b/tests/qemu-iotests/236.out
+@@ -25,12 +25,14 @@ write -P0xcd 0x3ff0000 64k
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "active"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "active"
+       }
+     ]
+@@ -85,12 +87,14 @@ write -P0xcd 0x3ff0000 64k
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "active"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "active"
+       }
+     ]
+@@ -183,18 +187,21 @@ write -P0xea 0x3fe0000 64k
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "disabled"
+       }
+     ]
+@@ -247,18 +254,21 @@ write -P0xea 0x3fe0000 64k
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "disabled"
+       }
+     ]
+@@ -304,24 +314,28 @@ write -P0xea 0x3fe0000 64k
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapD",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "disabled"
+       }
+     ]
 -- 
 2.17.2
