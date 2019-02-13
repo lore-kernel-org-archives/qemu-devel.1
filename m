@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45509)
+Received: from eggs.gnu.org ([209.51.188.92]:49963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtn6V-0008Hm-R0
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:29:05 -0500
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1gtnVU-00007K-LY
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtmwX-0005NT-EX
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:18:49 -0500
-Date: Wed, 13 Feb 2019 16:11:10 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213051109.GQ1884@umbus.fritz.box>
-References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-16-clg@kaod.org>
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1gtnRj-00007w-9o
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:51:01 -0500
+Received: from mga05.intel.com ([192.55.52.43]:31242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
+	id 1gtnRd-0006Ez-N2
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:50:55 -0500
+Date: Wed, 13 Feb 2019 13:46:28 +0800
+From: Yi Sun <yi.y.sun@linux.intel.com>
+Message-ID: <20190213054628.GD16968@yi.y.sun>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<20190211103741.GH1011@xz-x1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5ch3vXimoUl90IHM"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190128094625.4428-16-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 15/19] target/ppc: Detect erroneous
- condition in interrupt delivery
+In-Reply-To: <20190211103741.GH1011@xz-x1>
+Subject: Re: [Qemu-devel] [RFC v1 0/3] intel_iommu: support scalable mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
+On 19-02-11 18:37:41, Peter Xu wrote:
+> On Wed, Jan 30, 2019 at 01:09:10PM +0800, Yi Sun wrote:
+> > Intel vt-d rev3.0 [1] introduces a new translation mode called
+> > 'scalable mode', which enables PASID-granular translations for
+> > first level, second level, nested and pass-through modes. The
+> > vt-d scalable mode is the key ingredient to enable Scalable I/O
+> > Virtualization (Scalable IOV) [2] [3], which allows sharing a
+> > device in minimal possible granularity (ADI - Assignable Device
+> > Interface). As a result, previous Extended Context (ECS) mode
+> > is deprecated (no production ever implements ECS).
+> > 
+> > This patch set emulates a minimal capability set of VT-d scalable
+> > mode, equivalent to what is available in VT-d legacy mode today:
+> >     1. Scalable mode root entry, context entry and PASID table
+> >     2. Seconds level translation under scalable mode
+> >     3. Queued invalidation (with 256 bits descriptor)
+> >     4. Pass-through mode
+> > 
+> > Corresponding intel-iommu driver support will be included in
+> > kernel 5.0:
+> >     https://www.spinics.net/lists/kernel/msg2985279.html
+> > 
+> > We will add emulation of full scalable mode capability along with
+> > guest iommu driver progress later, e.g.:
+> >     1. First level translation
+> >     2. Nested translation
+> >     3. Per-PASID invalidation descriptors
+> >     4. Page request services for handling recoverable faults
+> 
+> Hi, YiSun/YiLiu,
+> 
+> Have you tested against any existing usages of VT-d with this series
+> applied?
+> 
+Thanks for the review!
 
---5ch3vXimoUl90IHM
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+With kernel/qemu scalable mode enabling patch sets applied, I tested
+kernel build/data copy/netperf on guest under both "scalable-mode"
+enabled and "scalable-mode" disabled scenarios.
 
-On Mon, Jan 28, 2019 at 10:46:21AM +0100, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->=20
-> It's very easy for the CPU specific has_work() implementation
-> and the logic in ppc_hw_interrupt() to be subtly out of sync.
->=20
-> This can occasionally allow a CPU to wakeup from a PM state
-> and resume executing past the PM instruction when it should
-> resume at the 0x100 vector.
->=20
-> This detects if it happens and aborts, making it a lot easier
-> to catch such bugs when testing rather than chasing obscure
-> guest misbehaviour.
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  target/ppc/excp_helper.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->=20
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 37546bb0f0fe..1a2f469a5fa2 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -878,6 +878,22 @@ static void ppc_hw_interrupt(CPUPPCState *env)
->              return;
->          }
->      }
-> +
-> +    if (env->resume_as_sreset) {
-> +        /*
-> +         * This is a bug ! It means that has_work took us out of halt wi=
-thout
-> +         * anything to deliver while in a PM state that requires getting
-> +         * out via a 0x100
-> +         *
-> +         * This means we will incorrectly execute past the power managem=
-ent
-> +         * instruction instead of triggering a reset.
-> +         *
-> +         * It generally means a discrepancy between the wakup conditions=
- in the
-> +         * processor has_work implementation and the logic in this funct=
-ion.
-> +         */
-> +        cpu_abort(CPU(ppc_env_get_cpu(env)),
-> +                  "Wakeup from PM state but interrupt Undelivered");
-> +    }
->  }
-> =20
->  void ppc_cpu_do_system_reset(CPUState *cs)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---5ch3vXimoUl90IHM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjpu0ACgkQbDjKyiDZ
-s5LFARAAgcJAyvWFIwqM+Vtef0EbpeXkJtmVHs+FAWgVQafiFEoVKeQV/qQckRG5
-kfsfpgO7TPrNsjHhnuVBpgxK2MUBQUzqfmcozZIq0G8HBApqF+8kry8DatfiSX3s
-livuU6NOG0qEvD1iYZnhEkDzA+0NqGAseJX9ynco9WpAoXEiDN0bNSv9Hi+DQ3zz
-3Ru2B+YwdGrzo1FS0nG9kPbjcaRSubHc6iHIhZtWlbFbMFNU3uTpDEE3Y2thxoAn
-7aXJYf9TcOmBORoYPXfj1euHcVDLA1ySWEhgzZF4ulihLNcL9Dwt2iIFUGYxAZu4
-ndb133JLtNAdEqlzhlR2t+gC4N6n1bUafuMOL/m3jp+h4vI7Y633xBWTT8zMJ35l
-8tPdiBzzLm+6QOHjkNfwAcTQTPnIvHPBcXEq7TAIu3Zwa9lBYV2twNK0HHnXJUWS
-ZYGBrdNHVFBnmUwf9RLNcm7dH6FKUYJU+5vhnWmnrIrBREA0KH7Myxdk0TSgMmc6
-K5+TQxgWY9CenUJMgKJoxMJMfYXnCgs+jgK4a8mjvTsHH9EE2iEncrWzzo2dd7Ga
-QwvMQZLTWhNdIVqUpjAVsA6Yq13YZ3aVuzlvAMHH8XVlNNS5Egqnap/wCXJ4EaA5
-rlcowE3/2Y1y55+OQCHq1rZ2qzka59fL11s8FhQoRPlMWFhzaww=
-=TmT3
------END PGP SIGNATURE-----
-
---5ch3vXimoUl90IHM--
+> Thanks,
+> 
+> -- 
+> Peter Xu
