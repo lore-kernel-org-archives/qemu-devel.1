@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41217)
+Received: from eggs.gnu.org ([209.51.188.92]:45606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtmhD-0004do-Jk
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:02:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gtn6L-0008KF-QN
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:28:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtmZX-0002R7-53
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:55:00 -0500
-Date: Wed, 13 Feb 2019 15:54:27 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gtmwX-0005NS-Ee
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:18:49 -0500
+Date: Wed, 13 Feb 2019 16:05:06 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213045427.GK1884@umbus.fritz.box>
+Message-ID: <20190213050505.GL1884@umbus.fritz.box>
 References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-8-clg@kaod.org>
-	<20190212055900.GN1884@umbus.fritz.box>
-	<56a5772ae88c5b5f65c969e2191a02d62cca5055.camel@kernel.crashing.org>
+	<20190128094625.4428-11-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="n0t7pLec3q0yZKtb"
+	protocol="application/pgp-signature"; boundary="dDdTYOCAbkFo0FQC"
 Content-Disposition: inline
-In-Reply-To: <56a5772ae88c5b5f65c969e2191a02d62cca5055.camel@kernel.crashing.org>
-Subject: Re: [Qemu-devel] [PATCH 07/19] target/ppc: Make special ORs match
- x86 pause and don't generate on mttcg
+In-Reply-To: <20190128094625.4428-11-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 10/19] target/ppc: Fix support for "STOP
+ light" states on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +25,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---n0t7pLec3q0yZKtb
+--dDdTYOCAbkFo0FQC
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 13, 2019 at 11:03:12AM +1100, Benjamin Herrenschmidt wrote:
-> On Tue, 2019-02-12 at 16:59 +1100, David Gibson wrote:
-> > On Mon, Jan 28, 2019 at 10:46:13AM +0100, C=E9dric Le Goater wrote:
-> > > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> > >=20
-> > > There's no point in going out of translation on an SMT OR with
-> > > mttcg since the backend won't do anything useful such as pausing,
-> > > it's only useful on traditional TCG to give time to other
-> > > processors.
-> >=20
-> > Is it actively harmful in the MTTCG case, or just pointless?
+On Mon, Jan 28, 2019 at 10:46:16AM +0100, C=E9dric Le Goater wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> I think it can hurt performance, I don't remember for sure :)
+> STOP must act differently based on PSSCR:EC on POWER9. When set, it
+> acts like the P7/P8 power management instructions and wake up at 0x100
+> based on the wakeup conditions in LPCR.
 >=20
-> > > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > > ---
-> > >  target/ppc/translate.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > > index e169c43643a1..7d40a1fbe6bd 100644
-> > > --- a/target/ppc/translate.c
-> > > +++ b/target/ppc/translate.c
-> > > @@ -1580,7 +1580,7 @@ static void gen_pause(DisasContext *ctx)
-> > >      tcg_temp_free_i32(t0);
-> > > =20
-> > >      /* Stop translation, this gives other CPUs a chance to run */
-> > > -    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
-> > > +    gen_exception_nip(ctx, EXCP_INTERRUPT, ctx->base.pc_next);
-> >=20
-> > I don't see how this change relates to the rest.
+> When PSSCR:EC is clear however it will wakeup at the next instruction
+> after STOP (if EE is clear) or take the corresponding interrupts (if
+> EE is set).
 >=20
-> Yeah not sure anymore :-)
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Oh.  That certainly doesn't make this easier to review.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-So, all these target/ppc patches are only indirectly related to XIVE
-pnv support.  C=E9dric, can you split them out into their own series on
-the next spin.
-
+> ---
+>  target/ppc/cpu-qom.h            |  1 +
+>  target/ppc/cpu.h                | 12 +++++++++---
+>  target/ppc/excp_helper.c        |  8 ++++++--
+>  target/ppc/translate.c          | 13 ++++++++++++-
+>  target/ppc/translate_init.inc.c |  7 +++++++
+>  5 files changed, 35 insertions(+), 6 deletions(-)
 >=20
-> > >  }
-> > >  #endif /* defined(TARGET_PPC64) */
-> > > =20
-> > > @@ -1662,7 +1662,9 @@ static void gen_or(DisasContext *ctx)
-> > >           * than no-op, e.g., miso(rs=3D26), yield(27), mdoio(29), md=
-oom(30),
-> > >           * and all currently undefined.
-> > >           */
-> > > -        gen_pause(ctx);
-> > > +        if (!mttcg_enabled) {
-> > > +            gen_pause(ctx);
-> > > +        }
-> > >  #endif
-> > >  #endif
-> > >      }
->=20
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index 4ea67692e2a6..7c54093a7122 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -122,6 +122,7 @@ typedef enum {
+>      PPC_PM_NAP,
+>      PPC_PM_SLEEP,
+>      PPC_PM_RVWINKLE,
+> +    PPC_PM_STOP,
+>  } powerpc_pm_insn_t;
+> =20
+>  /***********************************************************************=
+******/
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 2c22292e7f41..7ff65c804b57 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -413,6 +413,10 @@ struct ppc_slb_t {
+>  #define LPCR_HVICE        PPC_BIT(62) /* HV Virtualisation Int Enable */
+>  #define LPCR_HDICE        PPC_BIT(63)
+> =20
+> +/* PSSCR bits */
+> +#define PSSCR_ESL         PPC_BIT(42) /* Enable State Loss */
+> +#define PSSCR_EC          PPC_BIT(43) /* Exit Criterion */
+> +
+>  #define msr_sf   ((env->msr >> MSR_SF)   & 1)
+>  #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
+>  #define msr_shv  ((env->msr >> MSR_SHV)  & 1)
+> @@ -1109,9 +1113,11 @@ struct CPUPPCState {
+>       * instructions and SPRs are diallowed if MSR:HV is 0
+>       */
+>      bool has_hv_mode;
+> -    /* On P7/P8, set when in PM state, we need to handle resume
+> -     * in a special way (such as routing some resume causes to
+> -     * 0x100), so flag this here.
+> +
+> +    /*
+> +     * On P7/P8/P9, set when in PM state, we need to handle resume in
+> +     * a special way (such as routing some resume causes to 0x100), so
+> +     * flag this here.
+>       */
+>      bool in_pm_state;
+>  #endif
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 7c7c8d1b9dc6..97503193ef43 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -97,7 +97,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int e=
+xcp_model, int excp)
+>      asrr0 =3D -1;
+>      asrr1 =3D -1;
+> =20
+> -    /* check for special resume at 0x100 from doze/nap/sleep/winkle on P=
+7/P8 */
+> +    /*
+> +     * check for special resume at 0x100 from doze/nap/sleep/winkle on
+> +     * P7/P8/P9
+> +     */
+>      if (env->in_pm_state) {
+>          env->in_pm_state =3D false;
+> =20
+> @@ -960,7 +963,8 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
+t insn)
+>      env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+> =20
+>      /* Condition for waking up at 0x100 */
+> -    env->in_pm_state =3D true;
+> +    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
+> +        (env->spr[SPR_PSSCR] & PSSCR_EC);
+>  }
+>  #endif /* defined(TARGET_PPC64) */
+> =20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 55281a8975e0..07bedbb8f1ce 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -3594,7 +3594,18 @@ static void gen_nap(DisasContext *ctx)
+> =20
+>  static void gen_stop(DisasContext *ctx)
+>  {
+> -    gen_nap(ctx);
+> +#if defined(CONFIG_USER_ONLY)
+> +    GEN_PRIV;
+> +#else
+> +    TCGv_i32 t;
+> +
+> +    CHK_HV;
+> +    t =3D tcg_const_i32(PPC_PM_STOP);
+> +    gen_helper_pminsn(cpu_env, t);
+> +    tcg_temp_free_i32(t);
+> +    /* Stop translation, as the CPU is supposed to sleep from now */
+> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
+> +#endif /* defined(CONFIG_USER_ONLY) */
+>  }
+> =20
+>  static void gen_sleep(DisasContext *ctx)
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 59e0b8676236..076d94f45755 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8801,9 +8801,16 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+>      CPUPPCState *env =3D &cpu->env;
+> =20
+>      if (cs->halted) {
+> +        uint64_t psscr =3D env->spr[SPR_PSSCR];
+> +
+>          if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
+>              return false;
+>          }
+> +
+> +        /* If EC is clear, just return true on any pending interrupt */
+> +        if (!(psscr & PSSCR_EC)) {
+> +            return true;
+> +        }
+>          /* External Exception */
+>          if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
+>              (env->spr[SPR_LPCR] & LPCR_EEE)) {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -101,24 +183,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---n0t7pLec3q0yZKtb
+--dDdTYOCAbkFo0FQC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjowMACgkQbDjKyiDZ
-s5LAxBAA5ziEApJAyFoPgveyXZvh4svGQjB2C1mMSthO9Q/WUL4LYsjbIJQZYLP0
-+SJ6+Z2UJ7CNhuvohr/+4byNy8RHAs0bNk6BqhQ0QxRQBY4b5/olsMpxJolbt7JS
-bbZbbY/OWep2W8G8J9vaWhV8F7OUNL1Ph/QJJyUV92zJGCOWcMsq1kdlbS/Gf92i
-acZHPZd4Otel50yeFwsd9cTqtJB91GDungY7/0BBYMp8BiA10eEkQCDPG+RjxCNq
-XD9WTOEiOi925x9CbIw9ZtgoM3kmNLy7ERbAB/INR9hUufIgcN7Bsr8acbyYL8Ji
-DvB/vjn2zg5R9DkXE+vDElz2ILIcxJwqifMU3LFrtog8kZS00ZjleyA/oB/UjClR
-UXimjWyKfzfeh2DvPUKr5KRyq/GNEGn/s/k9u9Rrl3Q1VG+ileemvOIaupUK0c6Q
-jhudOFxpRpOvnye4ZdfIifF4H8vX/m9d2uxmYTrx1IC4A+1rwHAYRVObihTrocXr
-Ju0gsh4lWoXf24/i8XqHtQGoZGj1TUqmqsi0pKmhOoT0AdJeES6sxdBof2J7gyTj
-z0EX7HvyLfypTTnc10NsVuqZzXf665LnasYrFi0hPtsyiS+K9L7GKPMaQYfW7FkB
-VprNYYnjxY/vbSqHdgWP4j8OVUaUqTX2VLI0MbgJ5YwnhaEqf0M=
-=DXjX
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjpX8ACgkQbDjKyiDZ
+s5KzpBAAqMYoje2ELvk115yiuDNKAres2fm5SzTsfFcxdfTbeOYfUw5iaQayLKsu
+CD7YoPx3Kn+fIhFPM1tLpR8Kcj0TbIupduzWUZTbYYqcU05ssp45b/PEZpyx4AKz
+mlXh3b2y8twwoJx1CYM9yWOQRQvZ3AEuk3XLGyBzHX3UJcKzettyplvNho8jijkp
+fdF87pMt4seS2KMnoZmcT9RzC0brkyeXmpLFqajGc6glQ3a8RwC4akYX7XICDcVn
+/zEhkFOL9Yzw/8cSVR9/sHNmKalWiSHh0O5Vp2al1PPzqr2ofZ/75wS1LD9p6JMI
+0uGv2ipb1LlCrIbkgWWWLgQS5iAA2pr2TwyocZmDBbCbuaxKSngt17IT79GCR+iq
+E04qlYJrcsuE0mlPU217VvtTxpcK/EKjgHUSrdDa7M+oiGy7HXYnhkYmI2hL77QV
+Y2yTAOQoLM9Y0PRp1FcvX/ewiEhxtK7TWRDn6aXSjMdzOX51tSBkBhbUjO6tdGDu
+pUfdmkBAqJa+J20B0XrYeWgPRv9lb/02y0BZdMAJU7yhzmIr+L8CNcLxJKnrhxq0
+DvO3LM51H8CQFYqJkW5ZKgOfXu0Kvz8c0yp+qpe8gPLZN3XgOfTqZkcZ7TzpmOd8
+aRwP55clHeU3YubEHyAE52DjYJp+dpMRifP7QDj+kNeBZxMcev8=
+=Y5RG
 -----END PGP SIGNATURE-----
 
---n0t7pLec3q0yZKtb--
+--dDdTYOCAbkFo0FQC--
