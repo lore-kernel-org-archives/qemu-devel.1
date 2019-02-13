@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41011)
+Received: from eggs.gnu.org ([209.51.188.92]:41821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gttqW-000083-A8
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:41:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gttu0-0001hm-Q6
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:44:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gttqI-00080O-E2
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:40:50 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gttqC-0007u1-4e
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:40:41 -0500
-Received: by mail-wr1-f66.google.com with SMTP id l5so1240747wrw.6
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 04:40:37 -0800 (PST)
-References: <20190213065357.16076-1-yuval.shaia@oracle.com>
-	<20190213065357.16076-9-yuval.shaia@oracle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
-Date: Wed, 13 Feb 2019 13:40:34 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gttty-00034B-G7
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:44:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gttty-00032u-9k
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:44:34 -0500
+Date: Wed, 13 Feb 2019 13:44:28 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190213134428.11b03224@redhat.com>
+In-Reply-To: <1549377087-205549-1-git-send-email-imammedo@redhat.com>
+References: <1549377087-205549-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190213065357.16076-9-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/pvrdma: Delete unneeded function
- argument
+Subject: Re: [Qemu-devel] [PATCH] hostmem: fix crash when querying empty
+ host-nodes property via QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,14 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com, Eric Blake <eblake@redhat.com>, mdroth@linux.vnet.ibm.com
 
-On 2/13/19 7:53 AM, Yuval Shaia wrote:
-> The function argument rdma_dev_res is not needed as it is stored in the
-> backend_dev object at init.
+On Tue,  5 Feb 2019 15:31:27 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> QEMU will crashes with
+>  qapi/qobject-output-visitor.c:210: qobject_output_complete: Assertion `qov->root && ((&qov->stack)->slh_first == ((void *)0))' failed
+> when trying to get value of empty hostmem.host-nodes property.
 > 
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+> Fix it by calling visitor even if host-nodes wasn't set
+> before exiting from property getter to return empty list.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  backends/hostmem.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index 0c8ef17..fe14be5 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -86,7 +86,7 @@ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
+>  
+>      value = find_first_bit(backend->host_nodes, MAX_NODES);
+>      if (value == MAX_NODES) {
+> -        return;
+> +        goto ret;
+>      }
+>  
+>      *node = g_malloc0(sizeof(**node));
+> @@ -104,6 +104,7 @@ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
+>          node = &(*node)->next;
+>      } while (true);
+>  
+> +ret:
+>      visit_type_uint16List(v, name, &host_nodes, errp);
+>  }
+>  
 
-Should we teach checkpatch.pl to check name/space/email?
+Markus/Michael,
+
+does this patch make sense from QAPI point of view?
