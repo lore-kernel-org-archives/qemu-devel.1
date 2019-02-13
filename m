@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48098)
+Received: from eggs.gnu.org ([209.51.188.92]:48318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gtxhl-0002gA-AA
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:48:14 -0500
+	(envelope-from <berto@igalia.com>) id 1gtxjR-0003w9-07
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:49:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gtxhk-0007GU-4o
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:48:13 -0500
-Resent-Message-Id: <E1gtxhk-0007GU-4o@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gtxhj-0007Bt-SO
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:48:12 -0500
-Message-ID: <155007554232.7770.7902282730740577620@ebba9967afc0>
-In-Reply-To: <20190212160953.29051-1-marcandre.lureau@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 13 Feb 2019 08:32:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix slirp regression on win32
+	(envelope-from <berto@igalia.com>) id 1gtxjO-0001UD-UR
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:49:56 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 13 Feb 2019 18:48:53 +0200
+Message-Id: <20190213164853.32412-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qcow2: Default to 4KB for the qcow2 cache
+ entry size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +18,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, hsp.cat7@gmail.com, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMjE2MDk1My4yOTA1
-MS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJdIEZp
-eCBzbGlycCByZWdyZXNzaW9uIG9uIHdpbjMyClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5
-MDIxMjE2MDk1My4yOTA1MS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKOGVmYTI1MDBmZSBzbGlycDogd3JhcCB0aGUgcmVtYWluaW5nIHNvY2tldCBm
-dW5jdGlvbnMKNmRiNjkwNjM3ZiBzbGlycDogcmVtb3ZlIHNsaXJwXyBwcmVmaXggZm9yIHNvY2tl
-dCB3cmFwcGVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yIENoZWNraW5nIGNvbW1pdCA2ZGI2
-OTA2MzdmNDggKHNsaXJwOiByZW1vdmUgc2xpcnBfIHByZWZpeCBmb3Igc29ja2V0IHdyYXBwZXJz
-KQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMTU6IEZJTEU6IHNs
-aXJwL3NvY2tldC5jOjE4ODoKK15Jbm4gPSByZWN2KHNvLT5zLCBpb3ZbMF0uaW92X2Jhc2UsIGlv
-dlswXS5pb3ZfbGVuLDApOyQKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
-Y3R4OlZ4VikKIzExNTogRklMRTogc2xpcnAvc29ja2V0LmM6MTg4OgorICAgICAgIG5uID0gcmVj
-dihzby0+cywgaW92WzBdLmlvdl9iYXNlLCBpb3ZbMF0uaW92X2xlbiwwKTsKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogY29k
-ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjQ6IEZJTEU6IHNsaXJwL3NvY2tldC5j
-OjIwNDoKK15JXkleSV5JXklnZXRzb2Nrb3B0KHNvLT5zLCBTT0xfU09DS0VULCBTT19FUlJPUiwk
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMzM6IEZJ
-TEU6IHNsaXJwL3NvY2tldC5jOjIzNDoKKyAgICAgICAgICAgIHJldCA9IHJlY3Yoc28tPnMsIGlv
-dlsxXS5pb3ZfYmFzZSwgaW92WzFdLmlvdl9sZW4sMCk7CiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQyOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo1NTU6
-CiteSSAgaW9jdGxzb2NrZXQoc28tPnMsIEZJT05SRUFELCAmbik7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3Mzg6
-CiteSXNldHNvY2tvcHQocywgU09MX1NPQ0tFVCwgU09fT09CSU5MSU5FLCAmb3B0LCBzaXplb2Yo
-aW50KSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYzOiBG
-SUxFOiBzbGlycC9zb2NrZXQuYzo3NDA6CiteSXNldHNvY2tvcHQocywgSVBQUk9UT19UQ1AsIFRD
-UF9OT0RFTEFZLCAmb3B0LCBzaXplb2YoaW50KSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojMTc2OiBGSUxFOiBzbGlycC90Y3Bfc3Vici5jOjM0MDoKK15JY2xv
-c2Vzb2NrZXQoc28tPnMpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzIxOTogRklMRTogc2xpcnAvdWRwLmM6Mjk1OgorXkljbG9zZXNvY2tldChzby0+cyk7JAoK
-dG90YWw6IDkgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMTIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8y
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IDhlZmEyNTAw
-ZmViYiAoc2xpcnA6IHdyYXAgdGhlIHJlbWFpbmluZyBzb2NrZXQgZnVuY3Rpb25zKQo9PT0gT1VU
-UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwg
-bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxMjE2MDk1
-My4yOTA1MS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+QEMU 2.12 (commit 1221fe6f636754ab5f2c1c87caa77633e9123622) introduced
+a new setting called l2-cache-entry-size that allows making entries on
+the qcow2 L2 cache smaller than the cluster size.
+
+I have been performing several tests with different cluster and entry
+sizes and all of them show that reducing the entry size (aka L2 slice)
+consistently improves I/O performance, notably during random I/O (all
+tests done with sequential I/O show similar results). This is to be
+expected because loading and evicting an L2 slice is more expensive
+the larger the slice is.
+
+Here are some numbers on fully populated 40GB qcow2 images. The
+rightmost column represents the maximum L2 cache size in both cases.
+
+   Cluster size = 64 KB
+   |-------------+--------------+--------------+--------------|
+   |             | 1MB L2 cache | 3MB L2 cache | 5MB L2 cache |
+   |-------------+--------------+--------------+--------------|
+   |  4KB slices |    6545 IOPS |   12045 IOPS |   55680 IOPS |
+   | 16KB slices |    5177 IOPS |    9798 IOPS |   56278 IOPS |
+   | 64KB slices |    2718 IOPS |    5326 IOPS |   57355 IOPS |
+   |-------------+--------------+--------------+--------------|
+
+   Cluster size = 256 KB
+   |--------------+----------------+--------------+-----------------|
+   |              | 512KB L2 cache | 1MB L2 cache | 1280KB L2 cache |
+   |--------------+----------------+--------------+-----------------|
+   |   4KB slices |      8539 IOPS |   21071 IOPS |      55417 IOPS |
+   |  64KB slices |      3598 IOPS |    9772 IOPS |      57687 IOPS |
+   | 256KB slices |      1415 IOPS |    4120 IOPS |      58001 IOPS |
+   |--------------+----------------+--------------+-----------------|
+
+As can be seen in the numbers, the only exception to the rule is when
+the cache is large enough to hold all L2 tables. This is also to be
+expected because in this case no cache entry is ever evicted so
+reducing its size doesn't bring any benefit.
+
+This patch sets the default L2 cache entry size to 4KB except when the
+cache is large enough for the whole disk.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2.c        | 12 ++++++++++++
+ docs/qcow2-cache.txt | 17 +++++++++++------
+ 2 files changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 8c91b92865..ece1efc46b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -788,6 +788,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t combined_cache_size, l2_cache_max_setting;
+     bool l2_cache_size_set, refcount_cache_size_set, combined_cache_size_set;
++    bool l2_cache_entry_size_set;
+     int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+     uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+     uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+@@ -795,6 +796,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
+     l2_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
+     refcount_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_REFCOUNT_CACHE_SIZE);
++    l2_cache_entry_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE);
+ 
+     combined_cache_size = qemu_opt_get_size(opts, QCOW2_OPT_CACHE_SIZE, 0);
+     l2_cache_max_setting = qemu_opt_get_size(opts, QCOW2_OPT_L2_CACHE_SIZE,
+@@ -841,6 +843,16 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+             }
+         }
+     }
++
++    /*
++     * If the L2 cache is not enough to cover the whole disk then
++     * default to 4KB entries. Smaller entries reduce the cost of
++     * loads and evictions and increase I/O performance.
++     */
++    if (*l2_cache_size < max_l2_cache && !l2_cache_entry_size_set) {
++        *l2_cache_entry_size = MIN(s->cluster_size, 4096);
++    }
++
+     /* l2_cache_size and refcount_cache_size are ensured to have at least
+      * their minimum values in qcow2_update_options_prepare() */
+ 
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index c459bf5dd3..195b2c45d6 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -158,10 +158,10 @@ refcount cache is as small as possible unless overridden by the user.
+ 
+ Using smaller cache entries
+ ---------------------------
+-The qcow2 L2 cache stores complete tables by default. This means that
+-if QEMU needs an entry from an L2 table then the whole table is read
+-from disk and is kept in the cache. If the cache is full then a
+-complete table needs to be evicted first.
++The qcow2 L2 cache can store complete tables. This means that if QEMU
++needs an entry from an L2 table then the whole table is read from disk
++and is kept in the cache. If the cache is full then a complete table
++needs to be evicted first.
+ 
+ This can be inefficient with large cluster sizes since it results in
+ more disk I/O and wastes more cache memory.
+@@ -172,6 +172,9 @@ it smaller than the cluster size. This can be configured using the
+ 
+    -drive file=hd.qcow2,l2-cache-size=2097152,l2-cache-entry-size=4096
+ 
++Since QEMU 4.0 the value of l2-cache-entry-size defaults to 4KB (or
++the cluster size if it's smaller).
++
+ Some things to take into account:
+ 
+  - The L2 cache entry size has the same restrictions as the cluster
+@@ -185,7 +188,8 @@ Some things to take into account:
+ 
+  - Try different entry sizes to see which one gives faster performance
+    in your case. The block size of the host filesystem is generally a
+-   good default (usually 4096 bytes in the case of ext4).
++   good default (usually 4096 bytes in the case of ext4, hence the
++   default).
+ 
+  - Only the L2 cache can be configured this way. The refcount cache
+    always uses the cluster size as the entry size.
+@@ -194,7 +198,8 @@ Some things to take into account:
+    (as explained in the "Choosing the right cache sizes" and "How to
+    configure the cache sizes" sections in this document) then none of
+    this is necessary and you can omit the "l2-cache-entry-size"
+-   parameter altogether.
++   parameter altogether. In this case QEMU makes the entry size
++   equal to the cluster size by default.
+ 
+ 
+ Reducing the memory usage
+-- 
+2.11.0
