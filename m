@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39589)
+Received: from eggs.gnu.org ([209.51.188.92]:39604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbg-0008Mw-63
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:49 -0500
+	(envelope-from <david@redhat.com>) id 1gtvbi-0008Oe-Lp
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbf-0002Es-4i
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:48 -0500
+	(envelope-from <david@redhat.com>) id 1gtvbh-0002G8-ME
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:50 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Feb 2019 15:33:15 +0100
-Message-Id: <20190213143322.31371-9-david@redhat.com>
+Date: Wed, 13 Feb 2019 15:33:16 +0100
+Message-Id: <20190213143322.31371-10-david@redhat.com>
 In-Reply-To: <20190213143322.31371-1-david@redhat.com>
 References: <20190213143322.31371-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/15] s390x/tcg: Handle SET FPC AND LOAD
- FPC 3-bit BFP rounding modes
+Subject: [Qemu-devel] [PATCH v2 09/15] s390x/tcg: Check for exceptions in
+ SET BFP ROUNDING MODE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,114 +23,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-We already forward the 3 bits correctly in the translation functions. We
-also have to handle them properly and check for specification
-exceptions.
+Let's split handling of BFP/DFP rounding mode configuration. Also,
+let's not reuse the sfpc handler, use a separate handler so we can
+properly check for specification exceptions for SRNMB.
 
-Setting an invalid rounding mode (BFP only, all DFP rounding modes)
-results in a specification exception. Setting unassigned bits in the
-fpc, results in a specification exception.
-
-This fixes LOAD FPC (AND SIGNAL), SET FPC (AND SIGNAL). Also for,
-SET BFP ROUNDING MODE, 3-bit rounding mode is now explicitly checked.
-
-Notes:
-1. Use "float_round_to_zero" for now to handle "Round to prepare for
-   shorter precision". Looking at the PoP "Summary of Rounding and Range
-   Actions" for BFP. They differ when it comes to tiny values.
-2. TCG_CALL_NO_WG is required for sfpc handler, as we now inject
-   exceptions.
-
-We won't be modeling abscence of the "floating-point extension facility"
-for now, not necessary as most take the facility for granted without
-checking.
-
-z14 PoP, 9-23, "LOAD FPC"
-    When the floating-point extension facility is
-    installed, bits 29-31 of the second operand must
-    specify a valid BFP rounding mode and bits 6-7,
-    14-15, 24, and 28 must be zero; otherwise, a
-    specification exception is recognized.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/fpu_helper.c | 26 ++++++++++++++++++++++----
- target/s390x/helper.h     |  2 +-
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ target/s390x/fpu_helper.c  | 11 ++++++++
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  6 ++--
+ target/s390x/translate.c   | 56 ++++++++++++++++----------------------
+ 4 files changed, 39 insertions(+), 35 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 7508c0748e..a779cfada6 100644
+index a779cfada6..70fa053e8d 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -753,21 +753,34 @@ uint64_t HELPER(sqxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
-     return RET128(ret);
+@@ -823,3 +823,14 @@ void HELPER(sfas)(CPUS390XState *env, uint64_t fpc)
+         tcg_s390_data_exception(env, s390_exc | 3, GETPC());
+     }
  }
- 
--static const int fpc_to_rnd[4] = {
-+static const int fpc_to_rnd[8] = {
-     float_round_nearest_even,
-     float_round_to_zero,
-     float_round_up,
--    float_round_down
-+    float_round_down,
-+    -1,
-+    -1,
-+    -1,
-+    /*
-+     * FIXME: we actually want something like round_to_odd, but that does not
-+     * support all data types yet.
-+     */
-+    float_round_to_zero,
- };
- 
- /* set fpc */
- void HELPER(sfpc)(CPUS390XState *env, uint64_t fpc)
- {
-+    if (fpc_to_rnd[fpc & 0x7] == -1 || fpc & 0x03030088u ||
-+        (!s390_has_feat(S390_FEAT_FLOATING_POINT_EXT) && fpc & 0x4)) {
++
++/* set bfp rounding mode */
++void HELPER(srnm)(CPUS390XState *env, uint64_t rnd)
++{
++    if (rnd > 0x7 || fpc_to_rnd[rnd & 0x7] == -1) {
 +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, GETPC());
 +    }
 +
-     /* Install everything in the main FPC.  */
-     env->fpc = fpc;
- 
-     /* Install the rounding mode in the shadow fpu_status.  */
--    set_float_rounding_mode(fpc_to_rnd[fpc & 3], &env->fpu_status);
-+    set_float_rounding_mode(fpc_to_rnd[fpc & 0x7], &env->fpu_status);
- }
- 
- /* set fpc and signal */
-@@ -776,12 +789,17 @@ void HELPER(sfas)(CPUS390XState *env, uint64_t fpc)
-     uint32_t signalling = env->fpc;
-     uint32_t s390_exc;
- 
-+    if (fpc_to_rnd[fpc & 0x7] == -1 || fpc & 0x03030088u ||
-+        (!s390_has_feat(S390_FEAT_FLOATING_POINT_EXT) && fpc & 0x4)) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, GETPC());
-+    }
-+
-     /*
-      * FPC is set to the FPC operand with a bitwise OR of the signalling
-      * flags.
-      */
-     env->fpc = fpc | (signalling & 0x00ff0000);
--    set_float_rounding_mode(fpc_to_rnd[fpc & 3], &env->fpu_status);
-+    set_float_rounding_mode(fpc_to_rnd[fpc & 0x7], &env->fpu_status);
- 
-     /*
-      * If any signaling flag is enabled in the new FPC mask, a
++    env->fpc = deposit32(env->fpc, 0, 3, rnd);
++    set_float_rounding_mode(fpc_to_rnd[rnd & 0x7], &env->fpu_status);
++}
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 6260b50496..a99b067c9c 100644
+index a99b067c9c..d287d5dac0 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -104,7 +104,7 @@ DEF_HELPER_4(trtr, i32, env, i32, i64, i64)
- DEF_HELPER_5(trXX, i32, env, i32, i32, i32, i32)
- DEF_HELPER_4(cksm, i64, env, i64, i64, i64)
+@@ -106,6 +106,7 @@ DEF_HELPER_4(cksm, i64, env, i64, i64, i64)
  DEF_HELPER_FLAGS_5(calc_cc, TCG_CALL_NO_RWG_SE, i32, env, i32, i64, i64, i64)
--DEF_HELPER_FLAGS_2(sfpc, TCG_CALL_NO_RWG, void, env, i64)
-+DEF_HELPER_FLAGS_2(sfpc, TCG_CALL_NO_WG, void, env, i64)
+ DEF_HELPER_FLAGS_2(sfpc, TCG_CALL_NO_WG, void, env, i64)
  DEF_HELPER_FLAGS_2(sfas, TCG_CALL_NO_WG, void, env, i64)
++DEF_HELPER_FLAGS_2(srnm, TCG_CALL_NO_WG, void, env, i64)
  DEF_HELPER_FLAGS_1(popcnt, TCG_CALL_NO_RWG_SE, i64, i64)
  DEF_HELPER_2(stfle, i32, env, i64)
+ DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 61582372ab..2c9ae503c5 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -759,10 +759,10 @@
+ /* SET FPC AND SIGNAL */
+     F(0xb385, SFASR,   RRE,   IEEEE_SIM, 0, r1_o, 0, 0, sfas, 0, IF_DFP)
+ /* SET BFP ROUNDING MODE */
+-    F(0xb299, SRNM,    S,     Z,   0, 0, 0, 0, srnm, 0, IF_BFP)
+-    F(0xb2b8, SRNMB,   S,     FPE, 0, 0, 0, 0, srnm, 0, IF_BFP)
++    F(0xb299, SRNM,    S,     Z,   la2, 0, 0, 0, srnm, 0, IF_BFP)
++    F(0xb2b8, SRNMB,   S,     FPE, la2, 0, 0, 0, srnmb, 0, IF_BFP)
+ /* SET DFP ROUNDING MODE */
+-    F(0xb2b9, SRNMT,   S,     DFPR, 0, 0, 0, 0, srnm, 0, IF_DFP)
++    F(0xb2b9, SRNMT,   S,     DFPR, la2, 0, 0, 0, srnmt, 0, IF_DFP)
+ /* SET PROGRAM MASK */
+     C(0x0400, SPM,     RR_a,  Z,   r1, 0, 0, 0, spm, 0)
+ 
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 19072efec6..c2645891e8 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3955,41 +3955,33 @@ static DisasJumpType op_sfas(DisasContext *s, DisasOps *o)
+ 
+ static DisasJumpType op_srnm(DisasContext *s, DisasOps *o)
+ {
+-    int b2 = get_field(s->fields, b2);
+-    int d2 = get_field(s->fields, d2);
+-    TCGv_i64 t1 = tcg_temp_new_i64();
+-    TCGv_i64 t2 = tcg_temp_new_i64();
+-    int mask, pos, len;
++    /* Bits other than 62 and 63 are ignored. Bit 29 is set to zero. */
++    tcg_gen_andi_i64(o->addr1, o->addr1, 0x3ull);
++    gen_helper_srnm(cpu_env, o->addr1);
++    return DISAS_NEXT;
++}
+ 
+-    switch (s->fields->op2) {
+-    case 0x99: /* SRNM */
+-        pos = 0, len = 2;
+-        break;
+-    case 0xb8: /* SRNMB */
+-        pos = 0, len = 3;
+-        break;
+-    case 0xb9: /* SRNMT */
+-        pos = 4, len = 3;
+-        break;
+-    default:
+-        tcg_abort();
+-    }
+-    mask = (1 << len) - 1;
++static DisasJumpType op_srnmb(DisasContext *s, DisasOps *o)
++{
++    /* Bits 0-55 are are ignored. */
++    tcg_gen_andi_i64(o->addr1, o->addr1, 0xffull);
++    gen_helper_srnm(cpu_env, o->addr1);
++    return DISAS_NEXT;
++}
+ 
+-    /* Insert the value into the appropriate field of the FPC.  */
+-    if (b2 == 0) {
+-        tcg_gen_movi_i64(t1, d2 & mask);
+-    } else {
+-        tcg_gen_addi_i64(t1, regs[b2], d2);
+-        tcg_gen_andi_i64(t1, t1, mask);
+-    }
+-    tcg_gen_ld32u_i64(t2, cpu_env, offsetof(CPUS390XState, fpc));
+-    tcg_gen_deposit_i64(t2, t2, t1, pos, len);
+-    tcg_temp_free_i64(t1);
++static DisasJumpType op_srnmt(DisasContext *s, DisasOps *o)
++{
++    TCGv_i64 tmp = tcg_temp_new_i64();
+ 
+-    /* Then install the new FPC to set the rounding mode in fpu_status.  */
+-    gen_helper_sfpc(cpu_env, t2);
+-    tcg_temp_free_i64(t2);
++    /* Bits other than 61-63 are ignored. */
++    tcg_gen_andi_i64(o->addr1, o->addr1, 0x7ull);
++
++    /* No need to call a helper, we don't implement dfp */
++    tcg_gen_ld32u_i64(tmp, cpu_env, offsetof(CPUS390XState, fpc));
++    tcg_gen_deposit_i64(tmp, tmp, o->addr1, 4, 3);
++    tcg_gen_st32_i64(tmp, cpu_env, offsetof(CPUS390XState, fpc));
++
++    tcg_temp_free_i64(tmp);
+     return DISAS_NEXT;
+ }
+ 
 -- 
 2.17.2
