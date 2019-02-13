@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48509)
+Received: from eggs.gnu.org ([209.51.188.92]:48529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gtwFn-0004rC-Lc
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:15:16 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gtwG4-0004yC-9L
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gtwFm-0000Id-Gd
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:15:15 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:52895 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gtwG1-0000Va-BD
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:15:32 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:52958 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gtwFm-0000He-3m
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:15:14 -0500
+	id 1gtwFq-0000Lh-Kt
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:15:22 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 13 Feb 2019 16:14:51 +0100
-Message-Id: <1550070897-5013-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 13 Feb 2019 16:14:53 +0100
+Message-Id: <1550070897-5013-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550070897-5013-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550070897-5013-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 1/7] tests/tcg: target/mips: Remove an
- unnecessary file
+Subject: [Qemu-devel] [PATCH v2 3/7] tests/tcg: target/mips: Add a header
+ with test utilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +30,105 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, alex.ben
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Remove a file that was added long time ago by mistake. The commit
-that introduced this file was commit d70080c4 (from 2012).
+Add a header that contains test utilities. For now, it contains
+only a function for checking and printing test results for bit
+counting and similar MSA instructions.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/tcg/mips/mips64-dspr2/.directory | 2 --
- 1 file changed, 2 deletions(-)
- delete mode 100644 tests/tcg/mips/mips64-dspr2/.directory
+ tests/tcg/mips/include/test_utils.h | 84 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+ create mode 100644 tests/tcg/mips/include/test_utils.h
 
-diff --git a/tests/tcg/mips/mips64-dspr2/.directory b/tests/tcg/mips/mips64-dspr2/.directory
-deleted file mode 100644
-index c75a914..0000000
---- a/tests/tcg/mips/mips64-dspr2/.directory
-+++ /dev/null
-@@ -1,2 +0,0 @@
--[Dolphin]
--Timestamp=2012,8,3,16,41,52
+diff --git a/tests/tcg/mips/include/test_utils.h b/tests/tcg/mips/include/test_utils.h
+new file mode 100644
+index 0000000..03f3191
+--- /dev/null
++++ b/tests/tcg/mips/include/test_utils.h
+@@ -0,0 +1,84 @@
++/*
++ *  Header file for test utilities
++ *
++ *  Copyright (C) 2018  Wave Computing, Inc.
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef TEST_UTILS_H
++#define TEST_UTILS_H
++
++#include <stdio.h>
++#include <stdint.h>
++#include <inttypes.h>
++#include <string.h>
++
++#define PRINT_RESULTS 0
++
++static inline int32_t check_results(char *instruction_name,
++                                    uint32_t test_count,
++                                    double elapsed_time,
++                                    uint64_t *b128_result,
++                                    uint64_t *b128_expect)
++{
++#if PRINT_RESULTS
++
++    uint32_t i;
++    printf("\n");
++    for (i = 0; i < test_count; i++) {
++        uint64_t a, b;
++        memcpy(&a, (b128_result + 2 * i), 8);
++        memcpy(&b, (b128_result + 2 * i + 1), 8);
++        if (i % 8 != 0) {
++            printf("        { 0x%016llxULL, 0x%016llxULL, },\n", a, b);
++        } else {
++            printf("        { 0x%016llxULL, 0x%016llxULL, },    /* %3d  */\n",
++                   a, b, i);
++        }
++    }
++    printf("\n");
++
++    return 0;
++
++#else
++
++    uint32_t i;
++    uint32_t pass_count = 0;
++    uint32_t fail_count = 0;
++
++    printf("%s:   ", instruction_name);
++    for (i = 0; i < test_count; i++) {
++        if (b128_result[i] == b128_expect[i]) {
++            pass_count++;
++        } else {
++            fail_count++;
++        }
++    }
++
++    printf("PASS: %3d   FAIL: %3d   elapsed time: %5.2f ms\n",
++           pass_count, fail_count, elapsed_time);
++
++    if (fail_count > 0) {
++        return -1;
++    } else {
++        return 0;
++    }
++
++#endif
++}
++
++#endif
 -- 
 2.7.4
