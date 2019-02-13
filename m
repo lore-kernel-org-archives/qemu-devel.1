@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44420)
+Received: from eggs.gnu.org ([209.51.188.92]:44533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gti4w-00024w-U9
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 19:07:07 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gti51-00028w-0A
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 19:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gti1q-0006K4-F4
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 19:03:55 -0500
-Message-ID: <56a5772ae88c5b5f65c969e2191a02d62cca5055.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Wed, 13 Feb 2019 11:03:12 +1100
-In-Reply-To: <20190212055900.GN1884@umbus.fritz.box>
-References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-8-clg@kaod.org>
-	<20190212055900.GN1884@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <balaton@eik.bme.hu>) id 1gthze-0003oq-Du
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 19:01:39 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:53894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gthze-0003mW-2S
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 19:01:38 -0500
+Date: Wed, 13 Feb 2019 01:01:36 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <db8d6d0b-4ea5-4f99-f054-d6a397f3e967@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1902130100260.68636@zero.eik.bme.hu>
+References: <cover.1549857716.git.balaton@eik.bme.hu>
+	<9f5f3187f0eff04efc2ec3639727a17bf8d36dce.1549857716.git.balaton@eik.bme.hu>
+	<db8d6d0b-4ea5-4f99-f054-d6a397f3e967@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/19] target/ppc: Make special ORs match
- x86 pause and don't generate on mttcg
+Subject: Re: [Qemu-devel] [PATCH 4/4] mips_fulong2e: Add on-board graphics
+ chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Huacai Chen <zltjiangshi@gmail.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Tue, 2019-02-12 at 16:59 +1100, David Gibson wrote:
-> On Mon, Jan 28, 2019 at 10:46:13AM +0100, C=C3=A9dric Le Goater wrote:
-> > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> >=20
-> > There's no point in going out of translation on an SMT OR with
-> > mttcg since the backend won't do anything useful such as pausing,
-> > it's only useful on traditional TCG to give time to other
-> > processors.
->=20
-> Is it actively harmful in the MTTCG case, or just pointless?
+On Tue, 12 Feb 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/11/19 5:01 AM, BALATON Zoltan wrote:
+>> Add (partial) emulation of the on-board GPU of the machine. This
+>> allows the PMON2000 firmware to run and should also work with Linux
+>> console but probably not with X yet.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>> Depends on hw/display: Add basic ATI VGA emulation
+>>
+>>  hw/mips/mips_fulong2e.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+>> index eec6fd02c8..68bd030fc1 100644
+>> --- a/hw/mips/mips_fulong2e.c
+>> +++ b/hw/mips/mips_fulong2e.c
+>> @@ -287,6 +287,7 @@ static void mips_fulong2e_init(MachineState *machi=
+ne)
+>>      I2CBus *smbus;
+>>      MIPSCPU *cpu;
+>>      CPUMIPSState *env;
+>> +    DeviceState *dev;
+>>
+>>      /* init CPUs */
+>>      cpu =3D MIPS_CPU(cpu_create(machine->cpu_type));
+>> @@ -347,6 +348,11 @@ static void mips_fulong2e_init(MachineState *mach=
+ine)
+>>      vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5=
+],
+>>                                 &smbus, &isa_bus);
+>>
+>> +    /* GPU */
+>> +    dev =3D DEVICE(pci_create(pci_bus, -1, "ati-vga"));
+>
+> You missed in your cover:
+> Based-on: 20190211040434.1C98674569F@zero.eik.bme.hu
 
-I think it can hurt performance, I don't remember for sure :)
+I forgot what this was called, thanks for reminding. But patchew seems to=
+=20
+be down anyway.
 
-> > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > ---
-> >  target/ppc/translate.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > index e169c43643a1..7d40a1fbe6bd 100644
-> > --- a/target/ppc/translate.c
-> > +++ b/target/ppc/translate.c
-> > @@ -1580,7 +1580,7 @@ static void gen_pause(DisasContext *ctx)
-> >      tcg_temp_free_i32(t0);
-> > =20
-> >      /* Stop translation, this gives other CPUs a chance to run */
-> > -    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
-> > +    gen_exception_nip(ctx, EXCP_INTERRUPT, ctx->base.pc_next);
->=20
-> I don't see how this change relates to the rest.
+Regards,
+BALATON Zoltan
 
-Yeah not sure anymore :-)
-
-> >  }
-> >  #endif /* defined(TARGET_PPC64) */
-> > =20
-> > @@ -1662,7 +1662,9 @@ static void gen_or(DisasContext *ctx)
-> >           * than no-op, e.g., miso(rs=3D26), yield(27), mdoio(29), md=
-oom(30),
-> >           * and all currently undefined.
-> >           */
-> > -        gen_pause(ctx);
-> > +        if (!mttcg_enabled) {
-> > +            gen_pause(ctx);
-> > +        }
-> >  #endif
-> >  #endif
-> >      }
+>
+> Else testing we get:
+> qemu-system-mips64el: Unknown device 'ati-vga' for bus 'PCI'
+> Aborted (core dumped)
+>
+>> +    qdev_prop_set_uint16(dev, "device_id", 0x5159);
+>> +    qdev_init_nofail(dev);
+>> +
+>>      /* Populate SPD eeprom data */
+>>      spd_data =3D spd_data_generate(DDR, ram_size, &err);
+>>      if (err) {
+>>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+>
