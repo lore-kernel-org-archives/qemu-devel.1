@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50082)
+Received: from eggs.gnu.org ([209.51.188.92]:50154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gtuXx-0005NL-NZ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:25:56 -0500
+	(envelope-from <groug@kaod.org>) id 1gtuY9-0005WL-Je
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gtuXm-0005Di-Jm
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:25:50 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43086)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gtuXh-0004td-2l
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:25:39 -0500
-Received: by mail-wr1-x441.google.com with SMTP id r2so2450564wrv.10
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 05:25:32 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1gtuY7-0005sK-Lk
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:26:05 -0500
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:42301)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gtuY2-0005Nv-Eg
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:26:03 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.160.253])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E5C2FF2D75
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 14:25:47 +0100 (CET)
+Date: Wed, 13 Feb 2019 14:25:31 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190213142531.5a988b09@bahia.lan>
+In-Reply-To: <7dc24c62-2ca0-8de4-e9e3-def6fb2a554f@redhat.com>
+References: <154999583316.690774.15072605479770041782.stgit@bahia.lan>
+	<154999592549.690774.13071669609040970763.stgit@bahia.lan>
+	<7dc24c62-2ca0-8de4-e9e3-def6fb2a554f@redhat.com>
 MIME-Version: 1.0
-References: <20190202110729.23725-1-pbonzini@redhat.com>
-In-Reply-To: <20190202110729.23725-1-pbonzini@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 13 Feb 2019 14:25:18 +0100
-Message-ID: <CAJ+F1CLEALfM7ezrOOL6WKdvSOk7GK+D6hZwDe-8k4+fBiWexQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] char: allow specifying a GMainContext at
- opening time
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 14/15] spapr: add hotplug hooks for PHB
+ hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,721 +32,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-Hi
+On Wed, 13 Feb 2019 10:25:07 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On Sat, Feb 2, 2019 at 12:09 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> This will be needed by vhost-user-test, when each test switches to
-> its own GMainLoop and GMainContext.  Otherwise, for a reconnecting
-> socket the initial connection will happen on the default GMainContext,
-> and no one will be listening on it.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Based-on: <1544684731-18828-1-git-send-email-thuth@redhat.com>
+> On 12.02.19 19:25, Greg Kurz wrote:
+> > Hotplugging PHBs is a machine-level operation, but PHBs reside on the
+> > main system bus, so we register spapr machine as the handler for the
+> > main system bus.
+> > 
+> > Provide the usual pre-plug, plug and unplug-request handlers.
+> > 
+> > Move the checking of the PHB index to the pre-plug handler. It is okay
+> > to do that and assert in the realize function because the pre-plug
+> > handler is always called, even for the oldest machine types we support.
+> > 
+> > Unlike with other device types, there are some cases where we cannot
+> > provide the FDT fragment of the PHB from the plug handler, eg, before
+> > KVMPPC_H_UPDATE_DT was called. Do this from a DRC callback that is
+> > called just before the first FDT fragment is exposed to the guest.
+> > 
+> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > (Fixed interrupt controller phandle in "interrupt-map" and
+> >  TCE table size in "ibm,dma-window" FDT fragment, Greg Kurz)
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > v4: - populate FDT fragment in a DRC callback
+> > v3: - reworked phandle handling some more
+> > v2: - reworked phandle handling
+> >     - sync LSIs to KVM
+> > ---
+> > ---
+> >  hw/ppc/spapr.c         |  121 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/ppc/spapr_drc.c     |    2 +
+> >  hw/ppc/spapr_pci.c     |   16 ------
+> >  include/hw/ppc/spapr.h |    5 ++
+> >  4 files changed, 127 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 021758825b7e..06ce0babcb54 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2930,6 +2930,11 @@ static void spapr_machine_init(MachineState *machine)
+> >      register_savevm_live(NULL, "spapr/htab", -1, 1,
+> >                           &savevm_htab_handlers, spapr);
+> >  
+> > +    if (smc->dr_phb_enabled) {
+> > +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machine),
+> > +                                 &error_fatal);
+> > +    }
+> > +
+> >      qemu_register_boot_set(spapr_boot_set, spapr);
+> >  
+> >      if (kvm_enabled()) {
+> > @@ -3733,6 +3738,108 @@ out:
+> >      error_propagate(errp, local_err);
+> >  }
+> >  
+> > +int spapr_dt_phb(DeviceState *dev, sPAPRMachineState *spapr, void *fdt,
+> > +                 int *fdt_start_offset, Error **errp)
+> > +{
+> > +    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(dev);
+> > +    uint32_t intc_phandle;
+> > +
+> > +    if (spapr_irq_get_phandle(spapr, spapr->fdt_blob, &intc_phandle, errp)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    if (spapr_populate_pci_dt(sphb, intc_phandle, fdt, spapr->irq->nr_msis,
+> > +                              fdt_start_offset)) {
+> > +        error_setg(errp, "unable to create FDT node for PHB %d", sphb->index);
+> > +        return -1;
+> > +    }
+> > +
+> > +    /* generally SLOF creates these, for hotplug it's up to QEMU */
+> > +    _FDT(fdt_setprop_string(fdt, *fdt_start_offset, "name", "pci"));
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> > +                               Error **errp)
+> > +{
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
+> > +    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(dev);
+> > +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> > +    const unsigned windows_supported = spapr_phb_windows_supported(sphb);
+> > +
+> > +    if (sphb->index == (uint32_t)-1) {
+> > +        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+> > +        return;
+> > +    }
+> > +
+> > +    /*
+> > +     * This will check that sphb->index doesn't exceed the maximum number of
+> > +     * PHBs for the current machine type.
+> > +     */
+> > +    smc->phb_placement(spapr, sphb->index,
+> > +                       &sphb->buid, &sphb->io_win_addr,
+> > +                       &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> > +                       windows_supported, sphb->dma_liobn, errp);
+> > +}
+> > +
+> > +static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> > +                           Error **errp)
+> > +{
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
+> > +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> > +    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(dev);
+> > +    sPAPRDRConnector *drc;
+> > +    bool hotplugged = spapr_drc_hotplugged(dev);
+> > +    Error *local_err = NULL;
+> > +
+> > +    if (!smc->dr_phb_enabled) {
+> > +        return;
+> > +    }
+> > +
+> > +    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->index);
+> > +    /* hotplug hooks should check it's enabled before getting this far */
+> > +    assert(drc);
+> > +
+> > +    /*
+> > +     * The FDT fragment will be added during the first invocation of RTAS
+> > +     * ibm,client-architecture-support  for this device, when we're sure
+> > +     * that the IOMMU is configured and that QEMU knows the phandle of the
+> > +     * interrupt controller.
+> > +     */
+> > +    spapr_drc_attach(drc, DEVICE(dev), NULL, 0, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    if (hotplugged) {
+> > +        spapr_hotplug_req_add_by_index(drc);
+> > +    } else {
+> > +        spapr_drc_reset(drc);
+> > +    }
+> > +}
+> > +
+> > +void spapr_phb_release(DeviceState *dev)
+> > +{
+> > +    object_unparent(OBJECT(dev));
+> > +}
+> > +  
+> 
+> Please call the unplug handler here just like we already do with
+> spapr_phb_remove_pci_device_cb().
+> 
+> And add a _unplug handler that simply calls e.g.
+> 
+> qdev_simple_device_unplug_cb
+> 
+> 
+> Otherwise this will break with
+> [PATCH RFCv2 0/9] qdev: Hotplug handler chaining + virtio-pmem
+> 
 
-I did trivial rebase fixes and queued.
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Yes, I'll do that.
 
-thanks
-
-> ---
->  chardev/char.c          | 30 +++++++++++++++-------------
->  gdbstub.c               |  4 ++--
->  hmp.c                   |  2 +-
->  hw/arm/omap2.c          |  2 +-
->  hw/bt/hci-csr.c         |  2 +-
->  hw/char/omap_uart.c     |  4 ++--
->  hw/char/xen_console.c   |  3 ++-
->  hw/isa/isa-superio.c    |  4 ++--
->  hw/mips/boston.c        |  2 +-
->  hw/mips/mips_malta.c    |  2 +-
->  hw/usb/dev-serial.c     |  2 +-
->  include/chardev/char.h  | 16 +++++++++++----
->  net/slirp.c             |  2 +-
->  qtest.c                 |  2 +-
->  tests/test-char.c       | 43 +++++++++++++++++++++--------------------
->  tests/vhost-user-test.c |  2 +-
->  vl.c                    |  8 ++++----
->  17 files changed, 72 insertions(+), 58 deletions(-)
->
-> diff --git a/chardev/char.c b/chardev/char.c
-> index ccba36bafb..71ac061f62 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -634,7 +634,8 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, E=
-rror **errp)
->      return backend;
->  }
->
-> -Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
-> +Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMainContext *context,
-> +                                Error **errp)
->  {
->      const ChardevClass *cc;
->      Chardev *chr =3D NULL;
-> @@ -674,7 +675,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error=
- **errp)
->
->      chr =3D qemu_chardev_new(bid ? bid : id,
->                             object_class_get_name(OBJECT_CLASS(cc)),
-> -                           backend, errp);
-> +                           backend, context, errp);
->
->      if (chr =3D=3D NULL) {
->          goto out;
-> @@ -687,7 +688,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error=
- **errp)
->          backend->type =3D CHARDEV_BACKEND_KIND_MUX;
->          backend->u.mux.data =3D g_new0(ChardevMux, 1);
->          backend->u.mux.data->chardev =3D g_strdup(bid);
-> -        mux =3D qemu_chardev_new(id, TYPE_CHARDEV_MUX, backend, errp);
-> +        mux =3D qemu_chardev_new(id, TYPE_CHARDEV_MUX, backend, context,=
- errp);
->          if (mux =3D=3D NULL) {
->              object_unparent(OBJECT(chr));
->              chr =3D NULL;
-> @@ -703,7 +704,7 @@ out:
->  }
->
->  Chardev *qemu_chr_new_noreplay(const char *label, const char *filename,
-> -                               bool permit_mux_mon)
-> +                               bool permit_mux_mon, GMainContext *contex=
-t)
->  {
->      const char *p;
->      Chardev *chr;
-> @@ -718,7 +719,7 @@ Chardev *qemu_chr_new_noreplay(const char *label, con=
-st char *filename,
->      if (!opts)
->          return NULL;
->
-> -    chr =3D qemu_chr_new_from_opts(opts, &err);
-> +    chr =3D qemu_chr_new_from_opts(opts, context, &err);
->      if (!chr) {
->          error_report_err(err);
->          goto out;
-> @@ -736,10 +737,11 @@ out:
->
->  static Chardev *qemu_chr_new_permit_mux_mon(const char *label,
->                                            const char *filename,
-> -                                          bool permit_mux_mon)
-> +                                          bool permit_mux_mon,
-> +                                          GMainContext *context)
->  {
->      Chardev *chr;
-> -    chr =3D qemu_chr_new_noreplay(label, filename, permit_mux_mon);
-> +    chr =3D qemu_chr_new_noreplay(label, filename, permit_mux_mon, conte=
-xt);
->      if (chr) {
->          if (replay_mode !=3D REPLAY_MODE_NONE) {
->              qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
-> @@ -753,14 +755,14 @@ static Chardev *qemu_chr_new_permit_mux_mon(const c=
-har *label,
->      return chr;
->  }
->
-> -Chardev *qemu_chr_new(const char *label, const char *filename)
-> +Chardev *qemu_chr_new(const char *label, const char *filename, GMainCont=
-ext *context)
->  {
-> -    return qemu_chr_new_permit_mux_mon(label, filename, false);
-> +    return qemu_chr_new_permit_mux_mon(label, filename, false, context);
->  }
->
-> -Chardev *qemu_chr_new_mux_mon(const char *label, const char *filename)
-> +Chardev *qemu_chr_new_mux_mon(const char *label, const char *filename, G=
-MainContext *context)
->  {
-> -    return qemu_chr_new_permit_mux_mon(label, filename, true);
-> +    return qemu_chr_new_permit_mux_mon(label, filename, true, context);
->  }
->
->  static int qmp_query_chardev_foreach(Object *obj, void *data)
-> @@ -935,6 +937,7 @@ void qemu_chr_set_feature(Chardev *chr,
->
->  Chardev *qemu_chardev_new(const char *id, const char *typename,
->                            ChardevBackend *backend,
-> +                          GMainContext *gcontext,
->                            Error **errp)
->  {
->      Object *obj;
-> @@ -947,6 +950,7 @@ Chardev *qemu_chardev_new(const char *id, const char =
-*typename,
->      obj =3D object_new(typename);
->      chr =3D CHARDEV(obj);
->      chr->label =3D g_strdup(id);
-> +    chr->gcontext =3D gcontext;
->
->      qemu_char_open(chr, backend, &be_opened, &local_err);
->      if (local_err) {
-> @@ -991,7 +995,7 @@ ChardevReturn *qmp_chardev_add(const char *id, Charde=
-vBackend *backend,
->      }
->
->      chr =3D qemu_chardev_new(id, object_class_get_name(OBJECT_CLASS(cc))=
-,
-> -                           backend, errp);
-> +                           backend, NULL, errp);
->      if (!chr) {
->          return NULL;
->      }
-> @@ -1049,7 +1053,7 @@ ChardevReturn *qmp_chardev_change(const char *id, C=
-hardevBackend *backend,
->      }
->
->      chr_new =3D qemu_chardev_new(NULL, object_class_get_name(OBJECT_CLAS=
-S(cc)),
-> -                               backend, errp);
-> +                               backend, chr->gcontext, errp);
->      if (!chr_new) {
->          return NULL;
->      }
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 3129b5c284..582e880a4a 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2527,7 +2527,7 @@ int gdbserver_start(const char *device)
->           * FIXME: it's a bit weird to allow using a mux chardev here
->           * and implicitly setup a monitor. We may want to break this.
->           */
-> -        chr =3D qemu_chr_new_noreplay("gdb", device, true);
-> +        chr =3D qemu_chr_new_noreplay("gdb", device, true, NULL);
->          if (!chr)
->              return -1;
->      }
-> @@ -2541,7 +2541,7 @@ int gdbserver_start(const char *device)
->
->          /* Initialize a monitor terminal for gdb */
->          mon_chr =3D qemu_chardev_new(NULL, TYPE_CHARDEV_GDB,
-> -                                   NULL, &error_abort);
-> +                                   NULL, NULL, &error_abort);
->          monitor_init(mon_chr, 0);
->      } else {
->          qemu_chr_fe_deinit(&s->chr, true);
-> diff --git a/hmp.c b/hmp.c
-> index b2a2b1f84e..c18caacfd7 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2395,7 +2395,7 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdi=
-ct)
->      if (opts =3D=3D NULL) {
->          error_setg(&err, "Parsing chardev args failed");
->      } else {
-> -        qemu_chr_new_from_opts(opts, &err);
-> +        qemu_chr_new_from_opts(opts, NULL, &err);
->          qemu_opts_del(opts);
->      }
->      hmp_handle_error(mon, &err);
-> diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-> index 3c7d1364a9..94dffb2f57 100644
-> --- a/hw/arm/omap2.c
-> +++ b/hw/arm/omap2.c
-> @@ -799,7 +799,7 @@ static struct omap_sti_s *omap_sti_init(struct omap_t=
-arget_agent_s *ta,
->      s->irq =3D irq;
->      omap_sti_reset(s);
->
-> -    qemu_chr_fe_init(&s->chr, chr ?: qemu_chr_new("null", "null"),
-> +    qemu_chr_fe_init(&s->chr, chr ?: qemu_chr_new("null", "null", NULL),
->                       &error_abort);
->
->      memory_region_init_io(&s->iomem, NULL, &omap_sti_ops, s, "omap.sti",
-> diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
-> index 0341ded50c..fa6660a113 100644
-> --- a/hw/bt/hci-csr.c
-> +++ b/hw/bt/hci-csr.c
-> @@ -501,7 +501,7 @@ static const TypeInfo char_hci_type_info =3D {
->  Chardev *uart_hci_init(void)
->  {
->      return qemu_chardev_new(NULL, TYPE_CHARDEV_HCI,
-> -                            NULL, &error_abort);
-> +                            NULL, NULL, &error_abort);
->  }
->
->  static void register_types(void)
-> diff --git a/hw/char/omap_uart.c b/hw/char/omap_uart.c
-> index 6fd1b9cf6b..52c3a326c2 100644
-> --- a/hw/char/omap_uart.c
-> +++ b/hw/char/omap_uart.c
-> @@ -63,7 +63,7 @@ struct omap_uart_s *omap_uart_init(hwaddr base,
->      s->irq =3D irq;
->      s->serial =3D serial_mm_init(get_system_memory(), base, 2, irq,
->                                 omap_clk_getrate(fclk)/16,
-> -                               chr ?: qemu_chr_new(label, "null"),
-> +                               chr ?: qemu_chr_new(label, "null", NULL),
->                                 DEVICE_NATIVE_ENDIAN);
->      return s;
->  }
-> @@ -183,6 +183,6 @@ void omap_uart_attach(struct omap_uart_s *s, Chardev =
-*chr)
->      /* TODO: Should reuse or destroy current s->serial */
->      s->serial =3D serial_mm_init(get_system_memory(), s->base, 2, s->irq=
-,
->                                 omap_clk_getrate(s->fclk) / 16,
-> -                               chr ?: qemu_chr_new("null", "null"),
-> +                               chr ?: qemu_chr_new("null", "null", NULL)=
-,
->                                 DEVICE_NATIVE_ENDIAN);
->  }
-> diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
-> index dc6ff0e5b3..91f34ef06c 100644
-> --- a/hw/char/xen_console.c
-> +++ b/hw/char/xen_console.c
-> @@ -211,7 +211,8 @@ static int con_init(struct XenLegacyDevice *xendev)
->                            * FIXME: sure we want to support implicit
->                            * muxed monitors here?
->                            */
-> -                         qemu_chr_new_mux_mon(label, output), &error_abo=
-rt);
-> +                         qemu_chr_new_mux_mon(label, output, NULL),
-> +                         &error_abort);
->      }
->
->      xenstore_store_pv_console_info(con->xendev.dev,
-> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-> index 8bc2f69eaa..d54463bf03 100644
-> --- a/hw/isa/isa-superio.c
-> +++ b/hw/isa/isa-superio.c
-> @@ -44,7 +44,7 @@ static void isa_superio_realize(DeviceState *dev, Error=
- **errp)
->              chr =3D parallel_hds[i];
->              if (chr =3D=3D NULL) {
->                  name =3D g_strdup_printf("discarding-parallel%d", i);
-> -                chr =3D qemu_chr_new(name, "null");
-> +                chr =3D qemu_chr_new(name, "null", NULL);
->              } else {
->                  name =3D g_strdup_printf("parallel%d", i);
->              }
-> @@ -84,7 +84,7 @@ static void isa_superio_realize(DeviceState *dev, Error=
- **errp)
->              chr =3D serial_hd(i);
->              if (chr =3D=3D NULL) {
->                  name =3D g_strdup_printf("discarding-serial%d", i);
-> -                chr =3D qemu_chr_new(name, "null");
-> +                chr =3D qemu_chr_new(name, "null", NULL);
->              } else {
->                  name =3D g_strdup_printf("serial%d", i);
->              }
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index 6c9c20a93e..e5bab3cadc 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -512,7 +512,7 @@ static void boston_mach_init(MachineState *machine)
->      memory_region_init_io(lcd, NULL, &boston_lcd_ops, s, "boston-lcd", 0=
-x8);
->      memory_region_add_subregion_overlap(sys_mem, 0x17fff000, lcd, 0);
->
-> -    chr =3D qemu_chr_new("lcd", "vc:320x240");
-> +    chr =3D qemu_chr_new("lcd", "vc:320x240", NULL);
->      qemu_chr_fe_init(&s->lcd_display, chr, NULL);
->      qemu_chr_fe_set_handlers(&s->lcd_display, NULL, NULL,
->                               boston_lcd_event, NULL, s, NULL, true);
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 74667766c2..7a403ef1ce 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -568,7 +568,7 @@ static MaltaFPGAState *malta_fpga_init(MemoryRegion *=
-address_space,
->      memory_region_add_subregion(address_space, base, &s->iomem_lo);
->      memory_region_add_subregion(address_space, base + 0xa00, &s->iomem_h=
-i);
->
-> -    chr =3D qemu_chr_new("fpga", "vc:320x200");
-> +    chr =3D qemu_chr_new("fpga", "vc:320x200", NULL);
->      qemu_chr_fe_init(&s->display, chr, NULL);
->      qemu_chr_fe_set_handlers(&s->display, NULL, NULL,
->                               malta_fgpa_display_event, NULL, s, NULL, tr=
-ue);
-> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-> index 98d1ca3c91..03c3bcd240 100644
-> --- a/hw/usb/dev-serial.c
-> +++ b/hw/usb/dev-serial.c
-> @@ -514,7 +514,7 @@ static USBDevice *usb_braille_init(USBBus *bus, const=
- char *unused)
->      USBDevice *dev;
->      Chardev *cdrv;
->
-> -    cdrv =3D qemu_chr_new("braille", "braille");
-> +    cdrv =3D qemu_chr_new("braille", "braille", NULL);
->      if (!cdrv)
->          return NULL;
->
-> diff --git a/include/chardev/char.h b/include/chardev/char.h
-> index 014566c3de..c0b57f7685 100644
-> --- a/include/chardev/char.h
-> +++ b/include/chardev/char.h
-> @@ -73,6 +73,7 @@ struct Chardev {
->  /**
->   * qemu_chr_new_from_opts:
->   * @opts: see qemu-config.c for a list of valid options
-> + * @context: the #GMainContext to be used at initialization time
->   *
->   * Create a new character backend from a QemuOpts list.
->   *
-> @@ -81,6 +82,7 @@ struct Chardev {
->   *                            or left untouched in case of help option
->   */
->  Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-> +                                GMainContext *context,
->                                  Error **errp);
->
->  /**
-> @@ -106,25 +108,29 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
->   * qemu_chr_new:
->   * @label: the name of the backend
->   * @filename: the URI
-> + * @context: the #GMainContext to be used at initialization time
->   *
->   * Create a new character backend from a URI.
->   * Do not implicitly initialize a monitor if the chardev is muxed.
->   *
->   * Returns: a new character backend
->   */
-> -Chardev *qemu_chr_new(const char *label, const char *filename);
-> +Chardev *qemu_chr_new(const char *label, const char *filename,
-> +                      GMainContext *context);
->
->  /**
->   * qemu_chr_new_mux_mon:
->   * @label: the name of the backend
->   * @filename: the URI
-> + * @context: the #GMainContext to be used at initialization time
->   *
->   * Create a new character backend from a URI.
->   * Implicitly initialize a monitor if the chardev is muxed.
->   *
->   * Returns: a new character backend
->   */
-> -Chardev *qemu_chr_new_mux_mon(const char *label, const char *filename);
-> +Chardev *qemu_chr_new_mux_mon(const char *label, const char *filename,
-> +                              GMainContext *context);
->
->  /**
->  * qemu_chr_change:
-> @@ -146,6 +152,7 @@ void qemu_chr_cleanup(void);
->   * @label: the name of the backend
->   * @filename: the URI
->   * @permit_mux_mon: if chardev is muxed, initialize a monitor
-> + * @context: the #GMainContext to be used at initialization time
->   *
->   * Create a new character backend from a URI.
->   * Character device communications are not written
-> @@ -154,7 +161,7 @@ void qemu_chr_cleanup(void);
->   * Returns: a new character backend
->   */
->  Chardev *qemu_chr_new_noreplay(const char *label, const char *filename,
-> -                               bool permit_mux_mon);
-> +                               bool permit_mux_mon, GMainContext *contex=
-t);
->
->  /**
->   * qemu_chr_be_can_write:
-> @@ -272,7 +279,8 @@ typedef struct ChardevClass {
->  } ChardevClass;
->
->  Chardev *qemu_chardev_new(const char *id, const char *typename,
-> -                          ChardevBackend *backend, Error **errp);
-> +                          ChardevBackend *backend, GMainContext *context=
-,
-> +                          Error **errp);
->
->  extern int term_escape_char;
->
-> diff --git a/net/slirp.c b/net/slirp.c
-> index f98425ee9f..f5c32e6f8e 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -780,7 +780,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
-config_str, Error **errp)
->           * FIXME: sure we want to support implicit
->           * muxed monitors here?
->           */
-> -        Chardev *chr =3D qemu_chr_new_mux_mon(buf, p);
-> +        Chardev *chr =3D qemu_chr_new_mux_mon(buf, p, NULL);
->
->          if (!chr) {
->              error_setg(errp, "Could not open guest forwarding device '%s=
-'",
-> diff --git a/qtest.c b/qtest.c
-> index 60988c8aa2..527141785f 100644
-> --- a/qtest.c
-> +++ b/qtest.c
-> @@ -763,7 +763,7 @@ void qtest_init(const char *qtest_chrdev, const char =
-*qtest_log, Error **errp)
->  {
->      Chardev *chr;
->
-> -    chr =3D qemu_chr_new("qtest", qtest_chrdev);
-> +    chr =3D qemu_chr_new("qtest", qtest_chrdev, NULL);
->
->      if (chr =3D=3D NULL) {
->          error_setg(errp, "Failed to initialize device for qtest: \"%s\""=
-,
-> diff --git a/tests/test-char.c b/tests/test-char.c
-> index 19c3efad72..b23d038bd2 100644
-> --- a/tests/test-char.c
-> +++ b/tests/test-char.c
-> @@ -66,7 +66,7 @@ static void char_console_test_subprocess(void)
->                              1, &error_abort);
->      qemu_opt_set(opts, "backend", "console", &error_abort);
->
-> -    chr =3D qemu_chr_new_from_opts(opts, NULL);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, NULL);
->      g_assert_nonnull(chr);
->
->      qemu_chr_write_all(chr, (const uint8_t *)"CONSOLE", 7);
-> @@ -88,7 +88,7 @@ static void char_stdio_test_subprocess(void)
->      CharBackend be;
->      int ret;
->
-> -    chr =3D qemu_chr_new("label", "stdio");
-> +    chr =3D qemu_chr_new("label", "stdio", NULL);
->      g_assert_nonnull(chr);
->
->      qemu_chr_fe_init(&be, chr, &error_abort);
-> @@ -119,7 +119,7 @@ static void char_ringbuf_test(void)
->      qemu_opt_set(opts, "backend", "ringbuf", &error_abort);
->
->      qemu_opt_set(opts, "size", "5", &error_abort);
-> -    chr =3D qemu_chr_new_from_opts(opts, NULL);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, NULL);
->      g_assert_null(chr);
->      qemu_opts_del(opts);
->
-> @@ -127,7 +127,7 @@ static void char_ringbuf_test(void)
->                              1, &error_abort);
->      qemu_opt_set(opts, "backend", "ringbuf", &error_abort);
->      qemu_opt_set(opts, "size", "2", &error_abort);
-> -    chr =3D qemu_chr_new_from_opts(opts, &error_abort);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, &error_abort);
->      g_assert_nonnull(chr);
->      qemu_opts_del(opts);
->
-> @@ -150,7 +150,7 @@ static void char_ringbuf_test(void)
->                              1, &error_abort);
->      qemu_opt_set(opts, "backend", "memory", &error_abort);
->      qemu_opt_set(opts, "size", "2", &error_abort);
-> -    chr =3D qemu_chr_new_from_opts(opts, NULL);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, NULL);
->      g_assert_nonnull(chr);
->      object_unparent(OBJECT(chr));
->      qemu_opts_del(opts);
-> @@ -169,7 +169,7 @@ static void char_mux_test(void)
->      qemu_opt_set(opts, "backend", "ringbuf", &error_abort);
->      qemu_opt_set(opts, "size", "128", &error_abort);
->      qemu_opt_set(opts, "mux", "on", &error_abort);
-> -    chr =3D qemu_chr_new_from_opts(opts, &error_abort);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, &error_abort);
->      g_assert_nonnull(chr);
->      qemu_opts_del(opts);
->
-> @@ -335,7 +335,7 @@ static void char_socket_test_common(Chardev *chr, boo=
-l reconnect)
->      qemu_chr_fe_set_handlers(&be, socket_can_read, socket_read,
->                               NULL, NULL, &d, NULL, true);
->
-> -    chr_client =3D qemu_chr_new("client", tmp);
-> +    chr_client =3D qemu_chr_new("client", tmp, NULL);
->      qemu_chr_fe_init(&client_be, chr_client, &error_abort);
->      qemu_chr_fe_set_handlers(&client_be, socket_can_read_hello,
->                               socket_read_hello,
-> @@ -374,7 +374,7 @@ static void char_socket_test_common(Chardev *chr, boo=
-l reconnect)
->
->  static void char_socket_basic_test(void)
->  {
-> -    Chardev *chr =3D qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowa=
-it");
-> +    Chardev *chr =3D qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowa=
-it", NULL);
->
->      char_socket_test_common(chr, false);
->  }
-> @@ -382,7 +382,7 @@ static void char_socket_basic_test(void)
->
->  static void char_socket_reconnect_test(void)
->  {
-> -    Chardev *chr =3D qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowa=
-it");
-> +    Chardev *chr =3D qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowa=
-it", NULL);
->
->      char_socket_test_common(chr, true);
->  }
-> @@ -412,7 +412,7 @@ static void char_socket_fdpass_test(void)
->      g_free(optstr);
->      g_assert_nonnull(opts);
->
-> -    chr =3D qemu_chr_new_from_opts(opts, &error_abort);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, &error_abort);
->
->      qemu_opts_del(opts);
->
-> @@ -495,7 +495,8 @@ static void char_websock_test(void)
->      CharBackend client_be;
->      Chardev *chr_client;
->      Chardev *chr =3D qemu_chr_new("server",
-> -                                "websocket:127.0.0.1:0,server,nowait");
-> +                                "websocket:127.0.0.1:0,server,nowait",
-> +                                NULL);
->      const char handshake[] =3D "GET / HTTP/1.1\r\n"
->                               "Upgrade: websocket\r\n"
->                               "Connection: Upgrade\r\n"
-> @@ -519,7 +520,7 @@ static void char_websock_test(void)
->      qemu_chr_fe_set_handlers(&be, websock_server_can_read, websock_serve=
-r_read,
->                               NULL, NULL, chr, NULL, true);
->
-> -    chr_client =3D qemu_chr_new("client", tmp);
-> +    chr_client =3D qemu_chr_new("client", tmp, NULL);
->      qemu_chr_fe_init(&client_be, chr_client, &error_abort);
->      qemu_chr_fe_set_handlers(&client_be, websock_client_can_read,
->                               websock_client_read,
-> @@ -565,7 +566,7 @@ static void char_pipe_test(void)
->      }
->
->      tmp =3D g_strdup_printf("pipe:%s", pipe);
-> -    chr =3D qemu_chr_new("pipe", tmp);
-> +    chr =3D qemu_chr_new("pipe", tmp, NULL);
->      g_assert_nonnull(chr);
->      g_free(tmp);
->
-> @@ -647,7 +648,7 @@ static void char_udp_test_internal(Chardev *reuse_chr=
-, int sock)
->          int port;
->          sock =3D make_udp_socket(&port);
->          tmp =3D g_strdup_printf("udp:127.0.0.1:%d", port);
-> -        chr =3D qemu_chr_new("client", tmp);
-> +        chr =3D qemu_chr_new("client", tmp, NULL);
->          g_assert_nonnull(chr);
->
->          be =3D g_alloca(sizeof(CharBackend));
-> @@ -691,14 +692,14 @@ static void char_serial_test(void)
->      qemu_opt_set(opts, "backend", "serial", &error_abort);
->      qemu_opt_set(opts, "path", "/dev/null", &error_abort);
->
-> -    chr =3D qemu_chr_new_from_opts(opts, NULL);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, NULL);
->      g_assert_nonnull(chr);
->      /* TODO: add more tests with a pty */
->      object_unparent(OBJECT(chr));
->
->      /* test tty alias */
->      qemu_opt_set(opts, "backend", "tty", &error_abort);
-> -    chr =3D qemu_chr_new_from_opts(opts, NULL);
-> +    chr =3D qemu_chr_new_from_opts(opts, NULL, NULL);
->      g_assert_nonnull(chr);
->      object_unparent(OBJECT(chr));
->
-> @@ -731,7 +732,7 @@ static void char_file_fifo_test(void)
->      g_assert_cmpint(ret, =3D=3D, 8);
->
->      chr =3D qemu_chardev_new("label-file", TYPE_CHARDEV_FILE, &backend,
-> -                           &error_abort);
-> +                           NULL, &error_abort);
->
->      qemu_chr_fe_init(&be, chr, &error_abort);
->      qemu_chr_fe_set_handlers(&be,
-> @@ -785,7 +786,7 @@ static void char_file_test_internal(Chardev *ext_chr,=
- const char *filepath)
->          out =3D g_build_filename(tmp_path, "out", NULL);
->          file.out =3D out;
->          chr =3D qemu_chardev_new(NULL, TYPE_CHARDEV_FILE, &backend,
-> -                               &error_abort);
-> +                               NULL, &error_abort);
->      }
->      ret =3D qemu_chr_write_all(chr, (uint8_t *)"hello!", 6);
->      g_assert_cmpint(ret, =3D=3D, 6);
-> @@ -820,7 +821,7 @@ static void char_null_test(void)
->      chr =3D qemu_chr_find("label-null");
->      g_assert_null(chr);
->
-> -    chr =3D qemu_chr_new("label-null", "null");
-> +    chr =3D qemu_chr_new("label-null", "null", NULL);
->      chr =3D qemu_chr_find("label-null");
->      g_assert_nonnull(chr);
->
-> @@ -857,7 +858,7 @@ static void char_invalid_test(void)
->  {
->      Chardev *chr;
->
-> -    chr =3D qemu_chr_new("label-invalid", "invalid");
-> +    chr =3D qemu_chr_new("label-invalid", "invalid", NULL);
->      g_assert_null(chr);
->  }
->
-> @@ -890,7 +891,7 @@ static void char_hotswap_test(void)
->
->      chr_args =3D g_strdup_printf("udp:127.0.0.1:%d", port);
->
-> -    chr =3D qemu_chr_new("chardev", chr_args);
-> +    chr =3D qemu_chr_new("chardev", chr_args, NULL);
->      qemu_chr_fe_init(&be, chr, &error_abort);
->
->      /* check that chardev operates correctly */
-> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-> index e90cd4ca65..34c4e267c7 100644
-> --- a/tests/vhost-user-test.c
-> +++ b/tests/vhost-user-test.c
-> @@ -543,7 +543,7 @@ static void test_server_create_chr(TestServer *server=
-, const gchar *opt)
->      Chardev *chr;
->
->      chr_path =3D g_strdup_printf("unix:%s%s", server->socket_path, opt);
-> -    chr =3D qemu_chr_new(server->chr_name, chr_path);
-> +    chr =3D qemu_chr_new(server->chr_name, chr_path, NULL);
->      g_free(chr_path);
->
->      g_assert_nonnull(chr);
-> diff --git a/vl.c b/vl.c
-> index 41d6af2947..a63f7ec1fa 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2314,7 +2314,7 @@ static int chardev_init_func(void *opaque, QemuOpts=
- *opts, Error **errp)
->  {
->      Error *local_err =3D NULL;
->
-> -    if (!qemu_chr_new_from_opts(opts, &local_err)) {
-> +    if (!qemu_chr_new_from_opts(opts, NULL, &local_err)) {
->          if (local_err) {
->              error_propagate(errp, local_err);
->              return -1;
-> @@ -2452,7 +2452,7 @@ static int serial_parse(const char *devname)
->      snprintf(label, sizeof(label), "serial%d", index);
->      serial_hds =3D g_renew(Chardev *, serial_hds, index + 1);
->
-> -    serial_hds[index] =3D qemu_chr_new_mux_mon(label, devname);
-> +    serial_hds[index] =3D qemu_chr_new_mux_mon(label, devname, NULL);
->      if (!serial_hds[index]) {
->          error_report("could not connect serial device"
->                       " to character backend '%s'", devname);
-> @@ -2488,7 +2488,7 @@ static int parallel_parse(const char *devname)
->          exit(1);
->      }
->      snprintf(label, sizeof(label), "parallel%d", index);
-> -    parallel_hds[index] =3D qemu_chr_new_mux_mon(label, devname);
-> +    parallel_hds[index] =3D qemu_chr_new_mux_mon(label, devname, NULL);
->      if (!parallel_hds[index]) {
->          error_report("could not connect parallel device"
->                       " to character backend '%s'", devname);
-> @@ -2502,7 +2502,7 @@ static int debugcon_parse(const char *devname)
->  {
->      QemuOpts *opts;
->
-> -    if (!qemu_chr_new_mux_mon("debugcon", devname)) {
-> +    if (!qemu_chr_new_mux_mon("debugcon", devname, NULL)) {
->          error_report("invalid character backend '%s'", devname);
->          exit(1);
->      }
-> --
-> 2.20.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+> 
+> > +static void spapr_phb_unplug_request(HotplugHandler *hotplug_dev,
+> > +                                     DeviceState *dev, Error **errp)
+> > +{
+> > +    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(dev);
+> > +    sPAPRDRConnector *drc;
+> > +
+> > +    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->index);
+> > +    assert(drc);
+> > +
+> > +    if (!spapr_drc_unplug_requested(drc)) {
+> > +        spapr_drc_detach(drc);
+> > +        spapr_hotplug_req_remove_by_index(drc);
+> > +    }
+> > +}
+> > +
+> >  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+> >                                        DeviceState *dev, Error **errp)
+> >  {
+> > @@ -3740,6 +3847,8 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+> >          spapr_memory_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> >          spapr_core_plug(hotplug_dev, dev, errp);
+> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+> > +        spapr_phb_plug(hotplug_dev, dev, errp);
+> >      }
+> >  }
+> >  
+> > @@ -3758,6 +3867,7 @@ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+> >  {
+> >      sPAPRMachineState *sms = SPAPR_MACHINE(OBJECT(hotplug_dev));
+> >      MachineClass *mc = MACHINE_GET_CLASS(sms);
+> > +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> >  
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >          if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+> > @@ -3777,6 +3887,12 @@ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+> >              return;
+> >          }
+> >          spapr_core_unplug_request(hotplug_dev, dev, errp);
+> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+> > +        if (!smc->dr_phb_enabled) {
+> > +            error_setg(errp, "PHB hot unplug not supported on this machine");
+> > +            return;
+> > +        }
+> > +        spapr_phb_unplug_request(hotplug_dev, dev, errp);
+> >      }
+> >  }
+> >  
+> > @@ -3787,6 +3903,8 @@ static void spapr_machine_device_pre_plug(HotplugHandler *hotplug_dev,
+> >          spapr_memory_pre_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> >          spapr_core_pre_plug(hotplug_dev, dev, errp);
+> > +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+> > +        spapr_phb_pre_plug(hotplug_dev, dev, errp);
+> >      }
+> >  }
+> >  
+> > @@ -3794,7 +3912,8 @@ static HotplugHandler *spapr_get_hotplug_handler(MachineState *machine,
+> >                                                   DeviceState *dev)
+> >  {
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+> > -        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> > +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE) ||
+> > +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+> >          return HOTPLUG_HANDLER(machine);
+> >      }
+> >      return NULL;
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index c5a281915665..22563a381a37 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -709,6 +709,8 @@ static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
+> >      drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
+> >      drck->typename = "PHB";
+> >      drck->drc_name_prefix = "PHB ";
+> > +    drck->release = spapr_phb_release;
+> > +    drck->populate_dt = spapr_dt_phb;
+> >  }
+> >  
+> >  static const TypeInfo spapr_dr_connector_info = {
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 7df7f6502f93..d0caca627455 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1647,21 +1647,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+> >          return;
+> >      }
+> >  
+> > -    if (sphb->index != (uint32_t)-1) {
+> > -        Error *local_err = NULL;
+> > -
+> > -        smc->phb_placement(spapr, sphb->index,
+> > -                           &sphb->buid, &sphb->io_win_addr,
+> > -                           &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> > -                           windows_supported, sphb->dma_liobn, &local_err);
+> > -        if (local_err) {
+> > -            error_propagate(errp, local_err);
+> > -            return;
+> > -        }
+> > -    } else {
+> > -        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+> > -        return;
+> > -    }
+> > +    assert(sphb->index != (uint32_t)-1); /* checked in spapr_phb_pre_plug() */
+> >  
+> >      if (sphb->mem64_win_size != 0) {
+> >          if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index a3074e7fea37..69d9c2196ca2 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -764,9 +764,12 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+> >  void spapr_clear_pending_events(sPAPRMachineState *spapr);
+> >  int spapr_max_server_number(sPAPRMachineState *spapr);
+> >  
+> > -/* CPU and LMB DRC release callbacks. */
+> > +/* DRC callbacks. */
+> >  void spapr_core_release(DeviceState *dev);
+> >  void spapr_lmb_release(DeviceState *dev);
+> > +void spapr_phb_release(DeviceState *dev);
+> > +int spapr_dt_phb(DeviceState *dev, sPAPRMachineState *spapr, void *fdt,
+> > +                 int *fdt_start_offset, Error **errp);
+> >  
+> >  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+> >  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+> >   
+> 
+> 
