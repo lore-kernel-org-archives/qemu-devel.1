@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47210)
+Received: from eggs.gnu.org ([209.51.188.92]:48953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gtzaa-0000BO-7W
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtzfr-0003tz-Gc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:54:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gtzaY-0000Rq-BX
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:56 -0500
-Resent-Message-Id: <E1gtzaY-0000Rq-BX@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gtzaL-0008NG-Nc
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:44 -0500
-Message-ID: <155008367556.7770.4893587342381998467@ebba9967afc0>
-In-Reply-To: <20190213183153.23746-1-samuel.thibault@ens-lyon.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1gtzfp-00047a-6i
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:54:23 -0500
+References: <20190212173839.31587-1-chouteau@adacore.com>
+	<CAKmqyKOAVDbJQ6avwWgDHP1fHD_EXdZmi+Sjucm05ZqNkQoUog@mail.gmail.com>
+	<CAFEAcA_5jYqTWVBiTFjumkAHEEwvDkt_f_LHAo=00gkEfoY9sA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <49bd9805-2f40-7d5d-8814-e0a59a9c5be1@redhat.com>
+Date: Wed, 13 Feb 2019 19:54:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 13 Feb 2019 10:47:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/2] Fix slirp on windows
+In-Reply-To: <CAFEAcA_5jYqTWVBiTFjumkAHEEwvDkt_f_LHAo=00gkEfoY9sA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] SiFive RISC-V GPIO Device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +25,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Fabien Chouteau <chouteau@adacore.com>, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE4MzE1My4yMzc0
-Ni0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzJdIEZp
-eCBzbGlycCBvbiB3aW5kb3dzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDIxMzE4MzE1
-My4yMzc0Ni0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
-MjEzMTgzMTUzLjIzNzQ2LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZyAtPiBwYXRjaGV3
-LzIwMTkwMjEzMTgzMTUzLjIzNzQ2LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY1MTM2NzVjYTQgc2xpcnA6IHdyYXAgdGhlIHJl
-bWFpbmluZyBzb2NrZXQgZnVuY3Rpb25zCmFjYTc1MTQ2YTEgc2xpcnA6IHJlbW92ZSBzbGlycF8g
-cHJlZml4IGZvciBzb2NrZXQgd3JhcHBlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMiBDaGVj
-a2luZyBjb21taXQgYWNhNzUxNDZhMWI1IChzbGlycDogcmVtb3ZlIHNsaXJwXyBwcmVmaXggZm9y
-IHNvY2tldCB3cmFwcGVycykKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojMTE2OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoxODg6CiteSW5uID0gcmVjdihzby0+cywgaW92
-WzBdLmlvdl9iYXNlLCBpb3ZbMF0uaW92X2xlbiwwKTskCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQg
-YWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTY6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjE4ODoK
-KyAgICAgICBubiA9IHJlY3Yoc28tPnMsIGlvdlswXS5pb3ZfYmFzZSwgaW92WzBdLmlvdl9sZW4s
-MCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI1OiBGSUxF
-OiBzbGlycC9zb2NrZXQuYzoyMDQ6CiteSV5JXkleSV5JZ2V0c29ja29wdChzby0+cywgU09MX1NP
-Q0tFVCwgU09fRVJST1IsJAoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChj
-dHg6VnhWKQojMTM0OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoyMzQ6CisgICAgICAgICAgICByZXQg
-PSByZWN2KHNvLT5zLCBpb3ZbMV0uaW92X2Jhc2UsIGlvdlsxXS5pb3ZfbGVuLDApOwogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE0MzogRklMRTogc2xp
-cnAvc29ja2V0LmM6NTU1OgorXkkgIGlvY3Rsc29ja2V0KHNvLT5zLCBGSU9OUkVBRCwgJm4pOyQK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE2MTogRklMRTogc2xp
-cnAvc29ja2V0LmM6NzM4OgorXklzZXRzb2Nrb3B0KHMsIFNPTF9TT0NLRVQsIFNPX09PQklOTElO
-RSwgJm9wdCwgc2l6ZW9mKGludCkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzE2NDogRklMRTogc2xpcnAvc29ja2V0LmM6NzQwOgorXklzZXRzb2Nrb3B0KHMs
-IElQUFJPVE9fVENQLCBUQ1BfTk9ERUxBWSwgJm9wdCwgc2l6ZW9mKGludCkpOyQKCkVSUk9SOiBj
-b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3NzogRklMRTogc2xpcnAvdGNwX3N1
-YnIuYzozNDA6CiteSWNsb3Nlc29ja2V0KHNvLT5zKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiMyMjA6IEZJTEU6IHNsaXJwL3VkcC5jOjI5NToKK15JY2xvc2Vz
-b2NrZXQoc28tPnMpOyQKCnRvdGFsOiA5IGVycm9ycywgMCB3YXJuaW5ncywgMjEyIGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDEvMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8yIENoZWNraW5n
-IGNvbW1pdCA2NTEzNjc1Y2E0NzAgKHNsaXJwOiB3cmFwIHRoZSByZW1haW5pbmcgc29ja2V0IGZ1
-bmN0aW9ucykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTAyMTMxODMxNTMuMjM3NDYtMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24ub3JnL3Rl
-c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 2019-02-13 18:14, Peter Maydell wrote:
+> On Wed, 13 Feb 2019 at 00:13, Alistair Francis <alistair23@gmail.com> w=
+rote:
+>> I know the other RISC-V files don't do it, but this should go in the
+>> hw/gpio directory instead of hw/riscv.
+>=20
+> It might be nice to move those existing riscv devices into
+> their proper places at some point: should be a fairly easy
+> cleanup patch if somebody wants to take it on. (Advice
+> on what should live where available on request.)
+
+If devices only work on riscv, they should IMHO stay in hw/riscv/. I
+think hw/gpio/ and friends should primarily be used if a device is
+shared between architectures. If they stay in hw/riscv/ it is way easier
+to match the devices with wildcards in the MAINTAINERS file. Just my
+0.02 =E2=82=AC only, of course.
+
+ Thomas
