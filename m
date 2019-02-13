@@ -1,43 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60974)
+Received: from eggs.gnu.org ([209.51.188.92]:35507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gtvE1-0006hQ-Ik
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:09:22 -0500
+	(envelope-from <mst@redhat.com>) id 1gtvMT-00030F-Pr
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:18:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1gtv4U-0003pO-Bt
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:59:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54254
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1gtv4K-0003Si-Q3
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:59:24 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1DDtnM8112007
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 08:59:17 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qmhq1qwj3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 08:59:17 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Wed, 13 Feb 2019 13:59:16 -0000
-Reply-To: jjherne@linux.ibm.com
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-5-git-send-email-jjherne@linux.ibm.com>
-	<cc6dcf27-e1cf-14de-e729-486e1995f6eb@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Wed, 13 Feb 2019 08:59:08 -0500
+	(envelope-from <mst@redhat.com>) id 1gtvMS-0003IU-Oc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:18:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:27525)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtvMS-0003Hk-GP
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:18:04 -0500
+Date: Wed, 13 Feb 2019 09:17:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190213091402-mutt-send-email-mst@kernel.org>
+References: <1550064346-17012-1-git-send-email-wexu@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cc6dcf27-e1cf-14de-e729-486e1995f6eb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <722772b9-bdf7-6a4e-16cb-21bfb54e70ac@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 04/15] s390-bios: Extend
- find_dev() for non-virtio devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1550064346-17012-1-git-send-email-wexu@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] packed ring virtio-net backends
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,71 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: wexu@redhat.com
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com, tiwei.bie@intel.com
 
-On 2/11/19 11:38 AM, Thomas Huth wrote:
-> On 2019-01-29 14:29, Jason J. Herne wrote:
->> We need a method for finding the subchannel of a dasd device. Let's
->> modify find_dev to handle this since it mostly does what we need. Up to
->> this point find_dev has been specific to only virtio devices.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>   pc-bios/s390-ccw/main.c | 16 +++++++++++-----
->>   1 file changed, 11 insertions(+), 5 deletions(-)
->>
->> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
->> index 67df421..7e3f65e 100644
->> --- a/pc-bios/s390-ccw/main.c
->> +++ b/pc-bios/s390-ccw/main.c
->> @@ -49,6 +49,12 @@ unsigned int get_loadparm_index(void)
->>       return atoui(loadparm_str);
->>   }
->>   
->> +/*
->> + * Find the subchannel connected to the given device (dev_no) and fill in the
->> + * subchannel information block (schib) with the connected subchannel's info.
->> + * NOTE: The global variable blk_schid is updated to contain the subchannel
->> + * information.
->> + */
->>   static bool find_dev(Schib *schib, int dev_no)
->>   {
->>       int i, r;
->> @@ -62,15 +68,15 @@ static bool find_dev(Schib *schib, int dev_no)
->>           if (!schib->pmcw.dnv) {
->>               continue;
->>           }
->> -        if (!virtio_is_supported(blk_schid)) {
->> -            continue;
->> -        }
->> +
->>           /* Skip net devices since no IPLB is created and therefore no
->> -         * no network bootloader has been loaded
->> +         * network bootloader has been loaded
->>            */
->> -        if (virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
->> +        if (virtio_is_supported(blk_schid) &&
->> +            virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
->>               continue;
->>           }
->> +
->>           if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
->>               return true;
->>           }
->>
+On Wed, Feb 13, 2019 at 08:25:35AM -0500, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
 > 
-> Not sure whether this really works as expected? If dev_no is -1, this
-> used to return the first supported virtio device. Now it returns the
-> first device that could be found - but how are we sure that we can boot
-> from that device?
+> https://github.com/Whishay/qemu.git 
 > 
+> Userspace and vhost-net backedn test has been done with upstream kernel
+> in guest.
 
-How could we ever be sure we could boot from the first virtio device? The dev_no=1 case 
-means we don't know which device to boot from so we're guessing.  The only thing that is 
-changing here is that we're allowing non-virtio devices as well. We do this because we now 
-support booting from a device type that is not virtio.
+Just a general comment: please format *all* patches
+with --subject-prefix "PATCH v3", or with -v3.
+
+Do not manually change patch 0 subject adding version there.
+
+This makes it possible to figure out where does each patch go.
 
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+> v2->v3
+>     v2/01 - drop it since the header has been synchronized from kernel.(mst & jason)
+>     v3/01 - rename 'avail_wrap_counter' to 'last_avail_wrap_counter',
+>             'event_wrap_counter' to 'avail_wrap_counter' to make it easier
+>             to understand.(Jason)
+>           - revise commit message.(Jason)
+>     v3/02 - split packed ring areas size calculation to next patch.(Jason)
+>             to not break bisect(Jason).
+>     v3/03 - initialize packed ring region with correct size and attribute.
+>           - remove unnecessary 'else' checks. (Jason)
+>     v3/06 - add commit log.
+>           - replace 'event_wrap-counter' with 'avail_wrap_counter'.
+>           - merge common memory cache size check to virtqueue_get_avail_bytes().(Jason)
+>           - revise memory barrier comment.(Jason) 
+>           - check indirect descriptors by desc.len/sizeof(desc).(Jason)
+>           - flip wrap counter with '^=1'.(Jason)
+>     v3/07 - move desc.id/len initialization to the declaration.(Jason)
+>           - flip wrap counter '!' with '^=1'.(Jason)
+>           - add memory barrier comments in commit message.
+>     v3/08 - use offsetof() when writing cache.(Jason)
+>           - avoid duplicated memory region write when turning off event_idx
+>             supported notification.(Jason)
+>           - add commit log.(Jason)
+>           - add avail & last_avail wrap counter difference description in commit log.
+>     v3/09 - remove unnecessary used/avail idx/wrap-counter from subsection.
+>           - put new subsection to the end of vmstate_virtio.(Jason)
+>           - squash the two userspace and vhost-net migration patches in v2.(Jason)
+>     v3/10 - reword commit message.
+>           - this is a help not a bug fix so I would like to keep it as a
+>             separate patch still.(Proposed a merge it by Jason)
+>           - the virtqueue_fill() is also not like an API so I would prefer not
+>             to touch it, please correct me if I did not get it in the right
+>             way.(Proposed a squash by Jason)
+>     v3/11 - squash feature bits for user space and vhost kernel/user backends.
+>           - enable packed ring feature bit provision on host by default.(Jason)
+> 
+> Wei Xu (11):
+>   virtio: rename structure for packed ring
+>   virtio: device/driver area size calculation helper for split ring
+>   virtio: initialize packed ring region
+>   virtio: initialize wrap counter for packed ring
+>   virtio: queue/descriptor check helpers for packed ring
+>   virtio: get avail bytes check for packed ring
+>   virtio: fill/flush/pop for packed ring
+>   virtio: event suppression support for packed ring
+>   virtio-net: update the head descriptor in a chain lastly
+>   virtio: migration support for packed ring
+>   virtio: CLI and provide packed ring feature bit by default
+> 
+>  hw/net/vhost_net.c         |   2 +
+>  hw/net/virtio-net.c        |  11 +-
+>  hw/virtio/virtio.c         | 798 +++++++++++++++++++++++++++++++++++++++++----
+>  include/hw/virtio/virtio.h |   4 +-
+>  4 files changed, 757 insertions(+), 58 deletions(-)
+> 
+> -- 
+> 1.8.3.1
