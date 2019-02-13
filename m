@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38360)
+Received: from eggs.gnu.org ([209.51.188.92]:38524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gu3QI-0005DI-CG
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 17:54:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gu3Qw-0005oy-N3
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 17:55:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gu3QG-0007Er-FJ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 17:54:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gu3Qv-0008PP-Qg
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 17:55:14 -0500
+References: <20181203175211.8230-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 13 Feb 2019 23:53:08 +0100
-Message-Id: <20190213225311.17876-10-mreitz@redhat.com>
-In-Reply-To: <20190213225311.17876-1-mreitz@redhat.com>
-References: <20190213225311.17876-1-mreitz@redhat.com>
+Message-ID: <ad897e02-e1d3-5623-d829-55b2c3b98307@redhat.com>
+Date: Wed, 13 Feb 2019 23:55:07 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 09/12] iotests: Add filter commit test cases
+In-Reply-To: <20181203175211.8230-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PoFWM37HT75Sg5Ce3bbVPd6tlVUDR1a1g"
+Subject: Re: [Qemu-devel] [PATCH for-next 0/6] qemu-img: Add salvaging mode
+ to convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,170 +25,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This patch adds some tests on how commit copes with filter nodes.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PoFWM37HT75Sg5Ce3bbVPd6tlVUDR1a1g
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <ad897e02-e1d3-5623-d829-55b2c3b98307@redhat.com>
+Subject: Re: [PATCH for-next 0/6] qemu-img: Add salvaging mode to convert
+References: <20181203175211.8230-1-mreitz@redhat.com>
+In-Reply-To: <20181203175211.8230-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/040     | 130 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/040.out |   4 +-
- 2 files changed, 132 insertions(+), 2 deletions(-)
+Any opinions?
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index b81133a474..dc3fe57fbd 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -394,5 +394,135 @@ class TestReopenOverlay(ImageCommitTestCase):
-     def test_reopen_overlay(self):
-         self.run_commit_test(self.img1, self.img0)
-=20
-+class TestCommitWithFilters(iotests.QMPTestCase):
-+    img0 =3D os.path.join(iotests.test_dir, '0.img')
-+    img1 =3D os.path.join(iotests.test_dir, '1.img')
-+    img2 =3D os.path.join(iotests.test_dir, '2.img')
-+    img3 =3D os.path.join(iotests.test_dir, '3.img')
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, self.img0, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img1, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img2, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img3, '1M')
-+
-+        self.vm =3D iotests.VM()
-+        self.vm.launch()
-+        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group'=
-, id=3D'tg')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                'node-name': 'top-filter',
-+                'driver': 'throttle',
-+                'throttle-group': 'tg',
-+                'file': {
-+                    'node-name': 'cow-3',
-+                    'driver': iotests.imgfmt,
-+                    'file': {
-+                        'driver': 'file',
-+                        'filename': self.img3
-+                    },
-+                    'backing': {
-+                        'node-name': 'cow-2',
-+                        'driver': iotests.imgfmt,
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': self.img2
-+                        },
-+                        'backing': {
-+                            'node-name': 'cow-1',
-+                            'driver': iotests.imgfmt,
-+                            'file': {
-+                                'driver': 'file',
-+                                'filename': self.img1
-+                            },
-+                            'backing': {
-+                                'node-name': 'bottom-filter',
-+                                'driver': 'throttle',
-+                                'throttle-group': 'tg',
-+                                'file': {
-+                                    'node-name': 'cow-0',
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': self.img0
-+                                    }
-+                                }
-+                            }
-+                        }
-+                    }
-+                }
-+            })
-+        self.assert_qmp(result, 'return', {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(self.img3)
-+        os.remove(self.img2)
-+        os.remove(self.img1)
-+        os.remove(self.img0)
-+
-+    # Filters make for funny filenames, so we cannot just use
-+    # self.imgX for the block-commit parameters
-+    def get_filename(self, node):
-+        return self.vm.node_info(node)['image']['filename']
-+
-+    def test_filterless_commit(self):
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             top=3Dself.get_filename('cow-2'),
-+                             base=3Dself.get_filename('cow-1'))
-+        self.assert_qmp(result, 'return', {})
-+        self.wait_until_completed(drive=3D'commit')
-+
-+    def test_commit_through_filter(self):
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             top=3Dself.get_filename('cow-1'),
-+                             base=3Dself.get_filename('cow-0'))
-+        # Cannot commit through explicitly added filters (yet,
-+        # although in the future we probably want to make users use
-+        # blockdev-copy for this)
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', 'Cannot commit through exp=
-licit filter nodes')
-+
-+    def test_filtered_active_commit_with_filter(self):
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             base=3Dself.get_filename('cow-2'))
-+        # Not specifying @top means active commit, so including the
-+        # filter on top (which is not allowed right now)
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', 'Cannot commit through exp=
-licit filter nodes')
-+
-+    def test_filtered_active_commit_without_filter(self):
-+        cow3_name =3D self.get_filename('cow-3')
-+
-+        self.assert_no_active_block_jobs()
-+        result =3D self.vm.qmp('block-commit',
-+                             job_id=3D'commit',
-+                             device=3D'top-filter',
-+                             top=3Dcow3_name,
-+                             base=3Dself.get_filename('cow-2'))
-+        # This is how you'd want to specify committing img3 into img2
-+        # disregarding the filter on top of img3 -- but that does not
-+        # work, because you can only specify names of backing files
-+        # (and img3 is not a backing file).  The solution for this
-+        # would be for block-commit to accept node names.
-+        # Note that even if it did work, the above command would
-+        # result in a non-active commit, because img3 is not the top
-+        # node.  Which is wrong, because img3 can still be written to,
-+        # so it should be an active commit, but that is a different
-+        # story.
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc',
-+                        'Top image file %s not found' % cow3_name)
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
-index 802ffaa0c0..220a5fa82c 100644
---- a/tests/qemu-iotests/040.out
-+++ b/tests/qemu-iotests/040.out
-@@ -1,5 +1,5 @@
--...........................................
-+...............................................
- ----------------------------------------------------------------------
--Ran 43 tests
-+Ran 47 tests
-=20
- OK
---=20
-2.20.1
+On 03.12.18 18:52, Max Reitz wrote:
+> Hi,
+>=20
+> This series adds a --salvage option to qemu-img convert.  With this,
+> qemu-img will not abort when it encounters an I/O error.  Instead, it
+> tries to narrow it down and will treat the affected sectors as being
+> completely 0 (and print a warning).
+>=20
+> Testing this is not so easy, because while real I/O errors during read
+> operations should be treated as described above, errors encountered
+> during bdrv_block_status() should just be ignored and the affected
+> sectors should be considered allocated.  But blkdebug does not yet have=
+
+> a way to intercept this, and:
+>=20
+> (1) Just adding a new block-status event would be silly, because I don'=
+t
+>     want an event, I want it to fail on a certain kind of operation, on=
+
+>     a certain sector range, independently of any events, so why can't w=
+e
+>     just do that?  See patch 4.
+>=20
+> (2) If we just make blkdebug intercept .bdrv_co_block_status() like all=
+
+>     other kinds of operations, at least iotest 041 fails, which does
+>     exactly that silly thing: It uses the read_aio event to wait for an=
+y
+>     read.  But it turns out that there may be a bdrv_*block_status()
+>     call in between, so suddenly the wrong operation yields an error.
+>     As I said, the real fault here is that it does not really make sens=
+e
+>     to pray that the operation you want to fail is the one that is
+>     immediately executed after some event that you hope will trigger
+>     that operation.
+>     See patch 3.
+>=20
+> So patch 3 allows blkdebug users to select which kind of I/O operation
+> they actually want to make fail, and patch 4 allows them to not use any=
+
+> event, but to have a rule active all the time.
+>=20
+> Together, we can then enable error injection for block-status in patch =
+5
+> and make use of event=3Dnone iotype=3Dblock-status in patch 6.
+>=20
+>=20
+> Max Reitz (6):
+>   qemu-img: Move quiet into ImgConvertState
+>   qemu-img: Add salvaging mode to convert
+>   blkdebug: Add @iotype error option
+>   blkdebug: Add "none" event
+>   blkdebug: Inject errors on .bdrv_co_block_status()
+>   iotests: Test qemu-img convert --salvage
+>=20
+>  qapi/block-core.json       |  33 +++++++-
+>  block/blkdebug.c           |  60 ++++++++++++--
+>  qemu-img.c                 |  97 ++++++++++++++++------
+>  qemu-img-cmds.hx           |   4 +-
+>  qemu-img.texi              |   5 ++
+>  tests/qemu-iotests/236     | 164 +++++++++++++++++++++++++++++++++++++=
+
+>  tests/qemu-iotests/236.out |  43 ++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  8 files changed, 370 insertions(+), 37 deletions(-)
+>  create mode 100755 tests/qemu-iotests/236
+>  create mode 100644 tests/qemu-iotests/236.out
+>=20
+
+
+
+--PoFWM37HT75Sg5Ce3bbVPd6tlVUDR1a1g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxkoEsACgkQ9AfbAGHV
+z0Afzgf/floD+HosMbfwmdy5YDsTwZxwg7VDAyZ4yDypPbjxD5Vv3OIe5mQ21VQM
+OSpx+ePflXV72hfTZPnmnSHe34GiXlWIwdn1uaFik1rVxIf8Y2VDjBV6Xcbi+n2y
+UcjdO++pXW7KM4t55toP6Zp27Amp+ylGFpd5e9TfFomBYlsFwl1X7BTNJtKOjYzl
+NtRr1hObI/oF+8p91zcpatft7WPbNQxf1wB7mFWpdew6X+pGRy052SLPiVKBpn8r
+z/ZzyUWTf2bSvizqIvGNm6efN+o4NQDTsdErqP7a+cRJK9GUIqZi4If0bLRwzkfP
++RkjX4Cn1RrFiMerCkTlh6ELtVFLcQ==
+=tkhx
+-----END PGP SIGNATURE-----
+
+--PoFWM37HT75Sg5Ce3bbVPd6tlVUDR1a1g--
