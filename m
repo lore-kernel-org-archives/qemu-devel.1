@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45509)
+Received: from eggs.gnu.org ([209.51.188.92]:45525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gu3t2-0001lx-Px
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:17 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gu3t4-0001nD-IX
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gu3t1-0004th-QV
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:16 -0500
-References: <20190213225311.17876-1-mreitz@redhat.com>
-	<20190213225311.17876-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <41419065-2609-cec2-d518-4fb9d08dc811@redhat.com>
-Date: Wed, 13 Feb 2019 17:24:10 -0600
-MIME-Version: 1.0
-In-Reply-To: <20190213225311.17876-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NCelRHxKquXEfES4WRsRD6fWCLKLGsguR"
-Subject: Re: [Qemu-devel] [PATCH v3 01/12] block: Mark commit and mirror as
- filter drivers
+	(envelope-from <jsnow@redhat.com>) id 1gu3t2-0004uB-Pu
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:18 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Wed, 13 Feb 2019 18:23:51 -0500
+Message-Id: <20190213232356.21034-2-jsnow@redhat.com>
+In-Reply-To: <20190213232356.21034-1-jsnow@redhat.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/6] block/dirty-bitmap: add recording and
+ busy properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +20,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, libvir-list@redhat.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NCelRHxKquXEfES4WRsRD6fWCLKLGsguR
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <41419065-2609-cec2-d518-4fb9d08dc811@redhat.com>
-Subject: Re: [PATCH v3 01/12] block: Mark commit and mirror as filter drivers
-References: <20190213225311.17876-1-mreitz@redhat.com>
- <20190213225311.17876-2-mreitz@redhat.com>
-In-Reply-To: <20190213225311.17876-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The current API allows us to report a single status, which we've defined as:
 
-On 2/13/19 4:53 PM, Max Reitz wrote:
-> The commit and mirror block nodes are filters, so they should be marked=
+Frozen: has a successor, treated as qmp_locked, may or may not be enabled.
+Locked: no successor, qmp_locked. may or may not be enabled.
+Disabled: Not frozen or locked, disabled.
+Active: Not frozen, locked, or disabled.
 
-> as such.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/commit.c | 2 ++
->  block/mirror.c | 2 ++
->  2 files changed, 4 insertions(+)
+The problem is that both "Frozen" and "Locked" mean nearly the same thing,
+and that both of them do not intuit whether they are recording guest writes
+or not.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This patch deprecates that status field and introduces two orthogonal
+properties instead to replace it.
 
-I know there are patches pending review for a backup driver (for image
-fleecing and otherwise), have you checked if that series would need
-similar treatment?
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/dirty-bitmap.c       |  9 +++++++++
+ qapi/block-core.json       | 10 +++++++++-
+ qemu-deprecated.texi       |  6 ++++++
+ tests/qemu-iotests/236.out | 28 ++++++++++++++++++++++++++++
+ 4 files changed, 52 insertions(+), 1 deletion(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---NCelRHxKquXEfES4WRsRD6fWCLKLGsguR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxkpxoACgkQp6FrSiUn
-Q2qY5QgAnbdj9KoHPXb+h7itxqh5EO+WoFRdkTHX99p9Ba8ezueKSr9EGSAr/2LH
-T5vDezVrEOwfzGInWI6VqYBcllh/Hjpz0Dofh6DPLFV0sB0v1DU7gGu54amY0vXE
-40hmxvPcQPlcx+0MxlqYQjjXe/icIP3+mr7ZZVDxWaAx1n2qE4Lk0hXWDiB5cIbq
-D8PCTksHhuF4n/I2XD/zcLwZavDGFVc5sf9knn/fxqHwk1BQ/qI581Pl+Hqiwu9W
-nhamDSiGwV/4Er6SfgMxiyheBJrYJuhoz6qX07BXyUQe2tjqZQnhSWNLHUbRzwZd
-C/VNJSVzzO6NXOnXTzRJPuUi43YHoQ==
-=RH21
------END PGP SIGNATURE-----
-
---NCelRHxKquXEfES4WRsRD6fWCLKLGsguR--
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index c6d4acebfa..101383b3af 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -226,6 +226,13 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+     }
+ }
+ 
++/* Called with BQL taken.  */
++static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
++{
++    return !bitmap->disabled || (bitmap->successor &&
++                                 !bitmap->successor->disabled);
++}
++
+ /**
+  * Create a successor bitmap destined to replace this bitmap after an operation.
+  * Requires that the bitmap is not frozen and has no successor.
+@@ -448,6 +455,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+         info->has_name = !!bm->name;
+         info->name = g_strdup(bm->name);
+         info->status = bdrv_dirty_bitmap_status(bm);
++        info->recording = bdrv_dirty_bitmap_recording(bm);
++        info->busy = bdrv_dirty_bitmap_user_locked(bm);
+         info->persistent = bm->persistent;
+         entry->value = info;
+         *plist = entry;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 8f23f2ebb8..5d1d182447 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -458,7 +458,14 @@
+ #
+ # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
+ #
+-# @status: current status of the dirty bitmap (since 2.4)
++# @status: Deprecated in favor of @recording and @locked. (since 2.4)
++#
++# @recording: true if the bitmap is recording new writes from the guest.
++#             Replaces `active` and `disabled` statuses. (since 4.0)
++#
++# @busy: true if the bitmap is in-use by some operation (NBD or jobs)
++#        and cannot be modified via QMP or used by another operation.
++#        Replaces `locked` and `frozen` statuses. (since 4.0)
+ #
+ # @persistent: true if the bitmap will eventually be flushed to persistent
+ #              storage (since 4.0)
+@@ -467,6 +474,7 @@
+ ##
+ { 'struct': 'BlockDirtyInfo',
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
++           'recording': 'bool', 'busy': 'bool',
+            'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+ 
+ ##
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 80b0702ad5..f7c9f4c101 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -84,6 +84,12 @@ topologies described with -smp include all possible cpus, i.e.
+ "autoload" parameter is now ignored. All bitmaps are automatically loaded
+ from qcow2 images.
+ 
++@subsection query-block dirty-bitmaps.status parameter (since 4.0)
++
++The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
++the query-block command is deprecated. Two new boolean fields,
++``recording'' and ``busy'' effectively replace it.
++
+ @subsection query-cpus (since 2.12.0)
+ 
+ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
+diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
+index 5006f7bca1..815cd053f0 100644
+--- a/tests/qemu-iotests/236.out
++++ b/tests/qemu-iotests/236.out
+@@ -22,17 +22,21 @@ write -P0xcd 0x3ff0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       }
+     ]
+@@ -84,17 +88,21 @@ write -P0xcd 0x3ff0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": true,
+         "status": "active"
+       }
+     ]
+@@ -184,24 +192,30 @@ write -P0xea 0x3fe0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       }
+     ]
+@@ -251,24 +265,30 @@ write -P0xea 0x3fe0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       }
+     ]
+@@ -311,31 +331,39 @@ write -P0xea 0x3fe0000 64k
+   "bitmaps": {
+     "drive0": [
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapD",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       },
+       {
++        "busy": false,
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
+         "persistent": false,
++        "recording": false,
+         "status": "disabled"
+       }
+     ]
+-- 
+2.17.2
