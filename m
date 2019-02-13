@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59903)
+Received: from eggs.gnu.org ([209.51.188.92]:59961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtlvv-0003H5-S5
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvx-0003Iu-9a
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtlvs-0005C2-Dd
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:03 -0500
-Date: Wed, 13 Feb 2019 12:32:19 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvv-0005Go-50
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:05 -0500
+Date: Wed, 13 Feb 2019 15:05:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213013219.GU1884@umbus.fritz.box>
-References: <20190107183946.7230-1-clg@kaod.org>
-	<20190107183946.7230-14-clg@kaod.org>
-	<20190212011153.GH1884@umbus.fritz.box>
-	<d6dc35c6-4987-3fcc-de81-f2aff865cad1@kaod.org>
+Message-ID: <20190213040522.GG1884@umbus.fritz.box>
+References: <154999583316.690774.15072605479770041782.stgit@bahia.lan>
+	<154999591892.690774.10674853078354564704.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gn1ylXQ+YRNuZICZ"
+	protocol="application/pgp-signature"; boundary="nE/5a/j5SCML90Nq"
 Content-Disposition: inline
-In-Reply-To: <d6dc35c6-4987-3fcc-de81-f2aff865cad1@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 13/13] spapr: add KVM support to the 'dual'
- machine
+In-Reply-To: <154999591892.690774.10674853078354564704.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v4 13/15] spapr_drc: Allow FDT fragment to
+ be added later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,380 +25,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 
---gn1ylXQ+YRNuZICZ
-Content-Type: text/plain; charset=iso-8859-1
+--nE/5a/j5SCML90Nq
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 12, 2019 at 08:18:19AM +0100, C=E9dric Le Goater wrote:
-> On 2/12/19 2:11 AM, David Gibson wrote:
-> > On Mon, Jan 07, 2019 at 07:39:46PM +0100, C=E9dric Le Goater wrote:
-> >> The interrupt mode is chosen by the CAS negotiation process and
-> >> activated after a reset to take into account the required changes in
-> >> the machine. This brings new constraints on how the associated KVM IRQ
-> >> device is initialized.
-> >>
-> >> Currently, each model takes care of the initialization of the KVM
-> >> device in their realize method but this is not possible anymore as the
-> >> initialization needs to be done globaly when the interrupt mode is
-> >> known, i.e. when machine is reseted. It also means that we need a way
-> >> to delete a KVM device when another mode is chosen.
-> >>
-> >> Also, to support migration, the QEMU objects holding the state to
-> >> transfer should always be available but not necessarily activated.
-> >>
-> >> The overall approach of this proposal is to initialize both interrupt
-> >> mode at the QEMU level and keep the IRQ number space in sync to allow
-> >> switching from one mode to another. For the KVM side of things, the
-> >> whole initialization of the KVM device, sources and presenters, is
-> >> grouped in a single routine. The XICS and XIVE sPAPR IRQ reset
-> >> handlers are modified accordingly to handle the init and the delete
-> >> sequences of the KVM device.
-> >>
-> >> As KVM is now initialized at reset, we loose the possiblity to
-> >> fallback to the QEMU emulated mode in case of failure and failures
-> >> become fatal to the machine.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  hw/intc/spapr_xive.c     |  8 +---
-> >>  hw/intc/spapr_xive_kvm.c | 27 ++++++++++++++
-> >>  hw/intc/xics_kvm.c       | 25 +++++++++++++
-> >>  hw/intc/xive.c           |  4 --
-> >>  hw/ppc/spapr_irq.c       | 79 ++++++++++++++++++++++++++++------------
-> >>  5 files changed, 109 insertions(+), 34 deletions(-)
-> >>
-> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >> index 21f3c1ef0901..0661aca35900 100644
-> >> --- a/hw/intc/spapr_xive.c
-> >> +++ b/hw/intc/spapr_xive.c
-> >> @@ -330,13 +330,7 @@ static void spapr_xive_realize(DeviceState *dev, =
-Error **errp)
-> >>      xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
-> >>      xive->endt =3D g_new0(XiveEND, xive->nr_ends);
-> >> =20
-> >> -    if (kvmppc_xive_enabled()) {
-> >> -        kvmppc_xive_connect(xive, &local_err);
-> >> -        if (local_err) {
-> >> -            error_propagate(errp, local_err);
-> >> -            return;
-> >> -        }
-> >> -    } else {
-> >> +    if (!kvmppc_xive_enabled()) {
-> >>          /* TIMA initialization */
-> >>          memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_=
-ops, xive,
-> >>                                "xive.tima", 4ull << TM_SHIFT);
-> >> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> >> index d35814c1992e..3ebc947f2be7 100644
-> >> --- a/hw/intc/spapr_xive_kvm.c
-> >> +++ b/hw/intc/spapr_xive_kvm.c
-> >> @@ -737,6 +737,15 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error *=
-*errp)
-> >>      Error *local_err =3D NULL;
-> >>      size_t esb_len;
-> >>      size_t tima_len;
-> >> +    CPUState *cs;
-> >> +
-> >> +    /*
-> >> +     * The KVM XIVE device already in use. This is the case when
-> >> +     * rebooting XIVE -> XIVE
-> >=20
-> > Can this case actually occur?  Further down you appear to
-> > unconditionally destroy both KVM devices at reset time.
+On Tue, Feb 12, 2019 at 07:25:19PM +0100, Greg Kurz wrote:
+> The current logic is to provide the FDT fragment when attaching a device
+> to a DRC. This works perfectly fine for our current hotplug support, but
+> soon we will add support for PHB hotplug which has some constraints, that
+> CPU, PCI and LMB devices don't seem to have.
 >=20
-> I guess you are right. I will check.
+> The first constraint is that the "ibm,dma-window" property of the PHB
+> node requires the IOMMU to be configured, ie, spapr_tce_table_enable()
+> has been called, which happens during PHB reset. It is okay in the case
+> of hotplug since the device is reset before the hotplug handler is
+> called. On the contrary with coldplug, the hotplug handler is called
+> first and device is only reset during the initial system reset. Trying
+> to create the FDT fragment on the hotplug path in this case, would
+> result in somthing like this:
 >=20
-> >> +     */
-> >> +    if (xive->fd !=3D -1) {
-> >> +        return;
-> >> +    }
-> >> =20
-> >>      if (!kvm_enabled() || !kvmppc_has_cap_xive()) {
-> >>          error_setg(errp, "IRQ_XIVE capability must be present for KVM=
-");
-> >> @@ -800,6 +809,24 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error *=
-*errp)
-> >>      xive->change =3D qemu_add_vm_change_state_handler(
-> >>          kvmppc_xive_change_state_handler, xive);
-> >> =20
-> >> +    /* Connect the presenters to the initial VCPUs of the machine */
-> >> +    CPU_FOREACH(cs) {
-> >> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +
-> >> +        kvmppc_xive_cpu_connect(cpu->tctx, &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            return;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    /* Update the KVM sources */
-> >> +    kvmppc_xive_source_reset(xsrc, &local_err);
-> >> +    if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            return;
-> >> +    }
-> >> +
-> >>      kvm_kernel_irqchip =3D true;
-> >>      kvm_msi_via_irqfd_allowed =3D true;
-> >>      kvm_gsi_direct_mapping =3D true;
-> >> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> >> index 1d21ff217b82..bfc35d71df7f 100644
-> >> --- a/hw/intc/xics_kvm.c
-> >> +++ b/hw/intc/xics_kvm.c
-> >> @@ -448,6 +448,16 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
-> >>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp)
-> >>  {
-> >>      int rc;
-> >> +    CPUState *cs;
-> >> +    Error *local_err =3D NULL;
-> >> +
-> >> +    /*
-> >> +     * The KVM XICS device already in use. This is the case when
-> >> +     * rebooting XICS -> XICS
-> >> +     */
-> >> +    if (kernel_xics_fd !=3D -1) {
-> >> +        return 0;
-> >> +    }
-> >> =20
-> >>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ=
-_XICS)) {
-> >>          error_setg(errp,
-> >> @@ -496,6 +506,21 @@ int xics_kvm_init(sPAPRMachineState *spapr, Error=
- **errp)
-> >>      kvm_msi_via_irqfd_allowed =3D true;
-> >>      kvm_gsi_direct_mapping =3D true;
-> >> =20
-> >> +    /* Connect the presenters to the initial VCPUs of the machine */
-> >> +    CPU_FOREACH(cs) {
-> >> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> +
-> >> +        icp_kvm_connect(cpu->icp, &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            goto fail;
-> >> +        }
-> >> +        icp_set_kvm_state(cpu->icp, 1);
-> >> +    }
-> >> +
-> >> +    /* Update the KVM sources */
-> >> +    ics_set_kvm_state(ICS_KVM(spapr->ics), 1);
-> >> +
-> >>      return 0;
-> >> =20
-> >>  fail:
-> >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> >> index c5c2fbc3f8bc..c166eab5b210 100644
-> >> --- a/hw/intc/xive.c
-> >> +++ b/hw/intc/xive.c
-> >> @@ -932,10 +932,6 @@ static void xive_source_reset(void *dev)
-> >> =20
-> >>      /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "ints=
- off" */
-> >>      memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
-> >> -
-> >> -    if (kvmppc_xive_enabled()) {
-> >> -        kvmppc_xive_source_reset(xsrc, &error_fatal);
-> >> -    }
-> >>  }
-> >> =20
-> >>  static void xive_source_realize(DeviceState *dev, Error **errp)
-> >> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> >> index ba27d9d8e972..5592eec3787b 100644
-> >> --- a/hw/ppc/spapr_irq.c
-> >> +++ b/hw/ppc/spapr_irq.c
-> >> @@ -98,20 +98,14 @@ static void spapr_irq_init_xics(sPAPRMachineState =
-*spapr, Error **errp)
-> >>      int nr_irqs =3D spapr->irq->nr_irqs;
-> >>      Error *local_err =3D NULL;
-> >> =20
-> >> -    if (kvm_enabled()) {
-> >> -        if (machine_kernel_irqchip_allowed(machine) &&
-> >> -            !xics_kvm_init(spapr, &local_err)) {
-> >> -            spapr->icp_type =3D TYPE_KVM_ICP;
-> >> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_i=
-rqs,
-> >> -                                          &local_err);
-> >> -        }
-> >> -        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
-> >> -            error_prepend(&local_err,
-> >> -                          "kernel_irqchip requested but unavailable: =
-");
-> >> -            goto error;
-> >=20
-> > I don't see anything that replaces the irqchip_required logic, which
-> > doesn't seem right.
+> ibm,dma-window =3D < 0x80000000 0x00 0x00 0x00 0x00 >;
 >=20
-> Yes. We do loose the ability to fall back to the emulated device in case
-> of failure. It is not impossible to do but it will require more changes
-> to check what are the KVM capabilities before starting the machine.
+> This will cause linux in the guest to panic, by simply removing and
+> re-adding the PHB using the drmgr command:
+>=20
+> 	page =3D alloc_pages_node(nid, GFP_KERNEL, get_order(sz));
+> 	if (!page)
+> 		panic("iommu_init_table: Can't allocate %ld bytes\n", sz);
+>=20
+> The second and maybe more problematic constraint is that the
+> "interrupt-map" property needs to reference the interrupt controller
+> node using the very same phandle that SLOF has already exposed to the
+> guest. QEMU requires SLOF to call the private KVMPPC_H_UPDATE_DT hcall
+> at some point to know about this phandle. With the latest QEMU and SLOF,
+> this happens when SLOF gets quiesced. This means that if the PHB gets
+> hotplugged after CAS but before SLOF quiesce, then we're sure that the
+> phandle is not known when the hotplug handler is called.
+>=20
+> The FDT is only needed when the guest first invokes RTAS to configure
+> the connector actually, long after SLOF quiesce. Let's postpone the
+> creation of FDT fragments for PHBs to rtas_ibm_configure_connector().
+>=20
+> Since we only need this for PHBs, introduce a new method in the base
+> DRC class for that. It will implemented for "spapr-drc-phb" DRCs in
+> a subsequent patch.
+>=20
+> Allow spapr_drc_attach() to be passed a NULL fdt argument if the method
+> is available.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Uh... it seems more like it's the other way around.  We'll always fall
-back to emulated, even if we've explicitly said on the command line
-that we don't want that.
+The basic solution looks fine.  However I don't much like the fact
+that this leaves us with two ways to handle the fdt fragment - either
+at connect time or at configure connector time via a callback.  qemu
+already has way to many places where there are confusingly multiple
+ways to do things.
 
-> Nevertheless, any failure in reset when setting the KVM backend will
-> result in machine abort.
+I know it's a detour, but I'd really prefer to convert the existing
+DRC handling to this new callback scheme, rather than have two
+different approaches.
+
+> ---
+>  hw/ppc/spapr_drc.c         |   34 +++++++++++++++++++++++++++++-----
+>  include/hw/ppc/spapr_drc.h |    6 ++++++
+>  2 files changed, 35 insertions(+), 5 deletions(-)
 >=20
-> C.      =20
->=20
-> >=20
-> >> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >> +        spapr->icp_type =3D TYPE_KVM_ICP;
-> >> +        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs,
-> >> +                                      &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            return;
-> >>          }
-> >> -        error_free(local_err);
-> >> -        local_err =3D NULL;
-> >>      }
-> >> =20
-> >>      if (!spapr->ics) {
-> >> @@ -119,10 +113,11 @@ static void spapr_irq_init_xics(sPAPRMachineStat=
-e *spapr, Error **errp)
-> >>          spapr->icp_type =3D TYPE_ICP;
-> >>          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_ir=
-qs,
-> >>                                        &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            return;
-> >> +        }
-> >>      }
-> >> -
-> >> -error:
-> >> -    error_propagate(errp, local_err);
-> >>  }
-> >> =20
-> >>  #define ICS_IRQ_FREE(ics, srcno)   \
-> >> @@ -233,7 +228,17 @@ static void spapr_irq_set_irq_xics(void *opaque, =
-int srcno, int val)
-> >> =20
-> >>  static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **er=
-rp)
-> >>  {
-> >> -    /* TODO: create the KVM XICS device */
-> >> +    MachineState *machine =3D MACHINE(spapr);
-> >> +    Error *local_err =3D NULL;
-> >> +
-> >> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >> +        xics_kvm_init(spapr, &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            error_prepend(errp, "KVM XICS connect failed: ");
-> >> +            return;
-> >> +        }
-> >> +    }
-> >>  }
-> >> =20
-> >>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
-> >> @@ -393,6 +398,7 @@ static int spapr_irq_post_load_xive(sPAPRMachineSt=
-ate *spapr, int version_id)
-> >>  static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **er=
-rp)
-> >>  {
-> >>      CPUState *cs;
-> >> +    Error *local_err =3D NULL;
-> >> =20
-> >>      CPU_FOREACH(cs) {
-> >>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >> @@ -401,6 +407,15 @@ static void spapr_irq_reset_xive(sPAPRMachineStat=
-e *spapr, Error **errp)
-> >>          spapr_xive_set_tctx_os_cam(cpu->tctx);
-> >>      }
-> >> =20
-> >> +    if (kvmppc_xive_enabled()) {
-> >> +        kvmppc_xive_connect(spapr->xive, &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            error_prepend(errp, "KVM XIVE connect failed: ");
-> >> +            return;
-> >> +        }
-> >> +    }
-> >> +
-> >>      /* Activate the XIVE MMIOs */
-> >>      spapr_xive_mmio_set_enabled(spapr->xive, true);
-> >>  }
-> >> @@ -462,14 +477,8 @@ static sPAPRIrq *spapr_irq_current(sPAPRMachineSt=
-ate *spapr)
-> >> =20
-> >>  static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **err=
-p)
-> >>  {
-> >> -    MachineState *machine =3D MACHINE(spapr);
-> >>      Error *local_err =3D NULL;
-> >> =20
-> >> -    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >> -        error_setg(errp, "No KVM support for the 'dual' machine");
-> >> -        return;
-> >> -    }
-> >> -
-> >>      spapr_irq_xics.init(spapr, &local_err);
-> >>      if (local_err) {
-> >>          error_propagate(errp, local_err);
-> >> @@ -568,11 +577,16 @@ static void spapr_irq_cpu_intc_create_dual(sPAPR=
-MachineState *spapr,
-> >> =20
-> >>  static int spapr_irq_post_load_dual(sPAPRMachineState *spapr, int ver=
-sion_id)
-> >>  {
-> >> +    MachineState *machine =3D MACHINE(spapr);
-> >> +
-> >>      /*
-> >>       * Force a reset of the XIVE backend after migration. The machine
-> >>       * defaults to XICS at startup.
-> >>       */
-> >>      if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> >> +        if (kvm_enabled() && machine_kernel_irqchip_allowed(machine))=
- {
-> >> +            xics_kvm_disconnect(spapr, &error_fatal);
-> >> +        }
-> >>          spapr_irq_xive.reset(spapr, &error_fatal);
-> >>      }
-> >> =20
-> >> @@ -581,12 +595,31 @@ static int spapr_irq_post_load_dual(sPAPRMachine=
-State *spapr, int version_id)
-> >> =20
-> >>  static void spapr_irq_reset_dual(sPAPRMachineState *spapr, Error **er=
-rp)
-> >>  {
-> >> +    MachineState *machine =3D MACHINE(spapr);
-> >> +    Error *local_err =3D NULL;
-> >> +
-> >>      /*
-> >>       * Deactivate the XIVE MMIOs. The XIVE backend will reenable them
-> >>       * if selected.
-> >>       */
-> >>      spapr_xive_mmio_set_enabled(spapr->xive, false);
-> >> =20
-> >> +    /* Destroy all KVM devices */
-> >> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >> +        xics_kvm_disconnect(spapr, &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            error_prepend(errp, "KVM XICS disconnect failed: ");
-> >> +            return;
-> >> +        }
-> >> +        kvmppc_xive_disconnect(spapr->xive, &local_err);
-> >> +        if (local_err) {
-> >> +            error_propagate(errp, local_err);
-> >> +            error_prepend(errp, "KVM XIVE disconnect failed: ");
-> >> +            return;
-> >> +        }
-> >> +    }
-> >> +
-> >>      spapr_irq_current(spapr)->reset(spapr, errp);
-> >>  }
-> >> =20
-> >=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 189ee681062a..c5a281915665 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -22,6 +22,7 @@
+>  #include "qemu/error-report.h"
+>  #include "hw/ppc/spapr.h" /* for RTAS return codes */
+>  #include "hw/pci-host/spapr.h" /* spapr_phb_remove_pci_device_cb callbac=
+k */
+> +#include "sysemu/device_tree.h"
+>  #include "trace.h"
+> =20
+>  #define DRC_CONTAINER_PATH "/dr-connector"
+> @@ -376,6 +377,8 @@ static void prop_get_fdt(Object *obj, Visitor *v, con=
+st char *name,
+>  void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+>                        int fdt_start_offset, Error **errp)
+>  {
+> +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> +
+>      trace_spapr_drc_attach(spapr_drc_index(drc));
+> =20
+>      if (drc->dev) {
+> @@ -384,11 +387,14 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Device=
+State *d, void *fdt,
+>      }
+>      g_assert((drc->state =3D=3D SPAPR_DRC_STATE_LOGICAL_UNUSABLE)
+>               || (drc->state =3D=3D SPAPR_DRC_STATE_PHYSICAL_POWERON));
+> -    g_assert(fdt);
+> +    g_assert(fdt || drck->populate_dt);
+> =20
+>      drc->dev =3D d;
+> -    drc->fdt =3D fdt;
+> -    drc->fdt_start_offset =3D fdt_start_offset;
+> +
+> +    if (fdt) {
+> +        drc->fdt =3D fdt;
+> +        drc->fdt_start_offset =3D fdt_start_offset;
+> +    }
+> =20
+>      object_property_add_link(OBJECT(drc), "device",
+>                               object_get_typename(OBJECT(drc->dev)),
+> @@ -1118,10 +1124,28 @@ static void rtas_ibm_configure_connector(PowerPCC=
+PU *cpu,
+>          goto out;
+>      }
+> =20
+> -    g_assert(drc->fdt);
+> -
+>      drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> =20
+> +    g_assert(drc->fdt || drck->populate_dt);
+> +
+> +    if (!drc->fdt) {
+> +        Error *local_err =3D NULL;
+> +        void *fdt;
+> +        int fdt_size;
+> +
+> +        fdt =3D create_device_tree(&fdt_size);
+> +
+> +        if (drck->populate_dt(drc->dev, spapr, fdt, &drc->fdt_start_offs=
+et,
+> +                               &local_err)) {
+> +            g_free(fdt);
+> +            error_free(local_err);
+> +            rc =3D SPAPR_DR_CC_RESPONSE_ERROR;
+> +            goto out;
+> +        }
+> +
+> +        drc->fdt =3D fdt;
+> +    }
+> +
+>      do {
+>          uint32_t tag;
+>          const char *name;
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index 56bba36ad4da..e947d6987bf2 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -18,6 +18,7 @@
+>  #include "qom/object.h"
+>  #include "sysemu/sysemu.h"
+>  #include "hw/qdev.h"
+> +#include "qapi/error.h"
+> =20
+>  #define TYPE_SPAPR_DR_CONNECTOR "spapr-dr-connector"
+>  #define SPAPR_DR_CONNECTOR_GET_CLASS(obj) \
+> @@ -221,6 +222,8 @@ typedef struct sPAPRDRConnector {
+>      int fdt_start_offset;
+>  } sPAPRDRConnector;
+> =20
+> +struct sPAPRMachineState;
+> +
+>  typedef struct sPAPRDRConnectorClass {
+>      /*< private >*/
+>      DeviceClass parent;
+> @@ -236,6 +239,9 @@ typedef struct sPAPRDRConnectorClass {
+>      uint32_t (*isolate)(sPAPRDRConnector *drc);
+>      uint32_t (*unisolate)(sPAPRDRConnector *drc);
+>      void (*release)(DeviceState *dev);
+> +
+> +    int (*populate_dt)(DeviceState *dev, struct sPAPRMachineState *spapr,
+> +                       void *fdt, int *fdt_start_offset, Error **errp);
+>  } sPAPRDRConnectorClass;
+> =20
+>  typedef struct sPAPRDRCPhysical {
 >=20
 
 --=20
@@ -409,24 +209,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gn1ylXQ+YRNuZICZ
+--nE/5a/j5SCML90Nq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjc6MACgkQbDjKyiDZ
-s5Izug/+MuPh0MX3fFCRWtPwU5eic1FaELIeBkVl+7d/TTZvAh7yczb8gQ0e/qXs
-G63bMdQyea3e47Jai8aV2toRbBo1APL43FCpZsLlzS7M9JhAV5WE9tIbroxMZlSp
-71dZecB7KudcnewgG7hojHpP763xyoklJicq4OvNBX6veBXl+T1PoG9rI7kSiuQ3
-tCrCPJWq7VnrqepowMEA0EO3KZ8w0qhBYTd98LtQIC+UZl8+aSoT0wef/nKYiixq
-P+jQZffc8n6Js/XMEi9slugAI0dCxSlo/NbeUSuhUUN5OMu436hZ7epGOOjWMgjW
-TkV3vV7vebDpe4oXo0L0ppQR7nslDHfx5uDttcvJwnJ2zZVpD2FOWgAUjAq5wCrW
-ys8XjBvgoOGXg6FwAyJqbBxSZhrmCvnCvjF3ixZdV1HSC4lzUXmwHBESVWc8lur9
-/mVnnVqeUtQ7wt+vHsU7mH/CgbFn5F/+6q9hrWhLKi8wy2Ye3Zcx67PU0b7c0aoZ
-FDXtwpmAKg9yJrUs71DTIOa+ipFjSKsE8YrT22EuMWWk1IL47hWZ/QrsfOJgCaaU
-dqzxjhdVHqYde2pjjIkgmB1ppBsGAB3SmXSFLOX5A6DG67NLAiSS4PBzXn9CPl7h
-vRn4lqY6s40pfnhC7yNBvkPV9GnpSvzVXAliS9Emp3JOFEqy+D4=
-=zbad
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjl4IACgkQbDjKyiDZ
+s5J4rA/5Aa7beCATb8fKm8G2YFqIUOzewhvlvDGnrDzauC1FyIR52I3enr2bcAzX
+BScdmJoi93hNakXX8ZJKyaaYFfE7GPiD/AxNAMZPnU9NhHdM/upF9dIj5MMDworO
+ZQjHccaMvPgIDNxlXzn89EhLgSYZxl/i90HJ3wpV2YXMAoAjOXk81kAWTmSYsNFu
+JKelmO70QNRr8aXK1FkRf+Jn4/B1zUSZuvc7LKAG1W+lioQMl84ODZkxQz5eMHjL
+NC0w2usCXz6STO0pPAbIEoHGT60bYWpvRmnFTEFfL4zc1DG1StkxYhi+KJBLt/kN
+ogcmwzv/FgZnk2cvhCcPOA2JjMqjmp5iBZkJrfmBKTahXYpLujqdW1PiFvcGMXpa
+wYZMzyF5s2AkhAYufERSW1DM0TBcZrosY0ocXISuLfmjFcewmbAOyRQLUhSUxxiI
+ZqaeNxF4bp1nLkjZJ6X93TDpKD61Sxn41xlMUjUHXL5x+IdCd6o/Lg9Kah1dRSq8
+kT8GtLPUyHGBEm5fz3ktgFo5y9+dtML2244g2beO8VGq49fIAOXroGCuai9AFx7/
+yRiLWjpxoSDC09QsPd7kWLCs2LaEp2N6Opb9xrgsRN+a6tvFs65b1h50QhVJEO3N
+UcrmFzfA33/77l3U9UD3FNfkTlUTCun60mu3UjA/+tx+bvfGDZE=
+=sG62
 -----END PGP SIGNATURE-----
 
---gn1ylXQ+YRNuZICZ--
+--nE/5a/j5SCML90Nq--
