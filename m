@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57659)
+Received: from eggs.gnu.org ([209.51.188.92]:58028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gtwmB-0004gL-TW
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:48:45 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gtwnq-0005rk-4z
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:50:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gtwmA-0002wi-0S
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:48:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1gtwm7-0002ob-Va
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:48:41 -0500
-References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-	<1542006398-30037-3-git-send-email-marcolso@amazon.com>
-	<72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
-	<13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8a51bd30-40c2-e367-208f-df0f2d225d0f@redhat.com>
-Date: Wed, 13 Feb 2019 16:48:25 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gtwnV-0004Sn-QR
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:50:16 -0500
+Resent-Message-Id: <E1gtwnV-0004Sn-QR@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gtwnV-0004Kk-Dv
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:50:05 -0500
+Message-ID: <155007206363.8665.18092691820396893471@ebba9967afc0>
+In-Reply-To: <1549945516-25643-1-git-send-email-changpeng.liu@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tDis5uAY0ya8npN6dpWQUy6pLauZ8wgT1"
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] blkdebug: Add latency injection
- rule type
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 13 Feb 2019 07:34:25 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: set correct config size for
+ the host driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,191 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: changpeng.liu@intel.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, ldoktor@redhat.com, mst@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, sgarzare@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tDis5uAY0ya8npN6dpWQUy6pLauZ8wgT1
-From: Max Reitz <mreitz@redhat.com>
-To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <8a51bd30-40c2-e367-208f-df0f2d225d0f@redhat.com>
-Subject: Re: [PATCH v3 3/3] blkdebug: Add latency injection rule type
-References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
- <1542006398-30037-3-git-send-email-marcolso@amazon.com>
- <72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
- <13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
-In-Reply-To: <13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12.02.19 22:21, Marc Olson wrote:
-> On 1/11/19 7:00 AM, Max Reitz wrote:
->> On 12.11.18 08:06, Marc Olson wrote:
-
-[...]
-
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index d4fe710..72f7861 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -3057,6 +3057,34 @@
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 '*immediately': 'bool' } }
->>> =C2=A0 =C2=A0 ##
->>> +# @BlkdebugDelayOptions:
->>> +#
->>> +# Describes a single latency injection for blkdebug.
->>> +#
->>> +# @event:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trigger event
->>> +#
->>> +# @state:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the state identifier b=
-lkdebug needs to be in to
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 actually trigger the event; defaults to "any"
->>> +#
->>> +# @latency:=C2=A0=C2=A0=C2=A0=C2=A0 The delay to add to an I/O, in m=
-icroseconds.
->>> +#
->>> +# @sector:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 specifies the sector index =
-which has to be affected
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 in order to actually trigger the event; defaults to
->>> "any
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 sector"
->>> +#
->>> +# @once:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 disables further =
-events after this one has been
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 triggered; defaults to false
->>> +#
->>> +# Since: 3.1
->> Well, 4.0 now, sorry...
-> Baking version numbers into code is downright silly. Every single
-> version of this patch has made a comment along the lines of, "oops, it
-> didn't get reviewed in time for the next version bump, so you have to
-> resubmit." With a fast moving project, this is nonsense. If you're
-> looking at the code, you should have access to the git history as well
-> to determine the version.
-
-True, but these comments are used to generate documentation (e.g.
-docs/interopt/qemu-qmp-ref.7 in the build directory).  So they are used
-by people who don't have access to the git history.
-
-It might be possible to generate that information from git-blame when
-generating the documentation, but how would trivial fixes be handled
-that are no functional changes?  For instance, it seems difficult to me
-to distinguish between a spelling change for some parameter description
-and a change in behavior.
-
-(Then again, we shouldn't have such behavioral changes, hm.)
-
-To me personally, the easiest thing would seem to be some convention to
-write ***INSERT VERSION HERE*** into the code and then the maintainer
-can just find an replace all instances of that when applying the
-patches.  But that sounds a bit silly...
-
-(I don't have an issue with adjusting the version numbers myself as they
-are, but it's just as hard for me to find and replace all of them as it
-is for you.  And since you're probably going to send a v4 anyway...)
-
-In the end, it's up to the QAPI maintainers.
-
-[...]
-
->>> diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
->>> index 48b4955..976f747 100755
->>> --- a/tests/qemu-iotests/071
->>> +++ b/tests/qemu-iotests/071
->>> @@ -100,6 +100,69 @@ $QEMU_IO -c "open -o
->>> driver=3D$IMGFMT,file.driver=3Dblkdebug,file.inject-error.event
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'read=
- -P 42 0x38000 512'
->>> =C2=A0 =C2=A0 echo
->>> +echo "=3D=3D=3D Testing blkdebug latency through filename =3D=3D=3D"=
-
->>> +echo
->>> +
->>> +$QEMU_IO -c "open -o
->>> file.driver=3Dblkdebug,file.inject-delay.event=3Dwrite_aio,file.injec=
-t-delay.latency=3D10000
->>> $TEST_IMG" \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_write -P 42=
- 0x28000 512' \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_read -P 42 =
-0x38000 512' \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | _filter_qemu_io
->>> +
->>> +echo
->>> +echo "=3D=3D=3D Testing blkdebug latency through file blockref =3D=3D=
-=3D"
->>> +echo
->>> +
->>> +$QEMU_IO -c "open -o
->>> driver=3D$IMGFMT,file.driver=3Dblkdebug,file.inject-delay.event=3Dwri=
-te_aio,file.inject-delay.latency=3D10000,file.image.filename=3D$TEST_IMG"=
-
->>> \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_write -P 42=
- 0x28000 512' \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_read -P 42 =
-0x38000 512' \
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | _filter_qemu_io
->>> +
->>> +# Using QMP is synchronous by default, so even though we would
->>> +# expect reordering due to using the aio_* commands, they are
->>> +# not. The purpose of this test is to verify that the driver
->>> +# can be setup via QMP, and IO can complete. See the qemu-io
->>> +# test above to prove delay functionality
->> But it doesn't prove that because the output is filtered.=C2=A0 To pro=
-ve it,
->> you'd probably need to use null-co as the protocol (so there is as
->> little noise as possible) and then parse the qemu-io output to show th=
-at
->> the time is always above 10 ms.
->>
->> I leave it to you whether you'd like to go through that pain.
-> There's not a great way to prove it without doing a lot of parsing
-> changes in testing. I'll consider an update to this patch, but I think
-> this series has carried on long enough.
-
-I agree in this instance, but I'd like to note still that "this series
-has carried on long enough" is not an argument to merge bad code (or
-something incomplete without promise of a follow-up).  This is just a
-test for blkdebug, though, so it's OK (with the comment fixed, because
-it doesn't prove anything).
-
-(I'm sorry for not having looked at this series for so long, but qemu is
-not my own, so it isn't like I could pay for my wrong by accepting
-something incomplete -- if it were more important than this single test
-case.)
-
-Also, we do support Python for iotests, and parsing should be simpler
-there.  Since blkdebug is just a debugging driver, I'm fine with not
-knowing whether its features work, though.
-
-Maybe I'll write the test, that would kind of pay for my wrong...
-
-Max
-
-
---tDis5uAY0ya8npN6dpWQUy6pLauZ8wgT1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxkPEkACgkQ9AfbAGHV
-z0CHzQgAmCdmk38I6w70xqka6hc2FWKkCc1Q7Bafcm9aYUjS7SczW/WX4kKl0jAE
-E+rC9lsXJ8S0mTRT9EMQodZhD2wWx7MW2FfDlXtk/tBsPxAi+rfS6bpaSAFYHRaw
-IA0qnQ/0icd9l136OPHPRd/IuaROnlduHoXYNbzzH7ZmMcL4JNONmniTZftocWZ9
-VHQnJ83PLZRZsJ/80n4TdKRr7gctmkEdXIe4A9qcE2IMRaO2tlcKEmbGU0HWm0zA
-RC1HTKP3x+0Snnr2UBb2VUse6NMssUbHJY4r3xBe5rWTMtcTr1/aWGkM4sVPhsib
-a0g7JAUkevWcgb7YNtTZ+ardFBv/Cg==
-=vHMo
------END PGP SIGNATURE-----
-
---tDis5uAY0ya8npN6dpWQUy6pLauZ8wgT1--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ5OTQ1NTE2LTI1NjQzLTEt
+Z2l0LXNlbmQtZW1haWwtY2hhbmdwZW5nLmxpdUBpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJp
+ZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBi
+ZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNTQ5
+OTQ1NTE2LTI1NjQzLTEtZ2l0LXNlbmQtZW1haWwtY2hhbmdwZW5nLmxpdUBpbnRlbC5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gdmlydGlvLWJsazogc2V0IGNvcnJlY3QgY29uZmln
+IHNpemUgZm9yIHRoZSBob3N0IGRyaXZlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CmVycm9yOiBSZWYgcmVmcy9oZWFkcy9tYXN0ZXIgaXMgYXQgMGI1ZTc1
+MGJlYTYzNWIxNjdlYjAzZDg2YzNkOWEwOWJiZDQzYmMwNiBidXQgZXhwZWN0ZWQgZTQ3ZjgxYjYx
+NzY4NGM0NTQ2YWYyODZkMzA3YjY5MDE0YTgzNTM4YQpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogISBlNDdmODFiLi4wYjVlNzUwICBtYXN0ZXIgICAgIC0+IG1h
+c3RlciAgKHVuYWJsZSB0byB1cGRhdGUgbG9jYWwgcmVmKQogKiBbbmV3IHRhZ10gICAgICAgICBw
+YXRjaGV3LzE1NDk5NDU1MTYtMjU2NDMtMS1naXQtc2VuZC1lbWFpbC1jaGFuZ3BlbmcubGl1QGlu
+dGVsLmNvbSAtPiBwYXRjaGV3LzE1NDk5NDU1MTYtMjU2NDMtMS1naXQtc2VuZC1lbWFpbC1jaGFu
+Z3BlbmcubGl1QGludGVsLmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjA3
+MTAyNDQ1LjcxOTk4LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcvMjAxOTAy
+MDcxMDI0NDUuNzE5OTgtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20KIC0gW3RhZyB1cGRhdGVd
+ICAgICAgcGF0Y2hldy8yMDE5MDIwNzE2MDYxNy4xMTQyLTEtbWFyY2FuZHJlLmx1cmVhdUByZWRo
+YXQuY29tIC0+IHBhdGNoZXcvMjAxOTAyMDcxNjA2MTcuMTE0Mi0xLW1hcmNhbmRyZS5sdXJlYXVA
+cmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjEwMTA0NTM3LjE0
+ODgtMS15dXZhbC5zaGFpYUBvcmFjbGUuY29tIC0+IHBhdGNoZXcvMjAxOTAyMTAxMDQ1MzcuMTQ4
+OC0xLXl1dmFsLnNoYWlhQG9yYWNsZS5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8y
+MDE5MDIxMjAyNTI0MS41MzMwLTEtc3RlZmFuaGFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkw
+MjEyMDI1MjQxLjUzMzAtMS1zdGVmYW5oYUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAg
+IHBhdGNoZXcvMjAxOTAyMTIxMDUyMDEuMTM3OTUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcg
+LT4gcGF0Y2hldy8yMDE5MDIxMjEwNTIwMS4xMzc5NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9y
+ZwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwMjEyMTkzODU1LjEzMjIzLTEtY2Nh
+cnJhcmFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEyMTkzODU1LjEzMjIzLTEtY2NhcnJh
+cmFAcmVkaGF0LmNvbQplcnJvcjogQ291bGQgbm90IGZldGNoIDNjOGNmNWE5YzIxZmY4NzgyMTY0
+ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgog
+IEZpbGUgInBhdGNoZXctdGVzdGVyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNTIxLCBpbiB0ZXN0
+X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dm
+LCBUcnVlKQogIEZpbGUgInBhdGNoZXctdGVzdGVyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNDgs
+IGluIGdpdF9jbG9uZV9yZXBvCiAgICBzdGRvdXQ9bG9nZiwgc3RkZXJyPWxvZ2YpCiAgRmlsZSAi
+L3Vzci9saWI2NC9weXRob24zLjQvc3VicHJvY2Vzcy5weSIsIGxpbmUgNTU4LCBpbiBjaGVja19j
+YWxsCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNz
+LkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydnaXQnLCAncmVtb3RlJywgJ2FkZCcsICct
+ZicsICctLW1pcnJvcj1mZXRjaCcsICczYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
+NzEzMzg0JywgJ2h0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdSddJyByZXR1
+cm5lZCBub24temVybyBleGl0IHN0YXR1cyAxCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0OTk0NTUxNi0yNTY0My0xLWdpdC1zZW5kLWVt
+YWlsLWNoYW5ncGVuZy5saXVAaW50ZWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
