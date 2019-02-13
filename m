@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56594)
+Received: from eggs.gnu.org ([209.51.188.92]:58563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gu0GO-0003dP-Og
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 14:32:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1gu0Oz-0007zQ-2f
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 14:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gu0GN-0005fz-Bo
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 14:32:08 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40978)
+	(envelope-from <bounces@canonical.com>) id 1gu0Ov-0002b6-Kv
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 14:41:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gu0GN-0004iS-1v
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 14:32:07 -0500
-Received: by mail-pf1-x444.google.com with SMTP id b7so1640725pfi.8
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 11:31:53 -0800 (PST)
-References: <20190213143322.31371-1-david@redhat.com>
-	<20190213143322.31371-13-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <634cf76a-f1b9-138a-2ed4-e666c4be35f1@linaro.org>
-Date: Wed, 13 Feb 2019 11:31:49 -0800
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gu0Os-00022u-ME
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 14:40:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gu0Oo-0007bW-B2
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 19:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 527092E80C7
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 19:40:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190213143322.31371-13-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/15] s390x/tcg: Implement XxC and
- checks for most FP instructions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 Feb 2019 19:35:02 -0000
+From: RTOS Pharos <1815078@bugs.launchpad.net>
+Reply-To: Bug 1815078 <1815078@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154955529480.22127.1382747582342462477.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155008650283.4000.18362450386434870686.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815078] Re: Qemu 3.1.0 risc-v mie.MEIE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 2/13/19 6:33 AM, David Hildenbrand wrote:
-> With the floating-point extension facility
-> - CONVERT FROM LOGICAL
-> - CONVERT TO LOGICAL
-> - CONVERT TO FIXED
-> - CONVERT FROM FIXED
-> - LOAD FP INTEGER
-> have both, a rounding mode specification and the inexact-exception control
-> (XxC). Other instructions will be handled separatly.
-> 
-> Check for valid rounding modes and forward also the XxC (via m4). To avoid
-> a lot of boilerplate code and changes to the helpers, combine both, the
-> m3 and m4 field in a combined 32 bit TCG variable. Perform checks at
-> a central place, taking in account if the m3 or m4 field was ignore
-> before the floating-point extension facility was introduced.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+Good news,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks
 
-> +static inline bool xxc_from_m34(uint32_t m34)
-> +{
-> +    /* XxC is bit 1 of m4 */
-> +    return (extract32(m34, 4, 4) & 0x4) != 0;
+-- =
 
-Better as extract32(m32, 6, 1);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815078
 
+Title:
+  Qemu 3.1.0 risc-v mie.MEIE
 
-r~
+Status in QEMU:
+  New
+
+Bug description:
+  Hello all,
+
+  There is a bug in qemu for Risc-v, related to the mie register: when
+  we try to set the MEIE bit (11) nothing is done, even when we are
+  running at machine mode.
+
+  Li   a0 , 1 << 11
+  Csrs mie , a0
+
+  And when we read mie it is as though nothing was done.
+
+  Going through the qemu source code I was able to correct it: on file
+  op_helper.c, line 94, the variable all_ints should be initialized
+  with:
+
+  uint64_t all_ints =3D delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MEIP;
+
+  That is, the MIP_MEIP was missing.
+
+  I've successfully triggered uart interrupts with this patch (virt
+  machine).
+
+  All the best,
+  Pharos team
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815078/+subscriptions
