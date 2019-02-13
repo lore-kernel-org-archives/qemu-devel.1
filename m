@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39456)
+Received: from eggs.gnu.org ([209.51.188.92]:39489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbZ-0008J1-PN
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:42 -0500
+	(envelope-from <david@redhat.com>) id 1gtvba-0008Jj-Mz
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbY-00029F-SL
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:41 -0500
+	(envelope-from <david@redhat.com>) id 1gtvbZ-0002AG-Rv
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:42 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Feb 2019 15:33:11 +0100
-Message-Id: <20190213143322.31371-5-david@redhat.com>
+Date: Wed, 13 Feb 2019 15:33:13 +0100
+Message-Id: <20190213143322.31371-7-david@redhat.com>
 In-Reply-To: <20190213143322.31371-1-david@redhat.com>
 References: <20190213143322.31371-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/15] s390x/tcg: Fix parts of IEEE
- exception handling
+Subject: [Qemu-devel] [PATCH v2 06/15] s390x/tcg: Refactor SET FPC AND
+ SIGNAL handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +23,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Many things are wrong and some parts cannot be fixed yet. Fix what we
-can fix easily and add two FIXMEs:
+We can directly work on the uint64_t value, no need for a temporary
+uint32_t value.
 
-The fpc flags are not updated in case an exception is actually injected.
-Inexact exceptions have to be handled separately, as they are the only
-exceptions that can coexist with underflows and overflows.
-
-I reread the horribly complicated chapters in the PoP at least 5 times
-and hope I got it right.
-
-For references:
-- z14 PoP, 9-18, "IEEE Exceptions"
-- z14 PoP, 19-9, Figure 19-8
+Also cleanup and shorten the comments.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/fpu_helper.c | 38 ++++++++++++++++++++++++++++++++------
- 1 file changed, 32 insertions(+), 6 deletions(-)
+ target/s390x/fpu_helper.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
 diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index de02cf792d..dcad9c367a 100644
+index 64efab72a4..ea5a37ac5e 100644
 --- a/target/s390x/fpu_helper.c
 +++ b/target/s390x/fpu_helper.c
-@@ -63,13 +63,39 @@ static void handle_exceptions(CPUS390XState *env, uintptr_t retaddr)
-     env->fpu_status.float_exception_flags = 0;
-     s390_exc = s390_softfloat_exc_to_ieee(qemu_exc);
- 
--    /* Install the exceptions that we raised.  */
--    env->fpc |= s390_exc << 16;
-+    /*
-+     * FIXME:
-+     * 1. Right now, all inexact conditions are inidicated as
-+     *    "truncated" (0) and never as "incremented" (1) in the DXC.
-+     * 2. Only traps due to invalid/divbyzero are suppressing. Other traps
-+     *    are completing, meaning the target register has to be written!
-+     *    This, however will mean that we have to write the register before
-+     *    triggering the trap - impossible right now.
-+     */
-+
-+    /*
-+     * invalid/divbyzero cannot coexist with other conditions.
-+     * overflow/underflow however can coexist with inexact, we have to
-+     * handle it separatly.
-+     */
-+    if (s390_exc & ~S390_IEEE_MASK_INEXACT) {
-+        if (s390_exc & ~S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
-+            /* trap condition - inexact reported along */
-+            tcg_s390_data_exception(env, s390_exc, retaddr);
-+        }
-+        /* nontrap condition - inexact handled differently */
-+        env->fpc |= (s390_exc & ~S390_IEEE_MASK_INEXACT) << 16;
-+    }
- 
--    /* Send signals for enabled exceptions.  */
--    s390_exc &= env->fpc >> 24;
--    if (s390_exc) {
--        tcg_s390_data_exception(env, s390_exc, retaddr);
-+    /* inexact handling */
-+    if (s390_exc & S390_IEEE_MASK_INEXACT) {
-+        /* trap condition - overflow/underflow _not_ reported along */
-+        if (s390_exc & S390_IEEE_MASK_INEXACT & env->fpc >> 24) {
-+            tcg_s390_data_exception(env, s390_exc & S390_IEEE_MASK_INEXACT,
-+                                    retaddr);
-+        }
-+        /* nontrap condition */
-+        env->fpc |= (s390_exc & S390_IEEE_MASK_INEXACT) << 16;
-     }
+@@ -771,21 +771,23 @@ void HELPER(sfpc)(CPUS390XState *env, uint64_t fpc)
  }
  
+ /* set fpc and signal */
+-void HELPER(sfas)(CPUS390XState *env, uint64_t val)
++void HELPER(sfas)(CPUS390XState *env, uint64_t fpc)
+ {
+     uint32_t signalling = env->fpc;
+-    uint32_t source = val;
+     uint32_t s390_exc;
+ 
+-    /* The contents of the source operand are placed in the FPC register;
+-       then the flags in the FPC register are set to the logical OR of the
+-       signalling flags and the source flags.  */
+-    env->fpc = source | (signalling & 0x00ff0000);
+-    set_float_rounding_mode(fpc_to_rnd[source & 3], &env->fpu_status);
++    /*
++     * FPC is set to the FPC operand with a bitwise OR of the signalling
++     * flags.
++     */
++    env->fpc = fpc | (signalling & 0x00ff0000);
++    set_float_rounding_mode(fpc_to_rnd[fpc & 3], &env->fpu_status);
+ 
+-    /* If any signalling flag is 1 and the corresponding source mask
+-       is also 1, a simulated-iee-exception trap occurs.  */
+-    s390_exc = (signalling >> 16) & (source >> 24);
++    /*
++     * If any signaling flag is enabled in the new FPC mask, a
++     * simulated-iee-exception exception occurs.
++     */
++    s390_exc = (signalling >> 16) & (fpc >> 24);
+     if (s390_exc) {
+         tcg_s390_data_exception(env, s390_exc | 3, GETPC());
+     }
 -- 
 2.17.2
