@@ -1,14 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45506)
+Received: from eggs.gnu.org ([209.51.188.92]:45509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu3t2-0001ln-KM
+	(envelope-from <eblake@redhat.com>) id 1gu3t2-0001lx-Px
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu3t1-0004tZ-Mh
+	(envelope-from <eblake@redhat.com>) id 1gu3t1-0004th-QV
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:16 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Wed, 13 Feb 2019 18:23:50 -0500
-Message-Id: <20190213232356.21034-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] dirty-bitmaps: deprecate @status field
+References: <20190213225311.17876-1-mreitz@redhat.com>
+	<20190213225311.17876-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <41419065-2609-cec2-d518-4fb9d08dc811@redhat.com>
+Date: Wed, 13 Feb 2019 17:24:10 -0600
+MIME-Version: 1.0
+In-Reply-To: <20190213225311.17876-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NCelRHxKquXEfES4WRsRD6fWCLKLGsguR"
+Subject: Re: [Qemu-devel] [PATCH v3 01/12] block: Mark commit and mirror as
+ filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,51 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, libvir-list@redhat.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-The current internal meanings of "locked", "user_locked",
-"qmp_locked", "frozen", "enabled", and "disabled" are all
-a little muddled.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NCelRHxKquXEfES4WRsRD6fWCLKLGsguR
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <41419065-2609-cec2-d518-4fb9d08dc811@redhat.com>
+Subject: Re: [PATCH v3 01/12] block: Mark commit and mirror as filter drivers
+References: <20190213225311.17876-1-mreitz@redhat.com>
+ <20190213225311.17876-2-mreitz@redhat.com>
+In-Reply-To: <20190213225311.17876-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Deprecate the @status field in favor of two new booleans
-that carry very specific meanings. Then, rename and rework
-some of the internal semantics to help make the API a bit
-more clear and easier to read.
+On 2/13/19 4:53 PM, Max Reitz wrote:
+> The commit and mirror block nodes are filters, so they should be marked=
 
-Well, in my opinion.
+> as such.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/commit.c | 2 ++
+>  block/mirror.c | 2 ++
+>  2 files changed, 4 insertions(+)
 
-Based on my current bitmaps branch (includes Eric's patch
-and my documentation update patch.)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-V2: - All of Eric's suggestions, I hope.
-    - Vladimir's phrasing suggestion on patch 1
-    - Added a sixth patch that's mostly just motion.
+I know there are patches pending review for a backup driver (for image
+fleecing and otherwise), have you checked if that series would need
+similar treatment?
 
-I'm on PTO the next two days, so I didn't get to writing
-a test for the busy bit. I think test 223 is a good candidate,
-because it uses the NBD functionality. To test with push mode,
-I need to come up with a blockdebug configuration that will
-let me pause an incremental backup so I can test race-free.
-Maybe for V3, sorry.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-John Snow (6):
-  block/dirty-bitmap: add recording and busy properties
-  block/dirty-bitmaps: rename frozen predicate helper
-  block/dirty-bitmap: change semantics of enabled predicate
-  block/dirty-bitmap: explicitly lock bitmaps with successors
-  block/dirty-bitmaps: unify qmp_locked and user_locked calls
-  block/dirty-bitmaps: move comment block
 
- block/dirty-bitmap.c           | 110 ++++++++++++++++++---------------
- blockdev.c                     |  18 +++---
- include/block/dirty-bitmap.h   |   7 +--
- migration/block-dirty-bitmap.c |   8 +--
- nbd/server.c                   |   6 +-
- qapi/block-core.json           |  10 ++-
- qemu-deprecated.texi           |   6 ++
- tests/qemu-iotests/236.out     |  28 +++++++++
- 8 files changed, 122 insertions(+), 71 deletions(-)
+--NCelRHxKquXEfES4WRsRD6fWCLKLGsguR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-2.17.2
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxkpxoACgkQp6FrSiUn
+Q2qY5QgAnbdj9KoHPXb+h7itxqh5EO+WoFRdkTHX99p9Ba8ezueKSr9EGSAr/2LH
+T5vDezVrEOwfzGInWI6VqYBcllh/Hjpz0Dofh6DPLFV0sB0v1DU7gGu54amY0vXE
+40hmxvPcQPlcx+0MxlqYQjjXe/icIP3+mr7ZZVDxWaAx1n2qE4Lk0hXWDiB5cIbq
+D8PCTksHhuF4n/I2XD/zcLwZavDGFVc5sf9knn/fxqHwk1BQ/qI581Pl+Hqiwu9W
+nhamDSiGwV/4Er6SfgMxiyheBJrYJuhoz6qX07BXyUQe2tjqZQnhSWNLHUbRzwZd
+C/VNJSVzzO6NXOnXTzRJPuUi43YHoQ==
+=RH21
+-----END PGP SIGNATURE-----
+
+--NCelRHxKquXEfES4WRsRD6fWCLKLGsguR--
