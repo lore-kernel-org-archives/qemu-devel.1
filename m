@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37955)
+Received: from eggs.gnu.org ([209.51.188.92]:39395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gtvWI-0006lW-W0
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:28:15 -0500
+	(envelope-from <david@redhat.com>) id 1gtvbP-0008DC-J7
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gtvWH-0004qF-04
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:28:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45282)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gtvWG-0004mI-Mi
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:28:12 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 792FBC049E20
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 14:18:34 +0000 (UTC)
-References: <871s4chvb2.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9e429792-cbea-c96c-ad48-7f5bdd7ef781@redhat.com>
-Date: Wed, 13 Feb 2019 15:18:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <871s4chvb2.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Seeking QEMU makefile advice
+	(envelope-from <david@redhat.com>) id 1gtvbM-00022f-VM
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:33:30 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 13 Feb 2019 15:33:07 +0100
+Message-Id: <20190213143322.31371-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/15] s390x/tcg: Implement floating-point
+ extension facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +18,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On 13/02/19 10:49, Markus Armbruster wrote:
-> * Define QAPI_COMMON_MODULES, QAPI_TARGET_MODULES and QAPI_MODULES in
->   Makefile.obj
-> 
-> * Add to util-obj-y in Makefile.obj
-> 
-> * Add to obj-y in Makefile.target
+This series is based on the patches currently on the list:
+- softfloat: Implement float128_to_uint32
+- softfloat: add float128_is_{normal,denormal}
+- s390x: add zPCI feature to "qemu" CPU model
 
-Why can't both be in Makefile.objs, or in qapi/Makefile.objs?
+For the KVM folks, only the last patch is of interest.
 
-Paolo
+The floating-point extension facility seems to be used often without
+checking by user space. Vector instruction support seems to somewhat also
+rely on it being available. Some parts are already implemented, others
+not or are broken.
 
->   No go, because QAPI_TARGET_MODULES is blank there.  To make progress,
->   I duplicated its definition there, marked FIXME.
-> 
-> Message-Id: <20190206181725.14337-8-armbru@redhat.com>
-> https://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg01652.html
-> Diff appended for your convenience.
-> 
-> I've since realized QAPI_TARGET_MODULES is blank there because it only
-> gets defined further down, via include $(SRC_PATH)/Makefile.objs.
-> 
-> This leads me to my problem:
-> 
-> * On the one hand, I want to add to obj-y after the include defines
->   QAPI_TARGET_MODULES.
-> 
-> * On the other hand, I need to be done with adding to obj-y before the
->   all-obj-y := $(obj-y) line.
-> 
-> Can't satisfy both.  Any ideas on how to better distribute the work
-> between the makefiles?
+Fix some stuff in fpu code, add some FIXMEs to indicate what is definetly
+missing and implement all BFP stuff needed for the floating-point extension
+facility. Finally, enable it for TCG, adding it to the CPU model for the
+4.0 compat machine.
+
+This series also contains some refactorings needed for floating-point
+vector instruction support.
+
+v1 -> v2:
+- "s390x/tcg: Fix TEST DATA CLASS instructions"
+-- Simplify + use marko
+- "s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)"
+-- Fix some whitespace/newline issues
+- "s390x/tcg: Handle SET FPC AND LOAD FPC 3-bit BFP rounding modes"
+-- If FPE is not installed, also bail out on 3rd BFP bit
+- "s390x/tcg: Implement XxC and checks for most FP instructions"
+-- Use helper functions to simplify checks+mangling+unmangling
+-- Take care of FPE facility state
+-- Fix that XxC is actually bit 1, not bit 0
+- "s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)"
+-- Also use new helper functions
+
+David Hildenbrand (15):
+  s390x/tcg: Fix TEST DATA CLASS instructions
+  s390x/tcg: Fix rounding from float128 to uint64_t/uin32_t
+  s390x/tcg: Factor out conversion of softfloat exceptions
+  s390x/tcg: Fix parts of IEEE exception handling
+  s390x/tcg: Hide IEEE underflows in some scenarios
+  s390x/tcg: Refactor SET FPC AND SIGNAL handling
+  s390x/tcg: Fix simulated-IEEE exceptions
+  s390x/tcg: Handle SET FPC AND LOAD FPC 3-bit BFP rounding modes
+  s390x/tcg: Check for exceptions in SET BFP ROUNDING MODE
+  s390x/tcg: Refactor saving/restoring the bfp rounding mode
+  s390x/tcg: Prepare for IEEE-inexact-exception control (XxC)
+  s390x/tcg: Implement XxC and checks for most FP instructions
+  s390x/tcg: Implement rounding mode and XxC for LOAD ROUNDED
+  s390x/tcg: Handle all rounding modes overwritten by BFP instructions
+  s390x: Add floating-point extension facility to "qemu" cpu model
+
+ target/s390x/fpu_helper.c   | 550 ++++++++++++++++++++++--------------
+ target/s390x/gen-features.c |   5 +
+ target/s390x/helper.h       |   9 +-
+ target/s390x/insn-data.def  |  12 +-
+ target/s390x/internal.h     |   9 +
+ target/s390x/translate.c    | 315 ++++++++++++++-------
+ 6 files changed, 581 insertions(+), 319 deletions(-)
+
+-- 
+2.17.2
