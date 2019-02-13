@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39304)
+Received: from eggs.gnu.org ([209.51.188.92]:39148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGB-00049G-M0
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:44 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG4-00043i-Ef
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG6-0005S7-Qz
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57482)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005JN-0O
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtxG6-0005Pc-6X
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:38 -0500
+	id 1gtxG1-0005FM-EB
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:33 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Feb 2019 17:18:58 +0100
-Message-Id: <20190213161913.22107-11-marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 17:18:55 +0100
+Message-Id: <20190213161913.22107-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 References: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 10/25] chardev: remove unused 'sioc' variable
- & cleanup paths
+Subject: [Qemu-devel] [PULL v2 07/25] chardev: forbid 'wait' option with
+ client sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,111 +33,112 @@ Cc: peter.maydell@linaro.org
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-The 'sioc' variable in qmp_chardev_open_socket was unused since
-
-  commit 3e7d4d20d3a528b1ed10b1dc3d83119bfb0c5f24
-  Author: Peter Xu <peterx@redhat.com>
-  Date:   Tue Mar 6 13:33:17 2018 +0800
-
-    chardev: use chardev's gcontext for async connect
+The 'wait'/'nowait' parameter is used to tell server sockets whether to
+block until a client is accepted during initialization. Client chardevs
+have always silently ignored this option. Various tests were mistakenly
+passing this option for their client chardevs.
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190211182442.8542-9-berrange@redhat.com>
+Message-Id: <20190211182442.8542-6-berrange@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-socket.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+ chardev/char-socket.c          | 12 +++++++++++-
+ tests/ivshmem-test.c           |  2 +-
+ tests/libqtest.c               |  4 ++--
+ tests/test-filter-redirector.c |  4 ++--
+ 4 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 8a6e203da7..8a5e5c2fe7 100644
+index 743b7b11cd..728342dc9f 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -1073,7 +1073,6 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     bool is_waitconnect =3D sock->has_wait    ? sock->wait    : false;
-     bool is_websock     =3D sock->has_websocket ? sock->websocket : fals=
-e;
-     int64_t reconnect   =3D sock->has_reconnect ? sock->reconnect : 0;
--    QIOChannelSocket *sioc =3D NULL;
-     SocketAddress *addr;
-=20
-     s->is_listen =3D is_listen;
-@@ -1088,7 +1087,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         if (!creds) {
-             error_setg(errp, "No TLS credentials with id '%s'",
-                        sock->tls_creds);
--            goto error;
-+            return;
+@@ -1047,6 +1047,12 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
+ket *sock,
+             error_setg(errp, "%s", "Websocket client is not implemented"=
+);
+             return false;
          }
-         s->tls_creds =3D (QCryptoTLSCreds *)
-             object_dynamic_cast(creds,
-@@ -1096,20 +1095,20 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         if (!s->tls_creds) {
-             error_setg(errp, "Object with id '%s' is not TLS credentials=
-",
-                        sock->tls_creds);
--            goto error;
-+            return;
-         }
-         object_ref(OBJECT(s->tls_creds));
-         if (is_listen) {
-             if (s->tls_creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_S=
-ERVER) {
-                 error_setg(errp, "%s",
-                            "Expected TLS credentials for server endpoint=
-");
--                goto error;
-+                return;
-             }
-         } else {
-             if (s->tls_creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_C=
-LIENT) {
-                 error_setg(errp, "%s",
-                            "Expected TLS credentials for client endpoint=
-");
--                goto error;
-+                return;
-             }
-         }
-     }
-@@ -1117,7 +1116,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     s->addr =3D addr =3D socket_address_flatten(sock->addr);
-=20
-     if (!qmp_chardev_validate_socket(sock, addr, errp)) {
--        goto error;
-+        return;
++        if (sock->has_wait) {
++            error_setg(errp, "%s",
++                       "'wait' option is incompatible with "
++                       "socket in client connect mode");
++            return false;
++        }
      }
 =20
-     qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_RECONNECTABLE);
-@@ -1153,7 +1152,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-             if (qio_net_listener_open_sync(s->listener, s->addr, errp) <=
- 0) {
-                 object_unref(OBJECT(s->listener));
-                 s->listener =3D NULL;
--                goto error;
-+                return;
-             }
+     return true;
+@@ -1220,7 +1226,11 @@ static void qemu_chr_parse_socket(QemuOpts *opts, =
+ChardevBackend *backend,
+     sock->tn3270 =3D is_tn3270;
+     sock->has_websocket =3D true;
+     sock->websocket =3D is_websock;
+-    sock->has_wait =3D true;
++    /*
++     * We have different default to QMP for 'wait' when 'server'
++     * is set, hence we can't just check for existence of 'wait'
++     */
++    sock->has_wait =3D qemu_opt_find(opts, "wait") || is_listen;
+     sock->wait =3D is_waitconnect;
+     sock->has_reconnect =3D qemu_opt_find(opts, "reconnect");
+     sock->reconnect =3D reconnect;
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 4911b69317..942ddc9192 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -295,7 +295,7 @@ static void setup_vm_with_server(IVState *s, int nvec=
+tors)
+ {
+     char *cmd;
 =20
-             qapi_free_SocketAddress(s->addr);
-@@ -1171,16 +1170,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
-                                                       chr->gcontext);
-             }
-         } else if (qemu_chr_wait_connected(chr, errp) < 0) {
--            goto error;
-+            return;
-         }
-     }
--
--    return;
--
--error:
--    if (sioc) {
--        object_unref(OBJECT(sioc));
--    }
- }
+-    cmd =3D g_strdup_printf("-chardev socket,id=3Dchr0,path=3D%s,nowait =
+"
++    cmd =3D g_strdup_printf("-chardev socket,id=3Dchr0,path=3D%s "
+                           "-device ivshmem-doorbell,chardev=3Dchr0,vecto=
+rs=3D%d",
+                           tmpserver, nvectors);
 =20
- static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backen=
-d,
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 6fb30855fa..c49b85482d 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -232,9 +232,9 @@ QTestState *qtest_init_without_qmp_handshake(const ch=
+ar *extra_args)
+     qtest_add_abrt_handler(kill_qemu_hook_func, s);
+=20
+     command =3D g_strdup_printf("exec %s "
+-                              "-qtest unix:%s,nowait "
++                              "-qtest unix:%s "
+                               "-qtest-log %s "
+-                              "-chardev socket,path=3D%s,nowait,id=3Dcha=
+r0 "
++                              "-chardev socket,path=3D%s,id=3Dchar0 "
+                               "-mon chardev=3Dchar0,mode=3Dcontrol "
+                               "-machine accel=3Dqtest "
+                               "-display none "
+diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirecto=
+r.c
+index 9ca9feabf8..6dc21dd4fb 100644
+--- a/tests/test-filter-redirector.c
++++ b/tests/test-filter-redirector.c
+@@ -96,7 +96,7 @@ static void test_redirector_tx(void)
+         "-device %s,netdev=3Dqtest-bn0,id=3Dqtest-e0 "
+         "-chardev socket,id=3Dredirector0,path=3D%s,server,nowait "
+         "-chardev socket,id=3Dredirector1,path=3D%s,server,nowait "
+-        "-chardev socket,id=3Dredirector2,path=3D%s,nowait "
++        "-chardev socket,id=3Dredirector2,path=3D%s "
+         "-object filter-redirector,id=3Dqtest-f0,netdev=3Dqtest-bn0,"
+         "queue=3Dtx,outdev=3Dredirector0 "
+         "-object filter-redirector,id=3Dqtest-f1,netdev=3Dqtest-bn0,"
+@@ -166,7 +166,7 @@ static void test_redirector_rx(void)
+         "-device %s,netdev=3Dqtest-bn0,id=3Dqtest-e0 "
+         "-chardev socket,id=3Dredirector0,path=3D%s,server,nowait "
+         "-chardev socket,id=3Dredirector1,path=3D%s,server,nowait "
+-        "-chardev socket,id=3Dredirector2,path=3D%s,nowait "
++        "-chardev socket,id=3Dredirector2,path=3D%s "
+         "-object filter-redirector,id=3Dqtest-f0,netdev=3Dqtest-bn0,"
+         "queue=3Drx,indev=3Dredirector0 "
+         "-object filter-redirector,id=3Dqtest-f1,netdev=3Dqtest-bn0,"
 --=20
 2.21.0.rc0.1.g036caf7885
