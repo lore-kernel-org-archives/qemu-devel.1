@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56221)
+Received: from eggs.gnu.org ([209.51.188.92]:57302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gtqX3-0000AO-8u
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:08:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1gtqaa-0003Dc-Lo
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gtqX2-0001m0-2g
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:08:41 -0500
-References: <20190212214827.30543-1-lvivier@redhat.com>
-	<20190212214827.30543-2-lvivier@redhat.com>
-	<20190213012544.GS1884@umbus.fritz.box>
-	<20190213094259.37f78c6f@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <0a8d418d-61e3-f958-c73f-f7dd9ab7b7bb@redhat.com>
-Date: Wed, 13 Feb 2019 10:08:24 +0100
+	(envelope-from <berrange@redhat.com>) id 1gtqaS-0004l3-Bx
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:12:18 -0500
+Date: Wed, 13 Feb 2019 09:12:06 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190213091206.GB13960@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190212212917.26977-1-mdroth@linux.vnet.ibm.com>
+	<20190212212917.26977-2-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190213094259.37f78c6f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/4] numa,
- spapr: add thread-id in the possible_cpus list
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190212212917.26977-2-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] qga-win: include glib when building
+ VSS DLL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On 13/02/2019 09:42, Igor Mammedov wrote:
-> On Wed, 13 Feb 2019 12:25:45 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> 
->> On Tue, Feb 12, 2019 at 10:48:24PM +0100, Laurent Vivier wrote:
->>> spapr_possible_cpu_arch_ids() counts only cores, and so
->>> the number of available CPUs is the number of vCPU divided
->>> by smp_threads.
->>>
->>> ... -smp 4,maxcpus=8,cores=2,threads=2,sockets=2 -numa node,cpus=0,cpus=1 \
->>>                                                   -numa node,cpus=3,cpus=4 \
->>>                                                   -numa node -numa node
->>>
->>> This generates (info hotpluggable-cpus)
->>>
->>>    node-id: 0 core-id: 0 thread-id: 0 [thread-id: 1]
->>>    node-id: 0 core-id: 6 thread-id: 0 [thread-id: 1]
->>>    node-id: 1 core-id: 2 thread-id: 0 [thread-id: 1]
->>>    node-id: 1 core-id: 4 thread-id: 0 [thread-id: 1]
->>>
->>> And this command line generates the following error:
->>>
->>>    CPU(s) not present in any NUMA nodes: CPU 3 [core-id: 6]
->>>
->>> That is wrong because CPU 3 [core-id: 6] is assigned to node-id 0
->>> Moreover "cpus=4" is not valid, because it means core-id 8 but
->>> maxcpus is 8.
->>>
->>> With this patch we have now:
->>>
->>>    node-id: 0 core-id: 0 thread-id: 0
->>>    node-id: 0 core-id: 0 thread-id: 1
->>>    node-id: 0 core-id: 1 thread-id: 0
->>>    node-id: 1 core-id: 1 thread-id: 1
->>>    node-id: 0 core-id: 2 thread-id: 1
->>>    node-id: 1 core-id: 2 thread-id: 0
->>>    node-id: 0 core-id: 3 thread-id: 1
->>>    node-id: 0 core-id: 3 thread-id: 0
->>
->> I'm afraid this is not the right solution.  The point of the
->> hotpluggable cpus table is that it has exactly one entry for each
->> hotpluggable unit.  For PAPR that's a core, not a thread.
->>
->> So, the problem is with how the NUMA configuration code is
->> interpreting possible-cpus, not how the machine is building the table.
-> 
-> I'd suggest to deprecate/remove 'cpus' suboption in -numa.
-> One should use '-numa cpu' instead, which is written with
-> possible_cpus in mind.
+On Tue, Feb 12, 2019 at 03:29:16PM -0600, Michael Roth wrote:
+> Commit 3ebee3b191e defined assert() as g_assert(), but when we build
+> the VSS DLL component of QGA (to handle fsfreeze) we do not include
+> glib, which results in breakage when building with VSS support enabled.
+>=20
+> Fix this by including glib. Since the VSS DLL is built statically,
+> this introduces an additional dependency on static glib and supporting
+> libs for the mingw environment (possibly why we didn't include glib
+> originally), but VSS support already has very specific prerequisites
+> so it shouldn't affect too many build environments.
+>=20
+> Since the VSS DLL code does use qemu/osdep.h, this should also help
+> avoid future breakages and possibly allow for some clean ups in current
+> VSS code.
+>=20
+> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> ---
+>  qga/vss-win32/Makefile.objs | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
+> index 23d08da225..dad9d1b0ba 100644
+> --- a/qga/vss-win32/Makefile.objs
+> +++ b/qga/vss-win32/Makefile.objs
+> @@ -5,7 +5,7 @@ qga-vss-dll-obj-y +=3D requester.o provider.o install.o
+>  obj-qga-vss-dll-obj-y =3D $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
+>  $(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS =3D $(filter-out -Wstrict-prot=
+otypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wol=
+d-style-definition -Wredundant-decls -fstack-protector-all -fstack-protec=
+tor-strong, $(QEMU_CFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-=
+dtor
+> =20
+> -$(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enab=
+le-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
+> +$(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enab=
+le-stdcall-fixup -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -l=
+ws2_32 -static
 
-I agree.
+Adding -lglib-2.0 makes sense, but your commit message doesn't explain
+why -lintl or -lws2_32 are being added & they don't really make sense
+to me.
 
-Should I keep the patch to remove the incomplete CPU mapping support?
 
-Thanks,
-Laurent
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
