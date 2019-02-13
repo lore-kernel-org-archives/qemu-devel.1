@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37346)
+Received: from eggs.gnu.org ([209.51.188.92]:41072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtoxW-00070L-UB
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:27:56 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gtpMN-00023p-Nw
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:53:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gtokD-00055T-1b
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:14:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gtokC-000552-PO
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:14:08 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 13 Feb 2019 15:14:01 +0800
-Message-Id: <20190213071401.11544-1-stefanha@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1gtpLi-0005fs-7i
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:52:55 -0500
+Date: Wed, 13 Feb 2019 15:52:47 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190213075247.GC26332@stefanha-x1.localdomain>
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] hostmem-file: reject invalid pmem file sizes
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oTHb8nViIGeoXxdp"
+Content-Disposition: inline
+In-Reply-To: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/17] block: local qiov helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,178 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, fam@euphon.net, kwolf@redhat.com, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 
-Guests started with NVDIMMs larger than the underlying host file produce
-confusing errors inside the guest.  This happens because the guest
-accesses pages beyond the end of the file.
 
-Check the pmem file size on startup and print a clear error message if
-the size is invalid.
+--oTHb8nViIGeoXxdp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1669053
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v2:
- * Propagate qemu_get_pmem_size() errors [Igor]
+On Thu, Feb 07, 2019 at 01:24:28PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> Here is a new simple helper for a very often patter
+> around qemu_iovec_init_external, when we need simple qiov with only
+> one iov, initialized from external buffer.
+>=20
+> v3:
+>   01-02: tiny improvements, described in patch-emails
+>   03-17: new patches
+>=20
+>   Note: only hw/scsi/scsi-disk.c not updated, as it has too tricky
+>         logic around @iov fields of structures. So, it is simpler to
+>         keep it as is.
+>=20
+> Previous series version was "[PATCH v2 0/2] block: local qiov helper: par=
+t I"
+> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01610.html
+>=20
+> Vladimir Sementsov-Ogievskiy (17):
+>   block: enhance QEMUIOVector structure
+>   block/io: use qemu_iovec_init_buf
+>   block/block-backend: use QEMU_IOVEC_INIT_BUF
+>   block/backup: use qemu_iovec_init_buf
+>   block/commit: use QEMU_IOVEC_INIT_BUF
+>   block/stream: use QEMU_IOVEC_INIT_BUF
+>   block/parallels: use QEMU_IOVEC_INIT_BUF
+>   block/qcow: use qemu_iovec_init_buf
+>   block/qcow2: use qemu_iovec_init_buf
+>   block/qed: use qemu_iovec_init_buf
+>   block/vmdk: use qemu_iovec_init_buf
+>   qemu-img: use qemu_iovec_init_buf
+>   migration/block: use qemu_iovec_init_buf
+>   tests/test-bdrv-drain: use QEMU_IOVEC_INIT_BUF
+>   hw/ide: drop iov field from IDEState
+>   hw/ide: drop iov field from IDEBufferedRequest
+>   hw/ide: drop iov field from IDEDMA
+>=20
+>  include/hw/ide/internal.h |  3 --
+>  include/qemu/iov.h        | 64 +++++++++++++++++++++++++++-
+>  block/backup.c            |  5 +--
+>  block/block-backend.c     | 13 +-----
+>  block/commit.c            |  7 +--
+>  block/io.c                | 89 +++++++++------------------------------
+>  block/parallels.c         | 13 +++---
+>  block/qcow.c              | 21 ++-------
+>  block/qcow2.c             | 12 +-----
+>  block/qed-table.c         | 16 ++-----
+>  block/qed.c               | 31 ++++----------
+>  block/stream.c            |  7 +--
+>  block/vmdk.c              |  7 +--
+>  hw/ide/atapi.c            | 14 +++---
+>  hw/ide/core.c             | 19 ++++-----
+>  migration/block.c         | 10 ++---
+>  qemu-img.c                | 10 +----
+>  tests/test-bdrv-drain.c   | 29 ++-----------
+>  18 files changed, 134 insertions(+), 236 deletions(-)
+>=20
+> --=20
+> 2.18.0
 
- include/qemu/osdep.h    | 13 ++++++++++
- backends/hostmem-file.c | 22 +++++++++++++++++
- util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
- util/oslib-win32.c      |  5 ++++
- 4 files changed, 93 insertions(+)
+I made the changes suggested by Eric in Patch 1.
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 840af09cb0..303d315c5d 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -570,6 +570,19 @@ void qemu_set_tty_echo(int fd, bool echo);
- void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
-                      Error **errp);
-=20
-+/**
-+ * qemu_get_pmem_size:
-+ * @filename: path to a pmem file
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Determine the size of a persistent memory file.  Besides supporting f=
-iles on
-+ * DAX file systems, this function also supports Linux devdax character
-+ * devices.
-+ *
-+ * Returns: the size or 0 on failure
-+ */
-+uint64_t qemu_get_pmem_size(const char *filename, Error **errp);
-+
- /**
-  * qemu_get_pid_name:
-  * @pid: pid of a process
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index ba601ce940..d62689179b 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -46,6 +46,28 @@ file_backend_memory_alloc(HostMemoryBackend *backend, =
-Error **errp)
-     gchar *name;
- #endif
-=20
-+    /*
-+     * Verify pmem file size since starting a guest with an incorrect si=
-ze
-+     * leads to confusing failures inside the guest.
-+     */
-+    if (fb->is_pmem && fb->mem_path) {
-+        Error *local_err =3D NULL;
-+        uint64_t size;
-+
-+        size =3D qemu_get_pmem_size(fb->mem_path, &local_err);
-+        if (!size) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-+
-+        if (backend->size > size) {
-+            error_setg(errp, "size property %" PRIu64 " is larger than "
-+                       "pmem file \"%s\" size %" PRIu64, backend->size,
-+                       fb->mem_path, size);
-+            return;
-+        }
-+    }
-+
-     if (!backend->size) {
-         error_setg(errp, "can't create backend with size 0");
-         return;
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 37c5854b9c..10d90d1783 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -500,6 +500,59 @@ void os_mem_prealloc(int fd, char *area, size_t memo=
-ry, int smp_cpus,
-     }
- }
-=20
-+uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
-+{
-+    struct stat st;
-+
-+    if (stat(filename, &st) < 0) {
-+        error_setg(errp, "unable to stat pmem file \"%s\"", filename);
-+        return 0;
-+    }
-+
-+#if defined(__linux__)
-+    /* Special handling for devdax character devices */
-+    if (S_ISCHR(st.st_mode)) {
-+        char *subsystem_path =3D NULL;
-+        char *subsystem =3D NULL;
-+        char *size_path =3D NULL;
-+        char *size_str =3D NULL;
-+        uint64_t ret =3D 0;
-+
-+        subsystem_path =3D g_strdup_printf("/sys/dev/char/%d:%d/subsyste=
-m",
-+                                         major(st.st_rdev), minor(st.st_=
-rdev));
-+        subsystem =3D g_file_read_link(subsystem_path, NULL);
-+        if (!subsystem) {
-+            error_setg(errp, "unable to read subsystem for pmem file \"%=
-s\"",
-+                       filename);
-+            goto devdax_err;
-+        }
-+
-+        if (!g_str_has_suffix(subsystem, "/dax")) {
-+            error_setg(errp, "pmem file \"%s\" is not a dax device", fil=
-ename);
-+            goto devdax_err;
-+        }
-+
-+        size_path =3D g_strdup_printf("/sys/dev/char/%d:%d/size",
-+                                    major(st.st_rdev), minor(st.st_rdev)=
-);
-+        if (!g_file_get_contents(size_path, &size_str, NULL, NULL)) {
-+            error_setg(errp, "unable to read size for pmem file \"%s\"",
-+                       size_path);
-+            goto devdax_err;
-+        }
-+
-+        ret =3D g_ascii_strtoull(size_str, NULL, 0);
-+
-+devdax_err:
-+        g_free(size_str);
-+        g_free(size_path);
-+        g_free(subsystem);
-+        g_free(subsystem_path);
-+        return ret;
-+    }
-+#endif /* defined(__linux__) */
-+
-+    return st.st_size;
-+}
-=20
- char *qemu_get_pid_name(pid_t pid)
- {
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index b4c17f5dfa..bd633afab6 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -560,6 +560,11 @@ void os_mem_prealloc(int fd, char *area, size_t memo=
-ry, int smp_cpus,
-     }
- }
-=20
-+uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
-+{
-+    error_setg(errp, "pmem support not available");
-+    return 0;
-+}
-=20
- char *qemu_get_pid_name(pid_t pid)
- {
---=20
-2.20.1
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--oTHb8nViIGeoXxdp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcY8zOAAoJEJykq7OBq3PI+OwIAMDBXYCghUBGFLRCaI5MZlcI
+yEdN/QbxUvdS0scyfxDhJwYBWsaVh+uS4z5XNcoXXKwwPG2HP75D9L7X07oJaJTi
+8kMj3ZGaHgM+mswwVWB2zEKtX/kBO7FYh17GoVC2Kaq5aO7i7jtZeimUCOBBecj4
+dU/iCqwyiH3MpsGapCiIkmzrY43Bh/EdQH0jj469hdpjpTZz81zvIKWPQCbaWiJH
+ci06D0rFVcZJSc9gU2wgT1BviatC9rXCBg5yO/PydEl2eN3ox81ZEKKbUNAK/Ubj
+SqQlPPRRt6DAvioWwrljB+0EClpv0ZA/a9DnDm3iZMTnxtlnWbaoMl2tGv47/vo=
+=BKSR
+-----END PGP SIGNATURE-----
+
+--oTHb8nViIGeoXxdp--
