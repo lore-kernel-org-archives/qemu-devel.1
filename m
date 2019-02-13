@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60974)
+Received: from eggs.gnu.org ([209.51.188.92]:60978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1gtvDO-0006hQ-1n
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:08:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gtvDc-0006hR-WB
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:08:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1gtv9I-0004G7-5q
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:04:29 -0500
-Received: from mail-wr1-f41.google.com ([209.85.221.41]:44120)
+	(envelope-from <alex.bennee@linaro.org>) id 1gtv8f-0003JZ-OM
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:03:55 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1gtv9G-0004AV-0F
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:04:27 -0500
-Received: by mail-wr1-f41.google.com with SMTP id v16so2593850wrn.11
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 06:04:22 -0800 (PST)
-Date: Wed, 13 Feb 2019 15:04:18 +0100
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20190213150418.70acfbdf@fiorina>
-In-Reply-To: <1545208851-6906-2-git-send-email-bishara@daynix.com>
-References: <1545208851-6906-1-git-send-email-bishara@daynix.com>
-	<1545208851-6906-2-git-send-email-bishara@daynix.com>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gtv8d-00036x-Kc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:03:49 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t18so2648146wrx.2
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 06:03:43 -0800 (PST)
+References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
+	<CAJ+F1CJLHPa3LtviMGQuuwjv-PMzeeR4tJGoHHOz_JqfRR927A@mail.gmail.com>
+	<9336d69b-8896-4a19-c580-b6ce5aefec2d@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <9336d69b-8896-4a19-c580-b6ce5aefec2d@redhat.com>
+Date: Wed, 13 Feb 2019 14:03:40 +0000
+Message-ID: <87imxniy4j.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qga-win: Adding support for Windows Server
- 2019 get-osinfo command
+Subject: Re: [Qemu-devel] [PATCH v2] Add a gitlab-ci file for Continuous
+ Integration testing on Gitlab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bishara AbuHattoum <bishara@daynix.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Yan Vugenfirer <yan@daynix.com>, Samee Jubran <sameeh@daynix.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On Wed, 19 Dec 2018 10:40:51 +0200
-Bishara AbuHattoum <bishara@daynix.com> wrote:
 
-> Since Windows Server 2016, Microsoft stopped upgrading the major and minor
-> versions of their new Windows Server product, so, the current functionali=
-ty
-> of checking major and minor version numbers to determine the Windows Serv=
-er
-> version wont work as expected.
-> The implemented solution here is to use the build number in addition to t=
+Thomas Huth <thuth@redhat.com> writes:
+
+> On 2019-02-13 13:06, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi
+>>
+>> On Wed, Feb 13, 2019 at 12:55 PM Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>> This is very convenient for people like me who store their QEMU git tre=
+es
+>>> on gitlab.com: Automatic CI pipelines are now run for each branch that =
+is
+>>> pushed to the server - useful for some extra-testing before sending PUL=
+L-
+>>> requests for example. Since the runtime of the jobs is limited to 1h, t=
 he
-> major and minor version numbers of the product to determine the Windows
-> Server product version.
-> The final build number of Windows Server 2016 is 14939, and
-> the final build number of Windows Server 2019 is 17764, so any Windows
-> Server product that has the major version of 10 and minor version of 0
-> with a build number lower or equal to 14939 will resemble 2016 and if the
-> build number is lower or equal to 17763 will resemble 2019.
->=20
-> Reference:
-> https://techcommunity.microsoft.com/t5/Windows-Server-Insiders/Windows-Se=
-rver-2019-version-info/m-p/293112/highlight/true#M859
->=20
-> Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
-> ---
->  qga/commands-win32.c | 29 +++++++++++++++++++++++++++--
->  1 file changed, 27 insertions(+), 2 deletions(-)
->=20
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 62e1b51..3985b40 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -2009,12 +2009,24 @@ static ga_matrix_lookup_t const WIN_VERSION_MATRI=
-X[2][8] =3D {
->          { 6, 1, "Microsoft Windows Server 2008 R2",     "2008r2"},
->          { 6, 2, "Microsoft Windows Server 2012",        "2012"},
->          { 6, 3, "Microsoft Windows Server 2012 R2",     "2012r2"},
-> -        {10, 0, "Microsoft Windows Server 2016",        "2016"},
-> +        { 0, 0, 0},
->          { 0, 0, 0},
->          { 0, 0, 0}
->      }
->  };
-> =20
-> +typedef struct _ga_win_10_0_server_t {
-> +    int final_build;
-> +    char const *version;
-> +    char const *version_id;
-> +} ga_win_10_0_server_t;
-> +
-> +static ga_win_10_0_server_t const WIN_10_0_SERVER_VERSION_MATRIX[3] =3D {
-> +    {14393, "Microsoft Windows Server 2016",    "2016"},
-> +    {17763, "Microsoft Windows Server 2019",    "2019"},
-> +    {0, 0}
-> +};
-> +
->  static void ga_get_win_version(RTL_OSVERSIONINFOEXW *info, Error **errp)
->  {
->      typedef NTSTATUS(WINAPI * rtl_get_version_t)(
-> @@ -2039,10 +2051,23 @@ static char *ga_get_win_name(OSVERSIONINFOEXW con=
-st *os_version, bool id)
->  {
->      DWORD major =3D os_version->dwMajorVersion;
->      DWORD minor =3D os_version->dwMinorVersion;
-> +    DWORD build =3D os_version->dwBuildNumber;
->      int tbl_idx =3D (os_version->wProductType !=3D VER_NT_WORKSTATION);
->      ga_matrix_lookup_t const *table =3D WIN_VERSION_MATRIX[tbl_idx];
-> +    ga_win_10_0_server_t const *win_10_0_table =3D WIN_10_0_SERVER_VERSI=
-ON_MATRIX;
->      while (table->version !=3D NULL) {
-> -        if (major =3D=3D table->major && minor =3D=3D table->minor) {
-> +        if (major =3D=3D 10 && minor =3D=3D 0 && tbl_idx) {
-> +            while (win_10_0_table->version !=3D NULL) {
-> +                if (build <=3D win_10_0_table->final_build) {
+>>> jobs are distributed into multiple pipelines - this way everything fini=
+shs
+>>> fine within time (ca. 30 minutes currently).
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  An example can be seen here: https://gitlab.com/huth/qemu/pipelines/
+>>>
+>>>  I'd really like to get this into the main QEMU repository, so that I d=
+on't
+>>>  have to cherry-pick this patch onto my testing branches anymore each t=
+ime
+>>>  I want to test before sending a PULL request...
+>>>
+>>>  .gitlab-ci.yml | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>>>  MAINTAINERS    |  5 ++++
+>>>  2 files changed, 78 insertions(+)
+>>>  create mode 100644 .gitlab-ci.yml
+>>>
+>>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>>> new file mode 100644
+>>> index 0000000..79d02cf
+>>> --- /dev/null
+>>> +++ b/.gitlab-ci.yml
+>>> @@ -0,0 +1,73 @@
+>>> +before_script:
+>>> + - apt-get update -qq
+>>> + - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev ge=
+nisoimage
+>>> +
+>>> +build-system1:
+>>> + script:
+>>> + - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard=
+-dev
+>>> +      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
+>>> + - ./configure --enable-werror --target-list=3D"aarch64-softmmu alpha-=
+softmmu
+>>> +      cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazee=
+l-softmmu
+>>> +      mips64el-softmmu m68k-softmmu ppc-softmmu riscv64-softmmu sparc-=
+softmmu"
+>>> + - make -j2
+>>
+>> Have you tried $(nproc) ?
+>
+> The containers are only single CPU there. I'm using -j2 just in case one
+> of the processes is blocked by waiting for IO, the other one can still
+> continue compiling.
+>
+>> Despite the duplication of CI files, which is not really a problem imho,
+>>
+>> lgtm,
+>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Thanks!
+>
+> And yes, I also think the duplication of the CI files should not really
+> be a problem - it's rather a plus since we also got test variations this
+> way. I already found some bugs with this here that were not detected by
+> the other CI setups yet (e.g. since one of the pipelines uses
+> --disable-replication and other --disable-xxx flags).
 
-You should reverse the order of entries in you table for this to work,
-or break after first match. Otherwise you will always match the last
-entry.
+Sure I'm happy to have a thousand flowers bloom in this regard.
 
-    Tomas
+Do you know if gitlab does build status buttons like the others?
 
-> +                    if (id) {
-> +                        return g_strdup(win_10_0_table->version_id);
-> +                    } else {
-> +                        return g_strdup(win_10_0_table->version);
-> +                    }
-> +                }
-> +                win_10_0_table++;
-> +            }
-> +        } else if (major =3D=3D table->major && minor =3D=3D table->mino=
-r) {
->              if (id) {
->                  return g_strdup(table->version_id);
->              } else {
-> --=20
-> 1.8.3.1
->=20
->=20
-
-
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+--
+Alex Benn=C3=A9e
