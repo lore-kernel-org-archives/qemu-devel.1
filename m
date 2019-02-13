@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51485)
+Received: from eggs.gnu.org ([209.51.188.92]:52450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gtncJ-0002eK-W4
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:01:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1gtni8-0003yb-UG
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:08:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gtncC-00059W-KM
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:01:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gtnc4-00052u-Co
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:01:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1gtni6-0002qX-Oy
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:07:56 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <RO1P152MB1483088A66FD63B63FD7279A97650@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190212131136.GH9386@redhat.com>
-Date: Wed, 13 Feb 2019 07:01:35 +0100
-In-Reply-To: <20190212131136.GH9386@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
-	=?utf-8?Q?ang=C3=A9=22's?=
-	message of "Tue, 12 Feb 2019 13:11:36 +0000")
-Message-ID: <875ztokz0g.fsf@dusky.pond.sub.org>
+References: <20190212214216.GA17279@homura.localdomain>
+Date: Wed, 13 Feb 2019 07:07:44 +0100
+In-Reply-To: <20190212214216.GA17279@homura.localdomain> (Drew DeVault's
+	message of "Tue, 12 Feb 2019 16:42:16 -0500")
+Message-ID: <871s4ckyq7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Key repeat is no longer working on TTY and grub
- menu
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Combining -loadvm and -snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Leonardo Soares =?utf-8?Q?M=C3=BCller?= <leozinho29_eu@hotmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Drew DeVault <sir@cmpwn.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+Cc'ing the QCOW2 folks.
 
-> Yes, this is another regression accidentally introduced by the keyboard
-> state tracker.
->
-> When GTK does key repeat it omits the Up event for repeated keys.
->
-> IOW, you get
->
->     Press (a)
->     Press (a)
->     Press (a)
->     Release (a)
+Drew DeVault <sir@cmpwn.com> writes:
 
-This is how keyboards commonly do it, if I remember correctly.
-
-> Not
+> I recently ran into an issue where I found I couldn't combine the
+> -loadvm and -snapshot flags, nor any conceivable combination of
+> alternate approaches like loadvm via the monitor. Independently, both
+> options work as expected, but together I get this error:
 >
->     Press (a)
->     Release (a)
->     Press (a)
->     Release (a)
->     Press (a)
->     Release (a)
+> qemu-system-x86_64: Device 'virtio0' does not have the requested snapshot 'base'
 >
-> The keyboard state tracker doesn't take this into account, so it is
-> surpressing all except the first Press event.
+> The goal here is to resume the VM state from a snapshot, but to prevent
+> the guest from persisting writes to the underlying qcow2.
 >
-> This might affect other frontends too if they use the same trick for
-> key repeat
-
-Plausible.
+> I started digging into the code to understand this problem more, and I
+> was pretty deep in the weeds when I realized what the underlying problem
+> probably was and the kind of refactoring necessary to fix it - so I'm
+> here to touch base before moving any further.
+>
+> I believe this happens because -snapshot creates a temporary qcow2
+> overlaid on top of the disk you're using, and this overlay does not have
+> any snapshots copied, nor does any of the snapshot reading code (e.g.
+> qcow2_snapshot_list or qcow2_snapshot_goto) iterate over backing disks
+> to load their snapshots.
+>
+> At first I was going to adjust the qcow2 snapshot loading code (those
+> two functions in particular) to read through their backends, but I'm a
+> little unfamiliar with this code and the refactoring is not minor so I
+> would like to get feedback from some of the wiser folks on this mailing
+> list before I sink too much time into this.
+>
+> Thoughts?
+>
+> --
+> Drew DeVault
