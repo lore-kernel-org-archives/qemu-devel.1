@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51552)
+Received: from eggs.gnu.org ([209.51.188.92]:51742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gtuet-0000WB-CE
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:06 -0500
+	(envelope-from <wexu@redhat.com>) id 1gtufg-000136-PH
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gtues-0000ch-3O
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54535)
+	(envelope-from <wexu@redhat.com>) id 1gtufc-0001sT-Vv
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56652)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gtuer-0000Zm-Qh
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:01 -0500
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gtufX-0001hO-SC
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:47 -0500
 From: wexu@redhat.com
-Date: Wed, 13 Feb 2019 08:25:36 -0500
-Message-Id: <1550064346-17012-2-git-send-email-wexu@redhat.com>
+Date: Wed, 13 Feb 2019 08:25:44 -0500
+Message-Id: <1550064346-17012-10-git-send-email-wexu@redhat.com>
 In-Reply-To: <1550064346-17012-1-git-send-email-wexu@redhat.com>
 References: <1550064346-17012-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/11] virtio: rename structure for packed ring
+Subject: [Qemu-devel] [PATCH 09/11] virtio-net: update the head descriptor
+ in a chain lastly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +29,55 @@ Cc: wexu@redhat.com, jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, m
 
 From: Wei Xu <wexu@redhat.com>
 
-Redefine packed ring structure according to Qemu nomenclature.
+This is a helper for packed ring.
+
+To support packed ring, the head descriptor in a chain should be updated
+lastly since no 'avail_idx' like in packed ring to explicitly tell the
+driver side that all payload is ready after having done the chain, so
+the head is always visible immediately.
+
+This patch fills the header after done all the other ones.
 
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ hw/net/virtio-net.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index a1ff647..eafb4cc 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -39,6 +39,13 @@ typedef struct VRingDesc
-     uint16_t next;
- } VRingDesc;
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 3f319ef..330abea 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1251,6 +1251,8 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+     struct virtio_net_hdr_mrg_rxbuf mhdr;
+     unsigned mhdr_cnt = 0;
+     size_t offset, i, guest_offset;
++    VirtQueueElement head;
++    int head_len = 0;
  
-+typedef struct VRingPackedDesc {
-+    uint64_t addr;
-+    uint32_t len;
-+    uint16_t id;
-+    uint16_t flags;
-+} VRingPackedDesc;
-+
- typedef struct VRingAvail
- {
-     uint16_t flags;
-@@ -77,17 +84,25 @@ typedef struct VRing
-     VRingMemoryRegionCaches *caches;
- } VRing;
+     if (!virtio_net_can_receive(nc)) {
+         return -1;
+@@ -1328,7 +1330,13 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+         }
  
-+typedef struct VRingPackedDescEvent {
-+    uint16_t off_wrap;
-+    uint16_t flags;
-+} VRingPackedDescEvent ;
-+
- struct VirtQueue
- {
-     VRing vring;
+         /* signal other side */
+-        virtqueue_fill(q->rx_vq, elem, total, i++);
++        if (i == 0) {
++            head_len = total;
++            head = *elem;
++        } else {
++            virtqueue_fill(q->rx_vq, elem, len, i);
++        }
++        i++;
+         g_free(elem);
+     }
  
-     /* Next head to pop */
-     uint16_t last_avail_idx;
-+    bool last_avail_wrap_counter;
+@@ -1339,6 +1347,7 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+                      &mhdr.num_buffers, sizeof mhdr.num_buffers);
+     }
  
-     /* Last avail_idx read from VQ. */
-     uint16_t shadow_avail_idx;
-+    bool avail_wrap_counter;
++    virtqueue_fill(q->rx_vq, &head, head_len, 0);
+     virtqueue_flush(q->rx_vq, i);
+     virtio_notify(vdev, q->rx_vq);
  
-     uint16_t used_idx;
-+    bool used_wrap_counter;
- 
-     /* Last used index value we have signalled on */
-     uint16_t signalled_used;
 -- 
 1.8.3.1
