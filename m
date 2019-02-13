@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39767)
+Received: from eggs.gnu.org ([209.51.188.92]:43387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvc1-0000Bs-3P
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:34:10 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtvsm-00039U-LH
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:51:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gtvbv-0002PR-7W
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:34:09 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Feb 2019 15:33:21 +0100
-Message-Id: <20190213143322.31371-15-david@redhat.com>
-In-Reply-To: <20190213143322.31371-1-david@redhat.com>
-References: <20190213143322.31371-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 14/15] s390x/tcg: Handle all rounding modes
- overwritten by BFP instructions
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtvoN-0008Qd-Gr
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:47:00 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:56090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gtvoN-0007Z2-6I
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:46:55 -0500
+Date: Wed, 13 Feb 2019 16:46:30 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190213144629.GA10728@lap1>
+References: <20190213065357.16076-1-yuval.shaia@oracle.com>
+	<20190213065357.16076-9-yuval.shaia@oracle.com>
+	<d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/pvrdma: Delete unneeded function
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,76 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, dgilbert@redhat.com, armbru@redhat.com
 
-PoP describes "Round to nearest with ties away from 0" as
-  "The candidate nearest to the input value is selected. In case of a tie,
-   the candidate selected is the one that is larger in magnitude."
+On Wed, Feb 13, 2019 at 01:40:34PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 2/13/19 7:53 AM, Yuval Shaia wrote:
+> > The function argument rdma_dev_res is not needed as it is stored in t=
+he
+> > backend_dev object at init.
+> >=20
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+>=20
+> Should we teach checkpatch.pl to check name/space/email?
 
-While float_round_ties_away is according to the introducing commit
-f9288a76f181 ("softfloat: Add support for ties-away rounding")
-  "roundTiesToAway: the floating-point number nearest to the infinitely
-   precise result shall be delivered; if the two nearest floating-point
-   numbers bracketing an unrepresentable infinitely precise result are
-   equally near, the one with larger magnitude shall be delivered."
+Nice idea :)
 
-So this could be it if we're lucky ;)
+Marcel, i copied it from your signature so you may want to check it.
+Anyway, is re-spin needed or you can fix it for the PR?
 
-Handle "round to prepare for shorter precision" just as when setting it
-via SET FLOATING POINT and friends.
-
-As all instructions properly check for valid rounding modes in translate.c
-we can add an assert. Fix one missing empty line.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/fpu_helper.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 5e4b76f4aa..f790ec0c8e 100644
---- a/target/s390x/fpu_helper.c
-+++ b/target/s390x/fpu_helper.c
-@@ -397,14 +397,26 @@ uint32_t HELPER(cxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
- int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3)
- {
-     int ret = env->fpu_status.float_rounding_mode;
-+
-     switch (m3) {
-     case 0:
-         /* current mode */
-         break;
-     case 1:
--        /* biased round no nearest */
-+        /* round to nearest with ties away from 0 */
-+        set_float_rounding_mode(float_round_ties_away, &env->fpu_status);
-+        break;
-+    case 3:
-+        /*
-+         * round to prepare for shorter precision
-+         *
-+         * FIXME: we actually want something like round_to_odd, but that
-+         * does not support all data types yet.
-+         */
-+        set_float_rounding_mode(float_round_to_zero, &env->fpu_status);
-+        break;
-     case 4:
--        /* round to nearest */
-+        /* round to nearest with ties to even */
-         set_float_rounding_mode(float_round_nearest_even, &env->fpu_status);
-         break;
-     case 5:
-@@ -419,6 +431,8 @@ int s390_swap_bfp_rounding_mode(CPUS390XState *env, int m3)
-         /* round to -inf */
-         set_float_rounding_mode(float_round_down, &env->fpu_status);
-         break;
-+    default:
-+        g_assert_not_reached();
-     }
-     return ret;
- }
--- 
-2.17.2
+Yuval
