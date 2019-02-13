@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59830)
+Received: from eggs.gnu.org ([209.51.188.92]:59856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtlvt-0003EU-N0
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvu-0003FY-HD
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtlvr-0005BK-TJ
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:01 -0500
-Date: Wed, 13 Feb 2019 12:30:37 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvr-0005BW-WD
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:02 -0500
+Date: Wed, 13 Feb 2019 14:50:33 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213013037.GT1884@umbus.fritz.box>
-References: <20190212214827.30543-1-lvivier@redhat.com>
-	<20190212214827.30543-5-lvivier@redhat.com>
+Message-ID: <20190213035032.GC1884@umbus.fritz.box>
+References: <154999583316.690774.15072605479770041782.stgit@bahia.lan>
+	<154999585977.690774.12822496774363025882.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wYXww9TlNKyqAMAe"
+	protocol="application/pgp-signature"; boundary="a9msq94+WlNd0NRk"
 Content-Disposition: inline
-In-Reply-To: <20190212214827.30543-5-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 4/4] numa: check threads of the same core are
- on the same node
+In-Reply-To: <154999585977.690774.12822496774363025882.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v4 04/15] spapr: Expose the name of the
+ interrupt controller node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,135 +25,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 
---wYXww9TlNKyqAMAe
-Content-Type: text/plain; charset=us-ascii
+--a9msq94+WlNd0NRk
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 12, 2019 at 10:48:27PM +0100, Laurent Vivier wrote:
-> A core cannot be split between two nodes.
-> To check if a thread of the same core has already been assigned to a node,
-> this patch reverses the numa topology checking order and exits if the
-> topology is not valid.
-
-I'm not entirely sure if this makes sense to enforce generically.
-
-It's certainly true for PAPR - we have no way to represent threads
-with different NUMA nodes to the guest.
-
-It probably makes sense for everything - the whole point of threading
-is to take better advantage of latencies accessing memory, so it seems
-implausible that the threads would have different paths to memory.
-
-But... there are some pretty weird setups out there, so I'm not sure
-it's a good idea to enforce a restriction generically that's not
-actually inherent in the structure of the problem.
-
+On Tue, Feb 12, 2019 at 07:24:19PM +0100, Greg Kurz wrote:
+> This will be needed by PHB hotplug in order to access the "phandle"
+> property of the interrupt controller node.
 >=20
-> Update test/numa-test accordingly.
->=20
-> Fixes: 722387e78daf ("spapr: get numa node mapping from possible_cpus ins=
-tead of numa_get_node_for_cpu()")
-> Cc: imammedo@redhat.com
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  hw/core/machine.c | 27 ++++++++++++++++++++++++---
->  tests/numa-test.c |  4 ++--
->  2 files changed, 26 insertions(+), 5 deletions(-)
+> v4: - folded some changes from patches 15, 16 and 17 of v3
+>     - dropped useless helpers
+> ---
+>  hw/intc/spapr_xive.c        |    9 ++++-----
+>  hw/intc/xics_spapr.c        |    2 +-
+>  hw/ppc/spapr_irq.c          |   21 ++++++++++++++++++++-
+>  include/hw/ppc/spapr_irq.h  |    1 +
+>  include/hw/ppc/spapr_xive.h |    3 +++
+>  include/hw/ppc/xics_spapr.h |    2 ++
+>  6 files changed, 31 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index a2c29692b55e..c0a556b0dce7 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -602,6 +602,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
->      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
->      bool match =3D false;
->      int i;
-> +    const CpuInstanceProperties *previous_props =3D NULL;
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 815263ca72ab..f14e436ad4b9 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -317,6 +317,9 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
+r **errp)
+>      /* Map all regions */
+>      spapr_xive_map_mmio(xive);
 > =20
->      if (!mc->possible_cpu_arch_ids) {
->          error_setg(errp, "mapping of CPUs to NUMA node is not supported"=
-);
-> @@ -634,18 +635,38 @@ void machine_set_cpu_numa_node(MachineState *machin=
-e,
->          }
-> =20
->          /* skip slots with explicit mismatch */
-> -        if (props->has_thread_id && props->thread_id !=3D slot->props.th=
-read_id) {
-> +        if (props->has_socket_id && props->socket_id !=3D slot->props.so=
-cket_id) {
->                  continue;
->          }
-> =20
-> -        if (props->has_core_id && props->core_id !=3D slot->props.core_i=
-d) {
-> +        if (props->has_core_id) {
-> +            if (props->core_id !=3D slot->props.core_id) {
->                  continue;
-> +            }
-> +            if (slot->props.has_node_id) {
-> +                /* we have a node where our core is already assigned */
-> +                previous_props =3D &slot->props;
-> +            }
->          }
-> =20
-> -        if (props->has_socket_id && props->socket_id !=3D slot->props.so=
-cket_id) {
-> +        if (props->has_thread_id && props->thread_id !=3D slot->props.th=
-read_id) {
->                  continue;
->          }
-> =20
-> +        /* check current thread matches node of the thread of the same c=
-ore */
-> +        if (previous_props && previous_props->has_node_id &&
-> +            previous_props->node_id !=3D props->node_id) {
-> +            char *cpu_str =3D cpu_props_to_string(props);
-> +            char *node_str =3D cpu_props_to_string(previous_props);
-> +            error_setg(errp,  "Invalid node-id=3D%"PRIu64" of [%s]: core=
--id "
-> +                              "[%s] is already assigned to node-id %"PRI=
-u64,
-> +                              props->node_id, cpu_str,
-> +                              node_str, previous_props->node_id);
-> +            g_free(cpu_str);
-> +            g_free(node_str);
-> +            return;
-> +        }
+> +    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+> +                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
+SHIFT));
 > +
->          /* reject assignment if slot is already assigned, for compatibil=
-ity
->           * of legacy cpu_index mapping with SPAPR core based mapping do =
-not
->           * error out if cpu thread and matched core have the same node-i=
-d */
-> diff --git a/tests/numa-test.c b/tests/numa-test.c
-> index 5280573fc992..a7c3c5b4dee8 100644
-> --- a/tests/numa-test.c
-> +++ b/tests/numa-test.c
-> @@ -112,7 +112,7 @@ static void pc_numa_cpu(const void *data)
->          "-numa cpu,node-id=3D1,socket-id=3D0 "
->          "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
->          "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
-> -        "-numa cpu,node-id=3D1,socket-id=3D1,core-id=3D1,thread-id=3D1");
-> +        "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D1");
->      qtest_start(cli);
->      cpus =3D get_cpus(&resp);
->      g_assert(cpus);
-> @@ -141,7 +141,7 @@ static void pc_numa_cpu(const void *data)
->          } else if (socket =3D=3D 1 && core =3D=3D 1 && thread =3D=3D 0) {
->              g_assert_cmpint(node, =3D=3D, 0);
->          } else if (socket =3D=3D 1 && core =3D=3D 1 && thread =3D=3D 1) {
-> -            g_assert_cmpint(node, =3D=3D, 1);
-> +            g_assert_cmpint(node, =3D=3D, 0);
->          } else {
->              g_assert(false);
->          }
+>      qemu_register_reset(spapr_xive_reset, dev);
+>  }
+> =20
+> @@ -1443,7 +1446,6 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint32=
+_t nr_servers, void *fdt,
+>          cpu_to_be32(7),    /* start */
+>          cpu_to_be32(0xf8), /* count */
+>      };
+> -    gchar *nodename;
+> =20
+>      /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
+*/
+>      timas[0] =3D cpu_to_be64(xive->tm_base +
+> @@ -1453,10 +1455,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint3=
+2_t nr_servers, void *fdt,
+>                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
+>      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+> =20
+> -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
+SHIFT));
+> -    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
+> -    g_free(nodename);
+> +    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));
+> =20
+>      _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
+>      _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index e2d8b3818336..53bda6661b2a 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -254,7 +254,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t=
+ nr_servers, void *fdt,
+>      };
+>      int node;
+> =20
+> -    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
+> +    _FDT(node =3D fdt_add_subnode(fdt, 0, XICS_NODENAME));
+> =20
+>      _FDT(fdt_setprop_string(fdt, node, "device_type",
+>                              "PowerPC-External-Interrupt-Presentation"));
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 3fc34d7c8a43..b8d725e251ba 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -256,6 +256,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *=
+spapr, Error **errp)
+>      /* TODO: create the KVM XICS device */
+>  }
+> =20
+> +static const char *spapr_irq_get_nodename_xics(sPAPRMachineState *spapr)
+> +{
+> +    return XICS_NODENAME;
+> +}
+> +
+>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+>  #define SPAPR_IRQ_XICS_NR_MSIS     \
+>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+> @@ -276,6 +281,7 @@ sPAPRIrq spapr_irq_xics =3D {
+>      .post_load   =3D spapr_irq_post_load_xics,
+>      .reset       =3D spapr_irq_reset_xics,
+>      .set_irq     =3D spapr_irq_set_irq_xics,
+> +    .get_nodename =3D spapr_irq_get_nodename_xics,
+>  };
+> =20
+>  /*
+> @@ -415,6 +421,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int=
+ srcno, int val)
+>      xive_source_set_irq(&spapr->xive->source, srcno, val);
+>  }
+> =20
+> +static const char *spapr_irq_get_nodename_xive(sPAPRMachineState *spapr)
+> +{
+> +    return spapr->xive->nodename;
+> +}
+> +
+>  /*
+>   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+>   * with XICS.
+> @@ -438,6 +449,7 @@ sPAPRIrq spapr_irq_xive =3D {
+>      .post_load   =3D spapr_irq_post_load_xive,
+>      .reset       =3D spapr_irq_reset_xive,
+>      .set_irq     =3D spapr_irq_set_irq_xive,
+> +    .get_nodename =3D spapr_irq_get_nodename_xive,
+>  };
+> =20
+>  /*
+> @@ -585,6 +597,11 @@ static void spapr_irq_set_irq_dual(void *opaque, int=
+ srcno, int val)
+>      spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
+>  }
+> =20
+> +static const char *spapr_irq_get_nodename_dual(sPAPRMachineState *spapr)
+> +{
+> +    return spapr_irq_current(spapr)->get_nodename(spapr);
+> +}
+> +
+>  /*
+>   * Define values in sync with the XIVE and XICS backend
+>   */
+> @@ -615,7 +632,8 @@ sPAPRIrq spapr_irq_dual =3D {
+>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
+>      .post_load   =3D spapr_irq_post_load_dual,
+>      .reset       =3D spapr_irq_reset_dual,
+> -    .set_irq     =3D spapr_irq_set_irq_dual
+> +    .set_irq     =3D spapr_irq_set_irq_dual,
+> +    .get_nodename =3D spapr_irq_get_nodename_dual,
+>  };
+> =20
+>  /*
+> @@ -751,4 +769,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+>      .post_load   =3D spapr_irq_post_load_xics,
+>      .set_irq     =3D spapr_irq_set_irq_xics,
+> +    .get_nodename =3D spapr_irq_get_nodename_xics,
+>  };
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 0e6c65d55430..ad7127355441 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -48,6 +48,7 @@ typedef struct sPAPRIrq {
+>      int (*post_load)(sPAPRMachineState *spapr, int version_id);
+>      void (*reset)(sPAPRMachineState *spapr, Error **errp);
+>      void (*set_irq)(void *opaque, int srcno, int val);
+> +    const char *(*get_nodename)(sPAPRMachineState *spapr);
+>  } sPAPRIrq;
+> =20
+>  extern sPAPRIrq spapr_irq_xics;
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 885ca169cb29..2c57a59a3f5b 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -26,6 +26,9 @@ typedef struct sPAPRXive {
+>      XiveENDSource end_source;
+>      hwaddr        end_base;
+> =20
+> +    /* DT */
+> +    gchar *nodename;
+> +
+>      /* Routing table */
+>      XiveEAS       *eat;
+>      uint32_t      nr_irqs;
+> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> index b1ab27d022cf..b8d924baf437 100644
+> --- a/include/hw/ppc/xics_spapr.h
+> +++ b/include/hw/ppc/xics_spapr.h
+> @@ -29,6 +29,8 @@
+> =20
+>  #include "hw/ppc/spapr.h"
+> =20
+> +#define XICS_NODENAME "interrupt-controller"
+> +
+>  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+>                     uint32_t phandle);
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -161,24 +232,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---wYXww9TlNKyqAMAe
+--a9msq94+WlNd0NRk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjcz0ACgkQbDjKyiDZ
-s5L6kw/9EytTv20cZpl7Haa3pi/q5EcxyQ+wu23Sdy5I30sfoe9+Bbigoc5ETMHe
-LUnP/qoOcbFhpabnNovaJED6cg02ykbpLEQcDrcZV+lYphYhMG88hoHIpwY/nOFA
-X4lf7u2/ZiE/fAhXd8dn+yMS9g2utax+1PAJLPIH6jI7Lu6Xyo9jwvFjRlow1phU
-g45E7Zx+6U6IoqpSmqZo2nfoulv4m1I2EK+Iq/tZOBuQBw/PhT/qRSUQv+gZvpNy
-OPQpeiyvPzt+BLbBQGR1K6BX1TyCcX2/ugEZ3UVFBcPGCoUWgrCIdi4LygclhGl+
-VJQNJmCsvA4bAVEIilO9Oq8a5eUqOdQdI463qCko6fnzmVDiv0BBfkN/RYYgpyZu
-SOfMvrZ0w/Rfkayy/uTxYp/DTm7eKXCV3dEcirxZsSPSuMXAChzm1oZR83CChyAC
-rlNAp8XqXRd5Sdddm0u/o4YIlITai4E3i6p7CikKXOSvIbU87d+qF4BGbNXeCrGs
-rASubliisnXrvVU0YzKk/pNk1kzJ/0cWdt8FfHbjSD4/Xs6gRHzC70LYJ5+h5Z1O
-hAiujhZpVCmajmdEkT+pJNSltKhWjMyVUhcnLvkziRRxMkWk015ROgpz9VDbeGe+
-EU9fxgDIRF4kzDKVkUVHDtKuBNc6h+8ECa7HkO4DlUTy7zgnACs=
-=XY6O
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjlAgACgkQbDjKyiDZ
+s5KIPw//TsZ4DzblAOac+lGP0vnr+pGCPfHxk/ZlWexd1uCB+p+QcP+nXiyqQXVX
++QJ1jtl/RkFhw7SQChVv5Z4bywDIE4PV77lcnMH4r3TR3gNhACbr44nYZ94RIzEi
+mJwUnTIuQNTl6a43H+jWLe5yugKSNSEDYzBMNmRJvDX9B/gAlz01mHW0nWDNSD31
+CAwwnxkznDL8NyE+gnnNDJolMmiIKSil/l2YKjAKbwG+AbwaeTJZ5PJZ4DEX0ZQV
+YNdOHBffizANCeMTBeoTPu8/pyfZgN7FuvTTPkO1eCkfqT3PBLeAE/PV0tYLI2UU
++Q0GaltOISK4Chv04LqMjZ9v/rgVrQyhHlEdF/nwqjemckXBw3WqEkvjw0+DqTMT
+vq1DJB3V/GQPNE5sqBKyG6YE2FveKaXU91vJo8cx3BKnoAF87Bf7IFnuQq6uloAn
+tWZO/QUciHezPRHIKRiufESulNv3Gy9aOpfuJ6q6rxqUUM3t0+2y2ZZccVdM5/sm
+MRbfJcTIak5fwK9NtYJc/VbVptiIk6JJ6KydeHCoJqSQ7vWiYEs9StbQrkrAEJnU
+Hoot6HDl6xsaKAhU+2a5+SqYONQQHj+QsIvoZteNTXUuzYG/okASZpIKW3m9GfIX
+B1GQLG8Q+k55xBOxFK0nRwchlvSEu2MMbhsvTPVNVX5NKH+ye5w=
+=RZws
 -----END PGP SIGNATURE-----
 
---wYXww9TlNKyqAMAe--
+--a9msq94+WlNd0NRk--
