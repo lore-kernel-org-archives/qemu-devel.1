@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58028)
+Received: from eggs.gnu.org ([209.51.188.92]:59116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gtwnq-0005rk-4z
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:50:27 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gtws9-0000lz-9q
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gtwnV-0004Sn-QR
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:50:16 -0500
-Resent-Message-Id: <E1gtwnV-0004Sn-QR@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
+	(envelope-from <alifm@linux.ibm.com>) id 1gtws1-0000wK-1t
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:54:49 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54580
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gtwnV-0004Kk-Dv
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:50:05 -0500
-Message-ID: <155007206363.8665.18092691820396893471@ebba9967afc0>
-In-Reply-To: <1549945516-25643-1-git-send-email-changpeng.liu@intel.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gtwrq-0000io-QV
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:54:36 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1DFmvvc090557
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 10:54:27 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qmn0mcb2d-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 10:54:27 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Wed, 13 Feb 2019 15:54:26 -0000
+References: <20190212112323.15904-1-david@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Wed, 13 Feb 2019 10:54:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 13 Feb 2019 07:34:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] virtio-blk: set correct config size for
- the host driver
+In-Reply-To: <20190212112323.15904-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e36f47f0-04af-2677-184f-1bd8d8056076@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] s390x: add zPCI feature to "qemu" CPU
+ model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +42,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: changpeng.liu@intel.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, ldoktor@redhat.com, mst@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, sgarzare@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ5OTQ1NTE2LTI1NjQzLTEt
-Z2l0LXNlbmQtZW1haWwtY2hhbmdwZW5nLmxpdUBpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJp
-ZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBi
-ZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNTQ5
-OTQ1NTE2LTI1NjQzLTEtZ2l0LXNlbmQtZW1haWwtY2hhbmdwZW5nLmxpdUBpbnRlbC5jb20KU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gdmlydGlvLWJsazogc2V0IGNvcnJlY3QgY29uZmln
-IHNpemUgZm9yIHRoZSBob3N0IGRyaXZlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CmVycm9yOiBSZWYgcmVmcy9oZWFkcy9tYXN0ZXIgaXMgYXQgMGI1ZTc1
-MGJlYTYzNWIxNjdlYjAzZDg2YzNkOWEwOWJiZDQzYmMwNiBidXQgZXhwZWN0ZWQgZTQ3ZjgxYjYx
-NzY4NGM0NTQ2YWYyODZkMzA3YjY5MDE0YTgzNTM4YQpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogISBlNDdmODFiLi4wYjVlNzUwICBtYXN0ZXIgICAgIC0+IG1h
-c3RlciAgKHVuYWJsZSB0byB1cGRhdGUgbG9jYWwgcmVmKQogKiBbbmV3IHRhZ10gICAgICAgICBw
-YXRjaGV3LzE1NDk5NDU1MTYtMjU2NDMtMS1naXQtc2VuZC1lbWFpbC1jaGFuZ3BlbmcubGl1QGlu
-dGVsLmNvbSAtPiBwYXRjaGV3LzE1NDk5NDU1MTYtMjU2NDMtMS1naXQtc2VuZC1lbWFpbC1jaGFu
-Z3BlbmcubGl1QGludGVsLmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjA3
-MTAyNDQ1LjcxOTk4LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcvMjAxOTAy
-MDcxMDI0NDUuNzE5OTgtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20KIC0gW3RhZyB1cGRhdGVd
-ICAgICAgcGF0Y2hldy8yMDE5MDIwNzE2MDYxNy4xMTQyLTEtbWFyY2FuZHJlLmx1cmVhdUByZWRo
-YXQuY29tIC0+IHBhdGNoZXcvMjAxOTAyMDcxNjA2MTcuMTE0Mi0xLW1hcmNhbmRyZS5sdXJlYXVA
-cmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjEwMTA0NTM3LjE0
-ODgtMS15dXZhbC5zaGFpYUBvcmFjbGUuY29tIC0+IHBhdGNoZXcvMjAxOTAyMTAxMDQ1MzcuMTQ4
-OC0xLXl1dmFsLnNoYWlhQG9yYWNsZS5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8y
-MDE5MDIxMjAyNTI0MS41MzMwLTEtc3RlZmFuaGFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkw
-MjEyMDI1MjQxLjUzMzAtMS1zdGVmYW5oYUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAg
-IHBhdGNoZXcvMjAxOTAyMTIxMDUyMDEuMTM3OTUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcg
-LT4gcGF0Y2hldy8yMDE5MDIxMjEwNTIwMS4xMzc5NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9y
-ZwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwMjEyMTkzODU1LjEzMjIzLTEtY2Nh
-cnJhcmFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEyMTkzODU1LjEzMjIzLTEtY2NhcnJh
-cmFAcmVkaGF0LmNvbQplcnJvcjogQ291bGQgbm90IGZldGNoIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgog
-IEZpbGUgInBhdGNoZXctdGVzdGVyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNTIxLCBpbiB0ZXN0
-X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dm
-LCBUcnVlKQogIEZpbGUgInBhdGNoZXctdGVzdGVyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNDgs
-IGluIGdpdF9jbG9uZV9yZXBvCiAgICBzdGRvdXQ9bG9nZiwgc3RkZXJyPWxvZ2YpCiAgRmlsZSAi
-L3Vzci9saWI2NC9weXRob24zLjQvc3VicHJvY2Vzcy5weSIsIGxpbmUgNTU4LCBpbiBjaGVja19j
-YWxsCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNz
-LkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydnaXQnLCAncmVtb3RlJywgJ2FkZCcsICct
-ZicsICctLW1pcnJvcj1mZXRjaCcsICczYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0JywgJ2h0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdSddJyByZXR1
-cm5lZCBub24temVybyBleGl0IHN0YXR1cyAxCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0OTk0NTUxNi0yNTY0My0xLWdpdC1zZW5kLWVt
-YWlsLWNoYW5ncGVuZy5saXVAaW50ZWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+I noticed the qemu-iotests 200 was failing due to the commit
+"703fef6fcf3 : s390x/pci: Warn when adding PCI devices without the 
+'zpci' feature".
+
+This patch fixes the failure :).
+
+Thanks
+Farhan
+
+On 02/12/2019 06:23 AM, David Hildenbrand wrote:
+> As we now always have PCI support, let's add it to the "qemu" CPU model,
+> taking care of backwards compatibility.
+> 
+> Signed-off-by: David Hildenbrand<david@redhat.com>
+> ---
+> 
+> v1 -> v2:
+> - Use correct model identifiction of the z12 we emulate
+> 
+>   hw/s390x/s390-virtio-ccw.c  | 3 +++
+>   target/s390x/gen-features.c | 8 ++++++--
+>   2 files changed, 9 insertions(+), 2 deletions(-)
