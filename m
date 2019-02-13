@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41205)
+Received: from eggs.gnu.org ([209.51.188.92]:42927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtrUY-0005E6-AR
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:10:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gtrfA-0006qO-R2
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:21:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gtrUW-0005Kz-W6
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:10:10 -0500
-Date: Wed, 13 Feb 2019 11:09:56 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190213100956.GB994@localhost.localdomain>
-References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
-	<20190211034231.GD18083@stefanha-x1.localdomain>
-	<c861c023-c783-57f6-85ae-52ecba971636@virtuozzo.com>
-	<20190212032242.GC28401@stefanha-x1.localdomain>
-	<20190212115840.GB5283@localhost.localdomain>
-	<20190213065830.GA26332@stefanha-x1.localdomain>
+	(envelope-from <dgilbert@redhat.com>) id 1gtrf8-0006aM-KK
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:21:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gtrf8-0006Z1-AA
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:21:06 -0500
+Date: Wed, 13 Feb 2019 10:21:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190213102059.GB2601@work-vm>
+References: <20190213065357.16076-1-yuval.shaia@oracle.com>
+	<20190213065357.16076-6-yuval.shaia@oracle.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190213065830.GA26332@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
- wrapper code
+In-Reply-To: <20190213065357.16076-6-yuval.shaia@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/9] {monitor,
+ hw/pvrdma}: Expose device internals via monitor interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +28,597 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>, armbru@redhat.com
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
+* Yuval Shaia (yuval.shaia@oracle.com) wrote:
+> Allow interrogating device internals through HMP interface.
+> The exposed indicators can be used for troubleshooting by developers or
+> sysadmin.
+> There is no need to expose these attributes to a management system (e.x.
+> libvirt) because (1) most of them are not "device-management' related
+> info and (2) there is no guarantee the interface is stable.
+> 
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 
---a8Wt8u1KmwUX3Y2C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+OK for HMP
 
-Am 13.02.2019 um 07:58 hat Stefan Hajnoczi geschrieben:
-> On Tue, Feb 12, 2019 at 12:58:40PM +0100, Kevin Wolf wrote:
-> > Am 12.02.2019 um 04:22 hat Stefan Hajnoczi geschrieben:
-> > > On Mon, Feb 11, 2019 at 09:38:37AM +0000, Vladimir Sementsov-Ogievski=
-y wrote:
-> > > > 11.02.2019 6:42, Stefan Hajnoczi wrote:
-> > > > > On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogie=
-vskiy wrote:
-> > > > >> Hi all!
-> > > > >>
-> > > > >> We have a very frequent pattern of wrapping a coroutine_fn funct=
-ion
-> > > > >> to be called from non-coroutine context:
-> > > > >>
-> > > > >>    - create structure to pack parameters
-> > > > >>    - create function to call original function taking parameters=
- from
-> > > > >>      struct
-> > > > >>    - create wrapper, which in case of non-coroutine context will
-> > > > >>      create a coroutine, enter it and start poll-loop.
-> > > > >>
-> > > > >> Here is a draft of template code + example how it can be used to=
- drop a
-> > > > >> lot of similar code.
-> > > > >>
-> > > > >> Hope someone like it except me)
-> > > > >=20
-> > > > > My 2 cents.  Cons:
-> > > > >=20
-> > > > >   * Synchronous poll loops are an anti-pattern.  They block all o=
-f QEMU
-> > > > >     with the big mutex held.  Making them easier to write is
-> > > > >     questionable because we should aim to have as few of these as
-> > > > >     possible.
-> > > >=20
-> > > > Understand. Do we have a concept or a kind of target for a future t=
-o get rid of
-> > > > these a lot of poll-loops? What is the right way? At least for bloc=
-k-layer?
-> > >=20
-> > > It's non-trivial.  The nested event loop could be flattened if there =
-was
-> > > a mechanism to stop further activity on a specific object only (e.g.
-> > > BlockDriverState).  That way the event loop can continue processing
-> > > events for other objects and device emulation could continue for other
-> > > objects.
-> >=20
-> > The mechanism to stop activity on BlockDriverStates is bdrv_drain(). But
-> > I don't see how this is related. Nested event loops aren't for stopping
-> > concurrent activity (events related to async operations started earlier
-> > are still processed in nested event loops), but for making progress on
-> > the operation we're waiting for. They happen when synchronous code calls
-> > into asynchronous code.
-> >=20
-> > The way to get rid of them is making their callers async. I think we
-> > would come a long way if we ran QMP command handlers (at least the block
-> > related ones) and qemu-img operations in coroutines instead of blocking
-> > while we wait for the result.
->=20
-> A difficult caller is device reset, where we need to drain all requests.
-> But even converting some sync code paths to async is a win because it
-> removes places where QEMU can get stuck.
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Yes, as I said, draining a node can hang. And it can hang not because
-there are nested event loops or because of any other bad design
-decision, but because waiting for all requests to complete is required.
-
-The only thing we could try to improve this is cancelling requests after
-a timeout (or triggered by an OOB QMP command?) during a drain
-operation, but cancelling requests hasn't really been a success story so
-far.
-
-> Regarding block QMP handlers, do you mean suspending the monitor when
-> a command yields?  The monitor will be unresponsive to the outside
-> world, so this doesn't solve the problem from the QMP client's
-> perspective.  This is why async QMP and jobs are interesting but it's a
-> lot of work both inside QEMU and for clients like libvirt.
-
-Yes, it wouldn't keep the monitor responsive as long as the monitor
-protocol is synchronous. But it would keep the VM running at least, the
-GUI would stay responsive etc.
-
-Blocking the monitor is again nothing that restructuring the code could
-fix. It requires a change to the QMP protocol, but then it will easily
-fit in the current design.
-
-Nested event loops are unrelated.
-
-> > > Unfortunately there are interactions between objects like in block jo=
-bs
-> > > that act on multiple BDSes, so it becomes even tricky.
-> > >=20
-> > > A simple way of imagining this is to make each object an "actor"
-> > > coroutine.  The coroutine processes a single message (request) at a t=
-ime
-> > > and yields when it needs to wait.  Callers send messages and expect
-> > > asynchronous responses.  This model is bad for efficiency (parallelism
-> > > is necessary) but at least it offers a sane way of thinking about
-> > > multiple asynchronous components coordinating together.  (It's another
-> > > way of saying, let's put everything into coroutines.)
-> > >=20
-> > > The advantage of a flat event loop is that a hang in one object (e.g.
-> > > I/O getting stuck in one file) doesn't freeze the entire event loop.
-> >=20
-> > I think this one is more theoretical because you'll still have
-> > dependencies between the components. blk_drain_all() isn't hanging
-> > because the code is designed suboptimally, but because its semantics is
-> > to wait until all requests have completed. And it's called because this
-> > semantics is required.
->=20
-> If we try to convert everything to async there will be two cases:
-> 1. Accidental sync code which can be made async.  (Rare nowadays?)
-> 2. Fundamental synchronization points that require waiting.
->=20
-> When you reach a point that hangs there is still the possibility of a
-> timeout or an explicit cancel.  Today QEMU supports neither, so a
-> command that gets stuck will hang QEMU for as long as it takes.
->=20
-> If QMP clients want timeouts or cancel then making everything async is
-> necessary.  If not, then we can leave it as is and simply audit the code
-> for accidental sync code (there used to be a lot of this but it's rarer
-> now) and convert it.
-
-I'm not sure what makes sync code only "accidentally" sync, but at least
-everything the monitor does is sync.
-
-With your assessment that we can leave everything as it is if QMP
-clients don't want improvements, you're ignoring that currently, not
-only the QMP monitor becomes unresponsive, but it holds the BQL while
-doing so and brings down the whole VM this way. So even without changing
-the QMP protocol, there is something to be gained by making it async
-(i.e. executing the block layer command handlers in a coroutine).
-
-Kevin
-
---a8Wt8u1KmwUX3Y2C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJcY+z0AAoJEH8JsnLIjy/WPfkP/irIRo8UKhwJ7fo1QSccT8Mu
-7JdYNVKiKAb38933F1ldtFdjKYgzXzzgGaUA2fveH5w0K8brV0h070aDkCjZ178r
-1ba0YnY60vRYEgp3nSem+U/yn8+dKNriUlMzxlvoslF4C0E6nOVakIN4Xz5CRJ5o
-oNSHj4JeCzV6UE9v4PWBe6MtAFSP3ERXZBpNZ1oVVp0ZSHd4DKdRBftz6DYVK/Wd
-/LCMY7aUYdPlSrU6r/8cFBZIdiw+j+lqQTqzZ/SXsbF9TwM5R+D24kVrn6UTSJpZ
-yBGOYo6V+pH0mPbeLwThFG0uyL8srhgJ5ADMAgF/0T0aczJzBm5QHKpIPwg6PWvO
-DrbDn2QAa0uLekU0I/BLIxDx5xFst7A2K3i/Fs2mf7PAQa5Z7uSxKWDqeQaLYNyM
-RrHFjCl+ykQbgdWhKDeVEd9vBwGymO4OCoW1AipPM/54m7JH1gqJOTq9Y26lu4UH
-pMKy2h2rFryuS+BNfgyN2XrNc82z44rX9cuaBFve9NXCw/mPzmPUkODisoDzklUT
-w+tUana+geBOM9SBZ7t2/BcMEpDp5QekHBb57Jcu/yFaXu8qorXZCPgxooTi7m25
-SMEwmNskw/ciCdaBdY5z55R21ptZw49/7wqmaFhMrxOM1ljmyEuPo0C4I3cX15aE
-Yo+5uQ5S2tUm3aD4wdRd
-=dTEO
------END PGP SIGNATURE-----
-
---a8Wt8u1KmwUX3Y2C--
+> ---
+>  hmp-commands-info.hx      | 16 ++++++++
+>  hw/rdma/rdma_backend.c    | 70 ++++++++++++++++++++++++++---------
+>  hw/rdma/rdma_rm.c         |  7 ++++
+>  hw/rdma/rdma_rm_defs.h    | 27 +++++++++++++-
+>  hw/rdma/vmw/pvrdma.h      |  5 +++
+>  hw/rdma/vmw/pvrdma_hmp.h  | 21 +++++++++++
+>  hw/rdma/vmw/pvrdma_main.c | 77 +++++++++++++++++++++++++++++++++++++++
+>  monitor.c                 | 10 +++++
+>  8 files changed, 215 insertions(+), 18 deletions(-)
+>  create mode 100644 hw/rdma/vmw/pvrdma_hmp.h
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index cbee8b944d..9153c33974 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -524,6 +524,22 @@ STEXI
+>  Show CPU statistics.
+>  ETEXI
+>  
+> +#if defined(CONFIG_PVRDMA)
+> +    {
+> +        .name       = "pvrdmacounters",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show pvrdma device counters",
+> +        .cmd        = hmp_info_pvrdmacounters,
+> +    },
+> +
+> +STEXI
+> +@item info pvrdmacounters
+> +@findex info pvrdmacounters
+> +Show pvrdma device counters.
+> +ETEXI
+> +#endif
+> +
+>  #if defined(CONFIG_SLIRP)
+>      {
+>          .name       = "usernet",
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index 3a2913facf..0fb4842970 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -64,9 +64,9 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
+>      comp_handler(ctx, &wc);
+>  }
+>  
+> -static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+> +static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+>  {
+> -    int i, ne;
+> +    int i, ne, total_ne = 0;
+>      BackendCtx *bctx;
+>      struct ibv_wc wc[2];
+>  
+> @@ -89,12 +89,18 @@ static void rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+>              rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+>              g_free(bctx);
+>          }
+> +        total_ne += ne;
+>      } while (ne > 0);
+> +    atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
+>      qemu_mutex_unlock(&rdma_dev_res->lock);
+>  
+>      if (ne < 0) {
+>          rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+>      }
+> +
+> +    rdma_dev_res->stats.completions += total_ne;
+> +
+> +    return total_ne;
+>  }
+>  
+>  static void *comp_handler_thread(void *arg)
+> @@ -122,6 +128,9 @@ static void *comp_handler_thread(void *arg)
+>      while (backend_dev->comp_thread.run) {
+>          do {
+>              rc = qemu_poll_ns(pfds, 1, THR_POLL_TO * (int64_t)SCALE_MS);
+> +            if (!rc) {
+> +                backend_dev->rdma_dev_res->stats.poll_cq_ppoll_to++;
+> +            }
+>          } while (!rc && backend_dev->comp_thread.run);
+>  
+>          if (backend_dev->comp_thread.run) {
+> @@ -138,6 +147,7 @@ static void *comp_handler_thread(void *arg)
+>                                    errno);
+>              }
+>  
+> +            backend_dev->rdma_dev_res->stats.poll_cq_from_bk++;
+>              rdma_poll_cq(backend_dev->rdma_dev_res, ev_cq);
+>  
+>              ibv_ack_cq_events(ev_cq, 1);
+> @@ -271,7 +281,13 @@ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
+>  
+>  void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
+>  {
+> -    rdma_poll_cq(rdma_dev_res, cq->ibcq);
+> +    int polled;
+> +
+> +    rdma_dev_res->stats.poll_cq_from_guest++;
+> +    polled = rdma_poll_cq(rdma_dev_res, cq->ibcq);
+> +    if (!polled) {
+> +        rdma_dev_res->stats.poll_cq_from_guest_empty++;
+> +    }
+>  }
+>  
+>  static GHashTable *ah_hash;
+> @@ -333,7 +349,7 @@ static void ah_cache_init(void)
+>  
+>  static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+>                                  struct ibv_sge *dsge, struct ibv_sge *ssge,
+> -                                uint8_t num_sge)
+> +                                uint8_t num_sge, uint64_t *total_length)
+>  {
+>      RdmaRmMR *mr;
+>      int ssge_idx;
+> @@ -349,6 +365,8 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+>          dsge->length = ssge[ssge_idx].length;
+>          dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
+>  
+> +        *total_length += dsge->length;
+> +
+>          dsge++;
+>      }
+>  
+> @@ -445,8 +463,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+>              rc = mad_send(backend_dev, sgid_idx, sgid, sge, num_sge);
+>              if (rc) {
+>                  complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
+> +                backend_dev->rdma_dev_res->stats.mad_tx_err++;
+>              } else {
+>                  complete_work(IBV_WC_SUCCESS, 0, ctx);
+> +                backend_dev->rdma_dev_res->stats.mad_tx++;
+>              }
+>          }
+>          return;
+> @@ -458,20 +478,21 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+>      rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
+>      if (unlikely(rc)) {
+>          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+> -        goto out_free_bctx;
+> +        goto err_free_bctx;
+>      }
+>  
+> -    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge);
+> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
+> +                              &backend_dev->rdma_dev_res->stats.tx_len);
+>      if (rc) {
+>          complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> -        goto out_dealloc_cqe_ctx;
+> +        goto err_dealloc_cqe_ctx;
+>      }
+>  
+>      if (qp_type == IBV_QPT_UD) {
+>          wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd, sgid_idx, dgid);
+>          if (!wr.wr.ud.ah) {
+>              complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> -            goto out_dealloc_cqe_ctx;
+> +            goto err_dealloc_cqe_ctx;
+>          }
+>          wr.wr.ud.remote_qpn = dqpn;
+>          wr.wr.ud.remote_qkey = dqkey;
+> @@ -488,15 +509,19 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+>          rdma_error_report("ibv_post_send fail, qpn=0x%x, rc=%d, errno=%d",
+>                            qp->ibqp->qp_num, rc, errno);
+>          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> -        goto out_dealloc_cqe_ctx;
+> +        goto err_dealloc_cqe_ctx;
+>      }
+>  
+> +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
+> +    backend_dev->rdma_dev_res->stats.tx++;
+> +
+>      return;
+>  
+> -out_dealloc_cqe_ctx:
+> +err_dealloc_cqe_ctx:
+> +    backend_dev->rdma_dev_res->stats.tx_err++;
+>      rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
+>  
+> -out_free_bctx:
+> +err_free_bctx:
+>      g_free(bctx);
+>  }
+>  
+> @@ -554,6 +579,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+>              rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
+>              if (rc) {
+>                  complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> +                rdma_dev_res->stats.mad_rx_bufs_err++;
+> +            } else {
+> +                rdma_dev_res->stats.mad_rx_bufs++;
+>              }
+>          }
+>          return;
+> @@ -565,13 +593,14 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+>      rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
+>      if (unlikely(rc)) {
+>          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+> -        goto out_free_bctx;
+> +        goto err_free_bctx;
+>      }
+>  
+> -    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
+> +    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
+> +                              &backend_dev->rdma_dev_res->stats.rx_bufs_len);
+>      if (rc) {
+>          complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+> -        goto out_dealloc_cqe_ctx;
+> +        goto err_dealloc_cqe_ctx;
+>      }
+>  
+>      wr.num_sge = num_sge;
+> @@ -582,15 +611,19 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+>          rdma_error_report("ibv_post_recv fail, qpn=0x%x, rc=%d, errno=%d",
+>                            qp->ibqp->qp_num, rc, errno);
+>          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> -        goto out_dealloc_cqe_ctx;
+> +        goto err_dealloc_cqe_ctx;
+>      }
+>  
+> +    atomic_inc(&backend_dev->rdma_dev_res->stats.missing_cqe);
+> +    rdma_dev_res->stats.rx_bufs++;
+> +
+>      return;
+>  
+> -out_dealloc_cqe_ctx:
+> +err_dealloc_cqe_ctx:
+> +    backend_dev->rdma_dev_res->stats.rx_bufs_err++;
+>      rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
+>  
+> -out_free_bctx:
+> +err_free_bctx:
+>      g_free(bctx);
+>  }
+>  
+> @@ -929,12 +962,14 @@ static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
+>      bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
+>      if (unlikely(!bctx)) {
+>          rdma_error_report("No matching ctx for req %ld", cqe_ctx_id);
+> +        backend_dev->rdma_dev_res->stats.mad_rx_err++;
+>          return;
+>      }
+>  
+>      mad = rdma_pci_dma_map(backend_dev->dev, bctx->sge.addr,
+>                             bctx->sge.length);
+>      if (!mad || bctx->sge.length < msg->umad_len + MAD_HDR_SIZE) {
+> +        backend_dev->rdma_dev_res->stats.mad_rx_err++;
+>          complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
+>                        bctx->up_ctx);
+>      } else {
+> @@ -949,6 +984,7 @@ static void process_incoming_mad_req(RdmaBackendDev *backend_dev,
+>          wc.byte_len = msg->umad_len;
+>          wc.status = IBV_WC_SUCCESS;
+>          wc.wc_flags = IBV_WC_GRH;
+> +        backend_dev->rdma_dev_res->stats.mad_rx++;
+>          comp_handler(bctx->up_ctx, &wc);
+>      }
+>  
+> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> index 7cc597cdc8..d0f5dd0744 100644
+> --- a/hw/rdma/rdma_rm.c
+> +++ b/hw/rdma/rdma_rm.c
+> @@ -37,6 +37,7 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+>      tbl->bitmap = bitmap_new(tbl_sz);
+>      tbl->tbl_sz = tbl_sz;
+>      tbl->res_sz = res_sz;
+> +    tbl->used = 0;
+>      qemu_mutex_init(&tbl->lock);
+>  }
+>  
+> @@ -76,6 +77,8 @@ static inline void *rdma_res_tbl_alloc(RdmaRmResTbl *tbl, uint32_t *handle)
+>  
+>      set_bit(*handle, tbl->bitmap);
+>  
+> +    tbl->used++;
+> +
+>      qemu_mutex_unlock(&tbl->lock);
+>  
+>      memset(tbl->tbl + *handle * tbl->res_sz, 0, tbl->res_sz);
+> @@ -93,6 +96,7 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
+>  
+>      if (handle < tbl->tbl_sz) {
+>          clear_bit(handle, tbl->bitmap);
+> +        tbl->used--;
+>      }
+>  
+>      qemu_mutex_unlock(&tbl->lock);
+> @@ -620,6 +624,9 @@ int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
+>  
+>      qemu_mutex_init(&dev_res->lock);
+>  
+> +    memset(&dev_res->stats, 0, sizeof(dev_res->stats));
+> +    atomic_set(&dev_res->stats.missing_cqe, 0);
+> +
+>      return 0;
+>  }
+>  
+> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> index f0ee1f3072..325bbf58ec 100644
+> --- a/hw/rdma/rdma_rm_defs.h
+> +++ b/hw/rdma/rdma_rm_defs.h
+> @@ -34,7 +34,9 @@
+>  #define MAX_QP_INIT_RD_ATOM   16
+>  #define MAX_AH                64
+>  
+> -#define MAX_RM_TBL_NAME 16
+> +#define MAX_RM_TBL_NAME             16
+> +#define MAX_CONSEQ_EMPTY_POLL_CQ    4096 /* considered as error above this */
+> +
+>  typedef struct RdmaRmResTbl {
+>      char name[MAX_RM_TBL_NAME];
+>      QemuMutex lock;
+> @@ -42,6 +44,7 @@ typedef struct RdmaRmResTbl {
+>      size_t tbl_sz;
+>      size_t res_sz;
+>      void *tbl;
+> +    uint32_t used; /* number of used entries in the table */
+>  } RdmaRmResTbl;
+>  
+>  typedef struct RdmaRmPD {
+> @@ -96,6 +99,27 @@ typedef struct RdmaRmPort {
+>      enum ibv_port_state state;
+>  } RdmaRmPort;
+>  
+> +typedef struct RdmaRmStats {
+> +    uint64_t tx;
+> +    uint64_t tx_len;
+> +    uint64_t tx_err;
+> +    uint64_t rx_bufs;
+> +    uint64_t rx_bufs_len;
+> +    uint64_t rx_bufs_err;
+> +    uint64_t completions;
+> +    uint64_t mad_tx;
+> +    uint64_t mad_tx_err;
+> +    uint64_t mad_rx;
+> +    uint64_t mad_rx_err;
+> +    uint64_t mad_rx_bufs;
+> +    uint64_t mad_rx_bufs_err;
+> +    uint64_t poll_cq_from_bk;
+> +    uint64_t poll_cq_from_guest;
+> +    uint64_t poll_cq_from_guest_empty;
+> +    uint64_t poll_cq_ppoll_to;
+> +    uint64_t missing_cqe;
+> +} RdmaRmStats;
+> +
+>  typedef struct RdmaDeviceResources {
+>      RdmaRmPort port;
+>      RdmaRmResTbl pd_tbl;
+> @@ -106,6 +130,7 @@ typedef struct RdmaDeviceResources {
+>      RdmaRmResTbl cqe_ctx_tbl;
+>      GHashTable *qp_hash; /* Keeps mapping between real and emulated */
+>      QemuMutex lock;
+> +    RdmaRmStats stats;
+>  } RdmaDeviceResources;
+>  
+>  #endif
+> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> index 0879224957..167706ec2c 100644
+> --- a/hw/rdma/vmw/pvrdma.h
+> +++ b/hw/rdma/vmw/pvrdma.h
+> @@ -70,6 +70,10 @@ typedef struct DSRInfo {
+>      PvrdmaRing cq;
+>  } DSRInfo;
+>  
+> +typedef struct PVRDMADevStats {
+> +    uint64_t commands;
+> +} PVRDMADevStats;
+> +
+>  typedef struct PVRDMADev {
+>      PCIDevice parent_obj;
+>      MemoryRegion msix;
+> @@ -89,6 +93,7 @@ typedef struct PVRDMADev {
+>      CharBackend mad_chr;
+>      VMXNET3State *func0;
+>      Notifier shutdown_notifier;
+> +    PVRDMADevStats stats;
+>  } PVRDMADev;
+>  #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
+>  
+> diff --git a/hw/rdma/vmw/pvrdma_hmp.h b/hw/rdma/vmw/pvrdma_hmp.h
+> new file mode 100644
+> index 0000000000..2449bd2aef
+> --- /dev/null
+> +++ b/hw/rdma/vmw/pvrdma_hmp.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + * QEMU VMWARE paravirtual RDMA device definitions
+> + *
+> + * Copyright (C) 2018 Oracle
+> + * Copyright (C) 2018 Red Hat Inc
+> + *
+> + * Authors:
+> + *     Yuval Shaia <yuval.shaia@oracle.com>
+> + *     Marcel Apfelbaum <marcel@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#ifndef PVRDMA_PVRDMA_HMP_H
+> +#define PVRDMA_PVRDMA_HMP_H
+> +
+> +void pvrdma_dump_counters(Monitor *mon);
+> +
+> +#endif
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index b6061f4b6e..8ffe79ceca 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -14,6 +14,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+> @@ -25,6 +26,7 @@
+>  #include "cpu.h"
+>  #include "trace.h"
+>  #include "sysemu/sysemu.h"
+> +#include "monitor/monitor.h"
+>  
+>  #include "../rdma_rm.h"
+>  #include "../rdma_backend.h"
+> @@ -32,10 +34,13 @@
+>  
+>  #include <infiniband/verbs.h>
+>  #include "pvrdma.h"
+> +#include "pvrdma_hmp.h"
+>  #include "standard-headers/rdma/vmw_pvrdma-abi.h"
+>  #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
+>  #include "pvrdma_qp_ops.h"
+>  
+> +GSList *devices;
+> +
+>  static Property pvrdma_dev_properties[] = {
+>      DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name),
+>      DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
+> @@ -55,6 +60,71 @@ static Property pvrdma_dev_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static void pvrdma_dump_device_counters(gpointer data, gpointer user_data)
+> +{
+> +    Monitor *mon = user_data;
+> +    PCIDevice *pdev = data;
+> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> +
+> +    monitor_printf(mon, "%s_%x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
+> +                   PCI_FUNC(pdev->devfn));
+> +    monitor_printf(mon, "\tcommands         : %" PRId64 "\n",
+> +                   dev->stats.commands);
+> +    monitor_printf(mon, "\ttx               : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.tx);
+> +    monitor_printf(mon, "\ttx_len           : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.tx_len);
+> +    monitor_printf(mon, "\ttx_err           : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.tx_err);
+> +    monitor_printf(mon, "\trx_bufs          : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.rx_bufs);
+> +    monitor_printf(mon, "\trx_bufs_len      : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.rx_bufs_len);
+> +    monitor_printf(mon, "\trx_bufs_err      : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.rx_bufs_err);
+> +    monitor_printf(mon, "\tcomps            : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.completions);
+> +    monitor_printf(mon, "\tmissing_comps    : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.missing_cqe);
+> +    monitor_printf(mon, "\tpoll_cq (bk)     : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.poll_cq_from_bk);
+> +    monitor_printf(mon, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.poll_cq_ppoll_to);
+> +    monitor_printf(mon, "\tpoll_cq (fe)     : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.poll_cq_from_guest);
+> +    monitor_printf(mon, "\tpoll_cq_empty    : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.poll_cq_from_guest_empty);
+> +    monitor_printf(mon, "\tmad_tx           : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.mad_tx);
+> +    monitor_printf(mon, "\tmad_tx_err       : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.mad_tx_err);
+> +    monitor_printf(mon, "\tmad_rx           : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.mad_rx);
+> +    monitor_printf(mon, "\tmad_rx_err       : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.mad_rx_err);
+> +    monitor_printf(mon, "\tmad_rx_bufs      : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.mad_rx_bufs);
+> +    monitor_printf(mon, "\tmad_rx_bufs_err  : %" PRId64 "\n",
+> +                   dev->rdma_dev_res.stats.mad_rx_bufs_err);
+> +    monitor_printf(mon, "\tPDs              : %" PRId32 "\n",
+> +                   dev->rdma_dev_res.pd_tbl.used);
+> +    monitor_printf(mon, "\tMRs              : %" PRId32 "\n",
+> +                   dev->rdma_dev_res.mr_tbl.used);
+> +    monitor_printf(mon, "\tUCs              : %" PRId32 "\n",
+> +                   dev->rdma_dev_res.uc_tbl.used);
+> +    monitor_printf(mon, "\tQPs              : %" PRId32 "\n",
+> +                   dev->rdma_dev_res.qp_tbl.used);
+> +    monitor_printf(mon, "\tCQs              : %" PRId32 "\n",
+> +                   dev->rdma_dev_res.cq_tbl.used);
+> +    monitor_printf(mon, "\tCEQ_CTXs         : %" PRId32 "\n",
+> +                   dev->rdma_dev_res.cqe_ctx_tbl.used);
+> +}
+> +
+> +void pvrdma_dump_counters(Monitor *mon)
+> +{
+> +    g_slist_foreach(devices, pvrdma_dump_device_counters, mon);
+> +}
+> +
+>  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
+>                            void *ring_state)
+>  {
+> @@ -304,6 +374,8 @@ static void pvrdma_fini(PCIDevice *pdev)
+>  
+>      rdma_info_report("Device %s %x.%x is down", pdev->name,
+>                       PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
+> +
+> +    devices = g_slist_remove(devices, pdev);
+>  }
+>  
+>  static void pvrdma_stop(PVRDMADev *dev)
+> @@ -394,6 +466,7 @@ static void pvrdma_regs_write(void *opaque, hwaddr addr, uint64_t val,
+>          if (val == 0) {
+>              trace_pvrdma_regs_write(addr, val, "REQUEST", "");
+>              pvrdma_exec_cmd(dev);
+> +            dev->stats.commands++;
+>          }
+>          break;
+>      default:
+> @@ -612,9 +685,13 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+>          goto out;
+>      }
+>  
+> +    memset(&dev->stats, 0, sizeof(dev->stats));
+> +
+>      dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
+>      qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+>  
+> +    devices = g_slist_append(devices, pdev);
+> +
+>  out:
+>      if (rc) {
+>          pvrdma_fini(pdev);
+> diff --git a/monitor.c b/monitor.c
+> index e5de5765b8..7b757bd9b1 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -84,6 +84,9 @@
+>  #include "sysemu/iothread.h"
+>  #include "qemu/cutils.h"
+>  #include "tcg/tcg.h"
+> +#ifdef CONFIG_PVRDMA
+> +#include "hw/rdma/vmw/pvrdma_hmp.h"
+> +#endif
+>  
+>  #if defined(TARGET_S390X)
+>  #include "hw/s390x/storage-keys.h"
+> @@ -1397,6 +1400,13 @@ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+>      cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+>  }
+>  
+> +#ifdef CONFIG_PVRDMA
+> +static void hmp_info_pvrdmacounters(Monitor *mon, const QDict *qdict)
+> +{
+> +    pvrdma_dump_counters(mon);
+> +}
+> +#endif
+> +
+>  static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *name = qdict_get_try_str(qdict, "name");
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
