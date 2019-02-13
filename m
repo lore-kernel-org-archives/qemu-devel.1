@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36439)
+Received: from eggs.gnu.org ([209.51.188.92]:36577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gtr94-0007OV-Rk
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:47:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gtr9S-0007fc-Kw
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:48:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gtr93-0007Km-Cn
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:47:58 -0500
-Received: from mail-wr1-f41.google.com ([209.85.221.41]:43982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gtr93-0007KQ-5c
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:47:57 -0500
-Received: by mail-wr1-f41.google.com with SMTP id r2so1679284wrv.10
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 01:47:57 -0800 (PST)
-Date: Wed, 13 Feb 2019 10:47:52 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190213094752.5jz2m3xrv5zonfvw@steredhat>
-References: <20190212145322.30974-1-philmd@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gtr9R-0007TQ-Tq
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:48:22 -0500
+Date: Wed, 13 Feb 2019 10:48:13 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190213104813.7c79c44a.cohuck@redhat.com>
+In-Reply-To: <20190212011657.18324-3-walling@linux.ibm.com>
+References: <20190212011657.18324-1-walling@linux.ibm.com>
+	<20190212011657.18324-3-walling@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190212145322.30974-1-philmd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/dma/i8257: Use qemu_log_mask(UNIMP)
- instead of fprintf
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/cpumodel: add z14 GA2 model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, david@redhat.com, borntraeger@de.ibm.com, pasic@linux.ibm.com, rth@twiddle.net
 
-On Tue, Feb 12, 2019 at 03:53:22PM +0100, Philippe Mathieu-Daudé wrote:
-> Avoid to clutter stdout until explicitly requested (with -d unimp):
+On Mon, 11 Feb 2019 20:16:57 -0500
+Collin Walling <walling@linux.ibm.com> wrote:
+
+> Introduce the z14 GA2 cpu model for QEMU. There are no new features
+> introduced with this model, and will inherit the same feature set as
+> z14 GA1.
 > 
->   $ qemu-system-mips64el -M fulong2e -bios pmon_2e.bin
->   dma: command df not supported
->   dma: command df not supported
->   dma: command df not supported
->   dma: command df not supported
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/dma/i8257.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  target/s390x/cpu_models.c   | 1 +
+>  target/s390x/gen-features.c | 7 +++++++
+>  2 files changed, 8 insertions(+)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
+Thanks, applied.
