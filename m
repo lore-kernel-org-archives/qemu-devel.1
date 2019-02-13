@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34943)
+Received: from eggs.gnu.org ([209.51.188.92]:35168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gtr0M-0003cd-50
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:38:58 -0500
+	(envelope-from <bounces@canonical.com>) id 1gtr2X-0004a3-Mn
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gtr0L-00027X-8a
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:38:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gtr0K-00025y-WA
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:38:57 -0500
-References: <e6c30bdd-6cd0-ee9b-9fdf-cc8eaa54f7cc@yandex-team.ru>
-	<078dfb4d-2467-6a2c-1964-a463839e8183@redhat.com>
-	<7dafec67-e6dd-ad0a-db11-f71076ada26c@redhat.com>
-	<20190212133718-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <390c7dd2-2095-5bfd-c5fd-6cee4b6c5470@redhat.com>
-Date: Wed, 13 Feb 2019 17:38:44 +0800
+	(envelope-from <bounces@canonical.com>) id 1gtr2W-0003DU-RD
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:41:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gtr2W-0003C3-KH
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:41:12 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gtr2V-0004cT-EB
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:41:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 69E742E80C8
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:41:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190212133718-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Is IOThread for virtio-net a good idea?
+Date: Wed, 13 Feb 2019 09:31:25 -0000
+From: Darek Stojaczyk <darek.stojaczyk@gmail.com>
+Reply-To: Bug 1813940 <1813940@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154885462996.30915.15408927273139016803.malonedeb@gac.canonical.com>
+Message-Id: <155005028544.21527.1046627121434816637.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813940] Re: kvm_mem_ioeventfd_add: error adding
+ ioeventfd: No space left on device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +37,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Anton Kuchin <antonkuchin@yandex-team.ru>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+> Does this patch from Jagannathan Raman fixes it?
+> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01397.html
 
-On 2019/2/13 =E4=B8=8A=E5=8D=882:40, Michael S. Tsirkin wrote:
-> On Tue, Feb 12, 2019 at 03:00:55PM +0800, Jason Wang wrote:
->> On 2019/2/12 =E4=B8=8B=E5=8D=882:48, Jason Wang wrote:
->>> On 2019/2/11 =E4=B8=8B=E5=8D=889:40, Anton Kuchin wrote:
->>>> As far as I can see currently IOThread offloading is used only for
->>>> block devices and all others are emulated by main thread.
->>>>
->>>> I expect that network devices can also benefit from processing in
->>>> separate thread but I couldn't find any recent work in this
->>>> direction. I'm going to implement a PoC but I want to ask if you
->>>> know any previous attempts and do you know why it can be a total
->>>> waste of time. Are there fundamental obstacles that prevent network
->>>> emulation handling in IOThread?
->>>>
->>> I think there're no obstacles.
->>>
->>> The only question is whether or not you need to support legacy
->>> networking backends. If the answer is yes, you need to convert them n=
-ot
->>> to assume context of Main Loop. But I don't think it's worth to suppo=
-rt
->>> them. We should focus on high speed solution like linking dpdk.
->>>
->>> Another issue is the virtio implementation. Dpdk has virtio library
->>> which is pretty optimized, we should consider to use it. But last tim=
-e I
->>> check the code, it was tightly coupled with AF_UNIX transport of
->>> vhost-user. We may want to decouple it out of dpdk. Of course we can =
-do
->>> it our own as well. (Yes I know there's a vhost-user implementation, =
-but
->>> it was not optimized for performance).
->>>
->>> I do have some prototype that is based on vhost-scsi-dataplane with a
->>> TAP backend. I can send it to you if you wish.
->>>
->> Note, what I did is a vhost implementation inside IOThread. It doesn't=
- use
->> qemu memory core (which is slow for e.g 10Mpps) but vhost memory table=
-.
->>
->> Thanks
-> If you are going to all these lengths duplicating dpdk I would at least
-> make it out of process to qemu to improve security.
+It fixes my case. Thanks
 
+-- =
 
-Well I think I want to do the inverse for easing the access to VM=20
-metadata e.g IOMMU or RSS.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813940
 
+Title:
+  kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
 
-> As an excercise, maybe start by generalizing pxe test to support vhost
-> user bridge. That would already be a win.
->
->
-> As for IOTLB, I advicated VTD support in vhost for a while.  VTD page
-> table parsing isn't a lot of code at all if you put invalidations in
-> userspace.  We ended up with the message-passing instead for portabilit=
-y
-> but we can go back for sure.
+Status in QEMU:
+  Confirmed
 
+Bug description:
+  Latest QEMU master fails to run with too many MMIO devices specified.
 
-I think implementing a vendor specific things in vhost is probably not=20
-good. And as we've discussed, this will end up duplicating the QI=20
-interface through vhost protocol which doesn't help for performance if=20
-you move the process out of qemu.
+  After patch 3ac7d43a6fb [1] QEMU just prints an error message and exits.
+  > kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
 
-Thanks
+  This is reproducible e.g. with the following setup:
 
+  qemu-3.1.50-dirty \
+      -machine pc-i440fx-2.7,accel=3Dkvm \
+      -cpu host -m 4096 \
+      -smp 2,sockets=3D2,cores=3D1,threads=3D1 \
+      -drive file=3Dfreebsd_vm_1.qcow2,format=3Dqcow2,if=3Dnone,id=3Dbootdr=
+ \
+      -device ide-hd,drive=3Dbootdr,bootindex=3D0 \
+      -device virtio-scsi-pci,id=3Dvc0 \
+      -device virtio-scsi-pci,id=3Dvc1 \
+      -device virtio-scsi-pci,id=3Dvc2 \
+      -device virtio-scsi-pci,id=3Dvc3 \
 
->
->
->
->>> Thanks
->>>
->>>
+  Running with just 3 Virtio-SCSI controllers seems to work fine, adding
+  more than that causes the error above. Note that this is not Virtio-
+  SCSI specific. I've also reproduced this without any Virtio devices
+  whatsoever.
+
+  strace shows the following ioctl chain over and over:
+
+  145787 ioctl(11, KVM_UNREGISTER_COALESCED_MMIO, 0x7f60a4985410) =3D 0
+  145787 ioctl(11, KVM_UNREGISTER_COALESCED_MMIO, 0x7f60a4985410) =3D 0
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D 0
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+  145787 ioctl(11, KVM_REGISTER_COALESCED_MMIO, 0x7f60a49853b0) =3D -1 ENOS=
+PC (No space left on device)
+
+  Which suggests there's some kind of MMIO region leak.
+
+  [1]
+  commit 3ac7d43a6fbb5d4a3d01fc9a055c218030af3727
+  Author:     Paolo Bonzini <pbonzini@redhat.com>
+  AuthorDate: Wed Nov 28 17:28:45 2018 +0100
+  Commit:     Paolo Bonzini <pbonzini@redhat.com>
+  CommitDate: Fri Jan 11 13:57:24 2019 +0100
+
+      memory: update coalesced_range on transaction_commit
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813940/+subscriptions
