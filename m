@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34275)
+Received: from eggs.gnu.org ([209.51.188.92]:34943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtqwS-000242-EN
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:34:57 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gtr0M-0003cd-50
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtqwJ-0007Qn-Tl
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:34:51 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:56584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gtqwI-0007Nm-6D
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:34:46 -0500
-Message-ID: <a3bcf7a998d901c7d83eb33ab622415b388a9020.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Wed, 13 Feb 2019 10:34:30 +0100
-In-Reply-To: <4ad3f098-ded6-8ddb-4ae5-c2975a286245@gmail.com>
-References: <cover.d651a232d750c6f53cbe8d483b665d638f7a0c0a.1549779509.git-series.knut.omang@oracle.com>
-	<04c99e3c0b56dcbfe494f668bbe11777adbadba9.1549779509.git-series.knut.omang@oracle.com>
-	<4ad3f098-ded6-8ddb-4ae5-c2975a286245@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] gen_pcie_root_port: Add ACS (Access
- Control Services) capability
+	(envelope-from <jasowang@redhat.com>) id 1gtr0L-00027X-8a
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:38:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gtr0K-00025y-WA
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:38:57 -0500
+References: <e6c30bdd-6cd0-ee9b-9fdf-cc8eaa54f7cc@yandex-team.ru>
+	<078dfb4d-2467-6a2c-1964-a463839e8183@redhat.com>
+	<7dafec67-e6dd-ad0a-db11-f71076ada26c@redhat.com>
+	<20190212133718-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <390c7dd2-2095-5bfd-c5fd-6cee4b6c5470@redhat.com>
+Date: Wed, 13 Feb 2019 17:38:44 +0800
+MIME-Version: 1.0
+In-Reply-To: <20190212133718-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Is IOThread for virtio-net a good idea?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Anton Kuchin <antonkuchin@yandex-team.ru>, qemu-devel@nongnu.org
 
-On Mon, 2019-02-11 at 10:07 +0200, Marcel Apfelbaum wrote:
-> 
-> On 2/10/19 8:53 AM, Knut Omang wrote:
-> > Claim ACS support in the generic PCIe root port to allow
-> > passthrough of individual functions of a device to different
-> > guests (in a nested virt.setting) with VFIO.
-> > Without this patch, all functions of a device, such as all VFs of
-> > an SR/IOV device, will end up in the same IOMMU group.
-> > A similar situation occurs on Windows with Hyper-V.
-> > 
-> > In the single function device case, it also has a small cosmetic
-> > benefit in that the root port itself is not grouped with
-> > the device. VFIO handles that situation in that binding rules
-> > only apply to endpoints, so it does not limit passthrough in
-> > those cases.
-> > 
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > ---
-> >   hw/pci-bridge/gen_pcie_root_port.c | 4 ++++
-> >   hw/pci-bridge/pcie_root_port.c     | 4 ++++
-> >   include/hw/pci/pcie_port.h         | 1 +
-> >   3 files changed, 9 insertions(+)
-> > 
-> > diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-
-> > bridge/gen_pcie_root_port.c
-> > index 9766edb..26bda73 100644
-> > --- a/hw/pci-bridge/gen_pcie_root_port.c
-> > +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> > @@ -20,6 +20,9 @@
-> >           OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
-> >   
-> >   #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
-> > +#define GEN_PCIE_ROOT_PORT_ACS_OFFSET \
-> > +        (GEN_PCIE_ROOT_PORT_AER_OFFSET + PCI_ERR_SIZEOF)
-> > +
-> >   #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
-> >   
-> >   typedef struct GenPCIERootPort {
-> > @@ -149,6 +152,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass,
-> > void *data)
-> >       rpc->interrupts_init = gen_rp_interrupts_init;
-> >       rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-> >       rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
-> > +    rpc->acs_offset = GEN_PCIE_ROOT_PORT_ACS_OFFSET;
-> >   }
-> >   
-> >   static const TypeInfo gen_rp_dev_info = {
-> > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> > index 34ad767..a0b4cf7 100644
-> > --- a/hw/pci-bridge/pcie_root_port.c
-> > +++ b/hw/pci-bridge/pcie_root_port.c
-> > @@ -47,6 +47,7 @@ static void rp_reset(DeviceState *qdev)
-> >       pcie_cap_deverr_reset(d);
-> >       pcie_cap_slot_reset(d);
-> >       pcie_cap_arifwd_reset(d);
-> > +    pcie_cap_acs_reset(d);
-> >       pcie_aer_root_reset(d);
-> >       pci_bridge_reset(qdev);
-> >       pci_bridge_disable_base_limit(d);
-> > @@ -106,6 +107,9 @@ static void rp_realize(PCIDevice *d, Error **errp)
-> >       pcie_aer_root_init(d);
-> >       rp_aer_vector_update(d);
-> >   
-> > +    if (rpc->acs_offset) {
-> > +        pcie_acs_init(d, rpc->acs_offset);
-> > +    }
-> >       return;
-> >   
-> >   err:
-> > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> > index df242a0..09586f4 100644
-> > --- a/include/hw/pci/pcie_port.h
-> > +++ b/include/hw/pci/pcie_port.h
-> > @@ -78,6 +78,7 @@ typedef struct PCIERootPortClass {
-> >       int exp_offset;
-> >       int aer_offset;
-> >       int ssvid_offset;
-> > +    int acs_offset;    /* If nonzero, optional ACS capability offset */
-> >       int ssid;
-> >   } PCIERootPortClass;
-> >   
-> 
-> Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Thanks! I added this r-b to v4, but left out the one for patch 1 as it got some
-more changes based on Alex's feedback and our fruitful discussion afterwards,
-so you might want to recheck it.
+On 2019/2/13 =E4=B8=8A=E5=8D=882:40, Michael S. Tsirkin wrote:
+> On Tue, Feb 12, 2019 at 03:00:55PM +0800, Jason Wang wrote:
+>> On 2019/2/12 =E4=B8=8B=E5=8D=882:48, Jason Wang wrote:
+>>> On 2019/2/11 =E4=B8=8B=E5=8D=889:40, Anton Kuchin wrote:
+>>>> As far as I can see currently IOThread offloading is used only for
+>>>> block devices and all others are emulated by main thread.
+>>>>
+>>>> I expect that network devices can also benefit from processing in
+>>>> separate thread but I couldn't find any recent work in this
+>>>> direction. I'm going to implement a PoC but I want to ask if you
+>>>> know any previous attempts and do you know why it can be a total
+>>>> waste of time. Are there fundamental obstacles that prevent network
+>>>> emulation handling in IOThread?
+>>>>
+>>> I think there're no obstacles.
+>>>
+>>> The only question is whether or not you need to support legacy
+>>> networking backends. If the answer is yes, you need to convert them n=
+ot
+>>> to assume context of Main Loop. But I don't think it's worth to suppo=
+rt
+>>> them. We should focus on high speed solution like linking dpdk.
+>>>
+>>> Another issue is the virtio implementation. Dpdk has virtio library
+>>> which is pretty optimized, we should consider to use it. But last tim=
+e I
+>>> check the code, it was tightly coupled with AF_UNIX transport of
+>>> vhost-user. We may want to decouple it out of dpdk. Of course we can =
+do
+>>> it our own as well. (Yes I know there's a vhost-user implementation, =
+but
+>>> it was not optimized for performance).
+>>>
+>>> I do have some prototype that is based on vhost-scsi-dataplane with a
+>>> TAP backend. I can send it to you if you wish.
+>>>
+>> Note, what I did is a vhost implementation inside IOThread. It doesn't=
+ use
+>> qemu memory core (which is slow for e.g 10Mpps) but vhost memory table=
+.
+>>
+>> Thanks
+> If you are going to all these lengths duplicating dpdk I would at least
+> make it out of process to qemu to improve security.
 
-Knut
-> 
-> Thanks,
-> Marcel
+
+Well I think I want to do the inverse for easing the access to VM=20
+metadata e.g IOMMU or RSS.
+
+
+> As an excercise, maybe start by generalizing pxe test to support vhost
+> user bridge. That would already be a win.
+>
+>
+> As for IOTLB, I advicated VTD support in vhost for a while.  VTD page
+> table parsing isn't a lot of code at all if you put invalidations in
+> userspace.  We ended up with the message-passing instead for portabilit=
+y
+> but we can go back for sure.
+
+
+I think implementing a vendor specific things in vhost is probably not=20
+good. And as we've discussed, this will end up duplicating the QI=20
+interface through vhost protocol which doesn't help for performance if=20
+you move the process out of qemu.
+
+Thanks
+
+
+>
+>
+>
+>>> Thanks
+>>>
+>>>
