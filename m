@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51852)
+Received: from eggs.gnu.org ([209.51.188.92]:51882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gtqFX-00021O-4M
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:50:35 -0500
+	(envelope-from <lersek@redhat.com>) id 1gtqFo-00023s-At
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gtqES-0005DD-Bp
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:49:31 -0500
-References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
-	<20190212052224.GA4839@richard>
-	<20190212003414-mutt-send-email-mst@kernel.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4d6f639b-fe11-7048-3975-ee1c1875b8d3@vivier.eu>
-Date: Wed, 13 Feb 2019 09:49:01 +0100
+	(envelope-from <lersek@redhat.com>) id 1gtq8N-0000le-T4
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:43:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gtq8N-0000kV-Jp
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:43:11 -0500
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <cae4cdd7-2693-275b-5a54-e419e914d0a2@redhat.com>
+Date: Wed, 13 Feb 2019 09:37:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190212003414-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
+Subject: [Qemu-devel] nonzero LUN on USB Bulk Only Transfer fails with
+ QEMU+edk2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +26,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com, philmd@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, Ray Ni <ray.ni@intel.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, edk2-devel-01 <edk2-devel@lists.01.org>, Markus Armbruster <armbru@redhat.com>
 
-On 12/02/2019 06:34, Michael S. Tsirkin wrote:
-> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
->> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
->>> There are several functions/variable which are not used anymore.
->>>
->>> This serials just remove those without functional change.
->>>
->>> v3: add ack and repost in a new thread
->>> v2: change commit log from "is now used in no place" to "in not used anymore"
->>
->> Michael,
->>
->> Looks this serials is not merged yet.
->>
->> Is there any problem I need to fix?
-> 
-> Yes pls repost with fixed reviewed-by tags.
+Hi,
 
-Or I can take the series through the trivial branch and update manually
-Philippe's lastname?
+using QEMU, when I specify a nonzero LUN for the hard disk that sits on
+the "SCSI bus" that embodies the USB Bulk Only Transfer device, then
+UsbMassStorageDxe fails to recognize the hard disk.
 
-Laurent
+(1) Consider the following QEMU command line snippet:
+
+  -drive id=disk1,if=none,format=raw,readonly,file=$APPDISK \
+  -device qemu-xhci,id=xhci1,p3=15,addr=02.0 \
+  -device usb-bot,bus=xhci1.0,port=3,id=bot1 \
+  -device scsi-hd,drive=disk1,bus=bot1.0,lun=0,bootindex=1 \
+
+For this (i.e., lun=0), I see the following INQUIRY exchange between
+UsbMassStorageDxe and QEMU:
+
+> Lun=0 InquiryCmd {
+> Lun=0 InquiryCmd 000000 12 00 00 00 24 00 00 00 00 00 00 00
+> Lun=0 InquiryCmd }
+> Lun=0 InquiryData {
+> Lun=0 InquiryData 000000 00 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
+> Lun=0 InquiryData 000010 51 45 4D 55 20 48 41 52 44 44 49 53 4B 20 20 20
+> Lun=0 InquiryData 000020 32 2E 35 2B
+> Lun=0 InquiryData }
+
+The vendor and product ID fields translate to "QEMU____" and
+"QEMU_HARDDISK___", respectively. (For easier reading, I replaced the
+space characters with underscores, for the sake of better
+readability/wrapping.)
+
+In this case, edk2 recognizes the disk and things work fine.
+
+(In fact, for lun=0, the QemuBootOrderLib pattern matching / translation
+works fine as well -- verifying which was my original goal, before I ran
+into the issues below, for nonzero LUNs. But, I digress.)
+
+
+(2) If I change the cmdline to "lun=5", then the exchange is:
+
+> Lun=0 InquiryCmd {
+> Lun=0 InquiryCmd 000000 12 00 00 00 24 00 00 00 00 00 00 00
+> Lun=0 InquiryCmd }
+> Lun=0 InquiryData {
+> Lun=0 InquiryData 000000 3F 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
+> Lun=0 InquiryData 000010 51 45 4D 55 20 54 41 52 47 45 54 20 20 20 20 20
+> Lun=0 InquiryData 000020 32 2E 35 00
+> Lun=0 InquiryData }
+
+Here the product ID is unchanged, but the vendor ID becomes
+"QEMU_TARGET_____".
+
+And, edk2 fails to recognize the device:
+
+> UsbBootGetParams: Found an unsupported peripheral type[31]
+> UsbMassInitMedia: UsbBootGetParams (Unsupported)
+> UsbMassInitNonLun: UsbMassInitMedia (Unsupported)
+> USBMassDriverBindingStart: UsbMassInitNonLun (Unsupported)
+
+This happens because the first byte in the response is 0x3F. QEMU sets
+this byte in
+
+>         r->buf[0] = TYPE_NOT_PRESENT | TYPE_INACTIVE;
+
+in function scsi_target_emulate_inquiry(), file "hw/scsi/scsi-bus.c".
+
+And edk2 parses the byte in UsbBootInquiry() and UsbBootGetParams()
+(file "MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassBoot.c"):
+
+> typedef struct {
+>   UINT8             Pdt;            ///< Peripheral Device Type (low 5 bits)
+>   UINT8             Removable;      ///< Removable Media (highest bit)
+>   UINT8             Reserved0[2];
+>   UINT8             AddLen;         ///< Additional length
+>   UINT8             Reserved1[3];
+>   UINT8             VendorID[8];
+>   UINT8             ProductID[16];
+>   UINT8             ProductRevision[4];
+> } USB_BOOT_INQUIRY_DATA;
+
+> #define USB_BOOT_PDT(Pdt)           ((Pdt) & 0x1f)
+
+>   UsbMass->Pdt          = (UINT8) (USB_BOOT_PDT (UsbMass->InquiryData.Pdt));
+
+>   //
+>   // According to USB Mass Storage Specification for Bootability, only following
+>   // 4 Peripheral Device Types are in spec.
+>   //
+>   if ((UsbMass->Pdt != USB_PDT_DIRECT_ACCESS) &&
+>        (UsbMass->Pdt != USB_PDT_CDROM) &&
+>        (UsbMass->Pdt != USB_PDT_OPTICAL) &&
+>        (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
+>     DEBUG ((EFI_D_ERROR, "UsbBootGetParams: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
+>     return EFI_UNSUPPORTED;
+>   }
+
+It looks likely that at least one of edk2 and QEMU has a bug. Which one
+is it?
+
+Or is the command line incorrect perhaps? (I.e., is it invalid to
+specify *only* lun=5? Does the LUN space have to be contiguous?)
+
+
+(3) Starting again from the original command line, if I change "lun=0"
+to "lun=1" (rather than to "lun=5"), then OVMF even hangs, with the
+following log:
+
+> UsbMassInitMultiLun: Start to initialize No.0 logic unit
+> Lun=0 InquiryCmd {
+> Lun=0 InquiryCmd 000000 12 00 00 00 24 00 00 00 00 00 00 00
+> Lun=0 InquiryCmd }
+> Lun=0 InquiryData {
+> Lun=0 InquiryData 000000 3F 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
+> Lun=0 InquiryData 000010 51 45 4D 55 20 54 41 52 47 45 54 20 20 20 20 20
+> Lun=0 InquiryData 000020 32 2E 35 00
+> Lun=0 InquiryData }
+> UsbBootGetParams: Found an unsupported peripheral type[31]
+> UsbMassInitMedia: UsbBootGetParams (Unsupported)
+> UsbMassInitMultiLun: UsbMassInitMedia (Unsupported)
+> UsbMassInitMultiLun: Start to initialize No.1 logic unit
+> Lun=32 InquiryCmd {
+> Lun=32 InquiryCmd 000000 12 20 00 00 24 00 00 00 00 00 00 00
+> Lun=32 InquiryCmd }
+> Lun=32 InquiryData {
+> Lun=32 InquiryData 000000 00 00 05 12 1F 00 00 10 51 45 4D 55 20 20 20 20
+> Lun=32 InquiryData 000010 51 45 4D 55 20 48 41 52 44 44 49 53 4B 20 20 20
+> Lun=32 InquiryData 000020 32 2E 35 2B
+> Lun=32 InquiryData }
+> UsbBootExecCmd: Success to Exec 0x0 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbMassInitMedia: UsbBootGetParams (Media changed)
+> InstallProtocolInterface: 09576E91-6D3F-11D2-8E39-00A0C969723B 3DC7DD98
+> InstallProtocolInterface: 964E5B21-6459-11D2-8E39-00A0C969723B 3DBFA6B8
+> InstallProtocolInterface: D432A67F-14DC-484B-B3BB-3F0291849327 3DBFA730
+> UsbMassInitMultiLun: Success to initialize No.1 logic unit
+> InstallProtocolInterface: CE345171-BA0B-11D2-8E4F-00A0C969723B 3DBFA2A0
+>  BlockSize : 512
+>  LastBlock : 136B
+> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbBootExecCmd: Success to Exec 0x28 Cmd (Result = 1)
+> UsbBootRequestSense: (Invalid Parameter) with error code (70) sense key 5/25/0
+> UsbMassReadBlocks: UsbBootReadBlocks (Invalid Parameter) -> Reset
+> XhcUsbPortReset!
+> XhcSetRootHubPortFeature: status Success
+> XhcClearRootHubPortFeature: status Success
+> XhcClearRootHubPortFeature: status Success
+> Disable device slot 1!
+> Enable Slot Successfully, The Slot ID = 0x1
+>     Address 1 assigned successfully
+> UsbIoPortReset: device is now ADDRESSED at 1
+> ASSERT MdeModulePkg/Bus/Pci/XhciDxe/XhciSched.c(1915): TrsRing != ((void *) 0)
+
+In this case, edk2 seems to recognize that a nonzero LUN is available on
+the target, but the initialization never completes, and then an
+assertion fails, apparently in the lower-level XHCI transport code.
+
+
+The information that I'm primarily looking for here is which bug tracker
+I should file these under, the edk2 bugzilla, or the QEMU launchpad.
+
+Thanks,
+Laszlo
