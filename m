@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51742)
+Received: from eggs.gnu.org ([209.51.188.92]:51975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gtufg-000136-PH
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:56 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gtugO-0001Zl-Ib
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gtufc-0001sT-Vv
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gtufX-0001hO-SC
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:33:47 -0500
-From: wexu@redhat.com
-Date: Wed, 13 Feb 2019 08:25:44 -0500
-Message-Id: <1550064346-17012-10-git-send-email-wexu@redhat.com>
-In-Reply-To: <1550064346-17012-1-git-send-email-wexu@redhat.com>
-References: <1550064346-17012-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/11] virtio-net: update the head descriptor
- in a chain lastly
+	(envelope-from <richard.weiyang@gmail.com>) id 1gtugK-0002f4-P2
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:34:34 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:43717)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1gtugG-0002X1-6Z
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:34:31 -0500
+Received: by mail-ed1-x543.google.com with SMTP id f9so1913345eds.10
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 05:34:24 -0800 (PST)
+Date: Wed, 13 Feb 2019 13:34:22 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190213133422.22mjfia3btnwfhak@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190213071401.11544-1-stefanha@redhat.com>
+	<20190213123858.24620-1-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190213123858.24620-1-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hostmem: simplify ifdef-s in
+ file_backend_memory_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wexu@redhat.com, jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com, tiwei.bie@intel.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Wei Yang <richardw.yang@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-From: Wei Xu <wexu@redhat.com>
+On Wed, Feb 13, 2019 at 07:38:58AM -0500, Igor Mammedov wrote:
+>cleanup file_backend_memory_alloc() by using one CONFIG_POSIX ifdef
+>instead of several ones within the function to make it simpler to follow.
+>
+>Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>Suggested-by: Wei Yang <richardw.yang@linux.intel.com>
 
-This is a helper for packed ring.
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
 
-To support packed ring, the head descriptor in a chain should be updated
-lastly since no 'avail_idx' like in packed ring to explicitly tell the
-driver side that all payload is ready after having done the chain, so
-the head is always visible immediately.
+>---
+>Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+>Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
+>Cc: Eduardo Habkost <ehabkost@redhat.com>
+>Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>CC: Wei Yang <richardw.yang@linux.intel.com>
+>---
+> backends/hostmem-file.c | 9 ++++-----
+> 1 file changed, 4 insertions(+), 5 deletions(-)
+>
+>diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+>index ba601ce940..ce54788048 100644
+>--- a/backends/hostmem-file.c
+>+++ b/backends/hostmem-file.c
+>@@ -41,10 +41,12 @@ struct HostMemoryBackendFile {
+> static void
+> file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+> {
+>+#ifndef CONFIG_POSIX
+>+    error_setg(errp, "backend '%s' not supported on this host",
+>+               object_get_typename(OBJECT(backend)));
+>+#else
+>     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(backend);
+>-#ifdef CONFIG_POSIX
+>     gchar *name;
+>-#endif
+> 
+>     if (!backend->size) {
+>         error_setg(errp, "can't create backend with size 0");
+>@@ -54,9 +56,6 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>         error_setg(errp, "mem-path property not set");
+>         return;
+>     }
+>-#ifndef CONFIG_POSIX
+>-    error_setg(errp, "-mem-path not supported on this host");
+>-#else
+>     backend->force_prealloc = mem_prealloc;
+>     name = host_memory_backend_get_name(backend);
+>     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+>-- 
+>2.18.1
+>
 
-This patch fills the header after done all the other ones.
-
-Signed-off-by: Wei Xu <wexu@redhat.com>
----
- hw/net/virtio-net.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 3f319ef..330abea 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -1251,6 +1251,8 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-     struct virtio_net_hdr_mrg_rxbuf mhdr;
-     unsigned mhdr_cnt = 0;
-     size_t offset, i, guest_offset;
-+    VirtQueueElement head;
-+    int head_len = 0;
- 
-     if (!virtio_net_can_receive(nc)) {
-         return -1;
-@@ -1328,7 +1330,13 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-         }
- 
-         /* signal other side */
--        virtqueue_fill(q->rx_vq, elem, total, i++);
-+        if (i == 0) {
-+            head_len = total;
-+            head = *elem;
-+        } else {
-+            virtqueue_fill(q->rx_vq, elem, len, i);
-+        }
-+        i++;
-         g_free(elem);
-     }
- 
-@@ -1339,6 +1347,7 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-                      &mhdr.num_buffers, sizeof mhdr.num_buffers);
-     }
- 
-+    virtqueue_fill(q->rx_vq, &head, head_len, 0);
-     virtqueue_flush(q->rx_vq, i);
-     virtio_notify(vdev, q->rx_vq);
- 
 -- 
-1.8.3.1
+Wei Yang
+Help you, Help me
