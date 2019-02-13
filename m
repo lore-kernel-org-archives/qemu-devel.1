@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56815)
+Received: from eggs.gnu.org ([209.51.188.92]:59756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1gtljZ-0007dj-Pg
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:01:19 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvq-0003Dt-Kn
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:13:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Sandra_Loosemore@mentor.com>) id 1gtlZQ-00030w-Kc
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 22:50:50 -0500
-Received: from relay1.mentorg.com ([192.94.38.131]:38751)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Sandra_Loosemore@mentor.com>)
-	id 1gtlZO-0002ir-Hr
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 22:50:48 -0500
-From: Sandra Loosemore <sandra@codesourcery.com>
-Date: Tue, 12 Feb 2019 20:45:59 -0700
-Message-ID: <1550029560-30530-2-git-send-email-sandra@codesourcery.com>
-In-Reply-To: <1550029560-30530-1-git-send-email-sandra@codesourcery.com>
-References: <1550029560-30530-1-git-send-email-sandra@codesourcery.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvp-00058z-4a
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:13:58 -0500
+Date: Wed, 13 Feb 2019 12:25:45 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190213012544.GS1884@umbus.fritz.box>
+References: <20190212214827.30543-1-lvivier@redhat.com>
+	<20190212214827.30543-2-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 1/2] Add generic Nios II board.
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4ZVTVymsHR1TEBjP"
+Content-Disposition: inline
+In-Reply-To: <20190212214827.30543-2-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 1/4] numa,
+ spapr: add thread-id in the possible_cpus list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,211 +25,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marex@denx.de
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-This patch adds support for a generic MMU-less Nios II board that can
-be used e.g. for bare-metal compiler testing.  Nios II booting is also
-tweaked so that bare-metal binaries start executing in RAM starting at
-0x00000000, rather than an alias at 0xc0000000, which allows features
-such as unwinding to work when binaries are linked to start at the
-beginning of the address space.
 
-The generic_nommu.c parts are by Andrew Jenner, based on code by Marek
-Vasut.
+--4ZVTVymsHR1TEBjP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Originally by Marek Vasut and Andrew Jenner.
+On Tue, Feb 12, 2019 at 10:48:24PM +0100, Laurent Vivier wrote:
+> spapr_possible_cpu_arch_ids() counts only cores, and so
+> the number of available CPUs is the number of vCPU divided
+> by smp_threads.
+>=20
+> ... -smp 4,maxcpus=3D8,cores=3D2,threads=3D2,sockets=3D2 -numa node,cpus=
+=3D0,cpus=3D1 \
+>                                                  -numa node,cpus=3D3,cpus=
+=3D4 \
+>                                                  -numa node -numa node
+>=20
+> This generates (info hotpluggable-cpus)
+>=20
+>   node-id: 0 core-id: 0 thread-id: 0 [thread-id: 1]
+>   node-id: 0 core-id: 6 thread-id: 0 [thread-id: 1]
+>   node-id: 1 core-id: 2 thread-id: 0 [thread-id: 1]
+>   node-id: 1 core-id: 4 thread-id: 0 [thread-id: 1]
+>=20
+> And this command line generates the following error:
+>=20
+>   CPU(s) not present in any NUMA nodes: CPU 3 [core-id: 6]
+>=20
+> That is wrong because CPU 3 [core-id: 6] is assigned to node-id 0
+> Moreover "cpus=3D4" is not valid, because it means core-id 8 but
+> maxcpus is 8.
+>=20
+> With this patch we have now:
+>=20
+>   node-id: 0 core-id: 0 thread-id: 0
+>   node-id: 0 core-id: 0 thread-id: 1
+>   node-id: 0 core-id: 1 thread-id: 0
+>   node-id: 1 core-id: 1 thread-id: 1
+>   node-id: 0 core-id: 2 thread-id: 1
+>   node-id: 1 core-id: 2 thread-id: 0
+>   node-id: 0 core-id: 3 thread-id: 1
+>   node-id: 0 core-id: 3 thread-id: 0
 
-Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
-Signed-off-by: Julian Brown <julian@codesourcery.com>
-Signed-off-by: Andrew Jenner <andrew@codesourcery.com>
-Signed-off-by: Marek Vasut <marex@denx.de>
----
- default-configs/nios2-softmmu.mak |   1 +
- hw/nios2/Makefile.objs            |   1 +
- hw/nios2/boot.c                   |   5 +-
- hw/nios2/generic_nommu.c          | 130 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 136 insertions(+), 1 deletion(-)
- create mode 100644 hw/nios2/generic_nommu.c
+I'm afraid this is not the right solution.  The point of the
+hotpluggable cpus table is that it has exactly one entry for each
+hotpluggable unit.  For PAPR that's a core, not a thread.
 
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index ab42d0f..95ed1c2 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -5,3 +5,4 @@ CONFIG_SERIAL=y
- CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
- CONFIG_NIOS2_10M50=y
-+CONFIG_NIOS2_GENERIC_NOMMU=y
-diff --git a/hw/nios2/Makefile.objs b/hw/nios2/Makefile.objs
-index 89a419a..3e01798 100644
---- a/hw/nios2/Makefile.objs
-+++ b/hw/nios2/Makefile.objs
-@@ -1,2 +1,3 @@
- obj-y = boot.o cpu_pic.o
- obj-$(CONFIG_NIOS2_10M50) += 10m50_devboard.o
-+obj-$(CONFIG_NIOS2_GENERIC_NOMMU) += generic_nommu.o
-diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-index 5f0ab2f..c697047 100644
---- a/hw/nios2/boot.c
-+++ b/hw/nios2/boot.c
-@@ -140,6 +140,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
-         uint64_t entry, low, high;
-         uint32_t base32;
-         int big_endian = 0;
-+        int kernel_space = 0;
- 
- #ifdef TARGET_WORDS_BIGENDIAN
-         big_endian = 1;
-@@ -155,10 +156,12 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
-                                    translate_kernel_address, NULL,
-                                    &entry, NULL, NULL,
-                                    big_endian, EM_ALTERA_NIOS2, 0, 0);
-+            kernel_space = 1;
-         }
- 
-         /* Always boot into physical ram. */
--        boot_info.bootstrap_pc = ddr_base + 0xc0000000 + (entry & 0x07ffffff);
-+        boot_info.bootstrap_pc = ddr_base + (kernel_space ? 0xc0000000 : 0)
-+                                 + (entry & 0x07ffffff);
- 
-         /* If it wasn't an ELF image, try an u-boot image. */
-         if (kernel_size < 0) {
-diff --git a/hw/nios2/generic_nommu.c b/hw/nios2/generic_nommu.c
-new file mode 100644
-index 0000000..502567f
---- /dev/null
-+++ b/hw/nios2/generic_nommu.c
-@@ -0,0 +1,130 @@
-+/*
-+ * Generic simulator target with no MMU
-+ *
-+ * Copyright (c) 2018-2019 Mentor Graphics
-+ *
-+ * Copyright (c) 2016 Marek Vasut <marek.vasut@gmail.com>
-+ *
-+ * Based on LabX device code
-+ *
-+ * Copyright (c) 2012 Chris Wulff <crwulff@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+
-+#include "hw/sysbus.h"
-+#include "hw/hw.h"
-+#include "hw/char/serial.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/boards.h"
-+#include "exec/memory.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/config-file.h"
-+
-+#include "boot.h"
-+
-+#define BINARY_DEVICE_TREE_FILE    "generic-nommu.dtb"
-+
-+static void nios2_generic_nommu_init(MachineState *machine)
-+{
-+    Nios2CPU *cpu;
-+    DeviceState *dev;
-+    MemoryRegion *address_space_mem = get_system_memory();
-+    MemoryRegion *phys_tcm = g_new(MemoryRegion, 1);
-+    MemoryRegion *phys_tcm_alias = g_new(MemoryRegion, 1);
-+    MemoryRegion *phys_ram = g_new(MemoryRegion, 1);
-+    MemoryRegion *phys_ram_alias = g_new(MemoryRegion, 1);
-+    ram_addr_t tcm_base = 0x0;
-+    ram_addr_t tcm_size = 0x1000;    /* 1 kiB, but QEMU limit is 4 kiB */
-+    ram_addr_t ram_base = 0x10000000;
-+    ram_addr_t ram_size = 0x08000000;
-+    qemu_irq *cpu_irq, irq[32];
-+    int i;
-+
-+    /* Physical TCM (tb_ram_1k) with alias at 0xc0000000 */
-+    memory_region_init_ram(phys_tcm, NULL, "nios2.tcm", tcm_size,
-+                           &error_abort);
-+    memory_region_init_alias(phys_tcm_alias, NULL, "nios2.tcm.alias",
-+                             phys_tcm, 0, tcm_size);
-+    memory_region_add_subregion(address_space_mem, tcm_base, phys_tcm);
-+    memory_region_add_subregion(address_space_mem, 0xc0000000 + tcm_base,
-+                                phys_tcm_alias);
-+
-+    /* Physical DRAM with alias at 0xc0000000 */
-+    memory_region_init_ram(phys_ram, NULL, "nios2.ram", ram_size,
-+                           &error_abort);
-+    memory_region_init_alias(phys_ram_alias, NULL, "nios2.ram.alias",
-+                             phys_ram, 0, ram_size);
-+    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
-+    memory_region_add_subregion(address_space_mem, 0xc0000000 + ram_base,
-+                                phys_ram_alias);
-+
-+    cpu = NIOS2_CPU(cpu_create(TYPE_NIOS2_CPU));
-+
-+    /* Remove MMU */
-+    cpu->mmu_present = false;
-+
-+    /* Register: CPU interrupt controller (PIC) */
-+    cpu_irq = nios2_cpu_pic_init(cpu);
-+
-+    /* Register: Internal Interrupt Controller (IIC) */
-+    dev = qdev_create(NULL, "altera,iic");
-+    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
-+                                   &error_abort);
-+    qdev_init_nofail(dev);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
-+    for (i = 0; i < 32; i++) {
-+        irq[i] = qdev_get_gpio_in(dev, i);
-+    }
-+
-+    /* Register: Altera 16550 UART */
-+    serial_mm_init(address_space_mem, 0xf8001600, 2, irq[1], 115200,
-+                   serial_hd(0), DEVICE_NATIVE_ENDIAN);
-+
-+    /* Register: Timer sys_clk_timer  */
-+    dev = qdev_create(NULL, "ALTR.timer");
-+    qdev_prop_set_uint32(dev, "clock-frequency", 75 * 1000000);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xf8001440);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq[0]);
-+
-+    /* Register: Timer sys_clk_timer_1  */
-+    dev = qdev_create(NULL, "ALTR.timer");
-+    qdev_prop_set_uint32(dev, "clock-frequency", 75 * 1000000);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xe0000880);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq[5]);
-+
-+    /* Configure new exception vectors and reset CPU for it to take effect. */
-+    cpu->reset_addr = 0xd0000000;
-+    cpu->exception_addr = 0xc8000120;
-+    cpu->fast_tlb_miss_addr = 0x7fff400;
-+
-+    nios2_load_kernel(cpu, ram_base, ram_size, machine->initrd_filename,
-+                      BINARY_DEVICE_TREE_FILE, NULL);
-+}
-+
-+static void nios2_generic_nommu_machine_init(struct MachineClass *mc)
-+{
-+    mc->desc = "Generic NOMMU Nios II design";
-+    mc->init = nios2_generic_nommu_init;
-+}
-+
-+DEFINE_MACHINE("nios2-generic-nommu", nios2_generic_nommu_machine_init);
--- 
-2.8.1
+So, the problem is with how the NUMA configuration code is
+interpreting possible-cpus, not how the machine is building the table.
+
+> CPUs 0 (core-id: 0 thread-id: 0) and 1 (core-id: 0 thread-id: 1) are
+> correctly assigned to node-id 0, CPUs 3 (core-id: 1 thread-id: 1) and
+>  4 (core-id: 2 thread-id: 0) are correctly assigned to node-id 1.
+> All other CPUs are assigned to node-id 0 by default.
+>=20
+> And the error message is also correct:
+>=20
+>   CPU(s) not present in any NUMA nodes: CPU 2 [core-id: 1, thread-id: 0],=
+ \
+>                                         CPU 5 [core-id: 2, thread-id: 1],=
+ \
+>                                         CPU 6 [core-id: 3, thread-id: 0],=
+ \
+>                                         CPU 7 [core-id: 3, thread-id: 1]
+>=20
+> Fixes: ec78f8114bc4 ("numa: use possible_cpus for not mapped CPUs check")
+> Cc: imammedo@redhat.com
+>=20
+> Before commit ec78f8114bc4, output was correct:
+>=20
+>   CPU(s) not present in any NUMA nodes: 2 5 6 7
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  hw/ppc/spapr.c | 33 +++++++++++++--------------------
+>  1 file changed, 13 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 332cba89d425..7196ba09da34 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2404,15 +2404,13 @@ static void spapr_validate_node_memory(MachineSta=
+te *machine, Error **errp)
+>  /* find cpu slot in machine->possible_cpus by core_id */
+>  static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id, int=
+ *idx)
+>  {
+> -    int index =3D id / smp_threads;
+> -
+> -    if (index >=3D ms->possible_cpus->len) {
+> +    if (id >=3D ms->possible_cpus->len) {
+>          return NULL;
+>      }
+>      if (idx) {
+> -        *idx =3D index;
+> +        *idx =3D id;
+>      }
+> -    return &ms->possible_cpus->cpus[index];
+> +    return &ms->possible_cpus->cpus[id];
+>  }
+> =20
+>  static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+> @@ -2514,7 +2512,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
+r)
+>              error_report("This machine version does not support CPU hotp=
+lug");
+>              exit(1);
+>          }
+> -        boot_cores_nr =3D possible_cpus->len;
+> +        boot_cores_nr =3D possible_cpus->len / smp_threads;
+>      }
+> =20
+>      if (smc->pre_2_10_has_unused_icps) {
+> @@ -2528,7 +2526,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
+r)
+>          }
+>      }
+> =20
+> -    for (i =3D 0; i < possible_cpus->len; i++) {
+> +    for (i =3D 0; i < possible_cpus->len / smp_threads; i++) {
+>          int core_id =3D i * smp_threads;
+> =20
+>          if (mc->has_hotpluggable_cpus) {
+> @@ -3795,21 +3793,16 @@ spapr_cpu_index_to_props(MachineState *machine, u=
+nsigned cpu_index)
+> =20
+>  static int64_t spapr_get_default_cpu_node_id(const MachineState *ms, int=
+ idx)
+>  {
+> -    return idx / smp_cores % nb_numa_nodes;
+> +    return idx / (smp_cores * smp_threads) % nb_numa_nodes;
+>  }
+> =20
+>  static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *ma=
+chine)
+>  {
+>      int i;
+>      const char *core_type;
+> -    int spapr_max_cores =3D max_cpus / smp_threads;
+> -    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> =20
+> -    if (!mc->has_hotpluggable_cpus) {
+> -        spapr_max_cores =3D QEMU_ALIGN_UP(smp_cpus, smp_threads) / smp_t=
+hreads;
+> -    }
+>      if (machine->possible_cpus) {
+> -        assert(machine->possible_cpus->len =3D=3D spapr_max_cores);
+> +        assert(machine->possible_cpus->len =3D=3D max_cpus);
+>          return machine->possible_cpus;
+>      }
+> =20
+> @@ -3820,16 +3813,16 @@ static const CPUArchIdList *spapr_possible_cpu_ar=
+ch_ids(MachineState *machine)
+>      }
+> =20
+>      machine->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
+> -                             sizeof(CPUArchId) * spapr_max_cores);
+> -    machine->possible_cpus->len =3D spapr_max_cores;
+> +                             sizeof(CPUArchId) * max_cpus);
+> +    machine->possible_cpus->len =3D max_cpus;
+>      for (i =3D 0; i < machine->possible_cpus->len; i++) {
+> -        int core_id =3D i * smp_threads;
+> -
+>          machine->possible_cpus->cpus[i].type =3D core_type;
+>          machine->possible_cpus->cpus[i].vcpus_count =3D smp_threads;
+> -        machine->possible_cpus->cpus[i].arch_id =3D core_id;
+> +        machine->possible_cpus->cpus[i].arch_id =3D i;
+>          machine->possible_cpus->cpus[i].props.has_core_id =3D true;
+> -        machine->possible_cpus->cpus[i].props.core_id =3D core_id;
+> +        machine->possible_cpus->cpus[i].props.core_id =3D i / smp_thread=
+s;
+> +        machine->possible_cpus->cpus[i].props.has_thread_id =3D true;
+> +        machine->possible_cpus->cpus[i].props.thread_id =3D i % smp_thre=
+ads;
+>      }
+>      return machine->possible_cpus;
+>  }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4ZVTVymsHR1TEBjP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjchYACgkQbDjKyiDZ
+s5Im+A/+NtePU5hUyed9y/jtyUZJLnOCISb/o6Yo3S3xxgNSEiq8h0Itk3XBiyEy
+FxoF011MeguYx7QMifXR3kSNwMEXrfO1eXyRZ/dumQHqJdFZx1J1NLs9E7hsWrwi
+FVXx/rgiWmozn/g4VBopZP3o3fhqYvw0cmqIhPtCms/Sz8O0yX8yWPQI2PtrCfFS
+Lw8QdTZ2v0aaYJo3DrSCLe1RMxTG1iK9W1AAnQBfVxW59Lb3crzNSVFBooVgUFqt
+qv+6x87RIyHMacPD/Rlf2go7t1Hmg8Im00BMwhoQJl9PEoEHuhUkk8k74rkYE6xH
+8FZwiM4qzIcXrKg4wqH2Kc8AEzbEZNpXLndBypzJJRSNVZ1mAAoz/vhXWgo2FYc6
+8B83RBnaa94ZiigewWcngPgM8+Tc2ceTv4PFt6B6Ky1rX6Apk0x0/5FJA8Z2ejqS
+uPm0EpPob4Xy44DXj1J8dDIPvxIwh1aZzCoqRpK8h7zCS9hWQmE1tRFub/xqUZvM
+Mp1EM6/2gy8OfwtfR0QTgzg0uxog1+++8L0lN5hiTnSE7THVk/cvwb1lJxXiAMI7
+IeDTBNsY9dz2XX3c7B8aF59XjE9UCzn3xpnOi/xKGnxOLwfC2BEo4la3rBqUj8Rp
+C6aso3e18Oxg26VMORNhdIyWR5ib+Qnx3Dh/gEz2e9RpI+oCg4Y=
+=lH7r
+-----END PGP SIGNATURE-----
+
+--4ZVTVymsHR1TEBjP--
