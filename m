@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39186)
+Received: from eggs.gnu.org ([209.51.188.92]:39214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG5-00044t-O2
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG6-00045e-Fv
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005K8-2c
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48300)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005K5-4a
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtxG1-0005Cq-F3
+	id 1gtxG1-0005B7-F6
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:33 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Feb 2019 17:18:53 +0100
-Message-Id: <20190213161913.22107-6-marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 17:18:51 +0100
+Message-Id: <20190213161913.22107-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 References: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 05/25] chardev: fix validation of options for
- QMP created chardevs
+Subject: [Qemu-devel] [PULL v2 03/25] io: store reference to thread
+ information in the QIOTask struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,166 +33,149 @@ Cc: peter.maydell@linaro.org
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-The TLS creds option is not valid with certain address types. The user
-config was only checked for errors when parsing legacy QemuOpts, thus
-the user could pass unsupported values via QMP.
+Currently the struct QIOTaskThreadData is only needed by the worker
+thread, but a subsequent patch will need to access it from another
+context.
 
-Pull all code for validating options out into a new method
-qmp_chardev_validate_socket, that is called from the main
-qmp_chardev_open_socket method. This adds a missing check for rejecting
-TLS creds with the vsock address type.
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190211182442.8542-4-berrange@redhat.com>
+Message-Id: <20190211182442.8542-2-berrange@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-socket.c | 92 +++++++++++++++++++++++++++++++------------
- 1 file changed, 66 insertions(+), 26 deletions(-)
+ io/task.c | 64 +++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 34 insertions(+), 30 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index eaa8e8b68f..e85250b624 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -987,6 +987,65 @@ static gboolean socket_reconnect_timeout(gpointer op=
-aque)
-     return false;
+diff --git a/io/task.c b/io/task.c
+index 2886a2c1bc..396866b10f 100644
+--- a/io/task.c
++++ b/io/task.c
+@@ -24,6 +24,14 @@
+ #include "qemu/thread.h"
+ #include "trace.h"
+=20
++struct QIOTaskThreadData {
++    QIOTaskWorker worker;
++    gpointer opaque;
++    GDestroyNotify destroy;
++    GMainContext *context;
++};
++
++
+ struct QIOTask {
+     Object *source;
+     QIOTaskFunc func;
+@@ -32,6 +40,7 @@ struct QIOTask {
+     Error *err;
+     gpointer result;
+     GDestroyNotify destroyResult;
++    struct QIOTaskThreadData *thread;
+ };
+=20
+=20
+@@ -57,6 +66,18 @@ QIOTask *qio_task_new(Object *source,
+=20
+ static void qio_task_free(QIOTask *task)
+ {
++    if (task->thread) {
++        if (task->thread->destroy) {
++            task->thread->destroy(task->thread->opaque);
++        }
++
++        if (task->thread->context) {
++            g_main_context_unref(task->thread->context);
++        }
++
++        g_free(task->thread);
++    }
++
+     if (task->destroy) {
+         task->destroy(task->opaque);
+     }
+@@ -72,31 +93,12 @@ static void qio_task_free(QIOTask *task)
  }
 =20
-+
-+static bool qmp_chardev_validate_socket(ChardevSocket *sock,
-+                                        SocketAddress *addr,
-+                                        Error **errp)
-+{
-+    /* Validate any options which have a dependency on address type */
-+    switch (addr->type) {
-+    case SOCKET_ADDRESS_TYPE_FD:
-+        if (sock->has_reconnect) {
-+            error_setg(errp,
-+                       "'reconnect' option is incompatible with "
-+                       "'fd' address type");
-+            return false;
-+        }
-+        if (sock->has_tls_creds &&
-+            !(sock->has_server && sock->server)) {
-+            error_setg(errp,
-+                       "'tls_creds' option is incompatible with "
-+                       "'fd' address type as client");
-+            return false;
-+        }
-+        break;
-+
-+    case SOCKET_ADDRESS_TYPE_UNIX:
-+        if (sock->has_tls_creds) {
-+            error_setg(errp,
-+                       "'tls_creds' option is incompatible with "
-+                       "'unix' address type");
-+            return false;
-+        }
-+        break;
-+
-+    case SOCKET_ADDRESS_TYPE_INET:
-+        break;
-+
-+    case SOCKET_ADDRESS_TYPE_VSOCK:
-+        if (sock->has_tls_creds) {
-+            error_setg(errp,
-+                       "'tls_creds' option is incompatible with "
-+                       "'vsock' address type");
-+            return false;
-+        }
-+
-+    default:
-+        break;
-+    }
-+
-+    /* Validate any options which have a dependancy on client vs server =
-*/
-+    if (!(sock->has_server && sock->server)) {
-+        if (sock->has_websocket && sock->websocket) {
-+            error_setg(errp, "%s", "Websocket client is not implemented"=
-);
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
-+
- static void qmp_chardev_open_socket(Chardev *chr,
-                                     ChardevBackend *backend,
-                                     bool *be_opened,
-@@ -1004,11 +1063,6 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     QIOChannelSocket *sioc =3D NULL;
-     SocketAddress *addr;
 =20
--    if (!is_listen && is_websock) {
--        error_setg(errp, "%s", "Websocket client is not implemented");
--        goto error;
+-struct QIOTaskThreadData {
+-    QIOTask *task;
+-    QIOTaskWorker worker;
+-    gpointer opaque;
+-    GDestroyNotify destroy;
+-    GMainContext *context;
+-};
+-
+-
+ static gboolean qio_task_thread_result(gpointer opaque)
+ {
+-    struct QIOTaskThreadData *data =3D opaque;
++    QIOTask *task =3D opaque;
+=20
+-    trace_qio_task_thread_result(data->task);
+-    qio_task_complete(data->task);
+-
+-    if (data->destroy) {
+-        data->destroy(data->opaque);
 -    }
 -
-     s->is_listen =3D is_listen;
-     s->is_telnet =3D is_telnet;
-     s->is_tn3270 =3D is_tn3270;
-@@ -1049,10 +1103,10 @@ static void qmp_chardev_open_socket(Chardev *chr,
+-    if (data->context) {
+-        g_main_context_unref(data->context);
+-    }
+-
+-    g_free(data);
++    trace_qio_task_thread_result(task);
++    qio_task_complete(task);
 =20
-     s->addr =3D addr =3D socket_address_flatten(sock->addr);
+     return FALSE;
+ }
+@@ -104,22 +106,23 @@ static gboolean qio_task_thread_result(gpointer opa=
+que)
 =20
--    if (sock->has_reconnect && addr->type =3D=3D SOCKET_ADDRESS_TYPE_FD)=
+ static gpointer qio_task_thread_worker(gpointer opaque)
  {
--        error_setg(errp, "'reconnect' option is incompatible with 'fd'")=
-;
-+    if (!qmp_chardev_validate_socket(sock, addr, errp)) {
-         goto error;
-     }
+-    struct QIOTaskThreadData *data =3D opaque;
++    QIOTask *task =3D opaque;
+     GSource *idle;
+=20
+-    trace_qio_task_thread_run(data->task);
+-    data->worker(data->task, data->opaque);
++    trace_qio_task_thread_run(task);
 +
-     qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_RECONNECTABLE);
-     /* TODO SOCKET_ADDRESS_FD where fd has AF_UNIX */
-     if (addr->type =3D=3D SOCKET_ADDRESS_TYPE_UNIX) {
-@@ -1140,27 +1194,12 @@ static void qemu_chr_parse_socket(QemuOpts *opts,=
- ChardevBackend *backend,
-         return;
++    task->thread->worker(task, task->thread->opaque);
+=20
+     /* We're running in the background thread, and must only
+      * ever report the task results in the main event loop
+      * thread. So we schedule an idle callback to report
+      * the worker results
+      */
+-    trace_qio_task_thread_exit(data->task);
++    trace_qio_task_thread_exit(task);
+=20
+     idle =3D g_idle_source_new();
+-    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
+-    g_source_attach(idle, data->context);
++    g_source_set_callback(idle, qio_task_thread_result, task, NULL);
++    g_source_attach(idle, task->thread->context);
+=20
+     return NULL;
+ }
+@@ -138,17 +141,18 @@ void qio_task_run_in_thread(QIOTask *task,
+         g_main_context_ref(context);
      }
 =20
--    backend->type =3D CHARDEV_BACKEND_KIND_SOCKET;
--    if (path) {
--        if (tls_creds) {
--            error_setg(errp, "TLS can only be used over TCP socket");
--            return;
--        }
--    } else if (host) {
--        if (!port) {
--            error_setg(errp, "chardev: socket: no port given");
--            return;
--        }
--    } else if (fd) {
--        /* We don't know what host to validate against when in client mo=
-de */
--        if (tls_creds && !is_listen) {
--            error_setg(errp, "TLS can not be used with pre-opened client=
- FD");
--            return;
--        }
--    } else {
--        g_assert_not_reached();
-+    if (host && !port) {
-+        error_setg(errp, "chardev: socket: no port given");
-+        return;
-     }
+-    data->task =3D task;
+     data->worker =3D worker;
+     data->opaque =3D opaque;
+     data->destroy =3D destroy;
+     data->context =3D context;
 =20
-+    backend->type =3D CHARDEV_BACKEND_KIND_SOCKET;
-     sock =3D backend->u.socket.data =3D g_new0(ChardevSocket, 1);
-     qemu_chr_parse_common(opts, qapi_ChardevSocket_base(sock));
++    task->thread =3D data;
++
+     trace_qio_task_thread_start(task, worker, opaque);
+     qemu_thread_create(&thread,
+                        "io-task-worker",
+                        qio_task_thread_worker,
+-                       data,
++                       task,
+                        QEMU_THREAD_DETACHED);
+ }
 =20
-@@ -1178,6 +1217,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
-hardevBackend *backend,
-     sock->wait =3D is_waitconnect;
-     sock->has_reconnect =3D qemu_opt_find(opts, "reconnect");
-     sock->reconnect =3D reconnect;
-+    sock->has_tls_creds =3D tls_creds;
-     sock->tls_creds =3D g_strdup(tls_creds);
-=20
-     addr =3D g_new0(SocketAddressLegacy, 1);
 --=20
 2.21.0.rc0.1.g036caf7885
