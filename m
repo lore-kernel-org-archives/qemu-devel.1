@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42974)
+Received: from eggs.gnu.org ([209.51.188.92]:46268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=94072d1a0=marcolso@amazon.com>)
-	id 1gu1Sx-0007v2-PT
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:49:13 -0500
+	(envelope-from <clg@kaod.org>) id 1gu1lI-0003Bu-SP
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=94072d1a0=marcolso@amazon.com>)
-	id 1gu1Sw-0004x4-FK
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:49:11 -0500
-References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-	<1542006398-30037-3-git-send-email-marcolso@amazon.com>
-	<72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
-	<13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
-	<8a51bd30-40c2-e367-208f-df0f2d225d0f@redhat.com>
-From: Marc Olson <marcolso@amazon.com>
-Message-ID: <c2965971-4e19-8d68-d57a-6ee28ecfe22e@amazon.com>
-Date: Wed, 13 Feb 2019 12:49:00 -0800
+	(envelope-from <clg@kaod.org>) id 1gu1lI-0003Eh-0x
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:08:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42522
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gu1lH-0003E9-Py
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:08:07 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1DL02TZ058955
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 16:08:06 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qmsv7aphe-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 16:08:05 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
+	Wed, 13 Feb 2019 21:08:04 -0000
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed, 13 Feb 2019 22:07:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <8a51bd30-40c2-e367-208f-df0f2d225d0f@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] blkdebug: Add latency injection
- rule type
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20190213210756.27032-1-clg@kaod.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] spapr/irq: remove the XICS offset
+ adjustment for the dual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,141 +39,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 2/13/19 7:48 AM, Max Reitz wrote:
-> On 12.02.19 22:21, Marc Olson wrote:
->> On 1/11/19 7:00 AM, Max Reitz wrote:
->>> On 12.11.18 08:06, Marc Olson wrote:
-> [...]
->
->>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>>> index d4fe710..72f7861 100644
->>>> --- a/qapi/block-core.json
->>>> +++ b/qapi/block-core.json
->>>> @@ -3057,6 +3057,34 @@
->>>>                '*immediately': 'bool' } }
->>>>      ##
->>>> +# @BlkdebugDelayOptions:
->>>> +#
->>>> +# Describes a single latency injection for blkdebug.
->>>> +#
->>>> +# @event:       trigger event
->>>> +#
->>>> +# @state:       the state identifier blkdebug needs to be in to
->>>> +#               actually trigger the event; defaults to "any"
->>>> +#
->>>> +# @latency:     The delay to add to an I/O, in microseconds.
->>>> +#
->>>> +# @sector:      specifies the sector index which has to be affected
->>>> +#               in order to actually trigger the event; defaults to
->>>> "any
->>>> +#               sector"
->>>> +#
->>>> +# @once:        disables further events after this one has been
->>>> +#               triggered; defaults to false
->>>> +#
->>>> +# Since: 3.1
->>> Well, 4.0 now, sorry...
->> Baking version numbers into code is downright silly. Every single
->> version of this patch has made a comment along the lines of, "oops, it
->> didn't get reviewed in time for the next version bump, so you have to
->> resubmit." With a fast moving project, this is nonsense. If you're
->> looking at the code, you should have access to the git history as well
->> to determine the version.
-> True, but these comments are used to generate documentation (e.g.
-> docs/interopt/qemu-qmp-ref.7 in the build directory).  So they are used
-> by people who don't have access to the git history.
->
-> It might be possible to generate that information from git-blame when
-> generating the documentation, but how would trivial fixes be handled
-> that are no functional changes?  For instance, it seems difficult to me
-> to distinguish between a spelling change for some parameter description
-> and a change in behavior.
->
-> (Then again, we shouldn't have such behavioral changes, hm.)
->
-> To me personally, the easiest thing would seem to be some convention to
-> write ***INSERT VERSION HERE*** into the code and then the maintainer
-> can just find an replace all instances of that when applying the
-> patches.  But that sounds a bit silly...
->
-> (I don't have an issue with adjusting the version numbers myself as they
-> are, but it's just as hard for me to find and replace all of them as it
-> is for you.  And since you're probably going to send a v4 anyway...)
->
-> In the end, it's up to the QAPI maintainers.
+Hello,
 
-IFF I submit by the end of the week, what version number shall I choose?
+When using the 'dual' interrupt mode, the source numbers of both sPAPR
+IRQ backends are aligned to share a common IRQ number space and to use
+a similar mapping of the machine qemu_irq array which is indexed by
+the source number.
 
+The XICS IRQ number range initially being [ 0x1000 - 0x2000 ], this
+requires to change the XICS ICSState offset to 0 and to provision for
+an extra 4K of source numbers and qemu_irqs which will never be used
+by the machine when running under the XICS interrupt mode. This is not
+an optimal solution.
 
-> [...]
->
->>>> diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
->>>> index 48b4955..976f747 100755
->>>> --- a/tests/qemu-iotests/071
->>>> +++ b/tests/qemu-iotests/071
->>>> @@ -100,6 +100,69 @@ $QEMU_IO -c "open -o
->>>> driver=$IMGFMT,file.driver=blkdebug,file.inject-error.event
->>>>             -c 'read -P 42 0x38000 512'
->>>>      echo
->>>> +echo "=== Testing blkdebug latency through filename ==="
->>>> +echo
->>>> +
->>>> +$QEMU_IO -c "open -o
->>>> file.driver=blkdebug,file.inject-delay.event=write_aio,file.inject-delay.latency=10000
->>>> $TEST_IMG" \
->>>> +         -c 'aio_write -P 42 0x28000 512' \
->>>> +         -c 'aio_read -P 42 0x38000 512' \
->>>> +         | _filter_qemu_io
->>>> +
->>>> +echo
->>>> +echo "=== Testing blkdebug latency through file blockref ==="
->>>> +echo
->>>> +
->>>> +$QEMU_IO -c "open -o
->>>> driver=$IMGFMT,file.driver=blkdebug,file.inject-delay.event=write_aio,file.inject-delay.latency=10000,file.image.filename=$TEST_IMG"
->>>> \
->>>> +         -c 'aio_write -P 42 0x28000 512' \
->>>> +         -c 'aio_read -P 42 0x38000 512' \
->>>> +         | _filter_qemu_io
->>>> +
->>>> +# Using QMP is synchronous by default, so even though we would
->>>> +# expect reordering due to using the aio_* commands, they are
->>>> +# not. The purpose of this test is to verify that the driver
->>>> +# can be setup via QMP, and IO can complete. See the qemu-io
->>>> +# test above to prove delay functionality
->>> But it doesn't prove that because the output is filtered.  To prove it,
->>> you'd probably need to use null-co as the protocol (so there is as
->>> little noise as possible) and then parse the qemu-io output to show that
->>> the time is always above 10 ms.
->>>
->>> I leave it to you whether you'd like to go through that pain.
->> There's not a great way to prove it without doing a lot of parsing
->> changes in testing. I'll consider an update to this patch, but I think
->> this series has carried on long enough.
-> I agree in this instance, but I'd like to note still that "this series
-> has carried on long enough" is not an argument to merge bad code (or
-> something incomplete without promise of a follow-up).  This is just a
-> test for blkdebug, though, so it's OK (with the comment fixed, because
-> it doesn't prove anything).
-I wasn't implying that it's ok to merge bad code, but that at some point 
-we have to just paint the shed a color and move on. At the risk of 
-excess drama, at what point does a small addition become a complete 
-tear-down and rebuild?
-> (I'm sorry for not having looked at this series for so long, but qemu is
-> not my own, so it isn't like I could pay for my wrong by accepting
-> something incomplete -- if it were more important than this single test
-> case.)
->
-> Also, we do support Python for iotests, and parsing should be simpler
-> there.  Since blkdebug is just a debugging driver, I'm fine with not
-> knowing whether its features work, though.
->
-> Maybe I'll write the test, that would kind of pay for my wrong...
+Moreover, the KVM support for the 'dual' interrupt mode will require
+some adjustments. The XICS KVM device considers that the IRQ numbers
+start at XICS_IRQ_BASE (0x1000) and we have no way to inform KVM of
+the offset change. We will need to ignore the lower 4K numbers when
+capturing or restoring the source states from the XICS KVM device.
 
-I think the real fix is to make QMP support async IO, but if you'd like 
-to do more parsing, that's fine too.
+The first patch allocates an IRQ number space of the expected size for
+the XICS sPAPR IRQ backend. The overall IRQ number space size and the
+qemu_irq array size is still the one required by the 'dual' sPAPR IRQ
+backend, that is, in sync with XIVE. The second patch removes the
+ICSState offset adjustment. This last change adds some benefits as it
+simplifies greatly the qirq() method of the 'dual' sPAPR IRQ backend.
 
-/marc
+C.
+
+C=C3=A9dric Le Goater (2):
+  spapr/irq: add an 'nr_irq' parameter to initialize the backend.
+  spapr/irq: remove the XICS offset adjustment
+
+ include/hw/ppc/spapr_irq.h |  2 +-
+ hw/ppc/spapr_irq.c         | 45 ++++++++++----------------------------
+ 2 files changed, 12 insertions(+), 35 deletions(-)
+
+--=20
+2.20.1
