@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39214)
+Received: from eggs.gnu.org ([209.51.188.92]:39192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG6-00045e-Fv
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG5-000450-Q4
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005K5-4a
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57042)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005Js-44
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtxG1-0005B7-F6
+	id 1gtxG1-000597-F7
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:33 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Feb 2019 17:18:51 +0100
-Message-Id: <20190213161913.22107-4-marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 17:18:49 +0100
+Message-Id: <20190213161913.22107-2-marcandre.lureau@redhat.com>
 In-Reply-To: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 References: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 03/25] io: store reference to thread
- information in the QIOTask struct
+Subject: [Qemu-devel] [PULL v2 01/25] chardev: fix mess in OPENED/CLOSED
+ events when muxed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,151 +31,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-Currently the struct QIOTaskThreadData is only needed by the worker
-thread, but a subsequent patch will need to access it from another
-context.
+When chardev is multiplexed (mux=3Don) there are a lot of cases where
+CHR_EVENT_OPENED/CHR_EVENT_CLOSED events pairing (expected from
+frontend side) is broken. There are either generation of multiple
+repeated or extra CHR_EVENT_OPENED events, or CHR_EVENT_CLOSED just
+isn't generated at all.
+This is mostly because 'qemu_chr_fe_set_handlers()' function makes its
+own (and often wrong) implicit decision on updated frontend state and
+invokes 'fd_event' callback with 'CHR_EVENT_OPENED'. And even worse,
+it doesn't do symmetric action in opposite direction, as someone may
+expect (i.e. it doesn't invoke previously set 'fd_event' with
+'CHR_EVENT_CLOSED'). Muxed chardev uses trick by calling this function
+again to replace callback handlers with its own ones, but it doesn't
+account for such side effect.
+Fix that using extended version of this function with added argument
+for disabling side effect and keep original function for compatibility
+with lots of frontends already using this interface and being
+"tolerant" to its side effects.
+One more source of event duplication is just line of code in
+char-mux.c, which does far more than comment above says (obvious fix).
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190211182442.8542-2-berrange@redhat.com>
+Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.arte=
+m.k.pisarenko@gmail.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- io/task.c | 64 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 34 insertions(+), 30 deletions(-)
+ include/chardev/char-fe.h | 18 +++++++++++++++++-
+ chardev/char-fe.c         | 33 ++++++++++++++++++++++++---------
+ chardev/char-mux.c        | 16 ++++++++--------
+ 3 files changed, 49 insertions(+), 18 deletions(-)
 
-diff --git a/io/task.c b/io/task.c
-index 2886a2c1bc..396866b10f 100644
---- a/io/task.c
-+++ b/io/task.c
-@@ -24,6 +24,14 @@
- #include "qemu/thread.h"
- #include "trace.h"
+diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+index 46c997d352..c1b7fd9a95 100644
+--- a/include/chardev/char-fe.h
++++ b/include/chardev/char-fe.h
+@@ -67,7 +67,7 @@ bool qemu_chr_fe_backend_connected(CharBackend *be);
+ bool qemu_chr_fe_backend_open(CharBackend *be);
 =20
-+struct QIOTaskThreadData {
-+    QIOTaskWorker worker;
-+    gpointer opaque;
-+    GDestroyNotify destroy;
-+    GMainContext *context;
-+};
+ /**
+- * qemu_chr_fe_set_handlers:
++ * qemu_chr_fe_set_handlers_full:
+  * @b: a CharBackend
+  * @fd_can_read: callback to get the amount of data the frontend may
+  *               receive
+@@ -79,12 +79,28 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
+  * @context: a main loop context or NULL for the default
+  * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
+  * any of the handler is non-NULL
++ * @sync_state: whether to issue event callback with updated state
+  *
+  * Set the front end char handlers. The front end takes the focus if
+  * any of the handler is non-NULL.
+  *
+  * Without associated Chardev, nothing is changed.
+  */
++void qemu_chr_fe_set_handlers_full(CharBackend *b,
++                                   IOCanReadHandler *fd_can_read,
++                                   IOReadHandler *fd_read,
++                                   IOEventHandler *fd_event,
++                                   BackendChangeHandler *be_change,
++                                   void *opaque,
++                                   GMainContext *context,
++                                   bool set_open,
++                                   bool sync_state);
 +
-+
- struct QIOTask {
-     Object *source;
-     QIOTaskFunc func;
-@@ -32,6 +40,7 @@ struct QIOTask {
-     Error *err;
-     gpointer result;
-     GDestroyNotify destroyResult;
-+    struct QIOTaskThreadData *thread;
- };
-=20
-=20
-@@ -57,6 +66,18 @@ QIOTask *qio_task_new(Object *source,
-=20
- static void qio_task_free(QIOTask *task)
- {
-+    if (task->thread) {
-+        if (task->thread->destroy) {
-+            task->thread->destroy(task->thread->opaque);
-+        }
-+
-+        if (task->thread->context) {
-+            g_main_context_unref(task->thread->context);
-+        }
-+
-+        g_free(task->thread);
-+    }
-+
-     if (task->destroy) {
-         task->destroy(task->opaque);
++/**
++ * qemu_chr_fe_set_handlers:
++ *
++ * Version of qemu_chr_fe_set_handlers_full() with sync_state =3D true.
++ */
+ void qemu_chr_fe_set_handlers(CharBackend *b,
+                               IOCanReadHandler *fd_can_read,
+                               IOReadHandler *fd_read,
+diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+index a8931f7afd..b7bcbd59c0 100644
+--- a/chardev/char-fe.c
++++ b/chardev/char-fe.c
+@@ -246,14 +246,15 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
      }
-@@ -72,31 +93,12 @@ static void qio_task_free(QIOTask *task)
  }
 =20
-=20
--struct QIOTaskThreadData {
--    QIOTask *task;
--    QIOTaskWorker worker;
--    gpointer opaque;
--    GDestroyNotify destroy;
--    GMainContext *context;
--};
--
--
- static gboolean qio_task_thread_result(gpointer opaque)
+-void qemu_chr_fe_set_handlers(CharBackend *b,
+-                              IOCanReadHandler *fd_can_read,
+-                              IOReadHandler *fd_read,
+-                              IOEventHandler *fd_event,
+-                              BackendChangeHandler *be_change,
+-                              void *opaque,
+-                              GMainContext *context,
+-                              bool set_open)
++void qemu_chr_fe_set_handlers_full(CharBackend *b,
++                                   IOCanReadHandler *fd_can_read,
++                                   IOReadHandler *fd_read,
++                                   IOEventHandler *fd_event,
++                                   BackendChangeHandler *be_change,
++                                   void *opaque,
++                                   GMainContext *context,
++                                   bool set_open,
++                                   bool sync_state)
  {
--    struct QIOTaskThreadData *data =3D opaque;
-+    QIOTask *task =3D opaque;
-=20
--    trace_qio_task_thread_result(data->task);
--    qio_task_complete(data->task);
--
--    if (data->destroy) {
--        data->destroy(data->opaque);
--    }
--
--    if (data->context) {
--        g_main_context_unref(data->context);
--    }
--
--    g_free(data);
-+    trace_qio_task_thread_result(task);
-+    qio_task_complete(task);
-=20
-     return FALSE;
+     Chardev *s;
+     int fe_open;
+@@ -285,7 +286,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+         qemu_chr_fe_take_focus(b);
+         /* We're connecting to an already opened device, so let's make s=
+ure we
+            also get the open event */
+-        if (s->be_open) {
++        if (sync_state && s->be_open) {
+             qemu_chr_be_event(s, CHR_EVENT_OPENED);
+         }
+     }
+@@ -295,6 +296,20 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+     }
  }
-@@ -104,22 +106,23 @@ static gboolean qio_task_thread_result(gpointer opa=
-que)
 =20
- static gpointer qio_task_thread_worker(gpointer opaque)
- {
--    struct QIOTaskThreadData *data =3D opaque;
-+    QIOTask *task =3D opaque;
-     GSource *idle;
-=20
--    trace_qio_task_thread_run(data->task);
--    data->worker(data->task, data->opaque);
-+    trace_qio_task_thread_run(task);
++void qemu_chr_fe_set_handlers(CharBackend *b,
++                              IOCanReadHandler *fd_can_read,
++                              IOReadHandler *fd_read,
++                              IOEventHandler *fd_event,
++                              BackendChangeHandler *be_change,
++                              void *opaque,
++                              GMainContext *context,
++                              bool set_open)
++{
++    qemu_chr_fe_set_handlers_full(b, fd_can_read, fd_read, fd_event, be_=
+change,
++                                  opaque, context, set_open,
++                                  true);
++}
 +
-+    task->thread->worker(task, task->thread->opaque);
+ void qemu_chr_fe_take_focus(CharBackend *b)
+ {
+     if (!b->chr) {
+diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+index 6055e76293..1199d32674 100644
+--- a/chardev/char-mux.c
++++ b/chardev/char-mux.c
+@@ -283,13 +283,13 @@ void mux_chr_set_handlers(Chardev *chr, GMainContex=
+t *context)
+     MuxChardev *d =3D MUX_CHARDEV(chr);
 =20
-     /* We're running in the background thread, and must only
-      * ever report the task results in the main event loop
-      * thread. So we schedule an idle callback to report
-      * the worker results
+     /* Fix up the real driver with mux routines */
+-    qemu_chr_fe_set_handlers(&d->chr,
+-                             mux_chr_can_read,
+-                             mux_chr_read,
+-                             mux_chr_event,
+-                             NULL,
+-                             chr,
+-                             context, true);
++    qemu_chr_fe_set_handlers_full(&d->chr,
++                                  mux_chr_can_read,
++                                  mux_chr_read,
++                                  mux_chr_event,
++                                  NULL,
++                                  chr,
++                                  context, true, false);
+ }
+=20
+ void mux_set_focus(Chardev *chr, int focus)
+@@ -367,7 +367,7 @@ static int open_muxes(Chardev *chr)
+      * mark mux as OPENED so any new FEs will immediately receive
+      * OPENED event
       */
--    trace_qio_task_thread_exit(data->task);
-+    trace_qio_task_thread_exit(task);
+-    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
++    chr->be_open =3D 1;
 =20
-     idle =3D g_idle_source_new();
--    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
--    g_source_attach(idle, data->context);
-+    g_source_set_callback(idle, qio_task_thread_result, task, NULL);
-+    g_source_attach(idle, task->thread->context);
-=20
-     return NULL;
+     return 0;
  }
-@@ -138,17 +141,18 @@ void qio_task_run_in_thread(QIOTask *task,
-         g_main_context_ref(context);
-     }
-=20
--    data->task =3D task;
-     data->worker =3D worker;
-     data->opaque =3D opaque;
-     data->destroy =3D destroy;
-     data->context =3D context;
-=20
-+    task->thread =3D data;
-+
-     trace_qio_task_thread_start(task, worker, opaque);
-     qemu_thread_create(&thread,
-                        "io-task-worker",
-                        qio_task_thread_worker,
--                       data,
-+                       task,
-                        QEMU_THREAD_DETACHED);
- }
-=20
 --=20
 2.21.0.rc0.1.g036caf7885
