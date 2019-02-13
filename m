@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48787)
+Received: from eggs.gnu.org ([209.51.188.92]:49573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gtuPm-0002lD-Qi
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:17:27 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gtuVJ-0003lg-Eu
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:23:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gtuPk-000685-QK
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:17:26 -0500
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <mlureau@redhat.com>) id 1gtuVF-0002rC-Lz
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:23:07 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:35475)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gtuVF-0002oq-He
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:23:05 -0500
+Received: by mail-qk1-f194.google.com with SMTP id w204so1304847qka.2
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 05:23:02 -0800 (PST)
 MIME-Version: 1.0
+References: <20190213123446.1768-1-philmd@redhat.com>
+In-Reply-To: <20190213123446.1768-1-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 14:22:50 +0100
+Message-ID: <CAMxuvaxbiwiJUGSD=RjKGqPxH=9tGL-0VUKvRNLwR+Kn2_VKCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20190213091206.GB13960@redhat.com>
-References: <20190212212917.26977-1-mdroth@linux.vnet.ibm.com>
-	<20190212212917.26977-2-mdroth@linux.vnet.ibm.com>
-	<20190213091206.GB13960@redhat.com>
-Message-ID: <155006382924.21382.4005135691288035023@sif>
-Date: Wed, 13 Feb 2019 07:17:09 -0600
-Subject: Re: [Qemu-devel] [PATCH 1/2] qga-win: include glib when building
- VSS DLL
+Subject: Re: [Qemu-devel] [PATCH v2] chardev/wctablet: Fix a typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Anatoli Huseu1 <avg.tolik@gmail.com>
 
-Quoting Daniel P. Berrang=C3=A9 (2019-02-13 03:12:06)
-> On Tue, Feb 12, 2019 at 03:29:16PM -0600, Michael Roth wrote:
-> > Commit 3ebee3b191e defined assert() as g_assert(), but when we build
-> > the VSS DLL component of QGA (to handle fsfreeze) we do not include
-> > glib, which results in breakage when building with VSS support enabled.
-> > =
+Hi
 
-> > Fix this by including glib. Since the VSS DLL is built statically,
-> > this introduces an additional dependency on static glib and supporting
-> > libs for the mingw environment (possibly why we didn't include glib
-> > originally), but VSS support already has very specific prerequisites
-> > so it shouldn't affect too many build environments.
-> > =
+On Wed, Feb 13, 2019 at 1:34 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> The correct name is Wacom.
+> Fix the typo which is present since 378af96155d.
+>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> v2: Use correct English in description
 
-> > Since the VSS DLL code does use qemu/osdep.h, this should also help
-> > avoid future breakages and possibly allow for some clean ups in current
-> > VSS code.
-> > =
+thanks, I'll queue the patch in next chardev PR.
 
-> > Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Cc: qemu-stable@nongnu.org
-> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > ---
-> >  qga/vss-win32/Makefile.objs | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > =
-
-> > diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
-> > index 23d08da225..dad9d1b0ba 100644
-> > --- a/qga/vss-win32/Makefile.objs
-> > +++ b/qga/vss-win32/Makefile.objs
-> > @@ -5,7 +5,7 @@ qga-vss-dll-obj-y +=3D requester.o provider.o install.o
-> >  obj-qga-vss-dll-obj-y =3D $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
-> >  $(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS =3D $(filter-out -Wstrict-prot=
-otypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wold-=
-style-definition -Wredundant-decls -fstack-protector-all -fstack-protector-=
-strong, $(QEMU_CFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dtor
-> >  =
-
-> > -$(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enab=
-le-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
-> > +$(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enab=
-le-stdcall-fixup -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -lws=
-2_32 -static
-> =
-
-> Adding -lglib-2.0 makes sense, but your commit message doesn't explain
-> why -lintl or -lws2_32 are being added & they don't really make sense
-> to me.
-
-Those are dependencies introduced by glib for w32 socket APIs and =
-
-gettext/internationalization. I was getting linker errors otherwise.
-
-I'll add a note in the commit msg before applying (if there's no need for
-a re-respin).
-
-> =
-
-> =
-
-> Regards,
-> Daniel
-> -- =
-
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->=20
+> ---
+>  chardev/wctablet.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/chardev/wctablet.c b/chardev/wctablet.c
+> index 969d014574..35dbd29a33 100644
+> --- a/chardev/wctablet.c
+> +++ b/chardev/wctablet.c
+> @@ -177,7 +177,7 @@ static void wctablet_input_sync(DeviceState *dev)
+>  }
+>
+>  static QemuInputHandler wctablet_handler =3D {
+> -    .name  =3D "QEMU Wacome Pen Tablet",
+> +    .name  =3D "QEMU Wacom Pen Tablet",
+>      .mask  =3D INPUT_EVENT_MASK_BTN | INPUT_EVENT_MASK_ABS,
+>      .event =3D wctablet_input_event,
+>      .sync  =3D wctablet_input_sync,
+> --
+> 2.20.1
+>
