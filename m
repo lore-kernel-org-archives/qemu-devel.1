@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33267)
+Received: from eggs.gnu.org ([209.51.188.92]:33265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtqsF-0007Eh-NQ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:36 -0500
+	(envelope-from <knut.omang@oracle.com>) id 1gtqsF-0007Ef-NR
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtqsB-00021Z-QU
+	(envelope-from <knut.omang@oracle.com>) id 1gtqsB-00021z-T1
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:33 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:56854)
+Received: from userp2130.oracle.com ([156.151.31.86]:56834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gtqs9-0001ui-69
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:29 -0500
+	id 1gtqs9-0001r0-T3
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:31 -0500
 From: Knut Omang <knut.omang@oracle.com>
-Date: Wed, 13 Feb 2019 10:29:57 +0100
-Message-Id: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
+Date: Wed, 13 Feb 2019 10:29:58 +0100
+Message-Id: <3df33b2bd332259dc548751b3c3c5eaa297428b0.1550050121.git-series.knut.omang@oracle.com>
+In-Reply-To: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
+References: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 0/2] pcie: Add simple ACS "support" to the
- generic PCIe root port
+Subject: [Qemu-devel] [PATCH v4 1/2] pcie: Add a simple PCIe ACS (Access
+ Control Services) helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +30,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>, Knut Omang <knut.omang@oracle.com>
 
-These two patches together implements a PCIe capability
-config space header for Access Control Services (ACS) for the
-new Qemu specific generic root port. ACS support in the
-associated root port is a prerequisite to be able to pass
-individual functions of a device populating the port through to
-an L2 guest from an unmodified kernel.
+Add a helper function to add PCIe capability for Access Control Services (ACS)
+ACS support in the associated root port is needed to pass
+through individual functions of a device to different VMs with VFIO
+without Alex Williamson's pcie_acs_override kernel patch or similar
+in the guest.
 
-Without this, the IOMMU group the device belongs to will also
-include the root port itself, and all functions the device provides.
+Single function devices, or multifunction devices
+that all goes to the same VM works fine even without ACS, as VFIO
+will avoid putting the root port itself into the IOMMU group
+even without ACS support in the port.
 
-It is necessary to support SR/IOV where the primary
-purpose is to be able to share out individual VFs to different
-guests, which will not be permitted by VFIO or the Windows Hyper-V equivalent
-unless ACS is supported by the root port.
+Multifunction endpoints may also implement an ACS capability,
+only on function 0, and with more limited features.
 
-These patches can also be found as part of an updated version of
-my SR/IOV emulation patch set at
+Signed-off-by: Knut Omang <knut.omang@oracle.com>
+---
+ hw/pci/pcie.c              | 39 +++++++++++++++++++++++++++++++++++++++-
+ include/hw/pci/pcie.h      |  6 ++++++-
+ include/hw/pci/pcie_regs.h |  4 ++++-
+ 3 files changed, 49 insertions(+)
 
-  https://github.com/knuto/qemu/tree/sriov_patches_v11
-
-The patches' basic operation with VFIO and iommu groups have
-been tested with the above patch set and a rebased version of an
-in progress igb ethernet device, which needs some more care
-before I can let it go out.
-
-Changes from v3:
-----------------
-- rebased to the latest qemu master
-- Revised commit message and comments for patch #1 to make it
-  clearer that VFIO works for single function devices even without ACS.
-- Improved checking for valid endpoints for ACS.
-- Fixed comment style issue
-- Co-locate the pci_acs_init and _reset functions and
-  rename pci_cap_acs_reset to pci_acs_reset to adhere to the naming
-  conventions that _cap_ functions in pcie is for changing state
-  in the main pcie capability and not the individual extended
-  capabilities.
-- Added Marcel's r-b to patch 2, which did not change
-
-Changes from v2:
-----------------
-- rebased to the latest qemu master
-
-Incorporated further feedback from Alex:
-- Make sure slot/downstream capability bits are only set for slots.
-- Make acs reset callback do nothing if no acs capability exists
-- Set correct acs version
-- div simplification
-
-Changes from v1:
-----------------
-Incorporated feedback from Alex Williamson:
-- Make commit messages reflect a more correct understanding of how this
-  affects VFIO operation.
-- Implemented the CTRL register properly (reset callback + making non-implemented
-  capabilities RO, default value 0)
-- removed the egress ctrl vector parameter to the init function
-- Fixed some whitespace issues
-
-Knut Omang (2):
-  pcie: Add a simple PCIe ACS (Access Control Services) helper function
-  gen_pcie_root_port: Add ACS (Access Control Services) capability
-
- hw/pci-bridge/gen_pcie_root_port.c |  4 +++-
- hw/pci-bridge/pcie_root_port.c     |  4 +++-
- hw/pci/pcie.c                      | 39 +++++++++++++++++++++++++++++++-
- include/hw/pci/pcie.h              |  6 +++++-
- include/hw/pci/pcie_port.h         |  1 +-
- include/hw/pci/pcie_regs.h         |  4 +++-
- 6 files changed, 58 insertions(+)
-
-base-commit: 0b5e750bea635b167eb03d86c3d9a09bbd43bc06
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 230478f..6e87994 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
+ 
+     pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
+ }
++
++/* ACS (Access Control Services) */
++void pcie_acs_init(PCIDevice *dev, uint16_t offset)
++{
++    bool is_pcie_slot = !!object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT);
++    uint16_t cap_bits = 0;
++
++    /*
++     * For endpoints, only multifunction devices may have an
++     * ACS capability, and only on function 0:
++     */
++    assert(is_pcie_slot ||
++           ((dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) &&
++            PCI_FUNC(dev->devfn)));
++
++    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
++                        PCI_ACS_SIZEOF);
++    dev->exp.acs_cap = offset;
++
++    if (is_pcie_slot) {
++        /*
++         * Endpoints may also implement ACS, and optionally RR and CR,
++         * if they want to support p2p, but only slots may
++         * implement SV, TB or UF:
++         */
++        cap_bits =
++            PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF;
++    }
++
++    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
++    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
++}
++
++void pcie_acs_reset(PCIDevice *dev)
++{
++    if (dev->exp.acs_cap) {
++        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
++    }
++}
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 5b82a0d..e30334d 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -79,6 +79,9 @@ struct PCIExpressDevice {
+ 
+     /* Offset of ATS capability in config space */
+     uint16_t ats_cap;
++
++    /* ACS */
++    uint16_t acs_cap;
+ };
+ 
+ #define COMPAT_PROP_PCP "power_controller_present"
+@@ -128,6 +131,9 @@ void pcie_add_capability(PCIDevice *dev,
+                          uint16_t offset, uint16_t size);
+ void pcie_sync_bridge_lnk(PCIDevice *dev);
+ 
++void pcie_acs_init(PCIDevice *dev, uint16_t offset);
++void pcie_acs_reset(PCIDevice *dev);
++
+ void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
+ void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
+ void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+index ad4e780..1db86b0 100644
+--- a/include/hw/pci/pcie_regs.h
++++ b/include/hw/pci/pcie_regs.h
+@@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
+                                          PCI_ERR_COR_INTERNAL |         \
+                                          PCI_ERR_COR_HL_OVERFLOW)
+ 
++/* ACS */
++#define PCI_ACS_VER                     0x1
++#define PCI_ACS_SIZEOF                  8
++
+ #endif /* QEMU_PCIE_REGS_H */
 -- 
 git-series 0.9.1
