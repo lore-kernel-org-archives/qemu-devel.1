@@ -1,29 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60978)
+Received: from eggs.gnu.org ([209.51.188.92]:60974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtvDc-0006hR-WB
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:08:57 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtvE1-0006hQ-Ik
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gtv8f-0003JZ-OM
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:03:55 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gtv8d-00036x-Kc
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:03:49 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t18so2648146wrx.2
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 06:03:43 -0800 (PST)
-References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
-	<CAJ+F1CJLHPa3LtviMGQuuwjv-PMzeeR4tJGoHHOz_JqfRR927A@mail.gmail.com>
-	<9336d69b-8896-4a19-c580-b6ce5aefec2d@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <9336d69b-8896-4a19-c580-b6ce5aefec2d@redhat.com>
-Date: Wed, 13 Feb 2019 14:03:40 +0000
-Message-ID: <87imxniy4j.fsf@zen.linaroharston>
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtv4U-0003pO-Bt
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:59:34 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54254
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gtv4K-0003Si-Q3
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:59:24 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1DDtnM8112007
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 08:59:17 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qmhq1qwj3-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 08:59:17 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 13 Feb 2019 13:59:16 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-5-git-send-email-jjherne@linux.ibm.com>
+	<cc6dcf27-e1cf-14de-e729-486e1995f6eb@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 13 Feb 2019 08:59:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Add a gitlab-ci file for Continuous
- Integration testing on Gitlab
+In-Reply-To: <cc6dcf27-e1cf-14de-e729-486e1995f6eb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <722772b9-bdf7-6a4e-16cb-21bfb54e70ac@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 04/15] s390-bios: Extend
+ find_dev() for non-virtio devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +46,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 2019-02-13 13:06, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
+On 2/11/19 11:38 AM, Thomas Huth wrote:
+> On 2019-01-29 14:29, Jason J. Herne wrote:
+>> We need a method for finding the subchannel of a dasd device. Let's
+>> modify find_dev to handle this since it mostly does what we need. Up to
+>> this point find_dev has been specific to only virtio devices.
 >>
->> On Wed, Feb 13, 2019 at 12:55 PM Thomas Huth <thuth@redhat.com> wrote:
->>>
->>> This is very convenient for people like me who store their QEMU git tre=
-es
->>> on gitlab.com: Automatic CI pipelines are now run for each branch that =
-is
->>> pushed to the server - useful for some extra-testing before sending PUL=
-L-
->>> requests for example. Since the runtime of the jobs is limited to 1h, t=
-he
->>> jobs are distributed into multiple pipelines - this way everything fini=
-shs
->>> fine within time (ca. 30 minutes currently).
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  An example can be seen here: https://gitlab.com/huth/qemu/pipelines/
->>>
->>>  I'd really like to get this into the main QEMU repository, so that I d=
-on't
->>>  have to cherry-pick this patch onto my testing branches anymore each t=
-ime
->>>  I want to test before sending a PULL request...
->>>
->>>  .gitlab-ci.yml | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->>>  MAINTAINERS    |  5 ++++
->>>  2 files changed, 78 insertions(+)
->>>  create mode 100644 .gitlab-ci.yml
->>>
->>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->>> new file mode 100644
->>> index 0000000..79d02cf
->>> --- /dev/null
->>> +++ b/.gitlab-ci.yml
->>> @@ -0,0 +1,73 @@
->>> +before_script:
->>> + - apt-get update -qq
->>> + - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev ge=
-nisoimage
->>> +
->>> +build-system1:
->>> + script:
->>> + - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard=
--dev
->>> +      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
->>> + - ./configure --enable-werror --target-list=3D"aarch64-softmmu alpha-=
-softmmu
->>> +      cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazee=
-l-softmmu
->>> +      mips64el-softmmu m68k-softmmu ppc-softmmu riscv64-softmmu sparc-=
-softmmu"
->>> + - make -j2
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/main.c | 16 +++++++++++-----
+>>   1 file changed, 11 insertions(+), 5 deletions(-)
 >>
->> Have you tried $(nproc) ?
->
-> The containers are only single CPU there. I'm using -j2 just in case one
-> of the processes is blocked by waiting for IO, the other one can still
-> continue compiling.
->
->> Despite the duplication of CI files, which is not really a problem imho,
+>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>> index 67df421..7e3f65e 100644
+>> --- a/pc-bios/s390-ccw/main.c
+>> +++ b/pc-bios/s390-ccw/main.c
+>> @@ -49,6 +49,12 @@ unsigned int get_loadparm_index(void)
+>>       return atoui(loadparm_str);
+>>   }
+>>   
+>> +/*
+>> + * Find the subchannel connected to the given device (dev_no) and fill in the
+>> + * subchannel information block (schib) with the connected subchannel's info.
+>> + * NOTE: The global variable blk_schid is updated to contain the subchannel
+>> + * information.
+>> + */
+>>   static bool find_dev(Schib *schib, int dev_no)
+>>   {
+>>       int i, r;
+>> @@ -62,15 +68,15 @@ static bool find_dev(Schib *schib, int dev_no)
+>>           if (!schib->pmcw.dnv) {
+>>               continue;
+>>           }
+>> -        if (!virtio_is_supported(blk_schid)) {
+>> -            continue;
+>> -        }
+>> +
+>>           /* Skip net devices since no IPLB is created and therefore no
+>> -         * no network bootloader has been loaded
+>> +         * network bootloader has been loaded
+>>            */
+>> -        if (virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
+>> +        if (virtio_is_supported(blk_schid) &&
+>> +            virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
+>>               continue;
+>>           }
+>> +
+>>           if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
+>>               return true;
+>>           }
 >>
->> lgtm,
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Thanks!
->
-> And yes, I also think the duplication of the CI files should not really
-> be a problem - it's rather a plus since we also got test variations this
-> way. I already found some bugs with this here that were not detected by
-> the other CI setups yet (e.g. since one of the pipelines uses
-> --disable-replication and other --disable-xxx flags).
+> 
+> Not sure whether this really works as expected? If dev_no is -1, this
+> used to return the first supported virtio device. Now it returns the
+> first device that could be found - but how are we sure that we can boot
+> from that device?
+> 
 
-Sure I'm happy to have a thousand flowers bloom in this regard.
+How could we ever be sure we could boot from the first virtio device? The dev_no=1 case 
+means we don't know which device to boot from so we're guessing.  The only thing that is 
+changing here is that we're allowing non-virtio devices as well. We do this because we now 
+support booting from a device type that is not virtio.
 
-Do you know if gitlab does build status buttons like the others?
 
---
-Alex Benn=C3=A9e
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
