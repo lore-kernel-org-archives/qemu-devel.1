@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33265)
+Received: from eggs.gnu.org ([209.51.188.92]:33389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtqsF-0007Ef-NR
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtqsx-0007pR-Tu
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:31:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gtqsB-00021z-T1
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:33 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:56834)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gtqs9-0001r0-T3
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:30:31 -0500
-From: Knut Omang <knut.omang@oracle.com>
-Date: Wed, 13 Feb 2019 10:29:58 +0100
-Message-Id: <3df33b2bd332259dc548751b3c3c5eaa297428b0.1550050121.git-series.knut.omang@oracle.com>
-In-Reply-To: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
-References: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gtqsx-000339-1s
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:31:19 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 13 Feb 2019 09:31:02 +0000
+Message-ID: <365fa564-2f73-8fc6-3430-c1222229f5a8@virtuozzo.com>
+References: <20190212010248.11056-1-jsnow@redhat.com>
+	<20190212010248.11056-2-jsnow@redhat.com>
+In-Reply-To: <20190212010248.11056-2-jsnow@redhat.com>
+Content-Language: ru-RU
+Content-Type: text/plain; charset="koi8-r"
+Content-ID: <9D7C3493EA97B2438410E84B5A9A8E71@virtuozzo.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+Subject: Re: [Qemu-devel] [PATCH 1/5] block/dirty-bitmap: add recording and
+ busy properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>, Knut Omang <knut.omang@oracle.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Add a helper function to add PCIe capability for Access Control Services (ACS)
-ACS support in the associated root port is needed to pass
-through individual functions of a device to different VMs with VFIO
-without Alex Williamson's pcie_acs_override kernel patch or similar
-in the guest.
 
-Single function devices, or multifunction devices
-that all goes to the same VM works fine even without ACS, as VFIO
-will avoid putting the root port itself into the IOMMU group
-even without ACS support in the port.
 
-Multifunction endpoints may also implement an ACS capability,
-only on function 0, and with more limited features.
+On 12.02.2019 1:02, John Snow wrote:
+> The current API allows us to report a single status, which we've defined =
+as:
+>=20
+> Frozen: has a successor, treated as qmp_locked, may or may not be enabled=
+.
+> Locked: no successor, qmp_locked. may or may not be enabled.
+> Disabled: Not frozen or locked, disabled.
+> Active: Not frozen, locked, or disabled.
+>=20
+> The problem is that both "Frozen" and "Locked" mean nearly the same thing=
+,
+> and that both of them do not intuit whether they are recording guest writ=
+es
+> or not.
+>=20
+> This patch deprecates that status field and introduces two orthogonal
+> properties instead to replace it.
+> ---
+>   block/dirty-bitmap.c       |  9 +++++++++
+>   qapi/block-core.json       |  9 ++++++++-
+>   tests/qemu-iotests/236.out | 28 ++++++++++++++++++++++++++++
+>   3 files changed, 45 insertions(+), 1 deletion(-)
+>=20
 
-Signed-off-by: Knut Omang <knut.omang@oracle.com>
----
- hw/pci/pcie.c              | 39 +++++++++++++++++++++++++++++++++++++++-
- include/hw/pci/pcie.h      |  6 ++++++-
- include/hw/pci/pcie_regs.h |  4 ++++-
- 3 files changed, 49 insertions(+)
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 5a0f5f5a95..275f0d573c 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -455,7 +455,13 @@
+>   #
+>   # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
+>   #
+> -# @status: current status of the dirty bitmap (since 2.4)
+> +# @status: Deprecated in favor of @recording and @locked. (since 4.0)
+> +#
+> +# @recording: true if the bitmap is recording new writes from the guest.
+> +#             Replaces `active` status. (since 4.0)
+> +#
+> +# @busy: true if the bitmap is in-use by some operation (NBD or jobs)
+> +#        and cannot be modified via QMP right now. (since 4.0)
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 230478f..6e87994 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
- 
-     pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
- }
-+
-+/* ACS (Access Control Services) */
-+void pcie_acs_init(PCIDevice *dev, uint16_t offset)
-+{
-+    bool is_pcie_slot = !!object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT);
-+    uint16_t cap_bits = 0;
-+
-+    /*
-+     * For endpoints, only multifunction devices may have an
-+     * ACS capability, and only on function 0:
-+     */
-+    assert(is_pcie_slot ||
-+           ((dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) &&
-+            PCI_FUNC(dev->devfn)));
-+
-+    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
-+                        PCI_ACS_SIZEOF);
-+    dev->exp.acs_cap = offset;
-+
-+    if (is_pcie_slot) {
-+        /*
-+         * Endpoints may also implement ACS, and optionally RR and CR,
-+         * if they want to support p2p, but only slots may
-+         * implement SV, TB or UF:
-+         */
-+        cap_bits =
-+            PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF;
-+    }
-+
-+    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
-+    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
-+}
-+
-+void pcie_acs_reset(PCIDevice *dev)
-+{
-+    if (dev->exp.acs_cap) {
-+        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
-+    }
-+}
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index 5b82a0d..e30334d 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -79,6 +79,9 @@ struct PCIExpressDevice {
- 
-     /* Offset of ATS capability in config space */
-     uint16_t ats_cap;
-+
-+    /* ACS */
-+    uint16_t acs_cap;
- };
- 
- #define COMPAT_PROP_PCP "power_controller_present"
-@@ -128,6 +131,9 @@ void pcie_add_capability(PCIDevice *dev,
-                          uint16_t offset, uint16_t size);
- void pcie_sync_bridge_lnk(PCIDevice *dev);
- 
-+void pcie_acs_init(PCIDevice *dev, uint16_t offset);
-+void pcie_acs_reset(PCIDevice *dev);
-+
- void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
- void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
- void pcie_ats_init(PCIDevice *dev, uint16_t offset);
-diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-index ad4e780..1db86b0 100644
---- a/include/hw/pci/pcie_regs.h
-+++ b/include/hw/pci/pcie_regs.h
-@@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
-                                          PCI_ERR_COR_INTERNAL |         \
-                                          PCI_ERR_COR_HL_OVERFLOW)
- 
-+/* ACS */
-+#define PCI_ACS_VER                     0x1
-+#define PCI_ACS_SIZEOF                  8
-+
- #endif /* QEMU_PCIE_REGS_H */
--- 
-git-series 0.9.1
+not only modified, but also cannot be used somehow for any other operation.
+
+>   #
+>   # @persistent: true if the bitmap will eventually be flushed to persist=
+ent
+>   #              storage (since 4.0)
+> @@ -464,6 +470,7 @@
+>   ##
+>   { 'struct': 'BlockDirtyInfo',
+>     'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
+> +           'recording': 'bool', 'busy': 'bool',
+>              'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+>  =20
