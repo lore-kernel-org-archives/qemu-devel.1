@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46288)
+Received: from eggs.gnu.org ([209.51.188.92]:47064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gu1lJ-0003Bx-RA
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:08:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gu1ph-0005X8-8m
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:12:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gu1lI-0003Eq-K2
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:08:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59608)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gu1lI-0003EP-96
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:08:08 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1DL0HwD119132
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 16:08:06 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qmqp089us-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 16:08:06 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Wed, 13 Feb 2019 21:08:04 -0000
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 13 Feb 2019 22:07:55 +0100
-In-Reply-To: <20190213210756.27032-1-clg@kaod.org>
-References: <20190213210756.27032-1-clg@kaod.org>
+	(envelope-from <mreitz@redhat.com>) id 1gu1pf-00083S-58
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 16:12:41 -0500
+References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
+	<1542006398-30037-3-git-send-email-marcolso@amazon.com>
+	<72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
+	<13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
+	<8a51bd30-40c2-e367-208f-df0f2d225d0f@redhat.com>
+	<c2965971-4e19-8d68-d57a-6ee28ecfe22e@amazon.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <27c761fc-59e0-785c-f6ea-d022baa11c96@redhat.com>
+Date: Wed, 13 Feb 2019 22:12:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190213210756.27032-2-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2] spapr/irq: add an 'nr_irq' parameter to
- initialize the backend.
+In-Reply-To: <c2965971-4e19-8d68-d57a-6ee28ecfe22e@amazon.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cyuTOhiwKQFunzCXOTgwF7ZD4NMEEqHdV"
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] blkdebug: Add latency injection
+ rule type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,122 +29,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-When using the 'dual' interrupt mode, the source numbers of both sPAPR
-IRQ backends are aligned to share a common IRQ number space and to use
-a similar mapping of the machine qemu_irq array which is indexed by
-the source number.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cyuTOhiwKQFunzCXOTgwF7ZD4NMEEqHdV
+From: Max Reitz <mreitz@redhat.com>
+To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <27c761fc-59e0-785c-f6ea-d022baa11c96@redhat.com>
+Subject: Re: [PATCH v3 3/3] blkdebug: Add latency injection rule type
+References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
+ <1542006398-30037-3-git-send-email-marcolso@amazon.com>
+ <72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
+ <13cbaa71-82ac-e142-945f-4ece8e3093f6@amazon.com>
+ <8a51bd30-40c2-e367-208f-df0f2d225d0f@redhat.com>
+ <c2965971-4e19-8d68-d57a-6ee28ecfe22e@amazon.com>
+In-Reply-To: <c2965971-4e19-8d68-d57a-6ee28ecfe22e@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The XICS IRQ number range initially being [ 0x1000 - 0x2000 ], this
-requires to change the XICS ICSState offset to 0 and to provision for
-an extra 4K of source numbers and qemu_irqs which will never be used
-by the machine when running under the XICS interrupt mode. This is not
-an optimal solution.
+On 13.02.19 21:49, Marc Olson wrote:
+> On 2/13/19 7:48 AM, Max Reitz wrote:
+>> On 12.02.19 22:21, Marc Olson wrote:
+>>> On 1/11/19 7:00 AM, Max Reitz wrote:
+>>>> On 12.11.18 08:06, Marc Olson wrote:
+>> [...]
+>>
+>>>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>>>>> index d4fe710..72f7861 100644
+>>>>> --- a/qapi/block-core.json
+>>>>> +++ b/qapi/block-core.json
+>>>>> @@ -3057,6 +3057,34 @@
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 '*immediately': 'bool' } }
+>>>>> =C2=A0=C2=A0 =C2=A0 ##
+>>>>> +# @BlkdebugDelayOptions:
+>>>>> +#
+>>>>> +# Describes a single latency injection for blkdebug.
+>>>>> +#
+>>>>> +# @event:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trigger event
+>>>>> +#
+>>>>> +# @state:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the state identifier=
+ blkdebug needs to be in to
+>>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 actually trigger the event; defaults to "any"
+>>>>> +#
+>>>>> +# @latency:=C2=A0=C2=A0=C2=A0=C2=A0 The delay to add to an I/O, in=
+ microseconds.
+>>>>> +#
+>>>>> +# @sector:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 specifies the sector inde=
+x which has to be affected
+>>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 in order to actually trigger the event; defaults to
+>>>>> "any
+>>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 sector"
+>>>>> +#
+>>>>> +# @once:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 disables furthe=
+r events after this one has been
+>>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 triggered; defaults to false
+>>>>> +#
+>>>>> +# Since: 3.1
+>>>> Well, 4.0 now, sorry...
+>>> Baking version numbers into code is downright silly. Every single
+>>> version of this patch has made a comment along the lines of, "oops, i=
+t
+>>> didn't get reviewed in time for the next version bump, so you have to=
 
-Change the init() method to allocate an IRQ number space of the
-expected size for the XICS sPAPR IRQ backend. It breaks the interrupt
-signaling when under the 'dual' mode because source numbers have
-unexpected values but next patch will fix that.
+>>> resubmit." With a fast moving project, this is nonsense. If you're
+>>> looking at the code, you should have access to the git history as wel=
+l
+>>> to determine the version.
+>> True, but these comments are used to generate documentation (e.g.
+>> docs/interopt/qemu-qmp-ref.7 in the build directory).=C2=A0 So they ar=
+e used
+>> by people who don't have access to the git history.
+>>
+>> It might be possible to generate that information from git-blame when
+>> generating the documentation, but how would trivial fixes be handled
+>> that are no functional changes?=C2=A0 For instance, it seems difficult=
+ to me
+>> to distinguish between a spelling change for some parameter descriptio=
+n
+>> and a change in behavior.
+>>
+>> (Then again, we shouldn't have such behavioral changes, hm.)
+>>
+>> To me personally, the easiest thing would seem to be some convention t=
+o
+>> write ***INSERT VERSION HERE*** into the code and then the maintainer
+>> can just find an replace all instances of that when applying the
+>> patches.=C2=A0 But that sounds a bit silly...
+>>
+>> (I don't have an issue with adjusting the version numbers myself as th=
+ey
+>> are, but it's just as hard for me to find and replace all of them as i=
+t
+>> is for you.=C2=A0 And since you're probably going to send a v4 anyway.=
+=2E.)
+>>
+>> In the end, it's up to the QAPI maintainers.
+>=20
+> IFF I submit by the end of the week, what version number shall I choose=
+?
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/spapr_irq.h |  2 +-
- hw/ppc/spapr_irq.c         | 18 ++++++++++--------
- 2 files changed, 11 insertions(+), 9 deletions(-)
+4.0 is still the next one.
 
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 14b02c3aca33..488511c3d890 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -35,7 +35,7 @@ typedef struct sPAPRIrq {
-     uint32_t    nr_msis;
-     uint8_t     ov5;
-=20
--    void (*init)(sPAPRMachineState *spapr, Error **errp);
-+    void (*init)(sPAPRMachineState *spapr, int nr_irqs, Error **errp);
-     int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **er=
-rp);
-     void (*free)(sPAPRMachineState *spapr, int irq, int num);
-     qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 2d7a7c163876..99c3f6ba251a 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -93,10 +93,10 @@ error:
-     return NULL;
- }
-=20
--static void spapr_irq_init_xics(sPAPRMachineState *spapr, Error **errp)
-+static void spapr_irq_init_xics(sPAPRMachineState *spapr, int nr_irqs,
-+                                Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
--    int nr_irqs =3D spapr->irq->nr_irqs;
-     Error *local_err =3D NULL;
-=20
-     if (kvm_enabled()) {
-@@ -262,7 +262,8 @@ sPAPRIrq spapr_irq_xics =3D {
- /*
-  * XIVE IRQ backend.
-  */
--static void spapr_irq_init_xive(sPAPRMachineState *spapr, Error **errp)
-+static void spapr_irq_init_xive(sPAPRMachineState *spapr, int nr_irqs,
-+                                Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
-     uint32_t nr_servers =3D spapr_max_server_number(spapr);
-@@ -278,7 +279,7 @@ static void spapr_irq_init_xive(sPAPRMachineState *sp=
-apr, Error **errp)
-     }
-=20
-     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
--    qdev_prop_set_uint32(dev, "nr-irqs", spapr->irq->nr_irqs);
-+    qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
-     /*
-      * 8 XIVE END structures per CPU. One for each available priority
-      */
-@@ -435,7 +436,8 @@ static sPAPRIrq *spapr_irq_current(sPAPRMachineState =
-*spapr)
-         &spapr_irq_xive : &spapr_irq_xics;
- }
-=20
--static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **errp)
-+static void spapr_irq_init_dual(sPAPRMachineState *spapr, int nr_irqs,
-+                                Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
-     Error *local_err =3D NULL;
-@@ -445,7 +447,7 @@ static void spapr_irq_init_dual(sPAPRMachineState *sp=
-apr, Error **errp)
-         return;
-     }
-=20
--    spapr_irq_xics.init(spapr, &local_err);
-+    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_irqs, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -462,7 +464,7 @@ static void spapr_irq_init_dual(sPAPRMachineState *sp=
-apr, Error **errp)
-      */
-     spapr->ics->offset =3D 0;
-=20
--    spapr_irq_xive.init(spapr, &local_err);
-+    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_irqs, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -605,7 +607,7 @@ void spapr_irq_init(sPAPRMachineState *spapr, Error *=
-*errp)
-         spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
-     }
-=20
--    spapr->irq->init(spapr, errp);
-+    spapr->irq->init(spapr, spapr->irq->nr_irqs, errp);
-=20
-     spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
-                                       spapr->irq->nr_irqs);
---=20
-2.20.1
+>> [...]
+>>
+>>>>> diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
+>>>>> index 48b4955..976f747 100755
+>>>>> --- a/tests/qemu-iotests/071
+>>>>> +++ b/tests/qemu-iotests/071
+>>>>> @@ -100,6 +100,69 @@ $QEMU_IO -c "open -o
+>>>>> driver=3D$IMGFMT,file.driver=3Dblkdebug,file.inject-error.event
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+-c 'read -P 42 0x38000 512'
+>>>>> =C2=A0=C2=A0 =C2=A0 echo
+>>>>> +echo "=3D=3D=3D Testing blkdebug latency through filename =3D=3D=3D=
+"
+>>>>> +echo
+>>>>> +
+>>>>> +$QEMU_IO -c "open -o
+>>>>> file.driver=3Dblkdebug,file.inject-delay.event=3Dwrite_aio,file.inj=
+ect-delay.latency=3D10000
+>>>>>
+>>>>> $TEST_IMG" \
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_write -P =
+42 0x28000 512' \
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_read -P 4=
+2 0x38000 512' \
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | _filter_qemu_io=
+
+>>>>> +
+>>>>> +echo
+>>>>> +echo "=3D=3D=3D Testing blkdebug latency through file blockref =3D=
+=3D=3D"
+>>>>> +echo
+>>>>> +
+>>>>> +$QEMU_IO -c "open -o
+>>>>> driver=3D$IMGFMT,file.driver=3Dblkdebug,file.inject-delay.event=3Dw=
+rite_aio,file.inject-delay.latency=3D10000,file.image.filename=3D$TEST_IM=
+G"
+>>>>>
+>>>>> \
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_write -P =
+42 0x28000 512' \
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -c 'aio_read -P 4=
+2 0x38000 512' \
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | _filter_qemu_io=
+
+>>>>> +
+>>>>> +# Using QMP is synchronous by default, so even though we would
+>>>>> +# expect reordering due to using the aio_* commands, they are
+>>>>> +# not. The purpose of this test is to verify that the driver
+>>>>> +# can be setup via QMP, and IO can complete. See the qemu-io
+>>>>> +# test above to prove delay functionality
+>>>> But it doesn't prove that because the output is filtered.=C2=A0 To p=
+rove it,
+>>>> you'd probably need to use null-co as the protocol (so there is as
+>>>> little noise as possible) and then parse the qemu-io output to show
+>>>> that
+>>>> the time is always above 10 ms.
+>>>>
+>>>> I leave it to you whether you'd like to go through that pain.
+>>> There's not a great way to prove it without doing a lot of parsing
+>>> changes in testing. I'll consider an update to this patch, but I thin=
+k
+>>> this series has carried on long enough.
+>> I agree in this instance, but I'd like to note still that "this series=
+
+>> has carried on long enough" is not an argument to merge bad code (or
+>> something incomplete without promise of a follow-up).=C2=A0 This is ju=
+st a
+>> test for blkdebug, though, so it's OK (with the comment fixed, because=
+
+>> it doesn't prove anything).
+> I wasn't implying that it's ok to merge bad code, but that at some poin=
+t
+> we have to just paint the shed a color and move on. At the risk of
+> excess drama, at what point does a small addition become a complete
+> tear-down and rebuild?
+
+Depends on the case whether a tear down is necessary. :-)
+
+>> (I'm sorry for not having looked at this series for so long, but qemu =
+is
+>> not my own, so it isn't like I could pay for my wrong by accepting
+>> something incomplete -- if it were more important than this single tes=
+t
+>> case.)
+>>
+>> Also, we do support Python for iotests, and parsing should be simpler
+>> there.=C2=A0 Since blkdebug is just a debugging driver, I'm fine with =
+not
+>> knowing whether its features work, though.
+>>
+>> Maybe I'll write the test, that would kind of pay for my wrong...
+>=20
+> I think the real fix is to make QMP support async IO, but if you'd like=
+
+> to do more parsing, that's fine too.
+
+Hm, yeah, that would work, too.  But that's definitely more complicated
+than a bit of parsing...
+
+Max
+
+
+--cyuTOhiwKQFunzCXOTgwF7ZD4NMEEqHdV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxkiCwACgkQ9AfbAGHV
+z0AVDwf/ZrHv3YYJkL12OIsXfg3ShwXF63rDP9vO89dNKLa/laaeX6av1L5cV6EU
+sBLhmifXIdy+xgS86sPgy0712hFNsHXCoYeS7dRs+fTgBrGZ86//SzvbTzhEbjL5
+BY9ckxYGLCANyJi6JpeGn9cgaPAq18GTiLrdBWwdxcLdoaP6AEVx8WtOL7IglvhI
+PGGxVqHBt1/h7BhLUSPVLV9c+081/8rQ2T0O79dRpvdZq9YfpCgZWiAOvkHCQNIb
+u+C1kcmovlNP+o9N2rXJuMh9xxelWEMovQ9rxEd1qw5mqmqNVYchbXjbxqyiMl4M
+ON7OYJgvmUOIRIoWY8vQRSB5sQUJyw==
+=qdWD
+-----END PGP SIGNATURE-----
+
+--cyuTOhiwKQFunzCXOTgwF7ZD4NMEEqHdV--
