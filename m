@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33717)
+Received: from eggs.gnu.org ([209.51.188.92]:34275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtquY-00016r-St
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:33:00 -0500
+	(envelope-from <knut.omang@oracle.com>) id 1gtqwS-000242-EN
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gtquX-0005Fu-Ct
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:32:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33234)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gtquX-0004li-46
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:32:57 -0500
-Date: Wed, 13 Feb 2019 09:32:41 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190213093241.GF13960@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAChFQ9RNaHyROB47QeLwc6cLCCnFx4SmXKV7rbs1MYjk7S0sbw@mail.gmail.com>
-	<20190131104911.GF19982@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190131104911.GF19982@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] NSIS - including DLL dependencies for Windows
+	(envelope-from <knut.omang@oracle.com>) id 1gtqwJ-0007Qn-Tl
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:34:51 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:56584)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1gtqwI-0007Nm-6D
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 04:34:46 -0500
+Message-ID: <a3bcf7a998d901c7d83eb33ab622415b388a9020.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Wed, 13 Feb 2019 10:34:30 +0100
+In-Reply-To: <4ad3f098-ded6-8ddb-4ae5-c2975a286245@gmail.com>
+References: <cover.d651a232d750c6f53cbe8d483b665d638f7a0c0a.1549779509.git-series.knut.omang@oracle.com>
+	<04c99e3c0b56dcbfe494f668bbe11777adbadba9.1549779509.git-series.knut.omang@oracle.com>
+	<4ad3f098-ded6-8ddb-4ae5-c2975a286245@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] gen_pcie_root_port: Add ACS (Access
+ Control Services) capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Adam Baxter <voltagex@voltagex.org>
-Cc: qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
 
-On Thu, Jan 31, 2019 at 10:49:11AM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Jan 31, 2019 at 02:45:13PM +1100, Adam Baxter wrote:
-> > Hi,
-> > How do I gather and include the required DLLs (SDL, zlib etc) in the =
-NSIS
-> > installer? (and also in a standalone build to be zipped up, but that'=
-s less
-> > important)
-> >=20
-> > I noticed the wiki doesn't really mention bundling dependencies anywh=
-ere.
-> >=20
-> > The official unofficial windows builds are documented at
-> > https://qemu.weilnetz.de/FAQ but this doesn't cover building the actu=
-al
-> > installer.
->=20
-> Yeah, this is a pretty major ommision in QEMU's build rules for the NSI=
-S
-> installer making it pretty much useless as is. We really need to expand
-> it so that it can resolve the dlls that qemu .exe's need, locate them
-> on the host and bundle them into the installer automatically.
->=20
-> It seems we can get a list of deps for an .exe using=20
->=20
-> $ winedump  -j import /path/to/binary.exe  | grep offset | grep dll | a=
-wk '{print $3}'
+On Mon, 2019-02-11 at 10:07 +0200, Marcel Apfelbaum wrote:
+> 
+> On 2/10/19 8:53 AM, Knut Omang wrote:
+> > Claim ACS support in the generic PCIe root port to allow
+> > passthrough of individual functions of a device to different
+> > guests (in a nested virt.setting) with VFIO.
+> > Without this patch, all functions of a device, such as all VFs of
+> > an SR/IOV device, will end up in the same IOMMU group.
+> > A similar situation occurs on Windows with Hyper-V.
+> > 
+> > In the single function device case, it also has a small cosmetic
+> > benefit in that the root port itself is not grouped with
+> > the device. VFIO handles that situation in that binding rules
+> > only apply to endpoints, so it does not limit passthrough in
+> > those cases.
+> > 
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > ---
+> >   hw/pci-bridge/gen_pcie_root_port.c | 4 ++++
+> >   hw/pci-bridge/pcie_root_port.c     | 4 ++++
+> >   include/hw/pci/pcie_port.h         | 1 +
+> >   3 files changed, 9 insertions(+)
+> > 
+> > diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-
+> > bridge/gen_pcie_root_port.c
+> > index 9766edb..26bda73 100644
+> > --- a/hw/pci-bridge/gen_pcie_root_port.c
+> > +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> > @@ -20,6 +20,9 @@
+> >           OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
+> >   
+> >   #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
+> > +#define GEN_PCIE_ROOT_PORT_ACS_OFFSET \
+> > +        (GEN_PCIE_ROOT_PORT_AER_OFFSET + PCI_ERR_SIZEOF)
+> > +
+> >   #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
+> >   
+> >   typedef struct GenPCIERootPort {
+> > @@ -149,6 +152,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass,
+> > void *data)
+> >       rpc->interrupts_init = gen_rp_interrupts_init;
+> >       rpc->interrupts_uninit = gen_rp_interrupts_uninit;
+> >       rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
+> > +    rpc->acs_offset = GEN_PCIE_ROOT_PORT_ACS_OFFSET;
+> >   }
+> >   
+> >   static const TypeInfo gen_rp_dev_info = {
+> > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> > index 34ad767..a0b4cf7 100644
+> > --- a/hw/pci-bridge/pcie_root_port.c
+> > +++ b/hw/pci-bridge/pcie_root_port.c
+> > @@ -47,6 +47,7 @@ static void rp_reset(DeviceState *qdev)
+> >       pcie_cap_deverr_reset(d);
+> >       pcie_cap_slot_reset(d);
+> >       pcie_cap_arifwd_reset(d);
+> > +    pcie_cap_acs_reset(d);
+> >       pcie_aer_root_reset(d);
+> >       pci_bridge_reset(qdev);
+> >       pci_bridge_disable_base_limit(d);
+> > @@ -106,6 +107,9 @@ static void rp_realize(PCIDevice *d, Error **errp)
+> >       pcie_aer_root_init(d);
+> >       rp_aer_vector_update(d);
+> >   
+> > +    if (rpc->acs_offset) {
+> > +        pcie_acs_init(d, rpc->acs_offset);
+> > +    }
+> >       return;
+> >   
+> >   err:
+> > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> > index df242a0..09586f4 100644
+> > --- a/include/hw/pci/pcie_port.h
+> > +++ b/include/hw/pci/pcie_port.h
+> > @@ -78,6 +78,7 @@ typedef struct PCIERootPortClass {
+> >       int exp_offset;
+> >       int aer_offset;
+> >       int ssvid_offset;
+> > +    int acs_offset;    /* If nonzero, optional ACS capability offset */
+> >       int ssid;
+> >   } PCIERootPortClass;
+> >   
+> 
+> Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-FYI, I re-discovered a way to do this without needing wine, just plain
-binutils
+Thanks! I added this r-b to v4, but left out the one for patch 1 as it got some
+more changes based on Alex's feedback and our fruitful discussion afterwards,
+so you might want to recheck it.
 
-  x86_64-w64-mingw32-objdump -p /path/to/binary.exe | grep "DLL Name" | a=
-wk '{print $3}'
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Knut
+> 
+> Thanks,
+> Marcel
