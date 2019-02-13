@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47012)
+Received: from eggs.gnu.org ([209.51.188.92]:47210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtzaQ-0008Ot-Jt
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gtzaa-0000BO-7W
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gtzSn-0004zJ-Bv
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:40:54 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gtzSg-0004fB-1t
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:40:48 -0500
-Received: by mail-wm1-f67.google.com with SMTP id q21so3525506wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 10:40:41 -0800 (PST)
-References: <20190212045721.28041-1-richard.henderson@linaro.org>
-	<CAFEAcA_Oc4fTfcC-RFmV3zi7RnAbjDv=xWG8uPb_AT9buGnAcQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <46f22bec-d2ce-da2c-5aa0-c8572181f9ee@redhat.com>
-Date: Wed, 13 Feb 2019 19:40:37 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gtzaY-0000Rq-BX
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:56 -0500
+Resent-Message-Id: <E1gtzaY-0000Rq-BX@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gtzaL-0008NG-Nc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 13:48:44 -0500
+Message-ID: <155008367556.7770.4893587342381998467@ebba9967afc0>
+In-Reply-To: <20190213183153.23746-1-samuel.thibault@ens-lyon.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Oc4fTfcC-RFmV3zi7RnAbjDv=xWG8uPb_AT9buGnAcQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/24] target/hppa patch queue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 13 Feb 2019 10:47:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/2] Fix slirp on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: samuel.thibault@ens-lyon.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-Hi Peter,
-
-On 2/12/19 2:15 PM, Peter Maydell wrote:
-> On Tue, 12 Feb 2019 at 04:57, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> The following changes since commit 22c5f446514a2a4bb0dbe1fea26713da92fc85fa:
->>
->>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190211' into staging (2019-02-11 17:04:57 +0000)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/rth7680/qemu.git tags/pull-hppa-20190211
->>
->> for you to fetch changes up to 23e76627deba013509b5f1a1e1c53e8e111145aa:
->>
->>   hw/hppa: forward requests to CPU HPA (2019-02-11 20:49:06 -0800)
->>
->> ----------------------------------------------------------------
->> Convert to decodetree.
->> Fix signed overflow conditions.
->> Fix dcor.
->> Add CPU MIE to PCI address space.
-> 
-> Hi -- clang compiles fail with:
-> 
-> In file included from
-> /home/petmay01/linaro/qemu-for-merges/target/hppa/translate.c:337:
-> target/hppa/decode.inc.c:471:16: error: redefinition of typedef
-> 'arg_be' is a C11 feature [-Werror,-Wtypedef-redefinition]
-> typedef arg_be arg_be;
->                ^
-> target/hppa/decode.inc.c:9:3: note: previous definition is here
-> } arg_be;
->   ^
-> target/hppa/decode.inc.c:473:16: error: redefinition of typedef
-> 'arg_bl' is a C11 feature [-Werror,-Wtypedef-redefinition]
-> typedef arg_bl arg_bl;
->                ^
-> target/hppa/decode.inc.c:15:3: note: previous definition is here
-> } arg_bl;
->   ^
-
-What Clang version is that?
-
-I can not reproduce using:
-
-clang version 7.0.1 (Fedora 7.0.1-1.fc29)
-
-> 
-> thanks
-> -- PMM
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE4MzE1My4yMzc0
+Ni0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzJdIEZp
+eCBzbGlycCBvbiB3aW5kb3dzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDIxMzE4MzE1
+My4yMzc0Ni0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
+MjEzMTgzMTUzLjIzNzQ2LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZyAtPiBwYXRjaGV3
+LzIwMTkwMjEzMTgzMTUzLjIzNzQ2LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY1MTM2NzVjYTQgc2xpcnA6IHdyYXAgdGhlIHJl
+bWFpbmluZyBzb2NrZXQgZnVuY3Rpb25zCmFjYTc1MTQ2YTEgc2xpcnA6IHJlbW92ZSBzbGlycF8g
+cHJlZml4IGZvciBzb2NrZXQgd3JhcHBlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMiBDaGVj
+a2luZyBjb21taXQgYWNhNzUxNDZhMWI1IChzbGlycDogcmVtb3ZlIHNsaXJwXyBwcmVmaXggZm9y
+IHNvY2tldCB3cmFwcGVycykKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMTE2OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoxODg6CiteSW5uID0gcmVjdihzby0+cywgaW92
+WzBdLmlvdl9iYXNlLCBpb3ZbMF0uaW92X2xlbiwwKTskCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQg
+YWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTY6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjE4ODoK
+KyAgICAgICBubiA9IHJlY3Yoc28tPnMsIGlvdlswXS5pb3ZfYmFzZSwgaW92WzBdLmlvdl9sZW4s
+MCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI1OiBGSUxF
+OiBzbGlycC9zb2NrZXQuYzoyMDQ6CiteSV5JXkleSV5JZ2V0c29ja29wdChzby0+cywgU09MX1NP
+Q0tFVCwgU09fRVJST1IsJAoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChj
+dHg6VnhWKQojMTM0OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoyMzQ6CisgICAgICAgICAgICByZXQg
+PSByZWN2KHNvLT5zLCBpb3ZbMV0uaW92X2Jhc2UsIGlvdlsxXS5pb3ZfbGVuLDApOwogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE0MzogRklMRTogc2xp
+cnAvc29ja2V0LmM6NTU1OgorXkkgIGlvY3Rsc29ja2V0KHNvLT5zLCBGSU9OUkVBRCwgJm4pOyQK
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE2MTogRklMRTogc2xp
+cnAvc29ja2V0LmM6NzM4OgorXklzZXRzb2Nrb3B0KHMsIFNPTF9TT0NLRVQsIFNPX09PQklOTElO
+RSwgJm9wdCwgc2l6ZW9mKGludCkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
+dXNlIHRhYnMKIzE2NDogRklMRTogc2xpcnAvc29ja2V0LmM6NzQwOgorXklzZXRzb2Nrb3B0KHMs
+IElQUFJPVE9fVENQLCBUQ1BfTk9ERUxBWSwgJm9wdCwgc2l6ZW9mKGludCkpOyQKCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3NzogRklMRTogc2xpcnAvdGNwX3N1
+YnIuYzozNDA6CiteSWNsb3Nlc29ja2V0KHNvLT5zKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
+dWxkIG5ldmVyIHVzZSB0YWJzCiMyMjA6IEZJTEU6IHNsaXJwL3VkcC5jOjI5NToKK15JY2xvc2Vz
+b2NrZXQoc28tPnMpOyQKCnRvdGFsOiA5IGVycm9ycywgMCB3YXJuaW5ncywgMjEyIGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDEvMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8yIENoZWNraW5n
+IGNvbW1pdCA2NTEzNjc1Y2E0NzAgKHNsaXJwOiB3cmFwIHRoZSByZW1haW5pbmcgc29ja2V0IGZ1
+bmN0aW9ucykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMjAxOTAyMTMxODMxNTMuMjM3NDYtMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24ub3JnL3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
