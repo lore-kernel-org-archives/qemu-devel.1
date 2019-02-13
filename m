@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41054)
+Received: from eggs.gnu.org ([209.51.188.92]:41072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtpMc-00023i-A5
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:53:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gtpMd-00023p-M0
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:53:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gtpEq-0004cN-EK
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:45:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gtpEm-0004KG-UB
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:45:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gtpEh-0000eX-Nt
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:45:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AFF9F2E804F
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:45:39 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gtpET-0003uz-D0
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:45:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47936)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gtpEN-0003k9-Ms
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:45:21 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190211163829.10297-1-pbonzini@redhat.com>
+	<87imxppe68.fsf@dusky.pond.sub.org>
+	<8f8ef754-0003-77e2-0fd1-e10f3ab2e3e5@redhat.com>
+Date: Wed, 13 Feb 2019 08:45:13 +0100
+In-Reply-To: <8f8ef754-0003-77e2-0fd1-e10f3ab2e3e5@redhat.com> (Paolo
+	Bonzini's message of "Tue, 12 Feb 2019 11:59:06 +0100")
+Message-ID: <87d0nwjfna.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Feb 2019 07:37:04 -0000
-From: RTOS Pharos <1815721@bugs.launchpad.net>
-Reply-To: Bug 1815721 <1815721@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155004342499.19242.14077661245921319117.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815721] [NEW] RISC-V PLIC enable interrupt for
- multicore
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] Kconfig: add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +28,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
 
-Public bug reported:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Hello all,
+> On 12/02/19 10:08, Markus Armbruster wrote:
+>> Please wrap your lines at column 70 or so.  Humans tend to have trouble
+>> following long lines with their eyes (I sure do).  Typographic manuals
+>> suggest to limit columns to roughly 60 characters for exactly that
+>> reason[*].
+>
+> Yup, fixed in v2.
+>
+>>> +Each QEMU target enables a subset of the boards, devices and buses that are included
+>>> +in QEMU's source code.  As a result, each QEMU executable only links a small subset
+>> 
+>> Really?  Hmm...
+>> 
+>> $ size aarch64-softmmu/qemu-system-aarch64
+>>    text	   data	    bss	    dec	    hex	filename
+>> 19183216	7200124	 592732	26976072	19b9f48	aarch64-softmmu/qemu-system-aarch64
+>> $ size -t `find -name \*.o `| grep TOT
+>> 92713559	18652227	1183961440	1295327226	4d351ffa	(TOTALS)
+>> 
+>> Yep, really.
+>
+> Haha. :)
+>
+>>> +  Optionally, a condition for applying the default value can be added with
+>>> +  ``if``.  A config option can have any number of default values (usually, if more than
+>>> +  one default is present, they will have different conditions). If multiple
+>>> +  default values satisfy their condition, only the first defined one is active.
+>> 
+>> Hmm.  Is "multiple default values, first one wins" a healthy state?
+>> How obvious is "first defined" to humans?  
+>
+> It certainly helps that we never have more than one default. :)
 
-There is a bug in Qemu related to the enabling of external interrupts
-for multicores (Virt machine).
+True!
 
-After correcting Qemu as described in #1815078
-(https://bugs.launchpad.net/qemu/+bug/1815078), when we try to enable
-interrupts for core 1 at address 0x0C00_2080 we don't seem to be able to
-trigger an external interrupt  (e.g. UART0).
+> I could also be persuaded to remove "default n", so that multiple
+> "default y" clauses are just an OR of the conditions and the ordering
+> does not matter.
 
-This works perfectly for core 0, but fore core 1 it does not work at
-all. I assume that given bug #1815078 does not enable any external
-interrupt then this feature has not been tested. I tried to look at the
-qemu source code but with no luck so far.
+I'm looking for something that doesn't involve too much global
+reasoning.
 
-I guess the problem is related to function parse_hart_config (in
-sfive_plic.c) that initializes incorrectly the
-plic->addr_config[addrid].hartid, which is later on read in
-sifive_plic_update. But this is a guess.
+"All default directives must provide the same value; their conditions
+are ORed" feels fine to me.  Order doesn't matter then.  "if <expr>"
+really means "if", not "if-and-only-if", and that's fine.
 
-Best regards,
-Pharos team
+Additionally permitting an *unconditional* default with the negated
+value would still be okay, I guess.  But I'd do that only when we have a
+use.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> Are multiple "default y" clauses useful?  They were there in earlier
+> versions of the patches, for now "imply" has removed the need
+> everywhere.  However, I'm not sure it's a good idea to remove them
+> altogether before we try to extend Kconfig to more features.  (A
+> secondary effect of the documentation is to clarify the current scope of
+> Kconfig).
 
--- =
+My general advice would be YAGNI.  However, keeping currently unused
+features around while we grow Kconfig makes sense to me.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815721
+>>> +**reverse default** (weak reverse dependency): ``imply <symbol> [if <expr>]``
+>> 
+>> If "reverse default" can be regarded as weak reverse dependency, could
+>> "default value" be regarded as weak (forward) dependency?
+>
+> "default n if" could, but we never use it.  This also shows how we use
+> the language in a very limited way, according to the very simple rules
+> in the second part of the document; but even Linux only has a handful of
+> occurrences of "default n if".
+>
+>>> +
+>>> +  This is similar to ``select`` as it applies a lower limit of ``y`` to another
+>>> +  symbol.  However, the lower limit is only a default and the "implied" symbol's
+>>> +  value may still be set to ``n`` from a ``default-configs/*.mak`` files.  The
+>> 
+>> I'm afraid I don't get "lower limit".  What's the ordering relation?
+>
+> False < true, so "lower limit of y" means "tries to force to y".  The
+> difference is that a contradiction is ignored by "imply" (and then the
+> symbol remains at n), while it causes a build error for "select".
 
-Title:
-  RISC-V PLIC enable interrupt for multicore
+Can we use this explanation to rephrase the documentation in simpler
+language?
 
-Status in QEMU:
-  New
+Let me summarize to see whether I got it.  Please correct
+misunderstandings.
 
-Bug description:
-  Hello all,
+* "depends on" forces to false unless condition is met
 
-  There is a bug in Qemu related to the enabling of external interrupts
-  for multicores (Virt machine).
+* "select" forces to true if condition is met
 
-  After correcting Qemu as described in #1815078
-  (https://bugs.launchpad.net/qemu/+bug/1815078), when we try to enable
-  interrupts for core 1 at address 0x0C00_2080 we don't seem to be able
-  to trigger an external interrupt  (e.g. UART0).
+* Contradictions between "depends on" and "select" are rejected
 
-  This works perfectly for core 0, but fore core 1 it does not work at
-  all. I assume that given bug #1815078 does not enable any external
-  interrupt then this feature has not been tested. I tried to look at
-  the qemu source code but with no luck so far.
+* If neither applies, default-configs/*.mak may supply the value
 
-  I guess the problem is related to function parse_hart_config (in
-  sfive_plic.c) that initializes incorrectly the
-  plic->addr_config[addrid].hartid, which is later on read in
-  sifive_plic_update. But this is a guess.
+* If it doesn't, "default" / "imply" supply the value if condition is
+  met
 
-  Best regards,
-  Pharos team
+* What about contradictions between "default" / "imply"?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815721/+subscriptions
+
+PS: Thanks for writing down intended use in "Guidelines for writing
+Kconfig files", not just the language specification, makes the document
+so much more useful.
