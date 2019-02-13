@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34799)
+Received: from eggs.gnu.org ([209.51.188.92]:38179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu0lF-00070X-84
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:04:02 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gu17O-0001jG-0X
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu0lD-0005kV-Op
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:04:01 -0500
-References: <20190213195501.7790-1-jsnow@redhat.com>
-	<20190213195501.7790-2-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <f744a677-0604-f51e-9fd2-24977902cfd6@redhat.com>
-Date: Wed, 13 Feb 2019 15:03:52 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gu0z4-0003Kt-E3
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:18:19 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38933)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gu0z3-0003FK-Vs
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:18:18 -0500
+Received: by mail-wr1-x441.google.com with SMTP id l5so2909051wrw.6
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 12:18:17 -0800 (PST)
+References: <20181206151401.13455-1-peter.maydell@linaro.org>
+	<87ftsrird3.fsf@zen.linaroharston>
+	<CAFEAcA_GPW0B9bMOia_aB=H0PV8DwUNWBARz+uNbRk2565a+4w@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_GPW0B9bMOia_aB=H0PV8DwUNWBARz+uNbRk2565a+4w@mail.gmail.com>
+Date: Wed, 13 Feb 2019 20:18:14 +0000
+Message-ID: <87bm3figs9.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190213195501.7790-2-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] blockdev: acquire aio_context for
- bitmap add/remove
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] arm: Allow system registers for KVM guests
+ to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +32,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 2/13/19 2:55 PM, John Snow wrote:
-> When bitmaps are persistent, they may incur a disk read or write when bitmaps
-> are added or removed. For configurations like virtio-dataplane, failing to
-> acquire this lock will abort QEMU when disk IO occurs.
-> 
-> We used to acquire aio_context as part of the bitmap lookup, so re-introduce
-> the lock for just the cases that have an IO penalty. Commit 2119882c removed
-> these locks, and I failed to notice this when we committed fd5ae4cc, so this
-> has been broken since persistent bitmaps were introduced.
-> 
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1672010
-> Reported-By: Aihua Liang <aliang@redhat.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  blockdev.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index fb18e9c975..790b0e0ac8 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2820,6 +2820,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
->  {
->      BlockDriverState *bs;
->      BdrvDirtyBitmap *bitmap;
-> +    AioContext *aio_context = NULL;
->  
->      if (!name || name[0] == '\0') {
->          error_setg(errp, "Bitmap name cannot be empty");
-> @@ -2854,15 +2855,17 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
->          disabled = false;
->      }
->  
-> -    if (persistent &&
-> -        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-> -    {
-> -        return;
-> +    if (persistent) {
-> +        aio_context = bdrv_get_aio_context(bs);
-> +        aio_context_acquire(aio_context);
-> +        if (!bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp)) {
-> +            goto out;
-> +        }
->      }
->  
->      bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
->      if (bitmap == NULL) {
-> -        return;
-> +        goto out
->      }
->  
->      if (disabled) {
-> @@ -2870,6 +2873,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
->      }
->  
->      bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-> + out:
-> +    if (aio_context) {
-> +        aio_context_release(aio_context);
-> +    }
->  }
->  
->  void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-> @@ -2878,6 +2885,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
->      BlockDriverState *bs;
->      BdrvDirtyBitmap *bitmap;
->      Error *local_err = NULL;
-> +    AioContext *aio_context = NULL;
->  
->      bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
->      if (!bitmap || !bs) {
-> @@ -2892,14 +2900,20 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
->      }
->  
->      if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
-> +        aio_context = bdrv_get_aio_context(bs);
-> +        aio_context_acquire(aio_context);
->          bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
->          if (local_err != NULL) {
->              error_propagate(errp, local_err);
-> -            return;
-> +            goto out;
->          }
->      }
->  
->      bdrv_release_dirty_bitmap(bs, bitmap);
-> + out:
-> +    if (aio_context) {
-> +        aio_context_release(aio_context);
-> +    }
->  }
->  
->  /**
-> 
+> On Wed, 13 Feb 2019 at 16:29, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>> > At the moment the Arm implementations of kvm_arch_{get,put}_registers()
+>> > don't support having QEMU change the values of system registers
+>> > (aka coprocessor registers for AArch32). This is because although
+>> > kvm_arch_get_registers() calls write_list_to_cpustate() to
+>> > update the CPU state struct fields (so QEMU code can read the
+>> > values in the usual way), kvm_arch_put_registers() does not
+>> > call write_cpustate_to_list(), meaning that any changes to
+>> > the CPU state struct fields will not be passed back to KVM.
+>> >
+>> > The rationale for this design is documented in a comment in the
+>> > AArch32 kvm_arch_put_registers() -- writing the values in the
+>> > cpregs list into the CPU state struct is "lossy" because the
+>> > write of a register might not succeed, and so if we blindly
+>> > copy the CPU state values back again we will incorrectly
+>> > change register values for the guest. The assumption was that
+>> > no QEMU code would need to write to the registers.
+>> >
+>> > However, when we implemented debug support for KVM guests, we
+>> > broke that assumption: the code to handle "set the guest up
+>> > to take a breakpoint exception" does so by updating various
+>> > guest registers including ESR_EL1.
+>> >
+>> > Support this by making kvm_arch_put_registers() synchronize
+>> > CPU state back into the list. We sync only those registers
+>> > where the initial write succeeds, which should be sufficient.
+>
+>> [snip a long test setup that I didn't really understand]
 
-Aaaand staged on my bitmaps branch, unless Kevin or Max tell me not to.
+Sorry that was just making sure I'd documented the exact steps of the
+manual test for posterity.
+
+>
+> I'm confused -- I'm not sure if the things you're saying
+> didn't work:
+>  (a) didn't work before this patch and still don't
+>  (b) used to work and are broken by this patch
+>  (c) used to not work and are fixed by this patch
+
+option (c) - this patch has made things better hence the t-b and r-b
+tags. I might send you a follow up if we can also have single-step
+working as well but that requires me to test a kernel patch (and remove
+the error leg for guest single step in kvm64).
+
+>
+> More generally:
+>  * this patch claims to fix the code path where QEMU sets
+>    up the guest to take a breakpoint exception (specifically
+>    making our change of ESR_EL1 actually take effect) -- so does
+>    it do that? Or is it impossible for that code path in QEMU
+>    to be used (if so, can we just remove it) ?
+
+No it's needed - I'm observing exceptions coming through the path and
+then being delivered to the guest while the host is debugging - modulo
+the you can't have active HW breakpoints in both guest and host at the
+same time.
+
+Even here now we are sure the guest state is correctly reflected we
+could make the debug code smarter and try it's best to preserve guest
+debug regs while using it's own entirely in userspace. But I suspect
+that is a bit niche.
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
