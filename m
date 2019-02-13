@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38420)
+Received: from eggs.gnu.org ([209.51.188.92]:40081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtjvK-0000Un-Ep
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 21:05:19 -0500
+	(envelope-from <palmer@sifive.com>) id 1gtk5Z-00020b-AG
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 21:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gtjvJ-0002bC-9Z
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 21:05:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34805)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gtjvI-0002XM-KT
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 21:05:17 -0500
-Date: Tue, 12 Feb 2019 21:05:11 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190212210456-mutt-send-email-mst@kernel.org>
-References: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <palmer@sifive.com>) id 1gtk5X-0000ZQ-4O
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 21:15:53 -0500
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:42786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gtk5W-0000RZ-2X
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 21:15:50 -0500
+Received: by mail-qt1-x843.google.com with SMTP id b8so894156qtr.9
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 18:15:40 -0800 (PST)
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com.
+	[209.85.222.173]) by smtp.gmail.com with ESMTPSA id
+	z63sm16051447qkc.42.2019.02.12.18.15.38 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 12 Feb 2019 18:15:38 -0800 (PST)
+Received: by mail-qk1-f173.google.com with SMTP id m9so487356qkl.4
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 18:15:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v4] virtio-blk: set correct config size for
- the host driver
+References: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
+	<mhng-0fc7cd00-deda-4e41-abb3-c78657c4f0f1@palmer-si-x1c4>
+In-Reply-To: <mhng-0fc7cd00-deda-4e41-abb3-c78657c4f0f1@palmer-si-x1c4>
+From: Palmer Dabbelt <palmer@sifive.com>
+Date: Tue, 12 Feb 2019 18:15:26 -0800
+Message-ID: <CANs6eMkMKGKVdnWh2CmEz1sOtXEZh6eMUN5NkCwGjna7zEhh9Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +36,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, sgarzare@redhat.com, dgilbert@redhat.com, ldoktor@redhat.com
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-On Wed, Feb 13, 2019 at 09:48:57AM +0800, Changpeng Liu wrote:
-> Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features
-> support" added fields to struct virtio_blk_config. This changes
-> the size of the config space and breaks migration from QEMU 3.1
-> and older:
-> 
-> qemu-system-ppc64: get_pci_config_device: Bad config data: i=0x10 read: 41 device: 1 cmask: ff wmask: 80 w1cmask:0
-> qemu-system-ppc64: Failed to load PCIDevice:config
-> qemu-system-ppc64: Failed to load virtio-blk:virtio
-> qemu-system-ppc64: error while loading state for instance 0x0 of device 'pci@800000020000000:01.0/virtio-blk'
-> qemu-system-ppc64: load of migration failed: Invalid argument
-> 
-> Since virtio-blk doesn't support the "discard" and "write zeroes"
-> features, it shouldn't even expose the associated fields in the
-> config space actually. Just include all fields up to num_queues to
-> match QEMU 3.1 and older.
-> 
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+On Tue, Feb 12, 2019 at 3:21 PM Palmer Dabbelt <palmer@sifive.com> wrote:
 
+> On Wed, 23 Jan 2019 01:25:03 PST (-0800), Bastian Koppelmann wrote:
+> > Hi,
+> >
+> > this patchset converts the RISC-V decoder to decodetree in four major
+> steps:
+> >
+> > 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
+> >     Many of the gen_* functions are called by the decode functions for
+> 16-bit
+> >     and 32-bit functions. If we move translation code from the gen_*
+> >     functions to the generated trans_* functions of decode-tree, we get
+> a lot of
+> >     duplication. Therefore, we mostly generate calls to the old gen_*
+> function
+> >     which are properly replaced after step 2).
+> >
+> >     Each of the trans_ functions are grouped into files corresponding to
+> their
+> >     ISA extension, e.g. addi which is in RV32I is translated in the file
+> >     'trans_rvi.inc.c'.
+> >
+> > 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
+> >     All 16 bit instructions have a direct mapping to a 32 bit
+> instruction. Thus,
+> >     we convert the arguments in the 16 bit trans_ function to the
+> arguments of
+> >     the corresponding 32 bit instruction and call the 32 bit trans_
+> function.
+> >
+> > 3) Remove old manual decoding in gen_* function [Patch 20-30]:
+> >     this move all manual translation code into the trans_* instructions
+> of
+> >     decode tree, such that we can remove the old decode_* functions.
+> >
+> > 4) Simplify RVC by reusing as much as possible from the RVG decoder as
+> suggested
+> >    by Richard. [Patch 31-35]
+> >
+> > full tree available at
+> > https://github.com/bkoppelmann/qemu/tree/riscv-dt-v6
+> >
+> > Cheers,
+> > Bastian
+> >
+> > v5 -> v6:
+> >     - fixed funky indentation
+> >
+> >
+> > Bastian Koppelmann (35):
+> >   target/riscv: Move CPURISCVState pointer to DisasContext
+> >   target/riscv: Activate decodetree and implemnt LUI & AUIPC
+> >   target/riscv: Convert RVXI branch insns to decodetree
+> >   target/riscv: Convert RV32I load/store insns to decodetree
+> >   target/riscv: Convert RV64I load/store insns to decodetree
+> >   target/riscv: Convert RVXI arithmetic insns to decodetree
+> >   target/riscv: Convert RVXI fence insns to decodetree
+> >   target/riscv: Convert RVXI csr insns to decodetree
+> >   target/riscv: Convert RVXM insns to decodetree
+> >   target/riscv: Convert RV32A insns to decodetree
+> >   target/riscv: Convert RV64A insns to decodetree
+> >   target/riscv: Convert RV32F insns to decodetree
+> >   target/riscv: Convert RV64F insns to decodetree
+> >   target/riscv: Convert RV32D insns to decodetree
+> >   target/riscv: Convert RV64D insns to decodetree
+> >   target/riscv: Convert RV priv insns to decodetree
+> >   target/riscv: Convert quadrant 0 of RVXC insns to decodetree
+> >   target/riscv: Convert quadrant 1 of RVXC insns to decodetree
+> >   target/riscv: Convert quadrant 2 of RVXC insns to decodetree
+> >   target/riscv: Remove gen_jalr()
+> >   target/riscv: Remove manual decoding from gen_branch()
+> >   target/riscv: Remove manual decoding from gen_load()
+> >   target/riscv: Remove manual decoding from gen_store()
+> >   target/riscv: Move gen_arith_imm() decoding into trans_* functions
+> >   target/riscv: make ADD/SUB/OR/XOR/AND insn use arg lists
+> >   target/riscv: Remove shift and slt insn manual decoding
+> >   target/riscv: Remove manual decoding of RV32/64M insn
+> >   target/riscv: Rename trans_arith to gen_arith
+> >   target/riscv: Remove gen_system()
+> >   target/riscv: Remove decode_RV32_64G()
+> >   target/riscv: Convert @cs_2 insns to share translation functions
+> >   target/riscv: Convert @cl_d, @cl_w, @cs_d, @cs_w insns
+> >   target/riscv: Splice fsw_sd and flw_ld for riscv32 vs riscv64
+> >   target/riscv: Splice remaining compressed insn pairs for riscv32 vs
+> >     riscv64
+> >   target/riscv: Remaining rvc insn reuse 32 bit translators
+> >
+> >  target/riscv/Makefile.objs                    |   22 +
+> >  target/riscv/insn16-32.decode                 |   31 +
+> >  target/riscv/insn16-64.decode                 |   33 +
+> >  target/riscv/insn16.decode                    |  114 ++
+> >  target/riscv/insn32-64.decode                 |   72 +
+> >  target/riscv/insn32.decode                    |  203 ++
+> >  .../riscv/insn_trans/trans_privileged.inc.c   |  110 +
+> >  target/riscv/insn_trans/trans_rva.inc.c       |  207 ++
+> >  target/riscv/insn_trans/trans_rvc.inc.c       |  149 ++
+> >  target/riscv/insn_trans/trans_rvd.inc.c       |  388 ++++
+> >  target/riscv/insn_trans/trans_rvf.inc.c       |  388 ++++
+> >  target/riscv/insn_trans/trans_rvi.inc.c       |  568 ++++++
+> >  target/riscv/insn_trans/trans_rvm.inc.c       |  107 +
+> >  target/riscv/translate.c                      | 1781 ++---------------
+> >  14 files changed, 2611 insertions(+), 1562 deletions(-)
+> >  create mode 100644 target/riscv/insn16-32.decode
+> >  create mode 100644 target/riscv/insn16-64.decode
+> >  create mode 100644 target/riscv/insn16.decode
+> >  create mode 100644 target/riscv/insn32-64.decode
+> >  create mode 100644 target/riscv/insn32.decode
+> >  create mode 100644 target/riscv/insn_trans/trans_privileged.inc.c
+> >  create mode 100644 target/riscv/insn_trans/trans_rva.inc.c
+> >  create mode 100644 target/riscv/insn_trans/trans_rvc.inc.c
+> >  create mode 100644 target/riscv/insn_trans/trans_rvd.inc.c
+> >  create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
+> >  create mode 100644 target/riscv/insn_trans/trans_rvi.inc.c
+> >  create mode 100644 target/riscv/insn_trans/trans_rvm.inc.c
+>
+> Do you, by any chance, have a v7?  It looks like there's quite a few merge
+> conflicts here, and while I'm OK fixing them I don't want to do it if you
+> already have.
+>
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Stefan, are you merging this?
-
-> ---
->  hw/block/virtio-blk.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 9a87b3b..6fce9c7 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -28,6 +28,10 @@
->  #include "hw/virtio/virtio-bus.h"
->  #include "hw/virtio/virtio-access.h"
->  
-> +/* We don't support discard yet, hide associated config fields. */
-> +#define VIRTIO_BLK_CFG_SIZE offsetof(struct virtio_blk_config, \
-> +                                     max_discard_sectors)
-> +
->  static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
->                                      VirtIOBlockReq *req)
->  {
-> @@ -761,7 +765,8 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
->      blkcfg.alignment_offset = 0;
->      blkcfg.wce = blk_enable_write_cache(s->blk);
->      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
-> -    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-> +    memcpy(config, &blkcfg, VIRTIO_BLK_CFG_SIZE);
-> +    QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE > sizeof(blkcfg));
->  }
->  
->  static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
-> @@ -769,7 +774,8 @@ static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *config)
->      VirtIOBlock *s = VIRTIO_BLK(vdev);
->      struct virtio_blk_config blkcfg;
->  
-> -    memcpy(&blkcfg, config, sizeof(blkcfg));
-> +    memcpy(&blkcfg, config, VIRTIO_BLK_CFG_SIZE);
-> +    QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE > sizeof(blkcfg));
->  
->      aio_context_acquire(blk_get_aio_context(s->blk));
->      blk_set_enable_write_cache(s->blk, blkcfg.wce != 0);
-> @@ -952,8 +958,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> -    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-> -                sizeof(struct virtio_blk_config));
-> +    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, VIRTIO_BLK_CFG_SIZE);
->  
->      s->blk = conf->conf.blk;
->      s->rq = NULL;
-> -- 
-> 1.9.3
+I made it through my rebase, so unless you want to send out a v7 I will.
+There were some meaningful changes so I'd like to get a round of review
+just so everyone is on the same page.
