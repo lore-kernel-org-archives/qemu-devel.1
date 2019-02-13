@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45525)
+Received: from eggs.gnu.org ([209.51.188.92]:45556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu3t4-0001nD-IX
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gu3t8-0001ps-RZ
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu3t2-0004uB-Pu
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gu3t7-0004ws-Hw
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:24:22 -0500
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 13 Feb 2019 18:23:51 -0500
-Message-Id: <20190213232356.21034-2-jsnow@redhat.com>
+Date: Wed, 13 Feb 2019 18:23:52 -0500
+Message-Id: <20190213232356.21034-3-jsnow@redhat.com>
 In-Reply-To: <20190213232356.21034-1-jsnow@redhat.com>
 References: <20190213232356.21034-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] block/dirty-bitmap: add recording and
- busy properties
+Subject: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
+ predicate helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,249 +23,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, libvir-list@redhat.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The current API allows us to report a single status, which we've defined as:
+"Frozen" was a good description a long time ago, but it isn't adequate now.
+Rename the frozen predicate to has_successor to make the semantics of the
+predicate more clear to outside callers.
 
-Frozen: has a successor, treated as qmp_locked, may or may not be enabled.
-Locked: no successor, qmp_locked. may or may not be enabled.
-Disabled: Not frozen or locked, disabled.
-Active: Not frozen, locked, or disabled.
+In the process, remove some calls to frozen() that no longer semantically
+make sense. For enabled and disabled in particular, it's actually okay for
+the internals to do this but only forbidden for users to invoke them, and
+all of the QMP entry uses already check against qmp_locked.
 
-The problem is that both "Frozen" and "Locked" mean nearly the same thing,
-and that both of them do not intuit whether they are recording guest writes
-or not.
-
-This patch deprecates that status field and introduces two orthogonal
-properties instead to replace it.
+Several other assertions really want to check that the bitmap isn't in-use
+by another operation -- use the qmp_locked function for this instead, which
+presently also checks for has_successor.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c       |  9 +++++++++
- qapi/block-core.json       | 10 +++++++++-
- qemu-deprecated.texi       |  6 ++++++
- tests/qemu-iotests/236.out | 28 ++++++++++++++++++++++++++++
- 4 files changed, 52 insertions(+), 1 deletion(-)
+ block/dirty-bitmap.c           | 32 +++++++++++++++++---------------
+ include/block/dirty-bitmap.h   |  2 +-
+ migration/block-dirty-bitmap.c |  2 +-
+ 3 files changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index c6d4acebfa..101383b3af 100644
+index 101383b3af..639ebc0645 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -226,6 +226,13 @@ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
-     }
+@@ -50,7 +50,7 @@ struct BdrvDirtyBitmap {
+     HBitmap *meta;              /* Meta dirty bitmap */
+     bool qmp_locked;            /* Bitmap is locked, it can't be modified
+                                    through QMP */
+-    BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
++    BdrvDirtyBitmap *successor; /* Anonymous child; implies user_locked state */
+     char *name;                 /* Optional non-empty unique ID */
+     int64_t size;               /* Size of the bitmap, in bytes */
+     bool disabled;              /* Bitmap is disabled. It ignores all writes to
+@@ -183,14 +183,14 @@ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap)
  }
  
-+/* Called with BQL taken.  */
-+static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
-+{
-+    return !bitmap->disabled || (bitmap->successor &&
-+                                 !bitmap->successor->disabled);
-+}
-+
+ /* Called with BQL taken.  */
+-bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
++bool bdrv_dirty_bitmap_has_successor(BdrvDirtyBitmap *bitmap)
+ {
+     return bitmap->successor;
+ }
+ 
+ /* Both conditions disallow user-modification via QMP. */
+ bool bdrv_dirty_bitmap_user_locked(BdrvDirtyBitmap *bitmap) {
+-    return bdrv_dirty_bitmap_frozen(bitmap) ||
++    return bdrv_dirty_bitmap_has_successor(bitmap) ||
+            bdrv_dirty_bitmap_qmp_locked(bitmap);
+ }
+ 
+@@ -215,7 +215,7 @@ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
+ /* Called with BQL taken.  */
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap)
+ {
+-    if (bdrv_dirty_bitmap_frozen(bitmap)) {
++    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
+         return DIRTY_BITMAP_STATUS_FROZEN;
+     } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
+         return DIRTY_BITMAP_STATUS_LOCKED;
+@@ -235,7 +235,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
+ 
  /**
   * Create a successor bitmap destined to replace this bitmap after an operation.
-  * Requires that the bitmap is not frozen and has no successor.
-@@ -448,6 +455,8 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
-         info->has_name = !!bm->name;
-         info->name = g_strdup(bm->name);
-         info->status = bdrv_dirty_bitmap_status(bm);
-+        info->recording = bdrv_dirty_bitmap_recording(bm);
-+        info->busy = bdrv_dirty_bitmap_user_locked(bm);
-         info->persistent = bm->persistent;
-         entry->value = info;
-         *plist = entry;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 8f23f2ebb8..5d1d182447 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -458,7 +458,14 @@
- #
- # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
- #
--# @status: current status of the dirty bitmap (since 2.4)
-+# @status: Deprecated in favor of @recording and @locked. (since 2.4)
-+#
-+# @recording: true if the bitmap is recording new writes from the guest.
-+#             Replaces `active` and `disabled` statuses. (since 4.0)
-+#
-+# @busy: true if the bitmap is in-use by some operation (NBD or jobs)
-+#        and cannot be modified via QMP or used by another operation.
-+#        Replaces `locked` and `frozen` statuses. (since 4.0)
- #
- # @persistent: true if the bitmap will eventually be flushed to persistent
- #              storage (since 4.0)
-@@ -467,6 +474,7 @@
- ##
- { 'struct': 'BlockDirtyInfo',
-   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
-+           'recording': 'bool', 'busy': 'bool',
-            'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+- * Requires that the bitmap is not frozen and has no successor.
++ * Requires that the bitmap is not locked and has no successor.
+  * Called with BQL taken.
+  */
+ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+@@ -244,12 +244,16 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+     uint64_t granularity;
+     BdrvDirtyBitmap *child;
  
- ##
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 80b0702ad5..f7c9f4c101 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -84,6 +84,12 @@ topologies described with -smp include all possible cpus, i.e.
- "autoload" parameter is now ignored. All bitmaps are automatically loaded
- from qcow2 images.
+-    if (bdrv_dirty_bitmap_frozen(bitmap)) {
+-        error_setg(errp, "Cannot create a successor for a bitmap that is "
+-                   "currently frozen");
++    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
++        error_setg(errp, "Cannot create a successor for a bitmap that is in-use "
++                   "by an operation");
++        return -1;
++    }
++    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
++        error_setg(errp, "Cannot create a successor for a bitmap that already "
++                   "has one");
+         return -1;
+     }
+-    assert(!bitmap->successor);
  
-+@subsection query-block dirty-bitmaps.status parameter (since 4.0)
-+
-+The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
-+the query-block command is deprecated. Two new boolean fields,
-+``recording'' and ``busy'' effectively replace it.
-+
- @subsection query-cpus (since 2.12.0)
+     /* Create an anonymous successor */
+     granularity = bdrv_dirty_bitmap_granularity(bitmap);
+@@ -268,7 +272,6 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
  
- The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
-diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
-index 5006f7bca1..815cd053f0 100644
---- a/tests/qemu-iotests/236.out
-+++ b/tests/qemu-iotests/236.out
-@@ -22,17 +22,21 @@ write -P0xcd 0x3ff0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       }
-     ]
-@@ -84,17 +88,21 @@ write -P0xcd 0x3ff0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": true,
-         "status": "active"
-       }
-     ]
-@@ -184,24 +192,30 @@ write -P0xea 0x3fe0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 393216,
-         "granularity": 65536,
-         "name": "bitmapC",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       }
-     ]
-@@ -251,24 +265,30 @@ write -P0xea 0x3fe0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 393216,
-         "granularity": 65536,
-         "name": "bitmapC",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       }
-     ]
-@@ -311,31 +331,39 @@ write -P0xea 0x3fe0000 64k
-   "bitmaps": {
-     "drive0": [
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapD",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 393216,
-         "granularity": 65536,
-         "name": "bitmapC",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 262144,
-         "granularity": 65536,
-         "name": "bitmapB",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       },
-       {
-+        "busy": false,
-         "count": 458752,
-         "granularity": 65536,
-         "name": "bitmapA",
-         "persistent": false,
-+        "recording": false,
-         "status": "disabled"
-       }
-     ]
+ void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+ {
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     bitmap->disabled = false;
+ }
+ 
+@@ -285,7 +288,7 @@ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+ static void bdrv_release_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+ {
+     assert(!bitmap->active_iterators);
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
++    assert(!bdrv_dirty_bitmap_user_locked(bitmap));
+     assert(!bitmap->meta);
+     QLIST_REMOVE(bitmap, list);
+     hbitmap_free(bitmap->bitmap);
+@@ -325,7 +328,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+ /**
+  * In cases of failure where we can no longer safely delete the parent,
+  * we may wish to re-join the parent and child/successor.
+- * The merged parent will be un-frozen, but not explicitly re-enabled.
++ * The merged parent will not be user_locked, nor explicitly re-enabled.
+  * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
+  */
+ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+@@ -373,7 +376,7 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
+ 
+     bdrv_dirty_bitmaps_lock(bs);
+     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
+-        assert(!bdrv_dirty_bitmap_frozen(bitmap));
++        assert(!bdrv_dirty_bitmap_user_locked(bitmap));
+         assert(!bitmap->active_iterators);
+         hbitmap_truncate(bitmap->bitmap, bytes);
+         bitmap->size = bytes;
+@@ -391,7 +394,7 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ 
+ /**
+  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+- * There must not be any frozen bitmaps attached.
++ * There must not be any user_locked bitmaps attached.
+  * This function does not remove persistent bitmaps from the storage.
+  * Called with BQL taken.
+  */
+@@ -428,7 +431,6 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     bdrv_dirty_bitmap_lock(bitmap);
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     bitmap->disabled = true;
+     bdrv_dirty_bitmap_unlock(bitmap);
+ }
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 04a117fc81..cdbb4dfefd 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -36,7 +36,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
+ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
+-bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
++bool bdrv_dirty_bitmap_has_successor(BdrvDirtyBitmap *bitmap);
+ const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap);
+ int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap);
+ DirtyBitmapStatus bdrv_dirty_bitmap_status(BdrvDirtyBitmap *bitmap);
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+index 6426151e4f..ac6954142f 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -542,7 +542,7 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DirtyBitmapLoadState *s)
+         }
+     }
+ 
+-    if (bdrv_dirty_bitmap_frozen(s->bitmap)) {
++    if (bdrv_dirty_bitmap_has_successor(s->bitmap)) {
+         bdrv_dirty_bitmap_lock(s->bitmap);
+         if (enabled_bitmaps == NULL) {
+             /* in postcopy */
 -- 
 2.17.2
