@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53576)
+Received: from eggs.gnu.org ([209.51.188.92]:54925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gtwYK-000547-4v
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:34:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1gtweB-0007bX-5I
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gtwYJ-00068L-DU
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:34:24 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33699)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gtwYJ-00067N-5n
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:34:23 -0500
-Received: by mail-pg1-x541.google.com with SMTP id z11so1300848pgu.0
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:34:22 -0800 (PST)
-Date: Wed, 13 Feb 2019 07:34:19 -0800 (PST)
-In-Reply-To: <7a7b5675-3d66-6c87-8830-74c60f8a7471@mail.uni-paderborn.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-64897fe3-6dad-4973-9246-07c07ecba2af@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/35] target/riscv: Convert to
- decodetree
+	(envelope-from <eblake@redhat.com>) id 1gtweA-0002Xr-12
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:40:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gtwe8-0002Iw-67
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:40:25 -0500
+References: <20190213065357.16076-1-yuval.shaia@oracle.com>
+	<20190213065357.16076-9-yuval.shaia@oracle.com>
+	<d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b5804c51-312d-4fe7-1c27-9aecbc8085e3@redhat.com>
+Date: Wed, 13 Feb 2019 09:40:01 -0600
+MIME-Version: 1.0
+In-Reply-To: <d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="T3TkUpbAuElgtiz62YYEDMfwccI4ssXem"
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/pvrdma: Delete unneeded function
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, sagark@eecs.berkeley.edu
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com
 
-On Wed, 13 Feb 2019 01:06:41 PST (-0800), Bastian Koppelmann wrote:
->
-> On 2/13/19 3:15 AM, Palmer Dabbelt wrote:
->> On Tue, Feb 12, 2019 at 3:21 PM Palmer Dabbelt <palmer@sifive.com> wrote:
-> [snip]
->>>
->>> Do you, by any chance, have a v7?  It looks like there's quite a few merge
->>> conflicts here, and while I'm OK fixing them I don't want to do it if you
->>> already have.
->>>
->> I made it through my rebase, so unless you want to send out a v7 I will.
->> There were some meaningful changes so I'd like to get a round of review
->> just so everyone is on the same page.
->
->
-> Thanks for doing this work. I don't have a v7 yet, since I was waiting
-> on your current pull-request to get merged. So please do send a v7, I'm
-> happy to review/test it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--T3TkUpbAuElgtiz62YYEDMfwccI4ssXem
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com,
+ armbru@redhat.com
+Message-ID: <b5804c51-312d-4fe7-1c27-9aecbc8085e3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/pvrdma: Delete unneeded function
+ argument
+References: <20190213065357.16076-1-yuval.shaia@oracle.com>
+ <20190213065357.16076-9-yuval.shaia@oracle.com>
+ <d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+In-Reply-To: <d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sounds good.  It definitely deserves a review, as I was sort of just fumbling 
-around in the dark here :)
+On 2/13/19 6:40 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/13/19 7:53 AM, Yuval Shaia wrote:
+>> The function argument rdma_dev_res is not needed as it is stored in th=
+e
+>> backend_dev object at init.
+>>
+>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+>=20
+> Should we teach checkpatch.pl to check name/space/email?
+
+I already have a proposed patch to teach it to recognize typos such as
+'Reveiwed-by:'; it would be easy to expand that to also force
+'name/space/email'.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--T3TkUpbAuElgtiz62YYEDMfwccI4ssXem
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxkOlEACgkQp6FrSiUn
+Q2rOaAgApkOV6o3ZmXkuvIzW8hFng3zH03Vep3uyQRvxuNKdFvUM2nyPN2SM+3kP
+wY5+tdxZmUzMVBs4wG05Cr6aLWfSV+SGI/qMwsSoq2J2wfdne9OHVUakHLVIegHb
+0tctfVymAKbz9JxZ+wDm9RsplwWSMcoqVACakcwTcNZuH0BEosu+6WY1d6H9Bk9N
+XSBCT6mVwn/PLCMz2uSJOBUnBAISAzBNc/iqx9lc1lBpDzl/88KHG9N1kz8D/vau
+UFqSBDUdvnDC0zReUBy8msHYcWJ+nK69wJl71qxZBiqNF17OGXz1fNdWh91a1Drq
+iqhKJ6BQBuDWCE4TdaQrsG/C09iuWg==
+=3B3L
+-----END PGP SIGNATURE-----
+
+--T3TkUpbAuElgtiz62YYEDMfwccI4ssXem--
