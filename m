@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45320)
+Received: from eggs.gnu.org ([209.51.188.92]:45583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtn6T-0008GF-N6
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:29:02 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gtn6T-0008KE-Ov
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtmwh-00062T-Da
+	(envelope-from <dgibson@ozlabs.org>) id 1gtmwh-00063j-KY
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:18:56 -0500
-Date: Wed, 13 Feb 2019 16:12:48 +1100
+Date: Wed, 13 Feb 2019 16:17:38 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213051248.GR1884@umbus.fritz.box>
+Message-ID: <20190213051738.GT1884@umbus.fritz.box>
 References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-17-clg@kaod.org>
+	<20190128094625.4428-19-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="X1pyOwMoA9G3DWfK"
+	protocol="application/pgp-signature"; boundary="QgvTbcZPsSS/HkXe"
 Content-Disposition: inline
-In-Reply-To: <20190128094625.4428-17-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 16/19] target/ppc: Add Hypervisor
- Virtualization Interrupt on POWER9
+In-Reply-To: <20190128094625.4428-19-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 18/19] ppc/xive: Make XIVE generate the
+ proper interrupt types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,15 +29,20 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---X1pyOwMoA9G3DWfK
+--QgvTbcZPsSS/HkXe
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 28, 2019 at 10:46:22AM +0100, C=E9dric Le Goater wrote:
+On Mon, Jan 28, 2019 at 10:46:24AM +0100, C=E9dric Le Goater wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> This adds support for delivering that exception
+> It should be generic Hypervisor Virtualization interrupts for HV
+> directed rings and traditional External Interrupts for the OS directed
+> ring.
+>=20
+> Don't generate anything for the user ring as it isn't actually
+> supported.
 >=20
 > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
@@ -45,134 +50,79 @@ On Mon, Jan 28, 2019 at 10:46:22AM +0100, C=E9dric Le Goater wrote:
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target/ppc/cpu.h                |  5 ++++-
->  target/ppc/excp_helper.c        | 17 ++++++++++++++++-
->  target/ppc/translate_init.inc.c | 16 +++++++++++++++-
->  3 files changed, 35 insertions(+), 3 deletions(-)
+>  include/hw/ppc/xive.h |  3 ++-
+>  hw/intc/xive.c        | 22 +++++++++++++++++++---
+>  2 files changed, 21 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index b69410ea2541..385d33bd37ff 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -160,8 +160,10 @@ enum {
->      /* Server doorbell variants */
->      POWERPC_EXCP_SDOOR    =3D 99,
->      POWERPC_EXCP_SDOOR_HV =3D 100,
-> +    /* ISA 3.00 additions */
-> +    POWERPC_EXCP_HVIRT    =3D 101,
->      /* EOL                                                              =
-     */
-> -    POWERPC_EXCP_NB       =3D 101,
-> +    POWERPC_EXCP_NB       =3D 102,
->      /* QEMU exceptions: used internally during code translation         =
-     */
->      POWERPC_EXCP_STOP         =3D 0x200, /* stop translation            =
-       */
->      POWERPC_EXCP_BRANCH       =3D 0x201, /* branch instruction          =
-       */
-> @@ -2344,6 +2346,7 @@ enum {
->      PPC_INTERRUPT_PERFM,          /* Performance monitor interrupt      =
-  */
->      PPC_INTERRUPT_HMI,            /* Hypervisor Maintainance interrupt  =
-  */
->      PPC_INTERRUPT_HDOORBELL,      /* Hypervisor Doorbell interrupt      =
-  */
-> +    PPC_INTERRUPT_HVIRT,          /* Hypervisor virtualization interrupt=
-  */
->  };
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 2bad8526221b..82e9aef677c5 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -316,7 +316,8 @@ typedef struct XiveTCTX {
+>      DeviceState parent_obj;
 > =20
->  /* Processor Compatibility mask (PCR) */
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 1a2f469a5fa2..d171a5eb6236 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -97,6 +97,9 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
-te *env, int excp,
->      case POWERPC_EXCP_HV_MAINT:
->          *msr |=3D 0xaull << (63 - 45);
->          break;
-> +    case POWERPC_EXCP_HVIRT:
-> +        *msr |=3D 0x9ull << (63 - 45);
-> +        break;
->      default:
->          cpu_abort(cs, "Unsupported exception %d in Power Save mode\n",
->                    excp);
-> @@ -427,6 +430,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
->      case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
-tion */
->      case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
-     */
->      case POWERPC_EXCP_HV_EMU:
-> +    case POWERPC_EXCP_HVIRT:     /* Hypervisor virtualization           =
-     */
->          srr0 =3D SPR_HSRR0;
->          srr1 =3D SPR_HSRR1;
->          new_msr |=3D (target_ulong)MSR_HVB;
-> @@ -809,7 +813,18 @@ static void ppc_hw_interrupt(CPUPPCState *env)
->              return;
->          }
+>      CPUState    *cs;
+> -    qemu_irq    output;
+> +    qemu_irq    hv_output;
+> +    qemu_irq    os_output;
+> =20
+>      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
+>      uint32_t    hw_cam;
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 119bb02d345d..14b854181ab7 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -61,13 +61,28 @@ static uint8_t exception_mask(uint8_t ring)
 >      }
-> -    /* Extermal interrupt can ignore MSR:EE under some circumstances */
-> +
-> +    /* Hypervisor virtualization interrupt */
-> +    if (env->pending_interrupts & (1 << PPC_INTERRUPT_HVIRT)) {
-> +        /* LPCR will be clear when not supported so this will work */
-> +        bool hvice =3D !!(env->spr[SPR_LPCR] & LPCR_HVICE);
-> +        if ((async_deliver || msr_hv =3D=3D 0) && hvice) {
-> +            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_HVIRT);
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* External interrupt can ignore MSR:EE under some circumstances */
->      if (env->pending_interrupts & (1 << PPC_INTERRUPT_EXT)) {
->          bool lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
->          if (async_deliver || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
-es0)) {
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index c1719c46a383..6ffa4a8fe0fa 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -3313,6 +3313,15 @@ static void init_excp_POWER8(CPUPPCState *env)
->  #endif
 >  }
 > =20
-> +static void init_excp_POWER9(CPUPPCState *env)
+> +static qemu_irq xive_tctx_output(XiveTCTX *tctx, uint8_t ring)
 > +{
-> +    init_excp_POWER8(env);
-> +
-> +#if !defined(CONFIG_USER_ONLY)
-> +    env->excp_vectors[POWERPC_EXCP_HVIRT]    =3D 0x00000EA0;
-> +#endif
+> +        switch (ring) {
+> +        case TM_QW0_USER:
+> +                return 0; /* Not supported */
+> +        case TM_QW1_OS:
+> +                return tctx->os_output;
+> +        case TM_QW2_HV_POOL:
+> +        case TM_QW3_HV_PHYS:
+> +                return tctx->hv_output;
+> +        default:
+> +                return 0;
+> +        }
 > +}
 > +
->  #endif
+>  static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
+>  {
+>      uint8_t *regs =3D &tctx->regs[ring];
+>      uint8_t nsr =3D regs[TM_NSR];
+>      uint8_t mask =3D exception_mask(ring);
 > =20
->  /***********************************************************************=
-******/
-> @@ -8783,7 +8792,7 @@ static void init_proc_POWER9(CPUPPCState *env)
->      env->icache_line_size =3D 128;
+> -    qemu_irq_lower(tctx->output);
+> +    qemu_irq_lower(xive_tctx_output(tctx, ring));
 > =20
->      /* Allocate hardware IRQ controller */
-> -    init_excp_POWER8(env);
-> +    init_excp_POWER9(env);
->      ppcPOWER7_irq_init(ppc_env_get_cpu(env));
+>      if (regs[TM_NSR] & mask) {
+>          uint8_t cppr =3D regs[TM_PIPR];
+> @@ -100,7 +115,7 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t =
+ring)
+>          default:
+>              g_assert_not_reached();
+>          }
+> -        qemu_irq_raise(tctx->output);
+> +        qemu_irq_raise(xive_tctx_output(tctx, ring));
+>      }
 >  }
 > =20
-> @@ -8836,6 +8845,11 @@ static bool cpu_has_work_POWER9(CPUState *cs)
->              (env->spr[SPR_LPCR] & LPCR_HDEE)) {
->              return true;
->          }
-> +        /* Hypervisor virtualization exception */
-> +        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HVIRT)) &&
-> +            (env->spr[SPR_LPCR] & LPCR_HVEE)) {
-> +            return true;
-> +        }
->          if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
->              return true;
->          }
+> @@ -554,7 +569,8 @@ static void xive_tctx_realize(DeviceState *dev, Error=
+ **errp)
+>      env =3D &cpu->env;
+>      switch (PPC_INPUT(env)) {
+>      case PPC_FLAGS_INPUT_POWER9:
+> -        tctx->output =3D env->irq_inputs[POWER7_INPUT_INT];
+> +        tctx->hv_output =3D env->irq_inputs[POWER9_INPUT_HINT];
+> +        tctx->os_output =3D env->irq_inputs[POWER9_INPUT_INT];
+>          break;
+> =20
+>      default:
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -180,24 +130,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---X1pyOwMoA9G3DWfK
+--QgvTbcZPsSS/HkXe
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjp1AACgkQbDjKyiDZ
-s5JJ6A//aL84omqzfQ6meP5Vo0QfWCQbuvcU8yLBkJjHt0OJdhb4AoW+QBRD6ttv
-HH1y4khNnfEV1DETEIG3fICIv73wkJtiy5E0izpGoclYZm0Z/Y3+SEVNeK4sGPbZ
-uqSmRa63vmYztTYW0GRnj8oap7tYrAKcDjvGVdgsYdtiX9e36IjNigM+0AAf/4JB
-/raxJJXr8skkjxyVO0NoyE3v10nAeQ6EDW7cpszL1d/oWQLzZqQCZgU65kbIFAHp
-+g3QCOhOG4BqDy/10hl3P3aXv68msHHLvYnWskiDc8rKg9kiNMIJrQnlIhiHfJZR
-86C4K7h44CKthJVP0JAMazZ2Tuv7d3bIS5PByXZ4lPYnIrAUC66ZZpNs0ccBUYzK
-0SWDdRkB52JdZYAO5VMg/lwlEeUnQVvFMoxC+mkssgQL/sSKpuql9ClW3nLEeuqB
-kOBczDhrnZk/+5ne13be0ve986L424y6/zqRbsk3sleHxrYQXU0pI0PpbIpQlvcY
-s4Y5nAzrHagEu1F6lqRYBrrJvcEV1xVBkh4NseCoUXZm13plm0x0YkbpXVqU3bZI
-krtwx6RX+N/loyF5l2gkYrhANU11E559kHzNHB/feR75AeSzIGa1Y9HovoBnXvc2
-A9cK8cXz5tIDUhOTTsHdOXrN5MQg4mOclpXuuHeD/oXv07kVB70=
-=HYu0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjqHEACgkQbDjKyiDZ
+s5IeSBAAuSRTAxDuqYYrj1J0Iut5cqm9VkiaD0A6dJBGhUKbNgkuWlyeGTeL7c/L
+kwNHCjHdEWkgyHPuVe8hIhrYzNsp1lLLHss55+67OPR3Cwztq/Ts1HVt0hqXWgIY
+WzC1cmPWKibTzsnihr06s5VHUcHCGlE9psjJkGk6TGmHo8SV1aRAkTQ26y5RYn3y
+6oNB6q/TxNKqfst7+Phr/B7sFZqhpnNh/4hvPL0idfwWm7l63kAck6m7fxp/qJti
+kfDZbG7ochPSoW0hWemOCTFvResoqV82ZB1wWdVS2KUKXho3F1GSJlt7R9hf6Q+c
+uSTW3V27upP59P6xMCHA8WVGd+6Cdg4/ZpnuGNiwhMTT6C6UlypVeQ8ywC0orHME
+tqLrsaQfb+T9u/mvIf53EJSoI/nzGWa45RdF5DircuQD597GIHVVQe6Z1ALaZhU4
+XK5JmbVN/GleRs6FdCCf0aMqpcdZrAcZ+cPfqlBcf1gs2sJ3CPkBJoVpduFI7hqU
+WUB9CHLm/Q+QTgLNEmORoYEzJvIcA2Gyx7SxXby/iHJUMkvtLLIYmEHF7aY3n50z
+SzeXrt3JtinnTw+iSpJFtYEqmJ6G8T0ZF29pkKNYraTGAze+i/JiDDnFOZwLvTBy
+Chycc3bo4pOI4Sb+I0iB8XH8RwXIyEcvY2SsSAOCwZ00UMtQ6pw=
+=cl47
 -----END PGP SIGNATURE-----
 
---X1pyOwMoA9G3DWfK--
+--QgvTbcZPsSS/HkXe--
