@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52398)
+Received: from eggs.gnu.org ([209.51.188.92]:51852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtqG6-0002Tc-H1
+	(envelope-from <thuth@redhat.com>) id 1gtqG6-00021O-TX
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtq3v-00050B-A8
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:38:35 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtq3o-0004tq-8j
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:38:29 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 13 Feb 2019 09:37:55 +0100
-Message-Id: <1550047098-1210-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1550047098-1210-1-git-send-email-thuth@redhat.com>
-References: <1550047098-1210-1-git-send-email-thuth@redhat.com>
+Date: Wed, 13 Feb 2019 09:37:53 +0100
+Message-Id: <1550047098-1210-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 02/25] hw/arm: Express dependencies of the
- highbank machines with Kconfig
+Subject: [Qemu-devel] [PATCH v2 00/25] Kconfig dependencies for ARM machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +23,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, philmd@redhat.com
 
-Add Kconfig dependencies for the highbank machine (and the midway
-machine).
-This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
-e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+This series reworks the default-configs/arm-softmmu.mak and
+default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
+dependencies instead.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak |  4 +---
- hw/arm/Kconfig                  | 12 ++++++++++++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+Based-on: 1549562254-41157-1-git-send-email-pbonzini@redhat.com
+          ("Support Kconfig in QEMU")
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 3baafc4..59734ee 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -6,6 +6,7 @@ CONFIG_ARM_V7M=3Dy
- CONFIG_PCI_DEVICES=3Dy
-=20
- CONFIG_EXYNOS4=3Dy
-+CONFIG_HIGHBANK=3Dy
-=20
- CONFIG_VGA=3Dy
- CONFIG_NAND=3Dy
-@@ -54,14 +55,12 @@ CONFIG_PL022=3Dy
- CONFIG_PL031=3Dy
- CONFIG_PL041=3Dy
- CONFIG_PL050=3Dy
--CONFIG_PL061=3Dy
- CONFIG_PL080=3Dy
- CONFIG_PL110=3Dy
- CONFIG_PL181=3Dy
- CONFIG_PL190=3Dy
- CONFIG_PL330=3Dy
- CONFIG_CADENCE=3Dy
--CONFIG_XGMAC=3Dy
- CONFIG_PXA2XX=3Dy
- CONFIG_BITBANG_I2C=3Dy
- CONFIG_FRAMEBUFFER=3Dy
-@@ -151,7 +150,6 @@ CONFIG_XILINX_AXI=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
-=20
- CONFIG_STRONGARM=3Dy
--CONFIG_HIGHBANK=3Dy
- CONFIG_MUSICPAL=3Dy
-=20
- # for realview and versatilepb
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 2850000..984de8a 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -18,6 +18,18 @@ config EXYNOS4
-=20
- config HIGHBANK
-     bool
-+    select A9MPCORE
-+    select A15MPCORE
-+    select AHCI
-+    select ARM_TIMER # sp804
-+    select ARM_V7M
-+    select PCI
-+    select PL011 # UART
-+    select PL022 # Serial port
-+    select PL031 # RTC
-+    select PL061 # GPIO
-+    select PL310 # cache controller
-+    select XGMAC # ethernet
-=20
- config INTEGRATOR
-     bool
+The first half of the patches is slightly based on the work by =C3=81kos =
+Kov=C3=A1cs:
+
+https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
+
+The second part has been created by looking at the sources and finding
+out the dependencies the hard way via trial-and-error (i.e. by enabling
+only one machine at a time and checking whether it can be compiled and
+started).
+
+NB: One thing I noticed while working on these patches: We should
+tidy up the dependencies of AHCI and SDHCI. Both currently depend
+on PCI, but some boards that do not have PCI also want to use them
+(via sysbus devices)... but that's a clean-up for the future, this
+series here is already big enough.
+
+v2: Adressed review-feedback from v1
+ - CONFIG_SDHCI and CONFIG_AHCI now select CONFIG_PCI
+ - Added switches for MICROBIT and EMCRAFT_SF2
+
+Thomas Huth (25):
+  hw/arm: Express dependencies of the exynos machines with Kconfig
+  hw/arm: Express dependencies of the highbank machines with Kconfig
+  hw/arm: Express dependencies of integratorcp with Kconfig
+  hw/arm: Express dependencies of the fsl-imx31 machine with Kconfig
+  hw/arm: Express dependencies of musicpal with Kconfig
+  hw/arm: Express dependencies of the OMAP machines with Kconfig
+  hw/arm: Express dependencies of stellaris with Kconfig
+  hw/arm: Express dependencies of realview, versatile and vexpress with
+    Kconfig
+  hw/arm: Express dependencies of the PXA2xx machines with Kconfig
+  hw/arm: Express dependencies of xilinx-zynq with Kconfig
+  hw/arm: Express dependencies of collie with Kconfig
+  hw/arm: Express dependencies of the aspeed boards with Kconfig
+  hw/arm: Express dependencies of the virt machine with Kconfig
+  hw/arm: Express dependencies of netduino / stm32f2xx with Kconfig
+  hw/arm: Express dependencies of allwinner / cubieboard with Kconfig
+  hw/arm: Express dependencies of the MPS2 boards with Kconfig
+  hw/arm: Express dependencies of the raspi machines with Kconfig
+  hw/arm: Express dependencies of canon-a1100 with Kconfig
+  hw/arm: Express dependencies of sabrelite with Kconfig
+  hw/arm: Express dependencies of the MSF2 machine with Kconfig
+  hw/arm: Express dependencies for remaining IMX boards with Kconfig
+  hw/arm: Express dependencies of the microbit / nrf51 machine with
+    Kconfig
+  hw/arm: Express dependencies of the ZynqMP zcu102 machine with Kconfig
+  hw/arm: Express dependencies of the xlnx-versal-virt machine with
+    Kconfig
+  hw/arm: Remove hard-enablement of the remaining PCI devices
+
+ default-configs/aarch64-softmmu.mak |   4 -
+ default-configs/arm-softmmu.mak     | 177 +++-----------------
+ hw/arm/Kconfig                      | 313 ++++++++++++++++++++++++++++++=
+++++++
+ hw/arm/Makefile.objs                |  25 ++-
+ hw/display/Kconfig                  |   3 +
+ hw/i2c/Kconfig                      |   2 +-
+ hw/ide/Kconfig                      |   2 +-
+ hw/misc/Kconfig                     |   2 +
+ hw/sd/Kconfig                       |   2 +-
+ 9 files changed, 364 insertions(+), 166 deletions(-)
+
 --=20
 1.8.3.1
