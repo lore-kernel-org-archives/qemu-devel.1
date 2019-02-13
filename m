@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39306)
+Received: from eggs.gnu.org ([209.51.188.92]:39359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGB-00049I-M7
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:44 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGF-0004Dn-MT
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005Jw-4l
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55586)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGD-0005a0-Oc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtxG1-0005Dm-HY
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:33 -0500
+	id 1gtxGB-0005V0-Pc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:45 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Feb 2019 17:18:54 +0100
-Message-Id: <20190213161913.22107-7-marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 17:19:00 +0100
+Message-Id: <20190213161913.22107-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 References: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 06/25] chardev: forbid 'reconnect' option
- with server sockets
+Subject: [Qemu-devel] [PULL v2 12/25] chardev: split up
+ qmp_chardev_open_socket connection code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +33,138 @@ Cc: peter.maydell@linaro.org
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-The 'reconnect' option is used to give the sleep time, in seconds,
-before a client socket attempts to re-establish a connection to the
-server. It does not make sense to set this for server sockets, as they
-will always accept a new client connection immediately after the
-previous one went away.
+In qmp_chardev_open_socket the code for connecting client chardevs is
+split across two conditionals far apart with some server chardev code in
+the middle. Split up the method so that code for client connection setup
+is separate from code for server connection setup.
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190211182442.8542-5-berrange@redhat.com>
+Message-Id: <20190211182442.8542-11-berrange@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-socket.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ chardev/char-socket.c | 96 +++++++++++++++++++++++++++----------------
+ 1 file changed, 60 insertions(+), 36 deletions(-)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index e85250b624..743b7b11cd 100644
+index 222adbbad3..90dafef7d4 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -1035,7 +1035,14 @@ static bool qmp_chardev_validate_socket(ChardevSoc=
-ket *sock,
-     }
+@@ -1005,6 +1005,61 @@ static gboolean socket_reconnect_timeout(gpointer =
+opaque)
+ }
 =20
-     /* Validate any options which have a dependancy on client vs server =
-*/
--    if (!(sock->has_server && sock->server)) {
-+    if (!sock->has_server || sock->server) {
-+        if (sock->has_reconnect) {
-+            error_setg(errp,
-+                       "'reconnect' option is incompatible with "
-+                       "socket in server listen mode");
-+            return false;
-+        }
+=20
++static int qmp_chardev_open_socket_server(Chardev *chr,
++                                          bool is_telnet,
++                                          bool is_waitconnect,
++                                          Error **errp)
++{
++    SocketChardev *s =3D SOCKET_CHARDEV(chr);
++    char *name;
++    if (is_telnet) {
++        s->do_telnetopt =3D 1;
++    }
++    s->listener =3D qio_net_listener_new();
++
++    name =3D g_strdup_printf("chardev-tcp-listener-%s", chr->label);
++    qio_net_listener_set_name(s->listener, name);
++    g_free(name);
++
++    if (qio_net_listener_open_sync(s->listener, s->addr, errp) < 0) {
++        object_unref(OBJECT(s->listener));
++        s->listener =3D NULL;
++        return -1;
++    }
++
++    qapi_free_SocketAddress(s->addr);
++    s->addr =3D socket_local_address(s->listener->sioc[0]->fd, errp);
++    update_disconnected_filename(s);
++
++    if (is_waitconnect) {
++        tcp_chr_accept_server_sync(chr);
 +    } else {
-         if (sock->has_websocket && sock->websocket) {
-             error_setg(errp, "%s", "Websocket client is not implemented"=
-);
-             return false;
++        qio_net_listener_set_client_func_full(s->listener,
++                                              tcp_chr_accept,
++                                              chr, NULL,
++                                              chr->gcontext);
++    }
++
++    return 0;
++}
++
++
++static int qmp_chardev_open_socket_client(Chardev *chr,
++                                          int64_t reconnect,
++                                          Error **errp)
++{
++    SocketChardev *s =3D SOCKET_CHARDEV(chr);
++
++    if (reconnect > 0) {
++        s->reconnect_time =3D reconnect;
++        tcp_chr_connect_client_async(chr);
++        return 0;
++    } else {
++        return tcp_chr_connect_client_sync(chr, errp);
++    }
++}
++
++
+ static bool qmp_chardev_validate_socket(ChardevSocket *sock,
+                                         SocketAddress *addr,
+                                         Error **errp)
+@@ -1147,44 +1202,13 @@ static void qmp_chardev_open_socket(Chardev *chr,
+=20
+     update_disconnected_filename(s);
+=20
+-    if (is_listen) {
+-        if (is_telnet || is_tn3270) {
+-            s->do_telnetopt =3D 1;
++    if (s->is_listen) {
++        if (qmp_chardev_open_socket_server(chr, is_telnet || is_tn3270,
++                                           is_waitconnect, errp) < 0) {
++            return;
+         }
+-    } else if (reconnect > 0) {
+-        s->reconnect_time =3D reconnect;
+-    }
+-
+-    if (s->reconnect_time) {
+-        tcp_chr_connect_client_async(chr);
+     } else {
+-        if (s->is_listen) {
+-            char *name;
+-            s->listener =3D qio_net_listener_new();
+-
+-            name =3D g_strdup_printf("chardev-tcp-listener-%s", chr->lab=
+el);
+-            qio_net_listener_set_name(s->listener, name);
+-            g_free(name);
+-
+-            if (qio_net_listener_open_sync(s->listener, s->addr, errp) <=
+ 0) {
+-                object_unref(OBJECT(s->listener));
+-                s->listener =3D NULL;
+-                return;
+-            }
+-
+-            qapi_free_SocketAddress(s->addr);
+-            s->addr =3D socket_local_address(s->listener->sioc[0]->fd, e=
+rrp);
+-            update_disconnected_filename(s);
+-
+-            if (is_waitconnect) {
+-                tcp_chr_accept_server_sync(chr);
+-            } else {
+-                qio_net_listener_set_client_func_full(s->listener,
+-                                                      tcp_chr_accept,
+-                                                      chr, NULL,
+-                                                      chr->gcontext);
+-            }
+-        } else if (tcp_chr_connect_client_sync(chr, errp) < 0) {
++        if (qmp_chardev_open_socket_client(chr, reconnect, errp) < 0) {
+             return;
+         }
+     }
 --=20
 2.21.0.rc0.1.g036caf7885
