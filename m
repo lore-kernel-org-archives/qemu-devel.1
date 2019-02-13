@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40763)
+Received: from eggs.gnu.org ([209.51.188.92]:41205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gtrSS-0004Iu-AC
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:08:02 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gtrUY-0005E6-AR
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gtrSQ-0003fj-5D
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:08:00 -0500
-Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:46704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gtrSP-0003dd-RN
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:07:58 -0500
-Received: from player692.ha.ovh.net (unknown [10.109.160.230])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 60F02116AA5
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 11:07:55 +0100 (CET)
-Date: Wed, 13 Feb 2019 11:07:49 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190213110749.0194dcd0@bahia.lan>
-In-Reply-To: <f0b93ebb-e8b5-4448-9b57-8da2feee493c@kaod.org>
-References: <20190107183946.7230-1-clg@kaod.org>
-	<20190107183946.7230-14-clg@kaod.org>
-	<20190212011153.GH1884@umbus.fritz.box>
-	<d6dc35c6-4987-3fcc-de81-f2aff865cad1@kaod.org>
-	<20190213013219.GU1884@umbus.fritz.box>
-	<f0b93ebb-e8b5-4448-9b57-8da2feee493c@kaod.org>
+	(envelope-from <kwolf@redhat.com>) id 1gtrUW-0005Kz-W6
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 05:10:10 -0500
+Date: Wed, 13 Feb 2019 11:09:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190213100956.GB994@localhost.localdomain>
+References: <20190208141122.53046-1-vsementsov@virtuozzo.com>
+	<20190211034231.GD18083@stefanha-x1.localdomain>
+	<c861c023-c783-57f6-85ae-52ecba971636@virtuozzo.com>
+	<20190212032242.GC28401@stefanha-x1.localdomain>
+	<20190212115840.GB5283@localhost.localdomain>
+	<20190213065830.GA26332@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 13/13] spapr: add KVM support to
- the 'dual' machine
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
+Content-Disposition: inline
+In-Reply-To: <20190213065830.GA26332@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] coroutines: generate
+ wrapper code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,494 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "crosa@redhat.com" <crosa@redhat.com>, armbru@redhat.com
 
-On Wed, 13 Feb 2019 09:22:46 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-> On 2/13/19 2:32 AM, David Gibson wrote:
-> > On Tue, Feb 12, 2019 at 08:18:19AM +0100, C=C3=A9dric Le Goater wrote: =
-=20
-> >> On 2/12/19 2:11 AM, David Gibson wrote: =20
-> >>> On Mon, Jan 07, 2019 at 07:39:46PM +0100, C=C3=A9dric Le Goater wrote=
-: =20
-> >>>> The interrupt mode is chosen by the CAS negotiation process and
-> >>>> activated after a reset to take into account the required changes in
-> >>>> the machine. This brings new constraints on how the associated KVM I=
-RQ
-> >>>> device is initialized.
-> >>>>
-> >>>> Currently, each model takes care of the initialization of the KVM
-> >>>> device in their realize method but this is not possible anymore as t=
-he
-> >>>> initialization needs to be done globaly when the interrupt mode is
-> >>>> known, i.e. when machine is reseted. It also means that we need a way
-> >>>> to delete a KVM device when another mode is chosen.
-> >>>>
-> >>>> Also, to support migration, the QEMU objects holding the state to
-> >>>> transfer should always be available but not necessarily activated.
-> >>>>
-> >>>> The overall approach of this proposal is to initialize both interrupt
-> >>>> mode at the QEMU level and keep the IRQ number space in sync to allow
-> >>>> switching from one mode to another. For the KVM side of things, the
-> >>>> whole initialization of the KVM device, sources and presenters, is
-> >>>> grouped in a single routine. The XICS and XIVE sPAPR IRQ reset
-> >>>> handlers are modified accordingly to handle the init and the delete
-> >>>> sequences of the KVM device.
-> >>>>
-> >>>> As KVM is now initialized at reset, we loose the possiblity to
-> >>>> fallback to the QEMU emulated mode in case of failure and failures
-> >>>> become fatal to the machine.
-> >>>>
-> >>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> >>>> ---
-> >>>>  hw/intc/spapr_xive.c     |  8 +---
-> >>>>  hw/intc/spapr_xive_kvm.c | 27 ++++++++++++++
-> >>>>  hw/intc/xics_kvm.c       | 25 +++++++++++++
-> >>>>  hw/intc/xive.c           |  4 --
-> >>>>  hw/ppc/spapr_irq.c       | 79 ++++++++++++++++++++++++++++---------=
----
-> >>>>  5 files changed, 109 insertions(+), 34 deletions(-)
-> >>>>
-> >>>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >>>> index 21f3c1ef0901..0661aca35900 100644
-> >>>> --- a/hw/intc/spapr_xive.c
-> >>>> +++ b/hw/intc/spapr_xive.c
-> >>>> @@ -330,13 +330,7 @@ static void spapr_xive_realize(DeviceState *dev=
-, Error **errp)
-> >>>>      xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
-> >>>>      xive->endt =3D g_new0(XiveEND, xive->nr_ends);
-> >>>> =20
-> >>>> -    if (kvmppc_xive_enabled()) {
-> >>>> -        kvmppc_xive_connect(xive, &local_err);
-> >>>> -        if (local_err) {
-> >>>> -            error_propagate(errp, local_err);
-> >>>> -            return;
-> >>>> -        }
-> >>>> -    } else {
-> >>>> +    if (!kvmppc_xive_enabled()) {
-> >>>>          /* TIMA initialization */
-> >>>>          memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_t=
-m_ops, xive,
-> >>>>                                "xive.tima", 4ull << TM_SHIFT);
-> >>>> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> >>>> index d35814c1992e..3ebc947f2be7 100644
-> >>>> --- a/hw/intc/spapr_xive_kvm.c
-> >>>> +++ b/hw/intc/spapr_xive_kvm.c
-> >>>> @@ -737,6 +737,15 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error=
- **errp)
-> >>>>      Error *local_err =3D NULL;
-> >>>>      size_t esb_len;
-> >>>>      size_t tima_len;
-> >>>> +    CPUState *cs;
-> >>>> +
-> >>>> +    /*
-> >>>> +     * The KVM XIVE device already in use. This is the case when
-> >>>> +     * rebooting XIVE -> XIVE =20
-> >>>
-> >>> Can this case actually occur?  Further down you appear to
-> >>> unconditionally destroy both KVM devices at reset time. =20
-> >>
-> >> I guess you are right. I will check.
-> >> =20
-> >>>> +     */
-> >>>> +    if (xive->fd !=3D -1) {
-> >>>> +        return;
-> >>>> +    }
-> >>>> =20
-> >>>>      if (!kvm_enabled() || !kvmppc_has_cap_xive()) {
-> >>>>          error_setg(errp, "IRQ_XIVE capability must be present for K=
-VM");
-> >>>> @@ -800,6 +809,24 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error=
- **errp)
-> >>>>      xive->change =3D qemu_add_vm_change_state_handler(
-> >>>>          kvmppc_xive_change_state_handler, xive);
-> >>>> =20
-> >>>> +    /* Connect the presenters to the initial VCPUs of the machine */
-> >>>> +    CPU_FOREACH(cs) {
-> >>>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >>>> +
-> >>>> +        kvmppc_xive_cpu_connect(cpu->tctx, &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            return;
-> >>>> +        }
-> >>>> +    }
-> >>>> +
-> >>>> +    /* Update the KVM sources */
-> >>>> +    kvmppc_xive_source_reset(xsrc, &local_err);
-> >>>> +    if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            return;
-> >>>> +    }
-> >>>> +
-> >>>>      kvm_kernel_irqchip =3D true;
-> >>>>      kvm_msi_via_irqfd_allowed =3D true;
-> >>>>      kvm_gsi_direct_mapping =3D true;
-> >>>> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> >>>> index 1d21ff217b82..bfc35d71df7f 100644
-> >>>> --- a/hw/intc/xics_kvm.c
-> >>>> +++ b/hw/intc/xics_kvm.c
-> >>>> @@ -448,6 +448,16 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMa=
-chineState *spapr,
-> >>>>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp)
-> >>>>  {
-> >>>>      int rc;
-> >>>> +    CPUState *cs;
-> >>>> +    Error *local_err =3D NULL;
-> >>>> +
-> >>>> +    /*
-> >>>> +     * The KVM XICS device already in use. This is the case when
-> >>>> +     * rebooting XICS -> XICS
-> >>>> +     */
-> >>>> +    if (kernel_xics_fd !=3D -1) {
-> >>>> +        return 0;
-> >>>> +    }
-> >>>> =20
-> >>>>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_I=
-RQ_XICS)) {
-> >>>>          error_setg(errp,
-> >>>> @@ -496,6 +506,21 @@ int xics_kvm_init(sPAPRMachineState *spapr, Err=
-or **errp)
-> >>>>      kvm_msi_via_irqfd_allowed =3D true;
-> >>>>      kvm_gsi_direct_mapping =3D true;
-> >>>> =20
-> >>>> +    /* Connect the presenters to the initial VCPUs of the machine */
-> >>>> +    CPU_FOREACH(cs) {
-> >>>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >>>> +
-> >>>> +        icp_kvm_connect(cpu->icp, &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            goto fail;
-> >>>> +        }
-> >>>> +        icp_set_kvm_state(cpu->icp, 1);
-> >>>> +    }
-> >>>> +
-> >>>> +    /* Update the KVM sources */
-> >>>> +    ics_set_kvm_state(ICS_KVM(spapr->ics), 1);
-> >>>> +
-> >>>>      return 0;
-> >>>> =20
-> >>>>  fail:
-> >>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> >>>> index c5c2fbc3f8bc..c166eab5b210 100644
-> >>>> --- a/hw/intc/xive.c
-> >>>> +++ b/hw/intc/xive.c
-> >>>> @@ -932,10 +932,6 @@ static void xive_source_reset(void *dev)
-> >>>> =20
-> >>>>      /* PQs are initialized to 0b01 (Q=3D1) which corresponds to "in=
-ts off" */
-> >>>>      memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
-> >>>> -
-> >>>> -    if (kvmppc_xive_enabled()) {
-> >>>> -        kvmppc_xive_source_reset(xsrc, &error_fatal);
-> >>>> -    }
-> >>>>  }
-> >>>> =20
-> >>>>  static void xive_source_realize(DeviceState *dev, Error **errp)
-> >>>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> >>>> index ba27d9d8e972..5592eec3787b 100644
-> >>>> --- a/hw/ppc/spapr_irq.c
-> >>>> +++ b/hw/ppc/spapr_irq.c
-> >>>> @@ -98,20 +98,14 @@ static void spapr_irq_init_xics(sPAPRMachineStat=
-e *spapr, Error **errp)
-> >>>>      int nr_irqs =3D spapr->irq->nr_irqs;
-> >>>>      Error *local_err =3D NULL;
-> >>>> =20
-> >>>> -    if (kvm_enabled()) {
-> >>>> -        if (machine_kernel_irqchip_allowed(machine) &&
-> >>>> -            !xics_kvm_init(spapr, &local_err)) {
-> >>>> -            spapr->icp_type =3D TYPE_KVM_ICP;
-> >>>> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr=
-_irqs,
-> >>>> -                                          &local_err);
-> >>>> -        }
-> >>>> -        if (machine_kernel_irqchip_required(machine) && !spapr->ics=
-) {
-> >>>> -            error_prepend(&local_err,
-> >>>> -                          "kernel_irqchip requested but unavailable=
-: ");
-> >>>> -            goto error; =20
-> >>>
-> >>> I don't see anything that replaces the irqchip_required logic, which
-> >>> doesn't seem right. =20
-> >>
-> >> Yes. We do loose the ability to fall back to the emulated device in ca=
-se
-> >> of failure. It is not impossible to do but it will require more changes
-> >> to check what are the KVM capabilities before starting the machine. =20
+--a8Wt8u1KmwUX3Y2C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 13.02.2019 um 07:58 hat Stefan Hajnoczi geschrieben:
+> On Tue, Feb 12, 2019 at 12:58:40PM +0100, Kevin Wolf wrote:
+> > Am 12.02.2019 um 04:22 hat Stefan Hajnoczi geschrieben:
+> > > On Mon, Feb 11, 2019 at 09:38:37AM +0000, Vladimir Sementsov-Ogievski=
+y wrote:
+> > > > 11.02.2019 6:42, Stefan Hajnoczi wrote:
+> > > > > On Fri, Feb 08, 2019 at 05:11:22PM +0300, Vladimir Sementsov-Ogie=
+vskiy wrote:
+> > > > >> Hi all!
+> > > > >>
+> > > > >> We have a very frequent pattern of wrapping a coroutine_fn funct=
+ion
+> > > > >> to be called from non-coroutine context:
+> > > > >>
+> > > > >>    - create structure to pack parameters
+> > > > >>    - create function to call original function taking parameters=
+ from
+> > > > >>      struct
+> > > > >>    - create wrapper, which in case of non-coroutine context will
+> > > > >>      create a coroutine, enter it and start poll-loop.
+> > > > >>
+> > > > >> Here is a draft of template code + example how it can be used to=
+ drop a
+> > > > >> lot of similar code.
+> > > > >>
+> > > > >> Hope someone like it except me)
+> > > > >=20
+> > > > > My 2 cents.  Cons:
+> > > > >=20
+> > > > >   * Synchronous poll loops are an anti-pattern.  They block all o=
+f QEMU
+> > > > >     with the big mutex held.  Making them easier to write is
+> > > > >     questionable because we should aim to have as few of these as
+> > > > >     possible.
+> > > >=20
+> > > > Understand. Do we have a concept or a kind of target for a future t=
+o get rid of
+> > > > these a lot of poll-loops? What is the right way? At least for bloc=
+k-layer?
+> > >=20
+> > > It's non-trivial.  The nested event loop could be flattened if there =
+was
+> > > a mechanism to stop further activity on a specific object only (e.g.
+> > > BlockDriverState).  That way the event loop can continue processing
+> > > events for other objects and device emulation could continue for other
+> > > objects.
 > >=20
-> > Uh... it seems more like it's the other way around.  We'll always fall
-> > back to emulated, even if we've explicitly said on the command line
-> > that we don't want that. =20
+> > The mechanism to stop activity on BlockDriverStates is bdrv_drain(). But
+> > I don't see how this is related. Nested event loops aren't for stopping
+> > concurrent activity (events related to async operations started earlier
+> > are still processed in nested event loops), but for making progress on
+> > the operation we're waiting for. They happen when synchronous code calls
+> > into asynchronous code.
+> >=20
+> > The way to get rid of them is making their callers async. I think we
+> > would come a long way if we ran QMP command handlers (at least the block
+> > related ones) and qemu-img operations in coroutines instead of blocking
+> > while we wait for the result.
 >=20
-> Ah yes. The init function might be also broken.=20
+> A difficult caller is device reset, where we need to drain all requests.
+> But even converting some sync code paths to async is a win because it
+> removes places where QEMU can get stuck.
+
+Yes, as I said, draining a node can hang. And it can hang not because
+there are nested event loops or because of any other bad design
+decision, but because waiting for all requests to complete is required.
+
+The only thing we could try to improve this is cancelling requests after
+a timeout (or triggered by an OOB QMP command?) during a drain
+operation, but cancelling requests hasn't really been a success story so
+far.
+
+> Regarding block QMP handlers, do you mean suspending the monitor when
+> a command yields?  The monitor will be unresponsive to the outside
+> world, so this doesn't solve the problem from the QMP client's
+> perspective.  This is why async QMP and jobs are interesting but it's a
+> lot of work both inside QEMU and for clients like libvirt.
+
+Yes, it wouldn't keep the monitor responsive as long as the monitor
+protocol is synchronous. But it would keep the VM running at least, the
+GUI would stay responsive etc.
+
+Blocking the monitor is again nothing that restructuring the code could
+fix. It requires a change to the QMP protocol, but then it will easily
+fit in the current design.
+
+Nested event loops are unrelated.
+
+> > > Unfortunately there are interactions between objects like in block jo=
+bs
+> > > that act on multiple BDSes, so it becomes even tricky.
+> > >=20
+> > > A simple way of imagining this is to make each object an "actor"
+> > > coroutine.  The coroutine processes a single message (request) at a t=
+ime
+> > > and yields when it needs to wait.  Callers send messages and expect
+> > > asynchronous responses.  This model is bad for efficiency (parallelism
+> > > is necessary) but at least it offers a sane way of thinking about
+> > > multiple asynchronous components coordinating together.  (It's another
+> > > way of saying, let's put everything into coroutines.)
+> > >=20
+> > > The advantage of a flat event loop is that a hang in one object (e.g.
+> > > I/O getting stuck in one file) doesn't freeze the entire event loop.
+> >=20
+> > I think this one is more theoretical because you'll still have
+> > dependencies between the components. blk_drain_all() isn't hanging
+> > because the code is designed suboptimally, but because its semantics is
+> > to wait until all requests have completed. And it's called because this
+> > semantics is required.
 >=20
-> XICS mode is a bit more difficult to handle than XIVE because we have=20
-> different object type for the KVM device and the QEMU emulated device,=20
-
-This is indeed a bit unfortunate, but I think there's still room for
-improvement. Let's look at the base classes:
-
-struct ICPStateClass {
-    DeviceClass parent_class;
-
-    DeviceRealize parent_realize;
-    DeviceReset parent_reset;
-
-    void (*pre_save)(ICPState *icp);
-    int (*post_load)(ICPState *icp, int version_id);
-    void (*synchronize_state)(ICPState *icp);
-};
-
-struct ICSStateClass {
-    DeviceClass parent_class;
-
-    DeviceRealize parent_realize;
-    DeviceReset parent_reset;
-
-    void (*pre_save)(ICSState *s);
-    int (*post_load)(ICSState *s, int version_id);
-    void (*reject)(ICSState *s, uint32_t irq);
-    void (*resend)(ICSState *s);
-    void (*eoi)(ICSState *s, uint32_t irq);
-    void (*synchronize_state)(ICSState *s);
-};
-
-The pre_save and post_load callbacks are only used with
-the KVM device. They could be explicitely called from
-the corresponding VMStateDescription callbacks with a
-kvm_enabled() && kvm_irqchip_in_kernel() check.
-
-Same goes for the synchronize_state callbacks, which are only
-needed for 'info pic'.
-
-The reject, resend and eoi callbacks are only called by code that
-belongs to the QEMU emulated device. Either the RTAS/hypercalls
-or from the machine code with explicit checks like:
-
-static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
-{
-    sPAPRMachineState *spapr =3D opaque;
-    MachineState *machine =3D MACHINE(opaque);
-
-    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-        ics_kvm_set_irq(spapr->ics, srcno, val);
-    } else {
-        ics_simple_set_irq(spapr->ics, srcno, val);
-    }
-}
-
-or
-
-static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int version_i=
-d)
-{
-    if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
-        CPUState *cs;
-        CPU_FOREACH(cs) {
-            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-            icp_resend(spapr_cpu_state(cpu)->icp);
-        }
-    }
-    return 0;
-}
-
-Unless I'm missing something, the reject, resend and eoi callbacks could
-simply be removed. This would allow to unify KVM and QEMU emulation in
-the same ICP and ICS object types.
-
-If this makes sense to you, I can have a look (already started actually ;-)
-
-> and with the 'dual' mode, we activate the device at CAS reset time.
+> If we try to convert everything to async there will be two cases:
+> 1. Accidental sync code which can be made async.  (Rare nowadays?)
+> 2. Fundamental synchronization points that require waiting.
 >=20
-> Failures being handled at reset time, should we keep the same logic and =
-=20
-> abort the machine at reset if the kernel irqchip is required ?=20
+> When you reach a point that hangs there is still the possibility of a
+> timeout or an explicit cancel.  Today QEMU supports neither, so a
+> command that gets stuck will hang QEMU for as long as it takes.
 >=20
+> If QMP clients want timeouts or cancel then making everything async is
+> necessary.  If not, then we can leave it as is and simply audit the code
+> for accidental sync code (there used to be a lot of this but it's rarer
+> now) and convert it.
 
-If the user passed ic-mode=3Ddual,kernel-irqchip=3Don, we should at least m=
-ake
-sure KVM supports both XICS and XIVE devices during machine init. Then
-during reset if something goes wrong with KVM, it seems ok to abort.
+I'm not sure what makes sync code only "accidentally" sync, but at least
+everything the monitor does is sync.
 
-If the user didn't pass kernel-irqchip, ie, kernel_irqchip_allowed is true
-and kernel_irqchip_required is false, the current behavior for XICS is
-to try KVM first and fallback to QEMU emulation. I guess it could be the
-same for XIVE.
+With your assessment that we can leave everything as it is if QMP
+clients don't want improvements, you're ignoring that currently, not
+only the QMP monitor becomes unresponsive, but it holds the BQL while
+doing so and brings down the whole VM this way. So even without changing
+the QMP protocol, there is something to be gained by making it async
+(i.e. executing the block layer command handlers in a coroutine).
 
-> But we won't be able to fall back on the QEMU emulated device if KVM=20
-> XICS fails and if the kernel irqchip is only allowed. It should work for=
-=20
-> XIVE though.
->=20
-> Thanks,
->=20
-> C.
->=20
->=20
-> >> Nevertheless, any failure in reset when setting the KVM backend will
-> >> result in machine abort.
-> >>
-> >> C.      =20
-> >> =20
-> >>> =20
-> >>>> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >>>> +        spapr->icp_type =3D TYPE_KVM_ICP;
-> >>>> +        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irq=
-s,
-> >>>> +                                      &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            return;
-> >>>>          }
-> >>>> -        error_free(local_err);
-> >>>> -        local_err =3D NULL;
-> >>>>      }
-> >>>> =20
-> >>>>      if (!spapr->ics) {
-> >>>> @@ -119,10 +113,11 @@ static void spapr_irq_init_xics(sPAPRMachineSt=
-ate *spapr, Error **errp)
-> >>>>          spapr->icp_type =3D TYPE_ICP;
-> >>>>          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_=
-irqs,
-> >>>>                                        &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            return;
-> >>>> +        }
-> >>>>      }
-> >>>> -
-> >>>> -error:
-> >>>> -    error_propagate(errp, local_err);
-> >>>>  }
-> >>>> =20
-> >>>>  #define ICS_IRQ_FREE(ics, srcno)   \
-> >>>> @@ -233,7 +228,17 @@ static void spapr_irq_set_irq_xics(void *opaque=
-, int srcno, int val)
-> >>>> =20
-> >>>>  static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **=
-errp)
-> >>>>  {
-> >>>> -    /* TODO: create the KVM XICS device */
-> >>>> +    MachineState *machine =3D MACHINE(spapr);
-> >>>> +    Error *local_err =3D NULL;
-> >>>> +
-> >>>> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >>>> +        xics_kvm_init(spapr, &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            error_prepend(errp, "KVM XICS connect failed: ");
-> >>>> +            return;
-> >>>> +        }
-> >>>> +    }
-> >>>>  }
-> >>>> =20
-> >>>>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
-> >>>> @@ -393,6 +398,7 @@ static int spapr_irq_post_load_xive(sPAPRMachine=
-State *spapr, int version_id)
-> >>>>  static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **=
-errp)
-> >>>>  {
-> >>>>      CPUState *cs;
-> >>>> +    Error *local_err =3D NULL;
-> >>>> =20
-> >>>>      CPU_FOREACH(cs) {
-> >>>>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> >>>> @@ -401,6 +407,15 @@ static void spapr_irq_reset_xive(sPAPRMachineSt=
-ate *spapr, Error **errp)
-> >>>>          spapr_xive_set_tctx_os_cam(cpu->tctx);
-> >>>>      }
-> >>>> =20
-> >>>> +    if (kvmppc_xive_enabled()) {
-> >>>> +        kvmppc_xive_connect(spapr->xive, &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            error_prepend(errp, "KVM XIVE connect failed: ");
-> >>>> +            return;
-> >>>> +        }
-> >>>> +    }
-> >>>> +
-> >>>>      /* Activate the XIVE MMIOs */
-> >>>>      spapr_xive_mmio_set_enabled(spapr->xive, true);
-> >>>>  }
-> >>>> @@ -462,14 +477,8 @@ static sPAPRIrq *spapr_irq_current(sPAPRMachine=
-State *spapr)
-> >>>> =20
-> >>>>  static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **e=
-rrp)
-> >>>>  {
-> >>>> -    MachineState *machine =3D MACHINE(spapr);
-> >>>>      Error *local_err =3D NULL;
-> >>>> =20
-> >>>> -    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >>>> -        error_setg(errp, "No KVM support for the 'dual' machine");
-> >>>> -        return;
-> >>>> -    }
-> >>>> -
-> >>>>      spapr_irq_xics.init(spapr, &local_err);
-> >>>>      if (local_err) {
-> >>>>          error_propagate(errp, local_err);
-> >>>> @@ -568,11 +577,16 @@ static void spapr_irq_cpu_intc_create_dual(sPA=
-PRMachineState *spapr,
-> >>>> =20
-> >>>>  static int spapr_irq_post_load_dual(sPAPRMachineState *spapr, int v=
-ersion_id)
-> >>>>  {
-> >>>> +    MachineState *machine =3D MACHINE(spapr);
-> >>>> +
-> >>>>      /*
-> >>>>       * Force a reset of the XIVE backend after migration. The machi=
-ne
-> >>>>       * defaults to XICS at startup.
-> >>>>       */
-> >>>>      if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> >>>> +        if (kvm_enabled() && machine_kernel_irqchip_allowed(machine=
-)) {
-> >>>> +            xics_kvm_disconnect(spapr, &error_fatal);
-> >>>> +        }
-> >>>>          spapr_irq_xive.reset(spapr, &error_fatal);
-> >>>>      }
-> >>>> =20
-> >>>> @@ -581,12 +595,31 @@ static int spapr_irq_post_load_dual(sPAPRMachi=
-neState *spapr, int version_id)
-> >>>> =20
-> >>>>  static void spapr_irq_reset_dual(sPAPRMachineState *spapr, Error **=
-errp)
-> >>>>  {
-> >>>> +    MachineState *machine =3D MACHINE(spapr);
-> >>>> +    Error *local_err =3D NULL;
-> >>>> +
-> >>>>      /*
-> >>>>       * Deactivate the XIVE MMIOs. The XIVE backend will reenable th=
-em
-> >>>>       * if selected.
-> >>>>       */
-> >>>>      spapr_xive_mmio_set_enabled(spapr->xive, false);
-> >>>> =20
-> >>>> +    /* Destroy all KVM devices */
-> >>>> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> >>>> +        xics_kvm_disconnect(spapr, &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            error_prepend(errp, "KVM XICS disconnect failed: ");
-> >>>> +            return;
-> >>>> +        }
-> >>>> +        kvmppc_xive_disconnect(spapr->xive, &local_err);
-> >>>> +        if (local_err) {
-> >>>> +            error_propagate(errp, local_err);
-> >>>> +            error_prepend(errp, "KVM XIVE disconnect failed: ");
-> >>>> +            return;
-> >>>> +        }
-> >>>> +    }
-> >>>> +
-> >>>>      spapr_irq_current(spapr)->reset(spapr, errp);
-> >>>>  }
-> >>>>   =20
-> >>> =20
-> >> =20
-> >  =20
->=20
->=20
+Kevin
+
+--a8Wt8u1KmwUX3Y2C
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcY+z0AAoJEH8JsnLIjy/WPfkP/irIRo8UKhwJ7fo1QSccT8Mu
+7JdYNVKiKAb38933F1ldtFdjKYgzXzzgGaUA2fveH5w0K8brV0h070aDkCjZ178r
+1ba0YnY60vRYEgp3nSem+U/yn8+dKNriUlMzxlvoslF4C0E6nOVakIN4Xz5CRJ5o
+oNSHj4JeCzV6UE9v4PWBe6MtAFSP3ERXZBpNZ1oVVp0ZSHd4DKdRBftz6DYVK/Wd
+/LCMY7aUYdPlSrU6r/8cFBZIdiw+j+lqQTqzZ/SXsbF9TwM5R+D24kVrn6UTSJpZ
+yBGOYo6V+pH0mPbeLwThFG0uyL8srhgJ5ADMAgF/0T0aczJzBm5QHKpIPwg6PWvO
+DrbDn2QAa0uLekU0I/BLIxDx5xFst7A2K3i/Fs2mf7PAQa5Z7uSxKWDqeQaLYNyM
+RrHFjCl+ykQbgdWhKDeVEd9vBwGymO4OCoW1AipPM/54m7JH1gqJOTq9Y26lu4UH
+pMKy2h2rFryuS+BNfgyN2XrNc82z44rX9cuaBFve9NXCw/mPzmPUkODisoDzklUT
+w+tUana+geBOM9SBZ7t2/BcMEpDp5QekHBb57Jcu/yFaXu8qorXZCPgxooTi7m25
+SMEwmNskw/ciCdaBdY5z55R21ptZw49/7wqmaFhMrxOM1ljmyEuPo0C4I3cX15aE
+Yo+5uQ5S2tUm3aD4wdRd
+=dTEO
+-----END PGP SIGNATURE-----
+
+--a8Wt8u1KmwUX3Y2C--
