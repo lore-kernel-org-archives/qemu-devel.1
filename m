@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40713)
+Received: from eggs.gnu.org ([209.51.188.92]:41011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gttok-0007Aw-7j
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:39:10 -0500
+	(envelope-from <philmd@redhat.com>) id 1gttqW-000083-A8
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:41:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gttoj-0006V9-DB
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:39:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gttoj-0006Uf-84
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:39:09 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 13 Feb 2019 07:38:58 -0500
-Message-Id: <20190213123858.24620-1-imammedo@redhat.com>
-In-Reply-To: <20190213071401.11544-1-stefanha@redhat.com>
-References: <20190213071401.11544-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] hostmem: simplify ifdef-s in
- file_backend_memory_alloc()
+	(envelope-from <philmd@redhat.com>) id 1gttqI-00080O-E2
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:40:50 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39334)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gttqC-0007u1-4e
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 07:40:41 -0500
+Received: by mail-wr1-f66.google.com with SMTP id l5so1240747wrw.6
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 04:40:37 -0800 (PST)
+References: <20190213065357.16076-1-yuval.shaia@oracle.com>
+	<20190213065357.16076-9-yuval.shaia@oracle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
+Date: Wed, 13 Feb 2019 13:40:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190213065357.16076-9-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/pvrdma: Delete unneeded function
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +31,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, Zhang Yi <yi.z.zhang@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>
+To: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com
 
-cleanup file_backend_memory_alloc() by using one CONFIG_POSIX ifdef
-instead of several ones within the function to make it simpler to follow.
+On 2/13/19 7:53 AM, Yuval Shaia wrote:
+> The function argument rdma_dev_res is not needed as it is stored in the
+> backend_dev object at init.
+> 
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Wei Yang <richardw.yang@linux.intel.com>
----
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Wei Yang <richardw.yang@linux.intel.com>
----
- backends/hostmem-file.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index ba601ce940..ce54788048 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -41,10 +41,12 @@ struct HostMemoryBackendFile {
- static void
- file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- {
-+#ifndef CONFIG_POSIX
-+    error_setg(errp, "backend '%s' not supported on this host",
-+               object_get_typename(OBJECT(backend)));
-+#else
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(backend);
--#ifdef CONFIG_POSIX
-     gchar *name;
--#endif
- 
-     if (!backend->size) {
-         error_setg(errp, "can't create backend with size 0");
-@@ -54,9 +56,6 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-         error_setg(errp, "mem-path property not set");
-         return;
-     }
--#ifndef CONFIG_POSIX
--    error_setg(errp, "-mem-path not supported on this host");
--#else
-     backend->force_prealloc = mem_prealloc;
-     name = host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
--- 
-2.18.1
+Should we teach checkpatch.pl to check name/space/email?
