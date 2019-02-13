@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39192)
+Received: from eggs.gnu.org ([209.51.188.92]:39211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG5-000450-Q4
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:40 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG6-00045X-Cx
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005Js-44
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxG2-0005KJ-4n
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48156)
+Received: from mx1.redhat.com ([209.132.183.28]:49227)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtxG1-000597-F7
+	id 1gtxG1-00058S-F6
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:33 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Feb 2019 17:18:49 +0100
-Message-Id: <20190213161913.22107-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20190213161913.22107-1-marcandre.lureau@redhat.com>
-References: <20190213161913.22107-1-marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 17:18:48 +0100
+Message-Id: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 01/25] chardev: fix mess in OPENED/CLOSED
- events when muxed
+Subject: [Qemu-devel] [PULL v2 00/25] Chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,175 +28,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+The following changes since commit 0b5e750bea635b167eb03d86c3d9a09bbd43bc=
+06:
 
-When chardev is multiplexed (mux=3Don) there are a lot of cases where
-CHR_EVENT_OPENED/CHR_EVENT_CLOSED events pairing (expected from
-frontend side) is broken. There are either generation of multiple
-repeated or extra CHR_EVENT_OPENED events, or CHR_EVENT_CLOSED just
-isn't generated at all.
-This is mostly because 'qemu_chr_fe_set_handlers()' function makes its
-own (and often wrong) implicit decision on updated frontend state and
-invokes 'fd_event' callback with 'CHR_EVENT_OPENED'. And even worse,
-it doesn't do symmetric action in opposite direction, as someone may
-expect (i.e. it doesn't invoke previously set 'fd_event' with
-'CHR_EVENT_CLOSED'). Muxed chardev uses trick by calling this function
-again to replace callback handlers with its own ones, but it doesn't
-account for such side effect.
-Fix that using extended version of this function with added argument
-for disabling side effect and keep original function for compatibility
-with lots of frontends already using this interface and being
-"tolerant" to its side effects.
-One more source of event duplication is just line of code in
-char-mux.c, which does far more than comment above says (obvious fix).
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2019-02-12 10:53:37 +0000)
 
-Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.arte=
-m.k.pisarenko@gmail.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/chardev/char-fe.h | 18 +++++++++++++++++-
- chardev/char-fe.c         | 33 ++++++++++++++++++++++++---------
- chardev/char-mux.c        | 16 ++++++++--------
- 3 files changed, 49 insertions(+), 18 deletions(-)
+are available in the Git repository at:
 
-diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
-index 46c997d352..c1b7fd9a95 100644
---- a/include/chardev/char-fe.h
-+++ b/include/chardev/char-fe.h
-@@ -67,7 +67,7 @@ bool qemu_chr_fe_backend_connected(CharBackend *be);
- bool qemu_chr_fe_backend_open(CharBackend *be);
-=20
- /**
-- * qemu_chr_fe_set_handlers:
-+ * qemu_chr_fe_set_handlers_full:
-  * @b: a CharBackend
-  * @fd_can_read: callback to get the amount of data the frontend may
-  *               receive
-@@ -79,12 +79,28 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
-  * @context: a main loop context or NULL for the default
-  * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
-  * any of the handler is non-NULL
-+ * @sync_state: whether to issue event callback with updated state
-  *
-  * Set the front end char handlers. The front end takes the focus if
-  * any of the handler is non-NULL.
-  *
-  * Without associated Chardev, nothing is changed.
-  */
-+void qemu_chr_fe_set_handlers_full(CharBackend *b,
-+                                   IOCanReadHandler *fd_can_read,
-+                                   IOReadHandler *fd_read,
-+                                   IOEventHandler *fd_event,
-+                                   BackendChangeHandler *be_change,
-+                                   void *opaque,
-+                                   GMainContext *context,
-+                                   bool set_open,
-+                                   bool sync_state);
-+
-+/**
-+ * qemu_chr_fe_set_handlers:
-+ *
-+ * Version of qemu_chr_fe_set_handlers_full() with sync_state =3D true.
-+ */
- void qemu_chr_fe_set_handlers(CharBackend *b,
-                               IOCanReadHandler *fd_can_read,
-                               IOReadHandler *fd_read,
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index a8931f7afd..b7bcbd59c0 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -246,14 +246,15 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
-     }
- }
-=20
--void qemu_chr_fe_set_handlers(CharBackend *b,
--                              IOCanReadHandler *fd_can_read,
--                              IOReadHandler *fd_read,
--                              IOEventHandler *fd_event,
--                              BackendChangeHandler *be_change,
--                              void *opaque,
--                              GMainContext *context,
--                              bool set_open)
-+void qemu_chr_fe_set_handlers_full(CharBackend *b,
-+                                   IOCanReadHandler *fd_can_read,
-+                                   IOReadHandler *fd_read,
-+                                   IOEventHandler *fd_event,
-+                                   BackendChangeHandler *be_change,
-+                                   void *opaque,
-+                                   GMainContext *context,
-+                                   bool set_open,
-+                                   bool sync_state)
- {
-     Chardev *s;
-     int fe_open;
-@@ -285,7 +286,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-         qemu_chr_fe_take_focus(b);
-         /* We're connecting to an already opened device, so let's make s=
-ure we
-            also get the open event */
--        if (s->be_open) {
-+        if (sync_state && s->be_open) {
-             qemu_chr_be_event(s, CHR_EVENT_OPENED);
-         }
-     }
-@@ -295,6 +296,20 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-     }
- }
-=20
-+void qemu_chr_fe_set_handlers(CharBackend *b,
-+                              IOCanReadHandler *fd_can_read,
-+                              IOReadHandler *fd_read,
-+                              IOEventHandler *fd_event,
-+                              BackendChangeHandler *be_change,
-+                              void *opaque,
-+                              GMainContext *context,
-+                              bool set_open)
-+{
-+    qemu_chr_fe_set_handlers_full(b, fd_can_read, fd_read, fd_event, be_=
-change,
-+                                  opaque, context, set_open,
-+                                  true);
-+}
-+
- void qemu_chr_fe_take_focus(CharBackend *b)
- {
-     if (!b->chr) {
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 6055e76293..1199d32674 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -283,13 +283,13 @@ void mux_chr_set_handlers(Chardev *chr, GMainContex=
-t *context)
-     MuxChardev *d =3D MUX_CHARDEV(chr);
-=20
-     /* Fix up the real driver with mux routines */
--    qemu_chr_fe_set_handlers(&d->chr,
--                             mux_chr_can_read,
--                             mux_chr_read,
--                             mux_chr_event,
--                             NULL,
--                             chr,
--                             context, true);
-+    qemu_chr_fe_set_handlers_full(&d->chr,
-+                                  mux_chr_can_read,
-+                                  mux_chr_read,
-+                                  mux_chr_event,
-+                                  NULL,
-+                                  chr,
-+                                  context, true, false);
- }
-=20
- void mux_set_focus(Chardev *chr, int focus)
-@@ -367,7 +367,7 @@ static int open_muxes(Chardev *chr)
-      * mark mux as OPENED so any new FEs will immediately receive
-      * OPENED event
-      */
--    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
-+    chr->be_open =3D 1;
-=20
-     return 0;
- }
+  https://github.com/elmarco/qemu.git tags/chardev-pull-request
+
+for you to fetch changes up to f7ea2038bea04628eaa55156fc34edf9d0c4a2bb:
+
+  char-pty: remove write_lock usage (2019-02-13 16:46:39 +0100)
+
+----------------------------------------------------------------
+Chardev fixes
+
+----------------------------------------------------------------
+
+Artem Pisarenko (2):
+  chardev: fix mess in OPENED/CLOSED events when muxed
+  tests/test-char: add muxed chardev testing for open/close
+
+Daniel P. Berrang=C3=A9 (16):
+  io: store reference to thread information in the QIOTask struct
+  io: add qio_task_wait_thread to join with a background thread
+  chardev: fix validation of options for QMP created chardevs
+  chardev: forbid 'reconnect' option with server sockets
+  chardev: forbid 'wait' option with client sockets
+  chardev: remove many local variables in qemu_chr_parse_socket
+  chardev: ensure qemu_chr_parse_compat reports missing driver error
+  chardev: remove unused 'sioc' variable & cleanup paths
+  chardev: split tcp_chr_wait_connected into two methods
+  chardev: split up qmp_chardev_open_socket connection code
+  chardev: use a state machine for socket connection state
+  chardev: honour the reconnect setting in tcp_chr_wait_connected
+  chardev: disallow TLS/telnet/websocket with tcp_chr_wait_connected
+  chardev: fix race with client connections in tcp_chr_wait_connected
+  tests: expand coverage of socket chardev test
+  chardev: ensure termios is fully initialized
+
+Marc-Andr=C3=A9 Lureau (5):
+  char: update the mux handlers in class callback
+  terminal3270: do not use backend timer sources
+  chardev: add a note about frontend sources and context switch
+  char-pty: remove the check for connection on write
+  char-pty: remove write_lock usage
+
+Paolo Bonzini (1):
+  char: allow specifying a GMainContext at opening time
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  chardev/wctablet: Fix a typo
+
+ include/chardev/char-fe.h      |  21 +-
+ include/chardev/char-mux.h     |   1 -
+ include/chardev/char.h         |  16 +-
+ include/io/task.h              |  29 +-
+ chardev/char-fe.c              |  35 +-
+ chardev/char-mux.c             |  19 +-
+ chardev/char-pty.c             |  56 +--
+ chardev/char-serial.c          |   2 +-
+ chardev/char-socket.c          | 490 +++++++++++++++------
+ chardev/char.c                 |  34 +-
+ chardev/wctablet.c             |   2 +-
+ gdbstub.c                      |   4 +-
+ hmp.c                          |   2 +-
+ hw/arm/omap2.c                 |   2 +-
+ hw/bt/hci-csr.c                |   2 +-
+ hw/char/omap_uart.c            |   4 +-
+ hw/char/terminal3270.c         |  15 +-
+ hw/char/xen_console.c          |   3 +-
+ hw/isa/isa-superio.c           |   4 +-
+ hw/mips/boston.c               |   2 +-
+ hw/mips/mips_malta.c           |   2 +-
+ hw/usb/dev-serial.c            |   2 +-
+ io/task.c                      | 101 +++--
+ net/slirp.c                    |   2 +-
+ qtest.c                        |   2 +-
+ tests/ivshmem-test.c           |   2 +-
+ tests/libqtest.c               |   4 +-
+ tests/test-char.c              | 757 +++++++++++++++++++++++++--------
+ tests/test-filter-redirector.c |   4 +-
+ tests/vhost-user-test.c        |   2 +-
+ vl.c                           |   8 +-
+ io/trace-events                |   2 +
+ 32 files changed, 1150 insertions(+), 481 deletions(-)
+
 --=20
 2.21.0.rc0.1.g036caf7885
