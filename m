@@ -1,20 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52846)
+Received: from eggs.gnu.org ([209.51.188.92]:54379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gtujg-0004Ae-1W
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:38:00 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtunV-0007L0-7Y
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:41:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gtujd-0006Yo-W1
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:37:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gtuja-0006Gg-6Y
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:37:56 -0500
-From: wexu@redhat.com
-Date: Wed, 13 Feb 2019 08:25:45 -0500
-Message-Id: <1550064346-17012-11-git-send-email-wexu@redhat.com>
-In-Reply-To: <1550064346-17012-1-git-send-email-wexu@redhat.com>
-References: <1550064346-17012-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/11] virtio: migration support for packed ring
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtunU-0004Gi-1e
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:41:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44860
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gtunT-0004CL-Qq
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 08:41:55 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1DDeT7J120780
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 08:41:52 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qmk3xuv8g-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 08:41:50 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 13 Feb 2019 13:41:50 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
+	<20190204112630.75eac242.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 13 Feb 2019 08:41:43 -0500
+MIME-Version: 1.0
+In-Reply-To: <20190204112630.75eac242.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <97cdb9a7-bd44-153d-72a3-30cf01a67d13@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 01/15] s390 vfio-ccw: Add bootindex
+ property and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,152 +46,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wexu@redhat.com, jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com, tiwei.bie@intel.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com, Thomas Huth <thuth@redhat.com>
 
-From: Wei Xu <wexu@redhat.com>
+On 2/4/19 5:26 AM, Cornelia Huck wrote:
+> On Tue, 29 Jan 2019 08:29:08 -0500
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> 
+>> Add bootindex property and iplb data for vfio-ccw devices. This allows us to
+>> forward boot information into the bios for vfio-ccw devices.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>   hw/s390x/ipl.c              | 14 ++++++++++++++
+>>   hw/s390x/s390-ccw.c         |  9 +++++++++
+>>   hw/vfio/ccw.c               | 13 +------------
+>>   include/hw/s390x/s390-ccw.h |  1 +
+>>   include/hw/s390x/vfio-ccw.h | 38 ++++++++++++++++++++++++++++++++++++++
+>>   5 files changed, 63 insertions(+), 12 deletions(-)
+>>   create mode 100644 include/hw/s390x/vfio-ccw.h
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 21f64ad..a993f65 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -19,6 +19,7 @@
+>>   #include "hw/loader.h"
+>>   #include "hw/boards.h"
+>>   #include "hw/s390x/virtio-ccw.h"
+>> +#include "hw/s390x/vfio-ccw.h"
+>>   #include "hw/s390x/css.h"
+>>   #include "hw/s390x/ebcdic.h"
+>>   #include "ipl.h"
+>> @@ -311,8 +312,12 @@ static CcwDevice *s390_get_ccw_device(DeviceState *dev_st)
+>>           VirtioCcwDevice *virtio_ccw_dev = (VirtioCcwDevice *)
+>>               object_dynamic_cast(OBJECT(qdev_get_parent_bus(dev_st)->parent),
+>>                                   TYPE_VIRTIO_CCW_DEVICE);
+>> +        VFIOCCWDevice *vfio_ccw_dev = (VFIOCCWDevice *)
+>> +            object_dynamic_cast(OBJECT(dev_st), TYPE_VFIO_CCW);
+>>           if (virtio_ccw_dev) {
+>>               ccw_dev = CCW_DEVICE(virtio_ccw_dev);
+>> +        } else if (vfio_ccw_dev) {
+>> +            ccw_dev = CCW_DEVICE(vfio_ccw_dev);
+>>           } else {
+>>               SCSIDevice *sd = (SCSIDevice *)
+>>                   object_dynamic_cast(OBJECT(dev_st),
+>> @@ -347,6 +352,8 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>>       if (ccw_dev) {
+>>           SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
+>>                                                               TYPE_SCSI_DEVICE);
+>> +        VFIOCCWDevice *vc = (VFIOCCWDevice *)
+>> +            object_dynamic_cast(OBJECT(dev_st), TYPE_VFIO_CCW);
+>>   
+>>           if (sd) {
+>>               ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
+>> @@ -358,6 +365,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>>               ipl->iplb.scsi.channel = cpu_to_be16(sd->channel);
+>>               ipl->iplb.scsi.devno = cpu_to_be16(ccw_dev->sch->devno);
+>>               ipl->iplb.scsi.ssid = ccw_dev->sch->ssid & 3;
+>> +        } else if (vc) {
+>> +            CcwDevice *ccw_dev = CCW_DEVICE(vc);
+>> +
+>> +            ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_CCW_LEN);
+>> +            ipl->iplb.pbt = S390_IPL_TYPE_CCW;
+>> +            ipl->iplb.ccw.devno = cpu_to_be16(ccw_dev->sch->devno);
+>> +            ipl->iplb.ccw.ssid = ccw_dev->sch->ssid & 3;
+>>           } else {
+>>               VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
+>>                                                                 TYPE_VIRTIO_NET);
+> 
+> Hm, I think that this find-out-the-boot-type-and-set-up-the-right-thing
+> mechanism is getting a bit unwieldy. Basically, we
+> 
+> - call s390_get_ccw_device() to find out the device type via a bunch of
+>    casts and return a pointer to a CcwDevice if it's a supported type
+> - do a bunch of casts here *again* to find out what we have and fill
+>    out the iplb, while we really only need to do grab a non-CcwDevice
+>    for the scsi case
+> 
+> Should maybe s390_get_ccw_device() give us an ipl type in addition to
+> the pointer to the CcwDevice, so we can use a switch/case statement to
+> fill out the iplb here?
 
-Both userspace and vhost-net/user are supported with this patch.
+I think this idea makes sense. s390_ipl_reset_request also calls s390_get_ccw_device but 
+does not care bout the device type, so how about a separate function instead of 
+integrating it with s390_get_ccw_device? Maybe s390_get_ccw_device_type?
 
-A new subsection is introduced for packed ring, only 'last_avail_idx'
-and 'last_avail_wrap_counter' are saved/loaded presumably based on
-all the others relevant data(inuse, used/avail index and wrap count
-should be the same.
+Is there any easy way to grab the type or are we just hiding the ugly casting inside our 
+helper function?
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
----
- hw/virtio/virtio.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 66 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 8cfc7b6..7c5de07 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2349,6 +2349,13 @@ static bool virtio_virtqueue_needed(void *opaque)
-     return virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1);
- }
- 
-+static bool virtio_packed_virtqueue_needed(void *opaque)
-+{
-+    VirtIODevice *vdev = opaque;
-+
-+    return virtio_host_has_feature(vdev, VIRTIO_F_RING_PACKED);
-+}
-+
- static bool virtio_ringsize_needed(void *opaque)
- {
-     VirtIODevice *vdev = opaque;
-@@ -2390,6 +2397,17 @@ static const VMStateDescription vmstate_virtqueue = {
-     }
- };
- 
-+static const VMStateDescription vmstate_packed_virtqueue = {
-+    .name = "packed_virtqueue_state",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(last_avail_idx, struct VirtQueue),
-+        VMSTATE_BOOL(last_avail_wrap_counter, struct VirtQueue),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_virtio_virtqueues = {
-     .name = "virtio/virtqueues",
-     .version_id = 1,
-@@ -2402,6 +2420,18 @@ static const VMStateDescription vmstate_virtio_virtqueues = {
-     }
- };
- 
-+static const VMStateDescription vmstate_virtio_packed_virtqueues = {
-+    .name = "virtio/packed_virtqueues",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = &virtio_packed_virtqueue_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_STRUCT_VARRAY_POINTER_KNOWN(vq, struct VirtIODevice,
-+                      VIRTIO_QUEUE_MAX, 0, vmstate_packed_virtqueue, VirtQueue),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_ringsize = {
-     .name = "ringsize_state",
-     .version_id = 1,
-@@ -2522,6 +2552,7 @@ static const VMStateDescription vmstate_virtio = {
-         &vmstate_virtio_ringsize,
-         &vmstate_virtio_broken,
-         &vmstate_virtio_extra_state,
-+        &vmstate_virtio_packed_virtqueues,
-         NULL
-     }
- };
-@@ -2794,6 +2825,17 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-                 virtio_queue_update_rings(vdev, i);
-             }
- 
-+            if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+                vdev->vq[i].shadow_avail_idx = vdev->vq[i].last_avail_idx;
-+                vdev->vq[i].avail_wrap_counter =
-+                                        vdev->vq[i].last_avail_wrap_counter;
-+
-+                vdev->vq[i].used_idx = vdev->vq[i].last_avail_idx;
-+                vdev->vq[i].used_wrap_counter =
-+                                        vdev->vq[i].last_avail_wrap_counter;
-+                continue;
-+            }
-+
-             nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
-             /* Check it isn't doing strange things with descriptor numbers. */
-             if (nheads > vdev->vq[i].vring.num) {
-@@ -2955,17 +2997,34 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
- 
- uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
- {
--    return vdev->vq[n].last_avail_idx;
-+    uint16_t idx;
-+
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        idx = vdev->vq[n].last_avail_idx;
-+        idx |= ((int)vdev->vq[n].avail_wrap_counter) << 15;
-+    } else {
-+        idx = (int)vdev->vq[n].last_avail_idx;
-+    }
-+    return idx;
- }
- 
- void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx)
- {
--    vdev->vq[n].last_avail_idx = idx;
--    vdev->vq[n].shadow_avail_idx = idx;
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        vdev->vq[n].last_avail_idx = idx & 0x7fff;
-+        vdev->vq[n].avail_wrap_counter = !!(idx & 0x8000);
-+    } else {
-+        vdev->vq[n].last_avail_idx = idx;
-+        vdev->vq[n].shadow_avail_idx = idx;
-+    }
- }
- 
- void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
- {
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        return;
-+    }
-+
-     rcu_read_lock();
-     if (vdev->vq[n].vring.desc) {
-         vdev->vq[n].last_avail_idx = vring_used_idx(&vdev->vq[n]);
-@@ -2976,6 +3035,10 @@ void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
- 
- void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
- {
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        return;
-+    }
-+
-     rcu_read_lock();
-     if (vdev->vq[n].vring.desc) {
-         vdev->vq[n].used_idx = vring_used_idx(&vdev->vq[n]);
 -- 
-1.8.3.1
+-- Jason J. Herne (jjherne@linux.ibm.com)
