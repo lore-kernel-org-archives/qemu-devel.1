@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50106)
+Received: from eggs.gnu.org ([209.51.188.92]:51355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gtnVb-0000Cs-0b
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:54:59 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gtnbV-0002GE-21
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:01:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gtnOv-0003JU-03
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:48:05 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53296)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gtnOt-0003Fo-SE
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 00:48:04 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
-	<20190111104923.GD5010@dhcp-200-186.str.redhat.com>
-	<001001d4abf9$b6ea93e0$24bfbba0$@ru>
-	<20190114113520.GC6837@linux.fritz.box>
-In-Reply-To: <20190114113520.GC6837@linux.fritz.box>
-Date: Wed, 13 Feb 2019 08:47:57 +0300
-Message-ID: <001801d4c35f$ac572a10$05057e30$@ru>
+	(envelope-from <aik@ozlabs.ru>) id 1gtnbT-0004dQ-Lk
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:01:04 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40091)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gtnbP-0004Ui-K6
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:01:01 -0500
+Received: by mail-pl1-x644.google.com with SMTP id bj4so667573plb.7
+	for <qemu-devel@nongnu.org>; Tue, 12 Feb 2019 22:00:55 -0800 (PST)
+References: <20190201004012.13237-1-aik@ozlabs.ru>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <b799d329-3336-715f-bf03-776856ecb1bf@ozlabs.ru>
+Date: Wed, 13 Feb 2019 17:00:50 +1100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <20190201004012.13237-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v9 19/21] replay: add BH oneshot event for
- block layer
+Subject: Re: [Qemu-devel] [PATCH qemu] spapr/rtas: Force big endian compile
+ for rtas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Kevin Wolf' <kwolf@redhat.com>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 14.01.2019 um 12:10 hat Pavel Dovgalyuk geschrieben:
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > Am 09.01.2019 um 13:13 hat Pavel Dovgalyuk geschrieben:
-> > > > Replay is capable of recording normal BH events, but sometimes
-> > > > there are single use callbacks scheduled with aio_bh_schedule_oneshot
-> > > > function. This patch enables recording and replaying such callbacks.
-> > > > Block layer uses these events for calling the completion function.
-> > > > Replaying these calls makes the execution deterministic.
-> > > >
-> > > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > >
-> > > This still doesn't come even close to catching all BHs that need to be
-> > > caught. While you managed to show a few BHs that actually don't need to
-> > > be considered for recording when I asked for this in v7, most BHs in the
-> > > block layer can in some way lead to device callbacks and must therefore
-> > > be recorded.
-> >
-> > Let's have a brief review. I can change all the places, but how
-> > should I make a test case to be sure, that all of them are working ok?
+
+
+On 01/02/2019 11:40, Alexey Kardashevskiy wrote:
+> At the moment the rtas's Makefile uses generic QEMU rules which means
+> that when QEMU is compiled on a little endian system, the spapr-rtas.bin
+> is compiled as little endian too which is incorrect as it is always
+> executed in big endian mode.
 > 
-> The list is changing all the time. This is why I am so concerned about
-> special-casing a few callers instead of having a generic solution. I
-> don't know how we could make sure that we call the right function
-> everywhere.
+> This enforces -mbig by defining %.o:%.S rule as spapr-rtas.bin is
+> a standalone guest binary which should not depend on QEMU flags anyway.
 
-I changed all oneshot invocations in the block layer in the new version.
-Can you review it and other block-related patches?
+Bag? Good? Useless? :)
 
-Pavel Dovgalyuk
+
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  pc-bios/spapr-rtas/Makefile | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/spapr-rtas/Makefile b/pc-bios/spapr-rtas/Makefile
+> index f26dd42..4b9bb12 100644
+> --- a/pc-bios/spapr-rtas/Makefile
+> +++ b/pc-bios/spapr-rtas/Makefile
+> @@ -14,8 +14,11 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/spapr-rtas)
+>  
+>  build-all: spapr-rtas.bin
+>  
+> +%.o: %.S
+> +	$(call quiet-command,$(CCAS) -mbig -c -o $@ $<,"CCAS","$(TARGET_DIR)$@")
+> +
+>  %.img: %.o
+> -	$(call quiet-command,$(CC) -nostdlib -o $@ $<,"Building","$(TARGET_DIR)$@")
+> +	$(call quiet-command,$(CC) -nostdlib -mbig -o $@ $<,"Building","$(TARGET_DIR)$@")
+>  
+>  %.bin: %.img
+>  	$(call quiet-command,$(OBJCOPY) -O binary -j .text $< $@,"Building","$(TARGET_DIR)$@")
+> 
+
+-- 
+Alexey
