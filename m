@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38165)
+Received: from eggs.gnu.org ([209.51.188.92]:42377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gu17U-0001jA-0m
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:27:00 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gu1Qm-0006Za-KL
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gu0vq-0008HB-Uj
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:14:59 -0500
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:34253)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gu0vq-0008Fo-Oy
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:14:58 -0500
-Received: by mail-pf1-x42d.google.com with SMTP id j18so1720796pfe.1
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 12:14:58 -0800 (PST)
-Date: Wed, 13 Feb 2019 12:14:56 -0800 (PST)
-In-Reply-To: <49bd9805-2f40-7d5d-8814-e0a59a9c5be1@redhat.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-88540c09-3b63-4408-b3e8-4e16c9cded81@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] SiFive RISC-V GPIO Device
+	(envelope-from <laurent@vivier.eu>) id 1gu1Qk-0003Ey-Uc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:46:56 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:59095)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gu1Qj-00036I-Gd
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 15:46:54 -0500
+References: <1550076626-7202-1-git-send-email-sandra@codesourcery.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a48ece75-537d-72e9-8851-bc7a801f77af@vivier.eu>
+Date: Wed, 13 Feb 2019 21:46:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <1550076626-7202-1-git-send-email-sandra@codesourcery.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Fix breakpoint support in Nios II
+ user-mode emulation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, alistair23@gmail.com, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org, chouteau@adacore.com, mjc@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>
+To: Sandra Loosemore <sandra@codesourcery.com>, qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
-On Wed, 13 Feb 2019 10:54:08 PST (-0800), thuth@redhat.com wrote:
-> On 2019-02-13 18:14, Peter Maydell wrote:
->> On Wed, 13 Feb 2019 at 00:13, Alistair Francis <alistair23@gmail.com> wrote:
->>> I know the other RISC-V files don't do it, but this should go in the
->>> hw/gpio directory instead of hw/riscv.
->>
->> It might be nice to move those existing riscv devices into
->> their proper places at some point: should be a fairly easy
->> cleanup patch if somebody wants to take it on. (Advice
->> on what should live where available on request.)
->
-> If devices only work on riscv, they should IMHO stay in hw/riscv/. I
-> think hw/gpio/ and friends should primarily be used if a device is
-> shared between architectures. If they stay in hw/riscv/ it is way easier
-> to match the devices with wildcards in the MAINTAINERS file. Just my
-> 0.02 € only, of course.
+CC'ing NiosII Maintainers
 
-FWIW, I generally consider things like SiFive's GPIO controller to have nothing 
-to do with RISC-V and therefor don't belong in hw/riscv.  That said, I don't 
-really care that much so I'm happy with pretty much any source code 
-organization that works for everyone else.  Let me know if we should move them 
-around.
+On 13/02/2019 17:50, Sandra Loosemore wrote:
+> Nios II user-mode emulation was missing handling for EXCP_DEBUG,
+> making the gdb stub essentially useless.  This patch adds the missing
+> piece.  The new code was copied from the existing EXCP_TRAP handling
+> and is also similar to what other targets (e.g., arm) do with EXCP_DEBUG.
+> 
+> Signed-off-by: Sandra Loosemore <sandra@codesourcery.com>
+> ---
+>  linux-user/nios2/cpu_loop.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
+> index b96b1aa..5aa1eca 100644
+> --- a/linux-user/nios2/cpu_loop.c
+> +++ b/linux-user/nios2/cpu_loop.c
+> @@ -73,6 +73,12 @@ void cpu_loop(CPUNios2State *env)
+>                  queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+>                  break;
+>              }
+> +        case EXCP_DEBUG:
+> +            info.si_signo = TARGET_SIGTRAP;
+> +            info.si_errno = 0;
+> +            info.si_code = TARGET_TRAP_BRKPT;
+> +            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +            break;
+>          case 0xaa:
+>              switch (env->regs[R_PC]) {
+>              /*case 0x1000:*/  /* TODO:__kuser_helper_version */
+> 
