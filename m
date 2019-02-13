@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51907)
+Received: from eggs.gnu.org ([209.51.188.92]:52129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtqG3-00024X-SQ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:51:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtqFz-0002Kh-Gg
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:51:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gtq4d-0005iQ-AY
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:39:21 -0500
+	(envelope-from <thuth@redhat.com>) id 1gtq59-000692-KY
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:39:53 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 13 Feb 2019 09:38:03 +0100
-Message-Id: <1550047098-1210-11-git-send-email-thuth@redhat.com>
+Date: Wed, 13 Feb 2019 09:38:14 +0100
+Message-Id: <1550047098-1210-22-git-send-email-thuth@redhat.com>
 In-Reply-To: <1550047098-1210-1-git-send-email-thuth@redhat.com>
 References: <1550047098-1210-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/25] hw/arm: Express dependencies of
- xilinx-zynq with Kconfig
+Subject: [Qemu-devel] [PATCH v2 21/25] hw/arm: Express dependencies for
+ remaining IMX boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +23,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: yang.zhong@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, philmd@redhat.com
 
-Add Kconfig dependencies for the xilinx-zynq-a9 board.
-This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+IMX25, IMX7 and IMX6UL were still missing the Kconfig dependencies.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak |  7 +------
- hw/arm/Kconfig                  | 14 ++++++++++++++
- 2 files changed, 15 insertions(+), 6 deletions(-)
+ default-configs/arm-softmmu.mak |  2 --
+ hw/arm/Kconfig                  | 18 ++++++++++++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 1db76f6..5c43bb3 100644
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 5eceeba..ebe5de6 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -15,6 +15,7 @@ CONFIG_STELLARIS=3Dy
- CONFIG_REALVIEW=3Dy
- CONFIG_VERSATILE=3Dy
- CONFIG_VEXPRESS=3Dy
-+CONFIG_ZYNQ=3Dy
- CONFIG_MAINSTONE=3Dy
- CONFIG_GUMSTIX=3Dy
- CONFIG_SPITZ=3Dy
-@@ -34,16 +35,11 @@ CONFIG_VIRTIO_MMIO=3Dy
-=20
- CONFIG_NETDUINO2=3Dy
-=20
--CONFIG_PL330=3Dy
--CONFIG_CADENCE=3Dy
- CONFIG_FRAMEBUFFER=3Dy
--CONFIG_XILINX_SPIPS=3Dy
--CONFIG_ZYNQ_DEVCFG=3Dy
-=20
- CONFIG_DIGIC=3Dy
- CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
--CONFIG_ZYNQ=3Dy
- CONFIG_STM32F2XX_TIMER=3Dy
- CONFIG_STM32F2XX_USART=3Dy
- CONFIG_STM32F2XX_SYSCFG=3Dy
-@@ -98,7 +94,6 @@ CONFIG_SMBUS_EEPROM=3Dy
- CONFIG_GPIO_KEY=3Dy
- CONFIG_MSF2=3Dy
- CONFIG_FW_CFG_DMA=3Dy
--CONFIG_XILINX_AXI=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
-=20
- CONFIG_STRONGARM=3Dy
+@@ -33,7 +33,6 @@ CONFIG_SABRELITE=y
+ CONFIG_EMCRAFT_SF2=y
+ 
+ CONFIG_VGA=y
+-CONFIG_IMX_FEC=y
+ 
+ CONFIG_NRF51_SOC=y
+ 
+@@ -45,4 +44,3 @@ CONFIG_PCIE_PORT=y
+ CONFIG_XIO3130=y
+ CONFIG_IOH3420=y
+ CONFIG_I82801B11=y
+-CONFIG_PCI_EXPRESS_DESIGNWARE=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 95f2713..67f1228 100644
+index cebb410..c2fba8e 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -208,6 +208,20 @@ config VEXPRESS
-=20
- config ZYNQ
+@@ -295,6 +295,10 @@ config XLNX_VERSAL
+ 
+ config FSL_IMX25
      bool
-+    select A9MPCORE
-+    select CADENCE # UART
-+    select PCI
-+    select PFLASH_CFI02
-+    select PL330
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select DS1338
+ 
+ config FSL_IMX31
+     bool
+@@ -309,6 +313,7 @@ config FSL_IMX6
+     select A9MPCORE
+     select IMX
+     select IMX_I2C
 +    select SDHCI
-+    select SSI_M25P80
-+    select USB_EHCI
-+    select USB_EHCI_SYSBUS
-+    select XILINX # UART
-+    select XILINX_AXI
-+    select XILINX_SPI
-+    select XILINX_SPIPS
-+    select ZYNQ_DEVCFG
-=20
- config ARM_V7M
+ 
+ config ASPEED_SOC
      bool
---=20
+@@ -348,12 +353,25 @@ config IOTKIT
+ 
+ config FSL_IMX7
+     bool
++    imply PCI_DEVICES
++    select A15MPCORE
++    select PCI
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select PCI_EXPRESS_DESIGNWARE
++    select SDHCI
+ 
+ config ARM_SMMUV3
+     bool
+ 
+ config FSL_IMX6UL
+     bool
++    select A15MPCORE
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select SDHCI
+ 
+ config NRF51_SOC
+     bool
+-- 
 1.8.3.1
