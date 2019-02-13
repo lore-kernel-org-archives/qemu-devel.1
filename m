@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33507)
+Received: from eggs.gnu.org ([209.51.188.92]:33309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gtodU-0003Tw-Sx
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:07:14 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtodU-0003Ky-68
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 02:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gtoQu-0003sY-QE
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:54:13 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:59648)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gtoQw-0003ua-TM
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:54:16 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:55112)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gtoQu-0003r4-H6
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:54:12 -0500
+	id 1gtoQw-0003ti-Kt
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 01:54:14 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Wed, 13 Feb 2019 08:53:49 +0200
-Message-Id: <20190213065357.16076-3-yuval.shaia@oracle.com>
+Date: Wed, 13 Feb 2019 08:53:50 +0200
+Message-Id: <20190213065357.16076-4-yuval.shaia@oracle.com>
 In-Reply-To: <20190213065357.16076-1-yuval.shaia@oracle.com>
 References: <20190213065357.16076-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v1 2/9] hw/rdma: Introduce locked qlist
+Subject: [Qemu-devel] [PATCH v2 2/9] hw/rdma: Introduce protected qlist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +26,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-To make code more readable move handling of locked list to a generic
-functions.
+To make code more readable move handling of protected list to a
+rdma_utils
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
@@ -38,7 +38,7 @@ Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
  4 files changed, 55 insertions(+), 21 deletions(-)
 
 diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index 5f60856d19..2f6372f8f0 100644
+index 5f60856d19..6e9c4617da 100644
 --- a/hw/rdma/rdma_backend.c
 +++ b/hw/rdma/rdma_backend.c
 @@ -527,9 +527,7 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
@@ -48,7 +48,7 @@ index 5f60856d19..2f6372f8f0 100644
 -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
 -    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
 -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
-+    rdma_locked_list_append_int64(&backend_dev->recv_mads_list, bctx_id);
++    rdma_protected_qlist_append_int64(&backend_dev->recv_mads_list, bctx_id);
  
      return 0;
  }
@@ -67,7 +67,7 @@ index 5f60856d19..2f6372f8f0 100644
 -    o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
 -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
 -    if (!o_ctx_id) {
-+    cqe_ctx_id = rdma_locked_list_pop_int64(&backend_dev->recv_mads_list);
++    cqe_ctx_id = rdma_protected_qlist_pop_int64(&backend_dev->recv_mads_list);
 +    if (cqe_ctx_id == -ENOENT) {
          rdma_warn_report("No more free MADs buffers, waiting for a while");
          sleep(THR_POLL_TO);
@@ -84,7 +84,7 @@ index 5f60856d19..2f6372f8f0 100644
  
 -    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
 -    backend_dev->recv_mads_list.list = qlist_new();
-+    rdma_locked_list_init(&backend_dev->recv_mads_list);
++    rdma_protected_qlist_init(&backend_dev->recv_mads_list);
  
      enable_rdmacm_mux_async(backend_dev);
  
@@ -96,12 +96,12 @@ index 5f60856d19..2f6372f8f0 100644
 -        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
 -        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
 -    }
-+    rdma_locked_list_destroy(&backend_dev->recv_mads_list);
++    rdma_protected_qlist_destroy(&backend_dev->recv_mads_list);
  }
  
  int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
 diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-index 15ae8b970e..bec0457f25 100644
+index 15ae8b970e..a8c15b09ab 100644
 --- a/hw/rdma/rdma_backend_defs.h
 +++ b/hw/rdma/rdma_backend_defs.h
 @@ -20,6 +20,7 @@
@@ -129,12 +129,12 @@ index 15ae8b970e..bec0457f25 100644
      struct ibv_comp_channel *channel;
      uint8_t port_num;
 -    RecvMadList recv_mads_list;
-+    LockedList recv_mads_list;
++    RdmaProtectedQList recv_mads_list;
      RdmaCmMux rdmacm_mux;
  } RdmaBackendDev;
  
 diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
-index f1c980c6be..a2a4ea2a15 100644
+index f1c980c6be..672a09079a 100644
 --- a/hw/rdma/rdma_utils.c
 +++ b/hw/rdma/rdma_utils.c
 @@ -14,6 +14,8 @@
@@ -151,13 +151,13 @@ index f1c980c6be..a2a4ea2a15 100644
      }
  }
 +
-+void rdma_locked_list_init(LockedList *list)
++void rdma_protected_qlist_init(RdmaProtectedQList *list)
 +{
 +    qemu_mutex_init(&list->lock);
 +    list->list = qlist_new();
 +}
 +
-+void rdma_locked_list_destroy(LockedList *list)
++void rdma_protected_qlist_destroy(RdmaProtectedQList *list)
 +{
 +    if (list->list) {
 +        qlist_destroy_obj(QOBJECT(list->list));
@@ -166,14 +166,14 @@ index f1c980c6be..a2a4ea2a15 100644
 +    }
 +}
 +
-+void rdma_locked_list_append_int64(LockedList *list, int64_t value)
++void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value)
 +{
 +    qemu_mutex_lock(&list->lock);
 +    qlist_append_int(list->list, value);
 +    qemu_mutex_unlock(&list->lock);
 +}
 +
-+int64_t rdma_locked_list_pop_int64(LockedList *list)
++int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
 +{
 +    QObject *obj;
 +
@@ -188,24 +188,24 @@ index f1c980c6be..a2a4ea2a15 100644
 +    return qnum_get_uint(qobject_to(QNum, obj));
 +}
 diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-index acd148837f..4ba9956f81 100644
+index acd148837f..a8bf1d4fec 100644
 --- a/hw/rdma/rdma_utils.h
 +++ b/hw/rdma/rdma_utils.h
 @@ -29,8 +29,17 @@
  #define rdma_info_report(fmt, ...) \
      info_report("%s: " fmt, "rdma", ## __VA_ARGS__)
  
-+typedef struct LockedList {
++typedef struct RdmaProtectedQList {
 +    QemuMutex lock;
 +    QList *list;
-+} LockedList;
++} RdmaProtectedQList;
 +
  void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
  void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
-+void rdma_locked_list_init(LockedList *list);
-+void rdma_locked_list_destroy(LockedList *list);
-+void rdma_locked_list_append_int64(LockedList *list, int64_t value);
-+int64_t rdma_locked_list_pop_int64(LockedList *list);
++void rdma_protected_qlist_init(RdmaProtectedQList *list);
++void rdma_protected_qlist_destroy(RdmaProtectedQList *list);
++void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t value);
++int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list);
  
  static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
  {
