@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39405)
+Received: from eggs.gnu.org ([209.51.188.92]:39445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGL-0004KJ-Es
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:54 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGP-0004Oe-Le
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGJ-0005e9-FW
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32770)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gtxGO-0005ho-TK
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gtxGH-0005cN-NS
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:51 -0500
+	id 1gtxGN-0005gW-DY
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 11:19:56 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Feb 2019 17:19:03 +0100
-Message-Id: <20190213161913.22107-16-marcandre.lureau@redhat.com>
+Date: Wed, 13 Feb 2019 17:19:06 +0100
+Message-Id: <20190213161913.22107-19-marcandre.lureau@redhat.com>
 In-Reply-To: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 References: <20190213161913.22107-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 15/25] chardev: disallow TLS/telnet/websocket
- with tcp_chr_wait_connected
+Subject: [Qemu-devel] [PULL v2 18/25] chardev: ensure termios is fully
+ initialized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +33,28 @@ Cc: peter.maydell@linaro.org
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-In the previous commit
+valgrind on the test-char.c code reports that 'struct termios' contains
+uninitialized memory.
 
-    commit 1dc8a6695c731abb7461c637b2512c3670d82be4
-    Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-    Date:   Tue Aug 16 12:33:32 2016 +0400
-
-      char: fix waiting for TLS and telnet connection
-
-the tcp_chr_wait_connected() method was changed to check for a non-NULL
-'s->ioc' as a sign that there is already a connection present, as
-opposed to checking the "connected" flag to supposedly fix handling of
-TLS/telnet connections.
-
-The original code would repeatedly call tcp_chr_wait_connected creating
-many connections as 'connected' would never become true. The changed
-code would still repeatedly call tcp_chr_wait_connected busy waiting
-because s->ioc is set but the chardev will never see CHR_EVENT_OPENED.
-IOW, the code is still broken with TLS/telnet, but in a different way.
-
-Checking for a non-NULL 's->ioc' does not mean that a CHR_EVENT_OPENED
-will be ready for a TLS/telnet connection. These protocols (and the
-websocket protocol) all require the main loop to be running in order
-to complete the protocol handshake before emitting CHR_EVENT_OPENED.
-The tcp_chr_wait_connected() method is only used during early startup
-before a main loop is running, so TLS/telnet/websock connections can
-never complete initialization.
-
-Making this work would require changing tcp_chr_wait_connected to run
-a main loop. This is quite complex since we must not allow GSource's
-that other parts of QEMU have registered to run yet. The current callers
-of tcp_chr_wait_connected do not require use of the TLS/telnet/websocket
-protocols, so the simplest option is to just forbid this combination
-completely for now.
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190211182442.8542-14-berrange@redhat.com>
+Message-Id: <20190211182442.8542-17-berrange@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-socket.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ chardev/char-serial.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 7db20ff0a0..86c1f502d6 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -951,8 +951,20 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
- static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
+diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+index 3299b46853..a8bae31b8d 100644
+--- a/chardev/char-serial.c
++++ b/chardev/char-serial.c
+@@ -57,7 +57,7 @@ static void qmp_chardev_open_serial(Chardev *chr,
+ static void tty_serial_init(int fd, int speed,
+                             int parity, int data_bits, int stop_bits)
  {
-     SocketChardev *s =3D SOCKET_CHARDEV(chr);
--    /* It can't wait on s->connected, since it is set asynchronously
--     * in TLS and telnet cases, only wait for an accepted socket */
-+    const char *opts[] =3D { "telnet", "tn3270", "websock", "tls-creds" =
-};
-+    bool optset[] =3D { s->is_telnet, s->is_tn3270, s->is_websock, s->tl=
-s_creds };
-+    size_t i;
-+
-+    QEMU_BUILD_BUG_ON(G_N_ELEMENTS(opts) !=3D G_N_ELEMENTS(optset));
-+    for (i =3D 0; i < G_N_ELEMENTS(opts); i++) {
-+        if (optset[i]) {
-+            error_setg(errp,
-+                       "'%s' option is incompatible with waiting for "
-+                       "connection completion", opts[i]);
-+            return -1;
-+        }
-+    }
-+
-     while (!s->ioc) {
-         if (s->is_listen) {
-             tcp_chr_accept_server_sync(chr);
+-    struct termios tty;
++    struct termios tty =3D {0};
+     speed_t spd;
+=20
+ #if 0
 --=20
 2.21.0.rc0.1.g036caf7885
