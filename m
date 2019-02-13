@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43645)
+Received: from eggs.gnu.org ([209.51.188.92]:43707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gtvst-0003MO-2r
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:51:36 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtvtF-0003NW-JF
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:51:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gtvsq-0007h8-Ug
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:51:34 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35225)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
-	id 1gtvso-0007Yu-U5
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:51:31 -0500
-Received: by mail-wm1-x343.google.com with SMTP id t200so2734029wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 06:51:24 -0800 (PST)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Wed, 13 Feb 2019 16:51:16 +0200
-Message-Id: <20190213145116.20654-1-yuri.benditovich@daynix.com>
-Subject: [Qemu-devel] [PATCH] virtio-net: do not start queues that are not
- enabled by the guest
+	(envelope-from <jjherne@linux.ibm.com>) id 1gtviA-0002eU-QL
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:40:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56480
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gtviA-0002WD-Jp
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 09:40:30 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1DEX2PM071332
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:40:27 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qmmywgtr1-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:40:27 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 13 Feb 2019 14:40:26 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-8-git-send-email-jjherne@linux.ibm.com>
+	<20190204115758.765941f1.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 13 Feb 2019 09:40:18 -0500
+MIME-Version: 1.0
+In-Reply-To: <20190204115758.765941f1.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <40fc0f74-8987-2808-7ad9-fd5e3d54a0be@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 07/15] s390-bios: Decouple channel i/o
+ logic from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +46,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, yan@daynix.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1608226
-On startup/link-up in multiqueue configuration the virtio-net
-tries to starts all the queues, including those that the guest
-will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
-If the guest driver does not allocate queues that it will not
-use (for example, Windows driver does not) and number of actually
-used queues is less that maximal number supported by the device,
-this causes vhost_net_start to fail and actually disables vhost
-for all the queues, reducing the performance.
-Current commit fixes this: initially only first queue is started,
-upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
-requested by the guest.
+On 2/4/19 5:57 AM, Cornelia Huck wrote:
+> On Tue, 29 Jan 2019 08:29:14 -0500
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> 
+>> Create a separate library for channel i/o related code. This decouples
+>> channel i/o operations from virtio and allows us to make use of them for
+>> the real dasd boot path.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/Makefile        |  2 +-
+>>   pc-bios/s390-ccw/cio.c           | 41 ++++++++++++++++++++++++++++++++++++++++
+>>   pc-bios/s390-ccw/cio.h           |  3 +++
+>>   pc-bios/s390-ccw/main.c          |  1 +
+>>   pc-bios/s390-ccw/netboot.mak     |  2 +-
+>>   pc-bios/s390-ccw/netmain.c       |  1 +
+>>   pc-bios/s390-ccw/s390-ccw.h      |  1 -
+>>   pc-bios/s390-ccw/virtio-blkdev.c |  1 +
+>>   pc-bios/s390-ccw/virtio.c        | 27 ++------------------------
+>>   9 files changed, 51 insertions(+), 28 deletions(-)
+>>   create mode 100644 pc-bios/s390-ccw/cio.c
+>>
+> 
+>> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+>> new file mode 100644
+>> index 0000000..095f79b
+>> --- /dev/null
+>> +++ b/pc-bios/s390-ccw/cio.c
+>> @@ -0,0 +1,41 @@
+>> +/*
+>> + * S390 Channel I/O
+>> + *
+>> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>> + * your option) any later version. See the COPYING file in the top-level
+>> + * directory.
+>> + */
+> 
+> Not sure that copyright header is correct. You moved some code that
+> probably should be copyright IBM (although that was never added to the
+> header in the first place...) Also not sure if Alex has some copyrights
+> on the code you moved, or if that is only trivial stuff. (Don't want to
+> be difficult, but we should try to get this right.)
+> 
+>> +
+>> +#include "libc.h"
+>> +#include "s390-ccw.h"
+>> +#include "cio.h"
+>> +
+>> +static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+>> +
+>> +int enable_mss_facility(void)
+>> +{
+>> +    int ret;
+>> +    ChscAreaSda *sda_area = (ChscAreaSda *) chsc_page;
+>> +
+>> +    memset(sda_area, 0, PAGE_SIZE);
+>> +    sda_area->request.length = 0x0400;
+>> +    sda_area->request.code = 0x0031;
+>> +    sda_area->operation_code = 0x2;
+>> +
+>> +    ret = chsc(sda_area);
+>> +    if ((ret == 0) && (sda_area->response.code == 0x0001)) {
+>> +        return 0;
+>> +    }
+>> +    return -EIO;
+>> +}
+>> +
+>> +void enable_subchannel(SubChannelId schid)
+>> +{
+>> +    Schib schib;
+>> +
+>> +    stsch_err(schid, &schib);
+>> +    schib.pmcw.ena = 1;
+>> +    msch(schid, &schib);
+>> +}
+> 
+> (...)
+> 
+>> diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
+>> index 11c5626..d2e7fcd 100644
+>> --- a/pc-bios/s390-ccw/virtio-blkdev.c
+>> +++ b/pc-bios/s390-ccw/virtio-blkdev.c
+>> @@ -10,6 +10,7 @@
+>>   
+>>   #include "libc.h"
+>>   #include "s390-ccw.h"
+>> +#include "cio.h"
+> 
+> Not sure why you need to add this here?
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/virtio-net.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 3f319ef723..d3b1ac6d3a 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(n);
-     NetClientState *nc = qemu_get_queue(n->nic);
--    int queues = n->multiqueue ? n->max_queues : 1;
-+    int queues = n->multiqueue ? n->curr_queues : 1;
- 
-     if (!get_vhost_net(nc->peer)) {
-         return;
-@@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
-         return VIRTIO_NET_ERR;
-     }
- 
--    n->curr_queues = queues;
-     /* stop the backend before changing the number of queues to avoid handling a
-      * disabled queue */
-+    virtio_net_set_status(vdev, 0);
-+
-+    n->curr_queues = queues;
-+
-     virtio_net_set_status(vdev, vdev->status);
-     virtio_net_set_queues(n);
- 
--- 
-2.17.1
+Hmmm... I removed it and the code compiles cleanly... I was *sure* I needed this a while 
+go. Perhaps something changed? --
+-- Jason J. Herne (jjherne@linux.ibm.com)
