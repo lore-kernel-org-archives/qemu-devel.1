@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59935)
+Received: from eggs.gnu.org ([209.51.188.92]:60196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gtwtU-00024J-2w
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:56:26 -0500
+	(envelope-from <palmer@sifive.com>) id 1gtwtl-0002NR-Io
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:56:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gtwtM-0002yN-L7
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:56:15 -0500
-Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:46344)
+	(envelope-from <palmer@sifive.com>) id 1gtwtO-000324-4J
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:56:25 -0500
+Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:40734)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gtwtM-0001mc-69
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:56:08 -0500
-Received: by mail-pf1-x433.google.com with SMTP id g6so1306608pfh.13
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:55:19 -0800 (PST)
-Date: Wed, 13 Feb 2019 07:54:05 -0800
-Message-Id: <20190213155414.22285-27-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gtwtN-0001Xe-QY
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 10:56:09 -0500
+Received: by mail-pl1-x634.google.com with SMTP id bj4so1343501plb.7
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 07:55:13 -0800 (PST)
+Date: Wed, 13 Feb 2019 07:54:01 -0800
+Message-Id: <20190213155414.22285-23-palmer@sifive.com>
 In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
 References: <20190213155414.22285-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PATCH v7 26/35] target/riscv: Remove shift and slt
- insn manual decoding
+Subject: [Qemu-devel] [PATCH v7 22/35] target/riscv: Remove manual decoding
+ from gen_load()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,244 +31,122 @@ Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, 
 
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
+With decodetree we don't need to convert RISC-V opcodes into to MemOps
+as the old gen_load() did.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/insn_trans/trans_rvi.inc.c | 93 +++++++++++++++++--------
- target/riscv/translate.c                | 59 +++++-----------
- 2 files changed, 81 insertions(+), 71 deletions(-)
+ target/riscv/insn_trans/trans_rvi.inc.c | 35 +++++++++++++++----------
+ target/riscv/translate.c                |  6 +++--
+ 2 files changed, 25 insertions(+), 16 deletions(-)
 
 diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index d322ddf7fc21..d94b371b4d00 100644
+index 000cb6a37bdd..a3e00140d7d0 100644
 --- a/target/riscv/insn_trans/trans_rvi.inc.c
 +++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -220,30 +220,25 @@ static bool trans_addi(DisasContext *ctx, arg_addi *a)
-     return gen_arith_imm(ctx, a, &tcg_gen_add_tl);
+@@ -129,34 +129,43 @@ static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
+     return gen_branch(ctx, a, TCG_COND_GEU);
  }
  
--static bool trans_slti(DisasContext *ctx, arg_slti *a)
-+static void gen_slt(TCGv ret, TCGv s1, TCGv s2)
+-static bool trans_lb(DisasContext *ctx, arg_lb *a)
++static bool gen_load(DisasContext *ctx, arg_lb *a, TCGMemOp memop)
  {
--    TCGv source1;
--    source1 = tcg_temp_new();
--    gen_get_gpr(source1, a->rs1);
-+    tcg_gen_setcond_tl(TCG_COND_LT, ret, s1, s2);
+-    gen_load(ctx, OPC_RISC_LB, a->rd, a->rs1, a->imm);
++    TCGv t0 = tcg_temp_new();
++    TCGv t1 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++    tcg_gen_addi_tl(t0, t0, a->imm);
++
++    tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, memop);
++    gen_set_gpr(a->rd, t1);
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
+     return true;
+ }
+ 
++static bool trans_lb(DisasContext *ctx, arg_lb *a)
++{
++    return gen_load(ctx, a, MO_SB);
 +}
 +
-+static void gen_sltu(TCGv ret, TCGv s1, TCGv s2)
-+{
-+    tcg_gen_setcond_tl(TCG_COND_LTU, ret, s1, s2);
-+}
- 
--    tcg_gen_setcondi_tl(TCG_COND_LT, source1, source1, a->imm);
- 
--    gen_set_gpr(a->rd, source1);
--    tcg_temp_free(source1);
+ static bool trans_lh(DisasContext *ctx, arg_lh *a)
+ {
+-    gen_load(ctx, OPC_RISC_LH, a->rd, a->rs1, a->imm);
 -    return true;
-+static bool trans_slti(DisasContext *ctx, arg_slti *a)
-+{
-+    return gen_arith_imm(ctx, a, &gen_slt);
++    return gen_load(ctx, a, MO_TESW);
  }
  
- static bool trans_sltiu(DisasContext *ctx, arg_sltiu *a)
+ static bool trans_lw(DisasContext *ctx, arg_lw *a)
  {
--    TCGv source1;
--    source1 = tcg_temp_new();
--    gen_get_gpr(source1, a->rs1);
--
--    tcg_gen_setcondi_tl(TCG_COND_LTU, source1, source1, a->imm);
--
--    gen_set_gpr(a->rd, source1);
--    tcg_temp_free(source1);
+-    gen_load(ctx, OPC_RISC_LW, a->rd, a->rs1, a->imm);
 -    return true;
-+    return gen_arith_imm(ctx, a, &gen_sltu);
++    return gen_load(ctx, a, MO_TESL);
  }
  
- static bool trans_xori(DisasContext *ctx, arg_xori *a)
-@@ -322,20 +317,17 @@ static bool trans_sub(DisasContext *ctx, arg_sub *a)
- 
- static bool trans_sll(DisasContext *ctx, arg_sll *a)
+ static bool trans_lbu(DisasContext *ctx, arg_lbu *a)
  {
--    gen_arith(ctx, OPC_RISC_SLL, a->rd, a->rs1, a->rs2);
+-    gen_load(ctx, OPC_RISC_LBU, a->rd, a->rs1, a->imm);
 -    return true;
-+    return gen_shift(ctx, a, &tcg_gen_shl_tl);
++    return gen_load(ctx, a, MO_UB);
  }
  
- static bool trans_slt(DisasContext *ctx, arg_slt *a)
+ static bool trans_lhu(DisasContext *ctx, arg_lhu *a)
  {
--    gen_arith(ctx, OPC_RISC_SLT, a->rd, a->rs1, a->rs2);
+-    gen_load(ctx, OPC_RISC_LHU, a->rd, a->rs1, a->imm);
 -    return true;
-+    return trans_arith(ctx, a, &gen_slt);
++    return gen_load(ctx, a, MO_TEUW);
  }
  
- static bool trans_sltu(DisasContext *ctx, arg_sltu *a)
+ static bool trans_sb(DisasContext *ctx, arg_sb *a)
+@@ -180,14 +189,12 @@ static bool trans_sw(DisasContext *ctx, arg_sw *a)
+ #ifdef TARGET_RISCV64
+ static bool trans_lwu(DisasContext *ctx, arg_lwu *a)
  {
--    gen_arith(ctx, OPC_RISC_SLTU, a->rd, a->rs1, a->rs2);
+-    gen_load(ctx, OPC_RISC_LWU, a->rd, a->rs1, a->imm);
 -    return true;
-+    return trans_arith(ctx, a, &gen_sltu);
++    return gen_load(ctx, a, MO_TEUL);
  }
  
- static bool trans_xor(DisasContext *ctx, arg_xor *a)
-@@ -345,14 +337,12 @@ static bool trans_xor(DisasContext *ctx, arg_xor *a)
- 
- static bool trans_srl(DisasContext *ctx, arg_srl *a)
+ static bool trans_ld(DisasContext *ctx, arg_ld *a)
  {
--    gen_arith(ctx, OPC_RISC_SRL, a->rd, a->rs1, a->rs2);
+-    gen_load(ctx, OPC_RISC_LD, a->rd, a->rs1, a->imm);
 -    return true;
-+    return gen_shift(ctx, a, &tcg_gen_shr_tl);
++    return gen_load(ctx, a, MO_TEQ);
  }
  
- static bool trans_sra(DisasContext *ctx, arg_sra *a)
- {
--    gen_arith(ctx, OPC_RISC_SRA, a->rd, a->rs1, a->rs2);
--    return true;
-+    return gen_shift(ctx, a, &tcg_gen_sar_tl);
- }
- 
- static bool trans_or(DisasContext *ctx, arg_or *a)
-@@ -419,19 +409,62 @@ static bool trans_subw(DisasContext *ctx, arg_subw *a)
- 
- static bool trans_sllw(DisasContext *ctx, arg_sllw *a)
- {
--    gen_arith(ctx, OPC_RISC_SLLW, a->rd, a->rs1, a->rs2);
-+    TCGv source1 = tcg_temp_new();
-+    TCGv source2 = tcg_temp_new();
-+
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+
-+    tcg_gen_andi_tl(source2, source2, 0x1F);
-+    tcg_gen_shl_tl(source1, source1, source2);
-+
-+    tcg_gen_ext32s_tl(source1, source1);
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-     return true;
- }
- 
- static bool trans_srlw(DisasContext *ctx, arg_srlw *a)
- {
--    gen_arith(ctx, OPC_RISC_SRLW, a->rd, a->rs1, a->rs2);
-+    TCGv source1 = tcg_temp_new();
-+    TCGv source2 = tcg_temp_new();
-+
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+
-+    /* clear upper 32 */
-+    tcg_gen_ext32u_tl(source1, source1);
-+    tcg_gen_andi_tl(source2, source2, 0x1F);
-+    tcg_gen_shr_tl(source1, source1, source2);
-+
-+    tcg_gen_ext32s_tl(source1, source1);
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-     return true;
- }
- 
- static bool trans_sraw(DisasContext *ctx, arg_sraw *a)
- {
--    gen_arith(ctx, OPC_RISC_SRAW, a->rd, a->rs1, a->rs2);
-+    TCGv source1 = tcg_temp_new();
-+    TCGv source2 = tcg_temp_new();
-+
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+
-+    /*
-+     * first, trick to get it to act like working on 32 bits (get rid of
-+     * upper 32, sign extend to fill space)
-+     */
-+    tcg_gen_ext32s_tl(source1, source1);
-+    tcg_gen_andi_tl(source2, source2, 0x1F);
-+    tcg_gen_sar_tl(source1, source1, source2);
-+
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+
-     return true;
- }
- #endif
+ static bool trans_sd(DisasContext *ctx, arg_sd *a)
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 99ff11778f8a..e707081351cd 100644
+index a3e77b88f6e9..82ccb7192921 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -199,47 +199,6 @@ static void gen_arith(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-     gen_get_gpr(source2, rs2);
- 
-     switch (opc) {
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_SLLW:
--        tcg_gen_andi_tl(source2, source2, 0x1F);
--        tcg_gen_shl_tl(source1, source1, source2);
--        break;
--#endif
--    case OPC_RISC_SLL:
--        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
--        tcg_gen_shl_tl(source1, source1, source2);
--        break;
--    case OPC_RISC_SLT:
--        tcg_gen_setcond_tl(TCG_COND_LT, source1, source1, source2);
--        break;
--    case OPC_RISC_SLTU:
--        tcg_gen_setcond_tl(TCG_COND_LTU, source1, source1, source2);
--        break;
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_SRLW:
--        /* clear upper 32 */
--        tcg_gen_ext32u_tl(source1, source1);
--        tcg_gen_andi_tl(source2, source2, 0x1F);
--        tcg_gen_shr_tl(source1, source1, source2);
--        break;
--#endif
--    case OPC_RISC_SRL:
--        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
--        tcg_gen_shr_tl(source1, source1, source2);
--        break;
--#if defined(TARGET_RISCV64)
--    case OPC_RISC_SRAW:
--        /* first, trick to get it to act like working on 32 bits (get rid of
--        upper 32, sign extend to fill space) */
--        tcg_gen_ext32s_tl(source1, source1);
--        tcg_gen_andi_tl(source2, source2, 0x1F);
--        tcg_gen_sar_tl(source1, source1, source2);
--        break;
--#endif
--    case OPC_RISC_SRA:
--        tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
--        tcg_gen_sar_tl(source1, source1, source2);
--        break;
-     CASE_OP_32_64(OPC_RISC_MUL):
-         if (!has_ext(ctx, RVM)) {
-             goto do_illegal;
-@@ -737,6 +696,24 @@ static bool trans_arith(DisasContext *ctx, arg_r *a,
-     return true;
+@@ -532,7 +532,8 @@ static void gen_jal(DisasContext *ctx, int rd, target_ulong imm)
+     ctx->base.is_jmp = DISAS_NORETURN;
  }
  
-+static bool gen_shift(DisasContext *ctx, arg_r *a,
-+                        void(*func)(TCGv, TCGv, TCGv))
-+{
-+    TCGv source1 = tcg_temp_new();
-+    TCGv source2 = tcg_temp_new();
-+
-+    gen_get_gpr(source1, a->rs1);
-+    gen_get_gpr(source2, a->rs2);
-+
-+    tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-+    (*func)(source1, source1, source2);
-+
-+    gen_set_gpr(a->rd, source1);
-+    tcg_temp_free(source1);
-+    tcg_temp_free(source2);
-+    return true;
-+}
-+
- /* Include insn module translation function */
- #include "insn_trans/trans_rvi.inc.c"
- #include "insn_trans/trans_rvm.inc.c"
+-static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
++#ifdef TARGET_RISCV64
++static void gen_load_c(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+         target_long imm)
+ {
+     TCGv t0 = tcg_temp_new();
+@@ -551,6 +552,7 @@ static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+ }
++#endif
+ 
+ static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
+         target_long imm)
+@@ -724,7 +726,7 @@ static void decode_RV32_64C0(DisasContext *ctx)
+     case 3:
+ #if defined(TARGET_RISCV64)
+         /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
+-        gen_load(ctx, OPC_RISC_LD, rd_rs2, rs1s,
++        gen_load_c(ctx, OPC_RISC_LD, rd_rs2, rs1s,
+                  GET_C_LD_IMM(ctx->opcode));
+ #else
+         /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
 -- 
 2.18.1
