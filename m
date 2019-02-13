@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59902)
+Received: from eggs.gnu.org ([209.51.188.92]:59932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtlvv-0003H4-RO
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvw-0003HX-Cp
 	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gtlvs-0005CA-Fa
-	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:03 -0500
-Date: Wed, 13 Feb 2019 12:38:51 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gtlvt-0005D2-9K
+	for qemu-devel@nongnu.org; Tue, 12 Feb 2019 23:14:04 -0500
+Date: Wed, 13 Feb 2019 15:13:08 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190213013850.GX1884@umbus.fritz.box>
-References: <20190212113929.31390-1-ppandit@redhat.com>
+Message-ID: <20190213041307.GH1884@umbus.fritz.box>
+References: <154999583316.690774.15072605479770041782.stgit@bahia.lan>
+	<154999592549.690774.13071669609040970763.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XCIqNWEteo88hZlY"
+	protocol="application/pgp-signature"; boundary="u9wPhCK/rM6+CG+h"
 Content-Disposition: inline
-In-Reply-To: <20190212113929.31390-1-ppandit@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] ppc: add host-serial and host-model
- machine attributes
+In-Reply-To: <154999592549.690774.13071669609040970763.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v4 14/15] spapr: add hotplug hooks for PHB
+ hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,259 +25,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 
---XCIqNWEteo88hZlY
-Content-Type: text/plain; charset=iso-8859-1
+--u9wPhCK/rM6+CG+h
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 12, 2019 at 05:09:29PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On Tue, Feb 12, 2019 at 07:25:25PM +0100, Greg Kurz wrote:
+> Hotplugging PHBs is a machine-level operation, but PHBs reside on the
+> main system bus, so we register spapr machine as the handler for the
+> main system bus.
 >=20
-> On ppc hosts, hypervisor shares following system attributes
+> Provide the usual pre-plug, plug and unplug-request handlers.
 >=20
->   - /proc/device-tree/system-id
->   - /proc/device-tree/model
+> Move the checking of the PHB index to the pre-plug handler. It is okay
+> to do that and assert in the realize function because the pre-plug
+> handler is always called, even for the oldest machine types we support.
 >=20
-> with a guest. This could lead to information leakage and misuse.[*]
-> Add machine attributes to control such system information exposure
-> to a guest.
+> Unlike with other device types, there are some cases where we cannot
+> provide the FDT fragment of the PHB from the plug handler, eg, before
+> KVMPPC_H_UPDATE_DT was called. Do this from a DRC callback that is
+> called just before the first FDT fragment is exposed to the guest.
 >=20
-> [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
->=20
-> Reported-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Fix-suggested-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> (Fixed interrupt controller phandle in "interrupt-map" and
+>  TCE table size in "ibm,dma-window" FDT fragment, Greg Kurz)
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/core/machine.c   | 46 +++++++++++++++++++++++++++++++++++++++++++++
->  hw/ppc/spapr.c      | 36 +++++++++++++++++++++++++++++------
->  include/hw/boards.h |  2 ++
->  qemu-options.hx     | 10 +++++++++-
->  util/qemu-config.c  |  8 ++++++++
->  5 files changed, 95 insertions(+), 7 deletions(-)
+> v4: - populate FDT fragment in a DRC callback
+> v3: - reworked phandle handling some more
+> v2: - reworked phandle handling
+>     - sync LSIs to KVM
+> ---
+> ---
+>  hw/ppc/spapr.c         |  121 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/spapr_drc.c     |    2 +
+>  hw/ppc/spapr_pci.c     |   16 ------
+>  include/hw/ppc/spapr.h |    5 ++
+>  4 files changed, 127 insertions(+), 17 deletions(-)
 >=20
-> Update v2: add backward compatible properties
->   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00593.html
->=20
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2629515363..2d5a52476a 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -476,6 +476,38 @@ static void machine_set_memory_encryption(Object *ob=
-j, const char *value,
->      ms->memory_encryption =3D g_strdup(value);
->  }
-> =20
-> +static char *machine_get_host_serial(Object *obj, Error **errp)
-> +{
-> +    MachineState *ms =3D MACHINE(obj);
-> +
-> +    return g_strdup(ms->host_serial);
-> +}
-> +
-> +static void machine_set_host_serial(Object *obj, const char *value,
-> +                                    Error **errp)
-> +{
-> +    MachineState *ms =3D MACHINE(obj);
-> +
-> +    g_free(ms->host_serial);
-> +    ms->host_serial =3D g_strdup(value);
-> +}
-> +
-> +static char *machine_get_host_model(Object *obj, Error **errp)
-> +{
-> +    MachineState *ms =3D MACHINE(obj);
-> +
-> +    return g_strdup(ms->host_model);
-> +}
-> +
-> +static void machine_set_host_model(Object *obj, const char *value,
-> +                                   Error **errp)
-> +{
-> +    MachineState *ms =3D MACHINE(obj);
-> +
-> +    g_free(ms->host_model);
-> +    ms->host_model =3D g_strdup(value);
-> +}
-> +
->  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char=
- *type)
->  {
->      strList *item =3D g_new0(strList, 1);
-> @@ -760,6 +792,18 @@ static void machine_class_init(ObjectClass *oc, void=
- *data)
->          &error_abort);
->      object_class_property_set_description(oc, "memory-encryption",
->          "Set memory encryption object to use", &error_abort);
-> +
-> +    object_class_property_add_str(oc, "host-serial",
-> +        machine_get_host_serial, machine_set_host_serial,
-> +        &error_abort);
-> +    object_class_property_set_description(oc, "host-serial",
-> +        "Set host's system-id to use", &error_abort);
-> +
-> +    object_class_property_add_str(oc, "host-model",
-> +        machine_get_host_model, machine_set_host_model,
-> +        &error_abort);
-> +    object_class_property_set_description(oc, "host-model",
-> +        "Set host's model-id to use", &error_abort);
-
-You're adding properties to *all* machines, for something that's only
-used on the PAPR machine.  That doesn't seem right.
-
->  }
-> =20
->  static void machine_class_base_init(ObjectClass *oc, void *data)
-> @@ -785,6 +829,8 @@ static void machine_initfn(Object *obj)
->      ms->dump_guest_core =3D true;
->      ms->mem_merge =3D true;
->      ms->enable_graphics =3D true;
-> +    ms->host_serial =3D NULL;
-> +    ms->host_model =3D NULL;
-> =20
->      /* Register notifier when init is done for sysbus sanity checks */
->      ms->sysbus_notifier.notify =3D machine_init_notify;
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0942f35bf8..a70667d72d 100644
+> index 021758825b7e..06ce0babcb54 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1249,13 +1249,31 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
->       * Add info to guest to indentify which host is it being run on
->       * and what is the uuid of the guest
->       */
-> -    if (kvmppc_get_host_model(&buf)) {
-> -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> -        g_free(buf);
-> +    if (machine->host_model && !g_str_equal(machine->host_model, "none")=
-) {
-> +        if (g_str_equal(machine->host_model, "passthrough")) {
-> +            /* -M host-model=3Dpassthrough */
-> +            if (kvmppc_get_host_model(&buf)) {
-> +                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> +                g_free(buf);
-> +            }
-> +        } else {
-> +            /* -M host-model=3D<user-string> */
-> +            _FDT(fdt_setprop_string(fdt, 0, "host-model", machine->host_=
-model));
-> +        }
->      }
-> -    if (kvmppc_get_host_serial(&buf)) {
-> -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> -        g_free(buf);
-> +
-> +    if (machine->host_serial && !g_str_equal(machine->host_serial, "none=
-")) {
-> +        if (g_str_equal(machine->host_serial, "passthrough")) {
-> +            /* -M host-serial=3Dpassthrough */
-> +            if (kvmppc_get_host_serial(&buf)) {
-> +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> +                g_free(buf);
-> +            }
-> +        } else {
-> +            /* -M host-serial=3D<user-string> */
-> +            _FDT(fdt_setprop_string(fdt, 0,
-> +                                    "host-serial", machine->host_serial)=
-);
-> +        }
->      }
+> @@ -2930,6 +2930,11 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+>      register_savevm_live(NULL, "spapr/htab", -1, 1,
+>                           &savevm_htab_handlers, spapr);
 > =20
->      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-> @@ -4080,9 +4098,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
->  static void spapr_machine_3_1_class_options(MachineClass *mc)
->  {
->      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> +    static GlobalProperty compat[] =3D {
-> +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-> +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-> +    };
+> +    if (smc->dr_phb_enabled) {
+> +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machine),
+> +                                 &error_fatal);
+> +    }
+
+I think you could do this unconditionally and just check
+dr_phb_enabled at pre_plug.  That makes it more consistent with the
+other hotplug types, and I suspect will give us better error messages.
+
+>      qemu_register_boot_set(spapr_boot_set, spapr);
 > =20
->      spapr_machine_4_0_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-> +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-
-I'm still not convinced maintaining super-strict backwards compat at
-the expense of security is a good tradeoff here, but since the code's
-already written, let's run with it.
-
-> +
->      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
->      smc->update_dt_enabled =3D false;
+>      if (kvm_enabled()) {
+> @@ -3733,6 +3738,108 @@ out:
+>      error_propagate(errp, local_err);
 >  }
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 02f114085f..3e63dc4501 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -257,6 +257,8 @@ struct MachineState {
->      bool enforce_config_section;
->      bool enable_graphics;
->      char *memory_encryption;
-> +    char *host_serial;
-> +    char *host_model;
->      DeviceMemoryState *device_memory;
 > =20
->      ram_addr_t ram_size;
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 521511ec13..67ac1a9959 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -43,7 +43,9 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->      "                suppress-vmdesc=3Don|off disables self-describing m=
-igration (default=3Doff)\n"
->      "                nvdimm=3Don|off controls NVDIMM support (default=3D=
-off)\n"
->      "                enforce-config-section=3Don|off enforce configurati=
-on section migration (default=3Doff)\n"
-> -    "                memory-encryption=3D@var{} memory encryption object=
- to use (default=3Dnone)\n",
-> +    "                memory-encryption=3D@var{} memory encryption object=
- to use (default=3Dnone)\n"
-> +    "                host-serial=3Dnone|passthrough|string controls host=
- systemd-id (default=3Dpassthrough)\n"
-> +    "                host-model=3Dnone|passthrough|string controls host =
-model-id (default=3Dpassthrough)\n",
->      QEMU_ARCH_ALL)
->  STEXI
->  @item -machine [type=3D]@var{name}[,prop=3D@var{value}[,...]]
-> @@ -103,6 +105,12 @@ NOTE: this parameter is deprecated. Please use @opti=
-on{-global}
->  @option{migration.send-configuration}=3D@var{on|off} instead.
->  @item memory-encryption=3D@var{}
->  Memory encryption object to use. The default is none.
-> +@item host-serial=3Dnone|passthrough|string
-> +Pass 'system-id' parameter from host's device-tree to a guest. A user may
-> +disable it with 'none' or define a custom string for a guest.
-> +@item host-model=3Dnone|passthrough|string
-> +Pass 'model' paramter from host's device-tree to a guest. A user may dis=
-able
-> +it with 'none' or define a custom string for a guest.
->  @end table
->  ETEXI
-> =20
-> diff --git a/util/qemu-config.c b/util/qemu-config.c
-> index 9d2e278e29..86483ded34 100644
-> --- a/util/qemu-config.c
-> +++ b/util/qemu-config.c
-> @@ -238,6 +238,14 @@ static QemuOptsList machine_opts =3D {
->              .help =3D "Up to 8 chars in set of [A-Za-z0-9. ](lower case =
-chars"
->                      " converted to upper case) to pass to machine"
->                      " loader, boot manager, and guest kernel",
-> +        },{
-> +            .name =3D "host-serial",
-> +            .type =3D QEMU_OPT_STRING,
-> +            .help =3D "host's system-id seen by guest",
-> +        },{
-> +            .name =3D "host-model",
-> +            .type =3D QEMU_OPT_STRING,
-> +            .help =3D "host's model-id seen by guest",
->          },
->          { /* End of list */ }
+> +int spapr_dt_phb(DeviceState *dev, sPAPRMachineState *spapr, void *fdt,
+> +                 int *fdt_start_offset, Error **errp)
+> +{
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    uint32_t intc_phandle;
+> +
+> +    if (spapr_irq_get_phandle(spapr, spapr->fdt_blob, &intc_phandle, err=
+p)) {
+> +        return -1;
+> +    }
+> +
+> +    if (spapr_populate_pci_dt(sphb, intc_phandle, fdt, spapr->irq->nr_ms=
+is,
+> +                              fdt_start_offset)) {
+> +        error_setg(errp, "unable to create FDT node for PHB %d", sphb->i=
+ndex);
+> +        return -1;
+> +    }
+> +
+> +    /* generally SLOF creates these, for hotplug it's up to QEMU */
+> +    _FDT(fdt_setprop_string(fdt, *fdt_start_offset, "name", "pci"));
+> +
+> +    return 0;
+> +}
+> +
+> +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceState =
+*dev,
+> +                               Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    const unsigned windows_supported =3D spapr_phb_windows_supported(sph=
+b);
+> +
+> +    if (sphb->index =3D=3D (uint32_t)-1) {
+> +        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * This will check that sphb->index doesn't exceed the maximum numbe=
+r of
+> +     * PHBs for the current machine type.
+> +     */
+> +    smc->phb_placement(spapr, sphb->index,
+> +                       &sphb->buid, &sphb->io_win_addr,
+> +                       &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> +                       windows_supported, sphb->dma_liobn, errp);
+> +}
+> +
+> +static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                           Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    sPAPRDRConnector *drc;
+> +    bool hotplugged =3D spapr_drc_hotplugged(dev);
+> +    Error *local_err =3D NULL;
+> +
+> +    if (!smc->dr_phb_enabled) {
+> +        return;
+> +    }
+> +
+> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->index);
+> +    /* hotplug hooks should check it's enabled before getting this far */
+> +    assert(drc);
+> +
+> +    /*
+> +     * The FDT fragment will be added during the first invocation of RTAS
+> +     * ibm,client-architecture-support  for this device, when we're sure
+> +     * that the IOMMU is configured and that QEMU knows the phandle of t=
+he
+> +     * interrupt controller.
+> +     */
+> +    spapr_drc_attach(drc, DEVICE(dev), NULL, 0, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (hotplugged) {
+> +        spapr_hotplug_req_add_by_index(drc);
+> +    } else {
+> +        spapr_drc_reset(drc);
+> +    }
+> +}
+> +
+> +void spapr_phb_release(DeviceState *dev)
+> +{
+> +    object_unparent(OBJECT(dev));
+> +}
+> +
+> +static void spapr_phb_unplug_request(HotplugHandler *hotplug_dev,
+> +                                     DeviceState *dev, Error **errp)
+> +{
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    sPAPRDRConnector *drc;
+> +
+> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->index);
+> +    assert(drc);
+> +
+> +    if (!spapr_drc_unplug_requested(drc)) {
+> +        spapr_drc_detach(drc);
+> +        spapr_hotplug_req_remove_by_index(drc);
+> +    }
+> +}
+> +
+>  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp)
+>  {
+> @@ -3740,6 +3847,8 @@ static void spapr_machine_device_plug(HotplugHandle=
+r *hotplug_dev,
+>          spapr_memory_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+>          spapr_core_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRID=
+GE)) {
+> +        spapr_phb_plug(hotplug_dev, dev, errp);
 >      }
+>  }
+> =20
+> @@ -3758,6 +3867,7 @@ static void spapr_machine_device_unplug_request(Hot=
+plugHandler *hotplug_dev,
+>  {
+>      sPAPRMachineState *sms =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+>      MachineClass *mc =3D MACHINE_GET_CLASS(sms);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> =20
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+> @@ -3777,6 +3887,12 @@ static void spapr_machine_device_unplug_request(Ho=
+tplugHandler *hotplug_dev,
+>              return;
+>          }
+>          spapr_core_unplug_request(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRID=
+GE)) {
+> +        if (!smc->dr_phb_enabled) {
+> +            error_setg(errp, "PHB hot unplug not supported on this machi=
+ne");
+> +            return;
+> +        }
+> +        spapr_phb_unplug_request(hotplug_dev, dev, errp);
+>      }
+>  }
+> =20
+> @@ -3787,6 +3903,8 @@ static void spapr_machine_device_pre_plug(HotplugHa=
+ndler *hotplug_dev,
+>          spapr_memory_pre_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+>          spapr_core_pre_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRID=
+GE)) {
+> +        spapr_phb_pre_plug(hotplug_dev, dev, errp);
+>      }
+>  }
+> =20
+> @@ -3794,7 +3912,8 @@ static HotplugHandler *spapr_get_hotplug_handler(Ma=
+chineState *machine,
+>                                                   DeviceState *dev)
+>  {
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+> -        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE) ||
+> +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+>          return HOTPLUG_HANDLER(machine);
+>      }
+>      return NULL;
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index c5a281915665..22563a381a37 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -709,6 +709,8 @@ static void spapr_drc_phb_class_init(ObjectClass *k, =
+void *data)
+>      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
+>      drck->typename =3D "PHB";
+>      drck->drc_name_prefix =3D "PHB ";
+> +    drck->release =3D spapr_phb_release;
+> +    drck->populate_dt =3D spapr_dt_phb;
+>  }
+> =20
+>  static const TypeInfo spapr_dr_connector_info =3D {
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 7df7f6502f93..d0caca627455 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1647,21 +1647,7 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+>          return;
+>      }
+> =20
+> -    if (sphb->index !=3D (uint32_t)-1) {
+> -        Error *local_err =3D NULL;
+> -
+> -        smc->phb_placement(spapr, sphb->index,
+> -                           &sphb->buid, &sphb->io_win_addr,
+> -                           &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> -                           windows_supported, sphb->dma_liobn, &local_er=
+r);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> -        }
+> -    } else {
+> -        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+> -        return;
+> -    }
+> +    assert(sphb->index !=3D (uint32_t)-1); /* checked in spapr_phb_pre_p=
+lug() */
+> =20
+>      if (sphb->mem64_win_size !=3D 0) {
+>          if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index a3074e7fea37..69d9c2196ca2 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -764,9 +764,12 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, =
+int shift,
+>  void spapr_clear_pending_events(sPAPRMachineState *spapr);
+>  int spapr_max_server_number(sPAPRMachineState *spapr);
+> =20
+> -/* CPU and LMB DRC release callbacks. */
+> +/* DRC callbacks. */
+>  void spapr_core_release(DeviceState *dev);
+>  void spapr_lmb_release(DeviceState *dev);
+> +void spapr_phb_release(DeviceState *dev);
+> +int spapr_dt_phb(DeviceState *dev, sPAPRMachineState *spapr, void *fdt,
+> +                 int *fdt_start_offset, Error **errp);
+> =20
+>  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+>  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -284,24 +334,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---XCIqNWEteo88hZlY
+--u9wPhCK/rM6+CG+h
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjdSoACgkQbDjKyiDZ
-s5KLYA/+LOwHEMgsqIw0nBYX+MBbilVl0KUes4bVHMJ2k+/cSoT2Crf4Nws74slR
-qBasli2sxPeJwLyiiRbrmrDfTlsslgQNHwCdtqz58O1QpCdEwYV1qzoEinElN+7W
-H17paygSiDGXwQNNDhG3Ac9ldPoUc1pcyBAHS3LlpxzFfRRNwOUV5RUmR2RWYUmK
-0v8xmsd/xrZkFTvZ9lFissAicFOsZ+JGkDU8IjnSCd6LOMVWE/6GCHuQJfrJOY4N
-IGyFRyaSM47vGHF63pwIslRY+Yb60ty0sV6Ik7OfkgI1C6GSzGOncSwLoIx17wC0
-Z4MXXR6TNq8CUM3NF/hJYz1+O+qOYpnZN0pcEqpfmigzK5h1Y81usBSvaCHDliSP
-DnVl8WssT1VwvrMEoX9t7LHlot8X5Lzgno1ibrkuJIHLB+5YVqJmLZKWrl+6nUbq
-uPjEnIeOkzfHZlPmM3b5v6t2ixxKj0RzUpclyQsW6ezGHvLytV+fdST1Y43a3Vds
-78utHt0vjTPBrgyCwECOXihh9qj8qco8698mmPFIHpjgLOSqyzaKwghUvqBGM5l+
-UtdfFfK5iVx1T4ZzQBgSVEiAkGq4tIf09DW6C7O2CQipN/sD1qJXyqe5PaKafuuT
-cAyZ+mTfig3Kc6+gXAwti0aEuPs8DbmJrVN4b+JJ5e9OHY+rEk8=
-=aYRj
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxjmVMACgkQbDjKyiDZ
+s5J3JA//Yqfgd2DVrCQoz8/DW9GpAf1P6/iKXQkUcRLtUcfMuMaGAwjedDzNBdTm
+OyYzCFXeWvA4o98qp6nd8ntXZPZJAlXCN/GH5izM8zKbU6kbwkQeoqMKIe+Is+rZ
+IhXhU0hsJxS6PnrCy4jLDkjAuE6PtVLuwb5vG8B1vm7jWcjS0dqCXKWHCTKVcuYj
+W7tKTrKwiG1f2VeiPRnIE0qihGaxQAZHMZfcRzhaivG50hSLDRrTANDhrP55C3dd
+rxN5/Sj0z5VKeuouzZSoH0mNHk3dyCJNz7Iijuf4IgRT9ZCBgvtmkk51ZwwJNxat
+3t4ZznW1OumehJBeGnHKN4yhZjZrOuKPtxhREPxICoAebByqJRL+gInxq/wPkH1G
+Xwf43+SSnwj9/6aj6604NloIINOPLPf2oKFjx+0TnquiELel92tFoPYyqFR+fq3q
+vV0OAawE224NcOe9E8QIjERsQspv2vWdmPxiiIb7eAds+PukEZEbJH1P0lnBPO7Q
+6FxM5PaJiLM4vsgDppmsUueZPT1MPAwxuNfO64UkQnE7msKw3sIJ84kHrUkZpGN/
+hNrMjVbV4y5S+S1toE0lvHwcS3mjfRyu6R540juTR1eUL80bLFLi5eWtRKzkw3s6
+ZEadQXtM9SdU8Y1+ugCeDCC/JfJfkT/ObtXjFLmz0CYM7SOm4d0=
+=NTl3
 -----END PGP SIGNATURE-----
 
---XCIqNWEteo88hZlY--
+--u9wPhCK/rM6+CG+h--
