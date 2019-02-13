@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45738)
+Received: from eggs.gnu.org ([209.51.188.92]:48139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gtpgB-0002eX-5e
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:14:04 -0500
+	(envelope-from <peterx@redhat.com>) id 1gtpvv-0004mG-CA
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:30:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gtpg9-0002f9-9S
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:14:02 -0500
-Received: from mga18.intel.com ([134.134.136.126]:8803)
+	(envelope-from <peterx@redhat.com>) id 1gtpu4-0006Eo-7g
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:28:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1gtpg5-0002Xf-R2
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:13:59 -0500
-Date: Wed, 13 Feb 2019 16:13:18 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190213081318.GA9754@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190213071401.11544-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gtpu3-00068U-7v
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:28:24 -0500
+Date: Wed, 13 Feb 2019 16:28:12 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190213082812.GB6228@xz-x1>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-2-git-send-email-yi.y.sun@linux.intel.com>
+	<20190211101213.GF1011@xz-x1> <20190213073855.GE16968@yi.y.sun>
+	<20190213080305.GA6228@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190213071401.11544-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hostmem-file: reject invalid pmem file
- sizes
+In-Reply-To: <20190213080305.GA6228@xz-x1>
+Subject: Re: [Qemu-devel] [RFC v1 1/3] intel_iommu: scalable mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,176 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Zhang Yi <yi.z.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+To: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-On Wed, Feb 13, 2019 at 03:14:01PM +0800, Stefan Hajnoczi wrote:
->Guests started with NVDIMMs larger than the underlying host file produce
->confusing errors inside the guest.  This happens because the guest
->accesses pages beyond the end of the file.
->
->Check the pmem file size on startup and print a clear error message if
->the size is invalid.
->
->Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1669053
->Cc: Haozhong Zhang <haozhong.zhang@intel.com>
->Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
->Cc: Eduardo Habkost <ehabkost@redhat.com>
->Cc: Igor Mammedov <imammedo@redhat.com>
->Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->---
->v2:
-> * Propagate qemu_get_pmem_size() errors [Igor]
->
-> include/qemu/osdep.h    | 13 ++++++++++
-> backends/hostmem-file.c | 22 +++++++++++++++++
-> util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
-> util/oslib-win32.c      |  5 ++++
-> 4 files changed, 93 insertions(+)
->
->diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->index 840af09cb0..303d315c5d 100644
->--- a/include/qemu/osdep.h
->+++ b/include/qemu/osdep.h
->@@ -570,6 +570,19 @@ void qemu_set_tty_echo(int fd, bool echo);
-> void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
->                      Error **errp);
+On Wed, Feb 13, 2019 at 04:03:05PM +0800, Peter Xu wrote:
+> On Wed, Feb 13, 2019 at 03:38:55PM +0800, Yi Sun wrote:
 > 
->+/**
->+ * qemu_get_pmem_size:
->+ * @filename: path to a pmem file
->+ * @errp: pointer to a NULL-initialized error object
->+ *
->+ * Determine the size of a persistent memory file.  Besides supporting files on
->+ * DAX file systems, this function also supports Linux devdax character
->+ * devices.
->+ *
->+ * Returns: the size or 0 on failure
->+
-> /**
->  * qemu_get_pid_name:
->  * @pid: pid of a process
->diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
->index ba601ce940..d62689179b 100644
->--- a/backends/hostmem-file.c
->+++ b/backends/hostmem-file.c
->@@ -46,6 +46,28 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->     gchar *name;
-> #endif
+> [...]
 > 
->+    /*
->+     * Verify pmem file size since starting a guest with an incorrect size
->+     * leads to confusing failures inside the guest.
->+     */
->+    if (fb->is_pmem && fb->mem_path) {
->+        Error *local_err = NULL;
->+        uint64_t size;
->+
->+        size = qemu_get_pmem_size(fb->mem_path, &local_err);
->+        if (!size) {
->+            error_propagate(errp, local_err);
->+            return;
->+        }
->+
->+        if (backend->size > size) {
->+            error_setg(errp, "size property %" PRIu64 " is larger than "
->+                       "pmem file \"%s\" size %" PRIu64, backend->size,
->+                       fb->mem_path, size);
->+            return;
->+        }
->+    }
->+
->     if (!backend->size) {
->         error_setg(errp, "can't create backend with size 0");
->         return;
+> > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > > index 8b72735..396ac8e 100644
+> > > > --- a/hw/i386/intel_iommu.c
+> > > > +++ b/hw/i386/intel_iommu.c
+> > > > @@ -37,6 +37,34 @@
+> > > >  #include "kvm_i386.h"
+> > > >  #include "trace.h"
+> > > >  
+> > > > +#define vtd_devfn_check(devfn) ((devfn & VTD_DEVFN_CHECK_MASK) ? true : false)
+> > > 
+> > > "vtd_devfn_check(devfn)" is merely as long as "devfn &
+> > > VTD_DEVFN_CHECK_MASK", isn't it? :)
+> > > 
+> > > I would just drop the macro.
+> > > 
+> > There are two places to call this macro. Is that valuable to keep it?
+> 
+> The point here is "A ? true : false" is exactly "A" when used in
+> condition checks.  So IMHO it's clean enough to write:
+> 
+>   if (devfn & VTD_DEVFN_CHECK_MASK) {
+>     ...
+>   }
+> 
+> Comparing to:
+> 
+>   if (vtd_devfn_check(devfn)) {
+>     ...
+>   }
+> 
+> And imho actually the name "check"/"mask" is confusing itself
+> already...  So maybe even dropping both vtd_devfn_check() and
+> VTD_DEVFN_CHECK_MASK (note: there's nothing about any validity checks,
+> and it's not a mask at all!) and simply:
+> 
+>   if (devfn >= UINT8_MAX / 2)
+> 
+> That's even clearer to me that it's splitted into two halves.
 
-Would it be reasonable to move the above check after checking size and
-mem_path?
+Sorry I didn't notice UINT8_MAX is 255 rather than 256, then it should
+be ">"...  anyway, these are a bit nitpicking, feel free to use your
+own preference at last.
 
->diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->index 37c5854b9c..10d90d1783 100644
->--- a/util/oslib-posix.c
->+++ b/util/oslib-posix.c
->@@ -500,6 +500,59 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
->     }
-> }
 > 
->+uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
->+{
->+    struct stat st;
->+
->+    if (stat(filename, &st) < 0) {
->+        error_setg(errp, "unable to stat pmem file \"%s\"", filename);
->+        return 0;
->+    }
->+
->+#if defined(__linux__)
->+    /* Special handling for devdax character devices */
->+    if (S_ISCHR(st.st_mode)) {
->+        char *subsystem_path = NULL;
->+        char *subsystem = NULL;
->+        char *size_path = NULL;
->+        char *size_str = NULL;
->+        uint64_t ret = 0;
->+
->+        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
->+                                         major(st.st_rdev), minor(st.st_rdev));
->+        subsystem = g_file_read_link(subsystem_path, NULL);
->+        if (!subsystem) {
->+            error_setg(errp, "unable to read subsystem for pmem file \"%s\"",
->+                       filename);
->+            goto devdax_err;
->+        }
->+
->+        if (!g_str_has_suffix(subsystem, "/dax")) {
->+            error_setg(errp, "pmem file \"%s\" is not a dax device", filename);
->+            goto devdax_err;
->+        }
->+
->+        size_path = g_strdup_printf("/sys/dev/char/%d:%d/size",
->+                                    major(st.st_rdev), minor(st.st_rdev));
->+        if (!g_file_get_contents(size_path, &size_str, NULL, NULL)) {
->+            error_setg(errp, "unable to read size for pmem file \"%s\"",
->+                       size_path);
->+            goto devdax_err;
->+        }
->+
->+        ret = g_ascii_strtoull(size_str, NULL, 0);
->+
->+devdax_err:
->+        g_free(size_str);
->+        g_free(size_path);
->+        g_free(subsystem);
->+        g_free(subsystem_path);
->+        return ret;
->+    }
->+#endif /* defined(__linux__) */
->+
->+    return st.st_size;
->+}
+> [...]
 > 
-> char *qemu_get_pid_name(pid_t pid)
-> {
->diff --git a/util/oslib-win32.c b/util/oslib-win32.c
->index b4c17f5dfa..bd633afab6 100644
->--- a/util/oslib-win32.c
->+++ b/util/oslib-win32.c
->@@ -560,6 +560,11 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
->     }
-> }
+> > > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> > > > index a321cc9..ff13ff27 100644
+> > > > --- a/include/hw/i386/intel_iommu.h
+> > > > +++ b/include/hw/i386/intel_iommu.h
+> > > > @@ -66,11 +66,12 @@ typedef struct VTDIOTLBEntry VTDIOTLBEntry;
+> > > >  typedef struct VTDBus VTDBus;
+> > > >  typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+> > > >  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+> > > > +typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
+> > > > +typedef struct VTDPASIDEntry VTDPASIDEntry;
+> > > >  
+> > > >  /* Context-Entry */
+> > > >  struct VTDContextEntry {
+> > > > -    uint64_t lo;
+> > > > -    uint64_t hi;
+> > > > +    uint64_t val[4];
+> > > 
+> > > You can actually make it an enum, two benefits:
+> > > 
+> > Thanks for the suggestion! DYM 'union'?
 > 
->+uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
->+{
->+    error_setg(errp, "pmem support not available");
->+    return 0;
->+}
+> Yes. :)
 > 
-> char *qemu_get_pid_name(pid_t pid)
-> {
->-- 
->2.20.1
->
+> Regards,
+> 
+> -- 
+> Peter Xu
+
+Regards,
 
 -- 
-Wei Yang
-Help you, Help me
+Peter Xu
