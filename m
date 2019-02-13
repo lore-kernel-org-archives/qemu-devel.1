@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43343)
+Received: from eggs.gnu.org ([209.51.188.92]:43417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gtpVo-00079N-ES
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:21 -0500
+	(envelope-from <clg@kaod.org>) id 1gtpWJ-0007P8-2t
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gtpVn-0002ET-IQ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39216)
+	(envelope-from <clg@kaod.org>) id 1gtpWG-0002es-S3
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:50 -0500
+Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:56431)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gtpVn-0002BW-82
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:19 -0500
-Date: Wed, 13 Feb 2019 16:03:05 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190213080305.GA6228@xz-x1>
-References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
-	<1548824953-23413-2-git-send-email-yi.y.sun@linux.intel.com>
-	<20190211101213.GF1011@xz-x1> <20190213073855.GE16968@yi.y.sun>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gtpWG-0002YE-Lc
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 03:03:48 -0500
+Received: from player696.ha.ovh.net (unknown [10.109.160.25])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id AD517511F4
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 09:03:39 +0100 (CET)
+References: <20190107183946.7230-1-clg@kaod.org>
+	<20190107183946.7230-13-clg@kaod.org>
+	<20190212010643.GG1884@umbus.fritz.box>
+	<adcd2479-7a31-ba7d-50c6-cfa9af909f2e@kaod.org>
+	<20190213013321.GV1884@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0ff3b713-7211-662e-8a16-96cfae840d4d@kaod.org>
+Date: Wed, 13 Feb 2019 09:03:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190213073855.GE16968@yi.y.sun>
-Subject: Re: [Qemu-devel] [RFC v1 1/3] intel_iommu: scalable mode emulation
+In-Reply-To: <20190213013321.GV1884@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 12/13] spapr/xics: ignore the lower 4K in
+ the IRQ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +35,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, Feb 13, 2019 at 03:38:55PM +0800, Yi Sun wrote:
+On 2/13/19 2:33 AM, David Gibson wrote:
+> On Tue, Feb 12, 2019 at 08:05:53AM +0100, C=E9dric Le Goater wrote:
+>> On 2/12/19 2:06 AM, David Gibson wrote:
+>>> On Mon, Jan 07, 2019 at 07:39:45PM +0100, C=E9dric Le Goater wrote:
+>>>> The IRQ number space of the XIVE and XICS interrupt mode are aligned
+>>>> when using the dual interrupt mode for the machine. This means that
+>>>> the ICS offset is set to zero in QEMU and that the KVM XICS device
+>>>> should be informed of this new value. Unfortunately, there is now wa=
+y
+>>>> to do so and KVM still maintains the XICS_IRQ_BASE (0x1000) offset.
+>>>>
+>>>> Ignore the lower 4K which are not used under the XICS interrupt
+>>>> mode. These IRQ numbers are only claimed by XIVE for the CPU IPIs.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/intc/xics_kvm.c | 18 ++++++++++++++++++
+>>>>  1 file changed, 18 insertions(+)
+>>>>
+>>>> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+>>>> index 651bbfdf6966..1d21ff217b82 100644
+>>>> --- a/hw/intc/xics_kvm.c
+>>>> +++ b/hw/intc/xics_kvm.c
+>>>> @@ -238,6 +238,15 @@ static void ics_get_kvm_state(ICSState *ics)
+>>>>      for (i =3D 0; i < ics->nr_irqs; i++) {
+>>>>          ICSIRQState *irq =3D &ics->irqs[i];
+>>>> =20
+>>>> +        /*
+>>>> +         * The KVM XICS device considers that the IRQ numbers shoul=
+d
+>>>> +         * start at XICS_IRQ_BASE (0x1000). Ignore the lower 4K
+>>>> +         * numbers (only claimed by XIVE for the CPU IPIs).
+>>>> +         */
+>>>> +        if (i + ics->offset < XICS_IRQ_BASE) {
+>>>> +            continue;
+>>>> +        }
+>>>> +
+>>>
+>>> This seems bogus to me.  The guest-visible irq numbers need to line u=
+p
+>>> between xics and xive mode, yes, but that doesn't mean we need to kee=
+p
+>>> around a great big array of unused array of ICS irq states, even in
+>>> TCG mode.
+>>
+>> This is because the qirqs[] array is under the machine and shared betw=
+een=20
+>> both interrupt modes, xics and xive.
+>=20
+> I don't see how that follows.  ICSIRQState is indexed in terms of the
+> ICS source number, not the global irq number, so I don't see why it
+> has to match up with the qirq array.
 
-[...]
+The root cause is the use of spapr->irq->nr_irqs to initialize the ICS=20
+and sPAPRXive object. In case of the 'dual' backend, it covers the full=20
+XIVE IRQ number space (0x2000 today) but XICS only needs 0x1000.
 
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index 8b72735..396ac8e 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -37,6 +37,34 @@
-> > >  #include "kvm_i386.h"
-> > >  #include "trace.h"
-> > >  
-> > > +#define vtd_devfn_check(devfn) ((devfn & VTD_DEVFN_CHECK_MASK) ? true : false)
-> > 
-> > "vtd_devfn_check(devfn)" is merely as long as "devfn &
-> > VTD_DEVFN_CHECK_MASK", isn't it? :)
-> > 
-> > I would just drop the macro.
-> > 
-> There are two places to call this macro. Is that valuable to keep it?
+I think we can fix the offset issue by using the appropriate nr_irqs=20
+which should be for the XICS backend : spapr->irq->nr_irqs - ics->offset
 
-The point here is "A ? true : false" is exactly "A" when used in
-condition checks.  So IMHO it's clean enough to write:
 
-  if (devfn & VTD_DEVFN_CHECK_MASK) {
-    ...
-  }
+I keep in mind the XIVE support for nested guests and I think we will
+need to extend the IRQ number space in L1 and have the L2 use a portion
+of it (using an offset).    =20
 
-Comparing to:
-
-  if (vtd_devfn_check(devfn)) {
-    ...
-  }
-
-And imho actually the name "check"/"mask" is confusing itself
-already...  So maybe even dropping both vtd_devfn_check() and
-VTD_DEVFN_CHECK_MASK (note: there's nothing about any validity checks,
-and it's not a mask at all!) and simply:
-
-  if (devfn >= UINT8_MAX / 2)
-
-That's even clearer to me that it's splitted into two halves.
-
-[...]
-
-> > > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > > index a321cc9..ff13ff27 100644
-> > > --- a/include/hw/i386/intel_iommu.h
-> > > +++ b/include/hw/i386/intel_iommu.h
-> > > @@ -66,11 +66,12 @@ typedef struct VTDIOTLBEntry VTDIOTLBEntry;
-> > >  typedef struct VTDBus VTDBus;
-> > >  typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
-> > >  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
-> > > +typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
-> > > +typedef struct VTDPASIDEntry VTDPASIDEntry;
-> > >  
-> > >  /* Context-Entry */
-> > >  struct VTDContextEntry {
-> > > -    uint64_t lo;
-> > > -    uint64_t hi;
-> > > +    uint64_t val[4];
-> > 
-> > You can actually make it an enum, two benefits:
-> > 
-> Thanks for the suggestion! DYM 'union'?
-
-Yes. :)
-
-Regards,
-
--- 
-Peter Xu
+C.
+=20
+>>>
+>>>>          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+>>>>                            i + ics->offset, &state, false, &error_fa=
+tal);
+>>>> =20
+>>>> @@ -303,6 +312,15 @@ static int ics_set_kvm_state(ICSState *ics, int=
+ version_id)
+>>>>          ICSIRQState *irq =3D &ics->irqs[i];
+>>>>          int ret;
+>>>> =20
+>>>> +        /*
+>>>> +         * The KVM XICS device considers that the IRQ numbers shoul=
+d
+>>>> +         * start at XICS_IRQ_BASE (0x1000). Ignore the lower 4K
+>>>> +         * numbers (only claimed by XIVE for the CPU IPIs).
+>>>> +         */
+>>>> +        if (i + ics->offset < XICS_IRQ_BASE) {
+>>>> +            continue;
+>>>> +        }
+>>>> +
+>>>>          state =3D irq->server;
+>>>>          state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORI=
+TY_MASK)
+>>>>              << KVM_XICS_PRIORITY_SHIFT;
+>>>
+>>
+>=20
