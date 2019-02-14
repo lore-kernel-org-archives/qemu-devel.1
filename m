@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53787)
+Received: from eggs.gnu.org ([209.51.188.92]:53801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guMKq-0007i5-MN
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guMKr-0007i8-Oy
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guMKp-0004eE-RI
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:12 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:44973)
+	(envelope-from <peter.maydell@linaro.org>) id 1guMKq-0004eq-VZ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:13 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:36381)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guMKp-0004de-Ki
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:11 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id v16so7681111wrn.11
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 11:06:11 -0800 (PST)
+	id 1guMKq-0004eN-P0
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:12 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id o17so7731228wrw.3
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 11:06:12 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	n184sm7798471wmf.5.2019.02.14.11.06.09 for <qemu-devel@nongnu.org>
+	n184sm7798471wmf.5.2019.02.14.11.06.10 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 14 Feb 2019 11:06:09 -0800 (PST)
+	Thu, 14 Feb 2019 11:06:10 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 19:05:40 +0000
-Message-Id: <20190214190603.25030-5-peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 19:05:41 +0000
+Message-Id: <20190214190603.25030-6-peter.maydell@linaro.org>
 In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
 References: <20190214190603.25030-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/27] target/arm: Force result size into dp
- after operation
+Subject: [Qemu-devel] [PULL 05/27] target/arm: Restructure disas_fp_int_conv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,112 +37,139 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Rather than a complex set of cases testing for writeback,
-adjust DP after performing the operation.
+For opcodes 0-5, move some if conditions into the structure
+of a switch statement.  For opcodes 6 & 7, decode everything
+at once with a second switch.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190206052857.5077-2-richard.henderson@linaro.org
+Message-id: 20190206052857.5077-3-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ target/arm/translate-a64.c | 94 ++++++++++++++++++++------------------
+ 1 file changed, 49 insertions(+), 45 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 66cf28c8cbe..eb258958768 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3970,6 +3970,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         tcg_gen_or_i32(tmp, tmp, tmp2);
-                         tcg_temp_free_i32(tmp2);
-                         gen_vfp_msr(tmp);
-+                        dp = 0; /* always a single precision result */
-                         break;
-                     }
-                     case 7: /* vcvtt.f16.f32, vcvtt.f16.f64 */
-@@ -3993,20 +3994,25 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         tcg_gen_or_i32(tmp, tmp, tmp2);
-                         tcg_temp_free_i32(tmp2);
-                         gen_vfp_msr(tmp);
-+                        dp = 0; /* always a single precision result */
-                         break;
-                     }
-                     case 8: /* cmp */
-                         gen_vfp_cmp(dp);
-+                        dp = -1; /* no write back */
-                         break;
-                     case 9: /* cmpe */
-                         gen_vfp_cmpe(dp);
-+                        dp = -1; /* no write back */
-                         break;
-                     case 10: /* cmpz */
-                         gen_vfp_cmp(dp);
-+                        dp = -1; /* no write back */
-                         break;
-                     case 11: /* cmpez */
-                         gen_vfp_F1_ld0(dp);
-                         gen_vfp_cmpe(dp);
-+                        dp = -1; /* no write back */
-                         break;
-                     case 12: /* vrintr */
-                     {
-@@ -4047,10 +4053,12 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         break;
-                     }
-                     case 15: /* single<->double conversion */
--                        if (dp)
-+                        if (dp) {
-                             gen_helper_vfp_fcvtsd(cpu_F0s, cpu_F0d, cpu_env);
--                        else
-+                        } else {
-                             gen_helper_vfp_fcvtds(cpu_F0d, cpu_F0s, cpu_env);
-+                        }
-+                        dp = !dp; /* result size is opposite */
-                         break;
-                     case 16: /* fuito */
-                         gen_vfp_uito(dp, 0);
-@@ -4084,15 +4092,19 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         break;
-                     case 24: /* ftoui */
-                         gen_vfp_toui(dp, 0);
-+                        dp = 0; /* always an integer result */
-                         break;
-                     case 25: /* ftouiz */
-                         gen_vfp_touiz(dp, 0);
-+                        dp = 0; /* always an integer result */
-                         break;
-                     case 26: /* ftosi */
-                         gen_vfp_tosi(dp, 0);
-+                        dp = 0; /* always an integer result */
-                         break;
-                     case 27: /* ftosiz */
-                         gen_vfp_tosiz(dp, 0);
-+                        dp = 0; /* always an integer result */
-                         break;
-                     case 28: /* ftosh */
-                         if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
-@@ -4126,20 +4138,8 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     return 1;
-                 }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index e002251ac6f..2f849a6951d 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -6541,68 +6541,72 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
+     int type = extract32(insn, 22, 2);
+     bool sbit = extract32(insn, 29, 1);
+     bool sf = extract32(insn, 31, 1);
++    bool itof = false;
  
--                /* Write back the result.  */
--                if (op == 15 && (rn >= 8 && rn <= 11)) {
--                    /* Comparison, do nothing.  */
--                } else if (op == 15 && dp && ((rn & 0x1c) == 0x18 ||
--                                              (rn & 0x1e) == 0x6)) {
--                    /* VCVT double to int: always integer result.
--                     * VCVT double to half precision is always a single
--                     * precision result.
--                     */
--                    gen_mov_vreg_F0(0, rd);
--                } else if (op == 15 && rn == 15) {
--                    /* conversion */
--                    gen_mov_vreg_F0(!dp, rd);
--                } else {
-+                /* Write back the result, if any.  */
-+                if (dp >= 0) {
-                     gen_mov_vreg_F0(dp, rd);
-                 }
+     if (sbit) {
+-        unallocated_encoding(s);
+-        return;
++        goto do_unallocated;
+     }
+ 
+-    if (opcode > 5) {
+-        /* FMOV */
+-        bool itof = opcode & 1;
+-
+-        if (rmode >= 2) {
+-            unallocated_encoding(s);
+-            return;
+-        }
+-
+-        switch (sf << 3 | type << 1 | rmode) {
+-        case 0x0: /* 32 bit */
+-        case 0xa: /* 64 bit */
+-        case 0xd: /* 64 bit to top half of quad */
+-            break;
+-        case 0x6: /* 16-bit float, 32-bit int */
+-        case 0xe: /* 16-bit float, 64-bit int */
+-            if (dc_isar_feature(aa64_fp16, s)) {
+-                break;
+-            }
+-            /* fallthru */
+-        default:
+-            /* all other sf/type/rmode combinations are invalid */
+-            unallocated_encoding(s);
+-            return;
+-        }
+-
+-        if (!fp_access_check(s)) {
+-            return;
+-        }
+-        handle_fmov(s, rd, rn, type, itof);
+-    } else {
+-        /* actual FP conversions */
+-        bool itof = extract32(opcode, 1, 1);
+-
+-        if (rmode != 0 && opcode > 1) {
+-            unallocated_encoding(s);
+-            return;
++    switch (opcode) {
++    case 2: /* SCVTF */
++    case 3: /* UCVTF */
++        itof = true;
++        /* fallthru */
++    case 4: /* FCVTAS */
++    case 5: /* FCVTAU */
++        if (rmode != 0) {
++            goto do_unallocated;
+         }
++        /* fallthru */
++    case 0: /* FCVT[NPMZ]S */
++    case 1: /* FCVT[NPMZ]U */
+         switch (type) {
+         case 0: /* float32 */
+         case 1: /* float64 */
+             break;
+         case 3: /* float16 */
+-            if (dc_isar_feature(aa64_fp16, s)) {
+-                break;
++            if (!dc_isar_feature(aa64_fp16, s)) {
++                goto do_unallocated;
+             }
+-            /* fallthru */
++            break;
+         default:
+-            unallocated_encoding(s);
+-            return;
++            goto do_unallocated;
+         }
+-
+         if (!fp_access_check(s)) {
+             return;
+         }
+         handle_fpfpcvt(s, rd, rn, opcode, itof, rmode, 64, sf, type);
++        break;
++
++    default:
++        switch (sf << 7 | type << 5 | rmode << 3 | opcode) {
++        case 0b01100110: /* FMOV half <-> 32-bit int */
++        case 0b01100111:
++        case 0b11100110: /* FMOV half <-> 64-bit int */
++        case 0b11100111:
++            if (!dc_isar_feature(aa64_fp16, s)) {
++                goto do_unallocated;
++            }
++            /* fallthru */
++        case 0b00000110: /* FMOV 32-bit */
++        case 0b00000111:
++        case 0b10100110: /* FMOV 64-bit */
++        case 0b10100111:
++        case 0b11001110: /* FMOV top half of 128-bit */
++        case 0b11001111:
++            if (!fp_access_check(s)) {
++                return;
++            }
++            itof = opcode & 1;
++            handle_fmov(s, rd, rn, type, itof);
++            break;
++
++        default:
++        do_unallocated:
++            unallocated_encoding(s);
++            return;
++        }
++        break;
+     }
+ }
  
 -- 
 2.20.1
