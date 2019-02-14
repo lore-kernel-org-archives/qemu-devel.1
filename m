@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59407)
+Received: from eggs.gnu.org ([209.51.188.92]:59485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1guMg2-00084P-Rg
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:07 -0500
+	(envelope-from <mst@redhat.com>) id 1guMgY-0008TA-2G
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1guMg0-0004Bn-T5
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:06 -0500
-Date: Fri, 15 Feb 2019 00:57:35 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20190213013850.GX1884@umbus.fritz.box>
-Message-ID: <nycvar.YSQ.7.76.1902150047200.27283@xnncv>
-References: <20190212113929.31390-1-ppandit@redhat.com>
-	<20190213013850.GX1884@umbus.fritz.box>
+	(envelope-from <mst@redhat.com>) id 1guMgX-0004Pa-24
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1guMgW-0004On-Sg
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:37 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2ED268AE47
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 19:28:36 +0000 (UTC)
+Date: Thu, 14 Feb 2019 14:28:35 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190214142251-mutt-send-email-mst@kernel.org>
+References: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2] ppc: add host-serial and host-model
- machine attributes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] vhost: enable for all targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com
 
-+-- On Wed, 13 Feb 2019, David Gibson wrote --+
-| > +
-| > +    object_class_property_add_str(oc, "host-serial",
-| > +        machine_get_host_serial, machine_set_host_serial,
-| > +        &error_abort);
-| > +    object_class_property_set_description(oc, "host-serial",
-| > +        "Set host's system-id to use", &error_abort);
-| > +
-| > +    object_class_property_add_str(oc, "host-model",
-| > +        machine_get_host_model, machine_set_host_model,
-| > +        &error_abort);
-| > +    object_class_property_set_description(oc, "host-model",
-| > +        "Set host's model-id to use", &error_abort);
-| 
-| You're adding properties to *all* machines, for something that's only
-| used on the PAPR machine.  That doesn't seem right.
+On Thu, Feb 14, 2019 at 06:35:47PM +0100, Paolo Bonzini wrote:
+> See also "[PATCH for-3.2 00/10] vhost: preparation for qgraph
+> conversion of vhost-user-test".  Some of the other vhost-user-test
+> patches have gone in already, and this is what is left.
+> 
+> These patches are a prerequisite for both kconfig and qgraph.
+> 
+> I will probably test them on macOS myself before these are included
+> in a pull request, since the previous versions had some issues.
+> Michael, let me know if you want me to send the pull request.
+> 
+> Thanks,
+> 
+> Paolo
 
-I tried to figure out about adding these options to only spapr machine, but it 
-does not seem straight forward as above.
- 
-| >      spapr_machine_4_0_class_options(mc);
-| >      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-| > +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-| 
-| I'm still not convinced maintaining super-strict backwards compat at
-| the expense of security is a good tradeoff here, but since the code's
-| already written, let's run with it.
+what's the changelog from v1?
 
-I think current patch will provide a way to help fix the security issue, we 
-can revise it further if required.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+> Paolo Bonzini (9):
+>   vhost-net: move stubs to a separate file
+>   vhost-net-user: add stubs for when no virtio-net device is present
+>   vhost: restrict Linux dependency to kernel vhost
+>   vhost-user: support cross-endian vnet headers
+>   vhost-net: compile it on all targets that have virtio-net.
+>   vhost-net: revamp configure logic
+>   vhost-user-test: create a main loop per TestServer
+>   vhost-user-test: small changes to init_hugepagefs
+>   vhost-user-test: create a temporary directory per TestServer
+> 
+>  backends/Makefile.objs     |   5 +-
+>  configure                  | 102 ++++++++++++++++++-----------
+>  default-configs/virtio.mak |   4 +-
+>  hw/net/Makefile.objs       |   4 +-
+>  hw/net/vhost_net-stub.c    |  92 ++++++++++++++++++++++++++
+>  hw/net/vhost_net.c         |  85 ++----------------------
+>  hw/virtio/Makefile.objs    |   8 ++-
+>  hw/virtio/vhost-backend.c  |  12 +++-
+>  hw/virtio/vhost-user.c     |  13 +++-
+>  hw/virtio/vhost.c          |   2 +-
+>  include/exec/poison.h      |   1 -
+>  net/Makefile.objs          |   4 +-
+>  net/net.c                  |   2 +-
+>  net/vhost-user-stub.c      |  23 +++++++
+>  net/vhost-user.c           |  13 ++++
+>  tests/Makefile.include     |   5 +-
+>  tests/vhost-user-test.c    | 160 +++++++++++++++++++++++----------------------
+>  17 files changed, 319 insertions(+), 216 deletions(-)
+>  create mode 100644 hw/net/vhost_net-stub.c
+>  create mode 100644 net/vhost-user-stub.c
+> 
+> -- 
+> 1.8.3.1
