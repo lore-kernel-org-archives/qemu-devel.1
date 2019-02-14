@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37346)
+Received: from eggs.gnu.org ([209.51.188.92]:41128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guFac-0008UI-Rh
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:54:04 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1guFv9-0003Ya-Gt
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:15:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guFaa-0003wS-Ir
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:54:02 -0500
-Resent-Message-Id: <E1guFaa-0003wS-Ir@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21090)
+	(envelope-from <pmorel@linux.ibm.com>) id 1guFv5-0001bf-MH
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:15:15 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33598
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guFaW-0003sn-Ew
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:53:58 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155014245360.24.1481693520396854042@49fa7ef69f7b>
-In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 03:07:35 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1guFv0-0001Vm-Ee
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:15:10 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1EC6UMj118229
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:15:02 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qn7ycs2rf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:15:02 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Thu, 14 Feb 2019 12:15:00 -0000
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu, 14 Feb 2019 13:14:53 +0100
+Message-Id: <1550146494-21085-1-git-send-email-pmorel@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3] [RFC] s390x/vfio: VFIO-AP interrupt control
+ interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
+To: borntraeger@de.ibm.com
+Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
-bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
-aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIw
-MTkwMjEyMTM0NzU4LjEwNTE0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkw
-MjEyMTM0NzU4LjEwNTE0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTkwMjE0MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFy
-by5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIubWF5ZGVsbEBsaW5h
-cm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjZkZTg4YWIzYSB1aS9jb2Nv
-YTogUGVyZm9ybSBVSSBvcGVyYXRpb25zIG9ubHkgb24gdGhlIG1haW4gdGhyZWFkCjE5NDBiZmQy
-NjMgdWkvY29jb2E6IFN1YmNsYXNzIE5TQXBwbGljYXRpb24gc28gd2UgY2FuIGltcGxlbWVudCBz
-ZW5kRXZlbnQKNzI0NTI1ZGJmYyB1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5kRXZlbnQg
-ZGlyZWN0bHkgZnJvbSBoYW5kbGVFdmVudApkY2QwN2FhMzFjIHVpL2NvY29hOiBNb3ZlIGNvbnNv
-bGUvZGV2aWNlIG1lbnUgY3JlYXRpb24gY29kZSB1cCBpbiBmaWxlCmYwODkwZmEzOGQgdWkvY29j
-b2E6IEZhY3RvciBvdXQgaW5pdGlhbCBtZW51IGNyZWF0aW9uCjk2Njk4MTc3NjMgdWkvY29jb2E6
-IFVzZSB0aGUgcGl4bWFuIGltYWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UKYmNmZmI0MTcw
-NSB1aS9jb2NvYTogRW5zdXJlIHdlIGhhdmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5n
-IGludG8gUUVNVQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS83IENoZWNraW5nIGNvbW1pdCBiY2Zm
-YjQxNzA1ZDAgKHVpL2NvY29hOiBFbnN1cmUgd2UgaGF2ZSB0aGUgaW90aHJlYWQgbG9jayB3aGVu
-IGNhbGxpbmcgaW50byBRRU1VKQoyLzcgQ2hlY2tpbmcgY29tbWl0IDk2Njk4MTc3NjM3ZiAodWkv
-Y29jb2E6IFVzZSB0aGUgcGl4bWFuIGltYWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UpCjMv
-NyBDaGVja2luZyBjb21taXQgZjA4OTBmYTM4ZGMxICh1aS9jb2NvYTogRmFjdG9yIG91dCBpbml0
-aWFsIG1lbnUgY3JlYXRpb24pCjQvNyBDaGVja2luZyBjb21taXQgZGNkMDdhYTMxYzNiICh1aS9j
-b2NvYTogTW92ZSBjb25zb2xlL2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAgaW4gZmlsZSkK
-NS83IENoZWNraW5nIGNvbW1pdCA3MjQ1MjVkYmZjMDkgKHVpL2NvY29hOiBEb24ndCBjYWxsIE5T
-QXBwIHNlbmRFdmVudCBkaXJlY3RseSBmcm9tIGhhbmRsZUV2ZW50KQpFUlJPUjogdHJhaWxpbmcg
-d2hpdGVzcGFjZQojNDE6IEZJTEU6IHVpL2NvY29hLm06MTUyOgorICAgICQKCnRvdGFsOiAxIGVy
-cm9ycywgMCB3YXJuaW5ncywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNyBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKNi83IENoZWNraW5nIGNvbW1pdCAxOTQwYmZkMjYzMjYgKHVpL2Nv
-Y29hOiBTdWJjbGFzcyBOU0FwcGxpY2F0aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50
-KQo3LzcgQ2hlY2tpbmcgY29tbWl0IGI2ZGU4OGFiM2E2NyAodWkvY29jb2E6IFBlcmZvcm0gVUkg
-b3BlcmF0aW9ucyBvbmx5IG9uIHRoZSBtYWluIHRocmVhZCkKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxMDI4MTYuMzM5My0xLXBldGVy
-Lm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+This QEMU patch is to be used in conjonction with the following patch
+series in LINUX.
+
+vfio: ap: ioctl definitions for AP Queue Interrupt Control
+
+The LINUX patch series handle all the interception in KVM
+and we do not need to take care of the interception in QEMU.
+
+The goal of this patch is to define the apqi CPU feature which
+will be proposed by KVM when the AP Interrupt Control facility
+is to be available in the guest.
+
+This feature must be turned on by QEMU to intercept AP instructions
+on the KVM guest.
+The QEMU command line to turn this feature on looks something like:
+
+    qemu-system-s390x ... -cpu xxx,apqi=on ...
+
+
+Pierre Morel (1):
+  s390x/cpumodel: Set up CPU model for AQIC interception
+
+ target/s390x/cpu_features.c     | 1 +
+ target/s390x/cpu_features_def.h | 1 +
+ target/s390x/cpu_models.c       | 1 +
+ target/s390x/gen-features.c     | 1 +
+ 4 files changed, 4 insertions(+)
+
+-- 
+2.7.4
