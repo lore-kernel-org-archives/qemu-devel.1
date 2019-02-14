@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53412)
+Received: from eggs.gnu.org ([209.51.188.92]:57241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1guOC7-0005yy-SV
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:05:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1guOVD-00035N-Je
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:25:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1guO14-0002E8-A5
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:53:55 -0500
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:36767)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1guO13-0001lx-Tn
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:53:54 -0500
-Received: by mail-ed1-x544.google.com with SMTP id o59so6201042edb.3
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 12:53:34 -0800 (PST)
-Date: Thu, 14 Feb 2019 20:53:31 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190214205331.pvht6oqynndc2k7u@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190214005225.24048-1-richardw.yang@linux.intel.com>
-	<20190214122527.5d2fcab8@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1guOSR-0002qp-0v
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:22:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:20486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1guOSQ-0002o7-IR
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:22:10 -0500
+References: <20190214201939.494-1-philmd@redhat.com>
+	<20190214201939.494-8-philmd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d2eede57-fc2b-3f7f-1aa6-bc502c0fa36d@redhat.com>
+Date: Thu, 14 Feb 2019 15:22:07 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190214122527.5d2fcab8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386,
- acpi: check acpi_memory_hotplug capacity in pre_plug
+In-Reply-To: <20190214201939.494-8-philmd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Wb0wKGzm3TnFg9RROLTN8TE6FjfcNziMO"
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] ccid-card-passthru: Use
+ QERR_MISSING_PARAMETER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Feb 14, 2019 at 12:25:27PM +0100, Igor Mammedov wrote:
->On Thu, 14 Feb 2019 08:52:25 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->
->> Currently we do device realization like below:
->> 
->>    hotplug_handler_pre_plug()
->>    dc->realize()
->>    hotplug_handler_plug()
->> 
->> Before we do device realization and plug, we would allocate necessary
->> resources and check the capacity.
->'capacity' probably is not right word to use here
->maybe s/the capacity/if 'memory-hotplug-support' property is enabled/
->
->> 
->> While we leave acpi_memory_hotplug capacity check in the last step. This
->wouldn't use 'leave' and 'capacity' here either, pls rephrase.
->
->> looks not comply with current architecture and does some unnecessary
->s/looks not/doesn't/
->> work.
->add more explanation about 'unnecessary work'.
->problem as I see it, is that after successful pc_dimm_plug()
->we get into piix4_device_plug_cb() and since
-> s->acpi_memory_hotplug.is_enabled == false
->and all other 'if' conditions also false we would endup
->at g_assert_not_reached() causing QEMU crash in piix4 case
->and with error_abort up the call chain in case of ich9.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Wb0wKGzm3TnFg9RROLTN8TE6FjfcNziMO
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <d2eede57-fc2b-3f7f-1aa6-bc502c0fa36d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] ccid-card-passthru: Use
+ QERR_MISSING_PARAMETER
+References: <20190214201939.494-1-philmd@redhat.com>
+ <20190214201939.494-8-philmd@redhat.com>
+In-Reply-To: <20190214201939.494-8-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks Igor, I rephrase above change log like this. Does this look
-better to you now?
+On 2/14/19 2:19 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/usb/ccid-card-passthru.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+> index 6cb8b2d26b..d63aa28584 100644
+> --- a/hw/usb/ccid-card-passthru.c
+> +++ b/hw/usb/ccid-card-passthru.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/sockets.h"
+>  #include "ccid.h"
+>  #include "qapi/error.h"
+> +#include "qapi/qmp/qerror.h"
+> =20
+>  #define DPRINTF(card, lvl, fmt, ...)                    \
+>  do {                                                    \
+> @@ -339,7 +340,7 @@ static void passthru_realize(CCIDCardState *base, E=
+rror **errp)
+>      PassthruState *card =3D PASSTHRU_CCID_CARD(base);
+> =20
+>      if (!qemu_chr_fe_backend_connected(&card->cs)) {
+> -        error_setg(errp, "missing chardev");
+> +        error_setg(errp, QERR_MISSING_PARAMETER, "chardev");
 
-    Before we do device realization and plug, we would allocate
-    necessary resources and check if memory-hotplug-support property is
-    enabled.
-    
-    In piix4 and ich9, the acpi_memory_hotplug property is checked in
-    plug stage, this doesn't comply with current architecture. This
-    means we have prepared everything and even do pc_dimm_plug()
-    successfuly, but failed at last because
-    acpi_memory_hotplug.is_enabled == false. Which is worse is in piix4,
-    this endup at g_assert_not_reached() and cause QEMU crash.
+We're trying to get rid of QERR_ usage, not add more. But this
+particular one seems to be a wash:
+
+$ git grep '"missing ' | wc -l
+24
+$ git grep QERR_MISSING_P | wc -l
+25
+
+so I'd be interested if Markus has an opinion on this one.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
->> This patch abstract the check on acpi_memory_hotplug capacity in
->> pre_plug stage.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  hw/acpi/piix4.c | 14 ++++++++++++--
->>  hw/i386/pc.c    |  8 ++++++++
->doesn't look complete, why did you skip on similar code in ich9
->(Q35 machine)?
->
+--Wb0wKGzm3TnFg9RROLTN8TE6FjfcNziMO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-You are right, I missed this part.
+-----BEGIN PGP SIGNATURE-----
 
->>  2 files changed, 20 insertions(+), 2 deletions(-)
->> 
->> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
->> index e330f24c71..c97b747496 100644
->> --- a/hw/acpi/piix4.c
->> +++ b/hw/acpi/piix4.c
->> @@ -370,13 +370,22 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
->>      acpi_pm1_evt_power_down(&s->ar);
->>  }
->>  
->> +static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->> +                                 DeviceState *dev, Error **errp)
->> +{
->> +    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
->> +
->> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
->> +        !s->acpi_memory_hotplug.is_enabled)
->> +        error_setg(errp,
->> +            "memory hotplug is not enabled: PIIX4 memory hotplug disabled");
->> +}
->>  static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
->>                                   DeviceState *dev, Error **errp)
->>  {
->>      PIIX4PMState *s = PIIX4_PM(hotplug_dev);
->>  
->> -    if (s->acpi_memory_hotplug.is_enabled &&
->> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
->>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
->>          } else {
->> @@ -702,6 +711,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
->>       */
->>      dc->user_creatable = false;
->>      dc->hotpluggable = false;
->> +    hc->pre_plug = piix4_device_pre_plug_cb;
->>      hc->plug = piix4_device_plug_cb;
->>      hc->unplug_request = piix4_device_unplug_request_cb;
->>      hc->unplug = piix4_device_unplug_cb;
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 734d3268fa..3c6eed0cd3 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1662,6 +1662,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>      const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>      const uint64_t legacy_align = TARGET_PAGE_SIZE;
->> +    HotplugHandlerClass *hhc;
->>  
->>      /*
->>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
->> @@ -1674,6 +1675,13 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>          return;
->>      }
->>  
->> +    /*
->> +     * Check acpi_dev memory hotplug capacity
->> +     */
->> +    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> +    if (hcc->pre_plug)
->> +        hhc->pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, errp);
->use hotplug_handler_pre_plug() instead of open-coding check
->
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxl2/8ACgkQp6FrSiUn
+Q2pOpgf/feVghDC7/MOwx0IprGdR9FhvpvbclVmUWyaY6snzchtKO2Mn9GV0qENx
+Dm1VDmSYC3m8xlnx7KnMDLAjITP4Eqpl4dqdaVEvtKzZQKjcD4QO9rybk8ux84yp
+IIYWQT5pZC2Hwcz4ddaUq1xBrLMRhpt31Qoui3CVnCSRNNPygC/IJuZzo07n5PRE
+wZvJJXAYFkW1OU+UOkv8uZ64TDZkNfy2JLtUDZXn0mi2CU4XeSNQd764irc0CTCY
+18qc3JL+maYHZit9pkoymkOjU3C+HgqrhYB4fnxWGT5fvQmAuQs9YaDfXsjckKiz
+nZFlgUIaiuSZiXQl9iGWirqUnAA14g==
+=UhJl
+-----END PGP SIGNATURE-----
 
-Thanks, will fix this.
-
->>      if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
->>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->>          return;
->
-
--- 
-Wei Yang
-Help you, Help me
+--Wb0wKGzm3TnFg9RROLTN8TE6FjfcNziMO--
