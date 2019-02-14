@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49516)
+Received: from eggs.gnu.org ([209.51.188.92]:49454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ8m-00035F-66
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:10:01 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ8m-00034j-R2
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:10:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ0L-0005Iq-6V
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:21 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:35563)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ0E-0005F3-2L
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:13 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:40844)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1guQ0I-0005FW-WC
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:15 -0500
-Received: by mail-lf1-x142.google.com with SMTP id v7so5817433lfd.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:01:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1guQ0D-0005DB-DU
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:09 -0500
+Received: by mail-lf1-x142.google.com with SMTP id t14so5805704lfk.7
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:01:09 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 14 Feb 2019 15:00:00 -0800
-Message-Id: <20190214230000.24894-14-jcmvbkbc@gmail.com>
+Date: Thu, 14 Feb 2019 14:59:59 -0800
+Message-Id: <20190214230000.24894-13-jcmvbkbc@gmail.com>
 In-Reply-To: <20190214230000.24894-1-jcmvbkbc@gmail.com>
 References: <20190214230000.24894-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 13/13] target/xtensa: prioritize load/store in
- FLIX bundles
+Subject: [Qemu-devel] [PATCH 12/13] target/xtensa: break circular register
+ dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,210 +29,234 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-Load/store opcodes may raise MMU exceptions. Normally exceptions should
-be checked in priority order before any actual operations, but since MMU
-exceptions are tightly coupled with actual memory access, there's
-currently no way to do it.
-
-Approximate this behavior by executing all load, then all store, and
-then all other opcodes in the FLIX bundles. Use opcode dependency
-mechanism to express ordering. Mark load/store opcodes with
-XTENSA_OP_{LOAD,STORE} flags. Newer libisa has classifier functions that
-can tell whether opcode is a load or store, but this information is not
-available in the existing overlays.
+Currently topologic opcode sorting stops at the first detected
+dependency loop. Introduce struct opcode_arg_copy that describes
+temporary register copy. Scan remaining opcodes searching for
+dependencies that can be broken, break them by introducing temporary
+register copies and record them in an array. In case of success
+create local temporaries and initialize them with current register
+values. Share single temporary copy between all register users. Delete
+temporaries after translation.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/cpu.h       |  4 ++++
- target/xtensa/translate.c | 37 ++++++++++++++++++++++++++++++++-----
- 2 files changed, 36 insertions(+), 5 deletions(-)
+ target/xtensa/translate.c | 127 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 123 insertions(+), 4 deletions(-)
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index bf021f7695e6..a01a94e2a683 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -390,6 +390,10 @@ enum {
-     XTENSA_OP_NAME_ARRAY = 0x8000,
- 
-     XTENSA_OP_CONTROL_FLOW = 0x10000,
-+    XTENSA_OP_STORE = 0x20000,
-+    XTENSA_OP_LOAD = 0x40000,
-+    XTENSA_OP_LOAD_STORE =
-+        XTENSA_OP_LOAD | XTENSA_OP_STORE,
- };
- 
- typedef struct XtensaOpcodeOps {
 diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 8bc272d05b4b..2fd64f8d995d 100644
+index 276b435ce81e..8bc272d05b4b 100644
 --- a/target/xtensa/translate.c
 +++ b/target/xtensa/translate.c
-@@ -985,6 +985,10 @@ static bool op_depends_on(const struct slot_prop *a,
-     if (a->op_flags & XTENSA_OP_CONTROL_FLOW) {
-         return true;
-     }
-+    if ((a->op_flags & XTENSA_OP_LOAD_STORE) <
-+        (b->op_flags & XTENSA_OP_LOAD_STORE)) {
-+        return true;
-+    }
-     while (i < a->n_out && j < b->n_in) {
-         if (a->out[i].resource < b->in[j].resource) {
-             ++i;
-@@ -1016,6 +1020,10 @@ static bool break_dependency(struct slot_prop *a,
-     if (a->op_flags & XTENSA_OP_CONTROL_FLOW) {
-         return false;
-     }
-+    if ((a->op_flags & XTENSA_OP_LOAD_STORE) <
-+        (b->op_flags & XTENSA_OP_LOAD_STORE)) {
+@@ -935,6 +935,12 @@ static int gen_postprocess(DisasContext *dc, int slot)
+     return slot;
+ }
+ 
++struct opcode_arg_copy {
++    uint32_t resource;
++    void *temp;
++    OpcodeArg *arg;
++};
++
+ struct opcode_arg_info {
+     uint32_t resource;
+     int index;
+@@ -961,6 +967,11 @@ static uint32_t encode_resource(enum resource_type r, unsigned g, unsigned n)
+     return (r << 24) | (g << 16) | n;
+ }
+ 
++static enum resource_type get_resource_type(uint32_t resource)
++{
++    return resource >> 24;
++}
++
+ /*
+  * a depends on b if b must be executed before a,
+  * because a's side effects will destroy b's inputs.
+@@ -987,6 +998,49 @@ static bool op_depends_on(const struct slot_prop *a,
+ }
+ 
+ /*
++ * Try to break a dependency on b, append temporary register copy records
++ * to the end of copy and update n_copy in case of success.
++ * This is not always possible: e.g. control flow must always be the last,
++ * load/store must be first and state dependencies are not supported yet.
++ */
++static bool break_dependency(struct slot_prop *a,
++                             struct slot_prop *b,
++                             struct opcode_arg_copy *copy,
++                             unsigned *n_copy)
++{
++    unsigned i = 0;
++    unsigned j = 0;
++    unsigned n = *n_copy;
++    bool rv = false;
++
++    if (a->op_flags & XTENSA_OP_CONTROL_FLOW) {
 +        return false;
 +    }
-     while (i < a->n_out && j < b->n_in) {
-         if (a->out[i].resource < b->in[j].resource) {
-             ++i;
-@@ -1292,7 +1300,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
-         if (slots > 1) {
-             slot_prop[slot].n_in = 0;
-             slot_prop[slot].n_out = 0;
--            slot_prop[slot].op_flags = 0;
-+            slot_prop[slot].op_flags = ops->op_flags & XTENSA_OP_LOAD_STORE;
++    while (i < a->n_out && j < b->n_in) {
++        if (a->out[i].resource < b->in[j].resource) {
++            ++i;
++        } else if (a->out[i].resource > b->in[j].resource) {
++            ++j;
++        } else {
++            int index = b->in[j].index;
++
++            if (get_resource_type(a->out[i].resource) != RES_REGFILE ||
++                index < 0) {
++                return false;
++            }
++            copy[n].resource = b->in[j].resource;
++            copy[n].arg = b->arg + index;
++            ++n;
++            ++i;
++            ++j;
++            rv = true;
++        }
++    }
++    *n_copy = n;
++    return rv;
++}
++
++/*
+  * Calculate evaluation order for slot opcodes.
+  * Build opcode order graph and output its nodes in topological sort order.
+  * An edge a -> b in the graph means that opcode a must be followed by
+@@ -994,7 +1048,9 @@ static bool op_depends_on(const struct slot_prop *a,
+  */
+ static bool tsort(struct slot_prop *slot,
+                   struct slot_prop *sorted[],
+-                  unsigned n)
++                  unsigned n,
++                  struct opcode_arg_copy *copy,
++                  unsigned *n_copy)
+ {
+     struct tsnode {
+         unsigned n_in_edge;
+@@ -1007,7 +1063,8 @@ static bool tsort(struct slot_prop *slot,
+     unsigned n_in = 0;
+     unsigned n_out = 0;
+     unsigned n_edge = 0;
+-    unsigned in_idx;
++    unsigned in_idx = 0;
++    unsigned node_idx = 0;
  
-             opnds = xtensa_opcode_num_operands(isa, opc);
+     for (i = 0; i < n; ++i) {
+         node[i].n_in_edge = 0;
+@@ -1035,7 +1092,8 @@ static bool tsort(struct slot_prop *slot,
+         }
+     }
  
-@@ -3222,40 +3230,47 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "l16si",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TESW, false, false},
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "l16ui",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUW, false, false},
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "l32ai",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUL, true, false},
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "l32e",
-         .translate = translate_l32e,
--        .op_flags = XTENSA_OP_PRIVILEGED,
-+        .op_flags = XTENSA_OP_PRIVILEGED | XTENSA_OP_LOAD,
-     }, {
-         .name = (const char * const[]) {
-             "l32i", "l32i.n", NULL,
-         },
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUL, false, false},
--        .op_flags = XTENSA_OP_NAME_ARRAY,
-+        .op_flags = XTENSA_OP_NAME_ARRAY | XTENSA_OP_LOAD,
-     }, {
-         .name = "l32r",
-         .translate = translate_l32r,
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "l8ui",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_UB, false, false},
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "lddec",
-         .translate = translate_mac16,
-         .par = (const uint32_t[]){MAC16_NONE, 0, -4},
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "ldinc",
-         .translate = translate_mac16,
-         .par = (const uint32_t[]){MAC16_NONE, 0, 4},
-+        .op_flags = XTENSA_OP_LOAD,
-     }, {
-         .name = "ldpte",
-         .op_flags = XTENSA_OP_ILL,
-@@ -4213,28 +4228,32 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "s16i",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUW, false, true},
-+        .op_flags = XTENSA_OP_STORE,
-     }, {
-         .name = "s32c1i",
-         .translate = translate_s32c1i,
-+        .op_flags = XTENSA_OP_LOAD | XTENSA_OP_STORE,
-     }, {
-         .name = "s32e",
-         .translate = translate_s32e,
--        .op_flags = XTENSA_OP_PRIVILEGED,
-+        .op_flags = XTENSA_OP_PRIVILEGED | XTENSA_OP_STORE,
-     }, {
-         .name = (const char * const[]) {
-             "s32i", "s32i.n", "s32nb", NULL,
-         },
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUL, false, true},
--        .op_flags = XTENSA_OP_NAME_ARRAY,
-+        .op_flags = XTENSA_OP_NAME_ARRAY | XTENSA_OP_STORE,
-     }, {
-         .name = "s32ri",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUL, true, true},
-+        .op_flags = XTENSA_OP_STORE,
-     }, {
-         .name = "s8i",
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_UB, false, true},
-+        .op_flags = XTENSA_OP_STORE,
-     }, {
-         .name = "salt",
-         .translate = translate_salt,
-@@ -5524,21 +5543,25 @@ static const XtensaOpcodeOps fpu2000_ops[] = {
-         .name = "lsi",
-         .translate = translate_ldsti,
-         .par = (const uint32_t[]){false, false},
-+        .op_flags = XTENSA_OP_LOAD,
-         .coprocessor = 0x1,
-     }, {
-         .name = "lsiu",
-         .translate = translate_ldsti,
-         .par = (const uint32_t[]){false, true},
-+        .op_flags = XTENSA_OP_LOAD,
-         .coprocessor = 0x1,
-     }, {
-         .name = "lsx",
-         .translate = translate_ldstx,
-         .par = (const uint32_t[]){false, false},
-+        .op_flags = XTENSA_OP_LOAD,
-         .coprocessor = 0x1,
-     }, {
-         .name = "lsxu",
-         .translate = translate_ldstx,
-         .par = (const uint32_t[]){false, true},
-+        .op_flags = XTENSA_OP_LOAD,
-         .coprocessor = 0x1,
-     }, {
-         .name = "madd.s",
-@@ -5618,21 +5641,25 @@ static const XtensaOpcodeOps fpu2000_ops[] = {
-         .name = "ssi",
-         .translate = translate_ldsti,
-         .par = (const uint32_t[]){true, false},
-+        .op_flags = XTENSA_OP_STORE,
-         .coprocessor = 0x1,
-     }, {
-         .name = "ssiu",
-         .translate = translate_ldsti,
-         .par = (const uint32_t[]){true, true},
-+        .op_flags = XTENSA_OP_STORE,
-         .coprocessor = 0x1,
-     }, {
-         .name = "ssx",
-         .translate = translate_ldstx,
-         .par = (const uint32_t[]){true, false},
-+        .op_flags = XTENSA_OP_STORE,
-         .coprocessor = 0x1,
-     }, {
-         .name = "ssxu",
-         .translate = translate_ldstx,
-         .par = (const uint32_t[]){true, true},
-+        .op_flags = XTENSA_OP_STORE,
-         .coprocessor = 0x1,
-     }, {
-         .name = "sub.s",
+-    for (in_idx = 0; in_idx < n_in; ++in_idx) {
++again:
++    for (; in_idx < n_in; ++in_idx) {
+         i = in[in_idx];
+         sorted[n_out] = slot + i;
+         ++n_out;
+@@ -1047,6 +1105,29 @@ static bool tsort(struct slot_prop *slot,
+             }
+         }
+     }
++    if (n_edge) {
++        for (; node_idx < n; ++node_idx) {
++            struct tsnode *cnode = node + node_idx;
++
++            if (cnode->n_in_edge) {
++                for (j = 0; j < cnode->n_out_edge; ++j) {
++                    unsigned k = cnode->out_edge[j];
++
++                    if (break_dependency(slot + k, slot + node_idx,
++                                         copy, n_copy) &&
++                        --node[k].n_in_edge == 0) {
++                        in[n_in] = k;
++                        ++n_in;
++                        --n_edge;
++                        cnode->out_edge[j] =
++                            cnode->out_edge[cnode->n_out_edge - 1];
++                        --cnode->n_out_edge;
++                        goto again;
++                    }
++                }
++            }
++        }
++    }
+     return n_edge == 0;
+ }
+ 
+@@ -1084,6 +1165,15 @@ static int resource_compare(const void *a, const void *b)
+         -1 : (pa->resource > pb->resource ? 1 : 0);
+ }
+ 
++static int arg_copy_compare(const void *a, const void *b)
++{
++    const struct opcode_arg_copy *pa = a;
++    const struct opcode_arg_copy *pb = b;
++
++    return pa->resource < pb->resource ?
++        -1 : (pa->resource > pb->resource ? 1 : 0);
++}
++
+ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+ {
+     xtensa_isa isa = dc->config->isa;
+@@ -1095,6 +1185,8 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     uint32_t op_flags = 0;
+     struct slot_prop slot_prop[MAX_INSN_SLOTS];
+     struct slot_prop *ordered[MAX_INSN_SLOTS];
++    struct opcode_arg_copy arg_copy[MAX_INSN_SLOTS * MAX_OPCODE_ARGS];
++    unsigned n_arg_copy = 0;
+     uint32_t debug_cause = 0;
+     uint32_t windowed_register = 0;
+     uint32_t coprocessor = 0;
+@@ -1249,7 +1341,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     }
+ 
+     if (slots > 1) {
+-        if (!tsort(slot_prop, ordered, slots)) {
++        if (!tsort(slot_prop, ordered, slots, arg_copy, &n_arg_copy)) {
+             qemu_log_mask(LOG_UNIMP,
+                           "Circular resource dependencies (pc = %08x)\n",
+                           dc->pc);
+@@ -1297,6 +1389,29 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+         return;
+     }
+ 
++    if (n_arg_copy) {
++        uint32_t resource;
++        void *temp;
++        unsigned j;
++
++        qsort(arg_copy, n_arg_copy, sizeof(*arg_copy), arg_copy_compare);
++        for (i = j = 0; i < n_arg_copy; ++i) {
++            if (i == 0 || arg_copy[i].resource != resource) {
++                resource = arg_copy[i].resource;
++                temp = tcg_temp_local_new();
++                tcg_gen_mov_i32(temp, arg_copy[i].arg->in);
++                arg_copy[i].temp = temp;
++
++                if (i != j) {
++                    arg_copy[j] = arg_copy[i];
++                }
++                ++j;
++            }
++            arg_copy[i].arg->in = temp;
++        }
++        n_arg_copy = j;
++    }
++
+     if (op_flags & XTENSA_OP_DIVIDE_BY_ZERO) {
+         for (slot = 0; slot < slots; ++slot) {
+             if (slot_prop[slot].ops->op_flags & XTENSA_OP_DIVIDE_BY_ZERO) {
+@@ -1314,6 +1429,10 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+         ops->translate(dc, pslot->arg, ops->par);
+     }
+ 
++    for (i = 0; i < n_arg_copy; ++i) {
++        tcg_temp_free(arg_copy[i].temp);
++    }
++
+     if (dc->base.is_jmp == DISAS_NEXT) {
+         gen_postprocess(dc, 0);
+         dc->op_flags = 0;
 -- 
 2.11.0
