@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51057)
+Received: from eggs.gnu.org ([209.51.188.92]:51462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gu7Gq-0007i3-LQ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:01:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1gu7HZ-00008C-8n
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:01:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gu72q-0003Lh-K1
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:46:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gu72q-0003KC-C1
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:46:36 -0500
-Date: Thu, 14 Feb 2019 10:46:24 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190214024624.GC21877@stefanha-x1.localdomain>
-References: <20190213071401.11544-1-stefanha@redhat.com>
-	<20190213081318.GA9754@richard>
+	(envelope-from <eblake@redhat.com>) id 1gu7HR-0007Ks-49
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:01:44 -0500
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-7-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2a0e65ff-cd50-8a90-ba64-dabe29b1b43c@redhat.com>
+Date: Wed, 13 Feb 2019 21:01:15 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
-Content-Disposition: inline
-In-Reply-To: <20190213081318.GA9754@richard>
-Subject: Re: [Qemu-devel] [PATCH v2] hostmem-file: reject invalid pmem file
- sizes
+In-Reply-To: <20190213232356.21034-7-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="76wb0EENagNUPq7uDpC88utOmNev7aZtd"
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] block/dirty-bitmaps: move comment
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Zhang Yi <yi.z.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, libvir-list@redhat.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-
---32u276st3Jlj2kUU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--76wb0EENagNUPq7uDpC88utOmNev7aZtd
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, vsementsov@virtuozzo.com,
+ Fam Zheng <fam@euphon.net>, libvir-list@redhat.com,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <2a0e65ff-cd50-8a90-ba64-dabe29b1b43c@redhat.com>
+Subject: Re: [PATCH v2 6/6] block/dirty-bitmaps: move comment block
+References: <20190213232356.21034-1-jsnow@redhat.com>
+ <20190213232356.21034-7-jsnow@redhat.com>
+In-Reply-To: <20190213232356.21034-7-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 13, 2019 at 04:13:18PM +0800, Wei Yang wrote:
-> On Wed, Feb 13, 2019 at 03:14:01PM +0800, Stefan Hajnoczi wrote:
-> >diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> >index ba601ce940..d62689179b 100644
-> >--- a/backends/hostmem-file.c
-> >+++ b/backends/hostmem-file.c
-> >@@ -46,6 +46,28 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
- Error **errp)
-> >     gchar *name;
-> > #endif
-> >=20
-> >+    /*
-> >+     * Verify pmem file size since starting a guest with an incorrect s=
-ize
-> >+     * leads to confusing failures inside the guest.
-> >+     */
-> >+    if (fb->is_pmem && fb->mem_path) {
-> >+        Error *local_err =3D NULL;
-> >+        uint64_t size;
-> >+
-> >+        size =3D qemu_get_pmem_size(fb->mem_path, &local_err);
-> >+        if (!size) {
-> >+            error_propagate(errp, local_err);
-> >+            return;
-> >+        }
-> >+
-> >+        if (backend->size > size) {
-> >+            error_setg(errp, "size property %" PRIu64 " is larger than "
-> >+                       "pmem file \"%s\" size %" PRIu64, backend->size,
-> >+                       fb->mem_path, size);
-> >+            return;
-> >+        }
-> >+    }
-> >+
-> >     if (!backend->size) {
-> >         error_setg(errp, "can't create backend with size 0");
-> >         return;
+On 2/13/19 5:23 PM, John Snow wrote:
+> Simply move the big status enum comment block to above the status
+> function, and document it as being deprecated. The whole confusing
+> block can get deleted in three releases time.
 >=20
-> Would it be reasonable to move the above check after checking size and
-> mem_path?
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/dirty-bitmap.c | 36 +++++++++++++++++++-----------------
+>  1 file changed, 19 insertions(+), 17 deletions(-)
+>=20
 
-Thanks, will fix in v3.
+> -/* Called with BQL taken.  */
+> +/**
+> + * bdrv_dirty_bitmap_status: This API is now deprecated.
+> + * Called with BQL taken.
+> + *
+> + * A BdrvDirtyBitmap can be in four possible user-visible states:
+> + * (1) Active:   successor is NULL, and disabled is false: full r/w mo=
+de
+> + * (2) Disabled: successor is NULL, and disabled is true: qualified r/=
+w mode,
+> + *               guest writes are dropped, but monitor writes are poss=
+ible,
+> + *               through commands like merge and clear.
+> + * (3) Frozen:   successor is not NULL.
+> + *               A frozen bitmap cannot be renamed, deleted, cleared, =
+set,
+> + *               enabled, merged to, etc. A frozen bitmap can only abd=
+icate()
+> + *               or reclaim().
+> + *               In this state, the anonymous successor bitmap may be =
+either
+> + *               Active and recording writes from the guest (e.g. back=
+up jobs),
+> + *               but it can be Disabled and not recording writes.
 
-Stefan
+Pre-existing due to code motion, but you could improve the grammar with
+s/but/or/
 
---32u276st3Jlj2kUU
+> + * (4) Locked:   Whether Active or Disabled, the user cannot modify th=
+is bitmap
+> + *               in any way from the monitor.
+> + */
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--76wb0EENagNUPq7uDpC88utOmNev7aZtd
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcZNaAAAoJEJykq7OBq3PIZo4H/RPzSnMwr3Q4TcQq/CXkeZts
-J1lOusMLwaR56AOAOmFtMxpQoP497fwTm78HjbjfkaxfRjv397jQbyISCzGVnffC
-+3JU3aCNjmiVtt60ZrEsYKhH0IzDBHnXfC+h5PbGdF4P5V7KnP0EHj8CcgWnDHWT
-PGZxACvRMwQKybCXmYOauZ2YOBMx0aJ43Soi7vNW4RJOwKsvTdnXIBCzkQ/jrHws
-kX7wP6cZlk+MtjrSBECsnRYdjbA8EPtJcWeyx2yGfxpfKO7d0QLZa070viTdDQv4
-Pzd7LnUcWd5Gq+rn+yzNsgC/pYwaHBOffxhMu47b33gS7nF2EY8/fhwC1pXwDIs=
-=T/YS
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxk2fsACgkQp6FrSiUn
+Q2rfMQf/djw3iTbCFm8aESxzcFblKgvg5xt6u4TBeMpQo/CBx0H54Q9JSTMoh1SB
+Ync5cnQoz/xpmjap4TfJewE7Iwt/PHl+t3P5XYXWJeKHO0XibMNbjQbblnsLTseu
+9XR4TWQbfo51ELYOoIQAqv+5VQD6VywHSW8BFCZrqYY8PMXB9G1EL/AXStM6iI/R
+9/QpNeR771HpeKrpNxnoZwzS3BQk1A9Kp6X1zi6P+McIDIBbLQUd/naM9Njgt2F6
+LlGUPNENMivY7cZpKRMtRwJKmQJMvFKdbExVlW4igXsj5z8FBeL+LlbRzQygYg4J
+C1Y63WlGQYGud8CbzRTo3mzG598ByQ==
+=razI
 -----END PGP SIGNATURE-----
 
---32u276st3Jlj2kUU--
+--76wb0EENagNUPq7uDpC88utOmNev7aZtd--
