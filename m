@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50008)
+Received: from eggs.gnu.org ([209.51.188.92]:49891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guGeW-00038O-C9
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:02:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guGeR-00032s-UO
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guGTv-0006Pb-LI
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:51:12 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42969)
+	(envelope-from <peter.maydell@linaro.org>) id 1guGUD-0006nG-8P
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:51:32 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55949)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guGTu-0006Nb-S3
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:51:11 -0500
-Received: by mail-wr1-x442.google.com with SMTP id q18so6327475wrx.9
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 04:51:10 -0800 (PST)
+	id 1guGU2-0006VK-Lk
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:51:22 -0500
+Received: by mail-wm1-x344.google.com with SMTP id r17so6109277wmh.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 04:51:17 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 12:50:53 +0000
-Message-Id: <20190214125107.22178-1-peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 12:50:59 +0000
+Message-Id: <20190214125107.22178-7-peter.maydell@linaro.org>
+In-Reply-To: <20190214125107.22178-1-peter.maydell@linaro.org>
+References: <20190214125107.22178-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/14] Add model of the Arm Musca devboards
+Subject: [Qemu-devel] [PATCH 06/14] hw/char/pl011: Support all interrupt
+ lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +32,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-This patchset adds a model of the Arm Musca devboards
-('musca-a' and 'musca-b1').
-These boards are described here:
-https://developer.arm.com/products/system-design/development-boards/iot-test-chips-and-boards/musca-a-test-chip-board
-https://developer.arm.com/products/system-design/development-boards/iot-test-chips-and-boards/musca-b-test-chip-board
+The PL011 UART has six interrupt lines:
+ * RX (receive data)
+ * TX (transmit data)
+ * RT (receive timeout)
+ * MS (modem status)
+ * E (errors)
+ * combined (logical OR of all the above)
 
-They're based on the SSE-200 subsystem for embedded which
-we already have a model of. The two boards are somewhat
-similar but have a different layout of devices (Musca-B1
-puts them behind a more sophisticated PPC setup).
+So far we have only emulated the combined interrupt line;
+add support for the others, so that boards that wire them
+up to different interrupt controller inputs can do so.
 
-I've tested Musca-A with the Zephyr RTOS's "hello world"
-program, and Musca-B1 with Arm Trusted Firmware M.
-(Arm-TFM does in theory support also Musca-A, but in practice
-it requires proper QSPI flash device support there; Zephyr
-currently supports only Musca-A.)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/char/pl011.h |  2 +-
+ hw/char/pl011.c         | 46 +++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 45 insertions(+), 3 deletions(-)
 
-Zephyr getting started guide:
-https://docs.zephyrproject.org/latest/getting_started/index.html
-Arm-TFM build instructions:
-https://git.trustedfirmware.org/trusted-firmware-m.git/about/docs/user_guides/tfm_build_instruction.md
-
-The first half of the patchset is some fairly straightforward
-bugfixes and enhancements to various devices; the second half
-does the actual implementation.
-
-thanks
--- PMM
-
-Peter Maydell (14):
-  hw/arm/armsse: Fix miswiring of expansion IRQs
-  hw/misc/tz-ppc: Support having unused ports in the middle of the range
-  hw/timer/pl031: Allow use as an embedded-struct device
-  hw/timer/pl031: Convert to using trace events
-  hw/char/pl011: Allow use as an embedded-struct device
-  hw/char/pl011: Support all interrupt lines
-  hw/char/pl011: Use '0x' prefix when logging hex numbers
-  hw/arm/armsse: Document SRAM_ADDR_WIDTH property in header comment
-  hw/arm/armsse: Allow boards to specify init-svtor
-  hw/arm/musca.c: Implement models of the Musca-A and -B1 boards
-  hw/arm/musca: Add PPCs
-  hw/arm/musca: Add MPCs
-  hw/arm/musca: Wire up PL031 RTC
-  hw/arm/musca: Wire up PL011 UARTs
-
- hw/arm/Makefile.objs            |   1 +
- include/hw/arm/armsse.h         |   5 +
- include/hw/char/pl011.h         |  34 ++
- include/hw/misc/tz-ppc.h        |   8 +-
- include/hw/timer/pl031.h        |  44 +++
- hw/arm/armsse.c                 |  10 +-
- hw/arm/musca.c                  | 669 ++++++++++++++++++++++++++++++++
- hw/char/pl011.c                 |  81 ++--
- hw/misc/tz-ppc.c                |  32 ++
- hw/timer/pl031.c                |  80 ++--
- MAINTAINERS                     |   7 +
- default-configs/arm-softmmu.mak |   1 +
- hw/timer/trace-events           |   6 +
- 13 files changed, 890 insertions(+), 88 deletions(-)
- create mode 100644 include/hw/timer/pl031.h
- create mode 100644 hw/arm/musca.c
-
+diff --git a/include/hw/char/pl011.h b/include/hw/char/pl011.h
+index 1b52bfd5c90..dad3cf29121 100644
+--- a/include/hw/char/pl011.h
++++ b/include/hw/char/pl011.h
+@@ -45,7 +45,7 @@ typedef struct PL011State {
+     int read_count;
+     int read_trigger;
+     CharBackend chr;
+-    qemu_irq irq;
++    qemu_irq irq[6];
+     const unsigned char *id;
+ } PL011State;
+ 
+diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+index 0c4711e4027..29f4e5eb224 100644
+--- a/hw/char/pl011.c
++++ b/hw/char/pl011.c
+@@ -7,6 +7,17 @@
+  * This code is licensed under the GPL.
+  */
+ 
++/*
++ * QEMU interface:
++ *  + sysbus MMIO region 0: device registers
++ *  + sysbus IRQ 0: UARTINTR (combined interrupt line)
++ *  + sysbus IRQ 1: UARTRXINTR (receive FIFO interrupt line)
++ *  + sysbus IRQ 2: UARTTXINTR (transmit FIFO interrupt line)
++ *  + sysbus IRQ 3: UARTRTINTR (receive timeout interrupt line)
++ *  + sysbus IRQ 4: UARTMSINTR (momem status interrupt line)
++ *  + sysbus IRQ 5: UARTEINTR (error interrupt line)
++ */
++
+ #include "qemu/osdep.h"
+ #include "hw/char/pl011.h"
+ #include "hw/sysbus.h"
+@@ -22,18 +33,46 @@
+ #define PL011_FLAG_TXFF 0x20
+ #define PL011_FLAG_RXFE 0x10
+ 
++/* Interrupt status bits in UARTRIS, UARTMIS, UARTIMSC */
++#define INT_OE (1 << 10)
++#define INT_BE (1 << 9)
++#define INT_PE (1 << 8)
++#define INT_FE (1 << 7)
++#define INT_RT (1 << 6)
++#define INT_TX (1 << 5)
++#define INT_RX (1 << 4)
++#define INT_DSR (1 << 3)
++#define INT_DCD (1 << 2)
++#define INT_CTS (1 << 1)
++#define INT_RI (1 << 0)
++#define INT_E (INT_OE | INT_BE | INT_PE | INT_FE)
++#define INT_MS (INT_RI | INT_DSR | INT_DCD | INT_CTS)
++
+ static const unsigned char pl011_id_arm[8] =
+   { 0x11, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
+ static const unsigned char pl011_id_luminary[8] =
+   { 0x11, 0x00, 0x18, 0x01, 0x0d, 0xf0, 0x05, 0xb1 };
+ 
++/* Which bits in the interrupt status matter for each outbound IRQ line ? */
++static const uint32_t irqmask[] = {
++    INT_E | INT_MS | INT_RT | INT_TX | INT_RX, /* combined IRQ */
++    INT_RX,
++    INT_TX,
++    INT_RT,
++    INT_MS,
++    INT_E,
++};
++
+ static void pl011_update(PL011State *s)
+ {
+     uint32_t flags;
++    int i;
+ 
+     flags = s->int_level & s->int_enabled;
+     trace_pl011_irq_state(flags != 0);
+-    qemu_set_irq(s->irq, flags != 0);
++    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
++        qemu_set_irq(s->irq[i], (flags & irqmask[i]) != 0);
++    }
+ }
+ 
+ static uint64_t pl011_read(void *opaque, hwaddr offset,
+@@ -284,10 +323,13 @@ static void pl011_init(Object *obj)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     PL011State *s = PL011(obj);
++    int i;
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &pl011_ops, s, "pl011", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+-    sysbus_init_irq(sbd, &s->irq);
++    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
++        sysbus_init_irq(sbd, &s->irq[i]);
++    }
+ 
+     s->read_trigger = 1;
+     s->ifl = 0x12;
 -- 
 2.20.1
