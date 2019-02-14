@@ -1,27 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guKdT-0006ia-No
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:17:20 -0500
+	(envelope-from <david@redhat.com>) id 1guKdd-0006ia-GU
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:17:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guKcs-0000mb-Lw
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:16:43 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guKcs-0000kS-Fd
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:16:42 -0500
-Received: by mail-ot1-x344.google.com with SMTP id m1so11786580otf.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:16:42 -0800 (PST)
-MIME-Version: 1.0
+	(envelope-from <david@redhat.com>) id 1guKcK-0008WP-Qs
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:16:09 -0500
 References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-9-eric.auger@redhat.com>
-In-Reply-To: <20190205173306.20483-9-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 17:16:30 +0000
-Message-ID: <CAFEAcA96jCVKkX8NwaZhnzEXkJBU3Djr3ivAUJWzdhtv+FOaiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 08/18] vl: Set machine ram_size,
- maxram_size and ram_slots earlier
+	<20190205173306.20483-12-eric.auger@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <278b9b9a-f299-1ce2-2a9d-566ef406c1c7@redhat.com>
+Date: Thu, 14 Feb 2019 18:15:42 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190205173306.20483-12-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 11/18] hw/arm/virt: Add memory hotplug
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +25,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:
->
-> The machine RAM attributes will need to be analyzed during the
-> configure_accelerator() process. especially kvm_type() arm64
-> machine callback will use them to know how many IPA/GPA bits are
-> needed to model the whole RAM range. So let's assign those machine
-> state fields before calling configure_accelerator.
->
+On 05.02.19 18:32, Eric Auger wrote:
+> This patch adds the the memory hot-plug/hot-unplug infrastructure
+> in machvirt. It is still not enabled as no device memory is allocated.
+> 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
 > ---
->
-> v4: new
+> v4 -> v5:
+> - change in pc_dimm_pre_plug signature
+> - CONFIG_MEM_HOTPLUG replaced by CONFIG_MEM_DEVICE and CONFIG_DIMM
+> 
+> v3 -> v4:
+> - check the memory device is not hotplugged
+> 
+> v2 -> v3:
+> - change in pc_dimm_plug()'s signature
+> - add pc_dimm_pre_plug call
+> 
+> v1 -> v2:
+> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
+> - s/pc_dimm_memory_plug/pc_dimm_plug
+> - reworded title and commit message
+> - added pre_plug cb
+> - don't handle get_memory_region failure anymore
 > ---
->  vl.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index 9cf0fbe0b8..28f6bbebe2 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4324,6 +4324,9 @@ int main(int argc, char **argv, char **envp)
->      machine_opts = qemu_get_machine_opts();
->      qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
->                       &error_fatal);
-> +    current_machine->ram_size = ram_size;
-> +    current_machine->maxram_size = maxram_size;
-> +    current_machine->ram_slots = ram_slots;
->
->      configure_accelerator(current_machine, argv[0]);
+>  default-configs/arm-softmmu.mak |  2 ++
+>  hw/arm/virt.c                   | 64 ++++++++++++++++++++++++++++++++-
+>  2 files changed, 65 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index be88870799..dc4624794f 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -160,3 +160,5 @@ CONFIG_PCI_DESIGNWARE=y
+>  CONFIG_STRONGARM=y
+>  CONFIG_HIGHBANK=y
+>  CONFIG_MUSICPAL=y
+> +CONFIG_MEM_DEVICE=y
+> +CONFIG_DIMM=y
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index f01886da22..783468ba77 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -59,6 +59,8 @@
+>  #include "qapi/visitor.h"
+>  #include "standard-headers/linux/input.h"
+>  #include "hw/arm/smmuv3.h"
+> +#include "hw/mem/pc-dimm.h"
+> +#include "hw/mem/nvdimm.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1763,6 +1765,49 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>      return ms->possible_cpus;
+>  }
+>  
+> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                                 Error **errp)
+> +{
+> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> +
+> +    if (dev->hotplugged) {
+> +        error_setg(errp, "memory hotplug is not supported");
+> +    }
+> +
+> +    if (is_nvdimm) {
+> +        error_setg(errp, "nvdimm is not yet supported");
+> +        return;
+> +    }
+> +
+> +    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+> +}
+> +
+> +static void virt_memory_plug(HotplugHandler *hotplug_dev,
+> +                             DeviceState *dev, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    Error *local_err = NULL;
+> +
+> +    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> +
+> +    error_propagate(errp, local_err);
+> +}
+> +
+> +static void virt_memory_unplug(HotplugHandler *hotplug_dev,
+> +                               DeviceState *dev, Error **errp)
+> +{
+> +    pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
+> +    object_unparent(OBJECT(dev));
 
-This is still after the call to set_memory_options(), so it's OK.
+Please note that this will soon change with
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PATCH RFCv2 0/9] qdev: Hotplug handler chaining + virtio-pmem
 
-thanks
--- PMM
+What you'll have to do then is to replace the object_unparent by a
+
+object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
