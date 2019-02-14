@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60959)
+Received: from eggs.gnu.org ([209.51.188.92]:33508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guFDI-0001Eu-U5
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:29:58 -0500
+	(envelope-from <imammedo@redhat.com>) id 1guFFI-0002cW-7F
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guFDG-0003Va-4I
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:29:55 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:32781)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guFDE-0003Qx-BH
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:29:53 -0500
-Received: by mail-ot1-x343.google.com with SMTP id i20so9958029otl.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 03:29:50 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1guFFG-0005xy-PX
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1guFFE-0005hn-He
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:31:58 -0500
+Date: Thu, 14 Feb 2019 12:31:40 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190214123140.53d3cdf6@redhat.com>
+In-Reply-To: <c6e1d704-e0da-215e-40c7-6db3daa66da1@linux.intel.com>
+References: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
+	<20190205164716.79b9cd08@Igors-MacBook-Pro.local>
+	<c6e1d704-e0da-215e-40c7-6db3daa66da1@linux.intel.com>
 MIME-Version: 1.0
-References: <20190201145035.22739-1-peter.maydell@linaro.org>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 11:29:36 +0000
-Message-ID: <CAFEAcA89HnCL11_N9oXqwQZf=TFJdHzONg6jxy9FORNwK85OZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Issues] PCI hotplug does not work well on pc
+ platform?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: "Liu, Jing2" <jing2.liu@linux.intel.com>
+Cc: yang.zhong@intel.com, qemu-devel <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Ping! Thanks to Alex for doing low-level review of this patchset.
-I'm particularly interested in high-level review:
- * is this the right way to be going?
- * if we committed this and then did a release with the
-   docs as they are like this, would that be ok?
- * what's the most important next step after this?
+On Wed, 13 Feb 2019 15:40:57 +0800
+"Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
 
-thanks
--- PMM
+> Hi Igor,
+> 
+> Thanks for your reply!
+> 
+> On 2/5/2019 11:47 PM, Igor Mammedov wrote:
+> > On Wed, 30 Jan 2019 21:02:10 +0800
+> > "Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
+> >   
+> >> Hi everyone,
+> >>
+> >> I have two questions.
+> >> 1. PCI hotplug on pci.0 must manually rescan in guest. The ACPI hotplug
+> >> handler sends the GPE event to guest but it seems guest doesn't receive
+> >> it? I tried to open ACPI debug level/layer to 0xffffffff, in order to
+> >> see if there is any message after device_add in monitor, but no message
+> >> comes out until I manually rescan. Also tried printk in
+> >> acpi_ev_gpe_xrupt_handler() and acpi_ev_sci_xrupt_handler(). No output
+> >> in dmesg.
+> >> (I'm sure that CONFIG_HOTPLUG_PCI_PCIE=y, CONFIG_HOTPLUG_PCI_CPCI=y,
+> >> CONFIG_HOTPLUG_PCI=y, CONFIG_HOTPLUG_PCI_ACPI=y)
+> >>
+> >> Whether this is a kind of design or a known issue? Does guest receive
+> >> the request, where can I find the  
+> > does it work with known to work kernels (RHEL7)?
+> > 
+> > Also sharing used QEMU version and command line could help.
+> >   
+> Is there any key config of kernel in guest, besides those I listed above?
+Maybe Marcel knows something about it
+(CCed)
 
-On Fri, 1 Feb 2019 at 14:50, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> This patchset enables building and installing the various rST
-> docs we have started to accumulate in our docs/ directory.
-> It does this using Sphinx (which is the docs tooling that the
-> Linux kernel uses). The series is not trying to take us in one
-> giant leap to a brave new Sphinx-powered world -- it is simply
-> setting up a framework so that we are at least building and
-> shipping these documents and can gradually migrate other parts
-> of our documentation to it.
->
-> The approach I've used here is that we will have multiple "manuals",
-> as proposed by Paolo here:
->   https://wiki.qemu.org/Features/Documentation
-> For the moment I've only created 'interop' and 'devel' as we don't
-> yet have any rST files for 'user', 'system' or 'specs'.
->
-> One slightly awkward mismatch between how Sphinx naturally wants
-> to work and our requirements is that when Sphinx generates a
-> documentation set all in one go it creates hyperlinks between
-> all the docs, they all appear in a single top level table of
-> contents, and so on. But for QEMU's docs we don't want to
-> ship the "devel" manual to end-users. I've taken an approach
-> suggested to me on sphinx-users
-> (https://www.mail-archive.com/sphinx-users@googlegroups.com/msg03224.html)
-> where we run Sphinx once per manual, and treat them as
-> entirely separate documents. The config/tooling in this patchset
-> also supports building everything in a single run, for compatibility
-> with third-party docs sites like readthedocs.org.
->
-> To see the results:
->
-> What you get in the docs/ subdir of your build directory
-> when you do a local build:
->  http://people.linaro.org/~peter.maydell/build-dir-docs/
-> (follow the links to 'devel' and 'interop' for the two manuals)
->
-> What we'll ship in 'make install' in /usr/local/share/doc/qemu/
-> http://people.linaro.org/~peter.maydell/installed-docs/
-> (should be same as the build dir except we don't ship 'devel')
->
-> What you get with a standalone single-run docs build:
->  http://people.linaro.org/~peter.maydell/standalone-docs/index.html
->
-> These use the default 'alabaster' theme from Sphinx. I
-> also experimented with the 'read_the_docs' theme, which I
-> do think looks nicer. Unfortunately it also requires the
-> docs we install to include about 3MB of TrueType font files
-> per manual, which is awkward licensing-wise as the TTFs are
-> under the Open Font License and it's not completely clear to
-> me that it's OK to ship those to use with a doc file that is
-> GPLed. Alabaster doesn't ship fonts, which sidesteps both
-> those problems.
->
-> Other notes:
->  * this does not build the two .rst files that are directly
->    in docs/ (cpu-hotplug.rst and pr-manager.rst) -- we should
->    move these to whichever of the five manuals is the best place
->  * I do have some prototype patches which integrate the kernel's
->    kerneldoc Sphinx extension to parse doc comments in source
->    code. I haven't included them here because I think the 'devel'
->    manual is the lowest priority of the five. They might be
->    useful if we want to try things like building documentation
->    of supported machine models from in-code comments/etc, though.
->  * as noted in a previous email thread, the configure changes
->    now mean that building docs depends on build-sphinx being
->    available, so this is a new build-dep for --enable-docs.
->
-> thanks
-> -- PMM
->
-> Peter Maydell (11):
->   docs/cpu-hotplug.rst: Fix rST markup issues
->   docs: Convert memory.txt to rst format
->   docs: Commit initial files from sphinx-quickstart
->   docs/conf.py: Disable unused _static directory
->   docs/conf.py: Configure the 'alabaster' theme
->   docs/conf.py: Don't include rST sources in HTML build
->   docs/conf.py: Disable option warnings
->   Separate conf.py for each manual we want
->   Makefile, configure: Support building rST documentation
->   Makefile: Abstract out "identify the pkgversion" code
->   docs/conf.py: Don't hard-code QEMU version
->
->  configure                             |   4 +-
->  Makefile                              |  78 +++++++---
->  docs/conf.py                          | 215 ++++++++++++++++++++++++++
->  docs/cpu-hotplug.rst                  |   2 +-
->  docs/devel/conf.py                    |  15 ++
->  docs/devel/index.rst                  |  21 +++
->  docs/devel/{memory.txt => memory.rst} | 128 ++++++++-------
->  docs/index.rst                        |  15 ++
->  docs/interop/conf.py                  |  15 ++
->  docs/interop/index.rst                |  18 +++
->  10 files changed, 430 insertions(+), 81 deletions(-)
->  create mode 100644 docs/conf.py
->  create mode 100644 docs/devel/conf.py
->  create mode 100644 docs/devel/index.rst
->  rename docs/devel/{memory.txt => memory.rst} (85%)
->  create mode 100644 docs/index.rst
->  create mode 100644 docs/interop/conf.py
->  create mode 100644 docs/interop/index.rst
+> 
+> I used guest kernel v4.18 and qemu upstream v3.1.0
+> Command line:
+> sudo /home/xxx/qemu/x86_64-softmmu/qemu-system-x86_64  \
+> -machine pc,accel=kvm,kernel_irqchip -cpu host -m 1G,slots=2,maxmem=10G \
+> -nographic -no-user-config -nodefaults -vga none \
+> -drive file=/home/xxx/image/clear-24690-kvm.img,if=virtio,format=raw \
+>   -smp sockets=1,cpus=4,cores=2,maxcpus=8 \
+> -device virtio-serial-pci,id=virtio-serial0,disable-modern,addr=0x5 \
+> -monitor tcp:0.0.0.0:5000,nowait,server \
+> -chardev stdio,id=charconsole0 -device 
+> virtconsole,chardev=charconsole0,id=console0  \
+> -kernel /home/xxx/linux-stable/arch/x86/boot/bzImage \
+> -append 'root=/dev/vda3 rw rootfstype=ext4 data=ordered 
+> rcupdate.rcu_expedited=1 pci=lastbus=0 pci=realloc=on tsc=reliable 
+> no_timer_check reboot=t noapictimer console=hvc0 iommu=off  panic=1 
+> initcall_debug acpi.debug_layer=0x40000 acpi.debug_level=4 ' \
+> -device pci-bridge,bus=pci.0,id=br1,chassis_nr=1,shpc=on,addr=6  \
+> 
+> >>
+> >> 2. I want to try hotplugging on pci-bridge on pc platform, using shpc. I
+> >> set shpc=on, but when I do device_add, qemu still calls
+> >> acpi_pcihp_device_plug_cb? Why it does not call pci_bridge_dev_hotplug_cb?
+> >> (CONFIG_HOTPLUG_PCI_SHPC=y)  
+> > 
+> > try to disable ACPI hotplug for bridges
+> >   -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off
+> >   
+> I'll try it!
+> 
+> Thanks!
+> Jing
+> >   
+> 
