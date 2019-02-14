@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53984)
+Received: from eggs.gnu.org ([209.51.188.92]:54020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guMLI-00080r-1n
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guMLJ-00082m-Tk
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guMLF-0004r7-S2
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:39 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:40080)
+	(envelope-from <peter.maydell@linaro.org>) id 1guMLH-0004sS-Rz
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:41 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51855)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guMLD-0004pD-Tn
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:36 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id q1so7705326wrp.7
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 11:06:33 -0800 (PST)
+	id 1guMLF-0004nG-Rj
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:06:38 -0500
+Received: by mail-wm1-x332.google.com with SMTP id b11so7522607wmj.1
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 11:06:28 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	n184sm7798471wmf.5.2019.02.14.11.06.31 for <qemu-devel@nongnu.org>
+	n184sm7798471wmf.5.2019.02.14.11.06.26 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 14 Feb 2019 11:06:31 -0800 (PST)
+	Thu, 14 Feb 2019 11:06:26 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 19:05:58 +0000
-Message-Id: <20190214190603.25030-23-peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 19:05:54 +0000
+Message-Id: <20190214190603.25030-19-peter.maydell@linaro.org>
 In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
 References: <20190214190603.25030-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/27] target/arm: Split out flags setting from
- vfp compares
+Subject: [Qemu-devel] [PULL 18/27] target/arm: Use tcg integer min/max
+ primitives for neon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +38,35 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Minimize the code within a macro by splitting out a helper function.
-Use deposit32 instead of manual bit manipulation.
+The 32-bit PMIN/PMAX has been decomposed to scalars,
+and so can be trivially expanded inline.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190209033847.9014-9-richard.henderson@linaro.org
+Message-id: 20190209033847.9014-5-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 45 +++++++++++++++++++++++++++------------------
- 1 file changed, 27 insertions(+), 18 deletions(-)
+ target/arm/translate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8eedce113c1..28e45f0f0ba 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -12871,31 +12871,40 @@ float64 VFP_HELPER(sqrt, d)(float64 a, CPUARMState *env)
-     return float64_sqrt(a, &env->vfp.fp_status);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 61760dab917..103b4f1821a 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4760,10 +4760,10 @@ static inline void gen_neon_rsb(int size, TCGv_i32 t0, TCGv_i32 t1)
  }
  
-+static void softfloat_to_vfp_compare(CPUARMState *env, int cmp)
-+{
-+    uint32_t flags;
-+    switch (cmp) {
-+    case float_relation_equal:
-+        flags = 0x6;
-+        break;
-+    case float_relation_less:
-+        flags = 0x8;
-+        break;
-+    case float_relation_greater:
-+        flags = 0x2;
-+        break;
-+    case float_relation_unordered:
-+        flags = 0x3;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    env->vfp.xregs[ARM_VFP_FPSCR] =
-+        deposit32(env->vfp.xregs[ARM_VFP_FPSCR], 28, 4, flags);
-+}
-+
- /* XXX: check quiet/signaling case */
- #define DO_VFP_cmp(p, type) \
- void VFP_HELPER(cmp, p)(type a, type b, CPUARMState *env)  \
- { \
--    uint32_t flags; \
--    switch(type ## _compare_quiet(a, b, &env->vfp.fp_status)) { \
--    case 0: flags = 0x6; break; \
--    case -1: flags = 0x8; break; \
--    case 1: flags = 0x2; break; \
--    default: case 2: flags = 0x3; break; \
--    } \
--    env->vfp.xregs[ARM_VFP_FPSCR] = (flags << 28) \
--        | (env->vfp.xregs[ARM_VFP_FPSCR] & 0x0fffffff); \
-+    softfloat_to_vfp_compare(env, \
-+        type ## _compare_quiet(a, b, &env->vfp.fp_status)); \
- } \
- void VFP_HELPER(cmpe, p)(type a, type b, CPUARMState *env) \
- { \
--    uint32_t flags; \
--    switch(type ## _compare(a, b, &env->vfp.fp_status)) { \
--    case 0: flags = 0x6; break; \
--    case -1: flags = 0x8; break; \
--    case 1: flags = 0x2; break; \
--    default: case 2: flags = 0x3; break; \
--    } \
--    env->vfp.xregs[ARM_VFP_FPSCR] = (flags << 28) \
--        | (env->vfp.xregs[ARM_VFP_FPSCR] & 0x0fffffff); \
-+    softfloat_to_vfp_compare(env, \
-+        type ## _compare(a, b, &env->vfp.fp_status)); \
- }
- DO_VFP_cmp(s, float32)
- DO_VFP_cmp(d, float64)
+ /* 32-bit pairwise ops end up the same as the elementwise versions.  */
+-#define gen_helper_neon_pmax_s32  gen_helper_neon_max_s32
+-#define gen_helper_neon_pmax_u32  gen_helper_neon_max_u32
+-#define gen_helper_neon_pmin_s32  gen_helper_neon_min_s32
+-#define gen_helper_neon_pmin_u32  gen_helper_neon_min_u32
++#define gen_helper_neon_pmax_s32  tcg_gen_smax_i32
++#define gen_helper_neon_pmax_u32  tcg_gen_umax_i32
++#define gen_helper_neon_pmin_s32  tcg_gen_smin_i32
++#define gen_helper_neon_pmin_u32  tcg_gen_umin_i32
+ 
+ #define GEN_NEON_INTEGER_OP_ENV(name) do { \
+     switch ((size << 1) | u) { \
 -- 
 2.20.1
