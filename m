@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36227)
+Received: from eggs.gnu.org ([209.51.188.92]:39970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1guAFd-0006Vp-RM
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:12:02 -0500
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1guAY3-0000b9-ET
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1guAFc-0002xP-Ns
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:12:01 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45053)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1guAFc-0002rM-Hf
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:12:00 -0500
-Received: by mail-pg1-x543.google.com with SMTP id y1so2475120pgk.11
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 22:11:58 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 13 Feb 2019 22:11:54 -0800
-Message-Id: <20190214061154.30457-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] softfloat: Support float_round_to_odd more
- places
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1guAY2-0002UZ-D3
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:31:03 -0500
+Received: from mga04.intel.com ([192.55.52.120]:27593)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
+	id 1guAY2-00029r-3E
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:31:02 -0500
+Date: Thu, 14 Feb 2019 14:27:30 +0800
+From: Yi Sun <yi.y.sun@linux.intel.com>
+Message-ID: <20190214062730.GH16968@yi.y.sun>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-3-git-send-email-yi.y.sun@linux.intel.com>
+	<20190212062728.GK1011@xz-x1> <20190213090041.GF16968@yi.y.sun>
+	<20190213104224.GA4405@xz-x1> <20190214015204.GG16968@yi.y.sun>
+	<20190214032435.GA3197@xz-x1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190214032435.GA3197@xz-x1>
+Subject: Re: [Qemu-devel] [RFC v1 2/3] intel_iommu: add 256 bits qi_desc
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,152 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, david@redhat.com, qemu-s390x@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-Previously this was only supported for roundAndPackFloat64.
-Include support in round_canonical, round_to_int, roundAndPackFloat32,
-roundAndPackInt32, roundAndPackInt64, roundAndPackUint64.
+On 19-02-14 11:24:35, Peter Xu wrote:
+> On Thu, Feb 14, 2019 at 09:52:04AM +0800, Yi Sun wrote:
+> 
+> [...]
+> 
+> > > > > >  /* Fetch an Invalidation Descriptor from the Invalidation Queue */
+> > > > > > -static bool vtd_get_inv_desc(dma_addr_t base_addr, uint32_t offset,
+> > > > > > +static bool vtd_get_inv_desc(IntelIOMMUState *s,
+> > > > > >                               VTDInvDesc *inv_desc)
+> > > > > >  {
+> > > > > > -    dma_addr_t addr = base_addr + offset * sizeof(*inv_desc);
+> > > > > > -    if (dma_memory_read(&address_space_memory, addr, inv_desc,
+> > > > > > -        sizeof(*inv_desc))) {
+> > > > > > -        error_report_once("Read INV DESC failed");
+> > > > > > -        inv_desc->lo = 0;
+> > > > > > -        inv_desc->hi = 0;
+> > > > > > +    dma_addr_t base_addr = s->iq;
+> > > > > > +    uint32_t offset = s->iq_head;
+> > > > > > +    uint32_t dw = vtd_get_inv_desc_width(s);
+> > > > > > +    dma_addr_t addr = base_addr + offset * dw;
+> > > > > > +
+> > > > > > +    /* init */
+> > > > > > +    inv_desc->val[0] = 0;
+> > > > > > +    inv_desc->val[1] = 0;
+> > > > > > +    inv_desc->val[2] = 0;
+> > > > > > +    inv_desc->val[3] = 0;
+> > > > > 
+> > > > > No need?
+> > > > > 
+> > > > This is necessary. Per my test, the val[] are not 0 by default.
+> > > 
+> > > I agree, it's a stack variable. However...
+> > > 
+> > > > That makes bug happen.
+> > > 
+> > > ... could you explain the bug?
+> > > 
+> > Below error can be observed.
+> > 
+> > qemu-system-x86_64: vtd_process_inv_desc: invalid inv desc: val[3]=10, val[2]=0 (detect reserve non-zero)
+> 
+> Ok so you're checking val[2] & val[3] unconditionally:
+> 
+>     if (inv_desc.val[3] || inv_desc.val[2]) {
+>         error_report_once("%s: invalid inv desc: val[3]=%"PRIx64
+>                           ", val[2]=%"PRIx64
+>                           " (detect reserve non-zero)", __func__,
+>                           inv_desc.val[3],
+>                           inv_desc.val[2]);
+>         return false;
+>     }
+> 
+> Why?  Shouldn't they invalid if inv desc width is 128bits?
+> 
+Here, my intention is to simplify the codes. If inv_desc.val[] has been
+initialized to 0, the error will not happen no matter 128bits or 256bits.
 
-This does not include any of the floatx80 routines, as we
-do not have users for that rounding mode there.
+> When 256 bits invalidation descriptor is used, the guest driver
+> should be responsible to fill in zeros into reserved fields.
+> 
+> Another question: is val[2] & val[3] used in any place even with
+> 256bits mode?  From what I see from the spec (chap 6.5.2), all of them
+> seems to be reserved as zeros, then I don't understand why bother
+> extending this to 256bits...  Did I miss something?
+> 
+Although the high 128bits are not used now, they are defined by spec
+so that we should handle them. At least we can know if there is error
+by checking if high 128bits are 0. Furthermore, we handle them in codes
+now can avoid some changes in the future.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-
-David, if you could test this vs your s390 patches, vs real s390
-hardware, that would be lovely.
-
-
-r~
-
----
- fpu/softfloat.c | 40 ++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 38 insertions(+), 2 deletions(-)
-
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 9132d7a0b0..325c6e4e79 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -696,6 +696,7 @@ static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
- static FloatParts round_canonical(FloatParts p, float_status *s,
-                                   const FloatFmt *parm)
- {
-+    const uint64_t frac_lsb = parm->frac_lsb;
-     const uint64_t frac_lsbm1 = parm->frac_lsbm1;
-     const uint64_t round_mask = parm->round_mask;
-     const uint64_t roundeven_mask = parm->roundeven_mask;
-@@ -731,6 +732,10 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-             inc = p.sign ? round_mask : 0;
-             overflow_norm = !p.sign;
-             break;
-+        case float_round_to_odd:
-+            overflow_norm = true;
-+            inc = frac & frac_lsb ? 0 : frac_lsbm1;
-+            break;
-         default:
-             g_assert_not_reached();
-         }
-@@ -778,9 +783,14 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-             shift64RightJamming(frac, 1 - exp, &frac);
-             if (frac & round_mask) {
-                 /* Need to recompute round-to-even.  */
--                if (s->float_rounding_mode == float_round_nearest_even) {
-+                switch (s->float_rounding_mode) {
-+                case float_round_nearest_even:
-                     inc = ((frac & roundeven_mask) != frac_lsbm1
-                            ? frac_lsbm1 : 0);
-+                    break;
-+                case float_round_to_odd:
-+                    inc = frac & frac_lsb ? 0 : frac_lsbm1;
-+                    break;
-                 }
-                 flags |= float_flag_inexact;
-                 frac += inc;
-@@ -1988,6 +1998,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
-             case float_round_down:
-                 one = a.sign;
-                 break;
-+            case float_round_to_odd:
-+                one = true;
-+                break;
-             default:
-                 g_assert_not_reached();
-             }
-@@ -2021,6 +2034,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
-             case float_round_down:
-                 inc = a.sign ? rnd_mask : 0;
-                 break;
-+            case float_round_to_odd:
-+                inc = a.frac & frac_lsb ? 0 : frac_lsbm1;
-+                break;
-             default:
-                 g_assert_not_reached();
-             }
-@@ -3314,6 +3330,9 @@ static int32_t roundAndPackInt32(flag zSign, uint64_t absZ, float_status *status
-     case float_round_down:
-         roundIncrement = zSign ? 0x7f : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = absZ & 0x80 ? 0 : 0x7f;
-+        break;
-     default:
-         abort();
-     }
-@@ -3368,6 +3387,9 @@ static int64_t roundAndPackInt64(flag zSign, uint64_t absZ0, uint64_t absZ1,
-     case float_round_down:
-         increment = zSign && absZ1;
-         break;
-+    case float_round_to_odd:
-+        increment = !(absZ0 & 1) && absZ1;
-+        break;
-     default:
-         abort();
-     }
-@@ -3424,6 +3446,9 @@ static int64_t roundAndPackUint64(flag zSign, uint64_t absZ0,
-     case float_round_down:
-         increment = zSign && absZ1;
-         break;
-+    case float_round_to_odd:
-+        increment = !(absZ0 & 1) && absZ1;
-+        break;
-     default:
-         abort();
-     }
-@@ -3526,6 +3551,8 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-     case float_round_down:
-         roundIncrement = zSign ? 0x7f : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = zSig & 0x80 ? 0 : 0x7f;
-     default:
-         abort();
-         break;
-@@ -3536,8 +3563,10 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-              || (    ( zExp == 0xFD )
-                   && ( (int32_t) ( zSig + roundIncrement ) < 0 ) )
-            ) {
-+            bool overflow_to_inf = roundingMode != float_round_to_odd &&
-+                                   roundIncrement != 0;
-             float_raise(float_flag_overflow | float_flag_inexact, status);
--            return packFloat32( zSign, 0xFF, - ( roundIncrement == 0 ));
-+            return packFloat32(zSign, 0xFF, -!overflow_to_inf);
-         }
-         if ( zExp < 0 ) {
-             if (status->flush_to_zero) {
-@@ -3555,6 +3584,13 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-             if (isTiny && roundBits) {
-                 float_raise(float_flag_underflow, status);
-             }
-+            if (roundingMode == float_round_to_odd) {
-+                /*
-+                 * For round-to-odd case, the roundIncrement depends on
-+                 * zSig which just changed.
-+                 */
-+                roundIncrement = zSig & 0x80 ? 0 : 0x7f;
-+            }
-         }
-     }
-     if (roundBits) {
--- 
-2.17.2
+> Regards,
+> 
+> -- 
+> Peter Xu
