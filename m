@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43718)
+Received: from eggs.gnu.org ([209.51.188.92]:45373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1guCcr-0007LB-Ac
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:44:10 -0500
+	(envelope-from <pagupta@redhat.com>) id 1guCj4-0000MN-Gb
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1guCcn-00049k-0I
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:44:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59722)
+	(envelope-from <pagupta@redhat.com>) id 1guCj0-0002VW-Ac
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1guCcm-00048Y-Jz
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:44:04 -0500
-Date: Thu, 14 Feb 2019 16:43:54 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190214084354.GC9932@xz-x1>
-References: <20190212062728.GK1011@xz-x1> <20190213090041.GF16968@yi.y.sun>
-	<20190213104224.GA4405@xz-x1> <20190214015204.GG16968@yi.y.sun>
-	<20190214032435.GA3197@xz-x1> <20190214062730.GH16968@yi.y.sun>
-	<20190214071330.GA9932@xz-x1>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19C9402DA@SHSMSX104.ccr.corp.intel.com>
-	<20190214081305.GB9932@xz-x1>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19C9403C2@SHSMSX104.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1guCix-0002Oo-NP
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:28 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 983EC89AD1
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 08:50:18 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 895AE60857
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 08:50:18 +0000 (UTC)
+Date: Thu, 14 Feb 2019 03:50:18 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <2037886390.964185.1550134218213.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190214031004.32522-1-stefanha@redhat.com>
+References: <20190214031004.32522-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19C9403C2@SHSMSX104.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [RFC v1 2/3] intel_iommu: add 256 bits qi_desc
- support
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] hostmem-file: reject invalid pmem
+ file sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, Feb 14, 2019 at 08:22:05AM +0000, Tian, Kevin wrote:
-> > From: Peter Xu [mailto:peterx@redhat.com]
-> > Sent: Thursday, February 14, 2019 4:13 PM
-> > 
-> > On Thu, Feb 14, 2019 at 07:35:20AM +0000, Tian, Kevin wrote:
-> > > > From: Peter Xu [mailto:peterx@redhat.com]
-> > > > Sent: Thursday, February 14, 2019 3:14 PM
-> > > >
-> > > > >
-> > > > > > When 256 bits invalidation descriptor is used, the guest driver
-> > > > > > should be responsible to fill in zeros into reserved fields.
-> > > > > >
-> > > > > > Another question: is val[2] & val[3] used in any place even with
-> > > > > > 256bits mode?  From what I see from the spec (chap 6.5.2), all of
-> > them
-> > > > > > seems to be reserved as zeros, then I don't understand why bother
-> > > > > > extending this to 256bits...  Did I miss something?
-> > > > > >
-> > >
-> > > PRQ is extended to carry larger private data which requires 256bits
-> > > mode. You can take a look at 7.5.1.1 Page Request Descriptor.
-> > 
-> > But we are talking about IQ (Invalidation Queue), not PRQ, right?
-> > 
-> > I see that Page Request Queue seems to always have 256bits descriptors
-> > (chap 10.4.32, there is no Descriptor Width field, and I think it
-> > means DW==1 always), however the Invalidation Queue seems to support
-> > both modes (chap 10.4.23, there is Descriptor Width field, DW==0
-> > should be the legacy mode, and DW==1 should be the new mode).  While,
-> > none of the invalidate descriptors described in chap 6.5.2 is using
-> > the upper 128bits even if 256bits mode is supported.
-> > 
+
+
 > 
-> Page Group Response descriptor is composed by software through
-> invalidation queue, which needs to carry same private data back
-> (as in page request descriptor). it's described in 7.7.1.
+> v3:
+>  * Added Patch 1 by Igor [Wei]
+>  * Moved pmem size check after mem_path check [Wei]
+> 
+> Guests started with NVDIMMs larger than the underlying host file produce
+> confusing errors inside the guest.  This happens because the guest
+> accesses pages beyond the end of the file.
+> 
+> Check the pmem file size on startup and print a clear error message if
+> the size is invalid.
+> 
+> Igor Mammedov (1):
+>   hostmem: simplify ifdef-s in file_backend_memory_alloc()
+> 
+> Stefan Hajnoczi (1):
+>   hostmem-file: reject invalid pmem file sizes
+> 
+>  include/qemu/osdep.h    | 13 ++++++++++
+>  backends/hostmem-file.c | 32 +++++++++++++++++++++----
+>  util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
+>  util/oslib-win32.c      |  5 ++++
+>  4 files changed, 98 insertions(+), 5 deletions(-)
+> 
+> --
+> 2.20.1
 
-I see the point.  Thanks, Kevin.
-
-Regards,
-
--- 
-Peter Xu
+Both the patches look good to me.
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
