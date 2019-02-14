@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50487)
+Received: from eggs.gnu.org ([209.51.188.92]:51338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1guKHk-0006ce-Qu
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 11:54:54 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1guKKl-0000Ln-Mr
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 11:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1guKHX-0003Ir-7n
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 11:54:45 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:42566)
+	(envelope-from <amarkovic@wavecomp.com>) id 1guKKh-0007pg-G7
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 11:57:57 -0500
+Received: from mail-eopbgr820090.outbound.protection.outlook.com
+	([40.107.82.90]:36832
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1guKHW-00038w-D3
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 11:54:38 -0500
-Message-ID: <ec13ef9f4b4807887c68d5087dd46b3d0e22d900.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 14 Feb 2019 17:54:12 +0100
-In-Reply-To: <20190214085131.0b6d8d37@x1.home>
-References: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
-	<3df33b2bd332259dc548751b3c3c5eaa297428b0.1550050121.git-series.knut.omang@oracle.com>
-	<20190213121346.384ebbab@w520.home>
-	<80eacdbd99faa60d761951e9321a998764cd73ce.camel@oracle.com>
-	<20190214085131.0b6d8d37@x1.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1guKKV-0007OT-IC
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 11:57:46 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 14 Feb 2019 16:57:32 +0000
+Message-ID: <BN6PR2201MB125158759A9AA79430DA7EDEC6670@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1549902684-21740-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1549902684-21740-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1549902684-21740-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] target/mips: compare virtual
+ addresses in LL/SC sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,226 +32,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, Paul Burton <pburton@wavecomp.com>, "cota@braap.org" <cota@braap.org>
 
-On Thu, 2019-02-14 at 08:51 -0700, Alex Williamson wrote:
-> On Thu, 14 Feb 2019 08:07:33 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > On Wed, 2019-02-13 at 12:13 -0700, Alex Williamson wrote:
-> > > On Wed, 13 Feb 2019 10:29:58 +0100
-> > > Knut Omang <knut.omang@oracle.com> wrote:
-> > >   
-> > > > Add a helper function to add PCIe capability for Access Control Services
-> > > > (ACS)  
-> > > 
-> > > This is redundant to the commit title.
-> > >   
-> > > > ACS support in the associated root port is needed to pass
-> > > > through individual functions of a device to different VMs with VFIO
-> > > > without Alex Williamson's pcie_acs_override kernel patch or similar
-> > > > in the guest.  
-> > > 
-> > > This is overly subtle, to work backwards that individual functions
-> > > (plural!) of a device (singular!) must imply a multifunction endpoint
-> > > in the same hierarchy split to different L2 VMs.  Perhaps I only
-> > > finally realized this subtly on v4.
-> > >   
-> > > > Single function devices, or multifunction devices
-> > > > that all goes to the same VM works fine even without ACS, as VFIO
-> > > > will avoid putting the root port itself into the IOMMU group
-> > > > even without ACS support in the port.  
-> > > 
-> > > Also confusing and incorrectly states that a) VFIO is responsible for
-> > > IOMMU grouping, it's not, and b) that the root port would not be
-> > > included in such a group, it would.  The latter was I thought the
-> > > impetus for this series.  
-> > 
-> > that wasn't the intention but I can see that it looks that way now
-> > 
-> > > > Multifunction endpoints may also implement an ACS capability,
-> > > > only on function 0, and with more limited features.  
-> > > 
-> > > "only on function 0" is incorrect, each function of a multifunction
-> > > device should (not must) implement an ACS capability if any of them do.
-> > > 
-> > > Can't we just say something like:
-> > > 
-> > > "Implementing an ACS capability on downstream ports and multifuction
-> > > endpoints indicates isolation and IOMMU visibility to a finer
-> > > granularity thereby creating smaller IOMMU groups in the guest and thus
-> > > more flexibility in assigning endpoints to guest userspace or an L2
-> > > guest."  
-> > 
-> > sure - will use this - and remove my confusing attempt to 
-> > credit to your override patch and VFIO :)
-> > 
-> > > (I avoided including SR-IOV with multifunction since that's not
-> > > implemented here)  
-> > 
-> > I agree
-> > 
-> > > > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > > > ---
-> > > >  hw/pci/pcie.c              | 39
-> > > > +++++++++++++++++++++++++++++++++++++++-
-> > > >  include/hw/pci/pcie.h      |  6 ++++++-
-> > > >  include/hw/pci/pcie_regs.h |  4 ++++-
-> > > >  3 files changed, 49 insertions(+)
-> > > > 
-> > > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > > > index 230478f..6e87994 100644
-> > > > --- a/hw/pci/pcie.c
-> > > > +++ b/hw/pci/pcie.c
-> > > > @@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
-> > > >  
-> > > >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
-> > > >  }
-> > > > +
-> > > > +/* ACS (Access Control Services) */
-> > > > +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
-> > > > +{
-> > > > +    bool is_pcie_slot = !!object_dynamic_cast(OBJECT(dev),
-> > > > TYPE_PCIE_SLOT);  
-> > > 
-> > > Perhaps we should be using pci_is_express_downstream_port().  
-> > 
-> > oh - yes - I forgot that we need to look in pci.h for those kind of 
-> > helpers..
-> > 
-> > > > +    uint16_t cap_bits = 0;
-> > > > +
-> > > > +    /*
-> > > > +     * For endpoints, only multifunction devices may have an
-> > > > +     * ACS capability, and only on function 0:  
-> > > 
-> > > Incorrect
-> > >   
-> > > > +     */
-> > > > +    assert(is_pcie_slot ||
-> > > > +           ((dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) &&
-> > > > +            PCI_FUNC(dev->devfn)));  
-> > > 
-> > > The second test should be:
-> > > 
-> > > ((dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) ||
-> > >  PCI_FUNC(dev->devfn))
-> > > 
-> > > If the function number is non-zero, then it's clearly a multifunction
-> > > device, the multifunction capability is only required on function
-> > > zero.  Just as in my previous example, an ACS capability can only
-> > > describe/control the DMA flow of the function implementing it, nothing
-> > > in the spec that I can see imposes function zero's DMA flow on the
-> > > other functions.  
-> > 
-> > Ah - of course - that makes sense - 
-> > was thinking too complicated here, and also my comment didn't match
-> > the code at all..
-> > 
-> > > There's also a gap here that function zero can set the multifunction
-> > > capability, but there may be no secondary devices defined.  Not that
-> > > we necessarily need to resolve this, but it's a nuance of allowing
-> > > arbitrary multifunction configurations as QEMU does.  
-> > 
-> > Yes, in the SR/IOV case, at least as I have implemented it in QEMU, 
-> > with one PF that would be the default - as no VFs are defined at reset, 
-> > there's only one function, but it still need to be multifunction 
-> > for QEMU to accept more functions appearing later.
-> > 
-> > > > +
-> > > > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
-> > > > +                        PCI_ACS_SIZEOF);
-> > > > +    dev->exp.acs_cap = offset;
-> > > > +
-> > > > +    if (is_pcie_slot) {
-> > > > +        /*
-> > > > +         * Endpoints may also implement ACS, and optionally RR and CR,
-> > > > +         * if they want to support p2p, but only slots may
-> > > > +         * implement SV, TB or UF:  
-> > > 
-> > > Careful using "may" with spec references.  
-> > 
-> > :-D
-> > 
-> > > "Downstream ports must implement SV, TB, RR, CR, and UF (with caveats
-> > > on the latter three that we ignore for simplicity).  Endpoints may also
-> > > implement a subset of ACS capabilities, but these are optional if the
-> > > endpoint does not support peer-to-peer between functions and thus
-> > > omitted here."  
-> > 
-> > Thanks - I'll put that in instead
-> > 
-> > > > +         */
-> > > > +        cap_bits =
-> > > > +            PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR |
-> > > > PCI_ACS_UF;  
-> > > 
-> > > PCI_ACS_DT has similar "must be implemented" requirements to RR, RC,
-> > > and UF, why is it not included?  For all of these "caveat" ones there
-> > > are conditions which can make it optional for root ports, but required
-> > > for switch downstream ports, so it seems reasonable that we include
-> > > both since that's what our is_pci_slot() test covers.  Thanks,  
-> > 
-> > That was because my "reference" root ports don't not implement it, taking
-> > the
-> > conservative approach:
-> > 
-> > 00:07.0 PCI bridge: Intel Corporation 5520/5500/X58 I/O Hub PCI Express Root
-> > Port 7 (rev 22) (prog-if 00 [Normal decode])
-> >        ...
-> >        Capabilities: [150 v1] Access Control Services
-> >                 ACSCap: SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+
-> > UpstreamFwd+ EgressCtrl- DirectTrans-
-> >                 ACSCtl: SrcValid+ TransBlk- ReqRedir+ CmpltRedir+
-> > UpstreamFwd+ EgressCtrl- DirectTrans-
-> > 
-> > In fact, all gens of servers I have access to supports just the same cap
-> > bits in
-> > their root ports, in order of release date. The latest gen even have some
-> > root
-> > ports without an ACS capability.
-> > 
-> > 00:02.0 PCI bridge: Intel Corporation Xeon E5/Core i7 IIO PCI Express Root
-> > Port 2a (rev 07)
-> > 00:01.0 PCI bridge: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon
-> > D PCI Express Root Port 1 (rev 01) (prog-if 00 [Normal decode])
-> > 00:03.0 PCI bridge: Intel Corporation Xeon E7 v3/Xeon E5 v3/Core i7 PCI
-> > Express Root Port 3 (rev 02) (prog-if 00 [Normal decode])
-> > 00:02.0 PCI bridge: Intel Corporation Xeon E7 v2/Xeon E5 v2/Core i7 PCI
-> > Express Root Port 2a (rev 04) (prog-if 00 [Normal decode])
-> > 17:00.0 PCI bridge: Intel Corporation Sky Lake-E PCI Express Root Port A
-> > (rev 04) (prog-if 00 [Normal decode])
-> > 
-> > All of these have DirectTrans- in their ACSCap.
-> > 
-> > [For reference, the one without ACS cap, in the same server as 17:00.0
-> > above:
-> > 
-> > 00:1c.0 PCI bridge: Intel Corporation Lewisburg PCI Express Root Port #1
-> > (rev f9) (prog-if 00 [Normal decode])
-> > ]
-> > 
-> > Do you prefer that we set DT as default anyway, or should we stay within
-> > "known
-> > territory" for the OSes, at least for now?
-> 
-> Per the spec:
-> 
->   ACS Direct Translated P2P: must be implemented by Root Ports that
->   support Address Translation Services (ATS) and also support
->   peer-to-peer traffic with other Root Ports; must be implemented by
->   Switch Downstream Ports.
-> 
-> The caveats for root ports here are why your hardware is potentially
-> spec compliant without supporting DT.  There are no caveats for switch
-> downstream ports, therefore it would not be spec compliant to exclude
-> it.  I think your options are either to exclude switch downstream ports
-> from the function or to set DT.  Thanks,
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, February 11, 2019 5:31 PM
+> To: qemu-devel@nongnu.org
+> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo; alex.be=
+nnee@linaro.org; Paul > Burton; cota@braap.org
+> Subject: [PATCH v3 1/6] target/mips: compare virtual addresses in LL/SC s=
+equence
+>=20
+> From: Leon Alrae <leon.alrae@imgtec.com>
+>=20
+> Do only virtual addresses comaprisons in LL/SC sequence emulations.
+>=20
+> Until this patch, physical addresses had been compared in SC part of
+> LL/SC sequence, even though such comparisons could be avoided. Getting
+> rid of them allows throwing away SC helpers and having common SC
+> implementations in user and system mode, avoiding the need for two
+> separate implementations selected by #ifdef CONFIG_USER_ONLY.
+>=20
+> Correct guest software should not rely on LL/SC if they accesses the
+> same physical address via different virtual addresses or if page
+> mapping gets changed between LL/SC due to manipulating TLB entries.
+> MIPS Instruction Set Manual clearly says that an RMW sequence must
+> use the same address in the LL and SC (virtual address, physical
+> address, cacheability and coherency attributes must be identical).
+> Otherwise, the result of the SC is not predictable. This patch takes
+> advantage of this fact and removes the virtual->physical address
+> translation from SC helper.
+>=20
+> lladdr served as Coprocessor 0 LLAddr register which captures physical
+> address of the most recent LL instruction, and also lladdr was used
+> for comparison with following SC physical address. This patch changes
+> the meaning of lladdr - now it will only keep the virtual address of
+> the most recent LL. Additionally, CP0_LLAddr field is introduced which
+> is the actual Coperocessor 0 LLAddr register that guest can access.
+>=20
+> Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
+> Signed-off-by: Miodrag Dinic <miodrag.dinic@imgtec.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Acked-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  target/mips/cpu.h       |  3 ++-
+>  target/mips/machine.c   |  7 ++++---
+>  target/mips/op_helper.c | 29 +++++++++++++++++------------
+>  target/mips/translate.c |  4 ++--
+>  4 files changed, 25 insertions(+), 18 deletions(-)
+>=20
 
-Better to set DT then - a future generic switch downstream port would want to
-have ACS too.
+This patch was authored long time ago (perhaps two years ago), and
+there were some changes in the related areas in the meantime. This
+means that some code portions (for example, SC vs. SCWP handliing)
+are not as consistent as they could be. But this doeasn't affect the
+core of MTTCG feature, and can be handled separately in future
+cleanups, so for this patch anyway:
 
-Knut
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> Alex
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 473d26d..f10e016 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -867,13 +867,14 @@ struct CPUMIPSState {
+>  #define CP0C5_NFExists     0
+>      int32_t CP0_Config6;
+>      int32_t CP0_Config7;
+> +    uint64_t CP0_LLAddr;
+>      uint64_t CP0_MAAR[MIPS_MAAR_MAX];
+>      int32_t CP0_MAARI;
+>      /* XXX: Maybe make LLAddr per-TC? */
+>  /*
+>   * CP0 Register 17
+>   */
+> -    uint64_t lladdr;
+> +    target_ulong lladdr; /* LL virtual address compared against SC */
+>      target_ulong llval;
+>      target_ulong llnewval;
+>      uint64_t llval_wp;
+> diff --git a/target/mips/machine.c b/target/mips/machine.c
+> index 1341ab1..70d277d 100644
+> --- a/target/mips/machine.c
+> +++ b/target/mips/machine.c
+> @@ -214,8 +214,8 @@ const VMStateDescription vmstate_tlb =3D {
+>=20
+>  const VMStateDescription vmstate_mips_cpu =3D {
+>      .name =3D "cpu",
+> -    .version_id =3D 17,
+> -    .minimum_version_id =3D 17,
+> +    .version_id =3D 18,
+> +    .minimum_version_id =3D 18,
+>      .post_load =3D cpu_post_load,
+>      .fields =3D (VMStateField[]) {
+>          /* Active TC */
+> @@ -293,9 +293,10 @@ const VMStateDescription vmstate_mips_cpu =3D {
+>          VMSTATE_INT32(env.CP0_Config3, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Config6, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Config7, MIPSCPU),
+> +        VMSTATE_UINT64(env.CP0_LLAddr, MIPSCPU),
+>          VMSTATE_UINT64_ARRAY(env.CP0_MAAR, MIPSCPU, MIPS_MAAR_MAX),
+>          VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
+> -        VMSTATE_UINT64(env.lladdr, MIPSCPU),
+> +        VMSTATE_UINTTL(env.lladdr, MIPSCPU),
+>          VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
+>          VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
+>          VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
+> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+> index aebad24..44f2626 100644
+> --- a/target/mips/op_helper.c
+> +++ b/target/mips/op_helper.c
+> @@ -349,15 +349,15 @@ static inline hwaddr do_translate_address(CPUMIPSSt=
+ate *env,
+>                                                        target_ulong addre=
+ss,
+>                                                        int rw, uintptr_t =
+retaddr)
+>  {
+> -    hwaddr lladdr;
+> +    hwaddr paddr;
+>      CPUState *cs =3D CPU(mips_env_get_cpu(env));
+>=20
+> -    lladdr =3D cpu_mips_translate_address(env, address, rw);
+> +    paddr =3D cpu_mips_translate_address(env, address, rw);
+>=20
+> -    if (lladdr =3D=3D -1LL) {
+> +    if (paddr =3D=3D -1LL) {
+>          cpu_loop_exit_restore(cs, retaddr);
+>      } else {
+> -        return lladdr;
+> +        return paddr;
+>      }
+>  }
+>=20
+> @@ -370,7 +370,8 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
+ulong arg, int > mem_idx)  \
+>          }                                                               =
+      \
+>          do_raise_exception(env, EXCP_AdEL, GETPC());                    =
+      \
+>      }                                                                   =
+      \
+> -    env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
+        \
+> +    env->CP0_LLAddr =3D do_translate_address(env, arg, 0, GETPC());     =
+        \
+> +    env->lladdr =3D arg;                                                =
+        \
+>      env->llval =3D do_##insn(env, arg, mem_idx, GETPC());               =
+        \
+>      return env->llval;                                                  =
+      \
+>  }
+> @@ -392,7 +393,7 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
+ulong > arg1,              \
+>          }                                                               =
+      \
+>          do_raise_exception(env, EXCP_AdES, GETPC());                    =
+      \
+>      }                                                                   =
+      \
+> -    if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
+{         \
+> +    if (arg2 =3D=3D env->lladdr) {                                      =
+          \
+>          tmp =3D do_##ld_insn(env, arg2, mem_idx, GETPC());              =
+        \
+>          if (tmp =3D=3D env->llval) {                                    =
+          \
+>              do_##st_insn(env, arg2, arg1, mem_idx, GETPC());            =
+      \
+> @@ -987,7 +988,7 @@ target_ulong helper_mftc0_status(CPUMIPSState *env)
+>=20
+>  target_ulong helper_mfc0_lladdr(CPUMIPSState *env)
+>  {
+> -    return (int32_t)(env->lladdr >> env->CP0_LLAddr_shift);
+> +    return (int32_t)(env->CP0_LLAddr >> env->CP0_LLAddr_shift);
+>  }
+>=20
+>  target_ulong helper_mfc0_maar(CPUMIPSState *env)
+> @@ -1063,7 +1064,7 @@ target_ulong helper_dmfc0_tcschefback(CPUMIPSState =
+*env)
+>=20
+>  target_ulong helper_dmfc0_lladdr(CPUMIPSState *env)
+>  {
+> -    return env->lladdr >> env->CP0_LLAddr_shift;
+> +    return env->CP0_LLAddr >> env->CP0_LLAddr_shift;
+>  }
+>=20
+>  target_ulong helper_dmfc0_maar(CPUMIPSState *env)
+> @@ -1299,7 +1300,8 @@ void helper_mtc0_tcrestart(CPUMIPSState *env, targe=
+t_ulong arg1)
+>  {
+>      env->active_tc.PC =3D arg1;
+>      env->active_tc.CP0_TCStatus &=3D ~(1 << CP0TCSt_TDS);
+> -    env->lladdr =3D 0ULL;
+> +    env->CP0_LLAddr =3D 0;
+> +    env->lladdr =3D 0;
+>      /* MIPS16 not implemented. */
+>  }
+>=20
+> @@ -1311,12 +1313,14 @@ void helper_mttc0_tcrestart(CPUMIPSState *env, ta=
+rget_ulong arg1)
+>      if (other_tc =3D=3D other->current_tc) {
+>          other->active_tc.PC =3D arg1;
+>          other->active_tc.CP0_TCStatus &=3D ~(1 << CP0TCSt_TDS);
+> -        other->lladdr =3D 0ULL;
+> +        other->CP0_LLAddr =3D 0;
+> +        other->lladdr =3D 0;
+>          /* MIPS16 not implemented. */
+>      } else {
+>          other->tcs[other_tc].PC =3D arg1;
+>          other->tcs[other_tc].CP0_TCStatus &=3D ~(1 << CP0TCSt_TDS);
+> -        other->lladdr =3D 0ULL;
+> +        other->CP0_LLAddr =3D 0;
+> +        other->lladdr =3D 0;
+>          /* MIPS16 not implemented. */
+>      }
+>  }
+> @@ -1868,7 +1872,7 @@ void helper_mtc0_lladdr(CPUMIPSState *env, target_u=
+long arg1)
+>  {
+>      target_long mask =3D env->CP0_LLAddr_rw_bitmask;
+>      arg1 =3D arg1 << env->CP0_LLAddr_shift;
+> -    env->lladdr =3D (env->lladdr & ~mask) | (arg1 & mask);
+> +    env->CP0_LLAddr =3D (env->CP0_LLAddr & ~mask) | (arg1 & mask);
+>  }
+>=20
+>  #define MTC0_MAAR_MASK(env) \
+> @@ -2566,6 +2570,7 @@ static inline void exception_return(CPUMIPSState *e=
+nv)
+>  void helper_eret(CPUMIPSState *env)
+>  {
+>      exception_return(env);
+> +    env->CP0_LLAddr =3D 1;
+>      env->lladdr =3D 1;
+>  }
+>=20
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index e9b5d1d..307d4ea 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -6612,7 +6612,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, =
+int reg, int sel)
+>      case CP0_REGISTER_17:
+>          switch (sel) {
+>          case 0:
+> -            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, lladdr),
+> +            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_LLAddr),
+>                               ctx->CP0_LLAddr_shift);
+>              register_name =3D "LLAddr";
+>              break;
+> @@ -29795,7 +29795,7 @@ void mips_cpu_dump_state(CPUState *cs, FILE *f, f=
+printf_function > cpu_fprintf,
+>                  env->CP0_Status, env->CP0_Cause, env->CP0_EPC);
+>      cpu_fprintf(f, "    Config0 0x%08x Config1 0x%08x LLAddr 0x%016"
+>                  PRIx64 "\n",
+> -                env->CP0_Config0, env->CP0_Config1, env->lladdr);
+> +                env->CP0_Config0, env->CP0_Config1, env->CP0_LLAddr);
+>      cpu_fprintf(f, "    Config2 0x%08x Config3 0x%08x\n",
+>                  env->CP0_Config2, env->CP0_Config3);
+>      cpu_fprintf(f, "    Config4 0x%08x Config5 0x%08x\n",
+> --
+> 2.7.4
+>=20
+> =
