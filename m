@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54454)
+Received: from eggs.gnu.org ([209.51.188.92]:54440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guGye-0006z1-Ih
+	(envelope-from <arikalo@wavecomp.com>) id 1guGye-0006yn-Vz
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:22:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guGu0-0004W3-5i
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:18:08 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53793)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1guGtz-0004Tv-VU
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:18:08 -0500
-Received: by mail-wm1-x341.google.com with SMTP id d15so6260997wmb.3
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 05:18:07 -0800 (PST)
-References: <20190213065357.16076-1-yuval.shaia@oracle.com>
-	<20190213065357.16076-9-yuval.shaia@oracle.com>
-	<d460be76-ceb9-16ba-6cc7-56541a420753@redhat.com>
-	<20190213144629.GA10728@lap1>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <cff72eab-5d25-8759-f9a2-954370b53171@gmail.com>
-Date: Thu, 14 Feb 2019 15:18:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190213144629.GA10728@lap1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+	(envelope-from <arikalo@wavecomp.com>) id 1guGsw-0002sS-02
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:17:03 -0500
+Received: from mail-eopbgr730114.outbound.protection.outlook.com
+	([40.107.73.114]:28312
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+	id 1guGsv-0002gx-Ic
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:17:01 -0500
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+Date: Thu, 14 Feb 2019 13:16:54 +0000
+Message-ID: <DM5PR22MB1658387A88B7A312ED1D4A55D2670@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1550143103-20133-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1550143103-20133-1-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 7/9] hw/pvrdma: Delete unneeded function
- argument
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/9] target/mips: Add MSA ASE tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +30,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, dgilbert@redhat.com, armbru@redhat.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>
 
-
-
-On 2/13/19 4:46 PM, Yuval Shaia wrote:
-> On Wed, Feb 13, 2019 at 01:40:34PM +0100, Philippe Mathieu-Daudé wrote:
->> On 2/13/19 7:53 AM, Yuval Shaia wrote:
->>> The function argument rdma_dev_res is not needed as it is stored in the
->>> backend_dev object at init.
->>>
->>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->>> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
->> Should we teach checkpatch.pl to check name/space/email?
-> Nice idea :)
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Thursday, February 14, 2019 12:18 PM
+> To: qemu-devel@nongnu.org
+> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo; alex.be=
+nnee@linaro.org
+> Subject: [PATCH v3 0/9] target/mips: Add MSA ASE tests
 >
-> Marcel, i copied it from your signature so you may want to check it.
-> Anyway, is re-spin needed or you can fix it for the PR?
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> v2->v3:
+>
+>   - minor cosmetic changes
+>   - added wrappers and tests for MSA logic instructions
+>
+> v1->v2:
+>
+>   - added refference to the original commit in patch #1
+>   - corrected copy-and-paste error in comments in 12 new source files
+>   - renamed "bit_counting" subdirectory to "bit-counting"
+>   - added wrappers and tests for MSA interleave instructions
+>
+> This series begins to add unit tests (aka tcg tests) for MIPS'
+> MSA ASE. More tests and related test infrastructure will be added
+> in subsequent version of this series.
+>
+> There are several checkpatch warnings that are all false positives
+> for given circumstances.
+>
+> Aleksandar Markovic (9):
+>   tests/tcg: target/mips: Remove an unnecessary file
+>   tests/tcg: target/mips: Add a header with test inputs
+>   tests/tcg: target/mips: Add a header with test utilities
+>   tests/tcg: target/mips: Add wrappers for MSA bit counting instructions
+>   tests/tcg: target/mips: Add tests for MSA bit counting instructions
+>   tests/tcg: target/mips: Add wrappers for MSA interleave instructions
+>   tests/tcg: target/mips: Add tests for MSA interleave instructions
+>   tests/tcg: target/mips: Add wrappers for MSA logic instructions
+>   tests/tcg: target/mips: Add tests for MSA logic instructions
+>
+>  tests/tcg/mips/include/test_inputs.h               | 122 +++++++++++++++=
++
+>  tests/tcg/mips/include/test_utils.h                |  84 +++++++++++
+>  tests/tcg/mips/include/wrappers_msa.h              | 101 ++++++++++++++
+>  tests/tcg/mips/mips64-dspr2/.directory             |   2 -
+>  .../user/ase/msa/bit-counting/test_msa_nloc_b.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nloc_d.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nloc_h.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nloc_w.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nlzc_b.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nlzc_d.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nlzc_h.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_nlzc_w.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_pcnt_b.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_pcnt_d.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_pcnt_h.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/bit-counting/test_msa_pcnt_w.c    | 144 +++++++++++++++=
+++++
+>  .../user/ase/msa/interleave/test_msa_ilvev_b.c     | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvev_d.c     | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvev_h.c     | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvev_w.c     | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvl_b.c | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvl_d.c | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvl_h.c | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvl_w.c | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvod_b.c     | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvod_d.c     | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvod_h.c     | 153 +++++++++++++++=
+++++++
+>  .../user/ase/msa/interleave/test_msa_ilvod_w.c     | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvr_b.c | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvr_d.c | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvr_h.c | 153 +++++++++++++++=
+++++++
+>  .../mips/user/ase/msa/interleave/test_msa_ilvr_w.c | 153 +++++++++++++++=
+++++++
+>  tests/tcg/mips/user/ase/msa/logic/test_msa_and_v.c | 153 +++++++++++++++=
+++++++
+>  tests/tcg/mips/user/ase/msa/logic/test_msa_nor_v.c | 153 +++++++++++++++=
+++++++
+>  tests/tcg/mips/user/ase/msa/logic/test_msa_or_v.c  | 153 +++++++++++++++=
+++++++
+>  tests/tcg/mips/user/ase/msa/logic/test_msa_xor_v.c | 153 +++++++++++++++=
+++++++
+>  36 files changed, 5095 insertions(+), 2 deletions(-)
+>  create mode 100644 tests/tcg/mips/include/test_inputs.h
+>  create mode 100644 tests/tcg/mips/include/test_utils.h
+>  create mode 100644 tests/tcg/mips/include/wrappers_msa.h
+>  delete mode 100644 tests/tcg/mips/mips64-dspr2/.directory
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlo=
+c_b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlo=
+c_d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlo=
+c_h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlo=
+c_w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlz=
+c_b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlz=
+c_d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlz=
+c_h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlz=
+c_w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcn=
+t_b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcn=
+t_d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcn=
+t_h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcn=
+t_w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvev=
+_b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvev=
+_d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvev=
+_h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvev=
+_w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvl_=
+b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvl_=
+d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvl_=
+h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvl_=
+w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvod=
+_b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvod=
+_d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvod=
+_h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvod=
+_w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvr_=
+b.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvr_=
+d.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvr_=
+h.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/interleave/test_msa_ilvr_=
+w.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/logic/test_msa_and_v.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/logic/test_msa_nor_v.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/logic/test_msa_or_v.c
+>  create mode 100644 tests/tcg/mips/user/ase/msa/logic/test_msa_xor_v.c
+>
+> --
+> 2.7.4
 
-No need, I will fix it.
-Thanks,
-Marcel
+For all patches in this series:
 
-> Yuval
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
