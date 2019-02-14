@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49454)
+Received: from eggs.gnu.org ([209.51.188.92]:49516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guQ8Z-00034j-6j
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:09:48 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ8m-00035F-66
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guQ3E-0007g6-PE
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:04:19 -0500
-Resent-Message-Id: <E1guQ3E-0007g6-PE@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21741)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guQ3E-0007YB-FD
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:04:16 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155018270205.24.14557157829496190576@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 14:18:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ0L-0005Iq-6V
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:21 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:35563)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1guQ0I-0005FW-WC
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:15 -0500
+Received: by mail-lf1-x142.google.com with SMTP id v7so5817433lfd.2
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:01:11 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 14 Feb 2019 15:00:00 -0800
+Message-Id: <20190214230000.24894-14-jcmvbkbc@gmail.com>
+In-Reply-To: <20190214230000.24894-1-jcmvbkbc@gmail.com>
+References: <20190214230000.24894-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 13/13] target/xtensa: prioritize load/store in
+ FLIX bundles
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +26,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMu
-MjUwMzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYw
-My4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzIwMTkwMjE0MjIwNDUzLjE1ODU4LTEtc3ZlbnNAc3RhY2tmcmFtZS5vcmcg
-LT4gcGF0Y2hldy8yMDE5MDIxNDIyMDQ1My4xNTg1OC0xLXN2ZW5zQHN0YWNrZnJhbWUub3JnClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTA3ZDBjMTA1NCBnZGJzdHViOiBTZW5kIGEg
-cmVwbHkgdG8gdGhlIHZLaWxsIHBhY2tldC4KMWNlZmE5NGQ0YyB0YXJnZXQvYXJtOiBBZGQgbWlz
-c2luZyBjbGVhcl90YWlsIGNhbGxzCjJkN2FjZmJhNjUgdGFyZ2V0L2FybTogVXNlIHZlY3RvciBv
-cGVyYXRpb25zIGZvciBzYXR1cmF0aW9uCjRjYWNiNmQ0NzcgdGFyZ2V0L2FybTogU3BsaXQgb3V0
-IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZpZWxkCmFmNTUyZDVhOWEgdGFyZ2V0L2FybTogRml4IHNl
-dCBvZiBiaXRzIGtlcHQgaW4geHJlZ3NbQVJNX1ZGUF9GUFNDUl0KODg5ZTI1Y2VkZCB0YXJnZXQv
-YXJtOiBTcGxpdCBvdXQgZmxhZ3Mgc2V0dGluZyBmcm9tIHZmcCBjb21wYXJlcwowOGVkMzBmY2Jk
-IHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IKNThjMzQ4MzRiNCB0
-YXJnZXQvYXJtOiBGaXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUgozN2JhOTM4NGY0IHRh
-cmdldC9hcm06IFJlbW92ZSBuZW9uIG1pbi9tYXggaGVscGVycwozZmUzYmNkNTZlIHRhcmdldC9h
-cm06IFVzZSB0Y2cgaW50ZWdlciBtaW4vbWF4IHByaW1pdGl2ZXMgZm9yIG5lb24KNzkxNzA4MTYz
-MiB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoMzIKN2Jl
-NTg5NDcxMCB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNo
-NjQKM2RjNzdmY2E2ZSB0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNn
-X2dlbl9ndmVjX29yCjBhYTg1YzgzYjUgaHcvYXJtL2FybXNzZTogRml4IG1pc3dpcmluZyBvZiBl
-eHBhbnNpb24gSVJRcwphMTcxYjg1NzgxIGh3L2ludGMvYXJtdjdtX252aWM6IEFsbG93IGJ5dGUg
-YWNjZXNzZXMgdG8gU0hQUjEKNTM1YTdjMzY3MCBNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENy
-b3N0aHdhaXRlIGZyb20gdmFyaW91cyBlbnRyaWVzCjgyNGU3MjY1NWQgYXJtOiBBbGxvdyBzeXN0
-ZW0gcmVnaXN0ZXJzIGZvciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlCmM0
-NTgyYzIyZTUgbGludXgtdXNlci9lbGZsb2FkOiBlbmFibGUgSFdDQVBfQ1BVSUQgZm9yIEFBcmNo
-NjQKODM1ZWRiY2FiNSB0YXJnZXQvYXJtOiBleHBvc2UgcmVtYWluaW5nIENQVUlEIHJlZ2lzdGVy
-cyBhcyBSQVoKMDA4MTNhMjE4ZiB0YXJnZXQvYXJtOiBleHBvc2UgTVBJRFJfRUwxIHRvIHVzZXJz
-cGFjZQoyZmFkOGEwNjg1IHRhcmdldC9hcm06IGV4cG9zZSBDUFVJRCByZWdpc3RlcnMgdG8gdXNl
-cnNwYWNlCjg3NmYxODVkNWYgdGFyZ2V0L2FybTogcmVsYXggcGVybWlzc2lvbiBjaGVja3MgZm9y
-IEhXQ0FQX0NQVUlEIHJlZ2lzdGVycwoxYTgyOTZkMmE3IHRhcmdldC9hcm06IFJlc3RydWN0dXJl
-IGRpc2FzX2ZwX2ludF9jb252CjllZjczNjgxNDAgdGFyZ2V0L2FybTogRm9yY2UgcmVzdWx0IHNp
-emUgaW50byBkcCBhZnRlciBvcGVyYXRpb24KZTZmZmUwMzczMyB0YXJnZXQvYXJtOiBGaXggaW50
-MTI4X21ha2UxMjggbG8sIGhpIG9yZGVyIGluIHBhaXJlZF9jbXB4Y2hnNjRfYmUKMDU4ODIwOWRi
-OCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIKOGJlNzViZTRhZCB0YXJnZXQvYXJtOiBG
-aXggQ1JuIHRvIGJlIDE0IGZvciBQTUVWVFlQRVIvUE1FVkNOVFIKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvMjcgQ2hlY2tpbmcgY29tbWl0IDhiZTc1YmU0YWQyMSAodGFyZ2V0L2FybTogRml4IENS
-biB0byBiZSAxNCBmb3IgUE1FVlRZUEVSL1BNRVZDTlRSKQoyLzI3IENoZWNraW5nIGNvbW1pdCAw
-NTg4MjA5ZGI4OTEgKHRhcmdldC9hcm06IEltcGxlbWVudCBIQUNSX0VMMikKMy8yNyBDaGVja2lu
-ZyBjb21taXQgZTZmZmUwMzczM2I0ICh0YXJnZXQvYXJtOiBGaXggaW50MTI4X21ha2UxMjggbG8s
-IGhpIG9yZGVyIGluIHBhaXJlZF9jbXB4Y2hnNjRfYmUpCjQvMjcgQ2hlY2tpbmcgY29tbWl0IDll
-ZjczNjgxNDA3NyAodGFyZ2V0L2FybTogRm9yY2UgcmVzdWx0IHNpemUgaW50byBkcCBhZnRlciBv
-cGVyYXRpb24pCjUvMjcgQ2hlY2tpbmcgY29tbWl0IDFhODI5NmQyYTczMSAodGFyZ2V0L2FybTog
-UmVzdHJ1Y3R1cmUgZGlzYXNfZnBfaW50X2NvbnYpCjYvMjcgQ2hlY2tpbmcgY29tbWl0IDg3NmYx
-ODVkNWZkZSAodGFyZ2V0L2FybTogcmVsYXggcGVybWlzc2lvbiBjaGVja3MgZm9yIEhXQ0FQX0NQ
-VUlEIHJlZ2lzdGVycykKNy8yNyBDaGVja2luZyBjb21taXQgMmZhZDhhMDY4NTI3ICh0YXJnZXQv
-YXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZSkKOC8yNyBDaGVja2luZyBj
-b21taXQgMDA4MTNhMjE4ZjNkICh0YXJnZXQvYXJtOiBleHBvc2UgTVBJRFJfRUwxIHRvIHVzZXJz
-cGFjZSkKOS8yNyBDaGVja2luZyBjb21taXQgODM1ZWRiY2FiNTljICh0YXJnZXQvYXJtOiBleHBv
-c2UgcmVtYWluaW5nIENQVUlEIHJlZ2lzdGVycyBhcyBSQVopCjEwLzI3IENoZWNraW5nIGNvbW1p
-dCBjNDU4MmMyMmU1MzMgKGxpbnV4LXVzZXIvZWxmbG9hZDogZW5hYmxlIEhXQ0FQX0NQVUlEIGZv
-ciBBQXJjaDY0KQoxMS8yNyBDaGVja2luZyBjb21taXQgODI0ZTcyNjU1ZDQ3IChhcm06IEFsbG93
-IHN5c3RlbSByZWdpc3RlcnMgZm9yIEtWTSBndWVzdHMgdG8gYmUgY2hhbmdlZCBieSBRRU1VIGNv
-ZGUpCjEyLzI3IENoZWNraW5nIGNvbW1pdCA1MzVhN2MzNjcwNGIgKE1BSU5UQUlORVJTOiBSZW1v
-dmUgUGV0ZXIgQ3Jvc3Rod2FpdGUgZnJvbSB2YXJpb3VzIGVudHJpZXMpCjEzLzI3IENoZWNraW5n
-IGNvbW1pdCBhMTcxYjg1NzgxN2QgKGh3L2ludGMvYXJtdjdtX252aWM6IEFsbG93IGJ5dGUgYWNj
-ZXNzZXMgdG8gU0hQUjEpCjE0LzI3IENoZWNraW5nIGNvbW1pdCAwYWE4NWM4M2I1OGMgKGh3L2Fy
-bS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMpCjE1LzI3IENoZWNraW5n
-IGNvbW1pdCAzZGM3N2ZjYTZlMTIgKHRhcmdldC9hcm06IFJlbHkgb24gb3B0aW1pemF0aW9uIHdp
-dGhpbiB0Y2dfZ2VuX2d2ZWNfb3IpCjE2LzI3IENoZWNraW5nIGNvbW1pdCA3YmU1ODk0NzEwZWMg
-KHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3IgYWFyY2g2NCkKMTcv
-MjcgQ2hlY2tpbmcgY29tbWl0IDc5MTcwODE2MzJiZCAodGFyZ2V0L2FybTogVXNlIHZlY3RvciBt
-aW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyKQoxOC8yNyBDaGVja2luZyBjb21taXQgM2ZlM2Jj
-ZDU2ZTk0ICh0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIgbWluL21heCBwcmltaXRpdmVzIGZv
-ciBuZW9uKQoxOS8yNyBDaGVja2luZyBjb21taXQgMzdiYTkzODRmNDBiICh0YXJnZXQvYXJtOiBS
-ZW1vdmUgbmVvbiBtaW4vbWF4IGhlbHBlcnMpCjIwLzI3IENoZWNraW5nIGNvbW1pdCA1OGMzNDgz
-NGI0N2YgKHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9zZXRfcmVnIHZzIEZQU0NSKQpFUlJP
-UjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMyNTogRklMRTog
-dGFyZ2V0L2FybS9oZWxwZXIuYzo4NDoKKyAgICBjYXNlIDE6IHN0bF9wKGJ1ZiwgdmZwX2dldF9m
-cHNjcihlbnYpKTsgcmV0dXJuIDQ7CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQg
-YmUgb24gbmV4dCBsaW5lCiMzNDogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMTA6CisgICAg
-Y2FzZSAxOiB2ZnBfc2V0X2Zwc2NyKGVudiwgbGRsX3AoYnVmKSk7IHJldHVybiA0OwoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCAyMC8yNyBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjEvMjcgQ2hlY2tpbmcgY29tbWl0IDA4ZWQzMGZjYmQ1
-ZiAodGFyZ2V0L2FybTogRml4IGFybV9jcHVfZHVtcF9zdGF0ZSB2cyBGUFNDUikKMjIvMjcgQ2hl
-Y2tpbmcgY29tbWl0IDg4OWUyNWNlZGQ3MyAodGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdzIHNl
-dHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMpCjIzLzI3IENoZWNraW5nIGNvbW1pdCBhZjU1MmQ1YTlh
-MTUgKHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhyZWdzW0FSTV9WRlBfRlBT
-Q1JdKQoyNC8yNyBDaGVja2luZyBjb21taXQgNGNhY2I2ZDQ3NzA2ICh0YXJnZXQvYXJtOiBTcGxp
-dCBvdXQgRlBTQ1IuUUMgdG8gYSB2ZWN0b3IgZmllbGQpCjI1LzI3IENoZWNraW5nIGNvbW1pdCAy
-ZDdhY2ZiYTY1NjEgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJh
-dGlvbikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMz
-NjA6IEZJTEU6IHRhcmdldC9hcm0vdmVjX2hlbHBlci5jOjc3NDoKKyAgICBUWVBFTiAqZCA9IHZk
-LCAqbiA9IHZuOyBUWVBFTSAqbSA9IHZtOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMs
-IDAgd2FybmluZ3MsIDQzOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyNS8yNyBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKMjYvMjcgQ2hlY2tpbmcgY29tbWl0IDFjZWZhOTRkNGMxZCAodGFyZ2V0
-L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxscykKMjcvMjcgQ2hlY2tpbmcgY29tbWl0
-IDEwN2QwYzEwNTQ2YSAoZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBwYWNrZXQu
-KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5
-MDIxNDE5MDYwMy4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Load/store opcodes may raise MMU exceptions. Normally exceptions should
+be checked in priority order before any actual operations, but since MMU
+exceptions are tightly coupled with actual memory access, there's
+currently no way to do it.
+
+Approximate this behavior by executing all load, then all store, and
+then all other opcodes in the FLIX bundles. Use opcode dependency
+mechanism to express ordering. Mark load/store opcodes with
+XTENSA_OP_{LOAD,STORE} flags. Newer libisa has classifier functions that
+can tell whether opcode is a load or store, but this information is not
+available in the existing overlays.
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ target/xtensa/cpu.h       |  4 ++++
+ target/xtensa/translate.c | 37 ++++++++++++++++++++++++++++++++-----
+ 2 files changed, 36 insertions(+), 5 deletions(-)
+
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index bf021f7695e6..a01a94e2a683 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -390,6 +390,10 @@ enum {
+     XTENSA_OP_NAME_ARRAY = 0x8000,
+ 
+     XTENSA_OP_CONTROL_FLOW = 0x10000,
++    XTENSA_OP_STORE = 0x20000,
++    XTENSA_OP_LOAD = 0x40000,
++    XTENSA_OP_LOAD_STORE =
++        XTENSA_OP_LOAD | XTENSA_OP_STORE,
+ };
+ 
+ typedef struct XtensaOpcodeOps {
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 8bc272d05b4b..2fd64f8d995d 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -985,6 +985,10 @@ static bool op_depends_on(const struct slot_prop *a,
+     if (a->op_flags & XTENSA_OP_CONTROL_FLOW) {
+         return true;
+     }
++    if ((a->op_flags & XTENSA_OP_LOAD_STORE) <
++        (b->op_flags & XTENSA_OP_LOAD_STORE)) {
++        return true;
++    }
+     while (i < a->n_out && j < b->n_in) {
+         if (a->out[i].resource < b->in[j].resource) {
+             ++i;
+@@ -1016,6 +1020,10 @@ static bool break_dependency(struct slot_prop *a,
+     if (a->op_flags & XTENSA_OP_CONTROL_FLOW) {
+         return false;
+     }
++    if ((a->op_flags & XTENSA_OP_LOAD_STORE) <
++        (b->op_flags & XTENSA_OP_LOAD_STORE)) {
++        return false;
++    }
+     while (i < a->n_out && j < b->n_in) {
+         if (a->out[i].resource < b->in[j].resource) {
+             ++i;
+@@ -1292,7 +1300,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+         if (slots > 1) {
+             slot_prop[slot].n_in = 0;
+             slot_prop[slot].n_out = 0;
+-            slot_prop[slot].op_flags = 0;
++            slot_prop[slot].op_flags = ops->op_flags & XTENSA_OP_LOAD_STORE;
+ 
+             opnds = xtensa_opcode_num_operands(isa, opc);
+ 
+@@ -3222,40 +3230,47 @@ static const XtensaOpcodeOps core_ops[] = {
+         .name = "l16si",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TESW, false, false},
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "l16ui",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TEUW, false, false},
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "l32ai",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TEUL, true, false},
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "l32e",
+         .translate = translate_l32e,
+-        .op_flags = XTENSA_OP_PRIVILEGED,
++        .op_flags = XTENSA_OP_PRIVILEGED | XTENSA_OP_LOAD,
+     }, {
+         .name = (const char * const[]) {
+             "l32i", "l32i.n", NULL,
+         },
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TEUL, false, false},
+-        .op_flags = XTENSA_OP_NAME_ARRAY,
++        .op_flags = XTENSA_OP_NAME_ARRAY | XTENSA_OP_LOAD,
+     }, {
+         .name = "l32r",
+         .translate = translate_l32r,
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "l8ui",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_UB, false, false},
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "lddec",
+         .translate = translate_mac16,
+         .par = (const uint32_t[]){MAC16_NONE, 0, -4},
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "ldinc",
+         .translate = translate_mac16,
+         .par = (const uint32_t[]){MAC16_NONE, 0, 4},
++        .op_flags = XTENSA_OP_LOAD,
+     }, {
+         .name = "ldpte",
+         .op_flags = XTENSA_OP_ILL,
+@@ -4213,28 +4228,32 @@ static const XtensaOpcodeOps core_ops[] = {
+         .name = "s16i",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TEUW, false, true},
++        .op_flags = XTENSA_OP_STORE,
+     }, {
+         .name = "s32c1i",
+         .translate = translate_s32c1i,
++        .op_flags = XTENSA_OP_LOAD | XTENSA_OP_STORE,
+     }, {
+         .name = "s32e",
+         .translate = translate_s32e,
+-        .op_flags = XTENSA_OP_PRIVILEGED,
++        .op_flags = XTENSA_OP_PRIVILEGED | XTENSA_OP_STORE,
+     }, {
+         .name = (const char * const[]) {
+             "s32i", "s32i.n", "s32nb", NULL,
+         },
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TEUL, false, true},
+-        .op_flags = XTENSA_OP_NAME_ARRAY,
++        .op_flags = XTENSA_OP_NAME_ARRAY | XTENSA_OP_STORE,
+     }, {
+         .name = "s32ri",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_TEUL, true, true},
++        .op_flags = XTENSA_OP_STORE,
+     }, {
+         .name = "s8i",
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_UB, false, true},
++        .op_flags = XTENSA_OP_STORE,
+     }, {
+         .name = "salt",
+         .translate = translate_salt,
+@@ -5524,21 +5543,25 @@ static const XtensaOpcodeOps fpu2000_ops[] = {
+         .name = "lsi",
+         .translate = translate_ldsti,
+         .par = (const uint32_t[]){false, false},
++        .op_flags = XTENSA_OP_LOAD,
+         .coprocessor = 0x1,
+     }, {
+         .name = "lsiu",
+         .translate = translate_ldsti,
+         .par = (const uint32_t[]){false, true},
++        .op_flags = XTENSA_OP_LOAD,
+         .coprocessor = 0x1,
+     }, {
+         .name = "lsx",
+         .translate = translate_ldstx,
+         .par = (const uint32_t[]){false, false},
++        .op_flags = XTENSA_OP_LOAD,
+         .coprocessor = 0x1,
+     }, {
+         .name = "lsxu",
+         .translate = translate_ldstx,
+         .par = (const uint32_t[]){false, true},
++        .op_flags = XTENSA_OP_LOAD,
+         .coprocessor = 0x1,
+     }, {
+         .name = "madd.s",
+@@ -5618,21 +5641,25 @@ static const XtensaOpcodeOps fpu2000_ops[] = {
+         .name = "ssi",
+         .translate = translate_ldsti,
+         .par = (const uint32_t[]){true, false},
++        .op_flags = XTENSA_OP_STORE,
+         .coprocessor = 0x1,
+     }, {
+         .name = "ssiu",
+         .translate = translate_ldsti,
+         .par = (const uint32_t[]){true, true},
++        .op_flags = XTENSA_OP_STORE,
+         .coprocessor = 0x1,
+     }, {
+         .name = "ssx",
+         .translate = translate_ldstx,
+         .par = (const uint32_t[]){true, false},
++        .op_flags = XTENSA_OP_STORE,
+         .coprocessor = 0x1,
+     }, {
+         .name = "ssxu",
+         .translate = translate_ldstx,
+         .par = (const uint32_t[]){true, true},
++        .op_flags = XTENSA_OP_STORE,
+         .coprocessor = 0x1,
+     }, {
+         .name = "sub.s",
+-- 
+2.11.0
