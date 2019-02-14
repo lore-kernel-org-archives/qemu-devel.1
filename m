@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35579)
+Received: from eggs.gnu.org ([209.51.188.92]:36981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1guFQy-0005o5-LR
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:44:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1guFYn-0007iT-35
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:52:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1guFQx-0005MQ-8z
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:44:04 -0500
-Received: from mx2.suse.de ([195.135.220.15]:42968 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1guFQv-0005AG-24
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:44:03 -0500
-From: Andreas Schwab <schwab@suse.de>
-References: <mvmmun7y7m0.fsf@suse.de>
-	<3c8aca9d-e47e-04a7-1e6a-a65deab125ce@vivier.eu>
-Date: Thu, 14 Feb 2019 12:43:40 +0100
-In-Reply-To: <3c8aca9d-e47e-04a7-1e6a-a65deab125ce@vivier.eu> (Laurent
-	Vivier's message of "Thu, 14 Feb 2019 10:17:39 +0100")
-Message-ID: <mvmimxmppcj.fsf_-_@suse.de>
+	(envelope-from <alex.bennee@linaro.org>) id 1guFYm-0002je-1q
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:52:09 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1guFYl-0002iI-Jg
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:52:07 -0500
+Received: by mail-wr1-x444.google.com with SMTP id o17so6168278wrw.3
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 03:52:07 -0800 (PST)
+References: <20181206151401.13455-1-peter.maydell@linaro.org>
+	<87ftsrird3.fsf@zen.linaroharston>
+	<CAFEAcA_GPW0B9bMOia_aB=H0PV8DwUNWBARz+uNbRk2565a+4w@mail.gmail.com>
+	<87bm3figs9.fsf@zen.linaroharston>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87bm3figs9.fsf@zen.linaroharston>
+Date: Thu, 14 Feb 2019 11:52:04 +0000
+Message-ID: <875ztmio4b.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] linux-user: fix emulation of
- accept4/getpeername/getsockname/recvfrom syscalls
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] arm: Allow system registers for KVM guests
+ to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +33,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>
 
-System calls that return a socket address do so by writing the (possibly
-truncated) address into the provided buffer space, but setting the
-addrlen parameter to the actual size of the address.  To determine how
-much to copy back to the target memory the emulation needs to remember
-the incoming value of the addrlen parameter, so that it doesn't write
-past the buffer limits.
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
----
- linux-user/syscall.c | 41 +++++++++++++++++++++++++----------------
- 1 file changed, 25 insertions(+), 16 deletions(-)
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 4a320850bb..f24743a2b2 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2885,7 +2885,7 @@ static abi_long do_sendrecvmmsg(int fd, abi_ulong target_msgvec,
- static abi_long do_accept4(int fd, abi_ulong target_addr,
-                            abi_ulong target_addrlen_addr, int flags)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
-     int host_flags;
-@@ -2909,11 +2909,13 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(safe_accept4(fd, addr, &addrlen, host_flags));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(safe_accept4(fd, addr, &ret_addrlen, host_flags));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
-             ret = -TARGET_EFAULT;
-+        }
-     }
-     return ret;
- }
-@@ -2922,7 +2924,7 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
- static abi_long do_getpeername(int fd, abi_ulong target_addr,
-                                abi_ulong target_addrlen_addr)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
- 
-@@ -2938,11 +2940,13 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(getpeername(fd, addr, &addrlen));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(getpeername(fd, addr, &ret_addrlen));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
-             ret = -TARGET_EFAULT;
-+        }
-     }
-     return ret;
- }
-@@ -2951,7 +2955,7 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
- static abi_long do_getsockname(int fd, abi_ulong target_addr,
-                                abi_ulong target_addrlen_addr)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
- 
-@@ -2967,11 +2971,13 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(getsockname(fd, addr, &addrlen));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(getsockname(fd, addr, &ret_addrlen));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
-             ret = -TARGET_EFAULT;
-+        }
-     }
-     return ret;
- }
-@@ -3043,7 +3049,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-                             abi_ulong target_addr,
-                             abi_ulong target_addrlen)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     void *host_msg;
-     abi_long ret;
-@@ -3061,10 +3067,12 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             goto fail;
-         }
-         addr = alloca(addrlen);
-+        ret_addrlen = addrlen;
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
--                                      addr, &addrlen));
-+                                      addr, &ret_addrlen));
-     } else {
-         addr = NULL; /* To keep compiler quiet.  */
-+        addrlen = 0; /* To keep compiler quiet.  */
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags, NULL, 0));
-     }
-     if (!is_error(ret)) {
-@@ -3077,8 +3085,9 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             }
-         }
-         if (target_addr) {
--            host_to_target_sockaddr(target_addr, addr, addrlen);
--            if (put_user_u32(addrlen, target_addrlen)) {
-+            host_to_target_sockaddr(target_addr, addr,
-+                                    MIN(addrlen, ret_addrlen));
-+            if (put_user_u32(ret_addrlen, target_addrlen)) {
-                 ret = -TARGET_EFAULT;
-                 goto fail;
-             }
--- 
-2.20.1
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> On Wed, 13 Feb 2019 at 16:29, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
+>>>
+>>>
+>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>
+>>> > At the moment the Arm implementations of kvm_arch_{get,put}_registers=
+()
+>>> > don't support having QEMU change the values of system registers
+>>> > (aka coprocessor registers for AArch32). This is because although
+>>> > kvm_arch_get_registers() calls write_list_to_cpustate() to
+>>> > update the CPU state struct fields (so QEMU code can read the
+>>> > values in the usual way), kvm_arch_put_registers() does not
+>>> > call write_cpustate_to_list(), meaning that any changes to
+>>> > the CPU state struct fields will not be passed back to KVM.
+<snip>
+>
+>>
+>> I'm confused -- I'm not sure if the things you're saying
+>> didn't work:
+>>  (a) didn't work before this patch and still don't
+>>  (b) used to work and are broken by this patch
+>>  (c) used to not work and are fixed by this patch
+>
+> option (c) - this patch has made things better hence the t-b and r-b
+> tags. I might send you a follow up if we can also have single-step
+> working as well but that requires me to test a kernel patch (and remove
+> the error leg for guest single step in kvm64).
+
+Oh well it looks like we need to keep the suppression of SS while guest
+debug is happening. Otherwise we end up looping exceptions:
+
+first SS from guest trigger and exception at:
+kvm_arm_handle_debug: @0xffffff8010083fa8 mdscr_el1:0x9001 pstate:0x400003c5
+
+then repeats:
+kvm_arm_handle_debug: @0xffffff8010082200 mdscr_el1:0x9001 pstate:0x3c5
+kvm_arm_handle_debug: @0xffffff8010082200 mdscr_el1:0x9001 pstate:0x3c5
+kvm_arm_handle_debug: @0xffffff8010082200 mdscr_el1:0x9001 pstate:0x3c5
+kvm_arm_handle_debug: @0xffffff8010082200 mdscr_el1:0x9001 pstate:0x3c5
+
+This all looks like it is in the kernel which is slightly confusing:
+
+  (gdb) x/6i 0xffffff8010083fa0
+     0xffffff8010083fa0 <+24>:    orr     x2, x2, #0x1
+     0xffffff8010083fa4 <+28>:    msr     mdscr_el1, x2
+     0xffffff8010083fa8 <ret_to_user+32>: ldp     x21, x22, [sp, #256]
+     0xffffff8010083fac <ret_to_user+36>: bl      0xffffff80101f1ad8  <cont=
+ext_tracking_user_enter>
+     0xffffff8010083fb0 <ret_to_user+40>: ldr     x23, [sp, #248]
+     0xffffff8010083fb4 <ret_to_user+44>: msr     sp_el0, x23
+
+which is weird because we it seems the kernel is delivering a SOFTSTEP
+exception to userspace on access to mdscr_el1 rather than trapping the
+access and emulating it in kernel. The loop then just ends up in the
+vectors table:
+
+  (gdb) x/4i 0xffffff8010082200
+=3D> 0xffffff8010082200 <vectors+512>:    sub     sp, sp, #0x140
+   0xffffff8010082204 <vectors+516>:    add     sp, sp, x0
+   0xffffff8010082208 <vectors+520>:    sub     x0, sp, x0
+   0xffffff801008220c <vectors+524>:    tbnz    w0, #14, 0xffffff801008221c=
+ <vectors+540>
+
+Anyway that doesn't affect the viability of this patch for the
+breakpoint behaviour.
+
+>
+>>
+>> More generally:
+>>  * this patch claims to fix the code path where QEMU sets
+>>    up the guest to take a breakpoint exception (specifically
+>>    making our change of ESR_EL1 actually take effect) -- so does
+>>    it do that? Or is it impossible for that code path in QEMU
+>>    to be used (if so, can we just remove it) ?
+>
+> No it's needed - I'm observing exceptions coming through the path and
+> then being delivered to the guest while the host is debugging - modulo
+> the you can't have active HW breakpoints in both guest and host at the
+> same time.
+>
+> Even here now we are sure the guest state is correctly reflected we
+> could make the debug code smarter and try it's best to preserve guest
+> debug regs while using it's own entirely in userspace. But I suspect
+> that is a bit niche.
+>
+>>
+>> thanks
+>> -- PMM
+
+
+--
+Alex Benn=C3=A9e
