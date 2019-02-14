@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51183)
+Received: from eggs.gnu.org ([209.51.188.92]:52256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1guM94-0003Am-Ig
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:54:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guMDw-0005B2-Aw
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1guM93-0007rp-QH
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:54:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1guM93-0007qD-KB
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:54:01 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 14 Feb 2019 18:53:51 +0000
-Message-Id: <20190214185351.5927-1-dgilbert@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1guMDv-0004GE-8U
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:59:04 -0500
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:38203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guMDu-00048Q-PJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:59:03 -0500
+Received: by mail-ot1-x336.google.com with SMTP id m1so12358623otf.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 10:58:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration/rdma: Fix qemu_rdma_cleanup null
- check
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 18:58:46 +0000
+Message-ID: <CAFEAcA_WNz+=mxvyekHN0u9kSzw6QrmmF9Lz8LzjJaL125zanw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] coverity detected issue in contrib/elf2dmp/main.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +26,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Hi; Coverity detected an issue in contrib/elf2dmp/main.c (CID 1398641).
+In this loop:
 
-If the migration fails before the channel is open (e.g. a bad
-address) we end up in the cleanup with rdma->channel=3D=3DNULL.
+    for (; KernBase >= 0xfffff78000000000; KernBase -= PAGE_SIZE) {
+        nt_start_addr = va_space_resolve(&vs, KernBase);
+        if (!nt_start_addr) {
+            continue;
+        }
 
-Spotted by Coverity: CID 1398634
-Fixes: fbbaacab2758cb3f32a0
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/rdma.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+        if (*(uint16_t *)nt_start_addr == 0x5a4d) { /* MZ */
+            break;
+        }
+    }
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 54a3c11540..9fa3b176eb 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2321,7 +2321,9 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-         rdma->connected =3D false;
-     }
-=20
--    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-+    if (rdma->channel) {
-+        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-+    }
-     g_free(rdma->dest_blocks);
-     rdma->dest_blocks =3D NULL;
-=20
---=20
-2.20.1
+we might end exiting with nt_start_addr == NULL, if we go all
+the way through the address range without finding anything
+and the loop terminates via the "KernBase >= 0xfffff78000000000"
+condition.
+
+However, we don't check for this, so we will then segfault
+in pe_get_pdb_symstore_hash(), which assumes it's passed a non-NULL
+address.
+
+I guess we should be checking for nt_start_addr == NULL at the
+end of the loop and treating it as a fatal error?
+
+thanks
+-- PMM
