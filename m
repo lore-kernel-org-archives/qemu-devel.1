@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57630)
+Received: from eggs.gnu.org ([209.51.188.92]:33906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1guKhx-0001fG-1y
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:21:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guL4B-0002HG-Ig
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:44:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1guKhv-0005Z8-VC
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:21:56 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:58503)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1guKhv-0005Ux-H4
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:21:55 -0500
-Date: Thu, 14 Feb 2019 18:21:53 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190214102816.3393-7-peter.maydell@linaro.org>
-Message-ID: <alpine.BSF.2.21.9999.1902141821360.64316@zero.eik.bme.hu>
-References: <20190214102816.3393-1-peter.maydell@linaro.org>
-	<20190214102816.3393-7-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1guL1L-0006W6-C8
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:42:00 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:42800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guL1L-0006TK-5B
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:41:59 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id i5so11882176oto.9
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:41:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] ui/cocoa: Subclass NSApplication so
- we can implement sendEvent
+References: <20190214043322.2354-1-stefanha@redhat.com>
+In-Reply-To: <20190214043322.2354-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 17:41:47 +0000
+Message-ID: <CAFEAcA9ymZO9FHXPEDTHC9Qm9ShvrAhmHBX1jF2dnH38dwpG4A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, 14 Feb 2019, Peter Maydell wrote:
-> When we switch away from our custom event handling, we still want to
-> be able to have first go at any events our application receives,
-> because in full-screen mode we want to send key events to the guest,
-> even if they would be menu item activation events. There are several
-> ways we could do that, but one simple approach is to subclass
-> NSApplication so we can implement a custom sendEvent method.
-> Do that, but for the moment have our sendEvent just invoke the
-> superclass method.
+On Thu, 14 Feb 2019 at 04:33, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> The following changes since commit 0b5e750bea635b167eb03d86c3d9a09bbd43bc06:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-02-12 10:53:37 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 42824b4d16da56a50ff4027f6cd22378e0e2666e:
+>
+>   virtio-blk: set correct config size for the host driver (2019-02-13 16:18:17 +0800)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> Fix a virtio-blk migration regression.
+>
 
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+Applied, thanks.
 
-Regards,
-BALATON Zoltan
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-> ---
-> New patch in v2
-> ---
-> ui/cocoa.m | 13 ++++++++++++-
-> 1 file changed, 12 insertions(+), 1 deletion(-)
->
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 5a84e1aea7..184fbd877d 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -1478,6 +1478,17 @@ - (void)adjustSpeed:(id)sender
->
-> @end
->
-> +@interface QemuApplication : NSApplication
-> +@end
-> +
-> +@implementation QemuApplication
-> +- (void)sendEvent:(NSEvent *)event
-> +{
-> +    COCOA_DEBUG("QemuApplication: sendEvent\n");
-> +    [super sendEvent: event];
-> +}
-> +@end
-> +
-> static void create_initial_menus(void)
-> {
->     // Add menus
-> @@ -1691,7 +1702,7 @@ int main (int argc, const char * argv[]) {
->     ProcessSerialNumber psn = { 0, kCurrentProcess };
->     TransformProcessType(&psn, kProcessTransformToForegroundApplication);
->
-> -    [NSApplication sharedApplication];
-> +    [QemuApplication sharedApplication];
->
->     create_initial_menus();
->
->
+-- PMM
