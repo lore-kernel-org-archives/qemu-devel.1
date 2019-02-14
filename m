@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60068)
+Received: from eggs.gnu.org ([209.51.188.92]:60205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu88w-0006Zg-CN
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:56:59 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gu89b-0006hY-GA
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:57:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu87J-0005FZ-5q
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:55:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu87D-0005DS-VZ
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:55:13 -0500
-Date: Thu, 14 Feb 2019 11:52:18 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190214035218.GA12997@wei-ubt>
-References: <1550064346-17012-1-git-send-email-wexu@redhat.com>
-	<20190213091402-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190213091402-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] packed ring virtio-net backends
- support
+	(envelope-from <richard.henderson@linaro.org>) id 1gu7wL-000789-Tm
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:44:00 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38466)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gu7wL-0006zn-Im
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:43:57 -0500
+Received: by mail-pl1-x643.google.com with SMTP id e5so2379984plb.5
+	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 19:43:50 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 13 Feb 2019 19:43:42 -0800
+Message-Id: <20190214034345.24722-2-richard.henderson@linaro.org>
+In-Reply-To: <20190214034345.24722-1-richard.henderson@linaro.org>
+References: <20190214034345.24722-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/4] target/arm: Add helpers for FMLAL and FMLSL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +26,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com, tiwei.bie@intel.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On Wed, Feb 13, 2019 at 09:17:57AM -0500, Michael S. Tsirkin wrote:
-> On Wed, Feb 13, 2019 at 08:25:35AM -0500, wexu@redhat.com wrote:
-> > From: Wei Xu <wexu@redhat.com>
-> > 
-> > https://github.com/Whishay/qemu.git 
-> > 
-> > Userspace and vhost-net backedn test has been done with upstream kernel
-> > in guest.
-> 
-> Just a general comment: please format *all* patches
-> with --subject-prefix "PATCH v3", or with -v3.
-> 
-> Do not manually change patch 0 subject adding version there.
-> 
-> This makes it possible to figure out where does each patch go.
-> 
-OK, thanks a lot.
+Note that float16_to_float32 rightly squashes SNaN to QNaN.
+But of course pickNaNMulAdd, for ARM, selects SNaNs first.
+So we have to preserve SNaN long enough for the correct NaN
+to be selected.  Thus float16_to_float32_by_bits.
 
-Wei
-> 
-> > v2->v3
-> >     v2/01 - drop it since the header has been synchronized from kernel.(mst & jason)
-> >     v3/01 - rename 'avail_wrap_counter' to 'last_avail_wrap_counter',
-> >             'event_wrap_counter' to 'avail_wrap_counter' to make it easier
-> >             to understand.(Jason)
-> >           - revise commit message.(Jason)
-> >     v3/02 - split packed ring areas size calculation to next patch.(Jason)
-> >             to not break bisect(Jason).
-> >     v3/03 - initialize packed ring region with correct size and attribute.
-> >           - remove unnecessary 'else' checks. (Jason)
-> >     v3/06 - add commit log.
-> >           - replace 'event_wrap-counter' with 'avail_wrap_counter'.
-> >           - merge common memory cache size check to virtqueue_get_avail_bytes().(Jason)
-> >           - revise memory barrier comment.(Jason) 
-> >           - check indirect descriptors by desc.len/sizeof(desc).(Jason)
-> >           - flip wrap counter with '^=1'.(Jason)
-> >     v3/07 - move desc.id/len initialization to the declaration.(Jason)
-> >           - flip wrap counter '!' with '^=1'.(Jason)
-> >           - add memory barrier comments in commit message.
-> >     v3/08 - use offsetof() when writing cache.(Jason)
-> >           - avoid duplicated memory region write when turning off event_idx
-> >             supported notification.(Jason)
-> >           - add commit log.(Jason)
-> >           - add avail & last_avail wrap counter difference description in commit log.
-> >     v3/09 - remove unnecessary used/avail idx/wrap-counter from subsection.
-> >           - put new subsection to the end of vmstate_virtio.(Jason)
-> >           - squash the two userspace and vhost-net migration patches in v2.(Jason)
-> >     v3/10 - reword commit message.
-> >           - this is a help not a bug fix so I would like to keep it as a
-> >             separate patch still.(Proposed a merge it by Jason)
-> >           - the virtqueue_fill() is also not like an API so I would prefer not
-> >             to touch it, please correct me if I did not get it in the right
-> >             way.(Proposed a squash by Jason)
-> >     v3/11 - squash feature bits for user space and vhost kernel/user backends.
-> >           - enable packed ring feature bit provision on host by default.(Jason)
-> > 
-> > Wei Xu (11):
-> >   virtio: rename structure for packed ring
-> >   virtio: device/driver area size calculation helper for split ring
-> >   virtio: initialize packed ring region
-> >   virtio: initialize wrap counter for packed ring
-> >   virtio: queue/descriptor check helpers for packed ring
-> >   virtio: get avail bytes check for packed ring
-> >   virtio: fill/flush/pop for packed ring
-> >   virtio: event suppression support for packed ring
-> >   virtio-net: update the head descriptor in a chain lastly
-> >   virtio: migration support for packed ring
-> >   virtio: CLI and provide packed ring feature bit by default
-> > 
-> >  hw/net/vhost_net.c         |   2 +
-> >  hw/net/virtio-net.c        |  11 +-
-> >  hw/virtio/virtio.c         | 798 +++++++++++++++++++++++++++++++++++++++++----
-> >  include/hw/virtio/virtio.h |   4 +-
-> >  4 files changed, 757 insertions(+), 58 deletions(-)
-> > 
-> > -- 
-> > 1.8.3.1
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.h     |   9 +++
+ target/arm/vec_helper.c | 154 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 163 insertions(+)
+
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 53a38188c6..0302e13604 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -653,6 +653,15 @@ DEF_HELPER_FLAGS_6(gvec_fmla_idx_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_6(gvec_fmla_idx_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_5(gvec_fmlal_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fmlsl_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fmlal_idx_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fmlsl_idx_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
+ #ifdef TARGET_AARCH64
+ #include "helper-a64.h"
+ #include "helper-sve.h"
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 37f338732e..0c3b3de961 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -766,3 +766,157 @@ DO_FMLA_IDX(gvec_fmla_idx_s, float32, H4)
+ DO_FMLA_IDX(gvec_fmla_idx_d, float64, )
+ 
+ #undef DO_FMLA_IDX
++
++/*
++ * Convert float16 to float32, raising no exceptions and
++ * preserving exceptional values, including SNaN.
++ * This is effectively an unpack+repack operation.
++ */
++static float32 float16_to_float32_by_bits(uint32_t f16)
++{
++    const int f16_bias = 15;
++    const int f32_bias = 127;
++    uint32_t sign = extract32(f16, 15, 1);
++    uint32_t exp = extract32(f16, 10, 5);
++    uint32_t frac = extract32(f16, 0, 10);
++
++    if (exp == 0x1f) {
++        /* Inf or NaN */
++        exp = 0xff;
++    } else if (exp == 0) {
++        /* Zero or denormal.  */
++        if (frac != 0) {
++            /*
++             * Denormal; these are all normal float32.
++             * Shift the fraction so that the msb is at bit 11,
++             * then remove bit 11 as the implicit bit of the
++             * normalized float32.  Note that we still go through
++             * the shift for normal numbers below, to put the
++             * float32 fraction at the right place.
++             */
++            int shift = clz32(frac) - 21;
++            frac = (frac << shift) & 0x3ff;
++            exp = f32_bias - f16_bias - shift + 1;
++        }
++    } else {
++        /* Normal number; adjust the bias.  */
++        exp += f32_bias - f16_bias;
++    }
++    sign <<= 31;
++    exp <<= 23;
++    frac <<= 23 - 10;
++
++    return sign | exp | frac;
++}
++
++static float32 fmlal(float32 a, float16 n16, float16 m16, float_status *fpst)
++{
++    float32 n = float16_to_float32_by_bits(n16);
++    float32 m = float16_to_float32_by_bits(m16);
++    return float32_muladd(n, m, a, 0, fpst);
++}
++
++static float32 fmlsl(float32 a, float16 n16, float16 m16, float_status *fpst)
++{
++    float32 n = float16_to_float32_by_bits(n16);
++    float32 m = float16_to_float32_by_bits(m16);
++    return float32_muladd(float32_chs(n), m, a, 0, fpst);
++}
++
++static inline uint64_t load4_f16(uint64_t *ptr, int is_q, int is_2)
++{
++    /*
++     * Branchless load of u32[0], u64[0], u32[1], or u64[1].
++     * Load the 2nd qword iff is_q & is_2.
++     * Shift to the 2nd dword iff !is_q & is_2.
++     * For !is_q & !is_2, the upper bits of the result are garbage.
++     */
++    return ptr[is_q & is_2] >> ((is_2 & ~is_q) << 5);
++}
++
++/*
++ * Note that FMLAL and FMLSL require oprsz == 8 or oprsz == 16,
++ * as there is not yet SVE versions that might use blocking.
++ */
++
++void HELPER(gvec_fmlal_h)(void *vd, void *vn, void *vm,
++                          void *fpst, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc);
++    int is_2 = extract32(desc, SIMD_DATA_SHIFT, 1);
++    int is_q = oprsz == 16;
++    float32 *d = vd;
++    uint64_t n_4, m_4;
++
++    /* Pre-load all of the f16 data, avoiding overlap issues.  */
++    n_4 = load4_f16(vn, is_q, is_2);
++    m_4 = load4_f16(vm, is_q, is_2);
++
++    for (i = 0; i < oprsz / 4; i++) {
++        d[H4(i)] = fmlal(d[H4(i)], extract64(n_4, i*16, 16),
++                         extract64(m_4, i*16, 16), fpst);
++    }
++    clear_tail(d, oprsz, simd_maxsz(desc));
++}
++
++void HELPER(gvec_fmlsl_h)(void *vd, void *vn, void *vm,
++                          void *fpst, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc);
++    int is_2 = extract32(desc, SIMD_DATA_SHIFT, 1);
++    int is_q = oprsz == 16;
++    float32 *d = vd;
++    uint64_t n_4, m_4;
++
++    /* Pre-load all of the f16 data, avoiding overlap issues.  */
++    n_4 = load4_f16(vn, is_q, is_2);
++    m_4 = load4_f16(vm, is_q, is_2);
++
++    for (i = 0; i < oprsz / 4; i++) {
++        d[H4(i)] = fmlsl(d[H4(i)], extract64(n_4, i*16, 16),
++                         extract64(m_4, i*16, 16), fpst);
++    }
++    clear_tail(d, oprsz, simd_maxsz(desc));
++}
++
++void HELPER(gvec_fmlal_idx_h)(void *vd, void *vn, void *vm,
++                              void *fpst, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc);
++    int is_2 = extract32(desc, SIMD_DATA_SHIFT, 1);
++    int index = extract32(desc, SIMD_DATA_SHIFT + 1, 3);
++    int is_q = oprsz == 16;
++    float32 *d = vd;
++    uint64_t n_4;
++    float16 m_1;
++
++    /* Pre-load all of the f16 data, avoiding overlap issues.  */
++    n_4 = load4_f16(vn, is_q, is_2);
++    m_1 = ((float16 *)vm)[H2(index)];
++
++    for (i = 0; i < oprsz / 4; i++) {
++        d[H4(i)] = fmlal(d[H4(i)], extract64(n_4, i * 16, 16), m_1, fpst);
++    }
++    clear_tail(d, oprsz, simd_maxsz(desc));
++}
++
++void HELPER(gvec_fmlsl_idx_h)(void *vd, void *vn, void *vm,
++                              void *fpst, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc);
++    int is_2 = extract32(desc, SIMD_DATA_SHIFT, 1);
++    int index = extract32(desc, SIMD_DATA_SHIFT + 1, 3);
++    int is_q = oprsz == 16;
++    float32 *d = vd;
++    uint64_t n_4;
++    float16 m_1;
++
++    /* Pre-load all of the f16 data, avoiding overlap issues.  */
++    n_4 = load4_f16(vn, is_q, is_2);
++    m_1 = ((float16 *)vm)[H2(index)];
++
++    for (i = 0; i < oprsz / 4; i++) {
++        d[H4(i)] = fmlsl(d[H4(i)], extract64(n_4, i*16, 16), m_1, fpst);
++    }
++    clear_tail(d, oprsz, simd_maxsz(desc));
++}
+-- 
+2.17.2
