@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46907)
+Received: from eggs.gnu.org ([209.51.188.92]:47435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gu6js-0001JC-B5
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:27:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gu6o1-0002a9-4B
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gu6jr-0001Pn-6L
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:27:00 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:40648)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gu6jq-0001Kx-Mh
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:26:59 -0500
-Received: by mail-pf1-x442.google.com with SMTP id h1so2232099pfo.7
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 18:26:58 -0800 (PST)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20181113083104.2692-1-aik@ozlabs.ru>
-	<20181113083104.2692-4-aik@ozlabs.ru>
-	<CAKmqyKOOp0Nv7wqL_=s6f_1hep==bicXKofnhYo_puResrjNRg@mail.gmail.com>
-	<25ef3ad6-90b6-a255-7f65-f3a88625b622@ozlabs.ru>
-	<937f3d53-5ed1-85fe-c8de-623b69c870e4@ozlabs.ru>
-Message-ID: <192ed142-ee50-982f-46df-7b53d1f32ab8@ozlabs.ru>
-Date: Thu, 14 Feb 2019 13:26:49 +1100
+	(envelope-from <eblake@redhat.com>) id 1gu6o0-0006w3-7V
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:31:17 -0500
+References: <20181203175211.8230-1-mreitz@redhat.com>
+	<20181203175211.8230-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <413a20ef-77da-5818-24a4-38e67fb471ce@redhat.com>
+Date: Wed, 13 Feb 2019 20:31:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <937f3d53-5ed1-85fe-c8de-623b69c870e4@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu RFC 3/7] pci: Move NVIDIA vendor id to
- the rest of ids
+In-Reply-To: <20181203175211.8230-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xN7vsZtOC9EfdJLOyXvMqyOXW2fM6ERI5"
+Subject: Re: [Qemu-devel] [PATCH for-next 1/6] qemu-img: Move quiet into
+ ImgConvertState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, joserz@linux.ibm.com, Alistair Popple <alistair@popple.id.au>, alex.williamson@redhat.com, sbobroff@linux.ibm.com, pjaroszynski@nvidia.com, "open list:New World" <qemu-ppc@nongnu.org>, lagarcia@br.ibm.com, oohall@gmail.com, arbab@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Ping? 3 months today :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xN7vsZtOC9EfdJLOyXvMqyOXW2fM6ERI5
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <413a20ef-77da-5818-24a4-38e67fb471ce@redhat.com>
+Subject: Re: [PATCH for-next 1/6] qemu-img: Move quiet into ImgConvertState
+References: <20181203175211.8230-1-mreitz@redhat.com>
+ <20181203175211.8230-2-mreitz@redhat.com>
+In-Reply-To: <20181203175211.8230-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 12/3/18 11:52 AM, Max Reitz wrote:
+> Move img_convert()'s quiet flag into the ImgConvertState so it is
+> accessible by nested functions.  -q dictates that it suppresses anythin=
+g
+> but errors, so if those functions want to emit warnings, they need to
+> query this flag first.  (There currently are no such warnings, but ther=
+e
+> will be as of the next patch.)
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-img.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-On 16/01/2019 15:20, Alexey Kardashevskiy wrote:
-> Ping, anyone?
-> 
-> On 14/12/2018 14:36, Alexey Kardashevskiy wrote:
->>
->>
->> On 21/11/2018 05:27, Alistair Francis wrote:
->>> On Tue, Nov 13, 2018 at 12:42 AM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>>>
->>>> sPAPR code will use it too so move it from VFIO to the common code.
->>>>
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>
->>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->>
->>
->>
->> Aaaaaand who is taking this? I am going to repost the patchset, posting
->> this one over and over again seems redundant. Thanks,
->>
->>
->>
->>>
->>> Alistair
->>>
->>>> ---
->>>>  include/hw/pci/pci_ids.h | 2 ++
->>>>  hw/vfio/pci-quirks.c     | 2 --
->>>>  2 files changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
->>>> index 63acc72..3ed7d10 100644
->>>> --- a/include/hw/pci/pci_ids.h
->>>> +++ b/include/hw/pci/pci_ids.h
->>>> @@ -271,4 +271,6 @@
->>>>
->>>>  #define PCI_VENDOR_ID_SYNOPSYS           0x16C3
->>>>
->>>> +#define PCI_VENDOR_ID_NVIDIA             0x10de
->>>> +
->>>>  #endif
->>>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
->>>> index eae31c7..40a1200 100644
->>>> --- a/hw/vfio/pci-quirks.c
->>>> +++ b/hw/vfio/pci-quirks.c
->>>> @@ -526,8 +526,6 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
->>>>   * note it for future reference.
->>>>   */
->>>>
->>>> -#define PCI_VENDOR_ID_NVIDIA                    0x10de
->>>> -
->>>>  /*
->>>>   * Nvidia has several different methods to get to config space, the
->>>>   * nouveu project has several of these documented here:
->>>> --
->>>> 2.17.1
->>>>
->>>>
->>
-> 
+--xN7vsZtOC9EfdJLOyXvMqyOXW2fM6ERI5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Alexey
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxk0u0ACgkQp6FrSiUn
+Q2qYaAf9H5LzxIQbqE7EW/mdoKSHxtv+5OTmv5hZCZ0pNdezoTIUb3zUNfjy3iFH
+4fuyak0ffzZjWuceuhc1h+Rwd1OGVZ2ib0Ck4CY9QBfLsclsNJowZ0qoLtm8fwEG
+XhRWXaT2rQkzWwX/nALjEg+cywnARTKPxKEjaCHwpP2ec4IOhHis+kklb73OFoNx
+OHq+BIPWKu9k1VlaWCsGR5jfQPXQBVo5r0vxdGsObVmd6zJh3NHUb6BGHIwGR3P4
+lAJUEhoLxHkKxDLFSTFyplfehIiV5fEO8twBq5xCcXIFpIrykw1nppVu5gPSAUKu
+7mEas3JN7rCGNwhiJ8fu9QRwhzTI1A==
+=DoJn
+-----END PGP SIGNATURE-----
+
+--xN7vsZtOC9EfdJLOyXvMqyOXW2fM6ERI5--
