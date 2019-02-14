@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60369)
+Received: from eggs.gnu.org ([209.51.188.92]:33559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1guHNZ-00010d-1D
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:48:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guHQw-0003bQ-L5
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:52:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1guHIL-00052R-7a
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:43:19 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Thu, 14 Feb 2019 13:43:11 +0000
-Message-ID: <839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
-	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
-	<w51mun2uxts.fsf@maestria.local.igalia.com>
-	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
-	<w51mun18cjy.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51mun18cjy.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D304D136C4CCBB4184317197319638FE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1guHQu-0003fk-Q8
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:52:10 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41799)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guHQs-0003az-St
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:52:08 -0500
+Received: by mail-ot1-x342.google.com with SMTP id u16so10528881otk.8
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 05:52:05 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+References: <20190206052857.5077-1-richard.henderson@linaro.org>
+	<20190206052857.5077-4-richard.henderson@linaro.org>
+In-Reply-To: <20190206052857.5077-4-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 13:51:53 +0000
+Message-ID: <CAFEAcA9qRz_xyK=O8B8O3CnFkEpZwkwpXr37XeBJO-rg4rqyXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] target/arm: Implement ARMv8.3-JSConv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-DQoNCk9uIDEyLzAyLzIwMTkgMTQ6MzUsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPiBPbiBNb24g
-MTEgRmViIDIwMTkgMDU6NTg6MDUgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
-IHdyb3RlOg0KPj4+PiBUaGUgcHJvYmxlbSBpcyBpbiB0aGUgY29uY2VwdCBvZiAiYmFzZSIgbm9k
-ZS4gVGhlIGNvZGUgd3JpdHRlbiBpbg0KPj4+PiBtYW5uZXIgdGhhdCBiYXNlIGlzIG5vdCBjaGFu
-Z2VkIGR1cmluZyBibG9jayBqb2IuIEhvd2V2ZXIsIGpvYiBkb24ndA0KPj4+PiBvd24gYmFzZSBh
-bmQgdGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgaXQgd2lsbCBub3QgY2hhbmdlIGR1cmluZw0K
-Pj4+PiB0aGUgam9iLg0KPj4+DQo+Pj4gQnV0IGlmIHRoYXQncyB0aGUgY2FzZSB0aGVuIHdlIGhh
-dmUgYSBwcm9ibGVtIGFscmVhZHksIGJlY2F1c2UgJ2Jhc2UnDQo+Pj4gaXMgYSBtZW1iZXIgb2Yg
-U3RyZWFtQmxvY2tKb2IgYW5kIGlzIHVzZWQgaW4gdGhlIGV4aXN0aW5nDQo+Pj4gc3RyZWFtX3J1
-bigpIGNvZGUuDQo+Pg0KPj4gSSB0aGluayBpdCBzaG91bGQgYmUgcG9zc2libGUgdG8gcmVwcm9k
-dWNlLCB1c2luZyBibG9jay1jb21taXQgKHdoaWNoDQo+PiBhbHJlYWR5IGhhcyBmaWx0ZXIpIHdp
-dGggYmxvY2stc3RyZWFtIGluIHBhcmFsbGVsLCB3ZSdsbCB0cnkuDQo+IA0KPiBJdCdzIG5vdCBw
-b3NzaWJsZSB0byBydW4gYmxvY2stc3RyZWFtIGFuZCBibG9jay1jb21taXQgaW4gcGFyYWxsZWwg
-b24NCj4gdGhlIHNhbWUgbm9kZXMuIFNlZSBpb3Rlc3QgMDMwIGZvciBhIGZldyBleGFtcGxlcy4N
-Cj4gDQo+IFNvIHVubGVzcyB0aGVyZSdzIGEgYnVnIGl0IHNob3VsZCBiZSBzYWZlLg0KPiANCj4+
-PiBTbyBpZiB0aGVyZSdzIGEgd2F5IHRvIG1ha2UgJ2Jhc2UnIGRpc2FwcGVhciBkdXJpbmcgdGhl
-IGpvYiAoaG93PykNCj4+PiB0aGVuIHdlIGNvdWxkIHByb3RlY3QgaXQgd2l0aCBibG9ja19qb2Jf
-YWRkX2JkcnYoKS4NCj4+DQo+PiBJJ20gbm90IHN1cmUgdGhpcyBpcyBjb3JyZWN0LiBXaGF0IGlz
-IHRoZSByZWFzb24gZm9yIHN0cmVhbSB0byBvd24NCj4+IGJhc2U/IEl0J3Mgbm90IHJlYWxseSBp
-bnRlcmVzdGVkIGluIGl0Lg0KPiANCj4gc3RyZWFtIGRvZXMgbm90IG5lZWQgdG8gd3JpdGUgb3Ig
-bW9kaWZ5IGJhc2UsIGJ1dCBpdCBkb2VzIG5lZWQgdG8ga2VlcCBhDQo+IHJlZmVyZW5jZSB0byBp
-dCBpbiBvcmRlciB0byBub3cgd2hlcmUgdG8gc3RvcCBjb3B5aW5nIGRhdGEuDQo+IA0KPiBBcyBJ
-IHNhaWQgZWFybGllciBiYXNlIGlzIGEgbWVtYmVyIG9mIFN0cmVhbUJsb2NrSm9iLCBzbyBpdCBz
-aG91bGQgbm90DQo+IGRpc2FwcGVhciBkdXJpbmcgdGhlIGpvYi4NCj4gDQo+IEJlcnRvDQo+IA0K
-DQpObyBkb3VidCB0aGF0IGEgcmVmZXJlbmNlIHRvIHRoZSBiYXNlIG5vZGUgaXMgbmVlZGVkIGFz
-IGEgbGltaXQgZm9yIHRoZQ0KQ09SIHdvcmsuIFRoZSBiYXNlIGlzIHN0aWxsIGluIHRoZSBnYW1l
-LiBBY3R1YWxseSwgd2UgZW5jb3VudGVyIGFuIGlzc3VlDQp3aGVuIEJsb2NrRHJpdmVyU3RhdGUg
-b2YgdGhlIENPUi1maWx0ZXIgY29tZXMgaW50byBwbGF5IGluc3RlYWQgb2YgdGhlIA0KYmFzZS4g
-SXQgaXMgaW5oZXJpdGVkIGZyb20gYSBwYXJhbGxlbCBqb2IuIEJhc2VkIG9uIHRoZSBjYXNlDQp0
-ZXN0X3N0cmVhbV9wYXJhbGxlbCBmcm9tIHRoZSBxZW11LWlvdGVzdHMvMDMwLCBpdCB3b3JrcyBs
-aWtlIHRoaXM6DQoxLiBKb2IjMSBpcyBzdGFydGVkIGFuZCBpbnNlcnRzIGEgQ09SLWZpbHRlciBh
-Ym92ZSB0aGUgdG9wIG5vZGUuDQoyLiBDb250ZXh0IHN3aXRjaC4NCjMuIEpvYiMyIGlzIHN0YXJ0
-ZWQgYW5kIGluaGVyaXRzIHRoZSBDT1ItZmlsdGVyIGFzIHRoZSBiYXNlLg0KNC4gQ29udGV4dCBz
-d2l0Y2guDQo1LiBKb2IjMSBjb21lcyB0byB0aGUgZW5kIGFuZCByZW1vdmVzIGl0cyBDT1ItZmls
-dGVyIHJlZmVyZW5jZWQgYnkNCiAgICBqb2IjMi4NCjYuIENvbnRleHQgc3dpdGNoLg0KNy4gSm9i
-IzIgY29tZXMgdG8gdGhlIGVuZCBhbmQgdXNlcyB0aGUgZGVsZXRlZCBDT1ItZmlsdGVyIG5vZGUu
-DQo4LiBXZSBhcmUgaW4gdHJvdWJsZS4NCg0KT3IgYW5vdGhlciBzY2VuYXJpbzoNCjEtNC4gQXMg
-YWJvdmUNCjUuIEpvYiMyIGNvbWVzIHRvIHRoZSBlbmQgZmlyc3QgYW5kIGtlZXBzIHRoZSBDT1It
-ZmlsdGVyIGFzIHRoZQ0KICAgIGJhY2tpbmcgbm9kZS4NCjYuIFRoZSBhc3NlcnQoKSBmYWlscyBh
-cyB0aGUgcmVmZXJlbmNlZCBDT1ItZmlsdGVyIHdhcyBub3QgZGVsZXRlZA0KICAgIG9uIGV4aXQu
-DQo3LiBUaGUgZ2FtZSBpcyBvdmVyIHdpdGggYSBwb29yIHNjb3JlLg0KDQpJZiB3ZSBqdXN0IGtl
-ZXAgdGhlIGludGVybWVkaWF0ZSBib3R0b20gbm9kZSBpbnN0ZWFkIG9mIHRoZSBiYXNlLCB3ZQ0K
-d2lsbCBoYXZlIGEgc2ltaWxhciBpc3N1ZS4gT24gdGhlIGpvYiBleGl0LCB3ZSBjaGFuZ2UgdGhl
-IGJhY2tpbmcgZmlsZS4NCklmIHdlIGNhbGwgdGhlIGJhY2tpbmdfYnMoYm90dG9tX25vZGVfYnMp
-LCB3ZSB3aWxsIGtlZXAgdGhlIENPUi1maWx0ZXINCm5vZGUgaW5zdGVhZCwgd2hlcmVhcyBpdCBo
-YXMgbm90IGJlZW4gcmVtb3ZlZCBqZXQgYnkgdGhlIHVuZmluaXNoZWQgDQpqb2IjMSAoc2VlIHRo
-ZSBzZWNvbmQgc2NlbmFyaW8gYWJvdmUpLg0KDQpJZiB3ZSBpbmNsdWRlIHRoZSBiYXNlIG5vZGUg
-aW50byB0aGUgam9iIG5vZGUgbGlzdCB3aXRoIHNvbWUgcHJvdGVjdGluZw0KZmxhZ3MsIHRoYXQn
-cyBibG9ja19qb2JfYWRkX2JkcnYoJnMtPmNvbW1vbiwgImJhc2UiLCBiYXNlLCAuLiksIHdlIGNh
-bg0KZW5kIHVwIHdpdGggYSBmYWlsdXJlIG9mIHRoZSBiZHJ2X2NoZWNrX3VwZGF0ZV9wZXJtKCkg
-Y2FsbGVkIGJ5IHRoZQ0KYmRydl9yb290X2F0dGFjaF9jaGlsZCgpIGJlY2F1c2UgdGhlIHByZXZp
-b3VzIGpvYiMxIGhhcyB0aGUgcm9vdA0KcmVmZXJlbmNlIHRvIHRoZSBzYW1lIG5vZGUgd2l0aCBv
-dGhlciBwZXJtaXNzaW9ucy4gU28sIHRoZSBuZXh0IGpvYiB3aWxsDQpmYWlsIHRvIHN0YXJ0IGFu
-ZCB0aGUgdGVzdCBjYXNlcyB3b24ndCBwYXNzLg0KDQpJdCB3ZSBzZXQgdGhlIGZvbGxvd2luZyBm
-bGFncywgdGhlcmUgd2lsbCBiZSBubyBmYWlsdXJlOg0KYmxvY2tfam9iX2FkZF9iZHJ2KCZzLT5j
-b21tb24sICJiYXNlIiwgYmFzZSwgMCwgQkxLX1BFUk1fQ09OU0lTVEVOVF9SRUFEIA0KfCBCTEtf
-UEVSTV9XUklURV9VTkNIQU5HRUQgfCBCTEtfUEVSTV9HUkFQSF9NT0QsICZlcnJvcl9hYm9ydCk7
-DQpCdXQgd2hhdCBtYXJnaW4gd2lsbCB3ZSBnYWluPyBXZSB3aWxsIGhhdmUgdGhlIHNhbWUgaXNz
-dWVzIGFzIGFib3ZlLg0KDQpJbiBtYW55IG90aGVyIGNhc2VzLCB3aGVuIHRoZSBmaWx0ZXIgaGFz
-IG5vdCBiZWVuIGlkZW50aWZpZWQsIHdlIGNhbg0KZ2V0IGEgYnJva2VuIGNoYWluIHdoaWxlIGNh
-bGxpbmcgdG8gdGhlIGJhY2tpbmdfYnMoYnM9ZmlsdGVyKSBhcyB0aGUNCmJhY2tpbmcgbm9kZSBv
-ZiB0aGUgZmlsdGVyIGlzIHRoZSB6ZXJvIHBvaW50ZXIuDQoNClRoYXQncyB3aHkgSSBpbXBsZW1l
-bnRlZCB0aGUgc2tpcF9maWx0ZXIoKSBmdW5jdGlvbiBpbiB0aGlzIHNlcmllcyBhcw0KYSBzb21l
-IHNvcnQgb2Ygc29sdXRpb24gb3Igd29ya2Fyb3VuZC4gTWF5IHdlIHByb2NlZWQgd2l0aCB0aGF0
-Pw0KSXMgdGhlcmUgYW55IGJldHRlciBpZGVhPw0KDQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJk
-cywNCkFuZHJleSBTaGlua2V2aWNoDQo=
+On Wed, 6 Feb 2019 at 05:29, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v2: Return 0 for NaN
+> ---
+
+> +                /* The the fraction is shifted out entirely.  */
+
+"The the"...
+
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index eb25895876..a92d06b05b 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -4066,6 +4066,21 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+>                      case 17: /* fsito */
+>                          gen_vfp_sito(dp, 0);
+>                          break;
+> +                    case 19: /* vjcvt */
+> +                        if (!dp || !dc_isar_feature(aa32_jscvt, s)) {
+> +                            return 1;
+> +                        } else {
+> +                            TCGv_ptr fpst = get_fpstatus_ptr(0);
+> +                            gen_helper_fjcvtzs(cpu_F0d, cpu_F0d, fpst);
+> +                            tcg_temp_free_ptr(fpst);
+> +
+> +                            tcg_gen_extr_i64_i32(cpu_F0s, cpu_ZF, cpu_F0d);
+> +                            tcg_gen_movi_i32(cpu_NF, 0);
+> +                            tcg_gen_movi_i32(cpu_CF, 0);
+> +                            tcg_gen_movi_i32(cpu_VF, 0);
+> +                            dp = 0; /* always a single precision result */
+> +                        }
+
+The AArch32 version of the instruction sets the NZCV bits in
+the FPSCR, not the main PSTATE ones. (It passes Is64 == FALSE
+to the pseudocode FPToFixedJS().)
+
+> +                        break;
+>                      case 20: /* fshto */
+>                          if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
+>                              return 1;
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
