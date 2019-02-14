@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42428)
+Received: from eggs.gnu.org ([209.51.188.92]:42467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guCZh-0005Sa-15
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:53 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1guCZl-0005Z5-Lk
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guCZR-0000iK-D1
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guCZR-0000Ww-6K
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:37 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D4705947B
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 08:30:34 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <871s4chvb2.fsf@dusky.pond.sub.org>
-	<9e429792-cbea-c96c-ad48-7f5bdd7ef781@redhat.com>
-	<87bm3f4qbt.fsf@dusky.pond.sub.org>
-	<7ede9d69-a3fe-f20a-3770-dd2a4e90d1ca@redhat.com>
-Date: Thu, 14 Feb 2019 09:30:31 +0100
-In-Reply-To: <7ede9d69-a3fe-f20a-3770-dd2a4e90d1ca@redhat.com> (Paolo
-	Bonzini's message of "Wed, 13 Feb 2019 17:19:18 +0100")
-Message-ID: <87o97ebwm0.fsf@dusky.pond.sub.org>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1guCZa-0000t6-Gq
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:52 -0500
+Date: Thu, 14 Feb 2019 16:39:55 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190214083955.GA20090@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190212052224.GA4839@richard>
+	<20190212003414-mutt-send-email-mst@kernel.org>
+	<4d6f639b-fe11-7048-3975-ee1c1875b8d3@vivier.eu>
+	<3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
+	<af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
+	<20190214000317.GA19899@richard>
+	<3dd545f2-5346-2b01-8725-5f35cbaa0ae5@vivier.eu>
+	<d69dd1c9-aa58-4b03-6b9c-1cde7bed83cb@vivier.eu>
+	<20190214081828.GA19789@richard>
+	<33fc1da2-144b-22b5-bcb1-f85fab64b623@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Seeking QEMU makefile advice
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <33fc1da2-144b-22b5-bcb1-f85fab64b623@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +33,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 13/02/19 17:15, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->>> On 13/02/19 10:49, Markus Armbruster wrote:
->>>> * Define QAPI_COMMON_MODULES, QAPI_TARGET_MODULES and QAPI_MODULES in
->>>>   Makefile.obj
+On Thu, Feb 14, 2019 at 09:23:39AM +0100, Laurent Vivier wrote:
+>On 14/02/2019 09:18, Wei Yang wrote:
+>> On Thu, Feb 14, 2019 at 09:10:14AM +0100, Laurent Vivier wrote:
+>>> On 14/02/2019 08:57, Laurent Vivier wrote:
+>>>> On 14/02/2019 01:03, Wei Yang wrote:
+>>>>> On Wed, Feb 13, 2019 at 02:45:01PM +0100, Laurent Vivier wrote:
+>>>>>> On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
+>>>>>>> Hi Laurent,
+>>>>>>>
+>>>>>>> On 2/13/19 9:49 AM, Laurent Vivier wrote:
+>>>>>>>> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
+>>>>>>>>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
+>>>>>>>>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
+>>>>>>>>>>> There are several functions/variable which are not used anymore.
+>>>>>>>>>>>
+>>>>>>>>>>> This serials just remove those without functional change.
+>>>>>>>>>>>
+>>>>>>>>>>> v3: add ack and repost in a new thread
+>>>>>>>>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
+>>>>>>>>>>
+>>>>>>>>>> Michael,
+>>>>>>>>>>
+>>>>>>>>>> Looks this serials is not merged yet.
+>>>>>>>>>>
+>>>>>>>>>> Is there any problem I need to fix?
+>>>>>>>>>
+>>>>>>>>> Yes pls repost with fixed reviewed-by tags.
+>>>>>>>>
+>>>>>>>> Or I can take the series through the trivial branch and update manually
+>>>>>>>> Philippe's lastname?
+>>>>>>>
+>>>>>>> I appreciate the help with manual update, however Wei is not the only
+>>>>>>> one having this problem (other developpers has non-ASCII in their name,
+>>>>>>> and use such tags).
+>>>>>>> I'd rather prefer we find a proper configuration setup to help the
+>>>>>>> community.
+>>>>>>
+>>>>>> I'm wondering if it can be a problem with cut'n'paste rather than with
+>>>>>> git-sendemail.
+>>>>>>
+>>>>>> I think the following tags should cover Latin and Chinese characters:
+>>>>>>
+>>>>>> Content-Type: text/plain; charset=UTF-8
+>>>>>> Content-Transfer-Encoding: 8bit
+>>>>>>
+>>>>>
+>>>>> Looks not work.
+>>>>>
+>>>>> I have tried this and also with 
+>>>>>
+>>>>> Content-Language: en-US
 >>>>
->>>> * Add to util-obj-y in Makefile.obj
->>>>
->>>> * Add to obj-y in Makefile.target
+>>>> Could  you send me a gzipped version of the 0001-XXX.patch in attachment
+>>>> so I could see the real content before git-send-email?
 >>>
->>> Why can't both be in Makefile.objs, or in qapi/Makefile.objs?
+>>> OK, I've got it.
+>>>
+>>> What I see is it is already corrupted, thus the problem is not with
+>>> git-send-email.
+>>>
+>>> So either it is corrupted by git-format-patch (which is very unlikely,
+>>> we could see that if you push it to a public git repo) or it has been
+>>> corrupted when you have added it to the commit message.
+>>>
 >> 
->> When I try either place, I get
+>> Hmm... maybe you are right.
 >> 
->>       LINK    x86_64-softmmu/qemu-system-x86_64
->>     monitor.o: In function `qmp_query_qmp_schema':
->>     /work/armbru/qemu/monitor.c:1136: undefined reference to `qmp_schema_qlit'
->>     [more errors...]
+>> But I found confused how to fix this.
 >> 
->> Compiling with V=1 confirms qapi-introspect.o isn't in $(all-obj-y).
+>> When I use git commit --amend to fix it, the character looks good in my
+>> editor. I use vim as my git editor.
+>> 
+>> But when I use git show, it display an unknown character.
+>> 
+>> And if I use git format-patch, the patch file looks good in my vim editor. But
+>> corrupted if I use another editor.
+>> 
+>> Do you have any idea on this?
 >
-> Oh, ok.  Then I suggest placing it in qapi/Makefile.objs, and you'll
-> have to add "obj-y += qapi/" in Makefile.target (I'm not sure if it's
-> under "ifdef CONFIG_SOFTMMU" or outside, but you'd know that).
+>What is the result of command "locale" in your terminal?
+>How do you copy the characters to vim?
+>
 
-I think I got that to work.  Thanks for your help!
+My locale output:
+
+    $ locale
+    LANG=en_US.UTF-8
+    LANGUAGE=
+    LC_CTYPE="en_US.UTF-8"
+    LC_NUMERIC=zh_CN.UTF-8
+    LC_TIME=zh_CN.UTF-8
+    LC_COLLATE="en_US.UTF-8"
+    LC_MONETARY=zh_CN.UTF-8
+    LC_MESSAGES="en_US.UTF-8"
+    LC_PAPER=zh_CN.UTF-8
+    LC_NAME=zh_CN.UTF-8
+    LC_ADDRESS=zh_CN.UTF-8
+    LC_TELEPHONE=zh_CN.UTF-8
+    LC_MEASUREMENT=zh_CN.UTF-8
+    LC_IDENTIFICATION=zh_CN.UTF-8
+    LC_ALL=
+
+I copy&paste the character from mutt to vim. Let me see if it would work if I
+save the character from mutt mail itself.
+
+>Thanks,
+>Laurent
+
+-- 
+Wei Yang
+Help you, Help me
