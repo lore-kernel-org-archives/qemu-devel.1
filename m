@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56649)
+Received: from eggs.gnu.org ([209.51.188.92]:56648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guDMk-0003dt-N8
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:31:38 -0500
+	(envelope-from <armbru@redhat.com>) id 1guDMk-0003ds-N3
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:31:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guDMN-0003Oj-G3
+	(envelope-from <armbru@redhat.com>) id 1guDMN-0003PX-O9
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:31:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37616)
+Received: from mx1.redhat.com ([209.132.183.28]:47520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guDMN-0002ho-0d
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guDMN-0002cs-5g
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:31:11 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B6857C0703A6
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:30:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EAAE189AD6
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:30:55 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 14 Feb 2019 10:30:49 +0100
-Message-Id: <20190214093053.1400-15-armbru@redhat.com>
+Date: Thu, 14 Feb 2019 10:30:38 +0100
+Message-Id: <20190214093053.1400-4-armbru@redhat.com>
 In-Reply-To: <20190214093053.1400-1-armbru@redhat.com>
 References: <20190214093053.1400-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 14/18] qapi: make query-cpu-definitions
- depend on specific targets
+Subject: [Qemu-devel] [PATCH v4 03/18] qapi: Clean up modular built-in code
+ generation a bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,368 +36,283 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+We neglect to call .visit_module() for the special module we use for
+built-ins.  Harmless, but clean it up anyway.  The
+tests/qapi-schema/*.out now show the built-in module as 'module None'.
 
-It depends on TARGET_PPC || TARGET_ARM || TARGET_I386 || TARGET_S390X.
+Subclasses of QAPISchemaModularCVisitor need to ._add_module() this
+special module to enable code generation for built-ins.  When this
+hasn't been done, QAPISchemaModularCVisitor.visit_module() does
+nothing for the special module.  That looks like built-ins could
+accidentally be generated into the wrong module when a subclass
+neglects to call ._add_module().  Can't happen, because built-ins are
+all visited before any other module.  But that's non-obvious.  Switch
+off code generation explicitly.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Rename QAPISchemaModularCVisitor._begin_module() to
+._begin_user_module().
+
+New QAPISchemaModularCVisitor._is_builtin_module(), for clarity.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/arch_init.h      |  1 -
- monitor.c                       | 22 ------------
- qapi/misc.json                  | 58 ------------------------------
- qapi/target.json                | 64 +++++++++++++++++++++++++++++++++
- qmp.c                           |  5 ---
- stubs/Makefile.objs             |  1 -
- stubs/arch-query-cpu-def.c      | 11 ------
- target/arm/helper.c             |  3 +-
- target/i386/cpu.c               |  2 +-
- target/ppc/translate_init.inc.c |  3 +-
- target/s390x/cpu_models.c       |  2 +-
- 11 files changed, 70 insertions(+), 102 deletions(-)
- delete mode 100644 stubs/arch-query-cpu-def.c
+ scripts/qapi/commands.py                 |  2 +-
+ scripts/qapi/common.py                   | 24 ++++++++++++++++++------
+ scripts/qapi/events.py                   |  2 +-
+ scripts/qapi/types.py                    |  2 +-
+ scripts/qapi/visit.py                    |  2 +-
+ tests/qapi-schema/comments.out           |  1 +
+ tests/qapi-schema/doc-bad-section.out    |  1 +
+ tests/qapi-schema/doc-good.out           |  1 +
+ tests/qapi-schema/empty.out              |  1 +
+ tests/qapi-schema/event-case.out         |  1 +
+ tests/qapi-schema/ident-with-escape.out  |  1 +
+ tests/qapi-schema/include-relpath.out    |  1 +
+ tests/qapi-schema/include-repetition.out |  1 +
+ tests/qapi-schema/include-simple.out     |  1 +
+ tests/qapi-schema/indented-expr.out      |  1 +
+ tests/qapi-schema/qapi-schema-test.out   |  1 +
+ 16 files changed, 33 insertions(+), 10 deletions(-)
 
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 2497fd3351..10cbafe970 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -32,5 +32,4 @@ extern const uint32_t arch_type;
- int kvm_available(void);
- int xen_available(void);
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 0f3c991918..ebf488953d 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -242,7 +242,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
+isitor):
+         self._regy =3D QAPIGenCCode()
+         self._visited_ret_types =3D {}
 =20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
- #endif
-diff --git a/monitor.c b/monitor.c
-index 22a551b16b..1673db7015 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1131,26 +1131,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QOb=
-ject **ret_data,
-     *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
- }
+-    def _begin_module(self, name):
++    def _begin_user_module(self, name):
+         self._visited_ret_types[self._genc] =3D set()
+         commands =3D self._module_basename('qapi-commands', name)
+         types =3D self._module_basename('qapi-types', name)
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index c89edc0cb0..0e3ec598a4 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1868,6 +1868,7 @@ class QAPISchema(object):
+     def visit(self, visitor):
+         visitor.visit_begin(self)
+         module =3D None
++        visitor.visit_module(module)
+         for entity in self._entity_list:
+             if visitor.visit_needed(entity):
+                 if entity.module !=3D module:
+@@ -2321,9 +2322,15 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor)=
+:
+         self._what =3D what
+         self._blurb =3D blurb
+         self._pydoc =3D pydoc
++        self._genc =3D None
++        self._genh =3D None
+         self._module =3D {}
+         self._main_module =3D None
 =20
--/*
-- * We used to define commands in qmp-commands.hx in addition to the
-- * QAPI schema.  This permitted defining some of them only in certain
-- * configurations.  query-commands has always reflected that (good,
-- * because it lets QMP clients figure out what's actually available),
-- * while query-qmp-schema never did (not so good).  This function is a
-- * hack to keep the configuration-specific commands defined exactly as
-- * before, even though qmp-commands.hx is gone.
-- *
-- * FIXME Educate the QAPI schema on configuration-specific commands,
-- * and drop this hack.
-- */
--static void qmp_unregister_commands_hack(void)
--{
--#if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
-) \
--    && !defined(TARGET_S390X)
--    qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
--#endif
--}
--
- static void monitor_init_qmp_commands(void)
- {
-     /*
-@@ -1169,8 +1149,6 @@ static void monitor_init_qmp_commands(void)
-     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-                          QCO_NO_OPTIONS);
-=20
--    qmp_unregister_commands_hack();
--
-     QTAILQ_INIT(&qmp_cap_negotiation_commands);
-     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilitie=
-s",
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONF=
-IG);
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 1255201267..82f9147353 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2057,54 +2057,6 @@
- ##
- { 'command': 'query-current-machine', 'returns': 'CurrentMachineParams' =
-}
-=20
--##
--# @CpuDefinitionInfo:
--#
--# Virtual CPU definition.
--#
--# @name: the name of the CPU definition
--#
--# @migration-safe: whether a CPU definition can be safely used for
--#                  migration in combination with a QEMU compatibility ma=
-chine
--#                  when migrating between different QEMU versions and be=
-tween
--#                  hosts with different sets of (hardware or software)
--#                  capabilities. If not provided, information is not ava=
-ilable
--#                  and callers should not assume the CPU definition to b=
-e
--#                  migration-safe. (since 2.8)
--#
--# @static: whether a CPU definition is static and will not change depend=
-ing on
--#          QEMU version, machine type, machine options and accelerator o=
-ptions.
--#          A static model is always migration-safe. (since 2.8)
--#
--# @unavailable-features: List of properties that prevent
--#                        the CPU model from running in the current
--#                        host. (since 2.8)
--# @typename: Type name that can be used as argument to @device-list-prop=
-erties,
--#            to introspect properties configurable using -cpu or -global=
-.
--#            (since 2.9)
--#
--# @unavailable-features is a list of QOM property names that
--# represent CPU model attributes that prevent the CPU from running.
--# If the QOM property is read-only, that means there's no known
--# way to make the CPU model run in the current host. Implementations
--# that choose not to provide specific information return the
--# property name "type".
--# If the property is read-write, it means that it MAY be possible
--# to run the CPU model in the current host if that property is
--# changed. Management software can use it as hints to suggest or
--# choose an alternative for the user, or just to generate meaningful
--# error messages explaining why the CPU model can't be used.
--# If @unavailable-features is an empty list, the CPU model is
--# runnable using the current host and machine-type.
--# If @unavailable-features is not present, runnability
--# information for the CPU is not available.
--#
--# Since: 1.2.0
--##
--{ 'struct': 'CpuDefinitionInfo',
--  'data': { 'name': 'str', '*migration-safe': 'bool', 'static': 'bool',
--            '*unavailable-features': [ 'str' ], 'typename': 'str' } }
--
- ##
- # @MemoryInfo:
- #
-@@ -2137,16 +2089,6 @@
- ##
- { 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-=20
--##
--# @query-cpu-definitions:
--#
--# Return a list of supported virtual CPU definitions
--#
--# Returns: a list of CpuDefInfo
--#
--# Since: 1.2.0
--##
--{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'] }
-=20
- ##
- # @CpuModelInfo:
-diff --git a/qapi/target.json b/qapi/target.json
-index 35653648bb..5c41a0aee7 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -425,3 +425,67 @@
-             'model': 'CpuModelInfo' },
-   'returns': 'CpuModelExpansionInfo',
-   'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
++    @staticmethod
++    def _is_builtin_module(name):
++        return not name
 +
-+##
-+# @CpuDefinitionInfo:
-+#
-+# Virtual CPU definition.
-+#
-+# @name: the name of the CPU definition
-+#
-+# @migration-safe: whether a CPU definition can be safely used for
-+#                  migration in combination with a QEMU compatibility ma=
-chine
-+#                  when migrating between different QEMU versions and be=
-tween
-+#                  hosts with different sets of (hardware or software)
-+#                  capabilities. If not provided, information is not ava=
-ilable
-+#                  and callers should not assume the CPU definition to b=
-e
-+#                  migration-safe. (since 2.8)
-+#
-+# @static: whether a CPU definition is static and will not change depend=
-ing on
-+#          QEMU version, machine type, machine options and accelerator o=
-ptions.
-+#          A static model is always migration-safe. (since 2.8)
-+#
-+# @unavailable-features: List of properties that prevent
-+#                        the CPU model from running in the current
-+#                        host. (since 2.8)
-+# @typename: Type name that can be used as argument to @device-list-prop=
-erties,
-+#            to introspect properties configurable using -cpu or -global=
-.
-+#            (since 2.9)
-+#
-+# @unavailable-features is a list of QOM property names that
-+# represent CPU model attributes that prevent the CPU from running.
-+# If the QOM property is read-only, that means there's no known
-+# way to make the CPU model run in the current host. Implementations
-+# that choose not to provide specific information return the
-+# property name "type".
-+# If the property is read-write, it means that it MAY be possible
-+# to run the CPU model in the current host if that property is
-+# changed. Management software can use it as hints to suggest or
-+# choose an alternative for the user, or just to generate meaningful
-+# error messages explaining why the CPU model can't be used.
-+# If @unavailable-features is an empty list, the CPU model is
-+# runnable using the current host and machine-type.
-+# If @unavailable-features is not present, runnability
-+# information for the CPU is not available.
-+#
-+# Since: 1.2.0
-+##
-+{ 'struct': 'CpuDefinitionInfo',
-+  'data': { 'name': 'str',
-+            '*migration-safe': 'bool',
-+            'static': 'bool',
-+            '*unavailable-features': [ 'str' ],
-+            'typename': 'str' },
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+
-+##
-+# @query-cpu-definitions:
-+#
-+# Return a list of supported virtual CPU definitions
-+#
-+# Returns: a list of CpuDefInfo
-+#
-+# Since: 1.2.0
-+##
-+{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-diff --git a/qmp.c b/qmp.c
-index c81af9d23f..b92d62cd5f 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -605,11 +605,6 @@ ObjectPropertyInfoList *qmp_qom_list_properties(cons=
-t char *typename,
-     return prop_list;
- }
+     def _module_basename(self, what, name):
+         if name is None:
+             return re.sub(r'-', '-builtin-', what)
+@@ -2334,7 +2341,7 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+         return basename + '-' + os.path.splitext(os.path.basename(name))=
+[0]
 =20
--CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
--{
--    return arch_query_cpu_definitions(errp);
--}
--
- void qmp_add_client(const char *protocol, const char *fdname,
-                     bool has_skipauth, bool skipauth, bool has_tls, bool=
- tls,
-                     Error **errp)
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index f337208179..269dfa5832 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,4 +1,3 @@
--stub-obj-y +=3D arch-query-cpu-def.o
- stub-obj-y +=3D bdrv-next-monitor-owned.o
- stub-obj-y +=3D blk-commit-all.o
- stub-obj-y +=3D blockdev-close-all-bdrv-states.o
-diff --git a/stubs/arch-query-cpu-def.c b/stubs/arch-query-cpu-def.c
-deleted file mode 100644
-index d436f95314..0000000000
---- a/stubs/arch-query-cpu-def.c
-+++ /dev/null
-@@ -1,11 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "sysemu/arch_init.h"
--#include "qapi/error.h"
--#include "qapi/qmp/qerror.h"
--
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--    return NULL;
--}
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 520ceea7a4..c350fb5202 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -19,6 +19,7 @@
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
- #include "qemu/range.h"
-+#include "qapi/qapi-commands-target.h"
+     def _add_module(self, name, blurb):
+-        if self._main_module is None and name is not None:
++        if self._main_module is None and not self._is_builtin_module(nam=
+e):
+             self._main_module =3D name
+         genc =3D QAPIGenC(blurb, self._pydoc)
+         genh =3D QAPIGenH(blurb, self._pydoc)
+@@ -2346,22 +2353,27 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor=
+):
 =20
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable =
-*/
+     def write(self, output_dir, opt_builtins=3DFalse):
+         for name in self._module:
+-            if name is None and not opt_builtins:
++            if self._is_builtin_module(name) and not opt_builtins:
+                 continue
+             basename =3D self._module_basename(self._what, name)
+             (genc, genh) =3D self._module[name]
+             genc.write(output_dir, basename + '.c')
+             genh.write(output_dir, basename + '.h')
 =20
-@@ -6656,7 +6657,7 @@ static void arm_cpu_add_definition(gpointer data, g=
-pointer user_data)
-     *cpu_list =3D entry;
- }
+-    def _begin_module(self, name):
++    def _begin_user_module(self, name):
+         pass
 =20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index aa3a1f3a4f..d3aa6a815b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3791,7 +3791,7 @@ static void x86_cpu_definition_entry(gpointer data,=
- gpointer user_data)
-     *cpu_list =3D entry;
- }
+     def visit_module(self, name):
+         if name in self._module:
+             self._set_module(name)
+-            return
+-        self._add_module(name, self._blurb)
+-        self._begin_module(name)
++        elif self._is_builtin_module(name):
++            # The built-in module has not been created.  No code may
++            # be generated.
++            self._genc =3D None
++            self._genh =3D None
++        else:
++            self._add_module(name, self._blurb)
++            self._begin_user_module(name)
 =20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list =3D get_sorted_cpu_model_list();
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 59e0b86762..f393a408ac 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -38,6 +38,7 @@
- #include "qemu/cutils.h"
- #include "disas/capstone.h"
- #include "fpu/softfloat.h"
-+#include "qapi/qapi-commands-target.h"
+     def visit_include(self, name, info):
+         basename =3D self._module_basename(self._what, name)
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index d86a2d2b3e..6f39cf8196 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -142,7 +142,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
+itor):
+         self._event_enum_members =3D []
+         self._event_emit_name =3D c_name(prefix + 'qapi_event_emit')
 =20
- //#define PPC_DUMP_CPU
- //#define PPC_DEBUG_SPR
-@@ -10201,7 +10202,7 @@ static void ppc_cpu_defs_entry(gpointer data, gpo=
-inter user_data)
-     *first =3D entry;
- }
+-    def _begin_module(self, name):
++    def _begin_user_module(self, name):
+         types =3D self._module_basename('qapi-types', name)
+         visit =3D self._module_basename('qapi-visit', name)
+         self._genc.add(mcgen('''
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 62d4cf9f95..9fa510f7df 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -194,7 +194,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
+tor):
+ #include "qapi/util.h"
+ '''))
 =20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list;
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index cf87488bfc..5ef34abbf1 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -433,7 +433,7 @@ static void create_cpu_model_list(ObjectClass *klass,=
- void *opaque)
-     *cpu_list =3D entry;
- }
+-    def _begin_module(self, name):
++    def _begin_user_module(self, name):
+         types =3D self._module_basename('qapi-types', name)
+         visit =3D self._module_basename('qapi-visit', name)
+         self._genc.preamble_add(mcgen('''
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 82eab72b21..ca86009398 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -298,7 +298,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
+itor):
+ ''',
+                                       prefix=3Dprefix))
 =20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     struct CpuDefinitionInfoListData list_data =3D {
-         .list =3D NULL,
+-    def _begin_module(self, name):
++    def _begin_user_module(self, name):
+         types =3D self._module_basename('qapi-types', name)
+         visit =3D self._module_basename('qapi-visit', name)
+         self._genc.preamble_add(mcgen('''
+diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
+out
+index d1abc4b5a1..273f0f54e1 100644
+--- a/tests/qapi-schema/comments.out
++++ b/tests/qapi-schema/comments.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
+c-bad-section.out
+index db8014eed0..367e2a1c3e 100644
+--- a/tests/qapi-schema/doc-bad-section.out
++++ b/tests/qapi-schema/doc-bad-section.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+index 21bf345ff0..d3bca343eb 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/empty.out b/tests/qapi-schema/empty.out
+index 5483cb7bc6..5b53d00702 100644
+--- a/tests/qapi-schema/empty.out
++++ b/tests/qapi-schema/empty.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
+ase.out
+index f69d4ffe4e..ec8a1406e4 100644
+--- a/tests/qapi-schema/event-case.out
++++ b/tests/qapi-schema/event-case.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
+ident-with-escape.out
+index 7f891f7e90..39754eba8c 100644
+--- a/tests/qapi-schema/ident-with-escape.out
++++ b/tests/qapi-schema/ident-with-escape.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
+clude-relpath.out
+index 783ccfc855..cf8636b78f 100644
+--- a/tests/qapi-schema/include-relpath.out
++++ b/tests/qapi-schema/include-relpath.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
+/include-repetition.out
+index d45977ee56..5423983239 100644
+--- a/tests/qapi-schema/include-repetition.out
++++ b/tests/qapi-schema/include-repetition.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
+lude-simple.out
+index 1afe20802a..061f81e509 100644
+--- a/tests/qapi-schema/include-simple.out
++++ b/tests/qapi-schema/include-simple.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
+nted-expr.out
+index c0cf3243f3..bffdf6756d 100644
+--- a/tests/qapi-schema/indented-expr.out
++++ b/tests/qapi-schema/indented-expr.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 9464101d26..d8aec17115 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -1,3 +1,4 @@
++module None
+ object q_empty
+ enum QType
+     prefix QTYPE
 --=20
 2.17.2
