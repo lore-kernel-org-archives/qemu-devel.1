@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60182)
+Received: from eggs.gnu.org ([209.51.188.92]:60699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gu5F1-0000Gl-2N
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:51:03 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gu5Gr-00017F-DG
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:52:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gu52L-0005zX-U6
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:37:58 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gu52L-0005s8-8L
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:37:57 -0500
-Received: by mail-pg1-x543.google.com with SMTP id r11so2031331pgp.6
-	for <qemu-devel@nongnu.org>; Wed, 13 Feb 2019 16:37:55 -0800 (PST)
-Date: Wed, 13 Feb 2019 16:37:53 -0800 (PST)
-In-Reply-To: <7a7b5675-3d66-6c87-8830-74c60f8a7471@mail.uni-paderborn.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-ee0701f2-0571-4996-a9e1-2e6e03dd2167@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gu5Gq-0005G8-3k
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:52:57 -0500
+Received: from mga06.intel.com ([134.134.136.31]:53677)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1gu5Go-0005Ce-AM
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:52:56 -0500
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Thu, 14 Feb 2019 08:52:25 +0800
+Message-Id: <20190214005225.24048-1-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/35] target/riscv: Convert to
- decodetree
+Subject: [Qemu-devel] [PATCH] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, sagark@eecs.berkeley.edu
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, imammedo@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-On Wed, 13 Feb 2019 01:06:41 PST (-0800), Bastian Koppelmann wrote:
->
-> On 2/13/19 3:15 AM, Palmer Dabbelt wrote:
->> On Tue, Feb 12, 2019 at 3:21 PM Palmer Dabbelt <palmer@sifive.com> wrote:
-> [snip]
->>>
->>> Do you, by any chance, have a v7?  It looks like there's quite a few merge
->>> conflicts here, and while I'm OK fixing them I don't want to do it if you
->>> already have.
->>>
->> I made it through my rebase, so unless you want to send out a v7 I will.
->> There were some meaningful changes so I'd like to get a round of review
->> just so everyone is on the same page.
->
->
-> Thanks for doing this work. I don't have a v7 yet, since I was waiting
-> on your current pull-request to get merged. So please do send a v7, I'm
-> happy to review/test it.
+Currently we do device realization like below:
 
-No problem, they're my merge conflicts :).  It's on the list.
+   hotplug_handler_pre_plug()
+   dc->realize()
+   hotplug_handler_plug()
+
+Before we do device realization and plug, we would allocate necessary
+resources and check the capacity.
+
+While we leave acpi_memory_hotplug capacity check in the last step. This
+looks not comply with current architecture and does some unnecessary
+work.
+
+This patch abstract the check on acpi_memory_hotplug capacity in
+pre_plug stage.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ hw/acpi/piix4.c | 14 ++++++++++++--
+ hw/i386/pc.c    |  8 ++++++++
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index e330f24c71..c97b747496 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -370,13 +370,22 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+     acpi_pm1_evt_power_down(&s->ar);
+ }
+ 
++static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
++                                 DeviceState *dev, Error **errp)
++{
++    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
++
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
++        !s->acpi_memory_hotplug.is_enabled)
++        error_setg(errp,
++            "memory hotplug is not enabled: PIIX4 memory hotplug disabled");
++}
+ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+                                  DeviceState *dev, Error **errp)
+ {
+     PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+ 
+-    if (s->acpi_memory_hotplug.is_enabled &&
+-        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+             nvdimm_acpi_plug_cb(hotplug_dev, dev);
+         } else {
+@@ -702,6 +711,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
+      */
+     dc->user_creatable = false;
+     dc->hotpluggable = false;
++    hc->pre_plug = piix4_device_pre_plug_cb;
+     hc->plug = piix4_device_plug_cb;
+     hc->unplug_request = piix4_device_unplug_request_cb;
+     hc->unplug = piix4_device_unplug_cb;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 734d3268fa..3c6eed0cd3 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1662,6 +1662,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+     const uint64_t legacy_align = TARGET_PAGE_SIZE;
++    HotplugHandlerClass *hhc;
+ 
+     /*
+      * When -no-acpi is used with Q35 machine type, no ACPI is built,
+@@ -1674,6 +1675,13 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
++    /*
++     * Check acpi_dev memory hotplug capacity
++     */
++    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
++    if (hcc->pre_plug)
++        hhc->pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, errp);
++
+     if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+         return;
+-- 
+2.19.1
