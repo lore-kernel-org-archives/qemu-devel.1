@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43471)
+Received: from eggs.gnu.org ([209.51.188.92]:45973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gu8iu-0005p8-FS
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:34:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gu8p5-0002EK-6a
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gu8iq-0003bz-OS
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:34:06 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 14 Feb 2019 12:33:22 +0800
-Message-Id: <20190214043322.2354-2-stefanha@redhat.com>
-In-Reply-To: <20190214043322.2354-1-stefanha@redhat.com>
-References: <20190214043322.2354-1-stefanha@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gu8on-0006up-L7
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:18 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 14 Feb 2019 15:39:12 +1100
+Message-Id: <20190214043916.22128-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20190214043916.22128-1-david@gibson.dropbear.id.au>
+References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] virtio-blk: set correct config size for the
- host driver
+Subject: [Qemu-devel] [PATCH 1/5] virtio-balloon: Remove unnecessary
+ MADV_WILLNEED on deflate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,87 +22,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>
+To: mst@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>
 
-From: Changpeng Liu <changpeng.liu@intel.com>
+When the balloon is inflated, we discard memory place in it using madvise=
+()
+with MADV_DONTNEED.  And when we deflate it we use MADV_WILLNEED, which
+sounds like it makes sense but is actually unnecessary.
 
-Commit caa1ee43 "vhost-user-blk: add discard/write zeroes features
-support" added fields to struct virtio_blk_config. This changes
-the size of the config space and breaks migration from QEMU 3.1
-and older:
+The misleadingly named MADV_DONTNEED just discards the memory in question=
+,
+it doesn't set any persistent state on it in-kernel; all that's necessary
+to bring the memory back is to touch it.  MADV_WILLNEED in contrast
+specifically says that the memory will be used soon and faults it in.
 
-qemu-system-ppc64: get_pci_config_device: Bad config data: i=3D0x10 read:=
- 41 device: 1 cmask: ff wmask: 80 w1cmask:0
-qemu-system-ppc64: Failed to load PCIDevice:config
-qemu-system-ppc64: Failed to load virtio-blk:virtio
-qemu-system-ppc64: error while loading state for instance 0x0 of device '=
-pci@800000020000000:01.0/virtio-blk'
-qemu-system-ppc64: load of migration failed: Invalid argument
+This patch simplify's the balloon operation by dropping the madvise()
+on deflate.  This might have an impact on performance - it will move a
+delay at deflate time until that memory is actually touched, which
+might be more latency sensitive.  However:
 
-Since virtio-blk doesn't support the "discard" and "write zeroes"
-features, it shouldn't even expose the associated fields in the
-config space actually. Just include all fields up to num_queues to
-match QEMU 3.1 and older.
+  * Memory that's being given back to the guest by deflating the
+    balloon *might* be used soon, but it equally could just sit around
+    in the guest's pools until needed (or even be faulted out again if
+    the host is under memory pressure).
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+  * Usually, the timescale over which you'll be adjusting the balloon
+    is long enough that a few extra faults after deflation aren't
+    going to make a difference.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 1550022537-27565-1-git-send-email-changpeng.liu@intel.com
-Message-Id: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/block/virtio-blk.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ hw/virtio/virtio-balloon.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 843bb2bec8..cf7f47eaba 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -28,6 +28,10 @@
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index a12677d4d5..43af521884 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -35,9 +35,8 @@
 =20
-+/* We don't support discard yet, hide associated config fields. */
-+#define VIRTIO_BLK_CFG_SIZE offsetof(struct virtio_blk_config, \
-+                                     max_discard_sectors)
-+
- static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
-                                     VirtIOBlockReq *req)
+ static void balloon_page(void *addr, int deflate)
  {
-@@ -757,7 +761,8 @@ static void virtio_blk_update_config(VirtIODevice *vd=
-ev, uint8_t *config)
-     blkcfg.alignment_offset =3D 0;
-     blkcfg.wce =3D blk_enable_write_cache(s->blk);
-     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
--    memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
-+    memcpy(config, &blkcfg, VIRTIO_BLK_CFG_SIZE);
-+    QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE > sizeof(blkcfg));
+-    if (!qemu_balloon_is_inhibited()) {
+-        qemu_madvise(addr, BALLOON_PAGE_SIZE,
+-                deflate ? QEMU_MADV_WILLNEED : QEMU_MADV_DONTNEED);
++    if (!qemu_balloon_is_inhibited() && !deflate) {
++        qemu_madvise(addr, BALLOON_PAGE_SIZE, QEMU_MADV_DONTNEED);
+     }
  }
 =20
- static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *con=
-fig)
-@@ -765,7 +770,8 @@ static void virtio_blk_set_config(VirtIODevice *vdev,=
- const uint8_t *config)
-     VirtIOBlock *s =3D VIRTIO_BLK(vdev);
-     struct virtio_blk_config blkcfg;
-=20
--    memcpy(&blkcfg, config, sizeof(blkcfg));
-+    memcpy(&blkcfg, config, VIRTIO_BLK_CFG_SIZE);
-+    QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE > sizeof(blkcfg));
-=20
-     aio_context_acquire(blk_get_aio_context(s->blk));
-     blk_set_enable_write_cache(s->blk, blkcfg.wce !=3D 0);
-@@ -948,8 +954,7 @@ static void virtio_blk_device_realize(DeviceState *de=
-v, Error **errp)
-         return;
-     }
-=20
--    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
--                sizeof(struct virtio_blk_config));
-+    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, VIRTIO_BLK_CFG_SIZE=
-);
-=20
-     s->blk =3D conf->conf.blk;
-     s->rq =3D NULL;
 --=20
 2.20.1
