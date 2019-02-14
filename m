@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39991)
+Received: from eggs.gnu.org ([209.51.188.92]:40492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guLPN-0001rb-7f
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:06:51 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1guLQT-0002kR-Ck
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guLBu-00078E-2h
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:52:55 -0500
-Resent-Message-Id: <E1guLBu-00078E-2h@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guLBt-00074A-LS
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:52:53 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155016673104.24.10665819785480231643@49fa7ef69f7b>
-In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1guLQS-0008DG-Lf
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:07:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1guLQS-0008A4-6F
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:07:56 -0500
+References: <20190214122700.18572-1-zhengxiang9@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ec12aeeb-a480-f07d-c75e-6d6acf0359fa@redhat.com>
+Date: Thu, 14 Feb 2019 19:07:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 09:52:12 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
+In-Reply-To: <20190214122700.18572-1-zhengxiang9@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scsi-cd: Fix crash after remote cdrom
+ detached
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
+To: Xiang Zheng <zhengxiang9@huawei.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, wanghaibin.wang@huawei.com, lizhengui@huawei.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
-bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
-aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIw
-MTkwMjE0MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
-MDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKMDUzOGI2NDkwMiB1aS9jb2NvYTogUGVyZm9ybSBVSSBvcGVy
-YXRpb25zIG9ubHkgb24gdGhlIG1haW4gdGhyZWFkCjljODEzNzc2YzUgdWkvY29jb2E6IFN1YmNs
-YXNzIE5TQXBwbGljYXRpb24gc28gd2UgY2FuIGltcGxlbWVudCBzZW5kRXZlbnQKZWU5MTBkYWE3
-ZiB1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5kRXZlbnQgZGlyZWN0bHkgZnJvbSBoYW5k
-bGVFdmVudAo0NzVjNzMzMjljIHVpL2NvY29hOiBNb3ZlIGNvbnNvbGUvZGV2aWNlIG1lbnUgY3Jl
-YXRpb24gY29kZSB1cCBpbiBmaWxlCjg0MTg3YjAwYTEgdWkvY29jb2E6IEZhY3RvciBvdXQgaW5p
-dGlhbCBtZW51IGNyZWF0aW9uCmVjOWQyZDM1ZjEgdWkvY29jb2E6IFVzZSB0aGUgcGl4bWFuIGlt
-YWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UKMzFlM2NlNDU0NiB1aS9jb2NvYTogRW5zdXJl
-IHdlIGhhdmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5nIGludG8gUUVNVQoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KMS83IENoZWNraW5nIGNvbW1pdCAzMWUzY2U0NTQ2YjkgKHVpL2NvY29h
-OiBFbnN1cmUgd2UgaGF2ZSB0aGUgaW90aHJlYWQgbG9jayB3aGVuIGNhbGxpbmcgaW50byBRRU1V
-KQoyLzcgQ2hlY2tpbmcgY29tbWl0IGVjOWQyZDM1ZjE2MCAodWkvY29jb2E6IFVzZSB0aGUgcGl4
-bWFuIGltYWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UpCjMvNyBDaGVja2luZyBjb21taXQg
-ODQxODdiMDBhMTM5ICh1aS9jb2NvYTogRmFjdG9yIG91dCBpbml0aWFsIG1lbnUgY3JlYXRpb24p
-CjQvNyBDaGVja2luZyBjb21taXQgNDc1YzczMzI5Y2RkICh1aS9jb2NvYTogTW92ZSBjb25zb2xl
-L2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAgaW4gZmlsZSkKNS83IENoZWNraW5nIGNvbW1p
-dCBlZTkxMGRhYTdmMjAgKHVpL2NvY29hOiBEb24ndCBjYWxsIE5TQXBwIHNlbmRFdmVudCBkaXJl
-Y3RseSBmcm9tIGhhbmRsZUV2ZW50KQpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNDI6IEZJ
-TEU6IHVpL2NvY29hLm06MTUyOgorICAgICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-MTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Ni83IENoZWNraW5nIGNvbW1pdCA5YzgxMzc3NmM1MmEgKHVpL2NvY29hOiBTdWJjbGFzcyBOU0Fw
-cGxpY2F0aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50KQo3LzcgQ2hlY2tpbmcgY29t
-bWl0IDA1MzhiNjQ5MDJjZSAodWkvY29jb2E6IFBlcmZvcm0gVUkgb3BlcmF0aW9ucyBvbmx5IG9u
-IHRoZSBtYWluIHRocmVhZCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvMjAxOTAyMTQxMDI4MTYuMzM5My0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9y
-Zy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 14/02/19 13:27, Xiang Zheng wrote:
+> There is a small window between the twice blk_is_available in
+> scsi_disk_emulate_command which would cause crash due to the later
+> assertion if the remote cdrom is detached in this window.
+> 
+> So this patch replaces assertions with return to avoid qemu crash.
+> 
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> ---
+> The qemu error log shows:
+> 
+> qemu-system-aarch64: /home/qemu/hw/scsi/scsi-disk.c:1896: scsi_disk_emulate_command: Assertion `blk_is_available(s->qdev.conf.blk)' failed.
+> 2019-02-15 04:35:18.592: shutting down, reason=crashed
+
+Is this with virtio-scsi-dataplane?
+
+Paolo
