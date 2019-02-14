@@ -1,27 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:56125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guKeW-0007PH-5J
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:18:25 -0500
+	(envelope-from <cota@braap.org>) id 1guKed-0007PH-Lm
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:18:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guKUP-0001fi-Qj
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:07:58 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guKUP-0001ZZ-IC
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:07:57 -0500
-Received: by mail-ot1-x344.google.com with SMTP id w25so11636708otm.13
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:07:53 -0800 (PST)
+	(envelope-from <cota@braap.org>) id 1guKSZ-0007zx-4U
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:06:04 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:58305)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1guKSY-0007v4-Mm
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:06:03 -0500
+Date: Thu, 14 Feb 2019 12:05:56 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20190214170556.GA23920@flamenco>
+References: <20190214040652.4811-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-6-eric.auger@redhat.com>
-In-Reply-To: <20190205173306.20483-6-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 17:07:42 +0000
-Message-ID: <CAFEAcA9z83y2Xfp0QC5-uKY-6d5zOvxiD=vy7=oG9N2onqCnmA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 05/18] hw/arm/virt: Split the memory map
- description
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190214040652.4811-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:
->
-> In the prospect to introduce an extended memory map supporting more
-> RAM, let's split the memory map array into two parts:
->
-> - the former a15memmap contains regions below and including the RAM
-> - extended_memmap, only initialized with entries located after the RAM.
->   Only the size of the region is initialized there since their base
->   address will be dynamically computed, depending on the top of the
->   RAM (initial RAM at the moment), with same alignment as their size.
->
-> This new split will allow to grow the RAM size without changing the
-> description of the high regions.
+On Wed, Feb 13, 2019 at 20:06:48 -0800, Richard Henderson wrote:
+> We've talked about this before, caching state to reduce the
+> amount of computation that happens looking up each TB.
+> 
+> I know that Peter has been concerned that we would not be able to 
+> reliably maintain all of the places that need to be updates to
+> keep this up-to-date.
+> 
+> Well, modulo dirty tricks within linux-user, it appears as if
+> exception delivery and return, plus after every TB-ending write
+> to a system register is sufficient.
+> 
+> There seems to be a noticable improvement, although wall-time
+> is harder to come by -- all of my system-level measurements
+> include user input, and my user-level measurements seem to be
+> too small to matter.
 
-This change makes it clear that "a15memmap" is badly misnamed.
-I think we should change it to "base_memmap" here.
+Thanks for this!
 
->
-> The patch also moves the memory map setup into machvirt_init().
-> The rationale is the memory map will be soon affected by the
-> kvm_type() call that happens after virt_instance_init() and
-> before machvirt_init().
->
-> At that point the memory map is not changed, ie. the initial RAM can
+Some SPEC06int user-mode numbers (before vs. after)
 
-"At this point" ?
+                   aarch64-linux-user speedup for SPEC06int (test set)
+                      Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz
 
-> grow up to 256GiB. Then come the high IO regions with same layout as
-> before.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
-> v5 -> v6
-> - removal of many macros in units.h
-> - introduce the virt_set_memmap helper
-> - new computation for offsets of high IO regions
-> - add comments
-> ---
->  hw/arm/virt.c         | 45 ++++++++++++++++++++++++++++++++++++++-----
->  include/hw/arm/virt.h | 14 ++++++++++----
->  2 files changed, 50 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index a1955e7764..2b15839d0b 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -29,6 +29,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "qapi/error.h"
->  #include "hw/sysbus.h"
->  #include "hw/arm/arm.h"
-> @@ -149,11 +150,20 @@ static const MemMapEntry a15memmap[] = {
->      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
->      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
->      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
-> +};
-> +
-> +/*
-> + * Highmem IO Regions: This memory map is floating, located after the RAM.
-> + * Each IO region offset will be dynamically computed, depending on the
-> + * top of the RAM, so that its base get the same alignment as the size,
-> + * ie. a 512GiB region will be aligned on a 512GiB boundary.
+                      2 +-----------------------------------------+
+                        |                                         |
+                    1.9 |-+.........................a+-+r.......+-|
+                        |                            +-+          |
+                        |                            * *          |
+                    1.8 |-+..........................*.*........+-|
+                        |       +-+                  * *          |
+                    1.7 |-+.....+-+...............+-+*.*...+-+..+-|
+                        |       * *         +-+   * ** *   +-+    |
+                    1.6 |-+.....*.*..........|....*.**.*+-+*.*..+-|
+                        |       * *         *|*   * ** *+-+* *    |
+                    1.5 |-+.....*.*.........*|*...*.**.**.**.*..+-|
+                        |       * *         +-+   * ** ** ** *    |
+                        |       * *         * *   * ** ** ** *    |
+                    1.4 |-+.....*.*.........*.*...*.**.**.**.*+-+-|
+                        |       * *   +-+   * *   * ** ** ** ** * |
+                    1.3 |-+.....*.*...+-+...*.*...*.**.**.**.**.*-|
+                        | +-+   * *   * *   * *   * ** ** ** ** * |
+                    1.2 |-+-+...*.*...*.*...*.*...*.**.**.**.**.*-|
+                        | * *   * *   * *   * *   * ** ** ** ** * |
+                        | * *   * *   * *+-+* *   * ** ** ** ** * |
+                    1.1 |-*.*...*.*...*.**.**.*...*.**.**.**.**.*-|
+                        | * *+-+* *+-+* ** ** *+-+* ** ** ** ** * |
+                      1 +-----------------------------------------+
+              400.per401.b40344454462.li464471.483.xalangeomean
+ png: https://imgur.com/RjkYYJ5
 
-I think you should say here that if there is less than 256GiB of RAM
-then the floating area starts at the 256GiB mark.
+That is, a 1.4x average speedup.
 
-> + */
-> +static MemMapEntry extended_memmap[] = {
->      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
-> -    [VIRT_HIGH_GIC_REDIST2] =   { 0x4000000000ULL, 0x4000000 },
-> -    [VIRT_HIGH_PCIE_ECAM] =     { 0x4010000000ULL, 0x10000000 },
-> -    /* Second PCIe window, 512GB wide at the 512GB boundary */
-> -    [VIRT_HIGH_PCIE_MMIO] =     { 0x8000000000ULL, 0x8000000000ULL },
-> +    [VIRT_HIGH_GIC_REDIST2] =   { 0x0, 64 * MiB },
-> +    [VIRT_HIGH_PCIE_ECAM] =     { 0x0, 256 * MiB },
-> +    /* Second PCIe window */
-> +    [VIRT_HIGH_PCIE_MMIO] =     { 0x0, 512 * GiB },
->  };
->
->  static const int a15irqmap[] = {
-> @@ -1354,6 +1364,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
->      return arm_cpu_mp_affinity(idx, clustersz);
->  }
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+		Emilio
