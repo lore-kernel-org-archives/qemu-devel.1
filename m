@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36617)
+Received: from eggs.gnu.org ([209.51.188.92]:42502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gu5jW-0005Qb-1V
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 20:22:35 -0500
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1gu6FS-0003WA-Be
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 20:55:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gu5YF-0002Ys-H5
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 20:10:56 -0500
-References: <20181206151401.13455-1-peter.maydell@linaro.org>
-	<87ftsrird3.fsf@zen.linaroharston>
-	<CAFEAcA_GPW0B9bMOia_aB=H0PV8DwUNWBARz+uNbRk2565a+4w@mail.gmail.com>
-	<87bm3figs9.fsf@zen.linaroharston>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <9ac389c6-fa1b-70ca-d3f9-254e11bf5ce1@huawei.com>
-Date: Thu, 14 Feb 2019 09:10:22 +0800
+	(envelope-from <yi.y.sun@linux.intel.com>) id 1gu6FP-0005Xv-Vk
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 20:55:34 -0500
+Received: from mga06.intel.com ([134.134.136.31]:57685)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
+	id 1gu6FM-0005Ok-BY
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 20:55:30 -0500
+Date: Thu, 14 Feb 2019 09:52:04 +0800
+From: Yi Sun <yi.y.sun@linux.intel.com>
+Message-ID: <20190214015204.GG16968@yi.y.sun>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-3-git-send-email-yi.y.sun@linux.intel.com>
+	<20190212062728.GK1011@xz-x1> <20190213090041.GF16968@yi.y.sun>
+	<20190213104224.GA4405@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <87bm3figs9.fsf@zen.linaroharston>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] arm: Allow system registers for KVM guests
- to be changed by QEMU code
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190213104224.GA4405@xz-x1>
+Subject: Re: [Qemu-devel] [RFC v1 2/3] intel_iommu: add 256 bits qi_desc
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com
 
-I think Peter's patch is good, I will resubmit my series patches based on=
- this.
+On 19-02-13 18:42:24, Peter Xu wrote:
+> On Wed, Feb 13, 2019 at 05:00:41PM +0800, Yi Sun wrote:
+> 
+> [...]
+> 
+> > > >  
+> > > >  /* context entry operations */
+> > > >  #define vtd_get_ce_size(s, ce) \
+> > > > @@ -65,6 +66,9 @@
+> > > >  #define vtd_pe_get_slpt_base(pe) ((pe)->val[0] & VTD_SM_PASID_ENTRY_SLPTPTR)
+> > > >  #define vtd_pe_get_domain_id(pe) VTD_SM_PASID_ENTRY_DID((pe)->val[1])
+> > > >  
+> > > > +/* invalidation desc */
+> > > > +#define vtd_get_inv_desc_width(s) ((s)->iq_dw ? 32 : 16)
+> > > 
+> > > Nit: I'll prefer dropping all the "get" wordings in these macros to be
+> > > "vtd_inv_desc_width" since that "get" doesn't help much on
+> > > understanding its meanings.  But it's personal preference too.
+> > > 
+> > That is fine.
+> > 
+> > > And since you've already have the iq_dw variable - why not store the
+> > > width directly into it?  An uint8_t would suffice.
+> > > 
+> > iq_dw corresponds to VTD_IQA_DW_MASK (Descriptor Width defined in IQA
+> > register). 1 means 256-bit descriptor, 0 means 128-bit descriptor.
+> > 
+> > It is also used in vtd_handle_gcmd_qie() and VTD_IQT_QT() by checking if
+> > its value is 1.
+> > 
+> > So, I would prefer to keep the original design.
+> 
+> It's ok.   But please make it a boolean.  Now iq_dw can be 0x800.
+> 
+Sure.
 
-On 2019/2/14 4:18, Alex Benn=C3=A9e wrote:
->=20
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
->> On Wed, 13 Feb 2019 at 16:29, Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->>>
->>>
->>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>
->>>> At the moment the Arm implementations of kvm_arch_{get,put}_register=
-s()
->>>> don't support having QEMU change the values of system registers
->>>> (aka coprocessor registers for AArch32). This is because although
->>>> kvm_arch_get_registers() calls write_list_to_cpustate() to
->>>> update the CPU state struct fields (so QEMU code can read the
->>>> values in the usual way), kvm_arch_put_registers() does not
->>>> call write_cpustate_to_list(), meaning that any changes to
->>>> the CPU state struct fields will not be passed back to KVM.
->>>>
->>>> The rationale for this design is documented in a comment in the
->>>> AArch32 kvm_arch_put_registers() -- writing the values in the
->>>> cpregs list into the CPU state struct is "lossy" because the
->>>> write of a register might not succeed, and so if we blindly
->>>> copy the CPU state values back again we will incorrectly
->>>> change register values for the guest. The assumption was that
->>>> no QEMU code would need to write to the registers.
->>>>
->>>> However, when we implemented debug support for KVM guests, we
->>>> broke that assumption: the code to handle "set the guest up
->>>> to take a breakpoint exception" does so by updating various
->>>> guest registers including ESR_EL1.
->>>>
->>>> Support this by making kvm_arch_put_registers() synchronize
->>>> CPU state back into the list. We sync only those registers
->>>> where the initial write succeeds, which should be sufficient.
->>
->>> [snip a long test setup that I didn't really understand]
->=20
-> Sorry that was just making sure I'd documented the exact steps of the
-> manual test for posterity.
->=20
->>
->> I'm confused -- I'm not sure if the things you're saying
->> didn't work:
->>  (a) didn't work before this patch and still don't
->>  (b) used to work and are broken by this patch
->>  (c) used to not work and are fixed by this patch
->=20
-> option (c) - this patch has made things better hence the t-b and r-b
-> tags. I might send you a follow up if we can also have single-step
-> working as well but that requires me to test a kernel patch (and remove
-> the error leg for guest single step in kvm64).
->=20
->>
->> More generally:
->>  * this patch claims to fix the code path where QEMU sets
->>    up the guest to take a breakpoint exception (specifically
->>    making our change of ESR_EL1 actually take effect) -- so does
->>    it do that? Or is it impossible for that code path in QEMU
->>    to be used (if so, can we just remove it) ?
->=20
-> No it's needed - I'm observing exceptions coming through the path and
-> then being delivered to the guest while the host is debugging - modulo
-> the you can't have active HW breakpoints in both guest and host at the
-> same time.
->=20
-> Even here now we are sure the guest state is correctly reflected we
-> could make the debug code smarter and try it's best to preserve guest
-> debug regs while using it's own entirely in userspace. But I suspect
-> that is a bit niche.
->=20
->>
->> thanks
->> -- PMM
->=20
->=20
-> --
-> Alex Benn=C3=A9e
->=20
-> .
->=20
+> [...]
+> 
+> > > >  /* Fetch an Invalidation Descriptor from the Invalidation Queue */
+> > > > -static bool vtd_get_inv_desc(dma_addr_t base_addr, uint32_t offset,
+> > > > +static bool vtd_get_inv_desc(IntelIOMMUState *s,
+> > > >                               VTDInvDesc *inv_desc)
+> > > >  {
+> > > > -    dma_addr_t addr = base_addr + offset * sizeof(*inv_desc);
+> > > > -    if (dma_memory_read(&address_space_memory, addr, inv_desc,
+> > > > -        sizeof(*inv_desc))) {
+> > > > -        error_report_once("Read INV DESC failed");
+> > > > -        inv_desc->lo = 0;
+> > > > -        inv_desc->hi = 0;
+> > > > +    dma_addr_t base_addr = s->iq;
+> > > > +    uint32_t offset = s->iq_head;
+> > > > +    uint32_t dw = vtd_get_inv_desc_width(s);
+> > > > +    dma_addr_t addr = base_addr + offset * dw;
+> > > > +
+> > > > +    /* init */
+> > > > +    inv_desc->val[0] = 0;
+> > > > +    inv_desc->val[1] = 0;
+> > > > +    inv_desc->val[2] = 0;
+> > > > +    inv_desc->val[3] = 0;
+> > > 
+> > > No need?
+> > > 
+> > This is necessary. Per my test, the val[] are not 0 by default.
+> 
+> I agree, it's a stack variable. However...
+> 
+> > That makes bug happen.
+> 
+> ... could you explain the bug?
+> 
+Below error can be observed.
+
+qemu-system-x86_64: vtd_process_inv_desc: invalid inv desc: val[3]=10, val[2]=0 (detect reserve non-zero)
+
+> Regards,
+> 
+> -- 
+> Peter Xu
