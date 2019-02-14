@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47450)
+Received: from eggs.gnu.org ([209.51.188.92]:48322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1guLss-0004Wt-R0
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:37:19 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guLwT-0005yX-Of
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1guLsr-0000Yn-N6
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:37:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1guLsr-0000YW-HE
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:37:17 -0500
-Date: Thu, 14 Feb 2019 18:37:09 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190214183708.GG2617@work-vm>
-References: <20190122173111.29821-1-dgilbert@redhat.com>
-	<CAFEAcA_1SMNULOgVkN2qmwkHt26WPC4o2+aRkjLwLwC5-hubpQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1guLwS-0003UK-SP
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:41:01 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:41009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guLwS-0003Tp-Km
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:41:00 -0500
+Received: by mail-ot1-x329.google.com with SMTP id u16so12214818otk.8
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 10:41:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_1SMNULOgVkN2qmwkHt26WPC4o2+aRkjLwLwC5-hubpQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: unegister fd handler
+References: <1547830785-7079-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1547830785-7079-8-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1547830785-7079-8-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 18:40:48 +0000
+Message-ID: <CAFEAcA8gk8MsDoHA5mzO0q16odQs-++rY=QbjZu=dkC+=5OjFg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 07/12] target/mips: Update ITU to utilize
+ SAARI and SAAR CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, jemmy858585@gmail.com, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Tue, 22 Jan 2019 at 19:08, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> >
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Unregister the fd handler before we destroy the channel,
-> > otherwise we've got a race where we might land in the
-> > fd handler just as we're closing the device.
-> >
-> > (The race is quite data dependent, you just have to have
-> > the right set of devices for it to trigger).
-> >
-> > Corresponds to RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=1666601
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/rdma.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/migration/rdma.c b/migration/rdma.c
-> > index 9b2e7e10aa..54a3c11540 100644
-> > --- a/migration/rdma.c
-> > +++ b/migration/rdma.c
-> > @@ -2321,6 +2321,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-> >          rdma->connected = false;
-> >      }
-> >
-> > +    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> >      g_free(rdma->dest_blocks);
-> >      rdma->dest_blocks = NULL;
-> 
-> Hi -- this patch makes coverity complain (CID 1398634),
-> because here we use rdma->channel without checking that it is NULL,
-> but later in the function we have an "if (rdma->channel)" test.
-> Should this code be conditional on rmda->channel being non-NULL,
-> or is the later test incorrect?
+On Fri, 18 Jan 2019 at 16:59, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+>
+> From: Yongbok Kim <yongbok.kim@mips.com>
+>
+> Update ITU to utilize SAARI and SAAR CP0 registers.
 
-Yes, it's got a point - I can seg that.
+Hi; Coverity complains (CID 1398648) about this bit of code:
 
-I'll post a fix.
+> -static void itc_reconfigure(MIPSITUState *tag)
+> +void itc_reconfigure(MIPSITUState *tag)
+>  {
+>      uint64_t *am = &tag->ITCAddressMap[0];
+>      MemoryRegion *mr = &tag->storage_io;
+> @@ -92,6 +92,12 @@ static void itc_reconfigure(MIPSITUState *tag)
+>      uint64_t size = (1 * KiB) + (am[1] & ITC_AM1_ADDR_MASK_MASK);
+>      bool is_enabled = (am[0] & ITC_AM0_EN_MASK) != 0;
+>
+> +    if (tag->saar_present) {
+> +        address = ((*(uint64_t *) tag->saar) & 0xFFFFFFFFE000ULL) << 4;
+> +        size = 1 << ((*(uint64_t *) tag->saar >> 1) & 0x1f);
+> +        is_enabled = *(uint64_t *) tag->saar & 1;
+> +    }
+> +
 
-Dave
+because the "1 << ..." calculation of size is done as a 32-bit
+signed integer which may then be unintentionally sign-extended
+into the 64-bit result. Using "1ULL" instead of "1" on the LHS
+of the shift would fix this.
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
