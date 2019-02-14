@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39548)
+Received: from eggs.gnu.org ([209.51.188.92]:39991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guLPF-0001Mm-Qt
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:06:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guLPN-0001rb-7f
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:06:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guLES-0008P2-4C
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:55:33 -0500
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:39892)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guLEO-0008G1-2j
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:55:29 -0500
-Received: by mail-ot1-x335.google.com with SMTP id n8so11995838otl.6
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:55:22 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1guLBu-00078E-2h
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:52:55 -0500
+Resent-Message-Id: <E1guLBu-00078E-2h@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1guLBt-00074A-LS
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:52:53 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155016673104.24.10665819785480231643@49fa7ef69f7b>
+In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-References: <20190128181047.20781-1-peter.maydell@linaro.org>
-	<20190128181047.20781-10-peter.maydell@linaro.org>
-In-Reply-To: <20190128181047.20781-10-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 17:55:08 +0000
-Message-ID: <CAFEAcA8tinUgkBxmUe0-WNcaYStu0=6HsXwejQdOZ=L8ZSygXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 09/26] target/arm: Don't clear supported PMU
- events when initializing PMCEID1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 14 Feb 2019 09:52:12 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Aaron Lindsay <Aaron@os.amperecomputing.com>
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
 
-On Mon, 28 Jan 2019 at 18:11, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
->
-> A bug was introduced during a respin of:
->
->         commit 57a4a11b2b281bb548b419ca81bfafb214e4c77a
->         target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
-
-
-
-> @@ -1113,13 +1115,16 @@ uint64_t get_pmceid(CPUARMState *env, unsigned which)
->          /* We do not currently support events in the 0x40xx range */
->          assert(cnt->number <= 0x3f);
->
-> -        if ((cnt->number & 0x20) == (which << 6) &&
-> -                cnt->supported(env)) {
-> -            pmceid |= (1 << (cnt->number & 0x1f));
-> +        if (cnt->supported(&cpu->env)) {
->              supported_event_map[cnt->number] = i;
-> +            uint64_t event_mask = 1 << (cnt->number & 0x1f);
-
-Coverity complains about this line (CID 1398645). The
-RHS is evaluated using 32-bit signed arithmetic (because
-cnt->number is uint16_t and so integer promotion means it
-ends up working with the 'int' type. If cnt->number is
-31 then this means that the assignment will do an
-unintended sign-extension that sets the top 32 bits
-of event_mask.
-
-Fix is probably just to use "1ULL" instead of "1" on the LHS of <<.
-
-
-> +            if (cnt->number & 0x20) {
-> +                cpu->pmceid1 |= event_mask;
-> +            } else {
-> +                cpu->pmceid0 |= event_mask;
-> +            }
->          }
->      }
-> -    return pmceid;
->  }
-
-thanks
--- PMM
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
+LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
+bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
+aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIw
+MTkwMjE0MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8y
+MDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKMDUzOGI2NDkwMiB1aS9jb2NvYTogUGVyZm9ybSBVSSBvcGVy
+YXRpb25zIG9ubHkgb24gdGhlIG1haW4gdGhyZWFkCjljODEzNzc2YzUgdWkvY29jb2E6IFN1YmNs
+YXNzIE5TQXBwbGljYXRpb24gc28gd2UgY2FuIGltcGxlbWVudCBzZW5kRXZlbnQKZWU5MTBkYWE3
+ZiB1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5kRXZlbnQgZGlyZWN0bHkgZnJvbSBoYW5k
+bGVFdmVudAo0NzVjNzMzMjljIHVpL2NvY29hOiBNb3ZlIGNvbnNvbGUvZGV2aWNlIG1lbnUgY3Jl
+YXRpb24gY29kZSB1cCBpbiBmaWxlCjg0MTg3YjAwYTEgdWkvY29jb2E6IEZhY3RvciBvdXQgaW5p
+dGlhbCBtZW51IGNyZWF0aW9uCmVjOWQyZDM1ZjEgdWkvY29jb2E6IFVzZSB0aGUgcGl4bWFuIGlt
+YWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UKMzFlM2NlNDU0NiB1aS9jb2NvYTogRW5zdXJl
+IHdlIGhhdmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5nIGludG8gUUVNVQoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KMS83IENoZWNraW5nIGNvbW1pdCAzMWUzY2U0NTQ2YjkgKHVpL2NvY29h
+OiBFbnN1cmUgd2UgaGF2ZSB0aGUgaW90aHJlYWQgbG9jayB3aGVuIGNhbGxpbmcgaW50byBRRU1V
+KQoyLzcgQ2hlY2tpbmcgY29tbWl0IGVjOWQyZDM1ZjE2MCAodWkvY29jb2E6IFVzZSB0aGUgcGl4
+bWFuIGltYWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UpCjMvNyBDaGVja2luZyBjb21taXQg
+ODQxODdiMDBhMTM5ICh1aS9jb2NvYTogRmFjdG9yIG91dCBpbml0aWFsIG1lbnUgY3JlYXRpb24p
+CjQvNyBDaGVja2luZyBjb21taXQgNDc1YzczMzI5Y2RkICh1aS9jb2NvYTogTW92ZSBjb25zb2xl
+L2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAgaW4gZmlsZSkKNS83IENoZWNraW5nIGNvbW1p
+dCBlZTkxMGRhYTdmMjAgKHVpL2NvY29hOiBEb24ndCBjYWxsIE5TQXBwIHNlbmRFdmVudCBkaXJl
+Y3RseSBmcm9tIGhhbmRsZUV2ZW50KQpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNDI6IEZJ
+TEU6IHVpL2NvY29hLm06MTUyOgorICAgICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
+MTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+Ni83IENoZWNraW5nIGNvbW1pdCA5YzgxMzc3NmM1MmEgKHVpL2NvY29hOiBTdWJjbGFzcyBOU0Fw
+cGxpY2F0aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50KQo3LzcgQ2hlY2tpbmcgY29t
+bWl0IDA1MzhiNjQ5MDJjZSAodWkvY29jb2E6IFBlcmZvcm0gVUkgb3BlcmF0aW9ucyBvbmx5IG9u
+IHRoZSBtYWluIHRocmVhZCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAxOTAyMTQxMDI4MTYuMzM5My0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9y
+Zy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
