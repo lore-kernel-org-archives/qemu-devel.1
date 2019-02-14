@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36183)
+Received: from eggs.gnu.org ([209.51.188.92]:39548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guL8K-0005X1-SI
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:49:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guLPF-0001Mm-Qt
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 13:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guL8I-00054x-11
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:49:12 -0500
-Resent-Message-Id: <E1guL8I-00054x-11@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guL8H-00054E-RA
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:49:09 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155016651626.24.9183413458507847586@49fa7ef69f7b>
-In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1guLES-0008P2-4C
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:55:33 -0500
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:39892)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guLEO-0008G1-2j
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:55:29 -0500
+Received: by mail-ot1-x335.google.com with SMTP id n8so11995838otl.6
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:55:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 09:48:37 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
+References: <20190128181047.20781-1-peter.maydell@linaro.org>
+	<20190128181047.20781-10-peter.maydell@linaro.org>
+In-Reply-To: <20190128181047.20781-10-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 17:55:08 +0000
+Message-ID: <CAFEAcA8tinUgkBxmUe0-WNcaYStu0=6HsXwejQdOZ=L8ZSygXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 09/26] target/arm: Don't clear supported PMU
+ events when initializing PMCEID1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Aaron Lindsay <Aaron@os.amperecomputing.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAvN10gdWkv
-Y29jb2E6IFVzZSBPU1gncyBtYWluIGxvb3AKTWVzc2FnZS1pZDogMjAxOTAyMTQxMDI4MTYuMzM5
-My0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjE0
-MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIx
-NDEwMjgxNi4zMzkzLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiAtIFt0YWcgdXBkYXRlXSAg
-ICAgIHBhdGNoZXcvY292ZXIuMTU0OTg1NzcxNi5naXQuYmFsYXRvbkBlaWsuYm1lLmh1IC0+IHBh
-dGNoZXcvY292ZXIuMTU0OTg1NzcxNi5naXQuYmFsYXRvbkBlaWsuYm1lLmh1ClN1Ym1vZHVsZSAn
-Y2Fwc3RvbmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUuZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdjYXBzdG9uZScKU3VibW9kdWxlICdkdGMnIChodHRwczovL2dpdC5xZW11
-Lm9yZy9naXQvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpTdWJtb2R1bGUgJ3Jv
-bXMvUWVtdU1hY0RyaXZlcnMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvUWVtdU1hY0RyaXZl
-cnMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJwpTdWJtb2R1
-bGUgJ3JvbXMvU0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9GLmdpdCkgcmVnaXN0
-ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvaXB4ZScgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9pcHhl
-JwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3Bl
-bmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5iaW9zJwpTdWJtb2R1bGUg
-J3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5oYWNrd2Fy
-ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJwpTdWJtb2R1bGUg
-J3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3FlbXUtcGFsY29k
-ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJwpTdWJtb2R1bGUg
-J3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLmdpdC8pIHJl
-Z2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdyb21zL3NlYWJpb3Mt
-aHBwYScgKGh0dHBzOi8vZ2l0aHViLmNvbS9oZGVsbGVyL3NlYWJpb3MtaHBwYS5naXQpIHJlZ2lz
-dGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJwpTdWJtb2R1bGUgJ3JvbXMvc2dhYmlv
-cycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZ2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
-cGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2tpYm9vdCcgKGh0dHBzOi8vZ2l0
-LnFlbXUub3JnL2dpdC9za2lib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9za2li
-b290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3Ut
-Ym9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290JwpTdWJtb2R1bGUgJ3Jv
-bXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC1zYW00
-NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JwpTdWJt
-b2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJyAoaHR0cHM6Ly9naXRodWIuY29t
-L2NvdGEvYmVya2VsZXktc29mdGZsb2F0LTMpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2Zw
-L2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3Rm
-bG9hdC0zJyAoaHR0cHM6Ly9naXRodWIuY29tL2NvdGEvYmVya2VsZXktdGVzdGZsb2F0LTMpIHJl
-Z2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJwpTdWJtb2R1
-bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9rZXljb2RlbWFw
-ZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGInCkNsb25pbmcgaW50
-byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6IGNoZWNrZWQgb3V0ICcy
-MmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpDbG9uaW5nIGludG8gJ2R0
-YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYxODkwOWRiNzMxYTYy
-NzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGludG8gJ3JvbXMvUWVtdU1hY0RyaXZl
-cnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJzogY2hlY2tlZCBvdXQg
-JzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDljOGUyNjYnCkNsb25pbmcgaW50byAn
-cm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9TTE9GJzogY2hlY2tlZCBvdXQgJ2E1
-YjQyOGUxYzFlYWU3MDNiZGQ2MmEzZjUyNzIyM2MyOTFlZTNmZGMnCkNsb25pbmcgaW50byAncm9t
-cy9pcHhlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9pcHhlJzogY2hlY2tlZCBvdXQgJ2RlNDU2
-NWNiZTc2ZWE5Zjc5MTNhMDFmMzMxYmUzZWU5MDFiYjZlMTcnCkNsb25pbmcgaW50byAncm9tcy9v
-cGVuYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbmJpb3MnOiBjaGVja2VkIG91dCAn
-NDQxYTg0ZDNhNjQyYTEwYjk0ODM2OWM2M2YzMjM2N2U4ZmY2Mzk1YicKQ2xvbmluZyBpbnRvICdy
-b21zL29wZW5oYWNrd2FyZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJzog
-Y2hlY2tlZCBvdXQgJ2M1NTlkYTdjOGVlYzVlNDVlZjFmNjc5Nzg4MjdhZjZmMGI5NTQ2ZjUnCkNs
-b25pbmcgaW50byAncm9tcy9xZW11LXBhbGNvZGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3Fl
-bXUtcGFsY29kZSc6IGNoZWNrZWQgb3V0ICc1MWMyMzdkN2UyMGQwNTEwMGVhY2FkZWUyZjYxYWJj
-MTdlNmJjMDk3JwpDbG9uaW5nIGludG8gJ3JvbXMvc2VhYmlvcycuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvc2VhYmlvcyc6IGNoZWNrZWQgb3V0ICdhNjk4Yzg5OTVmZmIyODM4Mjk2ZWMyODRmZTNj
-NGFkMzNkZmNhMzA3JwpDbG9uaW5nIGludG8gJ3JvbXMvc2VhYmlvcy1ocHBhJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnOiBjaGVja2VkIG91dCAnMWVmOTlhMDE1NzJjMjU4
-MWMzMGUxNmU2ZmU2OWU5ZWEyZWY5MmNlMCcKQ2xvbmluZyBpbnRvICdyb21zL3NnYWJpb3MnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NnYWJpb3MnOiBjaGVja2VkIG91dCAnY2JhZWU1MjI4N2U1
-ZjMyMzczMTgxY2ZmNTBhMDBiNmM0YWM5MDE1YScKQ2xvbmluZyBpbnRvICdyb21zL3NraWJvb3Qn
-Li4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NraWJvb3QnOiBjaGVja2VkIG91dCAnZTBlZTI0YzI3
-YTE3MmJjZjQ4MmY2ZjJiYzkwNWU2MjExYzEzNGJjYycKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9v
-dCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290JzogY2hlY2tlZCBvdXQgJ2Q4NWNhMDI5
-ZjI1N2I1M2E5NmRhNmMyZmI0MjFlNzhhMDAzYTk5NDMnCkNsb25pbmcgaW50byAncm9tcy91LWJv
-b3Qtc2FtNDYwZXgnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCc6IGNo
-ZWNrZWQgb3V0ICc2MGIzOTE2ZjMzZTYxN2E4MTU5NzNjNWE2ZGY3NzA1NWIyZTNhNTg4JwpDbG9u
-aW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0
-aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMz
-Mjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9i
-ZXJrZWxleS10ZXN0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5
-LXRlc3RmbG9hdC0zJzogY2hlY2tlZCBvdXQgJzVhNTlkY2VjMTkzMjczOTZhMDExYTE3ZmQ5MjRh
-ZWQ0ZmVjNDE2YjMnCkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUg
-cGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5
-ZDMyMjA1NTIyODBlZjNkODMyY2UnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOGQ3
-NmM1NiB1aS9jb2NvYTogUGVyZm9ybSBVSSBvcGVyYXRpb25zIG9ubHkgb24gdGhlIG1haW4gdGhy
-ZWFkCjNhZWUwNjggdWkvY29jb2E6IFN1YmNsYXNzIE5TQXBwbGljYXRpb24gc28gd2UgY2FuIGlt
-cGxlbWVudCBzZW5kRXZlbnQKMWRhN2E2YSB1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5k
-RXZlbnQgZGlyZWN0bHkgZnJvbSBoYW5kbGVFdmVudAowN2UwMTgwIHVpL2NvY29hOiBNb3ZlIGNv
-bnNvbGUvZGV2aWNlIG1lbnUgY3JlYXRpb24gY29kZSB1cCBpbiBmaWxlCmFlNDkwZDggdWkvY29j
-b2E6IEZhY3RvciBvdXQgaW5pdGlhbCBtZW51IGNyZWF0aW9uCjRiMGFjNTAgdWkvY29jb2E6IFVz
-ZSB0aGUgcGl4bWFuIGltYWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UKYzgzZjBlYiB1aS9j
-b2NvYTogRW5zdXJlIHdlIGhhdmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5nIGludG8g
-UUVNVQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS83IENoZWNraW5nIGNvbW1pdCBjODNmMGViMzFk
-MDQgKHVpL2NvY29hOiBFbnN1cmUgd2UgaGF2ZSB0aGUgaW90aHJlYWQgbG9jayB3aGVuIGNhbGxp
-bmcgaW50byBRRU1VKQoyLzcgQ2hlY2tpbmcgY29tbWl0IDRiMGFjNTA1NTg2NyAodWkvY29jb2E6
-IFVzZSB0aGUgcGl4bWFuIGltYWdlIGRpcmVjdGx5IGluIHN3aXRjaFN1cmZhY2UpCjMvNyBDaGVj
-a2luZyBjb21taXQgYWU0OTBkODNkYmE3ICh1aS9jb2NvYTogRmFjdG9yIG91dCBpbml0aWFsIG1l
-bnUgY3JlYXRpb24pCjQvNyBDaGVja2luZyBjb21taXQgMDdlMDE4MDcyMDkzICh1aS9jb2NvYTog
-TW92ZSBjb25zb2xlL2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAgaW4gZmlsZSkKNS83IENo
-ZWNraW5nIGNvbW1pdCAxZGE3YTZhMTUwNTkgKHVpL2NvY29hOiBEb24ndCBjYWxsIE5TQXBwIHNl
-bmRFdmVudCBkaXJlY3RseSBmcm9tIGhhbmRsZUV2ZW50KQpFUlJPUjogdHJhaWxpbmcgd2hpdGVz
-cGFjZQojNDE6IEZJTEU6IHVpL2NvY29hLm06MTUyOgorICAgICQKCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgMTIyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNyBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKNi83IENoZWNraW5nIGNvbW1pdCAzYWVlMDY4YTdjNmEgKHVpL2NvY29hOiBT
-dWJjbGFzcyBOU0FwcGxpY2F0aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50KQo3Lzcg
-Q2hlY2tpbmcgY29tbWl0IDhkNzZjNTZkNmMzMyAodWkvY29jb2E6IFBlcmZvcm0gVUkgb3BlcmF0
-aW9ucyBvbmx5IG9uIHRoZSBtYWluIHRocmVhZCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
-aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxMDI4MTYuMzM5My0xLXBldGVyLm1heWRl
-bGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Mon, 28 Jan 2019 at 18:11, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+>
+> A bug was introduced during a respin of:
+>
+>         commit 57a4a11b2b281bb548b419ca81bfafb214e4c77a
+>         target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
+
+
+
+> @@ -1113,13 +1115,16 @@ uint64_t get_pmceid(CPUARMState *env, unsigned which)
+>          /* We do not currently support events in the 0x40xx range */
+>          assert(cnt->number <= 0x3f);
+>
+> -        if ((cnt->number & 0x20) == (which << 6) &&
+> -                cnt->supported(env)) {
+> -            pmceid |= (1 << (cnt->number & 0x1f));
+> +        if (cnt->supported(&cpu->env)) {
+>              supported_event_map[cnt->number] = i;
+> +            uint64_t event_mask = 1 << (cnt->number & 0x1f);
+
+Coverity complains about this line (CID 1398645). The
+RHS is evaluated using 32-bit signed arithmetic (because
+cnt->number is uint16_t and so integer promotion means it
+ends up working with the 'int' type. If cnt->number is
+31 then this means that the assignment will do an
+unintended sign-extension that sets the top 32 bits
+of event_mask.
+
+Fix is probably just to use "1ULL" instead of "1" on the LHS of <<.
+
+
+> +            if (cnt->number & 0x20) {
+> +                cpu->pmceid1 |= event_mask;
+> +            } else {
+> +                cpu->pmceid0 |= event_mask;
+> +            }
+>          }
+>      }
+> -    return pmceid;
+>  }
+
+thanks
+-- PMM
