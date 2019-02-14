@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34079)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1guMsZ-0006wF-L9
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:41:04 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:38854)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <no-reply@patchew.org>) id 1guNHS-00022v-QJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:06:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1guMsY-0006mF-Fw
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:41:03 -0500
-Received: from mout.gmx.net ([212.227.15.15]:44055)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1guMsS-0006Mx-1A
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:40:58 -0500
-References: <20190202144531.5772-1-n54@gmx.com>
-	<a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <d0b7bfcb-8894-5a06-8290-ac9daf5a05da@gmx.com>
-Date: Thu, 14 Feb 2019 20:41:13 +0100
+	(envelope-from <no-reply@patchew.org>) id 1guN8C-0003yr-GL
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:57:14 -0500
+Resent-Message-Id: <E1guN8C-0003yr-GL@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1guN8C-0003xj-Aa
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:57:12 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155017420875.24.16615981132770772136@49fa7ef69f7b>
+In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0"
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
- kvm_arch_get_supported_cpuid()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 14 Feb 2019 11:56:49 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,119 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0
-From: Kamil Rytarowski <n54@gmx.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <d0b7bfcb-8894-5a06-8290-ac9daf5a05da@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
- kvm_arch_get_supported_cpuid()
-References: <20190202144531.5772-1-n54@gmx.com>
- <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
-In-Reply-To: <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 14.02.2019 19:44, Paolo Bonzini wrote:
-> On 02/02/19 15:45, Kamil Rytarowski wrote:
->>
->> Clang/LLVM on NetBSD with enabled optimization cannot link
->> correct qemu program because of a missing symbol of
->> kvm_arch_get_supported_cpuid() in kvm-stubs.o used by executables.
->=20
-> Can you please include the full error message?  Usually these things ar=
-e
-> a sign of a bug elsewhere.
->=20
-> Paolo
->=20
-
-Please do replace the current kludge that is sensitive to:
- - compiler behavior that can change with new versions
- - compiler gcc/clang
- - optimization options
- - linux(KVM) - non-linux (no-KVM) build
- - community not actively testing non-linux no-kvm build with
-optimization on clang
-
-
-My patch replaced it makes it work.
-
-Build error:
-
-  LINK    i386-bsd-user/qemu-i386
-/usr/bin/ld: /usr/lib/libc.so and /usr/lib/crt0.o: warning: multiple
-common of `environ'
-/usr/bin/ld: target/i386/cpu.o: in function `x86_cpu_filter_features':
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5047:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5048:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5049:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5050:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5051:
-undefined reference to `kvm_arch_get_supported_cpuid'
-clang-9: error: linker command failed with exit code 1 (use -v to see
-invocation)
-make[1]: *** [Makefile:199: qemu-i386] Error 1
-gmake: *** [Makefile:483: subdir-i386-bsd-user] Error 2
-gmake: *** Waiting for unfinished jobs....
-  LINK    x86_64-bsd-user/qemu-x86_64
-/usr/bin/ld: /usr/lib/libc.so and /usr/lib/crt0.o: warning: multiple
-common of `environ'
-/usr/bin/ld: target/i386/cpu.o: in function `x86_cpu_filter_features':
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5047:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5048:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5049:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5050:
-undefined reference to `kvm_arch_get_supported_cpuid'
-/usr/bin/ld:
-/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5051:
-undefined reference to `kvm_arch_get_supported_cpuid'
-clang-9: error: linker command failed with exit code 1 (use -v to see
-invocation)
-make[1]: *** [Makefile:199: qemu-x86_64] Error 1
-gmake: *** [Makefile:483: subdir-x86_64-bsd-user] Error 2
-*** Error code 2
-
-
---PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxlxFkMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZsZi0P/0T5Pg4snNED2ae15joDg7IVhoDKDpkP6TPGp63/
-st6Y/ENBe/sLC2BnQ/GhWzDLU37cyR0vDrZk3iiuXJWweFEs5CbCSQjAmtXoY5dS
-vP11KBTnmBReq/TzwQ1dtm/8lVg3fY3WFXdJDp2SGpCV86gQq0w3+woLLvbfjhxs
-resRB+4/PRSLIXmSioAx4ZP5QuQ88U+zlbcmZ0sA7sv4sWq+kbi4E7mz3XgjZUEs
-+ZfK6im5RVVS+fFOLf+iIX+wW9oAlnhNpSjL/ZiNcAkDxr4SIzZQ+UgGZrmXDubs
-8u2+EwQ40GmuVk7weyT6tNG96W0BrO84uQMchnE6Cd+h6iFFHe4xuSljq2PcW1Sm
-7GbBDk8F97e5R02L1lOtjUGRd4cZesw3IcomTHNcGsEzEQ6VVeTpc7sVV0R+zlnw
-X/abtD+sccQN9yL1j6utU6FVkpBXLgXc8akC+8X+VWHzBV4lpCjgzc8jvYQu4h+I
-cYY0KNpGDBRRPDA4BR8jU4pNIoQ1YqS4JLFQ9ymMkA8An+04nc1KMWv2UYYmYt3U
-0etWevixEmf3/RiI6pZVezdFVb8mxl1vJqUAEnuklsXrYzRnNOAu/SUMgP/hyHAE
-CPz+zynyb1kI3lI7+tqPoAnCO97VMnZc17N6/HEzybU7q435VI1phI+e/TmqPtNM
-Ada+
-=Bz87
------END PGP SIGNATURE-----
-
---PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
+MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
+YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAgIDBkM2U0MWQ1ZWYuLjAyNjZjNzM5YWIgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAq
+IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1w
+ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYwMy4yNTAzMC0x
+LXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CmM5MDNkMTZmNjkgZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBwYWNrZXQuCmY0
+MWRiZTcwMDEgdGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxscwphMzkzODMx
+MGVjIHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJhdGlvbgo5Yjk5
+MWQzYmE0IHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFNDUi5RQyB0byBhIHZlY3RvciBmaWVsZAoy
+NjhkMWI5ZjVkIHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhyZWdzW0FSTV9W
+RlBfRlBTQ1JdCmYxZDA4OTQyZWUgdGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdzIHNldHRpbmcg
+ZnJvbSB2ZnAgY29tcGFyZXMKOTFlMjIzZjBmMSB0YXJnZXQvYXJtOiBGaXggYXJtX2NwdV9kdW1w
+X3N0YXRlIHZzIEZQU0NSCjc2NGQ3ODJmNGQgdGFyZ2V0L2FybTogRml4IHZmcF9nZGJfZ2V0L3Nl
+dF9yZWcgdnMgRlBTQ1IKNDcwNjdmZDUzYiB0YXJnZXQvYXJtOiBSZW1vdmUgbmVvbiBtaW4vbWF4
+IGhlbHBlcnMKMDVmMWM5YjUyOCB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIgbWluL21heCBw
+cmltaXRpdmVzIGZvciBuZW9uCjFmMTU0MzY0NmIgdGFyZ2V0L2FybTogVXNlIHZlY3RvciBtaW5t
+YXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjA2ZjI3ZmFkZjggdGFyZ2V0L2FybTogVXNlIHZlY3Rv
+ciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CmZjMmU5NzZhYTIgdGFyZ2V0L2FybTogUmVs
+eSBvbiBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgoxYWZhMjA1ODNjIGh3L2Fy
+bS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKZmRkMjVlOWIyNCBody9p
+bnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCjE4Mjc3NjhiZDEg
+TUFJTlRBSU5FUlM6IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlvdXMgZW50cmll
+cwo5OTFhZjcyMzZmIGFybTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZNIGd1ZXN0cyB0
+byBiZSBjaGFuZ2VkIGJ5IFFFTVUgY29kZQphOTYzNjY1NWRkIGxpbnV4LXVzZXIvZWxmbG9hZDog
+ZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0CjUxMTIxNDVlZmUgdGFyZ2V0L2FybTogZXhw
+b3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaCjEyZmQ5OWE0YmEgdGFyZ2V0L2Fy
+bTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UKYWZmOGNkMzJjYyB0YXJnZXQvYXJtOiBl
+eHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZQoxZWYxZDY2MjZhIHRhcmdldC9hcm06
+IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMKYmE3NWVm
+Y2QwNiB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9pbnRfY29udgphMWY1MWUxMTEx
+IHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uCjUw
+ZDViNDZiMzQgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBw
+YWlyZWRfY21weGNoZzY0X2JlCjg0N2JhZTE2N2IgdGFyZ2V0L2FybTogSW1wbGVtZW50IEhBQ1Jf
+RUwyCmRiNjk4ZThiZDUgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3IgUE1FVlRZUEVS
+L1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNvbW1pdCBkYjY5
+OGU4YmQ1NTggKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZUWVBFUi9QTUVW
+Q05UUikKMi8yNyBDaGVja2luZyBjb21taXQgODQ3YmFlMTY3YjI0ICh0YXJnZXQvYXJtOiBJbXBs
+ZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IDUwZDViNDZiMzRjYiAodGFyZ2V0
+L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRfY21weGNoZzY0
+X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCBhMWY1MWUxMTExNWEgKHRhcmdldC9hcm06IEZvcmNl
+IHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNraW5nIGNvbW1p
+dCBiYTc1ZWZjZDA2MzIgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2ZwX2ludF9jb252
+KQo2LzI3IENoZWNraW5nIGNvbW1pdCAxZWYxZDY2MjZhNzMgKHRhcmdldC9hcm06IHJlbGF4IHBl
+cm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcgQ2hlY2tpbmcg
+Y29tbWl0IGFmZjhjZDMyY2M0YSAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJlZ2lzdGVycyB0
+byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IDEyZmQ5OWE0YmFmOCAodGFyZ2V0L2Fy
+bTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcgY29tbWl0IDUx
+MTIxNDVlZmU4NCAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMg
+YXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgYTk2MzY2NTVkZDMxIChsaW51eC11c2VyL2Vs
+ZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hlY2tpbmcgY29t
+bWl0IDk5MWFmNzIzNmZkZiAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZvciBLVk0gZ3Vl
+c3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBjb21taXQgMTgy
+Nzc2OGJkMTFmIChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRlIGZyb20gdmFy
+aW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgZmRkMjVlOWIyNGM4IChody9pbnRj
+L2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8yNyBDaGVja2lu
+ZyBjb21taXQgMWFmYTIwNTgzYzI5IChody9hcm0vYXJtc3NlOiBGaXggbWlzd2lyaW5nIG9mIGV4
+cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgZmMyZTk3NmFhMjhlICh0YXJnZXQv
+YXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29yKQoxNi8yNyBD
+aGVja2luZyBjb21taXQgMDZmMjdmYWRmODM2ICh0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1h
+eCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCAxZjE1NDM2NDZi
+MjIgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3IgYWFyY2gzMikK
+MTgvMjcgQ2hlY2tpbmcgY29tbWl0IDA1ZjFjOWI1MjgzZSAodGFyZ2V0L2FybTogVXNlIHRjZyBp
+bnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tpbmcgY29tbWl0
+IDQ3MDY3ZmQ1M2JjNCAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzKQoy
+MC8yNyBDaGVja2luZyBjb21taXQgNzY0ZDc4MmY0ZDY0ICh0YXJnZXQvYXJtOiBGaXggdmZwX2dk
+Yl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxk
+IGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6ODQ6CisgICAg
+Y2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0OwoKRVJST1I6
+IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6IEZJTEU6IHRh
+cmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNjcihlbnYsIGxk
+bF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIxLzI3
+IENoZWNraW5nIGNvbW1pdCA5MWUyMjNmMGYxYWYgKHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1
+bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCBmMWQwODk0MmVlNzkgKHRh
+cmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBhcmVzKQoyMy8y
+NyBDaGVja2luZyBjb21taXQgMjY4ZDFiOWY1ZDYxICh0YXJnZXQvYXJtOiBGaXggc2V0IG9mIGJp
+dHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcgY29tbWl0IDli
+OTkxZDNiYTQwNCAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZp
+ZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgYTM5MzgzMTBlYzIwICh0YXJnZXQvYXJtOiBVc2Ug
+dmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
+YXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxw
+ZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0gPSB2bTsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3IENoZWNraW5n
+IGNvbW1pdCBmNDFkYmU3MDAxM2YgKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNsZWFyX3RhaWwg
+Y2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCBjOTAzZDE2ZjY5OTMgKGdkYnN0dWI6IFNlbmQg
+YSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
+aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRlci5tYXlk
+ZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
