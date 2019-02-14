@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43826)
+Received: from eggs.gnu.org ([209.51.188.92]:47426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1guArk-0002Zn-Jh
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:51:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1guB0s-0006du-4M
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:00:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1guAfN-0003r3-01
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:38:38 -0500
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:60771)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1guAfM-0003px-PA
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 01:38:36 -0500
-Received: from player756.ha.ovh.net (unknown [10.109.146.163])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 470B151C51
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:38:34 +0100 (CET)
-References: <20190213210756.27032-1-clg@kaod.org>
-	<20190214004902.GX1884@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ec91f7e7-9689-8325-20af-e2e860dcc32f@kaod.org>
-Date: Thu, 14 Feb 2019 07:38:28 +0100
+	(envelope-from <thuth@redhat.com>) id 1guB0i-00048P-ON
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:00:47 -0500
+References: <20190213211827.20300-1-thomas.petazzoni@bootlin.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8defa16a-2af8-a1a7-0e3e-cb281f9a477d@redhat.com>
+Date: Thu, 14 Feb 2019 08:00:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190214004902.GX1884@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190213211827.20300-1-thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/2] spapr/irq: remove the XICS offset
- adjustment for the dual machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: improve usbfs check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-stable@nongnu.org
 
-On 2/14/19 1:49 AM, David Gibson wrote:
-> On Wed, Feb 13, 2019 at 10:07:54PM +0100, C=E9dric Le Goater wrote:
->> Hello,
->>
->> When using the 'dual' interrupt mode, the source numbers of both sPAPR
->> IRQ backends are aligned to share a common IRQ number space and to use
->> a similar mapping of the machine qemu_irq array which is indexed by
->> the source number.
->>
->> The XICS IRQ number range initially being [ 0x1000 - 0x2000 ], this
->> requires to change the XICS ICSState offset to 0 and to provision for
->> an extra 4K of source numbers and qemu_irqs which will never be used
->> by the machine when running under the XICS interrupt mode. This is not
->> an optimal solution.
->>
->> Moreover, the KVM support for the 'dual' interrupt mode will require
->> some adjustments. The XICS KVM device considers that the IRQ numbers
->> start at XICS_IRQ_BASE (0x1000) and we have no way to inform KVM of
->> the offset change. We will need to ignore the lower 4K numbers when
->> capturing or restoring the source states from the XICS KVM device.
->>
->> The first patch allocates an IRQ number space of the expected size for
+On 2019-02-13 22:18, Thomas Petazzoni wrote:
+> The current check to test if usbfs support should be compiled or not
+> solely relies on the presence of <linux/usbdevice_fs.h>, without
+> actually checking that all definition used by Qemu are provided by
+> this header file.
+> 
+> With sufficiently old kernel headers, <linux/usbdevice_fs.h> may be
+> present, but some of the definitions needed by Qemu may not be
+> available.
+> 
+> This commit improves the check by building a small program that
+> actually tests whether the necessary definitions are available.
+> 
+> In addition, it fixes a bug where have_usbfs was set to "yes"
+> regardless of the result of the test.
+> 
+> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+> ---
+>  configure | 19 +++++++++++++++++--
+>  1 file changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 3d89870d99..799c8e3b08 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4266,10 +4266,25 @@ fi
+>  # check for usbfs
+>  have_usbfs=no
+>  if test "$linux_user" = "yes"; then
+> -  if check_include linux/usbdevice_fs.h; then
+> +  cat > $TMPC << EOF
+> +#include <linux/usbdevice_fs.h>
+> +
+> +#ifndef USBDEVFS_GET_CAPABILITIES
+> +#error "USBDEVFS_GET_CAPABILITIES undefined"
+> +#endif
+> +
+> +#ifndef USBDEVFS_DISCONNECT_CLAIM
+> +#error "USBDEVFS_DISCONNECT_CLAIM undefined"
+> +#endif
+> +
+> +int main(void)
+> +{
+> +    return 0;
+> +}
+> +EOF
+> +  if compile_prog "" ""; then
+>      have_usbfs=yes
+>    fi
+> -  have_usbfs=yes
+>  fi
+>  
+>  # check for fallocate
 
-s/IRQ number space/source numbers/
-
-There is still some confusion in the way I use the terms "IRQ number"=20
-and "source number". These are two different number spaces. I should
-pay more attention.
-
->> the XICS sPAPR IRQ backend. The overall IRQ number space size and the
->> qemu_irq array size is still the one required by the 'dual' sPAPR IRQ
->> backend, that is, in sync with XIVE. The second patch removes the
->> ICSState offset adjustment. This last change adds some benefits as it
->> simplifies greatly the qirq() method of the 'dual' sPAPR IRQ
->> backend.
->=20
-> Ah, much nicer.  Applied to ppc-for-4.0, thanks.
-
-I will just drop patch "spapr/xics: ignore the lower 4K in the IRQ=20
-number space"
-
-Thanks,
-
-C.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
