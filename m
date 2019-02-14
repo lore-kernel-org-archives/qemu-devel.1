@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55362)
+Received: from eggs.gnu.org ([209.51.188.92]:55405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gu9T8-0007Gj-OJ
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:21:56 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gu9TP-0007Pp-3B
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gu9T7-0005n7-Dc
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:21:54 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gu9TJ-0005t1-JE
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:22:09 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 14 Feb 2019 16:21:41 +1100
-Message-Id: <20190214052144.59541-2-aik@ozlabs.ru>
+Date: Thu, 14 Feb 2019 16:21:43 +1100
+Message-Id: <20190214052144.59541-4-aik@ozlabs.ru>
 In-Reply-To: <20190214052144.59541-1-aik@ozlabs.ru>
 References: <20190214052144.59541-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2 1/4] vfio/spapr: Fix indirect levels
- calculation
+Subject: [Qemu-devel] [PATCH qemu v2 3/4] vfio: Make
+ vfio_get_region_info_cap public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Reza Arbab <arbab@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-The current code assumes that we can address more bits on a PCI bus
-for DMA than we really can but there is no way knowing the actual limit.
-
-This makes a better guess for the number of levels and if the kernel
-fails to allocate that, this increases the level numbers till succeeded
-or reached the 64bit limit.
-
-This adds levels to the trace point.
-
-This may cause the kernel to warn about failed allocation:
-   [65122.837458] Failed to allocate a TCE memory, level shift=28
-which might happen if MAX_ORDER is not large enough as it can vary:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/Kconfig?h=v5.0-rc2#n727
+This makes vfio_get_region_info_cap() to be used in quirks.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
-Changes:
-v2:
-* replace systempagesize with getpagesize() when calculating bits_per_level/max_levels
----
- hw/vfio/spapr.c      | 41 ++++++++++++++++++++++++++++++++---------
- hw/vfio/trace-events |  2 +-
- 2 files changed, 33 insertions(+), 10 deletions(-)
+ include/hw/vfio/vfio-common.h | 2 ++
+ hw/vfio/common.c              | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-index becf71a..302d6b0 100644
---- a/hw/vfio/spapr.c
-+++ b/hw/vfio/spapr.c
-@@ -146,7 +146,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
-     int ret;
-     IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
-     uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
--    unsigned entries, pages;
-+    unsigned entries, bits_total, bits_per_level, max_levels;
-     struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
-     long systempagesize = qemu_getrampagesize();
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 7624c9f..fbf0966 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -189,6 +189,8 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+                              uint32_t subtype, struct vfio_region_info **info);
+ bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_type);
++struct vfio_info_cap_header *
++vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id);
+ #endif
+ extern const MemoryListener vfio_prereg_listener;
  
-@@ -176,16 +176,38 @@ int vfio_spapr_create_window(VFIOContainer *container,
-     create.window_size = int128_get64(section->size);
-     create.page_shift = ctz64(pagesize);
-     /*
--     * SPAPR host supports multilevel TCE tables, there is some
--     * heuristic to decide how many levels we want for our table:
--     * 0..64 = 1; 65..4096 = 2; 4097..262144 = 3; 262145.. = 4
-+     * SPAPR host supports multilevel TCE tables. We try to guess optimal
-+     * levels number and if this fails (for example due to the host memory
-+     * fragmentation), we increase levels. The DMA address structure is:
-+     * rrrrrrrr rxxxxxxx xxxxxxxx xxxxxxxx  xxxxxxxx xxxxxxxx xxxxxxxx iiiiiiii
-+     * where:
-+     *   r = reserved (bits >= 55 are reserved in the existing hardware)
-+     *   i = IOMMU page offset (64K in this example)
-+     *   x = bits to index a TCE which can be split to equal chunks to index
-+     *      within the level.
-+     * The aim is to split "x" to smaller possible number of levels.
-      */
-     entries = create.window_size >> create.page_shift;
--    pages = MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
--    pages = MAX(pow2ceil(pages), 1); /* Round up */
--    create.levels = ctz64(pages) / 6 + 1;
--
--    ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
-+    /* bits_total is number of "x" needed */
-+    bits_total = ctz64(entries * sizeof(uint64_t));
-+    /*
-+     * bits_per_level is a safe guess of how much we can allocate per level:
-+     * 8 is the current minimum for CONFIG_FORCE_MAX_ZONEORDER and MAX_ORDER
-+     * is usually bigger than that.
-+     * Below we look at getpagesize() as TCEs are allocated from system pages.
-+     */
-+    bits_per_level = ctz64(getpagesize()) + 8;
-+    create.levels = bits_total / bits_per_level;
-+    if (bits_total % bits_per_level) {
-+        ++create.levels;
-+    }
-+    max_levels = (64 - create.page_shift) / ctz64(getpagesize());
-+    for ( ; create.levels <= max_levels; ++create.levels) {
-+        ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
-+        if (!ret) {
-+            break;
-+        }
-+    }
-     if (ret) {
-         error_report("Failed to create a window, ret = %d (%m)", ret);
-         return -errno;
-@@ -200,6 +222,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
-         return -EINVAL;
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 4262b80..7e565e7 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -711,7 +711,7 @@ static void vfio_listener_release(VFIOContainer *container)
      }
-     trace_vfio_spapr_create_window(create.page_shift,
-+                                   create.levels,
-                                    create.window_size,
-                                    create.start_addr);
-     *pgsize = pagesize;
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index f41ca96..579be19 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -128,6 +128,6 @@ vfio_prereg_listener_region_add_skip(uint64_t start, uint64_t end) "0x%"PRIx64"
- vfio_prereg_listener_region_del_skip(uint64_t start, uint64_t end) "0x%"PRIx64" - 0x%"PRIx64
- vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
- vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
--vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
-+vfio_spapr_create_window(int ps, unsigned int levels, uint64_t ws, uint64_t off) "pageshift=0x%x levels=%u winsize=0x%"PRIx64" offset=0x%"PRIx64
- vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
- vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
+ }
+ 
+-static struct vfio_info_cap_header *
++struct vfio_info_cap_header *
+ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
+ {
+     struct vfio_info_cap_header *hdr;
 -- 
 2.17.1
