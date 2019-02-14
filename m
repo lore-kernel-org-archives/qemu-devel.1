@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38854)
+Received: from eggs.gnu.org ([209.51.188.92]:38743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guNHS-00022v-QJ
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:06:48 -0500
+	(envelope-from <lersek@redhat.com>) id 1guNHi-00022N-Ke
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guN8C-0003yr-GL
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:57:14 -0500
-Resent-Message-Id: <E1guN8C-0003yr-GL@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guN8C-0003xj-Aa
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:57:12 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155017420875.24.16615981132770772136@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <lersek@redhat.com>) id 1guN5H-0000in-Le
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:54:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1guN5H-0000fA-GD
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:54:11 -0500
+References: <20190214155714.8779-1-alex.bennee@linaro.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <bbefd980-c740-cb8f-a648-a6f51772d63d@redhat.com>
+Date: Thu, 14 Feb 2019 20:54:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 11:56:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+In-Reply-To: <20190214155714.8779-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/block: report when pflash backing file
+ isn't aligned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: pkg-qemu-devel@lists.alioth.debian.org, ard.biesheuvel@linaro.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAgIDBkM2U0MWQ1ZWYuLjAyNjZjNzM5YWIgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAq
-IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1w
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYwMy4yNTAzMC0x
-LXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CmM5MDNkMTZmNjkgZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBwYWNrZXQuCmY0
-MWRiZTcwMDEgdGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxscwphMzkzODMx
-MGVjIHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJhdGlvbgo5Yjk5
-MWQzYmE0IHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFNDUi5RQyB0byBhIHZlY3RvciBmaWVsZAoy
-NjhkMWI5ZjVkIHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhyZWdzW0FSTV9W
-RlBfRlBTQ1JdCmYxZDA4OTQyZWUgdGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdzIHNldHRpbmcg
-ZnJvbSB2ZnAgY29tcGFyZXMKOTFlMjIzZjBmMSB0YXJnZXQvYXJtOiBGaXggYXJtX2NwdV9kdW1w
-X3N0YXRlIHZzIEZQU0NSCjc2NGQ3ODJmNGQgdGFyZ2V0L2FybTogRml4IHZmcF9nZGJfZ2V0L3Nl
-dF9yZWcgdnMgRlBTQ1IKNDcwNjdmZDUzYiB0YXJnZXQvYXJtOiBSZW1vdmUgbmVvbiBtaW4vbWF4
-IGhlbHBlcnMKMDVmMWM5YjUyOCB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIgbWluL21heCBw
-cmltaXRpdmVzIGZvciBuZW9uCjFmMTU0MzY0NmIgdGFyZ2V0L2FybTogVXNlIHZlY3RvciBtaW5t
-YXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjA2ZjI3ZmFkZjggdGFyZ2V0L2FybTogVXNlIHZlY3Rv
-ciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CmZjMmU5NzZhYTIgdGFyZ2V0L2FybTogUmVs
-eSBvbiBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgoxYWZhMjA1ODNjIGh3L2Fy
-bS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKZmRkMjVlOWIyNCBody9p
-bnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCjE4Mjc3NjhiZDEg
-TUFJTlRBSU5FUlM6IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlvdXMgZW50cmll
-cwo5OTFhZjcyMzZmIGFybTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZNIGd1ZXN0cyB0
-byBiZSBjaGFuZ2VkIGJ5IFFFTVUgY29kZQphOTYzNjY1NWRkIGxpbnV4LXVzZXIvZWxmbG9hZDog
-ZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0CjUxMTIxNDVlZmUgdGFyZ2V0L2FybTogZXhw
-b3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaCjEyZmQ5OWE0YmEgdGFyZ2V0L2Fy
-bTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UKYWZmOGNkMzJjYyB0YXJnZXQvYXJtOiBl
-eHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZQoxZWYxZDY2MjZhIHRhcmdldC9hcm06
-IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMKYmE3NWVm
-Y2QwNiB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9pbnRfY29udgphMWY1MWUxMTEx
-IHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uCjUw
-ZDViNDZiMzQgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBw
-YWlyZWRfY21weGNoZzY0X2JlCjg0N2JhZTE2N2IgdGFyZ2V0L2FybTogSW1wbGVtZW50IEhBQ1Jf
-RUwyCmRiNjk4ZThiZDUgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3IgUE1FVlRZUEVS
-L1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNvbW1pdCBkYjY5
-OGU4YmQ1NTggKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZUWVBFUi9QTUVW
-Q05UUikKMi8yNyBDaGVja2luZyBjb21taXQgODQ3YmFlMTY3YjI0ICh0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IDUwZDViNDZiMzRjYiAodGFyZ2V0
-L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRfY21weGNoZzY0
-X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCBhMWY1MWUxMTExNWEgKHRhcmdldC9hcm06IEZvcmNl
-IHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNraW5nIGNvbW1p
-dCBiYTc1ZWZjZDA2MzIgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2ZwX2ludF9jb252
-KQo2LzI3IENoZWNraW5nIGNvbW1pdCAxZWYxZDY2MjZhNzMgKHRhcmdldC9hcm06IHJlbGF4IHBl
-cm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcgQ2hlY2tpbmcg
-Y29tbWl0IGFmZjhjZDMyY2M0YSAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJlZ2lzdGVycyB0
-byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IDEyZmQ5OWE0YmFmOCAodGFyZ2V0L2Fy
-bTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcgY29tbWl0IDUx
-MTIxNDVlZmU4NCAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMg
-YXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgYTk2MzY2NTVkZDMxIChsaW51eC11c2VyL2Vs
-ZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hlY2tpbmcgY29t
-bWl0IDk5MWFmNzIzNmZkZiAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZvciBLVk0gZ3Vl
-c3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBjb21taXQgMTgy
-Nzc2OGJkMTFmIChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRlIGZyb20gdmFy
-aW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgZmRkMjVlOWIyNGM4IChody9pbnRj
-L2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8yNyBDaGVja2lu
-ZyBjb21taXQgMWFmYTIwNTgzYzI5IChody9hcm0vYXJtc3NlOiBGaXggbWlzd2lyaW5nIG9mIGV4
-cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgZmMyZTk3NmFhMjhlICh0YXJnZXQv
-YXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29yKQoxNi8yNyBD
-aGVja2luZyBjb21taXQgMDZmMjdmYWRmODM2ICh0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1h
-eCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCAxZjE1NDM2NDZi
-MjIgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3IgYWFyY2gzMikK
-MTgvMjcgQ2hlY2tpbmcgY29tbWl0IDA1ZjFjOWI1MjgzZSAodGFyZ2V0L2FybTogVXNlIHRjZyBp
-bnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tpbmcgY29tbWl0
-IDQ3MDY3ZmQ1M2JjNCAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzKQoy
-MC8yNyBDaGVja2luZyBjb21taXQgNzY0ZDc4MmY0ZDY0ICh0YXJnZXQvYXJtOiBGaXggdmZwX2dk
-Yl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxk
-IGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6ODQ6CisgICAg
-Y2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0OwoKRVJST1I6
-IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6IEZJTEU6IHRh
-cmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNjcihlbnYsIGxk
-bF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIxLzI3
-IENoZWNraW5nIGNvbW1pdCA5MWUyMjNmMGYxYWYgKHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1
-bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCBmMWQwODk0MmVlNzkgKHRh
-cmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBhcmVzKQoyMy8y
-NyBDaGVja2luZyBjb21taXQgMjY4ZDFiOWY1ZDYxICh0YXJnZXQvYXJtOiBGaXggc2V0IG9mIGJp
-dHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcgY29tbWl0IDli
-OTkxZDNiYTQwNCAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZp
-ZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgYTM5MzgzMTBlYzIwICh0YXJnZXQvYXJtOiBVc2Ug
-dmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxw
-ZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0gPSB2bTsgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3IENoZWNraW5n
-IGNvbW1pdCBmNDFkYmU3MDAxM2YgKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNsZWFyX3RhaWwg
-Y2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCBjOTAzZDE2ZjY5OTMgKGdkYnN0dWI6IFNlbmQg
-YSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
-aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 02/14/19 16:57, Alex Benn=C3=A9e wrote:
+> It looks like there was going to be code to check we had some sort of
+> alignment so lets replace it with an actual check. This is a bit more
+> useful than the enigmatic "failed to read the initial flash content"
+> when we attempt to read the number of bytes the device should have.
+>=20
+> This is a potential confusing stumbling block when you move from using
+> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
+> loading your firmware code.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  hw/block/pflash_cfi01.c | 19 +++++++++++++------
+>  1 file changed, 13 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index bffb4c40e7..f3251b236c 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -722,12 +722,19 @@ static void pflash_cfi01_realize(DeviceState *dev=
+, Error **errp)
+>      }
+>      device_len =3D sector_len_per_device * blocks_per_device;
+> =20
+> -    /* XXX: to be fixed */
+> -#if 0
+> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 =
+* 1024) &&
+> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024=
+ * 1024))
+> -        return NULL;
+> -#endif
+> +    /*
+> +     * Validate the backing store is the right size for pflash
+> +     * devices. It has to be padded to a multiple of the flash block
+> +     * size.
+> +     */
+> +    if (pfl->blk) {
+> +        uint64_t backing_len =3D blk_getlength(pfl->blk);
+> +        if (device_len !=3D backing_len) {
+> +            error_setg(errp, "backing file wrong size "
+> +                       "(%" PRId64 " !=3D %" PRId64")", backing_len, d=
+evice_len);
+> +            return;
+> +        }
+> +    }
+> =20
+>      memory_region_init_rom_device(
+>          &pfl->mem, OBJECT(dev),
+>=20
+
+I have two suggestions:
+- backing_len and device_len are both uint64_t; we should print them
+  with PRIu64
+- from a user POV, I find it more useful if the error message also shows
+  which quantity is which, not just two inequal numbers.
+
+I don't feel too strongly about this, so up to you.
+
+Thanks,
+Laszlo
