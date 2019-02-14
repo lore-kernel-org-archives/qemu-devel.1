@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41770)
+Received: from eggs.gnu.org ([209.51.188.92]:41689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1guHxd-0002WI-5m
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:25:57 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guHxe-0002Ru-BE
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1guHnQ-0004AP-OJ
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:15:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1guHnP-00047i-Rw
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:15:24 -0500
-Date: Thu, 14 Feb 2019 15:15:20 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190214151520.2763805d@redhat.com>
-In-Reply-To: <6cd527d2-b8d8-0eb9-78eb-a59c3ee4ccc7@gmail.com>
-References: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
-	<20190205164716.79b9cd08@Igors-MacBook-Pro.local>
-	<c6e1d704-e0da-215e-40c7-6db3daa66da1@linux.intel.com>
-	<20190214123140.53d3cdf6@redhat.com>
-	<6cd527d2-b8d8-0eb9-78eb-a59c3ee4ccc7@gmail.com>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guHm0-0002oh-Lq
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:13:57 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37545)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1guHly-0002gr-M4
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:13:56 -0500
+Received: by mail-wr1-x441.google.com with SMTP id c8so6641277wrs.4
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 06:13:50 -0800 (PST)
+References: <20190213065357.16076-1-yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <6b51c177-b24e-4838-b477-3132f133dcf5@gmail.com>
+Date: Thu, 14 Feb 2019 16:14:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Issues] PCI hotplug does not work well on pc
- platform?
+In-Reply-To: <20190213065357.16076-1-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] Misc fixes to pvrdma device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: "Liu, Jing2" <jing2.liu@linux.intel.com>, yang.zhong@intel.com, qemu-devel <qemu-devel@nongnu.org>
+To: Yuval Shaia <yuval.shaia@oracle.com>, dgilbert@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On Thu, 14 Feb 2019 15:12:35 +0200
-Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
+Hi Yuval,
 
-> Hi Igor, Jing
-> 
-> On 2/14/19 1:31 PM, Igor Mammedov wrote:
-> > On Wed, 13 Feb 2019 15:40:57 +0800
-> > "Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
-> >  
-> >> Hi Igor,
-> >>
-> >> Thanks for your reply!
-> >>
-> >> On 2/5/2019 11:47 PM, Igor Mammedov wrote:  
-> >>> On Wed, 30 Jan 2019 21:02:10 +0800
-> >>> "Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
-> >>>      
-> >>>> Hi everyone,
-> >>>>
-> >>>> I have two questions.
-> >>>> 1. PCI hotplug on pci.0 must manually rescan in guest. The ACPI hotplug
-> >>>> handler sends the GPE event to guest but it seems guest doesn't receive
-> >>>> it? I tried to open ACPI debug level/layer to 0xffffffff, in order to
-> >>>> see if there is any message after device_add in monitor, but no message
-> >>>> comes out until I manually rescan. Also tried printk in
-> >>>> acpi_ev_gpe_xrupt_handler() and acpi_ev_sci_xrupt_handler(). No output
-> >>>> in dmesg.
-> >>>> (I'm sure that CONFIG_HOTPLUG_PCI_PCIE=y, CONFIG_HOTPLUG_PCI_CPCI=y,
-> >>>> CONFIG_HOTPLUG_PCI=y, CONFIG_HOTPLUG_PCI_ACPI=y)  
-> 
-> What about |CONFIG_HOTPLUG_PCI_SHPC=y ?
-> 
-> |
-> >>>> Whether this is a kind of design or a known issue? Does guest receive
-> >>>> the request, where can I find the  
-> >>> does it work with known to work kernels (RHEL7)?
-> >>>
-> >>> Also sharing used QEMU version and command line could help.
-> >>>      
-> >> Is there any key config of kernel in guest, besides those I listed above?  
-> > Maybe Marcel knows something about it
-> > (CCed)  
-> 
-> May I ask why do you need SHPC hotplug and not the ACPI based hotplug?
-I'd say SHPC one is preferred one, ACPI hotplug is rather complicated
-QEMU hack to make legacy Windows guest support hotplug of PCI devices.
- 
-[...]
+On 2/13/19 8:53 AM, Yuval Shaia wrote:
+> Hi,
+> Please review the following patch-set which consist of cosmetics fixes to
+> device's user interface (traces, error_report and monitor) and some bug
+> fixes.
+>
+> Thanks Markus, Eric, Marcel and David for reviewing v0.
+> Appreciate your review to this v2.
+
+clang compilation fails.
+Please use this configuration:
+
+     configure --target-list="x86_64-softmmu" --cc=clang --enable-pvrdma
+
+It will fail with:
+
+In file included from 
+/home/mapfelba/git/upstream/qemu/hw/rdma/rdma_backend.c:32:
+In file included from /home/mapfelba/git/upstream/qemu/hw/rdma/rdma_rm.h:21:
+/home/mapfelba/git/upstream/qemu/hw/rdma/rdma_rm_defs.h:108:3: error: 
+redefinition of typedef 'RdmaDeviceResources' is a C11 feature 
+[-Werror,-Wtypedef-redefinition]
+} RdmaDeviceResources;
+   ^
+/home/mapfelba/git/upstream/qemu/hw/rdma/rdma_backend_defs.h:24:36: 
+note: previous definition is here
+typedef struct RdmaDeviceResources RdmaDeviceResources;
+                                    ^
+1 error generated.
+make[1]: *** [/home/mapfelba/git/upstream/qemu/rules.mak:69: 
+hw/rdma/rdma_backend.o] Error 1
+make[1]: *** Waiting for unfinished jobs....
+In file included from /home/mapfelba/git/upstream/qemu/hw/rdma/rdma_rm.c:21:
+In file included from 
+/home/mapfelba/git/upstream/qemu/hw/rdma/rdma_backend.h:22:
+/home/mapfelba/git/upstream/qemu/hw/rdma/rdma_rm_defs.h:108:3: error: 
+redefinition of typedef 'RdmaDeviceResources' is a C11 feature 
+[-Werror,-Wtypedef-redefinition]
+} RdmaDeviceResources;
+   ^
+/home/mapfelba/git/upstream/qemu/hw/rdma/rdma_backend_defs.h:24:36: 
+note: previous definition is here
+typedef struct RdmaDeviceResources RdmaDeviceResources;
+                                    ^
+1 error generated.
+make[1]: *** [/home/mapfelba/git/upstream/qemu/rules.mak:69: 
+hw/rdma/rdma_rm.o] Error 1
+In file included from 
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/pvrdma_qp_ops.c:19:
+In file included from 
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/../rdma_rm.h:21:
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/../rdma_rm_defs.h:108:3: 
+error: redefinition of typedef 'RdmaDeviceResources' is a C11 feature 
+[-Werror,-Wtypedef-redefinition]
+} RdmaDeviceResources;
+   ^
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/../rdma_backend_defs.h:24:36: 
+note: previous definition is here
+typedef struct RdmaDeviceResources RdmaDeviceResources;
+                                    ^
+1 error generated.
+make[1]: *** [/home/mapfelba/git/upstream/qemu/rules.mak:69: 
+hw/rdma/vmw/pvrdma_qp_ops.o] Error 1
+In file included from 
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/pvrdma_cmd.c:23:
+In file included from 
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/../rdma_backend.h:22:
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/../rdma_rm_defs.h:108:3: 
+error: redefinition of typedef 'RdmaDeviceResources' is a C11 feature 
+[-Werror,-Wtypedef-redefinition]
+} RdmaDeviceResources;
+   ^
+/home/mapfelba/git/upstream/qemu/hw/rdma/vmw/../rdma_backend_defs.h:24:36: 
+note: previous definition is here
+typedef struct RdmaDeviceResources RdmaDeviceResources;
+                                    ^
+
+Thanks,
+Marcel
