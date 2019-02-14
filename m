@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34013)
+Received: from eggs.gnu.org ([209.51.188.92]:33906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1guL4L-0002Xb-7E
+	(envelope-from <paolo.bonzini@gmail.com>) id 1guL4L-0002HG-Ao
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:45:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1guKvd-0003MK-K4
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:36:06 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40843)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1guKvb-0003Kf-Pd
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:36:04 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40845)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1guKvd-0003LK-DV
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:36:05 -0500
-Received: by mail-wm1-x341.google.com with SMTP id q21so6915569wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:36:05 -0800 (PST)
+	id 1guKvb-0003Ja-Iq
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:36:03 -0500
+Received: by mail-wm1-x344.google.com with SMTP id q21so6915494wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:36:03 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 14 Feb 2019 18:35:53 +0100
-Message-Id: <1550165756-21617-7-git-send-email-pbonzini@redhat.com>
+Date: Thu, 14 Feb 2019 18:35:52 +0100
+Message-Id: <1550165756-21617-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
 References: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 6/9] vhost-net: revamp configure logic
+Subject: [Qemu-devel] [PATCH 5/9] vhost-net: compile it on all targets that
+ have virtio-net.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,226 +34,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, mst@redhat.com
 
-Detect all invalid configurations (e.g. mingw32 with vhost-user,
-non-Linux with vhost-kernel).  As a collateral benefit, all vhost-kernel
-backends can be now disabled if one wants to reduce the attack surface.
+This shows a preexisting bug: if a KVM target did not have virtio-net enabled,
+it would fail with undefined symbols when vhost was enabled.  This must now
+be fixed, lest targets that have no virtio-net fail to compile.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1543851204-41186-6-git-send-email-pbonzini@redhat.com>
+Message-Id: <1543851204-41186-5-git-send-email-pbonzini@redhat.com>
 ---
- configure                 | 89 +++++++++++++++++++++++++++++++----------------
- hw/virtio/Makefile.objs   |  4 +--
- hw/virtio/vhost-backend.c |  4 +--
- 3 files changed, 63 insertions(+), 34 deletions(-)
+ configure               | 11 ++++-------
+ hw/net/Makefile.objs    |  4 ++--
+ hw/net/vhost_net.c      |  4 +---
+ include/exec/poison.h   |  1 -
+ tests/Makefile.include  |  5 +----
+ tests/vhost-user-test.c | 16 +++++++++++-----
+ 6 files changed, 19 insertions(+), 22 deletions(-)
 
 diff --git a/configure b/configure
-index 4553c17..6d58718 100755
+index 7ac76ec..4553c17 100755
 --- a/configure
 +++ b/configure
-@@ -368,10 +368,10 @@ libattr=""
- xfs=""
- tcg="yes"
- membarrier=""
--vhost_net="no"
--vhost_crypto="no"
--vhost_scsi="no"
--vhost_vsock="no"
-+vhost_net=""
-+vhost_crypto=""
-+vhost_scsi=""
-+vhost_vsock=""
- vhost_user=""
- kvm="no"
- hax="no"
-@@ -782,6 +782,7 @@ case $targetos in
- MINGW32*)
-   mingw32="yes"
-   hax="yes"
-+  vhost_user="no"
-   audio_possible_drivers="dsound sdl"
-   if check_include dsound.h; then
-     audio_drv_list="dsound"
-@@ -882,10 +883,6 @@ Linux)
-   linux="yes"
-   linux_user="yes"
-   kvm="yes"
--  vhost_net="yes"
--  vhost_crypto="yes"
--  vhost_scsi="yes"
--  vhost_vsock="yes"
-   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
-   supported_os="yes"
-   libudev="yes"
-@@ -1261,11 +1258,7 @@ for opt do
-   ;;
-   --disable-vhost-crypto) vhost_crypto="no"
-   ;;
--  --enable-vhost-crypto)
--      vhost_crypto="yes"
--      if test "$mingw32" = "yes"; then
--          error_exit "vhost-crypto isn't available on win32"
--      fi
-+  --enable-vhost-crypto) vhost_crypto="yes"
-   ;;
-   --disable-vhost-scsi) vhost_scsi="no"
-   ;;
-@@ -1470,11 +1463,11 @@ for opt do
-   ;;
-   --disable-vhost-user) vhost_user="no"
-   ;;
--  --enable-vhost-user)
--      vhost_user="yes"
--      if test "$mingw32" = "yes"; then
--          error_exit "vhost-user isn't available on win32"
--      fi
-+  --enable-vhost-user) vhost_user="yes"
-+  ;;
-+  --disable-vhost-kernel) vhost_kernel="no"
-+  ;;
-+  --enable-vhost-kernel) vhost_kernel="yes"
-   ;;
-   --disable-capstone) capstone="no"
-   ;;
-@@ -1506,14 +1499,6 @@ for opt do
-   esac
- done
- 
--if test "$vhost_user" = ""; then
--    if test "$mingw32" = "yes"; then
--        vhost_user="no"
--    else
--        vhost_user="yes"
+@@ -6578,7 +6578,10 @@ fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
+-if test "$vhost_net" = "yes" && test "$vhost_user" = "yes"; then
++if test "$vhost_net" = "yes" ; then
++  echo "CONFIG_VHOST_NET=y" >> $config_host_mak
++fi
++if test "$vhost_net_user" = "yes" ; then
+   echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
+ fi
+ if test "$vhost_crypto" = "yes" ; then
+@@ -7354,12 +7357,6 @@ if supported_xen_target $target; then
+ fi
+ if supported_kvm_target $target; then
+     echo "CONFIG_KVM=y" >> $config_target_mak
+-    if test "$vhost_net" = "yes" ; then
+-        echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+-        if test "$vhost_user" = "yes" ; then
+-            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
+-        fi
 -    fi
--fi
--
- case "$cpu" in
-     ppc)
-            CPU_CFLAGS="-m32"
-@@ -1736,8 +1721,12 @@ disabled with --disable-FEATURE, default is enabled if available:
-   linux-aio       Linux AIO support
-   cap-ng          libcap-ng support
-   attr            attr and xattr support
--  vhost-net       vhost-net acceleration support
--  vhost-crypto    vhost-crypto acceleration support
-+  vhost-net       vhost-net kernel acceleration support
-+  vhost-vsock     virtio sockets device support
-+  vhost-scsi      vhost-scsi kernel target support
-+  vhost-crypto    vhost-user-crypto backend support
-+  vhost-kernel    vhost kernel backend support
-+  vhost-user      vhost-user backend support
-   spice           spice
-   rbd             rados block device (rbd)
-   libiscsi        iscsi support
-@@ -1763,7 +1752,6 @@ disabled with --disable-FEATURE, default is enabled if available:
-   jemalloc        jemalloc support
-   avx2            AVX2 optimization support
-   replication     replication support
--  vhost-vsock     virtio sockets device support
-   opengl          opengl support
-   virglrenderer   virgl rendering support
-   xfsctl          xfsctl support
-@@ -1780,7 +1768,6 @@ disabled with --disable-FEATURE, default is enabled if available:
-   parallels       parallels image format support
-   sheepdog        sheepdog block driver support
-   crypto-afalg    Linux AF_ALG crypto backend driver
--  vhost-user      vhost-user support
-   capstone        capstone disassembler support
-   debug-mutex     mutex debugging support
-   libpmem         libpmem support
-@@ -2171,6 +2158,45 @@ else
-   l2tpv3=no
  fi
+ if supported_hax_target $target; then
+     echo "CONFIG_HAX=y" >> $config_target_mak
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index acfaea5..ea63715 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -37,8 +37,8 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
+ obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
  
-+#########################################
-+# vhost interdependencies and host support
+ obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
+-obj-$(CONFIG_VHOST_NET) += vhost_net.o
+-common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
++common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET)) += vhost_net.o
++common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET))) += vhost_net-stub.o
+ common-obj-$(CONFIG_ALL) += vhost_net-stub.o
+ 
+ obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index ae3ca23..be3cc88 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -25,8 +25,6 @@
+ 
+ 
+ #include <sys/socket.h>
+-#include <netpacket/packet.h>
+-#include <net/ethernet.h>
+ #include <net/if.h>
+ #include <netinet/in.h>
+ 
+@@ -134,7 +132,7 @@ static int vhost_net_get_fd(NetClientState *backend)
+         return tap_get_fd(backend);
+     default:
+         fprintf(stderr, "vhost-net requires tap backend\n");
+-        return -EBADFD;
++        return -ENOSYS;
+     }
+ }
+ 
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index ecdc83c..1a7a57b 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -86,7 +86,6 @@
+ #pragma GCC poison CONFIG_XTENSA_DIS
+ 
+ #pragma GCC poison CONFIG_LINUX_USER
+-#pragma GCC poison CONFIG_VHOST_NET
+ #pragma GCC poison CONFIG_KVM
+ #pragma GCC poison CONFIG_SOFTMMU
+ 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index b39e989..048cf56 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -209,10 +209,7 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+ check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
+ check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+-check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+-ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+-check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
+-endif
++check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index d961bd0..cdbdf3d 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -27,10 +27,13 @@
+ #include "libqos/malloc-pc.h"
+ #include "hw/virtio/virtio-net.h"
+ 
+-#include <linux/vhost.h>
+-#include <linux/virtio_ids.h>
+-#include <linux/virtio_net.h>
++#include "standard-headers/linux/vhost_types.h"
++#include "standard-headers/linux/virtio_ids.h"
++#include "standard-headers/linux/virtio_net.h"
 +
-+# vhost backends
-+test "$vhost_user" = "" && vhost_user=yes
-+if test "$vhost_user" = "yes" && test "$mingw32" = "yes"; then
-+  error_exit "vhost-user isn't available on win32"
-+fi
-+test "$vhost_kernel" = "" && vhost_kernel=$linux
-+if test "$vhost_kernel" = "yes" && test "$linux" != "yes"; then
-+  error_exit "vhost-kernel is only available on Linux"
-+fi
-+
-+# vhost-kernel devices
-+test "$vhost_scsi" = "" && vhost_scsi=$vhost_kernel
-+if test "$vhost_scsi" = "yes" && test "$vhost_kernel" != "yes"; then
-+  error_exit "--enable-vhost-scsi requires --enable-vhost-kernel"
-+fi
-+test "$vhost_vsock" = "" && vhost_vsock=$vhost_kernel
-+if test "$vhost_vsock" = "yes" && test "$vhost_kernel" != "yes"; then
-+  error_exit "--enable-vhost-vsock requires --enable-vhost-kernel"
-+fi
-+
-+# vhost-user backends
-+test "$vhost_net_user" = "" && vhost_net_user=$vhost_user
-+if test "$vhost_net_user" = "yes" && test "$vhost_user" = "no"; then
-+  error_exit "--enable-vhost-net-user requires --enable-vhost-user"
-+fi
-+test "$vhost_crypto" = "" && vhost_crypto=$vhost_user
-+if test "$vhost_crypto" = "yes" && test "$vhost_user" = "no"; then
-+  error_exit "--enable-vhost-crypto requires --enable-vhost-user"
-+fi
-+
-+# OR the vhost-kernel and vhost-user values for simplicity
-+if test "$vhost_net" = ""; then
-+  test "$vhost_net_user" = "yes" && vhost_net=yes
-+  test "$vhost_kernel" = "yes" && vhost_net=yes
-+fi
-+
- ##########################################
- # MinGW / Mingw-w64 localtime_r/gmtime_r check
++#ifdef CONFIG_LINUX
+ #include <sys/vfs.h>
++#endif
  
-@@ -6590,6 +6616,9 @@ fi
- if test "$vhost_vsock" = "yes" ; then
-   echo "CONFIG_VHOST_VSOCK=y" >> $config_host_mak
- fi
-+if test "$vhost_kernel" = "yes" ; then
-+  echo "CONFIG_VHOST_KERNEL=y" >> $config_host_mak
-+fi
- if test "$vhost_user" = "yes" ; then
-   echo "CONFIG_VHOST_USER=y" >> $config_host_mak
- fi
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index ce542e7..a3eb8ed 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -2,8 +2,8 @@ ifeq ($(CONFIG_VIRTIO),y)
- common-obj-y += virtio-bus.o
- obj-y += virtio.o
  
--obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) += vhost.o vhost-backend.o
--common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))) += vhost-stub.o
-+obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL)) += vhost.o vhost-backend.o
-+common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL))) += vhost-stub.o
- obj-$(CONFIG_VHOST_USER) += vhost-user.o
+ #define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=mem,size=%dM," \
+@@ -459,6 +462,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+     g_mutex_unlock(&s->data_mutex);
+ }
  
- common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index e0f0bb7..96b8d3c 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -14,7 +14,7 @@
- #include "qemu/error-report.h"
- #include "standard-headers/linux/vhost_types.h"
++#ifdef CONFIG_LINUX
+ static const char *init_hugepagefs(const char *path)
+ {
+     struct statfs fs;
+@@ -485,6 +489,7 @@ static const char *init_hugepagefs(const char *path)
  
--#ifdef CONFIG_LINUX
-+#ifdef CONFIG_VHOST_KERNEL
- #include <linux/vhost.h>
- #include <sys/ioctl.h>
+     return path;
+ }
++#endif
  
-@@ -275,7 +275,7 @@ int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
-     int r = 0;
+ static TestServer *test_server_new(const gchar *name)
+ {
+@@ -983,13 +988,14 @@ int main(int argc, char **argv)
+     }
+     g_assert(tmpfs);
  
-     switch (backend_type) {
--#ifdef CONFIG_LINUX
-+#ifdef CONFIG_VHOST_KERNEL
-     case VHOST_BACKEND_TYPE_KERNEL:
-         dev->vhost_ops = &kernel_ops;
-         break;
++    root = tmpfs;
++#ifdef CONFIG_LINUX
+     hugefs = getenv("QTEST_HUGETLBFS_PATH");
+     if (hugefs) {
+         root = init_hugepagefs(hugefs);
+         g_assert(root);
+-    } else {
+-        root = tmpfs;
+     }
++#endif
+ 
+     loop = g_main_loop_new(NULL, FALSE);
+     /* run the main loop thread so the chardev may operate */
 -- 
 1.8.3.1
