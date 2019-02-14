@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55343)
+Received: from eggs.gnu.org ([209.51.188.92]:55362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gu9T6-0007GX-Qz
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:21:53 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gu9T8-0007Gj-OJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:21:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gu9T5-0005mT-VX
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:21:52 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gu9T7-0005n7-Dc
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:21:54 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 14 Feb 2019 16:21:40 +1100
-Message-Id: <20190214052144.59541-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2 0/4] spapr_pci,
- vfio: NVIDIA V100 + POWER9 passthrough
+Date: Thu, 14 Feb 2019 16:21:41 +1100
+Message-Id: <20190214052144.59541-2-aik@ozlabs.ru>
+In-Reply-To: <20190214052144.59541-1-aik@ozlabs.ru>
+References: <20190214052144.59541-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2 1/4] vfio/spapr: Fix indirect levels
+ calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,46 +23,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Reza Arbab <arbab@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-This is for passing through NVIDIA V100 GPUs on POWER9 systems.
+The current code assumes that we can address more bits on a PCI bus
+for DMA than we really can but there is no way knowing the actual limit.
 
-This implements a subdriver for NVIDIA V100 GPU with coherent memory and
-NPU/ATS support available in the POWER9 CPU.
+This makes a better guess for the number of levels and if the kernel
+fails to allocate that, this increases the level numbers till succeeded
+or reached the 64bit limit.
 
-1/4 is a preparation for bigger DMA windows.
-2/4 is a small cleanup.
+This adds levels to the trace point.
 
-Here is the kernel driver:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/vfio/pci?h=v5.0-rc6&id=7f92891778dff62303c070ac81de7b7d80de331a
+This may cause the kernel to warn about failed allocation:
+   [65122.837458] Failed to allocate a TCE memory, level shift=28
+which might happen if MAX_ORDER is not large enough as it can vary:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/Kconfig?h=v5.0-rc2#n727
 
-SLOF changes already went in.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v2:
+* replace systempagesize with getpagesize() when calculating bits_per_level/max_levels
+---
+ hw/vfio/spapr.c      | 41 ++++++++++++++++++++++++++++++++---------
+ hw/vfio/trace-events |  2 +-
+ 2 files changed, 33 insertions(+), 10 deletions(-)
 
-This depends on "pci: Move NVIDIA vendor id to the rest of ids" (posted separately).
-
-This is based on sha1
-1ea6057 Mark Cave-Ayland "mac_newworld: change default NIC to sungem for mac99 machine".
-
-Please comment. Thanks.
-
-
-
-Alexey Kardashevskiy (4):
-  vfio/spapr: Fix indirect levels calculation
-  vfio/spapr: Rename local systempagesize variable
-  vfio: Make vfio_get_region_info_cap public
-  spapr: Support NVIDIA V100 GPU with NVLink2
-
- hw/vfio/pci.h                 |   2 +
- include/hw/pci-host/spapr.h   |   9 +
- include/hw/ppc/spapr.h        |   3 +-
- include/hw/vfio/vfio-common.h |   2 +
- hw/ppc/spapr.c                |  25 ++-
- hw/ppc/spapr_pci.c            | 333 +++++++++++++++++++++++++++++++++-
- hw/vfio/common.c              |   2 +-
- hw/vfio/pci-quirks.c          | 120 ++++++++++++
- hw/vfio/pci.c                 |  14 ++
- hw/vfio/spapr.c               |  47 +++--
- hw/vfio/trace-events          |   6 +-
- 11 files changed, 545 insertions(+), 18 deletions(-)
-
+diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+index becf71a..302d6b0 100644
+--- a/hw/vfio/spapr.c
++++ b/hw/vfio/spapr.c
+@@ -146,7 +146,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+     int ret;
+     IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+     uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+-    unsigned entries, pages;
++    unsigned entries, bits_total, bits_per_level, max_levels;
+     struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
+     long systempagesize = qemu_getrampagesize();
+ 
+@@ -176,16 +176,38 @@ int vfio_spapr_create_window(VFIOContainer *container,
+     create.window_size = int128_get64(section->size);
+     create.page_shift = ctz64(pagesize);
+     /*
+-     * SPAPR host supports multilevel TCE tables, there is some
+-     * heuristic to decide how many levels we want for our table:
+-     * 0..64 = 1; 65..4096 = 2; 4097..262144 = 3; 262145.. = 4
++     * SPAPR host supports multilevel TCE tables. We try to guess optimal
++     * levels number and if this fails (for example due to the host memory
++     * fragmentation), we increase levels. The DMA address structure is:
++     * rrrrrrrr rxxxxxxx xxxxxxxx xxxxxxxx  xxxxxxxx xxxxxxxx xxxxxxxx iiiiiiii
++     * where:
++     *   r = reserved (bits >= 55 are reserved in the existing hardware)
++     *   i = IOMMU page offset (64K in this example)
++     *   x = bits to index a TCE which can be split to equal chunks to index
++     *      within the level.
++     * The aim is to split "x" to smaller possible number of levels.
+      */
+     entries = create.window_size >> create.page_shift;
+-    pages = MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
+-    pages = MAX(pow2ceil(pages), 1); /* Round up */
+-    create.levels = ctz64(pages) / 6 + 1;
+-
+-    ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
++    /* bits_total is number of "x" needed */
++    bits_total = ctz64(entries * sizeof(uint64_t));
++    /*
++     * bits_per_level is a safe guess of how much we can allocate per level:
++     * 8 is the current minimum for CONFIG_FORCE_MAX_ZONEORDER and MAX_ORDER
++     * is usually bigger than that.
++     * Below we look at getpagesize() as TCEs are allocated from system pages.
++     */
++    bits_per_level = ctz64(getpagesize()) + 8;
++    create.levels = bits_total / bits_per_level;
++    if (bits_total % bits_per_level) {
++        ++create.levels;
++    }
++    max_levels = (64 - create.page_shift) / ctz64(getpagesize());
++    for ( ; create.levels <= max_levels; ++create.levels) {
++        ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
++        if (!ret) {
++            break;
++        }
++    }
+     if (ret) {
+         error_report("Failed to create a window, ret = %d (%m)", ret);
+         return -errno;
+@@ -200,6 +222,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+         return -EINVAL;
+     }
+     trace_vfio_spapr_create_window(create.page_shift,
++                                   create.levels,
+                                    create.window_size,
+                                    create.start_addr);
+     *pgsize = pagesize;
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index f41ca96..579be19 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -128,6 +128,6 @@ vfio_prereg_listener_region_add_skip(uint64_t start, uint64_t end) "0x%"PRIx64"
+ vfio_prereg_listener_region_del_skip(uint64_t start, uint64_t end) "0x%"PRIx64" - 0x%"PRIx64
+ vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
+ vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
+-vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
++vfio_spapr_create_window(int ps, unsigned int levels, uint64_t ws, uint64_t off) "pageshift=0x%x levels=%u winsize=0x%"PRIx64" offset=0x%"PRIx64
+ vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
+ vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
 -- 
 2.17.1
