@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56450)
+Received: from eggs.gnu.org ([209.51.188.92]:60369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guH3G-0002J3-VG
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:27:43 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1guHNZ-00010d-1D
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:48:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guH3C-0007lJ-3C
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:27:39 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:33977)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1guH3A-0007fg-VF
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:27:37 -0500
-References: <mvmmun7y7m0.fsf@suse.de>
-	<3c8aca9d-e47e-04a7-1e6a-a65deab125ce@vivier.eu>
-	<mvmimxmppcj.fsf_-_@suse.de>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3260c47f-7e49-1035-776b-d0b8385c9dff@vivier.eu>
-Date: Thu, 14 Feb 2019 14:27:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <mvmimxmppcj.fsf_-_@suse.de>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1guHIL-00052R-7a
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:43:19 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Thu, 14 Feb 2019 13:43:11 +0000
+Message-ID: <839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
+References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w51o97m8ltv.fsf@maestria.local.igalia.com>
+	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
+	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
+	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
+	<w51mun2uxts.fsf@maestria.local.igalia.com>
+	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
+	<w51mun18cjy.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51mun18cjy.fsf@maestria.local.igalia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fix emulation of
- accept4/getpeername/getsockname/recvfrom syscalls
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D304D136C4CCBB4184317197319638FE@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
+ involves copy-on-read filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 14/02/2019 12:43, Andreas Schwab wrote:
-> System calls that return a socket address do so by writing the (possibly
-> truncated) address into the provided buffer space, but setting the
-> addrlen parameter to the actual size of the address.  To determine how
-> much to copy back to the target memory the emulation needs to remember
-> the incoming value of the addrlen parameter, so that it doesn't write
-> past the buffer limits.
-> 
-> Signed-off-by: Andreas Schwab <schwab@suse.de>
-> ---
->  linux-user/syscall.c | 41 +++++++++++++++++++++++++----------------
->  1 file changed, 25 insertions(+), 16 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 4a320850bb..f24743a2b2 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -2885,7 +2885,7 @@ static abi_long do_sendrecvmmsg(int fd, abi_ulong target_msgvec,
->  static abi_long do_accept4(int fd, abi_ulong target_addr,
->                             abi_ulong target_addrlen_addr, int flags)
->  {
-> -    socklen_t addrlen;
-> +    socklen_t addrlen, ret_addrlen;
->      void *addr;
->      abi_long ret;
->      int host_flags;
-> @@ -2909,11 +2909,13 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
->  
->      addr = alloca(addrlen);
->  
-> -    ret = get_errno(safe_accept4(fd, addr, &addrlen, host_flags));
-> +    ret_addrlen = addrlen;
-> +    ret = get_errno(safe_accept4(fd, addr, &ret_addrlen, host_flags));
->      if (!is_error(ret)) {
-> -        host_to_target_sockaddr(target_addr, addr, addrlen);
-> -        if (put_user_u32(addrlen, target_addrlen_addr))
-> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-> +        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
->              ret = -TARGET_EFAULT;
-> +        }
->      }
->      return ret;
->  }
-> @@ -2922,7 +2924,7 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
->  static abi_long do_getpeername(int fd, abi_ulong target_addr,
->                                 abi_ulong target_addrlen_addr)
->  {
-> -    socklen_t addrlen;
-> +    socklen_t addrlen, ret_addrlen;
->      void *addr;
->      abi_long ret;
->  
-> @@ -2938,11 +2940,13 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
->  
->      addr = alloca(addrlen);
->  
-> -    ret = get_errno(getpeername(fd, addr, &addrlen));
-> +    ret_addrlen = addrlen;
-> +    ret = get_errno(getpeername(fd, addr, &ret_addrlen));
->      if (!is_error(ret)) {
-> -        host_to_target_sockaddr(target_addr, addr, addrlen);
-> -        if (put_user_u32(addrlen, target_addrlen_addr))
-> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-> +        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
->              ret = -TARGET_EFAULT;
-> +        }
->      }
->      return ret;
->  }
-> @@ -2951,7 +2955,7 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
->  static abi_long do_getsockname(int fd, abi_ulong target_addr,
->                                 abi_ulong target_addrlen_addr)
->  {
-> -    socklen_t addrlen;
-> +    socklen_t addrlen, ret_addrlen;
->      void *addr;
->      abi_long ret;
->  
-> @@ -2967,11 +2971,13 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
->  
->      addr = alloca(addrlen);
->  
-> -    ret = get_errno(getsockname(fd, addr, &addrlen));
-> +    ret_addrlen = addrlen;
-> +    ret = get_errno(getsockname(fd, addr, &ret_addrlen));
->      if (!is_error(ret)) {
-> -        host_to_target_sockaddr(target_addr, addr, addrlen);
-> -        if (put_user_u32(addrlen, target_addrlen_addr))
-> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-> +        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
->              ret = -TARGET_EFAULT;
-> +        }
->      }
->      return ret;
->  }
-> @@ -3043,7 +3049,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
->                              abi_ulong target_addr,
->                              abi_ulong target_addrlen)
->  {
-> -    socklen_t addrlen;
-> +    socklen_t addrlen, ret_addrlen;
->      void *addr;
->      void *host_msg;
->      abi_long ret;
-> @@ -3061,10 +3067,12 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
->              goto fail;
->          }
->          addr = alloca(addrlen);
-> +        ret_addrlen = addrlen;
->          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
-> -                                      addr, &addrlen));
-> +                                      addr, &ret_addrlen));
->      } else {
->          addr = NULL; /* To keep compiler quiet.  */
-> +        addrlen = 0; /* To keep compiler quiet.  */
->          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags, NULL, 0));
->      }
->      if (!is_error(ret)) {
-> @@ -3077,8 +3085,9 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
->              }
->          }
->          if (target_addr) {
-> -            host_to_target_sockaddr(target_addr, addr, addrlen);
-> -            if (put_user_u32(addrlen, target_addrlen)) {
-> +            host_to_target_sockaddr(target_addr, addr,
-> +                                    MIN(addrlen, ret_addrlen));
-> +            if (put_user_u32(ret_addrlen, target_addrlen)) {
->                  ret = -TARGET_EFAULT;
->                  goto fail;
->              }
-> 
-
-Applied to my linux-user branch.
-
-Thanks,
-Laurent
+DQoNCk9uIDEyLzAyLzIwMTkgMTQ6MzUsIEFsYmVydG8gR2FyY2lhIHdyb3RlOg0KPiBPbiBNb24g
+MTEgRmViIDIwMTkgMDU6NTg6MDUgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
+IHdyb3RlOg0KPj4+PiBUaGUgcHJvYmxlbSBpcyBpbiB0aGUgY29uY2VwdCBvZiAiYmFzZSIgbm9k
+ZS4gVGhlIGNvZGUgd3JpdHRlbiBpbg0KPj4+PiBtYW5uZXIgdGhhdCBiYXNlIGlzIG5vdCBjaGFu
+Z2VkIGR1cmluZyBibG9jayBqb2IuIEhvd2V2ZXIsIGpvYiBkb24ndA0KPj4+PiBvd24gYmFzZSBh
+bmQgdGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgaXQgd2lsbCBub3QgY2hhbmdlIGR1cmluZw0K
+Pj4+PiB0aGUgam9iLg0KPj4+DQo+Pj4gQnV0IGlmIHRoYXQncyB0aGUgY2FzZSB0aGVuIHdlIGhh
+dmUgYSBwcm9ibGVtIGFscmVhZHksIGJlY2F1c2UgJ2Jhc2UnDQo+Pj4gaXMgYSBtZW1iZXIgb2Yg
+U3RyZWFtQmxvY2tKb2IgYW5kIGlzIHVzZWQgaW4gdGhlIGV4aXN0aW5nDQo+Pj4gc3RyZWFtX3J1
+bigpIGNvZGUuDQo+Pg0KPj4gSSB0aGluayBpdCBzaG91bGQgYmUgcG9zc2libGUgdG8gcmVwcm9k
+dWNlLCB1c2luZyBibG9jay1jb21taXQgKHdoaWNoDQo+PiBhbHJlYWR5IGhhcyBmaWx0ZXIpIHdp
+dGggYmxvY2stc3RyZWFtIGluIHBhcmFsbGVsLCB3ZSdsbCB0cnkuDQo+IA0KPiBJdCdzIG5vdCBw
+b3NzaWJsZSB0byBydW4gYmxvY2stc3RyZWFtIGFuZCBibG9jay1jb21taXQgaW4gcGFyYWxsZWwg
+b24NCj4gdGhlIHNhbWUgbm9kZXMuIFNlZSBpb3Rlc3QgMDMwIGZvciBhIGZldyBleGFtcGxlcy4N
+Cj4gDQo+IFNvIHVubGVzcyB0aGVyZSdzIGEgYnVnIGl0IHNob3VsZCBiZSBzYWZlLg0KPiANCj4+
+PiBTbyBpZiB0aGVyZSdzIGEgd2F5IHRvIG1ha2UgJ2Jhc2UnIGRpc2FwcGVhciBkdXJpbmcgdGhl
+IGpvYiAoaG93PykNCj4+PiB0aGVuIHdlIGNvdWxkIHByb3RlY3QgaXQgd2l0aCBibG9ja19qb2Jf
+YWRkX2JkcnYoKS4NCj4+DQo+PiBJJ20gbm90IHN1cmUgdGhpcyBpcyBjb3JyZWN0LiBXaGF0IGlz
+IHRoZSByZWFzb24gZm9yIHN0cmVhbSB0byBvd24NCj4+IGJhc2U/IEl0J3Mgbm90IHJlYWxseSBp
+bnRlcmVzdGVkIGluIGl0Lg0KPiANCj4gc3RyZWFtIGRvZXMgbm90IG5lZWQgdG8gd3JpdGUgb3Ig
+bW9kaWZ5IGJhc2UsIGJ1dCBpdCBkb2VzIG5lZWQgdG8ga2VlcCBhDQo+IHJlZmVyZW5jZSB0byBp
+dCBpbiBvcmRlciB0byBub3cgd2hlcmUgdG8gc3RvcCBjb3B5aW5nIGRhdGEuDQo+IA0KPiBBcyBJ
+IHNhaWQgZWFybGllciBiYXNlIGlzIGEgbWVtYmVyIG9mIFN0cmVhbUJsb2NrSm9iLCBzbyBpdCBz
+aG91bGQgbm90DQo+IGRpc2FwcGVhciBkdXJpbmcgdGhlIGpvYi4NCj4gDQo+IEJlcnRvDQo+IA0K
+DQpObyBkb3VidCB0aGF0IGEgcmVmZXJlbmNlIHRvIHRoZSBiYXNlIG5vZGUgaXMgbmVlZGVkIGFz
+IGEgbGltaXQgZm9yIHRoZQ0KQ09SIHdvcmsuIFRoZSBiYXNlIGlzIHN0aWxsIGluIHRoZSBnYW1l
+LiBBY3R1YWxseSwgd2UgZW5jb3VudGVyIGFuIGlzc3VlDQp3aGVuIEJsb2NrRHJpdmVyU3RhdGUg
+b2YgdGhlIENPUi1maWx0ZXIgY29tZXMgaW50byBwbGF5IGluc3RlYWQgb2YgdGhlIA0KYmFzZS4g
+SXQgaXMgaW5oZXJpdGVkIGZyb20gYSBwYXJhbGxlbCBqb2IuIEJhc2VkIG9uIHRoZSBjYXNlDQp0
+ZXN0X3N0cmVhbV9wYXJhbGxlbCBmcm9tIHRoZSBxZW11LWlvdGVzdHMvMDMwLCBpdCB3b3JrcyBs
+aWtlIHRoaXM6DQoxLiBKb2IjMSBpcyBzdGFydGVkIGFuZCBpbnNlcnRzIGEgQ09SLWZpbHRlciBh
+Ym92ZSB0aGUgdG9wIG5vZGUuDQoyLiBDb250ZXh0IHN3aXRjaC4NCjMuIEpvYiMyIGlzIHN0YXJ0
+ZWQgYW5kIGluaGVyaXRzIHRoZSBDT1ItZmlsdGVyIGFzIHRoZSBiYXNlLg0KNC4gQ29udGV4dCBz
+d2l0Y2guDQo1LiBKb2IjMSBjb21lcyB0byB0aGUgZW5kIGFuZCByZW1vdmVzIGl0cyBDT1ItZmls
+dGVyIHJlZmVyZW5jZWQgYnkNCiAgICBqb2IjMi4NCjYuIENvbnRleHQgc3dpdGNoLg0KNy4gSm9i
+IzIgY29tZXMgdG8gdGhlIGVuZCBhbmQgdXNlcyB0aGUgZGVsZXRlZCBDT1ItZmlsdGVyIG5vZGUu
+DQo4LiBXZSBhcmUgaW4gdHJvdWJsZS4NCg0KT3IgYW5vdGhlciBzY2VuYXJpbzoNCjEtNC4gQXMg
+YWJvdmUNCjUuIEpvYiMyIGNvbWVzIHRvIHRoZSBlbmQgZmlyc3QgYW5kIGtlZXBzIHRoZSBDT1It
+ZmlsdGVyIGFzIHRoZQ0KICAgIGJhY2tpbmcgbm9kZS4NCjYuIFRoZSBhc3NlcnQoKSBmYWlscyBh
+cyB0aGUgcmVmZXJlbmNlZCBDT1ItZmlsdGVyIHdhcyBub3QgZGVsZXRlZA0KICAgIG9uIGV4aXQu
+DQo3LiBUaGUgZ2FtZSBpcyBvdmVyIHdpdGggYSBwb29yIHNjb3JlLg0KDQpJZiB3ZSBqdXN0IGtl
+ZXAgdGhlIGludGVybWVkaWF0ZSBib3R0b20gbm9kZSBpbnN0ZWFkIG9mIHRoZSBiYXNlLCB3ZQ0K
+d2lsbCBoYXZlIGEgc2ltaWxhciBpc3N1ZS4gT24gdGhlIGpvYiBleGl0LCB3ZSBjaGFuZ2UgdGhl
+IGJhY2tpbmcgZmlsZS4NCklmIHdlIGNhbGwgdGhlIGJhY2tpbmdfYnMoYm90dG9tX25vZGVfYnMp
+LCB3ZSB3aWxsIGtlZXAgdGhlIENPUi1maWx0ZXINCm5vZGUgaW5zdGVhZCwgd2hlcmVhcyBpdCBo
+YXMgbm90IGJlZW4gcmVtb3ZlZCBqZXQgYnkgdGhlIHVuZmluaXNoZWQgDQpqb2IjMSAoc2VlIHRo
+ZSBzZWNvbmQgc2NlbmFyaW8gYWJvdmUpLg0KDQpJZiB3ZSBpbmNsdWRlIHRoZSBiYXNlIG5vZGUg
+aW50byB0aGUgam9iIG5vZGUgbGlzdCB3aXRoIHNvbWUgcHJvdGVjdGluZw0KZmxhZ3MsIHRoYXQn
+cyBibG9ja19qb2JfYWRkX2JkcnYoJnMtPmNvbW1vbiwgImJhc2UiLCBiYXNlLCAuLiksIHdlIGNh
+bg0KZW5kIHVwIHdpdGggYSBmYWlsdXJlIG9mIHRoZSBiZHJ2X2NoZWNrX3VwZGF0ZV9wZXJtKCkg
+Y2FsbGVkIGJ5IHRoZQ0KYmRydl9yb290X2F0dGFjaF9jaGlsZCgpIGJlY2F1c2UgdGhlIHByZXZp
+b3VzIGpvYiMxIGhhcyB0aGUgcm9vdA0KcmVmZXJlbmNlIHRvIHRoZSBzYW1lIG5vZGUgd2l0aCBv
+dGhlciBwZXJtaXNzaW9ucy4gU28sIHRoZSBuZXh0IGpvYiB3aWxsDQpmYWlsIHRvIHN0YXJ0IGFu
+ZCB0aGUgdGVzdCBjYXNlcyB3b24ndCBwYXNzLg0KDQpJdCB3ZSBzZXQgdGhlIGZvbGxvd2luZyBm
+bGFncywgdGhlcmUgd2lsbCBiZSBubyBmYWlsdXJlOg0KYmxvY2tfam9iX2FkZF9iZHJ2KCZzLT5j
+b21tb24sICJiYXNlIiwgYmFzZSwgMCwgQkxLX1BFUk1fQ09OU0lTVEVOVF9SRUFEIA0KfCBCTEtf
+UEVSTV9XUklURV9VTkNIQU5HRUQgfCBCTEtfUEVSTV9HUkFQSF9NT0QsICZlcnJvcl9hYm9ydCk7
+DQpCdXQgd2hhdCBtYXJnaW4gd2lsbCB3ZSBnYWluPyBXZSB3aWxsIGhhdmUgdGhlIHNhbWUgaXNz
+dWVzIGFzIGFib3ZlLg0KDQpJbiBtYW55IG90aGVyIGNhc2VzLCB3aGVuIHRoZSBmaWx0ZXIgaGFz
+IG5vdCBiZWVuIGlkZW50aWZpZWQsIHdlIGNhbg0KZ2V0IGEgYnJva2VuIGNoYWluIHdoaWxlIGNh
+bGxpbmcgdG8gdGhlIGJhY2tpbmdfYnMoYnM9ZmlsdGVyKSBhcyB0aGUNCmJhY2tpbmcgbm9kZSBv
+ZiB0aGUgZmlsdGVyIGlzIHRoZSB6ZXJvIHBvaW50ZXIuDQoNClRoYXQncyB3aHkgSSBpbXBsZW1l
+bnRlZCB0aGUgc2tpcF9maWx0ZXIoKSBmdW5jdGlvbiBpbiB0aGlzIHNlcmllcyBhcw0KYSBzb21l
+IHNvcnQgb2Ygc29sdXRpb24gb3Igd29ya2Fyb3VuZC4gTWF5IHdlIHByb2NlZWQgd2l0aCB0aGF0
+Pw0KSXMgdGhlcmUgYW55IGJldHRlciBpZGVhPw0KDQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJk
+cywNCkFuZHJleSBTaGlua2V2aWNoDQo=
