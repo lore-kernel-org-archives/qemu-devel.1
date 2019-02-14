@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38187)
+Received: from eggs.gnu.org ([209.51.188.92]:38705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1guHeJ-00084J-HR
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:06:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1guHfy-0000Ho-Cz
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1guHeI-0002lN-6Z
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:05:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1guHeH-0002j6-VT
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:05:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1guHeE-00058p-Ei
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 14:05:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 656892E80DA
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 14:05:53 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Feb 2019 13:53:21 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Reply-To: Bug 1815911 <1815911@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <155015240171.6215.11220706309348619396.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815911] [NEW] aptitude crashes qemu-m68k with
- handle_cpu_signal received signal outside vCPU context
+	(envelope-from <imammedo@redhat.com>) id 1guHfr-0004OJ-BS
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 09:07:42 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 14 Feb 2019 09:07:14 -0500
+Message-Id: <20190214140714.15738-1-imammedo@redhat.com>
+Subject: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead of
+ memory_region_allocate_system_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +19,140 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: jan.kiszka@web.de, peter.maydell@linaro.org, atar4qemu@gmail.com, mark.cave-ayland@ilande.co.uk, qemu-arm@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com
 
-Public bug reported:
+I'm considering to deprecating -mem-path/prealloc CLI options and replacing
+them with a single memdev Machine property to allow interested users to pick
+used backend for initial RAM (fixes mixed -mem-path+hostmem backends issues)
+and as a transition step to modeling initial as a Device instead of (ab)using
+MemoryRegion APIs.
 
-When building a package with sbuild on Debian, sbuild can use aptitude
-to resolve dependencies.
+Currently most boards use memory_region_allocate_system_memory() to allocate
+RAM and the interface tied up too much to MemoryRegion that makes changing API
+to hostmem across tree is quite a bit of work sometimes requiring logic rewrite
+to do it cleanly and I'm not sure it's worth the effort and that it really has
+a merit to do in case of TCG only boards.
 
-Recently, some changes introduced to aptitude or related packages cause
-qemu to crash:
+I suggest to get rid memory_region_allocate_system_memory() on TCG only boards
+since most of them don't really need NUMA features provided by this API and/or
+probably won't noticeably benefit from -mem-path/prealloc backed memory if at all
+and replacing memory allocation with plain memory_region_init_ram() API.
 
-(sid-m68k-sbuild)root@nofan:/# aptitude -y --without-recommends -o Dpkg::Op=
-tions::=3D--force-confold -o Aptitude::CmdLine::Ignore-Trust-Violations=3Df=
-alse -o Aptitude::ProblemResolver::StepScore=3D100 -o Aptitude::ProblemReso=
-lver::SolutionCost=3D"safety, priority, non-default-versions" -o Aptitude::=
-ProblemResolver::Hints::KeepDummy=3D"reject sbuild-build-depends-core-dummy=
- :UNINST" -o Aptitude::ProblemResolver::Keep-All-Level=3D55000 -o Aptitude:=
-:ProblemResolver::Remove-Essential-Level=3Dmaximum install vim
-Warning: Invalid locale (please review locale settings, this might lead to =
-problems later):
-  locale::facet::_S_create_c_locale name not valid
-The following NEW packages will be installed:
-  libgpm2{a} vim vim-common{a} vim-runtime{a} xxd{a} =
+It won't require extensive changes in TCG only boards we have now, since they would
+continue to use MemoryRegion based API approach. And the boards, that really need
+to use hugepages or numa features, could be amended to use new machine memdev
+property and/or initial RAM being allocated by implictly (-m) using hostmem-ram backend.
 
-0 packages upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
-Need to get 7225 kB/7260 kB of archives. After unpacking 33.5 MB will be us=
-ed.
-qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6019d1=
-bf
-qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x601b64=
-ab
-Segmentation fault
-(sid-m68k-sbuild)root@nofan:/#
+Also some boards (ab)use memory_region_allocate_system_memory(), calling it several
+times to allocate various fixed sized chunks of RAM and ROMs, which is problematic
+to map to a single initial RAM Machine::memdev backend and is currently broken if
+-mem-path points to a not hugepage pool.
 
-The crash does not reproduce on real hardware running Debian unstable.
+This RFC attempts to cleanup things a bit on TCG only boards (only several ones)
+side and test waters if it's acceptable approach.  If it looks acceptable, I'll send
+a proper series to make usage of memory_region_allocate_system_memory() minimal across
+the codebase and then convert boards that actually use numa/hugepages to initial RAM
+memdev model (arm/virt, spapr, s390x, pc/q35).
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/arm/musicpal.c    |  4 ++--
+ hw/arm/vexpress.c    |  4 ++--
+ hw/sparc64/niagara.c | 30 +++++++++++++++---------------
+ 3 files changed, 19 insertions(+), 19 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815911
-
-Title:
-  aptitude crashes qemu-m68k with handle_cpu_signal received signal
-  outside vCPU context
-
-Status in QEMU:
-  New
-
-Bug description:
-  When building a package with sbuild on Debian, sbuild can use aptitude
-  to resolve dependencies.
-
-  Recently, some changes introduced to aptitude or related packages
-  cause qemu to crash:
-
-  (sid-m68k-sbuild)root@nofan:/# aptitude -y --without-recommends -o Dpkg::=
-Options::=3D--force-confold -o Aptitude::CmdLine::Ignore-Trust-Violations=
-=3Dfalse -o Aptitude::ProblemResolver::StepScore=3D100 -o Aptitude::Problem=
-Resolver::SolutionCost=3D"safety, priority, non-default-versions" -o Aptitu=
-de::ProblemResolver::Hints::KeepDummy=3D"reject sbuild-build-depends-core-d=
-ummy :UNINST" -o Aptitude::ProblemResolver::Keep-All-Level=3D55000 -o Aptit=
-ude::ProblemResolver::Remove-Essential-Level=3Dmaximum install vim
-  Warning: Invalid locale (please review locale settings, this might lead t=
-o problems later):
-    locale::facet::_S_create_c_locale name not valid
-  The following NEW packages will be installed:
-    libgpm2{a} vim vim-common{a} vim-runtime{a} xxd{a} =
-
-  0 packages upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
-  Need to get 7225 kB/7260 kB of archives. After unpacking 33.5 MB will be =
-used.
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6019=
-d1bf
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x601b=
-64ab
-  Segmentation fault
-  (sid-m68k-sbuild)root@nofan:/#
-
-  The crash does not reproduce on real hardware running Debian unstable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815911/+subscriptions
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index d22532a11c..197e7d1282 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1592,8 +1592,8 @@ static void musicpal_init(MachineState *machine)
+     cpu = ARM_CPU(cpu_create(machine->cpu_type));
+ 
+     /* For now we use a fixed - the original - RAM size */
+-    memory_region_allocate_system_memory(ram, NULL, "musicpal.ram",
+-                                         MP_RAM_DEFAULT_SIZE);
++    memory_region_init_ram(ram, NULL, "musicpal.ram", MP_RAM_DEFAULT_SIZE,
++                           &error_fatal);
+     memory_region_add_subregion(address_space_mem, 0, ram);
+ 
+     memory_region_init_ram(sram, NULL, "musicpal.sram", MP_SRAM_SIZE,
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index c02d18ee61..a2cf5c0af2 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -280,8 +280,8 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
+         exit(1);
+     }
+ 
+-    memory_region_allocate_system_memory(ram, NULL, "vexpress.highmem",
+-                                         ram_size);
++    memory_region_init_ram(ram, NULL, "vexpress.highmem", ram_size,
++                           &error_fatal);
+     low_ram_size = ram_size;
+     if (low_ram_size > 0x4000000) {
+         low_ram_size = 0x4000000;
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index f8a856f611..62e0348d5f 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -37,6 +37,7 @@
+ #include "sysemu/block-backend.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
++#include "qapi/error.h"
+ 
+ 
+ typedef struct NiagaraBoardState {
+@@ -108,27 +109,26 @@ static void niagara_init(MachineState *machine)
+     /* init CPUs */
+     sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
+     /* set up devices */
+-    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
+-                                         NIAGARA_HV_RAM_SIZE);
++    memory_region_init_ram(&s->hv_ram, NULL, "sun4v-hv.ram",
++                                         NIAGARA_HV_RAM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
+ 
+-    memory_region_allocate_system_memory(&s->partition_ram, NULL,
+-                                         "sun4v-partition.ram",
+-                                         machine->ram_size);
++    memory_region_init_ram(&s->partition_ram, NULL, "sun4v-partition.ram",
++                                         machine->ram_size, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
+                                 &s->partition_ram);
+ 
+-    memory_region_allocate_system_memory(&s->nvram, NULL,
+-                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
++    memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_SIZE,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
+-    memory_region_allocate_system_memory(&s->md_rom, NULL,
+-                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
++    memory_region_init_ram(&s->md_rom, NULL, "sun4v-md.rom",
++                           NIAGARA_MD_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
+-    memory_region_allocate_system_memory(&s->hv_rom, NULL,
+-                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
++    memory_region_init_ram(&s->hv_rom, NULL, "sun4v-hv.rom",
++                           NIAGARA_HV_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
+-    memory_region_allocate_system_memory(&s->prom, NULL,
+-                                         "sun4v.prom", PROM_SIZE_MAX);
++    memory_region_init_ram(&s->prom, NULL, "sun4v.prom",
++                                         PROM_SIZE_MAX, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
+ 
+     add_rom_or_fail("nvram1", NIAGARA_NVRAM_BASE);
+@@ -145,8 +145,8 @@ static void niagara_init(MachineState *machine)
+         BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+         int size = blk_getlength(blk);
+         if (size > 0) {
+-            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
+-                                                 "sun4v_vdisk.ram", size);
++            memory_region_init_ram(&s->vdisk_ram, NULL, "sun4v_vdisk.ram", size,
++                                   &error_fatal);
+             memory_region_add_subregion(get_system_memory(),
+                                         NIAGARA_VDISK_BASE, &s->vdisk_ram);
+             dinfo->is_default = 1;
+-- 
+2.18.1
