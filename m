@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58799)
+Received: from eggs.gnu.org ([209.51.188.92]:59956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1guF4f-0003mP-NL
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:21:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1guF98-0007Fy-RJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1guF4c-0003lC-H7
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:21:01 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54079 helo=mail.rt-rk.com)
+	(envelope-from <imammedo@redhat.com>) id 1guF96-0007nQ-Dy
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:25:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1guF4U-0001HS-IK
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:20:53 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 14 Feb 2019 12:18:18 +0100
-Message-Id: <1550143103-20133-5-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1550143103-20133-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1550143103-20133-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 4/9] tests/tcg: target/mips: Add wrappers
- for MSA bit counting instructions
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1guF94-0007fx-BE
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:25:36 -0500
+Date: Thu, 14 Feb 2019 12:25:27 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190214122527.5d2fcab8@redhat.com>
+In-Reply-To: <20190214005225.24048-1-richardw.yang@linux.intel.com>
+References: <20190214005225.24048-1-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +27,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, alex.bennee@linaro.org
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Thu, 14 Feb 2019 08:52:25 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-Add a header that contains wrappers around MSA instructions assembler
-invocations. For now, only bit counting instructions (NLOC, NLZC, and
-PCNT; each in four data format flavors) are supported.
+> Currently we do device realization like below:
+> 
+>    hotplug_handler_pre_plug()
+>    dc->realize()
+>    hotplug_handler_plug()
+> 
+> Before we do device realization and plug, we would allocate necessary
+> resources and check the capacity.
+'capacity' probably is not right word to use here
+maybe s/the capacity/if 'memory-hotplug-support' property is enabled/
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- tests/tcg/mips/include/wrappers_msa.h | 57 +++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
- create mode 100644 tests/tcg/mips/include/wrappers_msa.h
+> 
+> While we leave acpi_memory_hotplug capacity check in the last step. This
+wouldn't use 'leave' and 'capacity' here either, pls rephrase.
 
-diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
-new file mode 100644
-index 0000000..8f8d00b
---- /dev/null
-+++ b/tests/tcg/mips/include/wrappers_msa.h
-@@ -0,0 +1,57 @@
-+/*
-+ *  Header file for wrappers around MSA instructions assembler invocations
-+ *
-+ *  Copyright (C) 2018  Wave Computing, Inc.
-+ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
-+ *
-+ *  This program is free software: you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation, either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef WRAPPERS_MSA_H
-+#define WRAPPERS_MSA_H
-+
-+
-+#define DO_MSA__WD__WS(suffix, mnemonic)                               \
-+static inline void do_msa_##suffix(void *input, void *output)          \
-+{                                                                      \
-+   __asm__ volatile (                                                  \
-+      "move $t0, %0\n\t"                                               \
-+      "ld.d $w11, 0($t0)\n\t"                                          \
-+      #mnemonic " $w10, $w11\n\t"                                      \
-+      "move $t0, %1\n\t"                                               \
-+      "st.d $w10, 0($t0)\n\t"                                          \
-+      :                                                                \
-+      : "r" (input), "r" (output)                                      \
-+      : "t0", "memory"                                                 \
-+   );                                                                  \
-+}
-+
-+DO_MSA__WD__WS(NLOC_B, nloc.b)
-+DO_MSA__WD__WS(NLOC_H, nloc.h)
-+DO_MSA__WD__WS(NLOC_W, nloc.w)
-+DO_MSA__WD__WS(NLOC_D, nloc.d)
-+
-+DO_MSA__WD__WS(NLZC_B, nlzc.b)
-+DO_MSA__WD__WS(NLZC_H, nlzc.h)
-+DO_MSA__WD__WS(NLZC_W, nlzc.w)
-+DO_MSA__WD__WS(NLZC_D, nlzc.d)
-+
-+DO_MSA__WD__WS(PCNT_B, pcnt.b)
-+DO_MSA__WD__WS(PCNT_H, pcnt.h)
-+DO_MSA__WD__WS(PCNT_W, pcnt.w)
-+DO_MSA__WD__WS(PCNT_D, pcnt.d)
-+
-+
-+#endif
--- 
-2.7.4
+> looks not comply with current architecture and does some unnecessary
+s/looks not/doesn't/
+> work.
+add more explanation about 'unnecessary work'.
+problem as I see it, is that after successful pc_dimm_plug()
+we get into piix4_device_plug_cb() and since
+ s->acpi_memory_hotplug.is_enabled == false
+and all other 'if' conditions also false we would endup
+at g_assert_not_reached() causing QEMU crash in piix4 case
+and with error_abort up the call chain in case of ich9.
+
+> This patch abstract the check on acpi_memory_hotplug capacity in
+> pre_plug stage.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  hw/acpi/piix4.c | 14 ++++++++++++--
+>  hw/i386/pc.c    |  8 ++++++++
+doesn't look complete, why did you skip on similar code in ich9
+(Q35 machine)?
+
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index e330f24c71..c97b747496 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -370,13 +370,22 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+>      acpi_pm1_evt_power_down(&s->ar);
+>  }
+>  
+> +static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> +                                 DeviceState *dev, Error **errp)
+> +{
+> +    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+> +
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> +        !s->acpi_memory_hotplug.is_enabled)
+> +        error_setg(errp,
+> +            "memory hotplug is not enabled: PIIX4 memory hotplug disabled");
+> +}
+>  static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+>                                   DeviceState *dev, Error **errp)
+>  {
+>      PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+>  
+> -    if (s->acpi_memory_hotplug.is_enabled &&
+> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
+>          } else {
+> @@ -702,6 +711,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
+>       */
+>      dc->user_creatable = false;
+>      dc->hotpluggable = false;
+> +    hc->pre_plug = piix4_device_pre_plug_cb;
+>      hc->plug = piix4_device_plug_cb;
+>      hc->unplug_request = piix4_device_unplug_request_cb;
+>      hc->unplug = piix4_device_unplug_cb;
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 734d3268fa..3c6eed0cd3 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1662,6 +1662,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>      const uint64_t legacy_align = TARGET_PAGE_SIZE;
+> +    HotplugHandlerClass *hhc;
+>  
+>      /*
+>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
+> @@ -1674,6 +1675,13 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          return;
+>      }
+>  
+> +    /*
+> +     * Check acpi_dev memory hotplug capacity
+> +     */
+> +    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+> +    if (hcc->pre_plug)
+> +        hhc->pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, errp);
+use hotplug_handler_pre_plug() instead of open-coding check
+
+>      if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>          return;
