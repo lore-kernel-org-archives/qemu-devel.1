@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55687)
+Received: from eggs.gnu.org ([209.51.188.92]:55722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guKdd-0006ia-GU
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:17:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guKdg-0006lf-VW
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guKcK-0008WP-Qs
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:16:09 -0500
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-12-eric.auger@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <278b9b9a-f299-1ce2-2a9d-566ef406c1c7@redhat.com>
-Date: Thu, 14 Feb 2019 18:15:42 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1guKcD-0008Q8-K1
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:16:04 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guKc0-0007ww-SN
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:15:51 -0500
+Received: by mail-ot1-x342.google.com with SMTP id i5so11724887oto.9
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:15:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190205173306.20483-12-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 11/18] hw/arm/virt: Add memory hotplug
- framework
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-8-eric.auger@redhat.com>
+In-Reply-To: <20190205173306.20483-8-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 17:15:13 +0000
+Message-ID: <CAFEAcA9OWQuuqO31-uzTuu-9XSdVkH7UvXdFA1GdvD9emoS0=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 07/18] kvm: add
+ kvm_arm_get_max_vm_phys_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
-Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-On 05.02.19 18:32, Eric Auger wrote:
-> This patch adds the the memory hot-plug/hot-unplug infrastructure
-> in machvirt. It is still not enabled as no device memory is allocated.
-> 
+On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> Add the kvm_arm_get_max_vm_phys_shift() helper that returns the
+> log of the maximum IPA size supported by KVM. This capability
+> needs to be known to create the VM with a specific IPA max size
+> (kvm_type passed along KVM_CREATE_VM ioctl.
+>
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> 
+>
 > ---
 > v4 -> v5:
-> - change in pc_dimm_pre_plug signature
-> - CONFIG_MEM_HOTPLUG replaced by CONFIG_MEM_DEVICE and CONFIG_DIMM
-> 
+> - return 40 if the host does not support the capability
+>
 > v3 -> v4:
-> - check the memory device is not hotplugged
-> 
-> v2 -> v3:
-> - change in pc_dimm_plug()'s signature
-> - add pc_dimm_pre_plug call
-> 
+> - s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
+> - check KVM_CAP_ARM_VM_IPA_SIZE extension
+>
 > v1 -> v2:
-> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
-> - s/pc_dimm_memory_plug/pc_dimm_plug
-> - reworded title and commit message
-> - added pre_plug cb
-> - don't handle get_memory_region failure anymore
+> - put this in ARM specific code
 > ---
->  default-configs/arm-softmmu.mak |  2 ++
->  hw/arm/virt.c                   | 64 ++++++++++++++++++++++++++++++++-
->  2 files changed, 65 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index be88870799..dc4624794f 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -160,3 +160,5 @@ CONFIG_PCI_DESIGNWARE=y
->  CONFIG_STRONGARM=y
->  CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
-> +CONFIG_MEM_DEVICE=y
-> +CONFIG_DIMM=y
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index f01886da22..783468ba77 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -59,6 +59,8 @@
->  #include "qapi/visitor.h"
->  #include "standard-headers/linux/input.h"
->  #include "hw/arm/smmuv3.h"
-> +#include "hw/mem/pc-dimm.h"
-> +#include "hw/mem/nvdimm.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1763,6 +1765,49 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->      return ms->possible_cpus;
+>  target/arm/kvm.c     | 10 ++++++++++
+>  target/arm/kvm_arm.h | 13 +++++++++++++
+>  2 files changed, 23 insertions(+)
+>
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index e00ccf9c98..fc1dd3ec6a 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -18,6 +18,7 @@
+>  #include "qemu/error-report.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/kvm.h"
+> +#include "sysemu/kvm_int.h"
+>  #include "kvm_arm.h"
+>  #include "cpu.h"
+>  #include "trace.h"
+> @@ -162,6 +163,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>      env->features = arm_host_cpu_features.features;
 >  }
->  
-> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                 Error **errp)
+>
+> +int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
 > +{
-> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> +    KVMState *s = KVM_STATE(ms->accelerator);
+> +    int ret;
 > +
-> +    if (dev->hotplugged) {
-> +        error_setg(errp, "memory hotplug is not supported");
-> +    }
-> +
-> +    if (is_nvdimm) {
-> +        error_setg(errp, "nvdimm is not yet supported");
-> +        return;
-> +    }
-> +
-> +    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+> +    ret = kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
+
+Why not name the function the same as the extension name?
+
+> +    return ret > 0 ? ret : 40;
 > +}
 > +
-> +static void virt_memory_plug(HotplugHandler *hotplug_dev,
-> +                             DeviceState *dev, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    Error *local_err = NULL;
-> +
-> +    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-> +
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void virt_memory_unplug(HotplugHandler *hotplug_dev,
-> +                               DeviceState *dev, Error **errp)
-> +{
-> +    pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
-> +    object_unparent(OBJECT(dev));
+>  int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+>      /* For ARM interrupt delivery is always asynchronous,
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 6393455b1d..0728bbfa6b 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -207,6 +207,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
+>   */
+>  void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+>
+> +/**
+> + * kvm_arm_get_max_vm_phys_shift - Returns log2 of the max IPA size
+> + * supported by KVM
 
-Please note that this will soon change with
+This is the number of bits in the IPA address space,
+right (ie 40 for a 40-bit IPA, and so on) ? If so, then
+I think "Return number of bits in the IPA address space"
+might be clearer.
 
-[PATCH RFCv2 0/9] qdev: Hotplug handler chaining + virtio-pmem
+> + *
+> + * @ms: Machine state handle
+> + */
+> +int kvm_arm_get_max_vm_phys_shift(MachineState *ms);
 
-What you'll have to do then is to replace the object_unparent by a
-
-object_property_set_bool(OBJECT(dev), false, "realized", NULL);
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
