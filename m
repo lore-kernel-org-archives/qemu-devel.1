@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46007)
+Received: from eggs.gnu.org ([209.51.188.92]:46354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gu8p7-0002G8-3M
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gu8pS-0002YX-B2
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gu8os-0006yt-OW
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gu8pE-0007CR-UL
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:48 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 14 Feb 2019 15:39:15 +1100
-Message-Id: <20190214043916.22128-5-david@gibson.dropbear.id.au>
+Date: Thu, 14 Feb 2019 15:39:16 +1100
+Message-Id: <20190214043916.22128-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20190214043916.22128-1-david@gibson.dropbear.id.au>
 References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/5] virtio-balloon: Use
- ram_block_discard_range() instead of raw madvise()
+Subject: [Qemu-devel] [PATCH 5/5] virtio-balloon: Safely handle
+ BALLOON_PAGE_SIZE < host page size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +25,192 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Currently, virtio-balloon uses madvise() with MADV_DONTNEED to actually
-discard RAM pages inserted into the balloon.  This is basically a Linux
-only interface (MADV_DONTNEED exists on some other platforms, but doesn't
-always have the same semantics).  It also doesn't work on hugepages and h=
-as
-some other limitations.
+The virtio-balloon always works in units of 4kiB (BALLOON_PAGE_SIZE), but
+we can only actually discard memory in units of the host page size.
 
-It turns out that postcopy also needs to discard chunks of memory, and us=
-es
-a better interface for it: ram_block_discard_range().  It doesn't cover
-every case, but it covers more than going direct to madvise() and this
-gives us a single place to update for more possibilities in future.
+Now, we handle this very badly: we silently ignore balloon requests that
+aren't host page aligned, and for requests that are host page aligned we
+discard the entire host page.  The latter can corrupt guest memory if its
+page size is smaller than the host's.
 
-There are some subtleties here to maintain the current balloon behaviour:
+The obvious choice would be to disable the balloon if the host page size =
+is
+not 4kiB.  However, that would break the special case where host and gues=
+t
+have the same page size, but that's larger than 4kiB.  That case currentl=
+y
+works by accident[1] - and is used in practice on many production POWER
+systems where 64kiB has long been the Linux default page size on both hos=
+t
+and guest.
 
-* For now, we just ignore requests to balloon in a hugepage backed region=
-.
-  That matches current behaviour, because MADV_DONTNEED on a hugepage wou=
-ld
-  simply fail, and we ignore the error.
+To make the balloon safe, without breaking that useful special case, we
+need to accumulate 4kiB balloon requests until we have a whole contiguous
+host page to discard.
 
-* If host page size is > BALLOON_PAGE_SIZE we can frequently call this on
-  non-host-page-aligned addresses.  These would also fail in madvise(),
-  which we then ignored.  ram_block_discard_range() error_report()s calls
-  on unaligned addresses, so we explicitly check that case to avoid
-  spamming the logs.
+We could in principle do that across all guest memory, but it would requi=
+re
+a large bitmap to track.  This patch represents a compromise: we track
+ballooned subpages for a single contiguous host page at a time.  This mea=
+ns
+that if the guest discards all 4kiB chunks of a host page in succession,
+we will discard it.  This is the expected behaviour in the (host page) =3D=
+=3D
+(guest page) !=3D 4kiB case we want to support.
 
-* We now call ram_block_discard_range() with the *host* page size, wherea=
-s
-  we previously called madvise() with BALLOON_PAGE_SIZE.  Surprisingly,
-  this also matches existing behaviour.  Although the kernel fails madvis=
+If the guest scatters 4kiB requests across different host pages, we don't
+discard anything, and issue a warning.  Not ideal, but at least we don't
+corrupt guest memory as the previous version could.
+
+Warning reporting is kind of a compromise here.  Determining whether we'r=
 e
-  on unaligned addresses, it will round unaligned sizes *up* to the host
-  page size.  Yes, this means that if BALLOON_PAGE_SIZE < guest page size
-  we can incorrectly discard more memory than the guest asked us to.  I'm
-  planning to address that soon.
+in a problematic state at realize() time is tricky, because we'd have to
+look at the host pagesizes of all memory backends, but we can't really kn=
+ow
+if some of those backends could be for special purpose memory that's not
+subject to ballooning.
 
-Errors other than the ones discussed above, will now be reported by
-ram_block_discard_range(), rather than silently ignored, which means we
-have a much better chance of seeing when something is going wrong.
+Reporting only when the guest tries to balloon a partial page also isn't
+great because if the guest page size happens to line up it won't indicate
+that we're in a non ideal situation.  It could also cause alarming repeat=
+ed
+warnings whenever a migration is attempted.
+
+So, what we do is warn the first time the guest attempts balloon a partia=
+l
+host page, whether or not it will end up ballooning the rest of the page
+immediately afterwards.
+
+[1] Because when the guest attempts to balloon a page, it will submit
+    requests for each 4kiB subpage.  Most will be ignored, but the one
+    which happens to be host page aligned will discard the whole lot.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-balloon.c         | 69 +++++++++++++++++++++++++-----
+ include/hw/virtio/virtio-balloon.h |  3 ++
+ 2 files changed, 62 insertions(+), 10 deletions(-)
 
 diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index bf93148486..e4cd8d566b 100644
+index e4cd8d566b..65f861cbef 100644
 --- a/hw/virtio/virtio-balloon.c
 +++ b/hw/virtio/virtio-balloon.c
-@@ -37,8 +37,29 @@ static void balloon_inflate_page(VirtIOBalloon *balloo=
-n,
+@@ -33,33 +33,82 @@
+=20
+ #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+=20
++typedef struct PartiallyBalloonedPage {
++    RAMBlock *rb;
++    ram_addr_t base;
++    unsigned long bitmap[];
++} PartiallyBalloonedPage;
++
+ static void balloon_inflate_page(VirtIOBalloon *balloon,
                                   MemoryRegion *mr, hwaddr offset)
  {
      void *addr =3D memory_region_get_ram_ptr(mr) + offset;
-+    RAMBlock *rb;
-+    size_t rb_page_size;
-+    ram_addr_t ram_offset;
+     RAMBlock *rb;
+     size_t rb_page_size;
+-    ram_addr_t ram_offset;
++    int subpages;
++    ram_addr_t ram_offset, host_page_base;
 =20
--    qemu_madvise(addr, BALLOON_PAGE_SIZE, QEMU_MADV_DONTNEED);
-+    /* XXX is there a better way to get to the RAMBlock than via a
-+     * host address? */
-+    rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
-+    rb_page_size =3D qemu_ram_pagesize(rb);
+     /* XXX is there a better way to get to the RAMBlock than via a
+      * host address? */
+     rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
+     rb_page_size =3D qemu_ram_pagesize(rb);
++    host_page_base =3D ram_offset & ~(rb_page_size - 1);
 +
-+    /* Silently ignore hugepage RAM blocks */
-+    if (rb_page_size !=3D getpagesize()) {
-+        return;
++    if (rb_page_size =3D=3D BALLOON_PAGE_SIZE) {
++        /* Easy case */
+=20
+-    /* Silently ignore hugepage RAM blocks */
+-    if (rb_page_size !=3D getpagesize()) {
++        ram_block_discard_range(rb, ram_offset, rb_page_size);
++        /* We ignore errors from ram_block_discard_range(), because it
++         * has already reported them, and failing to discard a balloon
++         * page is not fatal */
+         return;
+     }
+=20
+-    /* Silently ignore unaligned requests */
+-    if (ram_offset & (rb_page_size - 1)) {
+-        return;
++    /* Hard case
++     *
++     * We've put a piece of a larger host page into the balloon - we
++     * need to keep track until we have a whole host page to
++     * discard
++     */
++    warn_report_once(
++"Balloon used with backing page size > 4kiB, this may not be reliable");
++
++    subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
++
++    if (balloon->pbp
++        && (rb !=3D balloon->pbp->rb
++            || host_page_base !=3D balloon->pbp->base)) {
++        /* We've partially ballooned part of a host page, but now
++         * we're trying to balloon part of a different one.  Too hard,
++         * give up on the old partial page */
++        free(balloon->pbp);
++        balloon->pbp =3D NULL;
+     }
+=20
+-    ram_block_discard_range(rb, ram_offset, rb_page_size);
+-    /* We ignore errors from ram_block_discard_range(), because it has
+-     * already reported them, and failing to discard a balloon page is
+-     * not fatal */
++    if (!balloon->pbp) {
++        /* Starting on a new host page */
++        size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned long=
+);
++        balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + bitl=
+en);
++        balloon->pbp->rb =3D rb;
++        balloon->pbp->base =3D host_page_base;
 +    }
 +
-+    /* Silently ignore unaligned requests */
-+    if (ram_offset & (rb_page_size - 1)) {
-+        return;
-+    }
++    bitmap_set(balloon->pbp->bitmap,
++               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
++               subpages);
 +
-+    ram_block_discard_range(rb, ram_offset, rb_page_size);
-+    /* We ignore errors from ram_block_discard_range(), because it has
-+     * already reported them, and failing to discard a balloon page is
-+     * not fatal */
++    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
++        /* We've accumulated a full host page, we can actually discard
++         * it now */
++
++        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size);
++        /* We ignore errors from ram_block_discard_range(), because it
++         * has already reported them, and failing to discard a balloon
++         * page is not fatal */
++
++        free(balloon->pbp);
++        balloon->pbp =3D NULL;
++    }
  }
 =20
  static const char *balloon_stat_names[] =3D {
+diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virti=
+o-balloon.h
+index e0df3528c8..99dcd6d105 100644
+--- a/include/hw/virtio/virtio-balloon.h
++++ b/include/hw/virtio/virtio-balloon.h
+@@ -30,6 +30,8 @@ typedef struct virtio_balloon_stat_modern {
+        uint64_t val;
+ } VirtIOBalloonStatModern;
+=20
++typedef struct PartiallyBalloonedPage PartiallyBalloonedPage;
++
+ typedef struct VirtIOBalloon {
+     VirtIODevice parent_obj;
+     VirtQueue *ivq, *dvq, *svq;
+@@ -42,6 +44,7 @@ typedef struct VirtIOBalloon {
+     int64_t stats_last_update;
+     int64_t stats_poll_interval;
+     uint32_t host_features;
++    PartiallyBalloonedPage *pbp;
+ } VirtIOBalloon;
+=20
+ #endif
 --=20
 2.20.1
