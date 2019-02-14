@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45208)
+Received: from eggs.gnu.org ([209.51.188.92]:45555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1guNdb-0006up-KC
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:29:40 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guNfE-0008D8-CM
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:31:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1guNda-0006PI-Dd
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:29:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33398)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1guNda-0006Fm-3A
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:29:38 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A26D80E7A
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 20:29:29 +0000 (UTC)
-Date: Thu, 14 Feb 2019 20:29:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190214202920.GH2617@work-vm>
-References: <20190206110044.21662-1-dgilbert@redhat.com>
-	<20190206183521-mutt-send-email-mst@kernel.org>
-	<91c1bf04-1b85-8d99-4d48-b8ad80d36314@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1guNf8-00085J-5C
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:31:19 -0500
+Resent-Message-Id: <E1guNf8-00085J-5C@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1guNf6-00081E-GO
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:31:14 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155017625729.24.15503354532270088294@49fa7ef69f7b>
+In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <91c1bf04-1b85-8d99-4d48-b8ad80d36314@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] Network announce changes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 14 Feb 2019 12:30:58 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,111 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, germano@redhat.com, quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-* Jason Wang (jasowang@redhat.com) wrote:
->=20
-> On 2019/2/7 =E4=B8=8A=E5=8D=887:35, Michael S. Tsirkin wrote:
-> > On Wed, Feb 06, 2019 at 11:00:35AM +0000, Dr. David Alan Gilbert (git=
-) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > >=20
-> > > Hi,
-> > >    This is a reworking of a few sets of patches from 2017
-> > > that were put together by myself, Germano and Vlad that make
-> > > the network announce system more flexible.
-> > >=20
-> > >    Firstly, it's parameterised, so that you can change the number
-> > > of packets and the gap between them; the number can be set to 0
-> > > to disable announce completely.
-> > >=20
-> > >    Secondly, you can force an announce by a qmp or hmp command at
-> > > any time.  This is useful if you need the guest to do an announce
-> > > for a different reason; for example if the management layer
-> > > has just juggled some bonding configuration around.
-> > series
-> >=20
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->=20
->=20
-> Applied.
->=20
-> Thanks
-
-Hi Jason,
-  Can you drop the test patch for now (the last one) - I need to
-tweak the Makefile so it doesn't try and run on things without
-virtio-net.
-
-Dave
-
->=20
->=20
-> >=20
-> >=20
-> >=20
-> >=20
-> > >    The packet creation and timing also moves to net/ from migration=
-/
-> > >=20
-> > >    The previous set was:
-> > >       https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg0559=
-4.html
-> > >=20
-> > > Dave
-> > >=20
-> > > v3
-> > >    Fixes from Markus's review: blank lines, and json tweaks
-> > >=20
-> > > v2
-> > >    Fix the qmp example
-> > >    Typo fixes
-> > >=20
-> > >=20
-> > > Dr. David Alan Gilbert (9):
-> > >    net: Introduce announce timer
-> > >    migration: Add announce parameters
-> > >    virtio-net: Switch to using announce timer
-> > >    migration: Switch to using announce timer
-> > >    net: Add a network device specific self-announcement ability
-> > >    virtio-net: Allow qemu_announce_self to trigger virtio announcem=
-ents
-> > >    qmp: Add announce-self command
-> > >    hmp: Add hmp_announce_self
-> > >    tests: Add a test for qemu self announcements
-> > >=20
-> > >   hmp-commands.hx                |  14 ++++
-> > >   hmp.c                          |  33 ++++++++
-> > >   hmp.h                          |   1 +
-> > >   hw/net/trace-events            |   6 ++
-> > >   hw/net/virtio-net.c            |  69 ++++++++++++----
-> > >   include/hw/virtio/virtio-net.h |   4 +-
-> > >   include/migration/misc.h       |  12 +--
-> > >   include/net/announce.h         |  41 ++++++++++
-> > >   include/net/net.h              |   2 +
-> > >   include/qemu/typedefs.h        |   2 +
-> > >   include/sysemu/sysemu.h        |   2 -
-> > >   migration/migration.c          | 103 +++++++++++++++++++++++-
-> > >   migration/migration.h          |   4 +
-> > >   migration/savevm.c             |  72 +----------------
-> > >   migration/trace-events         |   1 -
-> > >   net/Makefile.objs              |   1 +
-> > >   net/announce.c                 | 140 ++++++++++++++++++++++++++++=
-+++++
-> > >   net/trace-events               |   3 +
-> > >   qapi/migration.json            |  53 ++++++++++++-
-> > >   qapi/net.json                  |  43 ++++++++++
-> > >   tests/Makefile.include         |   2 +
-> > >   tests/test-announce-self.c     |  83 +++++++++++++++++++
-> > >   tests/test-hmp.c               |   1 +
-> > >   23 files changed, 589 insertions(+), 103 deletions(-)
-> > >   create mode 100644 include/net/announce.h
-> > >   create mode 100644 net/announce.c
-> > >   create mode 100644 tests/test-announce-self.c
-> > >=20
-> > > --=20
-> > > 2.20.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
+MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
+YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmIzOWMy
+ZTkwZiBnZGJzdHViOiBTZW5kIGEgcmVwbHkgdG8gdGhlIHZLaWxsIHBhY2tldC4KODY1NjNiZGE5
+ZCB0YXJnZXQvYXJtOiBBZGQgbWlzc2luZyBjbGVhcl90YWlsIGNhbGxzCjg2NmYxOTU4YjQgdGFy
+Z2V0L2FybTogVXNlIHZlY3RvciBvcGVyYXRpb25zIGZvciBzYXR1cmF0aW9uCjdmYWRkOTA1YTcg
+dGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZpZWxkCjNiYmY0Mzg0
+ZjkgdGFyZ2V0L2FybTogRml4IHNldCBvZiBiaXRzIGtlcHQgaW4geHJlZ3NbQVJNX1ZGUF9GUFND
+Ul0KMTc4ZmUxNmFjOCB0YXJnZXQvYXJtOiBTcGxpdCBvdXQgZmxhZ3Mgc2V0dGluZyBmcm9tIHZm
+cCBjb21wYXJlcwoxZmI5NTQ4ZmVjIHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUg
+dnMgRlBTQ1IKYzA0NWJiZTM1ZiB0YXJnZXQvYXJtOiBGaXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2
+cyBGUFNDUgowYmZiNzY0YmE3IHRhcmdldC9hcm06IFJlbW92ZSBuZW9uIG1pbi9tYXggaGVscGVy
+cwo0YTQwZDcxNjMzIHRhcmdldC9hcm06IFVzZSB0Y2cgaW50ZWdlciBtaW4vbWF4IHByaW1pdGl2
+ZXMgZm9yIG5lb24KOWVhYmE1MDg2MCB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBh
+bmRlcnMgZm9yIGFhcmNoMzIKZTIyMjU0ODUzMyB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1h
+eCBleHBhbmRlcnMgZm9yIGFhcmNoNjQKZTc3MjMwMTkxZiB0YXJnZXQvYXJtOiBSZWx5IG9uIG9w
+dGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29yCjNmN2NkYTczYjIgaHcvYXJtL2FybXNz
+ZTogRml4IG1pc3dpcmluZyBvZiBleHBhbnNpb24gSVJRcwpkOTNlYmU4MTg1IGh3L2ludGMvYXJt
+djdtX252aWM6IEFsbG93IGJ5dGUgYWNjZXNzZXMgdG8gU0hQUjEKY2NlMzFhYWIzZCBNQUlOVEFJ
+TkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRlIGZyb20gdmFyaW91cyBlbnRyaWVzCjk4OTFl
+NWY2YzcgYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZvciBLVk0gZ3Vlc3RzIHRvIGJlIGNo
+YW5nZWQgYnkgUUVNVSBjb2RlCmFiNzAzZjBkNWEgbGludXgtdXNlci9lbGZsb2FkOiBlbmFibGUg
+SFdDQVBfQ1BVSUQgZm9yIEFBcmNoNjQKYjQzMDFlYWIwOCB0YXJnZXQvYXJtOiBleHBvc2UgcmVt
+YWluaW5nIENQVUlEIHJlZ2lzdGVycyBhcyBSQVoKN2FiZjNjODYzMSB0YXJnZXQvYXJtOiBleHBv
+c2UgTVBJRFJfRUwxIHRvIHVzZXJzcGFjZQpkMTdiYzc1MmQ4IHRhcmdldC9hcm06IGV4cG9zZSBD
+UFVJRCByZWdpc3RlcnMgdG8gdXNlcnNwYWNlCjcyMWQyYzIwNTYgdGFyZ2V0L2FybTogcmVsYXgg
+cGVybWlzc2lvbiBjaGVja3MgZm9yIEhXQ0FQX0NQVUlEIHJlZ2lzdGVycwo3MGQ2MmZkNzI5IHRh
+cmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2ZwX2ludF9jb252CjkwN2Q5OTk1MDYgdGFyZ2V0
+L2FybTogRm9yY2UgcmVzdWx0IHNpemUgaW50byBkcCBhZnRlciBvcGVyYXRpb24KYTIwZGNlY2Zh
+NiB0YXJnZXQvYXJtOiBGaXggaW50MTI4X21ha2UxMjggbG8sIGhpIG9yZGVyIGluIHBhaXJlZF9j
+bXB4Y2hnNjRfYmUKZDQyZDg0YjdiMSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIKZjFk
+ZmM4NDg0YiB0YXJnZXQvYXJtOiBGaXggQ1JuIHRvIGJlIDE0IGZvciBQTUVWVFlQRVIvUE1FVkNO
+VFIKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjcgQ2hlY2tpbmcgY29tbWl0IGYxZGZjODQ4NGJj
+NCAodGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3IgUE1FVlRZUEVSL1BNRVZDTlRSKQoy
+LzI3IENoZWNraW5nIGNvbW1pdCBkNDJkODRiN2IxMTAgKHRhcmdldC9hcm06IEltcGxlbWVudCBI
+QUNSX0VMMikKMy8yNyBDaGVja2luZyBjb21taXQgYTIwZGNlY2ZhNjQ5ICh0YXJnZXQvYXJtOiBG
+aXggaW50MTI4X21ha2UxMjggbG8sIGhpIG9yZGVyIGluIHBhaXJlZF9jbXB4Y2hnNjRfYmUpCjQv
+MjcgQ2hlY2tpbmcgY29tbWl0IDkwN2Q5OTk1MDY2NiAodGFyZ2V0L2FybTogRm9yY2UgcmVzdWx0
+IHNpemUgaW50byBkcCBhZnRlciBvcGVyYXRpb24pCjUvMjcgQ2hlY2tpbmcgY29tbWl0IDcwZDYy
+ZmQ3MjkzNyAodGFyZ2V0L2FybTogUmVzdHJ1Y3R1cmUgZGlzYXNfZnBfaW50X2NvbnYpCjYvMjcg
+Q2hlY2tpbmcgY29tbWl0IDcyMWQyYzIwNTY3ZSAodGFyZ2V0L2FybTogcmVsYXggcGVybWlzc2lv
+biBjaGVja3MgZm9yIEhXQ0FQX0NQVUlEIHJlZ2lzdGVycykKNy8yNyBDaGVja2luZyBjb21taXQg
+ZDE3YmM3NTJkODQ0ICh0YXJnZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJz
+cGFjZSkKOC8yNyBDaGVja2luZyBjb21taXQgN2FiZjNjODYzMTQzICh0YXJnZXQvYXJtOiBleHBv
+c2UgTVBJRFJfRUwxIHRvIHVzZXJzcGFjZSkKOS8yNyBDaGVja2luZyBjb21taXQgYjQzMDFlYWIw
+ODViICh0YXJnZXQvYXJtOiBleHBvc2UgcmVtYWluaW5nIENQVUlEIHJlZ2lzdGVycyBhcyBSQVop
+CjEwLzI3IENoZWNraW5nIGNvbW1pdCBhYjcwM2YwZDVhNDYgKGxpbnV4LXVzZXIvZWxmbG9hZDog
+ZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0KQoxMS8yNyBDaGVja2luZyBjb21taXQgOTg5
+MWU1ZjZjNzA5IChhcm06IEFsbG93IHN5c3RlbSByZWdpc3RlcnMgZm9yIEtWTSBndWVzdHMgdG8g
+YmUgY2hhbmdlZCBieSBRRU1VIGNvZGUpCjEyLzI3IENoZWNraW5nIGNvbW1pdCBjY2UzMWFhYjNk
+NjYgKE1BSU5UQUlORVJTOiBSZW1vdmUgUGV0ZXIgQ3Jvc3Rod2FpdGUgZnJvbSB2YXJpb3VzIGVu
+dHJpZXMpCjEzLzI3IENoZWNraW5nIGNvbW1pdCBkOTNlYmU4MTg1YTQgKGh3L2ludGMvYXJtdjdt
+X252aWM6IEFsbG93IGJ5dGUgYWNjZXNzZXMgdG8gU0hQUjEpCjE0LzI3IENoZWNraW5nIGNvbW1p
+dCAzZjdjZGE3M2IyMGEgKGh3L2FybS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9u
+IElSUXMpCjE1LzI3IENoZWNraW5nIGNvbW1pdCBlNzcyMzAxOTFmNDMgKHRhcmdldC9hcm06IFJl
+bHkgb24gb3B0aW1pemF0aW9uIHdpdGhpbiB0Y2dfZ2VuX2d2ZWNfb3IpCjE2LzI3IENoZWNraW5n
+IGNvbW1pdCBlMjIyNTQ4NTMzYjAgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFu
+ZGVycyBmb3IgYWFyY2g2NCkKMTcvMjcgQ2hlY2tpbmcgY29tbWl0IDllYWJhNTA4NjA5OCAodGFy
+Z2V0L2FybTogVXNlIHZlY3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyKQoxOC8yNyBD
+aGVja2luZyBjb21taXQgNGE0MGQ3MTYzMzE0ICh0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIg
+bWluL21heCBwcmltaXRpdmVzIGZvciBuZW9uKQoxOS8yNyBDaGVja2luZyBjb21taXQgMGJmYjc2
+NGJhNzcyICh0YXJnZXQvYXJtOiBSZW1vdmUgbmVvbiBtaW4vbWF4IGhlbHBlcnMpCjIwLzI3IENo
+ZWNraW5nIGNvbW1pdCBjMDQ1YmJlMzVmZDQgKHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9z
+ZXRfcmVnIHZzIEZQU0NSKQpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24g
+bmV4dCBsaW5lCiMyNTogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzo4NDoKKyAgICBjYXNlIDE6
+IHN0bF9wKGJ1ZiwgdmZwX2dldF9mcHNjcihlbnYpKTsgcmV0dXJuIDQ7CgpFUlJPUjogdHJhaWxp
+bmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMzNDogRklMRTogdGFyZ2V0L2Fy
+bS9oZWxwZXIuYzoxMTA6CisgICAgY2FzZSAxOiB2ZnBfc2V0X2Zwc2NyKGVudiwgbGRsX3AoYnVm
+KSk7IHJldHVybiA0OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCAyMC8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjEvMjcgQ2hlY2tp
+bmcgY29tbWl0IDFmYjk1NDhmZWM0MSAodGFyZ2V0L2FybTogRml4IGFybV9jcHVfZHVtcF9zdGF0
+ZSB2cyBGUFNDUikKMjIvMjcgQ2hlY2tpbmcgY29tbWl0IDE3OGZlMTZhYzg3MiAodGFyZ2V0L2Fy
+bTogU3BsaXQgb3V0IGZsYWdzIHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMpCjIzLzI3IENoZWNr
+aW5nIGNvbW1pdCAzYmJmNDM4NGY5OTUgKHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0
+IGluIHhyZWdzW0FSTV9WRlBfRlBTQ1JdKQoyNC8yNyBDaGVja2luZyBjb21taXQgN2ZhZGQ5MDVh
+N2YzICh0YXJnZXQvYXJtOiBTcGxpdCBvdXQgRlBTQ1IuUUMgdG8gYSB2ZWN0b3IgZmllbGQpCjI1
+LzI3IENoZWNraW5nIGNvbW1pdCA4NjZmMTk1OGI0ZDcgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3Ig
+b3BlcmF0aW9ucyBmb3Igc2F0dXJhdGlvbikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
+dGhhdCAnKicgKGN0eDpXeFYpCiMzNjA6IEZJTEU6IHRhcmdldC9hcm0vdmVjX2hlbHBlci5jOjc3
+NDoKKyAgICBUWVBFTiAqZCA9IHZkLCAqbiA9IHZuOyBUWVBFTSAqbSA9IHZtOyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQzOCBsaW5lcyBjaGVja2VkCgpQYXRj
+aCAyNS8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjYvMjcgQ2hlY2tpbmcgY29tbWl0
+IDg2NTYzYmRhOWRhOSAodGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxscykK
+MjcvMjcgQ2hlY2tpbmcgY29tbWl0IGZiMzljMmU5MGY2NiAoZ2Ric3R1YjogU2VuZCBhIHJlcGx5
+IHRvIHRoZSB2S2lsbCBwYWNrZXQuKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
+cGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxNDE5MDYwMy4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGlu
+YXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
