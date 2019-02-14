@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45461)
+Received: from eggs.gnu.org ([209.51.188.92]:45471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1guCjQ-0000ZD-SH
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:57 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1guCjS-0000cQ-3y
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1guCjP-0002jw-HO
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:56 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1guCjQ-0002lP-CT
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:50:58 -0500
 From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Thu, 14 Feb 2019 16:49:37 +0800
-Message-Id: <20190214084939.20640-2-richardw.yang@linux.intel.com>
+Date: Thu, 14 Feb 2019 16:49:39 +0800
+Message-Id: <20190214084939.20640-4-richardw.yang@linux.intel.com>
 In-Reply-To: <20190214084939.20640-1-richardw.yang@linux.intel.com>
 References: <20190214084939.20640-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [Patch v4 1/3] hw/i386/pc.c: remove unused function
- pc_acpi_init()
+Subject: [Qemu-devel] [Patch v4 3/3] hw/acpi: remove unnecessary variable
+ acpi_table_builtin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +26,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Cc: mst@redhat.com, laurent@vivier.eu, imammedo@redhat.com, philmd@redhat.com, thuth@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
 
-Function pc_acpi_init() is not used anymore.
+acpi_table_builtin is now always false, it is not necessary to check it
+again.
 
-Remove the definition and declaration.
+This patch just removes it.
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/i386/pc.c         | 27 ---------------------------
- include/hw/i386/pc.h |  1 -
- 2 files changed, 28 deletions(-)
+ hw/acpi/core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 5317e08f60..734d3268fa 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1280,33 +1280,6 @@ void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
-                                         pci_address_space, -1);
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index e9b1a85e54..f9c96535d1 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -303,8 +303,6 @@ out:
+     error_propagate(errp, err);
  }
  
--void pc_acpi_init(const char *default_dsdt)
--{
--    char *filename;
+-static bool acpi_table_builtin = false;
 -
--    if (acpi_tables != NULL) {
--        /* manually set via -acpitable, leave it alone */
--        return;
--    }
--
--    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
--    if (filename == NULL) {
--        warn_report("failed to find %s", default_dsdt);
--    } else {
--        QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
--                                          &error_abort);
--        Error *err = NULL;
--
--        qemu_opt_set(opts, "file", filename, &error_abort);
--
--        acpi_table_add_builtin(opts, &err);
--        if (err) {
--            warn_reportf_err(err, "failed to load %s: ", filename);
--        }
--        g_free(filename);
--    }
--}
--
- void xen_load_linux(PCMachineState *pcms)
+ unsigned acpi_table_len(void *current)
  {
-     int i;
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 9d29c4b1df..541124ba6d 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -187,7 +187,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+     struct acpi_table_header *hdr = current - sizeof(hdr->_length);
+@@ -320,7 +318,7 @@ void *acpi_table_hdr(void *h)
  
- void pc_cpus_init(PCMachineState *pcms);
- void pc_hot_add_cpu(const int64_t id, Error **errp);
--void pc_acpi_init(const char *default_dsdt);
- 
- void pc_guest_info_init(PCMachineState *pcms);
- 
+ uint8_t *acpi_table_first(void)
+ {
+-    if (acpi_table_builtin || !acpi_tables) {
++    if (!acpi_tables) {
+         return NULL;
+     }
+     return acpi_table_hdr(acpi_tables + ACPI_TABLE_PFX_SIZE);
 -- 
 2.19.1
