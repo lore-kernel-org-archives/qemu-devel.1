@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55544)
+Received: from eggs.gnu.org ([209.51.188.92]:60554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guIsy-0000wB-Op
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:25:13 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guJ8H-0004xg-Kt
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:41:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guIsw-0004dk-9z
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:25:12 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39129)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guJ8G-0003Gv-Py
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:41:01 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46728)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guIsu-0004Xr-BL
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:25:08 -0500
-Received: by mail-ot1-x344.google.com with SMTP id n8so11090256otl.6
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:25:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20190201145035.22739-1-peter.maydell@linaro.org>
-	<CAFEAcA89HnCL11_N9oXqwQZf=TFJdHzONg6jxy9FORNwK85OZA@mail.gmail.com>
-	<CAMxuvax=wO+dGTcgxV5L0CLf9nOozgNCM7TdqPeyj09=th0Jgw@mail.gmail.com>
-In-Reply-To: <CAMxuvax=wO+dGTcgxV5L0CLf9nOozgNCM7TdqPeyj09=th0Jgw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 15:24:52 +0000
-Message-ID: <CAFEAcA9m9CgfOsE5hVcQpWFvX7Pq9wVWiC3jf2Yr0SrXQPnTKg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1guJ8F-0003Dm-72
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:40:59 -0500
+Received: by mail-wr1-x441.google.com with SMTP id l9so6938695wrt.13
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:40:58 -0800 (PST)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Thu, 14 Feb 2019 17:40:53 +0200
+Message-Id: <20190214154053.15050-1-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel]  [PATCH] hw/rdma: another clang compilation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: yuval.shaia@oracle.com, kamalheib1@gmail.com, marcel.apfelbaum@gmail.com
 
-On Thu, 14 Feb 2019 at 14:56, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Hi
->
-> On Thu, Feb 14, 2019 at 12:30 PM Peter Maydell <peter.maydell@linaro.org>=
- wrote:
-> >
-> > Ping! Thanks to Alex for doing low-level review of this patchset.
->
-> Overall, looks good to me too.
->
-> Minor nit: configure doesn't check presence of sphinx-build, and on my
-> fc29, it's sphinx-build-3 :)
+Configuring QEMU with:
+   configure --target-list="x86_64-softmmu" --cc=clang --enable-pvrdma
+Results in:
+   qemu/hw/rdma/rdma_rm_defs.h:108:3: error: redefinition of typedef 'RdmaDeviceResources' is a C11 feature [-Werror,-Wtypedef-redefinition]
+   } RdmaDeviceResources;
+     ^
+   qemu/hw/rdma/rdma_backend_defs.h:24:36: note: previous definition is here
+   typedef struct RdmaDeviceResources RdmaDeviceResources;
 
-It does check, but I forgot to make the makefiles pay attention
-to the check.
+Fix by removing one of the 'typedef' definitions.
 
-That's very irritating that Fedora is using a weird filename for
-the tool -- what is their justification for doing that?
-I suppose we'll have to make configure cope :-(
+Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+---
+ hw/rdma/rdma_rm_defs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->
-> CI files will probably need to be updated.
->
-> > I'm particularly interested in high-level review:
-> >  * is this the right way to be going?
-> >  * if we committed this and then did a release with the
-> >    docs as they are like this, would that be ok?
->
-> Certainly, it can improve over time imho.
->
-> >  * what's the most important next step after this?
-> >
->
-> For me the next steps are:
->
-> - merge your series! :)
->
-> - integrate the texi doc somehow (apparently Paolo had some solution),
-> or convert the texi doc to rst (modiy texi2any to do that?)
->
-> - have the docs hosted on www.qemu.org, with some stability (ideally,
-> we could share links to a specific doc, say a QMP command or an
-> internal API, that would remain stable).
->
->   I wonder why Daniel qemu-web patches aren't yet merged. I remember
-> some questions regarding doc import and automation. There will be a
-> similar problem with sphinx doc.
->
->   (gitlab makes this fairly easy with CI artifcats, fwiw ;-)
->
-> - convert more of our doc to rst
->
-> - add kerneldoc
->
-> - improve the style, for consistency with qemu.org style
-
-Thanks for the suggestions.
-
--- PMM
+diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+index 0ba61d1838..5e877c1fd9 100644
+--- a/hw/rdma/rdma_rm_defs.h
++++ b/hw/rdma/rdma_rm_defs.h
+@@ -96,7 +96,7 @@ typedef struct RdmaRmPort {
+     enum ibv_port_state state;
+ } RdmaRmPort;
+ 
+-typedef struct RdmaDeviceResources {
++struct RdmaDeviceResources {
+     RdmaRmPort port;
+     RdmaRmResTbl pd_tbl;
+     RdmaRmResTbl mr_tbl;
+@@ -105,6 +105,6 @@ typedef struct RdmaDeviceResources {
+     RdmaRmResTbl cq_tbl;
+     RdmaRmResTbl cqe_ctx_tbl;
+     GHashTable *qp_hash; /* Keeps mapping between real and emulated */
+-} RdmaDeviceResources;
++};
+ 
+ #endif
+-- 
+2.17.1
