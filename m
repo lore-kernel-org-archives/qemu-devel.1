@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49548)
+Received: from eggs.gnu.org ([209.51.188.92]:50664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1guB7o-0000EI-JF
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:08:02 -0500
+	(envelope-from <clg@kaod.org>) id 1guBDL-0001nF-3m
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1guB7m-0001SP-9J
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:08:00 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:40058)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1guB7l-0001Ku-Sy
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:07:58 -0500
-Message-ID: <80eacdbd99faa60d761951e9321a998764cd73ce.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 14 Feb 2019 08:07:33 +0100
-In-Reply-To: <20190213121346.384ebbab@w520.home>
-References: <cover.cc19031e8d42f0196630e60c9016d57d8a46e676.1550050121.git-series.knut.omang@oracle.com>
-	<3df33b2bd332259dc548751b3c3c5eaa297428b0.1550050121.git-series.knut.omang@oracle.com>
-	<20190213121346.384ebbab@w520.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+	(envelope-from <clg@kaod.org>) id 1guBDF-0006zC-V5
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:13:40 -0500
+Received: from 15.mo3.mail-out.ovh.net ([87.98.150.177]:49483)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1guBDF-0006vE-8D
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:13:37 -0500
+Received: from player738.ha.ovh.net (unknown [10.109.159.224])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 127201F7A76
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 08:13:31 +0100 (CET)
+References: <20190107183946.7230-1-clg@kaod.org>
+	<20190107183946.7230-14-clg@kaod.org>
+	<20190212011153.GH1884@umbus.fritz.box>
+	<d6dc35c6-4987-3fcc-de81-f2aff865cad1@kaod.org>
+	<20190213013219.GU1884@umbus.fritz.box>
+	<f0b93ebb-e8b5-4448-9b57-8da2feee493c@kaod.org>
+	<20190213110749.0194dcd0@bahia.lan>
+	<20190214033555.GA1884@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <7bad1d1c-4d89-1102-9e57-445ac786eeb0@kaod.org>
+Date: Thu, 14 Feb 2019 08:13:26 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190214033555.GA1884@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 13/13] spapr: add KVM support to
+ the 'dual' machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,240 +38,363 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, 2019-02-13 at 12:13 -0700, Alex Williamson wrote:
-> On Wed, 13 Feb 2019 10:29:58 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > Add a helper function to add PCIe capability for Access Control Services
-> > (ACS)
-> 
-> This is redundant to the commit title.
-> 
-> > ACS support in the associated root port is needed to pass
-> > through individual functions of a device to different VMs with VFIO
-> > without Alex Williamson's pcie_acs_override kernel patch or similar
-> > in the guest.
-> 
-> This is overly subtle, to work backwards that individual functions
-> (plural!) of a device (singular!) must imply a multifunction endpoint
-> in the same hierarchy split to different L2 VMs.  Perhaps I only
-> finally realized this subtly on v4.
-> 
-> > Single function devices, or multifunction devices
-> > that all goes to the same VM works fine even without ACS, as VFIO
-> > will avoid putting the root port itself into the IOMMU group
-> > even without ACS support in the port.
-> 
-> Also confusing and incorrectly states that a) VFIO is responsible for
-> IOMMU grouping, it's not, and b) that the root port would not be
-> included in such a group, it would.  The latter was I thought the
-> impetus for this series.
+On 2/14/19 4:35 AM, David Gibson wrote:
+> On Wed, Feb 13, 2019 at 11:07:49AM +0100, Greg Kurz wrote:
+>> On Wed, 13 Feb 2019 09:22:46 +0100
+>> C=E9dric Le Goater <clg@kaod.org> wrote:
+>>
+>>> On 2/13/19 2:32 AM, David Gibson wrote:
+>>>> On Tue, Feb 12, 2019 at 08:18:19AM +0100, C=E9dric Le Goater wrote: =
+=20
+>>>>> On 2/12/19 2:11 AM, David Gibson wrote: =20
+>>>>>> On Mon, Jan 07, 2019 at 07:39:46PM +0100, C=E9dric Le Goater wrote=
+: =20
+>>>>>>> The interrupt mode is chosen by the CAS negotiation process and
+>>>>>>> activated after a reset to take into account the required changes=
+ in
+>>>>>>> the machine. This brings new constraints on how the associated KV=
+M IRQ
+>>>>>>> device is initialized.
+>>>>>>>
+>>>>>>> Currently, each model takes care of the initialization of the KVM
+>>>>>>> device in their realize method but this is not possible anymore a=
+s the
+>>>>>>> initialization needs to be done globaly when the interrupt mode i=
+s
+>>>>>>> known, i.e. when machine is reseted. It also means that we need a=
+ way
+>>>>>>> to delete a KVM device when another mode is chosen.
+>>>>>>>
+>>>>>>> Also, to support migration, the QEMU objects holding the state to
+>>>>>>> transfer should always be available but not necessarily activated=
+.
+>>>>>>>
+>>>>>>> The overall approach of this proposal is to initialize both inter=
+rupt
+>>>>>>> mode at the QEMU level and keep the IRQ number space in sync to a=
+llow
+>>>>>>> switching from one mode to another. For the KVM side of things, t=
+he
+>>>>>>> whole initialization of the KVM device, sources and presenters, i=
+s
+>>>>>>> grouped in a single routine. The XICS and XIVE sPAPR IRQ reset
+>>>>>>> handlers are modified accordingly to handle the init and the dele=
+te
+>>>>>>> sequences of the KVM device.
+>>>>>>>
+>>>>>>> As KVM is now initialized at reset, we loose the possiblity to
+>>>>>>> fallback to the QEMU emulated mode in case of failure and failure=
+s
+>>>>>>> become fatal to the machine.
+>>>>>>>
+>>>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>>>>> ---
+>>>>>>>  hw/intc/spapr_xive.c     |  8 +---
+>>>>>>>  hw/intc/spapr_xive_kvm.c | 27 ++++++++++++++
+>>>>>>>  hw/intc/xics_kvm.c       | 25 +++++++++++++
+>>>>>>>  hw/intc/xive.c           |  4 --
+>>>>>>>  hw/ppc/spapr_irq.c       | 79 ++++++++++++++++++++++++++++------=
+------
+>>>>>>>  5 files changed, 109 insertions(+), 34 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>>>>>>> index 21f3c1ef0901..0661aca35900 100644
+>>>>>>> --- a/hw/intc/spapr_xive.c
+>>>>>>> +++ b/hw/intc/spapr_xive.c
+>>>>>>> @@ -330,13 +330,7 @@ static void spapr_xive_realize(DeviceState *=
+dev, Error **errp)
+>>>>>>>      xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
+>>>>>>>      xive->endt =3D g_new0(XiveEND, xive->nr_ends);
+>>>>>>> =20
+>>>>>>> -    if (kvmppc_xive_enabled()) {
+>>>>>>> -        kvmppc_xive_connect(xive, &local_err);
+>>>>>>> -        if (local_err) {
+>>>>>>> -            error_propagate(errp, local_err);
+>>>>>>> -            return;
+>>>>>>> -        }
+>>>>>>> -    } else {
+>>>>>>> +    if (!kvmppc_xive_enabled()) {
+>>>>>>>          /* TIMA initialization */
+>>>>>>>          memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xiv=
+e_tm_ops, xive,
+>>>>>>>                                "xive.tima", 4ull << TM_SHIFT);
+>>>>>>> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+>>>>>>> index d35814c1992e..3ebc947f2be7 100644
+>>>>>>> --- a/hw/intc/spapr_xive_kvm.c
+>>>>>>> +++ b/hw/intc/spapr_xive_kvm.c
+>>>>>>> @@ -737,6 +737,15 @@ void kvmppc_xive_connect(sPAPRXive *xive, Er=
+ror **errp)
+>>>>>>>      Error *local_err =3D NULL;
+>>>>>>>      size_t esb_len;
+>>>>>>>      size_t tima_len;
+>>>>>>> +    CPUState *cs;
+>>>>>>> +
+>>>>>>> +    /*
+>>>>>>> +     * The KVM XIVE device already in use. This is the case when
+>>>>>>> +     * rebooting XIVE -> XIVE =20
+>>>>>>
+>>>>>> Can this case actually occur?  Further down you appear to
+>>>>>> unconditionally destroy both KVM devices at reset time. =20
+>>>>>
+>>>>> I guess you are right. I will check.
+>>>>> =20
+>>>>>>> +     */
+>>>>>>> +    if (xive->fd !=3D -1) {
+>>>>>>> +        return;
+>>>>>>> +    }
+>>>>>>> =20
+>>>>>>>      if (!kvm_enabled() || !kvmppc_has_cap_xive()) {
+>>>>>>>          error_setg(errp, "IRQ_XIVE capability must be present fo=
+r KVM");
+>>>>>>> @@ -800,6 +809,24 @@ void kvmppc_xive_connect(sPAPRXive *xive, Er=
+ror **errp)
+>>>>>>>      xive->change =3D qemu_add_vm_change_state_handler(
+>>>>>>>          kvmppc_xive_change_state_handler, xive);
+>>>>>>> =20
+>>>>>>> +    /* Connect the presenters to the initial VCPUs of the machin=
+e */
+>>>>>>> +    CPU_FOREACH(cs) {
+>>>>>>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>>>>>> +
+>>>>>>> +        kvmppc_xive_cpu_connect(cpu->tctx, &local_err);
+>>>>>>> +        if (local_err) {
+>>>>>>> +            error_propagate(errp, local_err);
+>>>>>>> +            return;
+>>>>>>> +        }
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>> +    /* Update the KVM sources */
+>>>>>>> +    kvmppc_xive_source_reset(xsrc, &local_err);
+>>>>>>> +    if (local_err) {
+>>>>>>> +            error_propagate(errp, local_err);
+>>>>>>> +            return;
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>>      kvm_kernel_irqchip =3D true;
+>>>>>>>      kvm_msi_via_irqfd_allowed =3D true;
+>>>>>>>      kvm_gsi_direct_mapping =3D true;
+>>>>>>> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+>>>>>>> index 1d21ff217b82..bfc35d71df7f 100644
+>>>>>>> --- a/hw/intc/xics_kvm.c
+>>>>>>> +++ b/hw/intc/xics_kvm.c
+>>>>>>> @@ -448,6 +448,16 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>>>>>>>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp)
+>>>>>>>  {
+>>>>>>>      int rc;
+>>>>>>> +    CPUState *cs;
+>>>>>>> +    Error *local_err =3D NULL;
+>>>>>>> +
+>>>>>>> +    /*
+>>>>>>> +     * The KVM XICS device already in use. This is the case when
+>>>>>>> +     * rebooting XICS -> XICS
+>>>>>>> +     */
+>>>>>>> +    if (kernel_xics_fd !=3D -1) {
+>>>>>>> +        return 0;
+>>>>>>> +    }
+>>>>>>> =20
+>>>>>>>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CA=
+P_IRQ_XICS)) {
+>>>>>>>          error_setg(errp,
+>>>>>>> @@ -496,6 +506,21 @@ int xics_kvm_init(sPAPRMachineState *spapr, =
+Error **errp)
+>>>>>>>      kvm_msi_via_irqfd_allowed =3D true;
+>>>>>>>      kvm_gsi_direct_mapping =3D true;
+>>>>>>> =20
+>>>>>>> +    /* Connect the presenters to the initial VCPUs of the machin=
+e */
+>>>>>>> +    CPU_FOREACH(cs) {
+>>>>>>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>>>>>> +
+>>>>>>> +        icp_kvm_connect(cpu->icp, &local_err);
+>>>>>>> +        if (local_err) {
+>>>>>>> +            error_propagate(errp, local_err);
+>>>>>>> +            goto fail;
+>>>>>>> +        }
+>>>>>>> +        icp_set_kvm_state(cpu->icp, 1);
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>> +    /* Update the KVM sources */
+>>>>>>> +    ics_set_kvm_state(ICS_KVM(spapr->ics), 1);
+>>>>>>> +
+>>>>>>>      return 0;
+>>>>>>> =20
+>>>>>>>  fail:
+>>>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>>>>> index c5c2fbc3f8bc..c166eab5b210 100644
+>>>>>>> --- a/hw/intc/xive.c
+>>>>>>> +++ b/hw/intc/xive.c
+>>>>>>> @@ -932,10 +932,6 @@ static void xive_source_reset(void *dev)
+>>>>>>> =20
+>>>>>>>      /* PQs are initialized to 0b01 (Q=3D1) which corresponds to =
+"ints off" */
+>>>>>>>      memset(xsrc->status, XIVE_ESB_OFF, xsrc->nr_irqs);
+>>>>>>> -
+>>>>>>> -    if (kvmppc_xive_enabled()) {
+>>>>>>> -        kvmppc_xive_source_reset(xsrc, &error_fatal);
+>>>>>>> -    }
+>>>>>>>  }
+>>>>>>> =20
+>>>>>>>  static void xive_source_realize(DeviceState *dev, Error **errp)
+>>>>>>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>>>>>>> index ba27d9d8e972..5592eec3787b 100644
+>>>>>>> --- a/hw/ppc/spapr_irq.c
+>>>>>>> +++ b/hw/ppc/spapr_irq.c
+>>>>>>> @@ -98,20 +98,14 @@ static void spapr_irq_init_xics(sPAPRMachineS=
+tate *spapr, Error **errp)
+>>>>>>>      int nr_irqs =3D spapr->irq->nr_irqs;
+>>>>>>>      Error *local_err =3D NULL;
+>>>>>>> =20
+>>>>>>> -    if (kvm_enabled()) {
+>>>>>>> -        if (machine_kernel_irqchip_allowed(machine) &&
+>>>>>>> -            !xics_kvm_init(spapr, &local_err)) {
+>>>>>>> -            spapr->icp_type =3D TYPE_KVM_ICP;
+>>>>>>> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM,=
+ nr_irqs,
+>>>>>>> -                                          &local_err);
+>>>>>>> -        }
+>>>>>>> -        if (machine_kernel_irqchip_required(machine) && !spapr->=
+ics) {
+>>>>>>> -            error_prepend(&local_err,
+>>>>>>> -                          "kernel_irqchip requested but unavaila=
+ble: ");
+>>>>>>> -            goto error; =20
+>>>>>>
+>>>>>> I don't see anything that replaces the irqchip_required logic, whi=
+ch
+>>>>>> doesn't seem right. =20
+>>>>>
+>>>>> Yes. We do loose the ability to fall back to the emulated device in=
+ case
+>>>>> of failure. It is not impossible to do but it will require more cha=
+nges
+>>>>> to check what are the KVM capabilities before starting the machine.=
+ =20
+>>>>
+>>>> Uh... it seems more like it's the other way around.  We'll always fa=
+ll
+>>>> back to emulated, even if we've explicitly said on the command line
+>>>> that we don't want that. =20
+>>>
+>>> Ah yes. The init function might be also broken.=20
+>>>
+>>> XICS mode is a bit more difficult to handle than XIVE because we have=
+=20
+>>> different object type for the KVM device and the QEMU emulated device=
+,=20
+>>
+>> This is indeed a bit unfortunate, but I think there's still room for
+>> improvement. Let's look at the base classes:
+>>
+>> struct ICPStateClass {
+>>     DeviceClass parent_class;
+>>
+>>     DeviceRealize parent_realize;
+>>     DeviceReset parent_reset;
+>>
+>>     void (*pre_save)(ICPState *icp);
+>>     int (*post_load)(ICPState *icp, int version_id);
+>>     void (*synchronize_state)(ICPState *icp);
+>> };
+>>
+>> struct ICSStateClass {
+>>     DeviceClass parent_class;
+>>
+>>     DeviceRealize parent_realize;
+>>     DeviceReset parent_reset;
+>>
+>>     void (*pre_save)(ICSState *s);
+>>     int (*post_load)(ICSState *s, int version_id);
+>>     void (*reject)(ICSState *s, uint32_t irq);
+>>     void (*resend)(ICSState *s);
+>>     void (*eoi)(ICSState *s, uint32_t irq);
+>>     void (*synchronize_state)(ICSState *s);
+>> };
+>>
+>> The pre_save and post_load callbacks are only used with
+>> the KVM device. They could be explicitely called from
+>> the corresponding VMStateDescription callbacks with a
+>> kvm_enabled() && kvm_irqchip_in_kernel() check.
 
-that wasn't the intention but I can see that it looks that way now
+yes.
+>> Same goes for the synchronize_state callbacks, which are only
+>> needed for 'info pic'.
 
-> > Multifunction endpoints may also implement an ACS capability,
-> > only on function 0, and with more limited features.
-> 
-> "only on function 0" is incorrect, each function of a multifunction
-> device should (not must) implement an ACS capability if any of them do.
-> 
-> Can't we just say something like:
-> 
-> "Implementing an ACS capability on downstream ports and multifuction
-> endpoints indicates isolation and IOMMU visibility to a finer
-> granularity thereby creating smaller IOMMU groups in the guest and thus
-> more flexibility in assigning endpoints to guest userspace or an L2
-> guest."
+yes, like we do for XIVE.
 
-sure - will use this - and remove my confusing attempt to 
-credit to your override patch and VFIO :)
+>> The reject, resend and eoi callbacks are only called by code that
+>> belongs to the QEMU emulated device. Either the RTAS/hypercalls
+>> or from the machine code with explicit checks like:
+>>
+>> static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
+>> {
+>>     sPAPRMachineState *spapr =3D opaque;
+>>     MachineState *machine =3D MACHINE(opaque);
+>>
+>>     if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
+>>         ics_kvm_set_irq(spapr->ics, srcno, val);
+>>     } else {
+>>         ics_simple_set_irq(spapr->ics, srcno, val);
+>>     }
+>> }
+>>
+>> or
+>>
+>> static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int vers=
+ion_id)
+>> {
+>>     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
+>>         CPUState *cs;
+>>         CPU_FOREACH(cs) {
+>>             PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>>             icp_resend(spapr_cpu_state(cpu)->icp);
+>>         }
+>>     }
+>>     return 0;
+>> }
+>>
+>> Unless I'm missing something, the reject, resend and eoi callbacks cou=
+ld
+>> simply be removed. This would allow to unify KVM and QEMU emulation in
+>> the same ICP and ICS object types.
 
-> (I avoided including SR-IOV with multifunction since that's not
-> implemented here)
+yes. =20
 
-I agree
+>> If this makes sense to you, I can have a look (already started actuall=
+y ;-)
+>=20
+> Please do.  The use of different object types was something that
+> seemed like a good idea at the time, but in hindsight, wasn't.  In
+> general different device types should represent guest-visibly
+> different objects, not just implementation differences.
 
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > ---
-> >  hw/pci/pcie.c              | 39 +++++++++++++++++++++++++++++++++++++++-
-> >  include/hw/pci/pcie.h      |  6 ++++++-
-> >  include/hw/pci/pcie_regs.h |  4 ++++-
-> >  3 files changed, 49 insertions(+)
-> > 
-> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > index 230478f..6e87994 100644
-> > --- a/hw/pci/pcie.c
-> > +++ b/hw/pci/pcie.c
-> > @@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
-> >  
-> >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
-> >  }
-> > +
-> > +/* ACS (Access Control Services) */
-> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
-> > +{
-> > +    bool is_pcie_slot = !!object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT);
-> 
-> Perhaps we should be using pci_is_express_downstream_port().
+yes. The direction we took to add KVM support in XIVE proved to be=20
+much simpler.
 
-oh - yes - I forgot that we need to look in pci.h for those kind of 
-helpers..
+>>> and with the 'dual' mode, we activate the device at CAS reset time.
+>>>
+>>> Failures being handled at reset time, should we keep the same logic a=
+nd =20
+>>> abort the machine at reset if the kernel irqchip is required ?=20
+>>>
+>>
+>> If the user passed ic-mode=3Ddual,kernel-irqchip=3Don, we should at le=
+ast make
+>> sure KVM supports both XICS and XIVE devices during machine init. Then
+>> during reset if something goes wrong with KVM, it seems ok to abort.
+>>
+>> If the user didn't pass kernel-irqchip, ie, kernel_irqchip_allowed is =
+true
+>> and kernel_irqchip_required is false, the current behavior for XICS is
+>> to try KVM first and fallback to QEMU emulation. I guess it could be t=
+he
+>> same for XIVE.
+>=20
+> Yes, I think that's the behaviour we want, on all counts.
+=20
+Thanks,
 
-> > +    uint16_t cap_bits = 0;
-> > +
-> > +    /*
-> > +     * For endpoints, only multifunction devices may have an
-> > +     * ACS capability, and only on function 0:
-> 
-> Incorrect
-> 
-> > +     */
-> > +    assert(is_pcie_slot ||
-> > +           ((dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) &&
-> > +            PCI_FUNC(dev->devfn)));
-> 
-> The second test should be:
-> 
-> ((dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) ||
->  PCI_FUNC(dev->devfn))
-> 
-> If the function number is non-zero, then it's clearly a multifunction
-> device, the multifunction capability is only required on function
-> zero.  Just as in my previous example, an ACS capability can only
-> describe/control the DMA flow of the function implementing it, nothing
-> in the spec that I can see imposes function zero's DMA flow on the
-> other functions.
-
-Ah - of course - that makes sense - 
-was thinking too complicated here, and also my comment didn't match
-the code at all..
-
-> There's also a gap here that function zero can set the multifunction
-> capability, but there may be no secondary devices defined.  Not that
-> we necessarily need to resolve this, but it's a nuance of allowing
-> arbitrary multifunction configurations as QEMU does.
-
-Yes, in the SR/IOV case, at least as I have implemented it in QEMU, 
-with one PF that would be the default - as no VFs are defined at reset, 
-there's only one function, but it still need to be multifunction 
-for QEMU to accept more functions appearing later.
-
-> > +
-> > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
-> > +                        PCI_ACS_SIZEOF);
-> > +    dev->exp.acs_cap = offset;
-> > +
-> > +    if (is_pcie_slot) {
-> > +        /*
-> > +         * Endpoints may also implement ACS, and optionally RR and CR,
-> > +         * if they want to support p2p, but only slots may
-> > +         * implement SV, TB or UF:
-> 
-> Careful using "may" with spec references.
-
-:-D
-
-> "Downstream ports must implement SV, TB, RR, CR, and UF (with caveats
-> on the latter three that we ignore for simplicity).  Endpoints may also
-> implement a subset of ACS capabilities, but these are optional if the
-> endpoint does not support peer-to-peer between functions and thus
-> omitted here."
-
-Thanks - I'll put that in instead
-
-> > +         */
-> > +        cap_bits =
-> > +            PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF;
-> 
-> PCI_ACS_DT has similar "must be implemented" requirements to RR, RC,
-> and UF, why is it not included?  For all of these "caveat" ones there
-> are conditions which can make it optional for root ports, but required
-> for switch downstream ports, so it seems reasonable that we include
-> both since that's what our is_pci_slot() test covers.  Thanks,
-
-That was because my "reference" root ports don't not implement it, taking the
-conservative approach:
-
-00:07.0 PCI bridge: Intel Corporation 5520/5500/X58 I/O Hub PCI Express Root Port 7 (rev 22) (prog-if 00 [Normal decode])
-       ...
-       Capabilities: [150 v1] Access Control Services
-                ACSCap: SrcValid+ TransBlk+ ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
-                ACSCtl: SrcValid+ TransBlk- ReqRedir+ CmpltRedir+ UpstreamFwd+ EgressCtrl- DirectTrans-
-
-In fact, all gens of servers I have access to supports just the same cap bits in
-their root ports, in order of release date. The latest gen even have some root
-ports without an ACS capability.
-
-00:02.0 PCI bridge: Intel Corporation Xeon E5/Core i7 IIO PCI Express Root Port 2a (rev 07)
-00:01.0 PCI bridge: Intel Corporation Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 1 (rev 01) (prog-if 00 [Normal decode])
-00:03.0 PCI bridge: Intel Corporation Xeon E7 v3/Xeon E5 v3/Core i7 PCI Express Root Port 3 (rev 02) (prog-if 00 [Normal decode])
-00:02.0 PCI bridge: Intel Corporation Xeon E7 v2/Xeon E5 v2/Core i7 PCI Express Root Port 2a (rev 04) (prog-if 00 [Normal decode])
-17:00.0 PCI bridge: Intel Corporation Sky Lake-E PCI Express Root Port A (rev 04) (prog-if 00 [Normal decode])
-
-All of these have DirectTrans- in their ACSCap.
-
-[For reference, the one without ACS cap, in the same server as 17:00.0 above:
-
-00:1c.0 PCI bridge: Intel Corporation Lewisburg PCI Express Root Port #1 (rev f9) (prog-if 00 [Normal decode])
-]
-
-Do you prefer that we set DT as default anyway, or should we stay within "known
-territory" for the OSes, at least for now?
-
-Knut
-
-> Alex
-> 
-> > +    }
-> > +
-> > +    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
-> > +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
-> > +}
-> > +
-> > +void pcie_acs_reset(PCIDevice *dev)
-> > +{
-> > +    if (dev->exp.acs_cap) {
-> > +        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
-> > +    }
-> > +}
-> > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > index 5b82a0d..e30334d 100644
-> > --- a/include/hw/pci/pcie.h
-> > +++ b/include/hw/pci/pcie.h
-> > @@ -79,6 +79,9 @@ struct PCIExpressDevice {
-> >  
-> >      /* Offset of ATS capability in config space */
-> >      uint16_t ats_cap;
-> > +
-> > +    /* ACS */
-> > +    uint16_t acs_cap;
-> >  };
-> >  
-> >  #define COMPAT_PROP_PCP "power_controller_present"
-> > @@ -128,6 +131,9 @@ void pcie_add_capability(PCIDevice *dev,
-> >                           uint16_t offset, uint16_t size);
-> >  void pcie_sync_bridge_lnk(PCIDevice *dev);
-> >  
-> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset);
-> > +void pcie_acs_reset(PCIDevice *dev);
-> > +
-> >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
-> >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t
-> > ser_num);
-> >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
-> > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-> > index ad4e780..1db86b0 100644
-> > --- a/include/hw/pci/pcie_regs.h
-> > +++ b/include/hw/pci/pcie_regs.h
-> > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
-> >                                           PCI_ERR_COR_INTERNAL |         \
-> >                                           PCI_ERR_COR_HL_OVERFLOW)
-> >  
-> > +/* ACS */
-> > +#define PCI_ACS_VER                     0x1
-> > +#define PCI_ACS_SIZEOF                  8
-> > +
-> >  #endif /* QEMU_PCIE_REGS_H */
+C.=20
