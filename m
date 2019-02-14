@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34510)
+Received: from eggs.gnu.org ([209.51.188.92]:34962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1guC6w-0004wE-Pp
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:11:11 -0500
+	(envelope-from <peterx@redhat.com>) id 1guC96-00060I-8g
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1guC6s-0001D1-N0
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:11:07 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:48902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1guC6q-00010i-M8
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:11:06 -0500
-Date: Thu, 14 Feb 2019 09:10:57 +0100
-From: Sven Schnelle <svens@stackframe.org>
-Message-ID: <20190214081056.GB22159@t470p.stackframe.org>
-References: <20190211181907.2219-2-svens@stackframe.org>
-	<20190211181907.2219-5-svens@stackframe.org>
-	<0d209109-b242-45f2-2132-4d8e196898fc@linaro.org>
+	(envelope-from <peterx@redhat.com>) id 1guC94-00043D-83
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:13:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1guC93-0003wl-0z
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:13:22 -0500
+Date: Thu, 14 Feb 2019 16:13:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190214081305.GB9932@xz-x1>
+References: <1548824953-23413-1-git-send-email-yi.y.sun@linux.intel.com>
+	<1548824953-23413-3-git-send-email-yi.y.sun@linux.intel.com>
+	<20190212062728.GK1011@xz-x1> <20190213090041.GF16968@yi.y.sun>
+	<20190213104224.GA4405@xz-x1> <20190214015204.GG16968@yi.y.sun>
+	<20190214032435.GA3197@xz-x1> <20190214062730.GH16968@yi.y.sun>
+	<20190214071330.GA9932@xz-x1>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19C9402DA@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0d209109-b242-45f2-2132-4d8e196898fc@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 4/5] target/hppa: fix sed conditions
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19C9402DA@SHSMSX104.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [RFC v1 2/3] intel_iommu: add 256 bits qi_desc
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, deller@gmx.de, Richard Henderson <rth@twiddle.net>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 
-Hi Richard,
-
-
-On Mon, Feb 11, 2019 at 08:27:32PM -0800, Richard Henderson wrote:
-> On 2/11/19 10:19 AM, Sven Schnelle wrote:
-> > -    f = (orig & 4) / 4;
-> > -
-> > -    return do_log_cond(c * 2 + f, res);
+On Thu, Feb 14, 2019 at 07:35:20AM +0000, Tian, Kevin wrote:
+> > From: Peter Xu [mailto:peterx@redhat.com]
+> > Sent: Thursday, February 14, 2019 3:14 PM
+> > 
+> > >
+> > > > When 256 bits invalidation descriptor is used, the guest driver
+> > > > should be responsible to fill in zeros into reserved fields.
+> > > >
+> > > > Another question: is val[2] & val[3] used in any place even with
+> > > > 256bits mode?  From what I see from the spec (chap 6.5.2), all of them
+> > > > seems to be reserved as zeros, then I don't understand why bother
+> > > > extending this to 256bits...  Did I miss something?
+> > > >
 > 
-> Given that this used to reference do_log_cond, and you've fixed do_log_cond,
-> why is there any reason for a change here?
+> PRQ is extended to carry larger private data which requires 256bits
+> mode. You can take a look at 7.5.1.1 Page Request Descriptor.
 
-You're right, this patch can be dropped.
+But we are talking about IQ (Invalidation Queue), not PRQ, right?
 
-Regards
-Sven
+I see that Page Request Queue seems to always have 256bits descriptors
+(chap 10.4.32, there is no Descriptor Width field, and I think it
+means DW==1 always), however the Invalidation Queue seems to support
+both modes (chap 10.4.23, there is Descriptor Width field, DW==0
+should be the legacy mode, and DW==1 should be the new mode).  While,
+none of the invalidate descriptors described in chap 6.5.2 is using
+the upper 128bits even if 256bits mode is supported.
+
+Regards,
+
+-- 
+Peter Xu
