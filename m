@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46222)
+Received: from eggs.gnu.org ([209.51.188.92]:46049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guEMK-0002Bg-Ta
+	(envelope-from <peter.maydell@linaro.org>) id 1guEML-00026t-Ie
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:35:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guEG2-00044s-51
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:45 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35192)
+	(envelope-from <peter.maydell@linaro.org>) id 1guEFp-0003tQ-IG
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:32 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35970)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guEFw-0003mN-Ph
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:38 -0500
-Received: by mail-wm1-x341.google.com with SMTP id t200so5541070wmt.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 02:28:22 -0800 (PST)
+	id 1guEFh-0003ki-VP
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:23 -0500
+Received: by mail-wr1-x444.google.com with SMTP id o17so5877248wrw.3
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 02:28:20 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 10:28:11 +0000
-Message-Id: <20190214102816.3393-3-peter.maydell@linaro.org>
-In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
-References: <20190214102816.3393-1-peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 10:28:09 +0000
+Message-Id: <20190214102816.3393-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/7] ui/cocoa: Use the pixman image directly
- in switchSurface
+Subject: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +29,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Currently the switchSurface method takes a DisplaySurface. We want
-to change our DisplayChangeListener's dpy_gfx_switch callback
-to do this work asynchronously on a different thread. The caller
-of the switch callback will free the old DisplaySurface
-immediately the callback returns, so to ensure that the
-other thread doesn't access freed data we need to switch
-to using the underlying pixman image instead. The pixman
-image is reference counted, so we will be able to take
-a reference to it to avoid it vanishing too early.
+This set of patches rearranges how we handle events on
+the OSX Cocoa UI so that we use the main thread to run
+the OSX event loop, and we don't do a long blocking
+operation from the applicationDidFinishLaunching callback.
+Instead we create a second thread which runs qemu_main()
+and becomes the QEMU main-loop thread. The callbacks from
+QEMU into the cocoa code asynchronously dispatch their
+work to the main thread, and the main thread takes the
+iothread lock before calling into QEMU code.
 
-In this commit we only change the switchSurface method
-to take a pixman image, and keep the flow of control
-synchronous for now.
+NB: the code to asynchronously run code blocks on the
+main thread uses dispatch_get_main_queue(), which is a
+10.10-or-later function. I think the benefit in
+clarity-of-code is a worthwhile gain for dropping support
+for ancient OSX versions.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- ui/cocoa.m | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+The change from v1 is that we actually wire up input events
+from OSX to the handleEvent method. There are a couple of
+plausible ways we could do this:
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 2931c751fd..9d23732ff9 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -315,7 +315,7 @@ @interface QemuCocoaView : NSView
-     BOOL isAbsoluteEnabled;
-     BOOL isMouseDeassociated;
- }
--- (void) switchSurface:(DisplaySurface *)surface;
-+- (void) switchSurface:(pixman_image_t *)image;
- - (void) grabMouse;
- - (void) ungrabMouse;
- - (void) toggleFullScreen:(id)sender;
-@@ -495,12 +495,13 @@ - (void) setContentDimensions
-     }
- }
- 
--- (void) switchSurface:(DisplaySurface *)surface
-+- (void) switchSurface:(pixman_image_t *)image
- {
-     COCOA_DEBUG("QemuCocoaView: switchSurface\n");
- 
--    int w = surface_width(surface);
--    int h = surface_height(surface);
-+    int w = pixman_image_get_width(image);
-+    int h = pixman_image_get_height(image);
-+    pixman_format_code_t image_format = pixman_image_get_format(image);
-     /* cdx == 0 means this is our very first surface, in which case we need
-      * to recalculate the content dimensions even if it happens to be the size
-      * of the initial empty window.
-@@ -522,10 +523,10 @@ - (void) switchSurface:(DisplaySurface *)surface
-         CGDataProviderRelease(dataProviderRef);
- 
-     //sync host window color space with guests
--    screen.bitsPerPixel = surface_bits_per_pixel(surface);
--    screen.bitsPerComponent = surface_bytes_per_pixel(surface) * 2;
-+    screen.bitsPerPixel = PIXMAN_FORMAT_BPP(image_format);
-+    screen.bitsPerComponent = DIV_ROUND_UP(screen.bitsPerPixel, 8) * 2;
- 
--    dataProviderRef = CGDataProviderCreateWithData(NULL, surface_data(surface), w * 4 * h, NULL);
-+    dataProviderRef = CGDataProviderCreateWithData(NULL, pixman_image_get_data(image), w * 4 * h, NULL);
- 
-     // update windows
-     if (isFullscreen) {
-@@ -1625,7 +1626,7 @@ static void cocoa_switch(DisplayChangeListener *dcl,
-     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
- 
-     COCOA_DEBUG("qemu_cocoa: cocoa_switch\n");
--    [cocoaView switchSurface:surface];
-+    [cocoaView switchSurface:surface->image];
-     [pool release];
- }
- 
+ * most OSX apps do this by implementing event handling
+   methods on their NSView. This won't work for us, because
+   these only get called after OSX has dealt with some events
+   like menu bar accelerator keystrokes, and we would like to
+   send those to the guest instead in some situations.
+ * we could use addLocalMonitorForEventsMatchingMask to
+   add a "local event monitor", which gets to examine/filter
+   events before the usual OSX event processing. I think this
+   would work, but it's not what I chose
+ * we can subclass NSApplication and implement a custom
+   sendEvent method in our subclass. This gets all events
+   first and can either handle them or call the superclass
+   sendEvent to hand them to OSX as usual. This is what I
+   ended up going for.
+ * It is also possible to implement sendEvent on NSWindow,
+   but I think this has the "only called after OSX has done
+   menu keystroke processing" issue.
+
+I've tested this a bit better than the v1 RFC, and it seems
+to work OK for me.
+
+Patchset structure:
+ * patch 1 does the "make sure we have the iothread lock for
+   calls into QEMU" (which is effectively a no-op initially
+   since we'll already be holding that lock when our refresh
+   etc callbacks are called)
+ * patch 2 makes switchSurface directly take the pixman image
+   (which is refcounted) rather than the DisplaySurface (which
+   is not), so we can make the calls to it asynchronous later
+ * patches 3 and 4 are just trivial code motion
+ * patch 5 (new in v2) restructures handleEvent so it doesn't
+   directly call sendEvent but instead returns a flag indicating
+   whether it consumed the event or not
+ * patch 6 (new in v2) subclasses NSApplication
+ * patch 7 (the old patch 5) does the bulk of the work (and can't
+   really be split further without the UI being broken at the
+   intermediate point)
+
+thanks
+-- PMM
+
+
+Peter Maydell (7):
+  ui/cocoa: Ensure we have the iothread lock when calling into QEMU
+  ui/cocoa: Use the pixman image directly in switchSurface
+  ui/cocoa: Factor out initial menu creation
+  ui/cocoa: Move console/device menu creation code up in file
+  ui/cocoa: Don't call NSApp sendEvent directly from handleEvent
+  ui/cocoa: Subclass NSApplication so we can implement sendEvent
+  ui/cocoa: Perform UI operations only on the main thread
+
+ ui/cocoa.m | 483 ++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 294 insertions(+), 189 deletions(-)
+
 -- 
 2.17.2 (Apple Git-113)
