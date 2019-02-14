@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51068)
+Received: from eggs.gnu.org ([209.51.188.92]:51057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gu7Gg-0007i5-NU
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:00:55 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gu7Gq-0007i3-LQ
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:01:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gu7Ay-0008OF-R9
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:55:02 -0500
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-2-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7a33b8e6-95bb-e6d4-d4e7-8fd62d3400e0@redhat.com>
-Date: Wed, 13 Feb 2019 20:54:38 -0600
+	(envelope-from <stefanha@redhat.com>) id 1gu72q-0003Lh-K1
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:46:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gu72q-0003KC-C1
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 21:46:36 -0500
+Date: Thu, 14 Feb 2019 10:46:24 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190214024624.GC21877@stefanha-x1.localdomain>
+References: <20190213071401.11544-1-stefanha@redhat.com>
+	<20190213081318.GA9754@richard>
 MIME-Version: 1.0
-In-Reply-To: <20190213232356.21034-2-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Byr68ZADeWltFnFF79cMOlHM7V5JQqhXX"
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] block/dirty-bitmap: add recording
- and busy properties
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
+Content-Disposition: inline
+In-Reply-To: <20190213081318.GA9754@richard>
+Subject: Re: [Qemu-devel] [PATCH v2] hostmem-file: reject invalid pmem file
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, libvir-list@redhat.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Zhang Yi <yi.z.zhang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Byr68ZADeWltFnFF79cMOlHM7V5JQqhXX
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, vsementsov@virtuozzo.com,
- Fam Zheng <fam@euphon.net>, libvir-list@redhat.com,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf
- <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <7a33b8e6-95bb-e6d4-d4e7-8fd62d3400e0@redhat.com>
-Subject: Re: [PATCH v2 1/6] block/dirty-bitmap: add recording and busy
- properties
-References: <20190213232356.21034-1-jsnow@redhat.com>
- <20190213232356.21034-2-jsnow@redhat.com>
-In-Reply-To: <20190213232356.21034-2-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--32u276st3Jlj2kUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2/13/19 5:23 PM, John Snow wrote:
-> The current API allows us to report a single status, which we've define=
-d as:
+On Wed, Feb 13, 2019 at 04:13:18PM +0800, Wei Yang wrote:
+> On Wed, Feb 13, 2019 at 03:14:01PM +0800, Stefan Hajnoczi wrote:
+> >diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> >index ba601ce940..d62689179b 100644
+> >--- a/backends/hostmem-file.c
+> >+++ b/backends/hostmem-file.c
+> >@@ -46,6 +46,28 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
+ Error **errp)
+> >     gchar *name;
+> > #endif
+> >=20
+> >+    /*
+> >+     * Verify pmem file size since starting a guest with an incorrect s=
+ize
+> >+     * leads to confusing failures inside the guest.
+> >+     */
+> >+    if (fb->is_pmem && fb->mem_path) {
+> >+        Error *local_err =3D NULL;
+> >+        uint64_t size;
+> >+
+> >+        size =3D qemu_get_pmem_size(fb->mem_path, &local_err);
+> >+        if (!size) {
+> >+            error_propagate(errp, local_err);
+> >+            return;
+> >+        }
+> >+
+> >+        if (backend->size > size) {
+> >+            error_setg(errp, "size property %" PRIu64 " is larger than "
+> >+                       "pmem file \"%s\" size %" PRIu64, backend->size,
+> >+                       fb->mem_path, size);
+> >+            return;
+> >+        }
+> >+    }
+> >+
+> >     if (!backend->size) {
+> >         error_setg(errp, "can't create backend with size 0");
+> >         return;
 >=20
-> Frozen: has a successor, treated as qmp_locked, may or may not be enabl=
-ed.
-> Locked: no successor, qmp_locked. may or may not be enabled.
-> Disabled: Not frozen or locked, disabled.
-> Active: Not frozen, locked, or disabled.
->=20
-> The problem is that both "Frozen" and "Locked" mean nearly the same thi=
-ng,
-> and that both of them do not intuit whether they are recording guest wr=
-ites
-> or not.
->=20
-> This patch deprecates that status field and introduces two orthogonal
-> properties instead to replace it.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/dirty-bitmap.c       |  9 +++++++++
->  qapi/block-core.json       | 10 +++++++++-
->  qemu-deprecated.texi       |  6 ++++++
->  tests/qemu-iotests/236.out | 28 ++++++++++++++++++++++++++++
->  4 files changed, 52 insertions(+), 1 deletion(-)
+> Would it be reasonable to move the above check after checking size and
+> mem_path?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks, will fix in v3.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Stefan
 
-
---Byr68ZADeWltFnFF79cMOlHM7V5JQqhXX
+--32u276st3Jlj2kUU
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxk2G4ACgkQp6FrSiUn
-Q2rb/gf9GM0s9fQJZLjVWqZ3EKtCWLsgBY3zaCLOEXnSTm9aW+EQHod4gIBB0hlo
-te7dr3/DlJl4uNGi0aMy6oyRVKP6UJLiJkwNr5LhwtGbeg5QiYc+4g6VngWLHyQ5
-31GxgnEEox1l3j7+9q+gxonfndqvpQqjzbhPv68nZkGy22ZrNAWwzo/+NgicsglH
-QuLFQ45TQDgk2tHg3uXP41tN0U2nIfz4/3zNdJ5Sth900pC/S655k2LbGuc/E3Yj
-+WasxWaMkjz0XD4yA0bB0jNJcg1U4+dkzPzWG/fL0StAlrEmm78zNrGCeKVp3nPI
-daD0jURhdsRFH2L1S7voGjHzMEUVyA==
-=MbIs
+iQEcBAEBAgAGBQJcZNaAAAoJEJykq7OBq3PIZo4H/RPzSnMwr3Q4TcQq/CXkeZts
+J1lOusMLwaR56AOAOmFtMxpQoP497fwTm78HjbjfkaxfRjv397jQbyISCzGVnffC
++3JU3aCNjmiVtt60ZrEsYKhH0IzDBHnXfC+h5PbGdF4P5V7KnP0EHj8CcgWnDHWT
+PGZxACvRMwQKybCXmYOauZ2YOBMx0aJ43Soi7vNW4RJOwKsvTdnXIBCzkQ/jrHws
+kX7wP6cZlk+MtjrSBECsnRYdjbA8EPtJcWeyx2yGfxpfKO7d0QLZa070viTdDQv4
+Pzd7LnUcWd5Gq+rn+yzNsgC/pYwaHBOffxhMu47b33gS7nF2EY8/fhwC1pXwDIs=
+=T/YS
 -----END PGP SIGNATURE-----
 
---Byr68ZADeWltFnFF79cMOlHM7V5JQqhXX--
+--32u276st3Jlj2kUU--
