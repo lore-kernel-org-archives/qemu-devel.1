@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41313)
+Received: from eggs.gnu.org ([209.51.188.92]:41330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu8d2-0001FV-Bj
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:05 -0500
+	(envelope-from <wexu@redhat.com>) id 1gu8d4-0001Fc-5D
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu8cx-0004gm-UG
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52756)
+	(envelope-from <wexu@redhat.com>) id 1gu8cx-0004gr-UU
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu8cv-0004Rd-SM
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu8cv-0004H8-Qm
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:27:59 -0500
 From: wexu@redhat.com
-Date: Wed, 13 Feb 2019 23:26:35 -0500
-Message-Id: <1550118402-4057-5-git-send-email-wexu@redhat.com>
-In-Reply-To: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 04/11] virtio: initialize wrap counter for
- packed ring
+Date: Wed, 13 Feb 2019 23:26:31 -0500
+Message-Id: <1550118402-4057-1-git-send-email-wexu@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/11] packed ring virtio-net backends
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +27,68 @@ Cc: wexu@redhat.com, jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, m
 
 From: Wei Xu <wexu@redhat.com>
 
-Set to 'true' by default due to spec.
+https://github.com/Whishay/qemu.git 
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
----
- hw/virtio/virtio.c | 3 +++
- 1 file changed, 3 insertions(+)
+Userspace and vhost-net backend test has been done with upstream kernel
+in guest.
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 1a98e61..54dc098 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1238,6 +1238,9 @@ void virtio_reset(void *opaque)
-         vdev->vq[i].last_avail_idx = 0;
-         vdev->vq[i].shadow_avail_idx = 0;
-         vdev->vq[i].used_idx = 0;
-+        vdev->vq[i].last_avail_wrap_counter = true;
-+        vdev->vq[i].avail_wrap_counter = true;
-+        vdev->vq[i].used_wrap_counter = true;
-         virtio_queue_set_vector(vdev, i, VIRTIO_NO_VECTOR);
-         vdev->vq[i].signalled_used = 0;
-         vdev->vq[i].signalled_used_valid = false;
+v3->v4:
+    - add version number to the subject of each patch.(mst)
+
+v2->v3:
+    v2/01 - drop it since the header has been synchronized from kernel.(mst & jason)
+    v3/01 - rename 'avail_wrap_counter' to 'last_avail_wrap_counter',
+            'event_wrap_counter' to 'avail_wrap_counter' to make it easier
+            to understand.(Jason)
+          - revise commit message.(Jason)
+    v3/02 - split packed ring areas size calculation to next patch.(Jason)
+            to not break bisect(Jason).
+    v3/03 - initialize packed ring region with correct size and attribute.
+          - remove unnecessary 'else' checks. (Jason)
+    v3/06 - add commit log.
+          - replace 'event_wrap-counter' with 'avail_wrap_counter'.
+          - merge common memory cache size check to virtqueue_get_avail_bytes().(Jason)
+          - revise memory barrier comment.(Jason) 
+          - check indirect descriptors by desc.len/sizeof(desc).(Jason)
+          - flip wrap counter with '^=1'.(Jason)
+    v3/07 - move desc.id/len initialization to the declaration.(Jason)
+          - flip wrap counter '!' with '^=1'.(Jason)
+          - add memory barrier comments in commit message.
+    v3/08 - use offsetof() when writing cache.(Jason)
+          - avoid duplicated memory region write when turning off event_idx
+            supported notification.(Jason)
+          - add commit log.(Jason)
+          - add avail & last_avail wrap counter difference description in commit log.
+    v3/09 - remove unnecessary used/avail idx/wrap-counter from subsection.
+          - put new subsection to the end of vmstate_virtio.(Jason)
+          - squash the two userspace and vhost-net migration patches in v2.(Jason)
+    v3/10 - reword commit message.
+          - this is a help not a bug fix so I would like to keep it as a
+            separate patch still.(Proposed a merge it by Jason)
+          - the virtqueue_fill() is also not like an API so I would prefer not
+            to touch it, please correct me if I did not get it in the right
+            way.(Proposed a squash by Jason)
+    v3/11 - squash feature bits for user space and vhost kernel/user backends.
+          - enable packed ring feature bit provision on host by default.(Jason)
+
+Wei Xu (11):
+  virtio: rename structure for packed ring
+  virtio: device/driver area size calculation helper for split ring
+  virtio: initialize packed ring region
+  virtio: initialize wrap counter for packed ring
+  virtio: queue/descriptor check helpers for packed ring
+  virtio: get avail bytes check for packed ring
+  virtio: fill/flush/pop for packed ring
+  virtio: event suppression support for packed ring
+  virtio-net: update the head descriptor in a chain lastly
+  virtio: migration support for packed ring
+  virtio: CLI and provide packed ring feature bit by default
+
+ hw/net/vhost_net.c         |   2 +
+ hw/net/virtio-net.c        |  11 +-
+ hw/virtio/virtio.c         | 798 +++++++++++++++++++++++++++++++++++++++++----
+ include/hw/virtio/virtio.h |   4 +-
+ 4 files changed, 757 insertions(+), 58 deletions(-)
+
 -- 
 1.8.3.1
