@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33172)
+Received: from eggs.gnu.org ([209.51.188.92]:33169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1guA1G-0007OK-MO
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:57:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guA1K-0007OF-4r
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:57:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gu9qg-0001qQ-9w
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:46:16 -0500
-Received: from ozlabs.org ([203.11.71.1]:36471)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gu9qe-0001pS-V5
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:46:14 -0500
-Date: Thu, 14 Feb 2019 16:38:36 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190214053836.GD1884@umbus.fritz.box>
-References: <20190214050808.16653-1-david@gibson.dropbear.id.au>
+	(envelope-from <no-reply@patchew.org>) id 1gu9pb-0001H8-9O
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:45:08 -0500
+Resent-Message-Id: <E1gu9pb-0001H8-9O@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155012277047.24.10759104947805473803@49fa7ef69f7b>
+In-Reply-To: <20190214052809.44336-1-mahaocong_work@163.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="oDT+BabbEBWcQhh5"
-Content-Disposition: inline
-In-Reply-To: <20190214050808.16653-1-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [PATCH 0/2] Some small cleanups and corrections to
- PCI-E handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 13 Feb 2019 21:39:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4] drive-mirror: add incremental mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +23,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, mdroth@linux.vnet.ibm.com
+To: mahaocong_work@163.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, mahaocong@didichuxing.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-
---oDT+BabbEBWcQhh5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 14, 2019 at 04:08:06PM +1100, David Gibson wrote:
-> Here are a couple of cleanups for PCI-E handling which arose out of
-> some other work I have in progress.  At least the first of these
-> patches has been posted before as part of a different series, but
-> wasn't ready to go at the time.
-
-Self NACK.
-
-Sorry, made a sloppy error in my testing and this breaks make check.
-I'll repost once I've fixed it.
-
->=20
-> David Gibson (2):
->   pci: Simplify pci_bus_is_root()
->   pcie: Don't allow extended config space access via conventional PCI
->     bridges
->=20
->  hw/pci-bridge/pci_expander_bridge.c |  6 -----
->  hw/pci/pci.c                        | 40 ++++++++++++++++++++++-------
->  hw/virtio/virtio-pci.c              |  1 +
->  include/hw/pci/pci.h                |  5 ++--
->  include/hw/pci/pci_bus.h            | 13 ++++++++++
->  5 files changed, 48 insertions(+), 17 deletions(-)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---oDT+BabbEBWcQhh5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxk/tcACgkQbDjKyiDZ
-s5LS+hAA5kEj8BnbskfFhhFPRwqxYYaFphC2bPUOHCNoQn0w9/Vx2sSJLm55xa75
-OlTuI2r4yNDu08/2AV2vgkLkZBlJiv0+JHwjwMo59WXRrS+v9iJ7wW9kCUkofqGo
-02OBhHe8VpoGhBoJnJkwv8AxDc9wbqCGadh9aXtdwsoOhGMIf77fOX4hVN2BjrjY
-LRL69PdxlbLzpJqsTgpS7RbOj3Zxx5z5KSt80uKP2gjyCZ9J0Wov0gu/NYT1InL/
-nbPDQ2x7YKbxpLSPWcRqAy+JThCDfHPhHqj1BaaLdGHA/MrJqco4pBA6myhY/Nmf
-eo06bQgn4z5vbeehPnuGCb8bWrgF6bkzRniFEEUNEejIbAvODvHM9Jw/GUBYA+r0
-LMfjL5HpXURomgGKRGn3MzGW3JqvgmSGhy0NyDjMVQ3+zzYz0WWglzR554BWHimm
-xVqEY98AsK+GDubMfATVPETwj789LFmsICykSY5qeS5ifxGAKbttSXGGYgsXSrpL
-Hq7oeiMl23EjluqQg0Hz7mLaAn2CxtyKAnXhF60Rv0bd/3egjCHnto0P2QExPEuz
-PjezvKJDE+QH0H/PbTV7vmMgV8+7xKqdWIHi21RKP2IffBKMxI1IHRCTcC19F7Fi
-S20D/QWdVQP//c3qKtsdE1UkkLji06UMFCWOqLTNXwjNmK0wWTk=
-=CNm9
------END PGP SIGNATURE-----
-
---oDT+BabbEBWcQhh5--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDA1MjgwOS40NDMz
+Ni0xLW1haGFvY29uZ193b3JrQDE2My5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMjE0MDUyODA5LjQ0MzM2LTEtbWFoYW9j
+b25nX3dvcmtAMTYzLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0XSBkcml2ZS1t
+aXJyb3I6IGFkZCBpbmNyZW1lbnRhbCBtb2RlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
+OTAyMTQwNTI4MDkuNDQzMzYtMS1tYWhhb2Nvbmdfd29ya0AxNjMuY29tIC0+IHBhdGNoZXcvMjAx
+OTAyMTQwNTI4MDkuNDQzMzYtMS1tYWhhb2Nvbmdfd29ya0AxNjMuY29tClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKOTc4MDY2ZDYzMSBkcml2ZS1taXJyb3I6IGFkZCBpbmNyZW1lbnRh
+bCBtb2RlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNjU6IEZJTEU6IGJsb2NrL21pcnJvci5jOjgyMjoKK3N0YXRpYyB2b2lkIGNvcm91dGlu
+ZV9mbiBtaXJyb3JfZGlydHlfaW5pdF9pbmNyZW1lbnRhbChNaXJyb3JCbG9ja0pvYiAqcywgRXJy
+b3IgKiplcnJwKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVu
+dGhlc2lzICcoJwojMTk5OiBGSUxFOiBibG9ja2Rldi5jOjM3NzM6CisgICAgaWYgKCAhYml0bWFw
+X25hbWUgJiYgKHN5bmMgPT0gTUlSUk9SX1NZTkNfTU9ERV9JTkNSRU1FTlRBTCkpIHsKCnRvdGFs
+OiAxIGVycm9ycywgMSB3YXJuaW5ncywgMjM2IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA5NzgwNjZk
+NjMxYTkgKGRyaXZlLW1pcnJvcjogYWRkIGluY3JlbWVudGFsIG1vZGUpIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwMjE0MDUyODA5LjQ0MzM2LTEtbWFoYW9jb25nX3dvcmtAMTYzLmNvbS90ZXN0
+aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
