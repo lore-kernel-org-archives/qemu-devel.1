@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42467)
+Received: from eggs.gnu.org ([209.51.188.92]:43718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1guCZl-0005Z5-Lk
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:58 -0500
+	(envelope-from <peterx@redhat.com>) id 1guCcr-0007LB-Ac
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:44:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1guCZa-0000t6-Gq
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:40:52 -0500
-Date: Thu, 14 Feb 2019 16:39:55 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190214083955.GA20090@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190212052224.GA4839@richard>
-	<20190212003414-mutt-send-email-mst@kernel.org>
-	<4d6f639b-fe11-7048-3975-ee1c1875b8d3@vivier.eu>
-	<3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
-	<af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
-	<20190214000317.GA19899@richard>
-	<3dd545f2-5346-2b01-8725-5f35cbaa0ae5@vivier.eu>
-	<d69dd1c9-aa58-4b03-6b9c-1cde7bed83cb@vivier.eu>
-	<20190214081828.GA19789@richard>
-	<33fc1da2-144b-22b5-bcb1-f85fab64b623@vivier.eu>
+	(envelope-from <peterx@redhat.com>) id 1guCcn-00049k-0I
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:44:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1guCcm-00048Y-Jz
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:44:04 -0500
+Date: Thu, 14 Feb 2019 16:43:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190214084354.GC9932@xz-x1>
+References: <20190212062728.GK1011@xz-x1> <20190213090041.GF16968@yi.y.sun>
+	<20190213104224.GA4405@xz-x1> <20190214015204.GG16968@yi.y.sun>
+	<20190214032435.GA3197@xz-x1> <20190214062730.GH16968@yi.y.sun>
+	<20190214071330.GA9932@xz-x1>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19C9402DA@SHSMSX104.ccr.corp.intel.com>
+	<20190214081305.GB9932@xz-x1>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19C9403C2@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <33fc1da2-144b-22b5-bcb1-f85fab64b623@vivier.eu>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19C9403C2@SHSMSX104.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [RFC v1 2/3] intel_iommu: add 256 bits qi_desc
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 
-On Thu, Feb 14, 2019 at 09:23:39AM +0100, Laurent Vivier wrote:
->On 14/02/2019 09:18, Wei Yang wrote:
->> On Thu, Feb 14, 2019 at 09:10:14AM +0100, Laurent Vivier wrote:
->>> On 14/02/2019 08:57, Laurent Vivier wrote:
->>>> On 14/02/2019 01:03, Wei Yang wrote:
->>>>> On Wed, Feb 13, 2019 at 02:45:01PM +0100, Laurent Vivier wrote:
->>>>>> On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
->>>>>>> Hi Laurent,
->>>>>>>
->>>>>>> On 2/13/19 9:49 AM, Laurent Vivier wrote:
->>>>>>>> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
->>>>>>>>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
->>>>>>>>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
->>>>>>>>>>> There are several functions/variable which are not used anymore.
->>>>>>>>>>>
->>>>>>>>>>> This serials just remove those without functional change.
->>>>>>>>>>>
->>>>>>>>>>> v3: add ack and repost in a new thread
->>>>>>>>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
->>>>>>>>>>
->>>>>>>>>> Michael,
->>>>>>>>>>
->>>>>>>>>> Looks this serials is not merged yet.
->>>>>>>>>>
->>>>>>>>>> Is there any problem I need to fix?
->>>>>>>>>
->>>>>>>>> Yes pls repost with fixed reviewed-by tags.
->>>>>>>>
->>>>>>>> Or I can take the series through the trivial branch and update manually
->>>>>>>> Philippe's lastname?
->>>>>>>
->>>>>>> I appreciate the help with manual update, however Wei is not the only
->>>>>>> one having this problem (other developpers has non-ASCII in their name,
->>>>>>> and use such tags).
->>>>>>> I'd rather prefer we find a proper configuration setup to help the
->>>>>>> community.
->>>>>>
->>>>>> I'm wondering if it can be a problem with cut'n'paste rather than with
->>>>>> git-sendemail.
->>>>>>
->>>>>> I think the following tags should cover Latin and Chinese characters:
->>>>>>
->>>>>> Content-Type: text/plain; charset=UTF-8
->>>>>> Content-Transfer-Encoding: 8bit
->>>>>>
->>>>>
->>>>> Looks not work.
->>>>>
->>>>> I have tried this and also with 
->>>>>
->>>>> Content-Language: en-US
->>>>
->>>> Could  you send me a gzipped version of the 0001-XXX.patch in attachment
->>>> so I could see the real content before git-send-email?
->>>
->>> OK, I've got it.
->>>
->>> What I see is it is already corrupted, thus the problem is not with
->>> git-send-email.
->>>
->>> So either it is corrupted by git-format-patch (which is very unlikely,
->>> we could see that if you push it to a public git repo) or it has been
->>> corrupted when you have added it to the commit message.
->>>
->> 
->> Hmm... maybe you are right.
->> 
->> But I found confused how to fix this.
->> 
->> When I use git commit --amend to fix it, the character looks good in my
->> editor. I use vim as my git editor.
->> 
->> But when I use git show, it display an unknown character.
->> 
->> And if I use git format-patch, the patch file looks good in my vim editor. But
->> corrupted if I use another editor.
->> 
->> Do you have any idea on this?
->
->What is the result of command "locale" in your terminal?
->How do you copy the characters to vim?
->
+On Thu, Feb 14, 2019 at 08:22:05AM +0000, Tian, Kevin wrote:
+> > From: Peter Xu [mailto:peterx@redhat.com]
+> > Sent: Thursday, February 14, 2019 4:13 PM
+> > 
+> > On Thu, Feb 14, 2019 at 07:35:20AM +0000, Tian, Kevin wrote:
+> > > > From: Peter Xu [mailto:peterx@redhat.com]
+> > > > Sent: Thursday, February 14, 2019 3:14 PM
+> > > >
+> > > > >
+> > > > > > When 256 bits invalidation descriptor is used, the guest driver
+> > > > > > should be responsible to fill in zeros into reserved fields.
+> > > > > >
+> > > > > > Another question: is val[2] & val[3] used in any place even with
+> > > > > > 256bits mode?  From what I see from the spec (chap 6.5.2), all of
+> > them
+> > > > > > seems to be reserved as zeros, then I don't understand why bother
+> > > > > > extending this to 256bits...  Did I miss something?
+> > > > > >
+> > >
+> > > PRQ is extended to carry larger private data which requires 256bits
+> > > mode. You can take a look at 7.5.1.1 Page Request Descriptor.
+> > 
+> > But we are talking about IQ (Invalidation Queue), not PRQ, right?
+> > 
+> > I see that Page Request Queue seems to always have 256bits descriptors
+> > (chap 10.4.32, there is no Descriptor Width field, and I think it
+> > means DW==1 always), however the Invalidation Queue seems to support
+> > both modes (chap 10.4.23, there is Descriptor Width field, DW==0
+> > should be the legacy mode, and DW==1 should be the new mode).  While,
+> > none of the invalidate descriptors described in chap 6.5.2 is using
+> > the upper 128bits even if 256bits mode is supported.
+> > 
+> 
+> Page Group Response descriptor is composed by software through
+> invalidation queue, which needs to carry same private data back
+> (as in page request descriptor). it's described in 7.7.1.
 
-My locale output:
+I see the point.  Thanks, Kevin.
 
-    $ locale
-    LANG=en_US.UTF-8
-    LANGUAGE=
-    LC_CTYPE="en_US.UTF-8"
-    LC_NUMERIC=zh_CN.UTF-8
-    LC_TIME=zh_CN.UTF-8
-    LC_COLLATE="en_US.UTF-8"
-    LC_MONETARY=zh_CN.UTF-8
-    LC_MESSAGES="en_US.UTF-8"
-    LC_PAPER=zh_CN.UTF-8
-    LC_NAME=zh_CN.UTF-8
-    LC_ADDRESS=zh_CN.UTF-8
-    LC_TELEPHONE=zh_CN.UTF-8
-    LC_MEASUREMENT=zh_CN.UTF-8
-    LC_IDENTIFICATION=zh_CN.UTF-8
-    LC_ALL=
-
-I copy&paste the character from mutt to vim. Let me see if it would work if I
-save the character from mutt mail itself.
-
->Thanks,
->Laurent
+Regards,
 
 -- 
-Wei Yang
-Help you, Help me
+Peter Xu
