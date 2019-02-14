@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40706)
+Received: from eggs.gnu.org ([209.51.188.92]:46058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guDwf-0005tw-5T
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:08:41 -0500
+	(envelope-from <laurent.desnogues@gmail.com>) id 1guEMJ-000276-70
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:35:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guDwZ-0002B9-Eu
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:08:37 -0500
-References: <20190213143322.31371-1-david@redhat.com>
-	<20190213143322.31371-13-david@redhat.com>
-	<634cf76a-f1b9-138a-2ed4-e666c4be35f1@linaro.org>
-	<99906aad-e22a-8cc3-8c49-4e2a2ce3d0e9@redhat.com>
-	<0d90f059-bb8f-7979-6b41-feaea75953d5@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fbf58651-4727-c60d-4491-9cd0d7c55245@redhat.com>
-Date: Thu, 14 Feb 2019 11:08:31 +0100
+	(envelope-from <laurent.desnogues@gmail.com>) id 1guEGS-00051E-RO
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:29:10 -0500
+Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:50469)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+	id 1guEGR-0004gB-1U
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:29:07 -0500
+Received: by mail-it1-x144.google.com with SMTP id z7so13838528iti.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 02:29:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <0d90f059-bb8f-7979-6b41-feaea75953d5@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/15] s390x/tcg: Implement XxC and
- checks for most FP instructions
+References: <20190214040652.4811-1-richard.henderson@linaro.org>
+In-Reply-To: <20190214040652.4811-1-richard.henderson@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Thu, 14 Feb 2019 11:28:48 +0100
+Message-ID: <CABoDooP6WtwRnSjRhQjD=0Z_K1+wvZGufzc40hnGjmwGuo9NkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 14.02.19 06:25, Richard Henderson wrote:
-> On 2/13/19 11:53 AM, David Hildenbrand wrote:
->> On 13.02.19 20:31, Richard Henderson wrote:
->>> On 2/13/19 6:33 AM, David Hildenbrand wrote:
->>>> With the floating-point extension facility
->>>> - CONVERT FROM LOGICAL
->>>> - CONVERT TO LOGICAL
->>>> - CONVERT TO FIXED
->>>> - CONVERT FROM FIXED
->>>> - LOAD FP INTEGER
->>>> have both, a rounding mode specification and the inexact-exception control
->>>> (XxC). Other instructions will be handled separatly.
->>>>
->>>> Check for valid rounding modes and forward also the XxC (via m4). To avoid
->>>> a lot of boilerplate code and changes to the helpers, combine both, the
->>>> m3 and m4 field in a combined 32 bit TCG variable. Perform checks at
->>>> a central place, taking in account if the m3 or m4 field was ignore
->>>> before the floating-point extension facility was introduced.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>
->>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>>
->>>> +static inline bool xxc_from_m34(uint32_t m34)
->>>> +{
->>>> +    /* XxC is bit 1 of m4 */
->>>> +    return (extract32(m34, 4, 4) & 0x4) != 0;
->>>
->>> Better as extract32(m32, 6, 1);
->>
->> Is it "better as" that or "better written as" that?
->>
->> I think "extract32(m34, 4, 4) & 0x4" is slightly easier to understand.
->> (get m4 field and take the bit number 1)
-> 
-> I don't like not extracting the bit that you want.  Do you prefer to let the
-> compiler fold the constant?  E.g.  4 + 3 - 1?
+Hi Richard,
 
-Yes, that looks better.
+On Thu, Feb 14, 2019 at 5:07 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> We've talked about this before, caching state to reduce the
+> amount of computation that happens looking up each TB.
+>
+> I know that Peter has been concerned that we would not be able to
+> reliably maintain all of the places that need to be updates to
+> keep this up-to-date.
+>
+> Well, modulo dirty tricks within linux-user, it appears as if
+> exception delivery and return, plus after every TB-ending write
+> to a system register is sufficient.
+>
+> There seems to be a noticable improvement, although wall-time
+> is harder to come by -- all of my system-level measurements
+> include user input, and my user-level measurements seem to be
+> too small to matter.
 
-> 
-> I hate big-endian bit numbering...
-> 
-> 
-> r~
-> 
-
-
--- 
+FWIW this patch series made a run of linux-user AArch64 176.gcc 166.i
+go from 29.5s down to 24.5s (on an E5-2650 v2).  Though that'd need
+more benchmarks, that looks quite good to me.
 
 Thanks,
 
-David / dhildenb
+Laurent
+
+>
+> r~
+>
+>
+> Richard Henderson (4):
+>   target/arm: Split out recompute_hflags et al
+>   target/arm: Rebuild hflags at el changes and MSR writes
+>   target/arm: Assert hflags is correct in cpu_get_tb_cpu_state
+>   target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
+>
+>  target/arm/cpu.h           |  22 ++-
+>  target/arm/helper.h        |   3 +
+>  target/arm/internals.h     |   4 +
+>  linux-user/syscall.c       |   1 +
+>  target/arm/cpu.c           |   1 +
+>  target/arm/helper-a64.c    |   3 +
+>  target/arm/helper.c        | 267 ++++++++++++++++++++++---------------
+>  target/arm/machine.c       |   1 +
+>  target/arm/op_helper.c     |   1 +
+>  target/arm/translate-a64.c |   6 +-
+>  target/arm/translate.c     |  14 +-
+>  11 files changed, 204 insertions(+), 119 deletions(-)
+>
+> --
+> 2.17.1
+>
+>
