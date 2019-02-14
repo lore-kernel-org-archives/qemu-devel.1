@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50008)
+Received: from eggs.gnu.org ([209.51.188.92]:49935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guGeU-00038O-4U
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:02:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guGeU-00034b-Gp
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guGTx-0006Rr-Ux
+	(envelope-from <peter.maydell@linaro.org>) id 1guGTx-0006RI-5N
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:51:14 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40011)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53578)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guGTx-0006RS-Oo
+	id 1guGTw-0006QP-VO
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 07:51:13 -0500
-Received: by mail-wm1-x342.google.com with SMTP id q21so5966731wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 04:51:13 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id d15so6168294wmb.3
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 04:51:12 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 12:50:56 +0000
-Message-Id: <20190214125107.22178-4-peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 12:50:55 +0000
+Message-Id: <20190214125107.22178-3-peter.maydell@linaro.org>
 In-Reply-To: <20190214125107.22178-1-peter.maydell@linaro.org>
 References: <20190214125107.22178-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 03/14] hw/timer/pl031: Allow use as an
- embedded-struct device
+Subject: [Qemu-devel] [PATCH 02/14] hw/misc/tz-ppc: Support having unused
+ ports in the middle of the range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,122 +32,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Create a new include file for the pl031's device struct,
-type macros, etc, so that it can be instantiated using
-the "embedded struct" coding style.
+The Peripheral Protection Controller's handling of unused ports
+is that if there is nothing connected to the port's downstream
+then it does not create the sysbus MMIO region for the upstream
+end of the port. This results in odd behaviour when there is
+an unused port in the middle of the range: since sysbus MMIO
+regions are implicitly consecutively allocated, any used ports
+above the unused ones end up with sysbus MMIO region numbers
+that don't match the port number.
+
+Avoid this numbering mismatch by creating dummy MMIO regions
+for the unused ports. This doesn't change anything for our
+existing boards, which don't have any gaps in the middle of
+the port ranges they use; but it will be needed for the Musca
+board.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/timer/pl031.h | 44 ++++++++++++++++++++++++++++++++++++++++
- hw/timer/pl031.c         | 25 +----------------------
- MAINTAINERS              |  1 +
- 3 files changed, 46 insertions(+), 24 deletions(-)
- create mode 100644 include/hw/timer/pl031.h
+ include/hw/misc/tz-ppc.h |  8 +++++++-
+ hw/misc/tz-ppc.c         | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/timer/pl031.h b/include/hw/timer/pl031.h
-new file mode 100644
-index 00000000000..99416d8ba52
---- /dev/null
-+++ b/include/hw/timer/pl031.h
-@@ -0,0 +1,44 @@
-+/*
-+ * ARM AMBA PrimeCell PL031 RTC
-+ *
-+ * Copyright (c) 2007 CodeSourcery
-+ *
-+ * This file is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * Contributions after 2012-01-13 are licensed under the terms of the
-+ * GNU GPL, version 2 or (at your option) any later version.
-+ */
-+
-+#ifndef HW_TIMER_PL031
-+#define HW_TIMER_PL031
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_PL031 "pl031"
-+#define PL031(obj) OBJECT_CHECK(PL031State, (obj), TYPE_PL031)
-+
-+typedef struct PL031State {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    QEMUTimer *timer;
-+    qemu_irq irq;
-+
+diff --git a/include/hw/misc/tz-ppc.h b/include/hw/misc/tz-ppc.h
+index fc8b806e4df..080d6e2ec17 100644
+--- a/include/hw/misc/tz-ppc.h
++++ b/include/hw/misc/tz-ppc.h
+@@ -38,7 +38,13 @@
+  *
+  * QEMU interface:
+  * + sysbus MMIO regions 0..15: MemoryRegions defining the upstream end
+- *   of each of the 16 ports of the PPC
++ *   of each of the 16 ports of the PPC. When a port is unused (i.e. no
++ *   downstream MemoryRegion is connected to it) at the end of the 0..15
++ *   range then no sysbus MMIO region is created for its upstream. When an
++ *   unused port lies in the middle of the range with other used ports at
++ *   higher port numbers, a dummy MMIO region is created to ensure that
++ *   port N's upstream is always sysbus MMIO region N. Dummy regions should
++ *   not be mapped, and will assert if any access is made to them.
+  * + Property "port[0..15]": MemoryRegion defining the downstream device(s)
+  *   for each of the 16 ports of the PPC
+  * + Named GPIO inputs "cfg_nonsec[0..15]": set to 1 if the port should be
+diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
+index 3dd045c15f5..2e04837bea9 100644
+--- a/hw/misc/tz-ppc.c
++++ b/hw/misc/tz-ppc.c
+@@ -181,6 +181,21 @@ static const MemoryRegionOps tz_ppc_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++static bool tz_ppc_dummy_accepts(void *opaque, hwaddr addr,
++                                 unsigned size, bool is_write,
++                                 MemTxAttrs attrs)
++{
 +    /*
-+     * Needed to preserve the tick_count across migration, even if the
-+     * absolute value of the rtc_clock is different on the source and
-+     * destination.
++     * Board code should never map the upstream end of an unused port,
++     * so we should never try to make a memory access to it.
 +     */
-+    uint32_t tick_offset_vmstate;
-+    uint32_t tick_offset;
++    g_assert_not_reached();
++}
 +
-+    uint32_t mr;
-+    uint32_t lr;
-+    uint32_t cr;
-+    uint32_t im;
-+    uint32_t is;
-+} PL031State;
++static const MemoryRegionOps tz_ppc_dummy_ops = {
++    .valid.accepts = tz_ppc_dummy_accepts,
++};
 +
-+#endif
-diff --git a/hw/timer/pl031.c b/hw/timer/pl031.c
-index d3aacce80da..f774dcd5223 100644
---- a/hw/timer/pl031.c
-+++ b/hw/timer/pl031.c
-@@ -12,6 +12,7 @@
-  */
+ static void tz_ppc_reset(DeviceState *dev)
+ {
+     TZPPC *s = TZ_PPC(dev);
+@@ -210,16 +225,33 @@ static void tz_ppc_realize(DeviceState *dev, Error **errp)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     TZPPC *s = TZ_PPC(dev);
+     int i;
++    int max_port = 0;
  
- #include "qemu/osdep.h"
-+#include "hw/timer/pl031.h"
- #include "hw/sysbus.h"
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
-@@ -36,30 +37,6 @@ do { printf("pl031: " fmt , ## __VA_ARGS__); } while (0)
- #define RTC_MIS     0x18    /* Masked interrupt status register */
- #define RTC_ICR     0x1c    /* Interrupt clear register */
+     /* We can't create the upstream end of the port until realize,
+      * as we don't know the size of the MR used as the downstream until then.
+      */
+     for (i = 0; i < TZ_NUM_PORTS; i++) {
++        if (s->port[i].downstream) {
++            max_port = i;
++        }
++    }
++
++    for (i = 0; i <= max_port; i++) {
+         TZPPCPort *port = &s->port[i];
+         char *name;
+         uint64_t size;
  
--#define TYPE_PL031 "pl031"
--#define PL031(obj) OBJECT_CHECK(PL031State, (obj), TYPE_PL031)
--
--typedef struct PL031State {
--    SysBusDevice parent_obj;
--
--    MemoryRegion iomem;
--    QEMUTimer *timer;
--    qemu_irq irq;
--
--    /* Needed to preserve the tick_count across migration, even if the
--     * absolute value of the rtc_clock is different on the source and
--     * destination.
--     */
--    uint32_t tick_offset_vmstate;
--    uint32_t tick_offset;
--
--    uint32_t mr;
--    uint32_t lr;
--    uint32_t cr;
--    uint32_t im;
--    uint32_t is;
--} PL031State;
--
- static const unsigned char pl031_id[] = {
-     0x31, 0x10, 0x14, 0x00,         /* Device ID        */
-     0x0d, 0xf0, 0x05, 0xb1          /* Cell ID      */
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9a76845581b..85d4b4c9f7c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -493,6 +493,7 @@ F: hw/sd/pl181.c
- F: hw/ssi/pl022.c
- F: include/hw/ssi/pl022.h
- F: hw/timer/pl031.c
-+F: include/hw/timer/pl031.h
- F: include/hw/arm/primecell.h
- F: hw/timer/cmsdk-apb-timer.c
- F: include/hw/timer/cmsdk-apb-timer.h
+         if (!port->downstream) {
++            /*
++             * Create dummy sysbus MMIO region so the sysbus region
++             * numbering doesn't get out of sync with the port numbers.
++             * The size is entirely arbitrary.
++             */
++            name = g_strdup_printf("tz-ppc-dummy-port[%d]", i);
++            memory_region_init_io(&port->upstream, obj, &tz_ppc_dummy_ops,
++                                  port, name, 0x10000);
++            sysbus_init_mmio(sbd, &port->upstream);
++            g_free(name);
+             continue;
+         }
+ 
 -- 
 2.20.1
