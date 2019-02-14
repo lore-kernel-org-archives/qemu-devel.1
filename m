@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35416)
+Received: from eggs.gnu.org ([209.51.188.92]:36040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1guCC0-00073h-89
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:16:27 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1guCEb-0008Ga-Tx
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:19:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1guCBz-0008P6-21
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:16:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1guCBy-0008OH-Oe
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:16:23 -0500
-Date: Thu, 14 Feb 2019 16:16:19 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190214081619.GB7652@stefanha-x1.localdomain>
-References: <20190214031004.32522-1-stefanha@redhat.com>
-	<20190214031004.32522-2-stefanha@redhat.com>
-	<20190214072629.GA18896@richard>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1guCEY-0004fq-63
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:19:05 -0500
+Date: Thu, 14 Feb 2019 16:18:28 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190214081828.GA19789@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
+	<20190212052224.GA4839@richard>
+	<20190212003414-mutt-send-email-mst@kernel.org>
+	<4d6f639b-fe11-7048-3975-ee1c1875b8d3@vivier.eu>
+	<3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
+	<af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
+	<20190214000317.GA19899@richard>
+	<3dd545f2-5346-2b01-8725-5f35cbaa0ae5@vivier.eu>
+	<d69dd1c9-aa58-4b03-6b9c-1cde7bed83cb@vivier.eu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190214072629.GA18896@richard>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] hostmem: simplify ifdef-s in
- file_backend_memory_alloc()
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d69dd1c9-aa58-4b03-6b9c-1cde7bed83cb@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
 
+On Thu, Feb 14, 2019 at 09:10:14AM +0100, Laurent Vivier wrote:
+>On 14/02/2019 08:57, Laurent Vivier wrote:
+>> On 14/02/2019 01:03, Wei Yang wrote:
+>>> On Wed, Feb 13, 2019 at 02:45:01PM +0100, Laurent Vivier wrote:
+>>>> On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
+>>>>> Hi Laurent,
+>>>>>
+>>>>> On 2/13/19 9:49 AM, Laurent Vivier wrote:
+>>>>>> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
+>>>>>>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
+>>>>>>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
+>>>>>>>>> There are several functions/variable which are not used anymore.
+>>>>>>>>>
+>>>>>>>>> This serials just remove those without functional change.
+>>>>>>>>>
+>>>>>>>>> v3: add ack and repost in a new thread
+>>>>>>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
+>>>>>>>>
+>>>>>>>> Michael,
+>>>>>>>>
+>>>>>>>> Looks this serials is not merged yet.
+>>>>>>>>
+>>>>>>>> Is there any problem I need to fix?
+>>>>>>>
+>>>>>>> Yes pls repost with fixed reviewed-by tags.
+>>>>>>
+>>>>>> Or I can take the series through the trivial branch and update manually
+>>>>>> Philippe's lastname?
+>>>>>
+>>>>> I appreciate the help with manual update, however Wei is not the only
+>>>>> one having this problem (other developpers has non-ASCII in their name,
+>>>>> and use such tags).
+>>>>> I'd rather prefer we find a proper configuration setup to help the
+>>>>> community.
+>>>>
+>>>> I'm wondering if it can be a problem with cut'n'paste rather than with
+>>>> git-sendemail.
+>>>>
+>>>> I think the following tags should cover Latin and Chinese characters:
+>>>>
+>>>> Content-Type: text/plain; charset=UTF-8
+>>>> Content-Transfer-Encoding: 8bit
+>>>>
+>>>
+>>> Looks not work.
+>>>
+>>> I have tried this and also with 
+>>>
+>>> Content-Language: en-US
+>> 
+>> Could  you send me a gzipped version of the 0001-XXX.patch in attachment
+>> so I could see the real content before git-send-email?
+>
+>OK, I've got it.
+>
+>What I see is it is already corrupted, thus the problem is not with
+>git-send-email.
+>
+>So either it is corrupted by git-format-patch (which is very unlikely,
+>we could see that if you push it to a public git repo) or it has been
+>corrupted when you have added it to the commit message.
+>
 
---lEGEL1/lMxI0MVQ2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hmm... maybe you are right.
 
-On Thu, Feb 14, 2019 at 03:26:29PM +0800, Wei Yang wrote:
-> Maybe change the title=20
->=20
->    s/hotmem/hostmem-file/
->=20
-> would be more proper.
->=20
-> I missed this in previous review.
+But I found confused how to fix this.
 
-You're right.  This can be fixed when merging the patch.
+When I use git commit --amend to fix it, the character looks good in my
+editor. I use vim as my git editor.
 
-Stefan
+But when I use git show, it display an unknown character.
 
---lEGEL1/lMxI0MVQ2
-Content-Type: application/pgp-signature; name="signature.asc"
+And if I use git format-patch, the patch file looks good in my vim editor. But
+corrupted if I use another editor.
 
------BEGIN PGP SIGNATURE-----
+Do you have any idea on this?
 
-iQEcBAEBAgAGBQJcZSPTAAoJEJykq7OBq3PILz0H/R8UbvPXIxwI5e40V39Ga7Id
-ZeSl/XkwRCUmHYRGpMcPXIAOsSKaRLMQBkDwu0fF2yhWQpcM4H1wfz6zkpspeOLI
-5tcgZDwZz/uPX3/wsQ04N6T3QSDjGg0gF7hUnLDtGFaQnSxMC0PyboKHdkPIM4AB
-tAPCWAx3YqjFCuYyYnMDMyQfLxA6Vo8X2d5Vw+r+4xwpcdW+avOpkd5EDWsRyqwD
-knoXKAj6yOes9FkJqqSkYMx6GDlZ3FoUhaZprRgIrLr3AMQzMjJ2Or8pfpPhk3PO
-ujNyzTeZK56SJDKcoGPhT63VmGDb39yKhvWvibyR40jyg0oaINML9wTdKMLiCc4=
-=bCcR
------END PGP SIGNATURE-----
+>Thanks,
+>Laurent
+>
 
---lEGEL1/lMxI0MVQ2--
+-- 
+Wei Yang
+Help you, Help me
