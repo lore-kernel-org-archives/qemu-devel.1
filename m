@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46354)
+Received: from eggs.gnu.org ([209.51.188.92]:52009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gu8pS-0002YX-B2
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gu9Aq-00019x-VF
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:03:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gu8pE-0007CR-UL
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:40:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gu9Ap-0008Uk-CW
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 00:03:00 -0500
+Date: Thu, 14 Feb 2019 15:59:32 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 14 Feb 2019 15:39:16 +1100
-Message-Id: <20190214043916.22128-6-david@gibson.dropbear.id.au>
-In-Reply-To: <20190214043916.22128-1-david@gibson.dropbear.id.au>
-References: <20190214043916.22128-1-david@gibson.dropbear.id.au>
+Message-ID: <20190214045926.GB1884@umbus.fritz.box>
+References: <20190117025115.81178-1-aik@ozlabs.ru>
+	<fbe0ca8e-4d52-d59c-4f8d-9a1f473a81df@gmail.com>
+	<b82674e7-cc41-6bba-2f9e-9882bfd7afbd@ozlabs.ru>
+	<20190207081830.4dcbb822@x1.home>
+	<295fa9ca-29c1-33e6-5168-8991bc0ef7b1@ozlabs.ru>
+	<20190207202620.23e9c063@x1.home>
+	<20190208052849.GB6434@umbus.fritz.box>
+	<45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 5/5] virtio-balloon: Safely handle
- BALLOON_PAGE_SIZE < host page size
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="5C/VXimrgG1HEvSQ"
+Content-Disposition: inline
+In-Reply-To: <45e89e77-02ad-aebf-ab2f-e5e7f7e12ecb@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
+ vfio: NVIDIA V100 + P9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,195 +31,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>
 
-The virtio-balloon always works in units of 4kiB (BALLOON_PAGE_SIZE), but
-we can only actually discard memory in units of the host page size.
 
-Now, we handle this very badly: we silently ignore balloon requests that
-aren't host page aligned, and for requests that are host page aligned we
-discard the entire host page.  The latter can corrupt guest memory if its
-page size is smaller than the host's.
+--5C/VXimrgG1HEvSQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The obvious choice would be to disable the balloon if the host page size =
-is
-not 4kiB.  However, that would break the special case where host and gues=
-t
-have the same page size, but that's larger than 4kiB.  That case currentl=
-y
-works by accident[1] - and is used in practice on many production POWER
-systems where 64kiB has long been the Linux default page size on both hos=
-t
-and guest.
-
-To make the balloon safe, without breaking that useful special case, we
-need to accumulate 4kiB balloon requests until we have a whole contiguous
-host page to discard.
-
-We could in principle do that across all guest memory, but it would requi=
-re
-a large bitmap to track.  This patch represents a compromise: we track
-ballooned subpages for a single contiguous host page at a time.  This mea=
-ns
-that if the guest discards all 4kiB chunks of a host page in succession,
-we will discard it.  This is the expected behaviour in the (host page) =3D=
-=3D
-(guest page) !=3D 4kiB case we want to support.
-
-If the guest scatters 4kiB requests across different host pages, we don't
-discard anything, and issue a warning.  Not ideal, but at least we don't
-corrupt guest memory as the previous version could.
-
-Warning reporting is kind of a compromise here.  Determining whether we'r=
-e
-in a problematic state at realize() time is tricky, because we'd have to
-look at the host pagesizes of all memory backends, but we can't really kn=
-ow
-if some of those backends could be for special purpose memory that's not
-subject to ballooning.
-
-Reporting only when the guest tries to balloon a partial page also isn't
-great because if the guest page size happens to line up it won't indicate
-that we're in a non ideal situation.  It could also cause alarming repeat=
+On Mon, Feb 11, 2019 at 02:49:49PM +1100, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 08/02/2019 16:28, David Gibson wrote:
+> > On Thu, Feb 07, 2019 at 08:26:20PM -0700, Alex Williamson wrote:
+> >> On Fri, 8 Feb 2019 13:29:37 +1100
+> >> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >>
+> >>> On 08/02/2019 02:18, Alex Williamson wrote:
+> >>>> On Thu, 7 Feb 2019 15:43:18 +1100
+> >>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >>>>  =20
+> >>>>> On 07/02/2019 04:22, Daniel Henrique Barboza wrote: =20
+> >>>>>> Based on this series, I've sent a Libvirt patch to allow a QEMU pr=
+ocess
+> >>>>>> to inherit IPC_LOCK when using VFIO passthrough with the Tesla V100
+> >>>>>> GPU:
+> >>>>>>
+> >>>>>> https://www.redhat.com/archives/libvir-list/2019-February/msg00219=
+=2Ehtml
+> >>>>>>
+> >>>>>>
+> >>>>>> In that thread, Alex raised concerns about allowing QEMU to freely=
+ lock
+> >>>>>> all the memory it wants. Is this an issue to be considered in the =
+review
+> >>>>>> of this series here?
+> >>>>>>
+> >>>>>> Reading the patches, specially patch 3/3, it seems to me that QEMU=
+ is
+> >>>>>> going to lock the KVM memory to populate the NUMA node with memory
+> >>>>>> of the GPU itself, so at first there is no risk of not taking over=
+ the
+> >>>>>> host RAM.
+> >>>>>> Am I missing something?   =20
+> >>>>>
+> >>>>>
+> >>>>> The GPU memory belongs to the device and not visible to the host as
+> >>>>> memory blocks and not covered by page structs, for the host it is m=
+ore
+> >>>>> like MMIO which is passed through to the guest without that locked
+> >>>>> accounting, I'd expect libvirt to keep working as usual except that:
+> >>>>>
+> >>>>> when libvirt calculates the amount of memory needed for TCE tables
+> >>>>> (which is guestRAM/64k*8), now it needs to use the end of the last =
+GPU
+> >>>>> RAM window as a guest RAM size. For example, in QEMU HMP "info mtre=
+e -f":
+> >>>>>
+> >>>>> FlatView #2
+> >>>>>  AS "memory", root: system
+> >>>>>  AS "cpu-memory-0", root: system
+> >>>>>  Root memory region: system
+> >>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >>>>>   0000010000000000-0000011fffffffff (prio 0, ram): nvlink2-mr
+> >>>>>
+> >>>>> So previously the DMA window would cover 0x7fffffff+1, now it has to
+> >>>>> cover 0x11fffffffff+1. =20
+> >>>>
+> >>>> This looks like a chicken and egg problem, you're saying libvirt nee=
+ds
+> >>>> to query mtree to understand the extent of the GPU layout, but we ne=
 ed
-warnings whenever a migration is attempted.
+> >>>> to specify the locked memory limits in order for QEMU to start?  Is
+> >>>> libvirt supposed to start the VM with unlimited locked memory and fix
+> >>>> it at some indeterminate point in the future?  Run a dummy VM with
+> >>>> unlimited locked memory in order to determine the limits for the real
+> >>>> VM?  Neither of these sound practical.  Thanks, =20
+> >>>
+> >>>
+> >>> QEMU maps GPU RAM at known locations (which only depends on the vPHB's
+> >>> index or can be set explicitely) and libvirt knows how many GPUs are
+> >>> passed so it is quite easy to calculate the required amount of memory.
+> >>>
+> >>> Here is the window start calculation:
+> >>> https://github.com/aik/qemu/commit/7073cad3ae7708d657e01672bcf5309280=
+8b54fb#diff-662409c2a5a150fe231d07ea8384b920R3812
+> >>>
+> >>> We do not exactly know the GPU RAM window size until QEMU reads it fr=
+om
+> >>> VFIO/nvlink2 but we know that all existing hardware has a window of
+> >>> 128GB (the adapters I have access to only have 16/32GB on board).
+> >>
+> >> So you're asking that libvirt add 128GB per GPU with magic nvlink
+> >> properties, which may be 8x what's actually necessary and libvirt
+> >> determines which GPUs to apply this to how?  Does libvirt need to sort
+> >> through device tree properties for this?  Thanks,
+> >=20
+> > Hm.  If the GPU memory is really separate from main RAM, which it
+> > sounds like, I don't think it makes sense to account it against the
+> > same locked memory limit as regular RAM.
+>=20
+> This is accounting for TCE table to cover GPU RAM, not for GPU RAM itself.
 
-So, what we do is warn the first time the guest attempts balloon a partia=
-l
-host page, whether or not it will end up ballooning the rest of the page
-immediately afterwards.
+Ah, ok, that makes sense then
 
-[1] Because when the guest attempts to balloon a page, it will submit
-    requests for each 4kiB subpage.  Most will be ignored, but the one
-    which happens to be host page aligned will discard the whole lot.
+> So I am asking libvirt to add 128GB/64k*8=3D16MB to the locked_vm. It
+> already does so for the guest RAM.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/virtio/virtio-balloon.c         | 69 +++++++++++++++++++++++++-----
- include/hw/virtio/virtio-balloon.h |  3 ++
- 2 files changed, 62 insertions(+), 10 deletions(-)
+That seems reasonable.  IIRC we already have some slop in the amount
+of locked vm that libvirt allocates; not sure if it'll be enough as
+is.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index e4cd8d566b..65f861cbef 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -33,33 +33,82 @@
-=20
- #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
-=20
-+typedef struct PartiallyBalloonedPage {
-+    RAMBlock *rb;
-+    ram_addr_t base;
-+    unsigned long bitmap[];
-+} PartiallyBalloonedPage;
-+
- static void balloon_inflate_page(VirtIOBalloon *balloon,
-                                  MemoryRegion *mr, hwaddr offset)
- {
-     void *addr =3D memory_region_get_ram_ptr(mr) + offset;
-     RAMBlock *rb;
-     size_t rb_page_size;
--    ram_addr_t ram_offset;
-+    int subpages;
-+    ram_addr_t ram_offset, host_page_base;
-=20
-     /* XXX is there a better way to get to the RAMBlock than via a
-      * host address? */
-     rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
-     rb_page_size =3D qemu_ram_pagesize(rb);
-+    host_page_base =3D ram_offset & ~(rb_page_size - 1);
-+
-+    if (rb_page_size =3D=3D BALLOON_PAGE_SIZE) {
-+        /* Easy case */
-=20
--    /* Silently ignore hugepage RAM blocks */
--    if (rb_page_size !=3D getpagesize()) {
-+        ram_block_discard_range(rb, ram_offset, rb_page_size);
-+        /* We ignore errors from ram_block_discard_range(), because it
-+         * has already reported them, and failing to discard a balloon
-+         * page is not fatal */
-         return;
-     }
-=20
--    /* Silently ignore unaligned requests */
--    if (ram_offset & (rb_page_size - 1)) {
--        return;
-+    /* Hard case
-+     *
-+     * We've put a piece of a larger host page into the balloon - we
-+     * need to keep track until we have a whole host page to
-+     * discard
-+     */
-+    warn_report_once(
-+"Balloon used with backing page size > 4kiB, this may not be reliable");
-+
-+    subpages =3D rb_page_size / BALLOON_PAGE_SIZE;
-+
-+    if (balloon->pbp
-+        && (rb !=3D balloon->pbp->rb
-+            || host_page_base !=3D balloon->pbp->base)) {
-+        /* We've partially ballooned part of a host page, but now
-+         * we're trying to balloon part of a different one.  Too hard,
-+         * give up on the old partial page */
-+        free(balloon->pbp);
-+        balloon->pbp =3D NULL;
-     }
-=20
--    ram_block_discard_range(rb, ram_offset, rb_page_size);
--    /* We ignore errors from ram_block_discard_range(), because it has
--     * already reported them, and failing to discard a balloon page is
--     * not fatal */
-+    if (!balloon->pbp) {
-+        /* Starting on a new host page */
-+        size_t bitlen =3D BITS_TO_LONGS(subpages) * sizeof(unsigned long=
-);
-+        balloon->pbp =3D g_malloc0(sizeof(PartiallyBalloonedPage) + bitl=
-en);
-+        balloon->pbp->rb =3D rb;
-+        balloon->pbp->base =3D host_page_base;
-+    }
-+
-+    bitmap_set(balloon->pbp->bitmap,
-+               (ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
-+               subpages);
-+
-+    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
-+        /* We've accumulated a full host page, we can actually discard
-+         * it now */
-+
-+        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size);
-+        /* We ignore errors from ram_block_discard_range(), because it
-+         * has already reported them, and failing to discard a balloon
-+         * page is not fatal */
-+
-+        free(balloon->pbp);
-+        balloon->pbp =3D NULL;
-+    }
- }
-=20
- static const char *balloon_stat_names[] =3D {
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virti=
-o-balloon.h
-index e0df3528c8..99dcd6d105 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -30,6 +30,8 @@ typedef struct virtio_balloon_stat_modern {
-        uint64_t val;
- } VirtIOBalloonStatModern;
-=20
-+typedef struct PartiallyBalloonedPage PartiallyBalloonedPage;
-+
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
-     VirtQueue *ivq, *dvq, *svq;
-@@ -42,6 +44,7 @@ typedef struct VirtIOBalloon {
-     int64_t stats_last_update;
-     int64_t stats_poll_interval;
-     uint32_t host_features;
-+    PartiallyBalloonedPage *pbp;
- } VirtIOBalloon;
-=20
- #endif
 --=20
-2.20.1
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--5C/VXimrgG1HEvSQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxk9asACgkQbDjKyiDZ
+s5LFzw/41jP75NOaTjZ/RL0vQ4BqtiYAfrK0rcxU+wl8pnnGgvqWWh2reQ+QOU/S
+RbopzKn6UgRiiX9LoS7rGQjPSGoD7Y5kjm9OnKeyLMhukVFq8T+UWgfu8yB5qyiy
+ZzTuShHB1USEn4ILfe7o+fqC+b5kazlK5wqRiHgZqavKtV+H++utZZqMOXYM88QH
+4BzhZO2uDUeeHHQovDXLbnfqGGLZm3vg5f2e5XsOIKELm8jAcy7y3WnQulvYQDy3
+KfKy52dCtP76JNZmd9wu3SauPZ2uB2c1lIJLKWbpCNnxSfIPLAvz2vm3e8sUckwQ
+MBJaND85CU2jxxf3wY2I8EF8ED5DpIHGLlz9qhQpYEmurR2bT+ndIwYVA3EGe2F1
+w3xoGDxT9erzogMamPKiTHU9s1BXu/JtDxH9PF/aZs4hXNH5v2IYURa5cksmDU8P
+t5o5XgM4CX8uesAICeXWIYOx5DaLgCvbGFRAY5WUsyLuTNKNm4VP0DKfpaCsLBdY
++YtsEhMSqvUYPialusQPW9MahxUUcQdpMIeDDmeTvl03MK5CkmoCjefdt1vdDuf2
+QJNV2O7QS1Lbq8EowUbqOkWUkU9i38ohFZkXHssH+LHbbuYwiyKa8PugAAjldier
+iyVNLosfS9U+BQaA4h7s0rDPiRNsCYauaL1glSJ4auN0X8aG4g==
+=OM6+
+-----END PGP SIGNATURE-----
+
+--5C/VXimrgG1HEvSQ--
