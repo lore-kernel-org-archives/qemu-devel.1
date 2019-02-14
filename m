@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36247)
+Received: from eggs.gnu.org ([209.51.188.92]:38436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guP07-0005rw-M2
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:57:01 -0500
+	(envelope-from <svens@stackframe.org>) id 1guP7x-0000vu-5R
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 17:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guOvR-0005Bx-TH
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:52:12 -0500
-Resent-Message-Id: <E1guOvR-0005Bx-TH@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21805)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guOvR-00051p-Du
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 16:52:09 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155018109490.24.5381803895505778006@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <svens@stackframe.org>) id 1guP7w-0005Xa-6F
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 17:05:05 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:43734)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1guP7v-0005VQ-Q6
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 17:05:04 -0500
+From: Sven Schnelle <svens@stackframe.org>
+Date: Thu, 14 Feb 2019 23:04:53 +0100
+Message-Id: <20190214220453.15858-1-svens@stackframe.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 13:51:35 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] lsi: implement basic SBCL functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +24,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Sven Schnelle <svens@stackframe.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMu
-MjUwMzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYw
-My4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCmFjZjU3MDYzNWIgZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBw
-YWNrZXQuCmNmZDhmNTVlOTUgdGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxs
-cwoyNTliYjg2N2I4IHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJh
-dGlvbgo2YjA0MzI4ZWY3IHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFNDUi5RQyB0byBhIHZlY3Rv
-ciBmaWVsZApkZTcyOTJjNWE4IHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhy
-ZWdzW0FSTV9WRlBfRlBTQ1JdCjk5OWVjN2JkMmQgdGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdz
-IHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMKMjAwMzFmNGQ4MSB0YXJnZXQvYXJtOiBGaXggYXJt
-X2NwdV9kdW1wX3N0YXRlIHZzIEZQU0NSCjdmMmNjYmUyZmMgdGFyZ2V0L2FybTogRml4IHZmcF9n
-ZGJfZ2V0L3NldF9yZWcgdnMgRlBTQ1IKMzY1MjIxNTA0MiB0YXJnZXQvYXJtOiBSZW1vdmUgbmVv
-biBtaW4vbWF4IGhlbHBlcnMKYTJmOWFlOWQwMCB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIg
-bWluL21heCBwcmltaXRpdmVzIGZvciBuZW9uCjJhOTc2MTYzNDEgdGFyZ2V0L2FybTogVXNlIHZl
-Y3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjBjYmQ4ZTFkNzMgdGFyZ2V0L2FybTog
-VXNlIHZlY3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CjYwZGJjMTljMDkgdGFyZ2V0
-L2FybTogUmVseSBvbiBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgo2MTJlMWE2
-NGY5IGh3L2FybS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKNzkwMzNm
-YjRmZiBody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCmIw
-MzUzZDA5ZDggTUFJTlRBSU5FUlM6IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlv
-dXMgZW50cmllcwoxZjJiMDJiMmNkIGFybTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZN
-IGd1ZXN0cyB0byBiZSBjaGFuZ2VkIGJ5IFFFTVUgY29kZQowNmE1MjY2ZWY3IGxpbnV4LXVzZXIv
-ZWxmbG9hZDogZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0CjYwZWVmNjAyNjEgdGFyZ2V0
-L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaCmRmZTBiZjIyNjkg
-dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UKMDI3YzI4M2FlZiB0YXJn
-ZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZQo2NDE3MTVjMWE1IHRh
-cmdldC9hcm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3Rl
-cnMKMGZjZTg3NTk1MSB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9pbnRfY29udgo3
-NDNmYTE4YWJmIHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3Bl
-cmF0aW9uCjkzNjAyZTJjZDMgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBv
-cmRlciBpbiBwYWlyZWRfY21weGNoZzY0X2JlCjU5MDg0ZTA0ZTUgdGFyZ2V0L2FybTogSW1wbGVt
-ZW50IEhBQ1JfRUwyCjcxNTBmMTc5NjcgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3Ig
-UE1FVlRZUEVSL1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNv
-bW1pdCA3MTUwZjE3OTY3YWEgKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZU
-WVBFUi9QTUVWQ05UUikKMi8yNyBDaGVja2luZyBjb21taXQgNTkwODRlMDRlNWQ2ICh0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IDkzNjAyZTJjZDNm
-NSAodGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRf
-Y21weGNoZzY0X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCA3NDNmYTE4YWJmYjggKHRhcmdldC9h
-cm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNr
-aW5nIGNvbW1pdCAwZmNlODc1OTUxNTMgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2Zw
-X2ludF9jb252KQo2LzI3IENoZWNraW5nIGNvbW1pdCA2NDE3MTVjMWE1M2QgKHRhcmdldC9hcm06
-IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcg
-Q2hlY2tpbmcgY29tbWl0IDAyN2MyODNhZWY4NiAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJl
-Z2lzdGVycyB0byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IGRmZTBiZjIyNjkyMSAo
-dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcg
-Y29tbWl0IDYwZWVmNjAyNjFiNiAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCBy
-ZWdpc3RlcnMgYXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgMDZhNTI2NmVmNzU0IChsaW51
-eC11c2VyL2VsZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hl
-Y2tpbmcgY29tbWl0IDFmMmIwMmIyY2Q3YSAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZv
-ciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBj
-b21taXQgYjAzNTNkMDlkODViIChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRl
-IGZyb20gdmFyaW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgNzkwMzNmYjRmZjQ0
-IChody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8y
-NyBDaGVja2luZyBjb21taXQgNjEyZTFhNjRmOWU5IChody9hcm0vYXJtc3NlOiBGaXggbWlzd2ly
-aW5nIG9mIGV4cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgNjBkYmMxOWMwOTZm
-ICh0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29y
-KQoxNi8yNyBDaGVja2luZyBjb21taXQgMGNiZDhlMWQ3MzY5ICh0YXJnZXQvYXJtOiBVc2UgdmVj
-dG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCAy
-YTk3NjE2MzQxMmIgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3Ig
-YWFyY2gzMikKMTgvMjcgQ2hlY2tpbmcgY29tbWl0IGEyZjlhZTlkMDBkYyAodGFyZ2V0L2FybTog
-VXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tp
-bmcgY29tbWl0IDM2NTIyMTUwNDJjZCAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBo
-ZWxwZXJzKQoyMC8yNyBDaGVja2luZyBjb21taXQgN2YyY2NiZTJmYzE0ICh0YXJnZXQvYXJtOiBG
-aXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVu
-dHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6
-ODQ6CisgICAgY2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0
-OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6
-IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNj
-cihlbnYsIGxkbF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
-cywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjIxLzI3IENoZWNraW5nIGNvbW1pdCAyMDAzMWY0ZDgxY2UgKHRhcmdldC9hcm06IEZpeCBh
-cm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCA5OTllYzdi
-ZDJkODEgKHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBh
-cmVzKQoyMy8yNyBDaGVja2luZyBjb21taXQgZGU3MjkyYzVhOGQzICh0YXJnZXQvYXJtOiBGaXgg
-c2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcg
-Y29tbWl0IDZiMDQzMjhlZjcwMiAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEg
-dmVjdG9yIGZpZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgMjU5YmI4NjdiOGM3ICh0YXJnZXQv
-YXJtOiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJt
-L3ZlY19oZWxwZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0g
-PSB2bTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3
-IENoZWNraW5nIGNvbW1pdCBjZmQ4ZjU1ZTk1OTkgKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNs
-ZWFyX3RhaWwgY2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCBhY2Y1NzA2MzViMzQgKGdkYnN0
-dWI6IFNlbmQgYSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1w
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+HP-UX checks this register after sending data to the target. If there's no valid
+information present, it assumes the client disconnected because the kernel sent
+to much data. Implement at least some of the SBCL functionality that is possible
+without having a real SCSI bus.
+
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ hw/scsi/lsi53c895a.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index 89def1421f..b12be02bf1 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -160,6 +160,11 @@ static const char *names[] = {
+ #define LSI_CCNTL1_DDAC      0x08
+ #define LSI_CCNTL1_ZMOD      0x80
+ 
++#define LSI_SBCL_ATN         0x08
++#define LSI_SBCL_BSY         0x20
++#define LSI_SBCL_ACK         0x40
++#define LSI_SBCL_REQ         0x80
++
+ /* Enable Response to Reselection */
+ #define LSI_SCID_RRE      0x60
+ 
+@@ -258,6 +263,7 @@ typedef struct {
+     uint8_t sdid;
+     uint8_t ssid;
+     uint8_t sfbr;
++    uint8_t sbcl;
+     uint8_t stest1;
+     uint8_t stest2;
+     uint8_t stest3;
+@@ -356,6 +362,7 @@ static void lsi_soft_reset(LSIState *s)
+     s->socl = 0;
+     s->sdid = 0;
+     s->ssid = 0;
++    s->sbcl = 0;
+     s->stest1 = 0;
+     s->stest2 = 0;
+     s->stest3 = 0;
+@@ -530,6 +537,8 @@ static void lsi_script_dma_interrupt(LSIState *s, int stat)
+ 
+ static inline void lsi_set_phase(LSIState *s, int phase)
+ {
++    s->sbcl &= ~PHASE_MASK;
++    s->sbcl |= phase | LSI_SBCL_REQ;
+     s->sstat1 = (s->sstat1 & ~PHASE_MASK) | phase;
+ }
+ 
+@@ -567,6 +576,7 @@ static void lsi_disconnect(LSIState *s)
+ {
+     s->scntl1 &= ~LSI_SCNTL1_CON;
+     s->sstat1 &= ~PHASE_MASK;
++    s->sbcl = 0;
+ }
+ 
+ static void lsi_bad_selection(LSIState *s, uint32_t id)
+@@ -1265,7 +1275,9 @@ again:
+                 s->scntl1 |= LSI_SCNTL1_CON;
+                 if (insn & (1 << 3)) {
+                     s->socl |= LSI_SOCL_ATN;
++                    s->sbcl |= LSI_SBCL_ATN;
+                 }
++                s->sbcl |= LSI_SBCL_BSY;
+                 lsi_set_phase(s, PHASE_MO);
+                 break;
+             case 1: /* Disconnect */
+@@ -1297,8 +1309,14 @@ again:
+                         insn & (1 << 10) ? " CC" : "");
+                 if (insn & (1 << 3)) {
+                     s->socl |= LSI_SOCL_ATN;
++                    s->sbcl |= LSI_SBCL_ATN;
+                     lsi_set_phase(s, PHASE_MO);
+                 }
++
++                if (insn & (1 << 6)) {
++                    s->sbcl |= LSI_SBCL_ACK;
++                }
++
+                 if (insn & (1 << 9)) {
+                     qemu_log_mask(LOG_UNIMP,
+                         "lsi_scsi: Target mode not implemented\n");
+@@ -1314,7 +1332,13 @@ again:
+                         insn & (1 << 10) ? " CC" : "");
+                 if (insn & (1 << 3)) {
+                     s->socl &= ~LSI_SOCL_ATN;
++                    s->sbcl &= ~LSI_SBCL_ATN;
+                 }
++
++                if (insn & (1 << 6)) {
++                    s->sbcl &= ~LSI_SBCL_ACK;
++                }
++
+                 if (insn & (1 << 10))
+                     s->carry = 0;
+                 break;
+@@ -1591,9 +1615,7 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
+         ret = s->ssid;
+         break;
+     case 0xb: /* SBCL */
+-        /* ??? This is not correct. However it's (hopefully) only
+-           used for diagnostics, so should be ok.  */
+-        ret = 0;
++        ret = s->sbcl;
+         break;
+     case 0xc: /* DSTAT */
+         ret = s->dstat | LSI_DSTAT_DFE;
+@@ -2202,6 +2224,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
+         VMSTATE_UINT8(stime0, LSIState),
+         VMSTATE_UINT8(respid0, LSIState),
+         VMSTATE_UINT8(respid1, LSIState),
++        VMSTATE_UINT8(sbcl, LSIState),
+         VMSTATE_UINT32(mmrs, LSIState),
+         VMSTATE_UINT32(mmws, LSIState),
+         VMSTATE_UINT32(sfs, LSIState),
+-- 
+2.20.1
