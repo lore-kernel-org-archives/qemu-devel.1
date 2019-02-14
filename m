@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46412)
+Received: from eggs.gnu.org ([209.51.188.92]:47076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guNjN-0001OL-Bd
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:35:38 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1guNlc-00025d-UJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guNjK-0002v0-12
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:35:36 -0500
-References: <1550047098-1210-1-git-send-email-thuth@redhat.com>
-	<1550047098-1210-3-git-send-email-thuth@redhat.com>
-	<CAFEAcA8XGsKzS=4=wn7k0ZYRpw7toNUtaxQarcvfmrcp_7LvZQ@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1guNlb-0004Hv-8D
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:37:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1guNla-0004Fi-VK
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:37:55 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D38D580E7C
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 20:37:53 +0000 (UTC)
+References: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
+	<20190214142251-mutt-send-email-mst@kernel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c13aed3-ff17-8416-270c-f2910ba51fe1@redhat.com>
-Date: Thu, 14 Feb 2019 21:35:07 +0100
+Message-ID: <dc4366ec-cbb7-47f6-d705-22edf680dfe6@redhat.com>
+Date: Thu, 14 Feb 2019 21:37:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8XGsKzS=4=wn7k0ZYRpw7toNUtaxQarcvfmrcp_7LvZQ@mail.gmail.com>
+In-Reply-To: <20190214142251-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/25] hw/arm: Express dependencies of
- the highbank machines with Kconfig
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] vhost: enable for all targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +34,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com
 
-On 14/02/19 20:17, Peter Maydell wrote:
-> On Wed, 13 Feb 2019 at 08:38, Thomas Huth <thuth@redhat.com> wrote:
+On 14/02/19 20:28, Michael S. Tsirkin wrote:
+> On Thu, Feb 14, 2019 at 06:35:47PM +0100, Paolo Bonzini wrote:
+>> See also "[PATCH for-3.2 00/10] vhost: preparation for qgraph
+>> conversion of vhost-user-test".  Some of the other vhost-user-test
+>> patches have gone in already, and this is what is left.
 >>
->> Add Kconfig dependencies for the highbank machine (and the midway
->> machine).
->> This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs =
-(i.e.
->> his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+>> These patches are a prerequisite for both kconfig and qgraph.
 >>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  default-configs/arm-softmmu.mak |  4 +---
->>  hw/arm/Kconfig                  | 12 ++++++++++++
->>  2 files changed, 13 insertions(+), 3 deletions(-)
+>> I will probably test them on macOS myself before these are included
+>> in a pull request, since the previous versions had some issues.
+>> Michael, let me know if you want me to send the pull request.
 >>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-sof=
-tmmu.mak
->> index 3baafc4..59734ee 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -6,6 +6,7 @@ CONFIG_ARM_V7M=3Dy
->>  CONFIG_PCI_DEVICES=3Dy
+>> Thanks,
 >>
->>  CONFIG_EXYNOS4=3Dy
->> +CONFIG_HIGHBANK=3Dy
->>
->>  CONFIG_VGA=3Dy
->>  CONFIG_NAND=3Dy
->> @@ -54,14 +55,12 @@ CONFIG_PL022=3Dy
->>  CONFIG_PL031=3Dy
->>  CONFIG_PL041=3Dy
->>  CONFIG_PL050=3Dy
->> -CONFIG_PL061=3Dy
->>  CONFIG_PL080=3Dy
->>  CONFIG_PL110=3Dy
->>  CONFIG_PL181=3Dy
->>  CONFIG_PL190=3Dy
->>  CONFIG_PL330=3Dy
->>  CONFIG_CADENCE=3Dy
->> -CONFIG_XGMAC=3Dy
->=20
-> Could you explain the logic for when CONFIG_*=3Dy
-> lines get deleted from the arm-softmmu.mak?
-> In this patch PL061 has been deleted, but PL011,
-> PL022, PL031 have not, though all these devices are
-> used in both Highbank and in other not-yet-converted
-> machine types. What's the difference ?
+>> Paolo
+> 
+> what's the changelog from v1?
 
-I think it's a mistake.  I'd not remove any CONFIG_*=3Dy except in a fina=
-l
-separate patch.
+It's rebased and it includes the not-yet-merged parts of "vhost:
+preparation for qgraph conversion of vhost-user-test", but otherwise
+there are no changes.
 
 Paolo
+
+> 
+>> Paolo Bonzini (9):
+>>   vhost-net: move stubs to a separate file
+>>   vhost-net-user: add stubs for when no virtio-net device is present
+>>   vhost: restrict Linux dependency to kernel vhost
+>>   vhost-user: support cross-endian vnet headers
+>>   vhost-net: compile it on all targets that have virtio-net.
+>>   vhost-net: revamp configure logic
+>>   vhost-user-test: create a main loop per TestServer
+>>   vhost-user-test: small changes to init_hugepagefs
+>>   vhost-user-test: create a temporary directory per TestServer
+>>
+>>  backends/Makefile.objs     |   5 +-
+>>  configure                  | 102 ++++++++++++++++++-----------
+>>  default-configs/virtio.mak |   4 +-
+>>  hw/net/Makefile.objs       |   4 +-
+>>  hw/net/vhost_net-stub.c    |  92 ++++++++++++++++++++++++++
+>>  hw/net/vhost_net.c         |  85 ++----------------------
+>>  hw/virtio/Makefile.objs    |   8 ++-
+>>  hw/virtio/vhost-backend.c  |  12 +++-
+>>  hw/virtio/vhost-user.c     |  13 +++-
+>>  hw/virtio/vhost.c          |   2 +-
+>>  include/exec/poison.h      |   1 -
+>>  net/Makefile.objs          |   4 +-
+>>  net/net.c                  |   2 +-
+>>  net/vhost-user-stub.c      |  23 +++++++
+>>  net/vhost-user.c           |  13 ++++
+>>  tests/Makefile.include     |   5 +-
+>>  tests/vhost-user-test.c    | 160 +++++++++++++++++++++++----------------------
+>>  17 files changed, 319 insertions(+), 216 deletions(-)
+>>  create mode 100644 hw/net/vhost_net-stub.c
+>>  create mode 100644 net/vhost-user-stub.c
+>>
+>> -- 
+>> 1.8.3.1
