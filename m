@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57145)
+Received: from eggs.gnu.org ([209.51.188.92]:60068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gu7q2-0000Zu-Vw
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:37:28 -0500
+	(envelope-from <wexu@redhat.com>) id 1gu88w-0006Zg-CN
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:56:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gu7q2-0002ke-3P
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:37:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37838)
+	(envelope-from <wexu@redhat.com>) id 1gu87J-0005FZ-5q
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:55:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gu7q1-0002h4-Rk
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:37:26 -0500
-Date: Thu, 14 Feb 2019 11:37:17 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190214033717.GE21877@stefanha-x1.localdomain>
-References: <1550022537-27565-1-git-send-email-changpeng.liu@intel.com>
-	<20190213080143.GE26332@stefanha-x1.localdomain>
-	<20190213083227.xkih3ckbtiromd2v@steredhat>
-	<20190213121703.zmzpgl4fvvsfg4pf@steredhat>
-	<20190213120418-mutt-send-email-mst@kernel.org>
-	<CAGxU2F7Pn2N4fxr54jg4fUsNNT2Yo-OR10XHqfCLKv=BhQUCBQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu87D-0005DS-VZ
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 22:55:13 -0500
+Date: Thu, 14 Feb 2019 11:52:18 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20190214035218.GA12997@wei-ubt>
+References: <1550064346-17012-1-git-send-email-wexu@redhat.com>
+	<20190213091402-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FEz7ebHBGB6b2e8X"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGxU2F7Pn2N4fxr54jg4fUsNNT2Yo-OR10XHqfCLKv=BhQUCBQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4] virtio-blk: set correct config size for
- the host driver
+In-Reply-To: <20190213091402-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] packed ring virtio-net backends
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Changpeng Liu <changpeng.liu@intel.com>, qemu devel list <qemu-devel@nongnu.org>, Lukas Doktor <ldoktor@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com, tiwei.bie@intel.com
 
+On Wed, Feb 13, 2019 at 09:17:57AM -0500, Michael S. Tsirkin wrote:
+> On Wed, Feb 13, 2019 at 08:25:35AM -0500, wexu@redhat.com wrote:
+> > From: Wei Xu <wexu@redhat.com>
+> > 
+> > https://github.com/Whishay/qemu.git 
+> > 
+> > Userspace and vhost-net backedn test has been done with upstream kernel
+> > in guest.
+> 
+> Just a general comment: please format *all* patches
+> with --subject-prefix "PATCH v3", or with -v3.
+> 
+> Do not manually change patch 0 subject adding version there.
+> 
+> This makes it possible to figure out where does each patch go.
+> 
+OK, thanks a lot.
 
---FEz7ebHBGB6b2e8X
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 13, 2019 at 06:45:20PM +0100, Stefano Garzarella wrote:
-> I'm not sure if using the feature_sizes array the migration works well.
-> I mean if we have QEMU 3.1 with a single queue and we want to migrate to
-> QEMU 4.0 with a single queue, the config_size could be different,
-> because VIRTIO_NET_F_MQ is not set in the host_features.
->=20
-> Maybe we should initialize a config_size to the VIRTIO_BLK_CFG_SIZE macro
-> defined by Changpeng and then use the feature_sizes arrays only for the
-> new features (i.e.  discard, write_zeroes)
->=20
-> What do you think?
-
-I agree.  The config size must not change for existing machine types.
-
-Your code makes sense for future features but old features must use the
-static config size.
-
-Stefan
-
---FEz7ebHBGB6b2e8X
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcZOJtAAoJEJykq7OBq3PIj28H/2OPFSoHyiL6/0Ceag8R/FDL
-BZJ9KSnWsmXexNCmxfhUujlxEjRkwvWvzgohgxf9MKAvtoeAMaXndboIDedtwXYX
-ASqUYuQZNn6fG8Y4RUlw9tLugRrWteiKKpJRWiZk/KaP1KTSG2xehgtVPGxwKh3N
-yc1zNTD5Nc38LZd0EGmYo72gvu5o70pJuJCUjx9elhgaLP+G8HmPh6KVTV2Y4vpP
-QRvufhy7+cfw+XCqKyJmIZepkkjZaPfRfQkw43GMgAXneLjZqcC4ljw8dg80942W
-0PdrBHJJu+pYUxjLIlS2PgxeT6CBFF+eTERN5+2Yv9a8wTWYLrK9DKvZjtnUp60=
-=0UXa
------END PGP SIGNATURE-----
-
---FEz7ebHBGB6b2e8X--
+Wei
+> 
+> > v2->v3
+> >     v2/01 - drop it since the header has been synchronized from kernel.(mst & jason)
+> >     v3/01 - rename 'avail_wrap_counter' to 'last_avail_wrap_counter',
+> >             'event_wrap_counter' to 'avail_wrap_counter' to make it easier
+> >             to understand.(Jason)
+> >           - revise commit message.(Jason)
+> >     v3/02 - split packed ring areas size calculation to next patch.(Jason)
+> >             to not break bisect(Jason).
+> >     v3/03 - initialize packed ring region with correct size and attribute.
+> >           - remove unnecessary 'else' checks. (Jason)
+> >     v3/06 - add commit log.
+> >           - replace 'event_wrap-counter' with 'avail_wrap_counter'.
+> >           - merge common memory cache size check to virtqueue_get_avail_bytes().(Jason)
+> >           - revise memory barrier comment.(Jason) 
+> >           - check indirect descriptors by desc.len/sizeof(desc).(Jason)
+> >           - flip wrap counter with '^=1'.(Jason)
+> >     v3/07 - move desc.id/len initialization to the declaration.(Jason)
+> >           - flip wrap counter '!' with '^=1'.(Jason)
+> >           - add memory barrier comments in commit message.
+> >     v3/08 - use offsetof() when writing cache.(Jason)
+> >           - avoid duplicated memory region write when turning off event_idx
+> >             supported notification.(Jason)
+> >           - add commit log.(Jason)
+> >           - add avail & last_avail wrap counter difference description in commit log.
+> >     v3/09 - remove unnecessary used/avail idx/wrap-counter from subsection.
+> >           - put new subsection to the end of vmstate_virtio.(Jason)
+> >           - squash the two userspace and vhost-net migration patches in v2.(Jason)
+> >     v3/10 - reword commit message.
+> >           - this is a help not a bug fix so I would like to keep it as a
+> >             separate patch still.(Proposed a merge it by Jason)
+> >           - the virtqueue_fill() is also not like an API so I would prefer not
+> >             to touch it, please correct me if I did not get it in the right
+> >             way.(Proposed a squash by Jason)
+> >     v3/11 - squash feature bits for user space and vhost kernel/user backends.
+> >           - enable packed ring feature bit provision on host by default.(Jason)
+> > 
+> > Wei Xu (11):
+> >   virtio: rename structure for packed ring
+> >   virtio: device/driver area size calculation helper for split ring
+> >   virtio: initialize packed ring region
+> >   virtio: initialize wrap counter for packed ring
+> >   virtio: queue/descriptor check helpers for packed ring
+> >   virtio: get avail bytes check for packed ring
+> >   virtio: fill/flush/pop for packed ring
+> >   virtio: event suppression support for packed ring
+> >   virtio-net: update the head descriptor in a chain lastly
+> >   virtio: migration support for packed ring
+> >   virtio: CLI and provide packed ring feature bit by default
+> > 
+> >  hw/net/vhost_net.c         |   2 +
+> >  hw/net/virtio-net.c        |  11 +-
+> >  hw/virtio/virtio.c         | 798 +++++++++++++++++++++++++++++++++++++++++----
+> >  include/hw/virtio/virtio.h |   4 +-
+> >  4 files changed, 757 insertions(+), 58 deletions(-)
+> > 
+> > -- 
+> > 1.8.3.1
