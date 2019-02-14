@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54888)
+Received: from eggs.gnu.org ([209.51.188.92]:54712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guDKG-0001pS-Jz
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:29:02 -0500
+	(envelope-from <laurent@vivier.eu>) id 1guDKL-0001n6-FT
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:29:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guDDy-0007Ii-Mc
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:22:31 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:45997)
+	(envelope-from <laurent@vivier.eu>) id 1guD9Y-00038c-3G
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:17:57 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:38171)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1guDDw-00077V-U0
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:22:29 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1guD9X-00035m-OB
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:17:56 -0500
+References: <mvmmun7y7m0.fsf@suse.de>
 From: Laurent Vivier <laurent@vivier.eu>
-References: <20190208173520.15007-1-remi@remlab.net>
-	<b7f75e48-e710-46fc-a420-8cba0d663542@vivier.eu>
-Message-ID: <ddd021dc-7760-6d38-729e-d7ae534549d3@vivier.eu>
-Date: Thu, 14 Feb 2019 10:22:07 +0100
+Message-ID: <3c8aca9d-e47e-04a7-1e6a-a65deab125ce@vivier.eu>
+Date: Thu, 14 Feb 2019 10:17:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <b7f75e48-e710-46fc-a420-8cba0d663542@vivier.eu>
+In-Reply-To: <mvmmun7y7m0.fsf@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: check valid address in
- access_ok()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix emulation of
+ accept4/getpeername/getsockname/recvfrom syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?R=c3=a9mi_Denis-Courmont?= <remi@remlab.net>, qemu-devel@nongnu.org
-Cc: remi.denis.courmont@huawei.com
+To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-On 08/02/2019 19:33, Laurent Vivier wrote:
-> On 08/02/2019 18:35, Rémi Denis-Courmont wrote:
->> This works around the LTP crash, but there are problably better ways to
->> go about it.
->>
->> Signed-off-by: Rémi Denis-Courmont <remi@remlab.net>
->> Cc: <lvivier@redhat.com>
->> ---
->>  linux-user/qemu.h | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
->> index ef400cb78a..1d222a0cce 100644
->> --- a/linux-user/qemu.h
->> +++ b/linux-user/qemu.h
->> @@ -457,7 +457,8 @@ extern unsigned long guest_stack_size;
->>  
->>  static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
->>  {
->> -    return page_check_range((target_ulong)addr, size,
->> +    return guest_addr_valid(addr) && guest_addr_valid(addr + size) &&
+On 07/02/2019 15:51, Andreas Schwab wrote:
+> System calls that return a socket address do so by writing the (possibly
+> truncated) address into the provided buffer space, but setting the addrlen
+> parameter to the actual size of the address.  To determine how much to
+> copy back to the target memory the emulation needs to remember the old
+> value of the addrlen parameter, so that it doesn't write past the buffer
+> limits.
 > 
-> I think it should be guest_addr_valid(addr + size - 1).
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
 
-In fact (len == 0 || guest_addr_valid(addr + size - 1)).
+Andreas,
 
-Could you send a new version of your patch?
-
-I've received several mail delivery system errors regarding your email
-address remi@remlab.net.
+could you fix the coding style errors reported by patchew?
 
 Thanks,
 Laurent
+
+> ---
+>  linux-user/syscall.c | 38 ++++++++++++++++++++++----------------
+>  1 file changed, 22 insertions(+), 16 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 55fa235a56..90bfda3563 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2884,7 +2884,7 @@ static abi_long do_sendrecvmmsg(int fd, abi_ulong target_msgvec,
+>  static abi_long do_accept4(int fd, abi_ulong target_addr,
+>                             abi_ulong target_addrlen_addr, int flags)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      abi_long ret;
+>      int host_flags;
+> @@ -2908,10 +2908,11 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
+>  
+>      addr = alloca(addrlen);
+>  
+> -    ret = get_errno(safe_accept4(fd, addr, &addrlen, host_flags));
+> +    ret_addrlen = addrlen;
+> +    ret = get_errno(safe_accept4(fd, addr, &ret_addrlen, host_flags));
+>      if (!is_error(ret)) {
+> -        host_to_target_sockaddr(target_addr, addr, addrlen);
+> -        if (put_user_u32(addrlen, target_addrlen_addr))
+> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
+> +        if (put_user_u32(ret_addrlen, target_addrlen_addr))
+>              ret = -TARGET_EFAULT;
+>      }
+>      return ret;
+> @@ -2921,7 +2922,7 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
+>  static abi_long do_getpeername(int fd, abi_ulong target_addr,
+>                                 abi_ulong target_addrlen_addr)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      abi_long ret;
+>  
+> @@ -2937,10 +2938,11 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
+>  
+>      addr = alloca(addrlen);
+>  
+> -    ret = get_errno(getpeername(fd, addr, &addrlen));
+> +    ret_addrlen = addrlen;
+> +    ret = get_errno(getpeername(fd, addr, &ret_addrlen));
+>      if (!is_error(ret)) {
+> -        host_to_target_sockaddr(target_addr, addr, addrlen);
+> -        if (put_user_u32(addrlen, target_addrlen_addr))
+> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
+> +        if (put_user_u32(ret_addrlen, target_addrlen_addr))
+>              ret = -TARGET_EFAULT;
+>      }
+>      return ret;
+> @@ -2950,7 +2952,7 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
+>  static abi_long do_getsockname(int fd, abi_ulong target_addr,
+>                                 abi_ulong target_addrlen_addr)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      abi_long ret;
+>  
+> @@ -2966,10 +2968,11 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
+>  
+>      addr = alloca(addrlen);
+>  
+> -    ret = get_errno(getsockname(fd, addr, &addrlen));
+> +    ret_addrlen = addrlen;
+> +    ret = get_errno(getsockname(fd, addr, &ret_addrlen));
+>      if (!is_error(ret)) {
+> -        host_to_target_sockaddr(target_addr, addr, addrlen);
+> -        if (put_user_u32(addrlen, target_addrlen_addr))
+> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
+> +        if (put_user_u32(ret_addrlen, target_addrlen_addr))
+>              ret = -TARGET_EFAULT;
+>      }
+>      return ret;
+> @@ -3042,7 +3045,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>                              abi_ulong target_addr,
+>                              abi_ulong target_addrlen)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      void *host_msg;
+>      abi_long ret;
+> @@ -3060,10 +3063,12 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>              goto fail;
+>          }
+>          addr = alloca(addrlen);
+> +        ret_addrlen = addrlen;
+>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
+> -                                      addr, &addrlen));
+> +                                      addr, &ret_addrlen));
+>      } else {
+>          addr = NULL; /* To keep compiler quiet.  */
+> +        addrlen = 0; /* To keep compiler quiet.  */
+>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags, NULL, 0));
+>      }
+>      if (!is_error(ret)) {
+> @@ -3076,8 +3081,9 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>              }
+>          }
+>          if (target_addr) {
+> -            host_to_target_sockaddr(target_addr, addr, addrlen);
+> -            if (put_user_u32(addrlen, target_addrlen)) {
+> +            host_to_target_sockaddr(target_addr, addr,
+> +                                    MIN(addrlen, ret_addrlen));
+> +            if (put_user_u32(ret_addrlen, target_addrlen)) {
+>                  ret = -TARGET_EFAULT;
+>                  goto fail;
+>              }
+> 
