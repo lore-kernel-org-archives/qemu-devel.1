@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60554)
+Received: from eggs.gnu.org ([209.51.188.92]:33645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guJ8H-0004xg-Kt
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:41:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1guJCm-0008Nv-V4
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1guJ8G-0003Gv-Py
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:41:01 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1guJ8F-0003Dm-72
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:40:59 -0500
-Received: by mail-wr1-x441.google.com with SMTP id l9so6938695wrt.13
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:40:58 -0800 (PST)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu, 14 Feb 2019 17:40:53 +0200
-Message-Id: <20190214154053.15050-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel]  [PATCH] hw/rdma: another clang compilation fix
+	(envelope-from <kwolf@redhat.com>) id 1guJCh-0000Hh-Ed
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:45:37 -0500
+Date: Thu, 14 Feb 2019 16:45:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190214154512.GB7178@linux.fritz.box>
+References: <cover.1547739122.git.berto@igalia.com>
+	<2da7b388a740d1f1b7f40e1182fc821f8abb8fbb.1547739122.git.berto@igalia.com>
+	<20190212145415.GD5283@localhost.localdomain>
+	<w51h8d62y5o.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51h8d62y5o.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 02/13] block: Freeze the backing chain for
+ the duration of the commit job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yuval.shaia@oracle.com, kamalheib1@gmail.com, marcel.apfelbaum@gmail.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Configuring QEMU with:
-   configure --target-list="x86_64-softmmu" --cc=clang --enable-pvrdma
-Results in:
-   qemu/hw/rdma/rdma_rm_defs.h:108:3: error: redefinition of typedef 'RdmaDeviceResources' is a C11 feature [-Werror,-Wtypedef-redefinition]
-   } RdmaDeviceResources;
-     ^
-   qemu/hw/rdma/rdma_backend_defs.h:24:36: note: previous definition is here
-   typedef struct RdmaDeviceResources RdmaDeviceResources;
+Am 14.02.2019 um 16:21 hat Alberto Garcia geschrieben:
+> On Tue 12 Feb 2019 03:54:15 PM CET, Kevin Wolf wrote:
+> >> @@ -336,6 +340,10 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+> >>          }
+> >>      }
+> >>  
+> >> +    if (bdrv_freeze_backing_chain(commit_top_bs, base, errp) < 0) {
+> >> +        goto fail;
+> >> +    }
+> >
+> > Don't error paths need to unfreeze after this?
+> 
+> Yes, and while debugging this I realized that the error path is wrong:
+> 
+>     if (commit_top_bs) {
+>         bdrv_replace_node(commit_top_bs, top, &error_abort);
+>     }
+>     job_early_fail(&s->common.job);
+> 
+> Doing bdrv_replace_node() here before job_early_fail() fails with
+> 
+> Unexpected error in bdrv_check_update_perm() at block.c:1920:
+> Conflicts with use by commit job 'virtio0' as 'intermediate node', which does not allow 'consistent read' on <node-name>
+> Aborted
 
-Fix by removing one of the 'typedef' definitions.
+Oh, good point. And it seems to have been wrong even since permissions
+were introduced to the commit job in 8dfba279776.
 
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/rdma/rdma_rm_defs.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> I'll write a separate patch for this problem.
 
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index 0ba61d1838..5e877c1fd9 100644
---- a/hw/rdma/rdma_rm_defs.h
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -96,7 +96,7 @@ typedef struct RdmaRmPort {
-     enum ibv_port_state state;
- } RdmaRmPort;
- 
--typedef struct RdmaDeviceResources {
-+struct RdmaDeviceResources {
-     RdmaRmPort port;
-     RdmaRmResTbl pd_tbl;
-     RdmaRmResTbl mr_tbl;
-@@ -105,6 +105,6 @@ typedef struct RdmaDeviceResources {
-     RdmaRmResTbl cq_tbl;
-     RdmaRmResTbl cqe_ctx_tbl;
-     GHashTable *qp_hash; /* Keeps mapping between real and emulated */
--} RdmaDeviceResources;
-+};
- 
- #endif
--- 
-2.17.1
+And a test case! :-)
+
+(That is, if the errors can even be triggered reliably without modifying
+the code.)
+
+Kevin
