@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59485)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1guMgY-0008TA-2G
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:38 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:34079)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1guMsZ-0006wF-L9
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:41:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1guMgX-0004Pa-24
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1guMgW-0004On-Sg
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:28:37 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2ED268AE47
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 19:28:36 +0000 (UTC)
-Date: Thu, 14 Feb 2019 14:28:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190214142251-mutt-send-email-mst@kernel.org>
-References: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <n54@gmx.com>) id 1guMsY-0006mF-Fw
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:41:03 -0500
+Received: from mout.gmx.net ([212.227.15.15]:44055)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1guMsS-0006Mx-1A
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 14:40:58 -0500
+References: <20190202144531.5772-1-n54@gmx.com>
+	<a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <d0b7bfcb-8894-5a06-8290-ac9daf5a05da@gmx.com>
+Date: Thu, 14 Feb 2019 20:41:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] vhost: enable for all targets
+In-Reply-To: <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0"
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
+ kvm_arch_get_supported_cpuid()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +29,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Thu, Feb 14, 2019 at 06:35:47PM +0100, Paolo Bonzini wrote:
-> See also "[PATCH for-3.2 00/10] vhost: preparation for qgraph
-> conversion of vhost-user-test".  Some of the other vhost-user-test
-> patches have gone in already, and this is what is left.
-> 
-> These patches are a prerequisite for both kconfig and qgraph.
-> 
-> I will probably test them on macOS myself before these are included
-> in a pull request, since the previous versions had some issues.
-> Michael, let me know if you want me to send the pull request.
-> 
-> Thanks,
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0
+From: Kamil Rytarowski <n54@gmx.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
+Message-ID: <d0b7bfcb-8894-5a06-8290-ac9daf5a05da@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
+ kvm_arch_get_supported_cpuid()
+References: <20190202144531.5772-1-n54@gmx.com>
+ <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
+In-Reply-To: <a3dc285c-496f-c2ad-126a-91b2e4690a5f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 14.02.2019 19:44, Paolo Bonzini wrote:
+> On 02/02/19 15:45, Kamil Rytarowski wrote:
+>>
+>> Clang/LLVM on NetBSD with enabled optimization cannot link
+>> correct qemu program because of a missing symbol of
+>> kvm_arch_get_supported_cpuid() in kvm-stubs.o used by executables.
+>=20
+> Can you please include the full error message?  Usually these things ar=
+e
+> a sign of a bug elsewhere.
+>=20
 > Paolo
+>=20
 
-what's the changelog from v1?
+Please do replace the current kludge that is sensitive to:
+ - compiler behavior that can change with new versions
+ - compiler gcc/clang
+ - optimization options
+ - linux(KVM) - non-linux (no-KVM) build
+ - community not actively testing non-linux no-kvm build with
+optimization on clang
 
-> Paolo Bonzini (9):
->   vhost-net: move stubs to a separate file
->   vhost-net-user: add stubs for when no virtio-net device is present
->   vhost: restrict Linux dependency to kernel vhost
->   vhost-user: support cross-endian vnet headers
->   vhost-net: compile it on all targets that have virtio-net.
->   vhost-net: revamp configure logic
->   vhost-user-test: create a main loop per TestServer
->   vhost-user-test: small changes to init_hugepagefs
->   vhost-user-test: create a temporary directory per TestServer
-> 
->  backends/Makefile.objs     |   5 +-
->  configure                  | 102 ++++++++++++++++++-----------
->  default-configs/virtio.mak |   4 +-
->  hw/net/Makefile.objs       |   4 +-
->  hw/net/vhost_net-stub.c    |  92 ++++++++++++++++++++++++++
->  hw/net/vhost_net.c         |  85 ++----------------------
->  hw/virtio/Makefile.objs    |   8 ++-
->  hw/virtio/vhost-backend.c  |  12 +++-
->  hw/virtio/vhost-user.c     |  13 +++-
->  hw/virtio/vhost.c          |   2 +-
->  include/exec/poison.h      |   1 -
->  net/Makefile.objs          |   4 +-
->  net/net.c                  |   2 +-
->  net/vhost-user-stub.c      |  23 +++++++
->  net/vhost-user.c           |  13 ++++
->  tests/Makefile.include     |   5 +-
->  tests/vhost-user-test.c    | 160 +++++++++++++++++++++++----------------------
->  17 files changed, 319 insertions(+), 216 deletions(-)
->  create mode 100644 hw/net/vhost_net-stub.c
->  create mode 100644 net/vhost-user-stub.c
-> 
-> -- 
-> 1.8.3.1
+
+My patch replaced it makes it work.
+
+Build error:
+
+  LINK    i386-bsd-user/qemu-i386
+/usr/bin/ld: /usr/lib/libc.so and /usr/lib/crt0.o: warning: multiple
+common of `environ'
+/usr/bin/ld: target/i386/cpu.o: in function `x86_cpu_filter_features':
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5047:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5048:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5049:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5050:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5051:
+undefined reference to `kvm_arch_get_supported_cpuid'
+clang-9: error: linker command failed with exit code 1 (use -v to see
+invocation)
+make[1]: *** [Makefile:199: qemu-i386] Error 1
+gmake: *** [Makefile:483: subdir-i386-bsd-user] Error 2
+gmake: *** Waiting for unfinished jobs....
+  LINK    x86_64-bsd-user/qemu-x86_64
+/usr/bin/ld: /usr/lib/libc.so and /usr/lib/crt0.o: warning: multiple
+common of `environ'
+/usr/bin/ld: target/i386/cpu.o: in function `x86_cpu_filter_features':
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5047:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5048:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5049:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5050:
+undefined reference to `kvm_arch_get_supported_cpuid'
+/usr/bin/ld:
+/tmp/pkgsrc-tmp/emulators/qemu/work/qemu-3.1.0/target/i386/cpu.c:5051:
+undefined reference to `kvm_arch_get_supported_cpuid'
+clang-9: error: linker command failed with exit code 1 (use -v to see
+invocation)
+make[1]: *** [Makefile:199: qemu-x86_64] Error 1
+gmake: *** [Makefile:483: subdir-x86_64-bsd-user] Error 2
+*** Error code 2
+
+
+--PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxlxFkMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsZi0P/0T5Pg4snNED2ae15joDg7IVhoDKDpkP6TPGp63/
+st6Y/ENBe/sLC2BnQ/GhWzDLU37cyR0vDrZk3iiuXJWweFEs5CbCSQjAmtXoY5dS
+vP11KBTnmBReq/TzwQ1dtm/8lVg3fY3WFXdJDp2SGpCV86gQq0w3+woLLvbfjhxs
+resRB+4/PRSLIXmSioAx4ZP5QuQ88U+zlbcmZ0sA7sv4sWq+kbi4E7mz3XgjZUEs
++ZfK6im5RVVS+fFOLf+iIX+wW9oAlnhNpSjL/ZiNcAkDxr4SIzZQ+UgGZrmXDubs
+8u2+EwQ40GmuVk7weyT6tNG96W0BrO84uQMchnE6Cd+h6iFFHe4xuSljq2PcW1Sm
+7GbBDk8F97e5R02L1lOtjUGRd4cZesw3IcomTHNcGsEzEQ6VVeTpc7sVV0R+zlnw
+X/abtD+sccQN9yL1j6utU6FVkpBXLgXc8akC+8X+VWHzBV4lpCjgzc8jvYQu4h+I
+cYY0KNpGDBRRPDA4BR8jU4pNIoQ1YqS4JLFQ9ymMkA8An+04nc1KMWv2UYYmYt3U
+0etWevixEmf3/RiI6pZVezdFVb8mxl1vJqUAEnuklsXrYzRnNOAu/SUMgP/hyHAE
+CPz+zynyb1kI3lI7+tqPoAnCO97VMnZc17N6/HEzybU7q435VI1phI+e/TmqPtNM
+Ada+
+=Bz87
+-----END PGP SIGNATURE-----
+
+--PLs9BIiIylVa5j7DWZLKXQOZDZyskbLP0--
