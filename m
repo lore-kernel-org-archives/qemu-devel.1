@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55829)
+Received: from eggs.gnu.org ([209.51.188.92]:56450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guH1F-0000m5-25
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:25:39 -0500
+	(envelope-from <laurent@vivier.eu>) id 1guH3G-0002J3-VG
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:27:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guH1D-0005Go-Qq
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:25:36 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:50435)
+	(envelope-from <laurent@vivier.eu>) id 1guH3C-0007lJ-3C
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:27:39 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:33977)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1guH1D-000591-FR
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:25:35 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1guH3A-0007fg-VF
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 08:27:37 -0500
 References: <mvmmun7y7m0.fsf@suse.de>
+	<3c8aca9d-e47e-04a7-1e6a-a65deab125ce@vivier.eu>
+	<mvmimxmppcj.fsf_-_@suse.de>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <25f32c5b-3b8e-0a1f-b86c-0c0e4ce37d69@vivier.eu>
-Date: Thu, 14 Feb 2019 14:25:17 +0100
+Message-ID: <3260c47f-7e49-1035-776b-d0b8385c9dff@vivier.eu>
+Date: Thu, 14 Feb 2019 14:27:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <mvmmun7y7m0.fsf@suse.de>
+In-Reply-To: <mvmimxmppcj.fsf_-_@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -28,20 +30,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Andreas Schwab <schwab@suse.de>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
 
-On 07/02/2019 15:51, Andreas Schwab wrote:
+On 14/02/2019 12:43, Andreas Schwab wrote:
 > System calls that return a socket address do so by writing the (possibly
-> truncated) address into the provided buffer space, but setting the addrlen
-> parameter to the actual size of the address.  To determine how much to
-> copy back to the target memory the emulation needs to remember the old
-> value of the addrlen parameter, so that it doesn't write past the buffer
-> limits.
+> truncated) address into the provided buffer space, but setting the
+> addrlen parameter to the actual size of the address.  To determine how
+> much to copy back to the target memory the emulation needs to remember
+> the incoming value of the addrlen parameter, so that it doesn't write
+> past the buffer limits.
 > 
 > Signed-off-by: Andreas Schwab <schwab@suse.de>
 > ---
->  linux-user/syscall.c | 38 ++++++++++++++++++++++----------------
->  1 file changed, 22 insertions(+), 16 deletions(-)
+>  linux-user/syscall.c | 41 +++++++++++++++++++++++++----------------
+>  1 file changed, 25 insertions(+), 16 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 4a320850bb..f24743a2b2 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2885,7 +2885,7 @@ static abi_long do_sendrecvmmsg(int fd, abi_ulong target_msgvec,
+>  static abi_long do_accept4(int fd, abi_ulong target_addr,
+>                             abi_ulong target_addrlen_addr, int flags)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      abi_long ret;
+>      int host_flags;
+> @@ -2909,11 +2909,13 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
+>  
+>      addr = alloca(addrlen);
+>  
+> -    ret = get_errno(safe_accept4(fd, addr, &addrlen, host_flags));
+> +    ret_addrlen = addrlen;
+> +    ret = get_errno(safe_accept4(fd, addr, &ret_addrlen, host_flags));
+>      if (!is_error(ret)) {
+> -        host_to_target_sockaddr(target_addr, addr, addrlen);
+> -        if (put_user_u32(addrlen, target_addrlen_addr))
+> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
+> +        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
+>              ret = -TARGET_EFAULT;
+> +        }
+>      }
+>      return ret;
+>  }
+> @@ -2922,7 +2924,7 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
+>  static abi_long do_getpeername(int fd, abi_ulong target_addr,
+>                                 abi_ulong target_addrlen_addr)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      abi_long ret;
+>  
+> @@ -2938,11 +2940,13 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
+>  
+>      addr = alloca(addrlen);
+>  
+> -    ret = get_errno(getpeername(fd, addr, &addrlen));
+> +    ret_addrlen = addrlen;
+> +    ret = get_errno(getpeername(fd, addr, &ret_addrlen));
+>      if (!is_error(ret)) {
+> -        host_to_target_sockaddr(target_addr, addr, addrlen);
+> -        if (put_user_u32(addrlen, target_addrlen_addr))
+> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
+> +        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
+>              ret = -TARGET_EFAULT;
+> +        }
+>      }
+>      return ret;
+>  }
+> @@ -2951,7 +2955,7 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
+>  static abi_long do_getsockname(int fd, abi_ulong target_addr,
+>                                 abi_ulong target_addrlen_addr)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      abi_long ret;
+>  
+> @@ -2967,11 +2971,13 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
+>  
+>      addr = alloca(addrlen);
+>  
+> -    ret = get_errno(getsockname(fd, addr, &addrlen));
+> +    ret_addrlen = addrlen;
+> +    ret = get_errno(getsockname(fd, addr, &ret_addrlen));
+>      if (!is_error(ret)) {
+> -        host_to_target_sockaddr(target_addr, addr, addrlen);
+> -        if (put_user_u32(addrlen, target_addrlen_addr))
+> +        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
+> +        if (put_user_u32(ret_addrlen, target_addrlen_addr)) {
+>              ret = -TARGET_EFAULT;
+> +        }
+>      }
+>      return ret;
+>  }
+> @@ -3043,7 +3049,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>                              abi_ulong target_addr,
+>                              abi_ulong target_addrlen)
+>  {
+> -    socklen_t addrlen;
+> +    socklen_t addrlen, ret_addrlen;
+>      void *addr;
+>      void *host_msg;
+>      abi_long ret;
+> @@ -3061,10 +3067,12 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>              goto fail;
+>          }
+>          addr = alloca(addrlen);
+> +        ret_addrlen = addrlen;
+>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
+> -                                      addr, &addrlen));
+> +                                      addr, &ret_addrlen));
+>      } else {
+>          addr = NULL; /* To keep compiler quiet.  */
+> +        addrlen = 0; /* To keep compiler quiet.  */
+>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags, NULL, 0));
+>      }
+>      if (!is_error(ret)) {
+> @@ -3077,8 +3085,9 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>              }
+>          }
+>          if (target_addr) {
+> -            host_to_target_sockaddr(target_addr, addr, addrlen);
+> -            if (put_user_u32(addrlen, target_addrlen)) {
+> +            host_to_target_sockaddr(target_addr, addr,
+> +                                    MIN(addrlen, ret_addrlen));
+> +            if (put_user_u32(ret_addrlen, target_addrlen)) {
+>                  ret = -TARGET_EFAULT;
+>                  goto fail;
+>              }
+> 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
