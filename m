@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39262)
+Received: from eggs.gnu.org ([209.51.188.92]:39351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guDrt-00024B-Rt
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:03:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1guDs5-0002Jn-2D
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:03:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guDqS-0005DU-Oo
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:02:21 -0500
-References: <20190212145322.30974-1-philmd@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3490f4fd-3e91-8494-8580-97a005174507@vivier.eu>
-Date: Thu, 14 Feb 2019 11:02:03 +0100
+	(envelope-from <armbru@redhat.com>) id 1guDqA-0004tQ-Of
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:02:04 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190212134758.10514-1-dgilbert@redhat.com>
+	<20190212134758.10514-5-dgilbert@redhat.com>
+Date: Thu, 14 Feb 2019 11:01:15 +0100
+In-Reply-To: <20190212134758.10514-5-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Tue, 12 Feb 2019 13:47:58 +0000")
+Message-ID: <87k1i2aduc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190212145322.30974-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw/dma/i8257: Use
- qemu_log_mask(UNIMP) instead of fprintf
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/4] wavcapture: Convert to error_report
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com, mst@redhat.com, qemu-trivial@nongnu.org
 
-On 12/02/2019 15:53, Philippe Mathieu-Daudé wrote:
-> Avoid to clutter stdout until explicitly requested (with -d unimp):
-> 
->   $ qemu-system-mips64el -M fulong2e -bios pmon_2e.bin
->   dma: command df not supported
->   dma: command df not supported
->   dma: command df not supported
->   dma: command df not supported
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/dma/i8257.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
-> index 52675e97c9..3e1f13a4aa 100644
-> --- a/hw/dma/i8257.c
-> +++ b/hw/dma/i8257.c
-> @@ -26,6 +26,7 @@
->  #include "hw/isa/isa.h"
->  #include "hw/dma/i8257.h"
->  #include "qemu/main-loop.h"
-> +#include "qemu/log.h"
->  #include "trace.h"
->  
->  #define I8257(obj) \
-> @@ -185,7 +186,8 @@ static void i8257_write_cont(void *opaque, hwaddr nport, uint64_t data,
->      switch (iport) {
->      case 0x00:                  /* command */
->          if ((data != 0) && (data & CMD_NOT_SUPPORTED)) {
-> -            dolog("command %"PRIx64" not supported\n", data);
-> +            qemu_log_mask(LOG_UNIMP, "%s: cmd 0x%02"PRIx64" not supported\n",
-> +                          __func__, data);
->              return;
->          }
->          d->command = data;
-> 
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Kill off a pile of monitor_printf's and cur_mon usage.
 
-Applied to my trivial-patches branch.
+You also switch from the two line error format
 
-Thanks,
-Laurent
+    <error message>
+    Reason: <strerror(errno)>
+
+to the more common
+
+    <error message>: <strerror(errno)>
+
+Suggest to mention that you're changing error messages in the commit
+message.
+
+> The only one left in wavcapture.c is the info case.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
