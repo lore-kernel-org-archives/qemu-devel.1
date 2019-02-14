@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49516)
+Received: from eggs.gnu.org ([209.51.188.92]:49744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ8v-00035F-21
+	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ8v-0003NE-JO
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ05-00054v-Cc
+	(envelope-from <jcmvbkbc@gmail.com>) id 1guQ05-00054Q-8O
 	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:02 -0500
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:42949)
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:42951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1guQ03-0004wH-V2
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:01:01 -0500
-Received: by mail-lf1-x141.google.com with SMTP id l10so5777065lfh.9
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:00:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1guQ03-0004zU-Ar
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:00:59 -0500
+Received: by mail-lf1-x142.google.com with SMTP id l10so5777253lfh.9
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:00:54 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 14 Feb 2019 14:59:50 -0800
-Message-Id: <20190214230000.24894-4-jcmvbkbc@gmail.com>
+Date: Thu, 14 Feb 2019 14:59:53 -0800
+Message-Id: <20190214230000.24894-7-jcmvbkbc@gmail.com>
 In-Reply-To: <20190214230000.24894-1-jcmvbkbc@gmail.com>
 References: <20190214230000.24894-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 03/13] target/xtensa: allow multiple names for
- single opcode
+Subject: [Qemu-devel] [PATCH 06/13] target/xtensa: add generic instruction
+ post-processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,245 +29,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-There are opcodes that differ only in encoding or possible range of
-immediate arguments. Allow multiple names for single opcode translation
-table entry to reduce code duplication in that case.
+Some opcodes may need additional actions at every exit from the
+translated instruction or may need to amend TB exit slots available to
+jumps generated for the instruction. Add gen_postprocess function and
+call it from the gen_jump_slot and from the disas_xtensa_insn.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/cpu.h       |   4 +-
- target/xtensa/helper.c    |  16 ++++++--
- target/xtensa/translate.c | 100 ++++++++++++++++++++--------------------------
- 3 files changed, 60 insertions(+), 60 deletions(-)
+ target/xtensa/cpu.h       |  8 ++++++++
+ target/xtensa/translate.c | 33 +++++++++++++++++++++++++--------
+ 2 files changed, 33 insertions(+), 8 deletions(-)
 
 diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 2765665ceca6..db8ee70a0386 100644
+index c59f79e56326..a3bab9c5a254 100644
 --- a/target/xtensa/cpu.h
 +++ b/target/xtensa/cpu.h
-@@ -371,10 +371,12 @@ enum {
+@@ -368,9 +368,17 @@ enum {
+ 
+     XTENSA_OP_DIVIDE_BY_ZERO = 0x100,
+ 
++    /* Postprocessing flags */
      XTENSA_OP_CHECK_INTERRUPTS = 0x200,
      XTENSA_OP_EXIT_TB_M1 = 0x400,
      XTENSA_OP_EXIT_TB_0 = 0x800,
++    XTENSA_OP_SYNC_REGISTER_WINDOW = 0x1000,
 +
-+    XTENSA_OP_NAME_ARRAY = 0x8000,
- };
++    XTENSA_OP_POSTPROCESS =
++        XTENSA_OP_CHECK_INTERRUPTS |
++        XTENSA_OP_EXIT_TB_M1 |
++        XTENSA_OP_EXIT_TB_0 |
++        XTENSA_OP_SYNC_REGISTER_WINDOW,
  
- typedef struct XtensaOpcodeOps {
--    const char *name;
-+    const void *name;
-     XtensaOpcodeOp translate;
-     XtensaOpcodeBoolTest test_ill;
-     XtensaOpcodeUintTest test_overflow;
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index 57709fc20caf..7008c6390d20 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -51,9 +51,19 @@ static GHashTable *hash_opcode_translators(const XtensaOpcodeTranslators *t)
-     GHashTable *translator = g_hash_table_new(g_str_hash, g_str_equal);
+     XTENSA_OP_NAME_ARRAY = 0x8000,
  
-     for (i = 0; i < t->num_opcodes; ++i) {
--        add_translator_to_hash(translator,
--                               (void *)t->opcode[i].name,
--                               (void *)(t->opcode + i));
-+        if (t->opcode[i].op_flags & XTENSA_OP_NAME_ARRAY) {
-+            const char * const *name = t->opcode[i].name;
-+
-+            for (j = 0; name[j]; ++j) {
-+                add_translator_to_hash(translator,
-+                                       (void *)name[j],
-+                                       (void *)(t->opcode + i));
-+            }
-+        } else {
-+            add_translator_to_hash(translator,
-+                                   (void *)t->opcode[i].name,
-+                                   (void *)(t->opcode + i));
-+        }
-     }
-     return translator;
- }
 diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 26342aaa1f82..1b730781ec05 100644
+index 616ed8f57972..149fcd37f9a1 100644
 --- a/target/xtensa/translate.c
 +++ b/target/xtensa/translate.c
-@@ -2409,17 +2409,17 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "abs",
-         .translate = translate_abs,
-     }, {
--        .name = "add",
-+        .name = (const char * const[]) {
-+            "add", "add.n", NULL,
-+        },
-         .translate = translate_add,
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
--        .name = "add.n",
--        .translate = translate_add,
--    }, {
--        .name = "addi",
--        .translate = translate_addi,
--    }, {
--        .name = "addi.n",
-+        .name = (const char * const[]) {
-+            "addi", "addi.n", NULL,
-+        },
-         .translate = translate_addi,
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "addmi",
-         .translate = translate_addi,
-@@ -2495,13 +2495,12 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_bi,
-         .par = (const uint32_t[]){TCG_COND_EQ},
-     }, {
--        .name = "beqz",
--        .translate = translate_bz,
--        .par = (const uint32_t[]){TCG_COND_EQ},
--    }, {
--        .name = "beqz.n",
-+        .name = (const char * const[]) {
-+            "beqz", "beqz.n", NULL,
-+        },
-         .translate = translate_bz,
-         .par = (const uint32_t[]){TCG_COND_EQ},
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "bf",
-         .translate = translate_bp,
-@@ -2559,13 +2558,12 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_bi,
-         .par = (const uint32_t[]){TCG_COND_NE},
-     }, {
--        .name = "bnez",
--        .translate = translate_bz,
--        .par = (const uint32_t[]){TCG_COND_NE},
--    }, {
--        .name = "bnez.n",
-+        .name = (const char * const[]) {
-+            "bnez", "bnez.n", NULL,
-+        },
-         .translate = translate_bz,
-         .par = (const uint32_t[]){TCG_COND_NE},
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "bnone",
-         .translate = translate_bany,
-@@ -2725,11 +2723,10 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_nop,
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
--        .name = "ill",
--        .op_flags = XTENSA_OP_ILL,
--    }, {
--        .name = "ill.n",
--        .op_flags = XTENSA_OP_ILL,
-+        .name = (const char * const[]) {
-+            "ill", "ill.n", NULL,
-+        },
-+        .op_flags = XTENSA_OP_ILL | XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "ipf",
-         .translate = translate_nop,
-@@ -2763,13 +2760,12 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_l32e,
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
--        .name = "l32i",
--        .translate = translate_ldst,
--        .par = (const uint32_t[]){MO_TEUL, false, false},
--    }, {
--        .name = "l32i.n",
-+        .name = (const char * const[]) {
-+            "l32i", "l32i.n", NULL,
-+        },
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUL, false, false},
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "l32r",
-         .translate = translate_l32r,
-@@ -2816,11 +2812,11 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "minu",
-         .translate = translate_umin,
-     }, {
--        .name = "mov",
--        .translate = translate_mov,
--    }, {
--        .name = "mov.n",
-+        .name = (const char * const[]) {
-+            "mov", "mov.n", NULL,
-+        },
-         .translate = translate_mov,
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "moveqz",
-         .translate = translate_movcond,
-@@ -3134,11 +3130,11 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "neg",
-         .translate = translate_neg,
-     }, {
--        .name = "nop",
--        .translate = translate_nop,
--    }, {
--        .name = "nop.n",
-+        .name = (const char * const[]) {
-+            "nop", "nop.n", NULL,
-+        },
-         .translate = translate_nop,
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "nsa",
-         .translate = translate_nsa,
-@@ -3202,21 +3198,18 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_rer,
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
--        .name = "ret",
-+        .name = (const char * const[]) {
-+            "ret", "ret.n", NULL,
-+        },
-         .translate = translate_ret,
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
--        .name = "ret.n",
--        .translate = translate_ret,
--    }, {
--        .name = "retw",
-+        .name = (const char * const[]) {
-+            "retw", "retw.n", NULL,
-+        },
-         .translate = translate_retw,
-         .test_ill = test_ill_retw,
--        .op_flags = XTENSA_OP_UNDERFLOW,
--    }, {
--        .name = "retw.n",
--        .translate = translate_retw,
--        .test_ill = test_ill_retw,
--        .op_flags = XTENSA_OP_UNDERFLOW,
-+        .op_flags = XTENSA_OP_UNDERFLOW | XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "rfdd",
-         .op_flags = XTENSA_OP_ILL,
-@@ -3742,17 +3735,12 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_s32e,
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
--        .name = "s32i",
--        .translate = translate_ldst,
--        .par = (const uint32_t[]){MO_TEUL, false, true},
--    }, {
--        .name = "s32i.n",
--        .translate = translate_ldst,
--        .par = (const uint32_t[]){MO_TEUL, false, true},
--    }, {
--        .name = "s32nb",
-+        .name = (const char * const[]) {
-+            "s32i", "s32i.n", "s32nb", NULL,
-+        },
-         .translate = translate_ldst,
-         .par = (const uint32_t[]){MO_TEUL, false, true},
-+        .op_flags = XTENSA_OP_NAME_ARRAY,
-     }, {
-         .name = "s32ri",
-         .translate = translate_ldst,
+@@ -71,6 +71,7 @@ struct DisasContext {
+ 
+     unsigned cpenable;
+ 
++    uint32_t op_flags;
+     uint32_t *raw_arg;
+     xtensa_insnbuf insnbuf;
+     xtensa_insnbuf slotbuf;
+@@ -363,6 +364,8 @@ static bool gen_check_cpenable(DisasContext *dc, uint32_t cp_mask)
+     return true;
+ }
+ 
++static int gen_postprocess(DisasContext *dc, int slot);
++
+ static void gen_jump_slot(DisasContext *dc, TCGv dest, int slot)
+ {
+     tcg_gen_mov_i32(cpu_pc, dest);
+@@ -372,6 +375,9 @@ static void gen_jump_slot(DisasContext *dc, TCGv dest, int slot)
+     if (dc->base.singlestep_enabled) {
+         gen_exception(dc, EXCP_DEBUG);
+     } else {
++        if (dc->op_flags & XTENSA_OP_POSTPROCESS) {
++            slot = gen_postprocess(dc, slot);
++        }
+         if (slot >= 0) {
+             tcg_gen_goto_tb(slot);
+             tcg_gen_exit_tb(dc->base.tb, slot);
+@@ -846,6 +852,19 @@ static inline unsigned xtensa_op0_insn_len(DisasContext *dc, uint8_t op0)
+     return xtensa_isa_length_from_chars(dc->config->isa, &op0);
+ }
+ 
++static int gen_postprocess(DisasContext *dc, int slot)
++{
++    uint32_t op_flags = dc->op_flags;
++
++    if (op_flags & XTENSA_OP_CHECK_INTERRUPTS) {
++        gen_check_interrupts(dc);
++    }
++    if (op_flags & XTENSA_OP_EXIT_TB_M1) {
++        slot = -1;
++    }
++    return slot;
++}
++
+ struct opcode_arg_info {
+     uint32_t resource;
+     int index;
+@@ -1210,6 +1229,8 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+         }
+     }
+ 
++    dc->op_flags = op_flags;
++
+     for (slot = 0; slot < slots; ++slot) {
+         struct slot_prop *pslot = ordered[slot];
+         XtensaOpcodeOps *ops = pslot->ops;
+@@ -1219,21 +1240,17 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+     }
+ 
+     if (dc->base.is_jmp == DISAS_NEXT) {
+-        if (op_flags & XTENSA_OP_CHECK_INTERRUPTS) {
+-            gen_check_interrupts(dc);
+-        }
+-
++        gen_postprocess(dc, 0);
++        dc->op_flags = 0;
+         if (op_flags & XTENSA_OP_EXIT_TB_M1) {
+             /* Change in mmu index, memory mapping or tb->flags; exit tb */
+             gen_jumpi_check_loop_end(dc, -1);
+         } else if (op_flags & XTENSA_OP_EXIT_TB_0) {
+             gen_jumpi_check_loop_end(dc, 0);
++        } else {
++            gen_check_loop_end(dc, 0);
+         }
+     }
+-
+-    if (dc->base.is_jmp == DISAS_NEXT) {
+-        gen_check_loop_end(dc, 0);
+-    }
+     dc->pc = dc->base.pc_next;
+ }
+ 
 -- 
 2.11.0
