@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36626)
+Received: from eggs.gnu.org ([209.51.188.92]:36925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1guJOK-0005MA-V0
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:57:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guJPo-00061Y-2I
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1guJOJ-0001Vk-5C
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:57:36 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:37283)
+	(envelope-from <peter.maydell@linaro.org>) id 1guJPm-0003l6-Vz
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:59:07 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:45247)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1guJOF-0001Lt-QK
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:57:33 -0500
-Received: by mail-wm1-x332.google.com with SMTP id x10so6544368wmg.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:57:31 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 14 Feb 2019 15:57:14 +0000
-Message-Id: <20190214155714.8779-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guJPm-0003kb-RQ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:59:06 -0500
+Received: by mail-ot1-x334.google.com with SMTP id 32so11224074ota.12
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 07:59:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/block: report when pflash backing file
- isn't aligned
+References: <20190213183153.23746-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190213183153.23746-1-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 15:58:54 +0000
+Message-ID: <CAFEAcA_6XzAfm51sGKPptGcrX+hkohv2eMfQqtbtTy6qnNU=DQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] Fix slirp on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ard.biesheuvel@linaro.org, pkg-qemu-devel@lists.alioth.debian.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-It looks like there was going to be code to check we had some sort of
-alignment so lets replace it with an actual check. This is a bit more
-useful than the enigmatic "failed to read the initial flash content"
-when we attempt to read the number of bytes the device should have.
+On Wed, 13 Feb 2019 at 18:31, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+>
+> The following changes since commit 0b5e750bea635b167eb03d86c3d9a09bbd43bc=
+06:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2019-02-12 10:53:37 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to adf1add2927c7bb652a168f5be627102921cf35f:
+>
+>   slirp: wrap the remaining socket functions (2019-02-12 20:49:13 +0100)
+>
+> ----------------------------------------------------------------
+> Fix slirp on windows
+>
+> Marc-Andr=C3=A9 Lureau (2):
+>   slirp: remove slirp_ prefix for socket wrappers
+>   slirp: wrap the remaining socket functions
+>
 
-This is a potential confusing stumbling block when you move from using
--bios to using -drive if=pflash,file=blob,format=raw,readonly for
-loading your firmware code.
+Applied, thanks.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- hw/block/pflash_cfi01.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index bffb4c40e7..f3251b236c 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -722,12 +722,19 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     }
-     device_len = sector_len_per_device * blocks_per_device;
- 
--    /* XXX: to be fixed */
--#if 0
--    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
--        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
--        return NULL;
--#endif
-+    /*
-+     * Validate the backing store is the right size for pflash
-+     * devices. It has to be padded to a multiple of the flash block
-+     * size.
-+     */
-+    if (pfl->blk) {
-+        uint64_t backing_len = blk_getlength(pfl->blk);
-+        if (device_len != backing_len) {
-+            error_setg(errp, "backing file wrong size "
-+                       "(%" PRId64 " != %" PRId64")", backing_len, device_len);
-+            return;
-+        }
-+    }
- 
-     memory_region_init_rom_device(
-         &pfl->mem, OBJECT(dev),
--- 
-2.20.1
+-- PMM
