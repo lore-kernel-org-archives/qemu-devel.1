@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34796)
+Received: from eggs.gnu.org ([209.51.188.92]:35447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guL5R-0003Xu-Kr
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:46:14 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1guL6z-0004XI-GP
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guL5K-0003Bz-Pw
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:46:09 -0500
-Resent-Message-Id: <E1guL5K-0003Bz-Pw@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guL56-0002ev-9D
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:45:57 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155016628719.24.2384484487369464866@49fa7ef69f7b>
-In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1guL6w-0004Aw-OQ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:47:49 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:52219 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1guL6v-0003xs-AN
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:47:45 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 14 Feb 2019 18:47:12 +0100
+Message-Id: <1550166444-22882-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1550166444-22882-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1550166444-22882-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 09:44:48 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ui/cocoa: Use OSX's main loop
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/15] hw/mips_int: hold BQL for all interrupt
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +28,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, programmingkidx@gmail.com, r.bolshakov@yadro.com, kraxel@redhat.com, ben.hekster@foghorn.io, berkus@gmail.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDEwMjgxNi4zMzkz
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxNDEwMjgxNi4zMzkzLTEtcGV0ZXIu
-bWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB1
-aS9jb2NvYTogVXNlIE9TWCdzIG1haW4gbG9vcApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjhkNzZjNTZkNmMgdWkvY29jb2E6IFBlcmZvcm0gVUkgb3BlcmF0aW9ucyBvbmx5IG9u
-IHRoZSBtYWluIHRocmVhZAozYWVlMDY4YTdjIHVpL2NvY29hOiBTdWJjbGFzcyBOU0FwcGxpY2F0
-aW9uIHNvIHdlIGNhbiBpbXBsZW1lbnQgc2VuZEV2ZW50CjFkYTdhNmExNTAgdWkvY29jb2E6IERv
-bid0IGNhbGwgTlNBcHAgc2VuZEV2ZW50IGRpcmVjdGx5IGZyb20gaGFuZGxlRXZlbnQKMDdlMDE4
-MDcyMCB1aS9jb2NvYTogTW92ZSBjb25zb2xlL2RldmljZSBtZW51IGNyZWF0aW9uIGNvZGUgdXAg
-aW4gZmlsZQphZTQ5MGQ4M2RiIHVpL2NvY29hOiBGYWN0b3Igb3V0IGluaXRpYWwgbWVudSBjcmVh
-dGlvbgo0YjBhYzUwNTU4IHVpL2NvY29hOiBVc2UgdGhlIHBpeG1hbiBpbWFnZSBkaXJlY3RseSBp
-biBzd2l0Y2hTdXJmYWNlCmM4M2YwZWIzMWQgdWkvY29jb2E6IEVuc3VyZSB3ZSBoYXZlIHRoZSBp
-b3RocmVhZCBsb2NrIHdoZW4gY2FsbGluZyBpbnRvIFFFTVUKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvNyBDaGVja2luZyBjb21taXQgYzgzZjBlYjMxZDA0ICh1aS9jb2NvYTogRW5zdXJlIHdlIGhh
-dmUgdGhlIGlvdGhyZWFkIGxvY2sgd2hlbiBjYWxsaW5nIGludG8gUUVNVSkKMi83IENoZWNraW5n
-IGNvbW1pdCA0YjBhYzUwNTU4NjcgKHVpL2NvY29hOiBVc2UgdGhlIHBpeG1hbiBpbWFnZSBkaXJl
-Y3RseSBpbiBzd2l0Y2hTdXJmYWNlKQozLzcgQ2hlY2tpbmcgY29tbWl0IGFlNDkwZDgzZGJhNyAo
-dWkvY29jb2E6IEZhY3RvciBvdXQgaW5pdGlhbCBtZW51IGNyZWF0aW9uKQo0LzcgQ2hlY2tpbmcg
-Y29tbWl0IDA3ZTAxODA3MjA5MyAodWkvY29jb2E6IE1vdmUgY29uc29sZS9kZXZpY2UgbWVudSBj
-cmVhdGlvbiBjb2RlIHVwIGluIGZpbGUpCjUvNyBDaGVja2luZyBjb21taXQgMWRhN2E2YTE1MDU5
-ICh1aS9jb2NvYTogRG9uJ3QgY2FsbCBOU0FwcCBzZW5kRXZlbnQgZGlyZWN0bHkgZnJvbSBoYW5k
-bGVFdmVudCkKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzQxOiBGSUxFOiB1aS9jb2NvYS5t
-OjE1MjoKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyMiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCA1LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjYvNyBDaGVja2luZyBj
-b21taXQgM2FlZTA2OGE3YzZhICh1aS9jb2NvYTogU3ViY2xhc3MgTlNBcHBsaWNhdGlvbiBzbyB3
-ZSBjYW4gaW1wbGVtZW50IHNlbmRFdmVudCkKNy83IENoZWNraW5nIGNvbW1pdCA4ZDc2YzU2ZDZj
-MzMgKHVpL2NvY29hOiBQZXJmb3JtIFVJIG9wZXJhdGlvbnMgb25seSBvbiB0aGUgbWFpbiB0aHJl
-YWQpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MTkwMjE0MTAyODE2LjMzOTMtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+Make sure BQL is held for all interrupt requests.
+
+For MTTCG-enabled configurations, handling soft and hard interrupts
+between vCPUs must be properly locked. By acquiring BQL, make sure
+all paths triggering an IRQ are synchronized.
+
+Signed-off-by: Miodrag Dinic <miodrag.dinic@imgtec.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+---
+ hw/mips/mips_int.c      | 12 ++++++++++++
+ target/mips/op_helper.c | 21 +++------------------
+ 2 files changed, 15 insertions(+), 18 deletions(-)
+
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 48192d2..5ddeb15 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -21,6 +21,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/main-loop.h"
+ #include "hw/hw.h"
+ #include "hw/mips/cpudevs.h"
+ #include "cpu.h"
+@@ -32,10 +33,17 @@ static void cpu_mips_irq_request(void *opaque, int ir=
+q, int level)
+     MIPSCPU *cpu =3D opaque;
+     CPUMIPSState *env =3D &cpu->env;
+     CPUState *cs =3D CPU(cpu);
++    bool locked =3D false;
+=20
+     if (irq < 0 || irq > 7)
+         return;
+=20
++    /* Make sure locking works even if BQL is already held by the caller=
+ */
++    if (!qemu_mutex_iothread_locked()) {
++        locked =3D true;
++        qemu_mutex_lock_iothread();
++    }
++
+     if (level) {
+         env->CP0_Cause |=3D 1 << (irq + CP0Ca_IP);
+=20
+@@ -56,6 +64,10 @@ static void cpu_mips_irq_request(void *opaque, int irq=
+, int level)
+     } else {
+         cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+     }
++
++    if (locked) {
++        qemu_mutex_unlock_iothread();
++    }
+ }
+=20
+ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 943a7ea..8c53b3b 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -17,7 +17,6 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu/main-loop.h"
+ #include "cpu.h"
+ #include "internal.h"
+ #include "qemu/host-utils.h"
+@@ -905,11 +904,7 @@ target_ulong helper_mftc0_tcschefback(CPUMIPSState *=
+env)
+=20
+ target_ulong helper_mfc0_count(CPUMIPSState *env)
+ {
+-    int32_t count;
+-    qemu_mutex_lock_iothread();
+-    count =3D (int32_t) cpu_mips_get_count(env);
+-    qemu_mutex_unlock_iothread();
+-    return count;
++    return (int32_t)cpu_mips_get_count(env);
+ }
+=20
+ target_ulong helper_mfc0_saar(CPUMIPSState *env)
+@@ -1594,9 +1589,7 @@ void helper_mtc0_hwrena(CPUMIPSState *env, target_u=
+long arg1)
+=20
+ void helper_mtc0_count(CPUMIPSState *env, target_ulong arg1)
+ {
+-    qemu_mutex_lock_iothread();
+     cpu_mips_store_count(env, arg1);
+-    qemu_mutex_unlock_iothread();
+ }
+=20
+ void helper_mtc0_saari(CPUMIPSState *env, target_ulong arg1)
+@@ -1685,9 +1678,7 @@ void helper_mttc0_entryhi(CPUMIPSState *env, target=
+_ulong arg1)
+=20
+ void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
+ {
+-    qemu_mutex_lock_iothread();
+     cpu_mips_store_compare(env, arg1);
+-    qemu_mutex_unlock_iothread();
+ }
+=20
+ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
+@@ -1741,9 +1732,7 @@ void helper_mtc0_srsctl(CPUMIPSState *env, target_u=
+long arg1)
+=20
+ void helper_mtc0_cause(CPUMIPSState *env, target_ulong arg1)
+ {
+-    qemu_mutex_lock_iothread();
+     cpu_mips_store_cause(env, arg1);
+-    qemu_mutex_unlock_iothread();
+ }
+=20
+ void helper_mttc0_cause(CPUMIPSState *env, target_ulong arg1)
+@@ -2587,16 +2576,12 @@ target_ulong helper_rdhwr_synci_step(CPUMIPSState=
+ *env)
+=20
+ target_ulong helper_rdhwr_cc(CPUMIPSState *env)
+ {
+-    int32_t count;
+     check_hwrena(env, 2, GETPC());
+ #ifdef CONFIG_USER_ONLY
+-    count =3D env->CP0_Count;
++    return env->CP0_Count;
+ #else
+-    qemu_mutex_lock_iothread();
+-    count =3D (int32_t)cpu_mips_get_count(env);
+-    qemu_mutex_unlock_iothread();
++    return (int32_t)cpu_mips_get_count(env);
+ #endif
+-    return count;
+ }
+=20
+ target_ulong helper_rdhwr_ccres(CPUMIPSState *env)
+--=20
+2.7.4
