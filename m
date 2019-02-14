@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50567)
+Received: from eggs.gnu.org ([209.51.188.92]:52917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu4Iy-0003r2-FR
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:51:05 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gu4VZ-000855-6m
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:04:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gu4Iw-0004pq-Ju
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:51:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gu4Iu-0004mT-MM
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 18:51:01 -0500
-References: <20190213234907.24173-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <11812548-716e-cc60-e6fc-20e6a2400634@redhat.com>
-Date: Wed, 13 Feb 2019 18:50:58 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gu4VX-0006WY-2I
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 19:04:05 -0500
+Date: Thu, 14 Feb 2019 08:03:17 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190214000317.GA19899@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
+	<20190212052224.GA4839@richard>
+	<20190212003414-mutt-send-email-mst@kernel.org>
+	<4d6f639b-fe11-7048-3975-ee1c1875b8d3@vivier.eu>
+	<3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
+	<af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20190213234907.24173-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/3] Bitmaps patches
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
+
+On Wed, Feb 13, 2019 at 02:45:01PM +0100, Laurent Vivier wrote:
+>On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
+>> Hi Laurent,
+>> 
+>> On 2/13/19 9:49 AM, Laurent Vivier wrote:
+>>> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
+>>>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
+>>>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
+>>>>>> There are several functions/variable which are not used anymore.
+>>>>>>
+>>>>>> This serials just remove those without functional change.
+>>>>>>
+>>>>>> v3: add ack and repost in a new thread
+>>>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
+>>>>>
+>>>>> Michael,
+>>>>>
+>>>>> Looks this serials is not merged yet.
+>>>>>
+>>>>> Is there any problem I need to fix?
+>>>>
+>>>> Yes pls repost with fixed reviewed-by tags.
+>>>
+>>> Or I can take the series through the trivial branch and update manually
+>>> Philippe's lastname?
+>> 
+>> I appreciate the help with manual update, however Wei is not the only
+>> one having this problem (other developpers has non-ASCII in their name,
+>> and use such tags).
+>> I'd rather prefer we find a proper configuration setup to help the
+>> community.
+>
+>I'm wondering if it can be a problem with cut'n'paste rather than with
+>git-sendemail.
+>
+>I think the following tags should cover Latin and Chinese characters:
+>
+>Content-Type: text/plain; charset=UTF-8
+>Content-Transfer-Encoding: 8bit
+>
+
+Looks not work.
+
+I have tried this and also with 
+
+Content-Language: en-US
 
 
-On 2/13/19 6:49 PM, John Snow wrote:
-> The following changes since commit 0b5e750bea635b167eb03d86c3d9a09bbd43bc06:
-> 
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-02-12 10:53:37 +0000)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
-> 
-> for you to fetch changes up to fbe8c2e3b041c682d3d52030b53e1627f285a84b:
-> 
->   blockdev: acquire aio_context for bitmap add/remove (2019-02-13 18:42:46 -0500)
-> 
-> ----------------------------------------------------------------
-> Pull request
-> 
+The character would be modified after git send-email.
 
-P.S. I have extended the expiry on my GPG key and extended the expiry to
-2021, you may need to refresh keys.
+>Thanks,
+>Laurent
 
-(Hopefully I did it right. This does not come up often.)
-
-> ----------------------------------------------------------------
-> 
-> Eric Blake (1):
->   dirty-bitmap: Expose persistent flag to 'query-block'
-> 
-> John Snow (2):
->   block/dirty-bitmap: Documentation and Comment fixups
->   blockdev: acquire aio_context for bitmap add/remove
-> 
->  block/dirty-bitmap.c       | 21 +++++++++++++++------
->  blockdev.c                 | 26 ++++++++++++++++++++------
->  qapi/block-core.json       | 37 ++++++++++++++++++++++++++++---------
->  tests/qemu-iotests/124     |  1 +
->  tests/qemu-iotests/236.out | 14 ++++++++++++++
->  5 files changed, 78 insertions(+), 21 deletions(-)
-> 
+-- 
+Wei Yang
+Help you, Help me
