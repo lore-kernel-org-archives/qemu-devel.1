@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55005)
+Received: from eggs.gnu.org ([209.51.188.92]:54934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guIr3-0007d9-BA
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:23:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1guIqy-0007ag-Tm
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:23:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guIqw-0001h5-OO
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:23:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45146)
+	(envelope-from <armbru@redhat.com>) id 1guIqu-0001eF-Eg
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:23:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guIqw-0001g6-Cy
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:23:06 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guIqu-0001cI-2S
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 10:23:04 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90D205944B
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:23:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2951B2D7EE
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 15:23:03 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 14 Feb 2019 16:22:46 +0100
-Message-Id: <20190214152251.2073-14-armbru@redhat.com>
+Date: Thu, 14 Feb 2019 16:22:38 +0100
+Message-Id: <20190214152251.2073-6-armbru@redhat.com>
 In-Reply-To: <20190214152251.2073-1-armbru@redhat.com>
 References: <20190214152251.2073-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 13/18] qapi: make query-cpu-model-expansion
- depend on s390 or x86
+Subject: [Qemu-devel] [PATCH v5 05/18] qapi: Generate QAPIEvent stuff into
+ separate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,315 +36,262 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Having to include qapi-events.h just for QAPIEvent is suboptimal, but
+quite tolerable now.  It'll become problematic when we have events
+conditional on the target, because then qapi-events.h won't be usable
+from target-independent code anymore.  Avoid that by generating it
+into separate files.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/arch_init.h             |  3 --
- monitor.c                              |  3 --
- qapi/misc.json                         | 51 -------------------------
- qapi/target.json                       | 52 ++++++++++++++++++++++++++
- qmp.c                                  |  7 ----
- stubs/Makefile.objs                    |  1 -
- stubs/arch-query-cpu-model-expansion.c | 13 -------
- target/i386/cpu.c                      |  5 ++-
- target/s390x/cpu_models.c              |  2 +-
- 9 files changed, 57 insertions(+), 80 deletions(-)
- delete mode 100644 stubs/arch-query-cpu-model-expansion.c
+ .gitignore                   |  1 +
+ Makefile                     |  1 +
+ Makefile.objs                |  1 +
+ docs/devel/qapi-code-gen.txt | 48 ++++++++++++++++++++++++------------
+ monitor.c                    |  2 +-
+ scripts/qapi/events.py       | 32 +++++++++++++++---------
+ stubs/monitor.c              |  2 +-
+ tests/test-qmp-event.c       |  1 +
+ ui/vnc.c                     |  3 ++-
+ 9 files changed, 61 insertions(+), 30 deletions(-)
 
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index f0ef652b2a..2497fd3351 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -33,7 +33,4 @@ int kvm_available(void);
- int xen_available(void);
+diff --git a/.gitignore b/.gitignore
+index 321095bf1a..b66b772551 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -32,6 +32,7 @@
+ /qapi/qapi-builtin-visit.[ch]
+ /qapi/qapi-commands-*.[ch]
+ /qapi/qapi-commands.[ch]
++/qapi/qapi-emit-events.[ch]
+ /qapi/qapi-events-*.[ch]
+ /qapi/qapi-events.[ch]
+ /qapi/qapi-introspect.[ch]
+diff --git a/Makefile b/Makefile
+index 3658310b95..53d161b65f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -101,6 +101,7 @@ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qap=
+i-visit-%.c)
+ GENERATED_QAPI_FILES +=3D qapi/qapi-commands.h qapi/qapi-commands.c
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.h)
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.c)
++GENERATED_QAPI_FILES +=3D qapi/qapi-emit-events.h qapi/qapi-emit-events.=
+c
+ GENERATED_QAPI_FILES +=3D qapi/qapi-events.h qapi/qapi-events.c
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-events-%.h)
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-events-%.c)
+diff --git a/Makefile.objs b/Makefile.objs
+index b7aae33367..ec11a0f55b 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -12,6 +12,7 @@ util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-types-%.o)
+ util-obj-y +=3D qapi/qapi-builtin-visit.o
+ util-obj-y +=3D qapi/qapi-visit.o
+ util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-visit-%.o)
++util-obj-y +=3D qapi/qapi-emit-events.o
+ util-obj-y +=3D qapi/qapi-events.o
+ util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-events-%.o)
+ util-obj-y +=3D qapi/qapi-introspect.o
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index c9ba8ddb2e..b517b0cfbf 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -1381,11 +1381,15 @@ qapi_event_send_EVENT().
 =20
- CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
--CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
-ype type,
--                                                      CpuModelInfo *mode=
-,
--                                                      Error **errp);
- #endif
+ The following files are created:
+=20
+-$(prefix)qapi-events.h - Function prototypes for each event type, plus a=
+n
+-                        enumeration of all event names
++$(prefix)qapi-events.h - Function prototypes for each event type
+=20
+ $(prefix)qapi-events.c - Implementation of functions to send an event
+=20
++$(prefix)qapi-emit-events.h - Enumeration of all event names, and
++                              common event code declarations
++
++$(prefix)qapi-emit-events.c - Common event code definitions
++
+ Example:
+=20
+     $ cat qapi-generated/example-qapi-events.h
+@@ -1397,9 +1401,32 @@ Example:
+     #include "qapi/util.h"
+     #include "example-qapi-types.h"
+=20
+-
+     void qapi_event_send_my_event(void);
+=20
++    #endif /* EXAMPLE_QAPI_EVENTS_H */
++    $ cat qapi-generated/example-qapi-events.c
++[Uninteresting stuff omitted...]
++
++    void qapi_event_send_my_event(void)
++    {
++        QDict *qmp;
++
++        qmp =3D qmp_event_build_dict("MY_EVENT");
++
++        example_qapi_event_emit(EXAMPLE_QAPI_EVENT_MY_EVENT, qmp);
++
++        qobject_unref(qmp);
++    }
++
++[Uninteresting stuff omitted...]
++    $ cat qapi-generated/example-qapi-emit-events.h
++[Uninteresting stuff omitted...]
++
++    #ifndef EXAMPLE_QAPI_EMIT_EVENTS_H
++    #define EXAMPLE_QAPI_EMIT_EVENTS_H
++
++    #include "qapi/util.h"
++
+     typedef enum example_QAPIEvent {
+         EXAMPLE_QAPI_EVENT_MY_EVENT,
+         EXAMPLE_QAPI_EVENT__MAX,
+@@ -1412,21 +1439,10 @@ Example:
+=20
+     void example_qapi_event_emit(example_QAPIEvent event, QDict *qdict);
+=20
+-    #endif /* EXAMPLE_QAPI_EVENTS_H */
+-    $ cat qapi-generated/example-qapi-events.c
++    #endif /* EXAMPLE_QAPI_EMIT_EVENTS_H */
++    $ cat qapi-generated/example-qapi-emit-events.c
+ [Uninteresting stuff omitted...]
+=20
+-    void qapi_event_send_my_event(void)
+-    {
+-        QDict *qmp;
+-
+-        qmp =3D qmp_event_build_dict("MY_EVENT");
+-
+-        example_qapi_event_emit(EXAMPLE_QAPI_EVENT_MY_EVENT, qmp);
+-
+-        qobject_unref(qmp);
+-    }
+-
+     const QEnumLookup example_QAPIEvent_lookup =3D {
+         .array =3D (const char *const[]) {
+             [EXAMPLE_QAPI_EVENT_MY_EVENT] =3D "MY_EVENT",
 diff --git a/monitor.c b/monitor.c
-index 33a0d81677..22a551b16b 100644
+index e5de5765b8..8e02a001a3 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1145,9 +1145,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
-ect **ret_data,
-  */
- static void qmp_unregister_commands_hack(void)
- {
--#if !defined(TARGET_S390X) && !defined(TARGET_I386)
--    qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
--#endif
- #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
-) \
-     && !defined(TARGET_S390X)
-     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 9df45a27ca..1255201267 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2199,57 +2199,6 @@
-   'data': [ 'static', 'full' ] }
+@@ -75,7 +75,7 @@
+ #include "qemu/thread.h"
+ #include "block/qapi.h"
+ #include "qapi/qapi-commands.h"
+-#include "qapi/qapi-events.h"
++#include "qapi/qapi-emit-events.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp-event.h"
+ #include "qapi/qapi-introspect.h"
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 6f39cf8196..28bbc3745d 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -143,12 +143,14 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCV=
+isitor):
+         self._event_emit_name =3D c_name(prefix + 'qapi_event_emit')
 =20
+     def _begin_user_module(self, name):
++        events =3D self._module_basename('qapi-events', name)
+         types =3D self._module_basename('qapi-types', name)
+         visit =3D self._module_basename('qapi-visit', name)
+         self._genc.add(mcgen('''
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "%(prefix)sqapi-events.h"
++#include "%(prefix)sqapi-emit-events.h"
++#include "%(events)s.h"
+ #include "%(visit)s.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+@@ -156,26 +158,34 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCV=
+isitor):
+ #include "qapi/qmp-event.h"
 =20
--##
--# @CpuModelExpansionInfo:
--#
--# The result of a cpu model expansion.
--#
--# @model: the expanded CpuModelInfo.
--#
--# Since: 2.8.0
--##
--{ 'struct': 'CpuModelExpansionInfo',
--  'data': { 'model': 'CpuModelInfo' } }
+ ''',
+-                             visit=3Dvisit, prefix=3Dself._prefix))
++                             events=3Devents, visit=3Dvisit,
++                             prefix=3Dself._prefix))
+         self._genh.add(mcgen('''
+ #include "qapi/util.h"
+ #include "%(types)s.h"
 -
--
--##
--# @query-cpu-model-expansion:
--#
--# Expands a given CPU model (or a combination of CPU model + additional =
-options)
--# to different granularities, allowing tooling to get an understanding w=
-hat a
--# specific CPU model looks like in QEMU under a certain configuration.
--#
--# This interface can be used to query the "host" CPU model.
--#
--# The data returned by this command may be affected by:
--#
--# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine-type: CPU model  may look different depending on the machine=
--type.
--#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
--# * machine options (including accelerator): in some architectures, CPU =
-models
--#   may look different depending on machine and accelerator options. (Ex=
-cept for
--#   CPU models reported as "static" in query-cpu-definitions.)
--# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
--#   global properties may affect expansion of CPU models. Using
--#   query-cpu-model-expansion while using these is not advised.
--#
--# Some architectures may not support all expansion types. s390x supports
--# "full" and "static".
--#
--# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
--#          not supported, if the model cannot be expanded, if the model =
-contains
--#          an unknown CPU definition name, unknown properties or propert=
-ies
--#          with a wrong type. Also returns an error if an expansion type=
- is
--#          not supported.
--#
--# Since: 2.8.0
--##
--{ 'command': 'query-cpu-model-expansion',
--  'data': { 'type': 'CpuModelExpansionType',
--            'model': 'CpuModelInfo' },
--  'returns': 'CpuModelExpansionInfo' }
--
- ##
- # @CpuModelCompareResult:
- #
-diff --git a/qapi/target.json b/qapi/target.json
-index f4a7054921..35653648bb 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -373,3 +373,55 @@
- ##
- { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-   'if': 'defined(TARGET_ARM)' }
-+
-+##
-+# @CpuModelExpansionInfo:
-+#
-+# The result of a cpu model expansion.
-+#
-+# @model: the expanded CpuModelInfo.
-+#
-+# Since: 2.8.0
-+##
-+{ 'struct': 'CpuModelExpansionInfo',
-+  'data': { 'model': 'CpuModelInfo' },
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-+
-+##
-+# @query-cpu-model-expansion:
-+#
-+# Expands a given CPU model (or a combination of CPU model + additional =
-options)
-+# to different granularities, allowing tooling to get an understanding w=
-hat a
-+# specific CPU model looks like in QEMU under a certain configuration.
-+#
-+# This interface can be used to query the "host" CPU model.
-+#
-+# The data returned by this command may be affected by:
-+#
-+# * QEMU version: CPU models may look different depending on the QEMU ve=
-rsion.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine-type: CPU model  may look different depending on the machine=
--type.
-+#   (Except for CPU models reported as "static" in query-cpu-definitions=
-.)
-+# * machine options (including accelerator): in some architectures, CPU =
-models
-+#   may look different depending on machine and accelerator options. (Ex=
-cept for
-+#   CPU models reported as "static" in query-cpu-definitions.)
-+# * "-cpu" arguments and global properties: arguments to the -cpu option=
- and
-+#   global properties may affect expansion of CPU models. Using
-+#   query-cpu-model-expansion while using these is not advised.
-+#
-+# Some architectures may not support all expansion types. s390x supports
-+# "full" and "static".
-+#
-+# Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
-+#          not supported, if the model cannot be expanded, if the model =
-contains
-+#          an unknown CPU definition name, unknown properties or propert=
-ies
-+#          with a wrong type. Also returns an error if an expansion type=
- is
-+#          not supported.
-+#
-+# Since: 2.8.0
-+##
-+{ 'command': 'query-cpu-model-expansion',
-+  'data': { 'type': 'CpuModelExpansionType',
-+            'model': 'CpuModelInfo' },
-+  'returns': 'CpuModelExpansionInfo',
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-diff --git a/qmp.c b/qmp.c
-index 8a613bf7c7..c81af9d23f 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -610,13 +610,6 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Err=
-or **errp)
-     return arch_query_cpu_definitions(errp);
- }
+ ''',
+                              types=3Dtypes))
 =20
--CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
-pe type,
--                                                     CpuModelInfo *model=
-,
--                                                     Error **errp)
--{
--    return arch_query_cpu_model_expansion(type, model, errp);
--}
--
- void qmp_add_client(const char *protocol, const char *fdname,
-                     bool has_skipauth, bool skipauth, bool has_tls, bool=
- tls,
-                     Error **errp)
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 8394a079d1..f337208179 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,5 +1,4 @@
- stub-obj-y +=3D arch-query-cpu-def.o
--stub-obj-y +=3D arch-query-cpu-model-expansion.o
- stub-obj-y +=3D bdrv-next-monitor-owned.o
- stub-obj-y +=3D blk-commit-all.o
- stub-obj-y +=3D blockdev-close-all-bdrv-states.o
-diff --git a/stubs/arch-query-cpu-model-expansion.c b/stubs/arch-query-cp=
-u-model-expansion.c
-deleted file mode 100644
-index 26273a8b10..0000000000
---- a/stubs/arch-query-cpu-model-expansion.c
-+++ /dev/null
-@@ -1,13 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "sysemu/arch_init.h"
--#include "qapi/error.h"
--#include "qapi/qmp/qerror.h"
--
--CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
-ype type,
--                                                      CpuModelInfo *mode=
-,
--                                                      Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--    return NULL;
--}
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b077196611..aa3a1f3a4f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -41,6 +41,7 @@
- #include "qapi/visitor.h"
- #include "qom/qom-qobject.h"
- #include "sysemu/arch_init.h"
-+#include "qapi/qapi-commands-target.h"
+     def visit_end(self):
+-        (genc, genh) =3D self._module[self._main_module]
+-        genh.add(gen_enum(self._event_enum_name,
+-                          self._event_enum_members))
+-        genc.add(gen_enum_lookup(self._event_enum_name,
+-                                 self._event_enum_members))
+-        genh.add(mcgen('''
++        self._add_system_module('emit', ' * QAPI Events emission')
++        self._genc.preamble_add(mcgen('''
++#include "qemu/osdep.h"
++#include "%(prefix)sqapi-emit-events.h"
++''',
++                                      prefix=3Dself._prefix))
++        self._genh.preamble_add(mcgen('''
++#include "qapi/util.h"
++'''))
++        self._genh.add(gen_enum(self._event_enum_name,
++                                self._event_enum_members))
++        self._genc.add(gen_enum_lookup(self._event_enum_name,
++                                       self._event_enum_members))
++        self._genh.add(mcgen('''
 =20
- #include "standard-headers/asm-x86/kvm_para.h"
+ void %(event_emit)s(%(event_enum)s event, QDict *qdict);
+ ''',
+-                       event_emit=3Dself._event_emit_name,
+-                       event_enum=3Dself._event_enum_name))
++                             event_emit=3Dself._event_emit_name,
++                             event_enum=3Dself._event_enum_name))
 =20
-@@ -3918,6 +3919,7 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDef=
-inition *def, Error **errp)
+     def visit_event(self, name, info, ifcond, arg_type, boxed):
+         with ifcontext(ifcond, self._genh, self._genc):
+diff --git a/stubs/monitor.c b/stubs/monitor.c
+index 32bd7012c3..b57fe6c32f 100644
+--- a/stubs/monitor.c
++++ b/stubs/monitor.c
+@@ -1,6 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qapi/qapi-events.h"
++#include "qapi/qapi-emit-events.h"
+ #include "qemu-common.h"
+ #include "monitor/monitor.h"
 =20
- }
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index bf900f14f4..eee7e08ab6 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -21,6 +21,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp-event.h"
+ #include "test-qapi-events.h"
++#include "test-qapi-emit-events.h"
 =20
-+#ifndef CONFIG_USER_ONLY
- /* Return a QDict containing keys for all properties that can be include=
-d
-  * in static expansion of CPU models. All properties set by x86_cpu_load=
-_def()
-  * must be included in the dictionary.
-@@ -4065,7 +4067,7 @@ out:
- }
-=20
- CpuModelExpansionInfo *
--arch_query_cpu_model_expansion(CpuModelExpansionType type,
-+qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-                                                       CpuModelInfo *mode=
-l,
-                                                       Error **errp)
- {
-@@ -4120,6 +4122,7 @@ out:
-     }
-     return ret;
- }
-+#endif  /* !CONFIG_USER_ONLY */
-=20
- static gchar *x86_gdb_arch_name(CPUState *cs)
- {
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index b532cd8d10..cf87488bfc 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -567,7 +567,7 @@ static void cpu_info_from_model(CpuModelInfo *info, c=
-onst S390CPUModel *model,
-     }
- }
-=20
--CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionT=
-ype type,
-+CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
-pe type,
-                                                       CpuModelInfo *mode=
-l,
-                                                       Error **errp)
- {
+ typedef struct TestEventData {
+     QDict *expect;
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 0fef646fc4..7e0710ed8f 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -35,7 +35,8 @@
+ #include "qemu/timer.h"
+ #include "qemu/acl.h"
+ #include "qemu/config-file.h"
+-#include "qapi/qapi-events.h"
++#include "qapi/qapi-emit-events.h"
++#include "qapi/qapi-events-ui.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-ui.h"
+ #include "ui/input.h"
 --=20
 2.17.2
