@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33508)
+Received: from eggs.gnu.org ([209.51.188.92]:33577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1guFFI-0002cW-7F
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:03 -0500
+	(envelope-from <philmd@redhat.com>) id 1guFFX-0002ji-1i
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1guFFG-0005xy-PX
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1guFFE-0005hn-He
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:31:58 -0500
-Date: Thu, 14 Feb 2019 12:31:40 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190214123140.53d3cdf6@redhat.com>
-In-Reply-To: <c6e1d704-e0da-215e-40c7-6db3daa66da1@linux.intel.com>
-References: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
-	<20190205164716.79b9cd08@Igors-MacBook-Pro.local>
-	<c6e1d704-e0da-215e-40c7-6db3daa66da1@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1guFFW-0006Jz-5x
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:15 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:55812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1guFFV-0006IM-WF
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:32:14 -0500
+Received: by mail-wm1-f66.google.com with SMTP id r17so5850104wmh.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 03:32:13 -0800 (PST)
+References: <20190212045721.28041-1-richard.henderson@linaro.org>
+	<CAFEAcA_Oc4fTfcC-RFmV3zi7RnAbjDv=xWG8uPb_AT9buGnAcQ@mail.gmail.com>
+	<46f22bec-d2ce-da2c-5aa0-c8572181f9ee@redhat.com>
+	<CAFEAcA9yvA5Vs-x3mYEJgn4aB7vN108Q7ek7jAnoNZtJ=K=mDQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1d9e4c0a-bc42-49d7-7d5a-b53cdd4be68f@redhat.com>
+Date: Thu, 14 Feb 2019 12:32:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Issues] PCI hotplug does not work well on pc
- platform?
+In-Reply-To: <CAFEAcA9yvA5Vs-x3mYEJgn4aB7vN108Q7ek7jAnoNZtJ=K=mDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 00/24] target/hppa patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Cc: yang.zhong@intel.com, qemu-devel <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 13 Feb 2019 15:40:57 +0800
-"Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
+Hi Peter,
 
-> Hi Igor,
+On 2/14/19 11:04 AM, Peter Maydell wrote:
+> On Wed, 13 Feb 2019 at 18:40, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> What Clang version is that?
+>>
+>> I can not reproduce using:
+>>
+>> clang version 7.0.1 (Fedora 7.0.1-1.fc29)
 > 
-> Thanks for your reply!
-> 
-> On 2/5/2019 11:47 PM, Igor Mammedov wrote:
-> > On Wed, 30 Jan 2019 21:02:10 +0800
-> > "Liu, Jing2" <jing2.liu@linux.intel.com> wrote:
-> >   
-> >> Hi everyone,
-> >>
-> >> I have two questions.
-> >> 1. PCI hotplug on pci.0 must manually rescan in guest. The ACPI hotplug
-> >> handler sends the GPE event to guest but it seems guest doesn't receive
-> >> it? I tried to open ACPI debug level/layer to 0xffffffff, in order to
-> >> see if there is any message after device_add in monitor, but no message
-> >> comes out until I manually rescan. Also tried printk in
-> >> acpi_ev_gpe_xrupt_handler() and acpi_ev_sci_xrupt_handler(). No output
-> >> in dmesg.
-> >> (I'm sure that CONFIG_HOTPLUG_PCI_PCIE=y, CONFIG_HOTPLUG_PCI_CPCI=y,
-> >> CONFIG_HOTPLUG_PCI=y, CONFIG_HOTPLUG_PCI_ACPI=y)
-> >>
-> >> Whether this is a kind of design or a known issue? Does guest receive
-> >> the request, where can I find the  
-> > does it work with known to work kernels (RHEL7)?
-> > 
-> > Also sharing used QEMU version and command line could help.
-> >   
-> Is there any key config of kernel in guest, besides those I listed above?
-Maybe Marcel knows something about it
-(CCed)
+> OSX: Apple LLVM version 10.0.0 (clang-1000.11.45.5)> and Ubuntu bionic: clang version 6.0.0-1ubuntu2 (tags/RELEASE_600/final)
 
-> 
-> I used guest kernel v4.18 and qemu upstream v3.1.0
-> Command line:
-> sudo /home/xxx/qemu/x86_64-softmmu/qemu-system-x86_64  \
-> -machine pc,accel=kvm,kernel_irqchip -cpu host -m 1G,slots=2,maxmem=10G \
-> -nographic -no-user-config -nodefaults -vga none \
-> -drive file=/home/xxx/image/clear-24690-kvm.img,if=virtio,format=raw \
->   -smp sockets=1,cpus=4,cores=2,maxcpus=8 \
-> -device virtio-serial-pci,id=virtio-serial0,disable-modern,addr=0x5 \
-> -monitor tcp:0.0.0.0:5000,nowait,server \
-> -chardev stdio,id=charconsole0 -device 
-> virtconsole,chardev=charconsole0,id=console0  \
-> -kernel /home/xxx/linux-stable/arch/x86/boot/bzImage \
-> -append 'root=/dev/vda3 rw rootfstype=ext4 data=ordered 
-> rcupdate.rcu_expedited=1 pci=lastbus=0 pci=realloc=on tsc=reliable 
-> no_timer_check reboot=t noapictimer console=hvc0 iommu=off  panic=1 
-> initcall_debug acpi.debug_layer=0x40000 acpi.debug_level=4 ' \
-> -device pci-bridge,bus=pci.0,id=br1,chassis_nr=1,shpc=on,addr=6  \
-> 
-> >>
-> >> 2. I want to try hotplugging on pci-bridge on pc platform, using shpc. I
-> >> set shpc=on, but when I do device_add, qemu still calls
-> >> acpi_pcihp_device_plug_cb? Why it does not call pci_bridge_dev_hotplug_cb?
-> >> (CONFIG_HOTPLUG_PCI_SHPC=y)  
-> > 
-> > try to disable ACPI hotplug for bridges
-> >   -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off
-> >   
-> I'll try it!
-> 
-> Thanks!
-> Jing
-> >   
-> 
+I can not reproduce on Bionic:
+
+$ clang --version
+clang version 6.0.0-1ubuntu2 (tags/RELEASE_600/final)
+Target: x86_64-pc-linux-gnu
+
+./configure --host-cc=clang \
+            --cxx=clang++ \
+            --cc=clang \
+            --extra-cflags=-Werror=typedef-redefinition
+Host C compiler   clang
+C++ compiler      clang++
+Objective-C compiler clang
+QEMU_CFLAGS       -I/usr/include/pixman-1 -I$(SRC_PATH)/dtc/libfdt
+-Werror  -pthread -I/usr/include/glib-2.0
+-I/usr/lib/x86_64-linux-gnu/glib-2.0/include -fPIE -DPIE -m64 -mcx16
+-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+-Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings
+-Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99
+ -Werror=typedef-redefinition -Wno-error=address-of-packed-member
+-Wno-string-plus-int -Wno-initializer-overrides -Wexpansion-to-defined
+-Wendif-labels -Wno-shift-negative-value -Wno-missing-include-dirs
+-Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self
+-Wignored-qualifiers -Wold-style-definition -Wtype-limits
+-fstack-protector-strong  -I/usr/include/p11-kit-1
+-I/usr/include/libpng16 -I/usr/include/spice-server
+-I/usr/include/spice-1 -I$(SRC_PATH)/capstone/include
+[...]
+
+$ make subdir-hppa-softmmu
+[...]
+
+$ hppa-softmmu/qemu-system-hppa --version
+QEMU emulator version 3.1.50 (v3.1.0-1733-gcb82c5728c-dirty)
+
+I don't have handy OSX setup except Travis, I'll see what I can do.
+
+Regards,
+
+Phil.
