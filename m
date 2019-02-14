@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41392)
+Received: from eggs.gnu.org ([209.51.188.92]:41403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu8dE-0001Kf-9n
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:17 -0500
+	(envelope-from <wexu@redhat.com>) id 1gu8dE-0001Kv-R7
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu8dB-00055V-QG
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34306)
+	(envelope-from <wexu@redhat.com>) id 1gu8dD-00058J-OY
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu8d7-0004MY-Qh
-	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:09 -0500
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu8d8-0004PG-L5
+	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:11 -0500
 From: wexu@redhat.com
-Date: Wed, 13 Feb 2019 23:26:33 -0500
-Message-Id: <1550118402-4057-3-git-send-email-wexu@redhat.com>
+Date: Wed, 13 Feb 2019 23:26:34 -0500
+Message-Id: <1550118402-4057-4-git-send-email-wexu@redhat.com>
 In-Reply-To: <1550118402-4057-1-git-send-email-wexu@redhat.com>
 References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/11] virtio: device/driver area size
- calculation helper for split ring
+Subject: [Qemu-devel] [PATCH v4 03/11] virtio: initialize packed ring region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +28,59 @@ Cc: wexu@redhat.com, jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, m
 
 From: Wei Xu <wexu@redhat.com>
 
-There is slight size difference between split/packed rings.
-
-This is a refactor of split ring as well as a helper to expand
-device and driver area size calculation for packed ring.
+Initialize packed ring memory region with correct size and attribute.
 
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ hw/virtio/virtio.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index eafb4cc..6769e54 100644
+index 6769e54..1a98e61 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -155,10 +155,8 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
-     VRingMemoryRegionCaches *old = vq->vring.caches;
+@@ -156,7 +156,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
      VRingMemoryRegionCaches *new = NULL;
      hwaddr addr, size;
--    int event_size;
      int64_t len;
- 
--    event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+-
++    bool attr;
  
      addr = vq->vring.desc;
      if (!addr) {
-@@ -173,7 +171,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+@@ -164,8 +164,10 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+     }
+     new = g_new0(VRingMemoryRegionCaches, 1);
+     size = virtio_queue_get_desc_size(vdev, n);
++    attr = virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED) ?
++                                   true : false;
+     len = address_space_cache_init(&new->desc, vdev->dma_as,
+-                                   addr, size, false);
++                                   addr, size, attr);
+     if (len < size) {
+         virtio_error(vdev, "Cannot map desc");
          goto err_desc;
-     }
- 
--    size = virtio_queue_get_used_size(vdev, n) + event_size;
-+    size = virtio_queue_get_used_size(vdev, n);
-     len = address_space_cache_init(&new->used, vdev->dma_as,
-                                    vq->vring.used, size, true);
-     if (len < size) {
-@@ -181,7 +179,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
-         goto err_used;
-     }
- 
--    size = virtio_queue_get_avail_size(vdev, n) + event_size;
-+    size = virtio_queue_get_avail_size(vdev, n);
-     len = address_space_cache_init(&new->avail, vdev->dma_as,
-                                    vq->vring.avail, size, false);
-     if (len < size) {
-@@ -2335,14 +2333,20 @@ hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n)
- 
- hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
+@@ -2335,6 +2337,10 @@ hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
  {
-+    int s;
+     int s;
+ 
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        return sizeof(struct VRingPackedDescEvent);
++    }
 +
-+    s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+     s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
      return offsetof(VRingAvail, ring) +
--        sizeof(uint16_t) * vdev->vq[n].vring.num;
-+        sizeof(uint16_t) * vdev->vq[n].vring.num + s;
- }
- 
- hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
+         sizeof(uint16_t) * vdev->vq[n].vring.num + s;
+@@ -2344,6 +2350,10 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
  {
-+    int s;
-+
-+    s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-     return offsetof(VRingUsed, ring) +
--        sizeof(VRingUsedElem) * vdev->vq[n].vring.num;
-+        sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
- }
+     int s;
  
- uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        return sizeof(struct VRingPackedDescEvent);
++    }
++
+     s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+     return offsetof(VRingUsed, ring) +
+         sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
 -- 
 1.8.3.1
