@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45555)
+Received: from eggs.gnu.org ([209.51.188.92]:46085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guNfE-0008D8-CM
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:31:21 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1guNhl-0000YO-Oe
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guNf8-00085J-5C
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:31:19 -0500
-Resent-Message-Id: <E1guNf8-00085J-5C@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guNf6-00081E-GO
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:31:14 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155017625729.24.15503354532270088294@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1guNhk-0001pJ-JY
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:33:57 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35175)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1guNhi-0001gA-LJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 15:33:54 -0500
+Received: by mail-wm1-x343.google.com with SMTP id t200so7440562wmt.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 12:33:42 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20190214180216.246707-1-sgarzare@redhat.com>
+	<20190214140613-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <43cdfd65-9ef4-df75-7932-3360813025f1@redhat.com>
+Date: Thu, 14 Feb 2019 21:33:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 12:30:58 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+In-Reply-To: <20190214140613-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: run the multiboot loader
+ before the PVH loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Liam Merwick <liam.merwick@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, George Kennedy <George.Kennedy@oracle.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmIzOWMy
-ZTkwZiBnZGJzdHViOiBTZW5kIGEgcmVwbHkgdG8gdGhlIHZLaWxsIHBhY2tldC4KODY1NjNiZGE5
-ZCB0YXJnZXQvYXJtOiBBZGQgbWlzc2luZyBjbGVhcl90YWlsIGNhbGxzCjg2NmYxOTU4YjQgdGFy
-Z2V0L2FybTogVXNlIHZlY3RvciBvcGVyYXRpb25zIGZvciBzYXR1cmF0aW9uCjdmYWRkOTA1YTcg
-dGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZpZWxkCjNiYmY0Mzg0
-ZjkgdGFyZ2V0L2FybTogRml4IHNldCBvZiBiaXRzIGtlcHQgaW4geHJlZ3NbQVJNX1ZGUF9GUFND
-Ul0KMTc4ZmUxNmFjOCB0YXJnZXQvYXJtOiBTcGxpdCBvdXQgZmxhZ3Mgc2V0dGluZyBmcm9tIHZm
-cCBjb21wYXJlcwoxZmI5NTQ4ZmVjIHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUg
-dnMgRlBTQ1IKYzA0NWJiZTM1ZiB0YXJnZXQvYXJtOiBGaXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2
-cyBGUFNDUgowYmZiNzY0YmE3IHRhcmdldC9hcm06IFJlbW92ZSBuZW9uIG1pbi9tYXggaGVscGVy
-cwo0YTQwZDcxNjMzIHRhcmdldC9hcm06IFVzZSB0Y2cgaW50ZWdlciBtaW4vbWF4IHByaW1pdGl2
-ZXMgZm9yIG5lb24KOWVhYmE1MDg2MCB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBh
-bmRlcnMgZm9yIGFhcmNoMzIKZTIyMjU0ODUzMyB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1h
-eCBleHBhbmRlcnMgZm9yIGFhcmNoNjQKZTc3MjMwMTkxZiB0YXJnZXQvYXJtOiBSZWx5IG9uIG9w
-dGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29yCjNmN2NkYTczYjIgaHcvYXJtL2FybXNz
-ZTogRml4IG1pc3dpcmluZyBvZiBleHBhbnNpb24gSVJRcwpkOTNlYmU4MTg1IGh3L2ludGMvYXJt
-djdtX252aWM6IEFsbG93IGJ5dGUgYWNjZXNzZXMgdG8gU0hQUjEKY2NlMzFhYWIzZCBNQUlOVEFJ
-TkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRlIGZyb20gdmFyaW91cyBlbnRyaWVzCjk4OTFl
-NWY2YzcgYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZvciBLVk0gZ3Vlc3RzIHRvIGJlIGNo
-YW5nZWQgYnkgUUVNVSBjb2RlCmFiNzAzZjBkNWEgbGludXgtdXNlci9lbGZsb2FkOiBlbmFibGUg
-SFdDQVBfQ1BVSUQgZm9yIEFBcmNoNjQKYjQzMDFlYWIwOCB0YXJnZXQvYXJtOiBleHBvc2UgcmVt
-YWluaW5nIENQVUlEIHJlZ2lzdGVycyBhcyBSQVoKN2FiZjNjODYzMSB0YXJnZXQvYXJtOiBleHBv
-c2UgTVBJRFJfRUwxIHRvIHVzZXJzcGFjZQpkMTdiYzc1MmQ4IHRhcmdldC9hcm06IGV4cG9zZSBD
-UFVJRCByZWdpc3RlcnMgdG8gdXNlcnNwYWNlCjcyMWQyYzIwNTYgdGFyZ2V0L2FybTogcmVsYXgg
-cGVybWlzc2lvbiBjaGVja3MgZm9yIEhXQ0FQX0NQVUlEIHJlZ2lzdGVycwo3MGQ2MmZkNzI5IHRh
-cmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2ZwX2ludF9jb252CjkwN2Q5OTk1MDYgdGFyZ2V0
-L2FybTogRm9yY2UgcmVzdWx0IHNpemUgaW50byBkcCBhZnRlciBvcGVyYXRpb24KYTIwZGNlY2Zh
-NiB0YXJnZXQvYXJtOiBGaXggaW50MTI4X21ha2UxMjggbG8sIGhpIG9yZGVyIGluIHBhaXJlZF9j
-bXB4Y2hnNjRfYmUKZDQyZDg0YjdiMSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIKZjFk
-ZmM4NDg0YiB0YXJnZXQvYXJtOiBGaXggQ1JuIHRvIGJlIDE0IGZvciBQTUVWVFlQRVIvUE1FVkNO
-VFIKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjcgQ2hlY2tpbmcgY29tbWl0IGYxZGZjODQ4NGJj
-NCAodGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3IgUE1FVlRZUEVSL1BNRVZDTlRSKQoy
-LzI3IENoZWNraW5nIGNvbW1pdCBkNDJkODRiN2IxMTAgKHRhcmdldC9hcm06IEltcGxlbWVudCBI
-QUNSX0VMMikKMy8yNyBDaGVja2luZyBjb21taXQgYTIwZGNlY2ZhNjQ5ICh0YXJnZXQvYXJtOiBG
-aXggaW50MTI4X21ha2UxMjggbG8sIGhpIG9yZGVyIGluIHBhaXJlZF9jbXB4Y2hnNjRfYmUpCjQv
-MjcgQ2hlY2tpbmcgY29tbWl0IDkwN2Q5OTk1MDY2NiAodGFyZ2V0L2FybTogRm9yY2UgcmVzdWx0
-IHNpemUgaW50byBkcCBhZnRlciBvcGVyYXRpb24pCjUvMjcgQ2hlY2tpbmcgY29tbWl0IDcwZDYy
-ZmQ3MjkzNyAodGFyZ2V0L2FybTogUmVzdHJ1Y3R1cmUgZGlzYXNfZnBfaW50X2NvbnYpCjYvMjcg
-Q2hlY2tpbmcgY29tbWl0IDcyMWQyYzIwNTY3ZSAodGFyZ2V0L2FybTogcmVsYXggcGVybWlzc2lv
-biBjaGVja3MgZm9yIEhXQ0FQX0NQVUlEIHJlZ2lzdGVycykKNy8yNyBDaGVja2luZyBjb21taXQg
-ZDE3YmM3NTJkODQ0ICh0YXJnZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJz
-cGFjZSkKOC8yNyBDaGVja2luZyBjb21taXQgN2FiZjNjODYzMTQzICh0YXJnZXQvYXJtOiBleHBv
-c2UgTVBJRFJfRUwxIHRvIHVzZXJzcGFjZSkKOS8yNyBDaGVja2luZyBjb21taXQgYjQzMDFlYWIw
-ODViICh0YXJnZXQvYXJtOiBleHBvc2UgcmVtYWluaW5nIENQVUlEIHJlZ2lzdGVycyBhcyBSQVop
-CjEwLzI3IENoZWNraW5nIGNvbW1pdCBhYjcwM2YwZDVhNDYgKGxpbnV4LXVzZXIvZWxmbG9hZDog
-ZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0KQoxMS8yNyBDaGVja2luZyBjb21taXQgOTg5
-MWU1ZjZjNzA5IChhcm06IEFsbG93IHN5c3RlbSByZWdpc3RlcnMgZm9yIEtWTSBndWVzdHMgdG8g
-YmUgY2hhbmdlZCBieSBRRU1VIGNvZGUpCjEyLzI3IENoZWNraW5nIGNvbW1pdCBjY2UzMWFhYjNk
-NjYgKE1BSU5UQUlORVJTOiBSZW1vdmUgUGV0ZXIgQ3Jvc3Rod2FpdGUgZnJvbSB2YXJpb3VzIGVu
-dHJpZXMpCjEzLzI3IENoZWNraW5nIGNvbW1pdCBkOTNlYmU4MTg1YTQgKGh3L2ludGMvYXJtdjdt
-X252aWM6IEFsbG93IGJ5dGUgYWNjZXNzZXMgdG8gU0hQUjEpCjE0LzI3IENoZWNraW5nIGNvbW1p
-dCAzZjdjZGE3M2IyMGEgKGh3L2FybS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9u
-IElSUXMpCjE1LzI3IENoZWNraW5nIGNvbW1pdCBlNzcyMzAxOTFmNDMgKHRhcmdldC9hcm06IFJl
-bHkgb24gb3B0aW1pemF0aW9uIHdpdGhpbiB0Y2dfZ2VuX2d2ZWNfb3IpCjE2LzI3IENoZWNraW5n
-IGNvbW1pdCBlMjIyNTQ4NTMzYjAgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFu
-ZGVycyBmb3IgYWFyY2g2NCkKMTcvMjcgQ2hlY2tpbmcgY29tbWl0IDllYWJhNTA4NjA5OCAodGFy
-Z2V0L2FybTogVXNlIHZlY3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyKQoxOC8yNyBD
-aGVja2luZyBjb21taXQgNGE0MGQ3MTYzMzE0ICh0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIg
-bWluL21heCBwcmltaXRpdmVzIGZvciBuZW9uKQoxOS8yNyBDaGVja2luZyBjb21taXQgMGJmYjc2
-NGJhNzcyICh0YXJnZXQvYXJtOiBSZW1vdmUgbmVvbiBtaW4vbWF4IGhlbHBlcnMpCjIwLzI3IENo
-ZWNraW5nIGNvbW1pdCBjMDQ1YmJlMzVmZDQgKHRhcmdldC9hcm06IEZpeCB2ZnBfZ2RiX2dldC9z
-ZXRfcmVnIHZzIEZQU0NSKQpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24g
-bmV4dCBsaW5lCiMyNTogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzo4NDoKKyAgICBjYXNlIDE6
-IHN0bF9wKGJ1ZiwgdmZwX2dldF9mcHNjcihlbnYpKTsgcmV0dXJuIDQ7CgpFUlJPUjogdHJhaWxp
-bmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMzNDogRklMRTogdGFyZ2V0L2Fy
-bS9oZWxwZXIuYzoxMTA6CisgICAgY2FzZSAxOiB2ZnBfc2V0X2Zwc2NyKGVudiwgbGRsX3AoYnVm
-KSk7IHJldHVybiA0OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAyMC8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjEvMjcgQ2hlY2tp
-bmcgY29tbWl0IDFmYjk1NDhmZWM0MSAodGFyZ2V0L2FybTogRml4IGFybV9jcHVfZHVtcF9zdGF0
-ZSB2cyBGUFNDUikKMjIvMjcgQ2hlY2tpbmcgY29tbWl0IDE3OGZlMTZhYzg3MiAodGFyZ2V0L2Fy
-bTogU3BsaXQgb3V0IGZsYWdzIHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMpCjIzLzI3IENoZWNr
-aW5nIGNvbW1pdCAzYmJmNDM4NGY5OTUgKHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0
-IGluIHhyZWdzW0FSTV9WRlBfRlBTQ1JdKQoyNC8yNyBDaGVja2luZyBjb21taXQgN2ZhZGQ5MDVh
-N2YzICh0YXJnZXQvYXJtOiBTcGxpdCBvdXQgRlBTQ1IuUUMgdG8gYSB2ZWN0b3IgZmllbGQpCjI1
-LzI3IENoZWNraW5nIGNvbW1pdCA4NjZmMTk1OGI0ZDcgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3Ig
-b3BlcmF0aW9ucyBmb3Igc2F0dXJhdGlvbikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
-dGhhdCAnKicgKGN0eDpXeFYpCiMzNjA6IEZJTEU6IHRhcmdldC9hcm0vdmVjX2hlbHBlci5jOjc3
-NDoKKyAgICBUWVBFTiAqZCA9IHZkLCAqbiA9IHZuOyBUWVBFTSAqbSA9IHZtOyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQzOCBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAyNS8yNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjYvMjcgQ2hlY2tpbmcgY29tbWl0
-IDg2NTYzYmRhOWRhOSAodGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxscykK
-MjcvMjcgQ2hlY2tpbmcgY29tbWl0IGZiMzljMmU5MGY2NiAoZ2Ric3R1YjogU2VuZCBhIHJlcGx5
-IHRvIHRoZSB2S2lsbCBwYWNrZXQuKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxNDE5MDYwMy4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 14/02/19 20:09, Michael S. Tsirkin wrote:
+> On Thu, Feb 14, 2019 at 07:02:16PM +0100, Stefano Garzarella wrote:
+>> Some multiboot images could be in the ELF format. In the current
+>> implementation QEMU fails because we try to load these images
+>> as a PVH image.
+>>
+>> In order to fix this issue, we should try multiboot first (we
+>> already check the multiboot magic header before to load it).
+>> If it is not a multiboot image, we can try the PVH loader.
+>>
+>> Fixes: ab969087da6 ("pvh: Boot uncompressed kernel using direct boot ABI", 2019-01-15)
+>> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Paolo can you pls merge since you did the pvh things?
+
+Yes, queued.
+
+Paolo
+
+>> ---
+>>  hw/i386/pc.c | 17 +++++++++++------
+>>  1 file changed, 11 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index 3889eccdc3..207c267093 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -1209,6 +1209,17 @@ static void load_linux(PCMachineState *pcms,
+>>      if (ldl_p(header+0x202) == 0x53726448) {
+>>          protocol = lduw_p(header+0x206);
+>>      } else {
+>> +        /*
+>> +         * This could be a multiboot kernel. If it is, let's stop treating it
+>> +         * like a Linux kernel.
+>> +         * Note: some multiboot images could be in the ELF format (the same of
+>> +         * PVH), so we try multiboot first since we check the multiboot magic
+>> +         * header before to load it.
+>> +         */
+>> +        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+>> +                           kernel_cmdline, kernel_size, header)) {
+>> +            return;
+>> +        }
+>>          /*
+>>           * Check if the file is an uncompressed kernel file (ELF) and load it,
+>>           * saving the PVH entry point used by the x86/HVM direct boot ABI.
+>> @@ -1262,12 +1273,6 @@ static void load_linux(PCMachineState *pcms,
+>>  
+>>              return;
+>>          }
+>> -        /* This looks like a multiboot kernel. If it is, let's stop
+>> -           treating it like a Linux kernel. */
+>> -        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+>> -                           kernel_cmdline, kernel_size, header)) {
+>> -            return;
+>> -        }
+>>          protocol = 0;
+>>      }
+>>  
+>> -- 
+>> 2.20.1
