@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36959)
+Received: from eggs.gnu.org ([209.51.188.92]:37027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guDib-0004RR-Uh
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:54:10 -0500
+	(envelope-from <laurent@vivier.eu>) id 1guDij-0004Wp-Eu
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guDia-0008RK-Jl
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:54:09 -0500
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1guDii-0000Hv-GJ
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 04:54:17 -0500
 References: <20190212134758.10514-1-dgilbert@redhat.com>
-	<20190212134758.10514-3-dgilbert@redhat.com>
-Date: Thu, 14 Feb 2019 10:53:58 +0100
-In-Reply-To: <20190212134758.10514-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Tue, 12 Feb 2019 13:47:56 +0000")
-Message-ID: <87o97eae6h.fsf@dusky.pond.sub.org>
+	<20190212134758.10514-2-dgilbert@redhat.com>
+	<87e9683c-1363-3777-f92a-af73e1ed3748@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <f71ebf01-c653-dea9-4cb6-3743e91fc990@vivier.eu>
+Date: Thu, 14 Feb 2019 10:54:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/4] HMP: Prepend errors with 'Error:'
+In-Reply-To: <87e9683c-1363-3777-f92a-af73e1ed3748@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/4] pckbd: Convert
+ DPRINTF->trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com, mst@redhat.com, qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com, mst@redhat.com
+Cc: qemu-trivial@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+On 12/02/2019 15:10, Philippe Mathieu-Daudé wrote:
+> On 2/12/19 2:47 PM, Dr. David Alan Gilbert (git) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Per https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03186.html
+> this one already has:
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Always make error messages start with 'Error:' as a fallback
-> to make sure that anything parsing them can tell it failed.
 
-Feeding HMP output to programs is a bad idea to begin with.  
+Applied the one from 2018-10
+(20181016112232.23241-1-dgilbert@redhat.com), as it is identical and has
+the R-b, to my trivial-patches branch.
 
-> Note: Some places don't use hmp_handle_error
-
-True.  A more honest subject would be "HMP: Prepend some errors with
-'Error:'".
-
-Several distinct reasons for not using hmp_handle_error():
-
-* Handling an error that isn't transmitted as an Error object
-
-  HMP command handlers generally wrap around QMP command handlers, which
-  always use Error objects.  Still, there are other sources of errors
-  when the HMP command does more than the wrapped QMP command (typically
-  convenience features for humans), or there is no wrapped QMP command.
-
-* Augmenting the error message
-
-  Reporting with error_reportf_err() is easier than first messing with
-  the Error object, then passing it to hmp_handle_error().  Example:
-  hmp_delvm().
-
-* hmp_handle_error() is static, and we're outside hmp.c
-
-  Tolerable as long as hmp_handle_error() is trivial.  Your patch makes
-  it a bit less trivial.
-
-If we truly want to "Prepend errors with 'Error:'", then we should make
-hmp command handlers take an Error ** argument, and leave the reporting
-to the HMP core.
-
-If you think prepending some errors is useful (and I guess you do), go
-right ahead with this patch.  I'd recommend to use the more honest
-subject, though.
+Thanks,
+Laurent
