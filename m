@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41403)
+Received: from eggs.gnu.org ([209.51.188.92]:41405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu8dE-0001Kv-R7
+	(envelope-from <wexu@redhat.com>) id 1gu8dE-0001L0-SE
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gu8dD-00058J-OY
+	(envelope-from <wexu@redhat.com>) id 1gu8dD-00058B-PG
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48184)
+Received: from mx1.redhat.com ([209.132.183.28]:58760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu8d8-0004PG-L5
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gu8d7-0004Lc-Uj
 	for qemu-devel@nongnu.org; Wed, 13 Feb 2019 23:28:11 -0500
 From: wexu@redhat.com
-Date: Wed, 13 Feb 2019 23:26:34 -0500
-Message-Id: <1550118402-4057-4-git-send-email-wexu@redhat.com>
+Date: Wed, 13 Feb 2019 23:26:32 -0500
+Message-Id: <1550118402-4057-2-git-send-email-wexu@redhat.com>
 In-Reply-To: <1550118402-4057-1-git-send-email-wexu@redhat.com>
 References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 03/11] virtio: initialize packed ring region
+Subject: [Qemu-devel] [PATCH v4 01/11] virtio: rename structure for packed
+ ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,56 @@ Cc: wexu@redhat.com, jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, m
 
 From: Wei Xu <wexu@redhat.com>
 
-Initialize packed ring memory region with correct size and attribute.
+Redefine packed ring structure according to Qemu nomenclature.
 
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ hw/virtio/virtio.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 6769e54..1a98e61 100644
+index a1ff647..eafb4cc 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -156,7 +156,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
-     VRingMemoryRegionCaches *new = NULL;
-     hwaddr addr, size;
-     int64_t len;
--
-+    bool attr;
+@@ -39,6 +39,13 @@ typedef struct VRingDesc
+     uint16_t next;
+ } VRingDesc;
  
-     addr = vq->vring.desc;
-     if (!addr) {
-@@ -164,8 +164,10 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
-     }
-     new = g_new0(VRingMemoryRegionCaches, 1);
-     size = virtio_queue_get_desc_size(vdev, n);
-+    attr = virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED) ?
-+                                   true : false;
-     len = address_space_cache_init(&new->desc, vdev->dma_as,
--                                   addr, size, false);
-+                                   addr, size, attr);
-     if (len < size) {
-         virtio_error(vdev, "Cannot map desc");
-         goto err_desc;
-@@ -2335,6 +2337,10 @@ hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
- {
-     int s;
- 
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        return sizeof(struct VRingPackedDescEvent);
-+    }
++typedef struct VRingPackedDesc {
++    uint64_t addr;
++    uint32_t len;
++    uint16_t id;
++    uint16_t flags;
++} VRingPackedDesc;
 +
-     s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-     return offsetof(VRingAvail, ring) +
-         sizeof(uint16_t) * vdev->vq[n].vring.num + s;
-@@ -2344,6 +2350,10 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
+ typedef struct VRingAvail
  {
-     int s;
+     uint16_t flags;
+@@ -77,17 +84,25 @@ typedef struct VRing
+     VRingMemoryRegionCaches *caches;
+ } VRing;
  
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        return sizeof(struct VRingPackedDescEvent);
-+    }
++typedef struct VRingPackedDescEvent {
++    uint16_t off_wrap;
++    uint16_t flags;
++} VRingPackedDescEvent ;
 +
-     s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-     return offsetof(VRingUsed, ring) +
-         sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
+ struct VirtQueue
+ {
+     VRing vring;
+ 
+     /* Next head to pop */
+     uint16_t last_avail_idx;
++    bool last_avail_wrap_counter;
+ 
+     /* Last avail_idx read from VQ. */
+     uint16_t shadow_avail_idx;
++    bool avail_wrap_counter;
+ 
+     uint16_t used_idx;
++    bool used_wrap_counter;
+ 
+     /* Last used index value we have signalled on */
+     uint16_t signalled_used;
 -- 
 1.8.3.1
