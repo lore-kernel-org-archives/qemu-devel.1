@@ -1,10 +1,11 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32906)
+Received: from eggs.gnu.org ([209.51.188.92]:34437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guC08-0001jN-Bj
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:04:09 -0500
+	(envelope-from <laurent@vivier.eu>) id 1guC6Q-0004b4-Kf
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:10:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1guBuI-0007C9-Ls
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 02:58:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1guC6P-0000EJ-Qt
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 03:10:38 -0500
+From: Laurent Vivier <laurent@vivier.eu>
 References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
 	<20190212052224.GA4839@richard>
 	<20190212003414-mutt-send-email-mst@kernel.org>
@@ -12,11 +13,11 @@ References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
 	<3d700eed-5637-b05a-63c2-9f73a465bcb5@redhat.com>
 	<af33ffd7-a134-4d61-40ee-b128f5104153@vivier.eu>
 	<20190214000317.GA19899@richard>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3dd545f2-5346-2b01-8725-5f35cbaa0ae5@vivier.eu>
-Date: Thu, 14 Feb 2019 08:57:44 +0100
+	<3dd545f2-5346-2b01-8725-5f35cbaa0ae5@vivier.eu>
+Message-ID: <d69dd1c9-aa58-4b03-6b9c-1cde7bed83cb@vivier.eu>
+Date: Thu, 14 Feb 2019 09:10:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190214000317.GA19899@richard>
+In-Reply-To: <3dd545f2-5346-2b01-8725-5f35cbaa0ae5@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -32,56 +33,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Wei Yang <richardw.yang@linux.intel.com>
 Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
 
-On 14/02/2019 01:03, Wei Yang wrote:
-> On Wed, Feb 13, 2019 at 02:45:01PM +0100, Laurent Vivier wrote:
->> On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
->>> Hi Laurent,
->>>
->>> On 2/13/19 9:49 AM, Laurent Vivier wrote:
->>>> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
->>>>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
->>>>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
->>>>>>> There are several functions/variable which are not used anymore.
->>>>>>>
->>>>>>> This serials just remove those without functional change.
->>>>>>>
->>>>>>> v3: add ack and repost in a new thread
->>>>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
->>>>>>
->>>>>> Michael,
->>>>>>
->>>>>> Looks this serials is not merged yet.
->>>>>>
->>>>>> Is there any problem I need to fix?
->>>>>
->>>>> Yes pls repost with fixed reviewed-by tags.
+On 14/02/2019 08:57, Laurent Vivier wrote:
+> On 14/02/2019 01:03, Wei Yang wrote:
+>> On Wed, Feb 13, 2019 at 02:45:01PM +0100, Laurent Vivier wrote:
+>>> On 13/02/2019 09:56, Philippe Mathieu-Daudé wrote:
+>>>> Hi Laurent,
 >>>>
->>>> Or I can take the series through the trivial branch and update manually
->>>> Philippe's lastname?
+>>>> On 2/13/19 9:49 AM, Laurent Vivier wrote:
+>>>>> On 12/02/2019 06:34, Michael S. Tsirkin wrote:
+>>>>>> On Tue, Feb 12, 2019 at 01:22:24PM +0800, Wei Yang wrote:
+>>>>>>> On Wed, Jan 30, 2019 at 08:06:50AM +0800, Wei Yang wrote:
+>>>>>>>> There are several functions/variable which are not used anymore.
+>>>>>>>>
+>>>>>>>> This serials just remove those without functional change.
+>>>>>>>>
+>>>>>>>> v3: add ack and repost in a new thread
+>>>>>>>> v2: change commit log from "is now used in no place" to "in not used anymore"
+>>>>>>>
+>>>>>>> Michael,
+>>>>>>>
+>>>>>>> Looks this serials is not merged yet.
+>>>>>>>
+>>>>>>> Is there any problem I need to fix?
+>>>>>>
+>>>>>> Yes pls repost with fixed reviewed-by tags.
+>>>>>
+>>>>> Or I can take the series through the trivial branch and update manually
+>>>>> Philippe's lastname?
+>>>>
+>>>> I appreciate the help with manual update, however Wei is not the only
+>>>> one having this problem (other developpers has non-ASCII in their name,
+>>>> and use such tags).
+>>>> I'd rather prefer we find a proper configuration setup to help the
+>>>> community.
 >>>
->>> I appreciate the help with manual update, however Wei is not the only
->>> one having this problem (other developpers has non-ASCII in their name,
->>> and use such tags).
->>> I'd rather prefer we find a proper configuration setup to help the
->>> community.
+>>> I'm wondering if it can be a problem with cut'n'paste rather than with
+>>> git-sendemail.
+>>>
+>>> I think the following tags should cover Latin and Chinese characters:
+>>>
+>>> Content-Type: text/plain; charset=UTF-8
+>>> Content-Transfer-Encoding: 8bit
+>>>
 >>
->> I'm wondering if it can be a problem with cut'n'paste rather than with
->> git-sendemail.
+>> Looks not work.
 >>
->> I think the following tags should cover Latin and Chinese characters:
+>> I have tried this and also with 
 >>
->> Content-Type: text/plain; charset=UTF-8
->> Content-Transfer-Encoding: 8bit
->>
+>> Content-Language: en-US
 > 
-> Looks not work.
-> 
-> I have tried this and also with 
-> 
-> Content-Language: en-US
+> Could  you send me a gzipped version of the 0001-XXX.patch in attachment
+> so I could see the real content before git-send-email?
 
-Could  you send me a gzipped version of the 0001-XXX.patch in attachment
-so I could see the real content before git-send-email?
+OK, I've got it.
 
-Thansk,
+What I see is it is already corrupted, thus the problem is not with
+git-send-email.
+
+So either it is corrupted by git-format-patch (which is very unlikely,
+we could see that if you push it to a public git repo) or it has been
+corrupted when you have added it to the commit message.
+
+Thanks,
 Laurent
