@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46058)
+Received: from eggs.gnu.org ([209.51.188.92]:46222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guEMK-000276-56
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:35:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guEMK-0002Bg-Ta
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:35:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guEGF-0004WI-UM
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:59 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42794)
+	(envelope-from <peter.maydell@linaro.org>) id 1guEG2-00044s-51
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:45 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guEG9-0003pv-94
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:50 -0500
-Received: by mail-wr1-x444.google.com with SMTP id q18so5833819wrx.9
-	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 02:28:25 -0800 (PST)
+	id 1guEFw-0003mN-Ph
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 05:28:38 -0500
+Received: by mail-wm1-x341.google.com with SMTP id t200so5541070wmt.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 02:28:22 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Feb 2019 10:28:13 +0000
-Message-Id: <20190214102816.3393-5-peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 10:28:11 +0000
+Message-Id: <20190214102816.3393-3-peter.maydell@linaro.org>
 In-Reply-To: <20190214102816.3393-1-peter.maydell@linaro.org>
 References: <20190214102816.3393-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 4/7] ui/cocoa: Move console/device menu
- creation code up in file
+Subject: [Qemu-devel] [PATCH v2 2/7] ui/cocoa: Use the pixman image directly
+ in switchSurface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,220 +32,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Move the console/device menu creation code functions
-further up in the source file, next to the code which
-creates the initial menus. We're going to want to
-change the location we call these functions from in
-the next patch.
+Currently the switchSurface method takes a DisplaySurface. We want
+to change our DisplayChangeListener's dpy_gfx_switch callback
+to do this work asynchronously on a different thread. The caller
+of the switch callback will free the old DisplaySurface
+immediately the callback returns, so to ensure that the
+other thread doesn't access freed data we need to switch
+to using the underlying pixman image instead. The pixman
+image is reference counted, so we will be able to take
+a reference to it to avoid it vanishing too early.
 
-This commit is a pure code move with no other changes.
+In this commit we only change the switchSurface method
+to take a pixman image, and keep the flow of control
+synchronous for now.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- ui/cocoa.m | 184 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 92 insertions(+), 92 deletions(-)
+ ui/cocoa.m | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 0b1cd31543..2d943b6e2a 100644
+index 2931c751fd..9d23732ff9 100644
 --- a/ui/cocoa.m
 +++ b/ui/cocoa.m
-@@ -1548,6 +1548,98 @@ static void create_initial_menus(void)
-     [[NSApp mainMenu] addItem:menuItem];
+@@ -315,7 +315,7 @@ @interface QemuCocoaView : NSView
+     BOOL isAbsoluteEnabled;
+     BOOL isMouseDeassociated;
+ }
+-- (void) switchSurface:(DisplaySurface *)surface;
++- (void) switchSurface:(pixman_image_t *)image;
+ - (void) grabMouse;
+ - (void) ungrabMouse;
+ - (void) toggleFullScreen:(id)sender;
+@@ -495,12 +495,13 @@ - (void) setContentDimensions
+     }
  }
  
-+/* Returns a name for a given console */
-+static NSString * getConsoleName(QemuConsole * console)
-+{
-+    return [NSString stringWithFormat: @"%s", qemu_console_get_label(console)];
-+}
-+
-+/* Add an entry to the View menu for each console */
-+static void add_console_menu_entries(void)
-+{
-+    NSMenu *menu;
-+    NSMenuItem *menuItem;
-+    int index = 0;
-+
-+    menu = [[[NSApp mainMenu] itemWithTitle:@"View"] submenu];
-+
-+    [menu addItem:[NSMenuItem separatorItem]];
-+
-+    while (qemu_console_lookup_by_index(index) != NULL) {
-+        menuItem = [[[NSMenuItem alloc] initWithTitle: getConsoleName(qemu_console_lookup_by_index(index))
-+                                               action: @selector(displayConsole:) keyEquivalent: @""] autorelease];
-+        [menuItem setTag: index];
-+        [menu addItem: menuItem];
-+        index++;
-+    }
-+}
-+
-+/* Make menu items for all removable devices.
-+ * Each device is given an 'Eject' and 'Change' menu item.
-+ */
-+static void addRemovableDevicesMenuItems(void)
-+{
-+    NSMenu *menu;
-+    NSMenuItem *menuItem;
-+    BlockInfoList *currentDevice, *pointerToFree;
-+    NSString *deviceName;
-+
-+    currentDevice = qmp_query_block(NULL);
-+    pointerToFree = currentDevice;
-+    if(currentDevice == NULL) {
-+        NSBeep();
-+        QEMU_Alert(@"Failed to query for block devices!");
-+        return;
-+    }
-+
-+    menu = [[[NSApp mainMenu] itemWithTitle:@"Machine"] submenu];
-+
-+    // Add a separator between related groups of menu items
-+    [menu addItem:[NSMenuItem separatorItem]];
-+
-+    // Set the attributes to the "Removable Media" menu item
-+    NSString *titleString = @"Removable Media";
-+    NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:titleString];
-+    NSColor *newColor = [NSColor blackColor];
-+    NSFontManager *fontManager = [NSFontManager sharedFontManager];
-+    NSFont *font = [fontManager fontWithFamily:@"Helvetica"
-+                                          traits:NSBoldFontMask|NSItalicFontMask
-+                                          weight:0
-+                                            size:14];
-+    [attString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, [titleString length])];
-+    [attString addAttribute:NSForegroundColorAttributeName value:newColor range:NSMakeRange(0, [titleString length])];
-+    [attString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt: 1] range:NSMakeRange(0, [titleString length])];
-+
-+    // Add the "Removable Media" menu item
-+    menuItem = [NSMenuItem new];
-+    [menuItem setAttributedTitle: attString];
-+    [menuItem setEnabled: NO];
-+    [menu addItem: menuItem];
-+
-+    /* Loop through all the block devices in the emulator */
-+    while (currentDevice) {
-+        deviceName = [[NSString stringWithFormat: @"%s", currentDevice->value->device] retain];
-+
-+        if(currentDevice->value->removable) {
-+            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Change %s...", currentDevice->value->device]
-+                                                  action: @selector(changeDeviceMedia:)
-+                                           keyEquivalent: @""];
-+            [menu addItem: menuItem];
-+            [menuItem setRepresentedObject: deviceName];
-+            [menuItem autorelease];
-+
-+            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Eject %s", currentDevice->value->device]
-+                                                  action: @selector(ejectDeviceMedia:)
-+                                           keyEquivalent: @""];
-+            [menu addItem: menuItem];
-+            [menuItem setRepresentedObject: deviceName];
-+            [menuItem autorelease];
-+        }
-+        currentDevice = currentDevice->next;
-+    }
-+    qapi_free_BlockInfoList(pointerToFree);
-+}
-+
- int main (int argc, const char * argv[]) {
- 
-     gArgc = argc;
-@@ -1676,98 +1768,6 @@ static void cocoa_cleanup(void)
-     .dpy_refresh = cocoa_refresh,
- };
- 
--/* Returns a name for a given console */
--static NSString * getConsoleName(QemuConsole * console)
--{
--    return [NSString stringWithFormat: @"%s", qemu_console_get_label(console)];
--}
--
--/* Add an entry to the View menu for each console */
--static void add_console_menu_entries(void)
--{
--    NSMenu *menu;
--    NSMenuItem *menuItem;
--    int index = 0;
--
--    menu = [[[NSApp mainMenu] itemWithTitle:@"View"] submenu];
--
--    [menu addItem:[NSMenuItem separatorItem]];
--
--    while (qemu_console_lookup_by_index(index) != NULL) {
--        menuItem = [[[NSMenuItem alloc] initWithTitle: getConsoleName(qemu_console_lookup_by_index(index))
--                                               action: @selector(displayConsole:) keyEquivalent: @""] autorelease];
--        [menuItem setTag: index];
--        [menu addItem: menuItem];
--        index++;
--    }
--}
--
--/* Make menu items for all removable devices.
-- * Each device is given an 'Eject' and 'Change' menu item.
-- */
--static void addRemovableDevicesMenuItems(void)
--{
--    NSMenu *menu;
--    NSMenuItem *menuItem;
--    BlockInfoList *currentDevice, *pointerToFree;
--    NSString *deviceName;
--
--    currentDevice = qmp_query_block(NULL);
--    pointerToFree = currentDevice;
--    if(currentDevice == NULL) {
--        NSBeep();
--        QEMU_Alert(@"Failed to query for block devices!");
--        return;
--    }
--
--    menu = [[[NSApp mainMenu] itemWithTitle:@"Machine"] submenu];
--
--    // Add a separator between related groups of menu items
--    [menu addItem:[NSMenuItem separatorItem]];
--
--    // Set the attributes to the "Removable Media" menu item
--    NSString *titleString = @"Removable Media";
--    NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:titleString];
--    NSColor *newColor = [NSColor blackColor];
--    NSFontManager *fontManager = [NSFontManager sharedFontManager];
--    NSFont *font = [fontManager fontWithFamily:@"Helvetica"
--                                          traits:NSBoldFontMask|NSItalicFontMask
--                                          weight:0
--                                            size:14];
--    [attString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, [titleString length])];
--    [attString addAttribute:NSForegroundColorAttributeName value:newColor range:NSMakeRange(0, [titleString length])];
--    [attString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt: 1] range:NSMakeRange(0, [titleString length])];
--
--    // Add the "Removable Media" menu item
--    menuItem = [NSMenuItem new];
--    [menuItem setAttributedTitle: attString];
--    [menuItem setEnabled: NO];
--    [menu addItem: menuItem];
--
--    /* Loop through all the block devices in the emulator */
--    while (currentDevice) {
--        deviceName = [[NSString stringWithFormat: @"%s", currentDevice->value->device] retain];
--
--        if(currentDevice->value->removable) {
--            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Change %s...", currentDevice->value->device]
--                                                  action: @selector(changeDeviceMedia:)
--                                           keyEquivalent: @""];
--            [menu addItem: menuItem];
--            [menuItem setRepresentedObject: deviceName];
--            [menuItem autorelease];
--
--            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Eject %s", currentDevice->value->device]
--                                                  action: @selector(ejectDeviceMedia:)
--                                           keyEquivalent: @""];
--            [menu addItem: menuItem];
--            [menuItem setRepresentedObject: deviceName];
--            [menuItem autorelease];
--        }
--        currentDevice = currentDevice->next;
--    }
--    qapi_free_BlockInfoList(pointerToFree);
--}
--
- static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+-- (void) switchSurface:(DisplaySurface *)surface
++- (void) switchSurface:(pixman_image_t *)image
  {
-     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
+     COCOA_DEBUG("QemuCocoaView: switchSurface\n");
+ 
+-    int w = surface_width(surface);
+-    int h = surface_height(surface);
++    int w = pixman_image_get_width(image);
++    int h = pixman_image_get_height(image);
++    pixman_format_code_t image_format = pixman_image_get_format(image);
+     /* cdx == 0 means this is our very first surface, in which case we need
+      * to recalculate the content dimensions even if it happens to be the size
+      * of the initial empty window.
+@@ -522,10 +523,10 @@ - (void) switchSurface:(DisplaySurface *)surface
+         CGDataProviderRelease(dataProviderRef);
+ 
+     //sync host window color space with guests
+-    screen.bitsPerPixel = surface_bits_per_pixel(surface);
+-    screen.bitsPerComponent = surface_bytes_per_pixel(surface) * 2;
++    screen.bitsPerPixel = PIXMAN_FORMAT_BPP(image_format);
++    screen.bitsPerComponent = DIV_ROUND_UP(screen.bitsPerPixel, 8) * 2;
+ 
+-    dataProviderRef = CGDataProviderCreateWithData(NULL, surface_data(surface), w * 4 * h, NULL);
++    dataProviderRef = CGDataProviderCreateWithData(NULL, pixman_image_get_data(image), w * 4 * h, NULL);
+ 
+     // update windows
+     if (isFullscreen) {
+@@ -1625,7 +1626,7 @@ static void cocoa_switch(DisplayChangeListener *dcl,
+     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+ 
+     COCOA_DEBUG("qemu_cocoa: cocoa_switch\n");
+-    [cocoaView switchSurface:surface];
++    [cocoaView switchSurface:surface->image];
+     [pool release];
+ }
+ 
 -- 
 2.17.2 (Apple Git-113)
