@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56845)
+Received: from eggs.gnu.org ([209.51.188.92]:57212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1guQZv-0001AB-7d
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:38:04 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guQbq-0002oK-1O
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1guQZt-0006a2-6t
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:38:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50898)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1guQZr-0006W7-8k
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:38:00 -0500
-Date: Thu, 14 Feb 2019 16:37:55 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190214163755.5e76ae62@w520.home>
-In-Reply-To: <20190214051440.59167-1-aik@ozlabs.ru>
-References: <20190214051440.59167-1-aik@ozlabs.ru>
+	(envelope-from <no-reply@patchew.org>) id 1guQbo-00087F-3Q
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:40:01 -0500
+Resent-Message-Id: <E1guQbo-00087F-3Q@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1guQbm-00083O-71
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 18:40:00 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155018758478.24.15310611613645186978@49fa7ef69f7b>
+In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] pci: Move NVIDIA vendor id to the
- rest of ids
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 14 Feb 2019 15:39:45 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-On Thu, 14 Feb 2019 16:14:40 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-
-> sPAPR code will use it too so move it from VFIO to the common code.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
-> 
-> Previous version was RFC, this is is not.
-
-I assume as a stand-alone patch this should go through the PCI branch,
-cc'ing maintainers.
-
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-> ---
->  include/hw/pci/pci_ids.h | 2 ++
->  hw/vfio/pci-quirks.c     | 2 --
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
-> index eeb3301..0abe27a 100644
-> --- a/include/hw/pci/pci_ids.h
-> +++ b/include/hw/pci/pci_ids.h
-> @@ -271,4 +271,6 @@
->  
->  #define PCI_VENDOR_ID_SYNOPSYS           0x16C3
->  
-> +#define PCI_VENDOR_ID_NVIDIA             0x10de
-> +
->  #endif
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index eae31c7..40a1200 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -526,8 +526,6 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
->   * note it for future reference.
->   */
->  
-> -#define PCI_VENDOR_ID_NVIDIA                    0x10de
-> -
->  /*
->   * Nvidia has several different methods to get to config space, the
->   * nouveu project has several of these documented here:
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
+MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
+YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMu
+MjUwMzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYw
+My4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCjFmY2FjYjkwMzAgZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBw
+YWNrZXQuCmZhY2M0NWQwMjYgdGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxs
+cwpmZTQ3YWUxYWMwIHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJh
+dGlvbgpiZWIzYWNiNGEyIHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFNDUi5RQyB0byBhIHZlY3Rv
+ciBmaWVsZAo4MTg3ODAwZjVmIHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhy
+ZWdzW0FSTV9WRlBfRlBTQ1JdCjYxMDkwZTY4MWMgdGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdz
+IHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMKNzUzYjMzZWY2YSB0YXJnZXQvYXJtOiBGaXggYXJt
+X2NwdV9kdW1wX3N0YXRlIHZzIEZQU0NSCmE2YWMyNTc1MmUgdGFyZ2V0L2FybTogRml4IHZmcF9n
+ZGJfZ2V0L3NldF9yZWcgdnMgRlBTQ1IKNzBhZTFlNWE1MSB0YXJnZXQvYXJtOiBSZW1vdmUgbmVv
+biBtaW4vbWF4IGhlbHBlcnMKYWEwNTc1ZDQ3MyB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIg
+bWluL21heCBwcmltaXRpdmVzIGZvciBuZW9uCjAwZDgxOGVhMWQgdGFyZ2V0L2FybTogVXNlIHZl
+Y3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjdlNzZjNmU1MTEgdGFyZ2V0L2FybTog
+VXNlIHZlY3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CjI2YTQ4ZTg0Y2YgdGFyZ2V0
+L2FybTogUmVseSBvbiBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgoxN2RiOTQw
+NjVlIGh3L2FybS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKZjViMGFm
+ZTdlNSBody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCmRh
+ZmExOWJhYTQgTUFJTlRBSU5FUlM6IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlv
+dXMgZW50cmllcwozZTEzM2U0NGExIGFybTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZN
+IGd1ZXN0cyB0byBiZSBjaGFuZ2VkIGJ5IFFFTVUgY29kZQpmMmNmYjc0YjA5IGxpbnV4LXVzZXIv
+ZWxmbG9hZDogZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0CmNhMDAwMmVlYmMgdGFyZ2V0
+L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaCjRiODkzZWIyMTIg
+dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UKOWQ1ZTU3MDRlMCB0YXJn
+ZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZQpiMWE2Y2FiZmY0IHRh
+cmdldC9hcm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3Rl
+cnMKYTI1MmYyZDNmOSB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9pbnRfY29udgow
+OTVjNzFmOTdhIHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3Bl
+cmF0aW9uCmRiYjZjOTVmYzUgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBv
+cmRlciBpbiBwYWlyZWRfY21weGNoZzY0X2JlCjAzMTliZjJhNWEgdGFyZ2V0L2FybTogSW1wbGVt
+ZW50IEhBQ1JfRUwyCjFlNzlmZDZkZWMgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3Ig
+UE1FVlRZUEVSL1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNv
+bW1pdCAxZTc5ZmQ2ZGVjYWEgKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZU
+WVBFUi9QTUVWQ05UUikKMi8yNyBDaGVja2luZyBjb21taXQgMDMxOWJmMmE1YWY1ICh0YXJnZXQv
+YXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IGRiYjZjOTVmYzUz
+OSAodGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRf
+Y21weGNoZzY0X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCAwOTVjNzFmOTdhNzYgKHRhcmdldC9h
+cm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNr
+aW5nIGNvbW1pdCBhMjUyZjJkM2Y5ZjcgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2Zw
+X2ludF9jb252KQo2LzI3IENoZWNraW5nIGNvbW1pdCBiMWE2Y2FiZmY0OWYgKHRhcmdldC9hcm06
+IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcg
+Q2hlY2tpbmcgY29tbWl0IDlkNWU1NzA0ZTA0YiAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJl
+Z2lzdGVycyB0byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IDRiODkzZWIyMTI4NyAo
+dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcg
+Y29tbWl0IGNhMDAwMmVlYmM0MyAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCBy
+ZWdpc3RlcnMgYXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgZjJjZmI3NGIwOTE2IChsaW51
+eC11c2VyL2VsZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hl
+Y2tpbmcgY29tbWl0IDNlMTMzZTQ0YTFiOCAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZv
+ciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBj
+b21taXQgZGFmYTE5YmFhNDViIChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRl
+IGZyb20gdmFyaW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgZjViMGFmZTdlNWY2
+IChody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8y
+NyBDaGVja2luZyBjb21taXQgMTdkYjk0MDY1ZTJmIChody9hcm0vYXJtc3NlOiBGaXggbWlzd2ly
+aW5nIG9mIGV4cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgMjZhNDhlODRjZjY4
+ICh0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29y
+KQoxNi8yNyBDaGVja2luZyBjb21taXQgN2U3NmM2ZTUxMTNhICh0YXJnZXQvYXJtOiBVc2UgdmVj
+dG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCAw
+MGQ4MThlYTFkOGEgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3Ig
+YWFyY2gzMikKMTgvMjcgQ2hlY2tpbmcgY29tbWl0IGFhMDU3NWQ0NzNhOCAodGFyZ2V0L2FybTog
+VXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tp
+bmcgY29tbWl0IDcwYWUxZTVhNTFlMCAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBo
+ZWxwZXJzKQoyMC8yNyBDaGVja2luZyBjb21taXQgYTZhYzI1NzUyZWRjICh0YXJnZXQvYXJtOiBG
+aXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVu
+dHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6
+ODQ6CisgICAgY2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0
+OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6
+IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNj
+cihlbnYsIGxkbF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
+cywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjIxLzI3IENoZWNraW5nIGNvbW1pdCA3NTNiMzNlZjZhOWYgKHRhcmdldC9hcm06IEZpeCBh
+cm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCA2MTA5MGU2
+ODFjYjEgKHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBh
+cmVzKQoyMy8yNyBDaGVja2luZyBjb21taXQgODE4NzgwMGY1ZjY3ICh0YXJnZXQvYXJtOiBGaXgg
+c2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcg
+Y29tbWl0IGJlYjNhY2I0YTI3MiAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEg
+dmVjdG9yIGZpZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgZmU0N2FlMWFjMGVmICh0YXJnZXQv
+YXJtOiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJt
+L3ZlY19oZWxwZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0g
+PSB2bTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3
+IENoZWNraW5nIGNvbW1pdCBmYWNjNDVkMDI2NmEgKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNs
+ZWFyX3RhaWwgY2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCAxZmNhY2I5MDMwMGQgKGdkYnN0
+dWI6IFNlbmQgYSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09
+CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
+bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1w
+ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
