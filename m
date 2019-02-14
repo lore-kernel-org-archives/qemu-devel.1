@@ -1,25 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1guEtB-0005A3-HY
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:09:10 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1guEtG-0005A3-Fp
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:09:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1guElk-0006Kn-Gk
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:01:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36836)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1guElc-0006EZ-Os
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:01:21 -0500
-Date: Thu, 14 Feb 2019 12:01:17 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190214120117.36f7b04c@redhat.com>
-In-Reply-To: <20190214031004.32522-3-stefanha@redhat.com>
-References: <20190214031004.32522-1-stefanha@redhat.com>
-	<20190214031004.32522-3-stefanha@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1guEkW-0005F1-9Y
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:00:16 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39376)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1guEkV-0005DK-TW
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 06:00:12 -0500
+Received: by mail-wm1-x344.google.com with SMTP id f16so5622593wmh.4
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 03:00:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hostmem-file: reject invalid pmem
- file sizes
+References: <20190214093053.1400-1-armbru@redhat.com>
+	<20190214093053.1400-8-armbru@redhat.com>
+In-Reply-To: <20190214093053.1400-8-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 14 Feb 2019 11:59:58 +0100
+Message-ID: <CAJ+F1CL3QGOhqNRNUAhhtBE2q0UpTS2AkOWc9-P09uz99EhKAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 07/18] build: Deal with all of QAPI's .o
+ in qapi/Makefile.objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,170 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Zhang Yi <yi.z.zhang@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On Thu, 14 Feb 2019 11:10:04 +0800
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
+Hi
 
-> Guests started with NVDIMMs larger than the underlying host file produce
-> confusing errors inside the guest.  This happens because the guest
-> accesses pages beyond the end of the file.
-> 
-> Check the pmem file size on startup and print a clear error message if
-> the size is invalid.
-> 
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1669053
-> Cc: Wei Yang <richardw.yang@linux.intel.com>
-> Cc: Zhang Yi <yi.z.zhang@linux.intel.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+On Thu, Feb 14, 2019 at 10:44 AM Markus Armbruster <armbru@redhat.com> wrot=
+e:
+>
+> Adding QAPI's .o to util-obj-y, common-obj-y and obj-y is spread over
+> three places: Makefile.objs takes care of target-independent generated
+> code, Makefile.target of target-dependent generated code, and
+> qapi/Makefile.objs of (target-independent) hand-written code.
+>
+> Do everything in qapi/Makefile.objs.
+>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  include/qemu/osdep.h    | 13 ++++++++++
->  backends/hostmem-file.c | 23 ++++++++++++++++++
->  util/oslib-posix.c      | 53 +++++++++++++++++++++++++++++++++++++++++
->  util/oslib-win32.c      |  5 ++++
->  4 files changed, 94 insertions(+)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 840af09cb0..303d315c5d 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -570,6 +570,19 @@ void qemu_set_tty_echo(int fd, bool echo);
->  void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
->                       Error **errp);
->  
-> +/**
-> + * qemu_get_pmem_size:
-> + * @filename: path to a pmem file
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Determine the size of a persistent memory file.  Besides supporting files on
-> + * DAX file systems, this function also supports Linux devdax character
-> + * devices.
-> + *
-> + * Returns: the size or 0 on failure
-> + */
-> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp);
+>  Makefile           |  1 -
+>  Makefile.objs      | 13 -------------
+>  Makefile.target    |  3 +--
+>  qapi/Makefile.objs | 19 +++++++++++++++++++
+>  4 files changed, 20 insertions(+), 16 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 53d161b65f..a6de28677f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -89,7 +89,6 @@ include $(SRC_PATH)/rules.mak
+>
+>  GENERATED_FILES =3D qemu-version.h config-host.h qemu-options.def
+>
+> -#see Makefile.objs for the definition of QAPI_MODULES
+>  GENERATED_QAPI_FILES =3D qapi/qapi-builtin-types.h qapi/qapi-builtin-typ=
+es.c
+>  GENERATED_QAPI_FILES +=3D qapi/qapi-types.h qapi/qapi-types.c
+>  GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-types-%.h)
+> diff --git a/Makefile.objs b/Makefile.objs
+> index bc78e26f55..4a266357a2 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -1,20 +1,7 @@
+> -QAPI_MODULES =3D block-core block char common crypto introspect job migr=
+ation
+> -QAPI_MODULES +=3D misc net rdma rocker run-state sockets tpm trace trans=
+action
+> -QAPI_MODULES +=3D ui
+> -
+>  #######################################################################
+>  # Common libraries for tools and emulators
+>  stub-obj-y =3D stubs/ crypto/
+>  util-obj-y =3D util/ qobject/ qapi/
+> -util-obj-y +=3D qapi/qapi-builtin-types.o
+> -util-obj-y +=3D qapi/qapi-types.o
+> -util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-types-%.o)
+> -util-obj-y +=3D qapi/qapi-builtin-visit.o
+> -util-obj-y +=3D qapi/qapi-visit.o
+> -util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-visit-%.o)
+> -util-obj-y +=3D qapi/qapi-emit-events.o
+> -util-obj-y +=3D qapi/qapi-events.o
+> -util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-events-%.o)
+>
+>  chardev-obj-y =3D chardev/
+>  slirp-obj-$(CONFIG_SLIRP) =3D slirp/
+> diff --git a/Makefile.target b/Makefile.target
+> index d8af835890..d6ce549388 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -148,6 +148,7 @@ ifdef CONFIG_SOFTMMU
+>  obj-y +=3D arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o num=
+a.o
+>  obj-y +=3D qtest.o
+>  obj-y +=3D hw/
+> +obj-y +=3D qapi/
+>  obj-y +=3D memory.o
+>  obj-y +=3D memory_mapping.o
+>  obj-y +=3D dump.o
+> @@ -164,8 +165,6 @@ endif
+>
+>  GENERATED_FILES +=3D hmp-commands.h hmp-commands-info.h
+>
+> -obj-y +=3D qapi/qapi-introspect.o
+> -
+>  endif # CONFIG_SOFTMMU
+>
+>  dummy :=3D $(call unnest-vars,,obj-y)
+> diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+> index 33906ff321..da0000cbae 100644
+> --- a/qapi/Makefile.objs
+> +++ b/qapi/Makefile.objs
+> @@ -4,3 +4,22 @@ util-obj-y +=3D string-input-visitor.o string-output-vis=
+itor.o
+>  util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
+>  util-obj-y +=3D qmp-event.o
+>  util-obj-y +=3D qapi-util.o
 > +
->  /**
->   * qemu_get_pid_name:
->   * @pid: pid of a process
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index ce54788048..37ac6445d2 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -56,6 +56,29 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->          error_setg(errp, "mem-path property not set");
->          return;
->      }
+> +QAPI_MODULES =3D block-core block char common crypto introspect job migr=
+ation
+> +QAPI_MODULES +=3D misc net rdma rocker run-state sockets tpm trace trans=
+action
+> +QAPI_MODULES +=3D ui
 > +
-> +    /*
-> +     * Verify pmem file size since starting a guest with an incorrect size
-> +     * leads to confusing failures inside the guest.
-> +     */
-> +    if (fb->is_pmem) {
-> +        Error *local_err = NULL;
-> +        uint64_t size;
+> +util-obj-y +=3D qapi-builtin-types.o
+> +util-obj-y +=3D qapi-types.o
+> +util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi-types-%.o)
+> +util-obj-y +=3D qapi-builtin-visit.o
+> +util-obj-y +=3D qapi-visit.o
+> +util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi-visit-%.o)
+> +util-obj-y +=3D qapi-emit-events.o
+> +util-obj-y +=3D qapi-events.o
+> +util-obj-y +=3D $(QAPI_MODULES:%=3Dqapi-events-%.o)
 > +
-> +        size = qemu_get_pmem_size(fb->mem_path, &local_err);
-> +        if (!size) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
+> +common-obj-y +=3D qapi-commands.o
+> +common-obj-y +=3D $(QAPI_MODULES:%=3Dqapi-commands-%.o)
+
+You meant to remove it from /Makefile.objs I suppose?
+
+Other than that,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > +
-> +        if (backend->size > size) {
-> +            error_setg(errp, "size property %" PRIu64 " is larger than "
-> +                       "pmem file \"%s\" size %" PRIu64, backend->size,
-> +                       fb->mem_path, size);
-> +            return;
-> +        }
-> +    }
-> +
->      backend->force_prealloc = mem_prealloc;
->      name = host_memory_backend_get_name(backend);
->      memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 37c5854b9c..10d90d1783 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -500,6 +500,59 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
->      }
->  }
->  
-> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
-> +{
-> +    struct stat st;
-> +
-> +    if (stat(filename, &st) < 0) {
-> +        error_setg(errp, "unable to stat pmem file \"%s\"", filename);
-> +        return 0;
-> +    }
-> +
-> +#if defined(__linux__)
-> +    /* Special handling for devdax character devices */
-> +    if (S_ISCHR(st.st_mode)) {
-> +        char *subsystem_path = NULL;
-> +        char *subsystem = NULL;
-> +        char *size_path = NULL;
-> +        char *size_str = NULL;
-> +        uint64_t ret = 0;
-> +
-> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
-> +                                         major(st.st_rdev), minor(st.st_rdev));
-> +        subsystem = g_file_read_link(subsystem_path, NULL);
-> +        if (!subsystem) {
-> +            error_setg(errp, "unable to read subsystem for pmem file \"%s\"",
-> +                       filename);
-> +            goto devdax_err;
-> +        }
-> +
-> +        if (!g_str_has_suffix(subsystem, "/dax")) {
-> +            error_setg(errp, "pmem file \"%s\" is not a dax device", filename);
-> +            goto devdax_err;
-> +        }
-> +
-> +        size_path = g_strdup_printf("/sys/dev/char/%d:%d/size",
-> +                                    major(st.st_rdev), minor(st.st_rdev));
-> +        if (!g_file_get_contents(size_path, &size_str, NULL, NULL)) {
-> +            error_setg(errp, "unable to read size for pmem file \"%s\"",
-> +                       size_path);
-> +            goto devdax_err;
-> +        }
-> +
-> +        ret = g_ascii_strtoull(size_str, NULL, 0);
-> +
-> +devdax_err:
-> +        g_free(size_str);
-> +        g_free(size_path);
-> +        g_free(subsystem);
-> +        g_free(subsystem_path);
-> +        return ret;
-> +    }
-> +#endif /* defined(__linux__) */
-> +
-> +    return st.st_size;
-> +}
->  
->  char *qemu_get_pid_name(pid_t pid)
->  {
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index b4c17f5dfa..bd633afab6 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -560,6 +560,11 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
->      }
->  }
->  
-> +uint64_t qemu_get_pmem_size(const char *filename, Error **errp)
-> +{
-> +    error_setg(errp, "pmem support not available");
-> +    return 0;
-> +}
->  
->  char *qemu_get_pid_name(pid_t pid)
->  {
+> +obj-y +=3D qapi-introspect.o
+> --
+> 2.17.2
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
