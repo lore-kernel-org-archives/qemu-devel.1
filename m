@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56125)
+Received: from eggs.gnu.org ([209.51.188.92]:56781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guKev-0007PH-Hm
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:18:50 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1guKfK-00089C-Uj
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guKPM-0004h7-9k
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:02:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34576)
+	(envelope-from <balaton@eik.bme.hu>) id 1guKfJ-00037v-Vj
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:19:14 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:52641)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1guKPL-0004ev-OK
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:02:44 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-43-git-send-email-pbonzini@redhat.com>
-	<a67e6380-daf5-62d1-0f37-45f7015cc0fa@redhat.com>
-	<b6cfc7bf-3eb0-3211-a008-0e891908a15c@redhat.com>
-	<20190214114744-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f3b314bb-d651-482d-0365-8cd9120147d1@redhat.com>
-Date: Thu, 14 Feb 2019 18:02:10 +0100
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1guKfJ-00033L-K7
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:19:13 -0500
+Date: Thu, 14 Feb 2019 18:19:08 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190214102816.3393-3-peter.maydell@linaro.org>
+Message-ID: <alpine.BSF.2.21.9999.1902141818520.64316@zero.eik.bme.hu>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-3-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190214114744-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 42/52] i386: express dependencies with
- Kconfig
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] ui/cocoa: Use the pixman image
+ directly in switchSurface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, yang.zhong@intel.com, thuth@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
-On 14/02/19 17:54, Michael S. Tsirkin wrote:
-> On Thu, Feb 14, 2019 at 05:47:08PM +0100, Paolo Bonzini wrote:
->> On 01/02/19 16:05, Philippe Mathieu-Daud=C3=A9 wrote:
->>> This lacks a DISPLAY dependency?
->>>
->>> $ i386-softmmu/qemu-system-i386 -M q35
->>> qemu-system-i386: Unknown device 'VGA' for bus 'PCIE'
->>> Aborted (core dumped)
->>
->> If you got this with --without-default-devices, then it's intended beh=
-avior.
->>
->> VGA_PCI is selected via CONFIG_PCI_DEVICES.
->=20
-> OK but I guess as a follow-up patch we can hide things that don't work,
-> or select things that are required?
+On Thu, 14 Feb 2019, Peter Maydell wrote:
+> Currently the switchSurface method takes a DisplaySurface. We want
+> to change our DisplayChangeListener's dpy_gfx_switch callback
+> to do this work asynchronously on a different thread. The caller
+> of the switch callback will free the old DisplaySurface
+> immediately the callback returns, so to ensure that the
+> other thread doesn't access freed data we need to switch
+> to using the underlying pixman image instead. The pixman
+> image is reference counted, so we will be able to take
+> a reference to it to avoid it vanishing too early.
+>
+> In this commit we only change the switchSurface method
+> to take a pixman image, and keep the flow of control
+> synchronous for now.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-It is not required; if you use "-nodefaults" you can build without
-CONFIG_VGA_PCI (the failure mode is horrible, granted; it's the same
-today if you modify pci.mak).  The documentation explains this for
---without-default-devices:
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-  When QEMU is built with this option, the user will probably
-  want to change some lines in the first group, for example like this::
+Regards,
+BALATON Zoltan
 
-    CONFIG_PCI_DEVICES=3Dy
-    #CONFIG_TEST_DEVICES=3Dn
-
-  and/or pick a subset of the devices in those device groups.
-
-Paolo
+> ---
+> ui/cocoa.m | 17 +++++++++--------
+> 1 file changed, 9 insertions(+), 8 deletions(-)
+>
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 2931c751fd..9d23732ff9 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -315,7 +315,7 @@ @interface QemuCocoaView : NSView
+>     BOOL isAbsoluteEnabled;
+>     BOOL isMouseDeassociated;
+> }
+> -- (void) switchSurface:(DisplaySurface *)surface;
+> +- (void) switchSurface:(pixman_image_t *)image;
+> - (void) grabMouse;
+> - (void) ungrabMouse;
+> - (void) toggleFullScreen:(id)sender;
+> @@ -495,12 +495,13 @@ - (void) setContentDimensions
+>     }
+> }
+>
+> -- (void) switchSurface:(DisplaySurface *)surface
+> +- (void) switchSurface:(pixman_image_t *)image
+> {
+>     COCOA_DEBUG("QemuCocoaView: switchSurface\n");
+>
+> -    int w = surface_width(surface);
+> -    int h = surface_height(surface);
+> +    int w = pixman_image_get_width(image);
+> +    int h = pixman_image_get_height(image);
+> +    pixman_format_code_t image_format = pixman_image_get_format(image);
+>     /* cdx == 0 means this is our very first surface, in which case we need
+>      * to recalculate the content dimensions even if it happens to be the size
+>      * of the initial empty window.
+> @@ -522,10 +523,10 @@ - (void) switchSurface:(DisplaySurface *)surface
+>         CGDataProviderRelease(dataProviderRef);
+>
+>     //sync host window color space with guests
+> -    screen.bitsPerPixel = surface_bits_per_pixel(surface);
+> -    screen.bitsPerComponent = surface_bytes_per_pixel(surface) * 2;
+> +    screen.bitsPerPixel = PIXMAN_FORMAT_BPP(image_format);
+> +    screen.bitsPerComponent = DIV_ROUND_UP(screen.bitsPerPixel, 8) * 2;
+>
+> -    dataProviderRef = CGDataProviderCreateWithData(NULL, surface_data(surface), w * 4 * h, NULL);
+> +    dataProviderRef = CGDataProviderCreateWithData(NULL, pixman_image_get_data(image), w * 4 * h, NULL);
+>
+>     // update windows
+>     if (isFullscreen) {
+> @@ -1625,7 +1626,7 @@ static void cocoa_switch(DisplayChangeListener *dcl,
+>     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+>
+>     COCOA_DEBUG("qemu_cocoa: cocoa_switch\n");
+> -    [cocoaView switchSurface:surface];
+> +    [cocoaView switchSurface:surface->image];
+>     [pool release];
+> }
+>
+>
