@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56016)
+Received: from eggs.gnu.org ([209.51.188.92]:56125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guKeJ-0007Ds-CX
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:18:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guKeW-0007PH-5J
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guKXv-00051F-QV
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:11:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1guKXv-0004zw-Fs
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:11:35 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 14 Feb 2019 18:11:28 +0100
-Message-Id: <20190214171128.24093-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] tests: Add a simple device_del test for PCI
- devices
+	(envelope-from <peter.maydell@linaro.org>) id 1guKUP-0001fi-Qj
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:07:58 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46190)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guKUP-0001ZZ-IC
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 12:07:57 -0500
+Received: by mail-ot1-x344.google.com with SMTP id w25so11636708otm.13
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 09:07:53 -0800 (PST)
+MIME-Version: 1.0
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-6-eric.auger@redhat.com>
+In-Reply-To: <20190205173306.20483-6-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Feb 2019 17:07:42 +0000
+Message-ID: <CAFEAcA9z83y2Xfp0QC5-uKY-6d5zOvxiD=vy7=oG9N2onqCnmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 05/18] hw/arm/virt: Split the memory map
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,189 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-The issue with testing asynchronous unplug requests it that they usually
-require a running guest to handle the request. However, to test if
-unplug of PCI devices works, we can apply a nice little trick on some
-architectures:
+On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> In the prospect to introduce an extended memory map supporting more
+> RAM, let's split the memory map array into two parts:
+>
+> - the former a15memmap contains regions below and including the RAM
+> - extended_memmap, only initialized with entries located after the RAM.
+>   Only the size of the region is initialized there since their base
+>   address will be dynamically computed, depending on the top of the
+>   RAM (initial RAM at the moment), with same alignment as their size.
+>
+> This new split will allow to grow the RAM size without changing the
+> description of the high regions.
 
-On system reset, x86 ACPI, s390x and spapr will perform the unplug,
-resulting in the device of interest to get deleted and a DEVICE_DELETED
-event getting sent.
+This change makes it clear that "a15memmap" is badly misnamed.
+I think we should change it to "base_memmap" here.
 
-On s390x, we still get a warning
-    qemu-system-s390x: -device virtio-mouse-pci,id=dev0:
-    warning: Plugging a PCI/zPCI device without the 'zpci' CPU feature
-    enabled; the guest will not be able to see/use this device
+>
+> The patch also moves the memory map setup into machvirt_init().
+> The rationale is the memory map will be soon affected by the
+> kvm_type() call that happens after virt_instance_init() and
+> before machvirt_init().
+>
+> At that point the memory map is not changed, ie. the initial RAM can
 
-This will be fixed soon, when we enable the zpci CPU feature always
-(Conny already has a patch for this queued).
+"At this point" ?
 
-Cc: Collin Walling <walling@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- tests/Makefile.include  |   4 ++
- tests/device_del-test.c | 103 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 107 insertions(+)
- create mode 100644 tests/device_del-test.c
+> grow up to 256GiB. Then come the high IO regions with same layout as
+> before.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+> v5 -> v6
+> - removal of many macros in units.h
+> - introduce the virt_set_memmap helper
+> - new computation for offsets of high IO regions
+> - add comments
+> ---
+>  hw/arm/virt.c         | 45 ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/arm/virt.h | 14 ++++++++++----
+>  2 files changed, 50 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index a1955e7764..2b15839d0b 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -29,6 +29,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/arm/arm.h"
+> @@ -149,11 +150,20 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+> +};
+> +
+> +/*
+> + * Highmem IO Regions: This memory map is floating, located after the RAM.
+> + * Each IO region offset will be dynamically computed, depending on the
+> + * top of the RAM, so that its base get the same alignment as the size,
+> + * ie. a 512GiB region will be aligned on a 512GiB boundary.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b39e989f72..713e5e23a7 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -192,6 +192,7 @@ check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += tests/ipmi-kcs-test$(EXESUF)
- # check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += tests/ipmi-bt-test$(EXESUF)
- check-qtest-i386-y += tests/i440fx-test$(EXESUF)
- check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
-+check-qtest-i386-y += tests/device_del-test$(EXESUF)
- check-qtest-i386-y += tests/drive_del-test$(EXESUF)
- check-qtest-i386-$(CONFIG_WDT_IB700) += tests/wdt_ib700-test$(EXESUF)
- check-qtest-i386-y += tests/tco-test$(EXESUF)
-@@ -256,6 +257,7 @@ check-qtest-ppc-$(CONFIG_M48T59) += tests/m48t59-test$(EXESUF)
- 
- check-qtest-ppc64-y += $(check-qtest-ppc-y)
- check-qtest-ppc64-$(CONFIG_PSERIES) += tests/spapr-phb-test$(EXESUF)
-+check-qtest-ppc64-$(CONFIG_PSERIES) += tests/device_del-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_POWERNV) += tests/pnv-xscom-test$(EXESUF)
- check-qtest-ppc64-y += tests/migration-test$(EXESUF)
- check-qtest-ppc64-$(CONFIG_PSERIES) += tests/rtas-test$(EXESUF)
-@@ -310,6 +312,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
-+check-qtest-s390x-y += tests/device_del-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- check-qtest-s390x-y += tests/migration-test$(EXESUF)
-@@ -750,6 +753,7 @@ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
- tests/qom-test$(EXESUF): tests/qom-test.o
- tests/test-hmp$(EXESUF): tests/test-hmp.o
- tests/machine-none-test$(EXESUF): tests/machine-none-test.o
-+tests/device_del-test$(EXESUF): tests/device_del-test.o
- tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
- tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
- tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
-diff --git a/tests/device_del-test.c b/tests/device_del-test.c
-new file mode 100644
-index 0000000000..cbc3e78e56
---- /dev/null
-+++ b/tests/device_del-test.c
-@@ -0,0 +1,103 @@
-+/*
-+ * QEMU device_del handling
-+ *
-+ * Copyright (C) 2019 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qstring.h"
-+
-+static void device_del_request(const char *id)
-+{
-+    QDict *resp;
-+
-+    resp = qmp("{'execute': 'device_del', 'arguments': { 'id': %s } }", id);
-+    g_assert(qdict_haskey(resp, "return"));
-+    qobject_unref(resp);
-+}
-+
-+static void system_reset(void)
-+{
-+    QDict *resp;
-+
-+    resp = qmp("{'execute': 'system_reset'}");
-+    g_assert(qdict_haskey(resp, "return"));
-+    qobject_unref(resp);
-+}
-+
-+static void wait_device_deleted_event(const char *id)
-+{
-+    QDict *resp, *data;
-+    QObject *device;
-+    QString *qstr;
-+
-+    /*
-+     * Other devices might get removed along with the removed device. Skip
-+     * these.
-+     */
-+    for (;;) {
-+        resp = qtest_qmp_eventwait_ref(global_qtest, "DEVICE_DELETED");
-+        data = qdict_get_qdict(resp, "data");
-+        if (!data) {
-+            qobject_unref(resp);
-+            continue;
-+        }
-+        device = qdict_get(data, "device");
-+        if (!device) {
-+            qobject_unref(resp);
-+            continue;
-+        }
-+        qstr = qobject_to(QString, device);
-+        g_assert(qstr);
-+        if (!strcmp(qstring_get_str(qstr), id)) {
-+            qobject_unref(data);
-+            qobject_unref(resp);
-+            break;
-+        }
-+        qobject_unref(data);
-+        qobject_unref(resp);
-+    }
-+}
-+
-+static void test_pci_device_del_request(void)
-+{
-+    char *args;
-+
-+    args = g_strdup_printf("-device virtio-mouse-pci,id=dev0");
-+    qtest_start(args);
-+
-+    /*
-+     * Request device removal. As the guest is not running, the request won't
-+     * be processed. However during system reset, the removal will be
-+     * handled, removing the device.
-+     */
-+    device_del_request("dev0");
-+    system_reset();
-+    wait_device_deleted_event("dev0");
-+
-+    qtest_end();
-+    g_free(args);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    /*
-+     * We need a system that will process unplug requests during system resets
-+     * and does not do PCI surprise removal. This holds for x86 ACPI,
-+     * s390x and spapr.
-+     */
-+    qtest_add_func("/device_del/pci_device_del_request",
-+                   test_pci_device_del_request);
-+
-+    return g_test_run();
-+}
--- 
-2.17.2
+I think you should say here that if there is less than 256GiB of RAM
+then the floating area starts at the 256GiB mark.
+
+> + */
+> +static MemMapEntry extended_memmap[] = {
+>      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+> -    [VIRT_HIGH_GIC_REDIST2] =   { 0x4000000000ULL, 0x4000000 },
+> -    [VIRT_HIGH_PCIE_ECAM] =     { 0x4010000000ULL, 0x10000000 },
+> -    /* Second PCIe window, 512GB wide at the 512GB boundary */
+> -    [VIRT_HIGH_PCIE_MMIO] =     { 0x8000000000ULL, 0x8000000000ULL },
+> +    [VIRT_HIGH_GIC_REDIST2] =   { 0x0, 64 * MiB },
+> +    [VIRT_HIGH_PCIE_ECAM] =     { 0x0, 256 * MiB },
+> +    /* Second PCIe window */
+> +    [VIRT_HIGH_PCIE_MMIO] =     { 0x0, 512 * GiB },
+>  };
+>
+>  static const int a15irqmap[] = {
+> @@ -1354,6 +1364,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>      return arm_cpu_mp_affinity(idx, clustersz);
+>  }
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
