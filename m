@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34387)
+Received: from eggs.gnu.org ([209.51.188.92]:34434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guZ3X-0000Hk-K3
+	(envelope-from <thuth@redhat.com>) id 1guZ3Y-0000J2-Bn
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guYsL-0007Lo-0m
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:29:37 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52234)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1guYsK-0007J1-Pk
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:29:36 -0500
-Received: by mail-wm1-f68.google.com with SMTP id m1so9026689wml.2
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 00:29:36 -0800 (PST)
-References: <20190214152251.2073-1-armbru@redhat.com>
-	<87h8d65r6k.fsf@dusky.pond.sub.org>
-	<e51e4eac-419b-bea0-6eef-8805ca45ebd6@redhat.com>
-	<875ztlzdw8.fsf_-_@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ba0a9a4c-8ed4-7d4b-d5ac-77d60d04e38a@redhat.com>
-Date: Fri, 15 Feb 2019 09:29:33 +0100
+	(envelope-from <thuth@redhat.com>) id 1guYqh-0005jX-Fj
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:27:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53920)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1guYqh-0005ea-6v
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:27:55 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A9BF7AEAE
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 08:27:49 +0000 (UTC)
+References: <1550165756-21617-1-git-send-email-pbonzini@redhat.com>
+	<1550165756-21617-9-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4c37f9c8-8cc4-031d-491f-e029640683aa@redhat.com>
+Date: Fri, 15 Feb 2019 09:27:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <875ztlzdw8.fsf_-_@dusky.pond.sub.org>
+In-Reply-To: <1550165756-21617-9-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Proper use of unnest-vars (was: [PATCH v5 00/18]
- qapi: add #if pre-processor conditions to generated code (part 3))
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 8/9] vhost-user-test: small changes to
+ init_hugepagefs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +35,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com
 
-On 15/02/19 08:53, Markus Armbruster wrote:
-> This time, $(obj-y) is very much not blank, and...
-> 
->     @qapi/ final qapi-introspect.o qapi-types-target.o qapi-types.o qapi-visit-target.o qapi-visit.o qapi-events-target.o qapi-events.o qapi-commands-target.o qapi-commands.o
->     [Trailing make output elided]
-> 
-> ... qapi/Makefile.obj-y *does* clobber it.  Oww.
-> 
-> How come this works anyway?
+On 14/02/2019 18.35, Paolo Bonzini wrote:
+> After the conversion to qgraph, the equivalent of "main" will be in
+> a constructor and will run even if the tests are not being requested.
+> Therefore, it should not assert that init_hugepagefs succeeds and will
+> be called when creating the TestServer.  This patch changes the prototy=
+pe
+> of init_hugepagefs, this way the next patch looks nicer.
+>=20
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-Id: <1543851204-41186-14-git-send-email-pbonzini@redhat.com>
+> ---
+>  tests/vhost-user-test.c | 26 ++++++++++++++------------
+>  1 file changed, 14 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+> index 33030e0..516e31c 100644
+> --- a/tests/vhost-user-test.c
+> +++ b/tests/vhost-user-test.c
+> @@ -465,14 +465,20 @@ static void chr_read(void *opaque, const uint8_t =
+*buf, int size)
+>      g_mutex_unlock(&s->data_mutex);
+>  }
+> =20
+> -#ifdef CONFIG_LINUX
+> -static const char *init_hugepagefs(const char *path)
+> +static const char *init_hugepagefs(void)
+>  {
+> +#ifdef CONFIG_LINUX
+> +    const char *path =3D getenv("QTEST_HUGETLBFS_PATH");
+>      struct statfs fs;
+>      int ret;
+> =20
+> +    if (!path) {
+> +        return NULL;
+> +    }
+> +
+>      if (access(path, R_OK | W_OK | X_OK)) {
+>          g_test_message("access on path (%s): %s\n", path, strerror(err=
+no));
+> +        abort();
+>          return NULL;
+>      }
 
-It works because at this point obj-y is not used anymore, it is assigned
-to all-obj-y a couple lines before:
+I think I'd rather replace the whole if-statement with something like
+this instead:
 
-	all-obj-y := $(obj-y)
+    g_assert_cmpint(access(path, R_OK | W_OK | X_OK), =3D=3D, 0);
 
-As an aside, target-obj-y seems unnecessary to me.
+> @@ -482,17 +488,21 @@ static const char *init_hugepagefs(const char *pa=
+th)
+> =20
+>      if (ret !=3D 0) {
+>          g_test_message("statfs on path (%s): %s\n", path, strerror(err=
+no));
+> +        abort();
+>          return NULL;
+>      }
 
-> Perhaps unnest-vars could be more hygienic.
+Maybe simplify to:
 
-Macro hygiene and Make in the same sentence? (well, not sentence but
-still...).
+    TFR(statfs_err =3D statfs(path, &fs));
+    g_assert_cmpint(statfs_err, =3D=3D, 0);
 
-> But that's not my immediate
-> concern.  All I want to know right now is whether I should refrain from
-> = and := in Makefile.objs.  Paolo, Fam?
+>      if (fs.f_type !=3D HUGETLBFS_MAGIC) {
+>          g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
+> +        abort();
+>          return NULL;
+>      }
 
-No, there is no need for that.
+    g_assert_cmpint(fs.f_type, =3D=3D, HUGETLBFS_MAGIC);
 
-Really the answer is that we are kind of pushing Makefiles to the limit
-here.  We do get good expressiveness, but at the cost of hiding things
-behind black magic.  In the end I think it's a net benefit, but the cost
-does exist.
+?
 
-Paolo
+>      return path;
+> -}
+> +#else
+> +    return NULL;
+>  #endif
+> +}
+> =20
+>  static TestServer *test_server_new(const gchar *name)
+>  {
+> @@ -986,7 +996,6 @@ static void test_multiqueue(void)
+> =20
+>  int main(int argc, char **argv)
+>  {
+> -    const char *hugefs;
+>      int ret;
+>      char template[] =3D "/tmp/vhost-test-XXXXXX";
+> =20
+> @@ -1001,14 +1010,7 @@ int main(int argc, char **argv)
+>      }
+>      g_assert(tmpfs);
+> =20
+> -    root =3D tmpfs;
+> -#ifdef CONFIG_LINUX
+> -    hugefs =3D getenv("QTEST_HUGETLBFS_PATH");
+> -    if (hugefs) {
+> -        root =3D init_hugepagefs(hugefs);
+> -        g_assert(root);
+> -    }
+> -#endif
+> +    root =3D init_hugepagefs() ? : tmpfs;
+
+I'd prefer the Elvis operator without space inbetween.
+
+>      if (qemu_memfd_check(0)) {
+>          qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
+
+Anyway, just nits, so still:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
