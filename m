@@ -1,42 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52773)
+Received: from eggs.gnu.org ([209.51.188.92]:53536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1guaGt-0004sa-L7
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:59:04 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1guaJq-0006mr-5t
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 05:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1guaGs-00055x-PI
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:59:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43044
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1guaGp-0004pC-Ff
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:59 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1F9nJCD139677
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 04:58:54 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qnshm5fy3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 04:58:53 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 15 Feb 2019 09:58:51 -0000
-References: <1550146494-21085-1-git-send-email-pmorel@linux.ibm.com>
-	<1550146494-21085-2-git-send-email-pmorel@linux.ibm.com>
-	<68ef1f07-75c2-5d40-1bf9-d6f1db1fa839@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 15 Feb 2019 10:58:44 +0100
-MIME-Version: 1.0
-In-Reply-To: <68ef1f07-75c2-5d40-1bf9-d6f1db1fa839@linux.ibm.com>
-Content-Language: en-US
-Message-Id: <6ae3208c-11ea-0fe5-bebb-5c3febb06339@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/cpumodel: Set up CPU model for
- AQIC interception
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1guaJm-0000PU-Bo
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 05:02:06 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 15 Feb 2019 10:00:48 +0000
+Message-Id: <20190215100058.20015-8-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190215100058.20015-1-mark.cave-ayland@ilande.co.uk>
+References: <20190215100058.20015-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 07/17] target/ppc: convert xxspltw to vector
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,38 +20,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: akrowiak@linux.ibm.com, peter.maydell@linaro.org, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.ibm.com, eric.auger@redhat.com, qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
 
+From: Richard Henderson <richard.henderson@linaro.org>
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/translate/vsx-impl.inc.c | 36 +++++++++++-------------------------
+ 1 file changed, 11 insertions(+), 25 deletions(-)
 
-On 15.02.2019 10:53, Pierre Morel wrote:
-> On 14/02/2019 13:14, Pierre Morel wrote:
->> A new CPU model facilities is introduced to support AP devices
->> interruption interception for a KVM guest.
->>
->> "APQI" for "AP-Queue Interruption" facility
->>
->> The S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, CPU facility indicates
->> whether the PQAP instruction with the AQIC command is available
->> to the guest.
->> This feature will be enabled only if the AP instructions are
->> available on the linux host and AQIC facility is installed on
->> the host.
->>
->> This feature must be turned on from userspace to intercept AP
->> instructions on the KVM guest. The QEMU command line to turn
->> this feature on looks something like this:
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 qemu-system-s390x ... -cpu xxx,apqi=3Don ...
->=20
->=20
->=20
-> Hi,
->=20
-> I suddenly have a very big doubt on this QEMU patch.
->=20
-> Older Linux advertise PQAP/AQIC feature (65)
-
-Which Linuxes advertise PQAP/AQIC (stfle.65)?
-This was never advertised by any previous Linux as far as I can tell.
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 944fc0608a..0e8cecb00a 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1359,38 +1359,24 @@ static void gen_xxsel(DisasContext * ctx)
+ 
+ static void gen_xxspltw(DisasContext *ctx)
+ {
+-    TCGv_i64 b, b2;
+-    TCGv_i64 vsr;
++    int rt = xT(ctx->opcode);
++    int rb = xB(ctx->opcode);
++    int uim = UIM(ctx->opcode);
++    int tofs, bofs;
+ 
+     if (unlikely(!ctx->vsx_enabled)) {
+         gen_exception(ctx, POWERPC_EXCP_VSXU);
+         return;
+     }
+ 
+-    vsr = tcg_temp_new_i64();
+-    if (UIM(ctx->opcode) & 2) {
+-        get_cpu_vsrl(vsr, xB(ctx->opcode));
+-    } else {
+-        get_cpu_vsrh(vsr, xB(ctx->opcode));
+-    }
+-
+-    b = tcg_temp_new_i64();
+-    b2 = tcg_temp_new_i64();
+-
+-    if (UIM(ctx->opcode) & 1) {
+-        tcg_gen_ext32u_i64(b, vsr);
+-    } else {
+-        tcg_gen_shri_i64(b, vsr, 32);
+-    }
+-
+-    tcg_gen_shli_i64(b2, b, 32);
+-    tcg_gen_or_i64(vsr, b, b2);
+-    set_cpu_vsrh(xT(ctx->opcode), vsr);
+-    set_cpu_vsrl(xT(ctx->opcode), vsr);
++    tofs = vsr_full_offset(rt);
++    bofs = vsr_full_offset(rb);
++    bofs += uim << MO_32;
++#ifndef HOST_WORDS_BIG_ENDIAN
++    bofs ^= 8 | 4;
++#endif
+ 
+-    tcg_temp_free_i64(vsr);
+-    tcg_temp_free_i64(b);
+-    tcg_temp_free_i64(b2);
++    tcg_gen_gvec_dup_mem(MO_32, tofs, bofs, 16, 16);
+ }
+ 
+ #define pattern(x) (((x) & 0xff) * (~(uint64_t)0 / 0xff))
+-- 
+2.11.0
