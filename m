@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54505)
+Received: from eggs.gnu.org ([209.51.188.92]:56557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
-	id 1gugJR-0001TU-Bm
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:26:06 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gugRh-00072A-9Z
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:34:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
-	id 1gugJQ-0007Gn-EX
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:26:05 -0500
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 15 Feb 2019 16:25:31 +0000
-Message-ID: <20190215162533.19475-2-paul.durrant@citrix.com>
-In-Reply-To: <20190215162533.19475-1-paul.durrant@citrix.com>
-References: <20190215162533.19475-1-paul.durrant@citrix.com>
+	(envelope-from <kwolf@redhat.com>) id 1gugRg-0008SX-6v
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:34:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gugRg-0008Ql-0G
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:34:36 -0500
+Date: Fri, 15 Feb 2019 17:34:31 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190215163431.GC7941@localhost.localdomain>
+References: <20181107131000.27744-1-danielhb413@gmail.com>
+	<20181107131000.27744-2-danielhb413@gmail.com>
+	<d8764234-8c52-a24f-c07f-da3655bf2293@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/3] dataplane/xen-block: remove dead code
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
+Content-Disposition: inline
+In-Reply-To: <d8764234-8c52-a24f-c07f-da3655bf2293@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 1/3] block/snapshot.c: eliminate
+ use of ID input in snapshot operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
 
-The if() statement is clearly bogus (dead code which should have been
-cleaned up when grant mapping was removed).
 
-Spotted by Coverity: CID 1398635
+--+QahgC5+KEYLbs62
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-While in the neighbourhood, add a missing 'fall through' annotation.
+Am 15.02.2019 um 17:21 hat Eric Blake geschrieben:
+> On 11/7/18 7:09 AM, Daniel Henrique Barboza wrote:
+> > At this moment, QEMU attempts to create/load/delete snapshots
+> > by using either an ID (id_str) or a name. The problem is that the code
+> > isn't consistent of whether the entered argument is an ID or a name,
+> > causing unexpected behaviors.
+> >=20
+>=20
+> >  STEXI
+> > -@item savevm [@var{tag}|@var{id}]
+> > +@item savevm @var{tag}
+> >  @findex savevm
+> >  Create a snapshot of the whole virtual machine. If @var{tag} is
+> >  provided, it is used as human readable identifier. If there is already
+> > -a snapshot with the same tag or ID, it is replaced. More info at
+> > +a snapshot with the same tag, it is replaced. More info at
+> >  @ref{vm_snapshots}.
+> > +
+> > +Since 3.2, savevm stopped allowing the snapshot id to be set, accepting
+>=20
+> s/3.2/4.0/
+>=20
+> > +only @var{tag} as parameter.
+>=20
+> > +Since 3.2, delvm stopped deleting snapshots by snapshot id, accepting
+> > +only @var{tag} as parameter.
+>=20
+> and again
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
----
- hw/block/dataplane/xen-block.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Sorry, I should have mentioned that I changed this while applying.
 
-diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index c6a15da024..f1523c5b45 100644
---- a/hw/block/dataplane/xen-block.c
-+++ b/hw/block/dataplane/xen-block.c
-@@ -281,10 +281,6 @@ static void xen_block_complete_aio(void *opaque, int ret)
-         break;
-     case BLKIF_OP_WRITE:
-     case BLKIF_OP_FLUSH_DISKCACHE:
--        if (!request->req.nr_segments) {
--            break;
--        }
--        break;
-     default:
-         break;
-     }
-@@ -298,6 +294,7 @@ static void xen_block_complete_aio(void *opaque, int ret)
-         if (!request->req.nr_segments) {
-             break;
-         }
-+        /* fall through */
-     case BLKIF_OP_READ:
-         if (request->status == BLKIF_RSP_OKAY) {
-             block_acct_done(blk_get_stats(dataplane->blk), &request->acct);
--- 
-2.20.1.2.gb21ebb6
+Kevin
+
+--+QahgC5+KEYLbs62
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcZuoXAAoJEH8JsnLIjy/Wn2oP/jy78zh+3SfYVD5aECwQ9Bpc
+CkCNzOIPdMXZRPe5iWMj1Tr6JkOQgy8iFUj+ozJvHZOT/DHQsB7lftWCN8s3QTiO
+iPS20tOJy+CG+kOrI07ks2coi0Q1JZlPHY4Ycmh5tKpMwDQnCyU4Waan6/2wgVjK
+PJLfRlhto/uFQJEP8FlnuiNMO5M/Ic+GAucnqmllwaVSe97QHfQyZJDrsGGrA8kt
+YuuDozs/8lKgjdLVc51VFB7IqNt2JEVDCYqJ/RIR8+uNWvl4Xx3YNjL+pkq9spBJ
+8WEFJqOfQnoVA+bR0XylvpGW0ijbQASH1/cq5eWfImB94w5zMIr3VACiGjRtbDfv
+1LPNcTDucZVax6Uzf1c7vI/S3vXOp4ymAwx9i3cerlJB3pTAWkPPWuE3bAxKUUgW
+HX7DgyxoDvumxvr48krcNBeee99DmymlWljZhaxDQF1eG00j9fZUKWJc1K+KFKiX
+lx2EXJQ149N6iSOcuIVtDdZkkqIDHgxO9//PMH9jBaReNlSgYi5fj6cJA/wZO29d
+ODQdTtv7HttatFGIOALpR67USN2xgi/cCTXpqkyZqeN1iU8/7wVw4HDan3DsA4xp
+mGaAMPbTA9Fcfrj+tWSA9W64dbVmc2nYEagyDAIIZu1PnN4WUFdrA/xpFNTFl+hI
+ilxhhzoh5BHhhNzSFCeJ
+=UjtH
+-----END PGP SIGNATURE-----
+
+--+QahgC5+KEYLbs62--
