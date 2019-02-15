@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50082)
+Received: from eggs.gnu.org ([209.51.188.92]:50189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gui46-00068f-Qb
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:18:23 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gui4o-0006SC-5m
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:19:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gui44-0005TR-TP
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:18:22 -0500
-Resent-Message-Id: <E1gui44-0005TR-TP@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gui42-0005Mz-WC
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:18:20 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155025464362.24.1200537447541094855@49fa7ef69f7b>
-In-Reply-To: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
+	(envelope-from <pbonzini@redhat.com>) id 1gui4n-0006bu-Eh
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:19:06 -0500
+References: <20190214140714.15738-1-imammedo@redhat.com>
+	<4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
+	<20190215123317.6903b818@Igors-MacBook-Pro.local>
+	<2d99aca8-5ed0-bea3-4a4f-7b2a8e89b049@redhat.com>
+	<20190215164209.54a6f747@Igors-MacBook-Pro.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b94c91de-5390-b04f-27d3-f183d010f730@redhat.com>
+Date: Fri, 15 Feb 2019 19:18:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 15 Feb 2019 10:17:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration
- capability
+In-Reply-To: <20190215164209.54a6f747@Igors-MacBook-Pro.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead
+ of memory_region_allocate_system_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yury-kotov@yandex-team.ru
-Cc: fam@euphon.net, dgilbert@redhat.com, ehabkost@redhat.com, eblake@redhat.com, imammedo@redhat.com, quintela@redhat.com, lvivier@redhat.com, armbru@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, thuth@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, wrfsh@yandex-team.ru
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org, qemu-arm@nongnu.org, jan.kiszka@web.de, atar4qemu@gmail.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNTE3NDU0OC4yNjMw
-LTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTUxNzQ1NDguMjYzMC0xLXl1cnkt
-a290b3ZAeWFuZGV4LXRlYW0ucnUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzVd
-IEFkZCBpZ25vcmUtZXh0ZXJuYWwgbWlncmF0aW9uIGNhcGFiaWxpdHkKVHlwZTogc2VyaWVzCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo1ZjllOTA5NjdlIG1pZ3JhdGlvbjogQWRkIGNhcGFiaWxpdGll
-cyB2YWxpZGF0aW9uCmZhZDQ4MDg4YTggdGVzdHMvbWlncmF0aW9uLXRlc3Q6IEFkZCBhIHRlc3Qg
-Zm9yIGlnbm9yZS1zaGFyZWQgY2FwYWJpbGl0eQo2ODM0N2FkMmViIG1pZ3JhdGlvbjogQWRkIGFu
-IGFiaWxpdHkgdG8gaWdub3JlIHNoYXJlZCBSQU0gYmxvY2tzCmUzZDJmZDAyOTggbWlncmF0aW9u
-OiBJbnRyb2R1Y2UgaWdub3JlLXNoYXJlZCBjYXBhYmlsaXR5CjczZDllMjM5MzcgZXhlYzogQ2hh
-bmdlIFJBTUJsb2NrSXRlckZ1bmMgZGVmaW5pdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS81
-IENoZWNraW5nIGNvbW1pdCA3M2Q5ZTIzOTM3ZTkgKGV4ZWM6IENoYW5nZSBSQU1CbG9ja0l0ZXJG
-dW5jIGRlZmluaXRpb24pCjIvNSBDaGVja2luZyBjb21taXQgZTNkMmZkMDI5OGE0IChtaWdyYXRp
-b246IEludHJvZHVjZSBpZ25vcmUtc2hhcmVkIGNhcGFiaWxpdHkpCjMvNSBDaGVja2luZyBjb21t
-aXQgNjgzNDdhZDJlYjI0IChtaWdyYXRpb246IEFkZCBhbiBhYmlsaXR5IHRvIGlnbm9yZSBzaGFy
-ZWQgUkFNIGJsb2NrcykKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hv
-dWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMxNDY6IEZJTEU6IG1pZ3JhdGlv
-bi9yYW0uYzoxNjk6CisjZGVmaW5lIFJBTUJMT0NLX0ZPUkVBQ0hfTk9UX0lHTk9SRUQoYmxvY2sp
-ICAgICAgICAgICAgXAorICAgIElOVEVSTkFMX1JBTUJMT0NLX0ZPUkVBQ0goYmxvY2spICAgICAg
-ICAgICAgICAgICAgIFwKKyAgICAgICAgaWYgKHJhbWJsb2NrX2lzX2lnbm9yZWQoYmxvY2spKSB7
-fSBlbHNlCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5l
-CiMxNDg6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uYzoxNzE6CisgICAgICAgIGlmIChyYW1ibG9ja19p
-c19pZ25vcmVkKGJsb2NrKSkge30gZWxzZQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAz
-ODYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0
-LzUgQ2hlY2tpbmcgY29tbWl0IGZhZDQ4MDg4YTgwNSAodGVzdHMvbWlncmF0aW9uLXRlc3Q6IEFk
-ZCBhIHRlc3QgZm9yIGlnbm9yZS1zaGFyZWQgY2FwYWJpbGl0eSkKNS81IENoZWNraW5nIGNvbW1p
-dCA1ZjllOTA5NjdlNjkgKG1pZ3JhdGlvbjogQWRkIGNhcGFiaWxpdGllcyB2YWxpZGF0aW9uKQo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIx
-NTE3NDU0OC4yNjMwLTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 15/02/19 16:42, Igor Mammedov wrote:
+>>
+>> What about -m, too?  Then you'd specify a memdev instead of the initial
+>> memory size.
+> that somewhat what I've planned,
+> make -m X translate into -object memory-backend-ram,id=magically-get-what-board-uses-now,size=X -machine memdev=thatid
+> 
+> one more reason for memdev vs device is that -numa now uses memdevs and so far it
+> doesn't look that non-numa initial RAM would get immediate benefits from using -device
+> on most boards (well, I couldn't come up with any modulo backend/frontend consistent usage)
+
+What I meant is what about making the non-NUMA option -m memdev=thatid
+(and the automatic translation you mention too).  Yes, bikeshedding. :)
+
+Paolo
