@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56676)
+Received: from eggs.gnu.org ([209.51.188.92]:36152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gulCR-0001ej-Ek
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:12 -0500
+	(envelope-from <david@redhat.com>) id 1gulgG-0007ip-G9
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 17:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gulCN-0005Im-Qd
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gulCN-0005GJ-Gn
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:07 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gukpe-0003kE-JM
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 21:15:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8DF172E8054
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 21:15:38 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1gulgE-0000q0-RU
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 17:10:00 -0500
+References: <20190215133005.15955-1-david@redhat.com>
+	<20190215162652-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1fd9fd75-6bd3-c120-22cf-495c1aab0652@redhat.com>
+Date: Fri, 15 Feb 2019 23:09:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Feb 2019 21:04:38 -0000
-From: Larry Dewey <larry.j.dewey@gmail.com>
-Reply-To: Bug 1816189 <1816189@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155026463486.6528.17912471655076346086.malonedeb@soybean.canonical.com>
-Message-Id: <155026467831.1164.4821807274678267776.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1816189] Re: Unable to create or revert snapshots
+In-Reply-To: <20190215162652-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] tests: Add device unplug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,71 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Adding System Information
+On 15.02.19 22:27, Michael S. Tsirkin wrote:
+> On Fri, Feb 15, 2019 at 02:29:59PM +0100, David Hildenbrand wrote:
+>> This is a set of tests to test basic device unplugging functionality for
+>> - some PCI implementations
+>> - CCW devices on s390x
+>> - spapr memory and cpu core devices
+>>
+>> I plaed with ACPI CPU unplug but getting that to run with qtest is more
+>> involved. (remove devices on reset, trick cpu-hotplug-legacy property,
+>> somehow create cpu hotplug state objects ...). Well we no have at least
+>> one unplug test for DIMMs and one for CPUs.
+>>
+>> @David, I dropped you t-b and r-b due to many changes but would be happy
+>> to readd them ;)
+> 
+> 
+> Series:
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> 
+> I think it's mostly spapr things so feel free to merge through
+> that tree.
 
-** Attachment added: "System-Details.txt"
-   https://bugs.launchpad.net/qemu/+bug/1816189/+attachment/5238921/+files/=
-System-Details.txt
+Thanks, I'll address the minor review comments next week and most
+probably resend on Monday. I also agree that spapr would be a good fit.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1816189
+-- 
 
-Title:
-  Unable to create or revert snapshots
+Thanks,
 
-Status in QEMU:
-  New
-
-Bug description:
-  With an update to Qemu (3.1.x) I am unable to revert snapshots using
-  virt-manager or virsh. Virtual Machines existing before the update
-  seem to function properly. It is only after creating a new machine
-  that snapshots are misbehaving. I tested spinning up vms of
-  tumbleweed, leap15, and ubuntu 18.04. Each of them had the following
-  issues:
-
-  - With the machine running, live reversions act like they apply, but no c=
-hanges are actually made.
-  - With the machine paused, reversion also does not apply.
-  - With the machine turned off, reversion is not possible. Virsh is unable=
- to find the snapshot, and virt-manager errors out with:
-
-  Error running snapshot 'FreshInstall': internal error: qemu
-  unexpectedly closed the monitor: 2019-01-15T19:19:46.020247Z qemu-
-  system-x86_64: Device 'drive-virtio-disk0' does not have the requested
-  snapshot 'FreshInstall'
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/libvirtobject.py", line 66, i=
-n newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/domain.py", line 1105, in rev=
-ert_to_snapshot
-      self._backend.revertToSnapshot(snap.get_backend())
-    File "/usr/lib64/python3.6/site-packages/libvirt.py", line 2024, in rev=
-ertToSnapshot
-      if ret =3D=3D -1: raise libvirtError ('virDomainRevertToSnapshot() fa=
-iled', dom=3Dself)
-
-  libvirt.libvirtError: internal error: qemu unexpectedly closed the
-  monitor: 2019-01-15T19:19:46.020247Z qemu-system-x86_64: Device
-  'drive-virtio-disk0' does not have the requested snapshot
-  'FreshInstall'
-
-  After doing some digging, the error occurs because of the following commi=
-t:
-  d98f26073bebddcd3da0ba1b86c3a34e840c0fb8
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1816189/+subscriptions
+David / dhildenb
