@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42761)
+Received: from eggs.gnu.org ([209.51.188.92]:43811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
-	id 1gufXu-0004hS-DD
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:37:01 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gufdH-00073L-Jz
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:42:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
-	id 1gufXs-0007xz-Jv
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:36:58 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:50141
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
-	id 1gufXr-0007X2-RD
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:36:56 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 15 Feb 2019 15:36:00 +0000
-Message-ID: <596fc361faea408cabae8a5f41df2e41@AMSPEX02CL03.citrite.net>
-References: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
-In-Reply-To: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gufd7-0005my-8F
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:42:23 -0500
+Date: Fri, 15 Feb 2019 16:42:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190215164209.54a6f747@Igors-MacBook-Pro.local>
+In-Reply-To: <2d99aca8-5ed0-bea3-4a4f-7b2a8e89b049@redhat.com>
+References: <20190214140714.15738-1-imammedo@redhat.com>
+	<4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
+	<20190215123317.6903b818@Igors-MacBook-Pro.local>
+	<2d99aca8-5ed0-bea3-4a4f-7b2a8e89b049@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] QEMU xen coverity issues
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead
+ of memory_region_allocate_system_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Peter Maydell' <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org, qemu-arm@nongnu.org, jan.kiszka@web.de, atar4qemu@gmail.com
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBNYXlkZWxsIFttYWls
-dG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXQ0KPiBTZW50OiAxNCBGZWJydWFyeSAyMDE5IDE4
-OjI5DQo+IFRvOiBRRU1VIERldmVsb3BlcnMgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gQ2M6
-IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+OyBBbnRob255IFBlcmFyZA0K
-PiA8YW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbT4NCj4gU3ViamVjdDogUUVNVSB4ZW4gY292ZXJp
-dHkgaXNzdWVzDQo+IA0KPiBIaTsgd2UndmUganVzdCBkb25lIGFub3RoZXIgQ292ZXJpdHkgcnVu
-LCBhbmQgaXQncyBwdWxsZWQgdXAgc29tZQ0KPiBpc3N1ZXMgaW4gdGhlIHJlY2VudGx5IGNoYW5n
-ZWQgWGVuIGNvZGUuIFJhdGhlciB0aGFuIHRyYWNrIHRoZW0NCj4gYmFjayB0byBleGFjdGx5IHdo
-aWNoIHBhdGNoZXMgaW4gdGhlIHJlY2VudCByZWZhY3RvcmluZ3MgcmVzdWx0ZWQNCj4gaW4gdGhl
-bSwgSSBmaWd1cmVkIEknZCBqdXN0IGxpc3QgdGhlbSBoZXJlLiBDb3VsZCB5b3UgdGFrZSBhDQo+
-IGxvb2sgYXQgdGhlbSwgcGxlYXNlID8NCj4gDQo+ICgxKSBDSUQgMTM5ODYzNTogeGVuX2Jsb2Nr
-X2NvbXBsZXRlX2FpbygpOiBpZGVudGljYWwgY29kZSBpbiB0d28gYnJhbmNoZXMNCj4gDQo+IElu
-IGh3L2Jsb2NrL2RhdGFwbGFuZS94ZW5fYmxvY2tfY29tcGxldGVfYWlvKCk6DQo+IA0KPiB0aGUg
-Zmlyc3Qgc3dpdGNoIGhhcyB0aGlzIGNvZGU6DQo+ICAgICBjYXNlIEJMS0lGX09QX1dSSVRFOg0K
-PiAgICAgY2FzZSBCTEtJRl9PUF9GTFVTSF9ESVNLQ0FDSEU6DQo+ICAgICAgICAgaWYgKCFyZXF1
-ZXN0LT5yZXEubnJfc2VnbWVudHMpIHsNCj4gICAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgICAg
-fQ0KDQpJIHRoaW5rIHRoaXMgc2l0dWF0aW9uIGFyb3NlIGluIHRoZSBvbGQgeGVuX2Rpc2suYyB3
-aGVuIGdyYW50IG1hcC91bm1hcCB3YXMgcmVtb3ZlZC4gVGhlcmUgdXNlZCB0byBiZSBjbGVhbnVw
-IHRvIGRvIG9uIHRoZSB3cml0ZSBwYXRoIChpLmUuIHdoZW4gbnJfc2VnbWVudHMgIT0gMCkgYnV0
-IHRoYXQgd2VudCBhd2F5IHdpdGggdGhlIG1vdmUgdGhlIGNvcHktb25seS4gSSdsbCBnZXQgcmlk
-IG9mIHRoZSBpZigpLg0KDQo+ICAgICAgICAgYnJlYWs7DQo+IA0KPiBzbyB0aGUgaWYoKSBkb2Vz
-bid0IGRvIGFueXRoaW5nLiBXaGF0IHdhcyB0aGlzIHN1cHBvc2VkIHRvIGJlPw0KPiANCj4gKDIp
-IE5vdCBzcG90dGVkIGJ5IGNvdmVyaXR5LCBidXQgaW4gYSBsYXRlciBzd2l0Y2ggaW4gdGhlIHNh
-bWUgZnVuY3Rpb246DQo+IA0KPiAgICAgc3dpdGNoIChyZXF1ZXN0LT5yZXEub3BlcmF0aW9uKSB7
-DQo+ICAgICBjYXNlIEJMS0lGX09QX1dSSVRFOg0KPiAgICAgY2FzZSBCTEtJRl9PUF9GTFVTSF9E
-SVNLQ0FDSEU6DQo+ICAgICAgICAgaWYgKCFyZXF1ZXN0LT5yZXEubnJfc2VnbWVudHMpIHsNCj4g
-ICAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgICAgfQ0KPiAgICAgY2FzZSBCTEtJRl9PUF9SRUFE
-Og0KPiANCj4gSWYgYSBzd2l0Y2ggY2FzZSBpcyBzdXBwb3NlZCB0byBmYWxsIHRocm91Z2ggaXQg
-c2hvdWxkIGJlDQo+IGV4cGxpY2l0bHkgbWFya2VkIHdpdGggYSAiLyogZmFsbCB0aHJvdWdoICov
-IiBjb21tZW50Lg0KDQpZZXMsIHRoaXMgd2FzIGFuIG92ZXJzaWdodCBjb3BpZWQgZnJvbSB0aGUg
-b2xkIGNvZGUgdG9vLg0KDQo+IA0KPiAoMykgQ0lEIDEzOTg2Mzg6IHVudXNlZCB2YWx1ZSBpbiB4
-ZW5fYmxvY2tfc2V0X3ZkZXYoKToNCj4gDQo+IEluIGh3L2Jsb2NrL3hlbi1ibG9jay5jIHhlbl9i
-bG9ja19zZXRfdmRldigpOg0KPiANCj4gICAgIGlmICh2ZGV2LT50eXBlID09IFhFTl9CTE9DS19W
-REVWX1RZUEVfRFApIHsNCj4gICAgICAgICBpZiAocWVtdV9zdHJ0b3VsKHAsICZlbmQsIDEwLCAm
-dmRldi0+ZGlzaykpIHsNCj4gICAgICAgICAgICAgZ290byBpbnZhbGlkOw0KPiAgICAgICAgIH0N
-Cj4gDQo+ICAgICAgICAgaWYgKCplbmQgPT0gJ3AnKSB7DQo+ICAgICAgICAgICAgIHAgPSAoY2hh
-ciAqKSArK2VuZDsgICAgLyogdGhpcyBhc3NpZ25tZW50IGlzIHVudXNlZCAqLw0KPiAgICAgICAg
-ICAgICBpZiAoKmVuZCA9PSAnXDAnKSB7DQo+ICAgICAgICAgICAgICAgICBnb3RvIGludmFsaWQ7
-DQo+ICAgICAgICAgICAgIH0NCj4gICAgICAgICB9DQo+ICAgICB9IGVsc2Ugew0KPiAgICAgICAg
-IHZkZXYtPmRpc2sgPSB2YmRfbmFtZV90b19kaXNrKHAsICZlbmQpOw0KPiAgICAgfQ0KPiANCj4g
-ICAgIGlmICgqZW5kICE9ICdcMCcpIHsNCj4gICAgICAgICBwID0gKGNoYXIgKillbmQ7DQo+ICAg
-ICAgICAgWy4uLl0NCj4gDQo+IFRoZSBhc3NpZ25tZW50IHRvIHAgd2hpY2ggSSd2ZSBtYXJrZWQg
-d2l0aCBhIGNvbW1lbnQgYWJvdmUNCj4gaXMgbmV2ZXIgdXNlZCwgYmVjYXVzZSB3ZSB3aWxsIGVp
-dGhlciBnb3RvICdpbnZhbGlkJyAod2hpY2ggbmV2ZXINCj4gdXNlcyAncCcpIG9yIHdlIHdpbGwg
-dGFrZSB0aGUgImlmICgqZW5kICE9ICdcMCcpIiBwYXRoIHdoaWNoDQo+IG92ZXJ3cml0ZXMgJ3An
-LiBXaGF0IGlzIHRoZSBpbnRlbnRpb24gaGVyZSA/DQoNCkl0J3Mgc3VmZmljaWVudCB0byBzaW1w
-bHkgaW5jcmVtZW50IGVuZCBiZWZvcmUgdGVzdGluZyBhZ2FpbnN0ICdcMCcgc28gSSdsbCBmb2xk
-IHRoZSBwcmUtaW5jcmVtZW50IGludG8gdGhlIGlmKCkuDQoNCj4gDQo+ICg0KSBDSUQgMTM5ODY0
-MDogdmJkX25hbWVfdG9fZGlzaygpIGludGVnZXIgb3ZlcmZsb3c6DQo+IA0KPiBJbiBody9ibG9j
-ay94ZW4tYmxvY2suYyB2YmRfbmFtZV90b19kaXNrKCksIGlmIHRoZSBuYW1lIHN0cmluZw0KPiBw
-YXNzZWQgaW4gaXMgZW1wdHkgb3IgZG9lc24ndCBzdGFydCB3aXRoIGEgbG93ZXJjYXNlIGFscGhh
-YmV0aWMNCj4gY2hhcmFjdGVyLCB0aGVuIHdlIGVuZCB0aGUgd2hpbGUgbG9vcCB3aXRoIGRpc2sg
-PT0gMC4gVGhlbg0KPiB3ZSByZXR1cm4gImRpc2sgLSAxIiB3aGljaCB1bmRlcmZsb3dzIHRvIFVJ
-TlRfTUFYLiBUaGlzIGlzbid0DQo+IGRvY3VtZW50ZWQgYXMgYmVpbmcgYW4gZXJyb3IgcmV0dXJu
-IGZvciB0aGUgZnVuY3Rpb24gYW5kIHRoZQ0KPiBjYWxsZXIgZG9lc24ndCBjaGVjayBmb3IgaXQu
-DQoNCk9rLCBJJ2xsIHJlLXdvcmsgdGhlIGZ1bmN0aW9uIHRvIGNoZWNrIGZvciBzdWNoIGFuIGVy
-cm9yIGNvbmRpdGlvbi4NCg0KPiANCj4gKDUpIENJRCAxMzk4NjQ5OiByZXNvdXJjZSBsZWFrIGlu
-IHhlbl9ibG9ja19kcml2ZV9jcmVhdGUoKToNCj4gDQo+IEluIGh3L2Jsb2NrL3hlbi1ibG9jay5j
-IHhlbl9ibG9ja19kcml2ZV9jcmVhdGUoKSBDb3Zlcml0eQ0KPiBjb21wbGFpbnMgdGhhdCB0aGUg
-Y2FsbCAiZHJpdmVyX2xheWVyID0gcWRpY3RfbmV3KCkiIGFsbG9jYXRlcw0KPiBtZW1vcnkgdGhh
-dCdzIGxlYWtlZCBiZWNhdXNlIHdlIGRvbid0IHNhdmUgdGhlIHBvaW50ZXIgYW55d2hlcmUNCj4g
-YnV0IGRvbid0IGRlYWxsb2NhdGUgaXQgYmVmb3JlIHRoZSBlbmQgb2YgdGhlIGZ1bmN0aW9uIGVp
-dGhlci4NCj4gQ292ZXJpdHkgaXMgbm90IGdyZWF0IGF0IHVuZGVyc3RhbmRpbmcgb3VyIHJlZmNv
-dW50aW5nIG9iamVjdHMsDQo+IGJ1dCB0aGlzIGRvZXMgbG9vayBsaWtlIGVpdGhlciB3ZSdyZSBt
-aXNzaW5nIGEgcW9iamVjdF91bnJlZigpDQo+IG9yIHNvbWV0aGluZyBzaG91bGQgYmUga2VlcGlu
-ZyBob2xkIG9mIHRoZSBkaWN0aW9uYXJ5LiBQcm9iYWJseQ0KPiBiZXN0IHRvIGFzayBhIGJsb2Nr
-IGxheWVyIGV4cGVydC4NCg0KQUZBSUNUIG5vdGhpbmcgd2lsbCBjb25zdW1lIHRoZSBkaWN0aW9u
-YXJ5IHNvIGl0IGRvZXMgYXBwZWFyIHRoYXQgd2UncmUgbWlzc2luZyBhbiB1bnJlZiBoZXJlLg0K
-DQpJJ2xsIHByZXBhcmUgYSBwYXRjaCB3aXRoIGZpeGVzIGZvciBhbGwgdGhlc2UgYW5kIHNlbmQg
-aXQgc2hvcnRseS4NCg0KICBQYXVsDQoNCj4gDQo+IHRoYW5rcw0KPiAtLSBQTU0NCg==
+On Fri, 15 Feb 2019 15:48:43 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 15/02/19 12:33, Igor Mammedov wrote:
+> > On Thu, 14 Feb 2019 19:11:27 +0100
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > 
+> >> On 14/02/19 15:07, Igor Mammedov wrote:
+> >>> Also some boards (ab)use memory_region_allocate_system_memory(), calling it several
+> >>> times to allocate various fixed sized chunks of RAM and ROMs, which is problematic
+> >>> to map to a single initial RAM Machine::memdev backend and is currently broken if
+> >>> -mem-path points to a not hugepage pool.
+> >>
+> >> This is certainly a good idea.  However, I'm not sure why you would need
+> >> a memdev property on the Machine instead of just allowing 1 -numa node,
+> >> which is what really is.
+> > 
+> > using '-numa node' would be confusing to user when he/she is not interested in numa usecase
+> > it also would enable numa fdt/acpi parts generated automatically (fixable but then again
+> > it adds more to confusion) and in the end there are boards that do not support numa at all
+> > (s390x).
+> 
+> Fair enough.
+> 
+> What about -m, too?  Then you'd specify a memdev instead of the initial
+> memory size.
+that somewhat what I've planned,
+make -m X translate into -object memory-backend-ram,id=magically-get-what-board-uses-now,size=X -machine memdev=thatid
+
+one more reason for memdev vs device is that -numa now uses memdevs and so far it
+doesn't look that non-numa initial RAM would get immediate benefits from using -device
+on most boards (well, I couldn't come up with any modulo backend/frontend consistent usage)
+
+> 
+> Paolo
+> 
