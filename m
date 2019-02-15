@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44086)
+Received: from eggs.gnu.org ([209.51.188.92]:44110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYz-000648-I4
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:14 -0500
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhZ1-00064b-2n
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYy-0002HI-6V
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:13 -0500
-Received: from forwardcorp1g.cmail.yandex.net ([2a02:6b8:0:1465::fd]:60944)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYz-0002I4-AL
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:15 -0500
+Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:43569)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1guhYx-0002F3-RQ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:12 -0500
+	id 1guhYy-0002Fk-Ur
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:13 -0500
 From: Yury Kotov <yury-kotov@yandex-team.ru>
-Date: Fri, 15 Feb 2019 20:45:44 +0300
-Message-Id: <20190215174548.2630-2-yury-kotov@yandex-team.ru>
+Date: Fri, 15 Feb 2019 20:45:46 +0300
+Message-Id: <20190215174548.2630-4-yury-kotov@yandex-team.ru>
 In-Reply-To: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
 References: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/5] exec: Change RAMBlockIterFunc definition
+Subject: [Qemu-devel] [PATCH v3 3/5] migration: Add an ability to ignore
+ shared RAM blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,273 +30,501 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: wrfsh@yandex-team.ru, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, peter.maydell@linaro.org
 
-Currently, qemu_ram_foreach_* calls RAMBlockIterFunc with many
-block-specific arguments. But often iter func needs RAMBlock*.
-This refactoring is needed for fast access to RAMBlock flags from
-qemu_ram_foreach_block's callback. The only way to achieve this now
-is to call qemu_ram_block_from_host (which also enumerates blocks).
-
-So, this patch reduces complexity of
-qemu_ram_foreach_block() -> cb() -> qemu_ram_block_from_host()
-from O(n^2) to O(n).
-
-Fix RAMBlockIterFunc definition and add some functions to read
-RAMBlock* fields witch were passed.
+If ignore-shared capability is set then skip shared RAMBlocks during the
+RAM migration.
+Also, move qemu_ram_foreach_migratable_block (and rename) to the
+migration code, because it requires access to the migration capabilities.
 
 Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 ---
- exec.c                    | 21 +++++++++++++++++----
- include/exec/cpu-common.h |  6 ++++--
- migration/postcopy-ram.c  | 36 +++++++++++++++++++++---------------
- migration/rdma.c          |  7 +++++--
- stubs/ram-block.c         | 15 +++++++++++++++
- util/vfio-helpers.c       |  6 +++---
- 6 files changed, 65 insertions(+), 26 deletions(-)
+ exec.c                    |  19 -------
+ include/exec/cpu-common.h |   1 -
+ migration/migration.h     |   4 +-
+ migration/postcopy-ram.c  |  12 ++---
+ migration/ram.c           | 110 +++++++++++++++++++++++++++++---------
+ migration/rdma.c          |   2 +-
+ 6 files changed, 94 insertions(+), 54 deletions(-)
 
 diff --git a/exec.c b/exec.c
-index 518064530b..bf71462929 100644
+index bf71462929..1d4f3784d6 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -1972,6 +1972,21 @@ const char *qemu_ram_get_idstr(RAMBlock *rb)
-     return rb->idstr;
+@@ -3985,25 +3985,6 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, =
+void *opaque)
+     return ret;
  }
 =20
-+void *qemu_ram_get_host_addr(RAMBlock *rb)
-+{
-+    return rb->host;
-+}
-+
-+ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
-+{
-+    return rb->offset;
-+}
-+
-+ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
-+{
-+    return rb->used_length;
-+}
-+
- bool qemu_ram_is_shared(RAMBlock *rb)
- {
-     return rb->flags & RAM_SHARED;
-@@ -3961,8 +3976,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, v=
-oid *opaque)
-=20
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
--        ret =3D func(block->idstr, block->host, block->offset,
--                   block->used_length, opaque);
-+        ret =3D func(block, opaque);
-         if (ret) {
-             break;
-         }
-@@ -3981,8 +3995,7 @@ int qemu_ram_foreach_migratable_block(RAMBlockIterF=
-unc func, void *opaque)
-         if (!qemu_ram_is_migratable(block)) {
-             continue;
-         }
--        ret =3D func(block->idstr, block->host, block->offset,
--                   block->used_length, opaque);
-+        ret =3D func(block, opaque);
-         if (ret) {
-             break;
-         }
+-int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
+e)
+-{
+-    RAMBlock *block;
+-    int ret =3D 0;
+-
+-    rcu_read_lock();
+-    RAMBLOCK_FOREACH(block) {
+-        if (!qemu_ram_is_migratable(block)) {
+-            continue;
+-        }
+-        ret =3D func(block, opaque);
+-        if (ret) {
+-            break;
+-        }
+-    }
+-    rcu_read_unlock();
+-    return ret;
+-}
+-
+ /*
+  * Unmap pages of memory from start to start+length such that
+  * they a) read as 0, b) Trigger whatever fault mechanism
 diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 63ec1f9b37..9cd1f94bc5 100644
+index 9cd1f94bc5..cef8b88a2a 100644
 --- a/include/exec/cpu-common.h
 +++ b/include/exec/cpu-common.h
-@@ -72,6 +72,9 @@ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, voi=
-d *host);
- void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *=
-dev);
- void qemu_ram_unset_idstr(RAMBlock *block);
- const char *qemu_ram_get_idstr(RAMBlock *rb);
-+void *qemu_ram_get_host_addr(RAMBlock *rb);
-+ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
-+ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
- bool qemu_ram_is_shared(RAMBlock *rb);
- bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
- void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-@@ -116,8 +119,7 @@ void cpu_flush_icache_range(hwaddr start, hwaddr len)=
-;
- extern struct MemoryRegion io_mem_rom;
- extern struct MemoryRegion io_mem_notdirty;
-=20
--typedef int (RAMBlockIterFunc)(const char *block_name, void *host_addr,
--    ram_addr_t offset, ram_addr_t length, void *opaque);
-+typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
+@@ -122,7 +122,6 @@ extern struct MemoryRegion io_mem_notdirty;
+ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
 =20
  int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
- int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
+-int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
 e);
+ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)=
+;
+=20
+ #endif
+diff --git a/migration/migration.h b/migration/migration.h
+index 4211995c53..2c88f8a555 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -302,8 +302,10 @@ void migrate_send_rp_resume_ack(MigrationIncomingSta=
+te *mis, uint32_t value);
+ void dirty_bitmap_mig_before_vm_start(void);
+ void init_dirty_bitmap_incoming_migration(void);
+=20
++int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
++
+ #define qemu_ram_foreach_block \
+-  #warning "Use qemu_ram_foreach_block_migratable in migration code"
++  #warning "Use foreach_not_ignored_block in migration code"
+=20
+ void migration_make_urgent_request(void);
+ void migration_consume_urgent_request(void);
 diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index fa09dba534..b098816221 100644
+index b098816221..e2aa57a701 100644
 --- a/migration/postcopy-ram.c
 +++ b/migration/postcopy-ram.c
-@@ -319,10 +319,10 @@ static bool ufd_check_and_apply(int ufd, MigrationI=
-ncomingState *mis)
+@@ -374,7 +374,7 @@ bool postcopy_ram_supported_by_host(MigrationIncoming=
+State *mis)
+     }
 =20
- /* Callback from postcopy_ram_supported_by_host block iterator.
+     /* We don't support postcopy with shared RAM yet */
+-    if (qemu_ram_foreach_migratable_block(test_ramblock_postcopiable, NU=
+LL)) {
++    if (foreach_not_ignored_block(test_ramblock_postcopiable, NULL)) {
+         goto out;
+     }
+=20
+@@ -508,7 +508,7 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
   */
--static int test_ramblock_postcopiable(const char *block_name, void *host=
-_addr,
--                             ram_addr_t offset, ram_addr_t length, void =
-*opaque)
-+static int test_ramblock_postcopiable(RAMBlock *rb, void *opaque)
+ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
  {
--    RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     size_t pagesize =3D qemu_ram_pagesize(rb);
-=20
-     if (length % pagesize) {
-@@ -443,9 +443,12 @@ out:
-  * must be done right at the start prior to pre-copy.
-  * opaque should be the MIS.
-  */
--static int init_range(const char *block_name, void *host_addr,
--                      ram_addr_t offset, ram_addr_t length, void *opaque=
-)
-+static int init_range(RAMBlock *rb, void *opaque)
- {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     trace_postcopy_init_range(block_name, host_addr, offset, length);
-=20
-     /*
-@@ -465,9 +468,12 @@ static int init_range(const char *block_name, void *=
-host_addr,
-  * At the end of migration, undo the effects of init_range
-  * opaque should be the MIS.
-  */
--static int cleanup_range(const char *block_name, void *host_addr,
--                        ram_addr_t offset, ram_addr_t length, void *opaq=
-ue)
-+static int cleanup_range(RAMBlock *rb, void *opaque)
- {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     MigrationIncomingState *mis =3D opaque;
-     struct uffdio_range range_struct;
-     trace_postcopy_cleanup_range(block_name, host_addr, offset, length);
-@@ -586,9 +592,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
-tate *mis)
- /*
-  * Disable huge pages on an area
-  */
--static int nhp_range(const char *block_name, void *host_addr,
--                    ram_addr_t offset, ram_addr_t length, void *opaque)
-+static int nhp_range(RAMBlock *rb, void *opaque)
- {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     trace_postcopy_nhp_range(block_name, host_addr, offset, length);
-=20
-     /*
-@@ -626,15 +635,13 @@ int postcopy_ram_prepare_discard(MigrationIncomingS=
-tate *mis)
-  *   opaque: MigrationIncomingState pointer
-  * Returns 0 on success
-  */
--static int ram_block_enable_notify(const char *block_name, void *host_ad=
-dr,
--                                   ram_addr_t offset, ram_addr_t length,
--                                   void *opaque)
-+static int ram_block_enable_notify(RAMBlock *rb, void *opaque)
- {
-     MigrationIncomingState *mis =3D opaque;
-     struct uffdio_register reg_struct;
-=20
--    reg_struct.range.start =3D (uintptr_t)host_addr;
--    reg_struct.range.len =3D length;
-+    reg_struct.range.start =3D (uintptr_t)qemu_ram_get_host_addr(rb);
-+    reg_struct.range.len =3D qemu_ram_get_used_length(rb);
-     reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
-=20
-     /* Now tell our userfault_fd that it's responsible for this area */
-@@ -647,7 +654,6 @@ static int ram_block_enable_notify(const char *block_=
-name, void *host_addr,
+-    if (qemu_ram_foreach_migratable_block(init_range, NULL)) {
++    if (foreach_not_ignored_block(init_range, NULL)) {
          return -1;
      }
-     if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
--        RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
-         qemu_ram_set_uf_zeroable(rb);
+=20
+@@ -550,7 +550,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingSt=
+ate *mis)
+             return -1;
+         }
+=20
+-        if (qemu_ram_foreach_migratable_block(cleanup_range, mis)) {
++        if (foreach_not_ignored_block(cleanup_range, mis)) {
+             return -1;
+         }
+=20
+@@ -617,7 +617,7 @@ static int nhp_range(RAMBlock *rb, void *opaque)
+  */
+ int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
+ {
+-    if (qemu_ram_foreach_migratable_block(nhp_range, mis)) {
++    if (foreach_not_ignored_block(nhp_range, mis)) {
+         return -1;
      }
 =20
+@@ -628,7 +628,7 @@ int postcopy_ram_prepare_discard(MigrationIncomingSta=
+te *mis)
+=20
+ /*
+  * Mark the given area of RAM as requiring notification to unwritten are=
+as
+- * Used as a  callback on qemu_ram_foreach_migratable_block.
++ * Used as a  callback on foreach_not_ignored_block.
+  *   host_addr: Base of area to mark
+  *   offset: Offset in the whole ram arena
+  *   length: Length of the section
+@@ -1122,7 +1122,7 @@ int postcopy_ram_enable_notify(MigrationIncomingSta=
+te *mis)
+     mis->have_fault_thread =3D true;
+=20
+     /* Mark so that we get notified of accesses to unwritten areas */
+-    if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis))=
+ {
++    if (foreach_not_ignored_block(ram_block_enable_notify, mis)) {
+         error_report("ram_block_enable_notify failed");
+         return -1;
+     }
+diff --git a/migration/ram.c b/migration/ram.c
+index 59191c1ed2..01315edd66 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -159,18 +159,44 @@ out:
+     return ret;
+ }
+=20
++static bool ramblock_is_ignored(RAMBlock *block)
++{
++    return !qemu_ram_is_migratable(block) ||
++           (migrate_ignore_shared() && qemu_ram_is_shared(block));
++}
++
+ /* Should be holding either ram_list.mutex, or the RCU lock. */
++#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
++    INTERNAL_RAMBLOCK_FOREACH(block)                   \
++        if (ramblock_is_ignored(block)) {} else
++
+ #define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+     INTERNAL_RAMBLOCK_FOREACH(block)                   \
+         if (!qemu_ram_is_migratable(block)) {} else
+=20
+ #undef RAMBLOCK_FOREACH
+=20
++int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
++{
++    RAMBlock *block;
++    int ret =3D 0;
++
++    rcu_read_lock();
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++        ret =3D func(block, opaque);
++        if (ret) {
++            break;
++        }
++    }
++    rcu_read_unlock();
++    return ret;
++}
++
+ static void ramblock_recv_map_init(void)
+ {
+     RAMBlock *rb;
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
+         assert(!rb->receivedmap);
+         rb->receivedmap =3D bitmap_new(rb->max_length >> qemu_target_pag=
+e_bits());
+     }
+@@ -1545,7 +1571,7 @@ unsigned long migration_bitmap_find_dirty(RAMState =
+*rs, RAMBlock *rb,
+     unsigned long *bitmap =3D rb->bmap;
+     unsigned long next;
+=20
+-    if (!qemu_ram_is_migratable(rb)) {
++    if (ramblock_is_ignored(rb)) {
+         return size;
+     }
+=20
+@@ -1594,7 +1620,7 @@ uint64_t ram_pagesize_summary(void)
+     RAMBlock *block;
+     uint64_t summary =3D 0;
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         summary |=3D block->page_size;
+     }
+=20
+@@ -1664,7 +1690,7 @@ static void migration_bitmap_sync(RAMState *rs)
+=20
+     qemu_mutex_lock(&rs->bitmap_mutex);
+     rcu_read_lock();
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         migration_bitmap_sync_range(rs, block, 0, block->used_length);
+     }
+     ram_counters.remaining =3D ram_bytes_remaining();
+@@ -2388,7 +2414,7 @@ static int ram_save_host_page(RAMState *rs, PageSea=
+rchStatus *pss,
+     size_t pagesize_bits =3D
+         qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+=20
+-    if (!qemu_ram_is_migratable(pss->block)) {
++    if (ramblock_is_ignored(pss->block)) {
+         error_report("block %s should not be migrated !", pss->block->id=
+str);
+         return 0;
+     }
+@@ -2486,19 +2512,30 @@ void acct_update_position(QEMUFile *f, size_t siz=
+e, bool zero)
+     }
+ }
+=20
+-uint64_t ram_bytes_total(void)
++static uint64_t ram_bytes_total_common(bool count_ignored)
+ {
+     RAMBlock *block;
+     uint64_t total =3D 0;
+=20
+     rcu_read_lock();
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+-        total +=3D block->used_length;
++    if (count_ignored) {
++        RAMBLOCK_FOREACH_MIGRATABLE(block) {
++            total +=3D block->used_length;
++        }
++    } else {
++        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++            total +=3D block->used_length;
++        }
+     }
+     rcu_read_unlock();
+     return total;
+ }
+=20
++uint64_t ram_bytes_total(void)
++{
++    return ram_bytes_total_common(false);
++}
++
+ static void xbzrle_load_setup(void)
+ {
+     XBZRLE.decoded_buf =3D g_malloc(TARGET_PAGE_SIZE);
+@@ -2547,7 +2584,7 @@ static void ram_save_cleanup(void *opaque)
+      */
+     memory_global_dirty_log_stop();
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         g_free(block->bmap);
+         block->bmap =3D NULL;
+         g_free(block->unsentmap);
+@@ -2610,7 +2647,7 @@ void ram_postcopy_migrated_memory_release(Migration=
+State *ms)
+ {
+     struct RAMBlock *block;
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         unsigned long *bitmap =3D block->bmap;
+         unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
+         unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0)=
+;
+@@ -2688,7 +2725,7 @@ static int postcopy_each_ram_send_discard(Migration=
+State *ms)
+     struct RAMBlock *block;
+     int ret;
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         PostcopyDiscardState *pds =3D
+             postcopy_discard_send_init(ms, block->idstr);
+=20
+@@ -2896,7 +2933,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
+ *ms)
+     rs->last_sent_block =3D NULL;
+     rs->last_page =3D 0;
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS;
+         unsigned long *bitmap =3D block->bmap;
+         unsigned long *unsentmap =3D block->unsentmap;
+@@ -3062,7 +3099,7 @@ static void ram_list_init_bitmaps(void)
+=20
+     /* Skip setting bitmap if there is no RAM */
+     if (ram_bytes_total()) {
+-        RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+             pages =3D block->max_length >> TARGET_PAGE_BITS;
+             block->bmap =3D bitmap_new(pages);
+             bitmap_set(block->bmap, 0, pages);
+@@ -3117,7 +3154,7 @@ static void ram_state_resume_prepare(RAMState *rs, =
+QEMUFile *out)
+      * about dirty page logging as well.
+      */
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         pages +=3D bitmap_count_one(block->bmap,
+                                   block->used_length >> TARGET_PAGE_BITS=
+);
+     }
+@@ -3176,7 +3213,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
+)
+=20
+     rcu_read_lock();
+=20
+-    qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
++    qemu_put_be64(f, ram_bytes_total_common(true) | RAM_SAVE_FLAG_MEM_SI=
+ZE);
+=20
+     RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         qemu_put_byte(f, strlen(block->idstr));
+@@ -3185,6 +3222,10 @@ static int ram_save_setup(QEMUFile *f, void *opaqu=
+e)
+         if (migrate_postcopy_ram() && block->page_size !=3D qemu_host_pa=
+ge_size) {
+             qemu_put_be64(f, block->page_size);
+         }
++        if (migrate_ignore_shared()) {
++            qemu_put_be64(f, block->mr->addr);
++            qemu_put_byte(f, ramblock_is_ignored(block) ? 1 : 0);
++        }
+     }
+=20
+     rcu_read_unlock();
+@@ -3443,7 +3484,7 @@ static inline RAMBlock *ram_block_from_stream(QEMUF=
+ile *f, int flags)
+         return NULL;
+     }
+=20
+-    if (!qemu_ram_is_migratable(block)) {
++    if (ramblock_is_ignored(block)) {
+         error_report("block %s should not be migrated !", id);
+         return NULL;
+     }
+@@ -3698,7 +3739,7 @@ int colo_init_ram_cache(void)
+     RAMBlock *block;
+=20
+     rcu_read_lock();
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         block->colo_cache =3D qemu_anon_ram_alloc(block->used_length,
+                                                 NULL,
+                                                 false);
+@@ -3719,7 +3760,7 @@ int colo_init_ram_cache(void)
+     if (ram_bytes_total()) {
+         RAMBlock *block;
+=20
+-        RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+             unsigned long pages =3D block->max_length >> TARGET_PAGE_BIT=
+S;
+=20
+             block->bmap =3D bitmap_new(pages);
+@@ -3734,7 +3775,7 @@ int colo_init_ram_cache(void)
+=20
+ out_locked:
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         if (block->colo_cache) {
+             qemu_anon_ram_free(block->colo_cache, block->used_length);
+             block->colo_cache =3D NULL;
+@@ -3751,14 +3792,14 @@ void colo_release_ram_cache(void)
+     RAMBlock *block;
+=20
+     memory_global_dirty_log_stop();
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         g_free(block->bmap);
+         block->bmap =3D NULL;
+     }
+=20
+     rcu_read_lock();
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         if (block->colo_cache) {
+             qemu_anon_ram_free(block->colo_cache, block->used_length);
+             block->colo_cache =3D NULL;
+@@ -3794,7 +3835,7 @@ static int ram_load_cleanup(void *opaque)
+ {
+     RAMBlock *rb;
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
+         if (ramblock_is_pmem(rb)) {
+             pmem_persist(rb->host, rb->used_length);
+         }
+@@ -3803,7 +3844,7 @@ static int ram_load_cleanup(void *opaque)
+     xbzrle_load_cleanup();
+     compress_threads_load_cleanup();
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
+         g_free(rb->receivedmap);
+         rb->receivedmap =3D NULL;
+     }
+@@ -4003,7 +4044,7 @@ static void colo_flush_ram_cache(void)
+=20
+     memory_global_dirty_log_sync();
+     rcu_read_lock();
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         migration_bitmap_sync_range(ram_state, block, 0, block->used_len=
+gth);
+     }
+     rcu_read_unlock();
+@@ -4146,6 +4187,23 @@ static int ram_load(QEMUFile *f, void *opaque, int=
+ version_id)
+                             ret =3D -EINVAL;
+                         }
+                     }
++                    if (migrate_ignore_shared()) {
++                        hwaddr addr =3D qemu_get_be64(f);
++                        bool ignored =3D qemu_get_byte(f);
++                        if (ignored !=3D ramblock_is_ignored(block)) {
++                            error_report("RAM block %s should %s be migr=
+ated",
++                                         id, ignored ? "" : "not");
++                            ret =3D -EINVAL;
++                        }
++                        if (ramblock_is_ignored(block) &&
++                            block->mr->addr !=3D addr) {
++                            error_report("Mismatched GPAs for block %s "
++                                         "%" PRId64 "!=3D %" PRId64,
++                                         id, (uint64_t)addr,
++                                         (uint64_t)block->mr->addr);
++                            ret =3D -EINVAL;
++                        }
++                    }
+                     ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
+                                           block->idstr);
+                 } else {
+@@ -4216,7 +4274,7 @@ static int ram_load(QEMUFile *f, void *opaque, int =
+version_id)
+ static bool ram_has_postcopy(void *opaque)
+ {
+     RAMBlock *rb;
+-    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
+         if (ramblock_is_pmem(rb)) {
+             info_report("Block: %s, host: %p is a nvdimm memory, postcop=
+y"
+                          "is not supported now!", rb->idstr, rb->host);
+@@ -4236,7 +4294,7 @@ static int ram_dirty_bitmap_sync_all(MigrationState=
+ *s, RAMState *rs)
+=20
+     trace_ram_dirty_bitmap_sync_start();
+=20
+-    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+         qemu_savevm_send_recv_bitmap(file, block->idstr);
+         trace_ram_dirty_bitmap_request(block->idstr);
+         ramblock_count++;
 diff --git a/migration/rdma.c b/migration/rdma.c
-index 54a3c11540..7eb38ee764 100644
+index 7eb38ee764..3cb579cc99 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -624,9 +624,12 @@ static int rdma_add_block(RDMAContext *rdma, const c=
-har *block_name,
-  * in advanced before the migration starts. This tells us where the RAM =
-blocks
-  * are so that we can register them individually.
-  */
--static int qemu_rdma_init_one_block(const char *block_name, void *host_a=
-ddr,
--    ram_addr_t block_offset, ram_addr_t length, void *opaque)
-+static int qemu_rdma_init_one_block(RAMBlock *rb, void *opaque)
- {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t block_offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     return rdma_add_block(opaque, block_name, host_addr, block_offset, l=
-ength);
- }
+@@ -644,7 +644,7 @@ static int qemu_rdma_init_ram_blocks(RDMAContext *rdm=
+a)
 =20
-diff --git a/stubs/ram-block.c b/stubs/ram-block.c
-index cfa5d8678f..73c0a3ee08 100644
---- a/stubs/ram-block.c
-+++ b/stubs/ram-block.c
-@@ -2,6 +2,21 @@
- #include "exec/ramlist.h"
- #include "exec/cpu-common.h"
-=20
-+void *qemu_ram_get_host_addr(RAMBlock *rb)
-+{
-+    return 0;
-+}
-+
-+ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
-+{
-+    return 0;
-+}
-+
-+ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
-+{
-+    return 0;
-+}
-+
- void ram_block_notifier_add(RAMBlockNotifier *n)
- {
- }
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 342d4a2285..2367fe8f7f 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -391,10 +391,10 @@ static void qemu_vfio_ram_block_removed(RAMBlockNot=
-ifier *n,
-     }
- }
-=20
--static int qemu_vfio_init_ramblock(const char *block_name, void *host_ad=
-dr,
--                                   ram_addr_t offset, ram_addr_t length,
--                                   void *opaque)
-+static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
- {
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     int ret;
-     QEMUVFIOState *s =3D opaque;
-=20
+     assert(rdma->blockmap =3D=3D NULL);
+     memset(local, 0, sizeof *local);
+-    qemu_ram_foreach_migratable_block(qemu_rdma_init_one_block, rdma);
++    foreach_not_ignored_block(qemu_rdma_init_one_block, rdma);
+     trace_qemu_rdma_init_ram_blocks(local->nb_blocks);
+     rdma->dest_blocks =3D g_new0(RDMADestBlock,
+                                rdma->local_ram_blocks.nb_blocks);
 --=20
 2.20.1
