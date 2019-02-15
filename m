@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42768)
+Received: from eggs.gnu.org ([209.51.188.92]:44063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1guhSf-0003vX-8g
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:39:41 -0500
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYy-000646-Su
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1guhSc-0002Ao-SE
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:39:41 -0500
-Date: Fri, 15 Feb 2019 10:39:25 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190215103925.2cbd1c8c@x1.home>
-In-Reply-To: <e692c549-ae11-bd08-d494-96dff03dab6e@redhat.com>
-References: <20181218115615.1499-1-philmd@redhat.com>
-	<20181218115615.1499-5-philmd@redhat.com>
-	<e692c549-ae11-bd08-d494-96dff03dab6e@redhat.com>
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYx-0002Gz-VN
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:12 -0500
+Received: from forwardcorp1g.cmail.yandex.net ([87.250.241.190]:40724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+	id 1guhYx-0002En-2a
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:11 -0500
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+Date: Fri, 15 Feb 2019 20:45:43 +0300
+Message-Id: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 04/12] MAINTAINERS: Add missing entries
- to VFIO and NVMe
+Subject: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Markus Armbruster <armbru@redhat.com>, Luc Michel <luc.michel@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: wrfsh@yandex-team.ru, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, peter.maydell@linaro.org
 
-On Fri, 15 Feb 2019 18:29:19 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Hi,
 
-> On 18/12/2018 12.56, Philippe Mathieu-Daud=C3=A9 wrote:
-> > The VFIO helpers are used by the NVMe block driver, add the
-> > entries to both sections.
-> >=20
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
-> > v2: add util/vfio-helpers.c, add entries to NVMe section
-> > ---
-> >  MAINTAINERS | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >=20
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index f3305a65b6..7a94b0dab3 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -1365,7 +1365,10 @@ VFIO
-> >  M: Alex Williamson <alex.williamson@redhat.com>
-> >  S: Supported
-> >  F: hw/vfio/*
-> > +F: util/vfio-helpers.c
-> >  F: include/hw/vfio/
-> > +F: include/qemu/vfio-helpers.h
-> > +F: docs/igd-assign.txt
-> > =20
-> >  vfio-ccw
-> >  M: Cornelia Huck <cohuck@redhat.com>
-> > @@ -2290,6 +2293,8 @@ M: Fam Zheng <fam@euphon.net>
-> >  L: qemu-block@nongnu.org
-> >  S: Supported
-> >  F: block/nvme*
-> > +F: util/vfio-helpers.c
-> > +F: include/qemu/vfio-helpers.h
-> > =20
-> >  Bootdevice
-> >  M: Gonglei <arei.gonglei@huawei.com>
-> >  =20
->=20
-> Cornelia? Alex? ... Ack? NAck?
+The series adds a migration capability, which allows to skip shared RAM b=
+locks
+during the migration. It's useful for fast local migration. E.g. to updat=
+e QEMU
+for the running guests.
 
-vfio-helpers consumes vfio but that's really the only tie to me having
-any remote authority over it.  I think it makes more sense to tie it
-with the direct consumer, which is nvme, and developer, Fam.  Thanks,
+Usage example:
+1. Start source VM:
+   qemu-system-x86 \
+     -m 4G \
+     -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-path=3D=
+/dev/shm/mem0 \
+     -numa node,memdev=3Dmem0 \
+     -qmp unix:/tmp/qemu-qmp-1.sock,server,nowait \
 
-Alex
+2. Start target VM:
+   qemu-system-x86 \
+     -m 4G \
+     -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-path=3D=
+/dev/shm/mem0 \
+     -numa node,memdev=3Dmem0 \
+     -qmp unix:/tmp/qemu-qmp-2.sock,server,nowait \
+     -incoming defer
+
+3. Enable ignore-shared capability on both VMs:
+   { "execute": "migrate-set-capabilities" , "arguments":
+     { "capabilities": [ { "capability": "x-ignore-shared", "state": true=
+ } ] } }
+
+4. Start migration.
+
+Another use case I keep in mind is to migrate to file. Usage is very simi=
+lar.
+
+V2 to V3:
+* Split "migration: Introduce ignore-shared capability"
+* Serialize the capabilities as strings rather than as indexes
+* Don't allow to enable postcopy and ignore-shared together
+* Skip the test for OSs which don't have /dev/shm
+* Add a check whether shared RAM has been really skipped
+
+V1 to V2:
+* Keep migration stream compatibility
+* Reuse the existing code to ignore unwanted RAMBlocks
+* Add capability validation feature
+* ignore-external -> ignore-shared
+
+Regards,
+Yury
+
+Yury Kotov (5):
+  exec: Change RAMBlockIterFunc definition
+  migration: Introduce ignore-shared capability
+  migration: Add an ability to ignore shared RAM blocks
+  tests/migration-test: Add a test for ignore-shared capability
+  migration: Add capabilities validation
+
+ exec.c                    |  38 +++++------
+ include/exec/cpu-common.h |   7 +-
+ migration/migration.c     |  14 ++++
+ migration/migration.h     |   5 +-
+ migration/postcopy-ram.c  |  48 +++++++------
+ migration/ram.c           | 110 ++++++++++++++++++++++--------
+ migration/rdma.c          |   9 ++-
+ migration/savevm.c        | 137 ++++++++++++++++++++++++++++++++++++++
+ qapi/migration.json       |   5 +-
+ stubs/ram-block.c         |  15 +++++
+ tests/migration-test.c    | 131 +++++++++++++++++++++++++++++-------
+ util/vfio-helpers.c       |   6 +-
+ 12 files changed, 420 insertions(+), 105 deletions(-)
+
+--=20
+2.20.1
