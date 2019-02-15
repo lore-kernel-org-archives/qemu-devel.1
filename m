@@ -1,22 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51234)
+Received: from eggs.gnu.org ([209.51.188.92]:51725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gudus-0004DQ-Cd
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:52:35 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gudws-0005D7-JS
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:54:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gudur-0000hz-Ee
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:52:34 -0500
-References: <1550146494-21085-1-git-send-email-pmorel@linux.ibm.com>
-	<1550146494-21085-2-git-send-email-pmorel@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8cc36b2c-0b35-3461-a09b-139c7f6eccad@redhat.com>
-Date: Fri, 15 Feb 2019 14:52:21 +0100
+	(envelope-from <pasic@linux.ibm.com>) id 1gudwq-00031H-I7
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:54:38 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gudwo-0002aw-IA
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:54:36 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1FDi9JE122161
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 08:54:20 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qnwn7jyje-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 08:54:19 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 15 Feb 2019 13:54:17 -0000
+Date: Fri, 15 Feb 2019 14:54:14 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190213103519.32585-1-cohuck@redhat.com>
+References: <20190213103519.32585-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1550146494-21085-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/cpumodel: Set up CPU model for
- AQIC interception
+Message-Id: <20190215145414.6f29423d@oc2783563651>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x: upgrade status of KVM
+ cores to "supported"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +40,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>, borntraeger@de.ibm.com
-Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 14.02.19 13:14, Pierre Morel wrote:
-> A new CPU model facilities is introduced to support AP devices
-> interruption interception for a KVM guest.
+On Wed, 13 Feb 2019 11:35:19 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-This sentence is confusing. At first I thought you would introduce a new
-_fake_ facility.
+> We are actually paid to look after this.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-"Let's add support for the AP-Queue interruption facility to the CPU model".
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
 
-> 
-> "APQI" for "AP-Queue Interruption" facility
-> 
-> The S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, CPU facility indicates
-> whether the PQAP instruction with the AQIC command is available
-> to the guest.
-> This feature will be enabled only if the AP instructions are
-> available on the linux host and AQIC facility is installed on
-> the host.
-> 
-> This feature must be turned on from userspace to intercept AP
-> instructions on the KVM guest. The QEMU command line to turn
-> this feature on looks something like this:
-> 
->     qemu-system-s390x ... -cpu xxx,apqi=on ...
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 > ---
->  target/s390x/cpu_features.c     | 1 +
->  target/s390x/cpu_features_def.h | 1 +
->  target/s390x/cpu_models.c       | 1 +
->  target/s390x/gen-features.c     | 1 +
->  4 files changed, 4 insertions(+)
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index 60cfeba..99bd382 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -84,6 +84,7 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("sema", S390_FEAT_TYPE_STFL, 59, "Semaphore-assist facility"),
->      FEAT_INIT("tsi", S390_FEAT_TYPE_STFL, 60, "Time-slice Instrumentation facility"),
->      FEAT_INIT("ri", S390_FEAT_TYPE_STFL, 64, "CPU runtime-instrumentation facility"),
-> +    FEAT_INIT("apqi", S390_FEAT_TYPE_STFL, 65, "AP-Queue interruption facility"),
->      FEAT_INIT("zpci", S390_FEAT_TYPE_STFL, 69, "z/PCI facility"),
->      FEAT_INIT("aen", S390_FEAT_TYPE_STFL, 71, "General-purpose-adapter-event-notification facility"),
->      FEAT_INIT("ais", S390_FEAT_TYPE_STFL, 72, "General-purpose-adapter-interruption-suppression facility"),
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index 5fc7e7b..3f22780 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -72,6 +72,7 @@ typedef enum {
->      S390_FEAT_SEMAPHORE_ASSIST,
->      S390_FEAT_TIME_SLICE_INSTRUMENTATION,
->      S390_FEAT_RUNTIME_INSTRUMENTATION,
-> +    S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL,
->      S390_FEAT_ZPCI,
->      S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
->      S390_FEAT_ADAPTER_INT_SUPPRESSION,
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 7c253ff..6b5e94b 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -788,6 +788,7 @@ static void check_consistency(const S390CPUModel *model)
->          { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
->          { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
->          { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
-> +        { S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, S390_FEAT_AP },
->      };
->      int i;
->  
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 70015ea..b051221 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -448,6 +448,7 @@ static uint16_t full_GEN12_GA1[] = {
->      S390_FEAT_EDAT_2,
->      S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
->      S390_FEAT_AP_QUERY_CONFIG_INFO,
-> +    S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL,
->      S390_FEAT_AP_FACILITIES_TEST,
->      S390_FEAT_AP,
->  };
-> 
-
-Looks good to me. In QEMU, we enable/indicate facilities only when all
-required parts were implemented on the QEMU side.
-
-Is there anything we have to do regarding
-- migration support unlocked with this facility
-- functional changes we have to implement?
-
-Or is this really a "kernel does it all, migration not relevant" ?
-
--- 
-
-Thanks,
-
-David / dhildenb
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9a76845581b1..73ff5915638e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -377,7 +377,7 @@ S390
+>  M: Halil Pasic <pasic@linux.ibm.com>
+>  M: Cornelia Huck <cohuck@redhat.com>
+>  M: Christian Borntraeger <borntraeger@de.ibm.com>
+> -S: Maintained
+> +S: Supported
+>  F: target/s390x/kvm.c
+>  F: target/s390x/kvm_s390x.h
+>  F: target/s390x/kvm-stub.c
