@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41091)
+Received: from eggs.gnu.org ([209.51.188.92]:40428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stappers@stappers.nl>) id 1guWuT-0005Uq-Iv
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 01:23:42 -0500
+	(envelope-from <jing.zhang.nokia@gmail.com>) id 1guUkQ-0007t4-O9
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 23:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stappers@stappers.nl>) id 1guWuR-00010u-8g
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 01:23:41 -0500
-Received: from gpm.stappers.nl ([2001:981:6c6a:1::49]:40143)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stappers@stappers.nl>) id 1guWuQ-0000C4-RC
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 01:23:39 -0500
-Date: Fri, 15 Feb 2019 07:23:18 +0100
-From: Geert Stappers <stappers@stappers.nl>
-Message-ID: <20190215062318.yjzevnuc3iybcaxv@gpm.stappers.nl>
-References: <20190214155714.8779-1-alex.bennee@linaro.org>
-	<bbefd980-c740-cb8f-a648-a6f51772d63d@redhat.com>
-	<8736oqhu6s.fsf@zen.linaroharston>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <8736oqhu6s.fsf@zen.linaroharston>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/block: report when pflash backing file
- isn't aligned
+	(envelope-from <jing.zhang.nokia@gmail.com>) id 1guUfj-0007d9-9p
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 23:00:19 -0500
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:37513)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jing.zhang.nokia@gmail.com>)
+	id 1guUfj-0007be-1Y
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 23:00:19 -0500
+Received: by mail-it1-x142.google.com with SMTP id l131so20170201ita.2
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 20:00:18 -0800 (PST)
+From: jing.zhang.nokia@gmail.com
+Date: Thu, 14 Feb 2019 22:56:50 -0500
+Message-Id: <1550203010-2682-1-git-send-email-jing.zhang.nokia@gmail.com>
+Subject: [Qemu-devel] [PATCH] Increase the number of RARP packets sent after
+ live migration from 5 to 10.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, pkg-qemu-devel@lists.alioth.debian.org, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Jing Zhang <jing.c.zhang@nokia.com>
 
-On Thu, Feb 14, 2019 at 10:38:35PM +0000, Alex Benn=E9e wrote:
-> Laszlo Ersek <lersek@redhat.com> writes:
-> > On 02/14/19 16:57, Alex Benn=E9e wrote:
-> >> +    /*
-> >> +     * Validate the backing store is the right size for pflash
-> >> +     * devices. It has to be padded to a multiple of the flash bloc=
-k
-> >> +     * size.
-> >> +     */
-> >> +    if (pfl->blk) {
-> >> +        uint64_t backing_len =3D blk_getlength(pfl->blk);
-> >> +        if (device_len !=3D backing_len) {
-> >> +            error_setg(errp, "backing file wrong size "
-> >> +                       "(%" PRId64 " !=3D %" PRId64")", backing_len=
-, device_len);
-> >> +            return;
-> >> +        }
-> >> +    }
-> >>
-> >>      memory_region_init_rom_device(
-> >>          &pfl->mem, OBJECT(dev),
-> >>
->=20
-> > - from a user POV, I find it more useful if the error message also sh=
-ows
-> >   which quantity is which, not just two inequal numbers.
->=20
-> How about:
->=20
->   "backing file size (%) not enough for whole device (%)"
->=20
-> ?
->=20
+From: Jing Zhang <jing.c.zhang@nokia.com>
 
-from a user POV, I find it more useful if the error messsage
-resembles the actual test in the source. Above is test   !=3D
+Signed-off-by: Jing Zhang <jing.c.zhang@nokia.com>
+---
+ include/migration/misc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-How about
-
-   "backing file size (%) not equal to whole device size (%)"
-
-?
-
-
-
-
-Groeten
-Geert Stappers
---=20
-Leven en laten leven
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 4ebf24c..353c77d 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -28,7 +28,7 @@ void blk_mig_init(void);
+ static inline void blk_mig_init(void) {}
+ #endif
+ 
+-#define SELF_ANNOUNCE_ROUNDS 5
++#define SELF_ANNOUNCE_ROUNDS 10
+ 
+ static inline
+ int64_t self_announce_delay(int round)
+-- 
+2.5.5
