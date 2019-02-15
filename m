@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45305)
+Received: from eggs.gnu.org ([209.51.188.92]:46169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gudX2-0003JU-74
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:27:57 -0500
+	(envelope-from <david@redhat.com>) id 1gudZN-0004pm-LM
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:30:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gudX1-0000Y1-8Y
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:27:56 -0500
-Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:45194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gudX1-0000QI-20
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:27:55 -0500
-Received: from player759.ha.ovh.net (unknown [10.109.143.249])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 0B7631FC6A5
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 14:27:46 +0100 (CET)
-Date: Fri, 15 Feb 2019 14:27:41 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190215142741.330f478b@bahia.lan>
-In-Reply-To: <bae9f493-b8db-d413-6ce6-b2a71356824a@kaod.org>
-References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023080049.1011724.15423463482790260696.stgit@bahia.lan>
-	<b25de46d-9449-4538-b2b5-dd18d373e6d9@kaod.org>
-	<20190215140356.7919577c@bahia.lan>
-	<bae9f493-b8db-d413-6ce6-b2a71356824a@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/10] xics: Handle KVM ICP realize from
- the common code
+	(envelope-from <david@redhat.com>) id 1gudZM-0003hq-T6
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:30:21 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 15 Feb 2019 14:29:59 +0100
+Message-Id: <20190215133005.15955-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/6] tests: Add device unplug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,132 +17,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Fri, 15 Feb 2019 14:09:53 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+This is a set of tests to test basic device unplugging functionality for
+- some PCI implementations
+- CCW devices on s390x
+- spapr memory and cpu core devices
 
-> On 2/15/19 2:03 PM, Greg Kurz wrote:
-> > On Fri, 15 Feb 2019 13:54:02 +0100
-> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >  =20
-> >> On 2/15/19 12:40 PM, Greg Kurz wrote: =20
-> >>> The realization of KVM ICP currently follows the parent_realize logic,
-> >>> which is a bit overkill here. Also we want to get rid of the KVM ICP
-> >>> class. Explicitely call icp_kvm_realize() from the base ICP realize
-> >>> function.
-> >>>
-> >>> Note that ICPStateClass::parent_realize is retained because powernv
-> >>> needs it.
-> >>>
-> >>> Signed-off-by: Greg Kurz <groug@kaod.org>>
-> >>> ---
-> >>>  hw/intc/xics.c        |    8 ++++++++
-> >>>  hw/intc/xics_kvm.c    |   10 +---------
-> >>>  include/hw/ppc/xics.h |    1 +
-> >>>  3 files changed, 10 insertions(+), 9 deletions(-)
-> >>>
-> >>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> >>> index 822d367e6388..acd63ab5e0b9 100644
-> >>> --- a/hw/intc/xics.c
-> >>> +++ b/hw/intc/xics.c
-> >>> @@ -349,6 +349,14 @@ static void icp_realize(DeviceState *dev, Error =
-**errp)
-> >>>          return;
-> >>>      }
-> >>> =20
-> >>> +    if (kvm_irqchip_in_kernel()) {
-> >>> +        icp_kvm_realize(dev, &err);   =20
-> >>
-> >> While we are at changing things, I would prefix all the KVM=20
-> >> backends routine with kvmppc_*. so that icp_kvm_realize()=20
-> >> becomes kvmppc_icp_realize()
-> >> =20
-> >=20
-> > Well... kvmppc_* routines have historically been sitting under
-> > target/ppc so I'm not sure we want to use the same prefix
-> > elsewhere... =20
->=20
-> Well, they could also be moved there but I think what is important=20
-> is that the kvmppc_* routine should be used under the kvm_enabled()=20
-> flag.=20
->=20
-> Those under target/ppc have and extra dummy stub provided for the=20
-> !kvm_enabled() case.=20
->=20
+I plaed with ACPI CPU unplug but getting that to run with qtest is more
+involved. (remove devices on reset, trick cpu-hotplug-legacy property,
+somehow create cpu hotplug state objects ...). Well we no have at least
+one unplug test for DIMMs and one for CPUs.
 
-Well, I don't really care but if we go this way (David?), I'd rather do it
-globally in a followup patch.
+@David, I dropped you t-b and r-b due to many changes but would be happy
+to readd them ;)
 
-> C.
->=20
->=20
->=20
-> >  =20
-> >> Apart from that,
-> >>
-> >> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> >>
-> >> Thanks,
-> >>
-> >> C.
-> >>
-> >> =20
-> >>> +        if (err) {
-> >>> +            error_propagate(errp, err);
-> >>> +            return;
-> >>> +        }
-> >>> +    }
-> >>> +
-> >>>      qemu_register_reset(icp_reset_handler, dev);
-> >>>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, =
-icp);
-> >>>  }
-> >>> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> >>> index 80321e9b75ab..4eebced516b6 100644
-> >>> --- a/hw/intc/xics_kvm.c
-> >>> +++ b/hw/intc/xics_kvm.c
-> >>> @@ -115,11 +115,9 @@ int icp_set_kvm_state(ICPState *icp)
-> >>>      return 0;
-> >>>  }
-> >>> =20
-> >>> -static void icp_kvm_realize(DeviceState *dev, Error **errp)
-> >>> +void icp_kvm_realize(DeviceState *dev, Error **errp)
-> >>>  {
-> >>>      ICPState *icp =3D ICP(dev);
-> >>> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
-> >>> -    Error *local_err =3D NULL;
-> >>>      CPUState *cs;
-> >>>      KVMEnabledICP *enabled_icp;
-> >>>      unsigned long vcpu_id;
-> >>> @@ -129,12 +127,6 @@ static void icp_kvm_realize(DeviceState *dev, Er=
-ror **errp)
-> >>>          abort();
-> >>>      }
-> >>> =20
-> >>> -    icpc->parent_realize(dev, &local_err);
-> >>> -    if (local_err) {
-> >>> -        error_propagate(errp, local_err);
-> >>> -        return;
-> >>> -    }
-> >>> -
-> >>>      cs =3D icp->cs;
-> >>>      vcpu_id =3D kvm_arch_vcpu_id(cs);
-> >>> =20
-> >>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> >>> index e33282a576d0..ab61dc24010a 100644
-> >>> --- a/include/hw/ppc/xics.h
-> >>> +++ b/include/hw/ppc/xics.h
-> >>> @@ -202,5 +202,6 @@ Object *icp_create(Object *cpu, const char *type,=
- XICSFabric *xi,
-> >>>  void icp_get_kvm_state(ICPState *icp);
-> >>>  int icp_set_kvm_state(ICPState *icp);
-> >>>  void icp_synchronize_state(ICPState *icp);
-> >>> +void icp_kvm_realize(DeviceState *dev, Error **errp);
-> >>> =20
-> >>>  #endif /* XICS_H */
-> >>>    =20
-> >> =20
-> >  =20
->=20
+v1 -> v2:
+- Tests for CCW, spapr memory and spapr cpu core unplug added
+- Fix a deadlock when unplugging dummy CPUs
+- Style fixes / simplifications (Thomas)
+- Don't use the global_qtest variable (Thomas)
+- Fix double-free (Greg)
+
+
+David Hildenbrand (6):
+  cpus: Properly release the iothread lock when killing a dummy VCPU
+  spapr: support memory unplug for qtest
+  tests/device-plug: Add a simple PCI unplug request test
+  tests/device-plug: Add CCW unplug test for s390x
+  tests/device-plug: Add CPU core unplug request test for spapr
+  tests/device-plug: Add memory unplug request test for spapr
+
+ cpus.c                   |   1 +
+ hw/ppc/spapr_ovec.c      |   6 ++
+ tests/Makefile.include   |   4 +
+ tests/device-plug-test.c | 165 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 176 insertions(+)
+ create mode 100644 tests/device-plug-test.c
+
+-- 
+2.17.2
