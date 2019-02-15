@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51126)
+Received: from eggs.gnu.org ([209.51.188.92]:51931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gubrX-0004sY-BU
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:41:01 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gubu0-0006xn-6x
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:43:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gubrU-0006LA-Mo
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:40:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gubrU-00062U-9C
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:40:56 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FBY6gi078029
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 06:40:37 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qntdh6ybb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 06:40:36 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 15 Feb 2019 11:40:34 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 15 Feb 2019 12:40:30 +0100
-In-Reply-To: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
+	(envelope-from <mlureau@redhat.com>) id 1gubtu-0000iC-Bj
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:43:28 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:41195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gubts-0000cG-GZ
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:43:24 -0500
+Received: by mail-qt1-f196.google.com with SMTP id v10so10468436qtp.8
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:43:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <155023082996.1011724.16237920586343905010.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH 08/10] xics: Handle KVM interrupt presentation
- from "simple" ICS code
+References: <20190214201939.494-1-philmd@redhat.com>
+	<20190214201939.494-5-philmd@redhat.com>
+In-Reply-To: <20190214201939.494-5-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 15 Feb 2019 12:43:12 +0100
+Message-ID: <CAMxuvazqxBh5Ma7BrisUQdFrm-hF3tvr9O9=zNBZbE2inc0bHQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/9] ccid-card-passthru: Let the
+ chardev::read() be more generic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,87 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-We want to use the "simple" ICS type in both KVM and non-KVM setups.
-Teach the "simple" ICS how to present interrupts to KVM and adapt
-sPAPR accordingly.
+Hi
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/intc/xics.c        |    5 +++++
- hw/intc/xics_kvm.c    |    3 +--
- hw/ppc/spapr_irq.c    |    7 +------
- include/hw/ppc/xics.h |    2 +-
- 4 files changed, 8 insertions(+), 9 deletions(-)
+On Thu, Feb 14, 2019 at 9:20 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/usb/ccid-card-passthru.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+> index 0c44b38fc2..ba7c285ded 100644
+> --- a/hw/usb/ccid-card-passthru.c
+> +++ b/hw/usb/ccid-card-passthru.c
+> @@ -285,8 +285,14 @@ static void ccid_card_vscard_read(void *opaque, cons=
+t uint8_t *buf, int size)
+>          card->vscard_in_hdr +=3D hdr->length + sizeof(VSCMsgHeader);
+>          hdr =3D (VSCMsgHeader *)(card->vscard_in_data + card->vscard_in_=
+hdr);
+>      }
+> -    if (card->vscard_in_hdr =3D=3D card->vscard_in_pos) {
+> -        card->vscard_in_pos =3D card->vscard_in_hdr =3D 0;
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 49401745c410..3009fa747277 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -466,6 +466,11 @@ void ics_simple_set_irq(void *opaque, int srcno, int val)
- {
-     ICSState *ics = (ICSState *)opaque;
- 
-+    if (kvm_irqchip_in_kernel()) {
-+        ics_kvm_set_irq(ics, srcno, val);
-+        return;
-+    }
-+
-     if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-         ics_simple_set_irq_lsi(ics, srcno, val);
-     } else {
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index e7b8d4c29ce6..f34eacda03e7 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -259,9 +259,8 @@ int ics_set_kvm_state(ICSState *ics)
-     return 0;
- }
- 
--void ics_kvm_set_irq(void *opaque, int srcno, int val)
-+void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
- {
--    ICSState *ics = opaque;
-     struct kvm_irq_level args;
-     int rc;
- 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index e6893df61e76..9f43b7b3bf16 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -222,13 +222,8 @@ static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int version_id)
- static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
- {
-     sPAPRMachineState *spapr = opaque;
--    MachineState *machine = MACHINE(opaque);
- 
--    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
--        ics_kvm_set_irq(spapr->ics, srcno, val);
--    } else {
--        ics_simple_set_irq(spapr->ics, srcno, val);
--    }
-+    ics_simple_set_irq(spapr->ics, srcno, val);
- }
- 
- static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 06e87128f88e..61bd0fb9784f 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -180,7 +180,6 @@ void icp_eoi(ICPState *icp, uint32_t xirr);
- void ics_simple_write_xive(ICSState *ics, int nr, int server,
-                            uint8_t priority, uint8_t saved_priority);
- void ics_simple_set_irq(void *opaque, int srcno, int val);
--void ics_kvm_set_irq(void *opaque, int srcno, int val);
- 
- void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
- void icp_pic_print_info(ICPState *icp, Monitor *mon);
-@@ -201,5 +200,6 @@ void icp_kvm_realize(DeviceState *dev, Error **errp);
- void ics_get_kvm_state(ICSState *ics);
- int ics_set_kvm_state(ICSState *ics);
- void ics_synchronize_state(ICSState *ics);
-+void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
- 
- #endif /* XICS_H */
+Interesting, it looks like we could end in a blocking condition today.
+
+card->vscard_in_pos - card->vscard_in_hdr could not have enough room
+to process an incoming message. After filling the buffer, it would
+stop reading.
+
+> +
+> +    /* Drop any messages that were fully processed.  */
+> +    if (card->vscard_in_hdr > 0) {
+> +        memmove(card->vscard_in_data,
+> +                card->vscard_in_data + card->vscard_in_hdr,
+> +                card->vscard_in_pos - card->vscard_in_hdr);
+> +        card->vscard_in_pos -=3D card->vscard_in_hdr;
+> +        card->vscard_in_hdr =3D 0;
+>      }
+>  }
+
+At least, by moving data around, this would leave always enough space
+for the header to be fully read.
+
+But I think we should add a condition like
+card->vscard_in_hdr + hdr->length + sizeof(VSCMsgHeader) <=3D
+VSCARD_IN_SIZE, to make sure the incoming message fits in the
+vscard_in_data buffer, else disconnect?
+
+>
+> --
+> 2.20.1
+>
