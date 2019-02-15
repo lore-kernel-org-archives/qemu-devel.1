@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33648)
+Received: from eggs.gnu.org ([209.51.188.92]:33534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugrI-00022h-L5
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:05 -0500
+	(envelope-from <clg@kaod.org>) id 1gugrD-0001tX-Lj
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugrG-0005v7-EN
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55640
+	(envelope-from <clg@kaod.org>) id 1gugrB-0005iK-Kw
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49108
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugrF-0005Js-Q6
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:01 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGxnOQ096133
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:47 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qp0u6spem-1
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugr9-0005I8-K3
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:55 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1FGxuYw141229
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:46 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0ga3ek2-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:46 -0500
 Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 17:00:44 -0000
+	Fri, 15 Feb 2019 17:00:43 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 18:00:28 +0100
+Date: Fri, 15 Feb 2019 18:00:27 +0100
 In-Reply-To: <20190215170029.15641-1-clg@kaod.org>
 References: <20190215170029.15641-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215170029.15641-12-clg@kaod.org>
+Message-Id: <20190215170029.15641-11-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/12] target/ppc: Support for POWER9 native
- hash
+Subject: [Qemu-devel] [PATCH 10/12] target/ppc: Rename PATB/PATBE -> PATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,188 +45,301 @@ Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-d
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-(Might need more patch splitting)
+That "b" means "base address" and thus shouldn't be in the name
+of actual entries and related constants.
+
+This patch keeps the synthetic patb_entry field of the spapr
+virtual hypervisor unchanged until I figure out if that has
+an impact on the migration stream.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/mmu-book3s-v3.h | 45 ++++++++++++++++++++++++++++++++++++++
- target/ppc/mmu-hash64.h    | 19 +---------------
- target/ppc/mmu-book3s-v3.c | 18 +++++++++++++++
- target/ppc/mmu-hash64.c    |  6 +++--
- 4 files changed, 68 insertions(+), 20 deletions(-)
+ target/ppc/cpu.h           |  6 +++++-
+ target/ppc/mmu-book3s-v3.h | 11 ++++++++++-
+ target/ppc/mmu-radix64.h   |  4 ++--
+ hw/ppc/spapr.c             | 24 +++++++++++++++---------
+ hw/ppc/spapr_hcall.c       | 22 ++++++++++++----------
+ target/ppc/mmu-radix64.c   | 18 ++++++++++--------
+ 6 files changed, 54 insertions(+), 31 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index e7c9ca8f5f84..e1fee1a03496 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -317,6 +317,10 @@ struct ppc_slb_t {
+ #define SEGMENT_SHIFT_1T        40
+ #define SEGMENT_MASK_1T         (~((1ULL << SEGMENT_SHIFT_1T) - 1))
+=20
++typedef struct ppc_v3_pate_t {
++    uint64_t dw0;
++    uint64_t dw1;
++} ppc_v3_pate_t;
+=20
+ /***********************************************************************=
+******/
+ /* Machine state register bits definition                               =
+     */
+@@ -1239,7 +1243,7 @@ struct PPCVirtualHypervisorClass {
+                         hwaddr ptex, int n);
+     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+                        uint64_t pte0, uint64_t pte1);
+-    uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
++    void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
+     target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
+ };
+=20
 diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-index 8474dfec41d9..f423d51f68ab 100644
+index 216ff296c088..8474dfec41d9 100644
 --- a/target/ppc/mmu-book3s-v3.h
 +++ b/target/ppc/mmu-book3s-v3.h
-@@ -55,6 +55,9 @@ static inline bool ppc64_use_proc_tbl(PowerPCCPU *cpu)
-     return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
- }
+@@ -32,7 +32,16 @@
+ #define PTCR_PATS               0x000000000000001FULL /* Partition Table=
+ Size */
 =20
-+bool ppc64_v3_get_pate(PowerPCCPU *cpu, target_ulong lpid,
-+                       ppc_v3_pate_t *entry);
+ /* Partition Table Entry Fields */
+-#define PATBE1_GR 0x8000000000000000
++#define PATE0_HR 0x8000000000000000
 +
- /*
-  * The LPCR:HR bit is a shortcut that avoids having to
-  * dig out the partition table in the fast path. This is
-@@ -82,6 +85,48 @@ hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, v=
-addr eaddr);
- int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-                               int mmu_idx);
++/*
++ * WARNING: This field doesn't actually exist in the final version of
++ * the architecture and is unused by hardware. However, qemu uses it
++ * as an indication of a radix guest in the pseudo-PATB entry that it
++ * maintains for SPAPR guests and in the migration stream, so we need
++ * to keep it around
++ */
++#define PATE1_GR 0x8000000000000000
 =20
-+static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
-+{
-+    uint64_t base;
-+
-+    if (cpu->vhyp) {
-+        return 0;
-+    }
-+    if (cpu->env.mmu_model =3D=3D POWERPC_MMU_3_00) {
-+        ppc_v3_pate_t pate;
-+
-+        if (!ppc64_v3_get_pate(cpu, cpu->env.spr[SPR_LPIDR], &pate)) {
-+            return 0;
-+        }
-+        base =3D pate.dw0;
-+    } else {
-+        base =3D cpu->env.spr[SPR_SDR1];
-+    }
-+    return base & SDR_64_HTABORG;
-+}
-+
-+static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
-+{
-+    uint64_t base;
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =3D
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        return vhc->hpt_mask(cpu->vhyp);
-+    }
-+    if (cpu->env.mmu_model =3D=3D POWERPC_MMU_3_00) {
-+        ppc_v3_pate_t pate;
-+
-+        if (!ppc64_v3_get_pate(cpu, cpu->env.spr[SPR_LPIDR], &pate)) {
-+            return 0;
-+        }
-+        base =3D pate.dw0;
-+    } else {
-+        base =3D cpu->env.spr[SPR_SDR1];
-+    }
-+    return (1ULL << ((base & SDR_64_HTABSIZE) + 18 - 7)) - 1;
-+}
-+
- #endif /* TARGET_PPC64 */
+ /* Process Table Entry */
+ struct prtb_entry {
+diff --git a/target/ppc/mmu-radix64.h b/target/ppc/mmu-radix64.h
+index 0ecf063a1751..96228546aa85 100644
+--- a/target/ppc/mmu-radix64.h
++++ b/target/ppc/mmu-radix64.h
+@@ -12,8 +12,8 @@
+ #define R_EADDR_QUADRANT3       0xC000000000000000
 =20
- #endif /* CONFIG_USER_ONLY */
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 016d6b44ee75..6b555b72200f 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -63,6 +63,7 @@ void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
- #define SDR_64_HTABORG         0x0FFFFFFFFFFC0000ULL
- #define SDR_64_HTABSIZE        0x000000000000001FULL
+ /* Radix Partition Table Entry Fields */
+-#define PATBE1_R_PRTB           0x0FFFFFFFFFFFF000
+-#define PATBE1_R_PRTS           0x000000000000001F
++#define PATE1_R_PRTB           0x0FFFFFFFFFFFF000
++#define PATE1_R_PRTS           0x000000000000001F
 =20
-+#define PATE0_HTABORG           0x0FFFFFFFFFFC0000ULL
- #define HPTES_PER_GROUP         8
- #define HASH_PTE_SIZE_64        16
- #define HASH_PTEG_SIZE_64       (HASH_PTE_SIZE_64 * HPTES_PER_GROUP)
-@@ -107,24 +108,6 @@ void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
- #define HPTE64_R_3_0_SSIZE_SHIFT 58
- #define HPTE64_R_3_0_SSIZE_MASK (3ULL << HPTE64_R_3_0_SSIZE_SHIFT)
-=20
--static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
--{
--    if (cpu->vhyp) {
--        return 0;
--    }
--    return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
--}
--
--static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
--{
--    if (cpu->vhyp) {
--        PPCVirtualHypervisorClass *vhc =3D
--            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
--        return vhc->hpt_mask(cpu->vhyp);
--    }
--    return (1ULL << ((cpu->env.spr[SPR_SDR1] & SDR_64_HTABSIZE) + 18 - 7=
-)) - 1;
--}
--
- struct ppc_hash_pte64 {
-     uint64_t pte0, pte1;
- };
-diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
-index ccbae3213cc1..400529d683cf 100644
---- a/target/ppc/mmu-book3s-v3.c
-+++ b/target/ppc/mmu-book3s-v3.c
-@@ -39,3 +39,21 @@ hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, v=
-addr eaddr)
-         return ppc_hash64_get_phys_page_debug(cpu, eaddr);
+ /* Radix Process Table Entry Fields */
+ #define PRTBE_R_GET_RTS(rts) \
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 1afe31ee6163..c77507b82473 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1403,11 +1403,13 @@ void spapr_set_all_lpcrs(target_ulong value, targ=
+et_ulong mask)
      }
  }
-+
-+bool ppc64_v3_get_pate(PowerPCCPU *cpu, target_ulong lpid, ppc_v3_pate_t=
- *entry)
-+{
-+    uint64_t patb =3D cpu->env.spr[SPR_PTCR] & PTCR_PATB;
-+    uint64_t pats =3D cpu->env.spr[SPR_PTCR] & PTCR_PATS;
-+
-+    /* Calculate number of entries */
-+    pats =3D 1ull << (pats + 12 - 4);
-+    if (pats <=3D lpid) {
-+        return false;
-+    }
-+
-+    /* Grab entry */
-+    patb +=3D 16 * lpid;
-+    entry->dw0 =3D ldq_phys(CPU(cpu)->as, patb);
-+    entry->dw1 =3D ldq_phys(CPU(cpu)->as, patb + 8);
-+    return true;
-+}
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 9afaab8a177c..a401f257a34f 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -416,7 +416,7 @@ const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCC=
-PU *cpu,
-                                              hwaddr ptex, int n)
+=20
+-static uint64_t spapr_get_patbe(PPCVirtualHypervisor *vhyp)
++static void spapr_get_pate(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *en=
+try)
  {
-     hwaddr pte_offset =3D ptex * HASH_PTE_SIZE_64;
--    hwaddr base =3D ppc_hash64_hpt_base(cpu);
-+    hwaddr base;
-     hwaddr plen =3D n * HASH_PTE_SIZE_64;
-     const ppc_hash_pte64_t *hptes;
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(vhyp);
 =20
-@@ -425,6 +425,7 @@ const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCC=
-PU *cpu,
-             PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-         return vhc->map_hptes(cpu->vhyp, ptex, n);
+-    return spapr->patb_entry;
++    /* Copy PATE1:GR into PATE0:HR */
++    entry->dw0 =3D spapr->patb_entry & PATE0_HR;
++    entry->dw1 =3D spapr->patb_entry;
+ }
+=20
+ #define HPTE(_table, _i)   (void *)(((uint64_t *)(_table)) + ((_i) * 2))
+@@ -1650,17 +1652,21 @@ static void spapr_machine_reset(void)
+     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
+         ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_0=
+0, 0,
+                               spapr->max_compat_pvr)) {
+-        /* If using KVM with radix mode available, VCPUs can be started
++        /*
++         * If using KVM with radix mode available, VCPUs can be started
+          * without a HPT because KVM will start them in radix mode.
+-         * Set the GR bit in PATB so that we know there is no HPT. */
+-        spapr->patb_entry =3D PATBE1_GR;
++         * Set the GR bit in PATE so that we know there is no HPT.
++         */
++        spapr->patb_entry =3D PATE1_GR;
+         spapr_set_all_lpcrs(LPCR_HR | LPCR_UPRT, LPCR_HR | LPCR_UPRT);
+     } else {
+         spapr_setup_hpt_and_vrma(spapr);
      }
-+    base =3D ppc_hash64_hpt_base(cpu);
 =20
-     if (!base) {
-         return NULL;
-@@ -928,7 +929,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
-, target_ulong addr)
- void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-                            uint64_t pte0, uint64_t pte1)
+-    /* if this reset wasn't generated by CAS, we should reset our
+-     * negotiated options and start from scratch */
++    /*
++     * If this reset wasn't generated by CAS, we should reset our
++     * negotiated options and start from scratch
++     */
+     if (!spapr->cas_reboot) {
+         spapr_ovec_cleanup(spapr->ov5_cas);
+         spapr->ov5_cas =3D spapr_ovec_new();
+@@ -1810,7 +1816,7 @@ static int spapr_post_load(void *opaque, int versio=
+n_id)
+=20
+     if (kvm_enabled() && spapr->patb_entry) {
+         PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+-        bool radix =3D !!(spapr->patb_entry & PATBE1_GR);
++        bool radix =3D !!(spapr->patb_entry & PATE1_GR);
+         bool gtse =3D !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
+=20
+         /*
+@@ -4060,7 +4066,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     vhc->map_hptes =3D spapr_map_hptes;
+     vhc->unmap_hptes =3D spapr_unmap_hptes;
+     vhc->store_hpte =3D spapr_store_hpte;
+-    vhc->get_patbe =3D spapr_get_patbe;
++    vhc->get_pate =3D spapr_get_pate;
+     vhc->encode_hpt_for_kvm_pr =3D spapr_encode_hpt_for_kvm_pr;
+     xic->ics_get =3D spapr_ics_get;
+     xic->ics_resend =3D spapr_ics_resend;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 2f64c69a6abf..54922b50aadb 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1310,12 +1310,12 @@ static void spapr_check_setup_free_hpt(sPAPRMachi=
+neState *spapr,
+      *       later and so assumed radix and now it's called H_REG_PROC_T=
+BL
+      */
+=20
+-    if ((patbe_old & PATBE1_GR) =3D=3D (patbe_new & PATBE1_GR)) {
++    if ((patbe_old & PATE1_GR) =3D=3D (patbe_new & PATE1_GR)) {
+         /* We assume RADIX, so this catches all the "Do Nothing" cases *=
+/
+-    } else if (!(patbe_old & PATBE1_GR)) {
++    } else if (!(patbe_old & PATE1_GR)) {
+         /* HASH->RADIX : Free HPT */
+         spapr_free_hpt(spapr);
+-    } else if (!(patbe_new & PATBE1_GR)) {
++    } else if (!(patbe_new & PATE1_GR)) {
+         /* RADIX->HASH || NOTHING->HASH : Allocate HPT */
+         spapr_setup_hpt_and_vrma(spapr);
+     }
+@@ -1353,7 +1353,7 @@ static target_ulong h_register_process_table(PowerP=
+CCPU *cpu,
+                 } else if (table_size > 24) {
+                     return H_P4;
+                 }
+-                cproc =3D PATBE1_GR | proc_tbl | table_size;
++                cproc =3D PATE1_GR | proc_tbl | table_size;
+             } else { /* Register new HPT process table */
+                 if (flags & FLAG_HASH_PROC_TBL) { /* Hash with Segment T=
+ables */
+                     /* TODO - Not Supported */
+@@ -1372,13 +1372,15 @@ static target_ulong h_register_process_table(Powe=
+rPCCPU *cpu,
+             }
+=20
+         } else { /* Deregister current process table */
+-            /* Set to benign value: (current GR) | 0. This allows
+-             * deregistration in KVM to succeed even if the radix bit in=
+ flags
+-             * doesn't match the radix bit in the old PATB. */
+-            cproc =3D spapr->patb_entry & PATBE1_GR;
++            /*
++             * Set to benign value: (current GR) | 0. This allows
++             * deregistration in KVM to succeed even if the radix bit
++             * in flags doesn't match the radix bit in the old PATE.
++             */
++            cproc =3D spapr->patb_entry & PATE1_GR;
+         }
+     } else { /* Maintain current registration */
+-        if (!(flags & FLAG_RADIX) !=3D !(spapr->patb_entry & PATBE1_GR))=
  {
--    hwaddr base =3D ppc_hash64_hpt_base(cpu);
-+    hwaddr base;
-     hwaddr offset =3D ptex * HASH_PTE_SIZE_64;
++        if (!(flags & FLAG_RADIX) !=3D !(spapr->patb_entry & PATE1_GR)) =
+{
+             /* Technically caused by flag bits =3D> H_PARAMETER */
+             return H_PARAMETER; /* Existing Process Table Mismatch */
+         }
+@@ -1615,7 +1617,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+     if (!spapr->cas_reboot) {
+         /* If spapr_machine_reset() did not set up a HPT but one is nece=
+ssary
+          * (because the guest isn't going to use radix) then set it up h=
+ere. */
+-        if ((spapr->patb_entry & PATBE1_GR) && !guest_radix) {
++        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
+             /* legacy hash or new hash: */
+             spapr_setup_hpt_and_vrma(spapr);
+         }
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index 5881efeb8598..f596f3c7774e 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -193,8 +193,9 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vad=
+dr eaddr, int rwx,
+     PPCVirtualHypervisorClass *vhc =3D
+         PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+     hwaddr raddr, pte_addr;
+-    uint64_t lpid =3D 0, pid =3D 0, offset, size, patbe, prtbe0, pte;
++    uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
+     int page_size, prot, fault_cause =3D 0;
++    ppc_v3_pate_t pate;
 =20
-     if (cpu->vhyp) {
-@@ -937,6 +938,7 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr pt=
-ex,
-         vhc->store_hpte(cpu->vhyp, ptex, pte0, pte1);
-         return;
+     assert((rwx =3D=3D 0) || (rwx =3D=3D 1) || (rwx =3D=3D 2));
+     assert(!msr_hv); /* For now there is no Radix PowerNV Support */
+@@ -219,17 +220,17 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, v=
+addr eaddr, int rwx,
      }
-+    base =3D ppc_hash64_hpt_base(cpu);
 =20
-     stq_phys(CPU(cpu)->as, base + offset, pte0);
-     stq_phys(CPU(cpu)->as, base + offset + HASH_PTE_SIZE_64 / 2, pte1);
+     /* Get Process Table */
+-    patbe =3D vhc->get_patbe(cpu->vhyp);
++    vhc->get_pate(cpu->vhyp, &pate);
+=20
+     /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
+     offset =3D pid * sizeof(struct prtb_entry);
+-    size =3D 1ULL << ((patbe & PATBE1_R_PRTS) + 12);
++    size =3D 1ULL << ((pate.dw1 & PATE1_R_PRTS) + 12);
+     if (offset >=3D size) {
+         /* offset exceeds size of the process table */
+         ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
+         return 1;
+     }
+-    prtbe0 =3D ldq_phys(cs->as, (patbe & PATBE1_R_PRTB) + offset);
++    prtbe0 =3D ldq_phys(cs->as, (pate.dw1 & PATE1_R_PRTB) + offset);
+=20
+     /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+     page_size =3D PRTBE_R_GET_RTS(prtbe0);
+@@ -257,8 +258,9 @@ hwaddr ppc_radix64_get_phys_page_debug(PowerPCCPU *cp=
+u, target_ulong eaddr)
+     PPCVirtualHypervisorClass *vhc =3D
+         PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+     hwaddr raddr, pte_addr;
+-    uint64_t lpid =3D 0, pid =3D 0, offset, size, patbe, prtbe0, pte;
++    uint64_t lpid =3D 0, pid =3D 0, offset, size, prtbe0, pte;
+     int page_size, fault_cause =3D 0;
++    ppc_v3_pate_t pate;
+=20
+     /* Handle Real Mode */
+     if (msr_dr =3D=3D 0) {
+@@ -272,16 +274,16 @@ hwaddr ppc_radix64_get_phys_page_debug(PowerPCCPU *=
+cpu, target_ulong eaddr)
+     }
+=20
+     /* Get Process Table */
+-    patbe =3D vhc->get_patbe(cpu->vhyp);
++    vhc->get_pate(cpu->vhyp, &pate);
+=20
+     /* Index Process Table by PID to Find Corresponding Process Table En=
+try */
+     offset =3D pid * sizeof(struct prtb_entry);
+-    size =3D 1ULL << ((patbe & PATBE1_R_PRTS) + 12);
++    size =3D 1ULL << ((pate.dw1 & PATE1_R_PRTS) + 12);
+     if (offset >=3D size) {
+         /* offset exceeds size of the process table */
+         return -1;
+     }
+-    prtbe0 =3D ldq_phys(cs->as, (patbe & PATBE1_R_PRTB) + offset);
++    prtbe0 =3D ldq_phys(cs->as, (pate.dw1 & PATE1_R_PRTB) + offset);
+=20
+     /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+     page_size =3D PRTBE_R_GET_RTS(prtbe0);
 --=20
 2.20.1
