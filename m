@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52323)
+Received: from eggs.gnu.org ([209.51.188.92]:52509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gubvb-0008MS-AC
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:45:12 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gubwK-0000Xl-14
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gubvU-00032T-AA
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:45:06 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:39997)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gubvQ-0002wJ-1t
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:45:02 -0500
-Received: by mail-qt1-f196.google.com with SMTP id j36so10459744qta.7
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:44:57 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gubwH-0003rD-RL
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:45:55 -0500
+Date: Fri, 15 Feb 2019 12:45:34 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190215124534.48cadc1e@Igors-MacBook-Pro.local>
+In-Reply-To: <CAFEAcA8Jh6B+aOJMEAgQWhbuun6e5HSVRZ1+k5adO9PcgGua4g@mail.gmail.com>
+References: <20190214140714.15738-1-imammedo@redhat.com>
+	<CAFEAcA8Jh6B+aOJMEAgQWhbuun6e5HSVRZ1+k5adO9PcgGua4g@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190214201939.494-1-philmd@redhat.com>
-	<20190214201939.494-6-philmd@redhat.com>
-In-Reply-To: <20190214201939.494-6-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 15 Feb 2019 12:44:46 +0100
-Message-ID: <CAMxuvawp4uYL=bS3Sr_Pgi3cw=cGuNVJd=bsaRc+vibvx-qv6Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] ccid-card-passthru: Replace
- assert() by QEMU_BUILD_BUG_ON()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead
+ of memory_region_allocate_system_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, Feb 14, 2019 at 9:20 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Thu, 14 Feb 2019 18:30:37 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> On Thu, 14 Feb 2019 at 14:07, Igor Mammedov <imammedo@redhat.com> wrote:
+> > Also some boards (ab)use memory_region_allocate_system_memory(), calling it several
+> > times to allocate various fixed sized chunks of RAM and ROMs, which is problematic
+> > to map to a single initial RAM Machine::memdev backend and is currently broken if
+> > -mem-path points to a not hugepage pool.
+> 
+> These boards are buggy and we could fix them, if we wanted to
+> keep the existing API. We should in that case add assertions
+> that memory_region_allocate_system_memory() is called once and
+> only once, which would let "make check" enforce the rule.
+we can do this, but I'd rather remove memory_region_allocate_system_memory() API
+altogether which looks like overkill for most boards and use simpler memory_region_init_ram().
+Then boards that need numa/hugepages could be switched to newer memdev/device model
+instead of using memory_region_init_ram() directly.
 
-> ---
->  hw/usb/ccid-card-passthru.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-> index ba7c285ded..ccc3ffa7fa 100644
-> --- a/hw/usb/ccid-card-passthru.c
-> +++ b/hw/usb/ccid-card-passthru.c
-> @@ -29,6 +29,9 @@ do {                                                   =
- \
->  #define D_MORE_INFO 3
->  #define D_VERBOSE 4
->
-> +/* maximum size of ATR - from 7816-3 */
-> +#define MAX_ATR_SIZE        40
-> +
->  /* TODO: do we still need this? */
->  static const uint8_t DEFAULT_ATR[] =3D {
->  /*
-> @@ -41,10 +44,9 @@ static const uint8_t DEFAULT_ATR[] =3D {
->   0x13, 0x08
->  };
->
-> -#define VSCARD_IN_SIZE      (64 * KiB)
-> +QEMU_BUILD_BUG_ON(sizeof(DEFAULT_ATR) > MAX_ATR_SIZE);
->
-> -/* maximum size of ATR - from 7816-3 */
-> -#define MAX_ATR_SIZE        40
-> +#define VSCARD_IN_SIZE      (64 * KiB)
->
->  typedef struct PassthruState PassthruState;
->
-> @@ -351,7 +353,6 @@ static void passthru_realize(CCIDCardState *base, Err=
-or **errp)
->      }
->      card->debug =3D parse_debug_env("QEMU_CCID_PASSTHRU_DEBUG", D_VERBOS=
-E,
->                                    card->debug);
-> -    assert(sizeof(DEFAULT_ATR) <=3D MAX_ATR_SIZE);
->      memcpy(card->atr, DEFAULT_ATR, sizeof(DEFAULT_ATR));
->      card->atr_length =3D sizeof(DEFAULT_ATR);
->  }
-> --
-> 2.20.1
->
+My end-goal in all this exercise is to switch initial RAM to frontend/backend
+model and replace adhoc legacy numa memory code (-numa node,mem=size  & default numa splitting)
+handling with a generic device or memdev based one.
+
+> 
+> thanks
+> - PMM
