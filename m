@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33336)
+Received: from eggs.gnu.org ([209.51.188.92]:33388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugr3-0001oa-LL
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:50 -0500
+	(envelope-from <clg@kaod.org>) id 1gugr7-0001pm-OA
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugr1-0005K6-LP
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47986
+	(envelope-from <clg@kaod.org>) id 1gugr5-0005TF-KQ
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55158
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugr0-0005ED-Bj
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:47 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FH03Et142022
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:44 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0ga3ej7-1
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugr3-0005Gu-KO
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:49 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1FGxni5096149
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:45 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qp0u6spea-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:44 -0500
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:45 -0500
 Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 17:00:42 -0000
+	Fri, 15 Feb 2019 17:00:43 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 18:00:23 +0100
+Date: Fri, 15 Feb 2019 18:00:22 +0100
 In-Reply-To: <20190215170029.15641-1-clg@kaod.org>
 References: <20190215170029.15641-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215170029.15641-7-clg@kaod.org>
+Message-Id: <20190215170029.15641-6-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/12] target/ppc: Fix ordering of hash MMU
- accesses
+Subject: [Qemu-devel] [PATCH 05/12] target/ppc: Cleanup 64-bit MMU includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,95 +45,83 @@ Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-d
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-With mttcg, we can have MMU lookups happening at the same time
-as the guest modifying the page tables.
-
-Since the HPTEs of the hash table MMU contains two words (or
-double worlds on 64-bit), we need to make sure we read them
-in the right order, with the correct memory barrier.
-
-Additionally, when using emulated SPAPR mode, the hypercalls
-writing to the hash table must also perform the udpates in
-the right order.
-
-Note: This part is still not entirely correct
+To enable inlining more things, move #include of mmu-hash64.h and
+mmu-radix64.h to mmu-book3s-v3.h
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr.c          | 21 +++++++++++++++++++--
- target/ppc/mmu-hash32.c |  6 ++++++
- target/ppc/mmu-hash64.c |  6 ++++++
- 3 files changed, 31 insertions(+), 2 deletions(-)
+ target/ppc/mmu-book3s-v3.h | 3 +++
+ hw/ppc/spapr_hcall.c       | 1 -
+ target/ppc/mmu-book3s-v3.c | 2 --
+ target/ppc/mmu-hash64.c    | 1 -
+ target/ppc/mmu-radix64.c   | 1 -
+ 5 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 60572eb59275..1afe31ee6163 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1507,8 +1507,25 @@ static void spapr_store_hpte(PPCVirtualHypervisor =
-*vhyp, hwaddr ptex,
-     if (!spapr->htab) {
-         kvmppc_write_hpte(ptex, pte0, pte1);
-     } else {
--        stq_p(spapr->htab + offset, pte0);
--        stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-+        if (pte0 & HPTE64_V_VALID) {
-+            stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-+            /*
-+             * When setting valid, we write PTE1 first. This ensures
-+             * proper synchronization with the reading code in
-+             * ppc_hash64_pteg_search()
-+             */
-+            smp_wmb();
-+            stq_p(spapr->htab + offset, pte0);
-+        } else {
-+            stq_p(spapr->htab + offset, pte0);
-+            /*
-+             * When clearing it we set PTE0 first. This ensures proper
-+             * synchronization with the reading code in
-+             * ppc_hash64_pteg_search()
-+             */
-+            smp_wmb();
-+            stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-+        }
-     }
- }
+diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
+index 12ec0054c207..4e59742d7eac 100644
+--- a/target/ppc/mmu-book3s-v3.h
++++ b/target/ppc/mmu-book3s-v3.h
+@@ -22,6 +22,9 @@
 =20
-diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
-index 03ae3c127985..e8562a7c8780 100644
---- a/target/ppc/mmu-hash32.c
-+++ b/target/ppc/mmu-hash32.c
-@@ -319,6 +319,12 @@ static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu=
-, hwaddr pteg_off,
+ #ifndef CONFIG_USER_ONLY
 =20
-     for (i =3D 0; i < HPTES_PER_GROUP; i++) {
-         pte0 =3D ppc_hash32_load_hpte0(cpu, pte_offset);
-+        /*
-+         * pte0 contains the valid bit and must be read before pte1,
-+         * otherwise we might see an old pte1 with a new valid bit and
-+         * thus an inconsistent hpte value
-+         */
-+        smp_rmb();
-         pte1 =3D ppc_hash32_load_hpte1(cpu, pte_offset);
++#include "mmu-hash64.h"
++#include "mmu-radix64.h"
++
+ /*
+  * Partition table definitions
+  */
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index b47241ace62a..2f64c69a6abf 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -9,7 +9,6 @@
+ #include "helper_regs.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/spapr_cpu_core.h"
+-#include "mmu-hash64.h"
+ #include "cpu-models.h"
+ #include "trace.h"
+ #include "kvm_ppc.h"
+diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
+index a174e7efc57c..ccbae3213cc1 100644
+--- a/target/ppc/mmu-book3s-v3.c
++++ b/target/ppc/mmu-book3s-v3.c
+@@ -19,9 +19,7 @@
 =20
-         if ((pte0 & HPTE32_V_VALID)
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "mmu-hash64.h"
+ #include "mmu-book3s-v3.h"
+-#include "mmu-radix64.h"
+=20
+ int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                               int mmu_idx)
 diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index f6c822ef917b..b3c4d33faa55 100644
+index 1175b991d994..f6c822ef917b 100644
 --- a/target/ppc/mmu-hash64.c
 +++ b/target/ppc/mmu-hash64.c
-@@ -506,6 +506,12 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu=
-, hwaddr hash,
-     }
-     for (i =3D 0; i < HPTES_PER_GROUP; i++) {
-         pte0 =3D ppc_hash64_hpte0(cpu, pteg, i);
-+        /*
-+         * pte0 contains the valid bit and must be read before pte1,
-+         * otherwise we might see an old pte1 with a new valid bit and
-+         * thus an inconsistent hpte value
-+         */
-+        smp_rmb();
-         pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
+@@ -24,7 +24,6 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/hw_accel.h"
+ #include "kvm_ppc.h"
+-#include "mmu-hash64.h"
+ #include "exec/log.h"
+ #include "hw/hw.h"
+ #include "mmu-book3s-v3.h"
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index ab76cbc83530..5881efeb8598 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -25,7 +25,6 @@
+ #include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "exec/log.h"
+-#include "mmu-radix64.h"
+ #include "mmu-book3s-v3.h"
 =20
-         /* This compares V, B, H (secondary) and the AVPN */
+ static bool ppc_radix64_get_fully_qualified_addr(CPUPPCState *env, vaddr=
+ eaddr,
 --=20
 2.20.1
