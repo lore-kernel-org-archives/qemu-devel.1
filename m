@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37147)
+Received: from eggs.gnu.org ([209.51.188.92]:37156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1guh5l-0005SQ-F7
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:16:02 -0500
+	(envelope-from <berrange@redhat.com>) id 1guh5l-0005Sn-QZ
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1guh5k-0006a5-5R
+	(envelope-from <berrange@redhat.com>) id 1guh5k-0006bH-DW
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:16:01 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 15 Feb 2019 17:14:35 +0000
-Message-Id: <20190215171436.30457-6-berrange@redhat.com>
+Date: Fri, 15 Feb 2019 17:14:34 +0000
+Message-Id: <20190215171436.30457-5-berrange@redhat.com>
 In-Reply-To: <20190215171436.30457-1-berrange@redhat.com>
 References: <20190215171436.30457-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 5/6] vnc: allow specifying a custom
- authorization object name
+Subject: [Qemu-devel] [PATCH v4 4/6] chardev: add support for authorization
+ for TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,228 +27,201 @@ Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcand
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The VNC server has historically had support for ACLs to check both the
-SASL username and the TLS x509 distinguished name. The VNC server was
-responsible for creating the initial ACL, and the client app was then
-responsible for populating it with rules using the HMP 'acl_add' command.
+Currently any client which can complete the TLS handshake is able to use
+a chardev server. The server admin can turn on the 'verify-peer' option
+for the x509 creds to require the client to provide a x509
+certificate. This means the client will have to acquire a certificate
+from the CA before they are permitted to use the chardev server. This is
+still a fairly low bar.
 
-This is not satisfactory for a variety of reasons. There is no way to
-populate the ACLs from the command line, users are forced to use the
-HMP. With multiple network services all supporting TLS and ACLs now, it
-is desirable to be able to define a single ACL that is referenced by all
-services.
+This adds a 'tls-authz=3DOBJECT-ID' option to the socket chardev backend
+which takes the ID of a previously added 'QAuthZ' object instance. This
+will be used to validate the client's x509 distinguished name. Clients
+failing the check will not be permitted to use the chardev server.
 
-To address these limitations, two new options are added to the VNC
-server CLI. The 'tls-authz' option takes the ID of a QAuthZ object to
-use for checking TLS x509 distinguished names, and the 'sasl-authz'
-option takes the ID of another object to use for checking SASL usernames.
+For example to setup authorization that only allows connection from a
+client whose x509 certificate distinguished name contains 'CN=3Dfred', yo=
+u
+would use:
 
-In this example, we setup two authorization rules. The first allows any
-client with a certificate issued by the 'RedHat' organization in the
-'London' locality. The second ACL allows clients with either the
-'joe@REDHAT.COM' or  'fred@REDHAT.COM' kerberos usernames. Both checks
-must pass for the user to be allowed.
-
-    $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
-                  endpoint=3Dserver,verify-peer=3Dyes \
-          -object authz-simple,id=3Dauthz0,policy=3Ddeny,\
-                  rules.0.match=3DO=3DRedHat,,L=3DLondon,rules.0.policy=3D=
-allow \
-          -object authz-simple,id=3Dauthz1,policy=3Ddeny,\
-                  rules.0.match=3Dfred@REDHAT.COM,rules.0.policy=3Dallow =
-\
-                  rules.0.match=3Djoe@REDHAT.COM,rules.0.policy=3Dallow \
-          -vnc 0.0.0.0:1,tls-creds=3Dtls0,tls-authz=3Dauthz0,
-	       sasl,sasl-authz=3Dauthz1 \
-          ...other QEMU args...
+  $QEMU -object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qemutls,\
+                endpoint=3Dserver,verify-peer=3Dyes \
+        -object authz-simple,id=3Dauthz0,identity=3DCN=3Dlaptop.example.c=
+om,,\
+                O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB \
+        -chardev socket,host=3D127.0.0.1,port=3D9000,server,\
+	         tls-creds=3Dtls0,tls-authz=3Dauthz0 \
+        ...other qemu args...
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- qemu-deprecated.texi |  5 ++++
- qemu-options.hx      | 35 ++++++++++++++++++--------
- ui/vnc.c             | 58 +++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 79 insertions(+), 19 deletions(-)
+ chardev/char-socket.c | 12 +++++++++++-
+ chardev/char.c        |  3 +++
+ qapi/char.json        |  6 ++++++
+ qemu-options.hx       |  9 +++++++--
+ 4 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index fe905551c5..6139d09793 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -60,6 +60,11 @@ Support for invalid topologies will be removed, the us=
-er must ensure
- topologies described with -smp include all possible cpus, i.e.
-   @math{@var{sockets} * @var{cores} * @var{threads} =3D @var{maxcpus}}.
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 4fcdd8aedd..e4c8ba5798 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -59,6 +59,7 @@ typedef struct {
+     QIONetListener *listener;
+     GSource *hup_source;
+     QCryptoTLSCreds *tls_creds;
++    char *tls_authz;
+     TCPChardevState state;
+     int max_size;
+     int do_telnetopt;
+@@ -807,7 +808,7 @@ static void tcp_chr_tls_init(Chardev *chr)
+     if (s->is_listen) {
+         tioc =3D qio_channel_tls_new_server(
+             s->ioc, s->tls_creds,
+-            NULL, /* XXX Use an ACL */
++            s->tls_authz,
+             &err);
+     } else {
+         tioc =3D qio_channel_tls_new_client(
+@@ -1055,6 +1056,7 @@ static void char_socket_finalize(Object *obj)
+     if (s->tls_creds) {
+         object_unref(OBJECT(s->tls_creds));
+     }
++    g_free(s->tls_authz);
 =20
-+@subsection -vnc acl (since 4.0.0)
-+
-+The @code{acl} option to the @code{-vnc} argument has been replaced
-+by the @code{tls-authz} and @code{sasl-authz} options.
-+
- @section QEMU Machine Protocol (QMP) commands
+     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+ }
+@@ -1320,6 +1322,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+             }
+         }
+     }
++    s->tls_authz =3D g_strdup(sock->tls_authz);
 =20
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 2bbcc743a4..316b3dd621 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1619,6 +1619,14 @@ will cause the VNC server socket to enable the VeN=
-Crypt auth
- mechanism.  The credentials should have been previously created
- using the @option{-object tls-creds} argument.
+     s->addr =3D addr =3D socket_address_flatten(sock->addr);
 =20
-+@item tls-authz=3D@var{ID}
-+
-+Provides the ID of the QAuthZ authorization object against which
-+the client's x509 distinguished name will validated. This object is
-+only resolved at time of use, so can be deleted and recreated on the
-+fly while the VNC server is active. If missing, it will default
-+to denying access.
-+
- @item sasl
+@@ -1358,6 +1361,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
+hardevBackend *backend,
+     const char *port =3D qemu_opt_get(opts, "port");
+     const char *fd =3D qemu_opt_get(opts, "fd");
+     SocketAddressLegacy *addr;
++    const char *tls_authz =3D qemu_opt_get(opts, "tls-authz");
+     ChardevSocket *sock;
 =20
- Require that the client use SASL to authenticate with the VNC server.
-@@ -1634,18 +1642,25 @@ ensures a data encryption preventing compromise o=
-f authentication
- credentials. See the @ref{vnc_security} section for details on using
- SASL authentication.
+     if ((!!path + !!fd + !!host) !=3D 1) {
+@@ -1370,6 +1374,10 @@ static void qemu_chr_parse_socket(QemuOpts *opts, =
+ChardevBackend *backend,
+         error_setg(errp, "chardev: socket: no port given");
+         return;
+     }
++    if (tls_authz && !tls_creds) {
++        error_setg(errp, "Authorization can only be used when TLS is ena=
+bled");
++        return;
++    }
 =20
-+@item sasl-authz=3D@var{ID}
-+
-+Provides the ID of the QAuthZ authorization object against which
-+the client's SASL username will validated. This object is
-+only resolved at time of use, so can be deleted and recreated on the
-+fly while the VNC server is active. If missing, it will default
-+to denying access.
-+
- @item acl
+     backend->type =3D CHARDEV_BACKEND_KIND_SOCKET;
+     sock =3D backend->u.socket.data =3D g_new0(ChardevSocket, 1);
+@@ -1399,6 +1407,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
+hardevBackend *backend,
+     sock->reconnect =3D qemu_opt_get_number(opts, "reconnect", 0);
+     sock->has_tls_creds =3D qemu_opt_get(opts, "tls-creds");
+     sock->tls_creds =3D g_strdup(qemu_opt_get(opts, "tls-creds"));
++    sock->has_tls_authz =3D qemu_opt_get(opts, "tls-authz");
++    sock->tls_authz =3D g_strdup(qemu_opt_get(opts, "tls-authz"));
 =20
--Turn on access control lists for checking of the x509 client certificate
--and SASL party. For x509 certs, the ACL check is made against the
--certificate's distinguished name. This is something that looks like
--@code{C=3DGB,O=3DACME,L=3DBoston,CN=3Dbob}. For SASL party, the ACL chec=
-k is
--made against the username, which depending on the SASL plugin, may
--include a realm component, eg @code{bob} or @code{bob@@EXAMPLE.COM}.
--When the @option{acl} flag is set, the initial access list will be
--empty, with a @code{deny} policy. Thus no one will be allowed to
--use the VNC server until the ACLs have been loaded. This can be
--achieved using the @code{acl} monitor command.
-+Legacy method for enabling authorization of clients against the
-+x509 distinguished name and SASL username. It results in the creation
-+of two @code{authz-list} objects with IDs of @code{vnc.username} and
-+@code{vnc.x509dname}. The rules for these objects must be configured
-+with the HMP ACL commands.
-+
-+This option is deprecated and should no longer be used. The new
-+@option{sasl-authz} and @option{tls-authz} options are a
-+replacement.
-=20
- @item lossy
-=20
-diff --git a/ui/vnc.c b/ui/vnc.c
-index f4b335eb5f..9a4164d412 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3356,6 +3356,12 @@ static QemuOptsList qemu_vnc_opts =3D {
+     addr =3D g_new0(SocketAddressLegacy, 1);
+     if (path) {
+diff --git a/chardev/char.c b/chardev/char.c
+index f6d61fa5f8..514cd6b0c3 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -880,6 +880,9 @@ QemuOptsList qemu_chardev_opts =3D {
          },{
-             .name =3D "acl",
-             .type =3D QEMU_OPT_BOOL,
+             .name =3D "tls-creds",
+             .type =3D QEMU_OPT_STRING,
 +        },{
 +            .name =3D "tls-authz",
 +            .type =3D QEMU_OPT_STRING,
-+        },{
-+            .name =3D "sasl-authz",
-+            .type =3D QEMU_OPT_STRING,
          },{
-             .name =3D "lossy",
+             .name =3D "websocket",
              .type =3D QEMU_OPT_BOOL,
-@@ -3795,6 +3801,8 @@ void vnc_display_open(const char *id, Error **errp)
-     const char *credid;
-     bool sasl =3D false;
-     int acl =3D 0;
-+    const char *tlsauthz;
-+    const char *saslauthz;
-     int lock_key_sync =3D 1;
-     int key_delay_ms;
+diff --git a/qapi/char.json b/qapi/char.json
+index 77ed847972..7847c98d05 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -248,6 +248,11 @@
+ # @addr: socket address to listen on (server=3Dtrue)
+ #        or connect to (server=3Dfalse)
+ # @tls-creds: the ID of the TLS credentials object (since 2.6)
++# @tls-authz: the ID of the QAuthZ authorization object against which
++#             the client's x509 distinguished name will validated. This
++#             object is only resolved at time of use, so can be deleted
++#             and recreated on the fly while the chardev server is activ=
+e.
++#             If missing, it will default to denying access (since 4.0)
+ # @server: create server socket (default: true)
+ # @wait: wait for incoming connection on server
+ #        sockets (default: false).
+@@ -268,6 +273,7 @@
+ { 'struct': 'ChardevSocket',
+   'data': { 'addr': 'SocketAddressLegacy',
+             '*tls-creds': 'str',
++            '*tls-authz'  : 'str',
+             '*server': 'bool',
+             '*wait': 'bool',
+             '*nodelay': 'bool',
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 22cfb32489..2bbcc743a4 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2408,7 +2408,7 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+     "-chardev null,id=3Did[,mux=3Don|off][,logfile=3DPATH][,logappend=3D=
+on|off]\n"
+     "-chardev socket,id=3Did[,host=3Dhost],port=3Dport[,to=3Dto][,ipv4][=
+,ipv6][,nodelay][,reconnect=3Dseconds]\n"
+     "         [,server][,nowait][,telnet][,websocket][,reconnect=3Dsecon=
+ds][,mux=3Don|off]\n"
+-    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID] (t=
+cp)\n"
++    "         [,logfile=3DPATH][,logappend=3Don|off][,tls-creds=3DID][,t=
+ls-authz=3DID] (tcp)\n"
+     "-chardev socket,id=3Did,path=3Dpath[,server][,nowait][,telnet][,web=
+socket][,reconnect=3Dseconds]\n"
+     "         [,mux=3Don|off][,logfile=3DPATH][,logappend=3Don|off] (uni=
+x)\n"
+     "-chardev udp,id=3Did[,host=3Dhost],port=3Dport[,localaddr=3Dlocalad=
+dr]\n"
+@@ -2537,7 +2537,7 @@ The available backends are:
+ A void device. This device will not emit any data, and will drop any dat=
+a it
+ receives. The null backend does not take any options.
 =20
-@@ -3866,7 +3874,33 @@ void vnc_display_open(const char *id, Error **errp=
-)
-             goto fail;
-         }
-     }
-+    if (qemu_opt_get(opts, "acl")) {
-+        error_report("The 'acl' option to -vnc is deprecated. "
-+                     "Please use the 'tls-authz' and 'sasl-authz' "
-+                     "options instead");
-+    }
-     acl =3D qemu_opt_get_bool(opts, "acl", false);
-+    tlsauthz =3D qemu_opt_get(opts, "tls-authz");
-+    if (acl && tlsauthz) {
-+        error_setg(errp, "'acl' option is mutually exclusive with the "
-+                   "'tls-authz' option");
-+        goto fail;
-+    }
-+    if (tlsauthz && !vd->tlscreds) {
-+        error_setg(errp, "'tls-authz' provided but TLS is not enabled");
-+        goto fail;
-+    }
+-@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
+ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][=
+,tls-creds=3D@var{id}]
++@item -chardev socket,id=3D@var{id}[,@var{TCP options} or @var{unix opti=
+ons}][,server][,nowait][,telnet][,websocket][,reconnect=3D@var{seconds}][=
+,tls-creds=3D@var{id}][,tls-authz=3D@var{id}]
+=20
+ Create a two-way stream socket, which can be either a TCP or a unix sock=
+et. A
+ unix socket will be created if @option{path} is specified. Behaviour is
+@@ -2563,6 +2563,11 @@ and specifies the id of the TLS credentials to use=
+ for the handshake. The
+ credentials must be previously created with the @option{-object tls-cred=
+s}
+ argument.
+=20
++@option{tls-auth} provides the ID of the QAuthZ authorization object aga=
+inst
++which the client's x509 distinguished name will validated. This object i=
+s only
++resolved at time of use, so can be deleted and recreated on the fly whil=
+e the
++chardev server is active. If missing, it will default to denying access.
 +
-+    saslauthz =3D qemu_opt_get(opts, "sasl-authz");
-+    if (acl && saslauthz) {
-+        error_setg(errp, "'acl' option is mutually exclusive with the "
-+                   "'sasl-authz' option");
-+        goto fail;
-+    }
-+    if (saslauthz && !sasl) {
-+        error_setg(errp, "'sasl-authz' provided but SASL auth is not ena=
-bled");
-+        goto fail;
-+    }
+ TCP and unix socket options are given below:
 =20
-     share =3D qemu_opt_get(opts, "share");
-     if (share) {
-@@ -3896,7 +3930,9 @@ void vnc_display_open(const char *id, Error **errp)
-         vd->non_adaptive =3D true;
-     }
-=20
--    if (acl) {
-+    if (tlsauthz) {
-+        vd->tlsauthzid =3D g_strdup(tlsauthz);
-+    } else if (acl) {
-         if (strcmp(vd->id, "default") =3D=3D 0) {
-             vd->tlsauthzid =3D g_strdup("vnc.x509dname");
-         } else {
-@@ -3907,15 +3943,19 @@ void vnc_display_open(const char *id, Error **err=
-p)
-                                               &error_abort));
-     }
- #ifdef CONFIG_VNC_SASL
--    if (acl && sasl) {
--        if (strcmp(vd->id, "default") =3D=3D 0) {
--            vd->sasl.authzid =3D g_strdup("vnc.username");
--        } else {
--            vd->sasl.authzid =3D g_strdup_printf("vnc.%s.username", vd->=
-id);
-+    if (sasl) {
-+        if (saslauthz) {
-+            vd->sasl.authzid =3D g_strdup(saslauthz);
-+        } else if (acl) {
-+            if (strcmp(vd->id, "default") =3D=3D 0) {
-+                vd->sasl.authzid =3D g_strdup("vnc.username");
-+            } else {
-+                vd->sasl.authzid =3D g_strdup_printf("vnc.%s.username", =
-vd->id);
-+            }
-+            vd->sasl.authz =3D QAUTHZ(qauthz_list_new(vd->sasl.authzid,
-+                                                    QAUTHZ_LIST_POLICY_D=
-ENY,
-+                                                    &error_abort));
-         }
--        vd->sasl.authz =3D QAUTHZ(qauthz_list_new(vd->sasl.authzid,
--                                                QAUTHZ_LIST_POLICY_DENY,
--                                                &error_abort));
-     }
- #endif
-=20
+ @table @option
 --=20
 2.20.1
