@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47581)
+Received: from eggs.gnu.org ([209.51.188.92]:47682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gudeR-0000PK-HB
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:35:36 -0500
+	(envelope-from <clg@kaod.org>) id 1gudf5-0000uX-6k
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:36:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gudeQ-0008FT-E0
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:35:35 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:55888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gudeO-0008Bc-2R
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:35:34 -0500
-From: Liam Merwick <liam.merwick@oracle.com>
-Date: Fri, 15 Feb 2019 13:35:19 +0000
-Message-Id: <1550237719-28355-3-git-send-email-liam.merwick@oracle.com>
-In-Reply-To: <1550237719-28355-1-git-send-email-liam.merwick@oracle.com>
-References: <1550237719-28355-1-git-send-email-liam.merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 3/3] tpm_tis: convert tpm_tis_show_buffer()
- to use trace event
+	(envelope-from <clg@kaod.org>) id 1gudf3-0000FA-Ct
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:36:14 -0500
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:47732)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gudf1-0008Mj-OY
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:36:13 -0500
+Received: from player746.ha.ovh.net (unknown [10.109.159.68])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id A639B15C19B
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 14:35:44 +0100 (CET)
+References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
+	<155023080049.1011724.15423463482790260696.stgit@bahia.lan>
+	<b25de46d-9449-4538-b2b5-dd18d373e6d9@kaod.org>
+	<20190215140356.7919577c@bahia.lan>
+	<bae9f493-b8db-d413-6ce6-b2a71356824a@kaod.org>
+	<20190215142741.330f478b@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <8b770f6a-aa73-314f-4000-962bff4a892a@kaod.org>
+Date: Fri, 15 Feb 2019 14:35:39 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190215142741.330f478b@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/10] xics: Handle KVM ICP realize from
+ the common code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,124 +36,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanb@linux.ibm.com, qemu-devel@nongnu.org
-Cc: liam.merwick@oracle.com, philmd@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-cppcheck reports:
+On 2/15/19 2:27 PM, Greg Kurz wrote:
+> On Fri, 15 Feb 2019 14:09:53 +0100
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> On 2/15/19 2:03 PM, Greg Kurz wrote:
+>>> On Fri, 15 Feb 2019 13:54:02 +0100
+>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>  =20
+>>>> On 2/15/19 12:40 PM, Greg Kurz wrote: =20
+>>>>> The realization of KVM ICP currently follows the parent_realize log=
+ic,
+>>>>> which is a bit overkill here. Also we want to get rid of the KVM IC=
+P
+>>>>> class. Explicitely call icp_kvm_realize() from the base ICP realize
+>>>>> function.
+>>>>>
+>>>>> Note that ICPStateClass::parent_realize is retained because powernv
+>>>>> needs it.
+>>>>>
+>>>>> Signed-off-by: Greg Kurz <groug@kaod.org>>
+>>>>> ---
+>>>>>  hw/intc/xics.c        |    8 ++++++++
+>>>>>  hw/intc/xics_kvm.c    |   10 +---------
+>>>>>  include/hw/ppc/xics.h |    1 +
+>>>>>  3 files changed, 10 insertions(+), 9 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+>>>>> index 822d367e6388..acd63ab5e0b9 100644
+>>>>> --- a/hw/intc/xics.c
+>>>>> +++ b/hw/intc/xics.c
+>>>>> @@ -349,6 +349,14 @@ static void icp_realize(DeviceState *dev, Erro=
+r **errp)
+>>>>>          return;
+>>>>>      }
+>>>>> =20
+>>>>> +    if (kvm_irqchip_in_kernel()) {
+>>>>> +        icp_kvm_realize(dev, &err);   =20
+>>>>
+>>>> While we are at changing things, I would prefix all the KVM=20
+>>>> backends routine with kvmppc_*. so that icp_kvm_realize()=20
+>>>> becomes kvmppc_icp_realize()
+>>>> =20
+>>>
+>>> Well... kvmppc_* routines have historically been sitting under
+>>> target/ppc so I'm not sure we want to use the same prefix
+>>> elsewhere... =20
+>>
+>> Well, they could also be moved there but I think what is important=20
+>> is that the kvmppc_* routine should be used under the kvm_enabled()=20
+>> flag.=20
+>>
+>> Those under target/ppc have and extra dummy stub provided for the=20
+>> !kvm_enabled() case.=20
+>>
+>=20
+> Well, I don't really care but if we go this way (David?), I'd rather do=
+ it
+> globally in a followup patch.
 
-[hw/tpm/tpm_tis.c:113]: (warning) %d in format string (no. 2) requires 'int' but the argument type is 'unsigned int'
+yes. that's fine also.
 
-Rather than just converting the format specifier to use '%u", the
-tpm_tis_show_buffer() function is converted to use trace points and
-the two debug callers use the trace event infrastructure so that it's
-available in production cases also and not just when DEBUG_TIS is enabled.
+C.=20
 
-Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
----
-v3 -> v4
-- Allow for null terminator in buffer length calc.
-- dropped "tpm_tis: " from direction string since function name is now printed
-- Minor tweak to trace event format string and function parameter names
-
-Sample trace output
-
---enable-trace-backends=simple
-
-% echo tpm_tis_show_buffer > /tmp/events 
-% export QTEST_QEMU_BINARY="/home/Development/qemu-upstream/x86_64-softmmu/qemu-system-x86_64 --trace events=/tmp/events"
-% tests/tpm-tis-test 
-/D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_localities: OK
-/D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_access_reg: OK
-/D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_access_reg_seize: OK
-/D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_access_reg_release: OK
-/D=/home/Development/qemu-upstream/hw/tpm/tpm-tis/test_check_transmit: OK
-% ./scripts/simpletrace.py trace-events-all `ls -1rt trace-[0-9]* | tail -1`
-tpm_tis_show_buffer 0.000 pid=8416 direction=To TPM len=0xc line=80 01 00 00 00 0C 00 00 01 44 00 00 
-tpm_tis_show_buffer 303.909 pid=8416 direction=From TPM len=0xa line=80 01 00 00 00 0A 00 00 01 01 
-
---enable-trace-backends=log
-
-1255@1550051983.333949:tpm_tis_show_buffer direction: To TPM len: 12
-buf: 80 01 00 00 00 0C 00 00 01 44 00 00 
-1255@1550051983.334213:tpm_tis_show_buffer direction: From TPM len: 10
-buf: 80 01 00 00 00 0A 00 00 01 01 
-
- hw/tpm/tpm_tis.c    | 31 +++++++++++++++++++------------
- hw/tpm/trace-events |  1 +
- 2 files changed, 20 insertions(+), 12 deletions(-)
-
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 772431f20874..d7b9bee85741 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -108,17 +108,26 @@ static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
- static void tpm_tis_show_buffer(const unsigned char *buffer,
-                                 size_t buffer_size, const char *string)
- {
--    uint32_t len, i;
-+    size_t len, i;
-+    char *line_buffer, *p;
- 
-     len = MIN(tpm_cmd_get_size(buffer), buffer_size);
--    printf("tpm_tis: %s length = %d\n", string, len);
--    for (i = 0; i < len; i++) {
-+
-+    /*
-+     * allocate enough room for 3 chars per buffer entry plus a
-+     * newline after every 16 chars and a final null terminator.
-+     */
-+    line_buffer = g_malloc(len * 3 + (len / 16) + 1);
-+
-+    for (i = 0, p = line_buffer; i < len; i++) {
-         if (i && !(i % 16)) {
--            printf("\n");
-+            p += sprintf(p, "\n");
-         }
--        printf("%.2X ", buffer[i]);
-+        p += sprintf(p, "%.2X ", buffer[i]);
-     }
--    printf("\n");
-+    trace_tpm_tis_show_buffer(string, len, line_buffer);
-+
-+    g_free(line_buffer);
- }
- 
- /*
-@@ -145,9 +154,8 @@ static void tpm_tis_sts_set(TPMLocality *l, uint32_t flags)
-  */
- static void tpm_tis_tpm_send(TPMState *s, uint8_t locty)
- {
--    if (DEBUG_TIS) {
--        tpm_tis_show_buffer(s->buffer, s->be_buffer_size,
--                            "tpm_tis: To TPM");
-+    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
-+        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
-     }
- 
-     /*
-@@ -315,9 +323,8 @@ static void tpm_tis_request_completed(TPMIf *ti, int ret)
-     s->loc[locty].state = TPM_TIS_STATE_COMPLETION;
-     s->rw_offset = 0;
- 
--    if (DEBUG_TIS) {
--        tpm_tis_show_buffer(s->buffer, s->be_buffer_size,
--                            "tpm_tis: From TPM");
-+    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
-+        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
-     }
- 
-     if (TPM_TIS_IS_VALID_LOCTY(s->next_locty)) {
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 920d32ad5514..f45dcd220993 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -36,6 +36,7 @@ tpm_emulator_pre_save(void) ""
- tpm_emulator_inst_init(void) ""
- 
- # hw/tpm/tpm_tis.c
-+tpm_tis_show_buffer(const char *direction, size_t len, const char *buf) "direction: %s len: %zu\nbuf: %s"
- tpm_tis_raise_irq(uint32_t irqmask) "Raising IRQ for flag 0x%08x"
- tpm_tis_new_active_locality(uint8_t locty) "Active locality is now %d"
- tpm_tis_abort(uint8_t locty) "New active locality is %d"
--- 
-1.8.3.1
+>=20
+>> C.
+>>
+>>
+>>
+>>>  =20
+>>>> Apart from that,
+>>>>
+>>>> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>>
+>>>> Thanks,
+>>>>
+>>>> C.
+>>>>
+>>>> =20
+>>>>> +        if (err) {
+>>>>> +            error_propagate(errp, err);
+>>>>> +            return;
+>>>>> +        }
+>>>>> +    }
+>>>>> +
+>>>>>      qemu_register_reset(icp_reset_handler, dev);
+>>>>>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server=
+, icp);
+>>>>>  }
+>>>>> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+>>>>> index 80321e9b75ab..4eebced516b6 100644
+>>>>> --- a/hw/intc/xics_kvm.c
+>>>>> +++ b/hw/intc/xics_kvm.c
+>>>>> @@ -115,11 +115,9 @@ int icp_set_kvm_state(ICPState *icp)
+>>>>>      return 0;
+>>>>>  }
+>>>>> =20
+>>>>> -static void icp_kvm_realize(DeviceState *dev, Error **errp)
+>>>>> +void icp_kvm_realize(DeviceState *dev, Error **errp)
+>>>>>  {
+>>>>>      ICPState *icp =3D ICP(dev);
+>>>>> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+>>>>> -    Error *local_err =3D NULL;
+>>>>>      CPUState *cs;
+>>>>>      KVMEnabledICP *enabled_icp;
+>>>>>      unsigned long vcpu_id;
+>>>>> @@ -129,12 +127,6 @@ static void icp_kvm_realize(DeviceState *dev, =
+Error **errp)
+>>>>>          abort();
+>>>>>      }
+>>>>> =20
+>>>>> -    icpc->parent_realize(dev, &local_err);
+>>>>> -    if (local_err) {
+>>>>> -        error_propagate(errp, local_err);
+>>>>> -        return;
+>>>>> -    }
+>>>>> -
+>>>>>      cs =3D icp->cs;
+>>>>>      vcpu_id =3D kvm_arch_vcpu_id(cs);
+>>>>> =20
+>>>>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>>>>> index e33282a576d0..ab61dc24010a 100644
+>>>>> --- a/include/hw/ppc/xics.h
+>>>>> +++ b/include/hw/ppc/xics.h
+>>>>> @@ -202,5 +202,6 @@ Object *icp_create(Object *cpu, const char *typ=
+e, XICSFabric *xi,
+>>>>>  void icp_get_kvm_state(ICPState *icp);
+>>>>>  int icp_set_kvm_state(ICPState *icp);
+>>>>>  void icp_synchronize_state(ICPState *icp);
+>>>>> +void icp_kvm_realize(DeviceState *dev, Error **errp);
+>>>>> =20
+>>>>>  #endif /* XICS_H */
+>>>>>    =20
+>>>> =20
+>>>  =20
+>>
+>=20
