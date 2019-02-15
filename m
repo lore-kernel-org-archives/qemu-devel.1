@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57006)
+Received: from eggs.gnu.org ([209.51.188.92]:60818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guTVU-000099-9e
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 21:45:42 -0500
+	(envelope-from <bounces@canonical.com>) id 1guTvN-0004S1-Ih
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:12:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guTTo-00052y-ST
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 21:43:58 -0500
-Resent-Message-Id: <E1guTTo-00052y-ST@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21822)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guTTn-00050J-Nb
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 21:43:56 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155019861254.24.4204487477938968483@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1guTtm-0003hv-8c
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:10:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35524)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1guTtk-0003ah-9N
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:10:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1guTti-0004QV-H1
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:10:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7C1402E8070
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:10:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 18:43:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Feb 2019 03:03:34 -0000
+From: Cheng Chen <1815993@bugs.launchpad.net>
+Reply-To: Bug 1815993 <1815993@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <155019981452.28486.1507573377077994257.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815993] [NEW] drive-backup with iscsi will cause
+ vm disk no response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +36,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMu
-MjUwMzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYw
-My4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjc5ZjgyM2RkNTAgZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBw
-YWNrZXQuCjU0MDU1YzY5MGUgdGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxs
-cwoyNTZlNDU1N2YyIHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJh
-dGlvbgpkYWM0N2Y2YjY0IHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFNDUi5RQyB0byBhIHZlY3Rv
-ciBmaWVsZApkZmZiZDNjZDFiIHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhy
-ZWdzW0FSTV9WRlBfRlBTQ1JdCjAwM2FkOTY4YTggdGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdz
-IHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMKOGUyY2RiNDVkMSB0YXJnZXQvYXJtOiBGaXggYXJt
-X2NwdV9kdW1wX3N0YXRlIHZzIEZQU0NSCmM2ODU5YzFhODQgdGFyZ2V0L2FybTogRml4IHZmcF9n
-ZGJfZ2V0L3NldF9yZWcgdnMgRlBTQ1IKNmEwYTE1MGIyZCB0YXJnZXQvYXJtOiBSZW1vdmUgbmVv
-biBtaW4vbWF4IGhlbHBlcnMKY2VkM2Q1ZTNkOSB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIg
-bWluL21heCBwcmltaXRpdmVzIGZvciBuZW9uCjBmMWE1NzJjODQgdGFyZ2V0L2FybTogVXNlIHZl
-Y3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjY2ZTAyMDViYzMgdGFyZ2V0L2FybTog
-VXNlIHZlY3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CjJjZTBlODc3M2YgdGFyZ2V0
-L2FybTogUmVseSBvbiBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgo2YmQzOTll
-ZjNkIGh3L2FybS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKZWUzYTBm
-MmUxNSBody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCmYy
-YmQ4OWNmZDMgTUFJTlRBSU5FUlM6IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlv
-dXMgZW50cmllcwowZDJmODAzNTEzIGFybTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZN
-IGd1ZXN0cyB0byBiZSBjaGFuZ2VkIGJ5IFFFTVUgY29kZQo4ZDdjMWFmOWYzIGxpbnV4LXVzZXIv
-ZWxmbG9hZDogZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0Cjg3ZDU1M2I2MmMgdGFyZ2V0
-L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaCjIyOTZhYmFkZmIg
-dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UKNjgyMzQ3ZmI5ZSB0YXJn
-ZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZQo2MWUxZTg3NmFlIHRh
-cmdldC9hcm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3Rl
-cnMKYTAzZDAxMTY2YiB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9pbnRfY29udgo0
-OWM3NWZiMTRkIHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3Bl
-cmF0aW9uCmIzMTE1NDhjZTUgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBv
-cmRlciBpbiBwYWlyZWRfY21weGNoZzY0X2JlCjZkOTE1NDY1NWYgdGFyZ2V0L2FybTogSW1wbGVt
-ZW50IEhBQ1JfRUwyCmI2YTJmNmU3ZDAgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3Ig
-UE1FVlRZUEVSL1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNv
-bW1pdCBiNmEyZjZlN2QwMDkgKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZU
-WVBFUi9QTUVWQ05UUikKMi8yNyBDaGVja2luZyBjb21taXQgNmQ5MTU0NjU1ZjhmICh0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IGIzMTE1NDhjZTUx
-NSAodGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRf
-Y21weGNoZzY0X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCA0OWM3NWZiMTRkMDggKHRhcmdldC9h
-cm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNr
-aW5nIGNvbW1pdCBhMDNkMDExNjZiMDIgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2Zw
-X2ludF9jb252KQo2LzI3IENoZWNraW5nIGNvbW1pdCA2MWUxZTg3NmFlNDcgKHRhcmdldC9hcm06
-IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcg
-Q2hlY2tpbmcgY29tbWl0IDY4MjM0N2ZiOWUzOSAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJl
-Z2lzdGVycyB0byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IDIyOTZhYmFkZmI5YSAo
-dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcg
-Y29tbWl0IDg3ZDU1M2I2MmMzMCAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCBy
-ZWdpc3RlcnMgYXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgOGQ3YzFhZjlmM2Y5IChsaW51
-eC11c2VyL2VsZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hl
-Y2tpbmcgY29tbWl0IDBkMmY4MDM1MTMwZCAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZv
-ciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBj
-b21taXQgZjJiZDg5Y2ZkM2ZiIChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRl
-IGZyb20gdmFyaW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgZWUzYTBmMmUxNTY2
-IChody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8y
-NyBDaGVja2luZyBjb21taXQgNmJkMzk5ZWYzZDU3IChody9hcm0vYXJtc3NlOiBGaXggbWlzd2ly
-aW5nIG9mIGV4cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgMmNlMGU4NzczZjIy
-ICh0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29y
-KQoxNi8yNyBDaGVja2luZyBjb21taXQgNjZlMDIwNWJjMzdlICh0YXJnZXQvYXJtOiBVc2UgdmVj
-dG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCAw
-ZjFhNTcyYzg0MDEgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3Ig
-YWFyY2gzMikKMTgvMjcgQ2hlY2tpbmcgY29tbWl0IGNlZDNkNWUzZDllYiAodGFyZ2V0L2FybTog
-VXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tp
-bmcgY29tbWl0IDZhMGExNTBiMmRhNSAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBo
-ZWxwZXJzKQoyMC8yNyBDaGVja2luZyBjb21taXQgYzY4NTljMWE4NDlkICh0YXJnZXQvYXJtOiBG
-aXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVu
-dHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6
-ODQ6CisgICAgY2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0
-OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6
-IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNj
-cihlbnYsIGxkbF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
-cywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjIxLzI3IENoZWNraW5nIGNvbW1pdCA4ZTJjZGI0NWQxODYgKHRhcmdldC9hcm06IEZpeCBh
-cm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCAwMDNhZDk2
-OGE4MDggKHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBh
-cmVzKQoyMy8yNyBDaGVja2luZyBjb21taXQgZGZmYmQzY2QxYjRkICh0YXJnZXQvYXJtOiBGaXgg
-c2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcg
-Y29tbWl0IGRhYzQ3ZjZiNjQ1ZiAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEg
-dmVjdG9yIGZpZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgMjU2ZTQ1NTdmMmU4ICh0YXJnZXQv
-YXJtOiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJt
-L3ZlY19oZWxwZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0g
-PSB2bTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3
-IENoZWNraW5nIGNvbW1pdCA1NDA1NWM2OTBlMWYgKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNs
-ZWFyX3RhaWwgY2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCA3OWY4MjNkZDUwMjEgKGdkYnN0
-dWI6IFNlbmQgYSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1w
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+Public bug reported:
+
+virsh qemu-monitor-command ${DOMAIN} '{ "execute" : "drive-backup" ,
+"arguments" : { "device" : "drive-virtio-disk0" , "sync" : "top" ,
+"target" : "iscsi://192.168.1.100:3260/iqn.2019-01.com.iaas/0" } }'
+
+When the drive-backup is running, I manually crash the iscsi server=EF=BC=
+=88or
+interrupt network, eg. iptables -j DROP=EF=BC=89.
+
+Then after less than 1 minute=EF=BC=9A
+virsh qemu-monitor-command ${DOMAIN} --pretty '{ "execute": "query-block" }=
+' will block and no any response, until timeout. This is still excusable.
+But, the disk=EF=BC=88drive-virtio-disk0=EF=BC=89will occur the same situat=
+ion=EF=BC=9Ain vm os, the disk will block and no any response.
+
+In other words, when qemu and iscsi-server lose contact, It will cause
+the vm unable.
+
+---
+Host: centos 7.5
+qemu version: ovirt-4.2=EF=BC=88qemu-2.12.0=EF=BC=89
+qemu command line: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3Don=
+ -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qem=
+u/domain-190-test./master-key.aes -machine pc-i440fx-3.1,accel=3Dkvm,usb=3D=
+off,dump-guest-core=3Doff,mem-merge=3Doff -m 1024 -mem-prealloc -mem-path /=
+dev/hugepages1G/libvirt/qemu/190-test -realtime mlock=3Doff -smp 1,sockets=
+=3D1,cores=3D1,threads=3D1 -uuid 1c8611c2-a18a-4b1c-b40b-9d82040eafa4 -smbi=
+os type=3D1,manufacturer=3DIaaS -no-user-config -nodefaults -chardev socket=
+,id=3Dcharmonitor,fd=3D31,server,nowait -mon chardev=3Dcharmonitor,id=3Dmon=
+itor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot menu=3Don,strict=3Do=
+n -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device virtio=
+-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/opt/v=
+ol/sas/fb0c7c37-13e7-41fe-b3f8-f0fbaaeec7ce,format=3Dqcow2,if=3Dnone,id=3Dd=
+rive-virtio-disk0,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,bus=
+=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=
+=3D1,write-cache=3Don -drive file=3D/opt/vol/sas/bde66671-536d-49cd-8b46-a4=
+f1ea7be513,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dwriteba=
+ck -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-v=
+irtio-disk1,id=3Dvirtio-disk1,write-cache=3Don -netdev tap,fd=3D33,id=3Dhos=
+tnet0,vhost=3Don,vhostfd=3D34 -device virtio-net-pci,netdev=3Dhostnet0,id=
+=3Dnet0,mac=3D00:85:45:3e:d4:3a,bus=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dch=
+arserial0 -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev so=
+cket,id=3Dcharchannel0,fd=3D35,server,nowait -device virtserialport,bus=3Dv=
+irtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu=
+.guest_agent.0 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0=
+.0.0:0,password -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
+ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=
+=3Don
+
+iscsi=EF=BC=9A
+yum -y install targetcli python-rtslib
+systemctl start target
+systemctl enable target
+
+targetcli /iscsi create iqn.2019-01.com.iaas
+
+targetcli /iscsi/iqn.2019-01.com.iaas/tpg1 set attribute
+authentication=3D0 demo_mode_write_protect=3D0 generate_node_acls=3D1
+
+targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/portals create 192.168.1.100 3260
+targetcli /backstores/fileio create testfile1 /backup/file1 2G
+targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/luns create /backstores/fileio/t=
+estfile1
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815993
+
+Title:
+  drive-backup with iscsi will cause vm disk no response
+
+Status in QEMU:
+  New
+
+Bug description:
+  virsh qemu-monitor-command ${DOMAIN} '{ "execute" : "drive-backup" ,
+  "arguments" : { "device" : "drive-virtio-disk0" , "sync" : "top" ,
+  "target" : "iscsi://192.168.1.100:3260/iqn.2019-01.com.iaas/0" } }'
+
+  When the drive-backup is running, I manually crash the iscsi server=EF=BC=
+=88or
+  interrupt network, eg. iptables -j DROP=EF=BC=89.
+
+  Then after less than 1 minute=EF=BC=9A
+  virsh qemu-monitor-command ${DOMAIN} --pretty '{ "execute": "query-block"=
+ }' will block and no any response, until timeout. This is still excusable.
+  But, the disk=EF=BC=88drive-virtio-disk0=EF=BC=89will occur the same situ=
+ation=EF=BC=9Ain vm os, the disk will block and no any response.
+
+  In other words, when qemu and iscsi-server lose contact, It will cause
+  the vm unable.
+
+  ---
+  Host: centos 7.5
+  qemu version: ovirt-4.2=EF=BC=88qemu-2.12.0=EF=BC=89
+  qemu command line: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3D=
+on -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/q=
+emu/domain-190-test./master-key.aes -machine pc-i440fx-3.1,accel=3Dkvm,usb=
+=3Doff,dump-guest-core=3Doff,mem-merge=3Doff -m 1024 -mem-prealloc -mem-pat=
+h /dev/hugepages1G/libvirt/qemu/190-test -realtime mlock=3Doff -smp 1,socke=
+ts=3D1,cores=3D1,threads=3D1 -uuid 1c8611c2-a18a-4b1c-b40b-9d82040eafa4 -sm=
+bios type=3D1,manufacturer=3DIaaS -no-user-config -nodefaults -chardev sock=
+et,id=3Dcharmonitor,fd=3D31,server,nowait -mon chardev=3Dcharmonitor,id=3Dm=
+onitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot menu=3Don,strict=
+=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device vi=
+rtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/o=
+pt/vol/sas/fb0c7c37-13e7-41fe-b3f8-f0fbaaeec7ce,format=3Dqcow2,if=3Dnone,id=
+=3Ddrive-virtio-disk0,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,b=
+us=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootinde=
+x=3D1,write-cache=3Don -drive file=3D/opt/vol/sas/bde66671-536d-49cd-8b46-a=
+4f1ea7be513,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dwriteb=
+ack -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-=
+virtio-disk1,id=3Dvirtio-disk1,write-cache=3Don -netdev tap,fd=3D33,id=3Dho=
+stnet0,vhost=3Don,vhostfd=3D34 -device virtio-net-pci,netdev=3Dhostnet0,id=
+=3Dnet0,mac=3D00:85:45:3e:d4:3a,bus=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dch=
+arserial0 -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev so=
+cket,id=3Dcharchannel0,fd=3D35,server,nowait -device virtserialport,bus=3Dv=
+irtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu=
+.guest_agent.0 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0=
+.0.0:0,password -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
+ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=
+=3Don
+
+  iscsi=EF=BC=9A
+  yum -y install targetcli python-rtslib
+  systemctl start target
+  systemctl enable target
+
+  targetcli /iscsi create iqn.2019-01.com.iaas
+
+  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1 set attribute
+  authentication=3D0 demo_mode_write_protect=3D0 generate_node_acls=3D1
+
+  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/portals create 192.168.1.100 3=
+260
+  targetcli /backstores/fileio create testfile1 /backup/file1 2G
+  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/luns create /backstores/fileio=
+/testfile1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815993/+subscriptions
