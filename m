@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33642)
+Received: from eggs.gnu.org ([209.51.188.92]:36145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1guU0x-000601-7o
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:18:11 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1guUKm-0008U6-8b
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1guU0w-00018i-C3
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:18:11 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2177 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
-	id 1guU0w-00015e-0d
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:18:10 -0500
-References: <20190214122700.18572-1-zhengxiang9@huawei.com>
-	<ec12aeeb-a480-f07d-c75e-6d6acf0359fa@redhat.com>
-From: Zheng Xiang <zhengxiang9@huawei.com>
-Message-ID: <fa2d4323-035e-5514-e201-5ce8162bf8ca@huawei.com>
-Date: Fri, 15 Feb 2019 11:17:38 +0800
+	(envelope-from <aik@ozlabs.ru>) id 1guUEp-0004is-FU
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:32:33 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40684)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1guUEn-0004ej-EB
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 22:32:31 -0500
+Received: by mail-pf1-x444.google.com with SMTP id h1so4148446pfo.7
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 19:32:22 -0800 (PST)
+References: <20190214052144.59541-1-aik@ozlabs.ru>
+	<20190214163743.7162ad53@w520.home>
+	<f8effbfc-e42e-acad-d141-a84a8aa04b92@ozlabs.ru>
+	<20190215032436.GG4573@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <d6f2f973-f57a-f5f0-c20b-9a574e05bd7b@ozlabs.ru>
+Date: Fri, 15 Feb 2019 14:32:14 +1100
 MIME-Version: 1.0
-In-Reply-To: <ec12aeeb-a480-f07d-c75e-6d6acf0359fa@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190215032436.GG4573@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scsi-cd: Fix crash after remote cdrom
- detached
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2 0/4] spapr_pci,
+ vfio: NVIDIA V100 + POWER9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +33,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: fam@euphon.net, wanghaibin.wang@huawei.com, lizhengui@huawei.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Reza Arbab <arbab@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Hi Paolo,
 
-On 2019/2/15 2:07, Paolo Bonzini wrote:
-> On 14/02/19 13:27, Xiang Zheng wrote:
->> There is a small window between the twice blk_is_available in
->> scsi_disk_emulate_command which would cause crash due to the later
->> assertion if the remote cdrom is detached in this window.
+
+On 15/02/2019 14:24, David Gibson wrote:
+> On Fri, Feb 15, 2019 at 11:35:02AM +1100, Alexey Kardashevskiy wrote:
 >>
->> So this patch replaces assertions with return to avoid qemu crash.
 >>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> ---
->> The qemu error log shows:
+>> On 15/02/2019 10:37, Alex Williamson wrote:
+>>> On Thu, 14 Feb 2019 16:21:40 +1100
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>
+>>>> This is for passing through NVIDIA V100 GPUs on POWER9 systems.
+>>>>
+>>>> This implements a subdriver for NVIDIA V100 GPU with coherent memory and
+>>>> NPU/ATS support available in the POWER9 CPU.
+>>>>
+>>>> 1/4 is a preparation for bigger DMA windows.
+>>>> 2/4 is a small cleanup.
+>>>>
+>>>> Here is the kernel driver:
+>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/vfio/pci?h=v5.0-rc6&id=7f92891778dff62303c070ac81de7b7d80de331a
+>>>>
+>>>> SLOF changes already went in.
+>>>>
+>>>> This depends on "pci: Move NVIDIA vendor id to the rest of ids" (posted separately).
+>>>
+>>> TBH, I'm not sure it was the best idea to let it live or die on it's
+>>> own when it now creates a build dependency for this series.
+>> I am sure that patch is disgustingly primitive and can make it to
+>> upstream in just one click and the rest of the series will take more
+>> time anyway (always does :) ).
 >>
->> qemu-system-aarch64: /home/qemu/hw/scsi/scsi-disk.c:1896: scsi_disk_emulate_command: Assertion `blk_is_available(s->qdev.conf.blk)' failed.
->> 2019-02-15 04:35:18.592: shutting down, reason=crashed
+>>>> This is based on sha1
+>>>> 1ea6057 Mark Cave-Ayland "mac_newworld: change default NIC to sungem for mac99 machine".
+>>>
+>>> Perhaps this is why it doesn't apply cleanly against qemu.git.  Are
+>>> there dependencies we need to wait for in the ppc tree as well?
+>>
+>> There are few changes in spapr_pci so conflicts are possible, every time
+>> when David updates his tree and I rebase I get some minor ones.
+>>
+>>>> Please comment. Thanks.
+>>>
+>>> Besides the build dependency on PCI_VENDOR_ID_NVIDIA, I also get this:
+>>>
+>>> .../qemu.git/hw/vfio/spapr.c: In function ‘vfio_spapr_create_window’:
+>>> .../qemu.git/hw/vfio/spapr.c:212:9: error: ‘ret’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>>          error_report("Failed to create a window, ret = %d (%m)", ret);
+>>>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>> cc1: all warnings being treated as errors
+>>
+>> Agrh. How exactly do you make them errors, not warnings? I get no
+>> warning/error with --disable-werror but not having  --disable-werror
+>> prints warnings, not errors so it does not fail the build and easy to miss.
 > 
-> Is this with virtio-scsi-dataplane?
+> Are you sure it's printing warnings with --enable-werror?  Otherwise
+> it sounds like you just have a compiler version that's not picking
+> this up.
+
+Ah, here is my mistake - I thought not having --disable-werror means
+that it is enabled as ./configure does not advertise  "--enable-werror":
+
+[fstn1-p1 qemu]$ ./configure --help | grep werror
+  --disable-werror         disable compilation abort on warning
+
+
+Apparently it is a tri-state flag :)
+
+
 > 
-
-No, the QEMU commandline about scsi is bellow:
-	-device virtio-scsi-pci,id=scsi0,bus=pci.4,addr=0x0 \
-	-drive file=/mnt/zhengxiang/guestos.qcow2,format=qcow2,if=none,id=drive-scsi0-0-0-0,cache=none,aio=native \
-	-device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1 \
-	-drive file=/home/tmp.iso,format=raw,if=none,id=drive-scsi0-0-0-1,readonly=on,cache=none,aio=threads \
-	-device scsi-cd,bus=scsi0.0,channel=0,scsi-id=0,lun=1,drive=drive-scsi0-0-0-1,id=scsi0-0-0-1
-
-This problem can be reproduced by detaching and attaching remote cdrom repeatly.
+>>> Is this series expected to go in through the ppc branch given the bulk
+>>> of the changes are there?  Thanks,
+>>
+>> I think so.
+>>
+>>
+> 
 
 -- 
-
-Thanks,
-Xiang
+Alexey
