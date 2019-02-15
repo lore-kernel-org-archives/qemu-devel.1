@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47398)
+Received: from eggs.gnu.org ([209.51.188.92]:47919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alnyan@airmail.cc>) id 1guftb-0006K5-O8
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:59:25 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gufvD-0007rT-1c
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:01:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alnyan@airmail.cc>) id 1guftS-00048U-9p
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:59:18 -0500
-Date: Fri, 15 Feb 2019 17:59:20 +0200
-From: Mark <alnyan@airmail.cc>
-Message-ID: <20190215155919.GA10823@nyan>
+	(envelope-from <no-reply@patchew.org>) id 1gufv9-0006wA-RD
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:01:02 -0500
+Resent-Message-Id: <E1gufv9-0006wA-RD@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21721)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gufv9-0006uI-Gm
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:00:59 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155024552092.24.9638465772760037729@49fa7ef69f7b>
+In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [v4 PATCH] hw/arm/bcm2835_peripherals: add bcm283x arm
- timer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Feb 2019 07:45:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v7 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,417 +29,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "open list:Raspberry Pi" <qemu-arm@nongnu.org>
+To: palmer@sifive.com
+Cc: fam@euphon.net, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Signed-off-by: Mark <alnyan@airmail.cc>
----
- hw/arm/bcm2835_peripherals.c         |  17 ++
- hw/timer/Makefile.objs               |   2 +
- hw/timer/bcm283x_timer.c             | 271 +++++++++++++++++++++++++++
- include/hw/arm/bcm2835_peripherals.h |   2 +
- include/hw/timer/bcm283x_timer.h     |  50 +++++
- 5 files changed, 342 insertions(+)
- create mode 100644 hw/timer/bcm283x_timer.c
- create mode 100644 include/hw/timer/bcm283x_timer.h
-
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 6be7660e8c..e6d4d35496 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -117,6 +117,10 @@ static void bcm2835_peripherals_init(Object *obj)
-                                    OBJECT(&s->sdhci.sdbus), &error_abort);
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhost",
-                                    OBJECT(&s->sdhost.sdbus), &error_abort);
-+
-+    /* SP804-alike ARM Timer */
-+    sysbus_init_child_obj(obj, "bcm283x_timer", OBJECT(&s->bcm283x_timer),
-+            sizeof(s->bcm283x_timer), TYPE_BCM283xTimer);
- }
-
- static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-@@ -334,6 +338,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         error_propagate(errp, err);
-         return;
-     }
-+
-+    /* SP804-alike ARM Timer */
-+    object_property_set_bool(OBJECT(&s->bcm283x_timer), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    memory_region_add_subregion(&s->peri_mr, ARMCTRL_TIMER0_1_OFFSET,
-+                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->bcm283x_timer), 0));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->bcm283x_timer), 0,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_ARM_IRQ,
-+                               INTERRUPT_ARM_TIMER));
- }
-
- static void bcm2835_peripherals_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 0e9a4530f8..09a3706701 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -47,3 +47,5 @@ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
- common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
- common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
- common-obj-$(CONFIG_MSF2) += mss-timer.o
-+
-+common-obj-$(CONFIG_RASPI) += bcm283x_timer.o
-diff --git a/hw/timer/bcm283x_timer.c b/hw/timer/bcm283x_timer.c
-new file mode 100644
-index 0000000000..0f696ae61f
---- /dev/null
-+++ b/hw/timer/bcm283x_timer.c
-@@ -0,0 +1,271 @@
-+/*
-+ * Broadcom BCM283x ARM timer variant based on ARM SP804
-+ * Copyright (c) 2019, Mark <alnyan@airmail.cc>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu/timer.h"
-+#include "qemu-common.h"
-+#include "hw/qdev.h"
-+#include "hw/timer/bcm283x_timer.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/log.h"
-+
-+#define TIMER_CTRL_32BIT            (1 << 1)
-+#define TIMER_CTRL_DIV1             (0 << 2)
-+#define TIMER_CTRL_DIV16            (1 << 2)
-+#define TIMER_CTRL_DIV256           (2 << 2)
-+#define TIMER_CTRL_IE               (1 << 5)
-+#define TIMER_CTRL_ENABLE           (1 << 7)
-+#define TIMER_CTRL_ENABLE_FREECNTR  (1 << 9)
-+
-+/* BCM283x's implementation of SP804 ARM timer */
-+
-+static void bcm283x_timer_set_irq(void *opaque, int irq, int level)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(opaque);
-+
-+    s->int_level = level;
-+    qemu_set_irq(s->irq, s->int_level);
-+}
-+
-+static void bcm283x_timer_update(BCM283xTimerState *s)
-+{
-+    if (s->int_level && (s->control & TIMER_CTRL_IE)) {
-+        qemu_irq_raise(s->irq);
-+    } else {
-+        qemu_irq_lower(s->irq);
-+    }
-+}
-+
-+static void bcm283x_timer_tick(void *opaque)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(opaque);
-+    s->int_level = 1;
-+    bcm283x_timer_update(s);
-+}
-+
-+static void bcm283x_free_timer_tick(void *opaque)
-+{
-+    /* Do nothing */
-+}
-+
-+static uint64_t bcm283x_timer_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(opaque);
-+
-+    switch (offset >> 2) {
-+    case 0: /* Load register */
-+    case 6: /* Reload register */
-+        return s->limit;
-+    case 1: /* Value register */
-+        return ptimer_get_count(s->timer);
-+    case 2: /* Control register */
-+        return s->control;
-+    case 3: /* IRQ clear/ACK register */
-+        /*
-+         * The register is write-only,
-+         * but returns reverse "ARMT" string bytes
-+         */
-+        return 0x544D5241;
-+    case 4: /* RAW IRQ register */
-+        return s->int_level;
-+    case 5: /* Masked IRQ register */
-+        if ((s->control & TIMER_CTRL_IE) == 0) {
-+            return 0;
-+        }
-+        return s->int_level;
-+    case 8: /* Free-running counter */
-+        return ptimer_get_count(s->free_timer);
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Bad offset %x\n", __func__, (int) offset);
-+        return 0;
-+    }
-+}
-+
-+static void bcm283x_timer_write(void *opaque, hwaddr offset, uint64_t value,
-+        unsigned size)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(opaque);
-+    uint32_t freq, freecntr_freq;
-+
-+    switch (offset >> 2) {
-+    case 0: /* Load register */
-+        s->limit = value;
-+        ptimer_set_limit(s->timer, s->limit, 1);
-+        break;
-+    case 1: /* Value register */
-+        /* Read only */
-+        break;
-+    case 2: /* Control register */
-+        if (s->control & TIMER_CTRL_ENABLE) {
-+            ptimer_stop(s->timer);
-+        }
-+
-+        s->control = value;
-+
-+        /* Configure SP804 */
-+        freq = BCM283x_SYSTEM_CLOCK_FREQ / (s->prediv + 1);
-+        /* Set pre-scaler */
-+        switch ((value >> 2) & 3) {
-+        case 1: /* 16 */
-+            freq >>= 4;
-+            break;
-+        case 2: /* 256 */
-+            freq >>= 8;
-+            break;
-+        }
-+        ptimer_set_limit(s->timer, s->limit, s->control & TIMER_CTRL_ENABLE);
-+        ptimer_set_freq(s->timer, freq);
-+
-+        /* Configure free-running counter */
-+        freecntr_freq = BCM283x_SYSTEM_CLOCK_FREQ /
-+            (1 + ((value >> 16) & 0xFF));
-+        if (s->control & TIMER_CTRL_32BIT) {
-+            ptimer_set_limit(s->free_timer, 0xFFFFFFFF,
-+                    s->control & TIMER_CTRL_ENABLE_FREECNTR);
-+        } else {
-+            ptimer_set_limit(s->free_timer, 0xFFFF,
-+                    s->control & TIMER_CTRL_ENABLE_FREECNTR);
-+        }
-+        ptimer_set_freq(s->free_timer, freecntr_freq);
-+
-+        if (s->control & TIMER_CTRL_ENABLE) {
-+            ptimer_run(s->timer, 0);
-+        } else {
-+            ptimer_stop(s->free_timer);
-+        }
-+
-+        if (s->control & TIMER_CTRL_ENABLE_FREECNTR) {
-+            ptimer_run(s->free_timer, 0);
-+        } else {
-+            ptimer_stop(s->free_timer);
-+        }
-+        break;
-+    case 3: /* IRQ clear/ACK register */
-+        s->int_level = 0;
-+        break;
-+    case 6: /* Reload register */
-+        s->limit = value;
-+        ptimer_set_limit(s->timer, s->limit, 0);
-+        break;
-+    case 7: /* Pre-divider register */
-+        s->prediv = value;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Bad offset %x\n", __func__, (int) offset);
-+        break;
-+    }
-+
-+    bcm283x_timer_update(s);
-+}
-+
-+static const MemoryRegionOps bcm283x_timer_ops = {
-+    .read = bcm283x_timer_read,
-+    .write = bcm283x_timer_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN
-+};
-+
-+static const VMStateDescription vmstate_bcm283x_timer = {
-+    .name = "bcm283x_timer",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(control, BCM283xTimerState),
-+        VMSTATE_UINT32(limit, BCM283xTimerState),
-+        VMSTATE_UINT32(int_level, BCM283xTimerState),
-+        VMSTATE_PTIMER(timer, BCM283xTimerState),
-+        VMSTATE_PTIMER(free_timer, BCM283xTimerState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void bcm283x_timer_init(Object *obj)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &bcm283x_timer_ops, s,
-+            TYPE_BCM283xTimer, 0x100);
-+
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+static void bcm283x_timer_reset(DeviceState *dev)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(dev);
-+
-+    s->limit = 0;
-+    s->int_level = 0;
-+    s->control = TIMER_CTRL_IE | (0x0E << 16);
-+    s->prediv = 0x7D;
-+
-+    /*
-+     * Stop the timers.
-+     * No need to update freqs/limits as this will automatically be done once
-+     * the system writes control register.
-+     */
-+    ptimer_stop(s->timer);
-+    ptimer_stop(s->free_timer);
-+}
-+
-+static void bcm283x_timer_realize(DeviceState *dev, Error **errp)
-+{
-+    BCM283xTimerState *s = BCM283xTimer(dev);
-+    QEMUBH *bh;
-+
-+    s->limit = 0;
-+    s->int_level = 0;
-+    s->control = TIMER_CTRL_IE | (0x0E << 16);
-+    s->prediv = 0x7D;
-+
-+    /* Create a regular SP804 timer */
-+    bh = qemu_bh_new(bcm283x_timer_tick, s);
-+    s->timer = ptimer_init(bh, PTIMER_POLICY_DEFAULT);
-+    s->irq = qemu_allocate_irq(bcm283x_timer_set_irq, s, 0);
-+
-+    /* Create a free-running timer */
-+    bh = qemu_bh_new(bcm283x_free_timer_tick, s);
-+    s->free_timer = ptimer_init(bh, PTIMER_POLICY_DEFAULT);
-+
-+    vmstate_register(NULL, -1, &vmstate_bcm283x_timer, s);
-+}
-+
-+static void bcm283x_timer_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *k = DEVICE_CLASS(klass);
-+
-+    k->realize = bcm283x_timer_realize;
-+    k->vmsd = &vmstate_bcm283x_timer;
-+    k->reset = bcm283x_timer_reset;
-+}
-+
-+static const TypeInfo bcm283x_timer_info = {
-+    .name           = TYPE_BCM283xTimer,
-+    .parent         = TYPE_SYS_BUS_DEVICE,
-+    .instance_size  = sizeof(BCM283xTimerState),
-+    .instance_init  = bcm283x_timer_init,
-+    .class_init     = bcm283x_timer_class_init
-+};
-+
-+static void bcm283x_timer_register_types(void)
-+{
-+    type_register_static(&bcm283x_timer_info);
-+}
-+
-+type_init(bcm283x_timer_register_types)
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index f5b193f670..bbe01d1500 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -23,6 +23,7 @@
- #include "hw/sd/sdhci.h"
- #include "hw/sd/bcm2835_sdhost.h"
- #include "hw/gpio/bcm2835_gpio.h"
-+#include "hw/timer/bcm283x_timer.h"
-
- #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
- #define BCM2835_PERIPHERALS(obj) \
-@@ -48,6 +49,7 @@ typedef struct BCM2835PeripheralState {
-     SDHCIState sdhci;
-     BCM2835SDHostState sdhost;
-     BCM2835GpioState gpio;
-+    BCM283xTimerState bcm283x_timer;
- } BCM2835PeripheralState;
-
- #endif /* BCM2835_PERIPHERALS_H */
-diff --git a/include/hw/timer/bcm283x_timer.h b/include/hw/timer/bcm283x_timer.h
-new file mode 100644
-index 0000000000..99d0ae0f61
---- /dev/null
-+++ b/include/hw/timer/bcm283x_timer.h
-@@ -0,0 +1,50 @@
-+/*
-+ * Broadcom BCM283x ARM timer variant based on ARM SP804
-+ * Copyright (c) 2019, Mark <alnyan@airmail.cc>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef HW_TIMER_BCM2835_TIMER_H
-+#define HW_TIMER_BCM2835_TIMER_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/ptimer.h"
-+
-+/*
-+ * The datasheet stated 252MHz is the system clock value after reset,
-+ *  but it may be changed either by device going to sleep mode or
-+ *  by kernel configuration
-+ */
-+#define BCM283x_SYSTEM_CLOCK_FREQ       252000000
-+
-+#define TYPE_BCM283xTimer "bcm283x_timer"
-+#define BCM283xTimer(obj) \
-+    OBJECT_CHECK(BCM283xTimerState, (obj), TYPE_BCM283xTimer)
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+
-+    qemu_irq irq;
-+
-+    uint32_t control;
-+    uint32_t limit;
-+    uint32_t int_level;
-+    uint32_t prediv;
-+
-+    ptimer_state *timer;
-+    ptimer_state *free_timer;
-+} BCM283xTimerState;
-+
-+#endif
---
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE1NTQxNC4yMjI4
+NS0xLXBhbG1lckBzaWZpdmUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxMzE1NTQxNC4yMjI4NS0xLXBhbG1lckBzaWZp
+dmUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMzVdIHRhcmdldC9yaXNj
+djogQ29udmVydCB0byBkZWNvZGV0cmVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAy
+MTMxNTU0MTQuMjIyODUtMS1wYWxtZXJAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEzMTU1
+NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2ZS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwpjYzg1MDVlZDRiIHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMy
+IGJpdCB0cmFuc2xhdG9ycwoyMDU4NWFkOTJmIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmlu
+ZyBjb21wcmVzc2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NAo2NTQ3OWU0OGQz
+IHRhcmdldC9yaXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJp
+c2N2NjQKMGYwYWQwNDc4YiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3Nf
+ZCwgQGNzX3cgaW5zbnMKMzViNzVmZTc5YyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5z
+bnMgdG8gc2hhcmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjg2OGNkNGZlZGQgdGFyZ2V0L3Jpc2N2
+OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkKMTBlNTBhNmRmMyB0YXJnZXQvcmlzY3Y6IFJlbW92
+ZSBnZW5fc3lzdGVtKCkKNmNiNTY3NTBlMiB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0
+aCB0byBnZW5fYXJpdGgKODhhZTc2ODI3ZiB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVj
+b2Rpbmcgb2YgUlYzMi82NE0gaW5zbgoxZTg5ZWRiMGRiIHRhcmdldC9yaXNjdjogUmVtb3ZlIHNo
+aWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcKYTlhODZjODhmNiB0YXJnZXQvcmlzY3Y6
+IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0cwo1NGQ1N2EzOGY3IHRh
+cmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1
+bmN0aW9ucwo5ZDk3NWM1ZWQyIHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBm
+cm9tIGdlbl9zdG9yZSgpCjM5YTZhYzRjYzcgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRl
+Y29kaW5nIGZyb20gZ2VuX2xvYWQoKQpiYjNmMWE5MDY1IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1h
+bnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKQpmNmIwYWEwZWViIHRhcmdldC9yaXNjdjog
+UmVtb3ZlIGdlbl9qYWxyKCkKOTIyZjVkZmU4ZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJh
+bnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNDdkNDE2OTczMiB0YXJnZXQvcmlzY3Y6
+IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKYjhmZDQwZmE1
+ZCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29k
+ZXRyZWUKYWEwOGY1NjFiOSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBk
+ZWNvZGV0cmVlCjU2MmRkZWM2YzUgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRv
+IGRlY29kZXRyZWUKMWFjZGY5ZTEyOSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMg
+dG8gZGVjb2RldHJlZQowYmEyNjczOTA1IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNu
+cyB0byBkZWNvZGV0cmVlCmJmMjFhZjRmMWUgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGlu
+c25zIHRvIGRlY29kZXRyZWUKNDQyNGNiNWQwZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEg
+aW5zbnMgdG8gZGVjb2RldHJlZQphMmE1YTFmYjc2IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMy
+QSBpbnNucyB0byBkZWNvZGV0cmVlCmI3NzExMDJiZjUgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
+WE0gaW5zbnMgdG8gZGVjb2RldHJlZQplNWMxOTk1NDIxIHRhcmdldC9yaXNjdjogQ29udmVydCBS
+VlhJIGNzciBpbnNucyB0byBkZWNvZGV0cmVlCjVjMGQ1YWM0NmYgdGFyZ2V0L3Jpc2N2OiBDb252
+ZXJ0IFJWWEkgZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZQo1YWMxM2Q5MGI1IHRhcmdldC9yaXNj
+djogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQoyNDYyNDVkYmM0
+IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRy
+ZWUKYjNmZjViNzBmYiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNu
+cyB0byBkZWNvZGV0cmVlCjVkNWMwMmFkZGEgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJh
+bmNoIGluc25zIHRvIGRlY29kZXRyZWUKMjg4OGE4Y2M0MCB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRl
+IGRlY29kZXRyZWUgYW5kIGltcGxlbW50IExVSSAmIEFVSVBDCjlhNTc2NGUzNDggdGFyZ2V0L3Jp
+c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IDlhNTc2NGUzNDhjYSAodGFyZ2V0L3Jp
+c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQpCjIvMzUgQ2hl
+Y2tpbmcgY29tbWl0IDI4ODhhOGNjNDA0NSAodGFyZ2V0L3Jpc2N2OiBBY3RpdmF0ZSBkZWNvZGV0
+cmVlIGFuZCBpbXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMg
+ZmlsZXMKIzEyNTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjE4ODU6Citib29sIGRl
+Y29kZV9pbnNuMzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IGluc24pOwoKdG90YWw6IDEg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBjb21taXQgNWQ1YzAyYWRkYThkICh0
+YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8z
+NSBDaGVja2luZyBjb21taXQgYjNmZjViNzBmYjJkICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYz
+MkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1LzM1IENoZWNraW5nIGNvbW1pdCAy
+NDYyNDVkYmM0NDMgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25z
+IHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+NS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1IENoZWNraW5nIGNvbW1pdCA1YWMx
+M2Q5MGI1YjQgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8g
+ZGVjb2RldHJlZSkKNy8zNSBDaGVja2luZyBjb21taXQgNWMwZDVhYzQ2ZjJmICh0YXJnZXQvcmlz
+Y3Y6IENvbnZlcnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNvZGV0cmVlKQo4LzM1IENoZWNraW5n
+IGNvbW1pdCBlNWMxOTk1NDIxMGMgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNu
+cyB0byBkZWNvZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1pdCBiNzcxMTAyYmY1MzggKHRhcmdl
+dC9yaXNjdjogQ29udmVydCBSVlhNIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQ4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgMTQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KMTAvMzUgQ2hlY2tpbmcgY29tbWl0IGEyYTVhMWZiNzY2NyAodGFyZ2V0L3Jpc2N2OiBDb252
+ZXJ0IFJWMzJBIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzM1IENo
+ZWNraW5nIGNvbW1pdCA0NDI0Y2I1ZDBmNDQgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0QSBp
+bnNucyB0byBkZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBjb21taXQgYmYyMWFmNGYxZWFlICh0
+YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojNzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCA0MTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMzUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMTMvMzUgQ2hlY2tpbmcgY29tbWl0IDBiYTI2NzM5MDVhNCAodGFyZ2V0L3Jpc2N2
+OiBDb252ZXJ0IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUpCjE0LzM1IENoZWNraW5nIGNvbW1p
+dCAxYWNkZjllMTI5MjUgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyRCBpbnNucyB0byBkZWNv
+ZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM3MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8zNSBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVja2luZyBjb21taXQgNTYyZGRlYzZj
+NTk1ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTYv
+MzUgQ2hlY2tpbmcgY29tbWl0IGFhMDhmNTYxYjkzMiAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
+IHByaXYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMzUgQ2hlY2tp
+bmcgY29tbWl0IGI4ZmQ0MGZhNWQzMCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDAg
+b2YgUlZYQyBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBm
+aWxlcwojMjQ2OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6MTA2NzoKK2Jvb2wgZGVj
+b2RlX2luc24xNihEaXNhc0NvbnRleHQgKmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBl
+cnJvcnMsIDEgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8zNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKMTgvMzUgQ2hlY2tpbmcgY29tbWl0IDQ3ZDQxNjk3MzI5MCAo
+dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDEgb2YgUlZYQyBpbnNucyB0byBkZWNvZGV0
+cmVlKQoxOS8zNSBDaGVja2luZyBjb21taXQgOTIyZjVkZmU4ZjEwICh0YXJnZXQvcmlzY3Y6IENv
+bnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjIwLzM1IENoZWNr
+aW5nIGNvbW1pdCBmNmIwYWEwZWViZTYgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdlbl9qYWxyKCkp
+CjIxLzM1IENoZWNraW5nIGNvbW1pdCBiYjNmMWE5MDY1NTEgKHRhcmdldC9yaXNjdjogUmVtb3Zl
+IG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKSkKMjIvMzUgQ2hlY2tpbmcgY29tbWl0
+IDM5YTZhYzRjYzcxMCAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20g
+Z2VuX2xvYWQoKSkKMjMvMzUgQ2hlY2tpbmcgY29tbWl0IDlkOTc1YzVlZDI2NSAodGFyZ2V0L3Jp
+c2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX3N0b3JlKCkpCjI0LzM1IENoZWNr
+aW5nIGNvbW1pdCA1NGQ1N2EzOGY3MmQgKHRhcmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1t
+KCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucykKMjUvMzUgQ2hlY2tpbmcgY29tbWl0
+IGE5YTg2Yzg4ZjYyOCAodGFyZ2V0L3Jpc2N2OiBtYWtlIEFERC9TVUIvT1IvWE9SL0FORCBpbnNu
+IHVzZSBhcmcgbGlzdHMpCjI2LzM1IENoZWNraW5nIGNvbW1pdCAxZTg5ZWRiMGRiNTIgKHRhcmdl
+dC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcpCjI3LzM1
+IENoZWNraW5nIGNvbW1pdCA4OGFlNzY4MjdmMGIgKHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVh
+bCBkZWNvZGluZyBvZiBSVjMyLzY0TSBpbnNuKQoyOC8zNSBDaGVja2luZyBjb21taXQgNmNiNTY3
+NTBlMjFlICh0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5fYXJpdGgpCjI5
+LzM1IENoZWNraW5nIGNvbW1pdCAxMGU1MGE2ZGYzNGMgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdl
+bl9zeXN0ZW0oKSkKMzAvMzUgQ2hlY2tpbmcgY29tbWl0IDg2OGNkNGZlZGQwMyAodGFyZ2V0L3Jp
+c2N2OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkpCjMxLzM1IENoZWNraW5nIGNvbW1pdCAzNWI3
+NWZlNzljOTMgKHRhcmdldC9yaXNjdjogQ29udmVydCBAY3NfMiBpbnNucyB0byBzaGFyZSB0cmFu
+c2xhdGlvbiBmdW5jdGlvbnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxODI6
+IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzo1NDM6Citib29sIGRlY29kZV9pbnNuMTYo
+RGlzYXNDb250ZXh0ICpjdHgsIHVpbnQxNl90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxNjQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzEvMzUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCjMyLzM1IENoZWNraW5nIGNvbW1pdCAwZjBhZDA0NzhiYmMgKHRhcmdldC9yaXNj
+djogQ29udmVydCBAY2xfZCwgQGNsX3csIEBjc19kLCBAY3NfdyBpbnNucykKMzMvMzUgQ2hlY2tp
+bmcgY29tbWl0IDY1NDc5ZTQ4ZDM4YSAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgZnN3X3NkIGFuZCBm
+bHdfbGQgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjg6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDkgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMzMvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzQvMzUgQ2hl
+Y2tpbmcgY29tbWl0IDIwNTg1YWQ5MmZiZiAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgcmVtYWluaW5n
+IGNvbXByZXNzZWQgaW5zbiBwYWlycyBmb3IgcmlzY3YzMiB2cyByaXNjdjY0KQozNS8zNSBDaGVj
+a2luZyBjb21taXQgY2M4NTA1ZWQ0Yjk5ICh0YXJnZXQvcmlzY3Y6IFJlbWFpbmluZyBydmMgaW5z
+biByZXVzZSAzMiBiaXQgdHJhbnNsYXRvcnMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjEzMTU1NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2
+ZS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
