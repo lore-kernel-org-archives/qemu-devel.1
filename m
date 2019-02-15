@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33146)
+Received: from eggs.gnu.org ([209.51.188.92]:33603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1guccz-0000ue-4O
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:30:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1gucf4-0001lt-MK
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:32:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1guccy-00050V-9G
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:30:01 -0500
-References: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
-Date: Fri, 15 Feb 2019 06:29:50 -0600
+	(envelope-from <thuth@redhat.com>) id 1gucew-0007Dt-Jc
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:32:06 -0500
+References: <20181218115615.1499-1-philmd@redhat.com>
+	<20181218115615.1499-6-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cfde5bf6-3ab6-4b04-0fb1-382237700f5e@redhat.com>
+Date: Fri, 15 Feb 2019 13:31:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j"
-Subject: Re: [Qemu-devel] [PATCH] block: don't set the same context
+In-Reply-To: <20181218115615.1499-6-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/12] MAINTAINERS: Add missing entries
+ for the QObject section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j
-From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
-Message-ID: <13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
-Subject: Re: [PATCH] block: don't set the same context
-References: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2/15/19 3:19 AM, Denis Plotnikov wrote:
-> Adds a fast path on aio context setting preventing
-> unnecessary context setting routine.
-> Also, it prevents issues with cyclic walk of child
-> bds-es appeared because of registring aio walking
-
-registering
-
-> notifiers:
->=20
-
-> This can happen because of "new" context attachment to VM disk bds.
-> When attaching a new context the corresponding aio context handler is
-> called for each of aio_notifiers registered on the VM disk bds context.=
-
-> Among those handlers, there is the block_job_attached_aio_context handl=
-er
-> which sets a new aio context for the block job bds. When doing so,
-> the old context is detached from all the block job bds children and one=
- of
-> them is the VM disk bds, serving as backing store for the blockjob bds,=
-
-> although the VM disk bds is actually the initializer of that process.
-> Since the VM disk bds is protected with walking_aio_notifiers flag
-> from double processing in recursive calls, the assert fires.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+On 18/12/2018 12.56, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  block.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> v2: Removed qdist
+> ---
+>  MAINTAINERS | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7a94b0dab3..a381882c27 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1900,10 +1900,14 @@ F: include/qapi/qmp/
+>  X: include/qapi/qmp/dispatch.h
+>  F: scripts/coccinelle/qobject.cocci
+>  F: tests/check-qdict.c
+> -F: tests/check-qnum.c
+>  F: tests/check-qjson.c
+>  F: tests/check-qlist.c
+> +F: tests/check-qlit.c
+> +F: tests/check-qnull.c
+> +F: tests/check-qnum.c
+> +F: tests/check-qobject.c
+>  F: tests/check-qstring.c
+> +F: qdict-test-data.txt
+>  T: git https://repo.or.cz/qemu/armbru.git qapi-next
 
-Naive question - do we have to always call
-attach_aio_context/detach_aio_context in pairs?  If so, will
-short-circuiting a nested attach cause reference count problems when we
-come to the matching detach calls?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxmsL4ACgkQp6FrSiUn
-Q2pRXAf+M5EL5qSvypdoJcN/wDihC3d4Ky6P7uzFXyP1SLB2uCCwDs+9N5ZNgHjN
-3scUh99Vq0a5irlQUTSW09htbN41+zLw+EPXEGeH8+Bvd3P01B+iwNSHt/wRwOku
-nQHW6IKM9K2kwYsQ84viKzz+pep4ZL/ESAMgDd+AwJmwTuf8zxKXINYCuRHCbJT/
-AJHbrluuIliLzmYFgSFs9YuWqTdYU8bWo6/gJcbOyGgtEKhfBtb8W++HftO4DUAT
-q8TNJXRjC6cE3QmGinXobo1t2aEEqHwIdZgrg/rd0dUt2RfkNFTMJn0QbhBpcZrp
-dSIL53sSr8XttzLyymY7NE6hpHIylg==
-=gO52
------END PGP SIGNATURE-----
-
---II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
