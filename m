@@ -1,28 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42952)
+Received: from eggs.gnu.org ([209.51.188.92]:45295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guZXc-0001pT-Az
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:12:17 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1guZfJ-0003GC-4c
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:20:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1guZXb-0005QB-9S
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:12:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guZXb-0005O5-0h
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:12:15 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190214155714.8779-1-alex.bennee@linaro.org>
-	<bbefd980-c740-cb8f-a648-a6f51772d63d@redhat.com>
-	<8736oqhu6s.fsf@zen.linaroharston>
-Date: Fri, 15 Feb 2019 10:12:11 +0100
-In-Reply-To: <8736oqhu6s.fsf@zen.linaroharston> ("Alex =?utf-8?Q?Benn?=
-	=?utf-8?Q?=C3=A9e=22's?= message of
-	"Thu, 14 Feb 2019 22:38:35 +0000")
-Message-ID: <87pnrtxvo4.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/block: report when pflash backing file
- isn't aligned
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1guZfI-0007qx-CR
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:20:13 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 15 Feb 2019 12:19:50 +0300
+Message-Id: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] block: don't set the same context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +17,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, pkg-qemu-devel@lists.alioth.debian.org, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org
+To: kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com, eblake@redhat.com
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Adds a fast path on aio context setting preventing
+unnecessary context setting routine.
+Also, it prevents issues with cyclic walk of child
+bds-es appeared because of registring aio walking
+notifiers:
 
-> Laszlo Ersek <lersek@redhat.com> writes:
->
->> On 02/14/19 16:57, Alex Benn=C3=A9e wrote:
->>> It looks like there was going to be code to check we had some sort of
->>> alignment so lets replace it with an actual check. This is a bit more
->>> useful than the enigmatic "failed to read the initial flash content"
->>> when we attempt to read the number of bytes the device should have.
->>>
->>> This is a potential confusing stumbling block when you move from using
->>> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
->>> loading your firmware code.
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> ---
->>>  hw/block/pflash_cfi01.c | 19 +++++++++++++------
->>>  1 file changed, 13 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->>> index bffb4c40e7..f3251b236c 100644
->>> --- a/hw/block/pflash_cfi01.c
->>> +++ b/hw/block/pflash_cfi01.c
->>> @@ -722,12 +722,19 @@ static void pflash_cfi01_realize(DeviceState *dev=
-, Error **errp)
->>>      }
->>>      device_len =3D sector_len_per_device * blocks_per_device;
->>>
->>> -    /* XXX: to be fixed */
->>> -#if 0
->>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 =
-* 1024) &&
->>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024=
- * 1024))
->>> -        return NULL;
->>> -#endif
->>> +    /*
->>> +     * Validate the backing store is the right size for pflash
->>> +     * devices. It has to be padded to a multiple of the flash block
->>> +     * size.
->>> +     */
->>> +    if (pfl->blk) {
->>> +        uint64_t backing_len =3D blk_getlength(pfl->blk);
->>> +        if (device_len !=3D backing_len) {
->>> +            error_setg(errp, "backing file wrong size "
->>> +                       "(%" PRId64 " !=3D %" PRId64")", backing_len, d=
-evice_len);
->>> +            return;
->>> +        }
->>> +    }
->>>
->>>      memory_region_init_rom_device(
->>>          &pfl->mem, OBJECT(dev),
->>>
->>
->> I have two suggestions:
->> - backing_len and device_len are both uint64_t; we should print them
->>   with PRIu64
->
-> blk_getlength actually returns int64_t for some reason (do signed
-> lengths even make sense? maybe it's for error handling?). But sure I can
-> make it PRIu64
+Call stack:
 
-Use of signed integers for file offsets is pervasive in the block layer.
-It's convenient when we return either a non-negative offset or a
-negative error code.  It's admittedly sloppy anywhere else.
+0  __GI_raise
+1  __GI_abort
+2  __assert_fail_base
+3  __GI___assert_fail
+4  bdrv_detach_aio_context (bs=0x55f54d65c000)      <<<
+5  bdrv_detach_aio_context (bs=0x55f54fc8a800)
+6  bdrv_set_aio_context (bs=0x55f54fc8a800, ...)
+7  block_job_attached_aio_context
+8  bdrv_attach_aio_context (bs=0x55f54d65c000, ...) <<<
+9  bdrv_set_aio_context (bs=0x55f54d65c000)
+10 blk_set_aio_context
+11 virtio_blk_data_plane_stop
+12 virtio_bus_stop_ioeventfd
+13 virtio_vmstate_change
+14 vm_state_notify (running=0, state=RUN_STATE_SHUTDOWN)
+15 do_vm_stop (state=RUN_STATE_SHUTDOWN, send_stop=true)
+16 vm_stop (state=RUN_STATE_SHUTDOWN)
+17 main_loop_should_exit
+18 main_loop
+19 main
 
->> - from a user POV, I find it more useful if the error message also shows
->>   which quantity is which, not just two inequal numbers.
->
-> How about:
->
->   "backing file size (%) not enough for whole device (%)"
->
-> ?
+This can happen because of "new" context attachment to VM disk bds.
+When attaching a new context the corresponding aio context handler is
+called for each of aio_notifiers registered on the VM disk bds context.
+Among those handlers, there is the block_job_attached_aio_context handler
+which sets a new aio context for the block job bds. When doing so,
+the old context is detached from all the block job bds children and one of
+them is the VM disk bds, serving as backing store for the blockjob bds,
+although the VM disk bds is actually the initializer of that process.
+Since the VM disk bds is protected with walking_aio_notifiers flag
+from double processing in recursive calls, the assert fires.
 
-Not bad.  Another one, avoiding parentheses:
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-    "device needs DDD bytes, backing file provides only BBB bytes"
-
->
->>
->> I don't feel too strongly about this, so up to you.
+diff --git a/block.c b/block.c
+index adda221c2c..5742545e7a 100644
+--- a/block.c
++++ b/block.c
+@@ -5263,6 +5263,10 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
+ {
+     AioContext *ctx = bdrv_get_aio_context(bs);
+ 
++    if (ctx == new_context) {
++        return;
++    }
++
+     aio_disable_external(ctx);
+     bdrv_parent_drained_begin(bs, NULL, false);
+     bdrv_drain(bs); /* ensure there are no in-flight requests */
+-- 
+2.17.0
