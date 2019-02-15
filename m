@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49284)
+Received: from eggs.gnu.org ([209.51.188.92]:50056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gubkU-0002Ap-8v
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:33:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gubnt-0003Fh-Bw
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:37:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gubkO-0003pu-0k
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:33:37 -0500
-Date: Fri, 15 Feb 2019 12:33:17 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190215123317.6903b818@Igors-MacBook-Pro.local>
-In-Reply-To: <4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
-References: <20190214140714.15738-1-imammedo@redhat.com>
-	<4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gubns-0001mn-HB
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:37:13 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36997)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gubnr-0001ks-Vv
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:37:12 -0500
+Received: by mail-wm1-x341.google.com with SMTP id x10so9205598wmg.2
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:37:11 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Feb 2019 11:37:07 +0000
+Message-Id: <20190215113707.24553-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead
- of memory_region_allocate_system_memory()
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hw/arm/armsse: Fix memory leak in error-exit
+ path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-arm@nongnu.org, jan.kiszka@web.de, atar4qemu@gmail.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Thu, 14 Feb 2019 19:11:27 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Coverity points out (CID 1398632, CID 1398650) that we
+leak a couple of allocated strings in the error-exit
+code path for setting up the MHUs in the ARMSSE.
+Fix this bug by moving the allocate-and-free of each
+string to be closer to the use, so we do the free before
+doing the error-exit check.
 
-> On 14/02/19 15:07, Igor Mammedov wrote:
-> > Also some boards (ab)use memory_region_allocate_system_memory(), calling it several
-> > times to allocate various fixed sized chunks of RAM and ROMs, which is problematic
-> > to map to a single initial RAM Machine::memdev backend and is currently broken if
-> > -mem-path points to a not hugepage pool.
-> 
-> This is certainly a good idea.  However, I'm not sure why you would need
-> a memdev property on the Machine instead of just allowing 1 -numa node,
-> which is what really is.
+Fixes: f8574705f62b38a ("hw/arm/armsse: Add unimplemented-device stubs for MHUs")
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/armsse.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-using '-numa node' would be confusing to user when he/she is not interested in numa usecase
-it also would enable numa fdt/acpi parts generated automatically (fixable but then again
-it adds more to confusion) and in the end there are boards that do not support numa at all
-(s390x).
-
-Machine memdev (initial-ram-memdev) property looked generic enough to me that it could be
-used with every board, but could go on a bit further and instead of memdev an add initial-ram
-property that would reference something like -device builtin-ram (I think I've seen some board
-using a sysbus based ram device for initial ram).
-If you ask why it's machine property, then I'm following '-m' semantics which is basically
-a machine property and I don't have a better idea how to tell board on CLI to use some
-device/memdev as initial ram.
-
-
-> Thanks,
-> 
-> Paolo
-> 
+diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+index 9a8c49547db..d0207dbabc7 100644
+--- a/hw/arm/armsse.c
++++ b/hw/arm/armsse.c
+@@ -762,26 +762,28 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+ 
+     if (info->has_mhus) {
+         for (i = 0; i < ARRAY_SIZE(s->mhu); i++) {
+-            char *name = g_strdup_printf("MHU%d", i);
+-            char *port = g_strdup_printf("port[%d]", i + 3);
++            char *name;
++            char *port;
+ 
++            name = g_strdup_printf("MHU%d", i);
+             qdev_prop_set_string(DEVICE(&s->mhu[i]), "name", name);
+             qdev_prop_set_uint64(DEVICE(&s->mhu[i]), "size", 0x1000);
+             object_property_set_bool(OBJECT(&s->mhu[i]), true,
+                                      "realized", &err);
++            g_free(name);
+             if (err) {
+                 error_propagate(errp, err);
+                 return;
+             }
++            port = g_strdup_printf("port[%d]", i + 3);
+             mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mhu[i]), 0);
+             object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr),
+                                      port, &err);
++            g_free(port);
+             if (err) {
+                 error_propagate(errp, err);
+                 return;
+             }
+-            g_free(name);
+-            g_free(port);
+         }
+     }
+ 
+-- 
+2.20.1
