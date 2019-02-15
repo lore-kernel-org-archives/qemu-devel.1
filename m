@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59185)
+Received: from eggs.gnu.org ([209.51.188.92]:33210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gueWQ-0007qM-SQ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:31:25 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guehl-0003ma-6B
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gueWO-0000DR-JP
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:31:22 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:55252)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gueWN-0000Bh-Up
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:31:20 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id a62so10153186wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 06:31:19 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 15 Feb 2019 14:31:15 +0000
-Message-Id: <20190215143115.28777-4-alex.bennee@linaro.org>
-In-Reply-To: <20190215143115.28777-1-alex.bennee@linaro.org>
-References: <20190215143115.28777-1-alex.bennee@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1guehj-0005D3-9s
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:43:04 -0500
+Resent-Message-Id: <E1guehj-0005D3-9s@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155024175197.24.14699683220180100952@49fa7ef69f7b>
+In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/3] accel/tcg: move unaligned helpers out
- of core helpers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Feb 2019 06:42:32 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v7 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,417 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org, mark.cave-ayland@ilande.co.uk, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: palmer@sifive.com
+Cc: fam@euphon.net, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Using __flatten__ ends up with fairly large functions. Attempt to
-ameliorate this by moving the unaligned handling out of the main
-helper. We can now use __always_inline__ instead of __flatten__ and
-keep the main functions relatively small.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
----
-v3
-  - take care to mask high bits in unaligned_load_helper
----
- accel/tcg/cputlb.c | 200 ++++++++++++++++++++++++---------------------
- 1 file changed, 109 insertions(+), 91 deletions(-)
-
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 351f579fed..5f225e3623 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1206,10 +1206,47 @@ static inline uint64_t handle_bswap(uint64_t val, int size, bool big_endian)
-  * is disassembled. It shouldn't be called directly by guest code.
-  */
- 
--static tcg_target_ulong load_helper(CPUArchState *env, target_ulong addr,
--                                    TCGMemOpIdx oi, uintptr_t retaddr,
--                                    size_t size, bool big_endian,
--                                    bool code_read)
-+static inline __attribute__((__always_inline__))
-+tcg_target_ulong load_helper(CPUArchState *env, target_ulong addr,
-+                             TCGMemOpIdx oi, uintptr_t retaddr,
-+                             size_t size, bool big_endian,
-+                             bool code_read);
-+
-+static tcg_target_ulong unaligned_load_helper(CPUArchState *env, target_ulong addr,
-+                                              TCGMemOpIdx oi, uintptr_t retaddr,
-+                                              size_t size, bool big_endian,
-+                                              bool code_read)
-+{
-+    target_ulong addr1, addr2;
-+    tcg_target_ulong res, r1, r2;
-+    const tcg_target_ulong size_mask = MAKE_64BIT_MASK(0, size * 8);
-+    unsigned shift;
-+
-+    addr1 = addr & ~(size - 1);
-+    addr2 = addr1 + size;
-+
-+    r1 = load_helper(env, addr1, oi, retaddr, size, big_endian, code_read);
-+    r2 = load_helper(env, addr2, oi, retaddr, size, big_endian, code_read);
-+    shift = (addr & (size - 1)) * 8;
-+
-+    if (big_endian) {
-+        /* Big-endian combine.  */
-+        r2 &= size_mask;
-+        res = (r1 << shift) | (r2 >> ((size * 8) - shift));
-+    } else {
-+        /* Little-endian combine.  */
-+        r1 &= size_mask;
-+        res = (r1 >> shift) | (r2 << ((size * 8) - shift));
-+    }
-+    return res;
-+}
-+
-+
-+static inline __attribute__((__always_inline__))
-+tcg_target_ulong load_helper(CPUArchState *env, target_ulong addr,
-+                             TCGMemOpIdx oi, uintptr_t retaddr,
-+                             size_t size, bool big_endian,
-+                             bool code_read)
- {
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-@@ -1247,7 +1284,8 @@ static tcg_target_ulong load_helper(CPUArchState *env, target_ulong addr,
-         uint64_t tmp;
- 
-         if ((addr & (size - 1)) != 0) {
--            goto do_unaligned_access;
-+            return unaligned_load_helper(env, addr, oi, retaddr,
-+                                         size, big_endian, code_read);
-         }
- 
-         tmp = io_readx(env, iotlbentry, mmu_idx, addr, retaddr,
-@@ -1260,24 +1298,9 @@ static tcg_target_ulong load_helper(CPUArchState *env, target_ulong addr,
-     if (size > 1
-         && unlikely((addr & ~TARGET_PAGE_MASK) + size - 1
-                     >= TARGET_PAGE_SIZE)) {
--        target_ulong addr1, addr2;
--        tcg_target_ulong r1, r2;
--        unsigned shift;
--    do_unaligned_access:
--        addr1 = addr & ~(size - 1);
--        addr2 = addr1 + size;
--        r1 = load_helper(env, addr1, oi, retaddr, size, big_endian, code_read);
--        r2 = load_helper(env, addr2, oi, retaddr, size, big_endian, code_read);
--        shift = (addr & (size - 1)) * 8;
- 
--        if (big_endian) {
--            /* Big-endian combine.  */
--            res = (r1 << shift) | (r2 >> ((size * 8) - shift));
--        } else {
--            /* Little-endian combine.  */
--            res = (r1 >> shift) | (r2 << ((size * 8) - shift));
--        }
--        return res;
-+        return unaligned_load_helper(env, addr, oi, retaddr,
-+                                     size, big_endian, code_read);
-     }
- 
-     haddr = addr + entry->addend;
-@@ -1325,50 +1348,49 @@ static tcg_target_ulong load_helper(CPUArchState *env, target_ulong addr,
-  * We don't bother with this widened value for SOFTMMU_CODE_ACCESS.
-  */
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_ret_ldub_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                     uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 1, false, false);
- }
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_le_lduw_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 2, false, false);
- }
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_be_lduw_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 2, true, false);
- }
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_le_ldul_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 4, false, false);
- }
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_be_ldul_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 4, true, false);
- }
- 
--uint64_t __attribute__((flatten))
--helper_le_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-+
-+uint64_t helper_le_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                   uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 8, false, false);
- }
- 
--uint64_t __attribute__((flatten))
--helper_be_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-+uint64_t helper_be_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                   uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 8, true, false);
-@@ -1379,22 +1401,21 @@ helper_be_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-  * avoid this for 64-bit data, or for 32-bit data on 32-bit host.
-  */
- 
--
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_ret_ldsb_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                     uintptr_t retaddr)
- {
-     return (int8_t)helper_ret_ldub_mmu(env, addr, oi, retaddr);
- }
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_le_ldsw_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return (int16_t)helper_le_lduw_mmu(env, addr, oi, retaddr);
- }
- 
--tcg_target_ulong __attribute__((flatten))
-+tcg_target_ulong
- helper_be_ldsw_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-@@ -1418,10 +1439,43 @@ helper_be_ldsl_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
- /*
-  * Store Helpers
-  */
-+static inline __attribute__((__always_inline__))
-+void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-+                  TCGMemOpIdx oi, uintptr_t retaddr, size_t size,
-+                  bool big_endian);
- 
--static void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
--                         TCGMemOpIdx oi, uintptr_t retaddr, size_t size,
--                         bool big_endian)
-+
-+static void
-+unaligned_store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-+                       TCGMemOpIdx oi, uintptr_t retaddr, size_t size,
-+                       bool big_endian)
-+{
-+    int i;
-+
-+    /*
-+     * This is inefficient but simple and hopefully on the slow path
-+     * anyway. The loop must go in the forward direction to avoid
-+     * issues with self-modifying code in Windows 64-bit.
-+     */
-+    for (i = 0; i < size; ++i) {
-+        uint8_t val8;
-+        if (big_endian) {
-+            /* Big-endian extract.  */
-+            val8 = val >> (((size - 1) * 8) - (i * 8));
-+        } else {
-+            /* Little-endian extract.  */
-+            val8 = val >> (i * 8);
-+        }
-+        store_helper(env, addr + i, val8, oi, retaddr, 1, big_endian);
-+    }
-+    return;
-+}
-+
-+
-+static inline __attribute__((__always_inline__))
-+void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-+                  TCGMemOpIdx oi, uintptr_t retaddr, size_t size,
-+                  bool big_endian)
- {
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-@@ -1452,7 +1506,8 @@ static void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-         CPUIOTLBEntry *iotlbentry = &env->iotlb[mmu_idx][index];
- 
-         if ((addr & (size - 1)) != 0) {
--            goto do_unaligned_access;
-+            unaligned_store_helper(env, addr, val, oi, retaddr, size, big_endian);
-+            return;
-         }
- 
-         io_writex(env, iotlbentry, mmu_idx,
-@@ -1465,44 +1520,7 @@ static void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-     if (size > 1
-         && unlikely((addr & ~TARGET_PAGE_MASK) + size - 1
-                      >= TARGET_PAGE_SIZE)) {
--        int i;
--        uintptr_t index2;
--        CPUTLBEntry *entry2;
--        target_ulong page2, tlb_addr2;
--    do_unaligned_access:
--        /*
--         * Ensure the second page is in the TLB.  Note that the first page
--         * is already guaranteed to be filled, and that the second page
--         * cannot evict the first.
--         */
--        page2 = (addr + size) & TARGET_PAGE_MASK;
--        index2 = tlb_index(env, mmu_idx, page2);
--        entry2 = tlb_entry(env, mmu_idx, index2);
--        tlb_addr2 = tlb_addr_write(entry2);
--        if (!tlb_hit_page(tlb_addr2, page2)
--            && !VICTIM_TLB_HIT(addr_write, page2)) {
--            tlb_fill(ENV_GET_CPU(env), page2, size, MMU_DATA_STORE,
--                     mmu_idx, retaddr);
--            index2 = tlb_index(env, mmu_idx, page2);
--            entry2 = tlb_entry(env, mmu_idx, index2);
--        }
--
--        /*
--         * XXX: not efficient, but simple.
--         * This loop must go in the forward direction to avoid issues
--         * with self-modifying code in Windows 64-bit.
--         */
--        for (i = 0; i < size; ++i) {
--            uint8_t val8;
--            if (big_endian) {
--                /* Big-endian extract.  */
--                val8 = val >> (((size - 1) * 8) - (i * 8));
--            } else {
--                /* Little-endian extract.  */
--                val8 = val >> (i * 8);
--            }
--            store_helper(env, addr + i, val8, oi, retaddr, 1, big_endian);
--        }
-+        unaligned_store_helper(env, addr, val, oi, retaddr, size, big_endian);
-         return;
-     }
- 
-@@ -1539,49 +1557,49 @@ static void store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-     }
- }
- 
--void __attribute__((flatten))
-+void
- helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
-                    TCGMemOpIdx oi, uintptr_t retaddr)
- {
-     store_helper(env, addr, val, oi, retaddr, 1, false);
- }
- 
--void __attribute__((flatten))
-+void
- helper_le_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
-                   TCGMemOpIdx oi, uintptr_t retaddr)
- {
-     store_helper(env, addr, val, oi, retaddr, 2, false);
- }
- 
--void __attribute__((flatten))
-+void
- helper_be_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
-                   TCGMemOpIdx oi, uintptr_t retaddr)
- {
-     store_helper(env, addr, val, oi, retaddr, 2, true);
- }
- 
--void __attribute__((flatten))
-+void
- helper_le_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
-                   TCGMemOpIdx oi, uintptr_t retaddr)
- {
-     store_helper(env, addr, val, oi, retaddr, 4, false);
- }
- 
--void __attribute__((flatten))
-+void
- helper_be_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t val,
-                   TCGMemOpIdx oi, uintptr_t retaddr)
- {
-     store_helper(env, addr, val, oi, retaddr, 4, true);
- }
- 
--void __attribute__((flatten))
-+void
- helper_le_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
-                   TCGMemOpIdx oi, uintptr_t retaddr)
- {
-     store_helper(env, addr, val, oi, retaddr, 8, false);
- }
- 
--void __attribute__((flatten))
-+void
- helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
-                   TCGMemOpIdx oi, uintptr_t retaddr)
- {
-@@ -1647,49 +1665,49 @@ helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
- 
- /* Code access functions.  */
- 
--uint8_t __attribute__((flatten))
-+uint8_t
- helper_ret_ldb_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                     uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 1, false, true);
- }
- 
--uint16_t __attribute__((flatten))
-+uint16_t
- helper_le_ldw_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 2, false, true);
- }
- 
--uint16_t __attribute__((flatten))
-+uint16_t
- helper_be_ldw_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 2, true, true);
- }
- 
--uint32_t __attribute__((flatten))
-+uint32_t
- helper_le_ldl_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 4, false, true);
- }
- 
--uint32_t __attribute__((flatten))
-+uint32_t
- helper_be_ldl_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 4, true, true);
- }
- 
--uint64_t __attribute__((flatten))
-+uint64_t
- helper_le_ldq_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
-     return load_helper(env, addr, oi, retaddr, 8, false, true);
- }
- 
--uint64_t __attribute__((flatten))
-+uint64_t
- helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-                    uintptr_t retaddr)
- {
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE1NTQxNC4yMjI4
+NS0xLXBhbG1lckBzaWZpdmUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxMzE1NTQxNC4yMjI4NS0xLXBhbG1lckBzaWZp
+dmUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMzVdIHRhcmdldC9yaXNj
+djogQ29udmVydCB0byBkZWNvZGV0cmVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAy
+MTMxNTU0MTQuMjIyODUtMS1wYWxtZXJAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEzMTU1
+NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2ZS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwozMDE2YjRkNTYyIHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMy
+IGJpdCB0cmFuc2xhdG9ycwoyNGIwNmQzNjBlIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmlu
+ZyBjb21wcmVzc2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NApjNDI5ZGMwYmNj
+IHRhcmdldC9yaXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJp
+c2N2NjQKNDcwNTgwMGU3MyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3Nf
+ZCwgQGNzX3cgaW5zbnMKYjYwODE0MzIwMCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5z
+bnMgdG8gc2hhcmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjRmMmY0OWY3ZDUgdGFyZ2V0L3Jpc2N2
+OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkKYmRmZDE5Y2MwMiB0YXJnZXQvcmlzY3Y6IFJlbW92
+ZSBnZW5fc3lzdGVtKCkKMjU5NTA5M2EzMyB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0
+aCB0byBnZW5fYXJpdGgKYTYxODQyMjJiMCB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVj
+b2Rpbmcgb2YgUlYzMi82NE0gaW5zbgozOThkMDI3YWZhIHRhcmdldC9yaXNjdjogUmVtb3ZlIHNo
+aWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcKNjE3MGZkNjVhMSB0YXJnZXQvcmlzY3Y6
+IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0cwphY2VjYzhmZmE2IHRh
+cmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1
+bmN0aW9ucwpmMDJkYzY4ZjdlIHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBm
+cm9tIGdlbl9zdG9yZSgpCjk5NjA0MTU1YjkgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRl
+Y29kaW5nIGZyb20gZ2VuX2xvYWQoKQphYTliZjJlNzY3IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1h
+bnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKQoyY2ZiNThmNDUwIHRhcmdldC9yaXNjdjog
+UmVtb3ZlIGdlbl9qYWxyKCkKYjc3MWEwMTIzYiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJh
+bnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNzlmZjE2Mjk0ZiB0YXJnZXQvcmlzY3Y6
+IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKM2Q3MGQ2NTI3
+MyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29k
+ZXRyZWUKYzJlMTkwYWM0MSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBk
+ZWNvZGV0cmVlCjRhZWIyYWMwYmQgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRv
+IGRlY29kZXRyZWUKMWYzYmUxZmRlMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMg
+dG8gZGVjb2RldHJlZQpmYWJhZGIxNWQ4IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNu
+cyB0byBkZWNvZGV0cmVlCmFkNzk5MzJkOTIgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGlu
+c25zIHRvIGRlY29kZXRyZWUKN2M2MDE4NGMyZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEg
+aW5zbnMgdG8gZGVjb2RldHJlZQpmMzc2YzEwYTVkIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMy
+QSBpbnNucyB0byBkZWNvZGV0cmVlCmY3MjUzNWI3NWQgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
+WE0gaW5zbnMgdG8gZGVjb2RldHJlZQphYzRjOTJkYTM3IHRhcmdldC9yaXNjdjogQ29udmVydCBS
+VlhJIGNzciBpbnNucyB0byBkZWNvZGV0cmVlCmI4YjJmNzViY2QgdGFyZ2V0L3Jpc2N2OiBDb252
+ZXJ0IFJWWEkgZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZQo4ODlhZjU4Nzc0IHRhcmdldC9yaXNj
+djogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQo4NzgzYmMzYWQ3
+IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRy
+ZWUKZjZlODJlMTg5YyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNu
+cyB0byBkZWNvZGV0cmVlCmRiMzAxN2I5MGMgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJh
+bmNoIGluc25zIHRvIGRlY29kZXRyZWUKY2Q5ZDdkZWQyMCB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRl
+IGRlY29kZXRyZWUgYW5kIGltcGxlbW50IExVSSAmIEFVSVBDCjRlOWViMGY3MjIgdGFyZ2V0L3Jp
+c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IDRlOWViMGY3MjJmNiAodGFyZ2V0L3Jp
+c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQpCjIvMzUgQ2hl
+Y2tpbmcgY29tbWl0IGNkOWQ3ZGVkMjA4NiAodGFyZ2V0L3Jpc2N2OiBBY3RpdmF0ZSBkZWNvZGV0
+cmVlIGFuZCBpbXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMg
+ZmlsZXMKIzEyNTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjE4ODU6Citib29sIGRl
+Y29kZV9pbnNuMzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IGluc24pOwoKdG90YWw6IDEg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBjb21taXQgZGIzMDE3YjkwYzllICh0
+YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8z
+NSBDaGVja2luZyBjb21taXQgZjZlODJlMTg5Y2MxICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYz
+MkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1LzM1IENoZWNraW5nIGNvbW1pdCA4
+NzgzYmMzYWQ3NTUgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25z
+IHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+NS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1IENoZWNraW5nIGNvbW1pdCA4ODlh
+ZjU4Nzc0NWIgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8g
+ZGVjb2RldHJlZSkKNy8zNSBDaGVja2luZyBjb21taXQgYjhiMmY3NWJjZDZjICh0YXJnZXQvcmlz
+Y3Y6IENvbnZlcnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNvZGV0cmVlKQo4LzM1IENoZWNraW5n
+IGNvbW1pdCBhYzRjOTJkYTM3ZjAgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNu
+cyB0byBkZWNvZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1pdCBmNzI1MzViNzVkZjIgKHRhcmdl
+dC9yaXNjdjogQ29udmVydCBSVlhNIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQ4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgMTQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KMTAvMzUgQ2hlY2tpbmcgY29tbWl0IGYzNzZjMTBhNWRmZiAodGFyZ2V0L3Jpc2N2OiBDb252
+ZXJ0IFJWMzJBIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzM1IENo
+ZWNraW5nIGNvbW1pdCA3YzYwMTg0YzJmNjkgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0QSBp
+bnNucyB0byBkZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBjb21taXQgYWQ3OTkzMmQ5MjAwICh0
+YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojNzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCA0MTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMzUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMTMvMzUgQ2hlY2tpbmcgY29tbWl0IGZhYmFkYjE1ZDgzZCAodGFyZ2V0L3Jpc2N2
+OiBDb252ZXJ0IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUpCjE0LzM1IENoZWNraW5nIGNvbW1p
+dCAxZjNiZTFmZGUxMTMgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyRCBpbnNucyB0byBkZWNv
+ZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM3MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8zNSBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVja2luZyBjb21taXQgNGFlYjJhYzBi
+ZDY4ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTYv
+MzUgQ2hlY2tpbmcgY29tbWl0IGMyZTE5MGFjNDE5MyAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
+IHByaXYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMzUgQ2hlY2tp
+bmcgY29tbWl0IDNkNzBkNjUyNzNlMCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDAg
+b2YgUlZYQyBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBm
+aWxlcwojMjQ2OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6MTA2NzoKK2Jvb2wgZGVj
+b2RlX2luc24xNihEaXNhc0NvbnRleHQgKmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBl
+cnJvcnMsIDEgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8zNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKMTgvMzUgQ2hlY2tpbmcgY29tbWl0IDc5ZmYxNjI5NGY5YyAo
+dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDEgb2YgUlZYQyBpbnNucyB0byBkZWNvZGV0
+cmVlKQoxOS8zNSBDaGVja2luZyBjb21taXQgYjc3MWEwMTIzYjc1ICh0YXJnZXQvcmlzY3Y6IENv
+bnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjIwLzM1IENoZWNr
+aW5nIGNvbW1pdCAyY2ZiNThmNDUwNzQgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdlbl9qYWxyKCkp
+CjIxLzM1IENoZWNraW5nIGNvbW1pdCBhYTliZjJlNzY3NWQgKHRhcmdldC9yaXNjdjogUmVtb3Zl
+IG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKSkKMjIvMzUgQ2hlY2tpbmcgY29tbWl0
+IDk5NjA0MTU1YjlhYiAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20g
+Z2VuX2xvYWQoKSkKMjMvMzUgQ2hlY2tpbmcgY29tbWl0IGYwMmRjNjhmN2UwZiAodGFyZ2V0L3Jp
+c2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX3N0b3JlKCkpCjI0LzM1IENoZWNr
+aW5nIGNvbW1pdCBhY2VjYzhmZmE2MDAgKHRhcmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1t
+KCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucykKMjUvMzUgQ2hlY2tpbmcgY29tbWl0
+IDYxNzBmZDY1YTFlNSAodGFyZ2V0L3Jpc2N2OiBtYWtlIEFERC9TVUIvT1IvWE9SL0FORCBpbnNu
+IHVzZSBhcmcgbGlzdHMpCjI2LzM1IENoZWNraW5nIGNvbW1pdCAzOThkMDI3YWZhZDYgKHRhcmdl
+dC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcpCjI3LzM1
+IENoZWNraW5nIGNvbW1pdCBhNjE4NDIyMmIwYWMgKHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVh
+bCBkZWNvZGluZyBvZiBSVjMyLzY0TSBpbnNuKQoyOC8zNSBDaGVja2luZyBjb21taXQgMjU5NTA5
+M2EzMzViICh0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5fYXJpdGgpCjI5
+LzM1IENoZWNraW5nIGNvbW1pdCBiZGZkMTljYzAyNGEgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdl
+bl9zeXN0ZW0oKSkKMzAvMzUgQ2hlY2tpbmcgY29tbWl0IDRmMmY0OWY3ZDUwNCAodGFyZ2V0L3Jp
+c2N2OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkpCjMxLzM1IENoZWNraW5nIGNvbW1pdCBiNjA4
+MTQzMjAwOTEgKHRhcmdldC9yaXNjdjogQ29udmVydCBAY3NfMiBpbnNucyB0byBzaGFyZSB0cmFu
+c2xhdGlvbiBmdW5jdGlvbnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxODI6
+IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzo1NDM6Citib29sIGRlY29kZV9pbnNuMTYo
+RGlzYXNDb250ZXh0ICpjdHgsIHVpbnQxNl90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxNjQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzEvMzUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCjMyLzM1IENoZWNraW5nIGNvbW1pdCA0NzA1ODAwZTczMzIgKHRhcmdldC9yaXNj
+djogQ29udmVydCBAY2xfZCwgQGNsX3csIEBjc19kLCBAY3NfdyBpbnNucykKMzMvMzUgQ2hlY2tp
+bmcgY29tbWl0IGM0MjlkYzBiY2M4ZSAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgZnN3X3NkIGFuZCBm
+bHdfbGQgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjg6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDkgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMzMvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzQvMzUgQ2hl
+Y2tpbmcgY29tbWl0IDI0YjA2ZDM2MGUyNyAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgcmVtYWluaW5n
+IGNvbXByZXNzZWQgaW5zbiBwYWlycyBmb3IgcmlzY3YzMiB2cyByaXNjdjY0KQozNS8zNSBDaGVj
+a2luZyBjb21taXQgMzAxNmI0ZDU2MjhlICh0YXJnZXQvcmlzY3Y6IFJlbWFpbmluZyBydmMgaW5z
+biByZXVzZSAzMiBiaXQgdHJhbnNsYXRvcnMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjEzMTU1NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2
+ZS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
