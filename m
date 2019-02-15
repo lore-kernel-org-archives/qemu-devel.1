@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50045)
+Received: from eggs.gnu.org ([209.51.188.92]:51329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gug36-0005PQ-9r
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:09:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1gug8S-0001Cy-R4
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:14:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gug34-0006Db-Ey
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:09:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gug34-0006B6-5z
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:09:10 -0500
-Date: Fri, 15 Feb 2019 17:09:03 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190215160903.GB7941@localhost.localdomain>
-References: <20181107131000.27744-1-danielhb413@gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1gug8S-0001x9-1g
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:14:44 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181218115615.1499-1-philmd@redhat.com>
+	<20181218115615.1499-6-philmd@redhat.com>
+Date: Fri, 15 Feb 2019 17:14:41 +0100
+In-Reply-To: <20181218115615.1499-6-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue,
+	18 Dec 2018 12:56:08 +0100")
+Message-ID: <87o97dyqoe.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181107131000.27744-1-danielhb413@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 0/3] HMP/snapshot changes - do
- not use ID anymore
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/12] MAINTAINERS: Add missing entries
+ for the QObject section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com, armbru@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Luc Michel <luc.michel@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Am 07.11.2018 um 14:09 hat Daniel Henrique Barboza geschrieben:
-> changes in v3:
-> - rebased to v3.1.0-rc0 tag
-> - hmp-commands.hx documentation now mentions the change of semantics
-> starting version 3.2.
-> - previous version link:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg00629.html
-> 
-> 
-> It is not uncommon to see bugs being opened by testers that attempt to
-> create VM snapshots using HMP. It turns out that "0" and "1" are quite
-> common snapshot names and they trigger a lot of bugs. I gave an example
-> in the commit message of patch 1, but to sum up here: QEMU treats the
-> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It
-> is documented as such, but this can lead to strange situations.
-> 
-> Given that it is strange for an API to consider a parameter to be 2 fields
-> at the same time, and inadvently treating them as one or the other, and
-> that removing the ID field is too drastic, my idea here is to keep the
-> ID field for internal control, but do not let the user set it.
-> 
-> This series simplifies the meaning of savevm/loadvm/delvm to be up to
-> par to what the QEMU code (and Libvirt) is already doing: snapshot
-> operations using "tag" semantics only, leaving the "id" to be
-> automatically calculated by the block drivers and used internally
-> only.
-> 
-> This change of semantics does not affect existing snapshots. What
-> changes is that any HMP operations with them will use the
-> updated semantics.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Thanks, applied to the block branch.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> v2: Removed qdist
+> ---
+>  MAINTAINERS | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7a94b0dab3..a381882c27 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1900,10 +1900,14 @@ F: include/qapi/qmp/
+>  X: include/qapi/qmp/dispatch.h
+>  F: scripts/coccinelle/qobject.cocci
+>  F: tests/check-qdict.c
+> -F: tests/check-qnum.c
+>  F: tests/check-qjson.c
+>  F: tests/check-qlist.c
+> +F: tests/check-qlit.c
+> +F: tests/check-qnull.c
+> +F: tests/check-qnum.c
+> +F: tests/check-qobject.c
+>  F: tests/check-qstring.c
+> +F: qdict-test-data.txt
+>  T: git https://repo.or.cz/qemu/armbru.git qapi-next
+>=20=20
+>  QEMU Guest Agent
 
-Kevin
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
