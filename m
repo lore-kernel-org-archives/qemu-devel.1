@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51946)
+Received: from eggs.gnu.org ([209.51.188.92]:51994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAe-00031t-FJ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:03 -0500
+	(envelope-from <clg@kaod.org>) id 1gugAg-00033V-BK
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAc-0005aO-W8
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41482)
+	(envelope-from <clg@kaod.org>) id 1gugAd-0005ci-Lw
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56342)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAc-0005Xb-J4
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:16:58 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAd-0005Ys-6q
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:16:59 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGBXAm038901
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:56 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0p2rstq-1
+	x1FGEXn5105488
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:57 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0s2g6sk-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:56 -0500
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:57 -0500
 Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
 	Fri, 15 Feb 2019 16:16:54 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 17:16:43 +0100
+Date: Fri, 15 Feb 2019 17:16:46 +0100
 In-Reply-To: <20190215161648.9600-1-clg@kaod.org>
 References: <20190215161648.9600-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215161648.9600-6-clg@kaod.org>
+Message-Id: <20190215161648.9600-9-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/10] target/ppc: Rename "in_pm_state" to
- "resume_as_sreset"
+Subject: [Qemu-devel] [PATCH 08/10] target/ppc: Add Hypervisor
+ Virtualization Interrupt on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,93 +45,139 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@ker
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-To better reflect what this does, as it's specific to some of the
-P7/P8/P9 PM states, not generic.
+This adds support for delivering that exception
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h         | 6 +++---
- hw/ppc/ppc.c             | 2 +-
- target/ppc/excp_helper.c | 8 ++++----
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ target/ppc/cpu.h                |  5 ++++-
+ target/ppc/excp_helper.c        | 17 ++++++++++++++++-
+ target/ppc/translate_init.inc.c | 16 +++++++++++++++-
+ 3 files changed, 35 insertions(+), 3 deletions(-)
 
 diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 190e8127f14f..945cb4bb7dde 100644
+index 945cb4bb7dde..ce55aa209770 100644
 --- a/target/ppc/cpu.h
 +++ b/target/ppc/cpu.h
-@@ -1117,10 +1117,10 @@ struct CPUPPCState {
+@@ -160,8 +160,10 @@ enum {
+     /* Server doorbell variants */
+     POWERPC_EXCP_SDOOR    =3D 99,
+     POWERPC_EXCP_SDOOR_HV =3D 100,
++    /* ISA 3.00 additions */
++    POWERPC_EXCP_HVIRT    =3D 101,
+     /* EOL                                                              =
+     */
+-    POWERPC_EXCP_NB       =3D 101,
++    POWERPC_EXCP_NB       =3D 102,
+     /* QEMU exceptions: used internally during code translation         =
+     */
+     POWERPC_EXCP_STOP         =3D 0x200, /* stop translation            =
+       */
+     POWERPC_EXCP_BRANCH       =3D 0x201, /* branch instruction          =
+       */
+@@ -2349,6 +2351,7 @@ enum {
+     PPC_INTERRUPT_PERFM,          /* Performance monitor interrupt      =
+  */
+     PPC_INTERRUPT_HMI,            /* Hypervisor Maintainance interrupt  =
+  */
+     PPC_INTERRUPT_HDOORBELL,      /* Hypervisor Doorbell interrupt      =
+  */
++    PPC_INTERRUPT_HVIRT,          /* Hypervisor virtualization interrupt=
+  */
+ };
 =20
-     /*
-      * On P7/P8/P9, set when in PM state, we need to handle resume in
--     * a special way (such as routing some resume causes to 0x100), so
--     * flag this here.
-+     * a special way (such as routing some resume causes to 0x100, ie,
-+     * sreset), so flag this here.
-      */
--    bool in_pm_state;
-+    bool resume_as_sreset;
- #endif
-=20
-     /* Those resources are used only during code translation */
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index cffdc3914a6c..12439dbe5d43 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -776,7 +776,7 @@ static inline void cpu_ppc_hdecr_excp(PowerPCCPU *cpu=
-)
-      * interrupts in a PM state. Not only they don't cause a
-      * wakeup but they also get effectively discarded.
-      */
--    if (!env->in_pm_state) {
-+    if (!env->resume_as_sreset) {
-         ppc_set_irq(cpu, PPC_INTERRUPT_HDECR, 1);
-     }
- }
+ /* Processor Compatibility mask (PCR) */
 diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 489a54f51b90..7536620a4133 100644
+index 1a2f469a5fa2..d171a5eb6236 100644
 --- a/target/ppc/excp_helper.c
 +++ b/target/ppc/excp_helper.c
-@@ -69,7 +69,7 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
+@@ -97,6 +97,9 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
 te *env, int excp,
-                                 target_ulong *msr)
- {
-     /* We no longer are in a PM state */
--    env->in_pm_state =3D false;
-+    env->resume_as_sreset =3D false;
-=20
-     /* Pretend to be returning from doze always as we don't lose state *=
-/
-     *msr |=3D (0x1ull << (63 - 47));
-@@ -141,7 +141,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+     case POWERPC_EXCP_HV_MAINT:
+         *msr |=3D 0xaull << (63 - 45);
+         break;
++    case POWERPC_EXCP_HVIRT:
++        *msr |=3D 0x9ull << (63 - 45);
++        break;
+     default:
+         cpu_abort(cs, "Unsupported exception %d in Power Save mode\n",
+                   excp);
+@@ -427,6 +430,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
 excp_model, int excp)
-      * check for special resume at 0x100 from doze/nap/sleep/winkle on
-      * P7/P8/P9
-      */
--    if (env->in_pm_state) {
-+    if (env->resume_as_sreset) {
-         excp =3D powerpc_reset_wakeup(cs, env, excp, &msr);
+     case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
+tion */
+     case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
+     */
+     case POWERPC_EXCP_HV_EMU:
++    case POWERPC_EXCP_HVIRT:     /* Hypervisor virtualization           =
+     */
+         srr0 =3D SPR_HSRR0;
+         srr1 =3D SPR_HSRR1;
+         new_msr |=3D (target_ulong)MSR_HVB;
+@@ -809,7 +813,18 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+             return;
+         }
      }
-=20
-@@ -787,7 +787,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-      * clear when coming out of some power management states (in order
-      * for them to become a 0x100).
-      */
--    async_deliver =3D (msr_ee !=3D 0) || env->in_pm_state;
-+    async_deliver =3D (msr_ee !=3D 0) || env->resume_as_sreset;
-=20
-     /* Hypervisor decrementer exception */
-     if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDECR)) {
-@@ -970,7 +970,7 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
-t insn)
-     env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
-=20
-     /* Condition for waking up at 0x100 */
--    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
-+    env->resume_as_sreset =3D (insn !=3D PPC_PM_STOP) ||
-         (env->spr[SPR_PSSCR] & PSSCR_EC);
+-    /* Extermal interrupt can ignore MSR:EE under some circumstances */
++
++    /* Hypervisor virtualization interrupt */
++    if (env->pending_interrupts & (1 << PPC_INTERRUPT_HVIRT)) {
++        /* LPCR will be clear when not supported so this will work */
++        bool hvice =3D !!(env->spr[SPR_LPCR] & LPCR_HVICE);
++        if ((async_deliver || msr_hv =3D=3D 0) && hvice) {
++            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_HVIRT);
++            return;
++        }
++    }
++
++    /* External interrupt can ignore MSR:EE under some circumstances */
+     if (env->pending_interrupts & (1 << PPC_INTERRUPT_EXT)) {
+         bool lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
+         if (async_deliver || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
+es0)) {
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index f8a780e323f2..ae88e004faef 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -3313,6 +3313,15 @@ static void init_excp_POWER8(CPUPPCState *env)
+ #endif
  }
- #endif /* defined(TARGET_PPC64) */
+=20
++static void init_excp_POWER9(CPUPPCState *env)
++{
++    init_excp_POWER8(env);
++
++#if !defined(CONFIG_USER_ONLY)
++    env->excp_vectors[POWERPC_EXCP_HVIRT]    =3D 0x00000EA0;
++#endif
++}
++
+ #endif
+=20
+ /***********************************************************************=
+******/
+@@ -8783,7 +8792,7 @@ static void init_proc_POWER9(CPUPPCState *env)
+     env->icache_line_size =3D 128;
+=20
+     /* Allocate hardware IRQ controller */
+-    init_excp_POWER8(env);
++    init_excp_POWER9(env);
+     ppcPOWER7_irq_init(ppc_env_get_cpu(env));
+ }
+=20
+@@ -8836,6 +8845,11 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+             (env->spr[SPR_LPCR] & LPCR_HDEE)) {
+             return true;
+         }
++        /* Hypervisor virtualization exception */
++        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HVIRT)) &&
++            (env->spr[SPR_LPCR] & LPCR_HVEE)) {
++            return true;
++        }
+         if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
+             return true;
+         }
 --=20
 2.20.1
