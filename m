@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35197)
+Received: from eggs.gnu.org ([209.51.188.92]:37361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1guesI-0007yF-Rf
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:53:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guf1v-0001UQ-LF
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:03:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1guesH-00049Y-UI
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:53:58 -0500
-Received: from 15.mo3.mail-out.ovh.net ([87.98.150.177]:55929)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1guesH-00046R-L1
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 09:53:57 -0500
-Received: from player715.ha.ovh.net (unknown [10.109.160.12])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 224851FC4BB
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 15:53:55 +0100 (CET)
-Date: Fri, 15 Feb 2019 15:53:36 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190215155336.0432e393@bahia.lan>
-In-Reply-To: <20190215133005.15955-2-david@redhat.com>
-References: <20190215133005.15955-1-david@redhat.com>
-	<20190215133005.15955-2-david@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1guf1r-0007cX-Qg
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:03:55 -0500
+Resent-Message-Id: <E1guf1r-0007cX-Qg@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1guf1q-0007Ts-WF
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:03:51 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155024299896.24.16988073178267343063@49fa7ef69f7b>
+In-Reply-To: <20190215143115.28777-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] cpus: Properly release the iothread
- lock when killing a dummy VCPU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Feb 2019 07:03:20 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH  v3 0/3] softmmu demacro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: alex.bennee@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, cota@braap.org, mark.cave-ayland@ilande.co.uk
 
-On Fri, 15 Feb 2019 14:30:00 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> This enables CPU unplug under qtest.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  cpus.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 154daf57dc..e83f72b48b 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1333,6 +1333,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
->          qemu_wait_io_event(cpu);
->      } while (!cpu->unplug);
->  
-> +    qemu_mutex_unlock_iothread();
->      rcu_unregister_thread();
->      return NULL;
->  #endif
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNTE0MzExNS4yODc3
+Ny0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMjE1MTQzMTE1LjI4Nzc3LTEtYWxleC5i
+ZW5uZWVAbGluYXJvLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIICB2MyAwLzNdIHNv
+ZnRtbXUgZGVtYWNybwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
+cWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTkwMjE1MTMzMDA1LjE1
+OTU1LTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE1MTMzMDA1LjE1OTU1LTEt
+ZGF2aWRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkw
+MjE1MTQzMTE1LjI4Nzc3LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkw
+MjE1MTQzMTE1LjI4Nzc3LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCmUyNjQ5N2M0YzEgYWNjZWwvdGNnOiBtb3ZlIHVuYWxpZ25lZCBoZWxw
+ZXJzIG91dCBvZiBjb3JlIGhlbHBlcnMKYmI3YTU3YmZmYiBhY2NlbC90Y2c6IHJlbW92ZSBzb2Z0
+bW11X3RlbXBsYXRlLmgKM2EzY2ZjMGQ5MiBhY2NlbC90Y2c6IGRlbWFjcm8gY3B1dGxiCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IDNhM2NmYzBkOTIyMyAoYWNjZWwv
+dGNnOiBkZW1hY3JvIGNwdXRsYikKMi8zIENoZWNraW5nIGNvbW1pdCBiYjdhNTdiZmZiZTAgKGFj
+Y2VsL3RjZzogcmVtb3ZlIHNvZnRtbXVfdGVtcGxhdGUuaCkKV0FSTklORzogYWRkZWQsIG1vdmVk
+IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTE6
+IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
+MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8z
+IENoZWNraW5nIGNvbW1pdCBlMjY0OTdjNGMxZTUgKGFjY2VsL3RjZzogbW92ZSB1bmFsaWduZWQg
+aGVscGVycyBvdXQgb2YgY29yZSBoZWxwZXJzKQpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
+aWRlZCBpbiAuYyBmaWxlcwojMjk6IEZJTEU6IGFjY2VsL3RjZy9jcHV0bGIuYzoxMjEwOgordGNn
+X3RhcmdldF91bG9uZyBsb2FkX2hlbHBlcihDUFVBcmNoU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25n
+IGFkZHIsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IGFjY2Vs
+L3RjZy9jcHV0bGIuYzoxMjE1Ogorc3RhdGljIHRjZ190YXJnZXRfdWxvbmcgdW5hbGlnbmVkX2xv
+YWRfaGVscGVyKENQVUFyY2hTdGF0ZSAqZW52LCB0YXJnZXRfdWxvbmcgYWRkciwKCkVSUk9SOiBl
+eHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxOTk6IEZJTEU6IGFjY2VsL3Rj
+Zy9jcHV0bGIuYzoxNDQzOgordm9pZCBzdG9yZV9oZWxwZXIoQ1BVQXJjaFN0YXRlICplbnYsIHRh
+cmdldF91bG9uZyBhZGRyLCB1aW50NjRfdCB2YWwsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMjQ2OiBGSUxFOiBhY2NlbC90Y2cvY3B1dGxiLmM6MTUwOToKKyAgICAgICAgICAg
+IHVuYWxpZ25lZF9zdG9yZV9oZWxwZXIoZW52LCBhZGRyLCB2YWwsIG9pLCByZXRhZGRyLCBzaXpl
+LCBiaWdfZW5kaWFuKTsKCnRvdGFsOiAyIGVycm9ycywgMiB3YXJuaW5ncywgMzgxIGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDMvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTUxNDMxMTUuMjg3
+NzctMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
