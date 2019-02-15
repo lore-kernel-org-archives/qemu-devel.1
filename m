@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53520)
+Received: from eggs.gnu.org ([209.51.188.92]:53522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1guaJq-0006mm-28
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 05:02:14 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1guaJq-0006mo-2A
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 05:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1guaJg-0000I7-ON
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1guaJm-0000Oi-9E
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 05:02:04 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 15 Feb 2019 10:00:42 +0000
-Message-Id: <20190215100058.20015-2-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 15 Feb 2019 10:00:45 +0000
+Message-Id: <20190215100058.20015-5-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20190215100058.20015-1-mark.cave-ayland@ilande.co.uk>
 References: <20190215100058.20015-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 01/17] target/ppc: convert VMX logical
- instructions to use vector operations
+Subject: [Qemu-devel] [PATCH 04/17] target/ppc: convert vsplt[bhw] to use
+ vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,91 +22,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, richard.henderson@linaro.org
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c              |  1 +
- target/ppc/translate/vmx-impl.inc.c | 47 +++++++++++++------------------------
- 2 files changed, 17 insertions(+), 31 deletions(-)
+ target/ppc/helper.h                 |  3 ---
+ target/ppc/int_helper.c             | 19 ---------------
+ target/ppc/translate/vmx-impl.inc.c | 46 ++++++++++++++++++++++---------------
+ 3 files changed, 27 insertions(+), 41 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e169c43643..f66786254d 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -24,6 +24,7 @@
- #include "disas/disas.h"
- #include "exec/exec-all.h"
- #include "tcg-op.h"
-+#include "tcg-op-gvec.h"
- #include "qemu/host-utils.h"
- #include "exec/cpu_ldst.h"
- 
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index f99d0284c2..c74932e5ee 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -266,45 +266,30 @@ GEN_VX_VMUL10(vmul10euq, 1, 0);
- GEN_VX_VMUL10(vmul10cuq, 0, 1);
- GEN_VX_VMUL10(vmul10ecuq, 1, 1);
- 
--/* Logical operations */
--#define GEN_VX_LOGICAL(name, tcg_op, opc2, opc3)                        \
--static void glue(gen_, name)(DisasContext *ctx)                                 \
-+#define GEN_VXFORM_V(name, vece, tcg_op, opc2, opc3)                    \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
- {                                                                       \
--    TCGv_i64 t0;                                                        \
--    TCGv_i64 t1;                                                        \
--    TCGv_i64 avr;                                                       \
--                                                                        \
-     if (unlikely(!ctx->altivec_enabled)) {                              \
-         gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-         return;                                                         \
-     }                                                                   \
--    t0 = tcg_temp_new_i64();                                            \
--    t1 = tcg_temp_new_i64();                                            \
--    avr = tcg_temp_new_i64();                                           \
--                                                                        \
--    get_avr64(t0, rA(ctx->opcode), true);                               \
--    get_avr64(t1, rB(ctx->opcode), true);                               \
--    tcg_op(avr, t0, t1);                                                \
--    set_avr64(rD(ctx->opcode), avr, true);                              \
--                                                                        \
--    get_avr64(t0, rA(ctx->opcode), false);                              \
--    get_avr64(t1, rB(ctx->opcode), false);                              \
--    tcg_op(avr, t0, t1);                                                \
--    set_avr64(rD(ctx->opcode), avr, false);                             \
-                                                                         \
--    tcg_temp_free_i64(t0);                                              \
--    tcg_temp_free_i64(t1);                                              \
--    tcg_temp_free_i64(avr);                                             \
-+    tcg_op(vece,                                                        \
-+           avr64_offset(rD(ctx->opcode), true),                         \
-+           avr64_offset(rA(ctx->opcode), true),                         \
-+           avr64_offset(rB(ctx->opcode), true),                         \
-+           16, 16);                                                     \
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 2aa60e5d36..069daa9883 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -246,9 +246,6 @@ DEF_HELPER_3(vrld, void, avr, avr, avr)
+ DEF_HELPER_3(vsl, void, avr, avr, avr)
+ DEF_HELPER_3(vsr, void, avr, avr, avr)
+ DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
+-DEF_HELPER_3(vspltb, void, avr, avr, i32)
+-DEF_HELPER_3(vsplth, void, avr, avr, i32)
+-DEF_HELPER_3(vspltw, void, avr, avr, i32)
+ DEF_HELPER_3(vextractub, void, avr, avr, i32)
+ DEF_HELPER_3(vextractuh, void, avr, avr, i32)
+ DEF_HELPER_3(vextractuw, void, avr, avr, i32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 2f793a3543..5c9623e952 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1869,25 +1869,6 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+ #endif
  }
  
--GEN_VX_LOGICAL(vand, tcg_gen_and_i64, 2, 16);
--GEN_VX_LOGICAL(vandc, tcg_gen_andc_i64, 2, 17);
--GEN_VX_LOGICAL(vor, tcg_gen_or_i64, 2, 18);
--GEN_VX_LOGICAL(vxor, tcg_gen_xor_i64, 2, 19);
--GEN_VX_LOGICAL(vnor, tcg_gen_nor_i64, 2, 20);
--GEN_VX_LOGICAL(veqv, tcg_gen_eqv_i64, 2, 26);
--GEN_VX_LOGICAL(vnand, tcg_gen_nand_i64, 2, 22);
--GEN_VX_LOGICAL(vorc, tcg_gen_orc_i64, 2, 21);
-+/* Logical operations */
-+GEN_VXFORM_V(vand, MO_64, tcg_gen_gvec_and, 2, 16);
-+GEN_VXFORM_V(vandc, MO_64, tcg_gen_gvec_andc, 2, 17);
-+GEN_VXFORM_V(vor, MO_64, tcg_gen_gvec_or, 2, 18);
-+GEN_VXFORM_V(vxor, MO_64, tcg_gen_gvec_xor, 2, 19);
-+GEN_VXFORM_V(vnor, MO_64, tcg_gen_gvec_nor, 2, 20);
-+GEN_VXFORM_V(veqv, MO_64, tcg_gen_gvec_eqv, 2, 26);
-+GEN_VXFORM_V(vnand, MO_64, tcg_gen_gvec_nand, 2, 22);
-+GEN_VXFORM_V(vorc, MO_64, tcg_gen_gvec_orc, 2, 21);
+-/* Experimental testing shows that hardware masks the immediate.  */
+-#define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1))
+-#define SPLAT_ELEMENT(element) _SPLAT_MASKED(element)
+-#define VSPLT(suffix, element, access)                                  \
+-    void helper_vsplt##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t splat) \
+-    {                                                                   \
+-        uint32_t s = b->access(SPLAT_ELEMENT(element));                 \
+-        int i;                                                          \
+-                                                                        \
+-        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
+-            r->access(i) = s;                                           \
+-        }                                                               \
+-    }
+-VSPLT(b, u8, VsrB)
+-VSPLT(h, u16, VsrH)
+-VSPLT(w, u32, VsrW)
+-#undef VSPLT
+-#undef SPLAT_ELEMENT
+-#undef _SPLAT_MASKED
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define VINSERT(suffix, element)                                            \
+     void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t index) \
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index c26c342e16..41ddbd879f 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -798,24 +798,32 @@ GEN_VXFORM_NOA(vprtybw, 1, 24);
+ GEN_VXFORM_NOA(vprtybd, 1, 24);
+ GEN_VXFORM_NOA(vprtybq, 1, 24);
  
- #define GEN_VXFORM(name, opc2, opc3)                                    \
- static void glue(gen_, name)(DisasContext *ctx)                                 \
+-#define GEN_VXFORM_UIMM(name, opc2, opc3)                               \
+-static void glue(gen_, name)(DisasContext *ctx)                                 \
+-    {                                                                   \
+-        TCGv_ptr rb, rd;                                                \
+-        TCGv_i32 uimm;                                                  \
+-        if (unlikely(!ctx->altivec_enabled)) {                          \
+-            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
+-            return;                                                     \
+-        }                                                               \
+-        uimm = tcg_const_i32(UIMM5(ctx->opcode));                       \
+-        rb = gen_avr_ptr(rB(ctx->opcode));                              \
+-        rd = gen_avr_ptr(rD(ctx->opcode));                              \
+-        gen_helper_##name (rd, rb, uimm);                               \
+-        tcg_temp_free_i32(uimm);                                        \
+-        tcg_temp_free_ptr(rb);                                          \
+-        tcg_temp_free_ptr(rd);                                          \
++static void gen_vsplt(DisasContext *ctx, int vece)
++{
++    int uimm, dofs, bofs;
++
++    if (unlikely(!ctx->altivec_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_VPU);
++        return;
+     }
+ 
++    uimm = UIMM5(ctx->opcode);
++    bofs = avr64_offset(rB(ctx->opcode), true);
++    dofs = avr64_offset(rD(ctx->opcode), true);
++
++    /* Experimental testing shows that hardware masks the immediate.  */
++    bofs += (uimm << vece) & 15;
++#ifndef HOST_WORDS_BIGENDIAN
++    bofs ^= 15;
++    bofs &= ~((1 << vece) - 1);
++#endif
++
++    tcg_gen_gvec_dup_mem(vece, dofs, bofs, 16, 16);
++}
++
++#define GEN_VXFORM_VSPLT(name, vece, opc2, opc3) \
++static void glue(gen_, name)(DisasContext *ctx) { gen_vsplt(ctx, vece); }
++
+ #define GEN_VXFORM_UIMM_ENV(name, opc2, opc3)                           \
+ static void glue(gen_, name)(DisasContext *ctx)                         \
+     {                                                                   \
+@@ -858,9 +866,9 @@ static void glue(gen_, name)(DisasContext *ctx)                         \
+         tcg_temp_free_ptr(rd);                                          \
+     }
+ 
+-GEN_VXFORM_UIMM(vspltb, 6, 8);
+-GEN_VXFORM_UIMM(vsplth, 6, 9);
+-GEN_VXFORM_UIMM(vspltw, 6, 10);
++GEN_VXFORM_VSPLT(vspltb, MO_8, 6, 8);
++GEN_VXFORM_VSPLT(vsplth, MO_16, 6, 9);
++GEN_VXFORM_VSPLT(vspltw, MO_32, 6, 10);
+ GEN_VXFORM_UIMM_SPLAT(vextractub, 6, 8, 15);
+ GEN_VXFORM_UIMM_SPLAT(vextractuh, 6, 9, 14);
+ GEN_VXFORM_UIMM_SPLAT(vextractuw, 6, 10, 12);
 -- 
 2.11.0
