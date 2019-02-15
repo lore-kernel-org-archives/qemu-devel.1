@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38521)
+Received: from eggs.gnu.org ([209.51.188.92]:38764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gud28-0002Ae-RZ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:56:01 -0500
+	(envelope-from <clg@kaod.org>) id 1gud3B-0002pk-8O
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:57:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gud28-0006st-0B
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:56:00 -0500
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:51975)
+	(envelope-from <clg@kaod.org>) id 1gud39-0000VQ-1k
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:57:05 -0500
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:50115)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gud27-0006pX-OD
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:55:59 -0500
-Received: from player763.ha.ovh.net (unknown [10.109.159.123])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 7A4B511B471
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:55:57 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gud38-00007f-QI
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:57:02 -0500
+Received: from player750.ha.ovh.net (unknown [10.109.160.12])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6A39AF39D3
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:56:52 +0100 (CET)
 References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023081228.1011724.12474992370439652538.stgit@bahia.lan>
+	<155023081817.1011724.14078777320394028836.stgit@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4690ad87-f634-4f3b-a39c-ee61bfc64e75@kaod.org>
-Date: Fri, 15 Feb 2019 13:55:53 +0100
+Message-ID: <f2af3c52-9041-47d2-9d47-3420876b960e@kaod.org>
+Date: Fri, 15 Feb 2019 13:56:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <155023081228.1011724.12474992370439652538.stgit@bahia.lan>
+In-Reply-To: <155023081817.1011724.14078777320394028836.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/10] xics: Drop the KVM ICP class
+Subject: Re: [Qemu-devel] [PATCH 06/10] xics: Explicitely call KVM ICS
+ methods from the common code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,9 +36,14 @@ To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 On 2/15/19 12:40 PM, Greg Kurz wrote:
-> The KVM ICP class isn't used anymore. Drop it.
+> The pre_save(), post_load() and synchronize_state() methods of the
+> ICSStateClass type are really KVM only things. Make that obvious
+> by dropping the indirections and directly calling the KVM functions
+> instead.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Isn't migration complaining ?  If not,
+A part from the kvmppc_ prefix,
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
@@ -45,63 +51,153 @@ Thanks,
 
 C.
 
-
-
-> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/intc/xics_kvm.c    |   18 ------------------
->  include/hw/ppc/xics.h |    3 ---
->  2 files changed, 21 deletions(-)
+>  hw/intc/xics.c        |   23 ++++++++++-------------
+>  hw/intc/xics_kvm.c    |   12 ++++--------
+>  include/hw/ppc/xics.h |    7 ++++---
+>  3 files changed, 18 insertions(+), 24 deletions(-)
 >=20
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index 4eebced516b6..fae4ac431f2f 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -152,23 +152,6 @@ void icp_kvm_realize(DeviceState *dev, Error **err=
-p)
->      QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index acd63ab5e0b9..ae5d5ea135b8 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -58,7 +58,6 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon)
+> =20
+>  void ics_pic_print_info(ICSState *ics, Monitor *mon)
+>  {
+> -    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
+>      uint32_t i;
+> =20
+>      monitor_printf(mon, "ICS %4x..%4x %p\n",
+> @@ -68,8 +67,8 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+>          return;
+>      }
+> =20
+> -    if (icsc->synchronize_state) {
+> -        icsc->synchronize_state(ics);
+> +    if (kvm_irqchip_in_kernel()) {
+> +        ics_synchronize_state(ics);
+>      }
+> =20
+>      for (i =3D 0; i < ics->nr_irqs; i++) {
+> @@ -647,25 +646,23 @@ static void ics_base_instance_init(Object *obj)
+>      ics->offset =3D XICS_IRQ_BASE;
 >  }
 > =20
-> -static void icp_kvm_class_init(ObjectClass *klass, void *data)
-> -{
-> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    ICPStateClass *icpc =3D ICP_CLASS(klass);
-> -
-> -    device_class_set_parent_realize(dc, icp_kvm_realize,
-> -                                    &icpc->parent_realize);
-> -}
-> -
-> -static const TypeInfo icp_kvm_info =3D {
-> -    .name =3D TYPE_KVM_ICP,
-> -    .parent =3D TYPE_ICP,
-> -    .instance_size =3D sizeof(ICPState),
-> -    .class_init =3D icp_kvm_class_init,
-> -    .class_size =3D sizeof(ICPStateClass),
-> -};
-> -
+> -static int ics_base_dispatch_pre_save(void *opaque)
+> +static int ics_base_pre_save(void *opaque)
+>  {
+>      ICSState *ics =3D opaque;
+> -    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
+> =20
+> -    if (info->pre_save) {
+> -        info->pre_save(ics);
+> +    if (kvm_irqchip_in_kernel()) {
+> +        ics_get_kvm_state(ics);
+>      }
+> =20
+>      return 0;
+>  }
+> =20
+> -static int ics_base_dispatch_post_load(void *opaque, int version_id)
+> +static int ics_base_post_load(void *opaque, int version_id)
+>  {
+>      ICSState *ics =3D opaque;
+> -    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
+> =20
+> -    if (info->post_load) {
+> -        return info->post_load(ics, version_id);
+> +    if (kvm_irqchip_in_kernel()) {
+> +        return ics_set_kvm_state(ics);
+>      }
+> =20
+>      return 0;
+> @@ -689,8 +686,8 @@ static const VMStateDescription vmstate_ics_base =3D=
+ {
+>      .name =3D "ics",
+>      .version_id =3D 1,
+>      .minimum_version_id =3D 1,
+> -    .pre_save =3D ics_base_dispatch_pre_save,
+> -    .post_load =3D ics_base_dispatch_post_load,
+> +    .pre_save =3D ics_base_pre_save,
+> +    .post_load =3D ics_base_post_load,
+>      .fields =3D (VMStateField[]) {
+>          /* Sanity check */
+>          VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index fae4ac431f2f..642351e5790f 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -155,7 +155,7 @@ void icp_kvm_realize(DeviceState *dev, Error **errp=
+)
 >  /*
 >   * ICS-KVM
 >   */
-> @@ -425,7 +408,6 @@ fail:
->  static void xics_kvm_register_types(void)
+> -static void ics_get_kvm_state(ICSState *ics)
+> +void ics_get_kvm_state(ICSState *ics)
 >  {
->      type_register_static(&ics_kvm_info);
-> -    type_register_static(&icp_kvm_info);
+>      uint64_t state;
+>      int i;
+> @@ -208,12 +208,12 @@ static void ics_get_kvm_state(ICSState *ics)
+>      }
 >  }
 > =20
->  type_init(xics_kvm_register_types)
+> -static void ics_synchronize_state(ICSState *ics)
+> +void ics_synchronize_state(ICSState *ics)
+>  {
+>      ics_get_kvm_state(ics);
+>  }
+> =20
+> -static int ics_set_kvm_state(ICSState *ics, int version_id)
+> +int ics_set_kvm_state(ICSState *ics)
+>  {
+>      uint64_t state;
+>      int i;
+> @@ -286,7 +286,7 @@ static void ics_kvm_reset(DeviceState *dev)
+> =20
+>      icsc->parent_reset(dev);
+> =20
+> -    ics_set_kvm_state(ICS_KVM(dev), 1);
+> +    ics_set_kvm_state(ICS_KVM(dev));
+>  }
+> =20
+>  static void ics_kvm_reset_handler(void *dev)
+> @@ -318,10 +318,6 @@ static void ics_kvm_class_init(ObjectClass *klass,=
+ void *data)
+>                                      &icsc->parent_realize);
+>      device_class_set_parent_reset(dc, ics_kvm_reset,
+>                                    &icsc->parent_reset);
+> -
+> -    icsc->pre_save =3D ics_get_kvm_state;
+> -    icsc->post_load =3D ics_set_kvm_state;
+> -    icsc->synchronize_state =3D ics_synchronize_state;
+>  }
+> =20
+>  static const TypeInfo ics_kvm_info =3D {
 > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index ab61dc24010a..fae54e6f28ae 100644
+> index fae54e6f28ae..06e87128f88e 100644
 > --- a/include/hw/ppc/xics.h
 > +++ b/include/hw/ppc/xics.h
-> @@ -50,9 +50,6 @@ typedef struct XICSFabric XICSFabric;
->  #define TYPE_ICP "icp"
->  #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+> @@ -109,12 +109,9 @@ struct ICSStateClass {
+>      DeviceRealize parent_realize;
+>      DeviceReset parent_reset;
 > =20
-> -#define TYPE_KVM_ICP "icp-kvm"
-> -#define KVM_ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_KVM_ICP)
-> -
->  #define TYPE_PNV_ICP "pnv-icp"
->  #define PNV_ICP(obj) OBJECT_CHECK(PnvICPState, (obj), TYPE_PNV_ICP)
+> -    void (*pre_save)(ICSState *s);
+> -    int (*post_load)(ICSState *s, int version_id);
+>      void (*reject)(ICSState *s, uint32_t irq);
+>      void (*resend)(ICSState *s);
+>      void (*eoi)(ICSState *s, uint32_t irq);
+> -    void (*synchronize_state)(ICSState *s);
+>  };
 > =20
+>  struct ICSState {
+> @@ -201,4 +198,8 @@ int icp_set_kvm_state(ICPState *icp);
+>  void icp_synchronize_state(ICPState *icp);
+>  void icp_kvm_realize(DeviceState *dev, Error **errp);
+> =20
+> +void ics_get_kvm_state(ICSState *ics);
+> +int ics_set_kvm_state(ICSState *ics);
+> +void ics_synchronize_state(ICSState *ics);
+> +
+>  #endif /* XICS_H */
 >=20
