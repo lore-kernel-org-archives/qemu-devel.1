@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39757)
+Received: from eggs.gnu.org ([209.51.188.92]:40419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guRms-0000OH-OD
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:55:32 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1guRnV-0001Rv-AT
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guRWu-0003MJ-Jf
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:39:02 -0500
-Resent-Message-Id: <E1guRWu-0003MJ-Jf@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guRWu-0003I9-AR
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:39:00 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155019112108.24.11844190340207543297@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1guRnT-0001Yx-Ap
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:56:09 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:16053)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1guRnO-0001Rg-KV
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:56:05 -0500
+Date: Fri, 15 Feb 2019 01:55:56 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190214102816.3393-8-peter.maydell@linaro.org>
+Message-ID: <alpine.BSF.2.21.9999.1902150142410.41761@zero.eik.bme.hu>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-8-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 16:38:42 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] ui/cocoa: Perform UI operations
+ only on the main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,180 +27,373 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0YXJn
-ZXQtYXJtIHF1ZXVlCk1lc3NhZ2UtaWQ6IDIwMTkwMjE0MTkwNjAzLjI1MDMwLTEtcGV0ZXIubWF5
-ZGVsbEBsaW5hcm8ub3JnClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMuMjUwMzAt
-MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTdWJtb2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6
-Ly9naXQucWVtdS5vcmcvZ2l0L2NhcHN0b25lLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fw
-c3RvbmUnClN1Ym1vZHVsZSAnZHRjJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKU3VibW9kdWxlICdyb21zL1FlbXVNYWNEcml2ZXJz
-JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1FlbXVNYWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycycKU3VibW9kdWxlICdyb21zL1NMT0YnICho
-dHRwczovL2dpdC5xZW11Lm9yZy9naXQvU0xPRi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Jv
-bXMvU0xPRicKU3VibW9kdWxlICdyb21zL2lweGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-aXB4ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvaXB4ZScKU3VibW9kdWxlICdyb21z
-L29wZW5iaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5iaW9zLmdpdCkgcmVnaXN0
-ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuYmlvcycKU3VibW9kdWxlICdyb21zL29wZW5oYWNrd2Fy
-ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuaGFja3dhcmUuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL29wZW5oYWNrd2FyZScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29k
-ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL3FlbXUtcGFsY29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnICho
-dHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2VhYmlvcy5naXQvKSByZWdpc3RlcmVkIGZvciBwYXRo
-ICdyb21zL3NlYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zLWhwcGEnIChodHRwczovL2dp
-dGh1Yi5jb20vaGRlbGxlci9zZWFiaW9zLWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL3NlYWJpb3MtaHBwYScKU3VibW9kdWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5x
-ZW11Lm9yZy9naXQvc2dhYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlv
-cycKU3VibW9kdWxlICdyb21zL3NraWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tp
-Ym9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdy
-b21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdyb21zL3UtYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBl
-eCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCcKU3VibW9kdWxlICd0ZXN0cy9mcC9i
-ZXJrZWxleS1zb2Z0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5LXNv
-ZnRmbG9hdC0zKSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0Zmxv
-YXQtMycKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8v
-Z2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5LXRlc3RmbG9hdC0zKSByZWdpc3RlcmVkIGZvciBwYXRo
-ICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFw
-ZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpT
-dWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2
-NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBw
-YXRoICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0
-ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUg
-cGF0aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNoZWNrZWQgb3V0ICc5MGM0ODhkNWY0YTQwNzM0
-MjI0N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3Vi
-bW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNrZWQgb3V0ICdhNWI0MjhlMWMxZWFlNzAzYmRk
-NjJhM2Y1MjcyMjNjMjkxZWUzZmRjJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9k
-dWxlIHBhdGggJ3JvbXMvaXB4ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAx
-ZjMzMWJlM2VlOTAxYmI2ZTE3JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1v
-ZHVsZSBwYXRoICdyb21zL29wZW5iaW9zJzogY2hlY2tlZCBvdXQgJzQ0MWE4NGQzYTY0MmExMGI5
-NDgzNjljNjNmMzIzNjdlOGZmNjM5NWInCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUn
-Li4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5
-ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMv
-cWVtdS1wYWxjb2RlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVj
-a2VkIG91dCAnNTFjMjM3ZDdlMjBkMDUxMDBlYWNhZGVlMmY2MWFiYzE3ZTZiYzA5NycKQ2xvbmlu
-ZyBpbnRvICdyb21zL3NlYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBj
-aGVja2VkIG91dCAnYTY5OGM4OTk1ZmZiMjgzODI5NmVjMjg0ZmUzYzRhZDMzZGZjYTMwNycKQ2xv
-bmluZyBpbnRvICdyb21zL3NlYWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2Vh
-Ymlvcy1ocHBhJzogY2hlY2tlZCBvdXQgJzFlZjk5YTAxNTcyYzI1ODFjMzBlMTZlNmZlNjllOWVh
-MmVmOTJjZTAnCkNsb25pbmcgaW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAn
-cm9tcy9zZ2FiaW9zJzogY2hlY2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAw
-YjZjNGFjOTAxNWEnCkNsb25pbmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0
-aCAncm9tcy9za2lib290JzogY2hlY2tlZCBvdXQgJ2UwZWUyNGMyN2ExNzJiY2Y0ODJmNmYyYmM5
-MDVlNjIxMWMxMzRiY2MnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBw
-YXRoICdyb21zL3UtYm9vdCc6IGNoZWNrZWQgb3V0ICdkODVjYTAyOWYyNTdiNTNhOTZkYTZjMmZi
-NDIxZTc4YTAwM2E5OTQzJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpT
-dWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBiMzkx
-NmYzM2U2MTdhODE1OTczYzVhNmRmNzcwNTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9m
-cC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2Jlcmtl
-bGV5LXNvZnRmbG9hdC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQw
-MGVlMDU2YjljODgwMzcnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0
-LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNo
-ZWNrZWQgb3V0ICc1YTU5ZGNlYzE5MzI3Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9u
-aW5nIGludG8gJ3VpL2tleWNvZGVtYXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVt
-YXBkYic6IGNoZWNrZWQgb3V0ICc2YjNkNzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgz
-MmNlJwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY3NDM5NmQgZ2Ric3R1YjogU2Vu
-ZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBwYWNrZXQuCjUyYzE4NTcgdGFyZ2V0L2FybTogQWRkIG1p
-c3NpbmcgY2xlYXJfdGFpbCBjYWxscwoyZjFhZWY5IHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3Bl
-cmF0aW9ucyBmb3Igc2F0dXJhdGlvbgo4MDY4M2U1IHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFND
-Ui5RQyB0byBhIHZlY3RvciBmaWVsZAo1ZDFkMjZmIHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0
-cyBrZXB0IGluIHhyZWdzW0FSTV9WRlBfRlBTQ1JdCjA2ZmU0ODcgdGFyZ2V0L2FybTogU3BsaXQg
-b3V0IGZsYWdzIHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMKZDBjZTYyNSB0YXJnZXQvYXJtOiBG
-aXggYXJtX2NwdV9kdW1wX3N0YXRlIHZzIEZQU0NSCmYzODI5MTcgdGFyZ2V0L2FybTogRml4IHZm
-cF9nZGJfZ2V0L3NldF9yZWcgdnMgRlBTQ1IKMjFjODBlZCB0YXJnZXQvYXJtOiBSZW1vdmUgbmVv
-biBtaW4vbWF4IGhlbHBlcnMKODIyNDM0ZSB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIgbWlu
-L21heCBwcmltaXRpdmVzIGZvciBuZW9uCmVjNDdlOGMgdGFyZ2V0L2FybTogVXNlIHZlY3RvciBt
-aW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjhlMWM5NmYgdGFyZ2V0L2FybTogVXNlIHZlY3Rv
-ciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CjVjZTEyNzUgdGFyZ2V0L2FybTogUmVseSBv
-biBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgo3Y2YyMWQ1IGh3L2FybS9hcm1z
-c2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKZmM0ZjRmYiBody9pbnRjL2FybXY3
-bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCmRmNGUxY2EgTUFJTlRBSU5FUlM6
-IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlvdXMgZW50cmllcwowODE4ZjU0IGFy
-bTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZNIGd1ZXN0cyB0byBiZSBjaGFuZ2VkIGJ5
-IFFFTVUgY29kZQoyOWFlNDRhIGxpbnV4LXVzZXIvZWxmbG9hZDogZW5hYmxlIEhXQ0FQX0NQVUlE
-IGZvciBBQXJjaDY0CmY1ZWIyZjcgdGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCBy
-ZWdpc3RlcnMgYXMgUkFaCmFjMGExNDMgdGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1
-c2Vyc3BhY2UKMDI2M2Q5YSB0YXJnZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVz
-ZXJzcGFjZQo5YjY5YzA2IHRhcmdldC9hcm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBI
-V0NBUF9DUFVJRCByZWdpc3RlcnMKZDYxNjI4NiB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNh
-c19mcF9pbnRfY29udgozODViZTBkIHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8g
-ZHAgYWZ0ZXIgb3BlcmF0aW9uCjFjYzZiODYgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4
-IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRfY21weGNoZzY0X2JlCjJkMmI3M2QgdGFyZ2V0L2FybTog
-SW1wbGVtZW50IEhBQ1JfRUwyCjg2Zjc1ZGQgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBm
-b3IgUE1FVlRZUEVSL1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5n
-IGNvbW1pdCA4NmY3NWRkZmRkZmMgKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBN
-RVZUWVBFUi9QTUVWQ05UUikKMi8yNyBDaGVja2luZyBjb21taXQgMmQyYjczZGM0ZDZjICh0YXJn
-ZXQvYXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IDFjYzZiODYz
-MWQ0MiAodGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWly
-ZWRfY21weGNoZzY0X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCAzODViZTBkMDk3N2EgKHRhcmdl
-dC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENo
-ZWNraW5nIGNvbW1pdCBkNjE2Mjg2OThhMjUgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2Fz
-X2ZwX2ludF9jb252KQo2LzI3IENoZWNraW5nIGNvbW1pdCA5YjY5YzA2ZTI4ZDQgKHRhcmdldC9h
-cm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcv
-MjcgQ2hlY2tpbmcgY29tbWl0IDAyNjNkOWFiMmRlOSAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlE
-IHJlZ2lzdGVycyB0byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IGFjMGExNDMxM2Vi
-MiAodGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tp
-bmcgY29tbWl0IGY1ZWIyZjdjNTc0MCAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJ
-RCByZWdpc3RlcnMgYXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgMjlhZTQ0YTU5NTFiIChs
-aW51eC11c2VyL2VsZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcg
-Q2hlY2tpbmcgY29tbWl0IDA4MThmNTQ0ZDZjZCAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJz
-IGZvciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2lu
-ZyBjb21taXQgZGY0ZTFjYTcxZGU2IChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdh
-aXRlIGZyb20gdmFyaW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgZmM0ZjRmYmUx
-Yzk4IChody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQox
-NC8yNyBDaGVja2luZyBjb21taXQgN2NmMjFkNTY0ODI5IChody9hcm0vYXJtc3NlOiBGaXggbWlz
-d2lyaW5nIG9mIGV4cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgNWNlMTI3NWU2
-NWVlICh0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVj
-X29yKQoxNi8yNyBDaGVja2luZyBjb21taXQgOGUxYzk2ZjY4MzQ0ICh0YXJnZXQvYXJtOiBVc2Ug
-dmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1p
-dCBlYzQ3ZThjOTE2OWIgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBm
-b3IgYWFyY2gzMikKMTgvMjcgQ2hlY2tpbmcgY29tbWl0IDgyMjQzNGViMjY3NyAodGFyZ2V0L2Fy
-bTogVXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hl
-Y2tpbmcgY29tbWl0IDIxYzgwZWQ5Y2Q2ZSAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21h
-eCBoZWxwZXJzKQoyMC8yNyBDaGVja2luZyBjb21taXQgZjM4MjkxNzEwNTI5ICh0YXJnZXQvYXJt
-OiBGaXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRl
-bWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVy
-LmM6ODQ6CisgICAgY2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVy
-biA0OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQoj
-MzQ6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9m
-cHNjcihlbnYsIGxkbF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJu
-aW5ncywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCjIxLzI3IENoZWNraW5nIGNvbW1pdCBkMGNlNjI1MTNlYWUgKHRhcmdldC9hcm06IEZp
-eCBhcm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCAwNmZl
-NDg3OTlkYzAgKHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNv
-bXBhcmVzKQoyMy8yNyBDaGVja2luZyBjb21taXQgNWQxZDI2ZjllYmE5ICh0YXJnZXQvYXJtOiBG
-aXggc2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tp
-bmcgY29tbWl0IDgwNjgzZTViYzE1YSAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRv
-IGEgdmVjdG9yIGZpZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgMmYxYWVmOTZlYzEwICh0YXJn
-ZXQvYXJtOiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFj
-ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQv
-YXJtL3ZlY19oZWxwZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0g
-Km0gPSB2bTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0Mzgg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2
-LzI3IENoZWNraW5nIGNvbW1pdCA1MmMxODU3MzkxZDggKHRhcmdldC9hcm06IEFkZCBtaXNzaW5n
-IGNsZWFyX3RhaWwgY2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCBmNzQzOTZkMTE2OGEgKGdk
-YnN0dWI6IFNlbmQgYSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAt
-MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+On Thu, 14 Feb 2019, Peter Maydell wrote:
+> The OSX Mojave release is more picky about enforcing the Cocoa API
+> restriction that only the main thread may perform UI calls. To
+> accommodate this we need to restructure the Cocoa code:
+> * the special OSX main() creates a second thread and uses
+>   that to call the vl.c qemu_main(); the original main
+>   thread goes into the OSX event loop
+> * the refresh, switch and update callbacks asynchronously
+>   tell the main thread to do the necessary work
+> * the refresh callback no longer does the "get events from the
+>   UI event queue and handle them" loop, since we now use
+>   the stock OSX event loop. Instead our NSApplication sendEvent
+>   method will either deal with them or pass them on to OSX
+>
+> All these things have to be changed in one commit, to avoid
+> breaking bisection.
+>
+> Note that since we use dispatch_get_main_queue(), this bumps
+> our minimum version requirement to OSX 10.10 Yosemite (released
+> in 2014, unsupported by Apple since 2017).
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> v2 changes: call handleEvent from sendEvent
+
+There's still something not right I'm afraid. After this menus stop 
+working for me (they don't react to mouse although keyboard short-cuts are 
+still working) but I don't know how to fix this. I could also reproduce a 
+stuck modifier key problem but not sure if that's preexisting and probably 
+obscure enough in itself to not hold back this series if the menu problem 
+is fixed. I'm just documenting it here for later debugging:
+
+1. start qemu-system-ppc -M mac99 (or maybe other but that's what I've tried)
+2. Switch to monitor with Ctrl-Alt-2
+3. Switch to full screen with Cmd-F
+4. type to verify it works
+5. Still in full screen, switch to main screen with Ctrl-Alt-1
+6. Now sometimes Alt seems to be stuck even after exiting full screen
+
+I'm also sending another patch on top of this series that brings the app 
+to the front to avoid it starting behind the active Terminal window when 
+started from the command line that has annoyed me in the past.
+
+Regards,
+BALATON Zoltan
+
+> ---
+> ui/cocoa.m | 191 +++++++++++++++++++++++++++++++----------------------
+> 1 file changed, 113 insertions(+), 78 deletions(-)
+>
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 184fbd877d..201a294ed4 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -129,6 +129,9 @@
+> NSTextField *pauseLabel;
+> NSArray * supportedImageFileTypes;
+>
+> +QemuSemaphore display_init_sem;
+> +QemuSemaphore app_started_sem;
+> +
+> // Utility functions to run specified code block with iothread lock held
+> typedef void (^CodeBlock)(void);
+> typedef bool (^BoolCodeBlock)(void);
+> @@ -325,6 +328,7 @@ @interface QemuCocoaView : NSView
+>     NSWindow *fullScreenWindow;
+>     float cx,cy,cw,ch,cdx,cdy;
+>     CGDataProviderRef dataProviderRef;
+> +    pixman_image_t *pixman_image;
+>     BOOL modifiers_state[256];
+>     BOOL isMouseGrabbed;
+>     BOOL isFullscreen;
+> @@ -535,13 +539,16 @@ - (void) switchSurface:(pixman_image_t *)image
+>     }
+>
+>     // update screenBuffer
+> -    if (dataProviderRef)
+> +    if (dataProviderRef) {
+>         CGDataProviderRelease(dataProviderRef);
+> +        pixman_image_unref(pixman_image);
+> +    }
+>
+>     //sync host window color space with guests
+>     screen.bitsPerPixel = PIXMAN_FORMAT_BPP(image_format);
+>     screen.bitsPerComponent = DIV_ROUND_UP(screen.bitsPerPixel, 8) * 2;
+>
+> +    pixman_image = image;
+>     dataProviderRef = CGDataProviderCreateWithData(NULL, pixman_image_get_data(image), w * 4 * h, NULL);
+>
+>     // update windows
+> @@ -1013,7 +1020,6 @@ @interface QemuCocoaAppController : NSObject
+> #endif
+> {
+> }
+> -- (void)startEmulationWithArgc:(int)argc argv:(char**)argv;
+> - (void)doToggleFullScreen:(id)sender;
+> - (void)toggleFullScreen:(id)sender;
+> - (void)showQEMUDoc:(id)sender;
+> @@ -1101,8 +1107,8 @@ - (void) dealloc
+> - (void)applicationDidFinishLaunching: (NSNotification *) note
+> {
+>     COCOA_DEBUG("QemuCocoaAppController: applicationDidFinishLaunching\n");
+> -    // launch QEMU, with the global args
+> -    [self startEmulationWithArgc:gArgc argv:(char **)gArgv];
+> +    /* Tell cocoa_display_init to proceed */
+> +    qemu_sem_post(&app_started_sem);
+> }
+>
+> - (void)applicationWillTerminate:(NSNotification *)aNotification
+> @@ -1145,15 +1151,6 @@ - (void) applicationWillResignActive: (NSNotification *)aNotification
+>     [cocoaView raiseAllKeys];
+> }
+>
+> -- (void)startEmulationWithArgc:(int)argc argv:(char**)argv
+> -{
+> -    COCOA_DEBUG("QemuCocoaAppController: startEmulationWithArgc\n");
+> -
+> -    int status;
+> -    status = qemu_main(argc, argv, *_NSGetEnviron());
+> -    exit(status);
+> -}
+> -
+> /* We abstract the method called by the Enter Fullscreen menu item
+>  * because Mac OS 10.7 and higher disables it. This is because of the
+>  * menu item's old selector's name toggleFullScreen:
+> @@ -1485,7 +1482,9 @@ @implementation QemuApplication
+> - (void)sendEvent:(NSEvent *)event
+> {
+>     COCOA_DEBUG("QemuApplication: sendEvent\n");
+> -    [super sendEvent: event];
+> +    if (!cocoaView || ![cocoaView handleEvent:event]) {
+> +        [super sendEvent: event];
+> +    }
+> }
+> @end
+>
+> @@ -1668,32 +1667,59 @@ static void addRemovableDevicesMenuItems(void)
+>     qapi_free_BlockInfoList(pointerToFree);
+> }
+>
+> -int main (int argc, const char * argv[]) {
+> +/*
+> + * The startup process for the OSX/Cocoa UI is complicated, because
+> + * OSX insists that the UI runs on the initial main thread, and so we
+> + * need to start a second thread which runs the vl.c qemu_main():
+> + *
+> + * Initial thread:                    2nd thread:
+> + * in main():
+> + *  create qemu-main thread
+> + *  wait on display_init semaphore
+> + *                                    call qemu_main()
+> + *                                    ...
+> + *                                    in cocoa_display_init():
+> + *                                     post the display_init semaphore
+> + *                                     wait on app_started semaphore
+> + *  create application, menus, etc
+> + *  enter OSX run loop
+> + * in applicationDidFinishLaunching:
+> + *  post app_started semaphore
+> + *                                     tell main thread to fullscreen if needed
+> + *                                    [...]
+> + *                                    run qemu main-loop
+> + *
+> + * We do this in two stages so that we don't do the creation of the
+> + * GUI application menus and so on for command line options like --help
+> + * where we want to just print text to stdout and exit immediately.
+> + */
+>
+> +static void *call_qemu_main(void *opaque)
+> +{
+> +    int status;
+> +
+> +    COCOA_DEBUG("Second thread: calling qemu_main()\n");
+> +    status = qemu_main(gArgc, gArgv, *_NSGetEnviron());
+> +    COCOA_DEBUG("Second thread: qemu_main() returned, exiting\n");
+> +    exit(status);
+> +}
+> +
+> +int main (int argc, const char * argv[]) {
+> +    QemuThread thread;
+> +
+> +    COCOA_DEBUG("Entered main()\n");
+>     gArgc = argc;
+>     gArgv = (char **)argv;
+> -    int i;
+>
+> -    /* In case we don't need to display a window, let's not do that */
+> -    for (i = 1; i < argc; i++) {
+> -        const char *opt = argv[i];
+> +    qemu_sem_init(&display_init_sem, 0);
+> +    qemu_sem_init(&app_started_sem, 0);
+>
+> -        if (opt[0] == '-') {
+> -            /* Treat --foo the same as -foo.  */
+> -            if (opt[1] == '-') {
+> -                opt++;
+> -            }
+> -            if (!strcmp(opt, "-h") || !strcmp(opt, "-help") ||
+> -                !strcmp(opt, "-vnc") ||
+> -                !strcmp(opt, "-nographic") ||
+> -                !strcmp(opt, "-version") ||
+> -                !strcmp(opt, "-curses") ||
+> -                !strcmp(opt, "-display") ||
+> -                !strcmp(opt, "-qtest")) {
+> -                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
+> -            }
+> -        }
+> -    }
+> +    qemu_thread_create(&thread, "qemu_main", call_qemu_main,
+> +                       NULL, QEMU_THREAD_DETACHED);
+> +
+> +    COCOA_DEBUG("Main thread: waiting for display_init_sem\n");
+> +    qemu_sem_wait(&display_init_sem);
+> +    COCOA_DEBUG("Main thread: initializing app\n");
+>
+>     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+>
+> @@ -1706,12 +1732,24 @@ int main (int argc, const char * argv[]) {
+>
+>     create_initial_menus();
+>
+> +    /*
+> +     * Create the menu entries which depend on QEMU state (for consoles
+> +     * and removeable devices). These make calls back into QEMU functions,
+> +     * which is OK because at this point we know that the second thread
+> +     * holds the iothread lock and is synchronously waiting for us to
+> +     * finish.
+> +     */
+> +    add_console_menu_entries();
+> +    addRemovableDevicesMenuItems();
+> +
+>     // Create an Application controller
+>     QemuCocoaAppController *appController = [[QemuCocoaAppController alloc] init];
+>     [NSApp setDelegate:appController];
+>
+>     // Start the main event loop
+> +    COCOA_DEBUG("Main thread: entering OSX run loop\n");
+>     [NSApp run];
+> +    COCOA_DEBUG("Main thread: left OSX run loop, exiting\n");
+>
+>     [appController release];
+>     [pool release];
+> @@ -1729,17 +1767,19 @@ static void cocoa_update(DisplayChangeListener *dcl,
+>
+>     COCOA_DEBUG("qemu_cocoa: cocoa_update\n");
+>
+> -    NSRect rect;
+> -    if ([cocoaView cdx] == 1.0) {
+> -        rect = NSMakeRect(x, [cocoaView gscreen].height - y - h, w, h);
+> -    } else {
+> -        rect = NSMakeRect(
+> -            x * [cocoaView cdx],
+> -            ([cocoaView gscreen].height - y - h) * [cocoaView cdy],
+> -            w * [cocoaView cdx],
+> -            h * [cocoaView cdy]);
+> -    }
+> -    [cocoaView setNeedsDisplayInRect:rect];
+> +    dispatch_async(dispatch_get_main_queue(), ^{
+> +        NSRect rect;
+> +        if ([cocoaView cdx] == 1.0) {
+> +            rect = NSMakeRect(x, [cocoaView gscreen].height - y - h, w, h);
+> +        } else {
+> +            rect = NSMakeRect(
+> +                x * [cocoaView cdx],
+> +                ([cocoaView gscreen].height - y - h) * [cocoaView cdy],
+> +                w * [cocoaView cdx],
+> +                h * [cocoaView cdy]);
+> +        }
+> +        [cocoaView setNeedsDisplayInRect:rect];
+> +    });
+>
+>     [pool release];
+> }
+> @@ -1748,9 +1788,19 @@ static void cocoa_switch(DisplayChangeListener *dcl,
+>                          DisplaySurface *surface)
+> {
+>     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+> +    pixman_image_t *image = surface->image;
+>
+>     COCOA_DEBUG("qemu_cocoa: cocoa_switch\n");
+> -    [cocoaView switchSurface:surface->image];
+> +
+> +    // The DisplaySurface will be freed as soon as this callback returns.
+> +    // We take a reference to the underlying pixman image here so it does
+> +    // not disappear from under our feet; the switchSurface method will
+> +    // deref the old image when it is done with it.
+> +    pixman_image_ref(image);
+> +
+> +    dispatch_async(dispatch_get_main_queue(), ^{
+> +        [cocoaView switchSurface:image];
+> +    });
+>     [pool release];
+> }
+>
+> @@ -1762,26 +1812,15 @@ static void cocoa_refresh(DisplayChangeListener *dcl)
+>     graphic_hw_update(NULL);
+>
+>     if (qemu_input_is_absolute()) {
+> -        if (![cocoaView isAbsoluteEnabled]) {
+> -            if ([cocoaView isMouseGrabbed]) {
+> -                [cocoaView ungrabMouse];
+> +        dispatch_async(dispatch_get_main_queue(), ^{
+> +            if (![cocoaView isAbsoluteEnabled]) {
+> +                if ([cocoaView isMouseGrabbed]) {
+> +                    [cocoaView ungrabMouse];
+> +                }
+>             }
+> -        }
+> -        [cocoaView setAbsoluteEnabled:YES];
+> +            [cocoaView setAbsoluteEnabled:YES];
+> +        });
+>     }
+> -
+> -    NSDate *distantPast;
+> -    NSEvent *event;
+> -    distantPast = [NSDate distantPast];
+> -    do {
+> -        event = [NSApp nextEventMatchingMask:NSEventMaskAny untilDate:distantPast
+> -                        inMode: NSDefaultRunLoopMode dequeue:YES];
+> -        if (event != nil) {
+> -            if (![cocoaView handleEvent:event]) {
+> -                [NSApp sendEvent:event];
+> -            }
+> -        }
+> -    } while(event != nil);
+>     [pool release];
+> }
+>
+> @@ -1802,10 +1841,17 @@ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+> {
+>     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
+>
+> +    /* Tell main thread to go ahead and create the app and enter the run loop */
+> +    qemu_sem_post(&display_init_sem);
+> +    qemu_sem_wait(&app_started_sem);
+> +    COCOA_DEBUG("cocoa_display_init: app start completed\n");
+> +
+>     /* if fullscreen mode is to be used */
+>     if (opts->has_full_screen && opts->full_screen) {
+> -        [NSApp activateIgnoringOtherApps: YES];
+> -        [(QemuCocoaAppController *)[[NSApplication sharedApplication] delegate] toggleFullScreen: nil];
+> +        dispatch_async(dispatch_get_main_queue(), ^{
+> +            [NSApp activateIgnoringOtherApps: YES];
+> +            [(QemuCocoaAppController *)[[NSApplication sharedApplication] delegate] toggleFullScreen: nil];
+> +        });
+>     }
+>
+>     dcl = g_malloc0(sizeof(DisplayChangeListener));
+> @@ -1816,17 +1862,6 @@ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+>
+>     // register cleanup function
+>     atexit(cocoa_cleanup);
+> -
+> -    /* At this point QEMU has created all the consoles, so we can add View
+> -     * menu entries for them.
+> -     */
+> -    add_console_menu_entries();
+> -
+> -    /* Give all removable devices a menu item.
+> -     * Has to be called after QEMU has started to
+> -     * find out what removable devices it has.
+> -     */
+> -    addRemovableDevicesMenuItems();
+> }
+>
+> static QemuDisplay qemu_display_cocoa = {
+>
