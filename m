@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32848)
+Received: from eggs.gnu.org ([209.51.188.92]:33146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gucbN-000056-JL
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:28:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1guccz-0000ue-4O
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:30:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gucbL-0003bg-Hd
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:28:21 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:36774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gucbL-0003Zm-5X
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:28:19 -0500
-Received: by mail-wm1-x334.google.com with SMTP id j125so9459011wmj.1
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 04:28:18 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 15 Feb 2019 12:28:08 +0000
-Message-Id: <20190215122808.22301-1-alex.bennee@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1guccy-00050V-9G
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:30:01 -0500
+References: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
+Date: Fri, 15 Feb 2019 06:29:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] hw/block: report when pflash backing file
- isn't aligned
+In-Reply-To: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j"
+Subject: Re: [Qemu-devel] [PATCH] block: don't set the same context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +23,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, armbru@redhat.com, stappers@stappers.nl, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
 
-It looks like there was going to be code to check we had some sort of
-alignment so lets replace it with an actual check. This is a bit more
-useful than the enigmatic "failed to read the initial flash content"
-when we attempt to read the number of bytes the device should have.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j
+From: Eric Blake <eblake@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
+ mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com
+Message-ID: <13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
+Subject: Re: [PATCH] block: don't set the same context
+References: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is a potential confusing stumbling block when you move from using
--bios to using -drive if=pflash,file=blob,format=raw,readonly for
-loading your firmware code.
+On 2/15/19 3:19 AM, Denis Plotnikov wrote:
+> Adds a fast path on aio context setting preventing
+> unnecessary context setting routine.
+> Also, it prevents issues with cyclic walk of child
+> bds-es appeared because of registring aio walking
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+registering
 
----
-v2
-  - use PRIu64 instead of PRId64
-  - tweaked message output
----
- hw/block/pflash_cfi01.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+> notifiers:
+>=20
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index bffb4c40e7..7532c8d8e8 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -722,12 +722,20 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     }
-     device_len = sector_len_per_device * blocks_per_device;
- 
--    /* XXX: to be fixed */
--#if 0
--    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
--        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
--        return NULL;
--#endif
-+    /*
-+     * Validate the backing store is the right size for pflash
-+     * devices. It has to be padded to a multiple of the flash block
-+     * size.
-+     */
-+    if (pfl->blk) {
-+        uint64_t backing_len = blk_getlength(pfl->blk);
-+        if (device_len != backing_len) {
-+            error_setg(errp, "device needs %" PRIu64 " bytes, "
-+                       "backing file provides only %" PRIu64 " bytes",
-+                       device_len, backing_len);
-+            return;
-+        }
-+    }
- 
-     memory_region_init_rom_device(
-         &pfl->mem, OBJECT(dev),
--- 
-2.20.1
+> This can happen because of "new" context attachment to VM disk bds.
+> When attaching a new context the corresponding aio context handler is
+> called for each of aio_notifiers registered on the VM disk bds context.=
+
+> Among those handlers, there is the block_job_attached_aio_context handl=
+er
+> which sets a new aio context for the block job bds. When doing so,
+> the old context is detached from all the block job bds children and one=
+ of
+> them is the VM disk bds, serving as backing store for the blockjob bds,=
+
+> although the VM disk bds is actually the initializer of that process.
+> Since the VM disk bds is protected with walking_aio_notifiers flag
+> from double processing in recursive calls, the assert fires.
+>=20
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>  block.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+
+Naive question - do we have to always call
+attach_aio_context/detach_aio_context in pairs?  If so, will
+short-circuiting a nested attach cause reference count problems when we
+come to the matching detach calls?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxmsL4ACgkQp6FrSiUn
+Q2pRXAf+M5EL5qSvypdoJcN/wDihC3d4Ky6P7uzFXyP1SLB2uCCwDs+9N5ZNgHjN
+3scUh99Vq0a5irlQUTSW09htbN41+zLw+EPXEGeH8+Bvd3P01B+iwNSHt/wRwOku
+nQHW6IKM9K2kwYsQ84viKzz+pep4ZL/ESAMgDd+AwJmwTuf8zxKXINYCuRHCbJT/
+AJHbrluuIliLzmYFgSFs9YuWqTdYU8bWo6/gJcbOyGgtEKhfBtb8W++HftO4DUAT
+q8TNJXRjC6cE3QmGinXobo1t2aEEqHwIdZgrg/rd0dUt2RfkNFTMJn0QbhBpcZrp
+dSIL53sSr8XttzLyymY7NE6hpHIylg==
+=gO52
+-----END PGP SIGNATURE-----
+
+--II6huPjFLu5xbQ9qDBAOADV9SekTG2I9j--
