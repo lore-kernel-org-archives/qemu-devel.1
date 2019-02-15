@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33980)
+Received: from eggs.gnu.org ([209.51.188.92]:37046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guR6g-0000sa-Nn
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:11:56 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1guRST-0005Do-Ts
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guR6a-0002Bj-I4
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:11:52 -0500
-Resent-Message-Id: <E1guR6a-0002Bj-I4@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guR6V-00028x-3w
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:11:44 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155018948948.24.14523809116222090454@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1guRSJ-0007oG-Uk
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:34:18 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28515)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1guRSI-0007YI-A6
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:34:15 -0500
+Date: Fri, 15 Feb 2019 01:34:08 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190214102816.3393-5-peter.maydell@linaro.org>
+Message-ID: <alpine.BSF.2.21.9999.1902150133550.41761@zero.eik.bme.hu>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-5-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 16:11:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] ui/cocoa: Move console/device menu
+ creation code up in file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,189 +27,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0YXJn
-ZXQtYXJtIHF1ZXVlCk1lc3NhZ2UtaWQ6IDIwMTkwMjE0MTkwNjAzLjI1MDMwLTEtcGV0ZXIubWF5
-ZGVsbEBsaW5hcm8ub3JnClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAgIDBkM2U0MWQuLjAyNjZjNzMgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAtIFt0YWcg
-dXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMTQwNTE0NDAuNTkxNjctMS1haWtAb3psYWJzLnJ1
-IC0+IHBhdGNoZXcvMjAxOTAyMTQwNTE0NDAuNTkxNjctMS1haWtAb3psYWJzLnJ1CiAtIFt0YWcg
-dXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMTQxNTQwNTMuMTUwNTAtMS1tYXJjZWwuYXBmZWxi
-YXVtQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE0MTU0MDUzLjE1MDUwLTEtbWFyY2VsLmFw
-ZmVsYmF1bUBnbWFpbC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE5MDIxNDE5
-MDYwMy4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwMjE0
-MTkwNjAzLjI1MDMwLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAg
-ICAgIHBhdGNoZXcvMjAxOTAyMTQyMDE5MzkuNDk0LTEtcGhpbG1kQHJlZGhhdC5jb20gLT4gcGF0
-Y2hldy8yMDE5MDIxNDIwMTkzOS40OTQtMS1waGlsbWRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10g
-ICAgICAgICBwYXRjaGV3LzIwMTkwMjE0MjIwNDUzLjE1ODU4LTEtc3ZlbnNAc3RhY2tmcmFtZS5v
-cmcgLT4gcGF0Y2hldy8yMDE5MDIxNDIyMDQ1My4xNTg1OC0xLXN2ZW5zQHN0YWNrZnJhbWUub3Jn
-ClN1Ym1vZHVsZSAnY2Fwc3RvbmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUu
-Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdjYXBzdG9uZScKU3VibW9kdWxlICdkdGMnIChodHRw
-czovL2dpdC5xZW11Lm9yZy9naXQvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpT
-dWJtb2R1bGUgJ3JvbXMvUWVtdU1hY0RyaXZlcnMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-UWVtdU1hY0RyaXZlcnMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2
-ZXJzJwpTdWJtb2R1bGUgJ3JvbXMvU0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9G
-LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvaXB4
-ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRwczovL2dpdC5xZW11
-Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5iaW9z
-JwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
-L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJl
-JwpTdWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
-L3FlbXUtcGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2Rl
-JwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFi
-aW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdy
-b21zL3NlYWJpb3MtaHBwYScgKGh0dHBzOi8vZ2l0aHViLmNvbS9oZGVsbGVyL3NlYWJpb3MtaHBw
-YS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJwpTdWJtb2R1bGUg
-J3JvbXMvc2dhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZ2FiaW9zLmdpdCkgcmVn
-aXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2tpYm9vdCcg
-KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9za2lib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAncm9tcy9za2lib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L3UtYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290JwpT
-dWJtb2R1bGUgJ3JvbXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
-L3UtYm9vdC1zYW00NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290LXNh
-bTQ2MGV4JwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJyAoaHR0cHM6
-Ly9naXRodWIuY29tL2NvdGEvYmVya2VsZXktc29mdGZsb2F0LTMpIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2Jl
-cmtlbGV5LXRlc3RmbG9hdC0zJyAoaHR0cHM6Ly9naXRodWIuY29tL2NvdGEvYmVya2VsZXktdGVz
-dGZsb2F0LTMpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9h
-dC0zJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dp
-dC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGIn
-CkNsb25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6IGNo
-ZWNrZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpDbG9u
-aW5nIGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYx
-ODkwOWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGludG8gJ3JvbXMv
-UWVtdU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJzog
-Y2hlY2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDljOGUyNjYnCkNs
-b25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9TTE9GJzogY2hl
-Y2tlZCBvdXQgJ2E1YjQyOGUxYzFlYWU3MDNiZGQ2MmEzZjUyNzIyM2MyOTFlZTNmZGMnCkNsb25p
-bmcgaW50byAncm9tcy9pcHhlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9pcHhlJzogY2hlY2tl
-ZCBvdXQgJ2RlNDU2NWNiZTc2ZWE5Zjc5MTNhMDFmMzMxYmUzZWU5MDFiYjZlMTcnCkNsb25pbmcg
-aW50byAncm9tcy9vcGVuYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbmJpb3MnOiBj
-aGVja2VkIG91dCAnNDQxYTg0ZDNhNjQyYTEwYjk0ODM2OWM2M2YzMjM2N2U4ZmY2Mzk1YicKQ2xv
-bmluZyBpbnRvICdyb21zL29wZW5oYWNrd2FyZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3Bl
-bmhhY2t3YXJlJzogY2hlY2tlZCBvdXQgJ2M1NTlkYTdjOGVlYzVlNDVlZjFmNjc5Nzg4MjdhZjZm
-MGI5NTQ2ZjUnCkNsb25pbmcgaW50byAncm9tcy9xZW11LXBhbGNvZGUnLi4uClN1Ym1vZHVsZSBw
-YXRoICdyb21zL3FlbXUtcGFsY29kZSc6IGNoZWNrZWQgb3V0ICc1MWMyMzdkN2UyMGQwNTEwMGVh
-Y2FkZWUyZjYxYWJjMTdlNmJjMDk3JwpDbG9uaW5nIGludG8gJ3JvbXMvc2VhYmlvcycuLi4KU3Vi
-bW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcyc6IGNoZWNrZWQgb3V0ICdhNjk4Yzg5OTVmZmIyODM4
-Mjk2ZWMyODRmZTNjNGFkMzNkZmNhMzA3JwpDbG9uaW5nIGludG8gJ3JvbXMvc2VhYmlvcy1ocHBh
-Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnOiBjaGVja2VkIG91dCAnMWVm
-OTlhMDE1NzJjMjU4MWMzMGUxNmU2ZmU2OWU5ZWEyZWY5MmNlMCcKQ2xvbmluZyBpbnRvICdyb21z
-L3NnYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NnYWJpb3MnOiBjaGVja2VkIG91dCAn
-Y2JhZWU1MjI4N2U1ZjMyMzczMTgxY2ZmNTBhMDBiNmM0YWM5MDE1YScKQ2xvbmluZyBpbnRvICdy
-b21zL3NraWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NraWJvb3QnOiBjaGVja2VkIG91
-dCAnZTBlZTI0YzI3YTE3MmJjZjQ4MmY2ZjJiYzkwNWU2MjExYzEzNGJjYycKQ2xvbmluZyBpbnRv
-ICdyb21zL3UtYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290JzogY2hlY2tlZCBv
-dXQgJ2Q4NWNhMDI5ZjI1N2I1M2E5NmRhNmMyZmI0MjFlNzhhMDAzYTk5NDMnCkNsb25pbmcgaW50
-byAncm9tcy91LWJvb3Qtc2FtNDYwZXgnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdC1z
-YW00NjBleCc6IGNoZWNrZWQgb3V0ICc2MGIzOTE2ZjMzZTYxN2E4MTU5NzNjNWE2ZGY3NzA1NWIy
-ZTNhNTg4JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJy4uLgpT
-dWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91
-dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRv
-ICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3Rz
-L2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJzogY2hlY2tlZCBvdXQgJzVhNTlkY2VjMTkzMjczOTZh
-MDExYTE3ZmQ5MjRhZWQ0ZmVjNDE2YjMnCkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRiJy4u
-LgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZl
-MmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMyY2UnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKM2ZiODRhYyBnZGJzdHViOiBTZW5kIGEgcmVwbHkgdG8gdGhlIHZLaWxsIHBhY2tl
-dC4KMWIwNWJmYSB0YXJnZXQvYXJtOiBBZGQgbWlzc2luZyBjbGVhcl90YWlsIGNhbGxzCjMzMDY2
-MzIgdGFyZ2V0L2FybTogVXNlIHZlY3RvciBvcGVyYXRpb25zIGZvciBzYXR1cmF0aW9uCjU4NWQ4
-MjMgdGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZpZWxkCjBhNjUx
-YjMgdGFyZ2V0L2FybTogRml4IHNldCBvZiBiaXRzIGtlcHQgaW4geHJlZ3NbQVJNX1ZGUF9GUFND
-Ul0KZjFlMjE5MyB0YXJnZXQvYXJtOiBTcGxpdCBvdXQgZmxhZ3Mgc2V0dGluZyBmcm9tIHZmcCBj
-b21wYXJlcwpjYzcxZjczIHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBT
-Q1IKZTVhYmRjYSB0YXJnZXQvYXJtOiBGaXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUgo3
-MWFiNjMxIHRhcmdldC9hcm06IFJlbW92ZSBuZW9uIG1pbi9tYXggaGVscGVycwpkNjRmMDQ3IHRh
-cmdldC9hcm06IFVzZSB0Y2cgaW50ZWdlciBtaW4vbWF4IHByaW1pdGl2ZXMgZm9yIG5lb24KNTY1
-ZmZiOCB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoMzIK
-ZjA3YTMzMiB0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNo
-NjQKODU2NmNiNCB0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dl
-bl9ndmVjX29yCmE1NTE2ZmUgaHcvYXJtL2FybXNzZTogRml4IG1pc3dpcmluZyBvZiBleHBhbnNp
-b24gSVJRcwplN2FjNTUzIGh3L2ludGMvYXJtdjdtX252aWM6IEFsbG93IGJ5dGUgYWNjZXNzZXMg
-dG8gU0hQUjEKYmNjNzk2NyBNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRlIGZy
-b20gdmFyaW91cyBlbnRyaWVzCmY4OGQ5OGQgYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZv
-ciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlCjM1MWMzMDIgbGludXgtdXNl
-ci9lbGZsb2FkOiBlbmFibGUgSFdDQVBfQ1BVSUQgZm9yIEFBcmNoNjQKNTkyNzg2MCB0YXJnZXQv
-YXJtOiBleHBvc2UgcmVtYWluaW5nIENQVUlEIHJlZ2lzdGVycyBhcyBSQVoKMTYyOWFmOSB0YXJn
-ZXQvYXJtOiBleHBvc2UgTVBJRFJfRUwxIHRvIHVzZXJzcGFjZQpiOWQ1ZDU4IHRhcmdldC9hcm06
-IGV4cG9zZSBDUFVJRCByZWdpc3RlcnMgdG8gdXNlcnNwYWNlCjQ0ZTNmYzIgdGFyZ2V0L2FybTog
-cmVsYXggcGVybWlzc2lvbiBjaGVja3MgZm9yIEhXQ0FQX0NQVUlEIHJlZ2lzdGVycwo3MDVjMmIz
-IHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2ZwX2ludF9jb252CmQyNDlkYzUgdGFyZ2V0
-L2FybTogRm9yY2UgcmVzdWx0IHNpemUgaW50byBkcCBhZnRlciBvcGVyYXRpb24KYjdiZTNhZCB0
-YXJnZXQvYXJtOiBGaXggaW50MTI4X21ha2UxMjggbG8sIGhpIG9yZGVyIGluIHBhaXJlZF9jbXB4
-Y2hnNjRfYmUKN2YwNmVjNGYgdGFyZ2V0L2FybTogSW1wbGVtZW50IEhBQ1JfRUwyCjhmMWZhOGEg
-dGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3IgUE1FVlRZUEVSL1BNRVZDTlRSCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNvbW1pdCA4ZjFmYThhMmQ0NGQgKHRhcmdl
-dC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZUWVBFUi9QTUVWQ05UUikKMi8yNyBDaGVj
-a2luZyBjb21taXQgN2YwNmVjNGY4MmZjICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIp
-CjMvMjcgQ2hlY2tpbmcgY29tbWl0IGI3YmUzYWQxNTY5ZCAodGFyZ2V0L2FybTogRml4IGludDEy
-OF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRfY21weGNoZzY0X2JlKQo0LzI3IENoZWNr
-aW5nIGNvbW1pdCBkMjQ5ZGM1ZjY2N2IgKHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGlu
-dG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNraW5nIGNvbW1pdCA3MDVjMmIzYWU3Nzgg
-KHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2ZwX2ludF9jb252KQo2LzI3IENoZWNraW5n
-IGNvbW1pdCA0NGUzZmMyOGU2YjkgKHRhcmdldC9hcm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tz
-IGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcgQ2hlY2tpbmcgY29tbWl0IGI5ZDVkNTgy
-ZDBiOCAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJlZ2lzdGVycyB0byB1c2Vyc3BhY2UpCjgv
-MjcgQ2hlY2tpbmcgY29tbWl0IDE2MjlhZjk4NGQzMSAodGFyZ2V0L2FybTogZXhwb3NlIE1QSURS
-X0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcgY29tbWl0IDU5Mjc4NjBkYzczNCAodGFy
-Z2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaKQoxMC8yNyBD
-aGVja2luZyBjb21taXQgMzUxYzMwMmVmMDYwIChsaW51eC11c2VyL2VsZmxvYWQ6IGVuYWJsZSBI
-V0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hlY2tpbmcgY29tbWl0IGY4OGQ5OGQyNTAw
-YiAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZvciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5n
-ZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBjb21taXQgYmNjNzk2N2RjYmNlIChNQUlO
-VEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRlIGZyb20gdmFyaW91cyBlbnRyaWVzKQox
-My8yNyBDaGVja2luZyBjb21taXQgZTdhYzU1M2MyNzMxIChody9pbnRjL2FybXY3bV9udmljOiBB
-bGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8yNyBDaGVja2luZyBjb21taXQgYTU1MTZm
-ZWNlNGFmIChody9hcm0vYXJtc3NlOiBGaXggbWlzd2lyaW5nIG9mIGV4cGFuc2lvbiBJUlFzKQox
-NS8yNyBDaGVja2luZyBjb21taXQgODU2NmNiNDg1Y2MxICh0YXJnZXQvYXJtOiBSZWx5IG9uIG9w
-dGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29yKQoxNi8yNyBDaGVja2luZyBjb21taXQg
-ZjA3YTMzMjdhZWIyICh0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG1pbm1heCBleHBhbmRlcnMgZm9y
-IGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCA1NjVmZmI4MTc1OTQgKHRhcmdldC9hcm06
-IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3IgYWFyY2gzMikKMTgvMjcgQ2hlY2tpbmcg
-Y29tbWl0IGQ2NGYwNDc2MmM0ZSAodGFyZ2V0L2FybTogVXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXgg
-cHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tpbmcgY29tbWl0IDcxYWI2MzFjMzk5MyAo
-dGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBoZWxwZXJzKQoyMC8yNyBDaGVja2luZyBj
-b21taXQgZTVhYmRjYTg0MjA3ICh0YXJnZXQvYXJtOiBGaXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2
-cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGlu
-ZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6ODQ6CisgICAgY2FzZSAxOiBzdGxfcChi
-dWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRl
-bWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVy
-LmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNjcihlbnYsIGxkbF9wKGJ1ZikpOyByZXR1
-cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIxLzI3IENoZWNraW5nIGNvbW1p
-dCBjYzcxZjczOWZmZjggKHRhcmdldC9hcm06IEZpeCBhcm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBT
-Q1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCBmMWUyMTkzMzczY2QgKHRhcmdldC9hcm06IFNwbGl0
-IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBhcmVzKQoyMy8yNyBDaGVja2luZyBjb21t
-aXQgMGE2NTFiMzk3YjI3ICh0YXJnZXQvYXJtOiBGaXggc2V0IG9mIGJpdHMga2VwdCBpbiB4cmVn
-c1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcgY29tbWl0IDU4NWQ4MjM1YzMxYSAodGFy
-Z2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEgdmVjdG9yIGZpZWxkKQoyNS8yNyBDaGVj
-a2luZyBjb21taXQgMzMwNjYzMjM1ZDYyICh0YXJnZXQvYXJtOiBVc2UgdmVjdG9yIG9wZXJhdGlv
-bnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyon
-IChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxwZXIuYzo3NzQ6CisgICAg
-VFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0gPSB2bTsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjUvMjcg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3IENoZWNraW5nIGNvbW1pdCAxYjA1YmZh
-MGIwMjEgKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNsZWFyX3RhaWwgY2FsbHMpCjI3LzI3IENo
-ZWNraW5nIGNvbW1pdCAzZmI4NGFjY2IxMGQgKGdkYnN0dWI6IFNlbmQgYSByZXBseSB0byB0aGUg
-dktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcv
-dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, 14 Feb 2019, Peter Maydell wrote:
+
+> Move the console/device menu creation code functions
+> further up in the source file, next to the code which
+> creates the initial menus. We're going to want to
+> change the location we call these functions from in
+> the next patch.
+>
+> This commit is a pure code move with no other changes.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Regards,
+BALATON Zoltan
+
+> ---
+> ui/cocoa.m | 184 ++++++++++++++++++++++++++---------------------------
+> 1 file changed, 92 insertions(+), 92 deletions(-)
+>
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 0b1cd31543..2d943b6e2a 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -1548,6 +1548,98 @@ static void create_initial_menus(void)
+>     [[NSApp mainMenu] addItem:menuItem];
+> }
+>
+> +/* Returns a name for a given console */
+> +static NSString * getConsoleName(QemuConsole * console)
+> +{
+> +    return [NSString stringWithFormat: @"%s", qemu_console_get_label(console)];
+> +}
+> +
+> +/* Add an entry to the View menu for each console */
+> +static void add_console_menu_entries(void)
+> +{
+> +    NSMenu *menu;
+> +    NSMenuItem *menuItem;
+> +    int index = 0;
+> +
+> +    menu = [[[NSApp mainMenu] itemWithTitle:@"View"] submenu];
+> +
+> +    [menu addItem:[NSMenuItem separatorItem]];
+> +
+> +    while (qemu_console_lookup_by_index(index) != NULL) {
+> +        menuItem = [[[NSMenuItem alloc] initWithTitle: getConsoleName(qemu_console_lookup_by_index(index))
+> +                                               action: @selector(displayConsole:) keyEquivalent: @""] autorelease];
+> +        [menuItem setTag: index];
+> +        [menu addItem: menuItem];
+> +        index++;
+> +    }
+> +}
+> +
+> +/* Make menu items for all removable devices.
+> + * Each device is given an 'Eject' and 'Change' menu item.
+> + */
+> +static void addRemovableDevicesMenuItems(void)
+> +{
+> +    NSMenu *menu;
+> +    NSMenuItem *menuItem;
+> +    BlockInfoList *currentDevice, *pointerToFree;
+> +    NSString *deviceName;
+> +
+> +    currentDevice = qmp_query_block(NULL);
+> +    pointerToFree = currentDevice;
+> +    if(currentDevice == NULL) {
+> +        NSBeep();
+> +        QEMU_Alert(@"Failed to query for block devices!");
+> +        return;
+> +    }
+> +
+> +    menu = [[[NSApp mainMenu] itemWithTitle:@"Machine"] submenu];
+> +
+> +    // Add a separator between related groups of menu items
+> +    [menu addItem:[NSMenuItem separatorItem]];
+> +
+> +    // Set the attributes to the "Removable Media" menu item
+> +    NSString *titleString = @"Removable Media";
+> +    NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:titleString];
+> +    NSColor *newColor = [NSColor blackColor];
+> +    NSFontManager *fontManager = [NSFontManager sharedFontManager];
+> +    NSFont *font = [fontManager fontWithFamily:@"Helvetica"
+> +                                          traits:NSBoldFontMask|NSItalicFontMask
+> +                                          weight:0
+> +                                            size:14];
+> +    [attString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, [titleString length])];
+> +    [attString addAttribute:NSForegroundColorAttributeName value:newColor range:NSMakeRange(0, [titleString length])];
+> +    [attString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt: 1] range:NSMakeRange(0, [titleString length])];
+> +
+> +    // Add the "Removable Media" menu item
+> +    menuItem = [NSMenuItem new];
+> +    [menuItem setAttributedTitle: attString];
+> +    [menuItem setEnabled: NO];
+> +    [menu addItem: menuItem];
+> +
+> +    /* Loop through all the block devices in the emulator */
+> +    while (currentDevice) {
+> +        deviceName = [[NSString stringWithFormat: @"%s", currentDevice->value->device] retain];
+> +
+> +        if(currentDevice->value->removable) {
+> +            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Change %s...", currentDevice->value->device]
+> +                                                  action: @selector(changeDeviceMedia:)
+> +                                           keyEquivalent: @""];
+> +            [menu addItem: menuItem];
+> +            [menuItem setRepresentedObject: deviceName];
+> +            [menuItem autorelease];
+> +
+> +            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Eject %s", currentDevice->value->device]
+> +                                                  action: @selector(ejectDeviceMedia:)
+> +                                           keyEquivalent: @""];
+> +            [menu addItem: menuItem];
+> +            [menuItem setRepresentedObject: deviceName];
+> +            [menuItem autorelease];
+> +        }
+> +        currentDevice = currentDevice->next;
+> +    }
+> +    qapi_free_BlockInfoList(pointerToFree);
+> +}
+> +
+> int main (int argc, const char * argv[]) {
+>
+>     gArgc = argc;
+> @@ -1676,98 +1768,6 @@ static void cocoa_cleanup(void)
+>     .dpy_refresh = cocoa_refresh,
+> };
+>
+> -/* Returns a name for a given console */
+> -static NSString * getConsoleName(QemuConsole * console)
+> -{
+> -    return [NSString stringWithFormat: @"%s", qemu_console_get_label(console)];
+> -}
+> -
+> -/* Add an entry to the View menu for each console */
+> -static void add_console_menu_entries(void)
+> -{
+> -    NSMenu *menu;
+> -    NSMenuItem *menuItem;
+> -    int index = 0;
+> -
+> -    menu = [[[NSApp mainMenu] itemWithTitle:@"View"] submenu];
+> -
+> -    [menu addItem:[NSMenuItem separatorItem]];
+> -
+> -    while (qemu_console_lookup_by_index(index) != NULL) {
+> -        menuItem = [[[NSMenuItem alloc] initWithTitle: getConsoleName(qemu_console_lookup_by_index(index))
+> -                                               action: @selector(displayConsole:) keyEquivalent: @""] autorelease];
+> -        [menuItem setTag: index];
+> -        [menu addItem: menuItem];
+> -        index++;
+> -    }
+> -}
+> -
+> -/* Make menu items for all removable devices.
+> - * Each device is given an 'Eject' and 'Change' menu item.
+> - */
+> -static void addRemovableDevicesMenuItems(void)
+> -{
+> -    NSMenu *menu;
+> -    NSMenuItem *menuItem;
+> -    BlockInfoList *currentDevice, *pointerToFree;
+> -    NSString *deviceName;
+> -
+> -    currentDevice = qmp_query_block(NULL);
+> -    pointerToFree = currentDevice;
+> -    if(currentDevice == NULL) {
+> -        NSBeep();
+> -        QEMU_Alert(@"Failed to query for block devices!");
+> -        return;
+> -    }
+> -
+> -    menu = [[[NSApp mainMenu] itemWithTitle:@"Machine"] submenu];
+> -
+> -    // Add a separator between related groups of menu items
+> -    [menu addItem:[NSMenuItem separatorItem]];
+> -
+> -    // Set the attributes to the "Removable Media" menu item
+> -    NSString *titleString = @"Removable Media";
+> -    NSMutableAttributedString *attString=[[NSMutableAttributedString alloc] initWithString:titleString];
+> -    NSColor *newColor = [NSColor blackColor];
+> -    NSFontManager *fontManager = [NSFontManager sharedFontManager];
+> -    NSFont *font = [fontManager fontWithFamily:@"Helvetica"
+> -                                          traits:NSBoldFontMask|NSItalicFontMask
+> -                                          weight:0
+> -                                            size:14];
+> -    [attString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, [titleString length])];
+> -    [attString addAttribute:NSForegroundColorAttributeName value:newColor range:NSMakeRange(0, [titleString length])];
+> -    [attString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt: 1] range:NSMakeRange(0, [titleString length])];
+> -
+> -    // Add the "Removable Media" menu item
+> -    menuItem = [NSMenuItem new];
+> -    [menuItem setAttributedTitle: attString];
+> -    [menuItem setEnabled: NO];
+> -    [menu addItem: menuItem];
+> -
+> -    /* Loop through all the block devices in the emulator */
+> -    while (currentDevice) {
+> -        deviceName = [[NSString stringWithFormat: @"%s", currentDevice->value->device] retain];
+> -
+> -        if(currentDevice->value->removable) {
+> -            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Change %s...", currentDevice->value->device]
+> -                                                  action: @selector(changeDeviceMedia:)
+> -                                           keyEquivalent: @""];
+> -            [menu addItem: menuItem];
+> -            [menuItem setRepresentedObject: deviceName];
+> -            [menuItem autorelease];
+> -
+> -            menuItem = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"Eject %s", currentDevice->value->device]
+> -                                                  action: @selector(ejectDeviceMedia:)
+> -                                           keyEquivalent: @""];
+> -            [menu addItem: menuItem];
+> -            [menuItem setRepresentedObject: deviceName];
+> -            [menuItem autorelease];
+> -        }
+> -        currentDevice = currentDevice->next;
+> -    }
+> -    qapi_free_BlockInfoList(pointerToFree);
+> -}
+> -
+> static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
+> {
+>     COCOA_DEBUG("qemu_cocoa: cocoa_display_init\n");
+>
