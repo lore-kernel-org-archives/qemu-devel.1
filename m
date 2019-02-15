@@ -1,14 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45295)
+Received: from eggs.gnu.org ([209.51.188.92]:45651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1guZfJ-0003GC-4c
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:20:13 -0500
+	(envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
+	id 1guZgw-0003wJ-IV
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:21:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1guZfI-0007qx-CR
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:20:13 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 15 Feb 2019 12:19:50 +0300
-Message-Id: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] block: don't set the same context
+	(envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
+	id 1guZgq-0002Et-0l
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:21:54 -0500
+Received: from smtp.eu.citrix.com ([185.25.65.24]:63944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=9420f6528=Paul.Durrant@citrix.com>)
+	id 1guZgi-0001Hq-28
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:21:43 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Fri, 15 Feb 2019 09:21:23 +0000
+Message-ID: <d9442f475fa049d885ecb6c5a7a6b2c6@AMSPEX02CL03.citrite.net>
+References: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
+In-Reply-To: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] QEMU xen coverity issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,68 +30,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com, eblake@redhat.com
+To: 'Peter Maydell' <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 
-Adds a fast path on aio context setting preventing
-unnecessary context setting routine.
-Also, it prevents issues with cyclic walk of child
-bds-es appeared because of registring aio walking
-notifiers:
-
-Call stack:
-
-0  __GI_raise
-1  __GI_abort
-2  __assert_fail_base
-3  __GI___assert_fail
-4  bdrv_detach_aio_context (bs=0x55f54d65c000)      <<<
-5  bdrv_detach_aio_context (bs=0x55f54fc8a800)
-6  bdrv_set_aio_context (bs=0x55f54fc8a800, ...)
-7  block_job_attached_aio_context
-8  bdrv_attach_aio_context (bs=0x55f54d65c000, ...) <<<
-9  bdrv_set_aio_context (bs=0x55f54d65c000)
-10 blk_set_aio_context
-11 virtio_blk_data_plane_stop
-12 virtio_bus_stop_ioeventfd
-13 virtio_vmstate_change
-14 vm_state_notify (running=0, state=RUN_STATE_SHUTDOWN)
-15 do_vm_stop (state=RUN_STATE_SHUTDOWN, send_stop=true)
-16 vm_stop (state=RUN_STATE_SHUTDOWN)
-17 main_loop_should_exit
-18 main_loop
-19 main
-
-This can happen because of "new" context attachment to VM disk bds.
-When attaching a new context the corresponding aio context handler is
-called for each of aio_notifiers registered on the VM disk bds context.
-Among those handlers, there is the block_job_attached_aio_context handler
-which sets a new aio context for the block job bds. When doing so,
-the old context is detached from all the block job bds children and one of
-them is the VM disk bds, serving as backing store for the blockjob bds,
-although the VM disk bds is actually the initializer of that process.
-Since the VM disk bds is protected with walking_aio_notifiers flag
-from double processing in recursive calls, the assert fires.
-
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- block.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block.c b/block.c
-index adda221c2c..5742545e7a 100644
---- a/block.c
-+++ b/block.c
-@@ -5263,6 +5263,10 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
- {
-     AioContext *ctx = bdrv_get_aio_context(bs);
- 
-+    if (ctx == new_context) {
-+        return;
-+    }
-+
-     aio_disable_external(ctx);
-     bdrv_parent_drained_begin(bs, NULL, false);
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
--- 
-2.17.0
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBNYXlkZWxsIFttYWls
+dG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXQ0KPiBTZW50OiAxNCBGZWJydWFyeSAyMDE5IDE4
+OjI5DQo+IFRvOiBRRU1VIERldmVsb3BlcnMgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gQ2M6
+IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+OyBBbnRob255IFBlcmFyZA0K
+PiA8YW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbT4NCj4gU3ViamVjdDogUUVNVSB4ZW4gY292ZXJp
+dHkgaXNzdWVzDQo+IA0KPiBIaTsgd2UndmUganVzdCBkb25lIGFub3RoZXIgQ292ZXJpdHkgcnVu
+LCBhbmQgaXQncyBwdWxsZWQgdXAgc29tZQ0KPiBpc3N1ZXMgaW4gdGhlIHJlY2VudGx5IGNoYW5n
+ZWQgWGVuIGNvZGUuIFJhdGhlciB0aGFuIHRyYWNrIHRoZW0NCj4gYmFjayB0byBleGFjdGx5IHdo
+aWNoIHBhdGNoZXMgaW4gdGhlIHJlY2VudCByZWZhY3RvcmluZ3MgcmVzdWx0ZWQNCj4gaW4gdGhl
+bSwgSSBmaWd1cmVkIEknZCBqdXN0IGxpc3QgdGhlbSBoZXJlLiBDb3VsZCB5b3UgdGFrZSBhDQo+
+IGxvb2sgYXQgdGhlbSwgcGxlYXNlID8NCg0KWWVzLiBUaGFua3MgUGV0ZXIsIEknbGwgdGFrZSBh
+IGxvb2sgYXQgdGhlbSBhbmQgZ2V0IGJhY2sgdG8geW91Lg0KDQogIFBhdWwNCg==
