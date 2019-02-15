@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53984)
+Received: from eggs.gnu.org ([209.51.188.92]:54046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1guc3K-0005xz-16
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:53:10 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1guc3N-000615-LL
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:53:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1guc3J-0000Rh-5o
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:53:09 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1guc3I-0008V6-Td
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:53:09 -0500
-Received: by mail-wr1-x431.google.com with SMTP id v13so10032714wrw.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:52:33 -0800 (PST)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1guc3M-0000Vz-JU
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:53:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1guc3M-0000CF-8r
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:53:12 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5EC711555C
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:52:44 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 15 Feb 2019 12:52:39 +0100
+Message-Id: <20190215115239.3159-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190214201939.494-1-philmd@redhat.com>
-	<20190214201939.494-10-philmd@redhat.com>
-In-Reply-To: <20190214201939.494-10-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 15 Feb 2019 12:52:21 +0100
-Message-ID: <CAJ+F1CJYRYH0uE8NZqPquQ+0PHHZ_fN2yBOR=zLOtbKvBwDMrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] ccid-card-passthru: Use size_t for
- index
+Subject: [Qemu-devel] [PATCH] build-sys: remove baum SDL CFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Feb 14, 2019 at 9:27 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> The variable 'opt_bytes' is an index to the data[] array.
-> Use size_t for indexes.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+SDL dependency was removed in commit
+f29b3431f6294168e5f8fc63edb91c15c6a08e41.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ chardev/Makefile.objs | 1 -
+ 1 file changed, 1 deletion(-)
 
-> ---
->  hw/usb/ccid-card-passthru.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-> index 083eb5ca08..664e8a1b54 100644
-> --- a/hw/usb/ccid-card-passthru.c
-> +++ b/hw/usb/ccid-card-passthru.c
-> @@ -152,7 +152,7 @@ static void ccid_card_vscard_handle_init(
->  static int check_atr(PassthruState *card, uint8_t *data, size_t len)
->  {
->      size_t historical_length;
-> -    int opt_bytes;
-> +    size_t opt_bytes;
->      int td_count =3D 0;
->      int td;
->
-> @@ -192,12 +192,13 @@ static int check_atr(PassthruState *card, uint8_t *=
-data, size_t len)
->      }
->      if (len > 2 + historical_length + opt_bytes) {
->          DPRINTF(card, D_WARN,
-> -            "atr too long: len %zu, but hist/opt %zu/%d, T1 0x%X\n",
-> +            "atr too long: len %zu, but hist/opt %zu/%zu, T1 0x%X\n",
->              len, historical_length, opt_bytes, data[1]);
->          /* let it through */
->      }
->      DPRINTF(card, D_VERBOSE,
-> -            "atr passes check: %zu total length, %zu historical, %d opti=
-onal\n",
-> +            "atr passes check: %zu total length,"
-> +            " %zu historical, %zu optional\n",
->              len, historical_length, opt_bytes);
->
->      return 1;
-> --
-> 2.20.1
->
->
-
-
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index d68e1347f9..7749bc0ec2 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -19,7 +19,6 @@ chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
+=20
+ common-obj-y +=3D msmouse.o wctablet.o testdev.o
+ common-obj-$(CONFIG_BRLAPI) +=3D baum.o
+-baum.o-cflags :=3D $(SDL_CFLAGS)
+ baum.o-libs :=3D $(BRLAPI_LIBS)
+=20
+ common-obj-$(CONFIG_SPICE) +=3D spice.o
 --=20
-Marc-Andr=C3=A9 Lureau
+2.21.0.rc1
