@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39426)
+Received: from eggs.gnu.org ([209.51.188.92]:39685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gud63-0004jN-0L
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1gud6q-0005Hm-2a
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gud60-0007Xz-VF
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:02 -0500
-Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:57161)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gud5y-0006bm-Qt
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:00 -0500
-Received: from player729.ha.ovh.net (unknown [10.109.159.7])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 769C843CD0
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:59:40 +0100 (CET)
-References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023082996.1011724.16237920586343905010.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2dea9d93-8662-2a32-deef-c45add6d87cd@kaod.org>
-Date: Fri, 15 Feb 2019 13:59:36 +0100
+	(envelope-from <bounces@canonical.com>) id 1gud6o-0001ju-Vc
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gud6n-0001Yi-6k
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gud6l-00064T-MP
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:00:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 75E6E2E80CB
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:00:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <155023082996.1011724.16237920586343905010.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/10] xics: Handle KVM interrupt
- presentation from "simple" ICS code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Feb 2019 12:47:17 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+Reply-To: Bug 1815911 <1815911@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155015240171.6215.11220706309348619396.malonedeb@soybean.canonical.com>
+Message-Id: <155023483785.1243.17367221566041086008.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1815911] Re: aptitude crashes qemu-m68k with
+ handle_cpu_signal received signal outside vCPU context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 2/15/19 12:40 PM, Greg Kurz wrote:
-> We want to use the "simple" ICS type in both KVM and non-KVM setups.
-> Teach the "simple" ICS how to present interrupts to KVM and adapt
-> sPAPR accordingly.
+It seems it crashes during futex syscall:
 
-I don't see the benefits of this change.
+...
+[pid     4] getpid()                    =3D 4
+[pid     4] tgkill(4, 24, SIGRT_1)      =3D 0
+[pid    24] <... futex resumed> )       =3D ? ERESTARTSYS (To be restarted =
+if SA_RESTART is set)
+[pid    24] --- SIGRT_1 {si_signo=3DSIGRT_1, si_code=3DSI_TKILL, si_pid=3D4=
+, si_uid=3D0} ---
+[pid     4] futex(0x7f77abb4f610, FUTEX_WAIT_PRIVATE, 16777216, NULL <unfin=
+ished ...>
+[pid    24] getpid()                    =3D 4
+[pid    24] --- SIGSEGV {si_signo=3DSIGSEGV, si_code=3DSEGV_MAPERR, si_addr=
+=3D0x10} ---
+...
 
-C.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815911
 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/intc/xics.c        |    5 +++++
->  hw/intc/xics_kvm.c    |    3 +--
->  hw/ppc/spapr_irq.c    |    7 +------
->  include/hw/ppc/xics.h |    2 +-
->  4 files changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 49401745c410..3009fa747277 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -466,6 +466,11 @@ void ics_simple_set_irq(void *opaque, int srcno, int val)
->  {
->      ICSState *ics = (ICSState *)opaque;
->  
-> +    if (kvm_irqchip_in_kernel()) {
-> +        ics_kvm_set_irq(ics, srcno, val);
-> +        return;
-> +    }
-> +
->      if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
->          ics_simple_set_irq_lsi(ics, srcno, val);
->      } else {
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index e7b8d4c29ce6..f34eacda03e7 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -259,9 +259,8 @@ int ics_set_kvm_state(ICSState *ics)
->      return 0;
->  }
->  
-> -void ics_kvm_set_irq(void *opaque, int srcno, int val)
-> +void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
->  {
-> -    ICSState *ics = opaque;
->      struct kvm_irq_level args;
->      int rc;
->  
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index e6893df61e76..9f43b7b3bf16 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -222,13 +222,8 @@ static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int version_id)
->  static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
->  {
->      sPAPRMachineState *spapr = opaque;
-> -    MachineState *machine = MACHINE(opaque);
->  
-> -    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> -        ics_kvm_set_irq(spapr->ics, srcno, val);
-> -    } else {
-> -        ics_simple_set_irq(spapr->ics, srcno, val);
-> -    }
-> +    ics_simple_set_irq(spapr->ics, srcno, val);
->  }
->  
->  static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 06e87128f88e..61bd0fb9784f 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -180,7 +180,6 @@ void icp_eoi(ICPState *icp, uint32_t xirr);
->  void ics_simple_write_xive(ICSState *ics, int nr, int server,
->                             uint8_t priority, uint8_t saved_priority);
->  void ics_simple_set_irq(void *opaque, int srcno, int val);
-> -void ics_kvm_set_irq(void *opaque, int srcno, int val);
->  
->  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
->  void icp_pic_print_info(ICPState *icp, Monitor *mon);
-> @@ -201,5 +200,6 @@ void icp_kvm_realize(DeviceState *dev, Error **errp);
->  void ics_get_kvm_state(ICSState *ics);
->  int ics_set_kvm_state(ICSState *ics);
->  void ics_synchronize_state(ICSState *ics);
-> +void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
->  
->  #endif /* XICS_H */
-> 
+Title:
+  aptitude crashes qemu-m68k with handle_cpu_signal received signal
+  outside vCPU context
+
+Status in QEMU:
+  New
+
+Bug description:
+  When building a package with sbuild on Debian, sbuild can use aptitude
+  to resolve dependencies.
+
+  Recently, some changes introduced to aptitude or related packages
+  cause qemu to crash:
+
+  (sid-m68k-sbuild)root@nofan:/# aptitude -y --without-recommends -o Dpkg::=
+Options::=3D--force-confold -o Aptitude::CmdLine::Ignore-Trust-Violations=
+=3Dfalse -o Aptitude::ProblemResolver::StepScore=3D100 -o Aptitude::Problem=
+Resolver::SolutionCost=3D"safety, priority, non-default-versions" -o Aptitu=
+de::ProblemResolver::Hints::KeepDummy=3D"reject sbuild-build-depends-core-d=
+ummy :UNINST" -o Aptitude::ProblemResolver::Keep-All-Level=3D55000 -o Aptit=
+ude::ProblemResolver::Remove-Essential-Level=3Dmaximum install vim
+  Warning: Invalid locale (please review locale settings, this might lead t=
+o problems later):
+    locale::facet::_S_create_c_locale name not valid
+  The following NEW packages will be installed:
+    libgpm2{a} vim vim-common{a} vim-runtime{a} xxd{a} =
+
+  0 packages upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
+  Need to get 7225 kB/7260 kB of archives. After unpacking 33.5 MB will be =
+used.
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6019=
+d1bf
+  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x601b=
+64ab
+  Segmentation fault
+  (sid-m68k-sbuild)root@nofan:/#
+
+  The crash does not reproduce on real hardware running Debian unstable.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815911/+subscriptions
