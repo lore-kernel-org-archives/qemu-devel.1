@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36097)
+Received: from eggs.gnu.org ([209.51.188.92]:36594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guh1k-0001j0-PC
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:11:54 -0500
+	(envelope-from <berrange@redhat.com>) id 1guh3o-0003VM-5B
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guh1j-0003qP-4G
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:11:52 -0500
-Resent-Message-Id: <E1guh1j-0003qP-4G@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155025069111.24.1475715005005100014@49fa7ef69f7b>
-In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
+	(envelope-from <berrange@redhat.com>) id 1guh3m-0005Vp-Tc
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:14:00 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 15 Feb 2019 17:13:28 +0000
+Message-Id: <20190215171345.30280-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 15 Feb 2019 09:11:32 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v7 00/35] target/riscv: Convert to
- decodetree
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 00/17] Add authorization support to all
+ network services
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,182 +21,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: palmer@sifive.com
-Cc: fam@euphon.net, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Max Reitz <mreitz@redhat.com>, libvir-list@redhat.com, qemu-block@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE1NTQxNC4yMjI4
-NS0xLXBhbG1lckBzaWZpdmUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxMzE1NTQxNC4yMjI4NS0xLXBhbG1lckBzaWZp
-dmUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMzVdIHRhcmdldC9yaXNj
-djogQ29udmVydCB0byBkZWNvZGV0cmVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAy
-MTMxNTU0MTQuMjIyODUtMS1wYWxtZXJAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEzMTU1
-NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2ZS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwoyODZjNGM5ZGI1IHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMy
-IGJpdCB0cmFuc2xhdG9ycwo3ZjBiOWM4MzRhIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmlu
-ZyBjb21wcmVzc2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NAo2MmNlYWJhOTYx
-IHRhcmdldC9yaXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJp
-c2N2NjQKNWJkZmI5YTI3NiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3Nf
-ZCwgQGNzX3cgaW5zbnMKZTMzZmM3OGQzYyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5z
-bnMgdG8gc2hhcmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjY0ZjVlZTYzNzEgdGFyZ2V0L3Jpc2N2
-OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkKNWQxNGQ3ODM5YSB0YXJnZXQvcmlzY3Y6IFJlbW92
-ZSBnZW5fc3lzdGVtKCkKZDk1ODc0YTUxNCB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0
-aCB0byBnZW5fYXJpdGgKYzczZTg5M2Q1MCB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVj
-b2Rpbmcgb2YgUlYzMi82NE0gaW5zbgplOTRmMjc2OTUyIHRhcmdldC9yaXNjdjogUmVtb3ZlIHNo
-aWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcKOWEyNWUyOWJlZSB0YXJnZXQvcmlzY3Y6
-IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0cwozNDYyMzA3ZTAwIHRh
-cmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1
-bmN0aW9ucwowYTdmMjRlMzI5IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBm
-cm9tIGdlbl9zdG9yZSgpCmRiYWY4OGY4MTAgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRl
-Y29kaW5nIGZyb20gZ2VuX2xvYWQoKQo1Yjc3MDdjNTg2IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1h
-bnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKQoyNzhlMTdlMzEzIHRhcmdldC9yaXNjdjog
-UmVtb3ZlIGdlbl9qYWxyKCkKYzE5Y2EyZWYyYyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJh
-bnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNDEwNDlmZjA3MyB0YXJnZXQvcmlzY3Y6
-IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKZmY5NDE2NDI1
-YSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29k
-ZXRyZWUKNWZjY2E1MmFkMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBk
-ZWNvZGV0cmVlCmM5ZWUwNDlhODcgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRv
-IGRlY29kZXRyZWUKNGExMTc0NTMyNyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMg
-dG8gZGVjb2RldHJlZQpjMGJjYjE3MjFhIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNu
-cyB0byBkZWNvZGV0cmVlCjliOTA4MTE0ZjkgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGlu
-c25zIHRvIGRlY29kZXRyZWUKNDdjODQ1ZmJmNiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEg
-aW5zbnMgdG8gZGVjb2RldHJlZQpmZjMzZTIyY2MyIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMy
-QSBpbnNucyB0byBkZWNvZGV0cmVlCmY2YjlhOTIzN2EgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
-WE0gaW5zbnMgdG8gZGVjb2RldHJlZQo4OGU4YjI2YzI0IHRhcmdldC9yaXNjdjogQ29udmVydCBS
-VlhJIGNzciBpbnNucyB0byBkZWNvZGV0cmVlCjg5ODUxNmIyZGEgdGFyZ2V0L3Jpc2N2OiBDb252
-ZXJ0IFJWWEkgZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZQo1NzdhZDI4ZmEyIHRhcmdldC9yaXNj
-djogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQo1MzY0MWUyNDg1
-IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRy
-ZWUKM2Q3ZjQ0ZmI0ZSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNu
-cyB0byBkZWNvZGV0cmVlCjBiMjkwMTJlNjkgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJh
-bmNoIGluc25zIHRvIGRlY29kZXRyZWUKNjllMTg5Y2UyNSB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRl
-IGRlY29kZXRyZWUgYW5kIGltcGxlbW50IExVSSAmIEFVSVBDCmQ2MWVkMzM3ZWQgdGFyZ2V0L3Jp
-c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IGQ2MWVkMzM3ZWRjYSAodGFyZ2V0L3Jp
-c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQpCjIvMzUgQ2hl
-Y2tpbmcgY29tbWl0IDY5ZTE4OWNlMjUyYyAodGFyZ2V0L3Jpc2N2OiBBY3RpdmF0ZSBkZWNvZGV0
-cmVlIGFuZCBpbXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcg
-ZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMg
-ZmlsZXMKIzEyNTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjE4ODU6Citib29sIGRl
-Y29kZV9pbnNuMzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IGluc24pOwoKdG90YWw6IDEg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zNSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBjb21taXQgMGIyOTAxMmU2OWVlICh0
-YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8z
-NSBDaGVja2luZyBjb21taXQgM2Q3ZjQ0ZmI0ZTJlICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYz
-MkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1LzM1IENoZWNraW5nIGNvbW1pdCA1
-MzY0MWUyNDg1MmYgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25z
-IHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-NS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1IENoZWNraW5nIGNvbW1pdCA1Nzdh
-ZDI4ZmEyMjQgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8g
-ZGVjb2RldHJlZSkKNy8zNSBDaGVja2luZyBjb21taXQgODk4NTE2YjJkYTgxICh0YXJnZXQvcmlz
-Y3Y6IENvbnZlcnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNvZGV0cmVlKQo4LzM1IENoZWNraW5n
-IGNvbW1pdCA4OGU4YjI2YzI0Y2YgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNu
-cyB0byBkZWNvZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1pdCBmNmI5YTkyMzdhNWQgKHRhcmdl
-dC9yaXNjdjogQ29udmVydCBSVlhNIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzQ4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgMTQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KMTAvMzUgQ2hlY2tpbmcgY29tbWl0IGZmMzNlMjJjYzI3MSAodGFyZ2V0L3Jpc2N2OiBDb252
-ZXJ0IFJWMzJBIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzM1IENo
-ZWNraW5nIGNvbW1pdCA0N2M4NDVmYmY2ZWEgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0QSBp
-bnNucyB0byBkZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBjb21taXQgOWI5MDgxMTRmOTk4ICh0
-YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojNzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCA0MTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMzUgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KMTMvMzUgQ2hlY2tpbmcgY29tbWl0IGMwYmNiMTcyMWFlMyAodGFyZ2V0L3Jpc2N2
-OiBDb252ZXJ0IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUpCjE0LzM1IENoZWNraW5nIGNvbW1p
-dCA0YTExNzQ1MzI3MzMgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyRCBpbnNucyB0byBkZWNv
-ZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM3MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8zNSBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVja2luZyBjb21taXQgYzllZTA0OWE4
-NzM0ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTYv
-MzUgQ2hlY2tpbmcgY29tbWl0IDVmY2NhNTJhZDFkMCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
-IHByaXYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmls
-ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMzUgQ2hlY2tp
-bmcgY29tbWl0IGZmOTQxNjQyNWEzMSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDAg
-b2YgUlZYQyBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBm
-aWxlcwojMjQ2OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6MTA2NzoKK2Jvb2wgZGVj
-b2RlX2luc24xNihEaXNhc0NvbnRleHQgKmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBl
-cnJvcnMsIDEgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8zNSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKMTgvMzUgQ2hlY2tpbmcgY29tbWl0IDQxMDQ5ZmYwNzNjZSAo
-dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDEgb2YgUlZYQyBpbnNucyB0byBkZWNvZGV0
-cmVlKQoxOS8zNSBDaGVja2luZyBjb21taXQgYzE5Y2EyZWYyYzgyICh0YXJnZXQvcmlzY3Y6IENv
-bnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjIwLzM1IENoZWNr
-aW5nIGNvbW1pdCAyNzhlMTdlMzEzYzEgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdlbl9qYWxyKCkp
-CjIxLzM1IENoZWNraW5nIGNvbW1pdCA1Yjc3MDdjNTg2Y2QgKHRhcmdldC9yaXNjdjogUmVtb3Zl
-IG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKSkKMjIvMzUgQ2hlY2tpbmcgY29tbWl0
-IGRiYWY4OGY4MTBhMSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20g
-Z2VuX2xvYWQoKSkKMjMvMzUgQ2hlY2tpbmcgY29tbWl0IDBhN2YyNGUzMjliNyAodGFyZ2V0L3Jp
-c2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX3N0b3JlKCkpCjI0LzM1IENoZWNr
-aW5nIGNvbW1pdCAzNDYyMzA3ZTAwNTYgKHRhcmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1t
-KCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucykKMjUvMzUgQ2hlY2tpbmcgY29tbWl0
-IDlhMjVlMjliZWVlNiAodGFyZ2V0L3Jpc2N2OiBtYWtlIEFERC9TVUIvT1IvWE9SL0FORCBpbnNu
-IHVzZSBhcmcgbGlzdHMpCjI2LzM1IENoZWNraW5nIGNvbW1pdCBlOTRmMjc2OTUyNWUgKHRhcmdl
-dC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcpCjI3LzM1
-IENoZWNraW5nIGNvbW1pdCBjNzNlODkzZDUwM2MgKHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVh
-bCBkZWNvZGluZyBvZiBSVjMyLzY0TSBpbnNuKQoyOC8zNSBDaGVja2luZyBjb21taXQgZDk1ODc0
-YTUxNGI3ICh0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5fYXJpdGgpCjI5
-LzM1IENoZWNraW5nIGNvbW1pdCA1ZDE0ZDc4MzlhMzkgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdl
-bl9zeXN0ZW0oKSkKMzAvMzUgQ2hlY2tpbmcgY29tbWl0IDY0ZjVlZTYzNzFkOCAodGFyZ2V0L3Jp
-c2N2OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkpCjMxLzM1IENoZWNraW5nIGNvbW1pdCBlMzNm
-Yzc4ZDNjNmQgKHRhcmdldC9yaXNjdjogQ29udmVydCBAY3NfMiBpbnNucyB0byBzaGFyZSB0cmFu
-c2xhdGlvbiBmdW5jdGlvbnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAx
-MDA2NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxODI6
-IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzo1NDM6Citib29sIGRlY29kZV9pbnNuMTYo
-RGlzYXNDb250ZXh0ICpjdHgsIHVpbnQxNl90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAxNjQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzEvMzUgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCjMyLzM1IENoZWNraW5nIGNvbW1pdCA1YmRmYjlhMjc2OTcgKHRhcmdldC9yaXNj
-djogQ29udmVydCBAY2xfZCwgQGNsX3csIEBjc19kLCBAY3NfdyBpbnNucykKMzMvMzUgQ2hlY2tp
-bmcgY29tbWl0IDYyY2VhYmE5NjE2YSAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgZnN3X3NkIGFuZCBm
-bHdfbGQgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjg6IApuZXcg
-ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDkgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMzMvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzQvMzUgQ2hl
-Y2tpbmcgY29tbWl0IDdmMGI5YzgzNGExZCAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgcmVtYWluaW5n
-IGNvbXByZXNzZWQgaW5zbiBwYWlycyBmb3IgcmlzY3YzMiB2cyByaXNjdjY0KQozNS8zNSBDaGVj
-a2luZyBjb21taXQgMjg2YzRjOWRiNWE4ICh0YXJnZXQvcmlzY3Y6IFJlbWFpbmluZyBydmMgaW5z
-biByZXVzZSAzMiBiaXQgdHJhbnNsYXRvcnMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjEzMTU1NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2
-ZS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04482.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05727.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01639.html
+
+This series builds on the core authorization framework:
+
+  v8: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04253.html
+
+enabling its use with the VNC, chardev, NBD and migration network servers=
+.
+
+In combination with TLS x509 client certificates, this allows these
+services to whitelist specific clients, which avoids the need to setup
+restricted child certificate authorities.
+
+In VNC it also allows whitelisting based on SASL user names.
+
+Changed in v4:
+
+  - Update deprecation versions to 4.0
+  - Rebased to latest git
+
+Changed in v3:
+
+  - Rebased to latest git master
+
+Changed in v2:
+
+ - Document that authz objects are resolved at time of use, not
+   time of network service activation
+ - Improve docs for tls-authz parameters on services
+ - Fix 2.13 -> 3.0 version tags
+ - Remove redundant conditionals around g_strdup
+ - Fix arg syntax for qemu-nbd  s/-/--/
+ - Remove QAPI (optional) annotation
+ - Fix some outdated usage example
+
+Based-on: <20190215155709.15777-1-berrange@redhat.com>
+
+Daniel P. Berrang=C3=A9 (17):
+  util: add helper APIs for dealing with inotify in portable manner
+  qom: don't require user creatable objects to be registered
+  hw/usb: don't set IN_ISDIR for inotify watch in MTP driver
+  hw/usb: fix const-ness for string params in MTP driver
+  hw/usb: switch MTP to use new inotify APIs
+  authz: add QAuthZ object as an authorization base class
+  authz: add QAuthZSimple object type for easy whitelist auth checks
+  authz: add QAuthZList object type for an access control list
+  authz: add QAuthZListFile object type for a file access control list
+  authz: add QAuthZPAM object type for authorizing using PAM
+  authz: delete existing ACL implementation
+  qemu-nbd: add support for authorization of TLS clients
+  nbd: allow authorization with nbd-server-start QMP command
+  migration: add support for a "tls-authz" migration parameter
+  chardev: add support for authorization for TLS clients
+  vnc: allow specifying a custom authorization object name
+  monitor: deprecate acl_show, acl_reset, acl_policy, acl_add,
+    acl_remove
+
+ MAINTAINERS                    |  15 +
+ Makefile                       |  10 +-
+ Makefile.objs                  |  10 +-
+ Makefile.target                |   2 +
+ authz/Makefile.objs            |   7 +
+ authz/base.c                   |  82 ++++
+ authz/list.c                   | 271 +++++++++++++
+ authz/listfile.c               | 283 ++++++++++++++
+ authz/pamacct.c                | 149 +++++++
+ authz/simple.c                 | 115 ++++++
+ authz/trace-events             |  18 +
+ blockdev-nbd.c                 |  11 +-
+ chardev/char-socket.c          |  12 +-
+ chardev/char.c                 |   3 +
+ configure                      |  54 ++-
+ crypto/tlssession.c            |  35 +-
+ crypto/trace-events            |   2 +-
+ hmp.c                          |  11 +-
+ hw/usb/dev-mtp.c               | 281 ++++++--------
+ hw/usb/trace-events            |   2 +-
+ include/authz/base.h           | 112 ++++++
+ include/authz/list.h           | 106 +++++
+ include/authz/listfile.h       | 111 ++++++
+ include/authz/pamacct.h        | 100 +++++
+ include/authz/simple.h         |  84 ++++
+ include/block/nbd.h            |   4 +-
+ include/qemu/acl.h             |  66 ----
+ include/qemu/filemonitor.h     | 128 ++++++
+ migration/migration.c          |   8 +
+ migration/tls.c                |   2 +-
+ monitor.c                      | 202 +++++++---
+ nbd/server.c                   |  10 +-
+ qapi/authz.json                |  58 +++
+ qapi/block.json                |   8 +-
+ qapi/char.json                 |   6 +
+ qapi/migration.json            |  14 +-
+ qapi/qapi-schema.json          |   1 +
+ qemu-deprecated.texi           |  11 +
+ qemu-nbd.c                     |  14 +-
+ qemu-nbd.texi                  |   4 +
+ qemu-options.hx                | 149 ++++++-
+ qom/object.c                   |  12 +-
+ qom/object_interfaces.c        |  16 +-
+ tests/Makefile.include         |  16 +-
+ tests/qemu-iotests/233         |  31 +-
+ tests/qemu-iotests/233.out     |  11 +
+ tests/test-authz-list.c        | 159 ++++++++
+ tests/test-authz-listfile.c    | 195 ++++++++++
+ tests/test-authz-pam.c         | 124 ++++++
+ tests/test-authz-simple.c      |  50 +++
+ tests/test-crypto-tlssession.c |  15 +-
+ tests/test-io-channel-tls.c    |  16 +-
+ tests/test-util-filemonitor.c  | 685 +++++++++++++++++++++++++++++++++
+ ui/vnc-auth-sasl.c             |  23 +-
+ ui/vnc-auth-sasl.h             |   5 +-
+ ui/vnc-auth-vencrypt.c         |   2 +-
+ ui/vnc-ws.c                    |   2 +-
+ ui/vnc.c                       |  85 +++-
+ ui/vnc.h                       |   4 +-
+ util/Makefile.objs             |   4 +-
+ util/acl.c                     | 179 ---------
+ util/filemonitor-inotify.c     | 338 ++++++++++++++++
+ util/filemonitor-stub.c        |  59 +++
+ util/trace-events              |   9 +
+ 64 files changed, 4013 insertions(+), 598 deletions(-)
+ create mode 100644 authz/Makefile.objs
+ create mode 100644 authz/base.c
+ create mode 100644 authz/list.c
+ create mode 100644 authz/listfile.c
+ create mode 100644 authz/pamacct.c
+ create mode 100644 authz/simple.c
+ create mode 100644 authz/trace-events
+ create mode 100644 include/authz/base.h
+ create mode 100644 include/authz/list.h
+ create mode 100644 include/authz/listfile.h
+ create mode 100644 include/authz/pamacct.h
+ create mode 100644 include/authz/simple.h
+ delete mode 100644 include/qemu/acl.h
+ create mode 100644 include/qemu/filemonitor.h
+ create mode 100644 qapi/authz.json
+ create mode 100644 tests/test-authz-list.c
+ create mode 100644 tests/test-authz-listfile.c
+ create mode 100644 tests/test-authz-pam.c
+ create mode 100644 tests/test-authz-simple.c
+ create mode 100644 tests/test-util-filemonitor.c
+ delete mode 100644 util/acl.c
+ create mode 100644 util/filemonitor-inotify.c
+ create mode 100644 util/filemonitor-stub.c
+
+--=20
+2.20.1
