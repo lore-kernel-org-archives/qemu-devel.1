@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48142)
+Received: from eggs.gnu.org ([209.51.188.92]:50082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guhrO-00043X-KE
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:05:15 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gui46-00068f-Qb
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guhrN-0000VE-JQ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:05:14 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guhrL-0000NM-HE
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:05:12 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w17so11238822wrn.12
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 10:05:04 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Feb 2019 18:05:00 +0000
-Message-Id: <20190215180500.6906-1-peter.maydell@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1gui44-0005TR-TP
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:18:22 -0500
+Resent-Message-Id: <E1gui44-0005TR-TP@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gui42-0005Mz-WC
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:18:20 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155025464362.24.1200537447541094855@49fa7ef69f7b>
+In-Reply-To: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/arm/armsse: Make 0x5... alias region work
- for per-CPU devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Feb 2019 10:17:25 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: yury-kotov@yandex-team.ru
+Cc: fam@euphon.net, dgilbert@redhat.com, ehabkost@redhat.com, eblake@redhat.com, imammedo@redhat.com, quintela@redhat.com, lvivier@redhat.com, armbru@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, thuth@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, wrfsh@yandex-team.ru
 
-The region 0x40010000 .. 0x4001ffff and its secure-only alias
-at 0x50010000... are for per-CPU devices. We implement this by
-giving each CPU its own container memory region, where the
-per-CPU devices live. Unfortunately, the alias region which
-makes devices mapped at 0x4... addresses also appear at 0x5...
-is only implemented in the overall "all CPUs" container. The
-effect of this bug is that the CPU_IDENTITY register block appears
-only at 0x4001f000, but not at the 0x5001f000 alias where it should
-also appear. Guests (like very recent Arm Trusted Firmware-M)
-which try to access it at 0x5001f000 will crash.
-
-Fix this by moving the handling for this alias from the "all CPUs"
-container to the per-CPU container. (We leave the aliases for
-0x1... and 0x3... in the overall container, because there are
-no per-CPU devices there.)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/armsse.h |  2 +-
- hw/arm/armsse.c         | 26 ++++++++++++++++----------
- 2 files changed, 17 insertions(+), 11 deletions(-)
-
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index f800bafb14a..5a845b3478d 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -182,7 +182,7 @@ typedef struct ARMSSE {
-     MemoryRegion cpu_container[SSE_MAX_CPUS];
-     MemoryRegion alias1;
-     MemoryRegion alias2;
--    MemoryRegion alias3;
-+    MemoryRegion alias3[SSE_MAX_CPUS];
-     MemoryRegion sram[MAX_SRAM_BANKS];
- 
-     qemu_irq *exp_irqs[SSE_MAX_CPUS];
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index d0207dbabc7..ee1357312f1 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -110,15 +110,16 @@ static bool irq_is_common[32] = {
-     /* 30, 31: reserved */
- };
- 
--/* Create an alias region of @size bytes starting at @base
-+/*
-+ * Create an alias region in @container of @size bytes starting at @base
-  * which mirrors the memory starting at @orig.
-  */
--static void make_alias(ARMSSE *s, MemoryRegion *mr, const char *name,
--                       hwaddr base, hwaddr size, hwaddr orig)
-+static void make_alias(ARMSSE *s, MemoryRegion *mr, MemoryRegion *container,
-+                       const char *name, hwaddr base, hwaddr size, hwaddr orig)
- {
--    memory_region_init_alias(mr, NULL, name, &s->container, orig, size);
-+    memory_region_init_alias(mr, NULL, name, container, orig, size);
-     /* The alias is even lower priority than unimplemented_device regions */
--    memory_region_add_subregion_overlap(&s->container, base, mr, -1500);
-+    memory_region_add_subregion_overlap(container, base, mr, -1500);
- }
- 
- static void irq_status_forwarder(void *opaque, int n, int level)
-@@ -608,16 +609,21 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Set up the big aliases first */
--    make_alias(s, &s->alias1, "alias 1", 0x10000000, 0x10000000, 0x00000000);
--    make_alias(s, &s->alias2, "alias 2", 0x30000000, 0x10000000, 0x20000000);
-+    make_alias(s, &s->alias1, &s->container, "alias 1",
-+               0x10000000, 0x10000000, 0x00000000);
-+    make_alias(s, &s->alias2, &s->container,
-+               "alias 2", 0x30000000, 0x10000000, 0x20000000);
-     /* The 0x50000000..0x5fffffff region is not a pure alias: it has
-      * a few extra devices that only appear there (generally the
-      * control interfaces for the protection controllers).
-      * We implement this by mapping those devices over the top of this
--     * alias MR at a higher priority.
-+     * alias MR at a higher priority. Some of the devices in this range
-+     * are per-CPU, so we must put this alias in the per-cpu containers.
-      */
--    make_alias(s, &s->alias3, "alias 3", 0x50000000, 0x10000000, 0x40000000);
--
-+    for (i = 0; i < info->num_cpus; i++) {
-+        make_alias(s, &s->alias3[i], &s->cpu_container[i],
-+                   "alias 3", 0x50000000, 0x10000000, 0x40000000);
-+    }
- 
-     /* Security controller */
-     object_property_set_bool(OBJECT(&s->secctl), true, "realized", &err);
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNTE3NDU0OC4yNjMw
+LTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTUxNzQ1NDguMjYzMC0xLXl1cnkt
+a290b3ZAeWFuZGV4LXRlYW0ucnUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzVd
+IEFkZCBpZ25vcmUtZXh0ZXJuYWwgbWlncmF0aW9uIGNhcGFiaWxpdHkKVHlwZTogc2VyaWVzCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0Jwo1ZjllOTA5NjdlIG1pZ3JhdGlvbjogQWRkIGNhcGFiaWxpdGll
+cyB2YWxpZGF0aW9uCmZhZDQ4MDg4YTggdGVzdHMvbWlncmF0aW9uLXRlc3Q6IEFkZCBhIHRlc3Qg
+Zm9yIGlnbm9yZS1zaGFyZWQgY2FwYWJpbGl0eQo2ODM0N2FkMmViIG1pZ3JhdGlvbjogQWRkIGFu
+IGFiaWxpdHkgdG8gaWdub3JlIHNoYXJlZCBSQU0gYmxvY2tzCmUzZDJmZDAyOTggbWlncmF0aW9u
+OiBJbnRyb2R1Y2UgaWdub3JlLXNoYXJlZCBjYXBhYmlsaXR5CjczZDllMjM5MzcgZXhlYzogQ2hh
+bmdlIFJBTUJsb2NrSXRlckZ1bmMgZGVmaW5pdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS81
+IENoZWNraW5nIGNvbW1pdCA3M2Q5ZTIzOTM3ZTkgKGV4ZWM6IENoYW5nZSBSQU1CbG9ja0l0ZXJG
+dW5jIGRlZmluaXRpb24pCjIvNSBDaGVja2luZyBjb21taXQgZTNkMmZkMDI5OGE0IChtaWdyYXRp
+b246IEludHJvZHVjZSBpZ25vcmUtc2hhcmVkIGNhcGFiaWxpdHkpCjMvNSBDaGVja2luZyBjb21t
+aXQgNjgzNDdhZDJlYjI0IChtaWdyYXRpb246IEFkZCBhbiBhYmlsaXR5IHRvIGlnbm9yZSBzaGFy
+ZWQgUkFNIGJsb2NrcykKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hv
+dWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMxNDY6IEZJTEU6IG1pZ3JhdGlv
+bi9yYW0uYzoxNjk6CisjZGVmaW5lIFJBTUJMT0NLX0ZPUkVBQ0hfTk9UX0lHTk9SRUQoYmxvY2sp
+ICAgICAgICAgICAgXAorICAgIElOVEVSTkFMX1JBTUJMT0NLX0ZPUkVBQ0goYmxvY2spICAgICAg
+ICAgICAgICAgICAgIFwKKyAgICAgICAgaWYgKHJhbWJsb2NrX2lzX2lnbm9yZWQoYmxvY2spKSB7
+fSBlbHNlCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5l
+CiMxNDg6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uYzoxNzE6CisgICAgICAgIGlmIChyYW1ibG9ja19p
+c19pZ25vcmVkKGJsb2NrKSkge30gZWxzZQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAz
+ODYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0
+LzUgQ2hlY2tpbmcgY29tbWl0IGZhZDQ4MDg4YTgwNSAodGVzdHMvbWlncmF0aW9uLXRlc3Q6IEFk
+ZCBhIHRlc3QgZm9yIGlnbm9yZS1zaGFyZWQgY2FwYWJpbGl0eSkKNS81IENoZWNraW5nIGNvbW1p
+dCA1ZjllOTA5NjdlNjkgKG1pZ3JhdGlvbjogQWRkIGNhcGFiaWxpdGllcyB2YWxpZGF0aW9uKQo9
+PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIx
+NTE3NDU0OC4yNjMwLTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS90ZXN0aW5nLmNoZWNrcGF0
+Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
