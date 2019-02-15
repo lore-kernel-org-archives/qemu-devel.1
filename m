@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52121)
+Received: from eggs.gnu.org ([209.51.188.92]:52088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAk-00037Y-Ii
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:08 -0500
+	(envelope-from <clg@kaod.org>) id 1gugAi-00035D-J6
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAi-0005lI-Ku
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39496
+	(envelope-from <clg@kaod.org>) id 1gugAh-0005jS-HG
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38702
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAi-0005kQ-Dx
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:04 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAh-0005iN-63
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:03 -0500
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGBbiP108895
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:17:04 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0ga1pdf-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	x1FGBc5I108950
 	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:17:02 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0ga1phf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:17:01 -0500
 Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 16:16:53 -0000
+	Fri, 15 Feb 2019 16:16:55 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 17:16:41 +0100
+Date: Fri, 15 Feb 2019 17:16:48 +0100
 In-Reply-To: <20190215161648.9600-1-clg@kaod.org>
 References: <20190215161648.9600-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215161648.9600-4-clg@kaod.org>
+Message-Id: <20190215161648.9600-11-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/10] target/ppc: Fix support for "STOP light"
- states on POWER9
+Subject: [Qemu-devel] [PATCH 10/10] target/ppc: Add support for LPCR:HEIC on
+ POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,142 +46,50 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@ker
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-STOP must act differently based on PSSCR:EC on POWER9. When set, it
-acts like the P7/P8 power management instructions and wake up at 0x100
-based on the wakeup conditions in LPCR.
-
-When PSSCR:EC is clear however it will wakeup at the next instruction
-after STOP (if EE is clear) or take the corresponding interrupts (if
-EE is set).
+This controls whether the External Interrupt (0x500) can be
+delivered to the hypervisor or not.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-qom.h            |  1 +
- target/ppc/cpu.h                | 12 +++++++++---
- target/ppc/excp_helper.c        |  8 ++++++--
- target/ppc/translate.c          | 13 ++++++++++++-
- target/ppc/translate_init.inc.c |  7 +++++++
- 5 files changed, 35 insertions(+), 6 deletions(-)
+ target/ppc/excp_helper.c        | 5 ++++-
+ target/ppc/translate_init.inc.c | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index 313080230419..e9cb15842387 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -122,6 +122,7 @@ typedef enum {
-     PPC_PM_NAP,
-     PPC_PM_SLEEP,
-     PPC_PM_RVWINKLE,
-+    PPC_PM_STOP,
- } powerpc_pm_insn_t;
-=20
- /***********************************************************************=
-******/
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 78af7e460894..190e8127f14f 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -414,6 +414,10 @@ struct ppc_slb_t {
- #define LPCR_HVICE        PPC_BIT(62) /* HV Virtualisation Int Enable */
- #define LPCR_HDICE        PPC_BIT(63)
-=20
-+/* PSSCR bits */
-+#define PSSCR_ESL         PPC_BIT(42) /* Enable State Loss */
-+#define PSSCR_EC          PPC_BIT(43) /* Exit Criterion */
-+
- #define msr_sf   ((env->msr >> MSR_SF)   & 1)
- #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
- #define msr_shv  ((env->msr >> MSR_SHV)  & 1)
-@@ -1110,9 +1114,11 @@ struct CPUPPCState {
-      * instructions and SPRs are diallowed if MSR:HV is 0
-      */
-     bool has_hv_mode;
--    /* On P7/P8, set when in PM state, we need to handle resume
--     * in a special way (such as routing some resume causes to
--     * 0x100), so flag this here.
-+
-+    /*
-+     * On P7/P8/P9, set when in PM state, we need to handle resume in
-+     * a special way (such as routing some resume causes to 0x100), so
-+     * flag this here.
-      */
-     bool in_pm_state;
- #endif
 diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 7c7c8d1b9dc6..97503193ef43 100644
+index d171a5eb6236..39bedbb11db0 100644
 --- a/target/ppc/excp_helper.c
 +++ b/target/ppc/excp_helper.c
-@@ -97,7 +97,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int e=
-xcp_model, int excp)
-     asrr0 =3D -1;
-     asrr1 =3D -1;
-=20
--    /* check for special resume at 0x100 from doze/nap/sleep/winkle on P=
-7/P8 */
-+    /*
-+     * check for special resume at 0x100 from doze/nap/sleep/winkle on
-+     * P7/P8/P9
-+     */
-     if (env->in_pm_state) {
-         env->in_pm_state =3D false;
-=20
-@@ -960,7 +963,8 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
-t insn)
-     env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
-=20
-     /* Condition for waking up at 0x100 */
--    env->in_pm_state =3D true;
-+    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
-+        (env->spr[SPR_PSSCR] & PSSCR_EC);
- }
- #endif /* defined(TARGET_PPC64) */
-=20
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e94422f7ff1c..75d170d1594f 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -3588,7 +3588,18 @@ static void gen_nap(DisasContext *ctx)
-=20
- static void gen_stop(DisasContext *ctx)
- {
--    gen_nap(ctx);
-+#if defined(CONFIG_USER_ONLY)
-+    GEN_PRIV;
-+#else
-+    TCGv_i32 t;
-+
-+    CHK_HV;
-+    t =3D tcg_const_i32(PPC_PM_STOP);
-+    gen_helper_pminsn(cpu_env, t);
-+    tcg_temp_free_i32(t);
-+    /* Stop translation, as the CPU is supposed to sleep from now */
-+    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
-+#endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
- static void gen_sleep(DisasContext *ctx)
+@@ -827,7 +827,10 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+     /* External interrupt can ignore MSR:EE under some circumstances */
+     if (env->pending_interrupts & (1 << PPC_INTERRUPT_EXT)) {
+         bool lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
+-        if (async_deliver || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
+es0)) {
++        bool heic =3D !!(env->spr[SPR_LPCR] & LPCR_HEIC);
++        /* HEIC blocks delivery to the hypervisor */
++        if ((async_deliver && !(heic && msr_hv && !msr_pr)) ||
++            (env->has_hv_mode && msr_hv =3D=3D 0 && !lpes0)) {
+             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_EXTERNAL);
+             return;
+         }
 diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
 inc.c
-index c9985c0d222e..1cfb70aced12 100644
+index befa1a95cd77..be95324bad95 100644
 --- a/target/ppc/translate_init.inc.c
 +++ b/target/ppc/translate_init.inc.c
-@@ -8801,9 +8801,16 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-     CPUPPCState *env =3D &cpu->env;
-=20
-     if (cs->halted) {
-+        uint64_t psscr =3D env->spr[SPR_PSSCR];
-+
-         if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-             return false;
-         }
-+
-+        /* If EC is clear, just return true on any pending interrupt */
-+        if (!(psscr & PSSCR_EC)) {
-+            return true;
-+        }
+@@ -8823,7 +8823,10 @@ static bool cpu_has_work_POWER9(CPUState *cs)
          /* External Exception */
          if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
              (env->spr[SPR_LPCR] & LPCR_EEE)) {
+-            return true;
++            bool heic =3D !!(env->spr[SPR_LPCR] & LPCR_HEIC);
++            if (heic =3D=3D 0 || !msr_hv || msr_pr) {
++                return true;
++            }
+         }
+         /* Decrementer Exception */
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
 --=20
 2.20.1
