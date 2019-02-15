@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39685)
+Received: from eggs.gnu.org ([209.51.188.92]:39846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gud6q-0005Hm-2a
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:53 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gud7k-0005tD-M5
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:01:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gud6o-0001ju-Vc
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gud6n-0001Yi-6k
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:00:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gud6l-00064T-MP
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:00:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 75E6E2E80CB
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:00:47 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gud7U-0004OA-0A
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:01:42 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 15 Feb 2019 13:01:14 +0000
+Message-ID: <6d0fca98-6b40-786e-2bd9-5eba1134d0a7@virtuozzo.com>
+References: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
+	<13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
+In-Reply-To: <13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Feb 2019 12:47:17 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-Reply-To: Bug 1815911 <1815911@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155015240171.6215.11220706309348619396.malonedeb@soybean.canonical.com>
-Message-Id: <155023483785.1243.17367221566041086008.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1815911] Re: aptitude crashes qemu-m68k with
- handle_cpu_signal received signal outside vCPU context
+Content-ID: <3D16D2E21E3F5740A6EA31E2B9259EE0@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] block: don't set the same context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Denis Lunev <den@virtuozzo.com>
 
-It seems it crashes during futex syscall:
-
-...
-[pid     4] getpid()                    =3D 4
-[pid     4] tgkill(4, 24, SIGRT_1)      =3D 0
-[pid    24] <... futex resumed> )       =3D ? ERESTARTSYS (To be restarted =
-if SA_RESTART is set)
-[pid    24] --- SIGRT_1 {si_signo=3DSIGRT_1, si_code=3DSI_TKILL, si_pid=3D4=
-, si_uid=3D0} ---
-[pid     4] futex(0x7f77abb4f610, FUTEX_WAIT_PRIVATE, 16777216, NULL <unfin=
-ished ...>
-[pid    24] getpid()                    =3D 4
-[pid    24] --- SIGSEGV {si_signo=3DSIGSEGV, si_code=3DSEGV_MAPERR, si_addr=
-=3D0x10} ---
-...
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815911
-
-Title:
-  aptitude crashes qemu-m68k with handle_cpu_signal received signal
-  outside vCPU context
-
-Status in QEMU:
-  New
-
-Bug description:
-  When building a package with sbuild on Debian, sbuild can use aptitude
-  to resolve dependencies.
-
-  Recently, some changes introduced to aptitude or related packages
-  cause qemu to crash:
-
-  (sid-m68k-sbuild)root@nofan:/# aptitude -y --without-recommends -o Dpkg::=
-Options::=3D--force-confold -o Aptitude::CmdLine::Ignore-Trust-Violations=
-=3Dfalse -o Aptitude::ProblemResolver::StepScore=3D100 -o Aptitude::Problem=
-Resolver::SolutionCost=3D"safety, priority, non-default-versions" -o Aptitu=
-de::ProblemResolver::Hints::KeepDummy=3D"reject sbuild-build-depends-core-d=
-ummy :UNINST" -o Aptitude::ProblemResolver::Keep-All-Level=3D55000 -o Aptit=
-ude::ProblemResolver::Remove-Essential-Level=3Dmaximum install vim
-  Warning: Invalid locale (please review locale settings, this might lead t=
-o problems later):
-    locale::facet::_S_create_c_locale name not valid
-  The following NEW packages will be installed:
-    libgpm2{a} vim vim-common{a} vim-runtime{a} xxd{a} =
-
-  0 packages upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
-  Need to get 7225 kB/7260 kB of archives. After unpacking 33.5 MB will be =
-used.
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6019=
-d1bf
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x601b=
-64ab
-  Segmentation fault
-  (sid-m68k-sbuild)root@nofan:/#
-
-  The crash does not reproduce on real hardware running Debian unstable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815911/+subscriptions
+DQoNCk9uIDE1LjAyLjIwMTkgMTU6MjksIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDIvMTUvMTkg
+MzoxOSBBTSwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPj4gQWRkcyBhIGZhc3QgcGF0aCBvbiBh
+aW8gY29udGV4dCBzZXR0aW5nIHByZXZlbnRpbmcNCj4+IHVubmVjZXNzYXJ5IGNvbnRleHQgc2V0
+dGluZyByb3V0aW5lLg0KPj4gQWxzbywgaXQgcHJldmVudHMgaXNzdWVzIHdpdGggY3ljbGljIHdh
+bGsgb2YgY2hpbGQNCj4+IGJkcy1lcyBhcHBlYXJlZCBiZWNhdXNlIG9mIHJlZ2lzdHJpbmcgYWlv
+IHdhbGtpbmcNCj4gDQo+IHJlZ2lzdGVyaW5nDQp3aWxsIGZpeCBpdA0KPiANCj4+IG5vdGlmaWVy
+czoNCj4+DQo+IA0KPj4gVGhpcyBjYW4gaGFwcGVuIGJlY2F1c2Ugb2YgIm5ldyIgY29udGV4dCBh
+dHRhY2htZW50IHRvIFZNIGRpc2sgYmRzLg0KPj4gV2hlbiBhdHRhY2hpbmcgYSBuZXcgY29udGV4
+dCB0aGUgY29ycmVzcG9uZGluZyBhaW8gY29udGV4dCBoYW5kbGVyIGlzDQo+PiBjYWxsZWQgZm9y
+IGVhY2ggb2YgYWlvX25vdGlmaWVycyByZWdpc3RlcmVkIG9uIHRoZSBWTSBkaXNrIGJkcyBjb250
+ZXh0Lg0KPj4gQW1vbmcgdGhvc2UgaGFuZGxlcnMsIHRoZXJlIGlzIHRoZSBibG9ja19qb2JfYXR0
+YWNoZWRfYWlvX2NvbnRleHQgaGFuZGxlcg0KPj4gd2hpY2ggc2V0cyBhIG5ldyBhaW8gY29udGV4
+dCBmb3IgdGhlIGJsb2NrIGpvYiBiZHMuIFdoZW4gZG9pbmcgc28sDQo+PiB0aGUgb2xkIGNvbnRl
+eHQgaXMgZGV0YWNoZWQgZnJvbSBhbGwgdGhlIGJsb2NrIGpvYiBiZHMgY2hpbGRyZW4gYW5kIG9u
+ZSBvZg0KPj4gdGhlbSBpcyB0aGUgVk0gZGlzayBiZHMsIHNlcnZpbmcgYXMgYmFja2luZyBzdG9y
+ZSBmb3IgdGhlIGJsb2Nram9iIGJkcywNCj4+IGFsdGhvdWdoIHRoZSBWTSBkaXNrIGJkcyBpcyBh
+Y3R1YWxseSB0aGUgaW5pdGlhbGl6ZXIgb2YgdGhhdCBwcm9jZXNzLg0KPj4gU2luY2UgdGhlIFZN
+IGRpc2sgYmRzIGlzIHByb3RlY3RlZCB3aXRoIHdhbGtpbmdfYWlvX25vdGlmaWVycyBmbGFnDQo+
+PiBmcm9tIGRvdWJsZSBwcm9jZXNzaW5nIGluIHJlY3Vyc2l2ZSBjYWxscywgdGhlIGFzc2VydCBm
+aXJlcy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBEZW5pcyBQbG90bmlrb3YgPGRwbG90bmlrb3ZA
+dmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBibG9jay5jIHwgNCArKysrDQo+PiAgIDEgZmls
+ZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykNCj4+DQo+IA0KPiBOYWl2ZSBxdWVzdGlvbiAtIGRv
+IHdlIGhhdmUgdG8gYWx3YXlzIGNhbGwNCj4gYXR0YWNoX2Fpb19jb250ZXh0L2RldGFjaF9haW9f
+Y29udGV4dCBpbiBwYWlycz8NCnNlZW1zLCB0byBiZSBzby4gdGhlIG9ubHkgdXNlciBkb2luZyBh
+dHRhY2gvZGV0YWNoIGlzIGJkcnZfc2V0X2Fpb19jb250ZXh0DQogICBJZiBzbywgd2lsbA0KPiBz
+aG9ydC1jaXJjdWl0aW5nIGEgbmVzdGVkIGF0dGFjaCBjYXVzZSByZWZlcmVuY2UgY291bnQgcHJv
+YmxlbXMgd2hlbiB3ZQ0KPiBjb21lIHRvIHRoZSBtYXRjaGluZyBkZXRhY2ggY2FsbHM/DQpJIGRv
+bid0IHF1aXRlIHVuZGVyc3RhbmQuIEkgc3VnZ2VzdGVkIHRoZSBzaG9ydCBjaXJjdWl0IGZvciAN
+CmJkcnZfc2V0X2Fpb19jb250ZXh0IHdoaWNoIGFjdHVhbGx5IHBhaXJzIGF0dGFjaC9kZXRhY2gg
+Y29udGV4dC4gU28sIHRoZSANCnBhaXJpbmcgaGVyZSBzaG91bGQgYmUgYSBwcm9ibGVtDQo+IA0K
+DQotLSANCkJlc3QsDQpEZW5pcw0K
