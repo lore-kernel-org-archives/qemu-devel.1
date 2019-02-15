@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50903)
+Received: from eggs.gnu.org ([209.51.188.92]:53826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gui7X-0007Z2-QX
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:21:57 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1guiN7-0003ZH-7z
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:38:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gui7W-0001cv-BK
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:21:55 -0500
-Resent-Message-Id: <E1gui7W-0001cv-BK@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21051)
+	(envelope-from <walling@linux.ibm.com>) id 1guiN4-0000zp-Ro
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:38:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gui7W-0001Yv-1n
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:21:54 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155025487310.24.1493215841079147791@49fa7ef69f7b>
-In-Reply-To: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1guiN2-0000pA-Ig
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:37:58 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1FIXmLQ005543
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:37:42 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp1rbjm1m-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:37:42 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Fri, 15 Feb 2019 18:37:39 -0000
+References: <20190215133005.15955-1-david@redhat.com>
+	<20190215133005.15955-4-david@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Fri, 15 Feb 2019 13:37:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 15 Feb 2019 10:21:15 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration
- capability
+In-Reply-To: <20190215133005.15955-4-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <5c74d2e9-d320-f424-6b1e-9fe70dfeef04@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/6] tests/device-plug: Add
+ a simple PCI unplug request test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +43,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yury-kotov@yandex-team.ru
-Cc: fam@euphon.net, dgilbert@redhat.com, ehabkost@redhat.com, eblake@redhat.com, imammedo@redhat.com, quintela@redhat.com, lvivier@redhat.com, armbru@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, thuth@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, wrfsh@yandex-team.ru
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNTE3NDU0OC4yNjMw
-LTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTUxNzQ1NDguMjYzMC0xLXl1cnkt
-a290b3ZAeWFuZGV4LXRlYW0ucnUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzVd
-IEFkZCBpZ25vcmUtZXh0ZXJuYWwgbWlncmF0aW9uIGNhcGFiaWxpdHkKVHlwZTogc2VyaWVzCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
-Y2hldy8yMDE5MDIxNTE3NDU0OC4yNjMwLTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydSAtPiBw
-YXRjaGV3LzIwMTkwMjE1MTc0NTQ4LjI2MzAtMS15dXJ5LWtvdG92QHlhbmRleC10ZWFtLnJ1CiAq
-IFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTUxNzQ2NTkuNDAwNy0xLXYubWFmZmlv
-bmVAZ21haWwuY29tIC0+IHBhdGNoZXcvMjAxOTAyMTUxNzQ2NTkuNDAwNy0xLXYubWFmZmlvbmVA
-Z21haWwuY29tClN1Ym1vZHVsZSAnY2Fwc3RvbmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-Y2Fwc3RvbmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdjYXBzdG9uZScKU3VibW9kdWxlICdk
-dGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAnZHRjJwpTdWJtb2R1bGUgJ3JvbXMvUWVtdU1hY0RyaXZlcnMnIChodHRwczovL2dpdC5xZW11
-Lm9yZy9naXQvUWVtdU1hY0RyaXZlcnMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1Fl
-bXVNYWNEcml2ZXJzJwpTdWJtb2R1bGUgJ3JvbXMvU0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9TTE9GLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUg
-J3JvbXMvaXB4ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRwczov
-L2dpdC5xZW11Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
-L29wZW5iaW9zJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3Bl
-bmhhY2t3YXJlJwpTdWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L3FlbXUtcGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVt
-dS1wYWxjb2RlJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9zZWFiaW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcycKU3Vi
-bW9kdWxlICdyb21zL3NlYWJpb3MtaHBwYScgKGh0dHBzOi8vZ2l0aHViLmNvbS9oZGVsbGVyL3Nl
-YWJpb3MtaHBwYS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJwpT
-dWJtb2R1bGUgJ3JvbXMvc2dhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZ2FiaW9z
-LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUgJ3JvbXMv
-c2tpYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9za2lib290LmdpdCkgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAncm9tcy9za2lib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoaHR0cHM6
-Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
-dS1ib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L3UtYm9vdC1zYW00NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
-dS1ib290LXNhbTQ2MGV4JwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0z
-JyAoaHR0cHM6Ly9naXRodWIuY29tL2NvdGEvYmVya2VsZXktc29mdGZsb2F0LTMpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ3Rl
-c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJyAoaHR0cHM6Ly9naXRodWIuY29tL2NvdGEvYmVy
-a2VsZXktdGVzdGZsb2F0LTMpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5
-LXRlc3RmbG9hdC0zJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXlj
-b2RlbWFwZGInCkNsb25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBz
-dG9uZSc6IGNoZWNrZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2
-NmJmJwpDbG9uaW5nIGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQg
-b3V0ICc4OGYxODkwOWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGlu
-dG8gJ3JvbXMvUWVtdU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNE
-cml2ZXJzJzogY2hlY2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDlj
-OGUyNjYnCkNsb25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9T
-TE9GJzogY2hlY2tlZCBvdXQgJ2E1YjQyOGUxYzFlYWU3MDNiZGQ2MmEzZjUyNzIyM2MyOTFlZTNm
-ZGMnCkNsb25pbmcgaW50byAncm9tcy9pcHhlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9pcHhl
-JzogY2hlY2tlZCBvdXQgJ2RlNDU2NWNiZTc2ZWE5Zjc5MTNhMDFmMzMxYmUzZWU5MDFiYjZlMTcn
-CkNsb25pbmcgaW50byAncm9tcy9vcGVuYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3Bl
-bmJpb3MnOiBjaGVja2VkIG91dCAnMzQ2NDY4MWIyYjU5ODNkZjgwMDg2YTQwMTc5ZDMyNDEwMjM0
-N2RhMycKQ2xvbmluZyBpbnRvICdyb21zL29wZW5oYWNrd2FyZScuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvb3BlbmhhY2t3YXJlJzogY2hlY2tlZCBvdXQgJ2M1NTlkYTdjOGVlYzVlNDVlZjFmNjc5
-Nzg4MjdhZjZmMGI5NTQ2ZjUnCkNsb25pbmcgaW50byAncm9tcy9xZW11LXBhbGNvZGUnLi4uClN1
-Ym1vZHVsZSBwYXRoICdyb21zL3FlbXUtcGFsY29kZSc6IGNoZWNrZWQgb3V0ICc1MWMyMzdkN2Uy
-MGQwNTEwMGVhY2FkZWUyZjYxYWJjMTdlNmJjMDk3JwpDbG9uaW5nIGludG8gJ3JvbXMvc2VhYmlv
-cycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcyc6IGNoZWNrZWQgb3V0ICdhNjk4Yzg5
-OTVmZmIyODM4Mjk2ZWMyODRmZTNjNGFkMzNkZmNhMzA3JwpDbG9uaW5nIGludG8gJ3JvbXMvc2Vh
-Ymlvcy1ocHBhJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnOiBjaGVja2Vk
-IG91dCAnMWVmOTlhMDE1NzJjMjU4MWMzMGUxNmU2ZmU2OWU5ZWEyZWY5MmNlMCcKQ2xvbmluZyBp
-bnRvICdyb21zL3NnYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NnYWJpb3MnOiBjaGVj
-a2VkIG91dCAnY2JhZWU1MjI4N2U1ZjMyMzczMTgxY2ZmNTBhMDBiNmM0YWM5MDE1YScKQ2xvbmlu
-ZyBpbnRvICdyb21zL3NraWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NraWJvb3QnOiBj
-aGVja2VkIG91dCAnZTBlZTI0YzI3YTE3MmJjZjQ4MmY2ZjJiYzkwNWU2MjExYzEzNGJjYycKQ2xv
-bmluZyBpbnRvICdyb21zL3UtYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290Jzog
-Y2hlY2tlZCBvdXQgJ2Q4NWNhMDI5ZjI1N2I1M2E5NmRhNmMyZmI0MjFlNzhhMDAzYTk5NDMnCkNs
-b25pbmcgaW50byAncm9tcy91LWJvb3Qtc2FtNDYwZXgnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21z
-L3UtYm9vdC1zYW00NjBleCc6IGNoZWNrZWQgb3V0ICc2MGIzOTE2ZjMzZTYxN2E4MTU5NzNjNWE2
-ZGY3NzA1NWIyZTNhNTg4JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9h
-dC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnOiBj
-aGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xv
-bmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBh
-dGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJzogY2hlY2tlZCBvdXQgJzVhNTlkY2Vj
-MTkzMjczOTZhMDExYTE3ZmQ5MjRhZWQ0ZmVjNDE2YjMnCkNsb25pbmcgaW50byAndWkva2V5Y29k
-ZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQg
-JzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMyY2UnClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKNWY5ZTkwOSBtaWdyYXRpb246IEFkZCBjYXBhYmlsaXRpZXMgdmFs
-aWRhdGlvbgpmYWQ0ODA4IHRlc3RzL21pZ3JhdGlvbi10ZXN0OiBBZGQgYSB0ZXN0IGZvciBpZ25v
-cmUtc2hhcmVkIGNhcGFiaWxpdHkKNjgzNDdhZCBtaWdyYXRpb246IEFkZCBhbiBhYmlsaXR5IHRv
-IGlnbm9yZSBzaGFyZWQgUkFNIGJsb2NrcwplM2QyZmQwIG1pZ3JhdGlvbjogSW50cm9kdWNlIGln
-bm9yZS1zaGFyZWQgY2FwYWJpbGl0eQo3M2Q5ZTIzIGV4ZWM6IENoYW5nZSBSQU1CbG9ja0l0ZXJG
-dW5jIGRlZmluaXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNSBDaGVja2luZyBjb21taXQg
-NzNkOWUyMzkzN2U5IChleGVjOiBDaGFuZ2UgUkFNQmxvY2tJdGVyRnVuYyBkZWZpbml0aW9uKQoy
-LzUgQ2hlY2tpbmcgY29tbWl0IGUzZDJmZDAyOThhNCAobWlncmF0aW9uOiBJbnRyb2R1Y2UgaWdu
-b3JlLXNoYXJlZCBjYXBhYmlsaXR5KQozLzUgQ2hlY2tpbmcgY29tbWl0IDY4MzQ3YWQyZWIyNCAo
-bWlncmF0aW9uOiBBZGQgYW4gYWJpbGl0eSB0byBpZ25vcmUgc2hhcmVkIFJBTSBibG9ja3MpCkVS
-Uk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBp
-biBhIGRvIC0gd2hpbGUgbG9vcAojMTQ2OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MTY5OgorI2Rl
-ZmluZSBSQU1CTE9DS19GT1JFQUNIX05PVF9JR05PUkVEKGJsb2NrKSAgICAgICAgICAgIFwKKyAg
-ICBJTlRFUk5BTF9SQU1CTE9DS19GT1JFQUNIKGJsb2NrKSAgICAgICAgICAgICAgICAgICBcCisg
-ICAgICAgIGlmIChyYW1ibG9ja19pc19pZ25vcmVkKGJsb2NrKSkge30gZWxzZQoKRVJST1I6IHRy
-YWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMTQ4OiBGSUxFOiBtaWdy
-YXRpb24vcmFtLmM6MTcxOgorICAgICAgICBpZiAocmFtYmxvY2tfaXNfaWdub3JlZChibG9jaykp
-IHt9IGVsc2UKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzg2IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDMvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC81IENoZWNraW5nIGNvbW1p
-dCBmYWQ0ODA4OGE4MDUgKHRlc3RzL21pZ3JhdGlvbi10ZXN0OiBBZGQgYSB0ZXN0IGZvciBpZ25v
-cmUtc2hhcmVkIGNhcGFiaWxpdHkpCjUvNSBDaGVja2luZyBjb21taXQgNWY5ZTkwOTY3ZTY5ICht
-aWdyYXRpb246IEFkZCBjYXBhYmlsaXRpZXMgdmFsaWRhdGlvbikKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTUxNzQ1NDguMjYzMC0xLXl1
-cnkta290b3ZAeWFuZGV4LXRlYW0ucnUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On 2/15/19 8:30 AM, David Hildenbrand wrote:
+> The issue with testing asynchronous unplug requests it that they usually
+> require a running guest to handle the request. However, to test if
+> unplug of PCI devices works, we can apply a nice little trick on some
+> architectures:
+> 
+> On system reset, x86 ACPI, s390x and spapr will perform the unplug,
+> resulting in the device of interest to get deleted and a DEVICE_DELETED
+> event getting sent.
+> 
+> On s390x, we still get a warning
+>      qemu-system-s390x: -device virtio-mouse-pci,id=dev0:
+>      warning: Plugging a PCI/zPCI device without the 'zpci' CPU feature
+>      enabled; the guest will not be able to see/use this device
+> 
+> This will be fixed soon, when we enable the zpci CPU feature always
+> (Conny already has a patch for this queued).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Looks fine from what I can tell. Ran it on my own system and passed
+with no issues.
+
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
+
+> ---
+>   tests/Makefile.include   |  4 ++
+>   tests/device-plug-test.c | 93 ++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 97 insertions(+)
+>   create mode 100644 tests/device-plug-test.c
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index b39e989f72..f242d65ea2 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -192,6 +192,7 @@ check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += tests/ipmi-kcs-test$(EXESUF)
+>   # check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += tests/ipmi-bt-test$(EXESUF)
+>   check-qtest-i386-y += tests/i440fx-test$(EXESUF)
+>   check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
+> +check-qtest-i386-y += tests/device-plug-test$(EXESUF)
+>   check-qtest-i386-y += tests/drive_del-test$(EXESUF)
+>   check-qtest-i386-$(CONFIG_WDT_IB700) += tests/wdt_ib700-test$(EXESUF)
+>   check-qtest-i386-y += tests/tco-test$(EXESUF)
+> @@ -256,6 +257,7 @@ check-qtest-ppc-$(CONFIG_M48T59) += tests/m48t59-test$(EXESUF)
+>   
+>   check-qtest-ppc64-y += $(check-qtest-ppc-y)
+>   check-qtest-ppc64-$(CONFIG_PSERIES) += tests/spapr-phb-test$(EXESUF)
+> +check-qtest-ppc64-$(CONFIG_PSERIES) += tests/device-plug-test$(EXESUF)
+>   check-qtest-ppc64-$(CONFIG_POWERNV) += tests/pnv-xscom-test$(EXESUF)
+>   check-qtest-ppc64-y += tests/migration-test$(EXESUF)
+>   check-qtest-ppc64-$(CONFIG_PSERIES) += tests/rtas-test$(EXESUF)
+> @@ -310,6 +312,7 @@ check-qtest-s390x-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+>   check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+>   check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+>   check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
+> +check-qtest-s390x-y += tests/device-plug-test$(EXESUF)
+>   check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
+>   check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
+>   check-qtest-s390x-y += tests/migration-test$(EXESUF)
+> @@ -750,6 +753,7 @@ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+>   tests/qom-test$(EXESUF): tests/qom-test.o
+>   tests/test-hmp$(EXESUF): tests/test-hmp.o
+>   tests/machine-none-test$(EXESUF): tests/machine-none-test.o
+> +tests/device-plug-test$(EXESUF): tests/device-plug-test.o
+>   tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
+>   tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
+>   tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
+> diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
+> new file mode 100644
+> index 0000000000..066433ebf5
+> --- /dev/null
+> +++ b/tests/device-plug-test.c
+> @@ -0,0 +1,93 @@
+> +/*
+> + * QEMU device plug/unplug handling
+> + *
+> + * Copyright (C) 2019 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "libqtest.h"
+> +#include "qapi/qmp/qdict.h"
+> +#include "qapi/qmp/qstring.h"
+> +
+> +static void device_del_request(QTestState *qtest, const char *id)
+> +{
+> +    QDict *resp;
+> +
+> +    resp = qtest_qmp(qtest,
+> +                     "{'execute': 'device_del', 'arguments': { 'id': %s } }",
+> +                     id);
+> +    g_assert(qdict_haskey(resp, "return"));
+> +    qobject_unref(resp);
+> +}
+> +
+> +static void system_reset(QTestState *qtest)
+> +{
+> +    QDict *resp;
+> +
+> +    resp = qtest_qmp(qtest, "{'execute': 'system_reset'}");
+> +    g_assert(qdict_haskey(resp, "return"));
+> +    qobject_unref(resp);
+> +}
+> +
+> +static void wait_device_deleted_event(QTestState *qtest, const char *id)
+> +{
+> +    QDict *resp, *data;
+> +    QString *qstr;
+> +
+> +    /*
+> +     * Other devices might get removed along with the removed device. Skip
+> +     * these. The device of interest will be the last one.
+> +     */
+> +    for (;;) {
+> +        resp = qtest_qmp_eventwait_ref(qtest, "DEVICE_DELETED");
+> +        data = qdict_get_qdict(resp, "data");
+> +        if (!data || !qdict_get(data, "device")) {
+> +            qobject_unref(resp);
+> +            continue;
+> +        }
+> +        qstr = qobject_to(QString, qdict_get(data, "device"));
+> +        g_assert(qstr);
+> +        if (!strcmp(qstring_get_str(qstr), id)) {
+> +            qobject_unref(resp);
+> +            break;
+> +        }
+> +        qobject_unref(resp);
+> +    }
+> +}
+> +
+> +static void test_pci_unplug_request(void)
+> +{
+> +    QTestState *qtest = qtest_initf("-device virtio-mouse-pci,id=dev0");
+> +
+> +    /*
+> +     * Request device removal. As the guest is not running, the request won't
+> +     * be processed. However during system reset, the removal will be
+> +     * handled, removing the device.
+> +     */
+> +    device_del_request(qtest, "dev0");
+> +    system_reset(qtest);
+> +    wait_device_deleted_event(qtest, "dev0");
+> +
+> +    qtest_quit(qtest);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    /*
+> +     * We need a system that will process unplug requests during system resets
+> +     * and does not do PCI surprise removal. This holds for x86 ACPI,
+> +     * s390x and spapr.
+> +     */
+> +    qtest_add_func("/device-plug/pci_unplug_request",
+> +                   test_pci_unplug_request);
+> +
+> +    return g_test_run();
+> +}
+> 
