@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47547)
+Received: from eggs.gnu.org ([209.51.188.92]:47531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guZwS-0005bx-AS
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:37:57 -0500
+	(envelope-from <armbru@redhat.com>) id 1guZxP-0005bl-OK
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:38:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1guZvg-0004iR-KJ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:37:09 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38777)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1guZve-0004K0-Qv
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:37:06 -0500
-Received: by mail-wm1-f67.google.com with SMTP id v26so8908553wmh.3
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 01:36:56 -0800 (PST)
-References: <20190214220453.15858-1-svens@stackframe.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <65d59485-9973-4ed1-b08f-084ed4db7ef1@redhat.com>
-Date: Fri, 15 Feb 2019 10:36:53 +0100
+	(envelope-from <armbru@redhat.com>) id 1guZlg-0002Is-Ds
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:26:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1guZlg-0002F2-86
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:26:48 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190214152251.2073-1-armbru@redhat.com>
+	<87h8d65r6k.fsf@dusky.pond.sub.org>
+	<e51e4eac-419b-bea0-6eef-8805ca45ebd6@redhat.com>
+	<875ztlzdw8.fsf_-_@dusky.pond.sub.org>
+	<ba0a9a4c-8ed4-7d4b-d5ac-77d60d04e38a@redhat.com>
+Date: Fri, 15 Feb 2019 10:26:41 +0100
+In-Reply-To: <ba0a9a4c-8ed4-7d4b-d5ac-77d60d04e38a@redhat.com> (Paolo
+	Bonzini's message of "Fri, 15 Feb 2019 09:29:33 +0100")
+Message-ID: <8736opxuzy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190214220453.15858-1-svens@stackframe.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] lsi: implement basic SBCL functionality
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Proper use of unnest-vars
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <fam@euphon.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
-On 14/02/19 23:04, Sven Schnelle wrote:
-> HP-UX checks this register after sending data to the target. If there's no valid
-> information present, it assumes the client disconnected because the kernel sent
-> to much data. Implement at least some of the SBCL functionality that is possible
-> without having a real SCSI bus.
-> 
-> Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> ---
->  hw/scsi/lsi53c895a.c | 29 ++++++++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> index 89def1421f..b12be02bf1 100644
-> --- a/hw/scsi/lsi53c895a.c
-> +++ b/hw/scsi/lsi53c895a.c
-> @@ -160,6 +160,11 @@ static const char *names[] = {
->  #define LSI_CCNTL1_DDAC      0x08
->  #define LSI_CCNTL1_ZMOD      0x80
->  
-> +#define LSI_SBCL_ATN         0x08
-> +#define LSI_SBCL_BSY         0x20
-> +#define LSI_SBCL_ACK         0x40
-> +#define LSI_SBCL_REQ         0x80
-> +
->  /* Enable Response to Reselection */
->  #define LSI_SCID_RRE      0x60
->  
-> @@ -258,6 +263,7 @@ typedef struct {
->      uint8_t sdid;
->      uint8_t ssid;
->      uint8_t sfbr;
-> +    uint8_t sbcl;
->      uint8_t stest1;
->      uint8_t stest2;
->      uint8_t stest3;
-> @@ -356,6 +362,7 @@ static void lsi_soft_reset(LSIState *s)
->      s->socl = 0;
->      s->sdid = 0;
->      s->ssid = 0;
-> +    s->sbcl = 0;
->      s->stest1 = 0;
->      s->stest2 = 0;
->      s->stest3 = 0;
-> @@ -530,6 +537,8 @@ static void lsi_script_dma_interrupt(LSIState *s, int stat)
->  
->  static inline void lsi_set_phase(LSIState *s, int phase)
->  {
-> +    s->sbcl &= ~PHASE_MASK;
-> +    s->sbcl |= phase | LSI_SBCL_REQ;
->      s->sstat1 = (s->sstat1 & ~PHASE_MASK) | phase;
->  }
->  
-> @@ -567,6 +576,7 @@ static void lsi_disconnect(LSIState *s)
->  {
->      s->scntl1 &= ~LSI_SCNTL1_CON;
->      s->sstat1 &= ~PHASE_MASK;
-> +    s->sbcl = 0;
->  }
->  
->  static void lsi_bad_selection(LSIState *s, uint32_t id)
-> @@ -1265,7 +1275,9 @@ again:
->                  s->scntl1 |= LSI_SCNTL1_CON;
->                  if (insn & (1 << 3)) {
->                      s->socl |= LSI_SOCL_ATN;
-> +                    s->sbcl |= LSI_SBCL_ATN;
->                  }
-> +                s->sbcl |= LSI_SBCL_BSY;
->                  lsi_set_phase(s, PHASE_MO);
->                  break;
->              case 1: /* Disconnect */
-> @@ -1297,8 +1309,14 @@ again:
->                          insn & (1 << 10) ? " CC" : "");
->                  if (insn & (1 << 3)) {
->                      s->socl |= LSI_SOCL_ATN;
-> +                    s->sbcl |= LSI_SBCL_ATN;
->                      lsi_set_phase(s, PHASE_MO);
->                  }
-> +
-> +                if (insn & (1 << 6)) {
-> +                    s->sbcl |= LSI_SBCL_ACK;
-> +                }
-> +
->                  if (insn & (1 << 9)) {
->                      qemu_log_mask(LOG_UNIMP,
->                          "lsi_scsi: Target mode not implemented\n");
-> @@ -1314,7 +1332,13 @@ again:
->                          insn & (1 << 10) ? " CC" : "");
->                  if (insn & (1 << 3)) {
->                      s->socl &= ~LSI_SOCL_ATN;
-> +                    s->sbcl &= ~LSI_SBCL_ATN;
->                  }
-> +
-> +                if (insn & (1 << 6)) {
-> +                    s->sbcl &= ~LSI_SBCL_ACK;
-> +                }
-> +
->                  if (insn & (1 << 10))
->                      s->carry = 0;
->                  break;
-> @@ -1591,9 +1615,7 @@ static uint8_t lsi_reg_readb(LSIState *s, int offset)
->          ret = s->ssid;
->          break;
->      case 0xb: /* SBCL */
-> -        /* ??? This is not correct. However it's (hopefully) only
-> -           used for diagnostics, so should be ok.  */
-> -        ret = 0;
-> +        ret = s->sbcl;
->          break;
->      case 0xc: /* DSTAT */
->          ret = s->dstat | LSI_DSTAT_DFE;
-> @@ -2202,6 +2224,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
->          VMSTATE_UINT8(stime0, LSIState),
->          VMSTATE_UINT8(respid0, LSIState),
->          VMSTATE_UINT8(respid1, LSIState),
-> +        VMSTATE_UINT8(sbcl, LSIState),
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-This breaks live migration.  You need to bump the version number higher
-in vmstate_lsi_scsi and use "VMSTATE_UINT8_V(sbcl, LSIState, 1)" so that
-the field is only marshalled/unmarshalled for version 1 of the migration
-state.
+> On 15/02/19 08:53, Markus Armbruster wrote:
+>> This time, $(obj-y) is very much not blank, and...
+>> 
+>>     @qapi/ final qapi-introspect.o qapi-types-target.o qapi-types.o qapi-visit-target.o qapi-visit.o qapi-events-target.o qapi-events.o qapi-commands-target.o qapi-commands.o
+>>     [Trailing make output elided]
+>> 
+>> ... qapi/Makefile.obj-y *does* clobber it.  Oww.
+>> 
+>> How come this works anyway?
+>
+> It works because at this point obj-y is not used anymore, it is assigned
+> to all-obj-y a couple lines before:
+>
+> 	all-obj-y := $(obj-y)
 
-Otherwise the patch looks good, thanks!
+Confirms my findings.
 
-Thanks,
+> As an aside, target-obj-y seems unnecessary to me.
 
-Paolo
+I have no idea :)
 
->          VMSTATE_UINT32(mmrs, LSIState),
->          VMSTATE_UINT32(mmws, LSIState),
->          VMSTATE_UINT32(sfs, LSIState),
-> 
+$ git-grep target-obj-y
+Makefile.objs:target-obj-y += trace/
+Makefile.target:target-obj-y :=
+Makefile.target:dummy := $(call unnest-vars,,target-obj-y)
+Makefile.target:target-obj-y-save := $(target-obj-y)
+Makefile.target:target-obj-y := $(target-obj-y-save)
+Makefile.target:all-obj-y += $(target-obj-y)
+trace/Makefile.objs:target-obj-y += generated-helpers.o
+trace/Makefile.objs:target-obj-y += control-target.o
+
+>> Perhaps unnest-vars could be more hygienic.
+>
+> Macro hygiene and Make in the same sentence? (well, not sentence but
+> still...).
+
+You're right.  My "perhaps could" should be read like "Perhaps we could
+make pigs fly, if we apply enough force, say with a trebuchet".
+
+>> But that's not my immediate
+>> concern.  All I want to know right now is whether I should refrain from
+>> = and := in Makefile.objs.  Paolo, Fam?
+>
+> No, there is no need for that.
+
+Thanks!
+
+> Really the answer is that we are kind of pushing Makefiles to the limit
+> here.  We do get good expressiveness, but at the cost of hiding things
+> behind black magic.  In the end I think it's a net benefit, but the cost
+> does exist.
+
+Concur.
+
+It's actually not bad most of the time.  Once in a great while, I need
+to do something more fancy, and then I'm prone to waste a few hours on
+(re-)learning how to work with the magic.
