@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51999)
+Received: from eggs.gnu.org ([209.51.188.92]:52057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAg-00033c-EZ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:04 -0500
+	(envelope-from <clg@kaod.org>) id 1gugAh-00034q-SR
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAd-0005cn-MG
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52576)
+	(envelope-from <clg@kaod.org>) id 1gugAf-0005fi-2K
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36896
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAd-0005Z5-7l
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:16:59 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAe-0005dr-Pn
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:00 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGBiPX064043
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:58 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp06ajf70-1
+	x1FGBcCm108967
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:17:00 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0ga1pg2-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:57 -0500
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:58 -0500
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 16:16:55 -0000
+	Fri, 15 Feb 2019 16:16:54 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 17:16:39 +0100
+Date: Fri, 15 Feb 2019 17:16:47 +0100
 In-Reply-To: <20190215161648.9600-1-clg@kaod.org>
 References: <20190215161648.9600-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215161648.9600-2-clg@kaod.org>
+Message-Id: <20190215161648.9600-10-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 01/10] target/ppc: Fix nip on power management
- instructions
+Subject: [Qemu-devel] [PATCH 09/10] target/ppc: Add POWER9 external
+ interrupt model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,82 +46,182 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@ker
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Those instructions currently raise an exception from within
-the helper. This tends to result in a bogus nip value in
-the env context (typically the beginning of the TB). Such
-a helper needs a gen_update_nip() first.
-
-This fixes it with a different approach which is to throw the
-exception from translate.c instead of the helper using
-gen_exception_nip() which does the right thing. Exception
-EXCP_HLT is also used instead of POWERPC_EXCP_STOP to effectively
-exit from the CPU execution loop.
+Adds support for the Hypervisor directed interrupts in addition to the
+OS ones.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-[clg : modified the commit log to comment the use of EXCP_HLT instead
-       of POWERPC_EXCP_STOP]
+[clg: - modified the icp_realize() and xive_tctx_realize() to take
+        into account explicitely the POWER9 interrupt model
+      - introduced a specific power9_set_irq for POWER9 ]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/excp_helper.c |  1 -
- target/ppc/translate.c   | 12 ++++++++----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ include/hw/ppc/ppc.h            |  2 ++
+ target/ppc/cpu-qom.h            |  2 ++
+ target/ppc/cpu.h                |  7 ++++++
+ hw/intc/xics.c                  |  3 +++
+ hw/intc/xive.c                  |  3 +++
+ hw/ppc/ppc.c                    | 42 +++++++++++++++++++++++++++++++++
+ target/ppc/translate_init.inc.c |  4 ++--
+ 7 files changed, 61 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 751d759fcc1d..8407e0ade938 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -958,7 +958,6 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
-t insn)
-      * but this doesn't seem to be a problem.
-      */
-     env->msr |=3D (1ull << MSR_EE);
--    raise_exception(env, EXCP_HLT);
+diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
+index 298ec354a8a8..746170f635c6 100644
+--- a/include/hw/ppc/ppc.h
++++ b/include/hw/ppc/ppc.h
+@@ -73,6 +73,7 @@ static inline void ppc40x_irq_init(PowerPCCPU *cpu) {}
+ static inline void ppc6xx_irq_init(PowerPCCPU *cpu) {}
+ static inline void ppc970_irq_init(PowerPCCPU *cpu) {}
+ static inline void ppcPOWER7_irq_init(PowerPCCPU *cpu) {}
++static inline void ppcPOWER9_irq_init(PowerPCCPU *cpu) {}
+ static inline void ppce500_irq_init(PowerPCCPU *cpu) {}
+ #else
+ void ppc40x_irq_init(PowerPCCPU *cpu);
+@@ -80,6 +81,7 @@ void ppce500_irq_init(PowerPCCPU *cpu);
+ void ppc6xx_irq_init(PowerPCCPU *cpu);
+ void ppc970_irq_init(PowerPCCPU *cpu);
+ void ppcPOWER7_irq_init(PowerPCCPU *cpu);
++void ppcPOWER9_irq_init(PowerPCCPU *cpu);
+ #endif
+=20
+ /* PPC machines for OpenBIOS */
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index 904ee694ac40..ae51fe754ecd 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -142,6 +142,8 @@ enum powerpc_input_t {
+     PPC_FLAGS_INPUT_970,
+     /* PowerPC POWER7 bus               */
+     PPC_FLAGS_INPUT_POWER7,
++    /* PowerPC POWER9 bus               */
++    PPC_FLAGS_INPUT_POWER9,
+     /* PowerPC 401 bus                  */
+     PPC_FLAGS_INPUT_401,
+     /* Freescale RCPU bus               */
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index ce55aa209770..42cad1ee06f6 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -2327,6 +2327,13 @@ enum {
+      * them */
+     POWER7_INPUT_NB,
+ };
++
++enum {
++    /* POWER9 input pins */
++    POWER9_INPUT_INT        =3D 0,
++    POWER9_INPUT_HINT       =3D 1,
++    POWER9_INPUT_NB,
++};
+ #endif
+=20
+ /* Hardware exceptions definitions */
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index 16e8ffa2aaf7..643f1dfcece8 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -344,6 +344,9 @@ static void icp_realize(DeviceState *dev, Error **err=
+p)
+     case PPC_FLAGS_INPUT_POWER7:
+         icp->output =3D env->irq_inputs[POWER7_INPUT_INT];
+         break;
++    case PPC_FLAGS_INPUT_POWER9: /* For SPAPR xics emulation */
++        icp->output =3D env->irq_inputs[POWER9_INPUT_INT];
++        break;
+=20
+     case PPC_FLAGS_INPUT_970:
+         icp->output =3D env->irq_inputs[PPC970_INPUT_INT];
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 2e9b8efd4342..425aa97ef9f6 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -484,6 +484,9 @@ static void xive_tctx_realize(DeviceState *dev, Error=
+ **errp)
+     case PPC_FLAGS_INPUT_POWER7:
+         tctx->output =3D env->irq_inputs[POWER7_INPUT_INT];
+         break;
++    case PPC_FLAGS_INPUT_POWER9:
++        tctx->output =3D env->irq_inputs[POWER9_INPUT_INT];
++        break;
+=20
+     default:
+         error_setg(errp, "XIVE interrupt controller does not support "
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index 12439dbe5d43..d1e3d4cd207e 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -306,6 +306,48 @@ void ppcPOWER7_irq_init(PowerPCCPU *cpu)
+     env->irq_inputs =3D (void **)qemu_allocate_irqs(&power7_set_irq, cpu=
+,
+                                                   POWER7_INPUT_NB);
  }
++
++/* POWER9 internal IRQ controller */
++static void power9_set_irq(void *opaque, int pin, int level)
++{
++    PowerPCCPU *cpu =3D opaque;
++    CPUPPCState *env =3D &cpu->env;
++
++    LOG_IRQ("%s: env %p pin %d level %d\n", __func__,
++                env, pin, level);
++
++    switch (pin) {
++    case POWER9_INPUT_INT:
++        /* Level sensitive - active high */
++        LOG_IRQ("%s: set the external IRQ state to %d\n",
++                __func__, level);
++        ppc_set_irq(cpu, PPC_INTERRUPT_EXT, level);
++        break;
++    case POWER9_INPUT_HINT:
++        /* Level sensitive - active high */
++        LOG_IRQ("%s: set the external IRQ state to %d\n",
++                __func__, level);
++        ppc_set_irq(cpu, PPC_INTERRUPT_HVIRT, level);
++        break;
++    default:
++        /* Unknown pin - do nothing */
++        LOG_IRQ("%s: unknown IRQ pin %d\n", __func__, pin);
++        return;
++    }
++    if (level) {
++        env->irq_input_state |=3D 1 << pin;
++    } else {
++        env->irq_input_state &=3D ~(1 << pin);
++    }
++}
++
++void ppcPOWER9_irq_init(PowerPCCPU *cpu)
++{
++    CPUPPCState *env =3D &cpu->env;
++
++    env->irq_inputs =3D (void **)qemu_allocate_irqs(&power9_set_irq, cpu=
+,
++                                                  POWER9_INPUT_NB);
++}
  #endif /* defined(TARGET_PPC64) */
 =20
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index d5f29d3536e1..e94422f7ff1c 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -3565,7 +3565,8 @@ static void gen_doze(DisasContext *ctx)
-     t =3D tcg_const_i32(PPC_PM_DOZE);
-     gen_helper_pminsn(cpu_env, t);
-     tcg_temp_free_i32(t);
--    gen_stop_exception(ctx);
-+    /* Stop translation, as the CPU is supposed to sleep from now */
-+    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
- #endif /* defined(CONFIG_USER_ONLY) */
+ void ppc40x_core_reset(PowerPCCPU *cpu)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index ae88e004faef..befa1a95cd77 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8793,7 +8793,7 @@ static void init_proc_POWER9(CPUPPCState *env)
+=20
+     /* Allocate hardware IRQ controller */
+     init_excp_POWER9(env);
+-    ppcPOWER7_irq_init(ppc_env_get_cpu(env));
++    ppcPOWER9_irq_init(ppc_env_get_cpu(env));
  }
 =20
-@@ -3580,7 +3581,8 @@ static void gen_nap(DisasContext *ctx)
-     t =3D tcg_const_i32(PPC_PM_NAP);
-     gen_helper_pminsn(cpu_env, t);
-     tcg_temp_free_i32(t);
--    gen_stop_exception(ctx);
-+    /* Stop translation, as the CPU is supposed to sleep from now */
-+    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
-@@ -3600,7 +3602,8 @@ static void gen_sleep(DisasContext *ctx)
-     t =3D tcg_const_i32(PPC_PM_SLEEP);
-     gen_helper_pminsn(cpu_env, t);
-     tcg_temp_free_i32(t);
--    gen_stop_exception(ctx);
-+    /* Stop translation, as the CPU is supposed to sleep from now */
-+    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
- #endif /* defined(CONFIG_USER_ONLY) */
- }
-=20
-@@ -3615,7 +3618,8 @@ static void gen_rvwinkle(DisasContext *ctx)
-     t =3D tcg_const_i32(PPC_PM_RVWINKLE);
-     gen_helper_pminsn(cpu_env, t);
-     tcg_temp_free_i32(t);
--    gen_stop_exception(ctx);
-+    /* Stop translation, as the CPU is supposed to sleep from now */
-+    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
- #endif /* defined(CONFIG_USER_ONLY) */
- }
- #endif /* #if defined(TARGET_PPC64) */
+ static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)
+@@ -8920,7 +8920,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+     pcc->radix_page_info =3D &POWER9_radix_page_info;
+ #endif
+     pcc->excp_model =3D POWERPC_EXCP_POWER9;
+-    pcc->bus_model =3D PPC_FLAGS_INPUT_POWER7;
++    pcc->bus_model =3D PPC_FLAGS_INPUT_POWER9;
+     pcc->bfd_mach =3D bfd_mach_ppc64;
+     pcc->flags =3D POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
+                  POWERPC_FLAG_BE | POWERPC_FLAG_PMM |
 --=20
 2.20.1
