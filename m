@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58494)
+Received: from eggs.gnu.org ([209.51.188.92]:59061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gugZq-0004fH-TP
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:43:05 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gugcg-00062J-GE
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gugZo-0001pV-Ou
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:43:02 -0500
-Resent-Message-Id: <E1gugZo-0001pV-Ou@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155024894003.24.9793700841909478196@49fa7ef69f7b>
-In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
+	(envelope-from <mreitz@redhat.com>) id 1gugce-0005vf-BL
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:45:58 -0500
+References: <20190213225311.17876-1-mreitz@redhat.com>
+	<20190213225311.17876-4-mreitz@redhat.com>
+	<895b530e-a81a-f8de-3be5-12e30c6190b7@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <760e0829-27cb-e732-fa0b-4a9d065002b0@redhat.com>
+Date: Fri, 15 Feb 2019 17:45:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 15 Feb 2019 08:42:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v7 00/35] target/riscv: Convert to
- decodetree
+In-Reply-To: <895b530e-a81a-f8de-3be5-12e30c6190b7@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jkmUgn18nipwlC6adETuy3oRKFTCbMuRn"
+Subject: Re: [Qemu-devel] [PATCH v3 03/12] block: Filtered children access
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,250 +26,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: palmer@sifive.com
-Cc: fam@euphon.net, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE1NTQxNC4yMjI4
-NS0xLXBhbG1lckBzaWZpdmUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxMzE1NTQxNC4yMjI4NS0xLXBhbG1lckBzaWZp
-dmUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMzVdIHRhcmdldC9yaXNj
-djogQ29udmVydCB0byBkZWNvZGV0cmVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAgIDgxZGJjZmEuLjFlMzYyMzIgIG1hc3RlciAgICAgLT4gbWFzdGVy
-CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMTMxNTU0MTQuMjIyODUtMS1wYWxt
-ZXJAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEzMTU1NDE0LjIyMjg1LTEtcGFsbWVyQHNp
-Zml2ZS5jb20KU3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9j
-YXBzdG9uZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0
-YycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
-ICdkdGMnClN1Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUu
-b3JnL2dpdC9RZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVt
-dU1hY0RyaXZlcnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L1NMT0YuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAn
-cm9tcy9pcHhlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
-b3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11
-Lm9yZy9naXQvb3BlbmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVu
-aGFja3dhcmUnClN1Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11
-Lm9yZy9naXQvcWVtdS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11
-LXBhbGNvZGUnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L3NlYWJpb3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJt
-b2R1bGUgJ3JvbXMvc2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXRodWIuY29tL2hkZWxsZXIvc2Vh
-Ymlvcy1ocHBhLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnClN1
-Ym1vZHVsZSAncm9tcy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NnYWJpb3Mu
-Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9z
-a2lib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChodHRwczov
-L2dpdC5xZW11Lm9yZy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91
-LWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczovL2dpdC5xZW11
-Lm9yZy9naXQvdS1ib290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91
-LWJvb3Qtc2FtNDYwZXgnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMn
-IChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS1zb2Z0ZmxvYXQtMykgcmVnaXN0ZXJl
-ZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVz
-dHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJr
-ZWxleS10ZXN0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXkt
-dGVzdGZsb2F0LTMnClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L2tleWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNv
-ZGVtYXBkYicKQ2xvbmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0
-b25lJzogY2hlY2tlZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2
-YmYnCkNsb25pbmcgaW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBv
-dXQgJzg4ZjE4OTA5ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50
-byAncm9tcy9RZW11TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0Ry
-aXZlcnMnOiBjaGVja2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVhODY5ZGYxYzJkOWM4
-ZTI2NicKQ2xvbmluZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NM
-T0YnOiBjaGVja2VkIG91dCAnYTViNDI4ZTFjMWVhZTcwM2JkZDYyYTNmNTI3MjIzYzI5MWVlM2Zk
-YycKQ2xvbmluZyBpbnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUn
-OiBjaGVja2VkIG91dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycK
-Q2xvbmluZyBpbnRvICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVu
-Ymlvcyc6IGNoZWNrZWQgb3V0ICczNDY0NjgxYjJiNTk4M2RmODAwODZhNDAxNzlkMzI0MTAyMzQ3
-ZGEzJwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAn
-cm9tcy9vcGVuaGFja3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3
-ODgyN2FmNmYwYjk1NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3Vi
-bW9kdWxlIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJzUxYzIzN2Q3ZTIw
-ZDA1MTAwZWFjYWRlZTJmNjFhYmMxN2U2YmMwOTcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9z
-Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E2OThjODk5
-NWZmYjI4MzgyOTZlYzI4NGZlM2M0YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50byAncm9tcy9zZWFi
-aW9zLWhwcGEnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQg
-b3V0ICcxZWY5OWEwMTU3MmMyNTgxYzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2UwJwpDbG9uaW5nIGlu
-dG8gJ3JvbXMvc2dhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNr
-ZWQgb3V0ICdjYmFlZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5n
-IGludG8gJ3JvbXMvc2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNo
-ZWNrZWQgb3V0ICdlMGVlMjRjMjdhMTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFjMTM0YmNjJwpDbG9u
-aW5nIGludG8gJ3JvbXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBj
-aGVja2VkIG91dCAnZDg1Y2EwMjlmMjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEwMDNhOTk0MycKQ2xv
-bmluZyBpbnRvICdyb21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
-dS1ib290LXNhbTQ2MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZk
-Zjc3MDU1YjJlM2E1ODgnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0
-LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNo
-ZWNrZWQgb3V0ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9u
-aW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0
-aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMx
-OTMyNzM5NmEwMTFhMTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2Rl
-bWFwZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAn
-NmIzZDcxNmUyYjY0NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwoxNTljZTNkIHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNu
-IHJldXNlIDMyIGJpdCB0cmFuc2xhdG9ycwpiOWM1ZjA1IHRhcmdldC9yaXNjdjogU3BsaWNlIHJl
-bWFpbmluZyBjb21wcmVzc2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NApmMTIx
-ZWI3IHRhcmdldC9yaXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZz
-IHJpc2N2NjQKZWE4NDg4ZCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3Nf
-ZCwgQGNzX3cgaW5zbnMKOWY5MGU0MSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5zbnMg
-dG8gc2hhcmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjU0NzA4OWIgdGFyZ2V0L3Jpc2N2OiBSZW1v
-dmUgZGVjb2RlX1JWMzJfNjRHKCkKZWQ3MWY1ZCB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBnZW5fc3lz
-dGVtKCkKNWJkMDZiMyB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5fYXJp
-dGgKNjdiY2FmNyB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2Rpbmcgb2YgUlYzMi82
-NE0gaW5zbgoxZGIyOTFmIHRhcmdldC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBt
-YW51YWwgZGVjb2RpbmcKOWUyNDQzYSB0YXJnZXQvcmlzY3Y6IG1ha2UgQUREL1NVQi9PUi9YT1Iv
-QU5EIGluc24gdXNlIGFyZyBsaXN0cwo5NDcwOTY0IHRhcmdldC9yaXNjdjogTW92ZSBnZW5fYXJp
-dGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucwo4OTk2ZGY3IHRhcmdldC9y
-aXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9zdG9yZSgpCmY2NTQ0YjUgdGFy
-Z2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX2xvYWQoKQo5NWQwYWVj
-IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKQpi
-Y2E0OTFkIHRhcmdldC9yaXNjdjogUmVtb3ZlIGdlbl9qYWxyKCkKYWEyMzAwYyB0YXJnZXQvcmlz
-Y3Y6IENvbnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNjA2YWQx
-OSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29k
-ZXRyZWUKYTBlN2EzMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGlu
-c25zIHRvIGRlY29kZXRyZWUKMWEwNzZlNSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBp
-bnNucyB0byBkZWNvZGV0cmVlCmM0NzQ2MjggdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGlu
-c25zIHRvIGRlY29kZXRyZWUKMzg3YTk3ZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5z
-bnMgdG8gZGVjb2RldHJlZQoxM2NjNmRiIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNu
-cyB0byBkZWNvZGV0cmVlCjMxYzIzOWIgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGluc25z
-IHRvIGRlY29kZXRyZWUKOTkxYzRhMyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEgaW5zbnMg
-dG8gZGVjb2RldHJlZQpiYTEwMWI1IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyQSBpbnNucyB0
-byBkZWNvZGV0cmVlCjg2ZWNmYzUgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWE0gaW5zbnMgdG8g
-ZGVjb2RldHJlZQphOWFjMDlhIHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNucyB0
-byBkZWNvZGV0cmVlCjQ3NmY5YjIgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgZmVuY2UgaW5z
-bnMgdG8gZGVjb2RldHJlZQpiOTBhYzU4IHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRo
-bWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQo3OTVmM2I1IHRhcmdldC9yaXNjdjogQ29udmVydCBS
-VjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRyZWUKYmRhYWYwNSB0YXJnZXQvcmlzY3Y6
-IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlCmUzYTg3NjUgdGFy
-Z2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJhbmNoIGluc25zIHRvIGRlY29kZXRyZWUKYWY1N2Rl
-ZSB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRlIGRlY29kZXRyZWUgYW5kIGltcGxlbW50IExVSSAmIEFV
-SVBDCjIwMjZkOWQgdGFyZ2V0L3Jpc2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBE
-aXNhc0NvbnRleHQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IDIw
-MjZkOWQ3Y2Q0NyAodGFyZ2V0L3Jpc2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBE
-aXNhc0NvbnRleHQpCjIvMzUgQ2hlY2tpbmcgY29tbWl0IGFmNTdkZWUzY2IxZiAodGFyZ2V0L3Jp
-c2N2OiBBY3RpdmF0ZSBkZWNvZGV0cmVlIGFuZCBpbXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojMzQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hv
-dWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzEyNTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5z
-bGF0ZS5jOjE4ODU6Citib29sIGRlY29kZV9pbnNuMzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQz
-Ml90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMi8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBj
-b21taXQgZTNhODc2NWNlMGYzICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5z
-bnMgdG8gZGVjb2RldHJlZSkKNC8zNSBDaGVja2luZyBjb21taXQgYmRhYWYwNWFmNDQ5ICh0YXJn
-ZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1
-LzM1IENoZWNraW5nIGNvbW1pdCA3OTVmM2I1ZjZiMDUgKHRhcmdldC9yaXNjdjogQ29udmVydCBS
-VjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3Zl
-ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5
-OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1
-IENoZWNraW5nIGNvbW1pdCBiOTBhYzU4OTQ3MWQgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJ
-IGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZSkKNy8zNSBDaGVja2luZyBjb21taXQgNDc2
-ZjliMjQwMWMzICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNv
-ZGV0cmVlKQo4LzM1IENoZWNraW5nIGNvbW1pdCBhOWFjMDlhMjBiZTUgKHRhcmdldC9yaXNjdjog
-Q29udmVydCBSVlhJIGNzciBpbnNucyB0byBkZWNvZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1p
-dCA4NmVjZmM1YTBlNzggKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhNIGluc25zIHRvIGRlY29k
-ZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
-TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQ4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMzUgQ2hlY2tpbmcgY29tbWl0IGJhMTAxYjU2MTA1
-ZSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJBIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzU0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCjExLzM1IENoZWNraW5nIGNvbW1pdCA5OTFjNGEzMWZkOWEgKHRhcmdldC9y
-aXNjdjogQ29udmVydCBSVjY0QSBpbnNucyB0byBkZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBj
-b21taXQgMzFjMjM5YjZiMDNlICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8g
-ZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
-cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0MTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIv
-MzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTMvMzUgQ2hlY2tpbmcgY29tbWl0IDEzY2M2
-ZGJjNGRkNSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUp
-CjE0LzM1IENoZWNraW5nIGNvbW1pdCAzODdhOTdmYWQyNjIgKHRhcmdldC9yaXNjdjogQ29udmVy
-dCBSVjMyRCBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM3MyBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAxNC8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVj
-a2luZyBjb21taXQgYzQ3NDYyODAyMjdmICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5z
-bnMgdG8gZGVjb2RldHJlZSkKMTYvMzUgQ2hlY2tpbmcgY29tbWl0IDFhMDc2ZTUwYTBlMSAodGFy
-Z2V0L3Jpc2N2OiBDb252ZXJ0IFJWIHByaXYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojNDE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAyMTQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KMTcvMzUgQ2hlY2tpbmcgY29tbWl0IGEwZTdhMzE4Nzk0ZCAodGFyZ2V0L3Jpc2N2
-OiBDb252ZXJ0IHF1YWRyYW50IDAgb2YgUlZYQyBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiMzMTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91
-bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjQ2OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNs
-YXRlLmM6MTA2NzoKK2Jvb2wgZGVjb2RlX2luc24xNihEaXNhc0NvbnRleHQgKmN0eCwgdWludDE2
-X3QgaW5zbik7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAxNy8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTgvMzUgQ2hlY2tpbmcg
-Y29tbWl0IDYwNmFkMTkyYjYwYSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDEgb2Yg
-UlZYQyBpbnNucyB0byBkZWNvZGV0cmVlKQoxOS8zNSBDaGVja2luZyBjb21taXQgYWEyMzAwY2M3
-ZWE4ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRvIGRl
-Y29kZXRyZWUpCjIwLzM1IENoZWNraW5nIGNvbW1pdCBiY2E0OTFkNTcyYjIgKHRhcmdldC9yaXNj
-djogUmVtb3ZlIGdlbl9qYWxyKCkpCjIxLzM1IENoZWNraW5nIGNvbW1pdCA5NWQwYWVjMDZmMWMg
-KHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKSkK
-MjIvMzUgQ2hlY2tpbmcgY29tbWl0IGY2NTQ0YjUwMTZlOSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUg
-bWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX2xvYWQoKSkKMjMvMzUgQ2hlY2tpbmcgY29tbWl0IDg5
-OTZkZjcxNjE4MyAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2Vu
-X3N0b3JlKCkpCjI0LzM1IENoZWNraW5nIGNvbW1pdCA5NDcwOTY0ODc5MTYgKHRhcmdldC9yaXNj
-djogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucykK
-MjUvMzUgQ2hlY2tpbmcgY29tbWl0IDllMjQ0M2ExZjVjOSAodGFyZ2V0L3Jpc2N2OiBtYWtlIEFE
-RC9TVUIvT1IvWE9SL0FORCBpbnNuIHVzZSBhcmcgbGlzdHMpCjI2LzM1IENoZWNraW5nIGNvbW1p
-dCAxZGIyOTFmZGE4ZjAgKHRhcmdldC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBt
-YW51YWwgZGVjb2RpbmcpCjI3LzM1IENoZWNraW5nIGNvbW1pdCA2N2JjYWY3OWY2ZTUgKHRhcmdl
-dC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBvZiBSVjMyLzY0TSBpbnNuKQoyOC8zNSBD
-aGVja2luZyBjb21taXQgNWJkMDZiMzhiM2ViICh0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19h
-cml0aCB0byBnZW5fYXJpdGgpCjI5LzM1IENoZWNraW5nIGNvbW1pdCBlZDcxZjVkNmJiYmMgKHRh
-cmdldC9yaXNjdjogUmVtb3ZlIGdlbl9zeXN0ZW0oKSkKMzAvMzUgQ2hlY2tpbmcgY29tbWl0IDU0
-NzA4OWI1YjY2OSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkpCjMxLzM1
-IENoZWNraW5nIGNvbW1pdCA5ZjkwZTQxZWVlNmQgKHRhcmdldC9yaXNjdjogQ29udmVydCBAY3Nf
-MiBpbnNucyB0byBzaGFyZSB0cmFuc2xhdGlvbiBmdW5jdGlvbnMpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9p
-ZGVkIGluIC5jIGZpbGVzCiMxODI6IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzo1NDM6
-Citib29sIGRlY29kZV9pbnNuMTYoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQxNl90IGluc24pOwoK
-dG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNjQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzEv
-MzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMyLzM1IENoZWNraW5nIGNvbW1pdCBlYTg0
-ODhkMTBhMDkgKHRhcmdldC9yaXNjdjogQ29udmVydCBAY2xfZCwgQGNsX3csIEBjc19kLCBAY3Nf
-dyBpbnNucykKMzMvMzUgQ2hlY2tpbmcgY29tbWl0IGYxMjFlYjc2MWM0MyAodGFyZ2V0L3Jpc2N2
-OiBTcGxpY2UgZnN3X3NkIGFuZCBmbHdfbGQgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NCkKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojMjg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAzMDkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzMvMzUgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KMzQvMzUgQ2hlY2tpbmcgY29tbWl0IGI5YzVmMDVlYWJhNyAodGFyZ2V0L3Jp
-c2N2OiBTcGxpY2UgcmVtYWluaW5nIGNvbXByZXNzZWQgaW5zbiBwYWlycyBmb3IgcmlzY3YzMiB2
-cyByaXNjdjY0KQozNS8zNSBDaGVja2luZyBjb21taXQgMTU5Y2UzZDc4NTUwICh0YXJnZXQvcmlz
-Y3Y6IFJlbWFpbmluZyBydmMgaW5zbiByZXVzZSAzMiBiaXQgdHJhbnNsYXRvcnMpCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjEzMTU1NDE0
-LjIyMjg1LTEtcGFsbWVyQHNpZml2ZS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jkmUgn18nipwlC6adETuy3oRKFTCbMuRn
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <760e0829-27cb-e732-fa0b-4a9d065002b0@redhat.com>
+Subject: Re: [PATCH v3 03/12] block: Filtered children access functions
+References: <20190213225311.17876-1-mreitz@redhat.com>
+ <20190213225311.17876-4-mreitz@redhat.com>
+ <895b530e-a81a-f8de-3be5-12e30c6190b7@redhat.com>
+In-Reply-To: <895b530e-a81a-f8de-3be5-12e30c6190b7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 14.02.19 03:25, Eric Blake wrote:
+> On 2/13/19 4:53 PM, Max Reitz wrote:
+>> What bs->file and bs->backing mean depends on the node.  For filter
+>> nodes, both signify a node that will eventually receive all R/W
+>> accesses.  For format nodes, bs->file contains metadata and data, and
+>> bs->backing will not receive writes -- instead, writes are COWed to
+>> bs->file.  Usually.
+>>
+>> In any case, it is not trivial to guess what a child means exactly wit=
+h
+>> our currently limited form of expression.  It is better to introduce
+>> some functions that actually guarantee a meaning:
+>>
+>> - bdrv_filtered_cow_child() will return the child that receives reques=
+ts
+>>   filtered through COW.  That is, reads may or may not be forwarded
+>>   (depending on the overlay's allocation status), but writes never go =
+to
+>>   this child.
+>>
+>> - bdrv_filtered_rw_child() will return the child that receives request=
+s
+>>   filtered through some very plain process.  Reads and writes issued t=
+o
+>>   the parent will go to the child as well (although timing, etc. may b=
+e
+>>   modified).
+>>
+>> - All drivers but quorum (but quorum is pretty opaque to the general
+>>   block layer anyway) always only have one of these children: All read=
+
+>>   requests must be served from the filtered_rw_child (if it exists), s=
+o
+>>   if there was a filtered_cow_child in addition, it would not receive
+>>   any requests at all.
+>>   (The closest here is mirror, where all requests are passed on to the=
+
+>>   source, but with write-blocking, write requests are "COWed" to the
+>>   target.  But that just means that the target is a special child that=
+
+>>   cannot be introspected by the generic block layer functions, and tha=
+t
+>>   source is a filtered_rw_child.)
+>>   Therefore, we can also add bdrv_filtered_child() which returns that
+>>   one child (or NULL, if there is no filtered child).
+>>
+>> Also, many places in the current block layer should be skipping filter=
+s
+>> (all filters or just the ones added implicitly, it depends) when going=
+
+>> through a block node chain.  They do not do that currently, but this
+>> patch makes them.
+>>
+>> One example for this is qemu-img map, which should skip filters and on=
+ly
+>> look at the COW elements in the graph.  The change to iotest 204's
+>> reference output shows how using blkdebug on top of a COW node used to=
+
+>> make qemu-img map disregard the rest of the backing chain, but with th=
+is
+>> patch, the allocation in the base image is reported correctly.
+>>
+>> Furthermore, a note should be made that sometimes we do want to access=
+
+>> bs->backing directly.  This is whenever the operation in question is n=
+ot
+>> about accessing the COW child, but the "backing" child, be it COW or
+>> not.  This is the case in functions such as bdrv_open_backing_file() o=
+r
+>> whenever we have to deal with the special behavior of @backing as a
+>> blockdev option, which is that it does not default to null like all
+>> other child references do.
+>>
+>> Finally, the query functions (query-block and query-named-block-nodes)=
+
+>> are modified to return any filtered child under "backing", not just
+>> bs->backing or COW children.  This is so that filters do not interrupt=
+
+>> the reported backing chain.  This changes the output of iotest 184, as=
+
+>> the throttled node now appears as a backing child.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>=20
+>> +++ b/qapi/block-core.json
+>> @@ -2417,6 +2417,10 @@
+>>  # On successful completion the image file is updated to drop the back=
+ing file
+>>  # and the BLOCK_JOB_COMPLETED event is emitted.
+>>  #
+>> +# In case @device is a filter node, block-stream modifies the first n=
+on-filter
+>> +# overlay node below it to point to base's backing node (or NULL if @=
+base was
+>> +# not specified) instead of modifying @device itself.
+>=20
+> Maybe s/In case/If/
+
+Works for me.
+
+>> +/*
+>> + * For a backing chain, return the first non-filter backing image.
+>> + */
+>> +BlockDriverState *bdrv_backing_chain_next(BlockDriverState *bs)
+>> +{
+>> +    return bdrv_skip_rw_filters(bdrv_filtered_cow_bs(bdrv_skip_rw_fil=
+ters(bs)));
+>=20
+> Quite a mouthful, but looks correct.
+>=20
+>=20
+>> +++ b/block/io.c
+>> @@ -118,8 +118,17 @@ static void bdrv_merge_limits(BlockLimits *dst, c=
+onst BlockLimits *src)
+>>  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>>  {
+>>      BlockDriver *drv =3D bs->drv;
+>> +    BlockDriverState *storage_bs;
+>> +    BlockDriverState *cow_bs =3D bdrv_filtered_cow_bs(bs);
+>=20
+> If the backing file is filtered by a blkdebug layer that intentionally
+> is trying to advertise alternative block sizes...
+>=20
+>>      Error *local_err =3D NULL;
+>> =20
+>> +    /*
+>> +     * FIXME: There should be a function for this, and in fact there
+>> +     * will be as of a follow-up patch.
+>> +     */
+>> +    storage_bs =3D
+>> +        child_bs(bs->file) ?: bdrv_filtered_rw_bs(bs);
+>> +
+>>      memset(&bs->bl, 0, sizeof(bs->bl));
+>> =20
+>>      if (!drv) {
+>> @@ -131,13 +140,13 @@ void bdrv_refresh_limits(BlockDriverState *bs, E=
+rror **errp)
+>>                                  drv->bdrv_aio_preadv) ? 1 : 512;
+>> =20
+>>      /* Take some limits from the children as a default */
+>> -    if (bs->file) {
+>> -        bdrv_refresh_limits(bs->file->bs, &local_err);
+>> +    if (storage_bs) {
+>> +        bdrv_refresh_limits(storage_bs, &local_err);
+>>          if (local_err) {
+>>              error_propagate(errp, local_err);
+>>              return;
+>>          }
+>> -        bdrv_merge_limits(&bs->bl, &bs->file->bs->bl);
+>> +        bdrv_merge_limits(&bs->bl, &storage_bs->bl);
+>>      } else {
+>>          bs->bl.min_mem_alignment =3D 512;
+>>          bs->bl.opt_mem_alignment =3D getpagesize();
+>> @@ -146,13 +155,13 @@ void bdrv_refresh_limits(BlockDriverState *bs, E=
+rror **errp)
+>>          bs->bl.max_iov =3D IOV_MAX;
+>>      }
+>> =20
+>> -    if (bs->backing) {
+>> -        bdrv_refresh_limits(bs->backing->bs, &local_err);
+>> +    if (cow_bs) {
+>> +        bdrv_refresh_limits(cow_bs, &local_err);
+>=20
+> ...then this change means that the active layer no longer picks up the
+> blkdebug block sizes, but the original COW layer sizes.
+
+How so?
+
+I don't see how this changes current behavior with just COW/blkdebug
+nodes at all.  For blkdebug, bs->file is the storage_bs.  For COW nodes,
+bs->file is the storage_bs and bs->backing is the cow_bs.  So these code
+changes do nothing in that case.
+
+(They only change something for filter nodes that use bs->backing for
+their filtered node; because that is translated to storage_bs now.)
+
+
+Note that bdrv_filtered_cow_bs() does not skip filters (i.e. the
+blkdebug node).  That would be bdrv_backing_chain_next().
+
+> Is that
+> intentional?  I don't think it is fatal to the patch (as blkdebug is no=
+t
+> used in production, but only in testing), but it may cause some
+> head-scratching when trying to test behaviors of a COW child with
+> different block sizes than the active layer by using blkdebug on top of=
+
+> the COW child.  I guess I'll find out soon enough (on my todo list is
+> fixing NBD to never split an NBD_CMD_READ or NBD_CMD_BLOCK_STATUS reply=
+
+> below the granularity advertised at the active layer, even if the
+> backing file has a smaller granularity - and using blkdebug to force th=
+e
+> backing file granularity was my original plan of attack - but it is not=
+
+> until this patch is applied that NBD can even locate the bitmap in a
+> backing file when a filter is interposed)
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+Max
+
+
+--jkmUgn18nipwlC6adETuy3oRKFTCbMuRn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxm7LIACgkQ9AfbAGHV
+z0Bmwgf/T8DI3kNIxZ9OgHR6wowuZgacSOOcNAtoozKNlFEA74LaIhq/eppMDt6r
+mNUaREaHPo/5+B5VQ7cu8r5mIWbUGZQy21k1gVc6oWHzFsLN1KxAdfSVlh4Xb3gS
+DB/XZTOirFY52QwlbNKCvUWCsLCjBG93iUM0vfFsmVkf/i5iTxVyq8gejK8iXaQS
+Lhze+2puh+iOust947ikgButx1cbDPUvsjtNA2/zjMtl0FXOdfueabdPBD7kSFys
+m0VgQ2rmmQwjBps0ASDYRg6qG9seIXyT5IDjPbrAOyxlX/SBOWIRiyM5B0Y1yZFu
+xNQI5PjizjmYPxso5NreCvqba9dQCg==
+=ehTS
+-----END PGP SIGNATURE-----
+
+--jkmUgn18nipwlC6adETuy3oRKFTCbMuRn--
