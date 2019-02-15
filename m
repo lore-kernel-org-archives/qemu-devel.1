@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56661)
+Received: from eggs.gnu.org ([209.51.188.92]:56676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gulCN-0001d8-PA
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1gulCR-0001ej-Ek
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gulCM-0005Hq-IN
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1gulCN-0005Im-Qd
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:09 -0500
 Received: from indium.canonical.com ([91.189.90.7]:59810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gulCM-0005GJ-3G
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:06 -0500
+	id 1gulCN-0005GJ-Gn
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:39:07 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gukpf-0003kt-0l
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 21:15:39 +0000
+	id 1gukpe-0003kE-JM
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 21:15:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 027332E8031
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 21:15:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8DF172E8054
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 21:15:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Feb 2019 21:06:39 -0000
+Date: Fri, 15 Feb 2019 21:04:38 -0000
 From: Larry Dewey <larry.j.dewey@gmail.com>
 Reply-To: Bug 1816189 <1816189@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155026463486.6528.17912471655076346086.malonedeb@soybean.canonical.com>
-Message-Id: <155026479944.3692.6064448049418312061.malone@wampee.canonical.com>
+Message-Id: <155026467831.1164.4821807274678267776.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1816189] Re: Unable to create or revert snapshots
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Before kernel 4.20.x this was not an issue as nested virtualization was
-not enabled by default. In any distribution using 4.20.x or later,
-snapshots and migration do not work.
+Adding System Information
+
+** Attachment added: "System-Details.txt"
+   https://bugs.launchpad.net/qemu/+bug/1816189/+attachment/5238921/+files/=
+System-Details.txt
 
 -- =
 
