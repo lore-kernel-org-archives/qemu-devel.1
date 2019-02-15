@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39962)
+Received: from eggs.gnu.org ([209.51.188.92]:39757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1guRmP-0000U5-8n
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:55:02 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1guRmS-0000OH-N6
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:55:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1guRdz-00025c-EQ
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:46:20 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:49727)
+	(envelope-from <balaton@eik.bme.hu>) id 1guRaP-0006uA-My
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:42:38 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:55281)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1guRdy-00022t-LD
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:46:19 -0500
-Date: Fri, 15 Feb 2019 11:44:01 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190215004401.GC4573@umbus.fritz.box>
-References: <20190214050808.16653-1-david@gibson.dropbear.id.au>
-	<20190214050808.16653-3-david@gibson.dropbear.id.au>
-	<a7779d7b-f83f-d681-b210-823b66e0f035@ozlabs.ru>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1guRaP-0006rk-6b
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:42:37 -0500
+Date: Fri, 15 Feb 2019 01:42:32 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA_hQVwGJoK17TzqcejiG+ycnt8rEAYwZ2Tub=H9Myj_Sw@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.9999.1902150134350.41761@zero.eik.bme.hu>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-6-peter.maydell@linaro.org>
+	<alpine.BSF.2.21.9999.1902141745470.64316@zero.eik.bme.hu>
+	<CAFEAcA_hQVwGJoK17TzqcejiG+ycnt8rEAYwZ2Tub=H9Myj_Sw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qjNfmADvan18RZcF"
-Content-Disposition: inline
-In-Reply-To: <a7779d7b-f83f-d681-b210-823b66e0f035@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH 2/2] pcie: Don't allow extended config
- space access via conventional PCI bridges
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2 5/7] ui/cocoa: Don't call NSApp
+ sendEvent directly from handleEvent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,201 +29,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
+On Thu, 14 Feb 2019, Peter Maydell wrote:
+> On Thu, 14 Feb 2019 at 17:04, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>> -- (void) handleEvent:(NSEvent *)event
+>>> +- (bool) handleEvent:(NSEvent *)event
+>>> {
+>>> -    with_iothread_lock(^{
+>>> -        [self handleEventLocked:event];
+>>> +    return bool_with_iothread_lock(^{
+>>> +        return [self handleEventLocked:event];
+>>>     });
+>>> }
+>>
+>> If this is only ever used for this one method, wouldn't it be easier to
+>> move locking to the method below (even with some goto after setting a ret
+>> variable to unlock at the end of the method where now it returns in the
+>> middle, but maybe it could even be done without goto as the whole code is
+>> one big switch that can be exited with break and an if that can be skipped
+>> by a flag)? That may be easier to follow than this method within block
+>> within method and then you wouldn't need bool_with_iothread_lock and
+>> neither handleEvent. Unless there's something I'm missing which makes this
+>> convoluted way needed.
+>
+> The aim was to avoid having to do changes to handleEvent's code flow
+> in order to do "run it with the lock held"; it also means that the
+> invariant "we always unlock the lock" is easy to confirm, whereas
+> if you do the lock/unlock inside a single handleEvent method you have
+> to look for whether it was done right in early-exit cases. It's
+> a bit less of a convincing argument than it was in v1 (where we were
+> making no changes to handleEvent at all other than wrapping it in a
+> lock), but I think it still makes sense this way.
 
---qjNfmADvan18RZcF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I thought of something like below which to me is simpler than your 
+proposal and makes less changes to the original but feel free to choose 
+whichever you like, I don't mind either way.
 
-On Thu, Feb 14, 2019 at 05:04:03PM +1100, Alexey Kardashevskiy wrote:
->=20
->=20
-> On 14/02/2019 16:08, David Gibson wrote:
-> > In hardware it's possible, if odd, to have a configuration like:
-> >=20
-> > PCIe host bridge
-> > \- PCIe to PCI bridge
-> >    \- PCI to PCIe bridge
-> >       \- PCIe device
-> >=20
-> > The PCIe extended configuration space on the device won't be
-> > accessible to the host, because the cycles can't traverse the
-> > conventional PCI bus on the way there.
-> >=20
-> > However, if we attempt to model that configuration under qemu,
-> > extended config access on the device *will* work, because
-> > pci_config_size() depends only on whether the device itself is PCIe
-> > capable.
-> >=20
-> > This patch fixes that modelling error by adding a flag to each
-> > PCI/PCIe bus instance indicating whether extended config space
-> > accesses are possible on it.  It will always be false for conventional
-> > PCI buses, for PCIe buses it will be true if and only if the parent
-> > bus also has the flag set.
-> >=20
-> > AIUI earlier attempts to correct this have been rejected, because they
-> > involved expensively traversing the whole bus hierarchy on each config
-> > access.  This approach avoids that by computing the value as the bus
-> > hierarchy is constructed, meaning we only need a single bit check when
-> > we actually attempt the config access.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/pci/pci.c             | 32 ++++++++++++++++++++++++++++++++
-> >  include/hw/pci/pci.h     |  4 +++-
-> >  include/hw/pci/pci_bus.h |  2 ++
-> >  3 files changed, 37 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index f6d8b337db..f2d9dff9ee 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -120,6 +120,25 @@ static void pci_bus_realize(BusState *qbus, Error =
-**errp)
-> >      vmstate_register(NULL, -1, &vmstate_pcibus, bus);
-> >  }
-> > =20
-> > +static void pcie_bus_realize(BusState *qbus, Error **errp)
-> > +{
-> > +    PCIBus *bus =3D PCI_BUS(qbus);
-> > +
-> > +    pci_bus_realize(qbus, errp);
-> > +
-> > +    /* a PCI-E bus can supported extended config space if it's the
-> > +     * root bus, or if the bus/bridge above it does as well */
-> > +    if (pci_bus_is_root(bus)) {
-> > +        bus->flags |=3D PCI_BUS_EXTENDED_CONFIG_SPACE;
-> > +    } else {
-> > +        PCIBus *parent_bus =3D pci_get_bus(bus->parent_dev);
-> > +
-> > +        if (pci_bus_extended_config_space(parent_bus)) {
-> > +            bus->flags |=3D PCI_BUS_EXTENDED_CONFIG_SPACE;
-> > +        }
-> > +    }
-> > +}
-> > +
-> >  static void pci_bus_unrealize(BusState *qbus, Error **errp)
-> >  {
-> >      PCIBus *bus =3D PCI_BUS(qbus);
-> > @@ -166,6 +185,13 @@ static const TypeInfo pci_bus_info =3D {
-> >      .class_init =3D pci_bus_class_init,
-> >  };
-> > =20
-> > +static void pcie_bus_class_init(ObjectClass *klass, void *data)
-> > +{
-> > +    BusClass *k =3D BUS_CLASS(klass);
-> > +
-> > +    k->realize =3D pcie_bus_realize;
-> > +}
-> > +
-> >  static const TypeInfo pcie_interface_info =3D {
-> >      .name          =3D INTERFACE_PCIE_DEVICE,
-> >      .parent        =3D TYPE_INTERFACE,
-> > @@ -174,6 +200,7 @@ static const TypeInfo pcie_interface_info =3D {
-> >  static const TypeInfo conventional_pci_interface_info =3D {
-> >      .name          =3D INTERFACE_CONVENTIONAL_PCI_DEVICE,
-> >      .parent        =3D TYPE_INTERFACE,
-> > +    .class_init    =3D pcie_bus_class_init,
-> >  };
-> > =20
-> >  static const TypeInfo pcie_bus_info =3D {
-> > @@ -391,6 +418,11 @@ bool pci_bus_is_express(PCIBus *bus)
-> >      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
-> >  }
-> > =20
-> > +bool pci_bus_extended_config_space(PCIBus *bus)
-> > +{
-> > +    return !!(bus->flags & PCI_BUS_EXTENDED_CONFIG_SPACE);
-> > +}
-> > +
-> >  void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceStat=
-e *parent,
-> >                                const char *name,
-> >                                MemoryRegion *address_space_mem,
-> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> > index 1273deb740..919e8a6f5f 100644
-> > --- a/include/hw/pci/pci.h
-> > +++ b/include/hw/pci/pci.h
-> > @@ -395,6 +395,7 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaq=
-ue, int pin);
-> >  #define TYPE_PCIE_BUS "PCIE"
-> > =20
-> >  bool pci_bus_is_express(PCIBus *bus);
-> > +bool pci_bus_extended_config_space(PCIBus *bus);
-> >  void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceStat=
-e *parent,
-> >                                const char *name,
-> >                                MemoryRegion *address_space_mem,
-> > @@ -754,7 +755,8 @@ static inline int pci_is_express_downstream_port(co=
-nst PCIDevice *d)
-> > =20
-> >  static inline uint32_t pci_config_size(const PCIDevice *d)
-> >  {
-> > -    return pci_is_express(d) ? PCIE_CONFIG_SPACE_SIZE : PCI_CONFIG_SPA=
-CE_SIZE;
-> > +    return (pci_is_express(d) && pci_bus_extended_config_space(pci_get=
-_bus(d)))
-> > +        ? PCIE_CONFIG_SPACE_SIZE : PCI_CONFIG_SPACE_SIZE;
->=20
->=20
-> Since there is a selfnack anyway, I'll ask out of curiosity - can a
-> device sit on PCIe bus and not be PCIe itself?
+But the comment about sendEvent near the end is now outdated after either 
+patch so you may want to update that even in your patch.
 
-I believe so.  I think the most common case is plain-PCI integrated
-devices in an otherwise PCI-E host bridge / root complex.
+Regards,
+BALATON Zoltan
 
-> The pci_is_express(d) check above just seems a little redundant,
-> g_assert() could probably do just that.
->=20
->=20
->=20
->=20
-> >  }
-> > =20
-> >  static inline uint16_t pci_get_bdf(PCIDevice *dev)
-> > diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-> > index 3a4d599da3..8b1e849c34 100644
-> > --- a/include/hw/pci/pci_bus.h
-> > +++ b/include/hw/pci/pci_bus.h
-> > @@ -23,6 +23,8 @@ typedef struct PCIBusClass {
-> >  enum PCIBusFlags {
-> >      /* This bus is the root of a PCI domain */
-> >      PCI_BUS_IS_ROOT                                         =3D 0x0001,
-> > +    /* PCIe extended configuration space is accessible on this bus */
-> > +    PCI_BUS_EXTENDED_CONFIG_SPACE                           =3D 0x0002,
-> >  };
-> > =20
-> >  struct PCIBus {
-> >=20
->=20
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 4727f9c392..de6606e017 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -132,9 +132,8 @@
+ QemuSemaphore display_init_sem;
+ QemuSemaphore app_started_sem;
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+-// Utility functions to run specified code block with iothread lock held
++// Utility function to run specified code block with iothread lock held
+ typedef void (^CodeBlock)(void);
+-typedef bool (^BoolCodeBlock)(void);
 
---qjNfmADvan18RZcF
-Content-Type: application/pgp-signature; name="signature.asc"
+ static void with_iothread_lock(CodeBlock block)
+ {
+@@ -148,21 +147,6 @@ static void with_iothread_lock(CodeBlock block)
+     }
+ }
 
------BEGIN PGP SIGNATURE-----
+-static bool bool_with_iothread_lock(BoolCodeBlock block)
+-{
+-    bool locked = qemu_mutex_iothread_locked();
+-    bool val;
+- 
+-    if (!locked) {
+-        qemu_mutex_lock_iothread();
+-    }
+-    val = block();
+-    if (!locked) {
+-        qemu_mutex_unlock_iothread();
+-    }
+-    return val;
+-}
+-
+ // Mac to QKeyCode conversion
+ const int mac_to_qkeycode_map[] = {
+     [kVK_ANSI_A] = Q_KEY_CODE_A,
+@@ -341,7 +325,6 @@ - (void) ungrabMouse;
+ - (void) toggleFullScreen:(id)sender;
+ - (void) handleMonitorInput:(NSEvent *)event;
+ - (bool) handleEvent:(NSEvent *)event;
+-- (bool) handleEventLocked:(NSEvent *)event;
+ - (void) setAbsoluteEnabled:(BOOL)tIsAbsoluteEnabled;
+ /* The state surrounding mouse grabbing is potentially confusing.
+  * isAbsoluteEnabled tracks qemu_input_is_absolute() [ie "is the emulated
+@@ -689,15 +672,15 @@ - (void) handleMonitorInput:(NSEvent *)event
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxmC1EACgkQbDjKyiDZ
-s5LejBAA1FyLA/SA0BuNJYW+2Mevyj014vrikETl+tbbXUmF1kATgfxZlQa36qkB
-SVfWi4eaLGR9vf7yeiOOIRnktQFiMfzUFyu8VKYuqZRpfu9hec5jAhE4Ur9jsR/n
-Ba4SltmQEaV3oY6Ki24yrCsZO8oNBVagRnq+e/oWKomuvucxZsqIL5MA71Vrssx6
-MxNbj8UsbFzwYEse6B2S+rv8x9bqYTc8JyPB+Q8cQdY3pu7AzMo0g2czuWKlaKR2
-ZbIU3mANe7eYc/tgJ7ATmz6nzxBpKTe7k7D/USFFdrSFiOW3fNCKl0q4wE7NTWwL
-saono8/YjJqYQ8voq82DVbZNaJlODqwVAsaAIPXh9ICxbsoTovRLhBa7RVFLWnYd
-oN8Qttho8WGk9+kH3+N5vqt+TBfAjeQh0lKD90lp/9qRNxZBw1P/zgIhpWtCQAv5
-W4nZBDncWsjJLTxHL6mLT5sfbubFWHegepVqpiZ2oK8Z/npvb3G3w6Skw4bmTjxc
-7VF+TY8afMYdtiXwLIKXPkR+lAJONyo6WTAMBgWf8LiD5HMWzgjsfGSDy9YxLVly
-+051s5vebMHpG2w6Uu9oowN3RZNIT57ppjRjb/FVDJcBAOiKFH10qJsDb3FWDE5a
-e5fYFLbJsChqo3pGScWpjle5r5/KOxxRkW1mFB/zKhFvwirMRJg=
-=pSsk
------END PGP SIGNATURE-----
+ - (bool) handleEvent:(NSEvent *)event
+ {
+-    return bool_with_iothread_lock(^{
+-        return [self handleEventLocked:event];
+-    });
+-}
+-
+-- (bool) handleEventLocked:(NSEvent *)event
+-{
+-    /* Return true if we handled the event, false if it should be given to OSX */
+     COCOA_DEBUG("QemuCocoaView: handleEvent\n");
++    /* Return true if we handled the event, false if it should be given to OSX */
++    bool handled = true;
++    bool locked = qemu_mutex_iothread_locked();
++    if (!locked) {
++        qemu_mutex_lock_iothread();
++    }
++    /* Make sure to release lock so don't return before the end */
++
+     int buttons = 0;
+     int keycode = 0;
+     bool mouse_event = false;
+@@ -767,7 +750,8 @@ - (bool) handleEventLocked:(NSEvent *)event
+                 if (keycode == Q_KEY_CODE_F) {
+                     switched_to_fullscreen = true;
+                 }
+-                return false;
++                handled = false;
++                goto unlock;
+             }
 
---qjNfmADvan18RZcF--
+             // default
+@@ -782,12 +766,12 @@ - (bool) handleEventLocked:(NSEvent *)event
+                         // enable graphic console
+                         case '1' ... '9':
+                             console_select(key - '0' - 1); /* ascii math */
+-                            return true;
++                            goto unlock;
+
+                         // release the mouse grab
+                         case 'g':
+                             [self ungrabMouse];
+-                            return true;
++                            goto unlock;
+                     }
+                 }
+             }
+@@ -804,7 +788,7 @@ - (bool) handleEventLocked:(NSEvent *)event
+             // don't pass the guest a spurious key-up if we treated this
+             // command-key combo as a host UI action
+             if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
+-                return true;
++                goto unlock;
+             }
+
+             if (qemu_console_is_graphic(NULL)) {
+@@ -898,16 +882,16 @@ - (bool) handleEventLocked:(NSEvent *)event
+             mouse_event = false;
+             break;
+         default:
+-            return false;
++            handled = false;
++            goto unlock;
+     }
+
+     if (mouse_event) {
+         /* Don't send button events to the guest unless we've got a
+          * mouse grab or window focus. If we have neither then this event
+          * is the user clicking on the background window to activate and
+-         * bring us to the front, which will be done by the sendEvent
+-         * call below. We definitely don't want to pass that click through
+-         * to the guest.
++         * bring us to the front, which will be done by sendEvent.
++         * We definitely don't want to pass that click through to the guest.
+          */
+         if ((isMouseGrabbed || [[self window] isKeyWindow]) &&
+             (last_buttons != buttons)) {
+@@ -934,11 +918,16 @@ - (bool) handleEventLocked:(NSEvent *)event
+                 qemu_input_queue_rel(dcl->con, INPUT_AXIS_Y, (int)[event deltaY]);
+             }
+         } else {
+-            return false;
++            handled = false;
++            goto unlock;
+         }
+         qemu_input_event_sync();
+     }
+-    return true;
++unlock:
++    if (!locked) {
++        qemu_mutex_unlock_iothread();
++    }
++    return handled;
+ }
+
+ - (void) grabMouse
