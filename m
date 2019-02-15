@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46410)
+Received: from eggs.gnu.org ([209.51.188.92]:41091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guda2-0005Sk-9j
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:31:04 -0500
+	(envelope-from <stappers@stappers.nl>) id 1guWuT-0005Uq-Iv
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 01:23:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1guda1-0004b2-IZ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:31:02 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 15 Feb 2019 14:30:04 +0100
-Message-Id: <20190215133005.15955-6-david@redhat.com>
-In-Reply-To: <20190215133005.15955-1-david@redhat.com>
-References: <20190215133005.15955-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] tests/device-plug: Add CPU core unplug
- request test for spapr
+	(envelope-from <stappers@stappers.nl>) id 1guWuR-00010u-8g
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 01:23:41 -0500
+Received: from gpm.stappers.nl ([2001:981:6c6a:1::49]:40143)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <stappers@stappers.nl>) id 1guWuQ-0000C4-RC
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 01:23:39 -0500
+Date: Fri, 15 Feb 2019 07:23:18 +0100
+From: Geert Stappers <stappers@stappers.nl>
+Message-ID: <20190215062318.yjzevnuc3iybcaxv@gpm.stappers.nl>
+References: <20190214155714.8779-1-alex.bennee@linaro.org>
+	<bbefd980-c740-cb8f-a648-a6f51772d63d@redhat.com>
+	<8736oqhu6s.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <8736oqhu6s.fsf@zen.linaroharston>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/block: report when pflash backing file
+ isn't aligned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,52 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, pkg-qemu-devel@lists.alioth.debian.org, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org
 
-We can easily test this, just like PCI.
+On Thu, Feb 14, 2019 at 10:38:35PM +0000, Alex Benn=E9e wrote:
+> Laszlo Ersek <lersek@redhat.com> writes:
+> > On 02/14/19 16:57, Alex Benn=E9e wrote:
+> >> +    /*
+> >> +     * Validate the backing store is the right size for pflash
+> >> +     * devices. It has to be padded to a multiple of the flash bloc=
+k
+> >> +     * size.
+> >> +     */
+> >> +    if (pfl->blk) {
+> >> +        uint64_t backing_len =3D blk_getlength(pfl->blk);
+> >> +        if (device_len !=3D backing_len) {
+> >> +            error_setg(errp, "backing file wrong size "
+> >> +                       "(%" PRId64 " !=3D %" PRId64")", backing_len=
+, device_len);
+> >> +            return;
+> >> +        }
+> >> +    }
+> >>
+> >>      memory_region_init_rom_device(
+> >>          &pfl->mem, OBJECT(dev),
+> >>
+>=20
+> > - from a user POV, I find it more useful if the error message also sh=
+ows
+> >   which quantity is which, not just two inequal numbers.
+>=20
+> How about:
+>=20
+>   "backing file size (%) not enough for whole device (%)"
+>=20
+> ?
+>=20
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- tests/device-plug-test.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+from a user POV, I find it more useful if the error messsage
+resembles the actual test in the source. Above is test   !=3D
 
-diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
-index 6f7255552a..ec6cb5de7b 100644
---- a/tests/device-plug-test.c
-+++ b/tests/device-plug-test.c
-@@ -101,6 +101,21 @@ static void test_ccw_unplug(void)
-     qtest_quit(qtest);
- }
- 
-+static void test_spapr_cpu_unplug_request(void)
-+{
-+    QTestState *qtest;
-+
-+    qtest = qtest_initf("-cpu power9_v2.0 -smp 1,maxcpus=2 "
-+                        "-device power9_v2.0-spapr-cpu-core,core-id=1,id=dev0");
-+
-+    /* similar to test_pci_unplug_request */
-+    device_del_request(qtest, "dev0");
-+    system_reset(qtest);
-+    wait_device_deleted_event(qtest, "dev0");
-+
-+    qtest_quit(qtest);
-+}
-+
- int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
-@@ -120,5 +135,10 @@ int main(int argc, char **argv)
-                        test_ccw_unplug);
-     }
- 
-+    if (!strcmp(arch, "ppc64")) {
-+        qtest_add_func("/device-plug/spapr_cpu_unplug_request",
-+                       test_spapr_cpu_unplug_request);
-+    }
-+
-     return g_test_run();
- }
--- 
-2.17.2
+How about
+
+   "backing file size (%) not equal to whole device size (%)"
+
+?
+
+
+
+
+Groeten
+Geert Stappers
+--=20
+Leven en laten leven
