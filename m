@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60184)
+Received: from eggs.gnu.org ([209.51.188.92]:33150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1guix6-0003DA-F1
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:15:13 -0500
+	(envelope-from <bsd@redhat.com>) id 1guj42-0004yP-Ls
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:22:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1guix5-0000nb-Ov
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:15:12 -0500
-References: <20190123103323.4516-1-stefanha@redhat.com>
-	<20190123103323.4516-3-stefanha@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7b9da22a-0756-054e-daad-9dba582a7487@redhat.com>
-Date: Fri, 15 Feb 2019 20:14:59 +0100
+	(envelope-from <bsd@redhat.com>) id 1guj40-00027G-Qp
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:22:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50456)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1guj3z-00025g-JX
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:22:20 -0500
+From: Bandan Das <bsd@redhat.com>
+References: <20190130073426.11525-1-kraxel@redhat.com>
+	<20190130073426.11525-8-kraxel@redhat.com>
+	<CAFEAcA-hgtFq-LHY=73+PtQKp2J-b6LdG73+Ag_uPtwF9Z4iYg@mail.gmail.com>
+	<jpgef886gbk.fsf@linux.bootlegged.copy>
+	<CAFEAcA8Q_73RQZOwqJSVA8AaY2D82n4Tb66gvdWP90mdroJs6Q@mail.gmail.com>
+Date: Fri, 15 Feb 2019 14:22:12 -0500
+In-Reply-To: <CAFEAcA8Q_73RQZOwqJSVA8AaY2D82n4Tb66gvdWP90mdroJs6Q@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 15 Feb 2019 18:55:29 +0000")
+Message-ID: <jpgva1k3li3.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <20190123103323.4516-3-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RNlivSOyUw9XkBSIOq0ENEU9hbXu0tezL"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: add LUKS payload overhead
- to 178 qemu-img measure test
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 7/8] usb-mtp: breakup MTP write into smaller
+ chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Daniel Berrange <berrange@redhat.com>, qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RNlivSOyUw9XkBSIOq0ENEU9hbXu0tezL
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Daniel Berrange <berrange@redhat.com>,
- qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
-Message-ID: <7b9da22a-0756-054e-daad-9dba582a7487@redhat.com>
-Subject: Re: [PATCH v2 2/2] iotests: add LUKS payload overhead to 178 qemu-img
- measure test
-References: <20190123103323.4516-1-stefanha@redhat.com>
- <20190123103323.4516-3-stefanha@redhat.com>
-In-Reply-To: <20190123103323.4516-3-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 23.01.19 11:33, Stefan Hajnoczi wrote:
-> The previous patch includes the LUKS payload overhead into the qemu-img=
+> On Fri, 15 Feb 2019 at 18:45, Bandan Das <bsd@redhat.com> wrote:
+>>
+...
+>> I believe this is a false positive, there's still more data incoming
+>> and we have successfully written the data we got this time, so we return
+>> without freeing up any of the structures. I will add a comment here.
+>
+> Looking at the code I think Coverity is correct about the 'path'
+> string. We allocate this with
+>             path = g_strdup_printf("%s/%s", parent->path, s->dataset.filename);
+> and then use it in a mkdir() and an open() call, and never
+> save the pointer anywhere. But we only g_free() it in the
+> exit paths that go through "free:".
+>
+Thanks for the catch! Indeed, it's not being saved anywhere. I assumed
+without looking it's d->path but we don't need path anywhere else, so I guess
+your solution below is fair.
 
-> measure calculation for qcow2.  Update qemu-iotests 178 to exercise thi=
-s
-> new code path.
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/178           |  8 ++++++++
->  tests/qemu-iotests/178.out.qcow2 | 24 ++++++++++++++++++++++++
->  2 files changed, 32 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-> index 3f4b4a4564..23eb017ea1 100755
-> --- a/tests/qemu-iotests/178
-> +++ b/tests/qemu-iotests/178
-> @@ -142,6 +142,14 @@ for ofmt in human json; do
->              # The backing file doesn't need to exist :)
->              $QEMU_IMG measure --output=3D$ofmt -o backing_file=3Dx \
->                                -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
-> +
-> +            echo
-> +            echo "=3D=3D $fmt input image and LUKS encryption =3D=3D"
-> +            echo
-> +            $QEMU_IMG measure --output=3D$ofmt \
-> +                              --object secret,id=3Dsec0,data=3Dbase \
-> +                              -o encrypt.format=3Dluks,encrypt.key-sec=
-ret=3Dsec0 \
-> +                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
+> One simple fix to this would be to narrow the scope of 'path',
+> so we deal with it only inside the if():
+>
+>         if (s->dataset.filename) {
+>             char *path = g_strdup_printf("%s/%s", parent->path,
+> s->dataset.filename);
+>             if (s->dataset.format == FMT_ASSOCIATION) {
+>                 d->fd = mkdir(path, mask);
+>                 g_free(path);
+>                 goto free;
+>             }
+>             d->fd = open(path, O_CREAT | O_WRONLY |
+>                          O_CLOEXEC | O_NOFOLLOW, mask);
+>             g_free(path);
+>             if (d->fd == -1) {
+>                 usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
+>                                      0, 0, 0, 0);
+>                 goto done;
+>             }
+>             [...]
+>
+> and then drop the g_free(path) from the end of the function.
+>
+>
+> While I'm looking at this, that call to mkdir() looks bogus:
+>                 d->fd = mkdir(path, mask);
+> mkdir() does not return a file descriptor, it returns a
+> 0-or-negative status code (which we are not checking),
+> so storing its result into d->fd looks very weird. If
+> we ever do try to treat d->fd as an fd later on then we
+> will end up operating on stdin, which is going to have
+> very confusing effects.
+>
+Agreed, this is incorrect and confusing. I will add a test
+for mkdir. I will post a patch for this as well as set
+d->fd to -1. Thanks for taking a look.
 
-With the change in patch 1, it would be possible to set
-encrypt.iter-time=3D10, for example (default for the LUKS tests).  For me=
-,
-that decreases the test's runtime from 24 to 15 seconds.
+Bandan
 
-Pretty please? :-)
-
-Max
-
->          fi
-> =20
->          echo
-
-
---RNlivSOyUw9XkBSIOq0ENEU9hbXu0tezL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxnD7MACgkQ9AfbAGHV
-z0AwXwf+JTtmVbC2lBwLHkBEY08Tol/b3aqSTq4qSYxLwoZDUq5oezmG8x8n2yXw
-vgbLRe6i8uKm9T4k9xrZ1YZbTD4LZAirLVxVtHSirCJ9pY5gQV4GKl5uXhwAOl3/
-XaOHhP9LhFNocS675lQEWouSiaSBtP9yVnS3YfqczgOcEqyIklw1mdh4u/fs7TPz
-T6COXjRLjE/VIf9y+h0DObX51JeaoJIj0JrvIggwo5Bt4MT5zjt6U7efI3vKFPHa
-mUFg8F6G2kZZZ9nK+bTMbQvUYSDxgJVmP901waz0v7vMcL2K6d/4eEMRVoBOB7Pi
-ZPfFARRy+8Ymao1Kw+SUolf/UG+m2g==
-=fxL7
------END PGP SIGNATURE-----
-
---RNlivSOyUw9XkBSIOq0ENEU9hbXu0tezL--
+>
+> If the MTPState* is kept around and reused, should the
+> cleanup code that does close(d->fd) also set d->fd to -1,
+> so that we know that the fd has been closed and don't
+> later try to close it twice or otherwise use it ?
+>
+> thanks
+> -- PMM
