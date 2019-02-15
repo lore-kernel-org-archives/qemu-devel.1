@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39846)
+Received: from eggs.gnu.org ([209.51.188.92]:40135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gud7k-0005tD-M5
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:01:49 -0500
+	(envelope-from <clg@kaod.org>) id 1gud8L-0006Gj-9P
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:02:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gud7U-0004OA-0A
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:01:42 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 15 Feb 2019 13:01:14 +0000
-Message-ID: <6d0fca98-6b40-786e-2bd9-5eba1134d0a7@virtuozzo.com>
-References: <20190215091950.20270-1-dplotnikov@virtuozzo.com>
-	<13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
-In-Reply-To: <13099f7d-3c90-8aea-d118-47370eb3685b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3D16D2E21E3F5740A6EA31E2B9259EE0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <clg@kaod.org>) id 1gud8K-0005QE-FK
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:02:25 -0500
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:47650)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gud8K-0005Or-8k
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:02:24 -0500
+Received: from player789.ha.ovh.net (unknown [10.109.159.159])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id A30C4F3A02
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 14:02:21 +0100 (CET)
+References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
+	<155023083585.1011724.2868047424353921455.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <57083069-924d-ddc5-2132-2e3b9588e968@kaod.org>
+Date: Fri, 15 Feb 2019 14:02:16 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: don't set the same context
+In-Reply-To: <155023083585.1011724.2868047424353921455.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 09/10] spapr/irq: Use the "simple" ICS
+ class for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +32,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Denis Lunev <den@virtuozzo.com>
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-DQoNCk9uIDE1LjAyLjIwMTkgMTU6MjksIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDIvMTUvMTkg
-MzoxOSBBTSwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPj4gQWRkcyBhIGZhc3QgcGF0aCBvbiBh
-aW8gY29udGV4dCBzZXR0aW5nIHByZXZlbnRpbmcNCj4+IHVubmVjZXNzYXJ5IGNvbnRleHQgc2V0
-dGluZyByb3V0aW5lLg0KPj4gQWxzbywgaXQgcHJldmVudHMgaXNzdWVzIHdpdGggY3ljbGljIHdh
-bGsgb2YgY2hpbGQNCj4+IGJkcy1lcyBhcHBlYXJlZCBiZWNhdXNlIG9mIHJlZ2lzdHJpbmcgYWlv
-IHdhbGtpbmcNCj4gDQo+IHJlZ2lzdGVyaW5nDQp3aWxsIGZpeCBpdA0KPiANCj4+IG5vdGlmaWVy
-czoNCj4+DQo+IA0KPj4gVGhpcyBjYW4gaGFwcGVuIGJlY2F1c2Ugb2YgIm5ldyIgY29udGV4dCBh
-dHRhY2htZW50IHRvIFZNIGRpc2sgYmRzLg0KPj4gV2hlbiBhdHRhY2hpbmcgYSBuZXcgY29udGV4
-dCB0aGUgY29ycmVzcG9uZGluZyBhaW8gY29udGV4dCBoYW5kbGVyIGlzDQo+PiBjYWxsZWQgZm9y
-IGVhY2ggb2YgYWlvX25vdGlmaWVycyByZWdpc3RlcmVkIG9uIHRoZSBWTSBkaXNrIGJkcyBjb250
-ZXh0Lg0KPj4gQW1vbmcgdGhvc2UgaGFuZGxlcnMsIHRoZXJlIGlzIHRoZSBibG9ja19qb2JfYXR0
-YWNoZWRfYWlvX2NvbnRleHQgaGFuZGxlcg0KPj4gd2hpY2ggc2V0cyBhIG5ldyBhaW8gY29udGV4
-dCBmb3IgdGhlIGJsb2NrIGpvYiBiZHMuIFdoZW4gZG9pbmcgc28sDQo+PiB0aGUgb2xkIGNvbnRl
-eHQgaXMgZGV0YWNoZWQgZnJvbSBhbGwgdGhlIGJsb2NrIGpvYiBiZHMgY2hpbGRyZW4gYW5kIG9u
-ZSBvZg0KPj4gdGhlbSBpcyB0aGUgVk0gZGlzayBiZHMsIHNlcnZpbmcgYXMgYmFja2luZyBzdG9y
-ZSBmb3IgdGhlIGJsb2Nram9iIGJkcywNCj4+IGFsdGhvdWdoIHRoZSBWTSBkaXNrIGJkcyBpcyBh
-Y3R1YWxseSB0aGUgaW5pdGlhbGl6ZXIgb2YgdGhhdCBwcm9jZXNzLg0KPj4gU2luY2UgdGhlIFZN
-IGRpc2sgYmRzIGlzIHByb3RlY3RlZCB3aXRoIHdhbGtpbmdfYWlvX25vdGlmaWVycyBmbGFnDQo+
-PiBmcm9tIGRvdWJsZSBwcm9jZXNzaW5nIGluIHJlY3Vyc2l2ZSBjYWxscywgdGhlIGFzc2VydCBm
-aXJlcy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBEZW5pcyBQbG90bmlrb3YgPGRwbG90bmlrb3ZA
-dmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBibG9jay5jIHwgNCArKysrDQo+PiAgIDEgZmls
-ZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykNCj4+DQo+IA0KPiBOYWl2ZSBxdWVzdGlvbiAtIGRv
-IHdlIGhhdmUgdG8gYWx3YXlzIGNhbGwNCj4gYXR0YWNoX2Fpb19jb250ZXh0L2RldGFjaF9haW9f
-Y29udGV4dCBpbiBwYWlycz8NCnNlZW1zLCB0byBiZSBzby4gdGhlIG9ubHkgdXNlciBkb2luZyBh
-dHRhY2gvZGV0YWNoIGlzIGJkcnZfc2V0X2Fpb19jb250ZXh0DQogICBJZiBzbywgd2lsbA0KPiBz
-aG9ydC1jaXJjdWl0aW5nIGEgbmVzdGVkIGF0dGFjaCBjYXVzZSByZWZlcmVuY2UgY291bnQgcHJv
-YmxlbXMgd2hlbiB3ZQ0KPiBjb21lIHRvIHRoZSBtYXRjaGluZyBkZXRhY2ggY2FsbHM/DQpJIGRv
-bid0IHF1aXRlIHVuZGVyc3RhbmQuIEkgc3VnZ2VzdGVkIHRoZSBzaG9ydCBjaXJjdWl0IGZvciAN
-CmJkcnZfc2V0X2Fpb19jb250ZXh0IHdoaWNoIGFjdHVhbGx5IHBhaXJzIGF0dGFjaC9kZXRhY2gg
-Y29udGV4dC4gU28sIHRoZSANCnBhaXJpbmcgaGVyZSBzaG91bGQgYmUgYSBwcm9ibGVtDQo+IA0K
-DQotLSANCkJlc3QsDQpEZW5pcw0K
+On 2/15/19 12:40 PM, Greg Kurz wrote:
+> The "simple" ICS class knows how to interract with KVM. Adapt sPAPR to use
+> it instead of the ICS KVM class.
+
+You are changing the type name. What about migration ? 
+
+Can't we move the xics_kvm_init() and xics_spapr_init() call under 
+spapr_ics_create() ? It would simplify a lot the routine I think
+if these were done before creating the ICSState. 
+
+C.
+
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/spapr_irq.c |   15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 9f43b7b3bf16..4aa8165307c7 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -67,13 +67,12 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+>   */
+>  
+>  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> -                                  const char *type_ics,
+>                                    int nr_irqs, Error **errp)
+>  {
+>      Error *local_err = NULL;
+>      Object *obj;
+>  
+> -    obj = object_new(type_ics);
+> +    obj = object_new(TYPE_ICS_SIMPLE);
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+>      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+>                                     &error_abort);
+> @@ -98,14 +97,14 @@ static void spapr_irq_init_xics(sPAPRMachineState *spapr, int nr_irqs,
+>  {
+>      MachineState *machine = MACHINE(spapr);
+>      Error *local_err = NULL;
+> +    bool xics_kvm = false;
+>  
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+>              !xics_kvm_init(spapr, &local_err)) {
+> -            spapr->ics = spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs,
+> -                                          &local_err);
+> +            xics_kvm = true;
+>          }
+> -        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> +        if (machine_kernel_irqchip_required(machine) && !xics_kvm) {
+>              error_prepend(&local_err,
+>                            "kernel_irqchip requested but unavailable: ");
+>              goto error;
+> @@ -114,12 +113,12 @@ static void spapr_irq_init_xics(sPAPRMachineState *spapr, int nr_irqs,
+>          local_err = NULL;
+>      }
+>  
+> -    if (!spapr->ics) {
+> +    if (!xics_kvm) {
+>          xics_spapr_init(spapr);
+> -        spapr->ics = spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
+> -                                      &local_err);
+>      }
+>  
+> +    spapr->ics = spapr_ics_create(spapr, nr_irqs, &local_err);
+> +
+>  error:
+>      error_propagate(errp, local_err);
+>  }
+> 
