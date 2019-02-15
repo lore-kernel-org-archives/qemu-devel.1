@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56568)
+Received: from eggs.gnu.org ([209.51.188.92]:56991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1guibk-0007WI-3c
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:53:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1guieH-000093-NQ
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1guibi-0003re-79
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:53:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1guibf-0003lu-Oo
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:53:04 -0500
-From: Bandan Das <bsd@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1guieF-0006YA-Qn
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:55:45 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:39254)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1guieE-0006Vn-GI
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 13:55:42 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id n8so18247481otl.6
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 10:55:41 -0800 (PST)
+MIME-Version: 1.0
 References: <20190130073426.11525-1-kraxel@redhat.com>
 	<20190130073426.11525-8-kraxel@redhat.com>
 	<CAFEAcA-hgtFq-LHY=73+PtQKp2J-b6LdG73+Ag_uPtwF9Z4iYg@mail.gmail.com>
-Date: Fri, 15 Feb 2019 13:45:51 -0500
-In-Reply-To: <CAFEAcA-hgtFq-LHY=73+PtQKp2J-b6LdG73+Ag_uPtwF9Z4iYg@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 14 Feb 2019 18:52:21 +0000")
-Message-ID: <jpgef886gbk.fsf@linux.bootlegged.copy>
-MIME-Version: 1.0
-Content-Type: text/plain
+	<jpgef886gbk.fsf@linux.bootlegged.copy>
+In-Reply-To: <jpgef886gbk.fsf@linux.bootlegged.copy>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Feb 2019 18:55:29 +0000
+Message-ID: <CAFEAcA8Q_73RQZOwqJSVA8AaY2D82n4Tb66gvdWP90mdroJs6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PULL 7/8] usb-mtp: breakup MTP write into smaller
  chunks
 List-Id: <qemu-devel.nongnu.org>
@@ -29,76 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Bandan Das <bsd@redhat.com>
 Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Fri, 15 Feb 2019 at 18:45, Bandan Das <bsd@redhat.com> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> > CID 1398642: This early-return case in usb_mtp_write_data() returns
+> > from the function without doing any of the cleanup (closing file,
+> > freeing data, etc). Possibly it should be "goto done;" instead ?
+> > The specific thing Coverity complains about is the memory pointed
+> > to by "path".
+> >
+>
+> I believe this is a false positive, there's still more data incoming
+> and we have successfully written the data we got this time, so we return
+> without freeing up any of the structures. I will add a comment here.
 
-> On Wed, 30 Jan 2019 at 07:41, Gerd Hoffmann <kraxel@redhat.com> wrote:
->>
->> From: Bandan Das <bsd@redhat.com>
->>
->> For every MTP_WRITE_BUF_SZ copied, this patch writes it to file before
->> getting the next block of data. The file is kept opened for the
->> duration of the operation but the sanity checks on the write operation
->> are performed only once when the write operation starts. Additionally,
->> we also update the file size in the object metadata once the file has
->> completely been written.
->>
->> Suggested-by: Gerd Hoffman <kraxel@redhat.com>
->> Signed-off-by: Bandan Das <bsd@redhat.com>
->> Message-id: 20190129131908.27924-3-bsd@redhat.com
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
-> Hi; Coverity has spotted a couple of issues with this patch:
->
->
->> +static void usb_mtp_update_object(MTPObject *parent, char *name)
->> +{
->> +    MTPObject *o =
->> +        usb_mtp_object_lookup_name(parent, name, strlen(name));
->> +
->> +    if (o) {
->> +        lstat(o->path, &o->stat);
->
-> CID 1398651: We don't check the return value of this lstat() for failure.
->
+Looking at the code I think Coverity is correct about the 'path'
+string. We allocate this with
+            path = g_strdup_printf("%s/%s", parent->path, s->dataset.filename);
+and then use it in a mkdir() and an open() call, and never
+save the pointer anywhere. But we only g_free() it in the
+exit paths that go through "free:".
 
-Thanks, will post a patch for this.
+One simple fix to this would be to narrow the scope of 'path',
+so we deal with it only inside the if():
 
->> +    }
->> +}
->> +
->>  static void usb_mtp_write_data(MTPState *s)
->>  {
->>      MTPData *d = s->data_out;
->
-> [...]
->
->> +    case WRITE_CONTINUE:
->> +    case WRITE_END:
->> +        rc = write_retry(d->fd, d->data, d->data_offset,
->> +                         d->offset - d->data_offset);
->> +        if (rc != d->data_offset) {
->>              usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
->>                                   0, 0, 0, 0);
->>              goto done;
->> +        }
->> +        if (d->write_status != WRITE_END) {
->> +            return;
->
-> CID 1398642: This early-return case in usb_mtp_write_data() returns
-> from the function without doing any of the cleanup (closing file,
-> freeing data, etc). Possibly it should be "goto done;" instead ?
-> The specific thing Coverity complains about is the memory pointed
-> to by "path".
->
+        if (s->dataset.filename) {
+            char *path = g_strdup_printf("%s/%s", parent->path,
+s->dataset.filename);
+            if (s->dataset.format == FMT_ASSOCIATION) {
+                d->fd = mkdir(path, mask);
+                g_free(path);
+                goto free;
+            }
+            d->fd = open(path, O_CREAT | O_WRONLY |
+                         O_CLOEXEC | O_NOFOLLOW, mask);
+            g_free(path);
+            if (d->fd == -1) {
+                usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
+                                     0, 0, 0, 0);
+                goto done;
+            }
+            [...]
 
-I believe this is a false positive, there's still more data incoming
-and we have successfully written the data we got this time, so we return
-without freeing up any of the structures. I will add a comment here.
+and then drop the g_free(path) from the end of the function.
 
-Bandan
 
-> thanks
-> -- PMM
+While I'm looking at this, that call to mkdir() looks bogus:
+                d->fd = mkdir(path, mask);
+mkdir() does not return a file descriptor, it returns a
+0-or-negative status code (which we are not checking),
+so storing its result into d->fd looks very weird. If
+we ever do try to treat d->fd as an fd later on then we
+will end up operating on stdin, which is going to have
+very confusing effects.
+
+
+If the MTPState* is kept around and reused, should the
+cleanup code that does close(d->fd) also set d->fd to -1,
+so that we know that the fd has been closed and don't
+later try to close it twice or otherwise use it ?
+
+thanks
+-- PMM
