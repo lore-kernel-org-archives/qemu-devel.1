@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36233)
+Received: from eggs.gnu.org ([209.51.188.92]:39705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1guZA7-0003Z8-PQ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:48:00 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1guZOt-0007Il-Pb
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:03:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1guZA6-0008Ee-TR
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:47:59 -0500
-Received: from mga07.intel.com ([134.134.136.100]:52909)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1guZA5-00082q-7S
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:47:58 -0500
-Date: Fri, 15 Feb 2019 16:47:19 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190215084719.GB5456@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190214201939.494-1-philmd@redhat.com>
-	<20190214201939.494-4-philmd@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1guZOp-0004BG-5a
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:03:15 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41206)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1guZOo-00048m-83
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:03:10 -0500
+Received: by mail-wr1-f66.google.com with SMTP id x10so9449939wrs.8
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 01:03:08 -0800 (PST)
+Date: Fri, 15 Feb 2019 10:02:55 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190215090255.p53uy3cfbwm2qeb3@steredhat>
+References: <20190214105733.25643-1-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190214201939.494-4-philmd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/9] ccid-card-passthru: Assert on a
- stricter expression
+In-Reply-To: <20190214105733.25643-1-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hostmem: fix crash when querying empty
+ host-nodes property via QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, mdroth@linux.vnet.ibm.com, ehabkost@redhat.com
 
-Would it be better to have some description?
-
-On Thu, Feb 14, 2019 at 09:19:33PM +0100, Philippe Mathieu-Daudé wrote:
->Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->---
-> hw/usb/ccid-card-passthru.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
->index 1676b5fc05..0c44b38fc2 100644
->--- a/hw/usb/ccid-card-passthru.c
->+++ b/hw/usb/ccid-card-passthru.c
->@@ -270,7 +270,7 @@ static void ccid_card_vscard_read(void *opaque, const uint8_t *buf, int size)
->     VSCMsgHeader *hdr;
+On Thu, Feb 14, 2019 at 05:57:33AM -0500, Igor Mammedov wrote:
+> QEMU will crashes with
+>  qapi/qobject-output-visitor.c:210: qobject_output_complete: Assertion `qov->root && ((&qov->stack)->slh_first == ((void *)0))' failed
+> when trying to get value of not set hostmem's "host-nodes"
+> property, HostMemoryBackend::host_nodes bitmap doesn't have
+> any bits set in it, which leads to find_first_bit() returning
+> MAX_NODES and consequently to an early return from
+> host_memory_backend_get_host_nodes() without calling visitor.
 > 
->     assert(size <= VSCARD_IN_SIZE - card->vscard_in_pos);
->-    assert(card->vscard_in_hdr < VSCARD_IN_SIZE);
->+    assert(card->vscard_in_hdr < card->vscard_in_pos);
->     memcpy(card->vscard_in_data + card->vscard_in_pos, buf, size);
->     card->vscard_in_pos += size;
->     hdr = (VSCMsgHeader *)(card->vscard_in_data + card->vscard_in_hdr);
->-- 
->2.20.1
->
+> Fix it by calling visitor even if "host-nodes" property wasn't
+> set before exiting from property getter to return valid empty
+> list.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   * fixup commit message to put emphasis on property instead
+>     local variable host_nodes and make explanation more hopefully
+>     more clear. (Markus Armbruster <armbru@redhat.com>)
+> ---
+>  backends/hostmem.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
--- 
-Wei Yang
-Help you, Help me
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
