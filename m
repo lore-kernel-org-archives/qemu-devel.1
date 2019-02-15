@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37091)
+Received: from eggs.gnu.org ([209.51.188.92]:37209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guRSv-0005R4-SX
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:34:55 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1guRTE-0005ez-06
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:35:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1guRSs-0000Eg-AX
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:34:53 -0500
-Resent-Message-Id: <E1guRSs-0000Eg-AX@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1guRSr-0008VX-9P
-	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:34:49 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155019087068.24.15325701657915930229@49fa7ef69f7b>
-In-Reply-To: <20190214190603.25030-1-peter.maydell@linaro.org>
+	(envelope-from <aik@ozlabs.ru>) id 1guRTC-0000jz-0D
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:35:11 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1guRTB-0000iX-Bl
+	for qemu-devel@nongnu.org; Thu, 14 Feb 2019 19:35:09 -0500
+Received: by mail-pg1-x542.google.com with SMTP id u9so399384pgo.7
+	for <qemu-devel@nongnu.org>; Thu, 14 Feb 2019 16:35:09 -0800 (PST)
+References: <20190214052144.59541-1-aik@ozlabs.ru>
+	<20190214163743.7162ad53@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <f8effbfc-e42e-acad-d141-a84a8aa04b92@ozlabs.ru>
+Date: Fri, 15 Feb 2019 11:35:02 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Feb 2019 16:34:31 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/27] target-arm queue
+In-Reply-To: <20190214163743.7162ad53@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2 0/4] spapr_pci,
+ vfio: NVIDIA V100 + POWER9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Reza Arbab <arbab@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNDE5MDYwMy4yNTAz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzI3XSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTQxOTA2MDMu
-MjUwMzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MDIxNDE5MDYw
-My4yNTAzMC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCmY3NDM5NmQxMTYgZ2Ric3R1YjogU2VuZCBhIHJlcGx5IHRvIHRoZSB2S2lsbCBw
-YWNrZXQuCjUyYzE4NTczOTEgdGFyZ2V0L2FybTogQWRkIG1pc3NpbmcgY2xlYXJfdGFpbCBjYWxs
-cwoyZjFhZWY5NmVjIHRhcmdldC9hcm06IFVzZSB2ZWN0b3Igb3BlcmF0aW9ucyBmb3Igc2F0dXJh
-dGlvbgo4MDY4M2U1YmMxIHRhcmdldC9hcm06IFNwbGl0IG91dCBGUFNDUi5RQyB0byBhIHZlY3Rv
-ciBmaWVsZAo1ZDFkMjZmOWViIHRhcmdldC9hcm06IEZpeCBzZXQgb2YgYml0cyBrZXB0IGluIHhy
-ZWdzW0FSTV9WRlBfRlBTQ1JdCjA2ZmU0ODc5OWQgdGFyZ2V0L2FybTogU3BsaXQgb3V0IGZsYWdz
-IHNldHRpbmcgZnJvbSB2ZnAgY29tcGFyZXMKZDBjZTYyNTEzZSB0YXJnZXQvYXJtOiBGaXggYXJt
-X2NwdV9kdW1wX3N0YXRlIHZzIEZQU0NSCmYzODI5MTcxMDUgdGFyZ2V0L2FybTogRml4IHZmcF9n
-ZGJfZ2V0L3NldF9yZWcgdnMgRlBTQ1IKMjFjODBlZDljZCB0YXJnZXQvYXJtOiBSZW1vdmUgbmVv
-biBtaW4vbWF4IGhlbHBlcnMKODIyNDM0ZWIyNiB0YXJnZXQvYXJtOiBVc2UgdGNnIGludGVnZXIg
-bWluL21heCBwcmltaXRpdmVzIGZvciBuZW9uCmVjNDdlOGM5MTYgdGFyZ2V0L2FybTogVXNlIHZl
-Y3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDMyCjhlMWM5NmY2ODMgdGFyZ2V0L2FybTog
-VXNlIHZlY3RvciBtaW5tYXggZXhwYW5kZXJzIGZvciBhYXJjaDY0CjVjZTEyNzVlNjUgdGFyZ2V0
-L2FybTogUmVseSBvbiBvcHRpbWl6YXRpb24gd2l0aGluIHRjZ19nZW5fZ3ZlY19vcgo3Y2YyMWQ1
-NjQ4IGh3L2FybS9hcm1zc2U6IEZpeCBtaXN3aXJpbmcgb2YgZXhwYW5zaW9uIElSUXMKZmM0ZjRm
-YmUxYyBody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxCmRm
-NGUxY2E3MWQgTUFJTlRBSU5FUlM6IFJlbW92ZSBQZXRlciBDcm9zdGh3YWl0ZSBmcm9tIHZhcmlv
-dXMgZW50cmllcwowODE4ZjU0NGQ2IGFybTogQWxsb3cgc3lzdGVtIHJlZ2lzdGVycyBmb3IgS1ZN
-IGd1ZXN0cyB0byBiZSBjaGFuZ2VkIGJ5IFFFTVUgY29kZQoyOWFlNDRhNTk1IGxpbnV4LXVzZXIv
-ZWxmbG9hZDogZW5hYmxlIEhXQ0FQX0NQVUlEIGZvciBBQXJjaDY0CmY1ZWIyZjdjNTcgdGFyZ2V0
-L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCByZWdpc3RlcnMgYXMgUkFaCmFjMGExNDMxM2Ug
-dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UKMDI2M2Q5YWIyZCB0YXJn
-ZXQvYXJtOiBleHBvc2UgQ1BVSUQgcmVnaXN0ZXJzIHRvIHVzZXJzcGFjZQo5YjY5YzA2ZTI4IHRh
-cmdldC9hcm06IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3Rl
-cnMKZDYxNjI4Njk4YSB0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9pbnRfY29udgoz
-ODViZTBkMDk3IHRhcmdldC9hcm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3Bl
-cmF0aW9uCjFjYzZiODYzMWQgdGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBv
-cmRlciBpbiBwYWlyZWRfY21weGNoZzY0X2JlCjJkMmI3M2RjNGQgdGFyZ2V0L2FybTogSW1wbGVt
-ZW50IEhBQ1JfRUwyCjg2Zjc1ZGRmZGQgdGFyZ2V0L2FybTogRml4IENSbiB0byBiZSAxNCBmb3Ig
-UE1FVlRZUEVSL1BNRVZDTlRSCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzI3IENoZWNraW5nIGNv
-bW1pdCA4NmY3NWRkZmRkZmMgKHRhcmdldC9hcm06IEZpeCBDUm4gdG8gYmUgMTQgZm9yIFBNRVZU
-WVBFUi9QTUVWQ05UUikKMi8yNyBDaGVja2luZyBjb21taXQgMmQyYjczZGM0ZDZjICh0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgSEFDUl9FTDIpCjMvMjcgQ2hlY2tpbmcgY29tbWl0IDFjYzZiODYzMWQ0
-MiAodGFyZ2V0L2FybTogRml4IGludDEyOF9tYWtlMTI4IGxvLCBoaSBvcmRlciBpbiBwYWlyZWRf
-Y21weGNoZzY0X2JlKQo0LzI3IENoZWNraW5nIGNvbW1pdCAzODViZTBkMDk3N2EgKHRhcmdldC9h
-cm06IEZvcmNlIHJlc3VsdCBzaXplIGludG8gZHAgYWZ0ZXIgb3BlcmF0aW9uKQo1LzI3IENoZWNr
-aW5nIGNvbW1pdCBkNjE2Mjg2OThhMjUgKHRhcmdldC9hcm06IFJlc3RydWN0dXJlIGRpc2FzX2Zw
-X2ludF9jb252KQo2LzI3IENoZWNraW5nIGNvbW1pdCA5YjY5YzA2ZTI4ZDQgKHRhcmdldC9hcm06
-IHJlbGF4IHBlcm1pc3Npb24gY2hlY2tzIGZvciBIV0NBUF9DUFVJRCByZWdpc3RlcnMpCjcvMjcg
-Q2hlY2tpbmcgY29tbWl0IDAyNjNkOWFiMmRlOSAodGFyZ2V0L2FybTogZXhwb3NlIENQVUlEIHJl
-Z2lzdGVycyB0byB1c2Vyc3BhY2UpCjgvMjcgQ2hlY2tpbmcgY29tbWl0IGFjMGExNDMxM2ViMiAo
-dGFyZ2V0L2FybTogZXhwb3NlIE1QSURSX0VMMSB0byB1c2Vyc3BhY2UpCjkvMjcgQ2hlY2tpbmcg
-Y29tbWl0IGY1ZWIyZjdjNTc0MCAodGFyZ2V0L2FybTogZXhwb3NlIHJlbWFpbmluZyBDUFVJRCBy
-ZWdpc3RlcnMgYXMgUkFaKQoxMC8yNyBDaGVja2luZyBjb21taXQgMjlhZTQ0YTU5NTFiIChsaW51
-eC11c2VyL2VsZmxvYWQ6IGVuYWJsZSBIV0NBUF9DUFVJRCBmb3IgQUFyY2g2NCkKMTEvMjcgQ2hl
-Y2tpbmcgY29tbWl0IDA4MThmNTQ0ZDZjZCAoYXJtOiBBbGxvdyBzeXN0ZW0gcmVnaXN0ZXJzIGZv
-ciBLVk0gZ3Vlc3RzIHRvIGJlIGNoYW5nZWQgYnkgUUVNVSBjb2RlKQoxMi8yNyBDaGVja2luZyBj
-b21taXQgZGY0ZTFjYTcxZGU2IChNQUlOVEFJTkVSUzogUmVtb3ZlIFBldGVyIENyb3N0aHdhaXRl
-IGZyb20gdmFyaW91cyBlbnRyaWVzKQoxMy8yNyBDaGVja2luZyBjb21taXQgZmM0ZjRmYmUxYzk4
-IChody9pbnRjL2FybXY3bV9udmljOiBBbGxvdyBieXRlIGFjY2Vzc2VzIHRvIFNIUFIxKQoxNC8y
-NyBDaGVja2luZyBjb21taXQgN2NmMjFkNTY0ODI5IChody9hcm0vYXJtc3NlOiBGaXggbWlzd2ly
-aW5nIG9mIGV4cGFuc2lvbiBJUlFzKQoxNS8yNyBDaGVja2luZyBjb21taXQgNWNlMTI3NWU2NWVl
-ICh0YXJnZXQvYXJtOiBSZWx5IG9uIG9wdGltaXphdGlvbiB3aXRoaW4gdGNnX2dlbl9ndmVjX29y
-KQoxNi8yNyBDaGVja2luZyBjb21taXQgOGUxYzk2ZjY4MzQ0ICh0YXJnZXQvYXJtOiBVc2UgdmVj
-dG9yIG1pbm1heCBleHBhbmRlcnMgZm9yIGFhcmNoNjQpCjE3LzI3IENoZWNraW5nIGNvbW1pdCBl
-YzQ3ZThjOTE2OWIgKHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgbWlubWF4IGV4cGFuZGVycyBmb3Ig
-YWFyY2gzMikKMTgvMjcgQ2hlY2tpbmcgY29tbWl0IDgyMjQzNGViMjY3NyAodGFyZ2V0L2FybTog
-VXNlIHRjZyBpbnRlZ2VyIG1pbi9tYXggcHJpbWl0aXZlcyBmb3IgbmVvbikKMTkvMjcgQ2hlY2tp
-bmcgY29tbWl0IDIxYzgwZWQ5Y2Q2ZSAodGFyZ2V0L2FybTogUmVtb3ZlIG5lb24gbWluL21heCBo
-ZWxwZXJzKQoyMC8yNyBDaGVja2luZyBjb21taXQgZjM4MjkxNzEwNTI5ICh0YXJnZXQvYXJtOiBG
-aXggdmZwX2dkYl9nZXQvc2V0X3JlZyB2cyBGUFNDUikKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVu
-dHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6
-ODQ6CisgICAgY2FzZSAxOiBzdGxfcChidWYsIHZmcF9nZXRfZnBzY3IoZW52KSk7IHJldHVybiA0
-OwoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMzQ6
-IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MTEwOgorICAgIGNhc2UgMTogdmZwX3NldF9mcHNj
-cihlbnYsIGxkbF9wKGJ1ZikpOyByZXR1cm4gNDsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
-cywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjIxLzI3IENoZWNraW5nIGNvbW1pdCBkMGNlNjI1MTNlYWUgKHRhcmdldC9hcm06IEZpeCBh
-cm1fY3B1X2R1bXBfc3RhdGUgdnMgRlBTQ1IpCjIyLzI3IENoZWNraW5nIGNvbW1pdCAwNmZlNDg3
-OTlkYzAgKHRhcmdldC9hcm06IFNwbGl0IG91dCBmbGFncyBzZXR0aW5nIGZyb20gdmZwIGNvbXBh
-cmVzKQoyMy8yNyBDaGVja2luZyBjb21taXQgNWQxZDI2ZjllYmE5ICh0YXJnZXQvYXJtOiBGaXgg
-c2V0IG9mIGJpdHMga2VwdCBpbiB4cmVnc1tBUk1fVkZQX0ZQU0NSXSkKMjQvMjcgQ2hlY2tpbmcg
-Y29tbWl0IDgwNjgzZTViYzE1YSAodGFyZ2V0L2FybTogU3BsaXQgb3V0IEZQU0NSLlFDIHRvIGEg
-dmVjdG9yIGZpZWxkKQoyNS8yNyBDaGVja2luZyBjb21taXQgMmYxYWVmOTZlYzEwICh0YXJnZXQv
-YXJtOiBVc2UgdmVjdG9yIG9wZXJhdGlvbnMgZm9yIHNhdHVyYXRpb24pCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzYwOiBGSUxFOiB0YXJnZXQvYXJt
-L3ZlY19oZWxwZXIuYzo3NzQ6CisgICAgVFlQRU4gKmQgPSB2ZCwgKm4gPSB2bjsgVFlQRU0gKm0g
-PSB2bTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MzggbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMjUvMjcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjI2LzI3
-IENoZWNraW5nIGNvbW1pdCA1MmMxODU3MzkxZDggKHRhcmdldC9hcm06IEFkZCBtaXNzaW5nIGNs
-ZWFyX3RhaWwgY2FsbHMpCjI3LzI3IENoZWNraW5nIGNvbW1pdCBmNzQzOTZkMTE2OGEgKGdkYnN0
-dWI6IFNlbmQgYSByZXBseSB0byB0aGUgdktpbGwgcGFja2V0LikKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTQxOTA2MDMuMjUwMzAtMS1w
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+
+
+On 15/02/2019 10:37, Alex Williamson wrote:
+> On Thu, 14 Feb 2019 16:21:40 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> This is for passing through NVIDIA V100 GPUs on POWER9 systems.
+>>
+>> This implements a subdriver for NVIDIA V100 GPU with coherent memory and
+>> NPU/ATS support available in the POWER9 CPU.
+>>
+>> 1/4 is a preparation for bigger DMA windows.
+>> 2/4 is a small cleanup.
+>>
+>> Here is the kernel driver:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/vfio/pci?h=v5.0-rc6&id=7f92891778dff62303c070ac81de7b7d80de331a
+>>
+>> SLOF changes already went in.
+>>
+>> This depends on "pci: Move NVIDIA vendor id to the rest of ids" (posted separately).
+> 
+> TBH, I'm not sure it was the best idea to let it live or die on it's
+> own when it now creates a build dependency for this series.
+I am sure that patch is disgustingly primitive and can make it to
+upstream in just one click and the rest of the series will take more
+time anyway (always does :) ).
+
+>> This is based on sha1
+>> 1ea6057 Mark Cave-Ayland "mac_newworld: change default NIC to sungem for mac99 machine".
+> 
+> Perhaps this is why it doesn't apply cleanly against qemu.git.  Are
+> there dependencies we need to wait for in the ppc tree as well?
+
+There are few changes in spapr_pci so conflicts are possible, every time
+when David updates his tree and I rebase I get some minor ones.
+
+>> Please comment. Thanks.
+> 
+> Besides the build dependency on PCI_VENDOR_ID_NVIDIA, I also get this:
+> 
+> .../qemu.git/hw/vfio/spapr.c: In function ‘vfio_spapr_create_window’:
+> .../qemu.git/hw/vfio/spapr.c:212:9: error: ‘ret’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>          error_report("Failed to create a window, ret = %d (%m)", ret);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+
+Agrh. How exactly do you make them errors, not warnings? I get no
+warning/error with --disable-werror but not having  --disable-werror
+prints warnings, not errors so it does not fail the build and easy to miss.
+
+> Is this series expected to go in through the ppc branch given the bulk
+> of the changes are there?  Thanks,
+
+I think so.
+
+
+-- 
+Alexey
