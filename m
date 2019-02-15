@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35943)
+Received: from eggs.gnu.org ([209.51.188.92]:38372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gujGj-0003d4-VO
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:35:31 -0500
+	(envelope-from <bounces@canonical.com>) id 1gujVh-00078x-CU
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gujGi-0000GP-OM
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:35:29 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37244)
+	(envelope-from <bounces@canonical.com>) id 1gujVf-0003HL-El
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:50:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41534)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gujGi-0000FE-HN
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:35:28 -0500
+	id 1gujVd-00036K-IB
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:50:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gujGh-0000tv-4d
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 19:35:27 +0000
+	id 1gujVa-0003LZ-Qk
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 19:50:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1E66F2E8050
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 19:35:27 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C87AD2E80CD
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 19:50:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Feb 2019 19:26:53 -0000
-From: Kris M <krislema2@gmail.com>
+Date: Fri, 15 Feb 2019 19:45:21 -0000
+From: Jeremy Bicha <jeremy@bicha.net>
 Reply-To: Bug 1816052 <1816052@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <155024186658.3618.3655538630796654144.malonedeb@wampee.canonical.com>
-Message-Id: <155025881389.3692.8069933331890287761.malone@wampee.canonical.com>
+Message-Id: <155025992182.5762.7797202510358881540.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1816052] Re: qemu system emulator fails to start
  if no sound card is present on host
@@ -39,16 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Don't know if same but just noticed "no sound" unless I unplug and
-replug headphones. If I boot with no headphones plugged in I get no
-sound, but if I plug in headphones I get sound. Of course, then, if I
-unplug headphones I still get sound. Something about plugging/unplugging
-to the headphones jack wakes things up.
-
-ThinkPad T530-2394-3J8, i5-3380M 2.9GHz, Dual boot (BIOS/MBR): Grub,
-Ubuntu 18.10 / Win7 Pro x64 . 8GB(15GB/s), Sammy 250GB SSD. Fast!
-
-4.19.0-13 kern and previous. current: I take all updates.
+Kris, your situation is completely different.
 
 -- =
 
