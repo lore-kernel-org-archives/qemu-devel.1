@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33010)
+Received: from eggs.gnu.org ([209.51.188.92]:33147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gugpq-0000vH-Ct
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:59:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gugqP-0001IY-PU
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gugpn-0003BN-OV
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:59:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gugpl-00037n-RR
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:59:30 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190215122808.22301-1-alex.bennee@linaro.org>
-	<60e020d0-ad5d-6b86-e492-1d3c91c48a13@redhat.com>
-	<87lg2hujld.fsf@dusky.pond.sub.org>
-Date: Fri, 15 Feb 2019 17:59:26 +0100
-In-Reply-To: <87lg2hujld.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 15 Feb 2019 17:01:18 +0100")
-Message-ID: <871s49vvgx.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1gugqL-00045L-LS
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:07 -0500
+References: <20181203175211.8230-1-mreitz@redhat.com>
+	<20181203175211.8230-4-mreitz@redhat.com>
+	<1abab9a3-331c-5e37-7eea-64078680011d@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <55b60490-4a90-4385-029f-5be9c3c2f0a4@redhat.com>
+Date: Fri, 15 Feb 2019 17:59:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] hw/block: report when pflash backing
- file isn't aligned
+In-Reply-To: <1abab9a3-331c-5e37-7eea-64078680011d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AkWVVIZGesXPEvW6viMdYXaqs2Fp2uR7j"
+Subject: Re: [Qemu-devel] [PATCH for-next 3/6] blkdebug: Add @iotype error
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, stappers@stappers.nl
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AkWVVIZGesXPEvW6viMdYXaqs2Fp2uR7j
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <55b60490-4a90-4385-029f-5be9c3c2f0a4@redhat.com>
+Subject: Re: [PATCH for-next 3/6] blkdebug: Add @iotype error option
+References: <20181203175211.8230-1-mreitz@redhat.com>
+ <20181203175211.8230-4-mreitz@redhat.com>
+ <1abab9a3-331c-5e37-7eea-64078680011d@redhat.com>
+In-Reply-To: <1abab9a3-331c-5e37-7eea-64078680011d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Laszlo Ersek <lersek@redhat.com> writes:
->
->> On 02/15/19 13:28, Alex Benn=C3=A9e wrote:
->>> It looks like there was going to be code to check we had some sort of
->>> alignment so lets replace it with an actual check. This is a bit more
->>> useful than the enigmatic "failed to read the initial flash content"
->>> when we attempt to read the number of bytes the device should have.
->>>=20
->>> This is a potential confusing stumbling block when you move from using
->>> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
->>> loading your firmware code.
->>>=20
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>=20
->>> ---
->>> v2
->>>   - use PRIu64 instead of PRId64
->>>   - tweaked message output
->>> ---
->>>  hw/block/pflash_cfi01.c | 20 ++++++++++++++------
->>>  1 file changed, 14 insertions(+), 6 deletions(-)
->>>=20
->>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->>> index bffb4c40e7..7532c8d8e8 100644
->>> --- a/hw/block/pflash_cfi01.c
->>> +++ b/hw/block/pflash_cfi01.c
->>> @@ -722,12 +722,20 @@ static void pflash_cfi01_realize(DeviceState *dev=
-, Error **errp)
->>>      }
->>>      device_len =3D sector_len_per_device * blocks_per_device;
->>>=20=20
->>> -    /* XXX: to be fixed */
->>> -#if 0
->>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 =
-* 1024) &&
->>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024=
- * 1024))
->>> -        return NULL;
->>> -#endif
->
-> pflash_cfi02_realize() has the same XXX.
->
-> There's a pair of related XXXs in taihu_405ep_init().  Related because
-> @total_len is computed like this
->
->     total_len =3D pfl->sector_len * pfl->nb_blocs;
->
-> and the two factors come from callers of pflash_cfi01_realize(),
-> pflash_cfi02_realize(), or from ve_pflash_cfi01_register(),
-> xtfpga_flash_init().  Aside: the latter two are slight variations of
-> pflash_cfi01_realize() which I'm going to clean up.  Some of these use
-> fixed sizes (good, real machines do that, too).  Some of them compute
-> them from blk_getlength(), with varying levels of care.
+On 14.02.19 03:35, Eric Blake wrote:
+> On 12/3/18 11:52 AM, Max Reitz wrote:
+>> This new error option allows users of blkdebug to inject errors only o=
+n
+>> certain kinds of I/O operations.  Users usually want to make a very
+>> specific operation fail, not just any; but right now they simply hope
+>> that the event that triggers the error injection is followed up with
+>> that very operation.  That may not be true, however, because the block=
 
-Missed one: create_one_flash().
+>> layer is changing (including blkdebug, which may increase the number o=
+f
+>> types of I/O operations on which to inject errors).
+>>
+>> The new option's default has been chosen to keep backwards
+>> compatibility.
+>>
+>> Note that similar to the internal representation, we could choose to
+>> expose this option as a list of I/O types.  But there is no practical
+>> use for this, because as described above, users usually know exactly
+>> which kind of operation they want to make fail, so there is no need to=
 
-Let's review flash size computation.
+>> specify multiple I/O types at once.  In addition, exposing this option=
 
-Single fixed size per machine type:
+>> as a list would require non-trivial changes to qemu_opts_absorb_qdict(=
+).
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> If you want @iotype be a list, I have patches.
+>=20
+> Might be interesting to see, whether or not we take them.
 
-    collie_init()               0x02000000 (two times)
-    connex_init()               0x01000000
-    verdex_init()               0x02000000
-    mainstone_common_init()     0x02000000
-    sx1_init()                  (16 * 1024 * 1024) for sx1-v1
-                                (32 * 1024 * 1024) for sx1
-                                ( 8 * 1024 * 1024) for sx1-v1
-    versatile_init()            (64 * 1024 * 1024)
-    z2_init()                   0x00800000
-    milkymist_init()            32 * MiB
-    petalogix_ml605_init()      (32 * MiB)
-    petalogix_s3adsp1800_init() (16 * MiB)
-    mips_malta_init()           (4 * MiB)
-    mips_r4k_init()             0x00400000
-    virtex_init()               (16 * MiB)
-    digic4_add_k8p3215uqb_rom() (4 * 1024 * 1024)
-    zynq_init()                 (64 * 1024 * 1024)
-    lm32_evr_init()             32 * MiB
-    lm32_uclinux_init()         32 * MiB
-    taihu_405ep_init()          32 * MiB (but see below)
-    r2d_init()                  0x02000000
-    ve_pflash_cfi01_register()  (64 * 1024 * 1024)
-    xtfpga_flash_init()         0x00400000 for lx60*
-                                0x01000000 for lx200*
-                                0x01000000 for ml605*
-                                0x08000000 for kc705*
-    create_one_flash()          0x08000000 / 2 (two times)
+Here you go:
 
-Set of fixed sizes:
+https://git.xanclic.moe/XanClic/qemu/commit/f4fcf47cb24b24040d3f0b2306403=
+b0a17b51439
+https://git.xanclic.moe/XanClic/qemu/commit/bffaabee7e1995df2adfb6183dec5=
+a2cf6a8e8c8
 
-    musicpal_init()             image size, either 8*1024*1024,
-                                16*1024*1024 or 32*1024*1024
+>> ---
+>>  qapi/block-core.json | 26 +++++++++++++++++++++++
+>>  block/blkdebug.c     | 50 ++++++++++++++++++++++++++++++++++++-------=
+-
+>>  2 files changed, 67 insertions(+), 9 deletions(-)
+>>
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Troublemakers:
+Once more, thanks!
 
-    pc_system_flash_init()      sum of image sizes, at most 8MiB
-                                rejects images whose size is not a
-                                multiple of 4KiB
-    sam460ex_load_uboot()       image size rounded up to multiple of
-                                64KiB
-    ref405ep_init()             image size rounded up to multiple of
-                                64KiB
-    taihu_405ep_init()          image size rounded up to multiple of
-                                64KiB
+Max
 
-> I'm afraid we need to take all that into account.
 
-We can ignore all but the four troublemakers.
+--AkWVVIZGesXPEvW6viMdYXaqs2Fp2uR7j
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-[...]
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxm8A0ACgkQ9AfbAGHV
+z0Ab5wf/VNKlXIE25QX1fg1CvIxAe8Sv1+pMb5C4Glc3dQbcdZEpnFNt84YAbvIC
+CWVfLDVC+vqwn+Aym5uYIKCIpkHnuiV6iVpJzMLX6VB7B5W0xIzlIa6V2GVWYS1v
+eehz2yZYjWwePowEpO+rVFthRoSlkIsUGHehdj+VYWZW93jS+4rlGQxoOGD/iZeR
+ze3V+sNo3ZQX4KMbGCMfJ7eYsSOYES8o1p56yJOsCaHEs6LOdKMBByeYZ/h1lfOH
+s6HHELkHS0jrtLimNKP3FURfGQvKPMDYF8mn2Lx4gFvR9uwoFyxoUsgJ+q8JBOp3
+Rp7x6EgVMNAkYCVdfW4qhNLJTRkF8g==
+=vRgk
+-----END PGP SIGNATURE-----
+
+--AkWVVIZGesXPEvW6viMdYXaqs2Fp2uR7j--
