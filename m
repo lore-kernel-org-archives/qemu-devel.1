@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34163)
+Received: from eggs.gnu.org ([209.51.188.92]:34387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1guZ3H-0008Vh-CO
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:40:56 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1guZ3X-0000Hk-K3
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1guZ0S-0007hg-1P
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:38:01 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 15 Feb 2019 08:37:35 +0000
-Message-ID: <f39e9aa3-b939-bdc9-f117-f3cb611c2866@virtuozzo.com>
-References: <20190124074825.2327-1-dplotnikov@virtuozzo.com>
-	<20190208110330.GC4494@dhcp-200-176.str.redhat.com>
-In-Reply-To: <20190208110330.GC4494@dhcp-200-176.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7F54C70416EA9D4C9CDCF630698C5011@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1guYsL-0007Lo-0m
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:29:37 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52234)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1guYsK-0007J1-Pk
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 03:29:36 -0500
+Received: by mail-wm1-f68.google.com with SMTP id m1so9026689wml.2
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 00:29:36 -0800 (PST)
+References: <20190214152251.2073-1-armbru@redhat.com>
+	<87h8d65r6k.fsf@dusky.pond.sub.org>
+	<e51e4eac-419b-bea0-6eef-8805ca45ebd6@redhat.com>
+	<875ztlzdw8.fsf_-_@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ba0a9a4c-8ed4-7d4b-d5ac-77d60d04e38a@redhat.com>
+Date: Fri, 15 Feb 2019 09:29:33 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: skip initializer BDS on recursive
- aio context attachment/detachment
+In-Reply-To: <875ztlzdw8.fsf_-_@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Proper use of unnest-vars (was: [PATCH v5 00/18]
+ qapi: add #if pre-processor conditions to generated code (part 3))
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
-DQoNCk9uIDA4LjAyLjIwMTkgMTQ6MDMsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDI0LjAxLjIw
-MTkgdW0gMDg6NDggaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IFdoZW4gdGhl
-cmUgaXMgYSBCYWNrdXAgQmxvY2sgSm9iIHJ1bm5pbmcgYW5kIHNodXRkb3duIGNvbW1hbmQgaXMg
-c2VudCB0bw0KPj4gYSBndWVzdCwgdGhlIGd1ZXN0IGNydXNoZXMgZHVlIHRvIGFzc2VydCghYnMt
-PndhbGtpbmdfYWlvX25vdGlmaWVycykuDQo+Pg0KPj4gQ2FsbCBzdGFjazoNCj4+DQo+PiAwICBf
-X0dJX3JhaXNlDQo+PiAxICBfX0dJX2Fib3J0DQo+PiAyICBfX2Fzc2VydF9mYWlsX2Jhc2UNCj4+
-IDMgIF9fR0lfX19hc3NlcnRfZmFpbA0KPj4gNCAgYmRydl9kZXRhY2hfYWlvX2NvbnRleHQgKGJz
-PTB4NTVmNTRkNjVjMDAwKSAgICAgIDw8PA0KPj4gNSAgYmRydl9kZXRhY2hfYWlvX2NvbnRleHQg
-KGJzPTB4NTVmNTRmYzhhODAwKQ0KPj4gNiAgYmRydl9zZXRfYWlvX2NvbnRleHQgKGJzPTB4NTVm
-NTRmYzhhODAwLCAuLi4pDQo+PiA3ICBibG9ja19qb2JfYXR0YWNoZWRfYWlvX2NvbnRleHQNCj4+
-IDggIGJkcnZfYXR0YWNoX2Fpb19jb250ZXh0IChicz0weDU1ZjU0ZDY1YzAwMCwgLi4uKSA8PDwN
-Cj4+IDkgIGJkcnZfc2V0X2Fpb19jb250ZXh0IChicz0weDU1ZjU0ZDY1YzAwMCkNCj4+IDEwIGJs
-a19zZXRfYWlvX2NvbnRleHQNCj4+IDExIHZpcnRpb19ibGtfZGF0YV9wbGFuZV9zdG9wDQo+PiAx
-MiB2aXJ0aW9fYnVzX3N0b3BfaW9ldmVudGZkDQo+PiAxMyB2aXJ0aW9fdm1zdGF0ZV9jaGFuZ2UN
-Cj4+IDE0IHZtX3N0YXRlX25vdGlmeSAocnVubmluZz0wLCBzdGF0ZT1SVU5fU1RBVEVfU0hVVERP
-V04pDQo+PiAxNSBkb192bV9zdG9wIChzdGF0ZT1SVU5fU1RBVEVfU0hVVERPV04sIHNlbmRfc3Rv
-cD10cnVlKQ0KPj4gMTYgdm1fc3RvcCAoc3RhdGU9UlVOX1NUQVRFX1NIVVRET1dOKQ0KPj4gMTcg
-bWFpbl9sb29wX3Nob3VsZF9leGl0DQo+PiAxOCBtYWluX2xvb3ANCj4+IDE5IG1haW4NCj4+DQo+
-PiBUaGlzIGhhcHBlbnMgYmVjYXVzZSBvZiAibmV3IiBjb250ZXh0IGF0dGFjaG1lbnQgdG8gVk0g
-ZGlzayBiZHMuDQo+PiBXaGVuIGF0dGFjaGluZyBhIG5ldyBjb250ZXh0IHRoZSBjb3JyZXNwb25k
-aW5nIGFpbyBjb250ZXh0IGhhbmRsZXIgaXMNCj4+IGNhbGxlZCBmb3IgZWFjaCBvZiBhaW9fbm90
-aWZpZXJzIHJlZ2lzdGVyZWQgb24gdGhlIFZNIGRpc2sgYmRzIGNvbnRleHQuDQo+PiBBbW9uZyB0
-aG9zZSBoYW5kbGVycyB0aGVyZSBpcyB0aGUgYmxvY2tfam9iX2F0dGFjaGVkX2Fpb19jb250ZXh0
-IGhhbmRsZXINCj4+IHdoaWNoIHNldHMgYSBuZXcgYWlvIGNvbnRleHQgZm9yIHRoZSBibG9jayBq
-b2IgYmRzLiBXaGVuIGRvaW5nIHNvLA0KPj4gdGhlIG9sZCBjb250ZXh0IGlzIGRldGFjaGVkIGZy
-b20gYWxsIHRoZSBibG9jayBqb2IgYmRzIGNoaWxkcmVuIGFuZCBvbmUgb2YNCj4+IHRoZW0gaXMg
-dGhlIFZNIGRpc2sgYmRzLCBzZXJ2aW5nIGFzIGJhY2tpbmcgc3RvcmUgZm9yIHRoZSBibG9ja2pv
-YiBiZHMsDQo+PiBhbHRob3VnaCB0aGUgVk0gZGlzayBiZHMgaXMgYWN0dWFsbHkgdGhlIGluaXRp
-YWxpemVyIG9mIHRoYXQgcHJvY2Vzcy4NCj4+IFNpbmNlIHRoZSBWTSBkaXNrIGJkcyBpcyBwcm90
-ZWN0ZWQgd2l0aCB3YWxraW5nX2Fpb19ub3RpZmllcnMgZmxhZw0KPj4gZnJvbSBkb3VibGUgcHJv
-Y2Vzc2luZyBpbiByZWN1cnNpdmUgY2FsbHMsIHRoZSBhc3NlcnQgZmlyZXMuDQo+Pg0KPj4gVGhl
-IHBhdGNoIGZpeGVzIHRoZSBwcm9ibGVtIGJ5IHNraXBwaW5nIHRoZSBiZHMtZXMgaW4gcmVjdXJz
-aXZlIGNhbGxzDQo+PiB3aGljaCBoYXZlIHN0YXJ0ZWQgYXR0YWNobWVudC9kZXRhY2htZW50IGFs
-cmVhZHkuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogRGVuaXMgUGxvdG5pa292IDxkcGxvdG5pa292
-QHZpcnR1b3p6by5jb20+DQo+IA0KPiBJJ20gbm90IHN1cmUgaWYgdGhpcyBmaXggaXMgYWN0dWFs
-bHkgY29ycmVjdCBpbiBtb3JlIHRoYW4ganVzdCB5b3VyDQo+IHNwZWNpYWwgY2FzZS4gSXQgYXNz
-dW1lcyB3aXRob3V0IGNoZWNraW5nIHRoYXQgdGhlIG5lc3RlZCBhdHRhY2ggaXMgZm9yDQo+IHRo
-ZSBzYW1lIGNvbnRleHQgYXMgdGhlIG91dGVyIGF0dGFjaC4gKE9mIGNvdXJzZSwgSSdtIG5vdCBz
-dXJlIHdoYXQgeW91DQo+IHdvdWxkIGRvIGlmIHRoZXkgd2VyZSBmb3IgZGlmZmVyZW50IGNvbnRl
-eHRzISBJdCdzIGEgY2FzZSB0byBhdm9pZCwgYW5kDQo+IGl0IHNob3VsZCBmYWlsIHZlcnkgdmlz
-aWJseSBpbnN0ZWFkIG9mIG1vdmluZyBub2RlcyB0byB1bmV4cGVjdGVkDQo+IGNvbnRleHRzLikN
-Cj4gDQo+IGJkcnZfc2V0X2Fpb19jb250ZXh0KCkgaXMgcHJldHR5IG1lc3N5LCBzbyBpdCBtYXkg
-c3RpbGwgdHVybiBvdXQgdGhhdA0KPiBsZWF2aW5nIHRoZSBncmVhdGVyIHByb2JsZW0gdW5hZHJl
-c3NlZCBhbmQganVzdCBmaXhpbmcgd2hhdCBicmVha3MgaW4NCj4gcHJhY3RpY2UgaXMgd2hhdCB3
-ZSBuZWVkIHRvIGRvLg0KPiANCj4gQnV0IGRpZCB5b3UgY29uc2lkZXIganVzdCBmb3JiaWRkaW5n
-IG5lc3RlZCBiZHJ2X3NldF9haW9fY29udGV4dCgpDQo+IGluc3RlYWQ/IEVzc2VudGlhbGx5LCBp
-bnN0ZWFkIG9mIHlvdXIgY2hlY2tzIHlvdSB3b3VsZCBhc3NlcnQNCj4gIXdhbGtpbmdfYWlvX25v
-dGlmaWVycy4gVGhpcyB3b3VsZCBzaW1wbGlmeSB0aGUgaW50ZXJmYWNlIGluc3RlYWQgb2YNCj4g
-YWRkaW5nIG1vcmUgY29tcGxleGl0eS4NCj4gDQo+IElmIEkgdW5kZXJzdGFuZCB0aGUgY29kZSBj
-b3JyZWN0bHksIGF0IHRoZSB0aW1lIG9mIHRoZSBuZXN0ZWQgY2FsbCwgdGhlDQo+IHJlc3BlY3Rp
-dmUgbm9kZXMgaGF2ZSBhbHJlYWR5IGJlZW4gbW92ZWQgdG8gdGhlIG5ldyBjb250ZXh0LCBzbyBh
-dm9pZGluZw0KPiB0aGUgbmVzdGVkIGNhbGxzIG1pZ2h0IGJlIGFzIGVhc3kgYXMgYWRkaW5nIGEg
-c2hvcnRjdXQgdG8NCj4gYmRydl9zZXRfYWlvX2NvbnRleHQoKSBmb3IgdGhpcyBjYXNlOg0KPiAN
-Cj4gICAgICBpZiAoY3R4ID09IG5ld19jb250ZXh0KSB7DQo+ICAgICAgICAgIHJldHVybjsNCj4g
-ICAgICB9DQo+IA0KWWVzLCB0aGlzIGlzIHByb2JhYmx5IHRoZSBiZXN0IHNvbHV0aW9uLiBJJ2xs
-IHNlbmQgdGhlIHBhdGNoIHNob3J0bHkuDQo+IE1vc3QgaW1wb3J0YW50bHksIHRob3VnaCwgcGxl
-YXNlIHdyaXRlIGEgdGVzdCBjYXNlIGZvciB0aGlzLiBXZSB3aWxsDQo+IHByb2JhYmx5IG5lZWQg
-dG8gcmV3b3JrIGJkcnZfc2V0X2Fpb19jb250ZXh0KCkgZnVuZGFtZW50YWxseSAoYXMgQmVydG8N
-Cj4gcmVjZW50bHkgbm90aWNlZCksIGFuZCB3ZSB3aWxsIHdhbnQgdG8gYXZvaWQgcmVncmVzc2lu
-ZyBvbiB0aGlzIGJ1Zy4NCj4gDQpXaWxsIGRvDQo+IEtldmluDQo+IA0KDQpEZW5pcw0KDQotLSAN
-CkJlc3QsDQpEZW5pcw0K
+On 15/02/19 08:53, Markus Armbruster wrote:
+> This time, $(obj-y) is very much not blank, and...
+> 
+>     @qapi/ final qapi-introspect.o qapi-types-target.o qapi-types.o qapi-visit-target.o qapi-visit.o qapi-events-target.o qapi-events.o qapi-commands-target.o qapi-commands.o
+>     [Trailing make output elided]
+> 
+> ... qapi/Makefile.obj-y *does* clobber it.  Oww.
+> 
+> How come this works anyway?
+
+It works because at this point obj-y is not used anymore, it is assigned
+to all-obj-y a couple lines before:
+
+	all-obj-y := $(obj-y)
+
+As an aside, target-obj-y seems unnecessary to me.
+
+> Perhaps unnest-vars could be more hygienic.
+
+Macro hygiene and Make in the same sentence? (well, not sentence but
+still...).
+
+> But that's not my immediate
+> concern.  All I want to know right now is whether I should refrain from
+> = and := in Makefile.objs.  Paolo, Fam?
+
+No, there is no need for that.
+
+Really the answer is that we are kind of pushing Makefiles to the limit
+here.  We do get good expressiveness, but at the cost of hiding things
+behind black magic.  In the end I think it's a net benefit, but the cost
+does exist.
+
+Paolo
