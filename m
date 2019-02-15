@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33492)
+Received: from eggs.gnu.org ([209.51.188.92]:33591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugrB-0001sn-R5
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:00 -0500
+	(envelope-from <clg@kaod.org>) id 1gugrF-0001y9-Te
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugr9-0005e2-N0
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45286)
+	(envelope-from <clg@kaod.org>) id 1gugrD-0005nN-QZ
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:01:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33546
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugr7-0005Ql-Id
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:54 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGxrma087464
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:50 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0p2tnec-1
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugrD-0005J6-JD
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:00:59 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1FH0H9E078751
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:47 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qnyvrcnfe-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:49 -0500
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 12:00:46 -0500
 Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 17:00:45 -0000
+	Fri, 15 Feb 2019 17:00:44 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 18:00:26 +0100
+Date: Fri, 15 Feb 2019 18:00:24 +0100
 In-Reply-To: <20190215170029.15641-1-clg@kaod.org>
 References: <20190215170029.15641-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215170029.15641-10-clg@kaod.org>
+Message-Id: <20190215170029.15641-8-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/12] target/ppc: Flush the TLB locally when
- the LPIDR is written
+Subject: [Qemu-devel] [PATCH 07/12] target/ppc: Add basic support for "new
+ format" HPTE as found on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,83 +46,80 @@ Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-d
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Our TCG TLB only tags whether it's a HV vs a guest access, so it must
-be flushed when the LPIDR is changed.
+POWER9 (arch v3) slightly changes the HPTE format. The B bits move
+from the first to the second half of the HPTE, and the AVPN/ARPN
+are slightly shorter.
+
+However, under SPAPR, the hypercalls still take the old format
+(and probably will for the foreseable future).
+
+The simplest way to support this is thus to convert the HPTEs from
+new to old format when reading them if the MMU model is v3 and there
+is no virtual hypervisor, leaving the rest of the code unchanged.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/helper.h             |  1 +
- target/ppc/misc_helper.c        | 15 +++++++++++++++
- target/ppc/translate_init.inc.c |  7 ++++++-
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ target/ppc/mmu-book3s-v3.h | 12 ++++++++++++
+ target/ppc/mmu-hash64.h    |  5 +++++
+ target/ppc/mmu-hash64.c    |  5 +++++
+ 3 files changed, 22 insertions(+)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index c7de04e06896..fe293937c646 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -718,6 +718,7 @@ DEF_HELPER_2(store_ptcr, void, env, tl)
- #endif
- DEF_HELPER_2(store_sdr1, void, env, tl)
- DEF_HELPER_2(store_pidr, void, env, tl)
-+DEF_HELPER_2(store_lpidr, void, env, tl)
- DEF_HELPER_FLAGS_2(store_tbl, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_2(store_tbu, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_2(store_atbl, TCG_CALL_NO_RWG, void, env, tl)
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index b88493009609..c65d1ade15c2 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -117,6 +117,21 @@ void helper_store_pidr(CPUPPCState *env, target_ulon=
-g val)
-     tlb_flush(CPU(cpu));
+diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
+index 4e59742d7eac..216ff296c088 100644
+--- a/target/ppc/mmu-book3s-v3.h
++++ b/target/ppc/mmu-book3s-v3.h
+@@ -56,6 +56,18 @@ static inline bool ppc64_v3_radix(PowerPCCPU *cpu)
+     return !!(cpu->env.spr[SPR_LPCR] & LPCR_HR);
  }
 =20
-+void helper_store_lpidr(CPUPPCState *env, target_ulong val)
++static inline void ppc64_v3_new_to_old_hpte(target_ulong *pte0,
++                                            target_ulong *pte1)
 +{
-+    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
++    /* Insert B into pte0 */
++    *pte0 =3D (*pte0 & HPTE64_V_COMMON_BITS) |
++            ((*pte1 & HPTE64_R_3_0_SSIZE_MASK) <<
++             (HPTE64_V_SSIZE_SHIFT - HPTE64_R_3_0_SSIZE_SHIFT));
 +
-+    env->spr[SPR_LPIDR] =3D val;
-+
-+    /*
-+     * We need to flush the TLB on LPID changes as we only tag HV vs
-+     * guest in TCG TLB. Also the quadrants means the HV will
-+     * potentially access and cache entries for the current LPID as
-+     * well.
-+     */
-+    tlb_flush(CPU(cpu));
++    /* Remove B from pte1 */
++    *pte1 =3D *pte1 & ~HPTE64_R_3_0_SSIZE_MASK;
 +}
 +
- void helper_store_hid0_601(CPUPPCState *env, target_ulong val)
- {
-     target_ulong hid0;
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 59e0b8676236..6f8b459e3b39 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -407,6 +407,11 @@ static void spr_write_pidr(DisasContext *ctx, int sp=
-rn, int gprn)
-     gen_helper_store_pidr(cpu_env, cpu_gpr[gprn]);
- }
+ hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, vaddr eaddr);
 =20
-+static void spr_write_lpidr(DisasContext *ctx, int sprn, int gprn)
-+{
-+    gen_helper_store_lpidr(cpu_env, cpu_gpr[gprn]);
-+}
+ int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index f11efc9cbc1f..016d6b44ee75 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -102,6 +102,11 @@ void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
+ #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
+ #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
+=20
++/* Format changes for ARCH v3 */
++#define HPTE64_V_COMMON_BITS    0x000fffffffffffffULL
++#define HPTE64_R_3_0_SSIZE_SHIFT 58
++#define HPTE64_R_3_0_SSIZE_MASK (3ULL << HPTE64_R_3_0_SSIZE_SHIFT)
 +
- static void spr_read_hior(DisasContext *ctx, int gprn, int sprn)
+ static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
  {
-     tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, excp_pre=
-fix));
-@@ -7876,7 +7881,7 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
-     spr_register_hv(env, SPR_LPIDR, "LPIDR",
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
-+                 &spr_read_generic, &spr_write_lpidr,
-                  0x00000000);
-     spr_register_hv(env, SPR_HFSCR, "HFSCR",
-                  SPR_NOACCESS, SPR_NOACCESS,
+     if (cpu->vhyp) {
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index b3c4d33faa55..9afaab8a177c 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -514,6 +514,11 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu=
+, hwaddr hash,
+         smp_rmb();
+         pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
+=20
++        /* Convert format if necessary */
++        if (cpu->env.mmu_model =3D=3D POWERPC_MMU_3_00 && !cpu->vhyp) {
++            ppc64_v3_new_to_old_hpte(&pte0, &pte1);
++        }
++
+         /* This compares V, B, H (secondary) and the AVPN */
+         if (HPTE64_V_COMPARE(pte0, ptem)) {
+             *pshift =3D hpte_page_shift(sps, pte0, pte1);
 --=20
 2.20.1
