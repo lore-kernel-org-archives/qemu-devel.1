@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41705)
+Received: from eggs.gnu.org ([209.51.188.92]:42546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gufRw-00035J-BT
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:30:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1gufWx-0004IH-GK
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:36:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gufRt-0006Dr-8u
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:30:47 -0500
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:42047)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gufRr-0005nE-8j
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:30:43 -0500
-Received: from player699.ha.ovh.net (unknown [10.109.159.152])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 167BFF3B4A
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 16:30:34 +0100 (CET)
-References: <20190128094625.4428-1-clg@kaod.org>
-	<20190128094625.4428-9-clg@kaod.org>
-	<20190212060227.GO1884@umbus.fritz.box>
-	<8adeacf3681e03343d64fac82b73505ffa122bfd.camel@kernel.crashing.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a6e5ece9-67aa-e8e2-0f07-08dc4a85afd0@kaod.org>
-Date: Fri, 15 Feb 2019 16:30:29 +0100
+	(envelope-from <thuth@redhat.com>) id 1gufWw-0006p9-PY
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:35:59 -0500
+References: <20190215133005.15955-1-david@redhat.com>
+	<20190215133005.15955-6-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c0200012-4bbd-d4ed-86ac-941f0f43bff1@redhat.com>
+Date: Fri, 15 Feb 2019 16:35:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <8adeacf3681e03343d64fac82b73505ffa122bfd.camel@kernel.crashing.org>
+In-Reply-To: <20190215133005.15955-6-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/19] target/ppc: Fix nip on power
- management instructions
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] tests/device-plug: Add CPU core
+ unplug request test for spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 2/13/19 1:04 AM, Benjamin Herrenschmidt wrote:
-> On Tue, 2019-02-12 at 17:02 +1100, David Gibson wrote:
->> On Mon, Jan 28, 2019 at 10:46:14AM +0100, C=C3=A9dric Le Goater wrote:
->>> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>>
->>> Those instructions currently raise an exception from within
->>> the helper. This tends to result in a bogus nip value in
->>> the env context (typically the beginning of the TB). Such
->>> a helper needs a gen_update_nip() first.
->>>
->>> This fixes it with a different approach which is to throw
->>> the exception from translate.c instead of the helper using
->>> gen_exception_nip() which does the right thing.
->>>
->>> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>> ---
->>>  target/ppc/excp_helper.c |  1 -
->>>  target/ppc/translate.c   | 12 ++++++++----
->>>  2 files changed, 8 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
->>> index 751d759fcc1d..8407e0ade938 100644
->>> --- a/target/ppc/excp_helper.c
->>> +++ b/target/ppc/excp_helper.c
->>> @@ -958,7 +958,6 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_i=
-nsn_t insn)
->>>       * but this doesn't seem to be a problem.
->>>       */
->>>      env->msr |=3D (1ull << MSR_EE);
->>> -    raise_exception(env, EXCP_HLT);
->>>  }
->>>  #endif /* defined(TARGET_PPC64) */
->>> =20
->>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->>> index 7d40a1fbe6bd..55281a8975e0 100644
->>> --- a/target/ppc/translate.c
->>> +++ b/target/ppc/translate.c
->>> @@ -3571,7 +3571,8 @@ static void gen_doze(DisasContext *ctx)
->>>      t =3D tcg_const_i32(PPC_PM_DOZE);
->>>      gen_helper_pminsn(cpu_env, t);
->>>      tcg_temp_free_i32(t);
->>> -    gen_stop_exception(ctx);
->>> +    /* Stop translation, as the CPU is supposed to sleep from now */
->>> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->>
->> IIUC this also changes from EXCP_STOP to EXCP_HLT, is that intentional=
-?
->=20
-> Off the top of my head, it might be to break out of the outer exec
-> loop, but I don't remember off hand.
+On 15/02/2019 14.30, David Hildenbrand wrote:
+> We can easily test this, just like PCI.
 
-yes and POWERPC_EXCP_STOP is only used under linux-user, which is the=20
-wrong value to exit from the cpu exec loop.
+... maybe add a sentence why this is only done for spapr, and not for
+s390x and x86 ?
 
-I think this is correct.
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  tests/device-plug-test.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> 
+> diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
+> index 6f7255552a..ec6cb5de7b 100644
+> --- a/tests/device-plug-test.c
+> +++ b/tests/device-plug-test.c
+> @@ -101,6 +101,21 @@ static void test_ccw_unplug(void)
+>      qtest_quit(qtest);
+>  }
+>  
+> +static void test_spapr_cpu_unplug_request(void)
+> +{
+> +    QTestState *qtest;
+> +
+> +    qtest = qtest_initf("-cpu power9_v2.0 -smp 1,maxcpus=2 "
+> +                        "-device power9_v2.0-spapr-cpu-core,core-id=1,id=dev0");
+> +
+> +    /* similar to test_pci_unplug_request */
+> +    device_del_request(qtest, "dev0");
+> +    system_reset(qtest);
+> +    wait_device_deleted_event(qtest, "dev0");
+> +
+> +    qtest_quit(qtest);
+> +}
 
-C.=20
-=20
+My initial thought was: This should go into tests/cpu-plug-test.c
+instead ... but since you need the functions that you defined here,
+looks like this is the better place here...
 
->>>  #endif /* defined(CONFIG_USER_ONLY) */
->>>  }
->>> =20
->>> @@ -3586,7 +3587,8 @@ static void gen_nap(DisasContext *ctx)
->>>      t =3D tcg_const_i32(PPC_PM_NAP);
->>>      gen_helper_pminsn(cpu_env, t);
->>>      tcg_temp_free_i32(t);
->>> -    gen_stop_exception(ctx);
->>> +    /* Stop translation, as the CPU is supposed to sleep from now */
->>> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->>>  #endif /* defined(CONFIG_USER_ONLY) */
->>>  }
->>> =20
->>> @@ -3606,7 +3608,8 @@ static void gen_sleep(DisasContext *ctx)
->>>      t =3D tcg_const_i32(PPC_PM_SLEEP);
->>>      gen_helper_pminsn(cpu_env, t);
->>>      tcg_temp_free_i32(t);
->>> -    gen_stop_exception(ctx);
->>> +    /* Stop translation, as the CPU is supposed to sleep from now */
->>> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->>>  #endif /* defined(CONFIG_USER_ONLY) */
->>>  }
->>> =20
->>> @@ -3621,7 +3624,8 @@ static void gen_rvwinkle(DisasContext *ctx)
->>>      t =3D tcg_const_i32(PPC_PM_RVWINKLE);
->>>      gen_helper_pminsn(cpu_env, t);
->>>      tcg_temp_free_i32(t);
->>> -    gen_stop_exception(ctx);
->>> +    /* Stop translation, as the CPU is supposed to sleep from now */
->>> +    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
->>>  #endif /* defined(CONFIG_USER_ONLY) */
->>>  }
->>>  #endif /* #if defined(TARGET_PPC64) */
->=20
+>  int main(int argc, char **argv)
+>  {
+>      const char *arch = qtest_get_arch();
+> @@ -120,5 +135,10 @@ int main(int argc, char **argv)
+>                         test_ccw_unplug);
+>      }
+>  
+> +    if (!strcmp(arch, "ppc64")) {
+> +        qtest_add_func("/device-plug/spapr_cpu_unplug_request",
+
+spapr-cpu-unplug-request ?
+
+> +                       test_spapr_cpu_unplug_request);
+> +    }
+> +
+>      return g_test_run();
+>  }
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
