@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33331)
+Received: from eggs.gnu.org ([209.51.188.92]:33339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1guj4r-0005Mg-6v
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:14 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1guj4s-0005NM-3w
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1guj4p-0003Dn-UI
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:13 -0500
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:44542)
+	(envelope-from <richard.henderson@linaro.org>) id 1guj4r-0003Fs-1F
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:14 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1guj4p-0003C9-Ke
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:11 -0500
-Received: by mail-pf1-x434.google.com with SMTP id u6so5266910pfh.11
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:23:11 -0800 (PST)
+	id 1guj4q-0003FR-RR
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:12 -0500
+Received: by mail-pg1-x541.google.com with SMTP id y4so5233420pgc.12
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:23:12 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 15 Feb 2019 11:22:58 -0800
-Message-Id: <20190215192302.27855-5-richard.henderson@linaro.org>
+Date: Fri, 15 Feb 2019 11:22:59 -0800
+Message-Id: <20190215192302.27855-6-richard.henderson@linaro.org>
 In-Reply-To: <20190215192302.27855-1-richard.henderson@linaro.org>
 References: <20190215192302.27855-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 4/8] target/arm: Implement ARMv8.3-JSConv
+Subject: [Qemu-devel] [PATCH v4 5/8] target/arm: Add helpers for FMLAL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,261 +29,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+Note that float16_to_float32 rightly squashes SNaN to QNaN.
+But of course pickNaNMulAdd, for ARM, selects SNaNs first.
+So we have to preserve SNaN long enough for the correct NaN
+to be selected.  Thus float16_to_float32_by_bits.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Return 0 for NaN
-v3: Return aa32 flags in FPSCR.NZCV.
----
- target/arm/cpu.h           | 10 +++++
- target/arm/helper.h        |  3 ++
- target/arm/cpu.c           |  1 +
- target/arm/cpu64.c         |  2 +
- target/arm/translate-a64.c | 26 +++++++++++
- target/arm/translate.c     | 10 +++++
- target/arm/vfp_helper.c    | 88 ++++++++++++++++++++++++++++++++++++++
- 7 files changed, 140 insertions(+)
+ target/arm/helper.h     |   5 ++
+ target/arm/vec_helper.c | 114 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 119 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 84ae6849c2..1eea1a408b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3273,6 +3273,11 @@ static inline bool isar_feature_aa32_vcma(const ARMISARegisters *id)
-     return FIELD_EX32(id->id_isar5, ID_ISAR5, VCMA) != 0;
- }
- 
-+static inline bool isar_feature_aa32_jscvt(const ARMISARegisters *id)
-+{
-+    return FIELD_EX32(id->id_isar6, ID_ISAR6, JSCVT) != 0;
-+}
-+
- static inline bool isar_feature_aa32_dp(const ARMISARegisters *id)
- {
-     return FIELD_EX32(id->id_isar6, ID_ISAR6, DP) != 0;
-@@ -3351,6 +3356,11 @@ static inline bool isar_feature_aa64_dp(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, DP) != 0;
- }
- 
-+static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
-+}
-+
- static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
- {
-     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 923e8e1525..747cb64d29 100644
+index 747cb64d29..03a613a00b 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -218,6 +218,9 @@ DEF_HELPER_FLAGS_2(rintd_exact, TCG_CALL_NO_RWG, f64, f64, ptr)
- DEF_HELPER_FLAGS_2(rints, TCG_CALL_NO_RWG, f32, f32, ptr)
- DEF_HELPER_FLAGS_2(rintd, TCG_CALL_NO_RWG, f64, f64, ptr)
+@@ -677,6 +677,11 @@ DEF_HELPER_FLAGS_5(gvec_sqsub_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(gvec_sqsub_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_2(vjcvt, TCG_CALL_NO_RWG, i32, f64, env)
-+DEF_HELPER_FLAGS_2(fjcvtzs, TCG_CALL_NO_RWG, i64, f64, ptr)
++DEF_HELPER_FLAGS_5(gvec_fmlal_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fmlal_idx_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
 +
- /* neon_helper.c */
- DEF_HELPER_FLAGS_3(neon_qadd_u8, TCG_CALL_NO_RWG, i32, env, i32, i32)
- DEF_HELPER_FLAGS_3(neon_qadd_s8, TCG_CALL_NO_RWG, i32, env, i32, i32)
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index edf6e0e1f1..8ea6569088 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2001,6 +2001,7 @@ static void arm_max_initfn(Object *obj)
-             cpu->isar.id_isar5 = t;
- 
-             t = cpu->isar.id_isar6;
-+            t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
-             t = FIELD_DP32(t, ID_ISAR6, DP, 1);
-             cpu->isar.id_isar6 = t;
- 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index eff0f164dd..69e4134f79 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -311,6 +311,7 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->isar.id_aa64isar0 = t;
- 
-         t = cpu->isar.id_aa64isar1;
-+        t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
-         t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
-@@ -344,6 +345,7 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->isar.id_isar5 = u;
- 
-         u = cpu->isar.id_isar6;
-+        u = FIELD_DP32(u, ID_ISAR6, JSCVT, 1);
-         u = FIELD_DP32(u, ID_ISAR6, DP, 1);
-         cpu->isar.id_isar6 = u;
- 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index dbce24fe32..c56e878787 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -6526,6 +6526,24 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
+ #ifdef TARGET_AARCH64
+ #include "helper-a64.h"
+ #include "helper-sve.h"
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index dfc635cf9a..224e5315b1 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -898,3 +898,117 @@ void HELPER(gvec_sqsub_d)(void *vd, void *vq, void *vn,
      }
- }
- 
-+static void handle_fjcvtzs(DisasContext *s, int rd, int rn)
-+{
-+    TCGv_i64 t = read_fp_dreg(s, rn);
-+    TCGv_ptr fpstatus = get_fpstatus_ptr(false);
-+
-+    gen_helper_fjcvtzs(t, t, fpstatus);
-+
-+    tcg_temp_free_ptr(fpstatus);
-+
-+    tcg_gen_ext32u_i64(cpu_reg(s, rd), t);
-+    tcg_gen_extrh_i64_i32(cpu_ZF, t);
-+    tcg_gen_movi_i32(cpu_CF, 0);
-+    tcg_gen_movi_i32(cpu_NF, 0);
-+    tcg_gen_movi_i32(cpu_VF, 0);
-+
-+    tcg_temp_free_i64(t);
-+}
-+
- /* Floating point <-> integer conversions
-  *   31   30  29 28       24 23  22  21 20   19 18 16 15         10 9  5 4  0
-  * +----+---+---+-----------+------+---+-------+-----+-------------+----+----+
-@@ -6601,6 +6619,14 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
-             handle_fmov(s, rd, rn, type, itof);
-             break;
- 
-+        case 0b00111110: /* FJCVTZS */
-+            if (!dc_isar_feature(aa64_jscvt, s)) {
-+                goto do_unallocated;
-+            } else if (fp_access_check(s)) {
-+                handle_fjcvtzs(s, rd, rn);
-+            }
-+            break;
-+
-         default:
-         do_unallocated:
-             unallocated_encoding(s);
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 64c5fe0df3..c1175798ac 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3718,6 +3718,13 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     rm_is_dp = false;
-                     break;
- 
-+                case 0x13: /* vjcvt */
-+                    if (!dp || !dc_isar_feature(aa32_jscvt, s)) {
-+                        return 1;
-+                    }
-+                    rd_is_dp = false;
-+                    break;
-+
-                 default:
-                     return 1;
-                 }
-@@ -4088,6 +4095,9 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     case 17: /* fsito */
-                         gen_vfp_sito(dp, 0);
-                         break;
-+                    case 19: /* vjcvt */
-+                        gen_helper_vjcvt(cpu_F0s, cpu_F0d, cpu_env);
-+                        break;
-                     case 20: /* fshto */
-                         gen_vfp_shto(dp, 16 - rm, 0);
-                         break;
-diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index 74d3030c47..f19c0606c2 100644
---- a/target/arm/vfp_helper.c
-+++ b/target/arm/vfp_helper.c
-@@ -1086,3 +1086,91 @@ int arm_rmode_to_sf(int rmode)
-     }
-     return rmode;
+     clear_tail(d, oprsz, simd_maxsz(desc));
  }
 +
 +/*
-+ * Implement float64 to int32_t conversion without saturation;
-+ * the result is supplied modulo 2^32.
++ * Convert float16 to float32, raising no exceptions and
++ * preserving exceptional values, including SNaN.
++ * This is effectively an unpack+repack operation.
 + */
-+uint64_t HELPER(fjcvtzs)(float64 value, void *vstatus)
++static float32 float16_to_float32_by_bits(uint32_t f16)
 +{
-+    float_status *status = vstatus;
-+    uint32_t exp, sign;
-+    uint64_t frac;
-+    uint32_t inexact = 1; /* !Z */
++    const int f16_bias = 15;
++    const int f32_bias = 127;
++    uint32_t sign = extract32(f16, 15, 1);
++    uint32_t exp = extract32(f16, 10, 5);
++    uint32_t frac = extract32(f16, 0, 10);
 +
-+    sign = extract64(value, 63, 1);
-+    exp = extract64(value, 52, 11);
-+    frac = extract64(value, 0, 52);
-+
-+    if (exp == 0) {
-+        /* While not inexact for IEEE FP, -0.0 is inexact for JavaScript.  */
-+        inexact = sign;
++    if (exp == 0x1f) {
++        /* Inf or NaN */
++        exp = 0xff;
++    } else if (exp == 0) {
++        /* Zero or denormal.  */
 +        if (frac != 0) {
-+            if (status->flush_inputs_to_zero) {
-+                float_raise(float_flag_input_denormal, status);
-+            } else {
-+                float_raise(float_flag_inexact, status);
-+                inexact = 1;
-+            }
++            /*
++             * Denormal; these are all normal float32.
++             * Shift the fraction so that the msb is at bit 11,
++             * then remove bit 11 as the implicit bit of the
++             * normalized float32.  Note that we still go through
++             * the shift for normal numbers below, to put the
++             * float32 fraction at the right place.
++             */
++            int shift = clz32(frac) - 21;
++            frac = (frac << shift) & 0x3ff;
++            exp = f32_bias - f16_bias - shift + 1;
 +        }
-+        frac = 0;
-+    } else if (exp == 0x7ff) {
-+        /* This operation raises Invalid for both NaN and overflow (Inf).  */
-+        float_raise(float_flag_invalid, status);
-+        frac = 0;
 +    } else {
-+        int true_exp = exp - 1023;
-+        int shift = true_exp - 52;
-+
-+        /* Restore implicit bit.  */
-+        frac |= 1ull << 52;
-+
-+        /* Shift the fraction into place.  */
-+        if (shift >= 0) {
-+            /* The number is so large we must shift the fraction left.  */
-+            if (shift >= 64) {
-+                /* The the fraction is shifted out entirely.  */
-+                frac = 0;
-+            } else {
-+                frac <<= shift;
-+            }
-+        } else if (shift > -64) {
-+            /* Normal case -- shift right and notice if bits shift out.  */
-+            inexact = (frac << (64 + shift)) != 0;
-+            frac >>= -shift;
-+        } else {
-+            /* The fraction is shifted out entirely.  */
-+            frac = 0;
-+        }
-+
-+        /* Notice overflow or inexact exceptions.  */
-+        if (true_exp > 31 || frac > (sign ? 0x80000000ull : 0x7fffffff)) {
-+            /* Overflow, for which this operation raises invalid.  */
-+            float_raise(float_flag_invalid, status);
-+            inexact = 1;
-+        } else if (inexact) {
-+            float_raise(float_flag_inexact, status);
-+        }
-+
-+        /* Honor the sign.  */
-+        if (sign) {
-+            frac = -frac;
-+        }
++        /* Normal number; adjust the bias.  */
++        exp += f32_bias - f16_bias;
 +    }
++    sign <<= 31;
++    exp <<= 23;
++    frac <<= 23 - 10;
 +
-+    /* Pack the result and the env->ZF representation of Z together.  */
-+    return deposit64(frac, 32, 32, inexact);
++    return sign | exp | frac;
 +}
 +
-+uint32_t HELPER(vjcvt)(float64 value, CPUARMState *env)
++static uint64_t load4_f16(uint64_t *ptr, int is_q, int is_2)
 +{
-+    uint64_t pair = HELPER(fjcvtzs)(value, &env->vfp.fp_status);
-+    uint32_t result = pair;
-+    uint32_t z = (pair >> 32) == 0;
++    /*
++     * Branchless load of u32[0], u64[0], u32[1], or u64[1].
++     * Load the 2nd qword iff is_q & is_2.
++     * Shift to the 2nd dword iff !is_q & is_2.
++     * For !is_q & !is_2, the upper bits of the result are garbage.
++     */
++    return ptr[is_q & is_2] >> ((is_2 & ~is_q) << 5);
++}
 +
-+    /* Store Z, clear NCV, in FPSCR.NZCF.  */
-+    env->vfp.xregs[ARM_VFP_FPSCR]
-+        = (env->vfp.xregs[ARM_VFP_FPSCR] & ~CPSR_NZCV) | (z * CPSR_Z);
++/*
++ * Note that FMLAL requires oprsz == 8 or oprsz == 16,
++ * as there is not yet SVE versions that might use blocking.
++ */
 +
-+    return result;
++void HELPER(gvec_fmlal_h)(void *vd, void *vn, void *vm,
++                          void *fpst, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc);
++    int is_s = extract32(desc, SIMD_DATA_SHIFT, 1);
++    int is_2 = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    int is_q = oprsz == 16;
++    float32 *d = vd;
++    uint64_t n_4, m_4;
++
++    /* Pre-load all of the f16 data, avoiding overlap issues.  */
++    n_4 = load4_f16(vn, is_q, is_2);
++    m_4 = load4_f16(vm, is_q, is_2);
++
++    /* Negate all inputs for FMLSL at once.  */
++    if (is_s) {
++        n_4 ^= 0x8000800080008000ull;
++    }
++
++    for (i = 0; i < oprsz / 4; i++) {
++        float32 n_1 = float16_to_float32_by_bits(n_4 >> (i * 16));
++        float32 m_1 = float16_to_float32_by_bits(m_4 >> (i * 16));
++        d[H4(i)] = float32_muladd(n_1, m_1, d[H4(i)], 0, fpst);
++    }
++    clear_tail(d, oprsz, simd_maxsz(desc));
++}
++
++void HELPER(gvec_fmlal_idx_h)(void *vd, void *vn, void *vm,
++                              void *fpst, uint32_t desc)
++{
++    intptr_t i, oprsz = simd_oprsz(desc);
++    int is_s = extract32(desc, SIMD_DATA_SHIFT, 1);
++    int is_2 = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    int index = extract32(desc, SIMD_DATA_SHIFT + 2, 3);
++    int is_q = oprsz == 16;
++    float32 *d = vd;
++    uint64_t n_4;
++    float32 m_1;
++
++    /* Pre-load all of the f16 data, avoiding overlap issues.  */
++    n_4 = load4_f16(vn, is_q, is_2);
++
++    /* Negate all inputs for FMLSL at once.  */
++    if (is_s) {
++        n_4 ^= 0x8000800080008000ull;
++    }
++
++    m_1 = float16_to_float32_by_bits(((float16 *)vm)[H2(index)]);
++
++    for (i = 0; i < oprsz / 4; i++) {
++        float32 n_1 = float16_to_float32_by_bits(n_4 >> (i * 16));
++        d[H4(i)] = float32_muladd(n_1, m_1, d[H4(i)], 0, fpst);
++    }
++    clear_tail(d, oprsz, simd_maxsz(desc));
 +}
 -- 
 2.17.2
