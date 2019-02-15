@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44063)
+Received: from eggs.gnu.org ([209.51.188.92]:44062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYy-000646-Su
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYy-000645-Sk
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYx-0002Gz-VN
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1guhYy-0002HB-3s
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:12 -0500
-Received: from forwardcorp1g.cmail.yandex.net ([87.250.241.190]:40724)
+Received: from forwardcorp1j.cmail.yandex.net ([5.255.227.105]:55741)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1guhYx-0002En-2a
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:11 -0500
+	id 1guhYx-0002FQ-Oq
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:46:12 -0500
 From: Yury Kotov <yury-kotov@yandex-team.ru>
-Date: Fri, 15 Feb 2019 20:45:43 +0300
-Message-Id: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
+Date: Fri, 15 Feb 2019 20:45:45 +0300
+Message-Id: <20190215174548.2630-3-yury-kotov@yandex-team.ru>
+In-Reply-To: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
+References: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration capability
+Subject: [Qemu-devel] [PATCH v3 2/5] migration: Introduce ignore-shared
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +30,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: wrfsh@yandex-team.ru, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, peter.maydell@linaro.org
 
-Hi,
+We want to use local migration to update QEMU for running guests.
+In this case we don't need to migrate shared (file backed) RAM.
+So, add a capability to ignore such blocks during live migration.
 
-The series adds a migration capability, which allows to skip shared RAM b=
-locks
-during the migration. It's useful for fast local migration. E.g. to updat=
-e QEMU
-for the running guests.
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+---
+ migration/migration.c | 14 ++++++++++++++
+ migration/migration.h |  1 +
+ qapi/migration.json   |  5 ++++-
+ 3 files changed, 19 insertions(+), 1 deletion(-)
 
-Usage example:
-1. Start source VM:
-   qemu-system-x86 \
-     -m 4G \
-     -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-path=3D=
-/dev/shm/mem0 \
-     -numa node,memdev=3Dmem0 \
-     -qmp unix:/tmp/qemu-qmp-1.sock,server,nowait \
-
-2. Start target VM:
-   qemu-system-x86 \
-     -m 4G \
-     -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-path=3D=
-/dev/shm/mem0 \
-     -numa node,memdev=3Dmem0 \
-     -qmp unix:/tmp/qemu-qmp-2.sock,server,nowait \
-     -incoming defer
-
-3. Enable ignore-shared capability on both VMs:
-   { "execute": "migrate-set-capabilities" , "arguments":
-     { "capabilities": [ { "capability": "x-ignore-shared", "state": true=
- } ] } }
-
-4. Start migration.
-
-Another use case I keep in mind is to migrate to file. Usage is very simi=
-lar.
-
-V2 to V3:
-* Split "migration: Introduce ignore-shared capability"
-* Serialize the capabilities as strings rather than as indexes
-* Don't allow to enable postcopy and ignore-shared together
-* Skip the test for OSs which don't have /dev/shm
-* Add a check whether shared RAM has been really skipped
-
-V1 to V2:
-* Keep migration stream compatibility
-* Reuse the existing code to ignore unwanted RAMBlocks
-* Add capability validation feature
-* ignore-external -> ignore-shared
-
-Regards,
-Yury
-
-Yury Kotov (5):
-  exec: Change RAMBlockIterFunc definition
-  migration: Introduce ignore-shared capability
-  migration: Add an ability to ignore shared RAM blocks
-  tests/migration-test: Add a test for ignore-shared capability
-  migration: Add capabilities validation
-
- exec.c                    |  38 +++++------
- include/exec/cpu-common.h |   7 +-
- migration/migration.c     |  14 ++++
- migration/migration.h     |   5 +-
- migration/postcopy-ram.c  |  48 +++++++------
- migration/ram.c           | 110 ++++++++++++++++++++++--------
- migration/rdma.c          |   9 ++-
- migration/savevm.c        | 137 ++++++++++++++++++++++++++++++++++++++
- qapi/migration.json       |   5 +-
- stubs/ram-block.c         |  15 +++++
- tests/migration-test.c    | 131 +++++++++++++++++++++++++++++-------
- util/vfio-helpers.c       |   6 +-
- 12 files changed, 420 insertions(+), 105 deletions(-)
-
+diff --git a/migration/migration.c b/migration/migration.c
+index 37e06b76dc..0fadd97fb9 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -957,6 +957,11 @@ static bool migrate_caps_check(bool *cap_list,
+             error_setg(errp, "Postcopy is not supported");
+             return false;
+         }
++
++        if (cap_list[MIGRATION_CAPABILITY_X_IGNORE_SHARED]) {
++            error_setg(errp, "Postcopy is not compatible with ignore-sha=
+red");
++            return false;
++        }
+     }
+=20
+     return true;
+@@ -1983,6 +1988,15 @@ bool migrate_dirty_bitmaps(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_DIRTY_BITMAPS];
+ }
+=20
++bool migrate_ignore_shared(void)
++{
++    MigrationState *s;
++
++    s =3D migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_X_IGNORE_SHARED]=
+;
++}
++
+ bool migrate_use_events(void)
+ {
+     MigrationState *s;
+diff --git a/migration/migration.h b/migration/migration.h
+index dcd05d9f87..4211995c53 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -261,6 +261,7 @@ bool migrate_release_ram(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
+ bool migrate_dirty_bitmaps(void);
++bool migrate_ignore_shared(void);
+=20
+ bool migrate_auto_converge(void);
+ bool migrate_use_multifd(void);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 7a795ecc16..7105570cd3 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -409,13 +409,16 @@
+ #           devices (and thus take locks) immediately at the end of migr=
+ation.
+ #           (since 3.0)
+ #
++# @x-ignore-shared: If enabled, QEMU will not migrate shared memory (sin=
+ce 4.0)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
+,
+            'block', 'return-path', 'pause-before-switchover', 'x-multifd=
+',
+-           'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate' =
+] }
++           'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate',
++           'x-ignore-shared' ] }
+=20
+ ##
+ # @MigrationCapabilityStatus:
 --=20
 2.20.1
