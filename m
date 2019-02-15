@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47061)
+Received: from eggs.gnu.org ([209.51.188.92]:47398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gufsp-0005Yz-JT
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:58:39 -0500
+	(envelope-from <alnyan@airmail.cc>) id 1guftb-0006K5-O8
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:59:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gufsm-0003OJ-Jx
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:58:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gufsj-0003L0-Da
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:58:32 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 15 Feb 2019 15:57:09 +0000
-Message-Id: <20190215155709.15777-12-berrange@redhat.com>
-In-Reply-To: <20190215155709.15777-1-berrange@redhat.com>
-References: <20190215155709.15777-1-berrange@redhat.com>
+	(envelope-from <alnyan@airmail.cc>) id 1guftS-00048U-9p
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 10:59:18 -0500
+Date: Fri, 15 Feb 2019 17:59:20 +0200
+From: Mark <alnyan@airmail.cc>
+Message-ID: <20190215155919.GA10823@nyan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 11/11] authz: delete existing ACL
- implementation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [v4 PATCH] hw/arm/bcm2835_peripherals: add bcm283x arm
+ timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,1072 +22,416 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "open list:Raspberry Pi" <qemu-arm@nongnu.org>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
-
-The 'qemu_acl' type was a previous non-QOM based attempt to provide an
-authorization facility in QEMU. Because it is non-QOM based it cannot be
-created via the command line and requires special monitor commands to
-manipulate it.
-
-The new QAuthZ subclasses provide a superset of the functionality in
-qemu_acl, so the latter can now be deleted. The HMP 'acl_*' monitor
-commands are converted to use the new QAuthZSimple data type instead
-in order to provide temporary backwards compatibility.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Mark <alnyan@airmail.cc>
 ---
- configure                      |  17 ----
- crypto/tlssession.c            |  35 ++++---
- crypto/trace-events            |   2 +-
- include/qemu/acl.h             |  66 ------------
- monitor.c                      | 179 ++++++++++++++++++++++-----------
- tests/Makefile.include         |   4 +-
- tests/test-crypto-tlssession.c |  15 ++-
- tests/test-io-channel-tls.c    |  16 ++-
- ui/vnc-auth-sasl.c             |  23 +++--
- ui/vnc-auth-sasl.h             |   5 +-
- ui/vnc-auth-vencrypt.c         |   2 +-
- ui/vnc-ws.c                    |   2 +-
- ui/vnc.c                       |  37 ++++---
- ui/vnc.h                       |   4 +-
- util/Makefile.objs             |   1 -
- util/acl.c                     | 179 ---------------------------------
- 16 files changed, 209 insertions(+), 378 deletions(-)
- delete mode 100644 include/qemu/acl.h
- delete mode 100644 util/acl.c
+ hw/arm/bcm2835_peripherals.c         |  17 ++
+ hw/timer/Makefile.objs               |   2 +
+ hw/timer/bcm283x_timer.c             | 271 +++++++++++++++++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |   2 +
+ include/hw/timer/bcm283x_timer.h     |  50 +++++
+ 5 files changed, 342 insertions(+)
+ create mode 100644 hw/timer/bcm283x_timer.c
+ create mode 100644 include/hw/timer/bcm283x_timer.h
 
-diff --git a/configure b/configure
-index 4fe916e31f..65a8c8c1db 100755
---- a/configure
-+++ b/configure
-@@ -3205,20 +3205,6 @@ if test "$xkbcommon" !=3D "no" ; then
-   fi
- fi
-=20
--##########################################
--# fnmatch() probe, used for ACL routines
--fnmatch=3D"no"
--cat > $TMPC << EOF
--#include <fnmatch.h>
--int main(void)
--{
--    fnmatch("foo", "foo", 0);
--    return 0;
--}
--EOF
--if compile_prog "" "" ; then
--   fnmatch=3D"yes"
--fi
-=20
- ##########################################
- # xfsctl() probe, used for file-posix.c
-@@ -6408,9 +6394,6 @@ if test "$xkbcommon" =3D "yes" ; then
-   echo "XKBCOMMON_CFLAGS=3D$xkbcommon_cflags" >> $config_host_mak
-   echo "XKBCOMMON_LIBS=3D$xkbcommon_libs" >> $config_host_mak
- fi
--if test "$fnmatch" =3D "yes" ; then
--  echo "CONFIG_FNMATCH=3Dy" >> $config_host_mak
--fi
- if test "$xfs" =3D "yes" ; then
-   echo "CONFIG_XFS=3Dy" >> $config_host_mak
- fi
-diff --git a/crypto/tlssession.c b/crypto/tlssession.c
-index 0dedd4af52..c3a920dfe8 100644
---- a/crypto/tlssession.c
-+++ b/crypto/tlssession.c
-@@ -24,7 +24,7 @@
- #include "crypto/tlscredspsk.h"
- #include "crypto/tlscredsx509.h"
- #include "qapi/error.h"
--#include "qemu/acl.h"
-+#include "authz/base.h"
- #include "trace.h"
-=20
- #ifdef CONFIG_GNUTLS
-@@ -37,7 +37,7 @@ struct QCryptoTLSSession {
-     QCryptoTLSCreds *creds;
-     gnutls_session_t handle;
-     char *hostname;
--    char *aclname;
-+    char *authzid;
-     bool handshakeComplete;
-     QCryptoTLSSessionWriteFunc writeFunc;
-     QCryptoTLSSessionReadFunc readFunc;
-@@ -56,7 +56,7 @@ qcrypto_tls_session_free(QCryptoTLSSession *session)
-     gnutls_deinit(session->handle);
-     g_free(session->hostname);
-     g_free(session->peername);
--    g_free(session->aclname);
-+    g_free(session->authzid);
-     object_unref(OBJECT(session->creds));
-     g_free(session);
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 6be7660e8c..e6d4d35496 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -117,6 +117,10 @@ static void bcm2835_peripherals_init(Object *obj)
+                                    OBJECT(&s->sdhci.sdbus), &error_abort);
+     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhost",
+                                    OBJECT(&s->sdhost.sdbus), &error_abort);
++
++    /* SP804-alike ARM Timer */
++    sysbus_init_child_obj(obj, "bcm283x_timer", OBJECT(&s->bcm283x_timer),
++            sizeof(s->bcm283x_timer), TYPE_BCM283xTimer);
  }
-@@ -95,7 +95,7 @@ qcrypto_tls_session_pull(void *opaque, void *buf, size_=
-t len)
- QCryptoTLSSession *
- qcrypto_tls_session_new(QCryptoTLSCreds *creds,
-                         const char *hostname,
--                        const char *aclname,
-+                        const char *authzid,
-                         QCryptoTLSCredsEndpoint endpoint,
-                         Error **errp)
- {
-@@ -105,13 +105,13 @@ qcrypto_tls_session_new(QCryptoTLSCreds *creds,
-     session =3D g_new0(QCryptoTLSSession, 1);
-     trace_qcrypto_tls_session_new(
-         session, creds, hostname ? hostname : "<none>",
--        aclname ? aclname : "<none>", endpoint);
-+        authzid ? authzid : "<none>", endpoint);
-=20
-     if (hostname) {
-         session->hostname =3D g_strdup(hostname);
-     }
--    if (aclname) {
--        session->aclname =3D g_strdup(aclname);
-+    if (authzid) {
-+        session->authzid =3D g_strdup(authzid);
-     }
-     session->creds =3D creds;
-     object_ref(OBJECT(creds));
-@@ -262,6 +262,7 @@ qcrypto_tls_session_check_certificate(QCryptoTLSSessi=
-on *session,
-     unsigned int nCerts, i;
-     time_t now;
-     gnutls_x509_crt_t cert =3D NULL;
-+    Error *err =3D NULL;
-=20
-     now =3D time(NULL);
-     if (now =3D=3D ((time_t)-1)) {
-@@ -349,19 +350,17 @@ qcrypto_tls_session_check_certificate(QCryptoTLSSes=
-sion *session,
-                            gnutls_strerror(ret));
-                 goto error;
-             }
--            if (session->aclname) {
--                qemu_acl *acl =3D qemu_acl_find(session->aclname);
--                int allow;
--                if (!acl) {
--                    error_setg(errp, "Cannot find ACL %s",
--                               session->aclname);
-+            if (session->authzid) {
-+                bool allow;
-+
-+                allow =3D qauthz_is_allowed_by_id(session->authzid,
-+                                                session->peername, &err)=
-;
-+                if (err) {
-+                    error_propagate(errp, err);
-                     goto error;
-                 }
--
--                allow =3D qemu_acl_party_is_allowed(acl, session->peerna=
-me);
--
-                 if (!allow) {
--                    error_setg(errp, "TLS x509 ACL check for %s is denie=
-d",
-+                    error_setg(errp, "TLS x509 authz check for %s is den=
-ied",
-                                session->peername);
-                     goto error;
-                 }
-@@ -555,7 +554,7 @@ qcrypto_tls_session_get_peer_name(QCryptoTLSSession *=
-session)
- QCryptoTLSSession *
- qcrypto_tls_session_new(QCryptoTLSCreds *creds G_GNUC_UNUSED,
-                         const char *hostname G_GNUC_UNUSED,
--                        const char *aclname G_GNUC_UNUSED,
-+                        const char *authzid G_GNUC_UNUSED,
-                         QCryptoTLSCredsEndpoint endpoint G_GNUC_UNUSED,
-                         Error **errp)
- {
-diff --git a/crypto/trace-events b/crypto/trace-events
-index 597389b73c..a38ad7b787 100644
---- a/crypto/trace-events
-+++ b/crypto/trace-events
-@@ -19,5 +19,5 @@ qcrypto_tls_creds_x509_load_cert(void *creds, int isSer=
-ver, const char *file) "T
- qcrypto_tls_creds_x509_load_cert_list(void *creds, const char *file) "TL=
-S creds x509 load cert list creds=3D%p file=3D%s"
-=20
- # crypto/tlssession.c
--qcrypto_tls_session_new(void *session, void *creds, const char *hostname=
-, const char *aclname, int endpoint) "TLS session new session=3D%p creds=3D=
-%p hostname=3D%s aclname=3D%s endpoint=3D%d"
-+qcrypto_tls_session_new(void *session, void *creds, const char *hostname=
-, const char *authzid, int endpoint) "TLS session new session=3D%p creds=3D=
-%p hostname=3D%s authzid=3D%s endpoint=3D%d"
- qcrypto_tls_session_check_creds(void *session, const char *status) "TLS =
-session check creds session=3D%p status=3D%s"
-diff --git a/include/qemu/acl.h b/include/qemu/acl.h
-deleted file mode 100644
-index 73d2a71c8d..0000000000
---- a/include/qemu/acl.h
-+++ /dev/null
-@@ -1,66 +0,0 @@
--/*
-- * QEMU access control list management
-- *
-- * Copyright (C) 2009 Red Hat, Inc
-- *
-- * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-- * of this software and associated documentation files (the "Software"),=
- to deal
-- * in the Software without restriction, including without limitation the=
- rights
-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-- * copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be includ=
-ed in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-- * THE SOFTWARE.
-- */
--
--#ifndef QEMU_ACL_H
--#define QEMU_ACL_H
--
--#include "qemu/queue.h"
--
--typedef struct qemu_acl_entry qemu_acl_entry;
--typedef struct qemu_acl qemu_acl;
--
--struct qemu_acl_entry {
--    char *match;
--    int deny;
--
--    QTAILQ_ENTRY(qemu_acl_entry) next;
--};
--
--struct qemu_acl {
--    char *aclname;
--    unsigned int nentries;
--    QTAILQ_HEAD(,qemu_acl_entry) entries;
--    int defaultDeny;
--};
--
--qemu_acl *qemu_acl_init(const char *aclname);
--
--qemu_acl *qemu_acl_find(const char *aclname);
--
--int qemu_acl_party_is_allowed(qemu_acl *acl,
--                              const char *party);
--
--void qemu_acl_reset(qemu_acl *acl);
--
--int qemu_acl_append(qemu_acl *acl,
--                    int deny,
--                    const char *match);
--int qemu_acl_insert(qemu_acl *acl,
--                    int deny,
--                    const char *match,
--                    int index);
--int qemu_acl_remove(qemu_acl *acl,
--                    const char *match);
--
--#endif /* QEMU_ACL_H */
-diff --git a/monitor.c b/monitor.c
-index e5de5765b8..b2a5ae5374 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -51,7 +51,8 @@
- #include "sysemu/balloon.h"
- #include "qemu/timer.h"
- #include "sysemu/hw_accel.h"
--#include "qemu/acl.h"
-+#include "authz/list.h"
-+#include "qapi/util.h"
- #include "sysemu/tpm.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
-@@ -2052,93 +2053,148 @@ static void hmp_wavcapture(Monitor *mon, const Q=
-Dict *qdict)
-     QLIST_INSERT_HEAD (&capture_head, s, entries);
- }
-=20
--static qemu_acl *find_acl(Monitor *mon, const char *name)
-+static QAuthZList *find_auth(Monitor *mon, const char *name)
- {
--    qemu_acl *acl =3D qemu_acl_find(name);
-+    Object *obj;
-+    Object *container;
-=20
--    if (!acl) {
-+    container =3D object_get_objects_root();
-+    obj =3D object_resolve_path_component(container, name);
-+    if (!obj) {
-         monitor_printf(mon, "acl: unknown list '%s'\n", name);
-+        return NULL;
-     }
--    return acl;
-+
-+    return QAUTHZ_LIST(obj);
- }
-=20
- static void hmp_acl_show(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname =3D qdict_get_str(qdict, "aclname");
--    qemu_acl *acl =3D find_acl(mon, aclname);
--    qemu_acl_entry *entry;
--    int i =3D 0;
--
--    if (acl) {
--        monitor_printf(mon, "policy: %s\n",
--                       acl->defaultDeny ? "deny" : "allow");
--        QTAILQ_FOREACH(entry, &acl->entries, next) {
--            i++;
--            monitor_printf(mon, "%d: %s %s\n", i,
--                           entry->deny ? "deny" : "allow", entry->match)=
-;
--        }
-+    QAuthZList *auth =3D find_auth(mon, aclname);
-+    QAuthZListRuleList *rules;
-+    size_t i =3D 0;
-+
-+    if (!auth) {
-+        return;
-+    }
-+
-+    monitor_printf(mon, "policy: %s\n",
-+                   QAuthZListPolicy_str(auth->policy));
-+
-+    rules =3D auth->rules;
-+    while (rules) {
-+        QAuthZListRule *rule =3D rules->value;
-+        i++;
-+        monitor_printf(mon, "%zu: %s %s\n", i,
-+                       QAuthZListPolicy_str(rule->policy),
-+                       rule->match);
-+        rules =3D rules->next;
-     }
- }
-=20
- static void hmp_acl_reset(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname =3D qdict_get_str(qdict, "aclname");
--    qemu_acl *acl =3D find_acl(mon, aclname);
-+    QAuthZList *auth =3D find_auth(mon, aclname);
-=20
--    if (acl) {
--        qemu_acl_reset(acl);
--        monitor_printf(mon, "acl: removed all rules\n");
-+    if (!auth) {
-+        return;
+
+ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+@@ -334,6 +338,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
      }
 +
-+    auth->policy =3D QAUTHZ_LIST_POLICY_DENY;
-+    qapi_free_QAuthZListRuleList(auth->rules);
-+    auth->rules =3D NULL;
-+    monitor_printf(mon, "acl: removed all rules\n");
- }
-=20
- static void hmp_acl_policy(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname =3D qdict_get_str(qdict, "aclname");
-     const char *policy =3D qdict_get_str(qdict, "policy");
--    qemu_acl *acl =3D find_acl(mon, aclname);
-+    QAuthZList *auth =3D find_auth(mon, aclname);
-+    int val;
-+    Error *err =3D NULL;
-=20
--    if (acl) {
--        if (strcmp(policy, "allow") =3D=3D 0) {
--            acl->defaultDeny =3D 0;
-+    if (!auth) {
-+        return;
-+    }
-+
-+    val =3D qapi_enum_parse(&QAuthZListPolicy_lookup,
-+                          policy,
-+                          QAUTHZ_LIST_POLICY_DENY,
-+                          &err);
++    /* SP804-alike ARM Timer */
++    object_property_set_bool(OBJECT(&s->bcm283x_timer), true, "realized", &err);
 +    if (err) {
-+        error_free(err);
-+        monitor_printf(mon, "acl: unknown policy '%s', "
-+                       "expected 'deny' or 'allow'\n", policy);
-+    } else {
-+        auth->policy =3D val;
-+        if (auth->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW) {
-             monitor_printf(mon, "acl: policy set to 'allow'\n");
--        } else if (strcmp(policy, "deny") =3D=3D 0) {
--            acl->defaultDeny =3D 1;
--            monitor_printf(mon, "acl: policy set to 'deny'\n");
-         } else {
--            monitor_printf(mon, "acl: unknown policy '%s', "
--                           "expected 'deny' or 'allow'\n", policy);
-+            monitor_printf(mon, "acl: policy set to 'deny'\n");
-         }
-     }
++        error_propagate(errp, err);
++        return;
++    }
++
++    memory_region_add_subregion(&s->peri_mr, ARMCTRL_TIMER0_1_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->bcm283x_timer), 0));
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->bcm283x_timer), 0,
++        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_ARM_IRQ,
++                               INTERRUPT_ARM_TIMER));
  }
-=20
-+static QAuthZListFormat hmp_acl_get_format(const char *match)
+
+ static void bcm2835_peripherals_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f8..09a3706701 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -47,3 +47,5 @@ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+ common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
+ common-obj-$(CONFIG_MSF2) += mss-timer.o
++
++common-obj-$(CONFIG_RASPI) += bcm283x_timer.o
+diff --git a/hw/timer/bcm283x_timer.c b/hw/timer/bcm283x_timer.c
+new file mode 100644
+index 0000000000..0f696ae61f
+--- /dev/null
++++ b/hw/timer/bcm283x_timer.c
+@@ -0,0 +1,271 @@
++/*
++ * Broadcom BCM283x ARM timer variant based on ARM SP804
++ * Copyright (c) 2019, Mark <alnyan@airmail.cc>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu/timer.h"
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/timer/bcm283x_timer.h"
++#include "qemu/main-loop.h"
++#include "qemu/log.h"
++
++#define TIMER_CTRL_32BIT            (1 << 1)
++#define TIMER_CTRL_DIV1             (0 << 2)
++#define TIMER_CTRL_DIV16            (1 << 2)
++#define TIMER_CTRL_DIV256           (2 << 2)
++#define TIMER_CTRL_IE               (1 << 5)
++#define TIMER_CTRL_ENABLE           (1 << 7)
++#define TIMER_CTRL_ENABLE_FREECNTR  (1 << 9)
++
++/* BCM283x's implementation of SP804 ARM timer */
++
++static void bcm283x_timer_set_irq(void *opaque, int irq, int level)
 +{
-+    if (strchr(match, '*')) {
-+        return QAUTHZ_LIST_FORMAT_GLOB;
++    BCM283xTimerState *s = BCM283xTimer(opaque);
++
++    s->int_level = level;
++    qemu_set_irq(s->irq, s->int_level);
++}
++
++static void bcm283x_timer_update(BCM283xTimerState *s)
++{
++    if (s->int_level && (s->control & TIMER_CTRL_IE)) {
++        qemu_irq_raise(s->irq);
 +    } else {
-+        return QAUTHZ_LIST_FORMAT_EXACT;
++        qemu_irq_lower(s->irq);
 +    }
 +}
 +
- static void hmp_acl_add(Monitor *mon, const QDict *qdict)
- {
-     const char *aclname =3D qdict_get_str(qdict, "aclname");
-     const char *match =3D qdict_get_str(qdict, "match");
--    const char *policy =3D qdict_get_str(qdict, "policy");
-+    const char *policystr =3D qdict_get_str(qdict, "policy");
-     int has_index =3D qdict_haskey(qdict, "index");
-     int index =3D qdict_get_try_int(qdict, "index", -1);
--    qemu_acl *acl =3D find_acl(mon, aclname);
--    int deny, ret;
--
--    if (acl) {
--        if (strcmp(policy, "allow") =3D=3D 0) {
--            deny =3D 0;
--        } else if (strcmp(policy, "deny") =3D=3D 0) {
--            deny =3D 1;
--        } else {
--            monitor_printf(mon, "acl: unknown policy '%s', "
--                           "expected 'deny' or 'allow'\n", policy);
--            return;
--        }
--        if (has_index)
--            ret =3D qemu_acl_insert(acl, deny, match, index);
--        else
--            ret =3D qemu_acl_append(acl, deny, match);
--        if (ret < 0)
--            monitor_printf(mon, "acl: unable to add acl entry\n");
--        else
--            monitor_printf(mon, "acl: added rule at position %d\n", ret)=
-;
-+    QAuthZList *auth =3D find_auth(mon, aclname);
-+    Error *err =3D NULL;
-+    QAuthZListPolicy policy;
-+    QAuthZListFormat format;
-+    size_t i =3D 0;
++static void bcm283x_timer_tick(void *opaque)
++{
++    BCM283xTimerState *s = BCM283xTimer(opaque);
++    s->int_level = 1;
++    bcm283x_timer_update(s);
++}
 +
-+    if (!auth) {
-+        return;
++static void bcm283x_free_timer_tick(void *opaque)
++{
++    /* Do nothing */
++}
++
++static uint64_t bcm283x_timer_read(void *opaque, hwaddr offset, unsigned size)
++{
++    BCM283xTimerState *s = BCM283xTimer(opaque);
++
++    switch (offset >> 2) {
++    case 0: /* Load register */
++    case 6: /* Reload register */
++        return s->limit;
++    case 1: /* Value register */
++        return ptimer_get_count(s->timer);
++    case 2: /* Control register */
++        return s->control;
++    case 3: /* IRQ clear/ACK register */
++        /*
++         * The register is write-only,
++         * but returns reverse "ARMT" string bytes
++         */
++        return 0x544D5241;
++    case 4: /* RAW IRQ register */
++        return s->int_level;
++    case 5: /* Masked IRQ register */
++        if ((s->control & TIMER_CTRL_IE) == 0) {
++            return 0;
++        }
++        return s->int_level;
++    case 8: /* Free-running counter */
++        return ptimer_get_count(s->free_timer);
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset %x\n", __func__, (int) offset);
++        return 0;
++    }
++}
++
++static void bcm283x_timer_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned size)
++{
++    BCM283xTimerState *s = BCM283xTimer(opaque);
++    uint32_t freq, freecntr_freq;
++
++    switch (offset >> 2) {
++    case 0: /* Load register */
++        s->limit = value;
++        ptimer_set_limit(s->timer, s->limit, 1);
++        break;
++    case 1: /* Value register */
++        /* Read only */
++        break;
++    case 2: /* Control register */
++        if (s->control & TIMER_CTRL_ENABLE) {
++            ptimer_stop(s->timer);
++        }
++
++        s->control = value;
++
++        /* Configure SP804 */
++        freq = BCM283x_SYSTEM_CLOCK_FREQ / (s->prediv + 1);
++        /* Set pre-scaler */
++        switch ((value >> 2) & 3) {
++        case 1: /* 16 */
++            freq >>= 4;
++            break;
++        case 2: /* 256 */
++            freq >>= 8;
++            break;
++        }
++        ptimer_set_limit(s->timer, s->limit, s->control & TIMER_CTRL_ENABLE);
++        ptimer_set_freq(s->timer, freq);
++
++        /* Configure free-running counter */
++        freecntr_freq = BCM283x_SYSTEM_CLOCK_FREQ /
++            (1 + ((value >> 16) & 0xFF));
++        if (s->control & TIMER_CTRL_32BIT) {
++            ptimer_set_limit(s->free_timer, 0xFFFFFFFF,
++                    s->control & TIMER_CTRL_ENABLE_FREECNTR);
++        } else {
++            ptimer_set_limit(s->free_timer, 0xFFFF,
++                    s->control & TIMER_CTRL_ENABLE_FREECNTR);
++        }
++        ptimer_set_freq(s->free_timer, freecntr_freq);
++
++        if (s->control & TIMER_CTRL_ENABLE) {
++            ptimer_run(s->timer, 0);
++        } else {
++            ptimer_stop(s->free_timer);
++        }
++
++        if (s->control & TIMER_CTRL_ENABLE_FREECNTR) {
++            ptimer_run(s->free_timer, 0);
++        } else {
++            ptimer_stop(s->free_timer);
++        }
++        break;
++    case 3: /* IRQ clear/ACK register */
++        s->int_level = 0;
++        break;
++    case 6: /* Reload register */
++        s->limit = value;
++        ptimer_set_limit(s->timer, s->limit, 0);
++        break;
++    case 7: /* Pre-divider register */
++        s->prediv = value;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset %x\n", __func__, (int) offset);
++        break;
 +    }
 +
-+    policy =3D qapi_enum_parse(&QAuthZListPolicy_lookup,
-+                             policystr,
-+                             QAUTHZ_LIST_POLICY_DENY,
-+                             &err);
-+    if (err) {
-+        error_free(err);
-+        monitor_printf(mon, "acl: unknown policy '%s', "
-+                       "expected 'deny' or 'allow'\n", policystr);
-+        return;
-+    }
++    bcm283x_timer_update(s);
++}
 +
-+    format =3D hmp_acl_get_format(match);
++static const MemoryRegionOps bcm283x_timer_ops = {
++    .read = bcm283x_timer_read,
++    .write = bcm283x_timer_write,
++    .endianness = DEVICE_NATIVE_ENDIAN
++};
 +
-+    if (has_index && index =3D=3D 0) {
-+        monitor_printf(mon, "acl: unable to add acl entry\n");
-+        return;
++static const VMStateDescription vmstate_bcm283x_timer = {
++    .name = "bcm283x_timer",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(control, BCM283xTimerState),
++        VMSTATE_UINT32(limit, BCM283xTimerState),
++        VMSTATE_UINT32(int_level, BCM283xTimerState),
++        VMSTATE_PTIMER(timer, BCM283xTimerState),
++        VMSTATE_PTIMER(free_timer, BCM283xTimerState),
++        VMSTATE_END_OF_LIST()
 +    }
++};
 +
-+    if (has_index) {
-+        i =3D qauthz_list_insert_rule(auth, match, policy,
-+                                    format, index - 1, &err);
-+    } else {
-+        i =3D qauthz_list_append_rule(auth, match, policy,
-+                                    format, &err);
-+    }
-+    if (err) {
-+        monitor_printf(mon, "acl: unable to add rule: %s",
-+                       error_get_pretty(err));
-+        error_free(err);
-+    } else {
-+        monitor_printf(mon, "acl: added rule at position %zu\n", i + 1);
-     }
- }
-=20
-@@ -2146,15 +2202,18 @@ static void hmp_acl_remove(Monitor *mon, const QD=
-ict *qdict)
- {
-     const char *aclname =3D qdict_get_str(qdict, "aclname");
-     const char *match =3D qdict_get_str(qdict, "match");
--    qemu_acl *acl =3D find_acl(mon, aclname);
--    int ret;
-+    QAuthZList *auth =3D find_auth(mon, aclname);
-+    ssize_t i =3D 0;
-=20
--    if (acl) {
--        ret =3D qemu_acl_remove(acl, match);
--        if (ret < 0)
--            monitor_printf(mon, "acl: no matching acl entry\n");
--        else
--            monitor_printf(mon, "acl: removed rule at position %d\n", re=
-t);
-+    if (!auth) {
-+        return;
-+    }
++static void bcm283x_timer_init(Object *obj)
++{
++    BCM283xTimerState *s = BCM283xTimer(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 +
-+    i =3D qauthz_list_delete_rule(auth, match);
-+    if (i >=3D 0) {
-+        monitor_printf(mon, "acl: removed rule at position %zu\n", i + 1=
-);
-+    } else {
-+        monitor_printf(mon, "acl: no matching acl entry\n");
-     }
- }
-=20
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index bc11d565a6..1792b1115a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -537,8 +537,8 @@ test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
- test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
- 	tests/test-qapi-introspect.o \
- 	$(test-qom-obj-y)
--benchmark-crypto-obj-y =3D $(crypto-obj-y) $(test-qom-obj-y)
--test-crypto-obj-y =3D $(crypto-obj-y) $(test-qom-obj-y)
-+benchmark-crypto-obj-y =3D $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj=
--y)
-+test-crypto-obj-y =3D $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
- test-io-obj-y =3D $(io-obj-y) $(test-crypto-obj-y)
- test-authz-obj-y =3D $(test-qom-obj-y) $(authz-obj-y)
- test-block-obj-y =3D $(block-obj-y) $(test-io-obj-y) tests/iothread.o
-diff --git a/tests/test-crypto-tlssession.c b/tests/test-crypto-tlssessio=
-n.c
-index 6fa9950afb..15212ec276 100644
---- a/tests/test-crypto-tlssession.c
-+++ b/tests/test-crypto-tlssession.c
-@@ -28,7 +28,7 @@
- #include "qom/object_interfaces.h"
- #include "qapi/error.h"
- #include "qemu/sockets.h"
--#include "qemu/acl.h"
-+#include "authz/list.h"
-=20
- #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
-=20
-@@ -229,7 +229,7 @@ static void test_crypto_tls_session_x509(const void *=
-opaque)
-     QCryptoTLSCreds *serverCreds;
-     QCryptoTLSSession *clientSess =3D NULL;
-     QCryptoTLSSession *serverSess =3D NULL;
--    qemu_acl *acl;
-+    QAuthZList *auth;
-     const char * const *wildcards;
-     int channel[2];
-     bool clientShake =3D false;
-@@ -285,11 +285,15 @@ static void test_crypto_tls_session_x509(const void=
- *opaque)
-         SERVER_CERT_DIR);
-     g_assert(serverCreds !=3D NULL);
-=20
--    acl =3D qemu_acl_init("tlssessionacl");
--    qemu_acl_reset(acl);
-+    auth =3D qauthz_list_new("tlssessionacl",
-+                           QAUTHZ_LIST_POLICY_DENY,
-+                           &error_abort);
-     wildcards =3D data->wildcards;
-     while (wildcards && *wildcards) {
--        qemu_acl_append(acl, 0, *wildcards);
-+        qauthz_list_append_rule(auth, *wildcards,
-+                                QAUTHZ_LIST_POLICY_ALLOW,
-+                                QAUTHZ_LIST_FORMAT_GLOB,
-+                                &error_abort);
-         wildcards++;
-     }
-=20
-@@ -377,6 +381,7 @@ static void test_crypto_tls_session_x509(const void *=
-opaque)
-=20
-     object_unparent(OBJECT(serverCreds));
-     object_unparent(OBJECT(clientCreds));
-+    object_unparent(OBJECT(auth));
-=20
-     qcrypto_tls_session_free(serverSess);
-     qcrypto_tls_session_free(clientSess);
-diff --git a/tests/test-io-channel-tls.c b/tests/test-io-channel-tls.c
-index 4900c6d433..43b707eba7 100644
---- a/tests/test-io-channel-tls.c
-+++ b/tests/test-io-channel-tls.c
-@@ -29,8 +29,8 @@
- #include "io-channel-helpers.h"
- #include "crypto/init.h"
- #include "crypto/tlscredsx509.h"
--#include "qemu/acl.h"
- #include "qapi/error.h"
-+#include "authz/list.h"
- #include "qom/object_interfaces.h"
-=20
- #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
-@@ -113,7 +113,7 @@ static void test_io_channel_tls(const void *opaque)
-     QIOChannelTLS *serverChanTLS;
-     QIOChannelSocket *clientChanSock;
-     QIOChannelSocket *serverChanSock;
--    qemu_acl *acl;
-+    QAuthZList *auth;
-     const char * const *wildcards;
-     int channel[2];
-     struct QIOChannelTLSHandshakeData clientHandshake =3D { false, false=
- };
-@@ -161,11 +161,15 @@ static void test_io_channel_tls(const void *opaque)
-         SERVER_CERT_DIR);
-     g_assert(serverCreds !=3D NULL);
-=20
--    acl =3D qemu_acl_init("channeltlsacl");
--    qemu_acl_reset(acl);
-+    auth =3D qauthz_list_new("channeltlsacl",
-+                           QAUTHZ_LIST_POLICY_DENY,
-+                           &error_abort);
-     wildcards =3D data->wildcards;
-     while (wildcards && *wildcards) {
--        qemu_acl_append(acl, 0, *wildcards);
-+        qauthz_list_append_rule(auth, *wildcards,
-+                                QAUTHZ_LIST_POLICY_ALLOW,
-+                                QAUTHZ_LIST_FORMAT_GLOB,
-+                                &error_abort);
-         wildcards++;
-     }
-=20
-@@ -253,6 +257,8 @@ static void test_io_channel_tls(const void *opaque)
-     object_unref(OBJECT(serverChanSock));
-     object_unref(OBJECT(clientChanSock));
-=20
-+    object_unparent(OBJECT(auth));
++    memory_region_init_io(&s->iomem, obj, &bcm283x_timer_ops, s,
++            TYPE_BCM283xTimer, 0x100);
 +
-     close(channel[0]);
-     close(channel[1]);
- }
-diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
-index 3751a777a4..7b2b09f242 100644
---- a/ui/vnc-auth-sasl.c
-+++ b/ui/vnc-auth-sasl.c
-@@ -24,6 +24,7 @@
-=20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "authz/base.h"
- #include "vnc.h"
- #include "trace.h"
-=20
-@@ -146,13 +147,14 @@ size_t vnc_client_read_sasl(VncState *vs)
- static int vnc_auth_sasl_check_access(VncState *vs)
- {
-     const void *val;
--    int err;
--    int allow;
-+    int rv;
-+    Error *err =3D NULL;
-+    bool allow;
-=20
--    err =3D sasl_getprop(vs->sasl.conn, SASL_USERNAME, &val);
--    if (err !=3D SASL_OK) {
-+    rv =3D sasl_getprop(vs->sasl.conn, SASL_USERNAME, &val);
-+    if (rv !=3D SASL_OK) {
-         trace_vnc_auth_fail(vs, vs->auth, "Cannot fetch SASL username",
--                            sasl_errstring(err, NULL, NULL));
-+                            sasl_errstring(rv, NULL, NULL));
-         return -1;
-     }
-     if (val =3D=3D NULL) {
-@@ -163,12 +165,19 @@ static int vnc_auth_sasl_check_access(VncState *vs)
-     vs->sasl.username =3D g_strdup((const char*)val);
-     trace_vnc_auth_sasl_username(vs, vs->sasl.username);
-=20
--    if (vs->vd->sasl.acl =3D=3D NULL) {
-+    if (vs->vd->sasl.authzid =3D=3D NULL) {
-         trace_vnc_auth_sasl_acl(vs, 1);
-         return 0;
-     }
-=20
--    allow =3D qemu_acl_party_is_allowed(vs->vd->sasl.acl, vs->sasl.usern=
-ame);
-+    allow =3D qauthz_is_allowed_by_id(vs->vd->sasl.authzid,
-+                                    vs->sasl.username, &err);
-+    if (err) {
-+        trace_vnc_auth_fail(vs, vs->auth, "Error from authz",
-+                            error_get_pretty(err));
-+        error_free(err);
-+        return -1;
-+    }
-=20
-     trace_vnc_auth_sasl_acl(vs, allow);
-     return allow ? 0 : -1;
-diff --git a/ui/vnc-auth-sasl.h b/ui/vnc-auth-sasl.h
-index 2ae224ee3a..fb55fe04ca 100644
---- a/ui/vnc-auth-sasl.h
-+++ b/ui/vnc-auth-sasl.h
-@@ -30,8 +30,8 @@
- typedef struct VncStateSASL VncStateSASL;
- typedef struct VncDisplaySASL VncDisplaySASL;
-=20
--#include "qemu/acl.h"
- #include "qemu/main-loop.h"
-+#include "authz/base.h"
-=20
- struct VncStateSASL {
-     sasl_conn_t *conn;
-@@ -60,7 +60,8 @@ struct VncStateSASL {
- };
-=20
- struct VncDisplaySASL {
--    qemu_acl *acl;
-+    QAuthZ *authz;
-+    char *authzid;
- };
-=20
- void vnc_sasl_client_cleanup(VncState *vs);
-diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
-index d99ea362c1..f072e16ace 100644
---- a/ui/vnc-auth-vencrypt.c
-+++ b/ui/vnc-auth-vencrypt.c
-@@ -109,7 +109,7 @@ static int protocol_client_vencrypt_auth(VncState *vs=
-, uint8_t *data, size_t len
-         tls =3D qio_channel_tls_new_server(
-             vs->ioc,
-             vs->vd->tlscreds,
--            vs->vd->tlsaclname,
-+            vs->vd->tlsauthzid,
-             &err);
-         if (!tls) {
-             trace_vnc_auth_fail(vs, vs->auth, "TLS setup failed",
-diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
-index 950f1cd2ac..95c9703c72 100644
---- a/ui/vnc-ws.c
-+++ b/ui/vnc-ws.c
-@@ -62,7 +62,7 @@ gboolean vncws_tls_handshake_io(QIOChannel *ioc G_GNUC_=
-UNUSED,
-     tls =3D qio_channel_tls_new_server(
-         vs->ioc,
-         vs->vd->tlscreds,
--        vs->vd->tlsaclname,
-+        vs->vd->tlsauthzid,
-         &err);
-     if (!tls) {
-         VNC_DEBUG("Failed to setup TLS %s\n", error_get_pretty(err));
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 0fef646fc4..f4b335eb5f 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -33,7 +33,7 @@
- #include "qemu/option.h"
- #include "qemu/sockets.h"
- #include "qemu/timer.h"
--#include "qemu/acl.h"
-+#include "authz/list.h"
- #include "qemu/config-file.h"
- #include "qapi/qapi-events.h"
- #include "qapi/error.h"
-@@ -3228,12 +3228,24 @@ static void vnc_display_close(VncDisplay *vd)
-         object_unparent(OBJECT(vd->tlscreds));
-         vd->tlscreds =3D NULL;
-     }
--    g_free(vd->tlsaclname);
--    vd->tlsaclname =3D NULL;
-+    if (vd->tlsauthz) {
-+        object_unparent(OBJECT(vd->tlsauthz));
-+        vd->tlsauthz =3D NULL;
-+    }
-+    g_free(vd->tlsauthzid);
-+    vd->tlsauthzid =3D NULL;
-     if (vd->lock_key_sync) {
-         qemu_remove_led_event_handler(vd->led);
-         vd->led =3D NULL;
-     }
-+#ifdef CONFIG_VNC_SASL
-+    if (vd->sasl.authz) {
-+        object_unparent(OBJECT(vd->sasl.authz));
-+        vd->sasl.authz =3D NULL;
-+    }
-+    g_free(vd->sasl.authzid);
-+    vd->sasl.authzid =3D NULL;
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
++}
++
++static void bcm283x_timer_reset(DeviceState *dev)
++{
++    BCM283xTimerState *s = BCM283xTimer(dev);
++
++    s->limit = 0;
++    s->int_level = 0;
++    s->control = TIMER_CTRL_IE | (0x0E << 16);
++    s->prediv = 0x7D;
++
++    /*
++     * Stop the timers.
++     * No need to update freqs/limits as this will automatically be done once
++     * the system writes control register.
++     */
++    ptimer_stop(s->timer);
++    ptimer_stop(s->free_timer);
++}
++
++static void bcm283x_timer_realize(DeviceState *dev, Error **errp)
++{
++    BCM283xTimerState *s = BCM283xTimer(dev);
++    QEMUBH *bh;
++
++    s->limit = 0;
++    s->int_level = 0;
++    s->control = TIMER_CTRL_IE | (0x0E << 16);
++    s->prediv = 0x7D;
++
++    /* Create a regular SP804 timer */
++    bh = qemu_bh_new(bcm283x_timer_tick, s);
++    s->timer = ptimer_init(bh, PTIMER_POLICY_DEFAULT);
++    s->irq = qemu_allocate_irq(bcm283x_timer_set_irq, s, 0);
++
++    /* Create a free-running timer */
++    bh = qemu_bh_new(bcm283x_free_timer_tick, s);
++    s->free_timer = ptimer_init(bh, PTIMER_POLICY_DEFAULT);
++
++    vmstate_register(NULL, -1, &vmstate_bcm283x_timer, s);
++}
++
++static void bcm283x_timer_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *k = DEVICE_CLASS(klass);
++
++    k->realize = bcm283x_timer_realize;
++    k->vmsd = &vmstate_bcm283x_timer;
++    k->reset = bcm283x_timer_reset;
++}
++
++static const TypeInfo bcm283x_timer_info = {
++    .name           = TYPE_BCM283xTimer,
++    .parent         = TYPE_SYS_BUS_DEVICE,
++    .instance_size  = sizeof(BCM283xTimerState),
++    .instance_init  = bcm283x_timer_init,
++    .class_init     = bcm283x_timer_class_init
++};
++
++static void bcm283x_timer_register_types(void)
++{
++    type_register_static(&bcm283x_timer_info);
++}
++
++type_init(bcm283x_timer_register_types)
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index f5b193f670..bbe01d1500 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -23,6 +23,7 @@
+ #include "hw/sd/sdhci.h"
+ #include "hw/sd/bcm2835_sdhost.h"
+ #include "hw/gpio/bcm2835_gpio.h"
++#include "hw/timer/bcm283x_timer.h"
+
+ #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
+ #define BCM2835_PERIPHERALS(obj) \
+@@ -48,6 +49,7 @@ typedef struct BCM2835PeripheralState {
+     SDHCIState sdhci;
+     BCM2835SDHostState sdhost;
+     BCM2835GpioState gpio;
++    BCM283xTimerState bcm283x_timer;
+ } BCM2835PeripheralState;
+
+ #endif /* BCM2835_PERIPHERALS_H */
+diff --git a/include/hw/timer/bcm283x_timer.h b/include/hw/timer/bcm283x_timer.h
+new file mode 100644
+index 0000000000..99d0ae0f61
+--- /dev/null
++++ b/include/hw/timer/bcm283x_timer.h
+@@ -0,0 +1,50 @@
++/*
++ * Broadcom BCM283x ARM timer variant based on ARM SP804
++ * Copyright (c) 2019, Mark <alnyan@airmail.cc>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef HW_TIMER_BCM2835_TIMER_H
++#define HW_TIMER_BCM2835_TIMER_H
++
++#include "hw/sysbus.h"
++#include "hw/ptimer.h"
++
++/*
++ * The datasheet stated 252MHz is the system clock value after reset,
++ *  but it may be changed either by device going to sleep mode or
++ *  by kernel configuration
++ */
++#define BCM283x_SYSTEM_CLOCK_FREQ       252000000
++
++#define TYPE_BCM283xTimer "bcm283x_timer"
++#define BCM283xTimer(obj) \
++    OBJECT_CHECK(BCM283xTimerState, (obj), TYPE_BCM283xTimer)
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++
++    qemu_irq irq;
++
++    uint32_t control;
++    uint32_t limit;
++    uint32_t int_level;
++    uint32_t prediv;
++
++    ptimer_state *timer;
++    ptimer_state *free_timer;
++} BCM283xTimerState;
++
 +#endif
- }
-=20
- int vnc_display_password(const char *id, const char *password)
-@@ -3886,23 +3898,24 @@ void vnc_display_open(const char *id, Error **err=
-p)
-=20
-     if (acl) {
-         if (strcmp(vd->id, "default") =3D=3D 0) {
--            vd->tlsaclname =3D g_strdup("vnc.x509dname");
-+            vd->tlsauthzid =3D g_strdup("vnc.x509dname");
-         } else {
--            vd->tlsaclname =3D g_strdup_printf("vnc.%s.x509dname", vd->i=
-d);
-+            vd->tlsauthzid =3D g_strdup_printf("vnc.%s.x509dname", vd->i=
-d);
-         }
--        qemu_acl_init(vd->tlsaclname);
-+        vd->tlsauthz =3D QAUTHZ(qauthz_list_new(vd->tlsauthzid,
-+                                              QAUTHZ_LIST_POLICY_DENY,
-+                                              &error_abort));
-     }
- #ifdef CONFIG_VNC_SASL
-     if (acl && sasl) {
--        char *aclname;
--
-         if (strcmp(vd->id, "default") =3D=3D 0) {
--            aclname =3D g_strdup("vnc.username");
-+            vd->sasl.authzid =3D g_strdup("vnc.username");
-         } else {
--            aclname =3D g_strdup_printf("vnc.%s.username", vd->id);
-+            vd->sasl.authzid =3D g_strdup_printf("vnc.%s.username", vd->=
-id);
-         }
--        vd->sasl.acl =3D qemu_acl_init(aclname);
--        g_free(aclname);
-+        vd->sasl.authz =3D QAUTHZ(qauthz_list_new(vd->sasl.authzid,
-+                                                QAUTHZ_LIST_POLICY_DENY,
-+                                                &error_abort));
-     }
- #endif
-=20
-diff --git a/ui/vnc.h b/ui/vnc.h
-index 81daa7a0eb..ee3da08f4a 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -39,6 +39,7 @@
- #include "io/channel-socket.h"
- #include "io/channel-tls.h"
- #include "io/net-listener.h"
-+#include "authz/base.h"
- #include <zlib.h>
-=20
- #include "keymaps.h"
-@@ -178,7 +179,8 @@ struct VncDisplay
-     bool lossy;
-     bool non_adaptive;
-     QCryptoTLSCreds *tlscreds;
--    char *tlsaclname;
-+    QAuthZ *tlsauthz;
-+    char *tlsauthzid;
- #ifdef CONFIG_VNC_SASL
-     VncDisplaySASL sasl;
- #endif
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index c1dd746902..0808575e3e 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -20,7 +20,6 @@ util-obj-y +=3D envlist.o path.o module.o
- util-obj-y +=3D host-utils.o
- util-obj-y +=3D bitmap.o bitops.o hbitmap.o
- util-obj-y +=3D fifo8.o
--util-obj-y +=3D acl.o
- util-obj-y +=3D cacheinfo.o
- util-obj-y +=3D error.o qemu-error.o
- util-obj-y +=3D id.o
-diff --git a/util/acl.c b/util/acl.c
-deleted file mode 100644
-index c105addadc..0000000000
---- a/util/acl.c
-+++ /dev/null
-@@ -1,179 +0,0 @@
--/*
-- * QEMU access control list management
-- *
-- * Copyright (C) 2009 Red Hat, Inc
-- *
-- * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-- * of this software and associated documentation files (the "Software"),=
- to deal
-- * in the Software without restriction, including without limitation the=
- rights
-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-- * copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be includ=
-ed in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-- * THE SOFTWARE.
-- */
--
--
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "qemu/acl.h"
--
--#ifdef CONFIG_FNMATCH
--#include <fnmatch.h>
--#endif
--
--
--static unsigned int nacls =3D 0;
--static qemu_acl **acls =3D NULL;
--
--
--
--qemu_acl *qemu_acl_find(const char *aclname)
--{
--    int i;
--    for (i =3D 0 ; i < nacls ; i++) {
--        if (strcmp(acls[i]->aclname, aclname) =3D=3D 0)
--            return acls[i];
--    }
--
--    return NULL;
--}
--
--qemu_acl *qemu_acl_init(const char *aclname)
--{
--    qemu_acl *acl;
--
--    acl =3D qemu_acl_find(aclname);
--    if (acl)
--        return acl;
--
--    acl =3D g_malloc(sizeof(*acl));
--    acl->aclname =3D g_strdup(aclname);
--    /* Deny by default, so there is no window of "open
--     * access" between QEMU starting, and the user setting
--     * up ACLs in the monitor */
--    acl->defaultDeny =3D 1;
--
--    acl->nentries =3D 0;
--    QTAILQ_INIT(&acl->entries);
--
--    acls =3D g_realloc(acls, sizeof(*acls) * (nacls +1));
--    acls[nacls] =3D acl;
--    nacls++;
--
--    return acl;
--}
--
--int qemu_acl_party_is_allowed(qemu_acl *acl,
--                              const char *party)
--{
--    qemu_acl_entry *entry;
--
--    QTAILQ_FOREACH(entry, &acl->entries, next) {
--#ifdef CONFIG_FNMATCH
--        if (fnmatch(entry->match, party, 0) =3D=3D 0)
--            return entry->deny ? 0 : 1;
--#else
--        /* No fnmatch, so fallback to exact string matching
--         * instead of allowing wildcards */
--        if (strcmp(entry->match, party) =3D=3D 0)
--            return entry->deny ? 0 : 1;
--#endif
--    }
--
--    return acl->defaultDeny ? 0 : 1;
--}
--
--
--void qemu_acl_reset(qemu_acl *acl)
--{
--    qemu_acl_entry *entry, *next_entry;
--
--    /* Put back to deny by default, so there is no window
--     * of "open access" while the user re-initializes the
--     * access control list */
--    acl->defaultDeny =3D 1;
--    QTAILQ_FOREACH_SAFE(entry, &acl->entries, next, next_entry) {
--        QTAILQ_REMOVE(&acl->entries, entry, next);
--        g_free(entry->match);
--        g_free(entry);
--    }
--    acl->nentries =3D 0;
--}
--
--
--int qemu_acl_append(qemu_acl *acl,
--                    int deny,
--                    const char *match)
--{
--    qemu_acl_entry *entry;
--
--    entry =3D g_malloc(sizeof(*entry));
--    entry->match =3D g_strdup(match);
--    entry->deny =3D deny;
--
--    QTAILQ_INSERT_TAIL(&acl->entries, entry, next);
--    acl->nentries++;
--
--    return acl->nentries;
--}
--
--
--int qemu_acl_insert(qemu_acl *acl,
--                    int deny,
--                    const char *match,
--                    int index)
--{
--    qemu_acl_entry *tmp;
--    int i =3D 0;
--
--    if (index <=3D 0)
--        return -1;
--    if (index > acl->nentries) {
--        return qemu_acl_append(acl, deny, match);
--    }
--
--    QTAILQ_FOREACH(tmp, &acl->entries, next) {
--        i++;
--        if (i =3D=3D index) {
--            qemu_acl_entry *entry;
--            entry =3D g_malloc(sizeof(*entry));
--            entry->match =3D g_strdup(match);
--            entry->deny =3D deny;
--
--            QTAILQ_INSERT_BEFORE(tmp, entry, next);
--            acl->nentries++;
--            break;
--        }
--    }
--
--    return i;
--}
--
--int qemu_acl_remove(qemu_acl *acl,
--                    const char *match)
--{
--    qemu_acl_entry *entry;
--    int i =3D 0;
--
--    QTAILQ_FOREACH(entry, &acl->entries, next) {
--        i++;
--        if (strcmp(entry->match, match) =3D=3D 0) {
--            QTAILQ_REMOVE(&acl->entries, entry, next);
--            acl->nentries--;
--            g_free(entry->match);
--            g_free(entry);
--            return i;
--        }
--    }
--    return -1;
--}
---=20
+--
 2.20.1
