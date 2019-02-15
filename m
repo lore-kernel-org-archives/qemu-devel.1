@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48689)
+Received: from eggs.gnu.org ([209.51.188.92]:49284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gubh9-0001L9-PZ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:30:16 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gubkU-0002Ap-8v
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gubh9-0006Ht-1i
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:30:15 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44409)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gubh8-0006Fk-S3
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:30:14 -0500
-Received: by mail-wr1-f66.google.com with SMTP id v16so9934086wrn.11
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 03:30:14 -0800 (PST)
-References: <20190214185351.5927-1-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <55487011-3538-f64e-0972-52a0a01a315e@redhat.com>
-Date: Fri, 15 Feb 2019 12:30:11 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gubkO-0003pu-0k
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:33:37 -0500
+Date: Fri, 15 Feb 2019 12:33:17 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190215123317.6903b818@Igors-MacBook-Pro.local>
+In-Reply-To: <4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
+References: <20190214140714.15738-1-imammedo@redhat.com>
+	<4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190214185351.5927-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: Fix qemu_rdma_cleanup null
- check
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead
+ of memory_region_allocate_system_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-arm@nongnu.org, jan.kiszka@web.de, atar4qemu@gmail.com
 
-On 2/14/19 7:53 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> If the migration fails before the channel is open (e.g. a bad
-> address) we end up in the cleanup with rdma->channel==NULL.
-> 
-> Spotted by Coverity: CID 1398634
-> Fixes: fbbaacab2758cb3f32a0
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/rdma.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 54a3c11540..9fa3b176eb 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -2321,7 +2321,9 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
->          rdma->connected = false;
->      }
->  
-> -    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +    if (rdma->channel) {
-> +        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> +    }
->      g_free(rdma->dest_blocks);
->      rdma->dest_blocks = NULL;
->  
-> 
+On Thu, 14 Feb 2019 19:11:27 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> On 14/02/19 15:07, Igor Mammedov wrote:
+> > Also some boards (ab)use memory_region_allocate_system_memory(), calling it several
+> > times to allocate various fixed sized chunks of RAM and ROMs, which is problematic
+> > to map to a single initial RAM Machine::memdev backend and is currently broken if
+> > -mem-path points to a not hugepage pool.
+> 
+> This is certainly a good idea.  However, I'm not sure why you would need
+> a memdev property on the Machine instead of just allowing 1 -numa node,
+> which is what really is.
+
+using '-numa node' would be confusing to user when he/she is not interested in numa usecase
+it also would enable numa fdt/acpi parts generated automatically (fixable but then again
+it adds more to confusion) and in the end there are boards that do not support numa at all
+(s390x).
+
+Machine memdev (initial-ram-memdev) property looked generic enough to me that it could be
+used with every board, but could go on a bit further and instead of memdev an add initial-ram
+property that would reference something like -device builtin-ram (I think I've seen some board
+using a sysbus based ram device for initial ram).
+If you ask why it's machine property, then I'm following '-m' semantics which is basically
+a machine property and I don't have a better idea how to tell board on CLI to use some
+device/memdev as initial ram.
+
+
+> Thanks,
+> 
+> Paolo
+> 
