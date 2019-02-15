@@ -1,24 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52548)
+Received: from eggs.gnu.org ([209.51.188.92]:52773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1guaFt-00045n-Kc
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:02 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1guaGt-0004sa-L7
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1guaFs-0003mI-Dj
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:7781)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1guaFs-0003dE-4G
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:00 -0500
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Fri, 15 Feb 2019 10:57:45 +0100
-Message-Id: <20190215095745.13614-1-lhrazky@redhat.com>
-In-Reply-To: <20190211141509.26964-1-lhrazky@redhat.com>
-References: <20190211141509.26964-1-lhrazky@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1guaGs-00055x-PI
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:59:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43044
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1guaGp-0004pC-Ff
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:59 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1F9nJCD139677
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 04:58:54 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qnshm5fy3-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 04:58:53 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 15 Feb 2019 09:58:51 -0000
+References: <1550146494-21085-1-git-send-email-pmorel@linux.ibm.com>
+	<1550146494-21085-2-git-send-email-pmorel@linux.ibm.com>
+	<68ef1f07-75c2-5d40-1bf9-d6f1db1fa839@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 15 Feb 2019 10:58:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <68ef1f07-75c2-5d40-1bf9-d6f1db1fa839@linux.ibm.com>
+Content-Language: en-US
+Message-Id: <6ae3208c-11ea-0fe5-bebb-5c3febb06339@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4] spice: set device address and device
- display ID in QXL interface
+Subject: Re: [Qemu-devel] [PATCH v3] s390x/cpumodel: Set up CPU model for
+ AQIC interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,180 +45,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: spice-devel@lists.freedesktop.org
-
-Calls the new SPICE QXL interface function spice_qxl_set_device_info to
-set the hardware address of the graphics device represented by the QXL
-interface (e.g. a PCI path) and the device display IDs (the IDs of the
-device's monitors that belong to this QXL interface).
-
-Also stops using the deprecated spice_qxl_set_max_monitors, the new
-interface function replaces it.
-
-Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
----
-Hi,
-
-Changes since v3:
-* Fix comments according to patchew check script.
-
-Cheers,
-Lukas
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: akrowiak@linux.ibm.com, peter.maydell@linaro.org, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.ibm.com, eric.auger@redhat.com, qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
 
- hw/display/qxl.c           | 14 ++++++++++-
- include/ui/spice-display.h |  4 ++++
- ui/spice-core.c            | 49 ++++++++++++++++++++++++++++++++++++++
- ui/spice-display.c         | 11 +++++++++
- 4 files changed, 77 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index da8fd5a40a..c8ce5781e0 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -276,7 +276,8 @@ static void qxl_spice_monitors_config_async(PCIQXLDev=
-ice *qxl, int replay)
-                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
-                     0));
-     } else {
--#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
-+/* >=3D release 0.12.6, < release 0.14.2 */
-+#if SPICE_SERVER_VERSION >=3D 0x000c06 && SPICE_SERVER_VERSION < 0x000e0=
-2
-         if (qxl->max_outputs) {
-             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
-         }
-@@ -2188,6 +2189,17 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
-Error **errp)
-                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
-;
-         return;
-     }
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(qxl->vga.con, device_address, 256=
-)) {
-+        spice_qxl_set_device_info(&qxl->ssd.qxl,
-+                                  device_address,
-+                                  0,
-+                                  qxl->max_outputs);
-+    }
-+#endif
-+
-     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
-=20
-     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 87a84a59d4..53c3612c32 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -179,3 +179,7 @@ void qemu_spice_wakeup(SimpleSpiceDisplay *ssd);
- void qemu_spice_display_start(void);
- void qemu_spice_display_stop(void);
- int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd);
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con,
-+                                    char *device_address,
-+                                    size_t size);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a40fb2c00d..4b501d485e 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -34,6 +34,7 @@
- #include "qemu/option.h"
- #include "migration/misc.h"
- #include "hw/hw.h"
-+#include "hw/pci/pci_bus.h"
- #include "ui/spice-display.h"
-=20
- /* core bits */
-@@ -863,6 +864,54 @@ bool qemu_spice_have_display_interface(QemuConsole *=
-con)
-     return false;
- }
-=20
-+/*
-+ * Recursively (in reverse order) appends addresses of PCI devices as it=
- moves
-+ * up in the PCI hierarchy.
-+ *
-+ * @returns true on success, false when the buffer wasn't large enough
-+ */
-+static bool append_pci_address(char *buf, size_t buf_size, const PCIDevi=
-ce *pci)
-+{
-+    PCIBus *bus =3D pci_get_bus(pci);
-+    /* equivalent to if (!pci_bus_is_root(bus)), but the function is not=
- built
-+       with PCI_CONFIG=3Dn, avoid using an #ifdef by checking directly *=
-/
-+    if (bus->parent_dev !=3D NULL) {
-+        append_pci_address(buf, buf_size, bus->parent_dev);
-+    }
-+
-+    size_t len =3D strlen(buf);
-+    ssize_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
-+        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
-+
-+    return written > 0 && written < buf_size - len;
-+}
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con,
-+                                    char *device_address,
-+                                    size_t size)
-+{
-+    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con),
-+                                                       "device",
-+                                                       &error_abort));
-+    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev),
-+                                                       TYPE_PCI_DEVICE);
-+
-+    if (pci =3D=3D NULL) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+                    "Not a PCI device.");
-+        return false;
-+    }
-+
-+    strncpy(device_address, "pci/0000", size);
-+    if (!append_pci_address(device_address, size, pci)) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+            "Too many PCI devices in the chain.");
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
-n)
- {
-     if (g_slist_find(spice_consoles, con)) {
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index aea6f6ebce..a5e26479a8 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -1147,6 +1147,17 @@ static void qemu_spice_display_init_one(QemuConsol=
-e *con)
-=20
-     ssd->qxl.base.sif =3D &dpy_interface.base;
-     qemu_spice_add_display_interface(&ssd->qxl, con);
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(con, device_address, 256)) {
-+        spice_qxl_set_device_info(&ssd->qxl,
-+                                  device_address,
-+                                  qemu_console_get_head(con),
-+                                  1);
-+    }
-+#endif
-+
-     qemu_spice_create_host_memslot(ssd);
-=20
-     register_displaychangelistener(&ssd->dcl);
---=20
-2.20.1
+On 15.02.2019 10:53, Pierre Morel wrote:
+> On 14/02/2019 13:14, Pierre Morel wrote:
+>> A new CPU model facilities is introduced to support AP devices
+>> interruption interception for a KVM guest.
+>>
+>> "APQI" for "AP-Queue Interruption" facility
+>>
+>> The S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, CPU facility indicates
+>> whether the PQAP instruction with the AQIC command is available
+>> to the guest.
+>> This feature will be enabled only if the AP instructions are
+>> available on the linux host and AQIC facility is installed on
+>> the host.
+>>
+>> This feature must be turned on from userspace to intercept AP
+>> instructions on the KVM guest. The QEMU command line to turn
+>> this feature on looks something like this:
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu-system-s390x ... -cpu xxx,apqi=3Don ...
+>=20
+>=20
+>=20
+> Hi,
+>=20
+> I suddenly have a very big doubt on this QEMU patch.
+>=20
+> Older Linux advertise PQAP/AQIC feature (65)
+
+Which Linuxes advertise PQAP/AQIC (stfle.65)?
+This was never advertised by any previous Linux as far as I can tell.
