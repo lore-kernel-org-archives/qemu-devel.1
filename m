@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48523)
+Received: from eggs.gnu.org ([209.51.188.92]:48738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gufxX-0001Cs-2d
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:03:28 -0500
+	(envelope-from <groug@kaod.org>) id 1gufyg-00023R-KE
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:04:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gufxV-0001FO-52
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:03:26 -0500
-Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:37129)
+	(envelope-from <groug@kaod.org>) id 1gufyW-00027d-OA
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:04:34 -0500
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:60631)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gufxU-0001AZ-St
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:03:25 -0500
-Received: from player739.ha.ovh.net (unknown [10.109.159.224])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 2B6CF52398
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 17:03:20 +0100 (CET)
-Date: Fri, 15 Feb 2019 17:03:02 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gufyP-00022P-3e
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:04:23 -0500
+Received: from player793.ha.ovh.net (unknown [10.109.146.175])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9BE0E21C54D
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 17:04:17 +0100 (CET)
+Date: Fri, 15 Feb 2019 17:03:59 +0100
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190215170302.5fa10931@bahia.lan>
-In-Reply-To: <20190215133005.15955-6-david@redhat.com>
+Message-ID: <20190215170359.352765a9@bahia.lan>
+In-Reply-To: <20190215133005.15955-7-david@redhat.com>
 References: <20190215133005.15955-1-david@redhat.com>
-	<20190215133005.15955-6-david@redhat.com>
+	<20190215133005.15955-7-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] tests/device-plug: Add CPU core
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] tests/device-plug: Add memory
  unplug request test for spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,7 +34,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, 15 Feb 2019 14:30:04 +0100
+On Fri, 15 Feb 2019 14:30:05 +0100
 David Hildenbrand <david@redhat.com> wrote:
 
 > We can easily test this, just like PCI.
@@ -44,23 +44,24 @@ David Hildenbrand <david@redhat.com> wrote:
 
 Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  tests/device-plug-test.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+>  tests/device-plug-test.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
 > diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
-> index 6f7255552a..ec6cb5de7b 100644
+> index ec6cb5de7b..4c581319c0 100644
 > --- a/tests/device-plug-test.c
 > +++ b/tests/device-plug-test.c
-> @@ -101,6 +101,21 @@ static void test_ccw_unplug(void)
+> @@ -116,6 +116,22 @@ static void test_spapr_cpu_unplug_request(void)
 >      qtest_quit(qtest);
 >  }
 >  
-> +static void test_spapr_cpu_unplug_request(void)
+> +static void test_spapr_memory_unplug_request(void)
 > +{
 > +    QTestState *qtest;
 > +
-> +    qtest = qtest_initf("-cpu power9_v2.0 -smp 1,maxcpus=2 "
-> +                        "-device power9_v2.0-spapr-cpu-core,core-id=1,id=dev0");
+> +    qtest = qtest_initf("-m 1G,slots=1,maxmem=2G "
+> +                        "-object memory-backend-ram,id=mem0,size=1G "
+> +                        "-device pc-dimm,id=dev0,memdev=mem0");
 > +
 > +    /* similar to test_pci_unplug_request */
 > +    device_del_request(qtest, "dev0");
@@ -73,13 +74,13 @@ Reviewed-by: Greg Kurz <groug@kaod.org>
 >  int main(int argc, char **argv)
 >  {
 >      const char *arch = qtest_get_arch();
-> @@ -120,5 +135,10 @@ int main(int argc, char **argv)
->                         test_ccw_unplug);
+> @@ -140,5 +156,10 @@ int main(int argc, char **argv)
+>                         test_spapr_cpu_unplug_request);
 >      }
 >  
 > +    if (!strcmp(arch, "ppc64")) {
-> +        qtest_add_func("/device-plug/spapr_cpu_unplug_request",
-> +                       test_spapr_cpu_unplug_request);
+> +        qtest_add_func("/device-plug/spapr_memory_unplug_request",
+> +                       test_spapr_memory_unplug_request);
 > +    }
 > +
 >      return g_test_run();
