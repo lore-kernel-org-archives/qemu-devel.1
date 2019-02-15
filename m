@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44139)
+Received: from eggs.gnu.org ([209.51.188.92]:44406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gudSY-00007d-HT
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:23:19 -0500
+	(envelope-from <lifei1214@126.com>) id 1gudTH-0000Xp-Ju
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gudSW-0001gF-FC
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:23:18 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:59322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gudSU-0001NI-M4
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:23:15 -0500
-From: Liam Merwick <liam.merwick@oracle.com>
-Date: Fri, 15 Feb 2019 13:22:58 +0000
-Message-Id: <1550236979-15658-2-git-send-email-liam.merwick@oracle.com>
-In-Reply-To: <1550236979-15658-1-git-send-email-liam.merwick@oracle.com>
-References: <1550236979-15658-1-git-send-email-liam.merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] tpm_tis: assert valid addr passed to
- tpm_tis_locality_from_addr()
+	(envelope-from <lifei1214@126.com>) id 1gudTE-0003rX-Gb
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:24:03 -0500
+Received: from m50-110.126.com ([123.125.50.110]:39603)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gudTC-0003Xx-QP
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 08:24:00 -0500
+References: <20190201051806.53183-1-lifei1214@126.com>
+	<20190201051806.53183-10-lifei1214@126.com>
+	<878syz4j5y.fsf@dusky.pond.sub.org> <20190204163451.GE2680@work-vm>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <7bc6ad10-9d10-4b96-767c-dbb5efcea004@126.com>
+Date: Fri, 15 Feb 2019 21:23:09 +0800
+MIME-Version: 1.0
+In-Reply-To: <20190204163451.GE2680@work-vm>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 09/11] qemu_thread: supplement
+ error handling for migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +29,346 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanb@linux.ibm.com, qemu-devel@nongnu.org
-Cc: liam.merwick@oracle.com, philmd@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, quintela@redhat.com, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-Assert that the address passed in results in a valid locality value.
-Current callers pass a valid address so this is just a defensive check
-to prevent future caller passing an incorrect address or catch if the
-MMIO address parameters were not all modified correctly.  This is to
-help static code analysis tools that report that no explicit checking
-is being done.
 
-Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
----
- hw/tpm/tpm_tis.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ÔÚ 2019/2/5 ÉÏÎç12:34, Dr. David Alan Gilbert Ð´µÀ:
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> Dave, I tried to review the error paths, in particular resource cleanup,
+>> but there's a lot going on, and I'm not feeling confident.  Please have
+>> a close look.
+>>
+>> Fei Li <lifei1214@126.com> writes:
+>>
+>>> From: Fei Li <fli@suse.com>
+>>>
+>>> Update qemu_thread_create()'s callers by
+>>> - setting an error on qemu_thread_create() failure for callers that
+>>>    set an error on failure;
+>>> - reporting the error and returning failure for callers that return
+>>>    an error code on failure;
+>>> - reporting the error and setting some state for callers that just
+>>>    report errors and choose not to continue on.
+>>>
+>>> Besides, make compress_threads_save_cleanup() cope with partially
+>>> initialized comp_param[i] to adapt to the new qemu_thread_create()
+>>> failure case.
+>>>
+>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> Signed-off-by: Fei Li <fli@suse.com>
+>>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> ---
+>>>   migration/migration.c    | 35 +++++++++++++-------
+>>>   migration/postcopy-ram.c | 16 ++++++---
+>>>   migration/ram.c          | 70 ++++++++++++++++++++++++++--------------
+>>>   migration/savevm.c       | 12 ++++---
+>>>   4 files changed, 89 insertions(+), 44 deletions(-)
+>>>
+>>> diff --git a/migration/migration.c b/migration/migration.c
+>>> index 1da71211c8..0034ca1334 100644
+>>> --- a/migration/migration.c
+>>> +++ b/migration/migration.c
+>>> @@ -447,10 +447,13 @@ static void process_incoming_migration_co(void *opaque)
+>>>               goto fail;
+>>>           }
+>>>   
+>>> -        /* TODO: let the further caller handle the error instead of abort() */
+>>> -        qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+>>> -                           colo_process_incoming_thread, mis,
+>>> -                           QEMU_THREAD_JOINABLE, &error_abort);
+>>> +        if (qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+>>> +                               colo_process_incoming_thread, mis,
+>>> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +            error_reportf_err(local_err, "failed to create "
+>>> +                              "colo_process_incoming_thread: ");
+>>> +            goto fail;
+>>> +        }
+>>>           mis->have_colo_incoming_thread = true;
+>>>           qemu_coroutine_yield();
+>>>   
+>>> @@ -2349,6 +2352,7 @@ out:
+>>>   static int open_return_path_on_source(MigrationState *ms,
+>>>                                         bool create_thread)
+>>>   {
+>>> +    Error *local_err = NULL;
+>>>   
+>>>       ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
+>>>       if (!ms->rp_state.from_dst_file) {
+>>> @@ -2362,10 +2366,15 @@ static int open_return_path_on_source(MigrationState *ms,
+>>>           return 0;
+>>>       }
+>>>   
+>>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>>> -    qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+>>> -                       source_return_path_thread, ms,
+>>> -                       QEMU_THREAD_JOINABLE, &error_abort);
+>>> +    if (qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+>>> +                           source_return_path_thread, ms,
+>>> +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +        error_reportf_err(local_err,
+>>> +                          "failed to create source_return_path_thread: ");
+>>> +        qemu_fclose(ms->rp_state.from_dst_file);
+>>> +        ms->rp_state.from_dst_file = NULL;
+>>> +        return -1;
+>>> +     }
+>>>   
+>>>       trace_open_return_path_on_source_continue();
+>>>   
+>>> @@ -3201,9 +3210,13 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
+>>         if (multifd_save_setup() != 0) {
+>>             migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>>                               MIGRATION_STATUS_FAILED);
+>>>           migrate_fd_cleanup(s);
+>>>           return;
+>>>       }
+>>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>>> -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+>>> -                       QEMU_THREAD_JOINABLE, &error_abort);
+>>> +    if (qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+>>> +                           QEMU_THREAD_JOINABLE, &error_in) < 0) {
+>>> +        error_reportf_err(error_in, "failed to create migration_thread: ");
+>>> +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+>>> +        migrate_fd_cleanup(s);
+>> Is there anything to clean up for multifd_save_setup()?  Dave?
+> I need to bounce that one to Juan; he knows the multifd stuff; cc'd
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 61a130beef35..772431f20874 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -100,7 +100,9 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
- 
- static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
- {
--    return (uint8_t)((addr >> TPM_TIS_LOCALITY_SHIFT) & 0x7);
-+    uint8_t locty = (uint8_t)(addr >> TPM_TIS_LOCALITY_SHIFT);
-+    assert(TPM_TIS_IS_VALID_LOCTY(locty));
-+    return locty;
- }
- 
- static void tpm_tis_show_buffer(const unsigned char *buffer,
--- 
-1.8.3.1
+Hi Juan, Peter,
+
+I think this may involve the sequential order between migration_thread() and
+multifd_save_setup() we talked earlier :
+
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg571178.html
+
+To be specific, the current code can not tell whether all channels have 
+been sent via multifd_new_send_channel_async() before/during/after the 
+migration_thread() runs.
+
+What do you think?
+
+Have a nice day, thanks :)
+Fei
+>
+>>> +        return;
+>>> +    }
+>>>       s->migration_thread_running = true;
+>>>   }
+>>>   
+>>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>>> index 221ea24919..0934a1403a 100644
+>>> --- a/migration/postcopy-ram.c
+>>> +++ b/migration/postcopy-ram.c
+>>> @@ -1083,6 +1083,8 @@ retry:
+>>>   
+>>>   int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>>>   {
+>>> +    Error *local_err = NULL;
+>>> +
+>>>       /* Open the fd for the kernel to give us userfaults */
+>>>       mis->userfault_fd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
+>>>       if (mis->userfault_fd == -1) {
+>>> @@ -1109,10 +1111,16 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>>>       }
+>>>   
+>>>       qemu_sem_init(&mis->fault_thread_sem, 0);
+>>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>>> -    qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+>>> -                       postcopy_ram_fault_thread, mis,
+>>> -                       QEMU_THREAD_JOINABLE, &error_abort);
+>>> +    if (qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+>>> +                           postcopy_ram_fault_thread, mis,
+>>> +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +        error_reportf_err(local_err,
+>>> +                          "failed to create postcopy_ram_fault_thread: ");
+>>> +        close(mis->userfault_event_fd);
+>>> +        close(mis->userfault_fd);
+>>> +        qemu_sem_destroy(&mis->fault_thread_sem);
+>>> +        return -1;
+>>> +    }
+>>>       qemu_sem_wait(&mis->fault_thread_sem);
+>>>       qemu_sem_destroy(&mis->fault_thread_sem);
+>>>       mis->have_fault_thread = true;
+>>         /* Mark so that we get notified of accesses to unwritten areas */
+>>         if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
+>>             error_report("ram_block_enable_notify failed");
+>>             return -1;
+>>
+>> Not this patch's problem, but here goes anyway: where are
+>> mis->userfault_event_fd and mis->userfault_fd closed?
+> As Fei replied, see postcopy_ram_incoming_cleanup; once the fault thread
+> is running it does a bigger cleanup.
+>
+> Dave
+>
+>>         }
+>>
+>>> diff --git a/migration/ram.c b/migration/ram.c
+>>> index 700ea229e0..66b8b764f1 100644
+>>> --- a/migration/ram.c
+>>> +++ b/migration/ram.c
+>>> @@ -441,6 +441,14 @@ static void compress_threads_save_cleanup(void)
+>>>   
+>>>       thread_count = migrate_compress_threads();
+>>>       for (i = 0; i < thread_count; i++) {
+>>> +        qemu_mutex_lock(&comp_param[i].mutex);
+>>> +        comp_param[i].quit = true;
+>>> +        qemu_cond_signal(&comp_param[i].cond);
+>>> +        qemu_mutex_unlock(&comp_param[i].mutex);
+>>> +
+>>> +        qemu_mutex_destroy(&comp_param[i].mutex);
+>>> +        qemu_cond_destroy(&comp_param[i].cond);
+>>> +
+>>>           /*
+>>>            * we use it as a indicator which shows if the thread is
+>>>            * properly init'd or not
+>>> @@ -448,15 +456,7 @@ static void compress_threads_save_cleanup(void)
+>>>           if (!comp_param[i].file) {
+>>>               break;
+>>>           }
+>>> -
+>>> -        qemu_mutex_lock(&comp_param[i].mutex);
+>>> -        comp_param[i].quit = true;
+>>> -        qemu_cond_signal(&comp_param[i].cond);
+>>> -        qemu_mutex_unlock(&comp_param[i].mutex);
+>>> -
+>>>           qemu_thread_join(compress_threads + i);
+>>> -        qemu_mutex_destroy(&comp_param[i].mutex);
+>>> -        qemu_cond_destroy(&comp_param[i].cond);
+>>>           deflateEnd(&comp_param[i].stream);
+>>>           g_free(comp_param[i].originbuf);
+>>>           qemu_fclose(comp_param[i].file);
+>>> @@ -473,6 +473,7 @@ static void compress_threads_save_cleanup(void)
+>>>   static int compress_threads_save_setup(void)
+>>>   {
+>>>       int i, thread_count;
+>>> +    Error *local_err = NULL;
+>>>   
+>>>       if (!migrate_use_compression()) {
+>>>           return 0;
+>>> @@ -483,6 +484,9 @@ static int compress_threads_save_setup(void)
+>>>       qemu_cond_init(&comp_done_cond);
+>>>       qemu_mutex_init(&comp_done_lock);
+>>>       for (i = 0; i < thread_count; i++) {
+>>> +        qemu_mutex_init(&comp_param[i].mutex);
+>>> +        qemu_cond_init(&comp_param[i].cond);
+>>> +        comp_param[i].quit = false;
+>>>           comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
+>>>           if (!comp_param[i].originbuf) {
+>>>               goto exit;
+>>> @@ -499,13 +503,16 @@ static int compress_threads_save_setup(void)
+>>>            */
+>>>           comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
+>>>           comp_param[i].done = true;
+>>> -        comp_param[i].quit = false;
+>>> -        qemu_mutex_init(&comp_param[i].mutex);
+>>> -        qemu_cond_init(&comp_param[i].cond);
+>>> -        /* TODO: let the further caller handle the error instead of abort() */
+>>> -        qemu_thread_create(compress_threads + i, "compress",
+>>> -                           do_data_compress, comp_param + i,
+>>> -                           QEMU_THREAD_JOINABLE, &error_abort);
+>>> +        if (qemu_thread_create(compress_threads + i, "compress",
+>>> +                               do_data_compress, comp_param + i,
+>>> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +            error_reportf_err(local_err, "failed to create do_data_compress: ");
+>>> +            deflateEnd(&comp_param[i].stream);
+>>> +            g_free(comp_param[i].originbuf);
+>>> +            qemu_fclose(comp_param[i].file);
+>>> +            comp_param[i].file = NULL;
+>>> +            goto exit;
+>>> +        }
+>>>       }
+>>>       return 0;
+>>>   
+>>> @@ -1076,9 +1083,14 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+>>>           p->c = QIO_CHANNEL(sioc);
+>>>           qio_channel_set_delay(p->c, false);
+>>>           p->running = true;
+>>> -        /* TODO: let the further caller handle the error instead of abort() */
+>>> -        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+>>> -                           QEMU_THREAD_JOINABLE, &error_abort);
+>>> +        if (qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+>>> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +            migrate_set_error(migrate_get_current(), local_err);
+>>> +            error_reportf_err(local_err,
+>>> +                              "failed to create multifd_send_thread: ");
+>>> +            multifd_save_cleanup();
+>>> +            return;
+>>> +        }
+>>>   
+>>>           atomic_inc(&multifd_send_state->count);
+>>>       }
+>>> @@ -1357,9 +1369,13 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
+>>>       p->num_packets = 1;
+>>>   
+>>>       p->running = true;
+>>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>>> -    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+>>> -                       QEMU_THREAD_JOINABLE, &error_abort);
+>>> +    if (qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+>>> +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +        error_propagate_prepend(errp, local_err,
+>>> +                                "failed to create multifd_recv_thread: ");
+>> This prepends only if @errp isn't null.  Fine from the caller's point of
+>> view.  But it also affects multifd_recv_thread():
+>>
+>>> +        multifd_recv_terminate_threads(local_err);
+>> That's at least unclean.
+>>
+>> I think you should use error_prepend() and error_propagate() here.
+>>
+>>> +        return false;
+>>> +    }
+>>>       atomic_inc(&multifd_recv_state->count);
+>>>       return atomic_read(&multifd_recv_state->count) ==
+>>>              migrate_multifd_channels();
+>>> @@ -3631,6 +3647,7 @@ static void compress_threads_load_cleanup(void)
+>>>   static int compress_threads_load_setup(QEMUFile *f)
+>>>   {
+>>>       int i, thread_count;
+>>> +    Error *local_err = NULL;
+>>>   
+>>>       if (!migrate_use_compression()) {
+>>>           return 0;
+>>> @@ -3652,10 +3669,13 @@ static int compress_threads_load_setup(QEMUFile *f)
+>>>           qemu_cond_init(&decomp_param[i].cond);
+>>>           decomp_param[i].done = true;
+>>>           decomp_param[i].quit = false;
+>>> -        /* TODO: let the further caller handle the error instead of abort() */
+>>> -        qemu_thread_create(decompress_threads + i, "decompress",
+>>> -                           do_data_decompress, decomp_param + i,
+>>> -                           QEMU_THREAD_JOINABLE, &error_abort);
+>>> +        if (qemu_thread_create(decompress_threads + i, "decompress",
+>>> +                               do_data_decompress, decomp_param + i,
+>>> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+>>> +            error_reportf_err(local_err,
+>>> +                              "failed to create do_data_decompress: ");
+>>> +            goto exit;
+>>> +        }
+>>>       }
+>>>       return 0;
+>>>   exit:
+>>> diff --git a/migration/savevm.c b/migration/savevm.c
+>>> index d5b45843b6..310cecbf8f 100644
+>>> --- a/migration/savevm.c
+>>> +++ b/migration/savevm.c
+>>> @@ -1747,10 +1747,14 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+>>>       mis->have_listen_thread = true;
+>>>       /* Start up the listening thread and wait for it to signal ready */
+>>>       qemu_sem_init(&mis->listen_thread_sem, 0);
+>>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>>> -    qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+>>> -                       postcopy_ram_listen_thread, NULL,
+>>> -                       QEMU_THREAD_DETACHED, &error_abort);
+>>> +    if (qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+>>> +                           postcopy_ram_listen_thread, NULL,
+>>> +                           QEMU_THREAD_DETACHED, &local_err) < 0) {
+>>> +        error_reportf_err(local_err,
+>>> +                          "failed to create postcopy_ram_listen_thread: ");
+>>> +        qemu_sem_destroy(&mis->listen_thread_sem);
+>>> +        return -1;
+>>> +    }
+>>>       qemu_sem_wait(&mis->listen_thread_sem);
+>>>       qemu_sem_destroy(&mis->listen_thread_sem);
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
