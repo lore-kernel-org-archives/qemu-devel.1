@@ -1,25 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40506)
+Received: from eggs.gnu.org ([209.51.188.92]:40508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gubFS-0007ED-Ue
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:01:41 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gubFn-0007EE-La
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:02:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gubEs-0003hg-8P
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:01:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gubEs-0003ex-2E
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:01:02 -0500
-Date: Fri, 15 Feb 2019 11:00:56 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190215110056.GB2630@work-vm>
-References: <20190214185351.5927-1-dgilbert@redhat.com>
-	<20190215015549.GA3232@xz-x1>
+	(envelope-from <pmorel@linux.ibm.com>) id 1gubE3-0002NM-GE
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:00:12 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50850
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gubE3-0002Lx-BT
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 06:00:11 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1FAtQiX091391
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 06:00:10 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qnt8td8p8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 06:00:09 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Fri, 15 Feb 2019 11:00:07 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1550146494-21085-1-git-send-email-pmorel@linux.ibm.com>
+	<1550146494-21085-2-git-send-email-pmorel@linux.ibm.com>
+	<68ef1f07-75c2-5d40-1bf9-d6f1db1fa839@linux.ibm.com>
+	<6ae3208c-11ea-0fe5-bebb-5c3febb06339@de.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Fri, 15 Feb 2019 12:00:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190215015549.GA3232@xz-x1>
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: Fix qemu_rdma_cleanup null
- check
+In-Reply-To: <6ae3208c-11ea-0fe5-bebb-5c3febb06339@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <772b60d0-4ab0-f57e-575e-188550c64148@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] s390x/cpumodel: Set up CPU model for
+ AQIC interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +47,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: akrowiak@linux.ibm.com, peter.maydell@linaro.org, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.ibm.com, eric.auger@redhat.com, qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Thu, Feb 14, 2019 at 06:53:51PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > If the migration fails before the channel is open (e.g. a bad
-> > address) we end up in the cleanup with rdma->channel==NULL.
-> > 
-> > Spotted by Coverity: CID 1398634
-> > Fixes: fbbaacab2758cb3f32a0
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/rdma.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/migration/rdma.c b/migration/rdma.c
-> > index 54a3c11540..9fa3b176eb 100644
-> > --- a/migration/rdma.c
-> > +++ b/migration/rdma.c
-> > @@ -2321,7 +2321,9 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-> >          rdma->connected = false;
-> >      }
-> >  
-> > -    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> > +    if (rdma->channel) {
-> > +        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-> > +    }
-> 
-> IIUC there's no strict ordering constraint on resetting the fd
-> handler, then how about simply moving this line into the below "if
-> (rdma->channel)" altogether?
+On 15/02/2019 10:58, Christian Borntraeger wrote:
+>=20
+>=20
+> On 15.02.2019 10:53, Pierre Morel wrote:
+>> On 14/02/2019 13:14, Pierre Morel wrote:
+>>> A new CPU model facilities is introduced to support AP devices
+>>> interruption interception for a KVM guest.
+>>>
+>>> "APQI" for "AP-Queue Interruption" facility
+>>>
+>>> The S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL, CPU facility indicates
+>>> whether the PQAP instruction with the AQIC command is available
+>>> to the guest.
+>>> This feature will be enabled only if the AP instructions are
+>>> available on the linux host and AQIC facility is installed on
+>>> the host.
+>>>
+>>> This feature must be turned on from userspace to intercept AP
+>>> instructions on the KVM guest. The QEMU command line to turn
+>>> this feature on looks something like this:
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 qemu-system-s390x ... -cpu xxx,apqi=3Don ...
+>>
+>>
+>>
+>> Hi,
+>>
+>> I suddenly have a very big doubt on this QEMU patch.
+>>
+>> Older Linux advertise PQAP/AQIC feature (65)
+>=20
+> Which Linuxes advertise PQAP/AQIC (stfle.65)?
+> This was never advertised by any previous Linux as far as I can tell.
+>=20
 
-The logic around the closing of the return path makes that check later a
-bit messy; rdma->channel can get set to Null before the other check.
+OK, very sorry, you are right, I checked on a different machine and it=20
+is not.
+I must have left something in my system.
 
-Dave
+Sorry for the panic.
+I will look at what made me experience this.
 
-> Regards,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Pierre
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
