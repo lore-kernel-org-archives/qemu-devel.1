@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52446)
+Received: from eggs.gnu.org ([209.51.188.92]:52548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guaFR-0003rL-Sy
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:57:35 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1guaFt-00045n-Kc
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1guaFR-0003EP-5O
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:57:33 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33579)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1guaFQ-0003DH-VZ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:57:33 -0500
-Received: by mail-ot1-x344.google.com with SMTP id i20so15642978otl.0
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 01:57:32 -0800 (PST)
+	(envelope-from <lhrazky@redhat.com>) id 1guaFs-0003mI-Dj
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:7781)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1guaFs-0003dE-4G
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 04:58:00 -0500
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Fri, 15 Feb 2019 10:57:45 +0100
+Message-Id: <20190215095745.13614-1-lhrazky@redhat.com>
+In-Reply-To: <20190211141509.26964-1-lhrazky@redhat.com>
+References: <20190211141509.26964-1-lhrazky@redhat.com>
 MIME-Version: 1.0
-References: <20190206052857.5077-1-richard.henderson@linaro.org>
-	<CAFEAcA9oyJ5RxTqJdptK6bmMwFe++NLn15XTxdBkZbsfOUT_NQ@mail.gmail.com>
-	<0334b231-fa3e-210c-ea9e-9d7bb7b21d1f@linaro.org>
-	<28da85ff-c718-bd3e-ddca-18772decd777@linaro.org>
-In-Reply-To: <28da85ff-c718-bd3e-ddca-18772decd777@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Feb 2019 09:57:20 +0000
-Message-ID: <CAFEAcA-3JsR6GNSQjn-79aAAvEdkJMfqZ24UXRwe4dctZhnOXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/arm: Implement ARMv8.3-JSConv
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4] spice: set device address and device
+ display ID in QXL interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +27,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: spice-devel@lists.freedesktop.org
 
-On Thu, 14 Feb 2019 at 21:28, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 2/14/19 1:10 PM, Richard Henderson wrote:
-> > On 2/14/19 5:53 AM, Peter Maydell wrote:
-> >> On Wed, 6 Feb 2019 at 05:29, Richard Henderson
-> >> <richard.henderson@linaro.org> wrote:
-> >>>
-> >>> Changes since v1:
-> >>>   * Typo fixed in patch 2, which had scrogged FMOV
-> >>>   * Return 0 for NaN, as for any other ARM fp conversion.
-> >>>
-> >>>
-> >>> r~
-> >>>
-> >>>
-> >>> Richard Henderson (3):
-> >>>   target/arm: Force result size into dp after operation
-> >>>   target/arm: Restructure disas_fp_int_conv
-> >>>   target/arm: Implement ARMv8.3-JSConv
-> >>
-> >> I've applied patches 1 and 2 to target-arm.next; 3 has a bug in it,
-> >> I think.
-> >
-> > Please dequeue patch 2; patch 3 has more than one bug in it, and I need to
-> > rewrite patch 2 as well.
->
-> Grr.  That's patch 1, "force result size into dp" that I want dequeued.
-> Of course, now I've seen your pull request, so if that's already gone through,
-> I guess I can smoosh a revert with my rewrite?
+Calls the new SPICE QXL interface function spice_qxl_set_device_info to
+set the hardware address of the graphics device represented by the QXL
+interface (e.g. a PCI path) and the device display IDs (the IDs of the
+device's monitors that belong to this QXL interface).
 
-I saw this before pushing the merge, so I've removed both patches 1 and
-2 from target-arm.next and will resend the pullreq.
+Also stops using the deprecated spice_qxl_set_max_monitors, the new
+interface function replaces it.
 
-thanks
--- PMM
+Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
+---
+Hi,
+
+Changes since v3:
+* Fix comments according to patchew check script.
+
+Cheers,
+Lukas
+
+
+ hw/display/qxl.c           | 14 ++++++++++-
+ include/ui/spice-display.h |  4 ++++
+ ui/spice-core.c            | 49 ++++++++++++++++++++++++++++++++++++++
+ ui/spice-display.c         | 11 +++++++++
+ 4 files changed, 77 insertions(+), 1 deletion(-)
+
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index da8fd5a40a..c8ce5781e0 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -276,7 +276,8 @@ static void qxl_spice_monitors_config_async(PCIQXLDev=
+ice *qxl, int replay)
+                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
+                     0));
+     } else {
+-#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
++/* >=3D release 0.12.6, < release 0.14.2 */
++#if SPICE_SERVER_VERSION >=3D 0x000c06 && SPICE_SERVER_VERSION < 0x000e0=
+2
+         if (qxl->max_outputs) {
+             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
+         }
+@@ -2188,6 +2189,17 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
+Error **errp)
+                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
+;
+         return;
+     }
++
++#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
++    char device_address[256] =3D "";
++    if (qemu_spice_fill_device_address(qxl->vga.con, device_address, 256=
+)) {
++        spice_qxl_set_device_info(&qxl->ssd.qxl,
++                                  device_address,
++                                  0,
++                                  qxl->max_outputs);
++    }
++#endif
++
+     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
+=20
+     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
+diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
+index 87a84a59d4..53c3612c32 100644
+--- a/include/ui/spice-display.h
++++ b/include/ui/spice-display.h
+@@ -179,3 +179,7 @@ void qemu_spice_wakeup(SimpleSpiceDisplay *ssd);
+ void qemu_spice_display_start(void);
+ void qemu_spice_display_stop(void);
+ int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd);
++
++bool qemu_spice_fill_device_address(QemuConsole *con,
++                                    char *device_address,
++                                    size_t size);
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index a40fb2c00d..4b501d485e 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -34,6 +34,7 @@
+ #include "qemu/option.h"
+ #include "migration/misc.h"
+ #include "hw/hw.h"
++#include "hw/pci/pci_bus.h"
+ #include "ui/spice-display.h"
+=20
+ /* core bits */
+@@ -863,6 +864,54 @@ bool qemu_spice_have_display_interface(QemuConsole *=
+con)
+     return false;
+ }
+=20
++/*
++ * Recursively (in reverse order) appends addresses of PCI devices as it=
+ moves
++ * up in the PCI hierarchy.
++ *
++ * @returns true on success, false when the buffer wasn't large enough
++ */
++static bool append_pci_address(char *buf, size_t buf_size, const PCIDevi=
+ce *pci)
++{
++    PCIBus *bus =3D pci_get_bus(pci);
++    /* equivalent to if (!pci_bus_is_root(bus)), but the function is not=
+ built
++       with PCI_CONFIG=3Dn, avoid using an #ifdef by checking directly *=
+/
++    if (bus->parent_dev !=3D NULL) {
++        append_pci_address(buf, buf_size, bus->parent_dev);
++    }
++
++    size_t len =3D strlen(buf);
++    ssize_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
++        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
++
++    return written > 0 && written < buf_size - len;
++}
++
++bool qemu_spice_fill_device_address(QemuConsole *con,
++                                    char *device_address,
++                                    size_t size)
++{
++    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con),
++                                                       "device",
++                                                       &error_abort));
++    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev),
++                                                       TYPE_PCI_DEVICE);
++
++    if (pci =3D=3D NULL) {
++        warn_report("Setting device address of a display device to SPICE=
+: "
++                    "Not a PCI device.");
++        return false;
++    }
++
++    strncpy(device_address, "pci/0000", size);
++    if (!append_pci_address(device_address, size, pci)) {
++        warn_report("Setting device address of a display device to SPICE=
+: "
++            "Too many PCI devices in the chain.");
++        return false;
++    }
++
++    return true;
++}
++
+ int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
+n)
+ {
+     if (g_slist_find(spice_consoles, con)) {
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index aea6f6ebce..a5e26479a8 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -1147,6 +1147,17 @@ static void qemu_spice_display_init_one(QemuConsol=
+e *con)
+=20
+     ssd->qxl.base.sif =3D &dpy_interface.base;
+     qemu_spice_add_display_interface(&ssd->qxl, con);
++
++#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
++    char device_address[256] =3D "";
++    if (qemu_spice_fill_device_address(con, device_address, 256)) {
++        spice_qxl_set_device_info(&ssd->qxl,
++                                  device_address,
++                                  qemu_console_get_head(con),
++                                  1);
++    }
++#endif
++
+     qemu_spice_create_host_memslot(ssd);
+=20
+     register_displaychangelistener(&ssd->dcl);
+--=20
+2.20.1
