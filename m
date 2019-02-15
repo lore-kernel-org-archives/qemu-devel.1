@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33317)
+Received: from eggs.gnu.org ([209.51.188.92]:33331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1guj4p-0005LO-Rk
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:13 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1guj4r-0005Mg-6v
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1guj4o-0003A2-DL
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:11 -0500
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:35296)
+	(envelope-from <richard.henderson@linaro.org>) id 1guj4p-0003Dn-UI
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:13 -0500
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:44542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1guj4o-00037z-4E
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:10 -0500
-Received: by mail-pg1-x52c.google.com with SMTP id s198so5256513pgs.2
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:23:10 -0800 (PST)
+	id 1guj4p-0003C9-Ke
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 14:23:11 -0500
+Received: by mail-pf1-x434.google.com with SMTP id u6so5266910pfh.11
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:23:11 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 15 Feb 2019 11:22:57 -0800
-Message-Id: <20190215192302.27855-4-richard.henderson@linaro.org>
+Date: Fri, 15 Feb 2019 11:22:58 -0800
+Message-Id: <20190215192302.27855-5-richard.henderson@linaro.org>
 In-Reply-To: <20190215192302.27855-1-richard.henderson@linaro.org>
 References: <20190215192302.27855-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 3/8] target/arm: Rearrange Floating-point
- data-processing (2 regs)
+Subject: [Qemu-devel] [PATCH v4 4/8] target/arm: Implement ARMv8.3-JSConv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,342 +29,261 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-There are lots of special cases within these insns.  Split the
-major argument decode/loading/saving into no_output (compares),
-rd_is_dp, and rm_is_dp.
-
-We still need to special case argument load for compare (rd as
-input, rm as zero) and vcvt fixed (rd as input+output), but lots
-of special cases do disappear.
-
-Now that we have a full switch at the beginning, hoist the ISA
-checks from the code generation.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 227 ++++++++++++++++++++---------------------
- 1 file changed, 111 insertions(+), 116 deletions(-)
+v2: Return 0 for NaN
+v3: Return aa32 flags in FPSCR.NZCV.
+---
+ target/arm/cpu.h           | 10 +++++
+ target/arm/helper.h        |  3 ++
+ target/arm/cpu.c           |  1 +
+ target/arm/cpu64.c         |  2 +
+ target/arm/translate-a64.c | 26 +++++++++++
+ target/arm/translate.c     | 10 +++++
+ target/arm/vfp_helper.c    | 88 ++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 140 insertions(+)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 84ae6849c2..1eea1a408b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3273,6 +3273,11 @@ static inline bool isar_feature_aa32_vcma(const ARMISARegisters *id)
+     return FIELD_EX32(id->id_isar5, ID_ISAR5, VCMA) != 0;
+ }
+ 
++static inline bool isar_feature_aa32_jscvt(const ARMISARegisters *id)
++{
++    return FIELD_EX32(id->id_isar6, ID_ISAR6, JSCVT) != 0;
++}
++
+ static inline bool isar_feature_aa32_dp(const ARMISARegisters *id)
+ {
+     return FIELD_EX32(id->id_isar6, ID_ISAR6, DP) != 0;
+@@ -3351,6 +3356,11 @@ static inline bool isar_feature_aa64_dp(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, DP) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
++}
++
+ static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 923e8e1525..747cb64d29 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -218,6 +218,9 @@ DEF_HELPER_FLAGS_2(rintd_exact, TCG_CALL_NO_RWG, f64, f64, ptr)
+ DEF_HELPER_FLAGS_2(rints, TCG_CALL_NO_RWG, f32, f32, ptr)
+ DEF_HELPER_FLAGS_2(rintd, TCG_CALL_NO_RWG, f64, f64, ptr)
+ 
++DEF_HELPER_FLAGS_2(vjcvt, TCG_CALL_NO_RWG, i32, f64, env)
++DEF_HELPER_FLAGS_2(fjcvtzs, TCG_CALL_NO_RWG, i64, f64, ptr)
++
+ /* neon_helper.c */
+ DEF_HELPER_FLAGS_3(neon_qadd_u8, TCG_CALL_NO_RWG, i32, env, i32, i32)
+ DEF_HELPER_FLAGS_3(neon_qadd_s8, TCG_CALL_NO_RWG, i32, env, i32, i32)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index edf6e0e1f1..8ea6569088 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2001,6 +2001,7 @@ static void arm_max_initfn(Object *obj)
+             cpu->isar.id_isar5 = t;
+ 
+             t = cpu->isar.id_isar6;
++            t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
+             t = FIELD_DP32(t, ID_ISAR6, DP, 1);
+             cpu->isar.id_isar6 = t;
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index eff0f164dd..69e4134f79 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -311,6 +311,7 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->isar.id_aa64isar0 = t;
+ 
+         t = cpu->isar.id_aa64isar1;
++        t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
+         t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
+         t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
+@@ -344,6 +345,7 @@ static void aarch64_max_initfn(Object *obj)
+         cpu->isar.id_isar5 = u;
+ 
+         u = cpu->isar.id_isar6;
++        u = FIELD_DP32(u, ID_ISAR6, JSCVT, 1);
+         u = FIELD_DP32(u, ID_ISAR6, DP, 1);
+         cpu->isar.id_isar6 = u;
+ 
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index dbce24fe32..c56e878787 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -6526,6 +6526,24 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
+     }
+ }
+ 
++static void handle_fjcvtzs(DisasContext *s, int rd, int rn)
++{
++    TCGv_i64 t = read_fp_dreg(s, rn);
++    TCGv_ptr fpstatus = get_fpstatus_ptr(false);
++
++    gen_helper_fjcvtzs(t, t, fpstatus);
++
++    tcg_temp_free_ptr(fpstatus);
++
++    tcg_gen_ext32u_i64(cpu_reg(s, rd), t);
++    tcg_gen_extrh_i64_i32(cpu_ZF, t);
++    tcg_gen_movi_i32(cpu_CF, 0);
++    tcg_gen_movi_i32(cpu_NF, 0);
++    tcg_gen_movi_i32(cpu_VF, 0);
++
++    tcg_temp_free_i64(t);
++}
++
+ /* Floating point <-> integer conversions
+  *   31   30  29 28       24 23  22  21 20   19 18 16 15         10 9  5 4  0
+  * +----+---+---+-----------+------+---+-------+-----+-------------+----+----+
+@@ -6601,6 +6619,14 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
+             handle_fmov(s, rd, rn, type, itof);
+             break;
+ 
++        case 0b00111110: /* FJCVTZS */
++            if (!dc_isar_feature(aa64_jscvt, s)) {
++                goto do_unallocated;
++            } else if (fp_access_check(s)) {
++                handle_fjcvtzs(s, rd, rn);
++            }
++            break;
++
+         default:
+         do_unallocated:
+             unallocated_encoding(s);
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index dac737f6ca..64c5fe0df3 100644
+index 64c5fe0df3..c1175798ac 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3639,52 +3639,108 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             }
-         } else {
-             /* data processing */
-+            bool rd_is_dp = dp;
-+            bool rm_is_dp = dp;
-+            bool no_output = false;
-+
-             /* The opcode is in bits 23, 21, 20 and 6.  */
-             op = ((insn >> 20) & 8) | ((insn >> 19) & 6) | ((insn >> 6) & 1);
--            if (dp) {
--                if (op == 15) {
--                    /* rn is opcode */
--                    rn = ((insn >> 15) & 0x1e) | ((insn >> 7) & 1);
--                } else {
--                    /* rn is register number */
--                    VFP_DREG_N(rn, insn);
--                }
-+            rn = VFP_SREG_N(insn);
+@@ -3718,6 +3718,13 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     rm_is_dp = false;
+                     break;
  
--                if (op == 15 && (rn == 15 || ((rn & 0x1c) == 0x18) ||
--                                 ((rn & 0x1e) == 0x6))) {
--                    /* Integer or single/half precision destination.  */
--                    rd = VFP_SREG_D(insn);
--                } else {
--                    VFP_DREG_D(rd, insn);
--                }
--                if (op == 15 &&
--                    (((rn & 0x1c) == 0x10) || ((rn & 0x14) == 0x14) ||
--                     ((rn & 0x1e) == 0x4))) {
--                    /* VCVT from int or half precision is always from S reg
--                     * regardless of dp bit. VCVT with immediate frac_bits
--                     * has same format as SREG_M.
-+            if (op == 15) {
-+                /* rn is opcode, encoded as per VFP_SREG_N. */
-+                switch (rn) {
-+                case 0x00: /* vmov */
-+                case 0x01: /* vabs */
-+                case 0x02: /* vneg */
-+                case 0x03: /* vsqrt */
-+                    break;
-+
-+                case 0x04: /* vcvtb.f64.f16, vcvtb.f32.f16 */
-+                case 0x05: /* vcvtt.f64.f16, vcvtt.f32.f16 */
-+                    /*
-+                     * VCVTB, VCVTT: only present with the halfprec extension
-+                     * UNPREDICTABLE if bit 8 is set prior to ARMv8
-+                     * (we choose to UNDEF)
-                      */
--                    rm = VFP_SREG_M(insn);
--                } else {
--                    VFP_DREG_M(rm, insn);
-+                    if ((dp && !arm_dc_feature(s, ARM_FEATURE_V8)) ||
-+                        !arm_dc_feature(s, ARM_FEATURE_VFP_FP16)) {
-+                        return 1;
-+                    }
-+                    rm_is_dp = false;
-+                    break;
-+                case 0x06: /* vcvtb.f16.f32, vcvtb.f16.f64 */
-+                case 0x07: /* vcvtt.f16.f32, vcvtt.f16.f64 */
-+                    if ((dp && !arm_dc_feature(s, ARM_FEATURE_V8)) ||
-+                        !arm_dc_feature(s, ARM_FEATURE_VFP_FP16)) {
++                case 0x13: /* vjcvt */
++                    if (!dp || !dc_isar_feature(aa32_jscvt, s)) {
 +                        return 1;
 +                    }
 +                    rd_is_dp = false;
 +                    break;
 +
-+                case 0x08: case 0x0a: /* vcmp, vcmpz */
-+                case 0x09: case 0x0b: /* vcmpe, vcmpez */
-+                    no_output = true;
-+                    break;
-+
-+                case 0x0c: /* vrintr */
-+                case 0x0d: /* vrintz */
-+                case 0x0e: /* vrintx */
-+                    break;
-+
-+                case 0x0f: /* vcvt double<->single */
-+                    rd_is_dp = !dp;
-+                    break;
-+
-+                case 0x10: /* vcvt.fxx.u32 */
-+                case 0x11: /* vcvt.fxx.s32 */
-+                    rm_is_dp = false;
-+                    break;
-+                case 0x18: /* vcvtr.u32.fxx */
-+                case 0x19: /* vcvtz.u32.fxx */
-+                case 0x1a: /* vcvtr.s32.fxx */
-+                case 0x1b: /* vcvtz.s32.fxx */
-+                    rd_is_dp = false;
-+                    break;
-+
-+                case 0x14: /* vcvt fp <-> fixed */
-+                case 0x15:
-+                case 0x16:
-+                case 0x17:
-+                case 0x1c:
-+                case 0x1d:
-+                case 0x1e:
-+                case 0x1f:
-+                    if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
-+                        return 1;
-+                    }
-+                    /* Immediate frac_bits has same format as SREG_M.  */
-+                    rm_is_dp = false;
-+                    break;
-+
-+                default:
-+                    return 1;
-                 }
-+            } else if (dp) {
-+                /* rn is register number */
-+                VFP_DREG_N(rn, insn);
-+            }
-+
-+            if (rd_is_dp) {
-+                VFP_DREG_D(rd, insn);
-+            } else {
-+                rd = VFP_SREG_D(insn);
-+            }
-+            if (rm_is_dp) {
-+                VFP_DREG_M(rm, insn);
-             } else {
--                rn = VFP_SREG_N(insn);
--                if (op == 15 && rn == 15) {
--                    /* Double precision destination.  */
--                    VFP_DREG_D(rd, insn);
--                } else {
--                    rd = VFP_SREG_D(insn);
--                }
--                /* NB that we implicitly rely on the encoding for the frac_bits
--                 * in VCVT of fixed to float being the same as that of an SREG_M
--                 */
-                 rm = VFP_SREG_M(insn);
-             }
- 
-             veclen = s->vec_len;
--            if (op == 15 && rn > 3)
-+            if (op == 15 && rn > 3) {
-                 veclen = 0;
-+            }
- 
-             /* Shut up compiler warnings.  */
-             delta_m = 0;
-@@ -3720,55 +3776,28 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             /* Load the initial operands.  */
-             if (op == 15) {
-                 switch (rn) {
--                case 16:
--                case 17:
--                    /* Integer source */
--                    gen_mov_F0_vreg(0, rm);
--                    break;
--                case 8:
--                case 9:
--                    /* Compare */
-+                case 0x08: case 0x09: /* Compare */
-                     gen_mov_F0_vreg(dp, rd);
-                     gen_mov_F1_vreg(dp, rm);
-                     break;
--                case 10:
--                case 11:
--                    /* Compare with zero */
-+                case 0x0a: case 0x0b: /* Compare with zero */
-                     gen_mov_F0_vreg(dp, rd);
-                     gen_vfp_F1_ld0(dp);
-                     break;
--                case 20:
--                case 21:
--                case 22:
--                case 23:
--                case 28:
--                case 29:
--                case 30:
--                case 31:
-+                case 0x14: /* vcvt fp <-> fixed */
-+                case 0x15:
-+                case 0x16:
-+                case 0x17:
-+                case 0x1c:
-+                case 0x1d:
-+                case 0x1e:
-+                case 0x1f:
-                     /* Source and destination the same.  */
-                     gen_mov_F0_vreg(dp, rd);
-                     break;
--                case 4:
--                case 5:
--                case 6:
--                case 7:
--                    /* VCVTB, VCVTT: only present with the halfprec extension
--                     * UNPREDICTABLE if bit 8 is set prior to ARMv8
--                     * (we choose to UNDEF)
--                     */
--                    if ((dp && !arm_dc_feature(s, ARM_FEATURE_V8)) ||
--                        !arm_dc_feature(s, ARM_FEATURE_VFP_FP16)) {
--                        return 1;
--                    }
--                    if (!extract32(rn, 1, 1)) {
--                        /* Half precision source.  */
--                        gen_mov_F0_vreg(0, rm);
--                        break;
--                    }
--                    /* Otherwise fall through */
                  default:
-                     /* One source operand.  */
--                    gen_mov_F0_vreg(dp, rm);
-+                    gen_mov_F0_vreg(rm_is_dp, rm);
-                     break;
-                 }
-             } else {
-@@ -4047,10 +4076,11 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         break;
-                     }
-                     case 15: /* single<->double conversion */
--                        if (dp)
-+                        if (dp) {
-                             gen_helper_vfp_fcvtsd(cpu_F0s, cpu_F0d, cpu_env);
--                        else
-+                        } else {
-                             gen_helper_vfp_fcvtds(cpu_F0d, cpu_F0s, cpu_env);
-+                        }
-                         break;
-                     case 16: /* fuito */
-                         gen_vfp_uito(dp, 0);
-@@ -4059,27 +4089,15 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         gen_vfp_sito(dp, 0);
-                         break;
-                     case 20: /* fshto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_shto(dp, 16 - rm, 0);
-                         break;
-                     case 21: /* fslto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_slto(dp, 32 - rm, 0);
-                         break;
-                     case 22: /* fuhto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_uhto(dp, 16 - rm, 0);
-                         break;
-                     case 23: /* fulto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_ulto(dp, 32 - rm, 0);
-                         break;
-                     case 24: /* ftoui */
-@@ -4095,57 +4113,34 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         gen_vfp_tosiz(dp, 0);
-                         break;
-                     case 28: /* ftosh */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_tosh(dp, 16 - rm, 0);
-                         break;
-                     case 29: /* ftosl */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_tosl(dp, 32 - rm, 0);
-                         break;
-                     case 30: /* ftouh */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_touh(dp, 16 - rm, 0);
-                         break;
-                     case 31: /* ftoul */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_toul(dp, 32 - rm, 0);
-                         break;
-                     default: /* undefined */
--                        return 1;
-+                        g_assert_not_reached();
-                     }
-                     break;
-                 default: /* undefined */
                      return 1;
                  }
- 
--                /* Write back the result.  */
--                if (op == 15 && (rn >= 8 && rn <= 11)) {
--                    /* Comparison, do nothing.  */
--                } else if (op == 15 && dp && ((rn & 0x1c) == 0x18 ||
--                                              (rn & 0x1e) == 0x6)) {
--                    /* VCVT double to int: always integer result.
--                     * VCVT double to half precision is always a single
--                     * precision result.
--                     */
--                    gen_mov_vreg_F0(0, rd);
--                } else if (op == 15 && rn == 15) {
--                    /* conversion */
--                    gen_mov_vreg_F0(!dp, rd);
--                } else {
--                    gen_mov_vreg_F0(dp, rd);
-+                /* Write back the result, if any.  */
-+                if (!no_output) {
-+                    gen_mov_vreg_F0(rd_is_dp, rd);
-                 }
- 
-                 /* break out of the loop if we have finished  */
--                if (veclen == 0)
-+                if (veclen == 0) {
-                     break;
-+                }
- 
-                 if (op == 15 && delta_m == 0) {
-                     /* single source one-many */
+@@ -4088,6 +4095,9 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                     case 17: /* fsito */
+                         gen_vfp_sito(dp, 0);
+                         break;
++                    case 19: /* vjcvt */
++                        gen_helper_vjcvt(cpu_F0s, cpu_F0d, cpu_env);
++                        break;
+                     case 20: /* fshto */
+                         gen_vfp_shto(dp, 16 - rm, 0);
+                         break;
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 74d3030c47..f19c0606c2 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -1086,3 +1086,91 @@ int arm_rmode_to_sf(int rmode)
+     }
+     return rmode;
+ }
++
++/*
++ * Implement float64 to int32_t conversion without saturation;
++ * the result is supplied modulo 2^32.
++ */
++uint64_t HELPER(fjcvtzs)(float64 value, void *vstatus)
++{
++    float_status *status = vstatus;
++    uint32_t exp, sign;
++    uint64_t frac;
++    uint32_t inexact = 1; /* !Z */
++
++    sign = extract64(value, 63, 1);
++    exp = extract64(value, 52, 11);
++    frac = extract64(value, 0, 52);
++
++    if (exp == 0) {
++        /* While not inexact for IEEE FP, -0.0 is inexact for JavaScript.  */
++        inexact = sign;
++        if (frac != 0) {
++            if (status->flush_inputs_to_zero) {
++                float_raise(float_flag_input_denormal, status);
++            } else {
++                float_raise(float_flag_inexact, status);
++                inexact = 1;
++            }
++        }
++        frac = 0;
++    } else if (exp == 0x7ff) {
++        /* This operation raises Invalid for both NaN and overflow (Inf).  */
++        float_raise(float_flag_invalid, status);
++        frac = 0;
++    } else {
++        int true_exp = exp - 1023;
++        int shift = true_exp - 52;
++
++        /* Restore implicit bit.  */
++        frac |= 1ull << 52;
++
++        /* Shift the fraction into place.  */
++        if (shift >= 0) {
++            /* The number is so large we must shift the fraction left.  */
++            if (shift >= 64) {
++                /* The the fraction is shifted out entirely.  */
++                frac = 0;
++            } else {
++                frac <<= shift;
++            }
++        } else if (shift > -64) {
++            /* Normal case -- shift right and notice if bits shift out.  */
++            inexact = (frac << (64 + shift)) != 0;
++            frac >>= -shift;
++        } else {
++            /* The fraction is shifted out entirely.  */
++            frac = 0;
++        }
++
++        /* Notice overflow or inexact exceptions.  */
++        if (true_exp > 31 || frac > (sign ? 0x80000000ull : 0x7fffffff)) {
++            /* Overflow, for which this operation raises invalid.  */
++            float_raise(float_flag_invalid, status);
++            inexact = 1;
++        } else if (inexact) {
++            float_raise(float_flag_inexact, status);
++        }
++
++        /* Honor the sign.  */
++        if (sign) {
++            frac = -frac;
++        }
++    }
++
++    /* Pack the result and the env->ZF representation of Z together.  */
++    return deposit64(frac, 32, 32, inexact);
++}
++
++uint32_t HELPER(vjcvt)(float64 value, CPUARMState *env)
++{
++    uint64_t pair = HELPER(fjcvtzs)(value, &env->vfp.fp_status);
++    uint32_t result = pair;
++    uint32_t z = (pair >> 32) == 0;
++
++    /* Store Z, clear NCV, in FPSCR.NZCF.  */
++    env->vfp.xregs[ARM_VFP_FPSCR]
++        = (env->vfp.xregs[ARM_VFP_FPSCR] & ~CPSR_NZCV) | (z * CPSR_Z);
++
++    return result;
++}
 -- 
 2.17.2
