@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34105)
+Received: from eggs.gnu.org ([209.51.188.92]:36097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gugss-00038O-EJ
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:02:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1guh1k-0001j0-PC
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:11:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gugsn-00008B-QY
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:02:41 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gugsg-0008Pm-6Z
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:02:32 -0500
-Received: by mail-pg1-x541.google.com with SMTP id s198so5082090pgs.2
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 09:02:29 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 15 Feb 2019 09:02:25 -0800
-Message-Id: <20190215170225.15537-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2] softfloat: Support float_round_to_odd more
- places
+	(envelope-from <no-reply@patchew.org>) id 1guh1j-0003qP-4G
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 12:11:52 -0500
+Resent-Message-Id: <E1guh1j-0003qP-4G@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155025069111.24.1475715005005100014@49fa7ef69f7b>
+In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Feb 2019 09:11:32 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v7 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,261 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@redhat.com, alex.bennee@linaro.org
+To: palmer@sifive.com
+Cc: fam@euphon.net, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Previously this was only supported for roundAndPackFloat64.
-
-New support in round_canonical, round_to_int, float128_round_to_int,
-roundAndPackFloat32, roundAndPackInt32, roundAndPackInt64,
-roundAndPackUint64.  This does not include any of the floatx80 routines,
-as we do not have users for that rounding mode there.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Convert float128_round_to_int as well.  Add fp-test support.
----
- fpu/softfloat.c    | 64 ++++++++++++++++++++++++++++++++++++++++++----
- tests/fp/fp-test.c | 43 ++++++++++++++++++++++++-------
- 2 files changed, 93 insertions(+), 14 deletions(-)
-
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 9132d7a0b0..76132d4cd5 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -696,6 +696,7 @@ static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
- static FloatParts round_canonical(FloatParts p, float_status *s,
-                                   const FloatFmt *parm)
- {
-+    const uint64_t frac_lsb = parm->frac_lsb;
-     const uint64_t frac_lsbm1 = parm->frac_lsbm1;
-     const uint64_t round_mask = parm->round_mask;
-     const uint64_t roundeven_mask = parm->roundeven_mask;
-@@ -731,6 +732,10 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-             inc = p.sign ? round_mask : 0;
-             overflow_norm = !p.sign;
-             break;
-+        case float_round_to_odd:
-+            overflow_norm = true;
-+            inc = frac & frac_lsb ? 0 : round_mask;
-+            break;
-         default:
-             g_assert_not_reached();
-         }
-@@ -778,9 +783,14 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-             shift64RightJamming(frac, 1 - exp, &frac);
-             if (frac & round_mask) {
-                 /* Need to recompute round-to-even.  */
--                if (s->float_rounding_mode == float_round_nearest_even) {
-+                switch (s->float_rounding_mode) {
-+                case float_round_nearest_even:
-                     inc = ((frac & roundeven_mask) != frac_lsbm1
-                            ? frac_lsbm1 : 0);
-+                    break;
-+                case float_round_to_odd:
-+                    inc = frac & frac_lsb ? 0 : round_mask;
-+                    break;
-                 }
-                 flags |= float_flag_inexact;
-                 frac += inc;
-@@ -1988,6 +1998,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
-             case float_round_down:
-                 one = a.sign;
-                 break;
-+            case float_round_to_odd:
-+                one = true;
-+                break;
-             default:
-                 g_assert_not_reached();
-             }
-@@ -2021,6 +2034,9 @@ static FloatParts round_to_int(FloatParts a, int rmode,
-             case float_round_down:
-                 inc = a.sign ? rnd_mask : 0;
-                 break;
-+            case float_round_to_odd:
-+                inc = a.frac & frac_lsb ? 0 : rnd_mask;
-+                break;
-             default:
-                 g_assert_not_reached();
-             }
-@@ -3314,6 +3330,9 @@ static int32_t roundAndPackInt32(flag zSign, uint64_t absZ, float_status *status
-     case float_round_down:
-         roundIncrement = zSign ? 0x7f : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = absZ & 0x80 ? 0 : 0x7f;
-+        break;
-     default:
-         abort();
-     }
-@@ -3368,6 +3387,9 @@ static int64_t roundAndPackInt64(flag zSign, uint64_t absZ0, uint64_t absZ1,
-     case float_round_down:
-         increment = zSign && absZ1;
-         break;
-+    case float_round_to_odd:
-+        increment = !(absZ0 & 1) && absZ1;
-+        break;
-     default:
-         abort();
-     }
-@@ -3424,6 +3446,9 @@ static int64_t roundAndPackUint64(flag zSign, uint64_t absZ0,
-     case float_round_down:
-         increment = zSign && absZ1;
-         break;
-+    case float_round_to_odd:
-+        increment = !(absZ0 & 1) && absZ1;
-+        break;
-     default:
-         abort();
-     }
-@@ -3526,6 +3551,8 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-     case float_round_down:
-         roundIncrement = zSign ? 0x7f : 0;
-         break;
-+    case float_round_to_odd:
-+        roundIncrement = zSig & 0x80 ? 0 : 0x7f;
-     default:
-         abort();
-         break;
-@@ -3536,8 +3563,10 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-              || (    ( zExp == 0xFD )
-                   && ( (int32_t) ( zSig + roundIncrement ) < 0 ) )
-            ) {
-+            bool overflow_to_inf = roundingMode != float_round_to_odd &&
-+                                   roundIncrement != 0;
-             float_raise(float_flag_overflow | float_flag_inexact, status);
--            return packFloat32( zSign, 0xFF, - ( roundIncrement == 0 ));
-+            return packFloat32(zSign, 0xFF, -!overflow_to_inf);
-         }
-         if ( zExp < 0 ) {
-             if (status->flush_to_zero) {
-@@ -3555,6 +3584,13 @@ static float32 roundAndPackFloat32(flag zSign, int zExp, uint32_t zSig,
-             if (isTiny && roundBits) {
-                 float_raise(float_flag_underflow, status);
-             }
-+            if (roundingMode == float_round_to_odd) {
-+                /*
-+                 * For round-to-odd case, the roundIncrement depends on
-+                 * zSig which just changed.
-+                 */
-+                roundIncrement = zSig & 0x80 ? 0 : 0x7f;
-+            }
-         }
-     }
-     if (roundBits) {
-@@ -6958,6 +6994,15 @@ float128 float128_round_to_int(float128 a, float_status *status)
-                 add128(z.high, z.low, 0, roundBitsMask, &z.high, &z.low);
-             }
-             break;
-+        case float_round_to_odd:
-+            /*
-+             * Note that if lastBitMask == 0, the last bit is the lsb
-+             * of high, and roundBitsMask == -1.
-+             */
-+            if ((lastBitMask ? z.low & lastBitMask : z.high & 1) == 0) {
-+                add128(z.high, z.low, 0, roundBitsMask, &z.high, &z.low);
-+            }
-+            break;
-         default:
-             abort();
-         }
-@@ -6969,7 +7014,7 @@ float128 float128_round_to_int(float128 a, float_status *status)
-             status->float_exception_flags |= float_flag_inexact;
-             aSign = extractFloat128Sign( a );
-             switch (status->float_rounding_mode) {
--             case float_round_nearest_even:
-+            case float_round_nearest_even:
-                 if (    ( aExp == 0x3FFE )
-                      && (   extractFloat128Frac0( a )
-                           | extractFloat128Frac1( a ) )
-@@ -6982,14 +7027,17 @@ float128 float128_round_to_int(float128 a, float_status *status)
-                     return packFloat128(aSign, 0x3FFF, 0, 0);
-                 }
-                 break;
--             case float_round_down:
-+            case float_round_down:
-                 return
-                       aSign ? packFloat128( 1, 0x3FFF, 0, 0 )
-                     : packFloat128( 0, 0, 0, 0 );
--             case float_round_up:
-+            case float_round_up:
-                 return
-                       aSign ? packFloat128( 1, 0, 0, 0 )
-                     : packFloat128( 0, 0x3FFF, 0, 0 );
-+
-+            case float_round_to_odd:
-+                return packFloat128(aSign, 0x3FFF, 0, 0);
-             }
-             return packFloat128( aSign, 0, 0, 0 );
-         }
-@@ -7022,6 +7070,12 @@ float128 float128_round_to_int(float128 a, float_status *status)
-                 z.high += roundBitsMask;
-             }
-             break;
-+        case float_round_to_odd:
-+            if ((z.high & lastBitMask) == 0) {
-+                z.high |= (a.low != 0);
-+                z.high += roundBitsMask;
-+            }
-+            break;
-         default:
-             abort();
-         }
-diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
-index 2a35ef601d..471adb862d 100644
---- a/tests/fp/fp-test.c
-+++ b/tests/fp/fp-test.c
-@@ -125,17 +125,42 @@ static void not_implemented(void)
- 
- static bool blacklisted(unsigned op, int rmode)
- {
--    /* odd has only been implemented for a few 128-bit ops */
-+    /* odd has not been implemented for any 80-bit ops */
-     if (rmode == softfloat_round_odd) {
-         switch (op) {
--        case F128_ADD:
--        case F128_SUB:
--        case F128_MUL:
--        case F128_DIV:
--        case F128_TO_F64:
--        case F128_SQRT:
--            return false;
--        default:
-+        case EXTF80_TO_UI32:
-+        case EXTF80_TO_UI64:
-+        case EXTF80_TO_I32:
-+        case EXTF80_TO_I64:
-+        case EXTF80_TO_UI32_R_MINMAG:
-+        case EXTF80_TO_UI64_R_MINMAG:
-+        case EXTF80_TO_I32_R_MINMAG:
-+        case EXTF80_TO_I64_R_MINMAG:
-+        case EXTF80_TO_F16:
-+        case EXTF80_TO_F32:
-+        case EXTF80_TO_F64:
-+        case EXTF80_TO_F128:
-+        case EXTF80_ROUNDTOINT:
-+        case EXTF80_ADD:
-+        case EXTF80_SUB:
-+        case EXTF80_MUL:
-+        case EXTF80_DIV:
-+        case EXTF80_REM:
-+        case EXTF80_SQRT:
-+        case EXTF80_EQ:
-+        case EXTF80_LE:
-+        case EXTF80_LT:
-+        case EXTF80_EQ_SIGNALING:
-+        case EXTF80_LE_QUIET:
-+        case EXTF80_LT_QUIET:
-+        case UI32_TO_EXTF80:
-+        case UI64_TO_EXTF80:
-+        case I32_TO_EXTF80:
-+        case I64_TO_EXTF80:
-+        case F16_TO_EXTF80:
-+        case F32_TO_EXTF80:
-+        case F64_TO_EXTF80:
-+        case F128_TO_EXTF80:
-             return true;
-         }
-     }
--- 
-2.17.2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxMzE1NTQxNC4yMjI4
+NS0xLXBhbG1lckBzaWZpdmUuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxMzE1NTQxNC4yMjI4NS0xLXBhbG1lckBzaWZp
+dmUuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMDAvMzVdIHRhcmdldC9yaXNj
+djogQ29udmVydCB0byBkZWNvZGV0cmVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAy
+MTMxNTU0MTQuMjIyODUtMS1wYWxtZXJAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzIwMTkwMjEzMTU1
+NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2ZS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwoyODZjNGM5ZGI1IHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMy
+IGJpdCB0cmFuc2xhdG9ycwo3ZjBiOWM4MzRhIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmlu
+ZyBjb21wcmVzc2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NAo2MmNlYWJhOTYx
+IHRhcmdldC9yaXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJp
+c2N2NjQKNWJkZmI5YTI3NiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3Nf
+ZCwgQGNzX3cgaW5zbnMKZTMzZmM3OGQzYyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5z
+bnMgdG8gc2hhcmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjY0ZjVlZTYzNzEgdGFyZ2V0L3Jpc2N2
+OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkKNWQxNGQ3ODM5YSB0YXJnZXQvcmlzY3Y6IFJlbW92
+ZSBnZW5fc3lzdGVtKCkKZDk1ODc0YTUxNCB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0
+aCB0byBnZW5fYXJpdGgKYzczZTg5M2Q1MCB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVj
+b2Rpbmcgb2YgUlYzMi82NE0gaW5zbgplOTRmMjc2OTUyIHRhcmdldC9yaXNjdjogUmVtb3ZlIHNo
+aWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcKOWEyNWUyOWJlZSB0YXJnZXQvcmlzY3Y6
+IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0cwozNDYyMzA3ZTAwIHRh
+cmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1
+bmN0aW9ucwowYTdmMjRlMzI5IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBm
+cm9tIGdlbl9zdG9yZSgpCmRiYWY4OGY4MTAgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRl
+Y29kaW5nIGZyb20gZ2VuX2xvYWQoKQo1Yjc3MDdjNTg2IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1h
+bnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKQoyNzhlMTdlMzEzIHRhcmdldC9yaXNjdjog
+UmVtb3ZlIGdlbl9qYWxyKCkKYzE5Y2EyZWYyYyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJh
+bnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNDEwNDlmZjA3MyB0YXJnZXQvcmlzY3Y6
+IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKZmY5NDE2NDI1
+YSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29k
+ZXRyZWUKNWZjY2E1MmFkMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBk
+ZWNvZGV0cmVlCmM5ZWUwNDlhODcgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRv
+IGRlY29kZXRyZWUKNGExMTc0NTMyNyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMg
+dG8gZGVjb2RldHJlZQpjMGJjYjE3MjFhIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNu
+cyB0byBkZWNvZGV0cmVlCjliOTA4MTE0ZjkgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGlu
+c25zIHRvIGRlY29kZXRyZWUKNDdjODQ1ZmJmNiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEg
+aW5zbnMgdG8gZGVjb2RldHJlZQpmZjMzZTIyY2MyIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMy
+QSBpbnNucyB0byBkZWNvZGV0cmVlCmY2YjlhOTIzN2EgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
+WE0gaW5zbnMgdG8gZGVjb2RldHJlZQo4OGU4YjI2YzI0IHRhcmdldC9yaXNjdjogQ29udmVydCBS
+VlhJIGNzciBpbnNucyB0byBkZWNvZGV0cmVlCjg5ODUxNmIyZGEgdGFyZ2V0L3Jpc2N2OiBDb252
+ZXJ0IFJWWEkgZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZQo1NzdhZDI4ZmEyIHRhcmdldC9yaXNj
+djogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQo1MzY0MWUyNDg1
+IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRy
+ZWUKM2Q3ZjQ0ZmI0ZSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNu
+cyB0byBkZWNvZGV0cmVlCjBiMjkwMTJlNjkgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJh
+bmNoIGluc25zIHRvIGRlY29kZXRyZWUKNjllMTg5Y2UyNSB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRl
+IGRlY29kZXRyZWUgYW5kIGltcGxlbW50IExVSSAmIEFVSVBDCmQ2MWVkMzM3ZWQgdGFyZ2V0L3Jp
+c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IGQ2MWVkMzM3ZWRjYSAodGFyZ2V0L3Jp
+c2N2OiBNb3ZlIENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQpCjIvMzUgQ2hl
+Y2tpbmcgY29tbWl0IDY5ZTE4OWNlMjUyYyAodGFyZ2V0L3Jpc2N2OiBBY3RpdmF0ZSBkZWNvZGV0
+cmVlIGFuZCBpbXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMg
+ZmlsZXMKIzEyNTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjE4ODU6Citib29sIGRl
+Y29kZV9pbnNuMzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IGluc24pOwoKdG90YWw6IDEg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBjb21taXQgMGIyOTAxMmU2OWVlICh0
+YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8z
+NSBDaGVja2luZyBjb21taXQgM2Q3ZjQ0ZmI0ZTJlICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYz
+MkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1LzM1IENoZWNraW5nIGNvbW1pdCA1
+MzY0MWUyNDg1MmYgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25z
+IHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+NS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1IENoZWNraW5nIGNvbW1pdCA1Nzdh
+ZDI4ZmEyMjQgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8g
+ZGVjb2RldHJlZSkKNy8zNSBDaGVja2luZyBjb21taXQgODk4NTE2YjJkYTgxICh0YXJnZXQvcmlz
+Y3Y6IENvbnZlcnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNvZGV0cmVlKQo4LzM1IENoZWNraW5n
+IGNvbW1pdCA4OGU4YjI2YzI0Y2YgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNu
+cyB0byBkZWNvZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1pdCBmNmI5YTkyMzdhNWQgKHRhcmdl
+dC9yaXNjdjogQ29udmVydCBSVlhNIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQ4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgMTQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KMTAvMzUgQ2hlY2tpbmcgY29tbWl0IGZmMzNlMjJjYzI3MSAodGFyZ2V0L3Jpc2N2OiBDb252
+ZXJ0IFJWMzJBIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzM1IENo
+ZWNraW5nIGNvbW1pdCA0N2M4NDVmYmY2ZWEgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0QSBp
+bnNucyB0byBkZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBjb21taXQgOWI5MDgxMTRmOTk4ICh0
+YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojNzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCA0MTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMzUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMTMvMzUgQ2hlY2tpbmcgY29tbWl0IGMwYmNiMTcyMWFlMyAodGFyZ2V0L3Jpc2N2
+OiBDb252ZXJ0IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUpCjE0LzM1IENoZWNraW5nIGNvbW1p
+dCA0YTExNzQ1MzI3MzMgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyRCBpbnNucyB0byBkZWNv
+ZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM3MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8zNSBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVja2luZyBjb21taXQgYzllZTA0OWE4
+NzM0ICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTYv
+MzUgQ2hlY2tpbmcgY29tbWl0IDVmY2NhNTJhZDFkMCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJW
+IHByaXYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMzUgQ2hlY2tp
+bmcgY29tbWl0IGZmOTQxNjQyNWEzMSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDAg
+b2YgUlZYQyBpbnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBm
+aWxlcwojMjQ2OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6MTA2NzoKK2Jvb2wgZGVj
+b2RlX2luc24xNihEaXNhc0NvbnRleHQgKmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBl
+cnJvcnMsIDEgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8zNSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKMTgvMzUgQ2hlY2tpbmcgY29tbWl0IDQxMDQ5ZmYwNzNjZSAo
+dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDEgb2YgUlZYQyBpbnNucyB0byBkZWNvZGV0
+cmVlKQoxOS8zNSBDaGVja2luZyBjb21taXQgYzE5Y2EyZWYyYzgyICh0YXJnZXQvcmlzY3Y6IENv
+bnZlcnQgcXVhZHJhbnQgMiBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjIwLzM1IENoZWNr
+aW5nIGNvbW1pdCAyNzhlMTdlMzEzYzEgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdlbl9qYWxyKCkp
+CjIxLzM1IENoZWNraW5nIGNvbW1pdCA1Yjc3MDdjNTg2Y2QgKHRhcmdldC9yaXNjdjogUmVtb3Zl
+IG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9icmFuY2goKSkKMjIvMzUgQ2hlY2tpbmcgY29tbWl0
+IGRiYWY4OGY4MTBhMSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20g
+Z2VuX2xvYWQoKSkKMjMvMzUgQ2hlY2tpbmcgY29tbWl0IDBhN2YyNGUzMjliNyAodGFyZ2V0L3Jp
+c2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZyb20gZ2VuX3N0b3JlKCkpCjI0LzM1IENoZWNr
+aW5nIGNvbW1pdCAzNDYyMzA3ZTAwNTYgKHRhcmdldC9yaXNjdjogTW92ZSBnZW5fYXJpdGhfaW1t
+KCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucykKMjUvMzUgQ2hlY2tpbmcgY29tbWl0
+IDlhMjVlMjliZWVlNiAodGFyZ2V0L3Jpc2N2OiBtYWtlIEFERC9TVUIvT1IvWE9SL0FORCBpbnNu
+IHVzZSBhcmcgbGlzdHMpCjI2LzM1IENoZWNraW5nIGNvbW1pdCBlOTRmMjc2OTUyNWUgKHRhcmdl
+dC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBzbHQgaW5zbiBtYW51YWwgZGVjb2RpbmcpCjI3LzM1
+IENoZWNraW5nIGNvbW1pdCBjNzNlODkzZDUwM2MgKHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVh
+bCBkZWNvZGluZyBvZiBSVjMyLzY0TSBpbnNuKQoyOC8zNSBDaGVja2luZyBjb21taXQgZDk1ODc0
+YTUxNGI3ICh0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5fYXJpdGgpCjI5
+LzM1IENoZWNraW5nIGNvbW1pdCA1ZDE0ZDc4MzlhMzkgKHRhcmdldC9yaXNjdjogUmVtb3ZlIGdl
+bl9zeXN0ZW0oKSkKMzAvMzUgQ2hlY2tpbmcgY29tbWl0IDY0ZjVlZTYzNzFkOCAodGFyZ2V0L3Jp
+c2N2OiBSZW1vdmUgZGVjb2RlX1JWMzJfNjRHKCkpCjMxLzM1IENoZWNraW5nIGNvbW1pdCBlMzNm
+Yzc4ZDNjNmQgKHRhcmdldC9yaXNjdjogQ29udmVydCBAY3NfMiBpbnNucyB0byBzaGFyZSB0cmFu
+c2xhdGlvbiBmdW5jdGlvbnMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMxODI6
+IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzo1NDM6Citib29sIGRlY29kZV9pbnNuMTYo
+RGlzYXNDb250ZXh0ICpjdHgsIHVpbnQxNl90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxNjQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzEvMzUgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCjMyLzM1IENoZWNraW5nIGNvbW1pdCA1YmRmYjlhMjc2OTcgKHRhcmdldC9yaXNj
+djogQ29udmVydCBAY2xfZCwgQGNsX3csIEBjc19kLCBAY3NfdyBpbnNucykKMzMvMzUgQ2hlY2tp
+bmcgY29tbWl0IDYyY2VhYmE5NjE2YSAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgZnN3X3NkIGFuZCBm
+bHdfbGQgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjg6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDkgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMzMvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzQvMzUgQ2hl
+Y2tpbmcgY29tbWl0IDdmMGI5YzgzNGExZCAodGFyZ2V0L3Jpc2N2OiBTcGxpY2UgcmVtYWluaW5n
+IGNvbXByZXNzZWQgaW5zbiBwYWlycyBmb3IgcmlzY3YzMiB2cyByaXNjdjY0KQozNS8zNSBDaGVj
+a2luZyBjb21taXQgMjg2YzRjOWRiNWE4ICh0YXJnZXQvcmlzY3Y6IFJlbWFpbmluZyBydmMgaW5z
+biByZXVzZSAzMiBiaXQgdHJhbnNsYXRvcnMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjEzMTU1NDE0LjIyMjg1LTEtcGFsbWVyQHNpZml2
+ZS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
