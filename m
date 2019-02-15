@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51994)
+Received: from eggs.gnu.org ([209.51.188.92]:51999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAg-00033V-BK
+	(envelope-from <clg@kaod.org>) id 1gugAg-00033c-EZ
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAd-0005ci-Lw
+	(envelope-from <clg@kaod.org>) id 1gugAd-0005cn-MG
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56342)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAd-0005Ys-6q
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAd-0005Z5-7l
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:16:59 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGEXn5105488
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:57 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0s2g6sk-1
+	x1FGBiPX064043
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:58 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp06ajf70-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:57 -0500
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 16:16:54 -0000
+	Fri, 15 Feb 2019 16:16:55 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 17:16:46 +0100
+Date: Fri, 15 Feb 2019 17:16:39 +0100
 In-Reply-To: <20190215161648.9600-1-clg@kaod.org>
 References: <20190215161648.9600-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215161648.9600-9-clg@kaod.org>
+Message-Id: <20190215161648.9600-2-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 08/10] target/ppc: Add Hypervisor
- Virtualization Interrupt on POWER9
+Subject: [Qemu-devel] [PATCH 01/10] target/ppc: Fix nip on power management
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,139 +45,82 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@ker
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This adds support for delivering that exception
+Those instructions currently raise an exception from within
+the helper. This tends to result in a bogus nip value in
+the env context (typically the beginning of the TB). Such
+a helper needs a gen_update_nip() first.
+
+This fixes it with a different approach which is to throw the
+exception from translate.c instead of the helper using
+gen_exception_nip() which does the right thing. Exception
+EXCP_HLT is also used instead of POWERPC_EXCP_STOP to effectively
+exit from the CPU execution loop.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+[clg : modified the commit log to comment the use of EXCP_HLT instead
+       of POWERPC_EXCP_STOP]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h                |  5 ++++-
- target/ppc/excp_helper.c        | 17 ++++++++++++++++-
- target/ppc/translate_init.inc.c | 16 +++++++++++++++-
- 3 files changed, 35 insertions(+), 3 deletions(-)
+ target/ppc/excp_helper.c |  1 -
+ target/ppc/translate.c   | 12 ++++++++----
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 945cb4bb7dde..ce55aa209770 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -160,8 +160,10 @@ enum {
-     /* Server doorbell variants */
-     POWERPC_EXCP_SDOOR    =3D 99,
-     POWERPC_EXCP_SDOOR_HV =3D 100,
-+    /* ISA 3.00 additions */
-+    POWERPC_EXCP_HVIRT    =3D 101,
-     /* EOL                                                              =
-     */
--    POWERPC_EXCP_NB       =3D 101,
-+    POWERPC_EXCP_NB       =3D 102,
-     /* QEMU exceptions: used internally during code translation         =
-     */
-     POWERPC_EXCP_STOP         =3D 0x200, /* stop translation            =
-       */
-     POWERPC_EXCP_BRANCH       =3D 0x201, /* branch instruction          =
-       */
-@@ -2349,6 +2351,7 @@ enum {
-     PPC_INTERRUPT_PERFM,          /* Performance monitor interrupt      =
-  */
-     PPC_INTERRUPT_HMI,            /* Hypervisor Maintainance interrupt  =
-  */
-     PPC_INTERRUPT_HDOORBELL,      /* Hypervisor Doorbell interrupt      =
-  */
-+    PPC_INTERRUPT_HVIRT,          /* Hypervisor virtualization interrupt=
-  */
- };
-=20
- /* Processor Compatibility mask (PCR) */
 diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 1a2f469a5fa2..d171a5eb6236 100644
+index 751d759fcc1d..8407e0ade938 100644
 --- a/target/ppc/excp_helper.c
 +++ b/target/ppc/excp_helper.c
-@@ -97,6 +97,9 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
-te *env, int excp,
-     case POWERPC_EXCP_HV_MAINT:
-         *msr |=3D 0xaull << (63 - 45);
-         break;
-+    case POWERPC_EXCP_HVIRT:
-+        *msr |=3D 0x9ull << (63 - 45);
-+        break;
-     default:
-         cpu_abort(cs, "Unsupported exception %d in Power Save mode\n",
-                   excp);
-@@ -427,6 +430,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
-excp_model, int excp)
-     case POWERPC_EXCP_HISEG:     /* Hypervisor instruction segment excep=
-tion */
-     case POWERPC_EXCP_SDOOR_HV:  /* Hypervisor Doorbell interrupt       =
-     */
-     case POWERPC_EXCP_HV_EMU:
-+    case POWERPC_EXCP_HVIRT:     /* Hypervisor virtualization           =
-     */
-         srr0 =3D SPR_HSRR0;
-         srr1 =3D SPR_HSRR1;
-         new_msr |=3D (target_ulong)MSR_HVB;
-@@ -809,7 +813,18 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-             return;
-         }
-     }
--    /* Extermal interrupt can ignore MSR:EE under some circumstances */
-+
-+    /* Hypervisor virtualization interrupt */
-+    if (env->pending_interrupts & (1 << PPC_INTERRUPT_HVIRT)) {
-+        /* LPCR will be clear when not supported so this will work */
-+        bool hvice =3D !!(env->spr[SPR_LPCR] & LPCR_HVICE);
-+        if ((async_deliver || msr_hv =3D=3D 0) && hvice) {
-+            powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_HVIRT);
-+            return;
-+        }
-+    }
-+
-+    /* External interrupt can ignore MSR:EE under some circumstances */
-     if (env->pending_interrupts & (1 << PPC_INTERRUPT_EXT)) {
-         bool lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
-         if (async_deliver || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
-es0)) {
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index f8a780e323f2..ae88e004faef 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -3313,6 +3313,15 @@ static void init_excp_POWER8(CPUPPCState *env)
- #endif
+@@ -958,7 +958,6 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
+t insn)
+      * but this doesn't seem to be a problem.
+      */
+     env->msr |=3D (1ull << MSR_EE);
+-    raise_exception(env, EXCP_HLT);
+ }
+ #endif /* defined(TARGET_PPC64) */
+=20
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index d5f29d3536e1..e94422f7ff1c 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3565,7 +3565,8 @@ static void gen_doze(DisasContext *ctx)
+     t =3D tcg_const_i32(PPC_PM_DOZE);
+     gen_helper_pminsn(cpu_env, t);
+     tcg_temp_free_i32(t);
+-    gen_stop_exception(ctx);
++    /* Stop translation, as the CPU is supposed to sleep from now */
++    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
+ #endif /* defined(CONFIG_USER_ONLY) */
  }
 =20
-+static void init_excp_POWER9(CPUPPCState *env)
-+{
-+    init_excp_POWER8(env);
-+
-+#if !defined(CONFIG_USER_ONLY)
-+    env->excp_vectors[POWERPC_EXCP_HVIRT]    =3D 0x00000EA0;
-+#endif
-+}
-+
- #endif
-=20
- /***********************************************************************=
-******/
-@@ -8783,7 +8792,7 @@ static void init_proc_POWER9(CPUPPCState *env)
-     env->icache_line_size =3D 128;
-=20
-     /* Allocate hardware IRQ controller */
--    init_excp_POWER8(env);
-+    init_excp_POWER9(env);
-     ppcPOWER7_irq_init(ppc_env_get_cpu(env));
+@@ -3580,7 +3581,8 @@ static void gen_nap(DisasContext *ctx)
+     t =3D tcg_const_i32(PPC_PM_NAP);
+     gen_helper_pminsn(cpu_env, t);
+     tcg_temp_free_i32(t);
+-    gen_stop_exception(ctx);
++    /* Stop translation, as the CPU is supposed to sleep from now */
++    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
+ #endif /* defined(CONFIG_USER_ONLY) */
  }
 =20
-@@ -8836,6 +8845,11 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-             (env->spr[SPR_LPCR] & LPCR_HDEE)) {
-             return true;
-         }
-+        /* Hypervisor virtualization exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HVIRT)) &&
-+            (env->spr[SPR_LPCR] & LPCR_HVEE)) {
-+            return true;
-+        }
-         if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
-             return true;
-         }
+@@ -3600,7 +3602,8 @@ static void gen_sleep(DisasContext *ctx)
+     t =3D tcg_const_i32(PPC_PM_SLEEP);
+     gen_helper_pminsn(cpu_env, t);
+     tcg_temp_free_i32(t);
+-    gen_stop_exception(ctx);
++    /* Stop translation, as the CPU is supposed to sleep from now */
++    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
+ #endif /* defined(CONFIG_USER_ONLY) */
+ }
+=20
+@@ -3615,7 +3618,8 @@ static void gen_rvwinkle(DisasContext *ctx)
+     t =3D tcg_const_i32(PPC_PM_RVWINKLE);
+     gen_helper_pminsn(cpu_env, t);
+     tcg_temp_free_i32(t);
+-    gen_stop_exception(ctx);
++    /* Stop translation, as the CPU is supposed to sleep from now */
++    gen_exception_nip(ctx, EXCP_HLT, ctx->base.pc_next);
+ #endif /* defined(CONFIG_USER_ONLY) */
+ }
+ #endif /* #if defined(TARGET_PPC64) */
 --=20
 2.20.1
