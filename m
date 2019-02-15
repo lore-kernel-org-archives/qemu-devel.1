@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38106)
+Received: from eggs.gnu.org ([209.51.188.92]:38307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gud0O-000108-Na
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:54:13 -0500
+	(envelope-from <clg@kaod.org>) id 1gud18-0001Qa-Um
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gud0N-000466-Q5
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:54:12 -0500
-Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:39416)
+	(envelope-from <clg@kaod.org>) id 1gud17-0005i1-Kr
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:54:58 -0500
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:34427)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gud0M-0003pt-B4
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:54:11 -0500
-Received: from player694.ha.ovh.net (unknown [10.109.160.12])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id A062B1AE0CE
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:54:07 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gud16-0005Xs-Ru
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 07:54:57 -0500
+Received: from player776.ha.ovh.net (unknown [10.109.143.24])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9FA4E50429
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:54:53 +0100 (CET)
 References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023080049.1011724.15423463482790260696.stgit@bahia.lan>
+	<155023080638.1011724.792095453419098948.stgit@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b25de46d-9449-4538-b2b5-dd18d373e6d9@kaod.org>
-Date: Fri, 15 Feb 2019 13:54:02 +0100
+Message-ID: <0d864751-5827-943b-a16b-0d4c4d8fb32a@kaod.org>
+Date: Fri, 15 Feb 2019 13:54:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <155023080049.1011724.15423463482790260696.stgit@bahia.lan>
+In-Reply-To: <155023080638.1011724.792095453419098948.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/10] xics: Handle KVM ICP realize from
- the common code
+Subject: Re: [Qemu-devel] [PATCH 04/10] spapr/irq: Use the base ICP class
+ for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +36,15 @@ To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 On 2/15/19 12:40 PM, Greg Kurz wrote:
-> The realization of KVM ICP currently follows the parent_realize logic,
-> which is a bit overkill here. Also we want to get rid of the KVM ICP
-> class. Explicitely call icp_kvm_realize() from the base ICP realize
-> function.
+> The base ICP class knows how to interact with KVM. Adapt sPAPR to use i=
+t
+> instead of the ICP KVM class.
 >=20
-> Note that ICPStateClass::parent_realize is retained because powernv
-> needs it.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>>
-> ---
->  hw/intc/xics.c        |    8 ++++++++
->  hw/intc/xics_kvm.c    |   10 +---------
->  include/hw/ppc/xics.h |    1 +
->  3 files changed, 10 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 822d367e6388..acd63ab5e0b9 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -349,6 +349,14 @@ static void icp_realize(DeviceState *dev, Error **=
-errp)
->          return;
->      }
-> =20
-> +    if (kvm_irqchip_in_kernel()) {
-> +        icp_kvm_realize(dev, &err);
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-While we are at changing things, I would prefix all the KVM=20
-backends routine with kvmppc_*. so that icp_kvm_realize()=20
-becomes kvmppc_icp_realize()
+ah. Good one !=20
 
-Apart from that,
+
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
@@ -75,58 +52,56 @@ Thanks,
 
 C.
 
-
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +    }
-> +
->      qemu_register_reset(icp_reset_handler, dev);
->      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, ic=
-p);
->  }
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index 80321e9b75ab..4eebced516b6 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -115,11 +115,9 @@ int icp_set_kvm_state(ICPState *icp)
->      return 0;
->  }
+> ---
+>  hw/ppc/spapr_irq.c     |    4 +---
+>  include/hw/ppc/spapr.h |    1 -
+>  2 files changed, 1 insertion(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 48d6b2daed6e..e6893df61e76 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -102,7 +102,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
+spapr, int nr_irqs,
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+>              !xics_kvm_init(spapr, &local_err)) {
+> -            spapr->icp_type =3D TYPE_KVM_ICP;
+>              spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_ir=
+qs,
+>                                            &local_err);
+>          }
+> @@ -117,7 +116,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
+spapr, int nr_irqs,
 > =20
-> -static void icp_kvm_realize(DeviceState *dev, Error **errp)
-> +void icp_kvm_realize(DeviceState *dev, Error **errp)
->  {
->      ICPState *icp =3D ICP(dev);
-> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
-> -    Error *local_err =3D NULL;
->      CPUState *cs;
->      KVMEnabledICP *enabled_icp;
->      unsigned long vcpu_id;
-> @@ -129,12 +127,6 @@ static void icp_kvm_realize(DeviceState *dev, Erro=
-r **errp)
->          abort();
+>      if (!spapr->ics) {
+>          xics_spapr_init(spapr);
+> -        spapr->icp_type =3D TYPE_ICP;
+>          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irq=
+s,
+>                                        &local_err);
 >      }
+> @@ -199,7 +197,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMac=
+hineState *spapr,
+>      Object *obj;
+>      sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
 > =20
-> -    icpc->parent_realize(dev, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> -
->      cs =3D icp->cs;
->      vcpu_id =3D kvm_arch_vcpu_id(cs);
+> -    obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr=
+),
+> +    obj =3D icp_create(OBJECT(cpu), TYPE_ICP, XICS_FABRIC(spapr),
+>                       &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index cbd276ed2b6a..631fc5103b7b 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -178,7 +178,6 @@ struct sPAPRMachineState {
+>      /*< public >*/
+>      char *kvm_type;
 > =20
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index e33282a576d0..ab61dc24010a 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -202,5 +202,6 @@ Object *icp_create(Object *cpu, const char *type, X=
-ICSFabric *xi,
->  void icp_get_kvm_state(ICPState *icp);
->  int icp_set_kvm_state(ICPState *icp);
->  void icp_synchronize_state(ICPState *icp);
-> +void icp_kvm_realize(DeviceState *dev, Error **errp);
-> =20
->  #endif /* XICS_H */
+> -    const char *icp_type;
+>      int32_t irq_map_nr;
+>      unsigned long *irq_map;
+>      sPAPRXive  *xive;
 >=20
