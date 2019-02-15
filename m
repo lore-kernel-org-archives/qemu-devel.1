@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51949)
+Received: from eggs.gnu.org ([209.51.188.92]:51946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAe-00031u-GL
+	(envelope-from <clg@kaod.org>) id 1gugAe-00031t-FJ
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gugAc-0005a6-S4
+	(envelope-from <clg@kaod.org>) id 1gugAc-0005aO-W8
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:17:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35226
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAc-0005Xi-IZ
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gugAc-0005Xb-J4
 	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 11:16:58 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1FGBbUk108891
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:57 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0ga1pe0-1
+	x1FGBXAm038901
+	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:56 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qp0p2rstq-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 11:16:56 -0500
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 15 Feb 2019 16:16:53 -0000
+	Fri, 15 Feb 2019 16:16:54 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Feb 2019 17:16:42 +0100
+Date: Fri, 15 Feb 2019 17:16:43 +0100
 In-Reply-To: <20190215161648.9600-1-clg@kaod.org>
 References: <20190215161648.9600-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190215161648.9600-5-clg@kaod.org>
+Message-Id: <20190215161648.9600-6-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 04/10] target/ppc: Move "wakeup reset" code to
- a separate function
+Subject: [Qemu-devel] [PATCH 05/10] target/ppc: Rename "in_pm_state" to
+ "resume_as_sreset"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,116 +45,93 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@ker
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This moves the code to handle waking up from the 0x100 vector
-from powerpc_excp() to a separate function, as the former is
-already way too big as it is.
-
-No functional change.
+To better reflect what this does, as it's specific to some of the
+P7/P8/P9 PM states, not generic.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/excp_helper.c | 75 ++++++++++++++++++++++------------------
- 1 file changed, 41 insertions(+), 34 deletions(-)
+ target/ppc/cpu.h         | 6 +++---
+ hw/ppc/ppc.c             | 2 +-
+ target/ppc/excp_helper.c | 8 ++++----
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 190e8127f14f..945cb4bb7dde 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1117,10 +1117,10 @@ struct CPUPPCState {
+=20
+     /*
+      * On P7/P8/P9, set when in PM state, we need to handle resume in
+-     * a special way (such as routing some resume causes to 0x100), so
+-     * flag this here.
++     * a special way (such as routing some resume causes to 0x100, ie,
++     * sreset), so flag this here.
+      */
+-    bool in_pm_state;
++    bool resume_as_sreset;
+ #endif
+=20
+     /* Those resources are used only during code translation */
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index cffdc3914a6c..12439dbe5d43 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -776,7 +776,7 @@ static inline void cpu_ppc_hdecr_excp(PowerPCCPU *cpu=
+)
+      * interrupts in a PM state. Not only they don't cause a
+      * wakeup but they also get effectively discarded.
+      */
+-    if (!env->in_pm_state) {
++    if (!env->resume_as_sreset) {
+         ppc_set_irq(cpu, PPC_INTERRUPT_HDECR, 1);
+     }
+ }
 diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 97503193ef43..489a54f51b90 100644
+index 489a54f51b90..7536620a4133 100644
 --- a/target/ppc/excp_helper.c
 +++ b/target/ppc/excp_helper.c
-@@ -65,6 +65,46 @@ static inline void dump_syscall(CPUPPCState *env)
-                   ppc_dump_gpr(env, 6), env->nip);
- }
+@@ -69,7 +69,7 @@ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCSta=
+te *env, int excp,
+                                 target_ulong *msr)
+ {
+     /* We no longer are in a PM state */
+-    env->in_pm_state =3D false;
++    env->resume_as_sreset =3D false;
 =20
-+static int powerpc_reset_wakeup(CPUState *cs, CPUPPCState *env, int excp=
-,
-+                                target_ulong *msr)
-+{
-+    /* We no longer are in a PM state */
-+    env->in_pm_state =3D false;
-+
-+    /* Pretend to be returning from doze always as we don't lose state *=
+     /* Pretend to be returning from doze always as we don't lose state *=
 /
-+    *msr |=3D (0x1ull << (63 - 47));
-+
-+    /* Machine checks are sent normally */
-+    if (excp =3D=3D POWERPC_EXCP_MCHECK) {
-+        return excp;
-+    }
-+    switch (excp) {
-+    case POWERPC_EXCP_RESET:
-+        *msr |=3D 0x4ull << (63 - 45);
-+        break;
-+    case POWERPC_EXCP_EXTERNAL:
-+        *msr |=3D 0x8ull << (63 - 45);
-+        break;
-+    case POWERPC_EXCP_DECR:
-+        *msr |=3D 0x6ull << (63 - 45);
-+        break;
-+    case POWERPC_EXCP_SDOOR:
-+        *msr |=3D 0x5ull << (63 - 45);
-+        break;
-+    case POWERPC_EXCP_SDOOR_HV:
-+        *msr |=3D 0x3ull << (63 - 45);
-+        break;
-+    case POWERPC_EXCP_HV_MAINT:
-+        *msr |=3D 0xaull << (63 - 45);
-+        break;
-+    default:
-+        cpu_abort(cs, "Unsupported exception %d in Power Save mode\n",
-+                  excp);
-+    }
-+    return POWERPC_EXCP_RESET;
-+}
-+
-+
- /* Note that this function should be greatly optimized
-  * when called with a constant excp, from ppc_hw_interrupt
-  */
-@@ -102,40 +142,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
- excp_model, int excp)
+     *msr |=3D (0x1ull << (63 - 47));
+@@ -141,7 +141,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+excp_model, int excp)
+      * check for special resume at 0x100 from doze/nap/sleep/winkle on
       * P7/P8/P9
       */
-     if (env->in_pm_state) {
--        env->in_pm_state =3D false;
--
--        /* Pretend to be returning from doze always as we don't lose sta=
-te */
--        msr |=3D (0x1ull << (63 - 47));
--
--        /* Non-machine check are routed to 0x100 with a wakeup cause
--         * encoded in SRR1
--         */
--        if (excp !=3D POWERPC_EXCP_MCHECK) {
--            switch (excp) {
--            case POWERPC_EXCP_RESET:
--                msr |=3D 0x4ull << (63 - 45);
--                break;
--            case POWERPC_EXCP_EXTERNAL:
--                msr |=3D 0x8ull << (63 - 45);
--                break;
--            case POWERPC_EXCP_DECR:
--                msr |=3D 0x6ull << (63 - 45);
--                break;
--            case POWERPC_EXCP_SDOOR:
--                msr |=3D 0x5ull << (63 - 45);
--                break;
--            case POWERPC_EXCP_SDOOR_HV:
--                msr |=3D 0x3ull << (63 - 45);
--                break;
--            case POWERPC_EXCP_HV_MAINT:
--                msr |=3D 0xaull << (63 - 45);
--                break;
--            default:
--                cpu_abort(cs, "Unsupported exception %d in Power Save mo=
-de\n",
--                          excp);
--            }
--            excp =3D POWERPC_EXCP_RESET;
--        }
-+        excp =3D powerpc_reset_wakeup(cs, env, excp, &msr);
+-    if (env->in_pm_state) {
++    if (env->resume_as_sreset) {
+         excp =3D powerpc_reset_wakeup(cs, env, excp, &msr);
      }
 =20
-     /* Exception targetting modifiers
+@@ -787,7 +787,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+      * clear when coming out of some power management states (in order
+      * for them to become a 0x100).
+      */
+-    async_deliver =3D (msr_ee !=3D 0) || env->in_pm_state;
++    async_deliver =3D (msr_ee !=3D 0) || env->resume_as_sreset;
+=20
+     /* Hypervisor decrementer exception */
+     if (env->pending_interrupts & (1 << PPC_INTERRUPT_HDECR)) {
+@@ -970,7 +970,7 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_=
+t insn)
+     env->pending_interrupts &=3D ~(1 << PPC_INTERRUPT_HDECR);
+=20
+     /* Condition for waking up at 0x100 */
+-    env->in_pm_state =3D (insn !=3D PPC_PM_STOP) ||
++    env->resume_as_sreset =3D (insn !=3D PPC_PM_STOP) ||
+         (env->spr[SPR_PSSCR] & PSSCR_EC);
+ }
+ #endif /* defined(TARGET_PPC64) */
 --=20
 2.20.1
