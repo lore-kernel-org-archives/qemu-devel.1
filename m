@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37914)
+Received: from eggs.gnu.org ([209.51.188.92]:40924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gv49n-0006us-7K
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:53:44 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gv4XK-0001Gc-Hg
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 13:18:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gv49k-0003O6-Sw
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:53:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36526)
+	(envelope-from <alex.williamson@redhat.com>) id 1gv4XI-0004Nf-1T
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 13:18:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gv49k-0003Nk-Fe
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:53:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190215122808.22301-1-alex.bennee@linaro.org>
-	<60e020d0-ad5d-6b86-e492-1d3c91c48a13@redhat.com>
-	<87lg2hujld.fsf@dusky.pond.sub.org>
-	<871s49vvgx.fsf@dusky.pond.sub.org>
-Date: Sat, 16 Feb 2019 18:53:37 +0100
-In-Reply-To: <871s49vvgx.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 15 Feb 2019 17:59:26 +0100")
-Message-ID: <8736ontyam.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gv4XF-0004LK-9M
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 13:17:59 -0500
+Date: Sat, 16 Feb 2019 11:17:41 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190216111741.30128faf@x1.home>
+In-Reply-To: <9308ccacc87e29da94aa86c20208459ac2a40024.1550185800.git-series.knut.omang@oracle.com>
+References: <cover.bbdd933afe52feffe3b42db89226ce23a34d03f1.1550185800.git-series.knut.omang@oracle.com>
+	<9308ccacc87e29da94aa86c20208459ac2a40024.1550185800.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] hw/block: report when pflash backing
- file isn't aligned
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] pcie: Add a simple PCIe ACS (Access
+ Control Services) helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,171 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, stappers@stappers.nl
+To: Knut Omang <knut.omang@oracle.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Sat, 16 Feb 2019 17:51:11 +0100
+Knut Omang <knut.omang@oracle.com> wrote:
 
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> Laszlo Ersek <lersek@redhat.com> writes:
->>
->>> On 02/15/19 13:28, Alex Benn=C3=A9e wrote:
->>>> It looks like there was going to be code to check we had some sort of
->>>> alignment so lets replace it with an actual check. This is a bit more
->>>> useful than the enigmatic "failed to read the initial flash content"
->>>> when we attempt to read the number of bytes the device should have.
->>>>=20
->>>> This is a potential confusing stumbling block when you move from using
->>>> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
->>>> loading your firmware code.
->>>>=20
->>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>>=20
->>>> ---
->>>> v2
->>>>   - use PRIu64 instead of PRId64
->>>>   - tweaked message output
->>>> ---
->>>>  hw/block/pflash_cfi01.c | 20 ++++++++++++++------
->>>>  1 file changed, 14 insertions(+), 6 deletions(-)
->>>>=20
->>>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->>>> index bffb4c40e7..7532c8d8e8 100644
->>>> --- a/hw/block/pflash_cfi01.c
->>>> +++ b/hw/block/pflash_cfi01.c
->>>> @@ -722,12 +722,20 @@ static void pflash_cfi01_realize(DeviceState *de=
-v, Error **errp)
->>>>      }
->>>>      device_len =3D sector_len_per_device * blocks_per_device;
->>>>=20=20
->>>> -    /* XXX: to be fixed */
->>>> -#if 0
->>>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024=
- * 1024) &&
->>>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 102=
-4 * 1024))
->>>> -        return NULL;
->>>> -#endif
->>
->> pflash_cfi02_realize() has the same XXX.
->>
->> There's a pair of related XXXs in taihu_405ep_init().  Related because
->> @total_len is computed like this
->>
->>     total_len =3D pfl->sector_len * pfl->nb_blocs;
->>
->> and the two factors come from callers of pflash_cfi01_realize(),
->> pflash_cfi02_realize(), or from ve_pflash_cfi01_register(),
->> xtfpga_flash_init().  Aside: the latter two are slight variations of
->> pflash_cfi01_realize() which I'm going to clean up.  Some of these use
->> fixed sizes (good, real machines do that, too).  Some of them compute
->> them from blk_getlength(), with varying levels of care.
->
-> Missed one: create_one_flash().
->
-> Let's review flash size computation.
->
-> Single fixed size per machine type:
->
->     collie_init()               0x02000000 (two times)
->     connex_init()               0x01000000
->     verdex_init()               0x02000000
->     mainstone_common_init()     0x02000000
->     sx1_init()                  (16 * 1024 * 1024) for sx1-v1
->                                 (32 * 1024 * 1024) for sx1
->                                 ( 8 * 1024 * 1024) for sx1-v1
->     versatile_init()            (64 * 1024 * 1024)
->     z2_init()                   0x00800000
->     milkymist_init()            32 * MiB
->     petalogix_ml605_init()      (32 * MiB)
->     petalogix_s3adsp1800_init() (16 * MiB)
->     mips_malta_init()           (4 * MiB)
->     mips_r4k_init()             0x00400000
->     virtex_init()               (16 * MiB)
->     digic4_add_k8p3215uqb_rom() (4 * 1024 * 1024)
->     zynq_init()                 (64 * 1024 * 1024)
->     lm32_evr_init()             32 * MiB
->     lm32_uclinux_init()         32 * MiB
->     taihu_405ep_init()          32 * MiB (but see below)
->     r2d_init()                  0x02000000
->     ve_pflash_cfi01_register()  (64 * 1024 * 1024)
->     xtfpga_flash_init()         0x00400000 for lx60*
->                                 0x01000000 for lx200*
->                                 0x01000000 for ml605*
->                                 0x08000000 for kc705*
->     create_one_flash()          0x08000000 / 2 (two times)
->
-> Set of fixed sizes:
->
->     musicpal_init()             image size, either 8*1024*1024,
->                                 16*1024*1024 or 32*1024*1024
->
-> Troublemakers:
->
->     pc_system_flash_init()      sum of image sizes, at most 8MiB
->                                 rejects images whose size is not a
->                                 multiple of 4KiB
+> Implementing an ACS capability on downstream ports and multifunction
+> endpoints indicates isolation and IOMMU visibility to a finer
+> granularity. This creates smaller IOMMU groups in the guest and thus
+> more flexibility in assigning endpoints to guest userspace or an L2
+> guest.
+> 
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> ---
+>  hw/pci/pcie.c              | 39 +++++++++++++++++++++++++++++++++++++++-
+>  include/hw/pci/pcie.h      |  6 ++++++-
+>  include/hw/pci/pcie_regs.h |  4 ++++-
+>  3 files changed, 49 insertions(+)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 230478f..6afc37a 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
+>  
+>      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
+>  }
+> +
+> +/* ACS (Access Control Services) */
+> +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
+> +{
+> +    bool is_downstream = pci_is_express_downstream_port(dev);
+> +    uint16_t cap_bits = 0;
+> +
+> +    /* For endpoints, only multifunction devs may have an ACS capability: */
+> +    assert(is_downstream ||
+> +           (dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) ||
+> +           PCI_FUNC(dev->devfn));
+> +
+> +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
+> +                        PCI_ACS_SIZEOF);
+> +    dev->exp.acs_cap = offset;
+> +
+> +    if (is_downstream) {
+> +        /* Downstream ports must implement SV, TB, RR, CR, and UF (with
+> +         * caveats on the latter three that we ignore for simplicity).
+> +         * Endpoints may also implement a subset of ACS capabilities,
+> +         * but these are optional if the endpoint does not support
+> +         * peer-to-peer between functions and thus omitted here.
+> +         * Downstream switch ports must also implement DT, while this
+> +         * is optional for root ports, so we set that as well:
+> +         */
 
-Image size must be one of n * 4KiB where 1 <=3D n <=3D 2048.  Can be filed
-under "Set of fixed sizes"
+Again...
+https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE;hb=HEAD#l127
 
->     sam460ex_load_uboot()       image size rounded up to multiple of
->                                 64KiB
+Personally I'd add DT in the original list rather than mention is
+separately, the caveats are pretty similar.
 
-Looks broken.
-
-(1) The flash is mapped at address 0xFFF00000.  When no image is
-    supplied, it's size is 1MiB (0x100000).  Else, it's size is the size
-    of the image rounded up to the next multiple of 64KiB.
-
-    I have no idea what happens when the size exceeds 1MiB.  Does it
-    wrap around the 32 bit address space?
-
-(2) Unless the image size is a multiple of 64KiB, pflash_cfi01_realize()
-    fails with "failed to read the initial flash content".
-
->     ref405ep_init()             image size rounded up to multiple of
->                                 64KiB
-
-Looks broken.
-
-(1) The flash is mapped at address 2^32 - (image size).  Its size is the
-    size of the image rounded up to the next multiple of 64KiB.
-
-    Unless the rounding is a no-op, the flash extends beyond the end of
-    the 32 bit address space.  Probably irrelevant due to (2).
-
-    If the size exceeds 0x80000 Bytes, we overlap first SRAM, then other
-    stuff.  No idea how that would play out.
-=20=20=20=20
-    I suspect we should either require the image to be 512KiB, or maybe
-    also accept smaller ones and pad them to 512KiB.  The latter would
-    be unusual.
-
-(2) Unless the image size is a multiple of 64KiB, pflash_cfi01_realize()
-    fails with "failed to read the initial flash content".
-
->     taihu_405ep_init()          image size rounded up to multiple of
->                                 64KiB
-
-Looks broken.
-
-Boot flash (unit 0) is just like ref405ep_init(), just with different
-addresses.
-
-(3) Application flash (unit 1) has a fixed size of 32 MiB.  If the image
-    is smaller, pflash_cfi01_realize() fails with "failed to read the
-    initial flash content".
-
-I think we should require the image to match the real machine's flash
-size.  We could also accept smaller ones and pad them to 1MiB, or larger
-ones ignoring the tail, but that would be unusual.
-
->> I'm afraid we need to take all that into account.
->
-> We can ignore all but the four troublemakers.
->
-> [...]
-
-I'll post patches.
+> +        cap_bits = PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR |
+> +            PCI_ACS_CR | PCI_ACS_UF | PCI_ACS_DT;
+> +    }
+> +
+> +    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
+> +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
+> +}
+> +
+> +void pcie_acs_reset(PCIDevice *dev)
+> +{
+> +    if (dev->exp.acs_cap) {
+> +        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
+> +    }
+> +}
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index 5b82a0d..e30334d 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -79,6 +79,9 @@ struct PCIExpressDevice {
+>  
+>      /* Offset of ATS capability in config space */
+>      uint16_t ats_cap;
+> +
+> +    /* ACS */
+> +    uint16_t acs_cap;
+>  };
+>  
+>  #define COMPAT_PROP_PCP "power_controller_present"
+> @@ -128,6 +131,9 @@ void pcie_add_capability(PCIDevice *dev,
+>                           uint16_t offset, uint16_t size);
+>  void pcie_sync_bridge_lnk(PCIDevice *dev);
+>  
+> +void pcie_acs_init(PCIDevice *dev, uint16_t offset);
+> +void pcie_acs_reset(PCIDevice *dev);
+> +
+>  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
+>  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
+>  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+> diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+> index ad4e780..1db86b0 100644
+> --- a/include/hw/pci/pcie_regs.h
+> +++ b/include/hw/pci/pcie_regs.h
+> @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
+>                                           PCI_ERR_COR_INTERNAL |         \
+>                                           PCI_ERR_COR_HL_OVERFLOW)
+>  
+> +/* ACS */
+> +#define PCI_ACS_VER                     0x1
+> +#define PCI_ACS_SIZEOF                  8
+> +
+>  #endif /* QEMU_PCIE_REGS_H */
