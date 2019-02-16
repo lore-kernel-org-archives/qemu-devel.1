@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38047)
+Received: from eggs.gnu.org ([209.51.188.92]:42904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gv7vN-0006pK-NT
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 16:55:06 -0500
+	(envelope-from <bounces@canonical.com>) id 1gv8dY-0005b5-LM
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 17:40:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gv7vM-0004YI-EL
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 16:55:05 -0500
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41143)
+	(envelope-from <bounces@canonical.com>) id 1gv8dX-00066E-L1
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 17:40:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56854)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1gv7vL-0004Ro-6p
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 16:55:04 -0500
-Received: by mail-ed1-x541.google.com with SMTP id x7so10700880eds.8
-	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 13:55:01 -0800 (PST)
-Date: Sat, 16 Feb 2019 21:54:58 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190216215458.at3o6ibqr24sy4rf@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190214005225.24048-1-richardw.yang@linux.intel.com>
-	<20190214122527.5d2fcab8@redhat.com>
-	<20190214205331.pvht6oqynndc2k7u@master>
-	<20190215121432.6823da96@Igors-MacBook-Pro.local>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gv8dX-00064w-ES
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 17:40:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gv8dV-0005jH-66
+	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 22:40:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 241482E80C9
+	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 22:40:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190215121432.6823da96@Igors-MacBook-Pro.local>
-Subject: Re: [Qemu-devel] [PATCH] i386,
- acpi: check acpi_memory_hotplug capacity in pre_plug
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 16 Feb 2019 22:31:33 -0000
+From: ITEAS <1685242@bugs.launchpad.net>
+Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
+Message-Id: <155035629347.28755.10089335643121774946.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
+ memory hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,160 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: qemu-devel@nongnu.org
 
-On Fri, Feb 15, 2019 at 12:14:32PM +0100, Igor Mammedov wrote:
->On Thu, 14 Feb 2019 20:53:31 +0000
->Wei Yang <richard.weiyang@gmail.com> wrote:
->
->> On Thu, Feb 14, 2019 at 12:25:27PM +0100, Igor Mammedov wrote:
->> >On Thu, 14 Feb 2019 08:52:25 +0800
->> >Wei Yang <richardw.yang@linux.intel.com> wrote:
->> >
->> >> Currently we do device realization like below:
->> >> 
->> >>    hotplug_handler_pre_plug()
->> >>    dc->realize()
->> >>    hotplug_handler_plug()
->> >> 
->> >> Before we do device realization and plug, we would allocate necessary
->> >> resources and check the capacity.
->> >'capacity' probably is not right word to use here
->> >maybe s/the capacity/if 'memory-hotplug-support' property is enabled/
->> >
->> >> 
->> >> While we leave acpi_memory_hotplug capacity check in the last step. This
->> >wouldn't use 'leave' and 'capacity' here either, pls rephrase.
->> >
->> >> looks not comply with current architecture and does some unnecessary
->> >s/looks not/doesn't/
->> >> work.
->> >add more explanation about 'unnecessary work'.
->> >problem as I see it, is that after successful pc_dimm_plug()
->> >we get into piix4_device_plug_cb() and since
->> > s->acpi_memory_hotplug.is_enabled == false
->> >and all other 'if' conditions also false we would endup
->> >at g_assert_not_reached() causing QEMU crash in piix4 case
->> >and with error_abort up the call chain in case of ich9.
->> >
->> 
->> Thanks Igor, I rephrase above change log like this. Does this look
->> better to you now?
->> 
->>     Before we do device realization and plug, we would allocate
->s/would/should/
->
->>     necessary resources and check if memory-hotplug-support property is
->>     enabled.
->>     
->>     In piix4 and ich9, the acpi_memory_hotplug property is checked in
->s/in/at the/
->>     plug stage, this doesn't comply with current architecture. This
->drop              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>     means we have prepared everything and even do pc_dimm_plug()
->            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->that device has been realized and mapped into guest address space
->'pc_dimm_plug()' by the time acpi plug handler is called, where it might
->fail and crash QEMU due to reaching  g_assert_not_reached() (piix4) or
->error_abort (ich9).
->
->or something like this, I'm not native speaker either so CC Eric Blake
->on next respin so he could check commit message.
->
+Tested here with versions of pc-i440fx-XX and it didn't work here on
+qemu-server 5.0-46, qemu 2.12.1-1
 
-Thanks for your patience and detailed suggestion :-)
+Didn't work.
 
->>     successfuly, but failed at last because
->>     acpi_memory_hotplug.is_enabled == false. Which is worse is in piix4,
->>     this endup at g_assert_not_reached() and cause QEMU crash.
->> 
->> 
->> >> This patch abstract the check on acpi_memory_hotplug capacity in
->> >> pre_plug stage.
->> >> 
->> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> >> ---
->> >>  hw/acpi/piix4.c | 14 ++++++++++++--
->> >>  hw/i386/pc.c    |  8 ++++++++
->> >doesn't look complete, why did you skip on similar code in ich9
->> >(Q35 machine)?
->> >
->> 
->> You are right, I missed this part.
->> 
->> >>  2 files changed, 20 insertions(+), 2 deletions(-)
->> >> 
->> >> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
->> >> index e330f24c71..c97b747496 100644
->> >> --- a/hw/acpi/piix4.c
->> >> +++ b/hw/acpi/piix4.c
->> >> @@ -370,13 +370,22 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
->> >>      acpi_pm1_evt_power_down(&s->ar);
->> >>  }
->> >>  
->> >> +static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->> >> +                                 DeviceState *dev, Error **errp)
->> >> +{
->> >> +    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
->> >> +
->> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
->> >> +        !s->acpi_memory_hotplug.is_enabled)
->> >> +        error_setg(errp,
->> >> +            "memory hotplug is not enabled: PIIX4 memory hotplug disabled");
->> >> +}
->> >>  static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
->> >>                                   DeviceState *dev, Error **errp)
->> >>  {
->> >>      PIIX4PMState *s = PIIX4_PM(hotplug_dev);
->> >>  
->> >> -    if (s->acpi_memory_hotplug.is_enabled &&
->> >> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->> >>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
->> >>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
->> >>          } else {
->> >> @@ -702,6 +711,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
->> >>       */
->> >>      dc->user_creatable = false;
->> >>      dc->hotpluggable = false;
->> >> +    hc->pre_plug = piix4_device_pre_plug_cb;
->> >>      hc->plug = piix4_device_plug_cb;
->> >>      hc->unplug_request = piix4_device_unplug_request_cb;
->> >>      hc->unplug = piix4_device_unplug_cb;
->> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> >> index 734d3268fa..3c6eed0cd3 100644
->> >> --- a/hw/i386/pc.c
->> >> +++ b/hw/i386/pc.c
->> >> @@ -1662,6 +1662,7 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->> >>      const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->> >>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->> >>      const uint64_t legacy_align = TARGET_PAGE_SIZE;
->> >> +    HotplugHandlerClass *hhc;
->> >>  
->> >>      /*
->> >>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
->> >> @@ -1674,6 +1675,13 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->> >>          return;
->> >>      }
->> >>  
->> >> +    /*
->> >> +     * Check acpi_dev memory hotplug capacity
->> >> +     */
->> >> +    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> >> +    if (hcc->pre_plug)
->> >> +        hhc->pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, errp);
->> >use hotplug_handler_pre_plug() instead of open-coding check
->> >
->> 
->> Thanks, will fix this.
->> 
->> >>      if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
->> >>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
->> >>          return;
->> >
->> 
+-- =
 
--- 
-Wei Yang
-Help you, Help me
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1685242
+
+Title:
+  ovmf hangs at efi with virtio-net memory hotplug
+
+Status in QEMU:
+  New
+
+Bug description:
+  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
+  and it has a virtio-net devices
+
+  the ovmf images where compiled from https://github.com/tianocore/edk2
+  (current master)
+
+  reproducer:
+
+  qemu-system-x86_64 -drive
+  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
+  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
+std
+  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
+  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
+
+  interestingly, it works when you do the following:
+
+  - omit the virtio-net-pci device
+  - use seabios
+  - use less maxmem, e.g. 512G
+
+  qemu was compiled from source (v2.9.0) with following options:
+
+  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
+--enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
+artcard --audio-drv-list=3D"alsa" --enable
+  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
+k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
+virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
+-agent-msi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
