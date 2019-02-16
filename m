@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47842)
+Received: from eggs.gnu.org ([209.51.188.92]:42168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gumVp-00010N-CL
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 18:03:19 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1guoaB-0001ip-II
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 20:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gumVn-0006fc-EI
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 18:03:17 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:42627)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gul1G-00063l-Iq
-	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 16:27:38 -0500
-Received: by mail-qt1-f193.google.com with SMTP id b8so12551665qtr.9
-	for <qemu-devel@nongnu.org>; Fri, 15 Feb 2019 13:27:29 -0800 (PST)
-Date: Fri, 15 Feb 2019 16:27:25 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190215162652-mutt-send-email-mst@kernel.org>
-References: <20190215133005.15955-1-david@redhat.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1guoa8-0002E9-7N
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 20:15:55 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42299)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1guoa2-0001p9-II
+	for qemu-devel@nongnu.org; Fri, 15 Feb 2019 20:15:48 -0500
+Date: Sat, 16 Feb 2019 02:15:28 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA9aUxU4gTnpP3OKLToLttagfNWuA9UzxNGHeXNkKCWiDg@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.9999.1902160210420.81823@zero.eik.bme.hu>
+References: <20190214102816.3393-1-peter.maydell@linaro.org>
+	<20190214102816.3393-8-peter.maydell@linaro.org>
+	<alpine.BSF.2.21.9999.1902150223200.49412@zero.eik.bme.hu>
+	<CAFEAcA9aUxU4gTnpP3OKLToLttagfNWuA9UzxNGHeXNkKCWiDg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190215133005.15955-1-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] tests: Add device unplug tests
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] ui/cocoa: Perform UI operations
+ only on the main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Ben Hekster <ben.hekster@foghorn.io>
 
-On Fri, Feb 15, 2019 at 02:29:59PM +0100, David Hildenbrand wrote:
-> This is a set of tests to test basic device unplugging functionality for
-> - some PCI implementations
-> - CCW devices on s390x
-> - spapr memory and cpu core devices
-> 
-> I plaed with ACPI CPU unplug but getting that to run with qtest is more
-> involved. (remove devices on reset, trick cpu-hotplug-legacy property,
-> somehow create cpu hotplug state objects ...). Well we no have at least
-> one unplug test for DIMMs and one for CPUs.
-> 
-> @David, I dropped you t-b and r-b due to many changes but would be happy
-> to readd them ;)
+On Fri, 15 Feb 2019, Peter Maydell wrote:
+> On Fri, 15 Feb 2019 at 01:28, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>
+>> On Thu, 14 Feb 2019, Peter Maydell wrote:
+>>> - (void)sendEvent:(NSEvent *)event
+>>> {
+>>>     COCOA_DEBUG("QemuApplication: sendEvent\n");
+>>> -    [super sendEvent: event];
+>>> +    if (!cocoaView || ![cocoaView handleEvent:event]) {
+>>> +        [super sendEvent: event];
+>>> +    }
+>>
+>> I think the menu problem may be because now all mouse events go to our
+>> handleEvent method and it may swallow those that should operate the menus
+>> somehow while previously [super sendEvent] took care of those events and
+>> only left the remaining mouse events in queue? Maybe we should test in
+>> handleEvent if the mouse event is within our window and forward everything
+>> else to super? But I'm not sure and could be wrong, only guessing.
+>
+> Menus definitely did work for me (both mouse interaction and
+> keyboard shortcuts), so I'm not sure why you're seeing something
+> different.
+>
+> My understanding is that the new code should eat exactly the
+> same set of events that the old code did:
+> * in the old code, only our custom "pull events off the queue"
+>   code took events from OSX, and it passed them to handleEvent;
+>   only events handleEvent called [NSApp sendEvent] on would
+>   ever get to the OSX menu/etc handling
+> * in the new code, OSX's run loop takes events off the queue:
+>   they go to our NSApplication sendEvent method, which passes
+>   them to handleEvent. Only events that handleEvent returns false
+>   for will ever get to the OSX menu/etc handling
+> and (absent bugs) handleEvent should now return false for exactly
+> the set of events that it previously called sendEvent on.
+>
+> I know menu handling in OSX is a bit odd because the menu
+> drag stuff uses a 'private event loop' to handle events
+> while the menu is down. Maybe something is interacting
+> badly with that.
 
+Sorry, looks like my proposed patch [ui/cocoa: Make sure app is not 
+starting in the background] is the one which breaks this. After some 
+recompiling menus work here as well with your series so forget about this 
+patch and sorry for the false alarm. (The habit of macOS to open apps 
+started from Terminal in the background is quite annoying but looks like 
+it's normal and can't be fixed that easily.)
 
-Series:
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-I think it's mostly spapr things so feel free to merge through
-that tree.
-
-> v1 -> v2:
-> - Tests for CCW, spapr memory and spapr cpu core unplug added
-> - Fix a deadlock when unplugging dummy CPUs
-> - Style fixes / simplifications (Thomas)
-> - Don't use the global_qtest variable (Thomas)
-> - Fix double-free (Greg)
-> 
-> 
-> David Hildenbrand (6):
->   cpus: Properly release the iothread lock when killing a dummy VCPU
->   spapr: support memory unplug for qtest
->   tests/device-plug: Add a simple PCI unplug request test
->   tests/device-plug: Add CCW unplug test for s390x
->   tests/device-plug: Add CPU core unplug request test for spapr
->   tests/device-plug: Add memory unplug request test for spapr
-> 
->  cpus.c                   |   1 +
->  hw/ppc/spapr_ovec.c      |   6 ++
->  tests/Makefile.include   |   4 +
->  tests/device-plug-test.c | 165 +++++++++++++++++++++++++++++++++++++++
->  4 files changed, 176 insertions(+)
->  create mode 100644 tests/device-plug-test.c
-> 
-> -- 
-> 2.17.2
+Regards,
+BALATON Zoltan
