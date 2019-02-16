@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34150)
+Received: from eggs.gnu.org ([209.51.188.92]:37914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gv3dm-0001Xp-SP
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:20:39 -0500
+	(envelope-from <armbru@redhat.com>) id 1gv49n-0006us-7K
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gv3dl-0006NV-RY
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:20:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54430)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gv3dl-0006Mt-Ip
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:20:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gv3dj-0003W1-9U
-	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 17:20:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 41C122E80C8
-	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 17:20:35 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gv49k-0003O6-Sw
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:53:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gv49k-0003Nk-Fe
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 12:53:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190215122808.22301-1-alex.bennee@linaro.org>
+	<60e020d0-ad5d-6b86-e492-1d3c91c48a13@redhat.com>
+	<87lg2hujld.fsf@dusky.pond.sub.org>
+	<871s49vvgx.fsf@dusky.pond.sub.org>
+Date: Sat, 16 Feb 2019 18:53:37 +0100
+In-Reply-To: <871s49vvgx.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 15 Feb 2019 17:59:26 +0100")
+Message-ID: <8736ontyam.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 16 Feb 2019 17:11:37 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Reply-To: Bug 1815911 <1815911@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155015240171.6215.11220706309348619396.malonedeb@soybean.canonical.com>
-	<155023483785.1243.17367221566041086008.malone@gac.canonical.com>
-Message-Id: <8fe09f41-96e2-70e0-d8b6-1e53f0d0ab69@physik.fu-berlin.de>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1815911] Re: aptitude crashes qemu-m68k with
- handle_cpu_signal received signal outside vCPU context
+Subject: Re: [Qemu-devel] [PATCH v2] hw/block: report when pflash backing
+ file isn't aligned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,71 +32,170 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, stappers@stappers.nl
 
-On 2/15/19 1:47 PM, Laurent Vivier wrote:
-> It seems it crashes during futex syscall:
-> =
+Markus Armbruster <armbru@redhat.com> writes:
 
-> ...
-> [pid     4] getpid()                    =3D 4
-> [pid     4] tgkill(4, 24, SIGRT_1)      =3D 0
-> [pid    24] <... futex resumed> )       =3D ? ERESTARTSYS (To be restarte=
-d if SA_RESTART is set)
-> [pid    24] --- SIGRT_1 {si_signo=3DSIGRT_1, si_code=3DSI_TKILL, si_pid=
-=3D4, si_uid=3D0} ---
-> [pid     4] futex(0x7f77abb4f610, FUTEX_WAIT_PRIVATE, 16777216, NULL <unf=
-inished ...>
-> [pid    24] getpid()                    =3D 4
-> [pid    24] --- SIGSEGV {si_signo=3DSIGSEGV, si_code=3DSEGV_MAPERR, si_ad=
-dr=3D0x10} ---
-> ...
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> Laszlo Ersek <lersek@redhat.com> writes:
+>>
+>>> On 02/15/19 13:28, Alex Benn=C3=A9e wrote:
+>>>> It looks like there was going to be code to check we had some sort of
+>>>> alignment so lets replace it with an actual check. This is a bit more
+>>>> useful than the enigmatic "failed to read the initial flash content"
+>>>> when we attempt to read the number of bytes the device should have.
+>>>>=20
+>>>> This is a potential confusing stumbling block when you move from using
+>>>> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
+>>>> loading your firmware code.
+>>>>=20
+>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>=20
+>>>> ---
+>>>> v2
+>>>>   - use PRIu64 instead of PRId64
+>>>>   - tweaked message output
+>>>> ---
+>>>>  hw/block/pflash_cfi01.c | 20 ++++++++++++++------
+>>>>  1 file changed, 14 insertions(+), 6 deletions(-)
+>>>>=20
+>>>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+>>>> index bffb4c40e7..7532c8d8e8 100644
+>>>> --- a/hw/block/pflash_cfi01.c
+>>>> +++ b/hw/block/pflash_cfi01.c
+>>>> @@ -722,12 +722,20 @@ static void pflash_cfi01_realize(DeviceState *de=
+v, Error **errp)
+>>>>      }
+>>>>      device_len =3D sector_len_per_device * blocks_per_device;
+>>>>=20=20
+>>>> -    /* XXX: to be fixed */
+>>>> -#if 0
+>>>> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024=
+ * 1024) &&
+>>>> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 102=
+4 * 1024))
+>>>> -        return NULL;
+>>>> -#endif
+>>
+>> pflash_cfi02_realize() has the same XXX.
+>>
+>> There's a pair of related XXXs in taihu_405ep_init().  Related because
+>> @total_len is computed like this
+>>
+>>     total_len =3D pfl->sector_len * pfl->nb_blocs;
+>>
+>> and the two factors come from callers of pflash_cfi01_realize(),
+>> pflash_cfi02_realize(), or from ve_pflash_cfi01_register(),
+>> xtfpga_flash_init().  Aside: the latter two are slight variations of
+>> pflash_cfi01_realize() which I'm going to clean up.  Some of these use
+>> fixed sizes (good, real machines do that, too).  Some of them compute
+>> them from blk_getlength(), with varying levels of care.
+>
+> Missed one: create_one_flash().
+>
+> Let's review flash size computation.
+>
+> Single fixed size per machine type:
+>
+>     collie_init()               0x02000000 (two times)
+>     connex_init()               0x01000000
+>     verdex_init()               0x02000000
+>     mainstone_common_init()     0x02000000
+>     sx1_init()                  (16 * 1024 * 1024) for sx1-v1
+>                                 (32 * 1024 * 1024) for sx1
+>                                 ( 8 * 1024 * 1024) for sx1-v1
+>     versatile_init()            (64 * 1024 * 1024)
+>     z2_init()                   0x00800000
+>     milkymist_init()            32 * MiB
+>     petalogix_ml605_init()      (32 * MiB)
+>     petalogix_s3adsp1800_init() (16 * MiB)
+>     mips_malta_init()           (4 * MiB)
+>     mips_r4k_init()             0x00400000
+>     virtex_init()               (16 * MiB)
+>     digic4_add_k8p3215uqb_rom() (4 * 1024 * 1024)
+>     zynq_init()                 (64 * 1024 * 1024)
+>     lm32_evr_init()             32 * MiB
+>     lm32_uclinux_init()         32 * MiB
+>     taihu_405ep_init()          32 * MiB (but see below)
+>     r2d_init()                  0x02000000
+>     ve_pflash_cfi01_register()  (64 * 1024 * 1024)
+>     xtfpga_flash_init()         0x00400000 for lx60*
+>                                 0x01000000 for lx200*
+>                                 0x01000000 for ml605*
+>                                 0x08000000 for kc705*
+>     create_one_flash()          0x08000000 / 2 (two times)
+>
+> Set of fixed sizes:
+>
+>     musicpal_init()             image size, either 8*1024*1024,
+>                                 16*1024*1024 or 32*1024*1024
+>
+> Troublemakers:
+>
+>     pc_system_flash_init()      sum of image sizes, at most 8MiB
+>                                 rejects images whose size is not a
+>                                 multiple of 4KiB
 
-The crash also reproduces with qemu-sh4, so it's not specific to m68k.
+Image size must be one of n * 4KiB where 1 <=3D n <=3D 2048.  Can be filed
+under "Set of fixed sizes"
 
--- =
+>     sam460ex_load_uboot()       image size rounded up to multiple of
+>                                 64KiB
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815911
+Looks broken.
 
-Title:
-  aptitude crashes qemu-m68k with handle_cpu_signal received signal
-  outside vCPU context
+(1) The flash is mapped at address 0xFFF00000.  When no image is
+    supplied, it's size is 1MiB (0x100000).  Else, it's size is the size
+    of the image rounded up to the next multiple of 64KiB.
 
-Status in QEMU:
-  New
+    I have no idea what happens when the size exceeds 1MiB.  Does it
+    wrap around the 32 bit address space?
 
-Bug description:
-  When building a package with sbuild on Debian, sbuild can use aptitude
-  to resolve dependencies.
+(2) Unless the image size is a multiple of 64KiB, pflash_cfi01_realize()
+    fails with "failed to read the initial flash content".
 
-  Recently, some changes introduced to aptitude or related packages
-  cause qemu to crash:
+>     ref405ep_init()             image size rounded up to multiple of
+>                                 64KiB
 
-  (sid-m68k-sbuild)root@nofan:/# aptitude -y --without-recommends -o Dpkg::=
-Options::=3D--force-confold -o Aptitude::CmdLine::Ignore-Trust-Violations=
-=3Dfalse -o Aptitude::ProblemResolver::StepScore=3D100 -o Aptitude::Problem=
-Resolver::SolutionCost=3D"safety, priority, non-default-versions" -o Aptitu=
-de::ProblemResolver::Hints::KeepDummy=3D"reject sbuild-build-depends-core-d=
-ummy :UNINST" -o Aptitude::ProblemResolver::Keep-All-Level=3D55000 -o Aptit=
-ude::ProblemResolver::Remove-Essential-Level=3Dmaximum install vim
-  Warning: Invalid locale (please review locale settings, this might lead t=
-o problems later):
-    locale::facet::_S_create_c_locale name not valid
-  The following NEW packages will be installed:
-    libgpm2{a} vim vim-common{a} vim-runtime{a} xxd{a} =
+Looks broken.
 
-  0 packages upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
-  Need to get 7225 kB/7260 kB of archives. After unpacking 33.5 MB will be =
-used.
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6019=
-d1bf
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x601b=
-64ab
-  Segmentation fault
-  (sid-m68k-sbuild)root@nofan:/#
+(1) The flash is mapped at address 2^32 - (image size).  Its size is the
+    size of the image rounded up to the next multiple of 64KiB.
 
-  The crash does not reproduce on real hardware running Debian unstable.
+    Unless the rounding is a no-op, the flash extends beyond the end of
+    the 32 bit address space.  Probably irrelevant due to (2).
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815911/+subscriptions
+    If the size exceeds 0x80000 Bytes, we overlap first SRAM, then other
+    stuff.  No idea how that would play out.
+=20=20=20=20
+    I suspect we should either require the image to be 512KiB, or maybe
+    also accept smaller ones and pad them to 512KiB.  The latter would
+    be unusual.
+
+(2) Unless the image size is a multiple of 64KiB, pflash_cfi01_realize()
+    fails with "failed to read the initial flash content".
+
+>     taihu_405ep_init()          image size rounded up to multiple of
+>                                 64KiB
+
+Looks broken.
+
+Boot flash (unit 0) is just like ref405ep_init(), just with different
+addresses.
+
+(3) Application flash (unit 1) has a fixed size of 32 MiB.  If the image
+    is smaller, pflash_cfi01_realize() fails with "failed to read the
+    initial flash content".
+
+I think we should require the image to match the real machine's flash
+size.  We could also accept smaller ones and pad them to 1MiB, or larger
+ones ignoring the tail, but that would be unusual.
+
+>> I'm afraid we need to take all that into account.
+>
+> We can ignore all but the four troublemakers.
+>
+> [...]
+
+I'll post patches.
