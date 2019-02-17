@@ -1,36 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42837)
+Received: from eggs.gnu.org ([209.51.188.92]:36665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <copymaster@howtolinux.de>) id 1gvDWv-0003V9-37
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 22:54:13 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gvHEa-0006fc-Vh
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 02:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <copymaster@howtolinux.de>) id 1gvDWr-0004SZ-G0
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 22:54:10 -0500
-Received: from mout7.gn-server.de ([87.238.194.234]:55267)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <copymaster@howtolinux.de>)
-	id 1gvDWo-0004M0-GD
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 22:54:06 -0500
-Received: from mout14.gn-server.de ([87.238.194.241])
-	by mout7.gn-server.de with esmtp (Exim 4.84_2)
-	(envelope-from <copymaster@howtolinux.de>) id 1gvDWj-0005sL-Ew
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 04:54:01 +0100
-Received: from pp1.greatnet.de ([178.254.50.204])
-	by mout14.gn-server.de with esmtps
-	(TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.88)
-	(envelope-from <copymaster@howtolinux.de>) id 1gvDWj-0006iW-6c
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 04:54:01 +0100
-Received: from [192.168.178.103] (ip1f115d71.dynamic.kabel-deutschland.de
-	[31.17.93.113])
-	by pp1.greatnet.de (Postfix) with ESMTPSA id E8E893326BDC
-	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 04:53:56 +0100 (CET)
-From: Alexander Marx <copymaster@howtolinux.de>
-Message-ID: <d5dc1bda-6b43-cbd6-3faa-69bb0ae45af4@howtolinux.de>
-Date: Sun, 17 Feb 2019 04:54:00 +0100
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gvHEa-00008B-5T
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 02:51:32 -0500
+References: <20190214154053.15050-1-marcel.apfelbaum@gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <d1b36054-424a-e492-402f-0a3019953d05@gmail.com>
+Date: Sun, 17 Feb 2019 09:51:58 +0200
 MIME-Version: 1.0
-Content-Language: de-DE
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Please help corrupt filesystem image
+In-Reply-To: <20190214154053.15050-1-marcel.apfelbaum@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] hw/rdma: another clang compilation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,33 +24,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: yuval.shaia@oracle.com, kamalheib1@gmail.com, qemu-stable@nongnu.org
 
-Dear List!
 
-I have a big problem and hope you can help me.
-I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
-hosts.
-I was nearly finished with the setup and ready to migrate the users from
-old to new domain.
 
-Then i had to restart the physical servers. Unfortunately 1 dc and 2 rds
-hosts could not be startet anymore.
-Error says:
+Cc:qemu-stable@nongnu.org
 
-qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
-header: Input/output error
 
-Even worst, a qemu-img check=C2=A0 also gave that error. and i was not ab=
-le
-to do anything i found in the internet to fix it.
-always that error or the qemu-img could not determine the format.
+Thanks,
+Marcel
 
-Is there a chance to fix these images? What can i do?
-
-I have no backup because the domain was not fully configured. But if i
-have to rebuild the whole domain, i will need several weeks for it.
-Any help is appreciated.
-
-Thank you
-
-Alex
+On 2/14/19 5:40 PM, Marcel Apfelbaum wrote:
+> Configuring QEMU with:
+>     configure --target-list="x86_64-softmmu" --cc=clang --enable-pvrdma
+> Results in:
+>     qemu/hw/rdma/rdma_rm_defs.h:108:3: error: redefinition of typedef 'RdmaDeviceResources' is a C11 feature [-Werror,-Wtypedef-redefinition]
+>     } RdmaDeviceResources;
+>       ^
+>     qemu/hw/rdma/rdma_backend_defs.h:24:36: note: previous definition is here
+>     typedef struct RdmaDeviceResources RdmaDeviceResources;
+>
+> Fix by removing one of the 'typedef' definitions.
+>
+> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> ---
+>   hw/rdma/rdma_rm_defs.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+> index 0ba61d1838..5e877c1fd9 100644
+> --- a/hw/rdma/rdma_rm_defs.h
+> +++ b/hw/rdma/rdma_rm_defs.h
+> @@ -96,7 +96,7 @@ typedef struct RdmaRmPort {
+>       enum ibv_port_state state;
+>   } RdmaRmPort;
+>   
+> -typedef struct RdmaDeviceResources {
+> +struct RdmaDeviceResources {
+>       RdmaRmPort port;
+>       RdmaRmResTbl pd_tbl;
+>       RdmaRmResTbl mr_tbl;
+> @@ -105,6 +105,6 @@ typedef struct RdmaDeviceResources {
+>       RdmaRmResTbl cq_tbl;
+>       RdmaRmResTbl cqe_ctx_tbl;
+>       GHashTable *qp_hash; /* Keeps mapping between real and emulated */
+> -} RdmaDeviceResources;
+> +};
+>   
+>   #endif
