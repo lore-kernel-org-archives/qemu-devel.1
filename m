@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49957)
+Received: from eggs.gnu.org ([209.51.188.92]:50474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gvQZd-0002qk-F1
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:49:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gvQbl-00045k-Uk
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:52:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gvQZc-0002m8-KU
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:49:53 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34480)
+	(envelope-from <richard.henderson@linaro.org>) id 1gvQbl-0005j8-8W
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:52:05 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40880)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gvQZc-0002l4-C7
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:49:52 -0500
-Received: by mail-pl1-x644.google.com with SMTP id d15so404526plr.1
-	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 09:49:52 -0800 (PST)
-References: <20190214113408.10214-1-peter.maydell@linaro.org>
+	id 1gvQbl-0005ht-0K
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:52:05 -0500
+Received: by mail-pg1-x543.google.com with SMTP id u9so3733953pgo.7
+	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 09:52:04 -0800 (PST)
+References: <20190214125107.22178-1-peter.maydell@linaro.org>
+	<20190214125107.22178-3-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <32ee50a4-f8cd-ffce-6b42-4611611b2e34@linaro.org>
-Date: Sun, 17 Feb 2019 09:49:48 -0800
+Message-ID: <778d340e-7b6f-8cb1-0ab8-37e19d1ff158@linaro.org>
+Date: Sun, 17 Feb 2019 09:51:59 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190214113408.10214-1-peter.maydell@linaro.org>
+In-Reply-To: <20190214125107.22178-3-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: v8M MPU should use background
- region as default, not always
+Subject: Re: [Qemu-devel] [PATCH 02/14] hw/misc/tz-ppc: Support having
+ unused ports in the middle of the range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +35,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-On 2/14/19 3:34 AM, Peter Maydell wrote:
-> The "background region" for a v8M MPU is a default which will be used
-> (if enabled, and if the access is privileged) if the access does
-> not match any specific MPU region. We were incorrectly using it
-> always (by putting the condition at the wrong nesting level). This
-> meant that we would always return the default background permissions
-> rather than the correct permissions for a specific region, and also
-> that we would not return the right information in response to a
-> TT instruction.
+On 2/14/19 4:50 AM, Peter Maydell wrote:
+> The Peripheral Protection Controller's handling of unused ports
+> is that if there is nothing connected to the port's downstream
+> then it does not create the sysbus MMIO region for the upstream
+> end of the port. This results in odd behaviour when there is
+> an unused port in the middle of the range: since sysbus MMIO
+> regions are implicitly consecutively allocated, any used ports
+> above the unused ones end up with sysbus MMIO region numbers
+> that don't match the port number.
 > 
-> Move the check for the background region to the same place in the
-> logic as the equivalent v8M MPUCheck() pseudocode puts it.
-> This in turn means we must adjust the condition we use to detect
-> matches in multiple regions to avoid false-positives.
+> Avoid this numbering mismatch by creating dummy MMIO regions
+> for the unused ports. This doesn't change anything for our
+> existing boards, which don't have any gaps in the middle of
+> the port ranges they use; but it will be needed for the Musca
+> board.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> I found this because the incorrect TT response eventually resulted
-> in the Zephyr RTOS writing an invalid region number back to the
-> NVIC and tripping the guest_errors logging.
-> ---
->  target/arm/helper.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  include/hw/misc/tz-ppc.h |  8 +++++++-
+>  hw/misc/tz-ppc.c         | 32 ++++++++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
