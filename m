@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42904)
+Received: from eggs.gnu.org ([209.51.188.92]:44429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gv8dY-0005b5-LM
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 17:40:45 -0500
+	(envelope-from <copymaster@howtolinux.de>) id 1gvDpv-0005Ck-Jh
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 23:13:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gv8dX-00066E-L1
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 17:40:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56854)
+	(envelope-from <copymaster@howtolinux.de>) id 1gvDpr-000131-T1
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 23:13:50 -0500
+Received: from mout7.gn-server.de ([87.238.194.234]:41672)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gv8dX-00064w-ES
-	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 17:40:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gv8dV-0005jH-66
-	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 22:40:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 241482E80C9
-	for <qemu-devel@nongnu.org>; Sat, 16 Feb 2019 22:40:41 +0000 (UTC)
+	(Exim 4.71) (envelope-from <copymaster@howtolinux.de>)
+	id 1gvDpq-0000qf-0s
+	for qemu-devel@nongnu.org; Sat, 16 Feb 2019 23:13:47 -0500
+Received: from mout14.gn-server.de ([87.238.194.241])
+	by mout7.gn-server.de with esmtp (Exim 4.84_2)
+	(envelope-from <copymaster@howtolinux.de>) id 1gvDpT-0006Ir-Ae
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 05:13:23 +0100
+Received: from pp1.greatnet.de ([178.254.50.204])
+	by mout14.gn-server.de with esmtps
+	(TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.88)
+	(envelope-from <copymaster@howtolinux.de>) id 1gvDpS-0007UT-QU
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 05:13:23 +0100
+Received: from [192.168.178.103] (ip1f115d71.dynamic.kabel-deutschland.de
+	[31.17.93.113])
+	by pp1.greatnet.de (Postfix) with ESMTPSA id 88BA43330082
+	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 05:13:13 +0100 (CET)
+From: Alexander Marx <copymaster@howtolinux.de>
+Message-ID: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
+Date: Sun, 17 Feb 2019 05:13:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 16 Feb 2019 22:31:33 -0000
-From: ITEAS <1685242@bugs.launchpad.net>
-Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
-Message-Id: <155035629347.28755.10089335643121774946.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
- memory hotplug
+Content-Language: de-DE
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] Please help corrupt filesystem image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,54 +41,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Tested here with versions of pc-i440fx-XX and it didn't work here on
-qemu-server 5.0-46, qemu 2.12.1-1
+Dear List!
 
-Didn't work.
+I have a big problem and hope you can help me.
+I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
+hosts.
+I was nearly finished with the setup and ready to migrate the users from
+old to new domain.
 
--- =
+Then i had to restart the physical servers. Unfortunately 1 dc and 2 rds
+hosts could not be startet anymore.
+Error says:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1685242
+qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
+header: Input/output error
 
-Title:
-  ovmf hangs at efi with virtio-net memory hotplug
+Even worst, a qemu-img check  also gave that error. and i was not able
+to do anything i found in the internet to fix it.
+always that error or the qemu-img could not determine the format.
 
-Status in QEMU:
-  New
+Is there a chance to fix these images? What can i do?
 
-Bug description:
-  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
-  and it has a virtio-net devices
+I have no backup because the domain was not fully configured. But if i
+have to rebuild the whole domain, i will need several weeks for it.
+Any help is appreciated.
 
-  the ovmf images where compiled from https://github.com/tianocore/edk2
-  (current master)
+Thank you
 
-  reproducer:
-
-  qemu-system-x86_64 -drive
-  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
-  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
-std
-  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
-  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
-
-  interestingly, it works when you do the following:
-
-  - omit the virtio-net-pci device
-  - use seabios
-  - use less maxmem, e.g. 512G
-
-  qemu was compiled from source (v2.9.0) with following options:
-
-  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
---enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
-artcard --audio-drv-list=3D"alsa" --enable
-  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
-k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
-virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
--agent-msi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
+Alex
