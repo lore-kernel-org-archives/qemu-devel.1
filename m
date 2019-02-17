@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50952)
+Received: from eggs.gnu.org ([209.51.188.92]:51240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gvQeg-0005Zp-Do
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:55:07 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gvQfe-00068V-Dh
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:56:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gvQef-0000I7-OE
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:55:06 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38676)
+	(envelope-from <richard.henderson@linaro.org>) id 1gvQfd-00019H-L4
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:56:06 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gvQef-0000H8-Fu
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:55:05 -0500
-Received: by mail-pl1-x643.google.com with SMTP id e5so7551730plb.5
-	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 09:55:05 -0800 (PST)
+	id 1gvQfd-00018Z-Dg
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 12:56:05 -0500
+Received: by mail-pl1-x644.google.com with SMTP id c4so2510666pls.11
+	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 09:56:05 -0800 (PST)
 References: <20190214125107.22178-1-peter.maydell@linaro.org>
-	<20190214125107.22178-4-peter.maydell@linaro.org>
+	<20190214125107.22178-5-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bce8fb4c-e3e2-8ee2-18e6-78b3c62d9110@linaro.org>
-Date: Sun, 17 Feb 2019 09:55:00 -0800
+Message-ID: <8a417877-fade-c8ec-038b-7c0ce9109649@linaro.org>
+Date: Sun, 17 Feb 2019 09:56:01 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190214125107.22178-4-peter.maydell@linaro.org>
+In-Reply-To: <20190214125107.22178-5-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/14] hw/timer/pl031: Allow use as an
- embedded-struct device
+Subject: Re: [Qemu-devel] [PATCH 04/14] hw/timer/pl031: Convert to using
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,17 +36,14 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 2/14/19 4:50 AM, Peter Maydell wrote:
-> Create a new include file for the pl031's device struct,
-> type macros, etc, so that it can be instantiated using
-> the "embedded struct" coding style.
+> Convert the debug printing in the PL031 device to use trace events,
+> and augment it to cover the interesting parts of device operation.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  include/hw/timer/pl031.h | 44 ++++++++++++++++++++++++++++++++++++++++
->  hw/timer/pl031.c         | 25 +----------------------
->  MAINTAINERS              |  1 +
->  3 files changed, 46 insertions(+), 24 deletions(-)
->  create mode 100644 include/hw/timer/pl031.h
+>  hw/timer/pl031.c      | 55 +++++++++++++++++++++++--------------------
+>  hw/timer/trace-events |  6 +++++
+>  2 files changed, 36 insertions(+), 25 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
