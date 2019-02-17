@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52503)
+Received: from eggs.gnu.org ([209.51.188.92]:52601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvWi7-0008At-TY
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvWiA-0008Bj-K6
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvWi6-0005ah-E9
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:03 -0500
-Date: Mon, 18 Feb 2019 10:14:55 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gvWi9-0005d2-Dk
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:06 -0500
+Date: Mon, 18 Feb 2019 10:43:55 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190217231455.GB2765@umbus.fritz.box>
+Message-ID: <20190217234355.GI2765@umbus.fritz.box>
 References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023078871.1011724.3083923389814185598.stgit@bahia.lan>
+	<155023082996.1011724.16237920586343905010.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="V0207lvV8h4k8FAm"
+	protocol="application/pgp-signature"; boundary="r4QXMf6/kyF/FvJJ"
 Content-Disposition: inline
-In-Reply-To: <155023078871.1011724.3083923389814185598.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 01/10] xics: Explicitely call KVM ICP
- methods from the common code
+In-Reply-To: <155023082996.1011724.16237920586343905010.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 08/10] xics: Handle KVM interrupt
+ presentation from "simple" ICS code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,176 +29,98 @@ To: Greg Kurz <groug@kaod.org>
 Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---V0207lvV8h4k8FAm
-Content-Type: text/plain; charset=us-ascii
+--r4QXMf6/kyF/FvJJ
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 15, 2019 at 12:39:48PM +0100, Greg Kurz wrote:
-> The pre_save(), post_load() and synchronize_state() methods of the
-> ICPStateClass type are really KVM only things. Make that obvious
-> by dropping the indirections and directly calling the KVM functions
-> instead.
+On Fri, Feb 15, 2019 at 12:40:30PM +0100, Greg Kurz wrote:
+> We want to use the "simple" ICS type in both KVM and non-KVM setups.
+> Teach the "simple" ICS how to present interrupts to KVM and adapt
+> sPAPR accordingly.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied, thanks.
+As C=E9dric points out, not strictly required to accomplish the series'
+goals, but I think it's a nice cleanup, so applied.
 
 > ---
->  hw/intc/xics.c        |   24 +++++++++++-------------
->  hw/intc/xics_kvm.c    |   12 ++++--------
->  include/hw/ppc/xics.h |    9 +++++----
->  3 files changed, 20 insertions(+), 25 deletions(-)
+>  hw/intc/xics.c        |    5 +++++
+>  hw/intc/xics_kvm.c    |    3 +--
+>  hw/ppc/spapr_irq.c    |    7 +------
+>  include/hw/ppc/xics.h |    2 +-
+>  4 files changed, 8 insertions(+), 9 deletions(-)
 >=20
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 16e8ffa2aaf7..988b53abd17d 100644
+> index 49401745c410..3009fa747277 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -37,18 +37,18 @@
->  #include "qapi/visitor.h"
->  #include "monitor/monitor.h"
->  #include "hw/intc/intc.h"
-> +#include "sysemu/kvm.h"
-> =20
->  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+> @@ -466,6 +466,11 @@ void ics_simple_set_irq(void *opaque, int srcno, int=
+ val)
 >  {
-> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
->      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+>      ICSState *ics =3D (ICSState *)opaque;
 > =20
->      if (!icp->output) {
->          return;
->      }
-> =20
-> -    if (icpc->synchronize_state) {
-> -        icpc->synchronize_state(icp);
 > +    if (kvm_irqchip_in_kernel()) {
-> +        icp_synchronize_state(icp);
->      }
-> =20
->      monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%02x\n=
-",
-> @@ -252,25 +252,23 @@ static void icp_irq(ICSState *ics, int server, int =
-nr, uint8_t priority)
->      }
->  }
-> =20
-> -static int icp_dispatch_pre_save(void *opaque)
-> +static int icp_pre_save(void *opaque)
->  {
->      ICPState *icp =3D opaque;
-> -    ICPStateClass *info =3D ICP_GET_CLASS(icp);
-> =20
-> -    if (info->pre_save) {
-> -        info->pre_save(icp);
-> +    if (kvm_irqchip_in_kernel()) {
-> +        icp_get_kvm_state(icp);
->      }
-> =20
->      return 0;
->  }
-> =20
-> -static int icp_dispatch_post_load(void *opaque, int version_id)
-> +static int icp_post_load(void *opaque, int version_id)
->  {
->      ICPState *icp =3D opaque;
-> -    ICPStateClass *info =3D ICP_GET_CLASS(icp);
-> =20
-> -    if (info->post_load) {
-> -        return info->post_load(icp, version_id);
-> +    if (kvm_irqchip_in_kernel()) {
-> +        return icp_set_kvm_state(icp);
->      }
-> =20
->      return 0;
-> @@ -280,8 +278,8 @@ static const VMStateDescription vmstate_icp_server =
-=3D {
->      .name =3D "icp/server",
->      .version_id =3D 1,
->      .minimum_version_id =3D 1,
-> -    .pre_save =3D icp_dispatch_pre_save,
-> -    .post_load =3D icp_dispatch_post_load,
-> +    .pre_save =3D icp_pre_save,
-> +    .post_load =3D icp_post_load,
->      .fields =3D (VMStateField[]) {
->          /* Sanity check */
->          VMSTATE_UINT32(xirr, ICPState),
+> +        ics_kvm_set_irq(ics, srcno, val);
+> +        return;
+> +    }
+> +
+>      if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
+>          ics_simple_set_irq_lsi(ics, srcno, val);
+>      } else {
 > diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index dff13300504c..7efa99b8b434 100644
+> index e7b8d4c29ce6..f34eacda03e7 100644
 > --- a/hw/intc/xics_kvm.c
 > +++ b/hw/intc/xics_kvm.c
-> @@ -54,7 +54,7 @@ static QLIST_HEAD(, KVMEnabledICP)
->  /*
->   * ICP-KVM
->   */
-> -static void icp_get_kvm_state(ICPState *icp)
-> +void icp_get_kvm_state(ICPState *icp)
+> @@ -259,9 +259,8 @@ int ics_set_kvm_state(ICSState *ics)
+>      return 0;
+>  }
+> =20
+> -void ics_kvm_set_irq(void *opaque, int srcno, int val)
+> +void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
 >  {
->      uint64_t state;
->      int ret;
-> @@ -83,14 +83,14 @@ static void do_icp_synchronize_state(CPUState *cpu, r=
-un_on_cpu_data arg)
->      icp_get_kvm_state(arg.host_ptr);
->  }
+> -    ICSState *ics =3D opaque;
+>      struct kvm_irq_level args;
+>      int rc;
 > =20
-> -static void icp_synchronize_state(ICPState *icp)
-> +void icp_synchronize_state(ICPState *icp)
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index e6893df61e76..9f43b7b3bf16 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -222,13 +222,8 @@ static int spapr_irq_post_load_xics(sPAPRMachineStat=
+e *spapr, int version_id)
+>  static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
 >  {
->      if (icp->cs) {
->          run_on_cpu(icp->cs, do_icp_synchronize_state, RUN_ON_CPU_HOST_PT=
-R(icp));
->      }
+>      sPAPRMachineState *spapr =3D opaque;
+> -    MachineState *machine =3D MACHINE(opaque);
+> =20
+> -    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
+> -        ics_kvm_set_irq(spapr->ics, srcno, val);
+> -    } else {
+> -        ics_simple_set_irq(spapr->ics, srcno, val);
+> -    }
+> +    ics_simple_set_irq(spapr->ics, srcno, val);
 >  }
 > =20
-> -static int icp_set_kvm_state(ICPState *icp, int version_id)
-> +int icp_set_kvm_state(ICPState *icp)
->  {
->      uint64_t state;
->      int ret;
-> @@ -121,7 +121,7 @@ static void icp_kvm_reset(DeviceState *dev)
-> =20
->      icpc->parent_reset(dev);
-> =20
-> -    icp_set_kvm_state(ICP(dev), 1);
-> +    icp_set_kvm_state(ICP(dev));
->  }
-> =20
->  static void icp_kvm_realize(DeviceState *dev, Error **errp)
-> @@ -178,10 +178,6 @@ static void icp_kvm_class_init(ObjectClass *klass, v=
-oid *data)
->                                      &icpc->parent_realize);
->      device_class_set_parent_reset(dc, icp_kvm_reset,
->                                    &icpc->parent_reset);
-> -
-> -    icpc->pre_save =3D icp_get_kvm_state;
-> -    icpc->post_load =3D icp_set_kvm_state;
-> -    icpc->synchronize_state =3D icp_synchronize_state;
->  }
-> =20
->  static const TypeInfo icp_kvm_info =3D {
+>  static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
 > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index fad786e8b22d..3236ccec924c 100644
+> index 06e87128f88e..61bd0fb9784f 100644
 > --- a/include/hw/ppc/xics.h
 > +++ b/include/hw/ppc/xics.h
-> @@ -66,10 +66,6 @@ struct ICPStateClass {
+> @@ -180,7 +180,6 @@ void icp_eoi(ICPState *icp, uint32_t xirr);
+>  void ics_simple_write_xive(ICSState *ics, int nr, int server,
+>                             uint8_t priority, uint8_t saved_priority);
+>  void ics_simple_set_irq(void *opaque, int srcno, int val);
+> -void ics_kvm_set_irq(void *opaque, int srcno, int val);
 > =20
->      DeviceRealize parent_realize;
->      DeviceReset parent_reset;
-> -
-> -    void (*pre_save)(ICPState *icp);
-> -    int (*post_load)(ICPState *icp, int version_id);
-> -    void (*synchronize_state)(ICPState *icp);
->  };
+>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon);
+> @@ -201,5 +200,6 @@ void icp_kvm_realize(DeviceState *dev, Error **errp);
+>  void ics_get_kvm_state(ICSState *ics);
+>  int ics_set_kvm_state(ICSState *ics);
+>  void ics_synchronize_state(ICSState *ics);
+> +void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
 > =20
->  struct ICPState {
-> @@ -203,4 +199,9 @@ void icp_resend(ICPState *ss);
->  Object *icp_create(Object *cpu, const char *type, XICSFabric *xi,
->                     Error **errp);
-> =20
-> +/* KVM */
-> +void icp_get_kvm_state(ICPState *icp);
-> +int icp_set_kvm_state(ICPState *icp);
-> +void icp_synchronize_state(ICPState *icp);
-> +
 >  #endif /* XICS_H */
 >=20
 
@@ -208,24 +130,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---V0207lvV8h4k8FAm
+--r4QXMf6/kyF/FvJJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxp6u8ACgkQbDjKyiDZ
-s5IbWhAAmhOqUSHWdrnig6CAipIdQCeSoYEO29wmvWyvdiGgxnGAnPy7Y0N9epBz
-Vsre8xcCR6fj3MUfNASe80Z0w2WyM33NwzZe7GDkvNsD1eieRKYb5jbGhhbyngM2
-GZOcMjhkKDvdblBi9GFnVeDJcTJLXVaikp1nj78sJItySDvy66jBpJiGoRKPraSd
-X2zzvgEZqpdt66px25qyyLQEDcQqy5za6yKyYjjgmvugiK+3ep7lzVi+0n9XzmeT
-9pc1/CAdMW9bqPBd6RHmlhfCZsYyL+ZbtrUU03BBecgKfY/ElWeeRP5fjKMM9Irp
-COmq0mLKKI5l7oy2L8CO9iCX7Ako/F5KINm+1hnBRIaRtke2PZM5vRECZqh/ufmI
-HY8sqbN44KnWUJl8KWfEhePIt45CaEj4CYzWpl3I6HsQdTpnaa7//Yr7Sc7KOGVH
-ONoLRBe/aG7mJ7A9/00/tD0SokxXkUtOAgQDG2zoJnefjZAiZqBJfdQK7lkqmQmE
-oENl8+2RcYWxnHx0xtN7xWGa66EpgE1DZ1blkORetFb6VuQC9z1eqKvfe6BMryeT
-wpR/SS928tUHWANbwGLmvai32eiRFbUmH3oVCJxG+eBauLFqs88AnZQhP/6EbcYo
-ZKv2wxVwZ4vJjZeLQkqzml5Lz9jx97DiRp1vhula6WqZrpiYYNU=
-=xUp5
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxp8bsACgkQbDjKyiDZ
+s5Jy4g//Qnn5mUWgoX0DFMtjtIfUyTAz8TWSucaA9jOQls0BkeTY3l/XfDmoOEhE
+7uKcbhUy1LsfBIdUU+dVSaDSjaNLjjaa4uDSuRy6yjD4Ng2ZYpijZk9vxEasA9pT
+Y6K00uMn0u0L1oCFB0alGOnn1pXFQbD258b0/n3tx5HCUWGrXQsi+8p7aFV2U/6B
+EWbQg12rBLtSIuDHt/+iXOE7KghMXHBg2BxJnNO/D5manD/DItQCeF+SjawewJ8k
+g9f1vkE9GkCdMWJceJYmPurqujQJB5eW7smIXlvLuB49UUs7Pf/X0LM83GQTrSX5
+aV4eQe2zRhswCfHSLulS396wwbJXS25ch1mAUYmO7RRnH0LvNdbjR01GnEj6yuk3
+0XD+zhGrY2lio41VuxBCawJedwpf9lBQEsCHeMi2Hw+Xr2leWiTuwT6OZgxUnRbJ
+WofUiNV/5BkcQd2FeOIxNL5O844UN8RTzpfDrVXetg4XB/tTa9+Wsh4lh7TtznZB
+wEKvAd+sOUngECXkZd7d4aXgcKFJyCW22SlbcRsrQwRhU1cemkU+5r7jnWK3SEYz
+q0dbgB5nkbgHwRvh7E+J3DTNjzPvy4zPp1QsmOXRLnBk/+ZH4C52314qYSnBwXM5
+zzWquqI/M+QIVlWbC73POVrS4cZc03C5DUTg2gSex9OOO8A9BT0=
+=JRQ2
 -----END PGP SIGNATURE-----
 
---V0207lvV8h4k8FAm--
+--r4QXMf6/kyF/FvJJ--
