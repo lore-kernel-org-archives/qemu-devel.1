@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52603)
+Received: from eggs.gnu.org ([209.51.188.92]:52667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvWiA-0008Bk-KQ
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvWiE-0008Dr-OP
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvWi9-0005dL-Jf
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:06 -0500
-Date: Mon, 18 Feb 2019 10:41:48 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gvWiA-0005eN-J6
+	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:08 -0500
+Date: Mon, 18 Feb 2019 10:58:19 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190217234148.GH2765@umbus.fritz.box>
-References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023082407.1011724.1983100830860273401.stgit@bahia.lan>
+Message-ID: <20190217235819.GL2765@umbus.fritz.box>
+References: <20190215133005.15955-1-david@redhat.com>
+	<20190215133005.15955-2-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hAW+M2+FUO+onfmf"
+	protocol="application/pgp-signature"; boundary="iK/wEI4vkfDmI6Zw"
 Content-Disposition: inline
-In-Reply-To: <155023082407.1011724.1983100830860273401.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 07/10] xics: Handle KVM ICS reset from the
- "simple" ICS code
+In-Reply-To: <20190215133005.15955-2-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] cpus: Properly release the iothread
+ lock when killing a dummy VCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 
---hAW+M2+FUO+onfmf
+--iK/wEI4vkfDmI6Zw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 15, 2019 at 12:40:24PM +0100, Greg Kurz wrote:
-> The KVM ICS reset handler simply writes the ICS state to KVM. This
-> doesn't need the overkill parent_reset logic we have today. Also
-> we want to use the same ICS type for the KVM and non-KVM case with
-> pseries.
+On Fri, Feb 15, 2019 at 02:30:00PM +0100, David Hildenbrand wrote:
+> This enables CPU unplug under qtest.
 >=20
-> Call icp_set_kvm_state() from the "simple" ICS reset function.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Applied, thanks.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/intc/xics.c     |    4 ++++
->  hw/intc/xics_kvm.c |   18 ------------------
->  2 files changed, 4 insertions(+), 18 deletions(-)
+>  cpus.c | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index ae5d5ea135b8..49401745c410 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -553,6 +553,10 @@ static void ics_simple_reset(DeviceState *dev)
->      ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
+> diff --git a/cpus.c b/cpus.c
+> index 154daf57dc..e83f72b48b 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1333,6 +1333,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>          qemu_wait_io_event(cpu);
+>      } while (!cpu->unplug);
 > =20
->      icsc->parent_reset(dev);
-> +
-> +    if (kvm_irqchip_in_kernel()) {
-> +        ics_set_kvm_state(ICS_BASE(dev));
-> +    }
->  }
-> =20
->  static void ics_simple_reset_handler(void *dev)
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index 642351e5790f..e7b8d4c29ce6 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -280,20 +280,6 @@ void ics_kvm_set_irq(void *opaque, int srcno, int va=
-l)
->      }
->  }
-> =20
-> -static void ics_kvm_reset(DeviceState *dev)
-> -{
-> -    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
-> -
-> -    icsc->parent_reset(dev);
-> -
-> -    ics_set_kvm_state(ICS_KVM(dev));
-> -}
-> -
-> -static void ics_kvm_reset_handler(void *dev)
-> -{
-> -    ics_kvm_reset(dev);
-> -}
-> -
->  static void ics_kvm_realize(DeviceState *dev, Error **errp)
->  {
->      ICSState *ics =3D ICS_KVM(dev);
-> @@ -305,8 +291,6 @@ static void ics_kvm_realize(DeviceState *dev, Error *=
-*errp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> -
-> -    qemu_register_reset(ics_kvm_reset_handler, ics);
->  }
-> =20
->  static void ics_kvm_class_init(ObjectClass *klass, void *data)
-> @@ -316,8 +300,6 @@ static void ics_kvm_class_init(ObjectClass *klass, vo=
-id *data)
-> =20
->      device_class_set_parent_realize(dc, ics_kvm_realize,
->                                      &icsc->parent_realize);
-> -    device_class_set_parent_reset(dc, ics_kvm_reset,
-> -                                  &icsc->parent_reset);
->  }
-> =20
->  static const TypeInfo ics_kvm_info =3D {
->=20
+> +    qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+>  #endif
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -120,24 +64,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hAW+M2+FUO+onfmf
+--iK/wEI4vkfDmI6Zw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxp8TsACgkQbDjKyiDZ
-s5LoIBAAnv31rhEOfAGKKeSjkl5yhPrEHzZVIIGX4ct5QUMNh0ncYVzpzhTf2d0c
-2UlMTO6TAuMSwhW3xbRVWlq9Gw7zCN2MVXpTSWx9uh+/8sRSm0d3s4EnlmmARK2Q
-2U3iu5xFDUcVqSWT/wZiQPUDdkQoTMuofe6jzIU5mWSRKlZ5IIhd+IznHsvGS8/s
-ehKh4OG7+B/Ay1Yz6Qo5hVmev/Zo8mrSEi00V0N8JeHWgtW7cX3HBmyfTo6rU7LJ
-f1x6xGFmnPQPwfjOF+wj5dtPmwGP+dQyv2PPB92KaG0+melFS7DWi4KW6iYAxicp
-JPL72c9FDQkUe0g2Q0dVaf65bsK6ZIk3ps0F12QUBTDMnYI4N3wJonFX6+1mN98Z
-LDatsXucAe+PXrVY9NGCMDZ4WRBQf4vCAH9DaLUrfVYI/tLWBinQnxLr1KyiXZb7
-DAakdacqWNhcrZu1zxB0yrVcZPkg4e1j6F1+Dhn5DOh4S0B+vuJ/PniQvZ5Z+qbL
-bLJqKKAHbtICzAi4h4cMWKbABv4Nh5m9Q3WsdLE2U6QkFqL+dmBtwyCJc42mZhNt
-AlFGLfkUmPC2QHs0GUqAfzN1wF7s4jpokxrEpvinoarAOp+oKe524FNAW7TD3USw
-qBEtuYsJ3768oGLgDVSXr+B/SJ+gHqwPtWJ/z1UDQUL6ln+o/Pw=
-=TBne
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxp9RsACgkQbDjKyiDZ
+s5KVNA/7BHiLbkut6sM24hU6791Y09l2jFDkRMBA93L65IBaWeX1RpmvrlqX9Mzm
+fMQqET922BPlCETj7HXLl5ur2N68O7Ci16oOuKQYNEuNENGBUXv2NrLUFuzDTZdH
+us6BAU/+CU+rWbVIbmTNa0dccSMIcGF47mrOoWX4NWSsGqYlS2ZEuROZ6lCGw3Ce
+ZtrRrrDShRS552Vi8RiqtoRZbbWP/IZfwNGbgBDUN+PU7wa6/VAY1dDKfzw6yaTM
+zBeivBmh7UJ/3FKHJANe8zg9JNgcAe0K41Y/yt0QvBNpt44lCsCUUPWDTNu9g60U
+dqZGsdQd1oEc2mF/jIJ5iBgjcGZ+SFdImu0e3r52g0CF9X/haINTwRhcOVdNsv1k
++GsBvlre0G3dthwwGKnoCo8QB8QzqZRVF9mv4A0TvGjgNnZulejQdhXWJKXwPIAq
+xu9GVrgTlGrgJgUMO0ohbSBdL6S/nX4n0O7i84/Wd8F25xdEkKOR0PcQgMjdOEK8
+2Ah7Cg2WwCiW4aAV8zfPrxQ4+4g/TP4BxoCIhCRe3SZtebtYy7tyMkmK4nh42Glu
+B7Svp4Lvmh6x4KUbMRs10poTilDYVKMofrtLEOilwaEQiuvVc5wb6nA1FBNl3dX7
+Nn/gLttJ5XhmB5eMZEi+oGV6bcgz8MWoWVvfl+bZY2nPXcswWFU=
+=20Iv
 -----END PGP SIGNATURE-----
 
---hAW+M2+FUO+onfmf--
+--iK/wEI4vkfDmI6Zw--
