@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52601)
+Received: from eggs.gnu.org ([209.51.188.92]:52617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvWiA-0008Bj-K6
+	(envelope-from <dgibson@ozlabs.org>) id 1gvWiA-0008CG-WD
 	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvWi9-0005d2-Dk
+	(envelope-from <dgibson@ozlabs.org>) id 1gvWi9-0005dm-UO
 	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 19:23:06 -0500
-Date: Mon, 18 Feb 2019 10:43:55 +1100
+Date: Mon, 18 Feb 2019 10:51:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190217234355.GI2765@umbus.fritz.box>
+Message-ID: <20190217235144.GK2765@umbus.fritz.box>
 References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023082996.1011724.16237920586343905010.stgit@bahia.lan>
+	<155023083585.1011724.2868047424353921455.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="r4QXMf6/kyF/FvJJ"
+	protocol="application/pgp-signature"; boundary="1ppIqr1kl39GnwQx"
 Content-Disposition: inline
-In-Reply-To: <155023082996.1011724.16237920586343905010.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 08/10] xics: Handle KVM interrupt
- presentation from "simple" ICS code
+In-Reply-To: <155023083585.1011724.2868047424353921455.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 09/10] spapr/irq: Use the "simple" ICS
+ class for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +29,84 @@ To: Greg Kurz <groug@kaod.org>
 Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---r4QXMf6/kyF/FvJJ
+--1ppIqr1kl39GnwQx
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 15, 2019 at 12:40:30PM +0100, Greg Kurz wrote:
-> We want to use the "simple" ICS type in both KVM and non-KVM setups.
-> Teach the "simple" ICS how to present interrupts to KVM and adapt
-> sPAPR accordingly.
+On Fri, Feb 15, 2019 at 12:40:35PM +0100, Greg Kurz wrote:
+> The "simple" ICS class knows how to interract with KVM. Adapt sPAPR to use
+> it instead of the ICS KVM class.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
-
-As C=E9dric points out, not strictly required to accomplish the series'
-goals, but I think it's a nice cleanup, so applied.
-
 > ---
->  hw/intc/xics.c        |    5 +++++
->  hw/intc/xics_kvm.c    |    3 +--
->  hw/ppc/spapr_irq.c    |    7 +------
->  include/hw/ppc/xics.h |    2 +-
->  4 files changed, 8 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr_irq.c |   15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 49401745c410..3009fa747277 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -466,6 +466,11 @@ void ics_simple_set_irq(void *opaque, int srcno, int=
- val)
->  {
->      ICSState *ics =3D (ICSState *)opaque;
-> =20
-> +    if (kvm_irqchip_in_kernel()) {
-> +        ics_kvm_set_irq(ics, srcno, val);
-> +        return;
-> +    }
-> +
->      if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
->          ics_simple_set_irq_lsi(ics, srcno, val);
->      } else {
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index e7b8d4c29ce6..f34eacda03e7 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -259,9 +259,8 @@ int ics_set_kvm_state(ICSState *ics)
->      return 0;
->  }
-> =20
-> -void ics_kvm_set_irq(void *opaque, int srcno, int val)
-> +void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
->  {
-> -    ICSState *ics =3D opaque;
->      struct kvm_irq_level args;
->      int rc;
-> =20
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index e6893df61e76..9f43b7b3bf16 100644
+> index 9f43b7b3bf16..4aa8165307c7 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -222,13 +222,8 @@ static int spapr_irq_post_load_xics(sPAPRMachineStat=
-e *spapr, int version_id)
->  static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
+> @@ -67,13 +67,12 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+>   */
+> =20
+>  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> -                                  const char *type_ics,
+>                                    int nr_irqs, Error **errp)
 >  {
->      sPAPRMachineState *spapr =3D opaque;
-> -    MachineState *machine =3D MACHINE(opaque);
+>      Error *local_err =3D NULL;
+>      Object *obj;
 > =20
-> -    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> -        ics_kvm_set_irq(spapr->ics, srcno, val);
-> -    } else {
-> -        ics_simple_set_irq(spapr->ics, srcno, val);
-> -    }
-> +    ics_simple_set_irq(spapr->ics, srcno, val);
+> -    obj =3D object_new(type_ics);
+> +    obj =3D object_new(TYPE_ICS_SIMPLE);
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+>      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+>                                     &error_abort);
+> @@ -98,14 +97,14 @@ static void spapr_irq_init_xics(sPAPRMachineState *sp=
+apr, int nr_irqs,
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+>      Error *local_err =3D NULL;
+> +    bool xics_kvm =3D false;
+> =20
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+>              !xics_kvm_init(spapr, &local_err)) {
+> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs,
+> -                                          &local_err);
+> +            xics_kvm =3D true;
+>          }
+> -        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> +        if (machine_kernel_irqchip_required(machine) && !xics_kvm) {
+>              error_prepend(&local_err,
+>                            "kernel_irqchip requested but unavailable: ");
+>              goto error;
+> @@ -114,12 +113,12 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
+spapr, int nr_irqs,
+>          local_err =3D NULL;
+>      }
+> =20
+> -    if (!spapr->ics) {
+> +    if (!xics_kvm) {
+>          xics_spapr_init(spapr);
+> -        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
+> -                                      &local_err);
+
+As C=E9dric suggested, I think this would be nicer if xics_kvm_init()
+and xics_spapr_init() were folded together with the KVM fallback
+inside.
+
+That can be a follow up patch, though,
+
+Applied.
+
+>      }
+> =20
+> +    spapr->ics =3D spapr_ics_create(spapr, nr_irqs, &local_err);
+> +
+>  error:
+>      error_propagate(errp, local_err);
 >  }
-> =20
->  static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 06e87128f88e..61bd0fb9784f 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -180,7 +180,6 @@ void icp_eoi(ICPState *icp, uint32_t xirr);
->  void ics_simple_write_xive(ICSState *ics, int nr, int server,
->                             uint8_t priority, uint8_t saved_priority);
->  void ics_simple_set_irq(void *opaque, int srcno, int val);
-> -void ics_kvm_set_irq(void *opaque, int srcno, int val);
-> =20
->  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
->  void icp_pic_print_info(ICPState *icp, Monitor *mon);
-> @@ -201,5 +200,6 @@ void icp_kvm_realize(DeviceState *dev, Error **errp);
->  void ics_get_kvm_state(ICSState *ics);
->  int ics_set_kvm_state(ICSState *ics);
->  void ics_synchronize_state(ICSState *ics);
-> +void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
-> =20
->  #endif /* XICS_H */
 >=20
 
 --=20
@@ -130,24 +115,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---r4QXMf6/kyF/FvJJ
+--1ppIqr1kl39GnwQx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxp8bsACgkQbDjKyiDZ
-s5Jy4g//Qnn5mUWgoX0DFMtjtIfUyTAz8TWSucaA9jOQls0BkeTY3l/XfDmoOEhE
-7uKcbhUy1LsfBIdUU+dVSaDSjaNLjjaa4uDSuRy6yjD4Ng2ZYpijZk9vxEasA9pT
-Y6K00uMn0u0L1oCFB0alGOnn1pXFQbD258b0/n3tx5HCUWGrXQsi+8p7aFV2U/6B
-EWbQg12rBLtSIuDHt/+iXOE7KghMXHBg2BxJnNO/D5manD/DItQCeF+SjawewJ8k
-g9f1vkE9GkCdMWJceJYmPurqujQJB5eW7smIXlvLuB49UUs7Pf/X0LM83GQTrSX5
-aV4eQe2zRhswCfHSLulS396wwbJXS25ch1mAUYmO7RRnH0LvNdbjR01GnEj6yuk3
-0XD+zhGrY2lio41VuxBCawJedwpf9lBQEsCHeMi2Hw+Xr2leWiTuwT6OZgxUnRbJ
-WofUiNV/5BkcQd2FeOIxNL5O844UN8RTzpfDrVXetg4XB/tTa9+Wsh4lh7TtznZB
-wEKvAd+sOUngECXkZd7d4aXgcKFJyCW22SlbcRsrQwRhU1cemkU+5r7jnWK3SEYz
-q0dbgB5nkbgHwRvh7E+J3DTNjzPvy4zPp1QsmOXRLnBk/+ZH4C52314qYSnBwXM5
-zzWquqI/M+QIVlWbC73POVrS4cZc03C5DUTg2gSex9OOO8A9BT0=
-=JRQ2
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxp85AACgkQbDjKyiDZ
+s5J1uQ/8C6pGQW9ys6GxEQERwXSD8PpwnqsGd3oDMWXIg6RVxjEZKEkLf3pWyMxj
+8pXDaai4pqMV7h1sLLD2JZXljcmJSfW/ZCz7gfDqd/KVOZpnR1DhglNYdAk9+ILx
++3vAjvTzZpVim2vSMVcKs42uwPzfL1PeGxPzPmQXJ98Y/73dXBINw24Ufolliqvn
+tonWVlFkSTt7awyOnJhFoIrUlqPOp0a7iUFi73oQg3t2k74VGZf7RRY/G60oK/Rb
+E3bm57aSiYRVLVfG0GxGfKmNNdzVybFopWygnsBNKJ9UVA2ha3fGnM1P726Y51ie
+5hDo+yerxnHZ8D7L5WbGgn+NSSdxblEqJLH2hOOgiBpviYw+9+OqWc1XjKCyJQ+n
+oR3X2zy1+UBQayET4OzPiFDD26onUxbz+FUdgJf0tNPJ1wpaRosOZtkKdKYQAQeO
+t4GTlJZGXXFtqNVkiK7ChSXOTBrbahjXT4LKPFG6YWDONUK37+s0RHxVN6g8MFRb
+/D7kLUklhwL540jCloYEHKUSOMtpPQSDYWQmBGALZVXpRHQDrAgx7cwYPgW9/hu+
+iCNLcPpUF0nz0gR6Q+Bi0iGfHiocfEGet9y6XtQw3dBHYKgkGYyCVEULHuOXYR8B
+dGXcTne4Fth1wCx3ldJZzMV/jA7tqJCLb95eDeBi2repAkYoCW8=
+=Vmcq
 -----END PGP SIGNATURE-----
 
---r4QXMf6/kyF/FvJJ--
+--1ppIqr1kl39GnwQx--
