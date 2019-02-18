@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48938)
+Received: from eggs.gnu.org ([209.51.188.92]:53827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gveLJ-0007YT-Hz
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:32:02 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gvenc-0002cj-Rn
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:01:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gveLI-0005XH-Ls
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:32:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gveLI-0005Ma-Ef
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:32:00 -0500
-Date: Mon, 18 Feb 2019 16:22:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190218082217.GA9040@xz-x1>
-References: <CACQB2UxS6a2LbnOsdLt6q1=9xN4NoGBQNwVNZe-vGQjWdus_KQ@mail.gmail.com>
-	<CABdVeAAvoXr5oG+G8NYJDiNO4Tdgu2QNhR4dVzd_wZ=W2GhgPg@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1gvelP-0004wY-Jd
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:59:00 -0500
+Date: Mon, 18 Feb 2019 09:58:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190218095838.048819c5@Igors-MacBook-Pro.local>
+In-Reply-To: <20190205173306.20483-13-eric.auger@redhat.com>
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-13-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CABdVeAAvoXr5oG+G8NYJDiNO4Tdgu2QNhR4dVzd_wZ=W2GhgPg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Fwd: QEMU: AMD IOMMU implementation bugs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 12/18] hw/arm/boot: Expose the PC-DIMM
+ nodes in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Kiarie <davidkiarie4@gmail.com>, alexaltea123@gmail.com
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Valentine Sinitsyn <valentine.sinitsyn@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, rkrcmar@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-On Sat, Feb 16, 2019 at 10:11:28PM +0300, David Kiarie wrote:
-> ---------- Forwarded message ---------
-> From: Alexandro S=C3=A1nchez Bach <alexaltea123@gmail.com>
-> Date: Wed, Jan 31, 2018 at 2:29 AM
-> Subject: QEMU: AMD IOMMU implementation bugs
-> To: <davidkiarie4@gmail.com>
->=20
->=20
-> Hey David,
->=20
-> hello Mr Alexandro Sanchez Bach,
->=20
-> I'm working with your AMD IOMMU implementation since I'm writing a
-> PlayStation 4 emulator. I found few bugs, that I wanted to report to yo=
-u.
->=20
-> 1. https://github.com/qemu/qemu/blob/master/hw/i386/amd_iommu.c#L380
-> Did you mean amdvi_assign_orq instead of  amdvi_test_mask? Otherwise my
-> guest OS will get stuck in an endless loop waiting for a flag that neve=
-r
-> comes.
->=20
-> it looks like you're correct to me.
->=20
-> 2. The arguments `addr` and `val` are swapped in these two lines:
-> > static void amdvi_writeq_raw(AMDVIState *s, uint64_t val, hwaddr addr=
-);
-> > amdvi_writeq_raw(s, addr, amdvi_readq(s, addr) | val);
->=20
-> same here.
->=20
-> 3. And this might be something specific to my AMD IOMMU (1022:1437, Fam=
-ily
-> 16h), but the PS4 OS is checks the entire word stored in these register=
-s
-> and computes the expression as:
-> config[AMDVI_CAPAB_BAR_LOW] | cap[AMDVI_CAPAB_BAR_HIGH] << 32
-> So just storing half words should be wrong.
->=20
-> not sure about this.
->=20
-> since it looks to me like you're working with emulation and virtualizat=
-ion,
-> i have cc'd people who i know/knew to be actively involved. it doubt it
-> would take any effort for these people to respond to bugs like above in=
- the
-> future.
+On Tue,  5 Feb 2019 18:33:00 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-Hi, Alex,
+> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> 
+> This patch add memory nodes corresponding to PC-DIMM regions.
+s/add/adds/ or s/This patch add/Add/
 
-The sentences are a bit messed up above.  IMHO you can simply post
-patches directly if you found any bugs in the code.  You can prefix
-the subject with "RFC" if you are uncertain about the changes.  People
-on the list can directly comment on the patches.
+> 
+> NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
+> don't need to care about NV-DIMM at this stage.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v3 -> v4:
+> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
+> 
+> v1 -> v2:
+> - added qapi_free_MemoryDeviceInfoList and simplify the loop
+> ---
+>  hw/arm/boot.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 2ef367e15b..2a70e8aa82 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -19,6 +19,7 @@
+>  #include "sysemu/numa.h"
+>  #include "hw/boards.h"
+>  #include "hw/loader.h"
+> +#include "hw/mem/memory-device.h"
+>  #include "elf.h"
+>  #include "sysemu/device_tree.h"
+>  #include "qemu/config-file.h"
+> @@ -526,6 +527,34 @@ static void fdt_add_psci_node(void *fdt)
+>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+>  }
+>  
+> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
+> +                                             uint32_t acells, uint32_t scells) {
+> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
+> +    MemoryDeviceInfo *mi;
+> +    PCDIMMDeviceInfo *di;
+> +    bool is_nvdimm;
+> +    int ret = 0;
+> +
+> +    for (info = info_list; info != NULL; info = info->next) {
+> +        mi = info->value;
+> +        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
+> +        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
+> +
+> +        if (is_nvdimm) {
+> +            ret = -ENOENT; /* NV-DIMM not yet supported */
+> +        } else {
+> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
+> +                                      scells, di->size, di->node);
+> +        }
+> +        if (ret < 0) {
+> +            goto out;
+> +        }
+> +    }
+> +out:
+> +    qapi_free_MemoryDeviceInfoList(info_list);
+> +    return ret;
+> +}
+> +
+>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>                   hwaddr addr_limit, AddressSpace *as)
+>  {
+> @@ -621,6 +650,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>          }
+>      }
+>  
+> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
+> +    if (rc < 0) {
+> +            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
+error message is rather vague, user using nvdimms + pc-dimms on CLI won't have
+a clue that the former is not supported.
+Suggest pass in error_fatal as argument and report more specific error from
+fdt_add_hotpluggable_memory_nodes()
 
-Regards,
+does this run on reboot?
 
---=20
-Peter Xu
+> +            goto fail;
+> +    }
+> +
+>      rc = fdt_path_offset(fdt, "/chosen");
+>      if (rc < 0) {
+>          qemu_fdt_add_subnode(fdt, "/chosen");
