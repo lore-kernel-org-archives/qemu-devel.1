@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60121)
+Received: from eggs.gnu.org ([209.51.188.92]:60112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjZ0-00024Y-Bw
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1gvjZ0-00024J-Ay
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjYx-0005Zx-Lu
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50934)
+	(envelope-from <armbru@redhat.com>) id 1gvjYu-0005X5-TP
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50870)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvjYw-0005Vb-4w
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:26 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvjYs-0005UQ-Li
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:24 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9273C07014C
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CB6A1C010930
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:18 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 15:06:07 +0100
-Message-Id: <20190218140607.31998-19-armbru@redhat.com>
+Date: Mon, 18 Feb 2019 15:06:01 +0100
+Message-Id: <20190218140607.31998-13-armbru@redhat.com>
 In-Reply-To: <20190218140607.31998-1-armbru@redhat.com>
 References: <20190218140607.31998-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/18] qapi: move RTC_CHANGE to the target schema
+Subject: [Qemu-devel] [PULL 12/18] qapi: make query-gic-capabilities depend
+ on TARGET_ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,126 +38,168 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-A few targets don't emit RTC_CHANGE, we could restrict the event to
-the tagets that do emit it.
-
-Note: There is a lot more of events & commands that we could restrict
-to capable targets, with the cost of some additional complexity, but
-the benefit of added correctness and better introspection.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190214152251.2073-19-armbru@redhat.com>
+Message-Id: <20190214152251.2073-13-armbru@redhat.com>
 ---
- hw/ppc/spapr_rtc.c     |  2 +-
- hw/timer/mc146818rtc.c |  2 +-
- qapi/misc.json         | 23 -----------------------
- qapi/target.json       | 23 +++++++++++++++++++++++
- 4 files changed, 25 insertions(+), 25 deletions(-)
+ monitor.c            | 11 -----------
+ qapi/misc.json       | 43 ------------------------------------------
+ qapi/target.json     | 45 ++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/monitor.c |  2 +-
+ 4 files changed, 46 insertions(+), 55 deletions(-)
 
-diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
-index cd049f389d..eb95a7077d 100644
---- a/hw/ppc/spapr_rtc.c
-+++ b/hw/ppc/spapr_rtc.c
-@@ -31,7 +31,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/ppc/spapr.h"
- #include "qapi/error.h"
--#include "qapi/qapi-events-misc.h"
-+#include "qapi/qapi-events-target.h"
- #include "qemu/cutils.h"
+diff --git a/monitor.c b/monitor.c
+index 621e26cc94..33a0d81677 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1145,9 +1145,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
+ect **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
+ {
+-#ifndef TARGET_ARM
+-    qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
+-#endif
+ #if !defined(TARGET_S390X) && !defined(TARGET_I386)
+     qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
+ #endif
+@@ -4657,14 +4654,6 @@ QemuOptsList qemu_mon_opts =3D {
+     },
+ };
 =20
- void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index bc1862b6fc..513f105e62 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -32,7 +32,7 @@
- #include "hw/timer/mc146818rtc.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-target.h"
--#include "qapi/qapi-events-misc.h"
-+#include "qapi/qapi-events-target.h"
- #include "qapi/visitor.h"
- #include "exec/address-spaces.h"
-=20
+-#ifndef TARGET_ARM
+-GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "query-gic-capabilities");
+-    return NULL;
+-}
+-#endif
+-
+ HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
+ {
+     MachineState *ms =3D MACHINE(qdev_get_machine());
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 98f59f828a..8b3ca4fdd3 100644
+index 431de64590..9df45a27ca 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -2876,29 +2876,6 @@
- { 'event': 'ACPI_DEVICE_OST',
-      'data': { 'info': 'ACPIOSTInfo' } }
+@@ -3044,49 +3044,6 @@
+ ##
+ { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
 =20
 -##
--# @RTC_CHANGE:
+-# @GICCapability:
 -#
--# Emitted when the guest changes the RTC time.
+-# The struct describes capability for a specific GIC (Generic
+-# Interrupt Controller) version. These bits are not only decided by
+-# QEMU/KVM software version, but also decided by the hardware that
+-# the program is running upon.
 -#
--# @offset: offset between base RTC clock (as specified by -rtc base), an=
-d
--#          new RTC clock value. Note that value will be different depend=
-ing
--#          on clock chosen to drive RTC (specified by -rtc clock).
+-# @version:  version of GIC to be described. Currently, only 2 and 3
+-#            are supported.
 -#
--# Note: This event is rate-limited.
+-# @emulated: whether current QEMU/hardware supports emulated GIC
+-#            device in user space.
 -#
--# Since: 0.13.0
+-# @kernel:   whether current QEMU/hardware supports hardware
+-#            accelerated GIC device in kernel.
+-#
+-# Since: 2.6
+-##
+-{ 'struct': 'GICCapability',
+-  'data': { 'version': 'int',
+-            'emulated': 'bool',
+-            'kernel': 'bool' } }
+-
+-##
+-# @query-gic-capabilities:
+-#
+-# This command is ARM-only. It will return a list of GICCapability
+-# objects that describe its capability bits.
+-#
+-# Returns: a list of GICCapability objects.
+-#
+-# Since: 2.6
 -#
 -# Example:
 -#
--# <-   { "event": "RTC_CHANGE",
--#        "data": { "offset": 78 },
--#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
+-# -> { "execute": "query-gic-capabilities" }
+-# <- { "return": [{ "version": 2, "emulated": true, "kernel": false },
+-#                 { "version": 3, "emulated": false, "kernel": true } ] =
 }
 -#
 -##
--{ 'event': 'RTC_CHANGE',
--  'data': { 'offset': 'int' } }
+-{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'] }
 -
  ##
- # @ReplayMode:
+ # @CpuInstanceProperties:
  #
 diff --git a/qapi/target.json b/qapi/target.json
-index 5c41a0aee7..da7b4be51e 100644
+index 010df35ebb..f4a7054921 100644
 --- a/qapi/target.json
 +++ b/qapi/target.json
-@@ -7,6 +7,29 @@
-=20
- { 'include': 'misc.json' }
-=20
+@@ -328,3 +328,48 @@
+             'modelb': 'CpuModelInfo' },
+   'returns': 'CpuModelBaselineInfo',
+   'if': 'defined(TARGET_S390X)' }
++
 +##
-+# @RTC_CHANGE:
++# @GICCapability:
 +#
-+# Emitted when the guest changes the RTC time.
++# The struct describes capability for a specific GIC (Generic
++# Interrupt Controller) version. These bits are not only decided by
++# QEMU/KVM software version, but also decided by the hardware that
++# the program is running upon.
 +#
-+# @offset: offset between base RTC clock (as specified by -rtc base), an=
-d
-+#          new RTC clock value
++# @version:  version of GIC to be described. Currently, only 2 and 3
++#            are supported.
 +#
-+# Note: This event is rate-limited.
++# @emulated: whether current QEMU/hardware supports emulated GIC
++#            device in user space.
 +#
-+# Since: 0.13.0
++# @kernel:   whether current QEMU/hardware supports hardware
++#            accelerated GIC device in kernel.
++#
++# Since: 2.6
++##
++{ 'struct': 'GICCapability',
++  'data': { 'version': 'int',
++            'emulated': 'bool',
++            'kernel': 'bool' },
++  'if': 'defined(TARGET_ARM)' }
++
++##
++# @query-gic-capabilities:
++#
++# This command is ARM-only. It will return a list of GICCapability
++# objects that describe its capability bits.
++#
++# Returns: a list of GICCapability objects.
++#
++# Since: 2.6
 +#
 +# Example:
 +#
-+# <-   { "event": "RTC_CHANGE",
-+#        "data": { "offset": 78 },
-+#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
++# -> { "execute": "query-gic-capabilities" }
++# <- { "return": [{ "version": 2, "emulated": true, "kernel": false },
++#                 { "version": 3, "emulated": false, "kernel": true } ] =
 }
 +#
 +##
-+{ 'event': 'RTC_CHANGE',
-+  'data': { 'offset': 'int' },
-+  'if': 'defined(TARGET_ALPHA) || defined(TARGET_ARM) || defined(TARGET_=
-HPPA) || defined(TARGET_I386) || defined(TARGET_MIPS) || defined(TARGET_M=
-IPS64) || defined(TARGET_MOXIE) || defined(TARGET_PPC) || defined(TARGET_=
-PPC64) || defined(TARGET_S390X) || defined(TARGET_SH4) || defined(TARGET_=
-SPARC)' }
-+
- ##
- # @rtc-reset-reinjection:
- #
++{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
++  'if': 'defined(TARGET_ARM)' }
+diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+index 4cdd2676dd..41b32b94b2 100644
+--- a/target/arm/monitor.c
++++ b/target/arm/monitor.c
+@@ -23,7 +23,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/boards.h"
+ #include "kvm_arm.h"
+-#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-target.h"
+=20
+ static GICCapability *gic_cap_new(int version)
+ {
 --=20
 2.17.2
