@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59582)
+Received: from eggs.gnu.org ([209.51.188.92]:59798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gvhTH-0001i3-Rr
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:52:29 -0500
+	(envelope-from <v.maffione@gmail.com>) id 1gvhUM-0002Eh-Di
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:53:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gvhTG-00037Y-FI
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:52:27 -0500
-Date: Mon, 18 Feb 2019 11:52:18 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190218115218.GF32287@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190218101218.4177-1-ppandit@redhat.com>
-	<20190218123811.5b7a1d61@bahia.lan>
+	(envelope-from <v.maffione@gmail.com>) id 1gvhUL-0003Zc-5T
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:53:34 -0500
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:44892)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <v.maffione@gmail.com>)
+	id 1gvhUH-0003Xo-I2
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:53:30 -0500
+Received: by mail-qt1-x842.google.com with SMTP id n32so18745757qte.11
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 03:53:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190218123811.5b7a1d61@bahia.lan>
+References: <20190215174659.4007-1-v.maffione@gmail.com>
+	<5159fece-5573-7d9e-b6fe-c5832138d63e@redhat.com>
+In-Reply-To: <5159fece-5573-7d9e-b6fe-c5832138d63e@redhat.com>
+From: Vincenzo Maffione <v.maffione@gmail.com>
+Date: Mon, 18 Feb 2019 12:53:14 +0100
+Message-ID: <CA+_eA9jMpjAvpX94N36+Kp52xZrtr6gbu=n9G78yYhnZRKYxgg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: add host-serial and
- host-model machine attributes
+Subject: Re: [Qemu-devel] [PATCH v1 0/1] Allow TAP to unnegotiate virtio-net
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,194 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: P J P <ppandit@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Mon, Feb 18, 2019 at 12:38:11PM +0100, Greg Kurz wrote:
-> On Mon, 18 Feb 2019 15:42:18 +0530
-> P J P <ppandit@redhat.com> wrote:
->=20
-> > From: Prasad J Pandit <pjp@fedoraproject.org>
-> >=20
-> > On ppc hosts, hypervisor shares following system attributes
-> >=20
-> >   - /proc/device-tree/system-id
-> >   - /proc/device-tree/model
-> >=20
-> > with a guest. This could lead to information leakage and misuse.[*]
-> > Add machine attributes to control such system information exposure
-> > to a guest.
-> >=20
-> > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
-> >=20
-> > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> > ---
-> >  hw/ppc/spapr.c         | 79 ++++++++++++++++++++++++++++++++++++++--=
---
-> >  include/hw/ppc/spapr.h |  2 ++
-> >  2 files changed, 75 insertions(+), 6 deletions(-)
-> >=20
-> > Update v3: move host-serial,host-model options to ppc sPAPR machine
-> >   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg03182.h=
-tml =20
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 0942f35bf8..666e500376 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineStat=
-e *spapr,
-> >       * Add info to guest to indentify which host is it being run on
-> >       * and what is the uuid of the guest
-> >       */
-> > -    if (kvmppc_get_host_model(&buf)) {
-> > -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> > -        g_free(buf);
-> > +    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")=
-) {
-> > +        if (g_str_equal(spapr->host_model, "passthrough")) {
-> > +            /* -M host-model=3Dpassthrough */
-> > +            if (kvmppc_get_host_model(&buf)) {
-> > +                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> > +                g_free(buf);
-> > +            }
-> > +        } else {
-> > +            /* -M host-model=3D<user-string> */
-> > +            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->hos=
-t_model));
-> > +        }
-> >      }
-> > -    if (kvmppc_get_host_serial(&buf)) {
-> > -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> > -        g_free(buf);
-> > +
-> > +    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none=
-")) {
-> > +        if (g_str_equal(spapr->host_serial, "passthrough")) {
-> > +            /* -M host-serial=3Dpassthrough */
-> > +            if (kvmppc_get_host_serial(&buf)) {
-> > +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf))=
-;
-> > +                g_free(buf);
-> > +            }
-> > +        } else {
-> > +            /* -M host-serial=3D<user-string> */
-> > +            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->ho=
-st_serial));
-> > +        }
-> >      }
-> > =20
-> >      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-> > @@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, con=
-st char *value, Error **errp)
-> >      }
-> >  }
-> > =20
-> > +static char *spapr_get_host_model(Object *obj, Error **errp)
-> > +{
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +
-> > +    return g_strdup(spapr->host_model);
-> > +}
-> > +
-> > +static void spapr_set_host_model(Object *obj, const char *value, Err=
-or **errp)
-> > +{
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +
-> > +    g_free(spapr->host_model);
-> > +    spapr->host_model =3D g_strdup(value);
-> > +}
-> > +
-> > +static char *spapr_get_host_serial(Object *obj, Error **errp)
-> > +{
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +
-> > +    return g_strdup(spapr->host_serial);
-> > +}
-> > +
-> > +static void spapr_set_host_serial(Object *obj, const char *value, Er=
-ror **errp)
-> > +{
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +
-> > +    g_free(spapr->host_serial);
-> > +    spapr->host_serial =3D g_strdup(value);
-> > +}
-> > +
-> >  static void spapr_instance_init(Object *obj)
-> >  {
-> >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > @@ -3183,6 +3230,20 @@ static void spapr_instance_init(Object *obj)
-> >      object_property_set_description(obj, "ic-mode",
-> >                   "Specifies the interrupt controller mode (xics, xiv=
-e, dual)",
-> >                   NULL);
-> > +
-> > +    spapr->host_model =3D NULL;
->=20
-> This isn't needed since object_initialize_with_type() already takes car=
-e
-> of zeroing the instance for us.
->=20
-> > +    object_property_add_str(obj, "host-model",
-> > +        spapr_get_host_model, spapr_set_host_model,
-> > +        &error_abort);
-> > +    object_property_set_description(obj, "host-model",
-> > +        "Set host's model-id to use - none|passthrough|string", &err=
-or_abort);
-> > +
-> > +    spapr->host_serial =3D NULL;
->=20
-> Same here.
->=20
-> > +    object_property_add_str(obj, "host-serial",
-> > +        spapr_get_host_serial, spapr_set_host_serial,
-> > +        &error_abort);
-> > +    object_property_set_description(obj, "host-serial",
-> > +        "Set host's system-id to use - none|passthrough|string", &er=
-ror_abort);
-> >  }
-> > =20
-> >  static void spapr_machine_finalizefn(Object *obj)
-> > @@ -4080,9 +4141,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-> >  static void spapr_machine_3_1_class_options(MachineClass *mc)
-> >  {
-> >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > +    static GlobalProperty compat[] =3D {
-> > +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-> > +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-> > +    };
-> > =20
->=20
-> So... we don't fix the information leak for older machines by default ?=
- From
-> previous discussions, I understand it is for the sake of compatibility,=
- but
-> leaving the burden of securing the host to downstream or to the user st=
-ill
-> looks unsecure to me FWIW.
+Hi Jason,
+  Thanks for the quick reply.
 
-Maintaining guest ABI compatibility has to take priority, even over
-fixing security issues, because we must never intentionally break
-guest OS/applications by silently altering guest ABI. This is one of
-the two reasons why machine type versioning exists (the other reason
-being live migration data stream).
+My PV device (to be open sourced soon) uses the QEMU net backend interface,
+in a way similar to virtio-net.
+For example it uses qemu_set_offload(), qemu_has_vnet_hdr_len(),
+qemu_using_vnet_hdr(), qemu_send_packet(), etc.
+This means that the device itself does not know which net backend is using,
+of course.
+In addition to TAP, also the netmap backend supports the virtio-net header,
+and so the PV device will work with both.
+Regarding the virtio-net header, the netmap backend is more flexible
+because you can change the virtio-net header length as you wish (choosing
+between 0, 10 and 12 bytes).
 
-This is nothing new - we've done it before for security flaws where
-a fix would involve changing guest ABI. This particular security flaw
-is pretty minor compared to other cases that we've left unfixed by
-default eg Meltdown / Spectre and is easily addressed by the user if
-needed.
+My problem cannot be solved by making sure that TAPs are opened without
+IFF_VNET_HDR. What I want instead
+is to dynamically change the length of the virtio-net header that the
+backend accepts, switching between 12 bytes (virtio 1.0 header) and 0 (no
+header). By "dynamically" I mean while the guest (and the device) is
+running. This is possible and safe if we get rid of that assert().
+The virtio-net device does not need that flexibility (once you enable the
+vtnet header, you never disable that again), so I guess that's why you have
+that assert().
+My PV device can be reconfigured on the fly in such a way it may or not may
+be aware of the virtio-net header, and as a consequence it may need to call
+qemu_using_vnet_hdr() with true or false (multiple times).
 
-Regards,
-Daniel
+Does it make sense?
+
+Cheers,
+  Vincenzo
+
+
+Il giorno lun 18 feb 2019 alle ore 05:19 Jason Wang <jasowang@redhat.com>
+ha scritto:
+
+>
+> On 2019/2/16 =E4=B8=8A=E5=8D=881:46, Vincenzo Maffione wrote:
+> > Hi,
+> >    I was doing experiments with a custom paravirtualized net device,
+> > and I ran into a limitation of the TAP backend. I see from the kernel
+> > code that it is not possible to set the TAP virtio-net header
+> > length to something different from 10 or 12, which means that it
+> > is not possible to set it to 0. That's fine.
+> > The QEMU implementation of the TAP backend already supports
+> > the case where virtio-net header is set to 10 or 12 in kernel,
+> > but the emulated/paravirtualized net device is not using that:
+> > the TAP backend will just strip/prepend a zeroed header in this case
+> > (e.g., see the if statement in tap_receive_iov()).
+> > However, the tap_using_vnet_hdr() has an assert() that prevents
+> > this situation to happen, and I don't understand why. Maybe it
+> > is a leftover? I tried to remove the assert and by doing that
+> > my paravirtualized device was able to stop using the virtio-net
+> > header.
+>
+>
+> Hi:
+>
+> If  I understand this correctly, your PV device is API compatible with
+> TAP? Then you may just adding code to call TUNSETIFF without IFF_VNET_HDR=
+?
+>
+> Thanks
+>
+>
+> >
+> > Vincenzo Maffione (1):
+> >    net: tap: allow net frontends to un-negotiate virtio-net header
+> >
+> >   net/tap.c | 1 -
+> >   1 file changed, 1 deletion(-)
+> >
+>
+
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Vincenzo
