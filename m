@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58523)
+Received: from eggs.gnu.org ([209.51.188.92]:59993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvn0Y-0004LV-B2
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:47:11 -0500
+	(envelope-from <crosa@redhat.com>) id 1gvn8b-0006O3-Ao
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvn0W-0005eY-Ar
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:47:10 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 17:46:25 +0000
-Message-ID: <416b38c6-24c8-c05f-78ec-601e800a17dc@virtuozzo.com>
-References: <20190213233618.22484-1-jsnow@redhat.com>
-	<20190213233618.22484-2-jsnow@redhat.com>
-In-Reply-To: <20190213233618.22484-2-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3B0584609E7BB943B19E929B4A6E0ACE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <crosa@redhat.com>) id 1gvn8a-0003iq-Fy
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:63977)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gvn8Z-0003hA-5J
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:27 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC9862D802
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 17:55:25 +0000 (UTC)
+References: <20190212193855.13223-1-ccarrara@redhat.com>
+	<20190212193855.13223-2-ccarrara@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <bc4bb11c-cb07-bfcc-3727-812312294229@redhat.com>
+Date: Mon, 18 Feb 2019 12:55:24 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] block/dirty-bitmaps: add
- inconsistent bit
+In-Reply-To: <20190212193855.13223-2-ccarrara@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] tests.acceptance: adds multi vm
+ capability for acceptance tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,101 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org
 
-MTQuMDIuMjAxOSAyOjM2LCBKb2huIFNub3cgd3JvdGU6DQo+IEFkZCBhbiBpbmNvbnNpc3RlbnQg
-Yml0IHRvIGRpcnR5LWJpdG1hcHMgdGhhdCBhbGxvd3MgdXMgdG8gcmVwb3J0IGEgYml0bWFwIGFz
-DQo+IHBlcnNpc3RlbnQgYnV0IHBvdGVudGlhbGx5IGluY29uc2lzdGVudCwgaS5lLiBpZiB3ZSBm
-aW5kIGJpdG1hcHMgb24gYSBxY293Mg0KPiB0aGF0IGhhdmUgYmVlbiBtYXJrZWQgYXMgImluIHVz
-ZSIuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3cgPGpzbm93QHJlZGhhdC5jb20+DQo+
-IC0tLQ0KPiAgIGJsb2NrL2RpcnR5LWJpdG1hcC5jICAgICAgICAgfCAxOSArKysrKysrKysrKysr
-KysrKysrDQo+ICAgaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRtYXAuaCB8ICAyICsrDQo+ICAgcWFw
-aS9ibG9jay1jb3JlLmpzb24gICAgICAgICB8ICA5ICsrKysrKystLQ0KPiAgIDMgZmlsZXMgY2hh
-bmdlZCwgMjggaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQg
-YS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IGluZGV4IGZj
-MzkwY2FlOTQuLmIxODc5ZDdmYmQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
-DQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBAIC00Nyw2ICs0Nyw5IEBAIHN0cnVj
-dCBCZHJ2RGlydHlCaXRtYXAgew0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgYW5kIHRoaXMgYml0bWFwIG11c3QgcmVtYWluIHVuY2hhbmdlZCB3aGlsZQ0KPiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyBmbGFnIGlzIHNldC4gKi8NCj4gICAg
-ICAgYm9vbCBwZXJzaXN0ZW50OyAgICAgICAgICAgIC8qIGJpdG1hcCBtdXN0IGJlIHNhdmVkIHRv
-IG93bmVyIGRpc2sgaW1hZ2UgKi8NCj4gKyAgICBib29sIGluY29uc2lzdGVudDsgICAgICAgICAg
-LyogYml0bWFwIGlzIHBlcnNpc3RlbnQsIGJ1dCBub3Qgb3duZWQgYnkgUUVNVS4NCj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICogSXQgY2Fubm90IGJlIHVzZWQgYXQgYWxsIGlu
-IGFueSB3YXksIGV4Y2VwdA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKiBh
-IFFNUCB1c2VyIGNhbiByZW1vdmUgb3IgY2xlYXIgaXQuICovDQo+ICAgICAgIGJvb2wgbWlncmF0
-aW9uOyAgICAgICAgICAgICAvKiBCaXRtYXAgaXMgc2VsZWN0ZWQgZm9yIG1pZ3JhdGlvbiwgaXQg
-c2hvdWxkDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBub3QgYmUgc3Rv
-cmVkIG9uIHRoZSBuZXh0IGluYWN0aXZhdGlvbg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgKHBlcnNpc3RlbnQgZmxhZyBkb2Vzbid0IG1hdHRlciB1bnRpbCBuZXh0DQo+
-IEBAIC00NjEsNiArNDY0LDggQEAgQmxvY2tEaXJ0eUluZm9MaXN0ICpiZHJ2X3F1ZXJ5X2RpcnR5
-X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICBpbmZvLT5yZWNvcmRp
-bmcgPSBiZHJ2X2RpcnR5X2JpdG1hcF9yZWNvcmRpbmcoYm0pOw0KPiAgICAgICAgICAgaW5mby0+
-YnVzeSA9IGJkcnZfZGlydHlfYml0bWFwX2J1c3koYm0pOw0KPiAgICAgICAgICAgaW5mby0+cGVy
-c2lzdGVudCA9IGJtLT5wZXJzaXN0ZW50Ow0KPiArICAgICAgICBpbmZvLT5oYXNfaW5jb25zaXN0
-ZW50ID0gYm0tPmluY29uc2lzdGVudDsNCj4gKyAgICAgICAgaW5mby0+aW5jb25zaXN0ZW50ID0g
-Ym0tPmluY29uc2lzdGVudDsNCj4gICAgICAgICAgIGVudHJ5LT52YWx1ZSA9IGluZm87DQo+ICAg
-ICAgICAgICAqcGxpc3QgPSBlbnRyeTsNCj4gICAgICAgICAgIHBsaXN0ID0gJmVudHJ5LT5uZXh0
-Ow0KPiBAQCAtNzA4LDYgKzcxMywxNSBAQCB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9wZXJz
-aXN0YW5jZShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCBwZXJzaXN0ZW50KQ0KPiAgICAg
-ICBxZW11X211dGV4X3VubG9jayhiaXRtYXAtPm11dGV4KTsNCj4gICB9DQo+ICAgDQo+ICsvKiBD
-YWxsZWQgd2l0aCBCUUwgdGFrZW4uICovDQoNCkRvIHdlIG5lZWQgQlFMIGlmIHdlIHVzZSBtdXRl
-eCBleHBsaWNpdGx5Pw0KDQo+ICt2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9pbmNvbnNpc3Rl
-bnQoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIGJvb2wgdmFsdWUpDQo+ICt7DQo+ICsgICAgcWVt
-dV9tdXRleF9sb2NrKGJpdG1hcC0+bXV0ZXgpOw0KPiArICAgIGJpdG1hcC0+aW5jb25zaXN0ZW50
-ID0gdmFsdWU7DQo+ICsgICAgYml0bWFwLT5kaXNhYmxlZCA9IHZhbHVlOw0KDQpTbywgc2V0IGlu
-Y29uc2lzdGVudCB0byBmYWxzZSB3aWxsIGVuYWJsZSB0aGUgYml0bWFwPyBTZWVtcyB0cmlja3ku
-DQoNCj4gKyAgICBxZW11X211dGV4X3VubG9jayhiaXRtYXAtPm11dGV4KTsNCj4gK30NCj4gKw0K
-PiAgIC8qIENhbGxlZCB3aXRoIEJRTCB0YWtlbi4gKi8NCj4gICB2b2lkIGJkcnZfZGlydHlfYml0
-bWFwX3NldF9taWdyYXRpb24oQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsIGJvb2wgbWlncmF0aW9u
-KQ0KPiAgIHsNCj4gQEAgLTcyMSw2ICs3MzUsMTEgQEAgYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF9n
-ZXRfcGVyc2lzdGFuY2UoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+ICAgICAgIHJldHVybiBi
-aXRtYXAtPnBlcnNpc3RlbnQgJiYgIWJpdG1hcC0+bWlncmF0aW9uOw0KPiAgIH0NCj4gICANCj4g
-K2Jvb2wgYmRydl9kaXJ0eV9iaXRtYXBfaW5jb25zaXN0ZW50KEJkcnZEaXJ0eUJpdG1hcCAqYml0
-bWFwKQ0KPiArew0KPiArICAgIHJldHVybiBiaXRtYXAtPmluY29uc2lzdGVudDsNCj4gK30NCj4g
-Kw0KPiAgIGJvb2wgYmRydl9oYXNfY2hhbmdlZF9wZXJzaXN0ZW50X2JpdG1hcHMoQmxvY2tEcml2
-ZXJTdGF0ZSAqYnMpDQo+ICAgew0KPiAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmJtOw0KPiBkaWZm
-IC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGly
-dHktYml0bWFwLmgNCj4gaW5kZXggYmE4NDc3YjczZi4uYzBkMzc3MDJmZCAxMDA2NDQNCj4gLS0t
-IGEvaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRtYXAuaA0KPiArKysgYi9pbmNsdWRlL2Jsb2NrL2Rp
-cnR5LWJpdG1hcC5oDQo+IEBAIC02OCw2ICs2OCw3IEBAIHZvaWQgYmRydl9kaXJ0eV9iaXRtYXBf
-ZGVzZXJpYWxpemVfZmluaXNoKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICB2b2lkIGJk
-cnZfZGlydHlfYml0bWFwX3NldF9yZWFkb25seShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9v
-bCB2YWx1ZSk7DQo+ICAgdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfcGVyc2lzdGFuY2UoQmRy
-dkRpcnR5Qml0bWFwICpiaXRtYXAsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgYm9vbCBwZXJzaXN0ZW50KTsNCj4gK3ZvaWQgYmRydl9kaXJ0eV9iaXRtYXBfc2V0
-X2luY29uc2lzdGVudChCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgYm9vbCB2YWx1ZSk7DQo+ICAg
-dm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9zZXRfYnVzeShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwg
-Ym9vbCBidXN5KTsNCj4gICB2b2lkIGJkcnZfbWVyZ2VfZGlydHlfYml0bWFwKEJkcnZEaXJ0eUJp
-dG1hcCAqZGVzdCwgY29uc3QgQmRydkRpcnR5Qml0bWFwICpzcmMsDQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBIQml0bWFwICoqYmFja3VwLCBFcnJvciAqKmVycnApOw0KPiBAQCAt
-OTEsNiArOTIsNyBAQCBib29sIGJkcnZfZGlydHlfYml0bWFwX3JlYWRvbmx5KGNvbnN0IEJkcnZE
-aXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICBib29sIGJkcnZfaGFzX3JlYWRvbmx5X2JpdG1hcHMo
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMpOw0KPiAgIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfZ2V0X2F1
-dG9sb2FkKGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKTsNCj4gICBib29sIGJkcnZfZGly
-dHlfYml0bWFwX2dldF9wZXJzaXN0YW5jZShCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+ICti
-b29sIGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lzdGVudChCZHJ2RGlydHlCaXRtYXAgKmJpdG1h
-cCk7DQo+ICAgYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF9idXN5KEJkcnZEaXJ0eUJpdG1hcCAqYml0
-bWFwKTsNCj4gICBib29sIGJkcnZfaGFzX2NoYW5nZWRfcGVyc2lzdGVudF9iaXRtYXBzKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzKTsNCj4gICBCZHJ2RGlydHlCaXRtYXAgKmJkcnZfZGlydHlfYml0bWFw
-X25leHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWNv
-cmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+IGluZGV4IDVkMWQxODI0NDcuLmY2YjZk
-YzJhZmYgMTAwNjQ0DQo+IC0tLSBhL3FhcGkvYmxvY2stY29yZS5qc29uDQo+ICsrKyBiL3FhcGkv
-YmxvY2stY29yZS5qc29uDQo+IEBAIC00NzAsMTIgKzQ3MCwxNyBAQA0KPiAgICMgQHBlcnNpc3Rl
-bnQ6IHRydWUgaWYgdGhlIGJpdG1hcCB3aWxsIGV2ZW50dWFsbHkgYmUgZmx1c2hlZCB0byBwZXJz
-aXN0ZW50DQo+ICAgIyAgICAgICAgICAgICAgc3RvcmFnZSAoc2luY2UgNC4wKQ0KPiAgICMNCj4g
-KyMgQGluY29uc2lzdGVudDogdHJ1ZSBpZiB0aGlzIGlzIGEgcGVyc2lzdGVudCBiaXRtYXAgdGhh
-dCBRRU1VIGRvZXMgbm90IG93bi4NCj4gKyMgICAgICAgICAgICAgICAgSW1wbGllcyBAcmVjb3Jk
-aW5nIHRvIGJlIGZhbHNlIGFuZCBAYnVzeSB0byBiZSB0cnVlLiBUbw0KPiArIyAgICAgICAgICAg
-ICAgICByZWNsYWltIG93bmVyc2hpcCwgc2VlIEBibG9jay1kaXJ0eS1iaXRtYXAtcmVtb3ZlIG9y
-DQo+ICsjICAgICAgICAgICAgICAgIEBibG9jay1kaXJ0eS1iaXRtYXAtY2xlYXIgKHNpbmNlIDQu
-MCkNCj4gKyMNCj4gICAjIFNpbmNlOiAxLjMNCj4gICAjIw0KPiAgIHsgJ3N0cnVjdCc6ICdCbG9j
-a0RpcnR5SW5mbycsDQo+ICAgICAnZGF0YSc6IHsnKm5hbWUnOiAnc3RyJywgJ2NvdW50JzogJ2lu
-dCcsICdncmFudWxhcml0eSc6ICd1aW50MzInLA0KPiAtICAgICAgICAgICAncmVjb3JkaW5nJzog
-J2Jvb2wnLCAnYnVzeSc6ICdib29sJywNCj4gLSAgICAgICAgICAgJ3N0YXR1cyc6ICdEaXJ0eUJp
-dG1hcFN0YXR1cycsICdwZXJzaXN0ZW50JzogJ2Jvb2wnIH0gfQ0KPiArICAgICAgICAgICAncmVj
-b3JkaW5nJzogJ2Jvb2wnLCAnYnVzeSc6ICdib29sJywgJ3N0YXR1cyc6ICdEaXJ0eUJpdG1hcFN0
-YXR1cycsDQo+ICsgICAgICAgICAgICdwZXJzaXN0ZW50JzogJ2Jvb2wnLCAnKmluY29uc2lzdGVu
-dCc6ICdib29sJyB9IH0NCj4gICANCj4gICAjIw0KPiAgICMgQFFjb3cyQml0bWFwSW5mb0ZsYWdz
-Og0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+
+On 2/12/19 2:38 PM, Caio Carrara wrote:
+> This change adds the possibility to write acceptance tests with multi
+> virtual machine support. It's done keeping the virtual machines objects
+> stored in a test attribute (dictionary). This dictionary shouldn't be
+> accessed directly but through the new method added `get_vm`. This new
+> method accept a list of args (that will be added as virtual machine
+> arguments) and an optional name argument. The name is the key that
+> identify a single virtual machine along the test machines available. If
+> a name without a machine is informed a new machine will be instantiated.
+> 
+> The current usage of vm in tests will not be broken by this change since
+> it keeps a property called vm in the base test class. This property only
+> calls the new method `get_vm` with default parameters (no args and
+> 'default' as machine name).
+> 
+> Signed-off-by: Caio Carrara <ccarrara@redhat.com>
+
+
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
