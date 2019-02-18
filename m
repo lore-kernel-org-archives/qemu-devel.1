@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52476)
+Received: from eggs.gnu.org ([209.51.188.92]:53260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvj1I-0000ma-BT
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:31:41 -0500
+	(envelope-from <berto@igalia.com>) id 1gvj5T-0002PI-F5
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:36:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvj1H-0007ch-7D
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:31:40 -0500
-Resent-Message-Id: <E1gvj1H-0007ch-7D@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155049667125.18484.12105589418486399592@49fa7ef69f7b>
-In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1gvj5R-0002rK-EH
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:35:59 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190214155252.GC7178@linux.fritz.box>
+References: <cover.1547739122.git.berto@igalia.com>
+	<ae441a8c27cae1a80e57fb6d291fe95667da0c76.1547739122.git.berto@igalia.com>
+	<20190212144747.GC5283@localhost.localdomain>
+	<w51k1i231c8.fsf@maestria.local.igalia.com>
+	<20190214155252.GC7178@linux.fritz.box>
+Date: Mon, 18 Feb 2019 14:35:30 +0100
+Message-ID: <w51h8d1cj8d.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Feb 2019 05:31:12 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 01/13] block: Allow freezing BdrvChild links
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
-MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
-YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDNmOWE3NmI4
-YyBody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9uIGNvZGUgc29t
-ZQo0ZTQzMmMwMWZlIHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBh
-cnQgMgpiZDYxY2Y4MWMzIHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJi
-IHBhcnQgMQozMWU5ODcxZjcxIG1pcHNfbWFsdGE6IENsZWFuIHVwIGRlZmluaXRpb24gb2YgZmxh
-c2ggbWVtb3J5IHNpemUgc29tZXdoYXQKNjZjOGFjMDkzMiByMmQ6IEZsYXNoIG1lbW9yeSBjcmVh
-dGlvbiBpcyBjb25mdXNlZCBhYm91dCBzaXplLCBtYXJrIEZJWE1FCjg1N2NkNjhhNTAgcHBjNDA1
-X2JvYXJkczogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0Y2ggYmFja2luZyBpbWFnZQox
-NzBhOGNlOTEyIHNhbTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNr
-aW5nIGltYWdlCmFhMmRmMmY0ZmQgaHc6IFVzZSBDRklfUEZMQVNIMHsxLCAyfSBhbmQgVFlQRV9D
-RklfUEZMQVNIMHsxLCAyfQo1ODhkNWI3MThjIHBmbGFzaDogTWFjcm8gUEZMQVNIX0JVRygpIGlz
-IHVzZWQganVzdCBvbmNlLCBleHBhbmQKZjQzMzlhNjNiNiBwZmxhc2g6IFJlbmFtZSBwZmxhc2hf
-dCB0byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTAg
-Q2hlY2tpbmcgY29tbWl0IGY0MzM5YTYzYjZkZCAocGZsYXNoOiBSZW5hbWUgcGZsYXNoX3QgdG8g
-UEZsYXNoQ0ZJMDEsIFBGbGFzaENGSTAyKQpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVu
-IGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxMjc6IEZJTEU6IGh3L2Js
-b2NrL3BmbGFzaF9jZmkwMS5jOjI4ODoKK3N0YXRpYyB1aW50MzJfdCBwZmxhc2hfcmVhZCAoUEZs
-YXNoQ0ZJMDEgKnBmbCwgaHdhZGRyIG9mZnNldCwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
-dHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzMzOTogRklMRTog
-aHcvYmxvY2svcGZsYXNoX2NmaTAyLmM6MTQxOgorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFk
-IChQRmxhc2hDRkkwMiAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0
-ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzU3OiBG
-SUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoyNjQ6CitzdGF0aWMgdm9pZCBwZmxhc2hfd3Jp
-dGUgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgp0b3RhbDogMyBlcnJvcnMsIDAg
-d2FybmluZ3MsIDQ4MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzEwIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgoyLzEwIENoZWNraW5nIGNvbW1pdCA1ODhkNWI3MThjYzQgKHBmbGFzaDogTWFj
-cm8gUEZMQVNIX0JVRygpIGlzIHVzZWQganVzdCBvbmNlLCBleHBhbmQpCjMvMTAgQ2hlY2tpbmcg
-Y29tbWl0IGFhMmRmMmY0ZmQ3MCAoaHc6IFVzZSBDRklfUEZMQVNIMHsxLCAyfSBhbmQgVFlQRV9D
-RklfUEZMQVNIMHsxLCAyfSkKNC8xMCBDaGVja2luZyBjb21taXQgMTcwYThjZTkxMmZkIChzYW00
-NjBleDogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0Y2ggYmFja2luZyBpbWFnZSkKNS8x
-MCBDaGVja2luZyBjb21taXQgODU3Y2Q2OGE1MDBkIChwcGM0MDVfYm9hcmRzOiBEb24ndCBzaXpl
-IGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo2LzEwIENoZWNraW5nIGNvbW1p
-dCA2NmM4YWMwOTMyN2IgKHIyZDogRmxhc2ggbWVtb3J5IGNyZWF0aW9uIGlzIGNvbmZ1c2VkIGFi
-b3V0IHNpemUsIG1hcmsgRklYTUUpCjcvMTAgQ2hlY2tpbmcgY29tbWl0IDMxZTk4NzFmNzE1OSAo
-bWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBmbGFzaCBtZW1vcnkgc2l6ZSBzb21l
-d2hhdCkKOC8xMCBDaGVja2luZyBjb21taXQgYmQ2MWNmODFjMzhmIChwZmxhc2g6IENsZWFuIHVw
-IGFmdGVyIGNvbW1pdCAzNjhhMzU0ZjAyYiBwYXJ0IDEpCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojODk6IEZJTEU6IGh3L2FybS9tdXNpY3BhbC5jOjE2
-Mzk6CisgICAgICAgIHBmbGFzaF9jZmkwMl9yZWdpc3RlcigweDEwMDAwMDAwMFVMTC1NUF9GTEFT
-SF9TSVpFX01BWCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM5Nzog
-RklMRTogaHcvYXJtL211c2ljcGFsLmM6MTY0NjoKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lz
-dGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDI0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cgo5LzEwIENoZWNraW5nIGNvbW1pdCA0ZTQzMmMwMWZlYTMgKHBmbGFzaDogQ2xlYW4gdXAgYWZ0
-ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMikKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IDAzZjlh
-NzZiOGNiZCAoaHcvYXJtIGh3L3h0ZW5zYTogRGUtZHVwbGljYXRlIHBmbGFzaCBjcmVhdGlvbiBj
-b2RlIHNvbWUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu 14 Feb 2019 04:52:52 PM CET, Kevin Wolf wrote:
+> Am 14.02.2019 um 15:13 hat Alberto Garcia geschrieben:
+>> On Tue 12 Feb 2019 03:47:47 PM CET, Kevin Wolf wrote:
+>> > Am 17.01.2019 um 16:33 hat Alberto Garcia geschrieben:
+>> >> @@ -3861,6 +3923,10 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+>> >>          goto exit;
+>> >>      }
+>> >>  
+>> >> +    if (bdrv_is_backing_chain_frozen(top, base, NULL)) {
+>> >> +        goto exit;
+>> >> +    }
+>> >> +
+>> >>      /* If 'base' recursively inherits from 'top' then we should set
+>> >>       * base->inherits_from to top->inherits_from after 'top' and all
+>> >>       * other intermediate nodes have been dropped.
+>> >
+>> > bdrv_drop_intermediate() doesn't change the links between in the chain
+>> > between top and base, but the links between the parents of top and top
+>> > are changed to point to base instead.
+>> >
+>> > I think this is checking the wrong thing.
+>> 
+>> You're right, those links should be checked.
+>> 
+>> On the other hand it does remove all references from top's parents to
+>> top, so in the general case it will end up deleting all intermediate
+>> notes, and their backing links with them. So I think we still need that
+>> check.
+>
+> That begs the question if removing a frozen child link should be
+> forbideen even when it's because the parent goes away. It don't think
+> there is a good reason to check this - who else than the removed
+> parent could be interested in keeping it frozen?
+>
+> In fact, this means that the parent forgot to unfreeze its child
+> before going away, which shouldn't happen. So I guess bdrv_close()
+> could just assert that this is not the case for any children?
+
+That actually sounds like a good solution.
+
+Berto
