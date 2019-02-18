@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57017)
+Received: from eggs.gnu.org ([209.51.188.92]:58409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gvhFw-0006uk-E2
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:38:42 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gvhMN-000071-1d
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:45:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gvhFq-0004Du-Rv
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:38:38 -0500
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:56401)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gvhFl-00047y-Cm
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:38:30 -0500
-Received: from player692.ha.ovh.net (unknown [10.109.160.93])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 45310184540
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 12:38:20 +0100 (CET)
-Date: Mon, 18 Feb 2019 12:38:11 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190218123811.5b7a1d61@bahia.lan>
-In-Reply-To: <20190218101218.4177-1-ppandit@redhat.com>
-References: <20190218101218.4177-1-ppandit@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gvhML-0007lq-Rn
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:45:19 -0500
+Resent-Message-Id: <E1gvhML-0007lq-Rn@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21096)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gvhML-0007lR-Jy
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:45:17 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155049027821.18484.7843524358872234087@49fa7ef69f7b>
+In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: add host-serial and
- host-model machine attributes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 18 Feb 2019 03:44:39 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,184 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, "Daniel P . Berrange" <berrange@redhat.com>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: cohuck@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 18 Feb 2019 15:42:18 +0530
-P J P <ppandit@redhat.com> wrote:
-
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->=20
-> On ppc hosts, hypervisor shares following system attributes
->=20
->   - /proc/device-tree/system-id
->   - /proc/device-tree/model
->=20
-> with a guest. This could lead to information leakage and misuse.[*]
-> Add machine attributes to control such system information exposure
-> to a guest.
->=20
-> [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
->=20
-> Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/ppc/spapr.c         | 79 ++++++++++++++++++++++++++++++++++++++----
->  include/hw/ppc/spapr.h |  2 ++
->  2 files changed, 75 insertions(+), 6 deletions(-)
->=20
-> Update v3: move host-serial,host-model options to ppc sPAPR machine
->   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg03182.html =
-=20
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0942f35bf8..666e500376 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
->       * Add info to guest to indentify which host is it being run on
->       * and what is the uuid of the guest
->       */
-> -    if (kvmppc_get_host_model(&buf)) {
-> -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> -        g_free(buf);
-> +    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")) {
-> +        if (g_str_equal(spapr->host_model, "passthrough")) {
-> +            /* -M host-model=3Dpassthrough */
-> +            if (kvmppc_get_host_model(&buf)) {
-> +                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> +                g_free(buf);
-> +            }
-> +        } else {
-> +            /* -M host-model=3D<user-string> */
-> +            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->host_mo=
-del));
-> +        }
->      }
-> -    if (kvmppc_get_host_serial(&buf)) {
-> -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> -        g_free(buf);
-> +
-> +    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none")) {
-> +        if (g_str_equal(spapr->host_serial, "passthrough")) {
-> +            /* -M host-serial=3Dpassthrough */
-> +            if (kvmppc_get_host_serial(&buf)) {
-> +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> +                g_free(buf);
-> +            }
-> +        } else {
-> +            /* -M host-serial=3D<user-string> */
-> +            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->host_s=
-erial));
-> +        }
->      }
-> =20
->      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-> @@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, const c=
-har *value, Error **errp)
->      }
->  }
-> =20
-> +static char *spapr_get_host_model(Object *obj, Error **errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    return g_strdup(spapr->host_model);
-> +}
-> +
-> +static void spapr_set_host_model(Object *obj, const char *value, Error *=
-*errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    g_free(spapr->host_model);
-> +    spapr->host_model =3D g_strdup(value);
-> +}
-> +
-> +static char *spapr_get_host_serial(Object *obj, Error **errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    return g_strdup(spapr->host_serial);
-> +}
-> +
-> +static void spapr_set_host_serial(Object *obj, const char *value, Error =
-**errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    g_free(spapr->host_serial);
-> +    spapr->host_serial =3D g_strdup(value);
-> +}
-> +
->  static void spapr_instance_init(Object *obj)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> @@ -3183,6 +3230,20 @@ static void spapr_instance_init(Object *obj)
->      object_property_set_description(obj, "ic-mode",
->                   "Specifies the interrupt controller mode (xics, xive, d=
-ual)",
->                   NULL);
-> +
-> +    spapr->host_model =3D NULL;
-
-This isn't needed since object_initialize_with_type() already takes care
-of zeroing the instance for us.
-
-> +    object_property_add_str(obj, "host-model",
-> +        spapr_get_host_model, spapr_set_host_model,
-> +        &error_abort);
-> +    object_property_set_description(obj, "host-model",
-> +        "Set host's model-id to use - none|passthrough|string", &error_a=
-bort);
-> +
-> +    spapr->host_serial =3D NULL;
-
-Same here.
-
-> +    object_property_add_str(obj, "host-serial",
-> +        spapr_get_host_serial, spapr_set_host_serial,
-> +        &error_abort);
-> +    object_property_set_description(obj, "host-serial",
-> +        "Set host's system-id to use - none|passthrough|string", &error_=
-abort);
->  }
-> =20
->  static void spapr_machine_finalizefn(Object *obj)
-> @@ -4080,9 +4141,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
->  static void spapr_machine_3_1_class_options(MachineClass *mc)
->  {
->      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> +    static GlobalProperty compat[] =3D {
-> +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-> +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-> +    };
-> =20
-
-So... we don't fix the information leak for older machines by default ? From
-previous discussions, I understand it is for the sake of compatibility, but
-leaving the burden of securing the host to downstream or to the user still
-looks unsecure to me FWIW.
-
->      spapr_machine_4_0_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-> +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> +
->      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
->      smc->update_dt_enabled =3D false;
->  }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a947a0a0dc..e004a570d8 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -177,6 +177,8 @@ struct sPAPRMachineState {
-> =20
->      /*< public >*/
->      char *kvm_type;
-> +    char *host_model;
-> +    char *host_serial;
-> =20
->      const char *icp_type;
->      int32_t irq_map_nr;
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODExMTE1My4yMjY4
+MS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODExMTE1My4yMjY4MS0xLWNvaHVja0ByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gczM5MHggdXBkYXRlClR5
+cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
+XSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tAcmVk
+aGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTExMTUzLjIyNjgxLTEtY29odWNrQHJlZGhhdC5j
+b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0NzBjZmNjMGYyIHMzOTB4OiB1cGdy
+YWRlIHN0YXR1cyBvZiBLVk0gY29yZXMgdG8gInN1cHBvcnRlZCIKZTk0OGJjNThlMiBzMzkweC9r
+dm06IGFkZCB0cmFjZXBvaW50IHRvIGlvZXZlbnRmZCBpbnRlcmZhY2UKNTkzODcyN2RjOCBzMzkw
+eC9jcHVtb2RlbDogYWRkIHoxNCBHQTIgbW9kZWwKOTM5NTJhZjZjNCBzMzkweC9jcHVtb2RlbDog
+ZGVmYXVsdCBlbmFibGUgbWVwb2NoIGZvciB6MTQgYW5kIGxhdGVyCjRhMDg4YzdiMzMgczM5MHgv
+Y3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBvY2ggYW5kIHJlLWFsaWduIGdy
+b3VwIGluaXQKYjNjNGUyYjQ5ZiBzMzkweDogYWRkIHpQQ0kgZmVhdHVyZSB0byAicWVtdSIgQ1BV
+IG1vZGVsCjY4NWE3MzI5YmUgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgU1RDSyBldCBhbCBmb3Ig
+Q09ORklHX1VTRVJfT05MWQo2NmFhNzQzMmRmIHRhcmdldC9zMzkweDogU3BsaXQgb3V0IHMzOTAt
+dG9kLmgKZTFhODQxMTNjOSBzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQKNDlkYTg5
+OWMyNCBzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRlci0yMDEyIGxp
+Y2Vuc2Ugc3RhdGVtZW50cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21t
+aXQgNDlkYTg5OWMyNDQ3IChzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1h
+ZnRlci0yMDEyIGxpY2Vuc2Ugc3RhdGVtZW50cykKMi8xMCBDaGVja2luZyBjb21taXQgZTFhODQx
+MTNjOWViIChzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQ3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KMy8xMCBDaGVja2luZyBjb21taXQgNjZhYTc0MzJkZmViICh0YXJnZXQvczM5MHg6IFNw
+bGl0IG91dCBzMzkwLXRvZC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU3IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMCBDaGVja2luZyBjb21taXQg
+Njg1YTczMjliZWFiICh0YXJnZXQvczM5MHg6IEltcGxlbWVudCBTVENLIGV0IGFsIGZvciBDT05G
+SUdfVVNFUl9PTkxZKQo1LzEwIENoZWNraW5nIGNvbW1pdCBiM2M0ZTJiNDlmOWQgKHMzOTB4OiBh
+ZGQgelBDSSBmZWF0dXJlIHRvICJxZW11IiBDUFUgbW9kZWwpCjYvMTAgQ2hlY2tpbmcgY29tbWl0
+IDRhMDg4YzdiMzM3YSAoczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBt
+ZXBvY2ggYW5kIHJlLWFsaWduIGdyb3VwIGluaXQpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0Njg6CisgICAgRkVB
+VF9HUk9VUF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5o
+YW5jZW1lbnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEwIENoZWNraW5nIGNvbW1pdCA5Mzk1MmFmNmM0
+NTcgKHMzOTB4L2NwdW1vZGVsOiBkZWZhdWx0IGVuYWJsZSBtZXBvY2ggZm9yIHoxNCBhbmQgbGF0
+ZXIpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogaHcvczM5MHgv
+czM5MC12aXJ0aW8tY2N3LmM6NjYzOgorICAgIHMzOTBfY3B1ZGVmX2dyb3VwX2ZlYXRvZmZfZ3Jl
+YXRlcigxNCwgMSwgUzM5MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYpOwoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEwIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMTAgQ2hlY2tpbmcgY29tbWl0IDU5Mzg3MjdkYzg2NyAo
+czM5MHgvY3B1bW9kZWw6IGFkZCB6MTQgR0EyIG1vZGVsKQo5LzEwIENoZWNraW5nIGNvbW1pdCBl
+OTQ4YmM1OGUyMmYgKHMzOTB4L2t2bTogYWRkIHRyYWNlcG9pbnQgdG8gaW9ldmVudGZkIGludGVy
+ZmFjZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IDQ3MGNmY2MwZjI0OCAoczM5MHg6IHVwZ3JhZGUg
+c3RhdHVzIG9mIEtWTSBjb3JlcyB0byAic3VwcG9ydGVkIikKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1
+Y2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
+IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
+LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
