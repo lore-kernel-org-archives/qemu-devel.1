@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60973)
+Received: from eggs.gnu.org ([209.51.188.92]:32911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcD-0004kG-G9
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gvjcL-0004ss-Md
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc2-00076k-VJ
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:45 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 17:09:10 +0300
-Message-Id: <20190218140926.333779-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190218140926.333779-1-vsementsov@virtuozzo.com>
-References: <20190218140926.333779-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 01/17] block: enhance QEMUIOVector structure
+	(envelope-from <peter.maydell@linaro.org>) id 1gvjcJ-0007Hi-Na
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:57 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:44041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gvjcG-00078d-2C
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:55 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id g1so28353638otj.11
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 06:09:43 -0800 (PST)
+MIME-Version: 1.0
+References: <20190218111153.22681-1-cohuck@redhat.com>
+In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 18 Feb 2019 14:09:30 +0000
+Message-ID: <CAFEAcA97EXY_nxt5L07vFv56Fd+zrovVko7WEa5-ZfSosSVENQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,93 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Add a possibility of embedded iovec, for cases when we need only one
-local iov.
+On Mon, 18 Feb 2019 at 11:11, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit 1e36232994c8ad01774501d2e299deba3a2469af:
+>
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-20190215' into staging (2019-02-15 11:12:14 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190218
+>
+> for you to fetch changes up to 0922e8c093a564219fcb7f43b18ceb12714dd931:
+>
+>   s390x: upgrade status of KVM cores to "supported" (2019-02-18 12:00:44 +0100)
+>
+> ----------------------------------------------------------------
+> s390x updates:
+> - tcg: implement STCK and friends for CONFIG_USER_ONLY
+> - add zpci to qemu cpu model, as pci is now always built
+> - add mepoch to default z14 cpu model
+> - add cpu model for z14 GA2
+> - various improvements
+>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/qemu/iov.h | 64 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 62 insertions(+), 2 deletions(-)
+Applied, thanks.
 
-diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-index 5f433c7768..48b45987b7 100644
---- a/include/qemu/iov.h
-+++ b/include/qemu/iov.h
-@@ -133,10 +133,70 @@ size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,
- typedef struct QEMUIOVector {
-     struct iovec *iov;
-     int niov;
--    int nalloc;
--    size_t size;
-+
-+    /*
-+     * For external @iov (qemu_iovec_init_external()) or allocated @iov
-+     * (qemu_iovec_init()), @size is the cumulative size of iovecs and
-+     * @local_iov is invalid and unused.
-+     *
-+     * For embedded @iov (QEMU_IOVEC_INIT_BUF() or qemu_iovec_init_buf()),
-+     * @iov is equal to &@local_iov, and @size is valid, as it has same
-+     * offset and type as @local_iov.iov_len, which is guaranteed by
-+     * static assertion below.
-+     *
-+     * @nalloc is always valid and is -1 both for embedded and external
-+     * cases. It is included in the union only to ensure the padding prior
-+     * to the @size field will not result in a 0-length array.
-+     */
-+    union {
-+        struct {
-+            int nalloc;
-+            struct iovec local_iov;
-+        };
-+        struct {
-+            char __pad[sizeof(int) + offsetof(struct iovec, iov_len)];
-+            size_t size;
-+        };
-+    };
- } QEMUIOVector;
- 
-+QEMU_BUILD_BUG_ON(offsetof(QEMUIOVector, size) !=
-+                  offsetof(QEMUIOVector, local_iov.iov_len));
-+
-+#define QEMU_IOVEC_INIT_BUF(self, buf, len)              \
-+{                                                        \
-+    .iov = &(self).local_iov,                            \
-+    .niov = 1,                                           \
-+    .nalloc = -1,                                        \
-+    .local_iov = {                                       \
-+        .iov_base = (void *)(buf), /* cast away const */ \
-+        .iov_len = (len),                                \
-+    },                                                   \
-+}
-+
-+/*
-+ * qemu_iovec_init_buf
-+ *
-+ * Initialize embedded QEMUIOVector.
-+ *
-+ * Note: "const" is used over @buf pointer to make it simple to pass
-+ * const pointers, appearing in read functions. Then this "const" is
-+ * cast away by QEMU_IOVEC_INIT_BUF().
-+ */
-+static inline void qemu_iovec_init_buf(QEMUIOVector *qiov,
-+                                       const void *buf, size_t len)
-+{
-+    *qiov = (QEMUIOVector) QEMU_IOVEC_INIT_BUF(*qiov, buf, len);
-+}
-+
-+static inline void *qemu_iovec_buf(QEMUIOVector *qiov)
-+{
-+    /* Only supports embedded iov */
-+    assert(qiov->nalloc == -1 && qiov->iov == &qiov->local_iov);
-+
-+    return qiov->local_iov.iov_base;
-+}
-+
- void qemu_iovec_init(QEMUIOVector *qiov, int alloc_hint);
- void qemu_iovec_init_external(QEMUIOVector *qiov, struct iovec *iov, int niov);
- void qemu_iovec_add(QEMUIOVector *qiov, void *base, size_t len);
--- 
-2.18.0
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
