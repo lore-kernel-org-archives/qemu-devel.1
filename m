@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42090)
+Received: from eggs.gnu.org ([209.51.188.92]:42479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvg48-0006n6-0C
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:22:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvg5s-0007Uk-4u
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvg45-0002MV-MS
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:22:23 -0500
-Date: Mon, 18 Feb 2019 11:21:44 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190218112144.48ac3ebc@Igors-MacBook-Pro.local>
-In-Reply-To: <20190205173306.20483-16-eric.auger@redhat.com>
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-16-eric.auger@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvg5r-0003X6-4t
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:24:12 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 10:24:03 +0000
+Message-ID: <3b789e65-4d40-b69d-9e2d-cd838000ea99@virtuozzo.com>
+References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
+	<20190213081951.GA13081@stefanha-x1.localdomain>
+In-Reply-To: <20190213081951.GA13081@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <E238794D714EE44CB44945D6E4CD2F3A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 15/18] nvdimm: use configurable ACPI IO
- base and size
+Subject: Re: [Qemu-devel] [PATCH v3 00/17] block: local qiov helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,191 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>, "fam@euphon.net" <fam@euphon.net>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>
 
-On Tue,  5 Feb 2019 18:33:03 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
+13.02.2019 11:19, Stefan Hajnoczi wrote:
+> On Thu, Feb 07, 2019 at 01:24:28PM +0300, Vladimir Sementsov-Ogievskiy wr=
+ote:
+>> Hi all!
+>>
+>> Here is a new simple helper for a very often patter
+>> around qemu_iovec_init_external, when we need simple qiov with only
+>> one iov, initialized from external buffer.
+>>
+>> v3:
+>=20
+> Hi Vladimir,
+> "make check" is failing:
+>=20
+>    TEST    check-qtest-x86_64: tests/ide-test
+> qemu-system-x86_64: /home/stefanha/qemu/include/qemu/iov.h:195: qemu_iove=
+c_get_buf: Assertion `qiov->niov =3D=3D -1 && qiov->iov =3D=3D &qiov->local=
+_iov' failed.
+>=20
+> Please take a look and send v4.
+>=20
+> Stefan
+>=20
 
-> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> 
-> This patch uses configurable IO base and size to create NPIO AML for
-> ACPI NFIT. Since a different architecture like AArch64 does not use
-> port-mapped IO, a configurable IO base is required to create correct
-> mapping of ACPI IO address and size.
-> 
-> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v2 -> v3:
-> - s/size/len in pc_piix.c and pc_q35.c
-> ---
->  hw/acpi/nvdimm.c        | 28 +++++++++++++++++++---------
->  hw/i386/pc_piix.c       |  8 +++++++-
->  hw/i386/pc_q35.c        |  8 +++++++-
->  include/hw/mem/nvdimm.h | 12 ++++++++++++
->  4 files changed, 45 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index e53b2cb681..da68de5535 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -929,8 +929,8 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
->                              FWCfgState *fw_cfg, Object *owner)
->  {
->      memory_region_init_io(&state->io_mr, owner, &nvdimm_dsm_ops, state,
-> -                          "nvdimm-acpi-io", NVDIMM_ACPI_IO_LEN);
-> -    memory_region_add_subregion(io, NVDIMM_ACPI_IO_BASE, &state->io_mr);
-> +                          "nvdimm-acpi-io", state->dsm_io.len);
-> +    memory_region_add_subregion(io, state->dsm_io.base, &state->io_mr);
->  
->      state->dsm_mem = g_array_new(false, true /* clear */, 1);
->      acpi_data_push(state->dsm_mem, sizeof(NvdimmDsmIn));
-> @@ -959,12 +959,14 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
->  
->  #define NVDIMM_QEMU_RSVD_UUID   "648B9CF2-CDA1-4312-8AD9-49C4AF32BD62"
->  
-> -static void nvdimm_build_common_dsm(Aml *dev)
-> +static void nvdimm_build_common_dsm(Aml *dev,
-> +                                    AcpiNVDIMMState *acpi_nvdimm_state)
->  {
->      Aml *method, *ifctx, *function, *handle, *uuid, *dsm_mem, *elsectx2;
->      Aml *elsectx, *unsupport, *unpatched, *expected_uuid, *uuid_invalid;
->      Aml *pckg, *pckg_index, *pckg_buf, *field, *dsm_out_buf, *dsm_out_buf_size;
->      uint8_t byte_list[1];
-> +    AmlRegionSpace rs;
->  
->      method = aml_method(NVDIMM_COMMON_DSM, 5, AML_SERIALIZED);
->      uuid = aml_arg(0);
-> @@ -975,9 +977,16 @@ static void nvdimm_build_common_dsm(Aml *dev)
->  
->      aml_append(method, aml_store(aml_name(NVDIMM_ACPI_MEM_ADDR), dsm_mem));
->  
-> +    if (acpi_nvdimm_state->dsm_io.type == NVDIMM_ACPI_IO_PORT) {
-> +        rs = AML_SYSTEM_IO;
-> +    } else {
-> +        rs = AML_SYSTEM_MEMORY;
-> +    }
-> +
->      /* map DSM memory and IO into ACPI namespace. */
-> -    aml_append(method, aml_operation_region(NVDIMM_DSM_IOPORT, AML_SYSTEM_IO,
-> -               aml_int(NVDIMM_ACPI_IO_BASE), NVDIMM_ACPI_IO_LEN));
-> +    aml_append(method, aml_operation_region(NVDIMM_DSM_IOPORT, rs,
-> +               aml_int(acpi_nvdimm_state->dsm_io.base),
-> +               acpi_nvdimm_state->dsm_io.len));
->      aml_append(method, aml_operation_region(NVDIMM_DSM_MEMORY,
->                 AML_SYSTEM_MEMORY, dsm_mem, sizeof(NvdimmDsmIn)));
->  
-> @@ -1260,7 +1269,8 @@ static void nvdimm_build_nvdimm_devices(Aml *root_dev, uint32_t ram_slots)
->  }
->  
->  static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
-> -                              BIOSLinker *linker, GArray *dsm_dma_arrea,
-> +                              BIOSLinker *linker,
-> +                              AcpiNVDIMMState *acpi_nvdimm_state,
->                                uint32_t ram_slots)
->  {
->      Aml *ssdt, *sb_scope, *dev;
-> @@ -1288,7 +1298,7 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
->       */
->      aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0012")));
->  
-> -    nvdimm_build_common_dsm(dev);
-> +    nvdimm_build_common_dsm(dev, acpi_nvdimm_state);
->  
->      /* 0 is reserved for root device. */
->      nvdimm_build_device_dsm(dev, 0);
-> @@ -1307,7 +1317,7 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
->                                                 NVDIMM_ACPI_MEM_ADDR);
->  
->      bios_linker_loader_alloc(linker,
-> -                             NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
-> +                             NVDIMM_DSM_MEM_FILE, acpi_nvdimm_state->dsm_mem,
->                               sizeof(NvdimmDsmIn), false /* high memory */);
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_TABLE_FILE, mem_addr_offset, sizeof(uint32_t),
-> @@ -1329,7 +1339,7 @@ void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
->          return;
->      }
->  
-> -    nvdimm_build_ssdt(table_offsets, table_data, linker, state->dsm_mem,
-> +    nvdimm_build_ssdt(table_offsets, table_data, linker, state,
->                        ram_slots);
->  
->      device_list = nvdimm_get_device_list();
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 63c84e3827..d9c81c9aa6 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -298,7 +298,13 @@ static void pc_init1(MachineState *machine,
->      }
->  
->      if (pcms->acpi_nvdimm_state.is_enabled) {
-> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
-> +        AcpiNVDIMMState *acpi_nvdimm_state = &pcms->acpi_nvdimm_state;
-> +
-> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_PORT;
+Oops, sorry for this, it obviously should be qiov->nalloc =3D=3D -1 in asse=
+rtion. I'll resend and rename s/qemu_iovec_get_buf/qemu_iovec_embedded_buf/=
+ to make it more obvious.
 
-> +        acpi_nvdimm_state->dsm_io.base = NVDIMM_ACPI_IO_BASE;
-> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
-above constants probably should by moved to target a specific header
-
-> +
-> +        nvdimm_init_acpi_state(acpi_nvdimm_state, system_io,
->                                 pcms->fw_cfg, OBJECT(pcms));
->      }
->  }
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index b7b7959934..1110a26e34 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -330,7 +330,13 @@ static void pc_q35_init(MachineState *machine)
->      pc_nic_init(pcmc, isa_bus, host_bus);
->  
->      if (pcms->acpi_nvdimm_state.is_enabled) {
-> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
-> +        AcpiNVDIMMState *acpi_nvdimm_state = &pcms->acpi_nvdimm_state;
-> +
-> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_PORT;
-> +        acpi_nvdimm_state->dsm_io.base = NVDIMM_ACPI_IO_BASE;
-> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
-> +
-> +        nvdimm_init_acpi_state(acpi_nvdimm_state, system_io,
->                                 pcms->fw_cfg, OBJECT(pcms));
->      }
->  }
-> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-> index c5c9b3c7f8..af8a5fd034 100644
-> --- a/include/hw/mem/nvdimm.h
-> +++ b/include/hw/mem/nvdimm.h
-> @@ -123,6 +123,17 @@ struct NvdimmFitBuffer {
->  };
->  typedef struct NvdimmFitBuffer NvdimmFitBuffer;
->  
-
-> +typedef enum {
-> +    NVDIMM_ACPI_IO_PORT,
-> +    NVDIMM_ACPI_IO_MEMORY,
-> +} AcpiNVDIMMIOType;
-> +
-> +typedef struct AcpiNVDIMMIOEntry {
-> +    AcpiNVDIMMIOType type;
-> +    hwaddr base;
-> +    hwaddr len;
-> +} AcpiNVDIMMIOEntry;
-This one very much resembles AcpiGenericAddress, 
-why not to reuse it?
-
->  struct AcpiNVDIMMState {
->      /* detect if NVDIMM support is enabled. */
->      bool is_enabled;
-> @@ -140,6 +151,7 @@ struct AcpiNVDIMMState {
->       */
->      int32_t persistence;
->      char    *persistence_string;
-> +    AcpiNVDIMMIOEntry dsm_io;
->  };
->  typedef struct AcpiNVDIMMState AcpiNVDIMMState;
->  
+--=20
+Best regards,
+Vladimir
