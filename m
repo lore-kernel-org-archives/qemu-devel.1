@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59237)
+Received: from eggs.gnu.org ([209.51.188.92]:33330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gvogv-0002Dc-93
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:35:02 -0500
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gvovg-0003dB-KR
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:50:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gvogt-0003ct-7H
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:35:01 -0500
-Date: Mon, 18 Feb 2019 16:34:28 -0300
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20190218193427.GB4582@localhost.localdomain>
-References: <20190206162901.19082-1-crosa@redhat.com>
-	<20190206162901.19082-2-crosa@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190206162901.19082-2-crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] Introduce a Python module structure
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gvovf-0007iu-Qj
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:50:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1gvovf-0007dZ-FM
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:50:15 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1IJi6Hw100095
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:50:13 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qr1r6m5ne-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:50:13 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Mon, 18 Feb 2019 19:50:12 -0000
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Mon, 18 Feb 2019 14:49:55 -0500
+Message-Id: <1550519397-25359-1-git-send-email-akrowiak@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] s390x/vfio-ap: hot plug/unplug vfio-ap
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Max Reitz <mreitz@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com, akrowiak@linux.ibm.com, fiuczy@linux.ibm.com
 
-On Wed, Feb 06, 2019 at 11:29:01AM -0500, Cleber Rosa wrote:
-> This is a simple move of Python code that wraps common QEMU
-> functionality, and are used by a number of different tests
-> and scripts.
-> 
-> By treating that code as a real Python module, we can more easily:
->  * reuse code
->  * have a proper place for the module's own unittests
->  * apply a more consistent style
->  * generate documentation
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+This patch series introduces hot plug/unplug of a vfio-ap device.
 
-Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+To hot plug a vfio-ap device, the QEMU device_add function may be used:
 
-> ---
->  configure                                  |  1 +
->  scripts/qemu.py => python/qemu/__init__.py | 11 ++++++-----
->  {scripts/qmp => python/qemu}/qmp.py        |  0
->  {scripts => python/qemu}/qtest.py          |  5 +++--
->  scripts/device-crash-test                  |  2 ++
->  scripts/qmp/__init__.py                    |  0
->  scripts/qmp/qemu-ga-client                 |  5 ++++-
->  scripts/qmp/qmp-shell                      |  4 +++-
->  scripts/render_block_graph.py              |  2 ++
->  tests/acceptance/avocado_qemu/__init__.py  |  5 ++---
->  tests/acceptance/virtio_version.py         |  2 +-
->  tests/migration/guestperf/engine.py        |  7 ++++---
->  tests/qemu-iotests/235                     |  2 +-
->  tests/qemu-iotests/238                     |  2 +-
->  tests/qemu-iotests/iotests.py              |  4 ++--
->  tests/vm/basevm.py                         |  2 +-
->  16 files changed, 33 insertions(+), 21 deletions(-)
->  rename scripts/qemu.py => python/qemu/__init__.py (98%)
->  rename {scripts/qmp => python/qemu}/qmp.py (100%)
->  rename {scripts => python/qemu}/qtest.py (98%)
->  delete mode 100644 scripts/qmp/__init__.py
-> 
-{...}
-> 
+   (qemu) device_add vfio-ap,sysfsdev=$path-to-mdev
 
-Thanks,
+   Where $path-to-mdev is the absolute path to the mediated matrix device
+   to which AP resources to be used by the guest have been assigned.
+
+   A vfio-ap device can be hot plugged only if:
+
+   1. A vfio-ap device has not been attached to the ap-bus (only one is
+      allowed per guest) either via the QEMU command line or a prior hot
+      plug action.
+
+   2. The guest was started with the CPU model feature for AP enabled
+      (e.g., -cpu host,ap=on).
+
+To hot unplug a vfio-ap device, the QEMU device-del function may be used:
+
+   (qemu) device_del vfio-ap,sysfsdev=$path-to-mdev
+
+   Where $path-to-mdev is the absolute path to the mediated matrix device
+   specified when the vfio-ap device was attached to the virtual machine's
+   ap-bus.
+
+   A vfio-ap device can be hot unplugged only if:
+
+   1. A vfio-ap device has been attached to the virtual machine's ap-abus
+      either via the QEMU command line or a prior hot plug action. 
+
+   2. The guest was started with the CPU model feature for AP enabled
+      (e.g., -cpu host,ap=on).
+
+Tony Krowiak (2):
+  s390x/vfio-ap: Implement hot plug/unplug of vfio-ap device
+  s390x/vfio-ap: document hot plug/unplug of vfio-ap device
+
+ docs/vfio-ap.txt     | 58 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ hw/s390x/ap-bridge.c | 12 ++++++++++-
+ hw/vfio/ap.c         |  2 +-
+ 3 files changed, 65 insertions(+), 7 deletions(-)
+
 -- 
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+Changes: v2==>v3
+* Split documentation changes into a separate patch
+* Grammatical changes recommended by Connie
+2.7.4
