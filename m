@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46260)
+Received: from eggs.gnu.org ([209.51.188.92]:46997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gvpzW-0006JE-Kd
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:58:19 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gvq42-0007Gh-5l
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 16:02:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gvpzV-0005JM-DE
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:58:18 -0500
-References: <20190218161822.3573-1-kwolf@redhat.com>
-	<20190218161822.3573-13-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8512108c-9716-dbfc-0075-2ec18f975bb9@redhat.com>
-Date: Mon, 18 Feb 2019 14:58:08 -0600
+	(envelope-from <jsnow@redhat.com>) id 1gvq41-00069p-8u
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 16:02:58 -0500
+References: <d5dc1bda-6b43-cbd6-3faa-69bb0ae45af4@howtolinux.de>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <2c817163-f940-98f9-ad6e-5da1f70baf99@redhat.com>
+Date: Mon, 18 Feb 2019 15:54:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190218161822.3573-13-kwolf@redhat.com>
+In-Reply-To: <d5dc1bda-6b43-cbd6-3faa-69bb0ae45af4@howtolinux.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/12] aio-posix: Assert that aio_poll() is
- always called in home thread
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Please help corrupt filesystem image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, stefanha@redhat.com, berrange@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Alexander Marx <copymaster@howtolinux.de>, qemu-devel@nongnu.org
+Cc: Qemu-block <qemu-block@nongnu.org>
 
-On 2/18/19 10:18 AM, Kevin Wolf wrote:
-> aio_poll() has an existing assertion that the function is only called
-> from the AioContext's home thread if blocking is allowed.
-> 
-> This is not enough, some handlers make assumptions about the thread they
-> run in. Extend the assertion to non-blocking calls, too.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  util/aio-posix.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> diff --git a/util/aio-posix.c b/util/aio-posix.c
-> index 8640dfde9f..6fbfa7924f 100644
-> --- a/util/aio-posix.c
-> +++ b/util/aio-posix.c
-> @@ -613,6 +613,8 @@ bool aio_poll(AioContext *ctx, bool blocking)
->      int64_t timeout;
->      int64_t start = 0;
->  
-> +    assert(in_aio_context_home_thread(ctx));
-> +
->      /* aio_notify can avoid the expensive event_notifier_set if
->       * everything (file descriptors, bottom halves, timers) will
->       * be re-evaluated before the next blocking poll().  This is
-> @@ -621,7 +623,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
->       * so disable the optimization now.
->       */
->      if (blocking) {
-> -        assert(in_aio_context_home_thread(ctx));
->          atomic_add(&ctx->notify_me, 2);
->      }
->  
-> 
+On 2/16/19 10:54 PM, Alexander Marx wrote:
+> Dear List!
+>=20
+> I have a big problem and hope you can help me.
+> I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
+> hosts.
+> I was nearly finished with the setup and ready to migrate the users fro=
+m
+> old to new domain.
+>=20
+> Then i had to restart the physical servers. Unfortunately 1 dc and 2 rd=
+s
+> hosts could not be startet anymore.
+> Error says:
+>=20
+> qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
+> header: Input/output error
+>=20
+> Even worst, a qemu-img check=C2=A0 also gave that error. and i was not =
+able
+> to do anything i found in the internet to fix it.
+> always that error or the qemu-img could not determine the format.
+>=20
+> Is there a chance to fix these images? What can i do?
+>=20
+> I have no backup because the domain was not fully configured. But if i
+> have to rebuild the whole domain, i will need several weeks for it.
+> Any help is appreciated.
+>=20
+> Thank you
+>=20
+> Alex
+>=20
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+What versions of QEMU were you running?
+What filesystem were these images stored on?
+What happened at the time of the corruption, is there some detail that
+might help explain the nature of the corruption? Did you shut down the
+physical host while the VMs were still running?
+
+There may not be a way to recover these images, but we should probably
+make sure that your configuration isn't unsafe to prevent this kind of
+problem in the future.
