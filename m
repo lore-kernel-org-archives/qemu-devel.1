@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59935)
+Received: from eggs.gnu.org ([209.51.188.92]:59945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjYo-0001qs-Ih
+	(envelope-from <armbru@redhat.com>) id 1gvjYo-0001r5-VX
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjYm-0005Rz-Ju
+	(envelope-from <armbru@redhat.com>) id 1gvjYm-0005SN-QQ
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47144)
+Received: from mx1.redhat.com ([209.132.183.28]:12657)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvjYm-0005PV-95
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvjYm-0005PW-Ca
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:16 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B0EAD86663
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:12 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-92.ams2.redhat.com
-	[10.36.116.92])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 71F051048102
+	by mx1.redhat.com (Postfix) with ESMTPS id B22CAA0B5A
 	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:12 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 15:06:05 +0100
-Message-Id: <20190218140607.31998-17-armbru@redhat.com>
+Date: Mon, 18 Feb 2019 15:06:04 +0100
+Message-Id: <20190218140607.31998-16-armbru@redhat.com>
 In-Reply-To: <20190218140607.31998-1-armbru@redhat.com>
 References: <20190218140607.31998-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/18] Revert "qapi-events: add 'if' condition
- to implicit event enum"
+Subject: [Qemu-devel] [PULL 15/18] qapi: remove qmp_unregister_command()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,47 +33,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This reverts commit 7bd263490590ee6fcf34ecb6203437e22f6e5a9c.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The commit applied the events' conditions to the members of enum
-QAPIEvent.  Awkward, because it renders QAPIEvent unusable in
-target-independent code as soon as we make an event target-dependent.
-Reverting this has the following effects:
+This command is no longer needed, the schema has compile-time
+configuration conditions.
 
-* ui/vnc.c can remain target independent.
-
-* monitor_qapi_event_conf[] doesn't have to muck around with #ifdef.
-
-* query-events again doesn't reflect conditionals.  I'm going to
-  deprecate it in favor of query-qmp-schema.
-
-Another option would be to split target-dependent parts off enum
-QAPIEvent into a target-dependent enum.  Doesn't seem worthwhile right
-now.
-
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190214152251.2073-17-armbru@redhat.com>
+Message-Id: <20190214152251.2073-16-armbru@redhat.com>
 ---
- scripts/qapi/events.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/qapi/qmp/dispatch.h | 1 -
+ qapi/qmp-registry.c         | 8 --------
+ 2 files changed, 9 deletions(-)
 
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 28bbc3745d..2067660be4 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -193,7 +193,9 @@ void %(event_emit)s(%(event_enum)s event, QDict *qdic=
-t);
-             self._genc.add(gen_event_send(name, arg_type, boxed,
-                                           self._event_enum_name,
-                                           self._event_emit_name))
--        self._event_enum_members.append(QAPISchemaMember(name, ifcond))
-+        # Note: we generate the enum member regardless of @ifcond, to
-+        # keep the enumeration usable in target-independent code.
-+        self._event_enum_members.append(QAPISchemaMember(name))
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 68a528a9aa..9aa426a398 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -39,7 +39,6 @@ typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpComm=
+andList;
 =20
+ void qmp_register_command(QmpCommandList *cmds, const char *name,
+                           QmpCommandFunc *fn, QmpCommandOptions options)=
+;
+-void qmp_unregister_command(QmpCommandList *cmds, const char *name);
+ QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
+ void qmp_disable_command(QmpCommandList *cmds, const char *name);
+ void qmp_enable_command(QmpCommandList *cmds, const char *name);
+diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+index 5af484cd9a..ca00f74795 100644
+--- a/qapi/qmp-registry.c
++++ b/qapi/qmp-registry.c
+@@ -27,14 +27,6 @@ void qmp_register_command(QmpCommandList *cmds, const =
+char *name,
+     QTAILQ_INSERT_TAIL(cmds, cmd, node);
+ }
 =20
- def gen_events(schema, output_dir, prefix):
+-void qmp_unregister_command(QmpCommandList *cmds, const char *name)
+-{
+-    QmpCommand *cmd =3D qmp_find_command(cmds, name);
+-
+-    QTAILQ_REMOVE(cmds, cmd, node);
+-    g_free(cmd);
+-}
+-
+ QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
+ {
+     QmpCommand *cmd;
 --=20
 2.17.2
