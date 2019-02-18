@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59253)
+Received: from eggs.gnu.org ([209.51.188.92]:59363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gvjWZ-0008G2-Ep
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:04:00 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjWr-0000Ah-Vy
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gvjWR-0004Ca-JX
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:03:55 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjWq-0004Un-23
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:04:17 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Mon, 18 Feb 2019 15:02:53 +0100
-Message-Id: <20190218140301.197408-3-sgarzare@redhat.com>
+Date: Mon, 18 Feb 2019 15:02:54 +0100
+Message-Id: <20190218140301.197408-4-sgarzare@redhat.com>
 In-Reply-To: <20190218140301.197408-1-sgarzare@redhat.com>
 References: <20190218140301.197408-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 02/10] virtio-blk: add host_features field
- in VirtIOBlock
+Subject: [Qemu-devel] [PATCH v5 03/10] virtio-blk: add "discard" and
+ "write-zeroes" properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +25,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Since configurable features for virtio-blk are growing, this patch
-adds host_features field in the struct VirtIOBlock. (as in virtio-net)
-In this way, we can avoid to add new fields for new properties and
-we can directly set VIRTIO_BLK_F* flags in the host_features.
+In order to avoid migration issues, we enable DISCARD and
+WRITE_ZEROES features only for machine type >=3D 4.0
 
-We update "config-wce" and "scsi" property definition to use the new
-host_features field without change the behaviour.
+As discussed with Michael S. Tsirkin and Stefan Hajnoczi on the
+list [1], DISCARD operation should not have security implications
+(eg. page cache attacks), so we can enable it by default.
 
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00504.html
+
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- hw/block/virtio-blk.c          | 16 +++++++++-------
- include/hw/virtio/virtio-blk.h |  3 +--
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ hw/block/virtio-blk.c | 4 ++++
+ hw/core/machine.c     | 2 ++
+ 2 files changed, 6 insertions(+)
 
 diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index afedf48ca6..7813237756 100644
+index 7813237756..f7cd322811 100644
 --- a/hw/block/virtio-blk.c
 +++ b/hw/block/virtio-blk.c
-@@ -245,7 +245,7 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq =
-*req)
-      */
-     scsi =3D (void *)elem->in_sg[elem->in_num - 2].iov_base;
+@@ -1027,6 +1027,10 @@ static Property virtio_blk_properties[] =3D {
+     DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHRE=
+AD,
+                      IOThread *),
++    DEFINE_PROP_BIT64("discard", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_DISCARD, true),
++    DEFINE_PROP_BIT64("write-zeroes", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_WRITE_ZEROES, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 =20
--    if (!blk->conf.scsi) {
-+    if (!virtio_has_feature(blk->host_features, VIRTIO_BLK_F_SCSI)) {
-         status =3D VIRTIO_BLK_S_UNSUPP;
-         goto fail;
-     }
-@@ -785,12 +785,15 @@ static uint64_t virtio_blk_get_features(VirtIODevic=
-e *vdev, uint64_t features,
- {
-     VirtIOBlock *s =3D VIRTIO_BLK(vdev);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 077fbd182a..766ca5899d 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -33,6 +33,8 @@ GlobalProperty hw_compat_3_1[] =3D {
+     { "usb-kbd", "serial", "42" },
+     { "usb-mouse", "serial", "42" },
+     { "usb-kbd", "serial", "42" },
++    { "virtio-blk-device", "discard", "false" },
++    { "virtio-blk-device", "write-zeroes", "false" },
+ };
+ const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
 =20
-+    /* Firstly sync all virtio-blk possible supported features */
-+    features |=3D s->host_features;
-+
-     virtio_add_feature(&features, VIRTIO_BLK_F_SEG_MAX);
-     virtio_add_feature(&features, VIRTIO_BLK_F_GEOMETRY);
-     virtio_add_feature(&features, VIRTIO_BLK_F_TOPOLOGY);
-     virtio_add_feature(&features, VIRTIO_BLK_F_BLK_SIZE);
-     if (virtio_has_feature(features, VIRTIO_F_VERSION_1)) {
--        if (s->conf.scsi) {
-+        if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_SCSI)) {
-             error_setg(errp, "Please set scsi=3Doff for virtio-blk devic=
-es in order to use virtio 1.0");
-             return 0;
-         }
-@@ -799,9 +802,6 @@ static uint64_t virtio_blk_get_features(VirtIODevice =
-*vdev, uint64_t features,
-         virtio_add_feature(&features, VIRTIO_BLK_F_SCSI);
-     }
-=20
--    if (s->conf.config_wce) {
--        virtio_add_feature(&features, VIRTIO_BLK_F_CONFIG_WCE);
--    }
-     if (blk_enable_write_cache(s->blk)) {
-         virtio_add_feature(&features, VIRTIO_BLK_F_WCE);
-     }
-@@ -1015,9 +1015,11 @@ static Property virtio_blk_properties[] =3D {
-     DEFINE_BLOCK_ERROR_PROPERTIES(VirtIOBlock, conf.conf),
-     DEFINE_BLOCK_CHS_PROPERTIES(VirtIOBlock, conf.conf),
-     DEFINE_PROP_STRING("serial", VirtIOBlock, conf.serial),
--    DEFINE_PROP_BIT("config-wce", VirtIOBlock, conf.config_wce, 0, true)=
-,
-+    DEFINE_PROP_BIT64("config-wce", VirtIOBlock, host_features,
-+                      VIRTIO_BLK_F_CONFIG_WCE, true),
- #ifdef __linux__
--    DEFINE_PROP_BIT("scsi", VirtIOBlock, conf.scsi, 0, false),
-+    DEFINE_PROP_BIT64("scsi", VirtIOBlock, host_features,
-+                      VIRTIO_BLK_F_SCSI, false),
- #endif
-     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging=
-, 0,
-                     true),
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
-k.h
-index 5117431d96..f7345b0511 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -35,8 +35,6 @@ struct VirtIOBlkConf
-     BlockConf conf;
-     IOThread *iothread;
-     char *serial;
--    uint32_t scsi;
--    uint32_t config_wce;
-     uint32_t request_merging;
-     uint16_t num_queues;
-     uint16_t queue_size;
-@@ -57,6 +55,7 @@ typedef struct VirtIOBlock {
-     bool dataplane_disabled;
-     bool dataplane_started;
-     struct VirtIOBlockDataPlane *dataplane;
-+    uint64_t host_features;
- } VirtIOBlock;
-=20
- typedef struct VirtIOBlockReq {
 --=20
 2.20.1
