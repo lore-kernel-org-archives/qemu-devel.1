@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34852)
+Received: from eggs.gnu.org ([209.51.188.92]:34874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gvhng-00062H-So
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:33 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gvhnj-00063c-4S
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gvhnf-0006dk-9k
+	(envelope-from <richard.weiyang@gmail.com>) id 1gvhng-0006eS-TH
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:35 -0500
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:45407)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1gvhnf-0006bB-7Q
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:32 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:27824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gvhnb-0006Xd-G5
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:29 -0500
-Message-Id: <d490c415fe1629a6421deac1c245a93790e8d39b.1550491301.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1550491301.git.balaton@eik.bme.hu>
-References: <cover.1550491301.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 18 Feb 2019 13:01:41 +0100
-Subject: [Qemu-devel] [PATCH v2 2/3] mips_fulong2e: Fix bios flash size
+Received: by mail-ed1-x541.google.com with SMTP id d9so13586010edh.12
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 04:13:27 -0800 (PST)
+Date: Mon, 18 Feb 2019 12:13:24 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190218121324.utxt2zojfjia4pjl@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190218011333.13976-1-richardw.yang@linux.intel.com>
+	<20190218105034.167293f4@Igors-MacBook-Pro.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190218105034.167293f4@Igors-MacBook-Pro.local>
+Subject: Re: [Qemu-devel] [PATCH v2] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +32,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <zltjiangshi@gmail.com>, philmd@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
 
-According to both the specifications on linux-mips.org referenced in a
-comment at the beginning of the file and the flash chip part number
-the bios size should be 512k not 1M.
+On Mon, Feb 18, 2019 at 10:50:34AM +0100, Igor Mammedov wrote:
+>On Mon, 18 Feb 2019 09:13:33 +0800
+>Wei Yang <richardw.yang@linux.intel.com> wrote:
+>
+>> Currently we do device realization like below:
+>> 
+>>    hotplug_handler_pre_plug()
+>>    dc->realize()
+>>    hotplug_handler_plug()
+>> 
+>> Before we do device realization and plug, we should allocate necessary
+>> resources and check if memory-hotplug-support property is enabled.
+>> 
+>> At the piix4 and ich9, the acpi_memory_hotplug property is checked in
+>                             ^^^^^^^ is field name and not a property so
+>s/acpi_memory_hotplug/memory-hotplug-support/
+>s/in/at/
+>
+>> plug stage. This means that device has been realized and mapped into
+>> guest address space 'pc_dimm_plug()' by the time acpi plug handler is
+>> called, where it might fail and crash QEMU due to reaching
+>> g_assert_not_reached() (piix4) or error_abort (ich9).
+>
+>
+>> This patch abstract the check on acpi_memory_hotplug capacity in
+>> pre_plug stage.
+>maybe better would be:
+>"Fix it by checking if memory hotplug is enabled at pre_plug stage
+>where we can gracefully abort hotplug request."
+>
+>> [changelog rephrase from imammedo@redhat.com]
+>this provides zero information for a commit reader,
+>it should go under --- to chagelog
+> 
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/mips/mips_fulong2e.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Ok, maybe different community has different convention.
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 02549d5c7e..10e6ed585a 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -21,6 +21,7 @@
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-+#include "cpu.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
- #include "hw/dma/i8257.h"
-@@ -35,7 +36,6 @@
- #include "audio/audio.h"
- #include "qemu/log.h"
- #include "hw/loader.h"
--#include "hw/mips/bios.h"
- #include "hw/ide.h"
- #include "elf.h"
- #include "hw/isa/vt82c686.h"
-@@ -51,6 +51,8 @@
- #define ENVP_NB_ENTRIES	 	16
- #define ENVP_ENTRY_SIZE	 	256
- 
-+/* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
-+#define BIOS_SIZE (512 * KiB)
- #define MAX_IDE_BUS 2
- 
- /*
-@@ -307,12 +309,9 @@ static void mips_fulong2e_init(MachineState *machine)
-     /* fulong 2e has 256M ram. */
-     ram_size = 256 * MiB;
- 
--    /* fulong 2e has a 1M flash.Winbond W39L040AP70Z */
--    bios_size = 1 * MiB;
--
-     /* allocate RAM */
-     memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram", ram_size);
--    memory_region_init_ram(bios, NULL, "fulong2e.bios", bios_size,
-+    memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
-                            &error_fatal);
-     memory_region_set_readonly(bios, true);
- 
+Linux kernel mm subsystem maintainer suggest me to add above line.
+
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> CC: Igor Mammedov <imammedo@redhat.com>
+>> CC: Eric Blake <eblake@redhat.com>
+>> 
+>> ---
+>> v2:
+>>    * rephrase change log
+>one usually adds commenter's name here
+>   * like this (someone@foo.bar)
+>or
+>   * (someone@foo.bar)
+>     - entry 1
+>     - entry 2
+>   * (someone-else@foo.bar)
+>     - ...
+>
+
+Well, I would change to this style.
+
+>>    * apply this change to ich9
+>>    * use hotplug_handler_pre_plug() instead of open-coding check
+>> ---
+>>  hw/acpi/ich9.c         | 14 ++++++++++++--
+>>  hw/acpi/piix4.c        | 14 ++++++++++++--
+>>  hw/i386/pc.c           |  5 +++++
+>>  hw/isa/lpc_ich9.c      |  1 +
+>>  include/hw/acpi/ich9.h |  2 ++
+>>  5 files changed, 32 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+>> index c5d8646abc..906a10f09a 100644
+>> --- a/hw/acpi/ich9.c
+>> +++ b/hw/acpi/ich9.c
+>> @@ -483,13 +483,23 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+>>                               NULL);
+>>  }
+>>  
+>> +void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> +                            Error **errp)
+>broken alignment?
+>
+>run /scripts/checkpatch.pl on patches before submitting them
+
+I copied this from ich9_pm_device_plug_cb(), so thought this is the
+correct style.
+
+Will adjust this according to checkpatch.pl.
+
+>
+>> +{
+>> +    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+>> +
+>> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+>> +        !lpc->pm.acpi_memory_hotplug.is_enabled)
+>> +        error_setg(errp,
+>> +            "memory hotplug is not enabled: ICH9 memory hotplug disabled");
+>I'd give a hint where it's disabled, something like
+>
+>"memory hotplug is not enabled: %s.memory-hotplug-support is not set", object_get_typename(lpc)
+>
+>the same for piix4
+>
+>> +}
+>> +
+>>  void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>                              Error **errp)
+>>  {
+>>      ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+>>  
+>> -    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
+>> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+>>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
+>>          } else {
+>> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+>> index e330f24c71..c97b747496 100644
+>> --- a/hw/acpi/piix4.c
+>> +++ b/hw/acpi/piix4.c
+>> @@ -370,13 +370,22 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+>>      acpi_pm1_evt_power_down(&s->ar);
+>>  }
+>>  
+>> +static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>> +                                 DeviceState *dev, Error **errp)
+>> +{
+>> +    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+>> +
+>> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+>> +        !s->acpi_memory_hotplug.is_enabled)
+>> +        error_setg(errp,
+>> +            "memory hotplug is not enabled: PIIX4 memory hotplug disabled");
+>> +}
+>>  static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+>>                                   DeviceState *dev, Error **errp)
+>>  {
+>>      PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+>>  
+>> -    if (s->acpi_memory_hotplug.is_enabled &&
+>> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+>>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
+>>          } else {
+>> @@ -702,6 +711,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
+>>       */
+>>      dc->user_creatable = false;
+>>      dc->hotpluggable = false;
+>> +    hc->pre_plug = piix4_device_pre_plug_cb;
+>>      hc->plug = piix4_device_plug_cb;
+>>      hc->unplug_request = piix4_device_unplug_request_cb;
+>>      hc->unplug = piix4_device_unplug_cb;
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index 734d3268fa..59c8ccf0ff 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -1674,6 +1674,11 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>          return;
+>>      }
+>>  
+>> +    /*
+>> +     * Check acpi_dev memory-hotplug-support property
+>> +     */
+>> +    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
+>> +
+>>      if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+>>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>>          return;
+>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>> index e692b9fdc1..ac44aa53be 100644
+>> --- a/hw/isa/lpc_ich9.c
+>> +++ b/hw/isa/lpc_ich9.c
+>> @@ -805,6 +805,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
+>>       * pc_q35_init()
+>>       */
+>>      dc->user_creatable = false;
+>> +    hc->pre_plug = ich9_pm_device_pre_plug_cb;
+>>      hc->plug = ich9_pm_device_plug_cb;
+>>      hc->unplug_request = ich9_pm_device_unplug_request_cb;
+>>      hc->unplug = ich9_pm_device_unplug_cb;
+>> diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+>> index 59aeb06393..428af0b0be 100644
+>> --- a/include/hw/acpi/ich9.h
+>> +++ b/include/hw/acpi/ich9.h
+>> @@ -74,6 +74,8 @@ extern const VMStateDescription vmstate_ich9_pm;
+>>  
+>>  void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp);
+>>  
+>> +void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> +                            Error **errp);
+>>  void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>                              Error **errp);
+>>  void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>
+
 -- 
-2.13.7
+Wei Yang
+Help you, Help me
