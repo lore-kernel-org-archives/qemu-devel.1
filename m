@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43427)
+Received: from eggs.gnu.org ([209.51.188.92]:45183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gvsJx-00047s-I5
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:27:34 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gvsOX-00064J-5N
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gvs6E-00038s-JZ
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:13:24 -0500
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-7-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e8d7022b-5946-381f-262c-47b1596cc2a6@redhat.com>
-Date: Tue, 19 Feb 2019 00:13:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190131175549.11691-7-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD"
-Subject: Re: [Qemu-devel] [RFC PATCH 06/11] qcow2: Don't assume 0 is an
- invalid cluster offset
+	(envelope-from <jsnow@redhat.com>) id 1gvsOV-0001ye-Tk
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:32:17 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Mon, 18 Feb 2019 18:31:54 -0500
+Message-Id: <20190218233154.19303-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v5] blockdev: acquire aio_context for bitmap
+ add/remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +18,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, pbonzini@redhat.com, vsementsov@virtuozzo.com, eblake@redhat.com, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <e8d7022b-5946-381f-262c-47b1596cc2a6@redhat.com>
-Subject: Re: [RFC PATCH 06/11] qcow2: Don't assume 0 is an invalid cluster
- offset
-References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-7-kwolf@redhat.com>
-In-Reply-To: <20190131175549.11691-7-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When bitmaps are persistent, they may incur a disk read or write when bitmaps
+are added or removed. For configurations like virtio-dataplane, failing to
+acquire this lock will abort QEMU when disk IO occurs.
 
-On 31.01.19 18:55, Kevin Wolf wrote:
-> The cluster allocation code uses 0 as an invalid offset that is used in=
+We used to acquire aio_context as part of the bitmap lookup, so re-introduce
+the lock for just the cases that have an IO penalty. Commit 2119882c removed
+these locks, and I failed to notice this when we committed fd5ae4cc, so this
+has been broken since persistent bitmaps were introduced.
 
-> case of errors or as "offset not yet determined". With external data
-> files, a host cluster offset of 0 becomes valid, though.
->=20
-> Define a constant INV_OFFSET (which is not cluster aligned and will
-> therefore never be a valid offset) that can be used for such purposes.
->=20
-> This removes the additional host_offset =3D=3D 0 check that commit
-> ff52aab2df5 introduced; the confusion between an invalid offset and
-> (erroneous) allocation at offset 0 is removed with this change.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qcow2.h         |  2 ++
->  block/qcow2-cluster.c | 59 ++++++++++++++++++++-----------------------=
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1672010
+Reported-By: Aihua Liang <aliang@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+v5: I'm having a really bad day. This version actually has the semicolon.
+---
+ blockdev.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
->  2 files changed, 29 insertions(+), 32 deletions(-)
-
-qcow2_get_cluster_offset() still returns 0 for unallocated clusters.
-(And qcow2_co_block_status() tests for that, so it would never report a
-valid offset for the first cluster in an externally allocated qcow2 file.=
-)
-
-qcow2_alloc_compressed_cluster_offset() should return INV_OFFSET on
-error (yeah, there are no compressed clusters in external files, but
-this seems like the right thing to do still).
-
-(And there are cases like qcow2_co_preadv(), where cluster_offset is
-initialized to 0 -- it doesn't make a difference what it's initialized
-to (it's just to silence the compiler, I suppose), but it should still
-use this new constant now.  I think.)
-
-Now bikeshedding begins: Also, s->free_byte_offset is initialized to 0
-and that is the expected value for "nothing allocated yet".  I think I'd
-prefer all of the qocw2 code to use a common invalidity constant, even
-thought it would make things like that more complicated.  But then we
-might get into the metadata territory (how bad is it that
-s->bitmap_directory_offset too is 0 when there is no directory?),
-because compressed clusters are not allowed in external files, just like
-metadata is not...
-So my bikeshedding result is "I think it would be nice if all of the
-qcow2 code made use of this constant, but it may also be pretty stupid
-to enforce that now."
-
-Max
-
-
---rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxrPAkACgkQ9AfbAGHV
-z0DydQf/ZEB2AoJYG35qqmCixLXBXi1Ah+cYgn9SgYXpY/jWi5MwTtnhkeSfNLJb
-gjnf3T/2uFEcuzNSslU/zi+wvEPgd+jnrLgwkj/fSso9lEbXR0aEoVLR2W7211m9
-bZg4JJhkGnQbmolcVKxho39qMDYcWvSSZxL9vOMvkbpZ44P8rduZ5Ptnq3ZHyCS2
-1dpNFJ0NO3cnm8fbWn8hoHn0NJt+acjEzgpjeLtsTcDlLR2YiDI6382HlUFCxyOp
-/GGYS71YEsCgHqyY0LTxEKwkvpBSxM1g0ZIrCQ06ZlsLeXU/y9fBxc4QcT6NDxWk
-SY01sTES9K1akEnfsT8qbfIDnJ3XEw==
-=tm7w
------END PGP SIGNATURE-----
-
---rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD--
+diff --git a/blockdev.c b/blockdev.c
+index fb18e9c975..8714ad2702 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2820,6 +2820,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+ {
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
++    AioContext *aio_context = NULL;
+ 
+     if (!name || name[0] == '\0') {
+         error_setg(errp, "Bitmap name cannot be empty");
+@@ -2854,15 +2855,17 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+         disabled = false;
+     }
+ 
+-    if (persistent &&
+-        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
+-    {
+-        return;
++    if (persistent) {
++        aio_context = bdrv_get_aio_context(bs);
++        aio_context_acquire(aio_context);
++        if (!bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp)) {
++            goto out;
++        }
+     }
+ 
+     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
+     if (bitmap == NULL) {
+-        return;
++        goto out;
+     }
+ 
+     if (disabled) {
+@@ -2870,6 +2873,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     }
+ 
+     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++ out:
++    if (aio_context) {
++        aio_context_release(aio_context);
++    }
+ }
+ 
+ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+@@ -2878,6 +2885,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
+     Error *local_err = NULL;
++    AioContext *aio_context = NULL;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
+     if (!bitmap || !bs) {
+@@ -2892,14 +2900,20 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     }
+ 
+     if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
++        aio_context = bdrv_get_aio_context(bs);
++        aio_context_acquire(aio_context);
+         bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+         if (local_err != NULL) {
+             error_propagate(errp, local_err);
+-            return;
++            goto out;
+         }
+     }
+ 
+     bdrv_release_dirty_bitmap(bs, bitmap);
++ out:
++    if (aio_context) {
++        aio_context_release(aio_context);
++    }
+ }
+ 
+ /**
+-- 
+2.17.2
