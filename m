@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39925)
+Received: from eggs.gnu.org ([209.51.188.92]:40112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjyY-00078n-MZ
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjye-0007Fe-P4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:33:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjyW-0003YV-9u
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:54 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjyd-0003es-UY
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:33:00 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:49 +1100
-Message-Id: <20190218143049.17142-44-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:40 +1100
+Message-Id: <20190218143049.17142-35-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 43/43] target/ppc: convert vmin* and vmax* to
- vector operations
+Subject: [Qemu-devel] [PULL 34/43] target/ppc: convert xxsel to vector
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +29,86 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190215100058.20015-18-mark.cave-ayland@ilande.co.uk>
+Message-Id: <20190215100058.20015-9-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h                 | 16 ---------------
- target/ppc/int_helper.c             | 27 ------------------------
- target/ppc/translate/vmx-impl.inc.c | 32 ++++++++++++++---------------
- 3 files changed, 16 insertions(+), 59 deletions(-)
+ target/ppc/translate/vsx-impl.inc.c | 55 ++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 28 deletions(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 3daf6bf863..18910d18a4 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -117,22 +117,6 @@ DEF_HELPER_3(vabsduw, void, avr, avr, avr)
- DEF_HELPER_3(vavgsb, void, avr, avr, avr)
- DEF_HELPER_3(vavgsh, void, avr, avr, avr)
- DEF_HELPER_3(vavgsw, void, avr, avr, avr)
--DEF_HELPER_3(vminsb, void, avr, avr, avr)
--DEF_HELPER_3(vminsh, void, avr, avr, avr)
--DEF_HELPER_3(vminsw, void, avr, avr, avr)
--DEF_HELPER_3(vminsd, void, avr, avr, avr)
--DEF_HELPER_3(vmaxsb, void, avr, avr, avr)
--DEF_HELPER_3(vmaxsh, void, avr, avr, avr)
--DEF_HELPER_3(vmaxsw, void, avr, avr, avr)
--DEF_HELPER_3(vmaxsd, void, avr, avr, avr)
--DEF_HELPER_3(vminub, void, avr, avr, avr)
--DEF_HELPER_3(vminuh, void, avr, avr, avr)
--DEF_HELPER_3(vminuw, void, avr, avr, avr)
--DEF_HELPER_3(vminud, void, avr, avr, avr)
--DEF_HELPER_3(vmaxub, void, avr, avr, avr)
--DEF_HELPER_3(vmaxuh, void, avr, avr, avr)
--DEF_HELPER_3(vmaxuw, void, avr, avr, avr)
--DEF_HELPER_3(vmaxud, void, avr, avr, avr)
- DEF_HELPER_4(vcmpequb, void, env, avr, avr, avr)
- DEF_HELPER_4(vcmpequh, void, env, avr, avr, avr)
- DEF_HELPER_4(vcmpequw, void, env, avr, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 4aeb375edd..162add561e 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -921,33 +921,6 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *=
-r, ppc_avr_t *a,
-     }
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+index 0e8cecb00a..e73197e717 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1321,40 +1321,39 @@ static void glue(gen_, name)(DisasContext * ctx) =
+           \
+ VSX_XXMRG(xxmrghw, 1)
+ VSX_XXMRG(xxmrglw, 0)
+=20
+-static void gen_xxsel(DisasContext * ctx)
++static void xxsel_i64(TCGv_i64 t, TCGv_i64 a, TCGv_i64 b, TCGv_i64 c)
+ {
+-    TCGv_i64 a, b, c, tmp;
+-    if (unlikely(!ctx->vsx_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VSXU);
+-        return;
+-    }
+-    a =3D tcg_temp_new_i64();
+-    b =3D tcg_temp_new_i64();
+-    c =3D tcg_temp_new_i64();
+-    tmp =3D tcg_temp_new_i64();
+-
+-    get_cpu_vsrh(a, xA(ctx->opcode));
+-    get_cpu_vsrh(b, xB(ctx->opcode));
+-    get_cpu_vsrh(c, xC(ctx->opcode));
+-
+     tcg_gen_and_i64(b, b, c);
+     tcg_gen_andc_i64(a, a, c);
+-    tcg_gen_or_i64(tmp, a, b);
+-    set_cpu_vsrh(xT(ctx->opcode), tmp);
++    tcg_gen_or_i64(t, a, b);
++}
+=20
+-    get_cpu_vsrl(a, xA(ctx->opcode));
+-    get_cpu_vsrl(b, xB(ctx->opcode));
+-    get_cpu_vsrl(c, xC(ctx->opcode));
++static void xxsel_vec(unsigned vece, TCGv_vec t, TCGv_vec a,
++                      TCGv_vec b, TCGv_vec c)
++{
++    tcg_gen_and_vec(vece, b, b, c);
++    tcg_gen_andc_vec(vece, a, a, c);
++    tcg_gen_or_vec(vece, t, a, b);
++}
+=20
+-    tcg_gen_and_i64(b, b, c);
+-    tcg_gen_andc_i64(a, a, c);
+-    tcg_gen_or_i64(tmp, a, b);
+-    set_cpu_vsrl(xT(ctx->opcode), tmp);
++static void gen_xxsel(DisasContext *ctx)
++{
++    static const GVecGen4 g =3D {
++        .fni8 =3D xxsel_i64,
++        .fniv =3D xxsel_vec,
++        .vece =3D MO_64,
++    };
++    int rt =3D xT(ctx->opcode);
++    int ra =3D xA(ctx->opcode);
++    int rb =3D xB(ctx->opcode);
++    int rc =3D xC(ctx->opcode);
+=20
+-    tcg_temp_free_i64(a);
+-    tcg_temp_free_i64(b);
+-    tcg_temp_free_i64(c);
+-    tcg_temp_free_i64(tmp);
++    if (unlikely(!ctx->vsx_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_VSXU);
++        return;
++    }
++    tcg_gen_gvec_4(vsr_full_offset(rt), vsr_full_offset(ra),
++                   vsr_full_offset(rb), vsr_full_offset(rc), 16, 16, &g)=
+;
  }
 =20
--#define VMINMAX_DO(name, compare, element)                              =
-\
--    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       =
-\
--    {                                                                   =
-\
--        int i;                                                          =
-\
--                                                                        =
-\
--        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
--            if (a->element[i] compare b->element[i]) {                  =
-\
--                r->element[i] =3D b->element[i];                        =
-  \
--            } else {                                                    =
-\
--                r->element[i] =3D a->element[i];                        =
-  \
--            }                                                           =
-\
--        }                                                               =
-\
--    }
--#define VMINMAX(suffix, element)                \
--    VMINMAX_DO(min##suffix, >, element)         \
--    VMINMAX_DO(max##suffix, <, element)
--VMINMAX(sb, s8)
--VMINMAX(sh, s16)
--VMINMAX(sw, s32)
--VMINMAX(sd, s64)
--VMINMAX(ub, u8)
--VMINMAX(uh, u16)
--VMINMAX(uw, u32)
--VMINMAX(ud, u64)
--#undef VMINMAX_DO
--#undef VMINMAX
--
- void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_=
-t *c)
- {
-     int i;
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
-mx-impl.inc.c
-index 62c5578070..f1b15ae2cb 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -416,22 +416,22 @@ GEN_VXFORM_V(vsububm, MO_8, tcg_gen_gvec_sub, 0, 16=
-);
- GEN_VXFORM_V(vsubuhm, MO_16, tcg_gen_gvec_sub, 0, 17);
- GEN_VXFORM_V(vsubuwm, MO_32, tcg_gen_gvec_sub, 0, 18);
- GEN_VXFORM_V(vsubudm, MO_64, tcg_gen_gvec_sub, 0, 19);
--GEN_VXFORM(vmaxub, 1, 0);
--GEN_VXFORM(vmaxuh, 1, 1);
--GEN_VXFORM(vmaxuw, 1, 2);
--GEN_VXFORM(vmaxud, 1, 3);
--GEN_VXFORM(vmaxsb, 1, 4);
--GEN_VXFORM(vmaxsh, 1, 5);
--GEN_VXFORM(vmaxsw, 1, 6);
--GEN_VXFORM(vmaxsd, 1, 7);
--GEN_VXFORM(vminub, 1, 8);
--GEN_VXFORM(vminuh, 1, 9);
--GEN_VXFORM(vminuw, 1, 10);
--GEN_VXFORM(vminud, 1, 11);
--GEN_VXFORM(vminsb, 1, 12);
--GEN_VXFORM(vminsh, 1, 13);
--GEN_VXFORM(vminsw, 1, 14);
--GEN_VXFORM(vminsd, 1, 15);
-+GEN_VXFORM_V(vmaxub, MO_8, tcg_gen_gvec_umax, 1, 0);
-+GEN_VXFORM_V(vmaxuh, MO_16, tcg_gen_gvec_umax, 1, 1);
-+GEN_VXFORM_V(vmaxuw, MO_32, tcg_gen_gvec_umax, 1, 2);
-+GEN_VXFORM_V(vmaxud, MO_64, tcg_gen_gvec_umax, 1, 3);
-+GEN_VXFORM_V(vmaxsb, MO_8, tcg_gen_gvec_smax, 1, 4);
-+GEN_VXFORM_V(vmaxsh, MO_16, tcg_gen_gvec_smax, 1, 5);
-+GEN_VXFORM_V(vmaxsw, MO_32, tcg_gen_gvec_smax, 1, 6);
-+GEN_VXFORM_V(vmaxsd, MO_64, tcg_gen_gvec_smax, 1, 7);
-+GEN_VXFORM_V(vminub, MO_8, tcg_gen_gvec_umin, 1, 8);
-+GEN_VXFORM_V(vminuh, MO_16, tcg_gen_gvec_umin, 1, 9);
-+GEN_VXFORM_V(vminuw, MO_32, tcg_gen_gvec_umin, 1, 10);
-+GEN_VXFORM_V(vminud, MO_64, tcg_gen_gvec_umin, 1, 11);
-+GEN_VXFORM_V(vminsb, MO_8, tcg_gen_gvec_smin, 1, 12);
-+GEN_VXFORM_V(vminsh, MO_16, tcg_gen_gvec_smin, 1, 13);
-+GEN_VXFORM_V(vminsw, MO_32, tcg_gen_gvec_smin, 1, 14);
-+GEN_VXFORM_V(vminsd, MO_64, tcg_gen_gvec_smin, 1, 15);
- GEN_VXFORM(vavgub, 1, 16);
- GEN_VXFORM(vabsdub, 1, 16);
- GEN_VXFORM_DUAL(vavgub, PPC_ALTIVEC, PPC_NONE, \
+ static void gen_xxspltw(DisasContext *ctx)
 --=20
 2.20.1
