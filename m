@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32955)
+Received: from eggs.gnu.org ([209.51.188.92]:33736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gvnDx-00020o-S1
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:01:06 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gvnGp-0003PV-RW
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:04:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gvnDv-0000Wr-A7
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:01:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58258
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gvnDu-0007wb-UK
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:00:59 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1IHrkcO060947
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 13:00:17 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qqy19gd9d-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 13:00:17 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Mon, 18 Feb 2019 18:00:16 -0000
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Mon, 18 Feb 2019 12:59:59 -0500
-In-Reply-To: <1550512800-9922-1-git-send-email-akrowiak@linux.ibm.com>
-References: <1550512800-9922-1-git-send-email-akrowiak@linux.ibm.com>
-Message-Id: <1550512800-9922-2-git-send-email-akrowiak@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] s390x/vfio-ap: Implement hot
- plug/unplug of vfio-ap device
+	(envelope-from <eric.auger@redhat.com>) id 1gvnGo-00031Z-Tf
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:03:59 -0500
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-8-eric.auger@redhat.com>
+	<CAFEAcA9OWQuuqO31-uzTuu-9XSdVkH7UvXdFA1GdvD9emoS0=Q@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <6799d205-cb29-9974-eaf2-1b5020b3a41a@redhat.com>
+Date: Mon, 18 Feb 2019 19:03:27 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9OWQuuqO31-uzTuu-9XSdVkH7UvXdFA1GdvD9emoS0=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 07/18] kvm: add
+ kvm_arm_get_max_vm_phys_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,103 +26,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com, akrowiak@linux.ibm.com, fiuczy@linux.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-Introduces hot plug/unplug support for the vfio-ap device. Note that only one
-vfio-ap device can be attached to the ap-bus, so a vfio-ap device can only be
-hot plugged if the '-device vfio-ap,sysfsdev=$path_to_mdev' option is not
-specified on the QEMU command line.
+Hi Peter,
+On 2/14/19 6:15 PM, Peter Maydell wrote:
+> On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> Add the kvm_arm_get_max_vm_phys_shift() helper that returns the
+>> log of the maximum IPA size supported by KVM. This capability
+>> needs to be known to create the VM with a specific IPA max size
+>> (kvm_type passed along KVM_CREATE_VM ioctl.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v4 -> v5:
+>> - return 40 if the host does not support the capability
+>>
+>> v3 -> v4:
+>> - s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
+>> - check KVM_CAP_ARM_VM_IPA_SIZE extension
+>>
+>> v1 -> v2:
+>> - put this in ARM specific code
+>> ---
+>>  target/arm/kvm.c     | 10 ++++++++++
+>>  target/arm/kvm_arm.h | 13 +++++++++++++
+>>  2 files changed, 23 insertions(+)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index e00ccf9c98..fc1dd3ec6a 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -18,6 +18,7 @@
+>>  #include "qemu/error-report.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "sysemu/kvm.h"
+>> +#include "sysemu/kvm_int.h"
+>>  #include "kvm_arm.h"
+>>  #include "cpu.h"
+>>  #include "trace.h"
+>> @@ -162,6 +163,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>>      env->features = arm_host_cpu_features.features;
+>>  }
+>>
+>> +int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
+>> +{
+>> +    KVMState *s = KVM_STATE(ms->accelerator);
+>> +    int ret;
+>> +
+>> +    ret = kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
+> 
+> Why not name the function the same as the extension name?
+> 
+>> +    return ret > 0 ? ret : 40;
+>> +}
+>> +
+>>  int kvm_arch_init(MachineState *ms, KVMState *s)
+>>  {
+>>      /* For ARM interrupt delivery is always asynchronous,
+>> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+>> index 6393455b1d..0728bbfa6b 100644
+>> --- a/target/arm/kvm_arm.h
+>> +++ b/target/arm/kvm_arm.h
+>> @@ -207,6 +207,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
+>>   */
+>>  void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+>>
+>> +/**
+>> + * kvm_arm_get_max_vm_phys_shift - Returns log2 of the max IPA size
+>> + * supported by KVM
+> 
+> This is the number of bits in the IPA address space,
+> right (ie 40 for a 40-bit IPA, and so on) ? If so, then
+> I think "Return number of bits in the IPA address space"
+> might be clearer.
 
-Please note that a hot plug handler is not necessary for the vfio-ap device
-because the AP matrix configuration for the guest is performed by the
-kernel device driver when the vfio-ap device is realized. The vfio-ap device
-represents a VFIO mediated device created in the host sysfs for use by a guest.
-The mdev device is configured with an AP matrix (i.e., adapters and domains) via
-its sysfs attribute interfaces prior to starting the guest or plugging a vfio-ap
-device in. When the device is realized, a file descriptor is opened on the mdev
-device which results in a callback to the vfio_ap kernel device driver. The
-device driver then configures the AP matrix in the guest's SIE state description
-from the AP matrix assigned via the mdev device's sysfs interfaces. The AP
-devices will be created for the guest when the AP bus running on the guest
-subsequently performs its periodic scan for AP devices.
+It actually returns the MAX number of bits in the IPA address space
+supported by the host kernel. What about naming this function
+"kvm_arm_get_max_vm_ipa_size".
 
-The qdev_simple_device_unplug_cb() callback function is used for the same
-reaons; namely, the vfio_ap kernel device driver will perform the AP resource
-de-configuration for the guest when the vfio-ap device is unplugged. When the
-vfio-ap device is unrealized, the mdev device file descriptor is closed which
-results in a callback to the vfio_ap kernel device driver. The device driver
-then clears the AP matrix configuration in the guest's SIE state description
-and resets all of the affected queues. The AP devices created for the guest
-will be removed when the AP bus running on the guest subsequently performs
-its periodic scan and finds there are no longer any AP resources assigned to the
-guest.
+Thanks
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Tested-by: Pierre Morel<pmorel@linux.ibm.com>
----
- hw/s390x/ap-bridge.c | 12 +++++++++++-
- hw/vfio/ap.c         |  2 +-
- 2 files changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
-index 3795d30dd7c9..25a03412fcb9 100644
---- a/hw/s390x/ap-bridge.c
-+++ b/hw/s390x/ap-bridge.c
-@@ -39,6 +39,7 @@ static const TypeInfo ap_bus_info = {
- void s390_init_ap(void)
- {
-     DeviceState *dev;
-+    BusState *bus;
- 
-     /* If no AP instructions then no need for AP bridge */
-     if (!s390_has_feat(S390_FEAT_AP)) {
-@@ -52,13 +53,18 @@ void s390_init_ap(void)
-     qdev_init_nofail(dev);
- 
-     /* Create bus on bridge device */
--    qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
-+    bus = qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
-+
-+    /* Enable hotplugging */
-+    qbus_set_hotplug_handler(bus, dev, &error_abort);
-  }
- 
- static void ap_bridge_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
- 
-+    hc->unplug = qdev_simple_device_unplug_cb;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
-@@ -67,6 +73,10 @@ static const TypeInfo ap_bridge_info = {
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = 0,
-     .class_init    = ap_bridge_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOTPLUG_HANDLER },
-+        { }
-+    }
- };
- 
- static void ap_register(void)
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index 6166ccd47a4a..d8b79ebe53ae 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -169,7 +169,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     dc->realize = vfio_ap_realize;
-     dc->unrealize = vfio_ap_unrealize;
--    dc->hotpluggable = false;
-+    dc->hotpluggable = true;
-     dc->reset = vfio_ap_reset;
-     dc->bus_type = TYPE_AP_BUS;
- }
--- 
-2.7.4
+Eric
+> 
+>> + *
+>> + * @ms: Machine state handle
+>> + */
+>> +int kvm_arm_get_max_vm_phys_shift(MachineState *ms);
+> 
+> thanks
+> -- PMM
+> 
