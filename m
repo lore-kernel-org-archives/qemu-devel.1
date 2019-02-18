@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34879)
+Received: from eggs.gnu.org ([209.51.188.92]:36244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gvhnj-00064F-V3
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:36 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gvhtR-0001Tx-MU
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:19:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gvhne-0006cY-9g
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:35 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:27835)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gvhna-0006Xi-1X
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:27 -0500
-Message-Id: <b47ef6e4eb1ff275ac2eec7293914e62936caf47.1550491301.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1550491301.git.balaton@eik.bme.hu>
-References: <cover.1550491301.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 18 Feb 2019 13:01:41 +0100
-Subject: [Qemu-devel] [PATCH v2 3/3] mips_fulong2e: Dynamically generate SPD
- EEPROM data
+	(envelope-from <no-reply@patchew.org>) id 1gvhtQ-0000iz-9U
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:19:29 -0500
+Resent-Message-Id: <E1gvhtQ-0000iz-9U@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155049234386.18484.9976926338573498285@49fa7ef69f7b>
+In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 18 Feb 2019 04:19:05 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <zltjiangshi@gmail.com>, philmd@redhat.com
+To: cohuck@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-The machine comes with 256M memory module by default but it's
-upgradable so it could have different memory size. There was a TODO
-comment to replace static SPD EEPROM data with dynamically generated
-one to support this. Now that we have a function for that, it's easy
-to do. Although this would allow larger RAM sizes, the peculiar memory
-map of the machine may need some special handling to map it as low and
-high memory. Because I don't know what the correct place would be for
-highmem, I've left memory size fixed at 256M for now and TODO is moved
-there instead.
-
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/mips/mips_fulong2e.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
-
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 10e6ed585a..eec6fd02c8 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -214,20 +214,6 @@ static void main_cpu_reset(void *opaque)
-     }
- }
- 
--static const uint8_t eeprom_spd[0x80] = {
--    0x80,0x08,0x07,0x0d,0x09,0x02,0x40,0x00,0x04,0x70,
--    0x70,0x00,0x82,0x10,0x00,0x01,0x0e,0x04,0x0c,0x01,
--    0x02,0x20,0x80,0x75,0x70,0x00,0x00,0x50,0x3c,0x50,
--    0x2d,0x20,0xb0,0xb0,0x50,0x50,0x00,0x00,0x00,0x00,
--    0x00,0x41,0x48,0x3c,0x32,0x75,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x9c,0x7b,0x07,0x00,0x00,0x00,0x00,
--    0x00,0x00,0x00,0x00,0x48,0x42,0x35,0x34,0x41,0x32,
--    0x35,0x36,0x38,0x4b,0x4e,0x2d,0x41,0x37,0x35,0x42,
--    0x20,0x30,0x20
--};
--
- static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
-                                        I2CBus **i2c_bus, ISABus **p_isa_bus)
- {
-@@ -284,7 +270,6 @@ static void network_init (PCIBus *pci_bus)
- 
- static void mips_fulong2e_init(MachineState *machine)
- {
--    ram_addr_t ram_size = machine->ram_size;
-     const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-@@ -292,7 +277,10 @@ static void mips_fulong2e_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *bios = g_new(MemoryRegion, 1);
-+    ram_addr_t ram_size = machine->ram_size;
-     long bios_size;
-+    uint8_t *spd_data;
-+    Error *err = NULL;
-     int64_t kernel_entry;
-     PCIBus *pci_bus;
-     ISABus *isa_bus;
-@@ -306,7 +294,7 @@ static void mips_fulong2e_init(MachineState *machine)
- 
-     qemu_register_reset(main_cpu_reset, cpu);
- 
--    /* fulong 2e has 256M ram. */
-+    /* TODO: support more than 256M RAM as highmem */
-     ram_size = 256 * MiB;
- 
-     /* allocate RAM */
-@@ -359,8 +347,14 @@ static void mips_fulong2e_init(MachineState *machine)
-     vt82c686b_southbridge_init(pci_bus, FULONG2E_VIA_SLOT, env->irq[5],
-                                &smbus, &isa_bus);
- 
--    /* TODO: Populate SPD eeprom data.  */
--    smbus_eeprom_init(smbus, 1, eeprom_spd, sizeof(eeprom_spd));
-+    /* Populate SPD eeprom data */
-+    spd_data = spd_data_generate(DDR, ram_size, &err);
-+    if (err) {
-+        warn_report_err(err);
-+    }
-+    if (spd_data) {
-+        smbus_eeprom_init_one(smbus, 0x50, spd_data);
-+    }
- 
-     mc146818_rtc_init(isa_bus, 2000, NULL);
- 
-@@ -374,6 +368,7 @@ static void mips_fulong2e_machine_init(MachineClass *mc)
-     mc->init = mips_fulong2e_init;
-     mc->block_default_type = IF_IDE;
-     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("Loongson-2E");
-+    mc->default_ram_size = 256 * MiB;
- }
- 
- DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
--- 
-2.13.7
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODExMTE1My4yMjY4
+MS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODExMTE1My4yMjY4MS0xLWNvaHVja0ByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gczM5MHggdXBkYXRlClR5
+cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBk
+YXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tAcmVk
+aGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTExMTUzLjIyNjgxLTEtY29odWNrQHJlZGhhdC5j
+b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozMjhmMGZjNDA5IHMzOTB4OiB1cGdy
+YWRlIHN0YXR1cyBvZiBLVk0gY29yZXMgdG8gInN1cHBvcnRlZCIKMDI5M2ExOTczOSBzMzkweC9r
+dm06IGFkZCB0cmFjZXBvaW50IHRvIGlvZXZlbnRmZCBpbnRlcmZhY2UKZDEzNjg4MWRjNSBzMzkw
+eC9jcHVtb2RlbDogYWRkIHoxNCBHQTIgbW9kZWwKODMxZjY4YzFhNCBzMzkweC9jcHVtb2RlbDog
+ZGVmYXVsdCBlbmFibGUgbWVwb2NoIGZvciB6MTQgYW5kIGxhdGVyCjI2ZWM2NzRjNTEgczM5MHgv
+Y3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBvY2ggYW5kIHJlLWFsaWduIGdy
+b3VwIGluaXQKNzk5NjFkM2ZhNSBzMzkweDogYWRkIHpQQ0kgZmVhdHVyZSB0byAicWVtdSIgQ1BV
+IG1vZGVsCjkyNzkyNGZjODYgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgU1RDSyBldCBhbCBmb3Ig
+Q09ORklHX1VTRVJfT05MWQo4M2I3Zjg0MjYwIHRhcmdldC9zMzkweDogU3BsaXQgb3V0IHMzOTAt
+dG9kLmgKNTE5YTIxY2E4YiBzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQKOGQyN2Uw
+ZDYzNSBzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRlci0yMDEyIGxp
+Y2Vuc2Ugc3RhdGVtZW50cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21t
+aXQgOGQyN2UwZDYzNThiIChzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1h
+ZnRlci0yMDEyIGxpY2Vuc2Ugc3RhdGVtZW50cykKMi8xMCBDaGVja2luZyBjb21taXQgNTE5YTIx
+Y2E4YjM5IChzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQ3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KMy8xMCBDaGVja2luZyBjb21taXQgODNiN2Y4NDI2MGM2ICh0YXJnZXQvczM5MHg6IFNw
+bGl0IG91dCBzMzkwLXRvZC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU3IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMCBDaGVja2luZyBjb21taXQg
+OTI3OTI0ZmM4NmEwICh0YXJnZXQvczM5MHg6IEltcGxlbWVudCBTVENLIGV0IGFsIGZvciBDT05G
+SUdfVVNFUl9PTkxZKQo1LzEwIENoZWNraW5nIGNvbW1pdCA3OTk2MWQzZmE1ZWIgKHMzOTB4OiBh
+ZGQgelBDSSBmZWF0dXJlIHRvICJxZW11IiBDUFUgbW9kZWwpCjYvMTAgQ2hlY2tpbmcgY29tbWl0
+IDI2ZWM2NzRjNTFhMSAoczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBt
+ZXBvY2ggYW5kIHJlLWFsaWduIGdyb3VwIGluaXQpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0Njg6CisgICAgRkVB
+VF9HUk9VUF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5o
+YW5jZW1lbnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEwIENoZWNraW5nIGNvbW1pdCA4MzFmNjhjMWE0
+YWQgKHMzOTB4L2NwdW1vZGVsOiBkZWZhdWx0IGVuYWJsZSBtZXBvY2ggZm9yIHoxNCBhbmQgbGF0
+ZXIpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogaHcvczM5MHgv
+czM5MC12aXJ0aW8tY2N3LmM6NjYzOgorICAgIHMzOTBfY3B1ZGVmX2dyb3VwX2ZlYXRvZmZfZ3Jl
+YXRlcigxNCwgMSwgUzM5MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYpOwoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEwIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMTAgQ2hlY2tpbmcgY29tbWl0IGQxMzY4ODFkYzU4MyAo
+czM5MHgvY3B1bW9kZWw6IGFkZCB6MTQgR0EyIG1vZGVsKQo5LzEwIENoZWNraW5nIGNvbW1pdCAw
+MjkzYTE5NzM5OWYgKHMzOTB4L2t2bTogYWRkIHRyYWNlcG9pbnQgdG8gaW9ldmVudGZkIGludGVy
+ZmFjZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IDMyOGYwZmM0MDliNSAoczM5MHg6IHVwZ3JhZGUg
+c3RhdHVzIG9mIEtWTSBjb3JlcyB0byAic3VwcG9ydGVkIikKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1
+Y2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
+IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
+LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
