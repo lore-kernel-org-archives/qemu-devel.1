@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40012)
+Received: from eggs.gnu.org ([209.51.188.92]:39925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjya-0007Aw-Fy
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:58 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjyY-0003b0-Vs
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjyY-00078n-MZ
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:56 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjyW-0003YV-9u
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:54 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:48 +1100
-Message-Id: <20190218143049.17142-43-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:49 +1100
+Message-Id: <20190218143049.17142-44-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 42/43] target/ppc: convert vadd*s and vsub*s to
+Subject: [Qemu-devel] [PULL 43/43] target/ppc: convert vmin* and vmax* to
  vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,227 +29,137 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190215100058.20015-17-mark.cave-ayland@ilande.co.uk>
+Message-Id: <20190215100058.20015-18-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h                 | 24 ++++++------
- target/ppc/int_helper.c             | 18 ++-------
- target/ppc/translate/vmx-impl.inc.c | 57 +++++++++++++++++++++++------
- 3 files changed, 61 insertions(+), 38 deletions(-)
+ target/ppc/helper.h                 | 16 ---------------
+ target/ppc/int_helper.c             | 27 ------------------------
+ target/ppc/translate/vmx-impl.inc.c | 32 ++++++++++++++---------------
+ 3 files changed, 16 insertions(+), 59 deletions(-)
 
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 7dbb08b9dd..3daf6bf863 100644
+index 3daf6bf863..18910d18a4 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -219,18 +219,18 @@ DEF_HELPER_2(vprtybq, void, avr, avr)
- DEF_HELPER_3(vsubcuw, void, avr, avr, avr)
- DEF_HELPER_2(lvsl, void, avr, tl)
- DEF_HELPER_2(lvsr, void, avr, tl)
--DEF_HELPER_4(vaddsbs, void, env, avr, avr, avr)
--DEF_HELPER_4(vaddshs, void, env, avr, avr, avr)
--DEF_HELPER_4(vaddsws, void, env, avr, avr, avr)
--DEF_HELPER_4(vsubsbs, void, env, avr, avr, avr)
--DEF_HELPER_4(vsubshs, void, env, avr, avr, avr)
--DEF_HELPER_4(vsubsws, void, env, avr, avr, avr)
--DEF_HELPER_4(vaddubs, void, env, avr, avr, avr)
--DEF_HELPER_4(vadduhs, void, env, avr, avr, avr)
--DEF_HELPER_4(vadduws, void, env, avr, avr, avr)
--DEF_HELPER_4(vsububs, void, env, avr, avr, avr)
--DEF_HELPER_4(vsubuhs, void, env, avr, avr, avr)
--DEF_HELPER_4(vsubuws, void, env, avr, avr, avr)
-+DEF_HELPER_FLAGS_5(vaddsbs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vaddshs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vaddsws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vsubsbs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vsubshs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vsubsws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vaddubs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vadduhs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vadduws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vsububs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vsubuhs, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
-+DEF_HELPER_FLAGS_5(vsubuws, TCG_CALL_NO_RWG, void, avr, avr, avr, avr, i=
-32)
- DEF_HELPER_3(vadduqm, void, avr, avr, avr)
- DEF_HELPER_4(vaddecuq, void, avr, avr, avr, avr)
- DEF_HELPER_4(vaddeuqm, void, avr, avr, avr, avr)
+@@ -117,22 +117,6 @@ DEF_HELPER_3(vabsduw, void, avr, avr, avr)
+ DEF_HELPER_3(vavgsb, void, avr, avr, avr)
+ DEF_HELPER_3(vavgsh, void, avr, avr, avr)
+ DEF_HELPER_3(vavgsw, void, avr, avr, avr)
+-DEF_HELPER_3(vminsb, void, avr, avr, avr)
+-DEF_HELPER_3(vminsh, void, avr, avr, avr)
+-DEF_HELPER_3(vminsw, void, avr, avr, avr)
+-DEF_HELPER_3(vminsd, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxsb, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxsh, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxsw, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxsd, void, avr, avr, avr)
+-DEF_HELPER_3(vminub, void, avr, avr, avr)
+-DEF_HELPER_3(vminuh, void, avr, avr, avr)
+-DEF_HELPER_3(vminuw, void, avr, avr, avr)
+-DEF_HELPER_3(vminud, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxub, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxuh, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxuw, void, avr, avr, avr)
+-DEF_HELPER_3(vmaxud, void, avr, avr, avr)
+ DEF_HELPER_4(vcmpequb, void, env, avr, avr, avr)
+ DEF_HELPER_4(vcmpequh, void, env, avr, avr, avr)
+ DEF_HELPER_4(vcmpequw, void, env, avr, avr, avr)
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 6ad596a08b..4aeb375edd 100644
+index 4aeb375edd..162add561e 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -571,27 +571,17 @@ VARITHFPFMA(nmsubfp, float_muladd_negate_result | f=
-loat_muladd_negate_c);
+@@ -921,33 +921,6 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *=
+r, ppc_avr_t *a,
      }
+ }
 =20
- #define VARITHSAT_DO(name, op, optype, cvt, element)                    =
+-#define VMINMAX_DO(name, compare, element)                              =
 \
--    void helper_v##name(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,   =
+-    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       =
 \
--                        ppc_avr_t *b)                                   =
+-    {                                                                   =
 \
-+    void helper_v##name(ppc_avr_t *r, ppc_avr_t *vscr_sat,              =
+-        int i;                                                          =
 \
-+                        ppc_avr_t *a, ppc_avr_t *b, uint32_t desc)      =
+-                                                                        =
 \
-     {                                                                   =
-\
-         int sat =3D 0;                                                  =
+-        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
   \
-         int i;                                                          =
+-            if (a->element[i] compare b->element[i]) {                  =
 \
-                                                                         =
-\
-         for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
+-                r->element[i] =3D b->element[i];                        =
   \
--            switch (sizeof(r->element[0])) {                            =
+-            } else {                                                    =
 \
--            case 1:                                                     =
-\
--                VARITHSAT_CASE(optype, op, cvt, element);               =
-\
--                break;                                                  =
-\
--            case 2:                                                     =
-\
--                VARITHSAT_CASE(optype, op, cvt, element);               =
-\
--                break;                                                  =
-\
--            case 4:                                                     =
-\
--                VARITHSAT_CASE(optype, op, cvt, element);               =
-\
--                break;                                                  =
-\
+-                r->element[i] =3D a->element[i];                        =
+  \
 -            }                                                           =
 \
-+            VARITHSAT_CASE(optype, op, cvt, element);                   =
+-        }                                                               =
 \
-         }                                                               =
-\
-         if (sat) {                                                      =
-\
--            set_vscr_sat(env);                                          =
-\
-+            vscr_sat->u32[0] =3D 1;                                     =
-  \
-         }                                                               =
-\
-     }
- #define VARITHSAT_SIGNED(suffix, element, optype, cvt)          \
+-    }
+-#define VMINMAX(suffix, element)                \
+-    VMINMAX_DO(min##suffix, >, element)         \
+-    VMINMAX_DO(max##suffix, <, element)
+-VMINMAX(sb, s8)
+-VMINMAX(sh, s16)
+-VMINMAX(sw, s32)
+-VMINMAX(sd, s64)
+-VMINMAX(ub, u8)
+-VMINMAX(uh, u16)
+-VMINMAX(uw, u32)
+-VMINMAX(ud, u64)
+-#undef VMINMAX_DO
+-#undef VMINMAX
+-
+ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_=
+t *c)
+ {
+     int i;
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
 mx-impl.inc.c
-index 5e13edbf53..62c5578070 100644
+index 62c5578070..f1b15ae2cb 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -552,22 +552,55 @@ GEN_VXFORM(vslo, 6, 16);
- GEN_VXFORM(vsro, 6, 17);
- GEN_VXFORM(vaddcuw, 0, 6);
- GEN_VXFORM(vsubcuw, 0, 22);
--GEN_VXFORM_ENV(vaddubs, 0, 8);
-+
-+#define GEN_VXFORM_SAT(NAME, VECE, NORM, SAT, OPC2, OPC3)               =
-\
-+static void glue(glue(gen_, NAME), _vec)(unsigned vece, TCGv_vec t,     =
-\
-+                                         TCGv_vec sat, TCGv_vec a,      =
-\
-+                                         TCGv_vec b)                    =
-\
-+{                                                                       =
-\
-+    TCGv_vec x =3D tcg_temp_new_vec_matching(t);                        =
-  \
-+    glue(glue(tcg_gen_, NORM), _vec)(VECE, x, a, b);                    =
-\
-+    glue(glue(tcg_gen_, SAT), _vec)(VECE, t, a, b);                     =
-\
-+    tcg_gen_cmp_vec(TCG_COND_NE, VECE, x, x, t);                        =
-\
-+    tcg_gen_or_vec(VECE, sat, sat, x);                                  =
-\
-+    tcg_temp_free_vec(x);                                               =
-\
-+}                                                                       =
-\
-+static void glue(gen_, NAME)(DisasContext *ctx)                         =
-\
-+{                                                                       =
-\
-+    static const GVecGen4 g =3D {                                       =
-  \
-+        .fniv =3D glue(glue(gen_, NAME), _vec),                         =
-  \
-+        .fno =3D glue(gen_helper_, NAME),                               =
-  \
-+        .opc =3D glue(glue(INDEX_op_, SAT), _vec),                      =
-  \
-+        .write_aofs =3D true,                                           =
-  \
-+        .vece =3D VECE,                                                 =
-  \
-+    };                                                                  =
-\
-+    if (unlikely(!ctx->altivec_enabled)) {                              =
-\
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                           =
-\
-+        return;                                                         =
-\
-+    }                                                                   =
-\
-+    tcg_gen_gvec_4(avr64_offset(rD(ctx->opcode), true),                 =
-\
-+                   offsetof(CPUPPCState, vscr_sat),                     =
-\
-+                   avr64_offset(rA(ctx->opcode), true),                 =
-\
-+                   avr64_offset(rB(ctx->opcode), true),                 =
-\
-+                   16, 16, &g);                                         =
-\
-+}
-+
-+GEN_VXFORM_SAT(vaddubs, MO_8, add, usadd, 0, 8);
- GEN_VXFORM_DUAL_EXT(vaddubs, PPC_ALTIVEC, PPC_NONE, 0,       \
-                     vmul10uq, PPC_NONE, PPC2_ISA300, 0x0000F800)
--GEN_VXFORM_ENV(vadduhs, 0, 9);
-+GEN_VXFORM_SAT(vadduhs, MO_16, add, usadd, 0, 9);
- GEN_VXFORM_DUAL(vadduhs, PPC_ALTIVEC, PPC_NONE, \
-                 vmul10euq, PPC_NONE, PPC2_ISA300)
--GEN_VXFORM_ENV(vadduws, 0, 10);
--GEN_VXFORM_ENV(vaddsbs, 0, 12);
--GEN_VXFORM_ENV(vaddshs, 0, 13);
--GEN_VXFORM_ENV(vaddsws, 0, 14);
--GEN_VXFORM_ENV(vsububs, 0, 24);
--GEN_VXFORM_ENV(vsubuhs, 0, 25);
--GEN_VXFORM_ENV(vsubuws, 0, 26);
--GEN_VXFORM_ENV(vsubsbs, 0, 28);
--GEN_VXFORM_ENV(vsubshs, 0, 29);
--GEN_VXFORM_ENV(vsubsws, 0, 30);
-+GEN_VXFORM_SAT(vadduws, MO_32, add, usadd, 0, 10);
-+GEN_VXFORM_SAT(vaddsbs, MO_8, add, ssadd, 0, 12);
-+GEN_VXFORM_SAT(vaddshs, MO_16, add, ssadd, 0, 13);
-+GEN_VXFORM_SAT(vaddsws, MO_32, add, ssadd, 0, 14);
-+GEN_VXFORM_SAT(vsububs, MO_8, sub, ussub, 0, 24);
-+GEN_VXFORM_SAT(vsubuhs, MO_16, sub, ussub, 0, 25);
-+GEN_VXFORM_SAT(vsubuws, MO_32, sub, ussub, 0, 26);
-+GEN_VXFORM_SAT(vsubsbs, MO_8, sub, sssub, 0, 28);
-+GEN_VXFORM_SAT(vsubshs, MO_16, sub, sssub, 0, 29);
-+GEN_VXFORM_SAT(vsubsws, MO_32, sub, sssub, 0, 30);
- GEN_VXFORM(vadduqm, 0, 4);
- GEN_VXFORM(vaddcuq, 0, 5);
- GEN_VXFORM3(vaddeuqm, 30, 0);
+@@ -416,22 +416,22 @@ GEN_VXFORM_V(vsububm, MO_8, tcg_gen_gvec_sub, 0, 16=
+);
+ GEN_VXFORM_V(vsubuhm, MO_16, tcg_gen_gvec_sub, 0, 17);
+ GEN_VXFORM_V(vsubuwm, MO_32, tcg_gen_gvec_sub, 0, 18);
+ GEN_VXFORM_V(vsubudm, MO_64, tcg_gen_gvec_sub, 0, 19);
+-GEN_VXFORM(vmaxub, 1, 0);
+-GEN_VXFORM(vmaxuh, 1, 1);
+-GEN_VXFORM(vmaxuw, 1, 2);
+-GEN_VXFORM(vmaxud, 1, 3);
+-GEN_VXFORM(vmaxsb, 1, 4);
+-GEN_VXFORM(vmaxsh, 1, 5);
+-GEN_VXFORM(vmaxsw, 1, 6);
+-GEN_VXFORM(vmaxsd, 1, 7);
+-GEN_VXFORM(vminub, 1, 8);
+-GEN_VXFORM(vminuh, 1, 9);
+-GEN_VXFORM(vminuw, 1, 10);
+-GEN_VXFORM(vminud, 1, 11);
+-GEN_VXFORM(vminsb, 1, 12);
+-GEN_VXFORM(vminsh, 1, 13);
+-GEN_VXFORM(vminsw, 1, 14);
+-GEN_VXFORM(vminsd, 1, 15);
++GEN_VXFORM_V(vmaxub, MO_8, tcg_gen_gvec_umax, 1, 0);
++GEN_VXFORM_V(vmaxuh, MO_16, tcg_gen_gvec_umax, 1, 1);
++GEN_VXFORM_V(vmaxuw, MO_32, tcg_gen_gvec_umax, 1, 2);
++GEN_VXFORM_V(vmaxud, MO_64, tcg_gen_gvec_umax, 1, 3);
++GEN_VXFORM_V(vmaxsb, MO_8, tcg_gen_gvec_smax, 1, 4);
++GEN_VXFORM_V(vmaxsh, MO_16, tcg_gen_gvec_smax, 1, 5);
++GEN_VXFORM_V(vmaxsw, MO_32, tcg_gen_gvec_smax, 1, 6);
++GEN_VXFORM_V(vmaxsd, MO_64, tcg_gen_gvec_smax, 1, 7);
++GEN_VXFORM_V(vminub, MO_8, tcg_gen_gvec_umin, 1, 8);
++GEN_VXFORM_V(vminuh, MO_16, tcg_gen_gvec_umin, 1, 9);
++GEN_VXFORM_V(vminuw, MO_32, tcg_gen_gvec_umin, 1, 10);
++GEN_VXFORM_V(vminud, MO_64, tcg_gen_gvec_umin, 1, 11);
++GEN_VXFORM_V(vminsb, MO_8, tcg_gen_gvec_smin, 1, 12);
++GEN_VXFORM_V(vminsh, MO_16, tcg_gen_gvec_smin, 1, 13);
++GEN_VXFORM_V(vminsw, MO_32, tcg_gen_gvec_smin, 1, 14);
++GEN_VXFORM_V(vminsd, MO_64, tcg_gen_gvec_smin, 1, 15);
+ GEN_VXFORM(vavgub, 1, 16);
+ GEN_VXFORM(vabsdub, 1, 16);
+ GEN_VXFORM_DUAL(vavgub, PPC_ALTIVEC, PPC_NONE, \
 --=20
 2.20.1
