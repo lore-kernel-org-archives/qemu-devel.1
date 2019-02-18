@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54797)
+Received: from eggs.gnu.org ([209.51.188.92]:55889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gvcvT-0008OF-GL
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:01:16 -0500
+	(envelope-from <clg@kaod.org>) id 1gvd2y-0000zx-VI
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gvcvR-0006hv-Ok
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:01:15 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:43696)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gvcvR-0006de-7s
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:01:13 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <154937205518.29984.9188603364499998604.stgit@pasha-VirtualBox>
-	<001c01d4c1cb$65a26390$30e72ab0$@ru>,
-	<43520125-e1d5-7ee6-60a8-5efc1dc061fe@redhat.com>
-	<BN6PR2201MB1251B9927732A72EB237EA66C6630@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB1251B9927732A72EB237EA66C6630@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Date: Mon, 18 Feb 2019 10:01:08 +0300
-Message-ID: <001301d4c757$b94cb040$2be610c0$@ru>
+	(envelope-from <clg@kaod.org>) id 1gvd2y-00054c-CU
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:09:00 -0500
+Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:48665)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gvd2y-0004sA-5t
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:09:00 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.143.72])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 578D5158E8B
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 08:08:43 +0100 (CET)
+References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
+	<155023081228.1011724.12474992370439652538.stgit@bahia.lan>
+	<4690ad87-f634-4f3b-a39c-ee61bfc64e75@kaod.org>
+	<20190215141824.3549d285@bahia.lan>
+	<2237cc20-ffcd-4a9b-944a-392520127432@kaod.org>
+	<20190217233711.GF2765@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c6472757-5a18-258b-de5f-a7471b4e675c@kaod.org>
+Date: Mon, 18 Feb 2019 08:08:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] mips: implement qmp query-cpu-definitions
- command
+In-Reply-To: <20190217233711.GF2765@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/10] xics: Drop the KVM ICP class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Aleksandar Markovic' <amarkovic@wavecomp.com>, =?iso-8859-1?Q?'Philippe_Mathieu-Daud=E9'?= <philmd@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, =?iso-8859-1?Q?'Marc-Andr=E9_Lureau'?= <marcandre.lureau@redhat.com>, 'Markus Armbruster' <armbru@redhat.com>
-Cc: 'Aleksandar Rikalo' <arikalo@wavecomp.com>, mdroth@linux.vnet.ibm.com, natalia.fursova@ispras.ru, aurelien@aurel32.net
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-> From: Aleksandar Markovic [mailto:amarkovic@wavecomp.com]
-> > From: Pavel Dovgalyuk [mailto:Pavel.Dovgaluk@ispras.ru]
-> >
-> > This patch enables QMP-based querying of the available CPU types for MIPS
-> > and MIPS64 platforms.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > ---
-> >  monitor.c            |    2 +-
-> >  target/mips/helper.c |   33 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 34 insertions(+), 1 deletion(-)
-> >
-> 
-> Hello, Pavel,
-> 
-> Thanks for involving in this area!
-> 
-> I have just a couple of question:
-> 
-> 1) What are the effects of these two patches on the end user?
+On 2/18/19 12:37 AM, David Gibson wrote:
+> On Fri, Feb 15, 2019 at 02:35:03PM +0100, C=E9dric Le Goater wrote:
+>> On 2/15/19 2:18 PM, Greg Kurz wrote:
+>>> On Fri, 15 Feb 2019 13:55:53 +0100
+>>> C=E9dric Le Goater <clg@kaod.org> wrote:
+>>>
+>>>> On 2/15/19 12:40 PM, Greg Kurz wrote:
+>>>>> The KVM ICP class isn't used anymore. Drop it. =20
+>>>>
+>>>> Isn't migration complaining ?  If not,
+>>>>
+>>>
+>>> Hm.. no, but why would migration complain ?
+>>
+>> You are changing the type name of the object being transferred:
+>>
+>> "icp-kcm" -> "icp"
+>=20
+> It's a little more complex than that.  The way migration works, the
+> state associated with the base class is transferred under the name
+> "icp" and the state associated with the derived class is transferred
+> under the name "icp-kvm".
+>=20
+>> Isn't that an issue ?
+>=20
+> It would be.. except that there is no extra state in the derived
+> class, which is why we got away with this not-very-good solution at
+> all in the first place.
 
-This patch make qmp query-cpu-definitions available for the MIPS users.
-This command allows requesting possible CPU models with QMP.
+Ah good. Another reason to get rid of the sub-class.
 
-> 2) What is the context of these patches? Do you intend to send more related patches in the
-> future? Are these patches preconditions for some other not yet implemented features?
-
-Not yet.
-We are developing GUI for virtual machine management and debugging
-with record-replay feature: https://github.com/ispras/qemu-gui
-Therefore we need to request possible CPU and hardware options.
-
-> 3) Why is only target MIPS included? Do other targets need similar improvements?
-
-We use MIPS in our projects. Some other targets need similar improvements, but we do
-not focus on them right now.
-
-Pavel Dovgalyuk
-
-> 
-> Thanks,
-> Aleksandar
-> 
-> 
-> > diff --git a/monitor.c b/monitor.c
-> > index c09fa63940..25d3b141ad 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -1165,7 +1165,7 @@ static void qmp_unregister_commands_hack(void)
-> >      qmp_unregister_command(&qmp_commands, "query-cpu-model-comparison");
-> >  #endif
-> >  #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386) \
-> > -    && !defined(TARGET_S390X)
-> > +    && !defined(TARGET_S390X) && !defined(TARGET_MIPS)
-> >      qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
-> >  #endif
-> >  }
-> > diff --git a/target/mips/helper.c b/target/mips/helper.c
-> > index 8988452dbd..c84d056c09 100644
-> > --- a/target/mips/helper.c
-> > +++ b/target/mips/helper.c
-> > @@ -24,6 +24,7 @@
-> >  #include "exec/cpu_ldst.h"
-> >  #include "exec/log.h"
-> >  #include "hw/mips/cpudevs.h"
-> > +#include "sysemu/arch_init.h"
-> >
-> >  enum {
-> >      TLBRET_XI = -6,
-> > @@ -1472,3 +1473,35 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
-> >
-> >      cpu_loop_exit_restore(cs, pc);
-> >  }
-> > +
-> > +static void mips_cpu_add_definition(gpointer data, gpointer user_data)
-> > +{
-> > +    ObjectClass *oc = data;
-> > +    CpuDefinitionInfoList **cpu_list = user_data;
-> > +    CpuDefinitionInfoList *entry;
-> > +    CpuDefinitionInfo *info;
-> > +    const char *typename;
-> > +
-> > +    typename = object_class_get_name(oc);
-> > +    info = g_malloc0(sizeof(*info));
-> > +    info->name = g_strndup(typename,
-> > +                           strlen(typename) - strlen("-" TYPE_MIPS_CPU));
-> > +    info->q_typename = g_strdup(typename);
-> > +
-> > +    entry = g_malloc0(sizeof(*entry));
-> > +    entry->value = info;
-> > +    entry->next = *cpu_list;
-> > +    *cpu_list = entry;
-> > +}
-> > +
-> > +CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-> > +{
-> > +    CpuDefinitionInfoList *cpu_list = NULL;
-> > +    GSList *list;
-> > +
-> > +    list = object_class_get_list(TYPE_MIPS_CPU, false);
-> > +    g_slist_foreach(list, mips_cpu_add_definition, &cpu_list);
-> > +    g_slist_free(list);
-> > +
-> > +    return cpu_list;
-> > +}
-> 
-> 
+C.
+ =20
