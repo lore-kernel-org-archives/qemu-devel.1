@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47005)
+Received: from eggs.gnu.org ([209.51.188.92]:47965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gvmTJ-00019E-Ql
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:12:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gvmX6-0003IY-DG
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:16:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gvmTE-0007GV-6C
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:12:47 -0500
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-11-armbru@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e993bad5-efc9-a196-afee-4375fc89a37a@redhat.com>
-Date: Mon, 18 Feb 2019 18:12:27 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gvmX3-00010i-GM
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:16:44 -0500
+Resent-Message-Id: <E1gvmX3-00010i-GM@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155051018108.18484.17607044699539442367@49fa7ef69f7b>
+In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190218125615.18970-11-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/10] hw/arm hw/xtensa: De-duplicate
- pflash creation code some
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 18 Feb 2019 09:16:22 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,233 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On 02/18/19 13:56, Markus Armbruster wrote:
-> pflash_cfi01_register() creates a TYPE_CFI_PFLASH01 device, sets
-> properties, realizes, and wires up.
-> 
-> We have three modified copies of it, because their users need to set
-> additional properties, or have the wiring done differently.
-> 
-> Factor out their common part into pflash_cfi01_create().
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/arm/vexpress.c        | 22 +++++-----------------
->  hw/arm/virt.c            | 26 +++++++++-----------------
->  hw/block/pflash_cfi01.c  | 39 +++++++++++++++++++++++++++------------
->  hw/xtensa/xtfpga.c       | 18 +++++++-----------
->  include/hw/block/flash.h |  8 ++++++++
->  5 files changed, 56 insertions(+), 57 deletions(-)
-> 
-> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-> index 00913f2655..b23c63ed24 100644
-> --- a/hw/arm/vexpress.c
-> +++ b/hw/arm/vexpress.c
-> @@ -515,26 +515,14 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
->  static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
->                                               DriveInfo *di)
->  {
-> -    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
-> +    DeviceState *dev;
->  
-> -    if (di) {
-> -        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
-> -                            &error_abort);
-> -    }
-> -
-> -    qdev_prop_set_uint32(dev, "num-blocks",
-> -                         VEXPRESS_FLASH_SIZE / VEXPRESS_FLASH_SECT_SIZE);
-> -    qdev_prop_set_uint64(dev, "sector-length", VEXPRESS_FLASH_SECT_SIZE);
-> -    qdev_prop_set_uint8(dev, "width", 4);
-> +    dev = DEVICE(pflash_cfi01_create(name, VEXPRESS_FLASH_SIZE,
-> +                                     di ? blk_by_legacy_dinfo(di) : NULL,
-> +                                     VEXPRESS_FLASH_SECT_SIZE,
-> +                                     4, 0x89, 0x18, 0x00, 0x00, false));
->      qdev_prop_set_uint8(dev, "device-width", 2);
-> -    qdev_prop_set_bit(dev, "big-endian", false);
-> -    qdev_prop_set_uint16(dev, "id0", 0x89);
-> -    qdev_prop_set_uint16(dev, "id1", 0x18);
-> -    qdev_prop_set_uint16(dev, "id2", 0x00);
-> -    qdev_prop_set_uint16(dev, "id3", 0x00);
-> -    qdev_prop_set_string(dev, "name", name);
->      qdev_init_nofail(dev);
-> -
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
->      return CFI_PFLASH01(dev);
->  }
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index b7d53b2b87..7787918483 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -48,6 +48,7 @@
->  #include "exec/address-spaces.h"
->  #include "qemu/bitops.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/units.h"
->  #include "hw/pci-host/gpex.h"
->  #include "hw/arm/sysbus-fdt.h"
->  #include "hw/platform-bus.h"
-> @@ -875,29 +876,20 @@ static void create_one_flash(const char *name, hwaddr flashbase,
->       * parameters as the flash devices on the Versatile Express board.
->       */
->      DriveInfo *dinfo = drive_get_next(IF_PFLASH);
-> -    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
-> -    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-> -    const uint64_t sectorlength = 256 * 1024;
-> +    DeviceState *dev;
-> +    SysBusDevice *sbd;
->  
-> -    if (dinfo) {
-> -        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-> -                            &error_abort);
-> -    }
-> +    dev = DEVICE(pflash_cfi01_create(name, flashsize,
-> +                                     dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-> +                                     256 * KiB,
-> +                                     4, 0x89, 0x18, 0x00, 0x00, false));
->  
-> -    qdev_prop_set_uint32(dev, "num-blocks", flashsize / sectorlength);
-> -    qdev_prop_set_uint64(dev, "sector-length", sectorlength);
-> -    qdev_prop_set_uint8(dev, "width", 4);
->      qdev_prop_set_uint8(dev, "device-width", 2);
-> -    qdev_prop_set_bit(dev, "big-endian", false);
-> -    qdev_prop_set_uint16(dev, "id0", 0x89);
-> -    qdev_prop_set_uint16(dev, "id1", 0x18);
-> -    qdev_prop_set_uint16(dev, "id2", 0x00);
-> -    qdev_prop_set_uint16(dev, "id3", 0x00);
-> -    qdev_prop_set_string(dev, "name", name);
->      qdev_init_nofail(dev);
->  
-> +    sbd = SYS_BUS_DEVICE(dev);
->      memory_region_add_subregion(sysmem, flashbase,
-> -                                sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0));
-> +                                sysbus_mmio_get_region(sbd, 0));
->  
->      if (file) {
->          char *fn;
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index 2e161f937f..00c2efd0d7 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -920,15 +920,14 @@ static void pflash_cfi01_register_types(void)
->  
->  type_init(pflash_cfi01_register_types)
->  
-> -PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-> -                                   const char *name,
-> -                                   hwaddr size,
-> -                                   BlockBackend *blk,
-> -                                   uint32_t sector_len,
-> -                                   int bank_width,
-> -                                   uint16_t id0, uint16_t id1,
-> -                                   uint16_t id2, uint16_t id3,
-> -                                   int be)
-> +PFlashCFI01 *pflash_cfi01_create(const char *name,
-> +                                 hwaddr size,
-> +                                 BlockBackend *blk,
-> +                                 uint32_t sector_len,
-> +                                 int bank_width,
-> +                                 uint16_t id0, uint16_t id1,
-> +                                 uint16_t id2, uint16_t id3,
-> +                                 int be)
->  {
->      DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
->  
-> @@ -945,12 +944,28 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
->      qdev_prop_set_uint16(dev, "id2", id2);
->      qdev_prop_set_uint16(dev, "id3", id3);
->      qdev_prop_set_string(dev, "name", name);
-> -    qdev_init_nofail(dev);
-> -
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
->      return CFI_PFLASH01(dev);
->  }
->  
-> +PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-> +                                   const char *name,
-> +                                   hwaddr size,
-> +                                   BlockBackend *blk,
-> +                                   uint32_t sector_len,
-> +                                   int bank_width,
-> +                                   uint16_t id0, uint16_t id1,
-> +                                   uint16_t id2, uint16_t id3,
-> +                                   int be)
-> +{
-> +    PFlashCFI01 *dev = pflash_cfi01_create(name, size, blk,
-> +                                           sector_len, bank_width,
-> +                                           id0, id1, id2, id3, be);
-> +
-> +    qdev_init_nofail(DEVICE(dev));
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> +    return dev;
-> +}
-> +
->  MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
->  {
->      return &fl->mem;
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index a726d5632a..0e96e73ee2 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -167,21 +167,17 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
->                                        DriveInfo *dinfo, int be)
->  {
->      SysBusDevice *s;
-> -    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
-> +    PFlashCFI01 *dev = pflash_cfi01_create("xtfpga.io.flash",
-> +                                           board->flash->size,
-> +                                           blk_by_legacy_dinfo(dinfo),
-> +                                           board->flash->sector_size,
-> +                                           2, 0, 0, 0, 0, be);
->  
-> -    qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-> -                        &error_abort);
-> -    qdev_prop_set_uint32(dev, "num-blocks",
-> -                         board->flash->size / board->flash->sector_size);
-> -    qdev_prop_set_uint64(dev, "sector-length", board->flash->sector_size);
-> -    qdev_prop_set_uint8(dev, "width", 2);
-> -    qdev_prop_set_bit(dev, "big-endian", be);
-> -    qdev_prop_set_string(dev, "name", "xtfpga.io.flash");
-> -    qdev_init_nofail(dev);
-> +    qdev_init_nofail(DEVICE(dev));
->      s = SYS_BUS_DEVICE(dev);
->      memory_region_add_subregion(address_space, board->flash->base,
->                                  sysbus_mmio_get_region(s, 0));
-> -    return CFI_PFLASH01(dev);
-> +    return dev;
->  }
->  
->  static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-> index 24b13eb525..dbb25ba382 100644
-> --- a/include/hw/block/flash.h
-> +++ b/include/hw/block/flash.h
-> @@ -13,6 +13,14 @@
->  
->  typedef struct PFlashCFI01 PFlashCFI01;
->  
-> +PFlashCFI01 *pflash_cfi01_create(const char *name,
-> +                                 hwaddr size,
-> +                                 BlockBackend *blk,
-> +                                 uint32_t sector_len,
-> +                                 int width,
-> +                                 uint16_t id0, uint16_t id1,
-> +                                 uint16_t id2, uint16_t id3,
-> +                                 int be);
->  PFlashCFI01 *pflash_cfi01_register(hwaddr base,
->                                     const char *name,
->                                     hwaddr size,
-> 
-
-Writing this patch must have been "fun"; my eyes are bleeding from
-cross-referencing the new parameters with the removed properties. :/
-
-I think the patch is correct.
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
+MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
+YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
+NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
+YXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5YTk5NGU0
+MWE1IGh3L2FybSBody94dGVuc2E6IERlLWR1cGxpY2F0ZSBwZmxhc2ggY3JlYXRpb24gY29kZSBz
+b21lCjMwM2ZiYWNkNTUgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIg
+cGFydCAyCjNmMTZiZjY2YmMgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYw
+MmIgcGFydCAxCjNlMmFlMzFlODQgbWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBm
+bGFzaCBtZW1vcnkgc2l6ZSBzb21ld2hhdApkMDY1Mjk1OGI3IHIyZDogRmxhc2ggbWVtb3J5IGNy
+ZWF0aW9uIGlzIGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUKZjI2ZjJlNGQyZCBwcGM0
+MDVfYm9hcmRzOiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdl
+CmU1ZGQ0YTMzZjUgc2FtNDYwZXg6IERvbid0IHNpemUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJh
+Y2tpbmcgaW1hZ2UKMmVlYzY2NGU0ZCBodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
+X0NGSV9QRkxBU0gwezEsIDJ9CjgzZGE2ODc2ZGQgcGZsYXNoOiBNYWNybyBQRkxBU0hfQlVHKCkg
+aXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZAowYjkwNzVlYTZhIHBmbGFzaDogUmVuYW1lIHBmbGFz
+aF90IHRvIFBGbGFzaENGSTAxLCBQRmxhc2hDRkkwMgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8x
+MCBDaGVja2luZyBjb21taXQgMGI5MDc1ZWE2YTc3IChwZmxhc2g6IFJlbmFtZSBwZmxhc2hfdCB0
+byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
+ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyODogRklMRTogaHcv
+YmxvY2svcGZsYXNoX2NmaTAxLmM6Mjg4Ogorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFkIChQ
+Rmxhc2hDRkkwMSAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
+YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzQwOiBGSUxF
+OiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoxNDE6CitzdGF0aWMgdWludDMyX3QgcGZsYXNoX3Jl
+YWQgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgpFUlJPUjogc3BhY2UgcHJvaGli
+aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTg6
+IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjI2NDoKK3N0YXRpYyB2b2lkIHBmbGFzaF93
+cml0ZSAoUEZsYXNoQ0ZJMDIgKnBmbCwgaHdhZGRyIG9mZnNldCwKCnRvdGFsOiAzIGVycm9ycywg
+MCB3YXJuaW5ncywgNDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCjIvMTAgQ2hlY2tpbmcgY29tbWl0IDgzZGE2ODc2ZGQ4OCAocGZsYXNoOiBN
+YWNybyBQRkxBU0hfQlVHKCkgaXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZCkKMy8xMCBDaGVja2lu
+ZyBjb21taXQgMmVlYzY2NGU0ZGNkIChodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
+X0NGSV9QRkxBU0gwezEsIDJ9KQo0LzEwIENoZWNraW5nIGNvbW1pdCBlNWRkNGEzM2Y1YWEgKHNh
+bTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo1
+LzEwIENoZWNraW5nIGNvbW1pdCBmMjZmMmU0ZDJkM2YgKHBwYzQwNV9ib2FyZHM6IERvbid0IHNp
+emUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UpCjYvMTAgQ2hlY2tpbmcgY29t
+bWl0IGQwNjUyOTU4YjdjOCAocjJkOiBGbGFzaCBtZW1vcnkgY3JlYXRpb24gaXMgY29uZnVzZWQg
+YWJvdXQgc2l6ZSwgbWFyayBGSVhNRSkKNy8xMCBDaGVja2luZyBjb21taXQgM2UyYWUzMWU4NDM0
+IChtaXBzX21hbHRhOiBDbGVhbiB1cCBkZWZpbml0aW9uIG9mIGZsYXNoIG1lbW9yeSBzaXplIHNv
+bWV3aGF0KQo4LzEwIENoZWNraW5nIGNvbW1pdCAzZjE2YmY2NmJjZTMgKHBmbGFzaDogQ2xlYW4g
+dXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMSkKRVJST1I6IHNwYWNlcyByZXF1aXJl
+ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM5MDogRklMRTogaHcvYXJtL211c2ljcGFsLmM6
+MTYzOToKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZM
+QVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzk4
+OiBGSUxFOiBody9hcm0vbXVzaWNwYWwuYzoxNjQ2OgorICAgICAgICBwZmxhc2hfY2ZpMDJfcmVn
+aXN0ZXIoMHgxMDAwMDAwMDBVTEwtTVBfRkxBU0hfU0laRV9NQVgsCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
+cywgMjQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjkvMTAgQ2hlY2tpbmcgY29tbWl0IDMwM2ZiYWNkNTUyOSAocGZsYXNoOiBDbGVhbiB1cCBh
+ZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAyKQoxMC8xMCBDaGVja2luZyBjb21taXQgOWE5
+OTRlNDFhNTc3IChody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9u
+IGNvZGUgc29tZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAxOTAyMTgxMjU2MTUuMTg5NzAtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNo
+ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
