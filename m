@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60974)
+Received: from eggs.gnu.org ([209.51.188.92]:60969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcD-0004kH-GJ
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcD-0004kD-G1
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc3-00077S-9O
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc2-00076e-TI
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:45 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 17:09:13 +0300
-Message-Id: <20190218140926.333779-5-vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:09:17 +0300
+Message-Id: <20190218140926.333779-9-vsementsov@virtuozzo.com>
 In-Reply-To: <20190218140926.333779-1-vsementsov@virtuozzo.com>
 References: <20190218140926.333779-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 04/17] block/backup: use qemu_iovec_init_buf
+Subject: [Qemu-devel] [PATCH v4 08/17] block/qcow: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,82 @@ Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/backup.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ block/qcow.c | 21 ++++-----------------
+ 1 file changed, 4 insertions(+), 17 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 435414e964..9988753249 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -107,7 +107,6 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-                                                       void **bounce_buffer)
- {
-     int ret;
--    struct iovec iov;
-     QEMUIOVector qiov;
-     BlockBackend *blk = job->common.blk;
-     int nbytes;
-@@ -119,9 +118,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     if (!*bounce_buffer) {
-         *bounce_buffer = blk_blockalign(blk, job->cluster_size);
-     }
--    iov.iov_base = *bounce_buffer;
--    iov.iov_len = nbytes;
--    qemu_iovec_init_external(&qiov, &iov, 1);
-+    qemu_iovec_init_buf(&qiov, *bounce_buffer, nbytes);
+diff --git a/block/qcow.c b/block/qcow.c
+index 0a235bf393..409c700d33 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -628,7 +628,6 @@ static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
+     int offset_in_cluster;
+     int ret = 0, n;
+     uint64_t cluster_offset;
+-    struct iovec hd_iov;
+     QEMUIOVector hd_qiov;
+     uint8_t *buf;
+     void *orig_buf;
+@@ -661,9 +660,7 @@ static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
+         if (!cluster_offset) {
+             if (bs->backing) {
+                 /* read from the base image */
+-                hd_iov.iov_base = (void *)buf;
+-                hd_iov.iov_len = n;
+-                qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
++                qemu_iovec_init_buf(&hd_qiov, buf, n);
+                 qemu_co_mutex_unlock(&s->lock);
+                 /* qcow2 emits this on bs->file instead of bs->backing */
+                 BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+@@ -688,9 +685,7 @@ static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
+                 ret = -EIO;
+                 break;
+             }
+-            hd_iov.iov_base = (void *)buf;
+-            hd_iov.iov_len = n;
+-            qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
++            qemu_iovec_init_buf(&hd_qiov, buf, n);
+             qemu_co_mutex_unlock(&s->lock);
+             BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+             ret = bdrv_co_preadv(bs->file, cluster_offset + offset_in_cluster,
+@@ -733,7 +728,6 @@ static coroutine_fn int qcow_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     int offset_in_cluster;
+     uint64_t cluster_offset;
+     int ret = 0, n;
+-    struct iovec hd_iov;
+     QEMUIOVector hd_qiov;
+     uint8_t *buf;
+     void *orig_buf;
+@@ -779,9 +773,7 @@ static coroutine_fn int qcow_co_pwritev(BlockDriverState *bs, uint64_t offset,
+             }
+         }
  
-     ret = blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
+-        hd_iov.iov_base = (void *)buf;
+-        hd_iov.iov_len = n;
+-        qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
++        qemu_iovec_init_buf(&hd_qiov, buf, n);
+         qemu_co_mutex_unlock(&s->lock);
+         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+         ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
+@@ -1062,7 +1054,6 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+ {
+     BDRVQcowState *s = bs->opaque;
+     QEMUIOVector hd_qiov;
+-    struct iovec iov;
+     z_stream strm;
+     int ret, out_len;
+     uint8_t *buf, *out_buf;
+@@ -1128,11 +1119,7 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+     }
+     cluster_offset &= s->cluster_offset_mask;
+ 
+-    iov = (struct iovec) {
+-        .iov_base   = out_buf,
+-        .iov_len    = out_len,
+-    };
+-    qemu_iovec_init_external(&hd_qiov, &iov, 1);
++    qemu_iovec_init_buf(&hd_qiov, out_buf, out_len);
+     BLKDBG_EVENT(bs->file, BLKDBG_WRITE_COMPRESSED);
+     ret = bdrv_co_pwritev(bs->file, cluster_offset, out_len, &hd_qiov, 0);
      if (ret < 0) {
 -- 
 2.18.0
