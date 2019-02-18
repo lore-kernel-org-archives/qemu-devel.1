@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59993)
+Received: from eggs.gnu.org ([209.51.188.92]:60066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gvn8b-0006O3-Ao
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:30 -0500
+	(envelope-from <svens@stackframe.org>) id 1gvn98-0006dh-NW
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gvn8a-0003iq-Fy
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:63977)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gvn8Z-0003hA-5J
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:27 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC9862D802
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 17:55:25 +0000 (UTC)
-References: <20190212193855.13223-1-ccarrara@redhat.com>
-	<20190212193855.13223-2-ccarrara@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <bc4bb11c-cb07-bfcc-3727-812312294229@redhat.com>
-Date: Mon, 18 Feb 2019 12:55:24 -0500
+	(envelope-from <svens@stackframe.org>) id 1gvn93-0004Fr-16
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:58 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:43702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1gvn8x-00047A-EX
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:55:53 -0500
+From: Sven Schnelle <svens@stackframe.org>
+Date: Mon, 18 Feb 2019 18:55:28 +0100
+Message-Id: <20190218175529.11237-1-svens@stackframe.org>
 MIME-Version: 1.0
-In-Reply-To: <20190212193855.13223-2-ccarrara@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] tests.acceptance: adds multi vm
- capability for acceptance tests
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/2] lsi: 810/895A are always little endian
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,26 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
 
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ hw/scsi/lsi53c895a.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-
-On 2/12/19 2:38 PM, Caio Carrara wrote:
-> This change adds the possibility to write acceptance tests with multi
-> virtual machine support. It's done keeping the virtual machines objects
-> stored in a test attribute (dictionary). This dictionary shouldn't be
-> accessed directly but through the new method added `get_vm`. This new
-> method accept a list of args (that will be added as virtual machine
-> arguments) and an optional name argument. The name is the key that
-> identify a single virtual machine along the test machines available. If
-> a name without a machine is informed a new machine will be instantiated.
-> 
-> The current usage of vm in tests will not be broken by this change since
-> it keeps a property called vm in the base test class. This property only
-> calls the new method `get_vm` with default parameters (no args and
-> 'default' as machine name).
-> 
-> Signed-off-by: Caio Carrara <ccarrara@redhat.com>
-
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index bcff859bac..c493e3c4c7 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -2061,14 +2061,13 @@ static uint64_t lsi_mmio_read(void *opaque, hwaddr addr,
+                               unsigned size)
+ {
+     LSIState *s = opaque;
+-
+     return lsi_reg_readb(s, addr & 0xff);
+ }
+ 
+ static const MemoryRegionOps lsi_mmio_ops = {
+     .read = lsi_mmio_read,
+     .write = lsi_mmio_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+     .impl = {
+         .min_access_size = 1,
+         .max_access_size = 1,
+@@ -2107,7 +2106,7 @@ static uint64_t lsi_ram_read(void *opaque, hwaddr addr,
+ static const MemoryRegionOps lsi_ram_ops = {
+     .read = lsi_ram_read,
+     .write = lsi_ram_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+ static uint64_t lsi_io_read(void *opaque, hwaddr addr,
+@@ -2127,7 +2126,7 @@ static void lsi_io_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps lsi_io_ops = {
+     .read = lsi_io_read,
+     .write = lsi_io_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_LITTLE_ENDIAN,
+     .impl = {
+         .min_access_size = 1,
+         .max_access_size = 1,
+-- 
+2.20.1
