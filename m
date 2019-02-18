@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47965)
+Received: from eggs.gnu.org ([209.51.188.92]:49372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvmX6-0003IY-DG
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:16:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gvmdm-0005R8-Mw
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:23:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvmX3-00010i-GM
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:16:44 -0500
-Resent-Message-Id: <E1gvmX3-00010i-GM@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155051018108.18484.17607044699539442367@49fa7ef69f7b>
-In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gvmdl-0004tl-Px
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:23:38 -0500
+References: <20190218161822.3573-1-kwolf@redhat.com>
+	<20190218161822.3573-8-kwolf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9fe39150-f308-8f2e-0c9d-6d0a31d9329d@redhat.com>
+Date: Mon, 18 Feb 2019 18:22:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Feb 2019 09:16:22 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
+In-Reply-To: <20190218161822.3573-8-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 07/12] nbd: Increase bs->in_flight during
+ AioContext switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, eblake@redhat.com, stefanha@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
-MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
-YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
-NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
-YXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5YTk5NGU0
-MWE1IGh3L2FybSBody94dGVuc2E6IERlLWR1cGxpY2F0ZSBwZmxhc2ggY3JlYXRpb24gY29kZSBz
-b21lCjMwM2ZiYWNkNTUgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIg
-cGFydCAyCjNmMTZiZjY2YmMgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYw
-MmIgcGFydCAxCjNlMmFlMzFlODQgbWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBm
-bGFzaCBtZW1vcnkgc2l6ZSBzb21ld2hhdApkMDY1Mjk1OGI3IHIyZDogRmxhc2ggbWVtb3J5IGNy
-ZWF0aW9uIGlzIGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUKZjI2ZjJlNGQyZCBwcGM0
-MDVfYm9hcmRzOiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdl
-CmU1ZGQ0YTMzZjUgc2FtNDYwZXg6IERvbid0IHNpemUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJh
-Y2tpbmcgaW1hZ2UKMmVlYzY2NGU0ZCBodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
-X0NGSV9QRkxBU0gwezEsIDJ9CjgzZGE2ODc2ZGQgcGZsYXNoOiBNYWNybyBQRkxBU0hfQlVHKCkg
-aXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZAowYjkwNzVlYTZhIHBmbGFzaDogUmVuYW1lIHBmbGFz
-aF90IHRvIFBGbGFzaENGSTAxLCBQRmxhc2hDRkkwMgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8x
-MCBDaGVja2luZyBjb21taXQgMGI5MDc1ZWE2YTc3IChwZmxhc2g6IFJlbmFtZSBwZmxhc2hfdCB0
-byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
-ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyODogRklMRTogaHcv
-YmxvY2svcGZsYXNoX2NmaTAxLmM6Mjg4Ogorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFkIChQ
-Rmxhc2hDRkkwMSAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzQwOiBGSUxF
-OiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoxNDE6CitzdGF0aWMgdWludDMyX3QgcGZsYXNoX3Jl
-YWQgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgpFUlJPUjogc3BhY2UgcHJvaGli
-aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTg6
-IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjI2NDoKK3N0YXRpYyB2b2lkIHBmbGFzaF93
-cml0ZSAoUEZsYXNoQ0ZJMDIgKnBmbCwgaHdhZGRyIG9mZnNldCwKCnRvdGFsOiAzIGVycm9ycywg
-MCB3YXJuaW5ncywgNDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCjIvMTAgQ2hlY2tpbmcgY29tbWl0IDgzZGE2ODc2ZGQ4OCAocGZsYXNoOiBN
-YWNybyBQRkxBU0hfQlVHKCkgaXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZCkKMy8xMCBDaGVja2lu
-ZyBjb21taXQgMmVlYzY2NGU0ZGNkIChodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
-X0NGSV9QRkxBU0gwezEsIDJ9KQo0LzEwIENoZWNraW5nIGNvbW1pdCBlNWRkNGEzM2Y1YWEgKHNh
-bTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo1
-LzEwIENoZWNraW5nIGNvbW1pdCBmMjZmMmU0ZDJkM2YgKHBwYzQwNV9ib2FyZHM6IERvbid0IHNp
-emUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UpCjYvMTAgQ2hlY2tpbmcgY29t
-bWl0IGQwNjUyOTU4YjdjOCAocjJkOiBGbGFzaCBtZW1vcnkgY3JlYXRpb24gaXMgY29uZnVzZWQg
-YWJvdXQgc2l6ZSwgbWFyayBGSVhNRSkKNy8xMCBDaGVja2luZyBjb21taXQgM2UyYWUzMWU4NDM0
-IChtaXBzX21hbHRhOiBDbGVhbiB1cCBkZWZpbml0aW9uIG9mIGZsYXNoIG1lbW9yeSBzaXplIHNv
-bWV3aGF0KQo4LzEwIENoZWNraW5nIGNvbW1pdCAzZjE2YmY2NmJjZTMgKHBmbGFzaDogQ2xlYW4g
-dXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMSkKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM5MDogRklMRTogaHcvYXJtL211c2ljcGFsLmM6
-MTYzOToKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZM
-QVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzk4
-OiBGSUxFOiBody9hcm0vbXVzaWNwYWwuYzoxNjQ2OgorICAgICAgICBwZmxhc2hfY2ZpMDJfcmVn
-aXN0ZXIoMHgxMDAwMDAwMDBVTEwtTVBfRkxBU0hfU0laRV9NQVgsCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
-cywgMjQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjkvMTAgQ2hlY2tpbmcgY29tbWl0IDMwM2ZiYWNkNTUyOSAocGZsYXNoOiBDbGVhbiB1cCBh
-ZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAyKQoxMC8xMCBDaGVja2luZyBjb21taXQgOWE5
-OTRlNDFhNTc3IChody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9u
-IGNvZGUgc29tZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTAyMTgxMjU2MTUuMTg5NzAtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNo
-ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 18/02/19 17:18, Kevin Wolf wrote:
+> +            /* aio_ctx_switch is only supposed to be set if we're sitting in
+> +             * the qio_channel_yield() below. */
+> +            assert(!*aio_ctx_switch);
+>              bdrv_dec_in_flight(bs);
+>              qio_channel_yield(ioc, G_IO_IN);
+> -            bdrv_inc_in_flight(bs);
+> +            if (*aio_ctx_switch) {
+> +                /* nbd_client_attach_aio_context() already increased in_flight
+> +                 * when scheduling this coroutine for reentry */
+> +                *aio_ctx_switch = false;
+> +            } else {
+> +                bdrv_inc_in_flight(bs);
+> +            }
+
+Hmm, my first thought would have been to do the bdrv_inc_in_flight(bs);
+unconditionally here, and in nbd_connection_entry do the opposite, like
+
+	if (s->aio_ctx_switch) {
+	    s->aio_ctx_switch = false;
+	    bdrv_dec_in_flight(bs);
+	}
+
+but I guess the problem is that then bdrv_drain could hang.
+
+So my question is:
+
+1) is there a testcase that shows the problem with this "obvious"
+refactoring;
+
+2) maybe instead of aio_co_schedul-ing client->connection_co and having
+the s->aio_ctx_switch flag, you could go through a bottom half that does
+the bdrv_inc_in_flight and then enters client->connection_co?
+
+Paolo
