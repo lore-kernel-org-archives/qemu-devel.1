@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34848)
+Received: from eggs.gnu.org ([209.51.188.92]:34852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gvhng-00062G-SC
+	(envelope-from <balaton@eik.bme.hu>) id 1gvhng-00062H-So
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gvhne-0006ce-9g
+	(envelope-from <balaton@eik.bme.hu>) id 1gvhnf-0006dk-9k
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:32 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:27818)
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:27824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gvhna-0006XS-2O
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:27 -0500
-Message-Id: <e9f29b1aa44e719d15bfb658e2c03a9715c8b9c0.1550491301.git.balaton@eik.bme.hu>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gvhnb-0006Xd-G5
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:13:29 -0500
+Message-Id: <d490c415fe1629a6421deac1c245a93790e8d39b.1550491301.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1550491301.git.balaton@eik.bme.hu>
 References: <cover.1550491301.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Mon, 18 Feb 2019 13:01:41 +0100
-Subject: [Qemu-devel] [PATCH v2 1/3] hw/pci-host/bonito.c: Add PCI mem
- region mapped at the correct address
+Subject: [Qemu-devel] [PATCH v2 2/3] mips_fulong2e: Fix bios flash size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +26,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Huacai Chen <zltjiangshi@gmail.com>, philmd@redhat.com
 
-Stop using system memory as PCI memory otherwise devices such as VGA
-that have regions mapped to PCI memory clash with RAM. Use a separate
-memory region for PCI memory and map it to the correct address in
-system memory which allows PCI mem regions to show at the correct
-address where clients expect them.
+According to both the specifications on linux-mips.org referenced in a
+comment at the beginning of the file and the flash chip part number
+the bios size should be 512k not 1M.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-v2: add mem region to BonitoState instead of allocating it
+ hw/mips/mips_fulong2e.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
- hw/pci-host/bonito.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 9f33582706..dde4437595 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -217,6 +217,7 @@ struct BonitoState {
-     PCIHostState parent_obj;
-     qemu_irq *pic;
-     PCIBonitoState *pci_dev;
-+    MemoryRegion pci_mem;
- };
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 02549d5c7e..10e6ed585a 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
+ #include "qapi/error.h"
++#include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
+ #include "hw/dma/i8257.h"
+@@ -35,7 +36,6 @@
+ #include "audio/audio.h"
+ #include "qemu/log.h"
+ #include "hw/loader.h"
+-#include "hw/mips/bios.h"
+ #include "hw/ide.h"
+ #include "elf.h"
+ #include "hw/isa/vt82c686.h"
+@@ -51,6 +51,8 @@
+ #define ENVP_NB_ENTRIES	 	16
+ #define ENVP_ENTRY_SIZE	 	256
  
- #define TYPE_BONITO_PCI_HOST_BRIDGE "Bonito-pcihost"
-@@ -598,11 +599,15 @@ static const VMStateDescription vmstate_bonito = {
- static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
-+    BonitoState *bs = BONITO_PCI_HOST_BRIDGE(dev);
++/* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
++#define BIOS_SIZE (512 * KiB)
+ #define MAX_IDE_BUS 2
  
-+    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCILO_SIZE);
-     phb->bus = pci_register_root_bus(DEVICE(dev), "pci",
-                                      pci_bonito_set_irq, pci_bonito_map_irq,
--                                     dev, get_system_memory(), get_system_io(),
-+                                     dev, &bs->pci_mem, get_system_io(),
-                                      0x28, 32, TYPE_PCI_BUS);
-+    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
-+                                &bs->pci_mem);
- }
+ /*
+@@ -307,12 +309,9 @@ static void mips_fulong2e_init(MachineState *machine)
+     /* fulong 2e has 256M ram. */
+     ram_size = 256 * MiB;
  
- static void bonito_realize(PCIDevice *dev, Error **errp)
+-    /* fulong 2e has a 1M flash.Winbond W39L040AP70Z */
+-    bios_size = 1 * MiB;
+-
+     /* allocate RAM */
+     memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram", ram_size);
+-    memory_region_init_ram(bios, NULL, "fulong2e.bios", bios_size,
++    memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
+                            &error_fatal);
+     memory_region_set_readonly(bios, true);
+ 
 -- 
 2.13.7
