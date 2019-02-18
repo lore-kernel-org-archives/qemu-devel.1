@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59191)
+Received: from eggs.gnu.org ([209.51.188.92]:59253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gvjWA-00084L-CQ
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:03:40 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjWZ-0008G2-Ep
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:04:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gvjW9-0003nG-KO
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:03:34 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjWR-0004Ca-JX
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:03:55 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Mon, 18 Feb 2019 15:02:52 +0100
-Message-Id: <20190218140301.197408-2-sgarzare@redhat.com>
+Date: Mon, 18 Feb 2019 15:02:53 +0100
+Message-Id: <20190218140301.197408-3-sgarzare@redhat.com>
 In-Reply-To: <20190218140301.197408-1-sgarzare@redhat.com>
 References: <20190218140301.197408-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 01/10] virtio-blk: add acct_failed param to
- virtio_blk_handle_rw_error()
+Subject: [Qemu-devel] [PATCH v5 02/10] virtio-blk: add host_features field
+ in VirtIOBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-We add acct_failed param in order to use virtio_blk_handle_rw_error()
-also when is not required to call block_acct_failed(). (eg. a discard
-operation is failed)
+Since configurable features for virtio-blk are growing, this patch
+adds host_features field in the struct VirtIOBlock. (as in virtio-net)
+In this way, we can avoid to add new fields for new properties and
+we can directly set VIRTIO_BLK_F* flags in the host_features.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+We update "config-wce" and "scsi" property definition to use the new
+host_features field without change the behaviour.
+
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- hw/block/virtio-blk.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ hw/block/virtio-blk.c          | 16 +++++++++-------
+ include/hw/virtio/virtio-blk.h |  3 +--
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index cf7f47eaba..afedf48ca6 100644
+index afedf48ca6..7813237756 100644
 --- a/hw/block/virtio-blk.c
 +++ b/hw/block/virtio-blk.c
-@@ -65,7 +65,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
-, unsigned char status)
- }
+@@ -245,7 +245,7 @@ static int virtio_blk_handle_scsi_req(VirtIOBlockReq =
+*req)
+      */
+     scsi =3D (void *)elem->in_sg[elem->in_num - 2].iov_base;
 =20
- static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
--    bool is_read)
-+    bool is_read, bool acct_failed)
+-    if (!blk->conf.scsi) {
++    if (!virtio_has_feature(blk->host_features, VIRTIO_BLK_F_SCSI)) {
+         status =3D VIRTIO_BLK_S_UNSUPP;
+         goto fail;
+     }
+@@ -785,12 +785,15 @@ static uint64_t virtio_blk_get_features(VirtIODevic=
+e *vdev, uint64_t features,
  {
-     VirtIOBlock *s =3D req->dev;
-     BlockErrorAction action =3D blk_get_error_action(s->blk, is_read, er=
-ror);
-@@ -78,7 +78,9 @@ static int virtio_blk_handle_rw_error(VirtIOBlockReq *r=
-eq, int error,
-         s->rq =3D req;
-     } else if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
-         virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
--        block_acct_failed(blk_get_stats(s->blk), &req->acct);
-+        if (acct_failed) {
-+            block_acct_failed(blk_get_stats(s->blk), &req->acct);
-+        }
-         virtio_blk_free_request(req);
+     VirtIOBlock *s =3D VIRTIO_BLK(vdev);
+=20
++    /* Firstly sync all virtio-blk possible supported features */
++    features |=3D s->host_features;
++
+     virtio_add_feature(&features, VIRTIO_BLK_F_SEG_MAX);
+     virtio_add_feature(&features, VIRTIO_BLK_F_GEOMETRY);
+     virtio_add_feature(&features, VIRTIO_BLK_F_TOPOLOGY);
+     virtio_add_feature(&features, VIRTIO_BLK_F_BLK_SIZE);
+     if (virtio_has_feature(features, VIRTIO_F_VERSION_1)) {
+-        if (s->conf.scsi) {
++        if (virtio_has_feature(s->host_features, VIRTIO_BLK_F_SCSI)) {
+             error_setg(errp, "Please set scsi=3Doff for virtio-blk devic=
+es in order to use virtio 1.0");
+             return 0;
+         }
+@@ -799,9 +802,6 @@ static uint64_t virtio_blk_get_features(VirtIODevice =
+*vdev, uint64_t features,
+         virtio_add_feature(&features, VIRTIO_BLK_F_SCSI);
      }
 =20
-@@ -116,7 +118,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
-ret)
-              * the memory until the request is completed (which will
-              * happen on the other side of the migration).
-              */
--            if (virtio_blk_handle_rw_error(req, -ret, is_read)) {
-+            if (virtio_blk_handle_rw_error(req, -ret, is_read, true)) {
-                 continue;
-             }
-         }
-@@ -135,7 +137,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
-nt ret)
-=20
-     aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
-     if (ret) {
--        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
-+        if (virtio_blk_handle_rw_error(req, -ret, 0, true)) {
-             goto out;
-         }
+-    if (s->conf.config_wce) {
+-        virtio_add_feature(&features, VIRTIO_BLK_F_CONFIG_WCE);
+-    }
+     if (blk_enable_write_cache(s->blk)) {
+         virtio_add_feature(&features, VIRTIO_BLK_F_WCE);
      }
+@@ -1015,9 +1015,11 @@ static Property virtio_blk_properties[] =3D {
+     DEFINE_BLOCK_ERROR_PROPERTIES(VirtIOBlock, conf.conf),
+     DEFINE_BLOCK_CHS_PROPERTIES(VirtIOBlock, conf.conf),
+     DEFINE_PROP_STRING("serial", VirtIOBlock, conf.serial),
+-    DEFINE_PROP_BIT("config-wce", VirtIOBlock, conf.config_wce, 0, true)=
+,
++    DEFINE_PROP_BIT64("config-wce", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_CONFIG_WCE, true),
+ #ifdef __linux__
+-    DEFINE_PROP_BIT("scsi", VirtIOBlock, conf.scsi, 0, false),
++    DEFINE_PROP_BIT64("scsi", VirtIOBlock, host_features,
++                      VIRTIO_BLK_F_SCSI, false),
+ #endif
+     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging=
+, 0,
+                     true),
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
+k.h
+index 5117431d96..f7345b0511 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -35,8 +35,6 @@ struct VirtIOBlkConf
+     BlockConf conf;
+     IOThread *iothread;
+     char *serial;
+-    uint32_t scsi;
+-    uint32_t config_wce;
+     uint32_t request_merging;
+     uint16_t num_queues;
+     uint16_t queue_size;
+@@ -57,6 +55,7 @@ typedef struct VirtIOBlock {
+     bool dataplane_disabled;
+     bool dataplane_started;
+     struct VirtIOBlockDataPlane *dataplane;
++    uint64_t host_features;
+ } VirtIOBlock;
+=20
+ typedef struct VirtIOBlockReq {
 --=20
 2.20.1
