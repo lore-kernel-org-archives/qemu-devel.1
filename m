@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49748)
+Received: from eggs.gnu.org ([209.51.188.92]:52234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gvgdY-00044i-Ug
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:59:01 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gvgqA-0006pE-MV
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gvgdX-0005rA-Ej
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:59:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gvgdX-0005qK-8H
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:58:59 -0500
-Date: Mon, 18 Feb 2019 11:58:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190218105855.GC5303@dhcp-200-176.str.redhat.com>
-References: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
-	<596fc361faea408cabae8a5f41df2e41@AMSPEX02CL03.citrite.net>
-	<61c2a38ace454e2d963dcdd89d53737d@AMSPEX02CL03.citrite.net>
-	<20190218100919.GB5303@dhcp-200-176.str.redhat.com>
-	<1dd9342a7ee149f2beaaebc27c72fd15@AMSPEX02CL03.citrite.net>
+	(envelope-from <cohuck@redhat.com>) id 1gvgq8-0006cP-OR
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:02 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 18 Feb 2019 12:11:43 +0100
+Message-Id: <20190218111153.22681-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1dd9342a7ee149f2beaaebc27c72fd15@AMSPEX02CL03.citrite.net>
-Subject: Re: [Qemu-devel] QEMU xen coverity issues
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +20,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: Anthony Perard <anthony.perard@citrix.com>, 'Peter Maydell' <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Am 18.02.2019 um 11:28 hat Paul Durrant geschrieben:
-> > -----Original Message-----
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Sent: 18 February 2019 10:09
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: 'Peter Maydell' <peter.maydell@linaro.org>; QEMU Developers <qemu-
-> > devel@nongnu.org>; Anthony Perard <anthony.perard@citrix.com>
-> > Subject: Re: [Qemu-devel] QEMU xen coverity issues
-> > 
-> > Am 15.02.2019 um 17:20 hat Paul Durrant geschrieben:
-> > > > -----Original Message-----
-> > > [snip]
-> > > > >
-> > > > > (5) CID 1398649: resource leak in xen_block_drive_create():
-> > > > >
-> > > > > In hw/block/xen-block.c xen_block_drive_create() Coverity
-> > > > > complains that the call "driver_layer = qdict_new()" allocates
-> > > > > memory that's leaked because we don't save the pointer anywhere
-> > > > > but don't deallocate it before the end of the function either.
-> > > > > Coverity is not great at understanding our refcounting objects,
-> > > > > but this does look like either we're missing a qobject_unref()
-> > > > > or something should be keeping hold of the dictionary. Probably
-> > > > > best to ask a block layer expert.
-> > > >
-> > > > AFAICT nothing will consume the dictionary so it does appear that
-> > we're
-> > > > missing an unref here.
-> > >
-> > > Testing proves me wrong... This one is a false positive.
-> > 
-> > Hm, but where is it freed?
-> > 
-> > xen_block_blockdev_add() only feeds it to an input visitor, which
-> > doesn't take ownership of the QDict (and in the first error path, it
-> > hasn't even done that yet).
-> 
-> Agreed that error path does not free things... that's definitely a
-> leak... but attempting to free the QDict's on return from
-> xen_block_blockdev_add() certainly causes a seg fault. My assumption
-> was that, having been fed through the input visitor and then through
-> the output visitor in qmp_blockdev_add() that the BlockDriverState
-> eventually takes ownership... but maybe that's not true?
+The following changes since commit 1e36232994c8ad01774501d2e299deba3a2469=
+af:
 
-qmp_blockdev_add() only ever sees the QAPI object, not the original
-QDict, so it should be able to take ownership of it. If anything, the
-visitor could do so, but I don't think it does (it takes an extra
-reference, which it frees at the end, but it doesn't free the reference
-it was originally passed).
+  Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-20190=
+215' into staging (2019-02-15 11:12:14 +0000)
 
-Maybe worth having another look at that segfault? It could point to a
-related, but separate bug.
+are available in the Git repository at:
 
-Kevin
+  https://github.com/cohuck/qemu tags/s390x-20190218
+
+for you to fetch changes up to 0922e8c093a564219fcb7f43b18ceb12714dd931:
+
+  s390x: upgrade status of KVM cores to "supported" (2019-02-18 12:00:44 =
++0100)
+
+----------------------------------------------------------------
+s390x updates:
+- tcg: implement STCK and friends for CONFIG_USER_ONLY
+- add zpci to qemu cpu model, as pci is now always built
+- add mepoch to default z14 cpu model
+- add cpu model for z14 GA2
+- various improvements
+
+----------------------------------------------------------------
+
+Collin Walling (3):
+  s390x/cpumodel: mepochptff: warn when no mepoch and re-align group
+    init
+  s390x/cpumodel: default enable mepoch for z14 and later
+  s390x/cpumodel: add z14 GA2 model
+
+Cornelia Huck (3):
+  s390x: always provide pci support
+  s390x/kvm: add tracepoint to ioeventfd interface
+  s390x: upgrade status of KVM cores to "supported"
+
+David Hildenbrand (1):
+  s390x: add zPCI feature to "qemu" CPU model
+
+Richard Henderson (2):
+  target/s390x: Split out s390-tod.h
+  target/s390x: Implement STCK et al for CONFIG_USER_ONLY
+
+Thomas Huth (1):
+  s390x: Fix the confusing contributions-after-2012 license statements
+
+ MAINTAINERS                   |  2 +-
+ hw/s390x/Makefile.objs        |  3 +-
+ hw/s390x/s390-pci-stub.c      | 77 -----------------------------------
+ hw/s390x/s390-virtio-ccw.c    |  8 ++--
+ include/hw/s390x/tod.h        | 16 +-------
+ linux-user/s390x/target_cpu.h | 19 ++++-----
+ target/s390x/cpu.c            | 19 ++++-----
+ target/s390x/cpu.h            | 19 ++++-----
+ target/s390x/cpu_features.c   |  2 +-
+ target/s390x/cpu_models.c     | 34 +++++++++++++---
+ target/s390x/cpu_models.h     |  2 +
+ target/s390x/gen-features.c   | 18 ++++++--
+ target/s390x/helper.h         |  2 +-
+ target/s390x/insn-data.def    | 11 ++---
+ target/s390x/kvm.c            | 25 +++++-------
+ target/s390x/misc_helper.c    | 34 ++++++++++------
+ target/s390x/s390-tod.h       | 29 +++++++++++++
+ target/s390x/trace-events     |  1 +
+ target/s390x/translate.c      |  2 +
+ 19 files changed, 150 insertions(+), 173 deletions(-)
+ delete mode 100644 hw/s390x/s390-pci-stub.c
+ create mode 100644 target/s390x/s390-tod.h
+
+--=20
+2.17.2
