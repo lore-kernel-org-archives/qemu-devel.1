@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54100)
+Received: from eggs.gnu.org ([209.51.188.92]:54184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gveoA-00032R-Ea
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:01:54 -0500
+	(envelope-from <david@redhat.com>) id 1gveoI-000393-Hs
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:02:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvegO-0002lj-En
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:53:49 -0500
-Date: Mon, 18 Feb 2019 17:47:09 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190218064709.GD9345@umbus.fritz.box>
-References: <20190215170029.15641-1-clg@kaod.org>
-	<20190215170029.15641-3-clg@kaod.org>
+	(envelope-from <david@redhat.com>) id 1gvef3-00029C-91
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:52:27 -0500
+References: <20190215133005.15955-1-david@redhat.com>
+	<20190215133005.15955-4-david@redhat.com>
+	<c3ec671c-8c02-25e2-dfa1-9f5086bb7c21@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <fb000af4-b831-ca39-1d90-07641b5dfc46@redhat.com>
+Date: Mon, 18 Feb 2019 09:42:14 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SFyWQ0h3ruR435lw"
-Content-Disposition: inline
-In-Reply-To: <20190215170029.15641-3-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 02/12] target/ppci/mmu: Use LPCR:HR to
- chose radix vs. hash translation
+In-Reply-To: <c3ec671c-8c02-25e2-dfa1-9f5086bb7c21@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] tests/device-plug: Add a simple PCI
+ unplug request test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+On 15.02.19 16:21, Thomas Huth wrote:
+> On 15/02/2019 14.30, David Hildenbrand wrote:
+>> The issue with testing asynchronous unplug requests it that they usually
+>> require a running guest to handle the request. However, to test if
+>> unplug of PCI devices works, we can apply a nice little trick on some
+>> architectures:
+>>
+>> On system reset, x86 ACPI, s390x and spapr will perform the unplug,
+>> resulting in the device of interest to get deleted and a DEVICE_DELETED
+>> event getting sent.
+>>
+>> On s390x, we still get a warning
+>>     qemu-system-s390x: -device virtio-mouse-pci,id=dev0:
+>>     warning: Plugging a PCI/zPCI device without the 'zpci' CPU feature
+>>     enabled; the guest will not be able to see/use this device
+>>
+>> This will be fixed soon, when we enable the zpci CPU feature always
+>> (Conny already has a patch for this queued).
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  tests/Makefile.include   |  4 ++
+>>  tests/device-plug-test.c | 93 ++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 97 insertions(+)
+>>  create mode 100644 tests/device-plug-test.c
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> BTW, have you spotted the qpci_unplug_acpi_device_test() in libqos
+> already? Might be interesting for these kinds of tests, too - we use it
+> in a couple of other tests already, though, so I'm not sure if we need
+> additional tests with that...
+> 
 
---SFyWQ0h3ruR435lw
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Cool, no I haven't! It's PCI only, something similar for CPU/memory
+unplug on x86 would be interesting. I might be looking into that in the
+future.
 
-On Fri, Feb 15, 2019 at 06:00:19PM +0100, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->=20
-> Now that LPCR:HR is set properly for SPAPR, use it for deciding
-> the translation type, which also works for bare metal
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+-- 
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Thanks,
 
-> ---
->  target/ppc/mmu-book3s-v3.h | 14 +++++++++-----
->  target/ppc/mmu-book3s-v3.c | 11 ++++++++++-
->  target/ppc/mmu_helper.c    |  9 ++-------
->  3 files changed, 21 insertions(+), 13 deletions(-)
->=20
-> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-> index fdf80987d7b2..41b77158622a 100644
-> --- a/target/ppc/mmu-book3s-v3.h
-> +++ b/target/ppc/mmu-book3s-v3.h
-> @@ -43,14 +43,18 @@ static inline bool ppc64_use_proc_tbl(PowerPCCPU *cpu)
->      return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
->  }
-> =20
-> -static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
-> +/*
-> + * The LPCR:HR bit is a shortcut that avoids having to
-> + * dig out the partition table in the fast path. This is
-> + * also how the HW uses it.
-> + */
-> +static inline bool ppc64_v3_radix(PowerPCCPU *cpu)
->  {
-> -    PPCVirtualHypervisorClass *vhc =3D
-> -        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-> -
-> -    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
-> +    return !!(cpu->env.spr[SPR_LPCR] & LPCR_HR);
->  }
-> =20
-> +hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, vaddr eaddr);
-> +
->  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                                int mmu_idx);
-> =20
-> diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
-> index b60df4408f3b..a174e7efc57c 100644
-> --- a/target/ppc/mmu-book3s-v3.c
-> +++ b/target/ppc/mmu-book3s-v3.c
-> @@ -26,9 +26,18 @@
->  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                                int mmu_idx)
->  {
-> -    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
-> +    if (ppc64_v3_radix(cpu)) { /* Guest uses radix */
->          return ppc_radix64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
->      } else { /* Guest uses hash */
->          return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
->      }
->  }
-> +
-> +hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, vaddr eaddr)
-> +{
-> +    if (ppc64_v3_radix(cpu)) {
-> +        return ppc_radix64_get_phys_page_debug(cpu, eaddr);
-> +    } else {
-> +        return ppc_hash64_get_phys_page_debug(cpu, eaddr);
-> +    }
-> +}
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index cefed34da4f2..ae81ee18ae95 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -1342,7 +1342,7 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf=
-, CPUPPCState *env)
->          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
->          break;
->      case POWERPC_MMU_3_00:
-> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> +        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
->              /* TODO - Unsupported */
->          } else {
->              dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> @@ -1497,12 +1497,7 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, v=
-addr addr)
->      case POWERPC_MMU_2_07:
->          return ppc_hash64_get_phys_page_debug(cpu, addr);
->      case POWERPC_MMU_3_00:
-> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> -            return ppc_radix64_get_phys_page_debug(cpu, addr);
-> -        } else {
-> -            return ppc_hash64_get_phys_page_debug(cpu, addr);
-> -        }
-> -        break;
-> +        return ppc64_v3_get_phys_page_debug(cpu, addr);
->  #endif
-> =20
->      case POWERPC_MMU_32B:
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---SFyWQ0h3ruR435lw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxqVOoACgkQbDjKyiDZ
-s5Kb8xAA2JdIy0GQ7e4dYU7BB99Ipuw12wFol+KALHAccGDfEGSCrvjGm0ukWLIX
-vG2BvqLy6DWf0S6Di5qKuBl2sN5EkiLlPmmwVuaBJqZTj+feiCez87n3sDfSfbOE
-zX9FX243b9nktoOq6n2rjNPsyDa3WkU/h4Cc2qW0e4JuBXgloY57VlKtF0+BUtA5
-X2x7mnd63CtYN2HZz2IOD1tUsCWBjwA0b/jmGZCLKwZnuQo5N9ywO3hrWgJsUlxy
-LllEGGDIfyuxU/VTyCf+YrCqjx9wNzSAGolT+BSn3snz3SsALaU65o+DnFJv4sSp
-Jie7VgHPLm3AHNFQ62k9JzS8CgzJdMh6NWS5GK6GSL7XDd6cHjJkEKX3PHyWdOz8
-q8pfMi4gyS2Aw+uL+L7o17Mg0egVty+jPCdPDAlQLTii8lB6vZz34BudHjlIM3Mb
-lsiHfef2b60IArYwAkWgD+JvVXsXfy0StupFl/m+oIqMMBPntht/PEAcAiApnzCf
-/vZikF7spY9jfSPGItizjnpGL47s1C5y5lwiCDcLpKnFP5A0SuRltAUHYfM+fVQs
-aNH/PIRz7b1KiqC6o0DkuHuHCy1zG4nGS0vvGBdlzzLiOVmjDArqpMgc2KbGTcU8
-DyTpGsaouO/RrA2bbTj23UnUPNO6dwHezce7xsma8oXHrZGkaMo=
-=tPuf
------END PGP SIGNATURE-----
-
---SFyWQ0h3ruR435lw--
+David / dhildenb
