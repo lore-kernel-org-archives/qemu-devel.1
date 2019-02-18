@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39533)
+Received: from eggs.gnu.org ([209.51.188.92]:39652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvfr6-0008PO-0v
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:08:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gvfrm-0000Sq-8b
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:09:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvfr3-0003CE-P4
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:08:55 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 10:08:40 +0000
-Message-ID: <0a42b9c6-9bc6-b826-b90e-226ab4c122e2@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
-	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
-	<w51mun2uxts.fsf@maestria.local.igalia.com>
-	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
-	<w51mun18cjy.fsf@maestria.local.igalia.com>
-	<839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
-In-Reply-To: <839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3F86121E2A7C454BB521B7EE95DD6CAD@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1gvfrg-0003OF-Bh
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:09:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gvfrY-0003Kd-J5
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:09:26 -0500
+Date: Mon, 18 Feb 2019 11:09:19 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190218100919.GB5303@dhcp-200-176.str.redhat.com>
+References: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
+	<596fc361faea408cabae8a5f41df2e41@AMSPEX02CL03.citrite.net>
+	<61c2a38ace454e2d963dcdd89d53737d@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <61c2a38ace454e2d963dcdd89d53737d@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] QEMU xen coverity issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>
 
-MTQuMDIuMjAxOSAxNjo0MywgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IA0KPiANCj4gT24g
-MTIvMDIvMjAxOSAxNDozNSwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+PiBPbiBNb24gMTEgRmVi
-IDIwMTkgMDU6NTg6MDUgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
-Og0KPj4+Pj4gVGhlIHByb2JsZW0gaXMgaW4gdGhlIGNvbmNlcHQgb2YgImJhc2UiIG5vZGUuIFRo
-ZSBjb2RlIHdyaXR0ZW4gaW4NCj4+Pj4+IG1hbm5lciB0aGF0IGJhc2UgaXMgbm90IGNoYW5nZWQg
-ZHVyaW5nIGJsb2NrIGpvYi4gSG93ZXZlciwgam9iIGRvbid0DQo+Pj4+PiBvd24gYmFzZSBhbmQg
-dGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgaXQgd2lsbCBub3QgY2hhbmdlIGR1cmluZw0KPj4+
-Pj4gdGhlIGpvYi4NCj4+Pj4NCj4+Pj4gQnV0IGlmIHRoYXQncyB0aGUgY2FzZSB0aGVuIHdlIGhh
-dmUgYSBwcm9ibGVtIGFscmVhZHksIGJlY2F1c2UgJ2Jhc2UnDQo+Pj4+IGlzIGEgbWVtYmVyIG9m
-IFN0cmVhbUJsb2NrSm9iIGFuZCBpcyB1c2VkIGluIHRoZSBleGlzdGluZw0KPj4+PiBzdHJlYW1f
-cnVuKCkgY29kZS4NCj4+Pg0KPj4+IEkgdGhpbmsgaXQgc2hvdWxkIGJlIHBvc3NpYmxlIHRvIHJl
-cHJvZHVjZSwgdXNpbmcgYmxvY2stY29tbWl0ICh3aGljaA0KPj4+IGFscmVhZHkgaGFzIGZpbHRl
-cikgd2l0aCBibG9jay1zdHJlYW0gaW4gcGFyYWxsZWwsIHdlJ2xsIHRyeS4NCj4+DQo+PiBJdCdz
-IG5vdCBwb3NzaWJsZSB0byBydW4gYmxvY2stc3RyZWFtIGFuZCBibG9jay1jb21taXQgaW4gcGFy
-YWxsZWwgb24NCj4+IHRoZSBzYW1lIG5vZGVzLiBTZWUgaW90ZXN0IDAzMCBmb3IgYSBmZXcgZXhh
-bXBsZXMuDQo+Pg0KPj4gU28gdW5sZXNzIHRoZXJlJ3MgYSBidWcgaXQgc2hvdWxkIGJlIHNhZmUu
-DQo+Pg0KPj4+PiBTbyBpZiB0aGVyZSdzIGEgd2F5IHRvIG1ha2UgJ2Jhc2UnIGRpc2FwcGVhciBk
-dXJpbmcgdGhlIGpvYiAoaG93PykNCj4+Pj4gdGhlbiB3ZSBjb3VsZCBwcm90ZWN0IGl0IHdpdGgg
-YmxvY2tfam9iX2FkZF9iZHJ2KCkuDQo+Pj4NCj4+PiBJJ20gbm90IHN1cmUgdGhpcyBpcyBjb3Jy
-ZWN0LiBXaGF0IGlzIHRoZSByZWFzb24gZm9yIHN0cmVhbSB0byBvd24NCj4+PiBiYXNlPyBJdCdz
-IG5vdCByZWFsbHkgaW50ZXJlc3RlZCBpbiBpdC4NCj4+DQo+PiBzdHJlYW0gZG9lcyBub3QgbmVl
-ZCB0byB3cml0ZSBvciBtb2RpZnkgYmFzZSwgYnV0IGl0IGRvZXMgbmVlZCB0byBrZWVwIGENCj4+
-IHJlZmVyZW5jZSB0byBpdCBpbiBvcmRlciB0byBub3cgd2hlcmUgdG8gc3RvcCBjb3B5aW5nIGRh
-dGEuDQo+Pg0KPj4gQXMgSSBzYWlkIGVhcmxpZXIgYmFzZSBpcyBhIG1lbWJlciBvZiBTdHJlYW1C
-bG9ja0pvYiwgc28gaXQgc2hvdWxkIG5vdA0KPj4gZGlzYXBwZWFyIGR1cmluZyB0aGUgam9iLg0K
-Pj4NCj4+IEJlcnRvDQo+Pg0KPiANCj4gTm8gZG91YnQgdGhhdCBhIHJlZmVyZW5jZSB0byB0aGUg
-YmFzZSBub2RlIGlzIG5lZWRlZCBhcyBhIGxpbWl0IGZvciB0aGUNCj4gQ09SIHdvcmsuIFRoZSBi
-YXNlIGlzIHN0aWxsIGluIHRoZSBnYW1lLiBBY3R1YWxseSwgd2UgZW5jb3VudGVyIGFuIGlzc3Vl
-DQo+IHdoZW4gQmxvY2tEcml2ZXJTdGF0ZSBvZiB0aGUgQ09SLWZpbHRlciBjb21lcyBpbnRvIHBs
-YXkgaW5zdGVhZCBvZiB0aGUNCj4gYmFzZS4gSXQgaXMgaW5oZXJpdGVkIGZyb20gYSBwYXJhbGxl
-bCBqb2IuIEJhc2VkIG9uIHRoZSBjYXNlDQo+IHRlc3Rfc3RyZWFtX3BhcmFsbGVsIGZyb20gdGhl
-IHFlbXUtaW90ZXN0cy8wMzAsIGl0IHdvcmtzIGxpa2UgdGhpczoNCj4gMS4gSm9iIzEgaXMgc3Rh
-cnRlZCBhbmQgaW5zZXJ0cyBhIENPUi1maWx0ZXIgYWJvdmUgdGhlIHRvcCBub2RlLg0KPiAyLiBD
-b250ZXh0IHN3aXRjaC4NCj4gMy4gSm9iIzIgaXMgc3RhcnRlZCBhbmQgaW5oZXJpdHMgdGhlIENP
-Ui1maWx0ZXIgYXMgdGhlIGJhc2UuDQo+IDQuIENvbnRleHQgc3dpdGNoLg0KPiA1LiBKb2IjMSBj
-b21lcyB0byB0aGUgZW5kIGFuZCByZW1vdmVzIGl0cyBDT1ItZmlsdGVyIHJlZmVyZW5jZWQgYnkN
-Cj4gICAgICBqb2IjMi4NCj4gNi4gQ29udGV4dCBzd2l0Y2guDQo+IDcuIEpvYiMyIGNvbWVzIHRv
-IHRoZSBlbmQgYW5kIHVzZXMgdGhlIGRlbGV0ZWQgQ09SLWZpbHRlciBub2RlLg0KPiA4LiBXZSBh
-cmUgaW4gdHJvdWJsZS4NCj4gDQo+IE9yIGFub3RoZXIgc2NlbmFyaW86DQo+IDEtNC4gQXMgYWJv
-dmUNCj4gNS4gSm9iIzIgY29tZXMgdG8gdGhlIGVuZCBmaXJzdCBhbmQga2VlcHMgdGhlIENPUi1m
-aWx0ZXIgYXMgdGhlDQo+ICAgICAgYmFja2luZyBub2RlLg0KPiA2LiBUaGUgYXNzZXJ0KCkgZmFp
-bHMgYXMgdGhlIHJlZmVyZW5jZWQgQ09SLWZpbHRlciB3YXMgbm90IGRlbGV0ZWQNCj4gICAgICBv
-biBleGl0Lg0KPiA3LiBUaGUgZ2FtZSBpcyBvdmVyIHdpdGggYSBwb29yIHNjb3JlLg0KPiANCj4g
-SWYgd2UganVzdCBrZWVwIHRoZSBpbnRlcm1lZGlhdGUgYm90dG9tIG5vZGUgaW5zdGVhZCBvZiB0
-aGUgYmFzZSwgd2UNCj4gd2lsbCBoYXZlIGEgc2ltaWxhciBpc3N1ZS4gT24gdGhlIGpvYiBleGl0
-LCB3ZSBjaGFuZ2UgdGhlIGJhY2tpbmcgZmlsZS4NCj4gSWYgd2UgY2FsbCB0aGUgYmFja2luZ19i
-cyhib3R0b21fbm9kZV9icyksIHdlIHdpbGwga2VlcCB0aGUgQ09SLWZpbHRlcg0KPiBub2RlIGlu
-c3RlYWQsIHdoZXJlYXMgaXQgaGFzIG5vdCBiZWVuIHJlbW92ZWQgamV0IGJ5IHRoZSB1bmZpbmlz
-aGVkDQo+IGpvYiMxIChzZWUgdGhlIHNlY29uZCBzY2VuYXJpbyBhYm92ZSkuDQoNCkhvbmVzdGx5
-LCBkb24ndCBzZWUgYW55IHByb2JsZW0gd2l0aCBpdC4NCg0KPiANCj4gSWYgd2UgaW5jbHVkZSB0
-aGUgYmFzZSBub2RlIGludG8gdGhlIGpvYiBub2RlIGxpc3Qgd2l0aCBzb21lIHByb3RlY3RpbmcN
-Cj4gZmxhZ3MsIHRoYXQncyBibG9ja19qb2JfYWRkX2JkcnYoJnMtPmNvbW1vbiwgImJhc2UiLCBi
-YXNlLCAuLiksIHdlIGNhbg0KPiBlbmQgdXAgd2l0aCBhIGZhaWx1cmUgb2YgdGhlIGJkcnZfY2hl
-Y2tfdXBkYXRlX3Blcm0oKSBjYWxsZWQgYnkgdGhlDQo+IGJkcnZfcm9vdF9hdHRhY2hfY2hpbGQo
-KSBiZWNhdXNlIHRoZSBwcmV2aW91cyBqb2IjMSBoYXMgdGhlIHJvb3QNCj4gcmVmZXJlbmNlIHRv
-IHRoZSBzYW1lIG5vZGUgd2l0aCBvdGhlciBwZXJtaXNzaW9ucy4gU28sIHRoZSBuZXh0IGpvYiB3
-aWxsDQo+IGZhaWwgdG8gc3RhcnQgYW5kIHRoZSB0ZXN0IGNhc2VzIHdvbid0IHBhc3MuDQoNCllv
-dSBtZWFuIHRlc3QgMzAgIyB0ZXN0Y2FzZSBhYm91dCBwYXJhbGxlbCBzdHJlYW0gam9icywgd2hp
-Y2ggc3RhcnRzIHN0cmVhbXMsDQpzaGFyaW5nIG9uZSBub2RlIGFzIGJhc2UgZm9yIG9uZSBhbmQg
-dG9wIGZvciBhbm90aGVyLiBBbmQgaWYgd2UgbG9jayBiYXNlIGluDQpzdHJlYW0gam9iIHRoZSB0
-ZXN0IGZhaWxzLiBJIHRoaW5rLCB3ZSBqdXN0IG5lZWQgdG8gdXBkYXRlIHRoZSB0ZXN0LCBieSBp
-bnNlcnRpbmcNCmFkZGl0aW9uYWwgZW1wdHkgcWNvdzIgbm9kZXMgYmVsb3cgc2hhcmVkIG9uZXMs
-IGFuZCBtYWtlIG5ldyBpbnNlcnRlZCBub2Rlcw0KdG8gYmUgdG9wIG5vZGVzIG9mIHN0cmVhbSBq
-b2JzLCBzbyB0aGVyZSBubyBtb3JlIG5vZGUtc2hhcmluZyBiZXR3ZWVuIGpvYnMuDQoNCj4gDQo+
-IEl0IHdlIHNldCB0aGUgZm9sbG93aW5nIGZsYWdzLCB0aGVyZSB3aWxsIGJlIG5vIGZhaWx1cmU6
-DQo+IGJsb2NrX2pvYl9hZGRfYmRydigmcy0+Y29tbW9uLCAiYmFzZSIsIGJhc2UsIDAsIEJMS19Q
-RVJNX0NPTlNJU1RFTlRfUkVBRA0KPiB8IEJMS19QRVJNX1dSSVRFX1VOQ0hBTkdFRCB8IEJMS19Q
-RVJNX0dSQVBIX01PRCwgJmVycm9yX2Fib3J0KTsNCj4gQnV0IHdoYXQgbWFyZ2luIHdpbGwgd2Ug
-Z2Fpbj8gV2Ugd2lsbCBoYXZlIHRoZSBzYW1lIGlzc3VlcyBhcyBhYm92ZS4NCg0KV2UgbWVlZCBm
-bGFncyAuLi4sIEJMS19QRVJNX0dSQVBIX01PRCwgQkxLX1BFUk1fQUxMICYgfkJMS19QRVJNX0dS
-QVBIX01PRCwgLi4uDQpmb3IgYmFzZSBub2RlLg0KDQo+IA0KPiBJbiBtYW55IG90aGVyIGNhc2Vz
-LCB3aGVuIHRoZSBmaWx0ZXIgaGFzIG5vdCBiZWVuIGlkZW50aWZpZWQsIHdlIGNhbg0KPiBnZXQg
-YSBicm9rZW4gY2hhaW4gd2hpbGUgY2FsbGluZyB0byB0aGUgYmFja2luZ19icyhicz1maWx0ZXIp
-IGFzIHRoZQ0KPiBiYWNraW5nIG5vZGUgb2YgdGhlIGZpbHRlciBpcyB0aGUgemVybyBwb2ludGVy
-Lg0KPiANCj4gVGhhdCdzIHdoeSBJIGltcGxlbWVudGVkIHRoZSBza2lwX2ZpbHRlcigpIGZ1bmN0
-aW9uIGluIHRoaXMgc2VyaWVzIGFzDQo+IGEgc29tZSBzb3J0IG9mIHNvbHV0aW9uIG9yIHdvcmth
-cm91bmQuIE1heSB3ZSBwcm9jZWVkIHdpdGggdGhhdD8NCj4gSXMgdGhlcmUgYW55IGJldHRlciBp
-ZGVhPw0KPiANCg0KSSB0aGluayBub3csIHRoYXQgYmVzdCB3YXkgaXMgdG8gbG9jayBiYXNlIG5v
-ZGUuIEFzIGl0IGlzIHRoZSBzaW1wbGVzdCBvbmUuIEFuZCBpdA0KY29ycmVzcG9uZHMgdG8gY3Vy
-cmVudCBjb2RlLCB3aGljaCBhY3R1YWxseSBrZWVwcyBpbGxlZ2FsIHBvaW50ZXIgdG8gYmFzZSBu
-b2RlLA0Kd2l0aG91dCBhbnkgYWNjZXNzIHJpZ2h0cy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
-ClZsYWRpbWlyDQo=
+Am 15.02.2019 um 17:20 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> [snip]
+> > >
+> > > (5) CID 1398649: resource leak in xen_block_drive_create():
+> > >
+> > > In hw/block/xen-block.c xen_block_drive_create() Coverity
+> > > complains that the call "driver_layer = qdict_new()" allocates
+> > > memory that's leaked because we don't save the pointer anywhere
+> > > but don't deallocate it before the end of the function either.
+> > > Coverity is not great at understanding our refcounting objects,
+> > > but this does look like either we're missing a qobject_unref()
+> > > or something should be keeping hold of the dictionary. Probably
+> > > best to ask a block layer expert.
+> > 
+> > AFAICT nothing will consume the dictionary so it does appear that we're
+> > missing an unref here.
+> 
+> Testing proves me wrong... This one is a false positive.
+
+Hm, but where is it freed?
+
+xen_block_blockdev_add() only feeds it to an input visitor, which
+doesn't take ownership of the QDict (and in the first error path, it
+hasn't even done that yet).
+
+Kevin
