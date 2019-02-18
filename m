@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60571)
+Received: from eggs.gnu.org ([209.51.188.92]:60908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvjag-0003RO-35
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:08:15 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc3-0004bi-5V
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvjae-0006Og-Oa
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:08:14 -0500
-Resent-Message-Id: <E1gvjae-0006Og-Oa@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155049886697.18484.13470112413311246497@49fa7ef69f7b>
-In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Feb 2019 06:07:48 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc2-00075g-0N
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:39 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:09:16 +0300
+Message-Id: <20190218140926.333779-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20190218140926.333779-1-vsementsov@virtuozzo.com>
+References: <20190218140926.333779-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 07/17] block/parallels: use
+ QEMU_IOVEC_INIT_BUF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +20,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cohuck@redhat.com
-Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODExMTE1My4yMjY4
-MS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODExMTE1My4yMjY4MS0xLWNvaHVja0ByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gczM5MHggdXBkYXRlClR5
-cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBk
-YXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tAcmVk
-aGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTExMTUzLjIyNjgxLTEtY29odWNrQHJlZGhhdC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozMGJkMTBhNzUzIHMzOTB4OiB1cGdy
-YWRlIHN0YXR1cyBvZiBLVk0gY29yZXMgdG8gInN1cHBvcnRlZCIKZDBjODA1M2UzNyBzMzkweC9r
-dm06IGFkZCB0cmFjZXBvaW50IHRvIGlvZXZlbnRmZCBpbnRlcmZhY2UKNTg5MTJlN2M3MCBzMzkw
-eC9jcHVtb2RlbDogYWRkIHoxNCBHQTIgbW9kZWwKZjBhNzYzMTY1YyBzMzkweC9jcHVtb2RlbDog
-ZGVmYXVsdCBlbmFibGUgbWVwb2NoIGZvciB6MTQgYW5kIGxhdGVyCmI1N2NmODMyNTQgczM5MHgv
-Y3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBvY2ggYW5kIHJlLWFsaWduIGdy
-b3VwIGluaXQKNDAzNmY5YTY3ZSBzMzkweDogYWRkIHpQQ0kgZmVhdHVyZSB0byAicWVtdSIgQ1BV
-IG1vZGVsCjYyNWM4OWM1NTYgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgU1RDSyBldCBhbCBmb3Ig
-Q09ORklHX1VTRVJfT05MWQoyYTQ5ZTYxNmI3IHRhcmdldC9zMzkweDogU3BsaXQgb3V0IHMzOTAt
-dG9kLmgKMWVhYTdmMGVkYSBzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQKNjAyZmU5
-YmRiMCBzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRlci0yMDEyIGxp
-Y2Vuc2Ugc3RhdGVtZW50cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21t
-aXQgNjAyZmU5YmRiMDA4IChzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1h
-ZnRlci0yMDEyIGxpY2Vuc2Ugc3RhdGVtZW50cykKMi8xMCBDaGVja2luZyBjb21taXQgMWVhYTdm
-MGVkYTE1IChzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzQwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDQ3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KMy8xMCBDaGVja2luZyBjb21taXQgMmE0OWU2MTZiNzIyICh0YXJnZXQvczM5MHg6IFNw
-bGl0IG91dCBzMzkwLXRvZC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU3IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMCBDaGVja2luZyBjb21taXQg
-NjI1Yzg5YzU1NmQ1ICh0YXJnZXQvczM5MHg6IEltcGxlbWVudCBTVENLIGV0IGFsIGZvciBDT05G
-SUdfVVNFUl9PTkxZKQo1LzEwIENoZWNraW5nIGNvbW1pdCA0MDM2ZjlhNjdlZWUgKHMzOTB4OiBh
-ZGQgelBDSSBmZWF0dXJlIHRvICJxZW11IiBDUFUgbW9kZWwpCjYvMTAgQ2hlY2tpbmcgY29tbWl0
-IGI1N2NmODMyNTQ3ZiAoczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBt
-ZXBvY2ggYW5kIHJlLWFsaWduIGdyb3VwIGluaXQpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojMzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0Njg6CisgICAgRkVB
-VF9HUk9VUF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5o
-YW5jZW1lbnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEwIENoZWNraW5nIGNvbW1pdCBmMGE3NjMxNjVj
-OTQgKHMzOTB4L2NwdW1vZGVsOiBkZWZhdWx0IGVuYWJsZSBtZXBvY2ggZm9yIHoxNCBhbmQgbGF0
-ZXIpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogaHcvczM5MHgv
-czM5MC12aXJ0aW8tY2N3LmM6NjYzOgorICAgIHMzOTBfY3B1ZGVmX2dyb3VwX2ZlYXRvZmZfZ3Jl
-YXRlcigxNCwgMSwgUzM5MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYpOwoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEwIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMTAgQ2hlY2tpbmcgY29tbWl0IDU4OTEyZTdjNzA4NSAo
-czM5MHgvY3B1bW9kZWw6IGFkZCB6MTQgR0EyIG1vZGVsKQo5LzEwIENoZWNraW5nIGNvbW1pdCBk
-MGM4MDUzZTM3NTYgKHMzOTB4L2t2bTogYWRkIHRyYWNlcG9pbnQgdG8gaW9ldmVudGZkIGludGVy
-ZmFjZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IDMwYmQxMGE3NTM4MCAoczM5MHg6IHVwZ3JhZGUg
-c3RhdHVzIG9mIEtWTSBjb3JlcyB0byAic3VwcG9ydGVkIikKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1
-Y2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Use new QEMU_IOVEC_INIT_BUF() instead of
+qemu_iovec_init_external( ... , 1), which simplifies the code.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/parallels.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/block/parallels.c b/block/parallels.c
+index cc9445879d..15bc97b759 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -220,23 +220,20 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+     if (bs->backing) {
+         int64_t nb_cow_sectors = to_allocate * s->tracks;
+         int64_t nb_cow_bytes = nb_cow_sectors << BDRV_SECTOR_BITS;
+-        QEMUIOVector qiov;
+-        struct iovec iov = {
+-            .iov_len = nb_cow_bytes,
+-            .iov_base = qemu_blockalign(bs, nb_cow_bytes)
+-        };
+-        qemu_iovec_init_external(&qiov, &iov, 1);
++        QEMUIOVector qiov =
++            QEMU_IOVEC_INIT_BUF(qiov, qemu_blockalign(bs, nb_cow_bytes),
++                                nb_cow_bytes);
+ 
+         ret = bdrv_co_preadv(bs->backing, idx * s->tracks * BDRV_SECTOR_SIZE,
+                              nb_cow_bytes, &qiov, 0);
+         if (ret < 0) {
+-            qemu_vfree(iov.iov_base);
++            qemu_vfree(qemu_iovec_buf(&qiov));
+             return ret;
+         }
+ 
+         ret = bdrv_co_pwritev(bs->file, s->data_end * BDRV_SECTOR_SIZE,
+                               nb_cow_bytes, &qiov, 0);
+-        qemu_vfree(iov.iov_base);
++        qemu_vfree(qemu_iovec_buf(&qiov));
+         if (ret < 0) {
+             return ret;
+         }
+-- 
+2.18.0
