@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58029)
+Received: from eggs.gnu.org ([209.51.188.92]:59164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjQk-0006mi-GU
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:57:59 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjW9-00083e-6C
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjQj-0000Jv-AO
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:57:58 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 13:57:53 +0000
-Message-ID: <b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-3-jsnow@redhat.com>
-In-Reply-To: <20190213232356.21034-3-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E6094CC2CEFDD84FA847839FEDA4631B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <sgarzare@redhat.com>) id 1gvjW8-0003mR-4M
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:03:33 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Mon, 18 Feb 2019 15:02:51 +0100
+Message-Id: <20190218140301.197408-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
- predicate helper
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/10] virtio-blk: add DISCARD and
+ WRITE_ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +20,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+ICJGcm96ZW4iIHdhcyBhIGdvb2Qg
-ZGVzY3JpcHRpb24gYSBsb25nIHRpbWUgYWdvLCBidXQgaXQgaXNuJ3QgYWRlcXVhdGUgbm93Lg0K
-PiBSZW5hbWUgdGhlIGZyb3plbiBwcmVkaWNhdGUgdG8gaGFzX3N1Y2Nlc3NvciB0byBtYWtlIHRo
-ZSBzZW1hbnRpY3Mgb2YgdGhlDQo+IHByZWRpY2F0ZSBtb3JlIGNsZWFyIHRvIG91dHNpZGUgY2Fs
-bGVycy4NCj4gDQo+IEluIHRoZSBwcm9jZXNzLCByZW1vdmUgc29tZSBjYWxscyB0byBmcm96ZW4o
-KSB0aGF0IG5vIGxvbmdlciBzZW1hbnRpY2FsbHkNCj4gbWFrZSBzZW5zZS4gRm9yIGVuYWJsZWQg
-YW5kIGRpc2FibGVkIGluIHBhcnRpY3VsYXIsIGl0J3MgYWN0dWFsbHkgb2theSBmb3INCj4gdGhl
-IGludGVybmFscyB0byBkbyB0aGlzIGJ1dCBvbmx5IGZvcmJpZGRlbiBmb3IgdXNlcnMgdG8gaW52
-b2tlIHRoZW0sIGFuZA0KDQpJJ20gYSBiaXQgbG9zdCBpbiB0aGlzIHBhcmFncmFwaC4uIHRvIHRo
-aXMgLSB3aGF0PywgdG8gaW52b2tlIHRoZW0gLSB3aG9tPw0KSSB0aGluaywgaXQgd291bGQgYmUg
-c2ltcGxlciBmb3IgbWUgdG8gcmVhZCBwYXRjaCBpdHNlbGYgOikNCg0KPiBhbGwgb2YgdGhlIFFN
-UCBlbnRyeSB1c2VzIGFscmVhZHkgY2hlY2sgYWdhaW5zdCBxbXBfbG9ja2VkLg0KPiANCj4gU2V2
-ZXJhbCBvdGhlciBhc3NlcnRpb25zIHJlYWxseSB3YW50IHRvIGNoZWNrIHRoYXQgdGhlIGJpdG1h
-cCBpc24ndCBpbi11c2UNCj4gYnkgYW5vdGhlciBvcGVyYXRpb24gLS0gdXNlIHRoZSBxbXBfbG9j
-a2VkIGZ1bmN0aW9uIGZvciB0aGlzIGluc3RlYWQsIHdoaWNoDQo+IHByZXNlbnRseSBhbHNvIGNo
-ZWNrcyBmb3IgaGFzX3N1Y2Nlc3Nvci4NCg0KaG0sIHlvdSBtZWFuIHVzZXJfbG9ja2VkLCBub3Qg
-cW1wX2xvY2tlZC4NCg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRo
-YXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyAgICAgICAgICAgfCAzMiAr
-KysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLQ0KPiAgIGluY2x1ZGUvYmxvY2svZGlydHkt
-Yml0bWFwLmggICB8ICAyICstDQo+ICAgbWlncmF0aW9uL2Jsb2NrLWRpcnR5LWJpdG1hcC5jIHwg
-IDIgKy0NCj4gICAzIGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9u
-cygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jIGIvYmxvY2svZGly
-dHktYml0bWFwLmMNCj4gaW5kZXggMTAxMzgzYjNhZi4uNjM5ZWJjMDY0NSAxMDA2NDQNCj4gLS0t
-IGEvYmxvY2svZGlydHktYml0bWFwLmMNCj4gKysrIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4g
-QEAgLTUwLDcgKzUwLDcgQEAgc3RydWN0IEJkcnZEaXJ0eUJpdG1hcCB7DQo+ICAgICAgIEhCaXRt
-YXAgKm1ldGE7ICAgICAgICAgICAgICAvKiBNZXRhIGRpcnR5IGJpdG1hcCAqLw0KPiAgICAgICBi
-b29sIHFtcF9sb2NrZWQ7ICAgICAgICAgICAgLyogQml0bWFwIGlzIGxvY2tlZCwgaXQgY2FuJ3Qg
-YmUgbW9kaWZpZWQNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRocm91
-Z2ggUU1QICovDQo+IC0gICAgQmRydkRpcnR5Qml0bWFwICpzdWNjZXNzb3I7IC8qIEFub255bW91
-cyBjaGlsZDsgaW1wbGllcyBmcm96ZW4gc3RhdHVzICovDQo+ICsgICAgQmRydkRpcnR5Qml0bWFw
-ICpzdWNjZXNzb3I7IC8qIEFub255bW91cyBjaGlsZDsgaW1wbGllcyB1c2VyX2xvY2tlZCBzdGF0
-ZSAqLw0KDQphaGEsIGxvb2tzIGxpa2UgYSBnb29kIG1vbWVudCB0byBmaXggcHJlZXhpc3Rpbmcg
-bWlzYWxpZ25tZW50IG9mIHRoZSBjb21tZW50LA0KYnV0IG5ldyBsaW5lIGlzIGV4YWN0bHkgODAg
-Y2hhcmFjdGVycyBsZW5ndGgsIHNvLCBub3QgYSBnb29kIG1vbWVudCkNCg0KPiAgICAgICBjaGFy
-ICpuYW1lOyAgICAgICAgICAgICAgICAgLyogT3B0aW9uYWwgbm9uLWVtcHR5IHVuaXF1ZSBJRCAq
-Lw0KPiAgICAgICBpbnQ2NF90IHNpemU7ICAgICAgICAgICAgICAgLyogU2l6ZSBvZiB0aGUgYml0
-bWFwLCBpbiBieXRlcyAqLw0KPiAgICAgICBib29sIGRpc2FibGVkOyAgICAgICAgICAgICAgLyog
-Qml0bWFwIGlzIGRpc2FibGVkLiBJdCBpZ25vcmVzIGFsbCB3cml0ZXMgdG8NCj4gQEAgLTE4Mywx
-NCArMTgzLDE0IEBAIGNvbnN0IGNoYXIgKmJkcnZfZGlydHlfYml0bWFwX25hbWUoY29uc3QgQmRy
-dkRpcnR5Qml0bWFwICpiaXRtYXApDQo+ICAgfQ0KPiAgIA0KPiAgIC8qIENhbGxlZCB3aXRoIEJR
-TCB0YWtlbi4gICovDQo+IC1ib29sIGJkcnZfZGlydHlfYml0bWFwX2Zyb3plbihCZHJ2RGlydHlC
-aXRtYXAgKmJpdG1hcCkNCj4gK2Jvb2wgYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihC
-ZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCkNCj4gICB7DQo+ICAgICAgIHJldHVybiBiaXRtYXAtPnN1
-Y2Nlc3NvcjsNCj4gICB9DQo+ICAgDQo+ICAgLyogQm90aCBjb25kaXRpb25zIGRpc2FsbG93IHVz
-ZXItbW9kaWZpY2F0aW9uIHZpYSBRTVAuICovDQo+ICAgYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF91
-c2VyX2xvY2tlZChCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCkgew0KPiAtICAgIHJldHVybiBiZHJ2
-X2RpcnR5X2JpdG1hcF9mcm96ZW4oYml0bWFwKSB8fA0KPiArICAgIHJldHVybiBiZHJ2X2RpcnR5
-X2JpdG1hcF9oYXNfc3VjY2Vzc29yKGJpdG1hcCkgfHwNCj4gICAgICAgICAgICAgIGJkcnZfZGly
-dHlfYml0bWFwX3FtcF9sb2NrZWQoYml0bWFwKTsNCj4gICB9DQo+ICAgDQo+IEBAIC0yMTUsNyAr
-MjE1LDcgQEAgYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF9lbmFibGVkKEJkcnZEaXJ0eUJpdG1hcCAq
-Yml0bWFwKQ0KPiAgIC8qIENhbGxlZCB3aXRoIEJRTCB0YWtlbi4gICovDQo+ICAgRGlydHlCaXRt
-YXBTdGF0dXMgYmRydl9kaXJ0eV9iaXRtYXBfc3RhdHVzKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFw
-KQ0KPiAgIHsNCj4gLSAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfZnJvemVuKGJpdG1hcCkpIHsN
-Cj4gKyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihiaXRtYXApKSB7DQo+
-ICAgICAgICAgICByZXR1cm4gRElSVFlfQklUTUFQX1NUQVRVU19GUk9aRU47DQo+ICAgICAgIH0g
-ZWxzZSBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfcW1wX2xvY2tlZChiaXRtYXApKSB7DQo+ICAgICAg
-ICAgICByZXR1cm4gRElSVFlfQklUTUFQX1NUQVRVU19MT0NLRUQ7DQo+IEBAIC0yMzUsNyArMjM1
-LDcgQEAgc3RhdGljIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfcmVjb3JkaW5nKEJkcnZEaXJ0eUJp
-dG1hcCAqYml0bWFwKQ0KPiAgIA0KPiAgIC8qKg0KPiAgICAqIENyZWF0ZSBhIHN1Y2Nlc3NvciBi
-aXRtYXAgZGVzdGluZWQgdG8gcmVwbGFjZSB0aGlzIGJpdG1hcCBhZnRlciBhbiBvcGVyYXRpb24u
-DQo+IC0gKiBSZXF1aXJlcyB0aGF0IHRoZSBiaXRtYXAgaXMgbm90IGZyb3plbiBhbmQgaGFzIG5v
-IHN1Y2Nlc3Nvci4NCj4gKyAqIFJlcXVpcmVzIHRoYXQgdGhlIGJpdG1hcCBpcyBub3QgbG9ja2Vk
-IGFuZCBoYXMgbm8gc3VjY2Vzc29yLg0KDQpJIHRoaW5rLCB1c2VyX2xvY2tlZCwgdG8gbm90IGlu
-dGVyZmVyZSB3aXRoIGJpdG1hcHMgbXV0ZXguIEFuZCB5b3UgdXNlIHVzZXJfbG9ja2VkIGluDQpv
-dGhlciBjb21tZW50cyBpbiB0aGlzIHBhdGNoLg0KDQo+ICAgICogQ2FsbGVkIHdpdGggQlFMIHRh
-a2VuLg0KPiAgICAqLw0KPiAgIGludCBiZHJ2X2RpcnR5X2JpdG1hcF9jcmVhdGVfc3VjY2Vzc29y
-KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiBAQCAtMjQ0LDEyICsyNDQsMTYgQEAgaW50IGJkcnZf
-ZGlydHlfYml0bWFwX2NyZWF0ZV9zdWNjZXNzb3IoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAg
-ICAgIHVpbnQ2NF90IGdyYW51bGFyaXR5Ow0KPiAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmNoaWxk
-Ow0KPiAgIA0KPiAtICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9mcm96ZW4oYml0bWFwKSkgew0K
-PiAtICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJDYW5ub3QgY3JlYXRlIGEgc3VjY2Vzc29yIGZv
-ciBhIGJpdG1hcCB0aGF0IGlzICINCj4gLSAgICAgICAgICAgICAgICAgICAiY3VycmVudGx5IGZy
-b3plbiIpOw0KPiArICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF91c2VyX2xvY2tlZChiaXRtYXAp
-KSB7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkNhbm5vdCBjcmVhdGUgYSBzdWNjZXNz
-b3IgZm9yIGEgYml0bWFwIHRoYXQgaXMgaW4tdXNlICINCj4gKyAgICAgICAgICAgICAgICAgICAi
-YnkgYW4gb3BlcmF0aW9uIik7DQo+ICsgICAgICAgIHJldHVybiAtMTsNCj4gKyAgICB9DQo+ICsg
-ICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX2hhc19zdWNjZXNzb3IoYml0bWFwKSkgew0KPiArICAg
-ICAgICBlcnJvcl9zZXRnKGVycnAsICJDYW5ub3QgY3JlYXRlIGEgc3VjY2Vzc29yIGZvciBhIGJp
-dG1hcCB0aGF0IGFscmVhZHkgIg0KPiArICAgICAgICAgICAgICAgICAgICJoYXMgb25lIik7DQoN
-Cg0KQW1tLCBkZWFkIGNvZGU/IF91c2VyX2xvY2tlZCgpIGltcGxpZXMgbm8gc3VjY2Vzc29yLCBz
-byB3ZSBpbnN0ZWFkIGNhbiBrZWVwIGFuIGFzc2VydGlvbi4uDQoNCg0KPiAgICAgICAgICAgcmV0
-dXJuIC0xOw0KPiAgICAgICB9DQo+IC0gICAgYXNzZXJ0KCFiaXRtYXAtPnN1Y2Nlc3Nvcik7DQo+
-ICAgDQo+ICAgICAgIC8qIENyZWF0ZSBhbiBhbm9ueW1vdXMgc3VjY2Vzc29yICovDQo+ICAgICAg
-IGdyYW51bGFyaXR5ID0gYmRydl9kaXJ0eV9iaXRtYXBfZ3JhbnVsYXJpdHkoYml0bWFwKTsNCg0K
-DQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+This series adds the support of DISCARD and WRITE_ZEROES commands
+and extends the virtio-blk-test to test these new commands.
+
+v5:
+- rebased on master
+- handled the config size for DISCARD and WRITE_ZEROES features as in
+  virtio-net (patches 4 and 5) [Michael, Stefan]
+- fixed an endianness issues on the WRITE_ZEROES test (patches 8 and 9)
+- added a test for DISCARD command to only test the status returned by th=
+e
+  request (patch 10)
+- others patches are unchanged (patches 1, 2, 3, 6, 7)
+
+v4:
+- fixed error with mingw compiler in patch 4
+  gcc and clang want %lu, but mingw wants %llu for BDRV_REQUEST_MAX_SECTO=
+RS.
+  Since is less than INT_MAX, I casted it to integer and I used %d in the
+  format string of error_setg. (mingw now is happy)
+
+v3:
+- rebased on master (I removed Based-on tag since the new virtio headers =
+from
+  linux v5.0-rc1 are merged)
+- added patch 2 to add host_features field (as in virtio-net) [Michael]
+- fixed patch 3 (previously 2/5) using the new host_features field
+- fixed patch 4 (previously 3/5) following the Stefan's comments:
+                - fixed name of functions and fields
+                - used vdev and s pointers
+                - removed "wz-may-unmap" property
+                - split "dwz-max-sectors" in two properties
+
+v2:
+- added patch 1 to use virtio_blk_handle_rw_error() with discard operatio=
+n
+- added patch 2 to make those new features machine-type dependent (thanks=
+ David)
+- fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
+rt()
+                for WRITE_ZEROES requests, and configurable parameters to
+                initialize the limits (max_sectors, wzeroes_may_unmap).
+                (thanks Stefan)
+                I moved in a new function the code to handle a single seg=
+ment,
+                in order to simplify the support of multiple segments in =
+the
+                future.
+- added patch 4 to change the assert on data_size following the discussio=
+n with
+                Thomas, Changpeng, Michael, and Stefan (thanks all)
+- fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
+ad of
+                dynamic allocation (thanks Thomas)
+
+Thanks,
+Stefano
+
+Stefano Garzarella (10):
+  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
+  virtio-blk: add host_features field in VirtIOBlock
+  virtio-blk: add "discard" and "write-zeroes" properties
+  virtio-net: make VirtIOFeature usable for other virtio devices
+  virtio-blk: set config size depending on the features enabled
+  virtio-blk: add DISCARD and WRITE_ZEROES features
+  tests/virtio-blk: change assert on data_size in virtio_blk_request()
+  tests/virtio-blk: add virtio_blk_fix_dwz_hdr() function
+  tests/virtio-blk: add test for WRITE_ZEROES command
+  tests/virtio-blk: add test for DISCARD command
+
+ hw/block/virtio-blk.c          | 245 ++++++++++++++++++++++++++++++---
+ hw/core/machine.c              |   2 +
+ hw/net/virtio-net.c            |  31 +----
+ hw/virtio/virtio.c             |  15 ++
+ include/hw/virtio/virtio-blk.h |   6 +-
+ include/hw/virtio/virtio.h     |  15 ++
+ tests/virtio-blk-test.c        | 127 ++++++++++++++++-
+ 7 files changed, 391 insertions(+), 50 deletions(-)
+
+--=20
+2.20.1
