@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35560)
+Received: from eggs.gnu.org ([209.51.188.92]:35584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gvnNE-0007FD-Sk
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvnNF-0007Fu-Sk
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:10:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gvnND-0000lQ-TU
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:10:36 -0500
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-12-eric.auger@redhat.com>
-	<278b9b9a-f299-1ce2-2a9d-566ef406c1c7@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <791bf4ec-aa80-b296-7140-84fa1c46a06f@redhat.com>
-Date: Mon, 18 Feb 2019 19:10:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <278b9b9a-f299-1ce2-2a9d-566ef406c1c7@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvnNE-0000o5-UF
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:10:37 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 18:10:19 +0000
+Message-ID: <2a7e5028-fad5-6ad2-b466-3c45fc0846a7@virtuozzo.com>
+References: <20190213233618.22484-1-jsnow@redhat.com>
+In-Reply-To: <20190213233618.22484-1-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 11/18] hw/arm/virt: Add memory hotplug
- framework
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <496E1FA4E36E7548B38D8190CA2EC510@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] bitmaps: add inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,115 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
-Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi David,
-
-On 2/14/19 6:15 PM, David Hildenbrand wrote:
-> On 05.02.19 18:32, Eric Auger wrote:
->> This patch adds the the memory hot-plug/hot-unplug infrastructure
->> in machvirt. It is still not enabled as no device memory is allocated.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>
->> ---
->> v4 -> v5:
->> - change in pc_dimm_pre_plug signature
->> - CONFIG_MEM_HOTPLUG replaced by CONFIG_MEM_DEVICE and CONFIG_DIMM
->>
->> v3 -> v4:
->> - check the memory device is not hotplugged
->>
->> v2 -> v3:
->> - change in pc_dimm_plug()'s signature
->> - add pc_dimm_pre_plug call
->>
->> v1 -> v2:
->> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
->> - s/pc_dimm_memory_plug/pc_dimm_plug
->> - reworded title and commit message
->> - added pre_plug cb
->> - don't handle get_memory_region failure anymore
->> ---
->>  default-configs/arm-softmmu.mak |  2 ++
->>  hw/arm/virt.c                   | 64 ++++++++++++++++++++++++++++++++-
->>  2 files changed, 65 insertions(+), 1 deletion(-)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index be88870799..dc4624794f 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -160,3 +160,5 @@ CONFIG_PCI_DESIGNWARE=y
->>  CONFIG_STRONGARM=y
->>  CONFIG_HIGHBANK=y
->>  CONFIG_MUSICPAL=y
->> +CONFIG_MEM_DEVICE=y
->> +CONFIG_DIMM=y
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index f01886da22..783468ba77 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -59,6 +59,8 @@
->>  #include "qapi/visitor.h"
->>  #include "standard-headers/linux/input.h"
->>  #include "hw/arm/smmuv3.h"
->> +#include "hw/mem/pc-dimm.h"
->> +#include "hw/mem/nvdimm.h"
->>  
->>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
->> @@ -1763,6 +1765,49 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->>      return ms->possible_cpus;
->>  }
->>  
->> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->> +                                 Error **errp)
->> +{
->> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->> +
->> +    if (dev->hotplugged) {
->> +        error_setg(errp, "memory hotplug is not supported");
->> +    }
->> +
->> +    if (is_nvdimm) {
->> +        error_setg(errp, "nvdimm is not yet supported");
->> +        return;
->> +    }
->> +
->> +    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
->> +}
->> +
->> +static void virt_memory_plug(HotplugHandler *hotplug_dev,
->> +                             DeviceState *dev, Error **errp)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->> +    Error *local_err = NULL;
->> +
->> +    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
->> +
->> +    error_propagate(errp, local_err);
->> +}
->> +
->> +static void virt_memory_unplug(HotplugHandler *hotplug_dev,
->> +                               DeviceState *dev, Error **errp)
->> +{
->> +    pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
->> +    object_unparent(OBJECT(dev));
-> 
-> Please note that this will soon change with
-> 
-> [PATCH RFCv2 0/9] qdev: Hotplug handler chaining + virtio-pmem
-> 
-> What you'll have to do then is to replace the object_unparent by a
-> 
-> object_property_set_bool(OBJECT(dev), false, "realized", NULL);
-Noted.
-
-Thanks for the heads up!
-
-Eric
-> 
-> 
+MTQuMDIuMjAxOSAyOjM2LCBKb2huIFNub3cgd3JvdGU6DQo+IEFsbG93IFFFTVUgdG8gcmVhZCBp
+biBiaXRtYXBzIHRoYXQgaGF2ZSB0aGUgaW4tdXNlIGJpdCBzZXQsIGZvciB0aGUNCj4gcHVycG9z
+ZXMgb2YgYWxsb3dpbmcgdXNlcnMgdG8gY2xlYXIgb3IgcmVzZXQgdGhlc2UgYml0bWFwcy4NCj4g
+DQo+IFRoaXMgaXMgY2hvc2VuIGluIHByZWZlcmVuY2UgdG8gYSBoYXJkIGVycm9yIG9uIGxvYWQg
+dG8gbWluaW1pemUNCj4gaW1wYWN0IGZvciBhIG5vbi1jcml0aWNhbCBlcnJvciwgYnV0IHRvIGZv
+cmNlIHRoZSB1c2VyIG9yIG1hbmFnZW1lbnQNCj4gdXRpbGl0eSB0byBhY2tub3dsZWRnZSB0aGF0
+IHRoZSBiaXRtYXAgaXMgbm8gbG9uZ2VyIHZpYWJsZS4NCj4gDQo+IFJlcXVpcmVzOiBbUEFUQ0gg
+djIgMC82XSBkaXJ0eS1iaXRtYXBzOiBkZXByZWNhdGUgQHN0YXR1cyBmaWVsZA0KPiAgICAgICAg
+ICAgIChXaGljaCBpbiB0dXJuIHJlcXVpcmVzIG15IGJpdG1hcHMgc3RhZ2luZyBicmFuY2guKQ0K
+PiANCj4gUkZDOiBUaGlzIGlzIGp1c3QgZm9yIGdlbmVyYWwgYXBwcm9hY2gsIG5hbWluZywgYW5k
+IEFQSS4NCj4gICAgICAgSSBjaG9zZSBOT1QgdG8gb3ZlcmxvYWQgdGhlIGJ1c3kgcHJlZGljYXRl
+IHNvIHRoYXQgaXQgd291bGQgYmUgZGlzdGluY3QsDQo+ICAgICAgIHdoaWNoIHVuZm9ydHVuYXRl
+bHkgbWVhbnMgbWFueSBtb3JlIG1hbnVhbCBjaGVja3MgYWNyb3NzIGJsb2NrZGV2Lg0KDQpJIHRo
+aW5rIHdlIGp1c3QgbmVlZCBhIGhlbHBlciBwcmVkaWNhdGUgd2l0aCBlcnJwIHBhcmFtZXRlciwg
+d2hpY2ggd2lsbCBjYWxsIGJvdGgNCl9idXN5IGFuZCBfaW5jb25zaXN0ZW50Lg0KDQo+IA0KPiAg
+ICAgICAtIEkgY2hvc2UgImluY29uc2lzdGVudCIgb3ZlciAiY29ycnVwdCIgdG8gYmUgbW9yZSBs
+aXRlcmFsIHRvIHRoZQ0KPiAgICAgICBtZWFuaW5nIG9mIHRoZSAiaW4tdXNlIiBiaXQsIGJ1dCBt
+YXliZSB0aGlzIGlzIG92ZXJjYXV0aW91cy4NCg0KSSdtIG9rIHdpdGggYm90aA0KDQo+IA0KPiAg
+ICAgICAtIEkgY2hvc2UgdG8gbWFrZSB0aGUgZmllbGQgb3B0aW9uYWwgc28gdGhhdCBpdCBkaXNh
+cHBlYXJzIGluDQo+ICAgICAgIG5vcm1hdGl2ZSBjYXNlcywgYXMgdGhlIGluZm9ybWF0aW9uIGlz
+IG9ubHkgcmVhbGx5IHJlbGV2YW50IHdoZW4NCj4gICAgICAgaW5jb25zaXN0ZW50PXRydWUuDQoN
+CkFncmVlDQoNCj4gDQo+ICAgICAgIEkgYWxzbyBoYXZlIE5PVCB0ZXN0ZWQgdGhpcyBhbmQgSSBk
+aWRuJ3QgdmVyaWZ5IHRoZSBzYXZpbmcgbG9naWMNCj4gICAgICAgZm9yIHdoYXQgaGFwcGVucyBp
+ZiB5b3UgZG9uJ3QgZGVsZXRlIG9yIGNsZWFyIHRoZSBiaXRtYXAsDQo+ICAgICAgIGJ1dCBJJ20g
+b24gUFRPIHRoZSBuZXh0IHR3byBkYXlzIGFuZCBJIHdhbnRlZCB0aGlzIHRvIHNlZSBkYXlsaWdo
+dC4NCg0KSSB0aGluaywgd2Ugc2hvdWxkIG5vdCBjaGFuZ2UgY2xlYXIoKSBsb2dpYyB0byBtYWtl
+IGJpdG1hcHMgY29uc2lzdGVudC4gSXMNCnRoZXJlIHJlYWwgdXNhZ2Ugb2YgaXQ/DQoNCjEuIGJp
+dG1hcCAoYW5kIGl0cyBuYW1lKSBpcyByZWxhdGVkIHRvIHNvbWUgY2hlY2twb2ludCwgYW5kIGNs
+ZWFyaW5nIGRvbid0IG1ha2UgaXQgY29uc2lzdGVudA0KMi4gaXQgaXMgZXh0cmEgZGlmZmljdWx0
+eQ0KMy4gd2UgY2FuIGFkZCB0aGlzIGxvZ2ljIHNlcGFyYXRlbHksIGxhdGVyLCBvbiBkZW1hbmQs
+IGlmIG5lZWRlZA0KNC4gd2l0aG91dCBpdCwgd2UgY2FuIHVzZSB0aGUgZm9sbG93aW5nIHNpbXBs
+ZSBpbnRlcmZhY2UgYW5kIGVhc2lseSBzYXZlIFJBTToNCg0Kbm8gYmRydl9kaXJ0eV9iaXRtYXBf
+c2V0X2luY29uc2lzdGVudCgpLCBidXQganVzdCBiZHJ2X2NyZWF0ZV9pbmNvbnNpc3RlbnRfZGly
+dHlfYml0bWFwKCkNCihhaGFoYSBjb29sIGZ1bmN0aW9uIG5hbWUpLCBhbmQgY2FsbCBpdCBpbiBx
+Y293MiBjb2RlLCB3aGVuIGZvdW5kIGluLXVzZSBiaXRtYXAuIEFuZCwgaW4NCnRoaXMgYmRydl9j
+cmVhdGVfaW5jb25zaXRlbnRfZGlydHlfYml0bWFwKCkgZG8gbm90IGFsbG9jYXRlIEhCaXRtYXAs
+IHdoaWNoIG1heSBzYXZlIGENCmxvdCBvZiBtZW1vcnkuDQoNCj4gDQo+IEpvaG4gU25vdyAoMik6
+DQo+ICAgIGJsb2NrL2RpcnR5LWJpdG1hcHM6IGFkZCBpbmNvbnNpc3RlbnQgYml0DQo+ICAgIGJs
+b2NrL2RpcnR5LWJpdG1hcDogaW1wbGVtZW50IGluY29uc2lzdGVudCBiaXQNCj4gDQo+ICAgYmxv
+Y2svZGlydHktYml0bWFwLmMgICAgICAgICB8IDM0ICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysNCj4gICBibG9jay9xY293Mi1iaXRtYXAuYyAgICAgICAgIHwgNDIgKysrKysrKysrKysrKysr
+KysrLS0tLS0tLS0tLS0tLS0tLS0NCj4gICBibG9ja2Rldi5jICAgICAgICAgICAgICAgICAgIHwg
+NDMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgaW5jbHVkZS9ibG9j
+ay9kaXJ0eS1iaXRtYXAuaCB8ICAzICsrKw0KPiAgIHFhcGkvYmxvY2stY29yZS5qc29uICAgICAg
+ICAgfCAgOSArKysrKystLQ0KPiAgIDUgZmlsZXMgY2hhbmdlZCwgMTA5IGluc2VydGlvbnMoKyks
+IDIyIGRlbGV0aW9ucygtKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
