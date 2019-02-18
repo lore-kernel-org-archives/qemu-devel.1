@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44437)
+Received: from eggs.gnu.org ([209.51.188.92]:44446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gviTO-00087R-Jp
+	(envelope-from <armbru@redhat.com>) id 1gviTO-00087Z-QZ
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gviTM-0000n5-L9
+	(envelope-from <armbru@redhat.com>) id 1gviTN-0000nk-2l
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:38 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 13:56:08 +0100
-Message-Id: <20190218125615.18970-4-armbru@redhat.com>
+Date: Mon, 18 Feb 2019 13:56:10 +0100
+Message-Id: <20190218125615.18970-6-armbru@redhat.com>
 In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 References: <20190218125615.18970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/10] hw: Use CFI_PFLASH0{1,
- 2} and TYPE_CFI_PFLASH0{1, 2}
+Subject: [Qemu-devel] [PATCH 05/10] ppc405_boards: Don't size flash memory
+ to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,140 +21,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-We have two open-coded copies of macro CFI_PFLASH01().  Move the macro
-to the header, so we can ditch the copies.  Move CFI_PFLASH02() to the
-header for symmetry.
+Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+Image size is rounded up to the next multiple of 64KiB.  Useless,
+because pflash_cfi02_realize() fails with "failed to read the initial
+flash content" unless the rounding is a no-op.
 
-We define macros TYPE_CFI_PFLASH01 and TYPE_CFI_PFLASH02 for type name
-strings, then mostly use the strings.  If the macros are worth
-defining, they are worth using.  Replace the strings by the macros.
+If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+other stuff.  No idea how that would play out, but a useful outcomes
+seem unlikely.
 
+Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+regardless of image size, to match the physical hardware.
+
+Machine "taihu" maps its boot flash memory similarly.  The code even
+has a comment /* XXX: should check that size is 2MB */, followed by
+disabled code to adjust the size to 2MiB regardless of image size.
+
+Its code to map its application flash memory looks the same, except
+there the XXX comment asks for 32MiB, and the code to adjust the size
+isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+to read the initial flash content" for images smaller than 32MiB.
+
+Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+to match the physical hardware.  Delete dead code from application
+flash mapping, and simplify some.
+
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/arm/vexpress.c        | 4 ++--
- hw/arm/virt.c            | 3 ++-
- hw/block/pflash_cfi01.c  | 3 ---
- hw/block/pflash_cfi02.c  | 3 ---
- hw/xtensa/xtfpga.c       | 4 ++--
- include/hw/block/flash.h | 4 ++++
- 6 files changed, 10 insertions(+), 11 deletions(-)
+ hw/ppc/ppc405_boards.c | 53 +++++++++++++-----------------------------
+ 1 file changed, 16 insertions(+), 37 deletions(-)
 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index ed46d2e730..00913f2655 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
- static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
-                                              DriveInfo *di)
- {
--    DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index f47b15f10e..728154aebb 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+     target_ulong kernel_base, initrd_base;
+     long kernel_size, initrd_size;
+     int linux_boot;
+-    int fl_idx, fl_sectors, len;
++    int len;
+     DriveInfo *dinfo;
+     MemoryRegion *sysmem = get_system_memory();
  
-     if (di) {
-         qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
-@@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
-     qdev_init_nofail(dev);
- 
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-+    return CFI_PFLASH01(dev);
- }
- 
- static void vexpress_common_init(MachineState *machine)
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 99c2b6e60d..b7d53b2b87 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -34,6 +34,7 @@
- #include "hw/arm/arm.h"
- #include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
-+#include "hw/block/flash.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
-@@ -874,7 +875,7 @@ static void create_one_flash(const char *name, hwaddr flashbase,
-      * parameters as the flash devices on the Versatile Express board.
-      */
-     DriveInfo *dinfo = drive_get_next(IF_PFLASH);
--    DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     const uint64_t sectorlength = 256 * 1024;
- 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index f73c30a3ee..43dbb7db26 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -59,9 +59,6 @@ do {                                                        \
- #define DPRINTF(fmt, ...) do { } while (0)
+@@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+ #ifdef DEBUG_BOARD_INIT
+     printf("%s: register BIOS\n", __func__);
  #endif
- 
--#define CFI_PFLASH01(obj) \
--    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
+-    fl_idx = 0;
+ #ifdef USE_FLASH_BIOS
+-    dinfo = drive_get(IF_PFLASH, 0, fl_idx);
++    dinfo = drive_get(IF_PFLASH, 0, 0);
+     if (dinfo) {
+-        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
 -
- #define PFLASH_BE          0
- #define PFLASH_SECURE      1
+-        bios_size = blk_getlength(blk);
+-        fl_sectors = (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+-        printf("Register parallel flash %d size %lx"
+-               " at addr %lx '%s' %d\n",
+-               fl_idx, bios_size, -bios_size,
+-               blk_name(blk), fl_sectors);
++        printf("Register parallel flash\n");
+ #endif
+-        pflash_cfi02_register((uint32_t)(-bios_size),
++        bios_size = 0x80000;
++        pflash_cfi02_register(0xFFF80000,
+                               NULL, "ef405ep.bios", bios_size,
+-                              blk, 65536, fl_sectors, 1,
++                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              65536, bios_size / 65536, 1,
+                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+                               1);
+-        fl_idx++;
+     } else
+ #endif
+     {
+@@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
+     target_ulong kernel_base, initrd_base;
+     long kernel_size, initrd_size;
+     int linux_boot;
+-    int fl_idx, fl_sectors;
++    int fl_idx;
+     DriveInfo *dinfo;
  
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 424cc106d6..e9c76d6cfb 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -57,9 +57,6 @@ do {                                                       \
- 
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
- 
--#define CFI_PFLASH02(obj) \
--    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
+     /* RAM is soldered to the board so the size cannot be changed */
+@@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
+ #if defined(USE_FLASH_BIOS)
+     dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+     if (dinfo) {
+-        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
 -
- struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 3d59a7a356..a726d5632a 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
-                                       DriveInfo *dinfo, int be)
- {
-     SysBusDevice *s;
--    DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
-+    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
- 
-     qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-                         &error_abort);
-@@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
-     s = SYS_BUS_DEVICE(dev);
-     memory_region_add_subregion(address_space, board->flash->base,
-                                 sysbus_mmio_get_region(s, 0));
--    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-+    return CFI_PFLASH01(dev);
- }
- 
- static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 51d8f60c65..1078dc7238 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -8,6 +8,8 @@
- /* pflash_cfi01.c */
- 
- #define TYPE_CFI_PFLASH01 "cfi.pflash01"
-+#define CFI_PFLASH01(obj) \
-+    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
- 
- typedef struct PFlashCFI01 PFlashCFI01;
- 
-@@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
- /* pflash_cfi02.c */
- 
- #define TYPE_CFI_PFLASH02 "cfi.pflash02"
-+#define CFI_PFLASH02(obj) \
-+    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
- 
- typedef struct PFlashCFI02 PFlashCFI02;
- 
+-        bios_size = blk_getlength(blk);
+-        /* XXX: should check that size is 2MB */
+-        //        bios_size = 2 * 1024 * 1024;
+-        fl_sectors = (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+-        printf("Register parallel flash %d size %lx"
+-               " at addr %lx '%s' %d\n",
+-               fl_idx, bios_size, -bios_size,
+-               blk_name(blk), fl_sectors);
++        printf("Register boot flash\n");
+ #endif
+-        pflash_cfi02_register((uint32_t)(-bios_size),
++        bios_size = 2 * MiB;
++        pflash_cfi02_register(0xFFE00000,
+                               NULL, "taihu_405ep.bios", bios_size,
+-                              blk, 65536, fl_sectors, 1,
++                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              65536, bios_size / 65536, 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+                               1);
+         fl_idx++;
+@@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
+     /* Register Linux flash */
+     dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+     if (dinfo) {
+-        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+-
+-        bios_size = blk_getlength(blk);
+-        /* XXX: should check that size is 32MB */
+         bios_size = 32 * MiB;
+-        fl_sectors = (bios_size + 65535) >> 16;
+ #ifdef DEBUG_BOARD_INIT
+-        printf("Register parallel flash %d size %lx"
+-               " at addr " TARGET_FMT_lx " '%s'\n",
+-               fl_idx, bios_size, (target_ulong)0xfc000000,
+-               blk_name(blk));
++        printf("Register application flash\n"
+ #endif
+         pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bios_size,
+-                              blk, 65536, fl_sectors, 1,
++                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
++                              65536, bios_size / 65536, 1,
+                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+                               1);
+         fl_idx++;
 -- 
 2.17.2
