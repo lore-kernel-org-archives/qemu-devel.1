@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38641)
+Received: from eggs.gnu.org ([209.51.188.92]:38739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjws-0005XC-5W
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:31:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjwv-0005cm-Md
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjwl-0002ap-2k
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:31:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjwu-0002h7-5U
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:31:13 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:10 +1100
-Message-Id: <20190218143049.17142-5-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:13 +1100
+Message-Id: <20190218143049.17142-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/43] target/ppc: Fix msync to do what hardware
- does
+Subject: [Qemu-devel] [PULL 07/43] spapr: Disallow unsupported
+ kernel-irqchip settings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +23,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Greg Kurz <groug@kaod.org>
 
-According to BookE docs, invalid bits (while undefined behaviour) should
-not raise exception but be ignored. This seems to be implementation
-dependent though and QEMU currently does what e500 CPUs do and raise
-exception for invalid bits. Unfortunately some versions of libstdc++
-(and so all programs compiled with it) have lwsync on PPC440 which is
-invalid but on real hardware it's just executed as msync ignoring the
-invalid bits (maybe that's why it got undetected) but they fail on QEMU.
-This patch changes invalid mask of msync to allow these programs to run
-but keep generating exception on e500 cores to follow what hardware does.
+Split mode doesn't make sense on pseries, neither with XICS nor XIVE. But
+passing kernel-irqchip=3Dsplit silently behaves like kernel-irqchip=3Don.
+Other architectures that support kernel-irqchip do terminate QEMU when
+split mode is requested but not available though. Do the same with pserie=
+s
+for consistency.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Similarly, passing kernel-irqchip=3Don,accel=3Dtcg starts the machine wit=
+h the
+emulated interrupt controller, ie, behaves like kernel-irqchip=3Doff. How=
+ever,
+when passing  kernel-irqchip=3Don,accel=3Dkvm, if we can't initialize the=
+ KVM
+XICS for some reason, ie, xics_kvm_init() fails, then QEMU is terminated.
+This is inconsistent. Terminate QEMU all the same when requesting the
+in-kernel interrupt controller without KVM.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <154964986747.291716.2679312373018476920.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_irq.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e169c43643..5429ceb1ab 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6476,7 +6476,12 @@ static void gen_mbar(DisasContext *ctx)
- /* msync replaces sync on 440 */
- static void gen_msync_4xx(DisasContext *ctx)
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 2d7a7c1638..80b0083b8e 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -600,6 +600,19 @@ sPAPRIrq spapr_irq_dual =3D {
+  */
+ void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
  {
--    /* interpreted as no-op */
-+    /* Only e500 seems to treat reserved bits as invalid */
-+    if ((ctx->insns_flags2 & PPC2_BOOKE206) &&
-+        (ctx->opcode & 0x03FFF801)) {
-+        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
++    MachineState *machine =3D MACHINE(spapr);
++
++    if (machine_kernel_irqchip_split(machine)) {
++        error_setg(errp, "kernel_irqchip split mode not supported on pse=
+ries");
++        return;
 +    }
-+    /* otherwise interpreted as no-op */
- }
-=20
- /* icbt */
-@@ -7054,11 +7059,11 @@ GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01,=
- PPC_WRTEE),
- GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
- GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
-               PPC_BOOKE, PPC2_BOOKE206),
--GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
-+GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x039FF801, PPC_BOOKE),
- GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
-                PPC_BOOKE, PPC2_BOOKE206),
- GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
--               PPC_440_SPEC),
-+             PPC_440_SPEC),
- GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
++
++    if (!kvm_enabled() && machine_kernel_irqchip_required(machine)) {
++        error_setg(errp,
++                   "kernel_irqchip requested but only available with KVM=
+");
++        return;
++    }
++
+     /* Initialize the MSI IRQ allocator. */
+     if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+         spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
 --=20
 2.20.1
