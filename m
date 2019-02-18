@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60099)
+Received: from eggs.gnu.org ([209.51.188.92]:60184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gvn9B-0006fC-BA
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:06 -0500
+	(envelope-from <crosa@redhat.com>) id 1gvn9U-0006qy-FP
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gvn9A-0004Le-Ir
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:05 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:43414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1gvn94-000494-TC
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:00 -0500
-From: Sven Schnelle <svens@stackframe.org>
-Date: Mon, 18 Feb 2019 18:55:29 +0100
-Message-Id: <20190218175529.11237-2-svens@stackframe.org>
-In-Reply-To: <20190218175529.11237-1-svens@stackframe.org>
-References: <20190218175529.11237-1-svens@stackframe.org>
+	(envelope-from <crosa@redhat.com>) id 1gvn9T-0004bL-Ro
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gvn9T-0004ad-IW
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:56:23 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8F4EE81F31
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 17:56:22 +0000 (UTC)
+References: <20190212193855.13223-1-ccarrara@redhat.com>
+	<20190212193855.13223-3-ccarrara@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <0624c3b5-aee7-8658-cf89-b4ae9f6eeb20@redhat.com>
+Date: Mon, 18 Feb 2019 12:56:21 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/2] lsi: use ldn_le_p()/stn_le_p()
+In-Reply-To: <20190212193855.13223-3-ccarrara@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] tests.acceptance: adds simple
+ migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +35,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
+To: Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
----
- hw/scsi/lsi53c895a.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index c493e3c4c7..93c4434bfb 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -2078,29 +2078,14 @@ static void lsi_ram_write(void *opaque, hwaddr addr,
-                           uint64_t val, unsigned size)
- {
-     LSIState *s = opaque;
--    uint32_t newval;
--    uint32_t mask;
--    int shift;
--
--    newval = s->script_ram[addr >> 2];
--    shift = (addr & 3) * 8;
--    mask = ((uint64_t)1 << (size * 8)) - 1;
--    newval &= ~(mask << shift);
--    newval |= val << shift;
--    s->script_ram[addr >> 2] = newval;
-+    stn_le_p(((void*)s->script_ram) + addr, size, val);
- }
- 
- static uint64_t lsi_ram_read(void *opaque, hwaddr addr,
-                              unsigned size)
- {
-     LSIState *s = opaque;
--    uint32_t val;
--    uint32_t mask;
--
--    val = s->script_ram[addr >> 2];
--    mask = ((uint64_t)1 << (size * 8)) - 1;
--    val >>= (addr & 3) * 8;
--    return val & mask;
-+    return ldn_le_p(((void *)s->script_ram) + addr, size);
- }
- 
- static const MemoryRegionOps lsi_ram_ops = {
--- 
-2.20.1
+
+On 2/12/19 2:38 PM, Caio Carrara wrote:
+> This change adds the simplest possible migration test. Beyond the test
+> purpose itself it's also useful to exercise the multi virtual machines
+> capabilities from base avocado qemu test class.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Caio Carrara <ccarrara@redhat.com>
+
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
