@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42171)
+Received: from eggs.gnu.org ([209.51.188.92]:42692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gvm7R-0007Jh-O1
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:50:14 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvm9Q-0008Oq-K0
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:52:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gvm7R-0004Lr-1x
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:50:13 -0500
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-9-armbru@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <aa7290ec-34e1-2fe7-8bcb-0a9db90bd418@redhat.com>
-Date: Mon, 18 Feb 2019 17:50:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190218125615.18970-9-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvm9P-0005YS-B7
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:52:16 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 16:52:09 +0000
+Message-ID: <957f3ab5-d5b7-b44d-9bc5-89a4ff78d87f@virtuozzo.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-5-jsnow@redhat.com>
+In-Reply-To: <20190213232356.21034-5-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/10] pflash: Clean up after commit
- 368a354f02b part 1
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A0C5E95679D475489934E706692D1C1A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] block/dirty-bitmap: explicitly lock
+ bitmaps with successors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 02/18/19 13:56, Markus Armbruster wrote:
-> QOMification left parameter @qdev unused in pflash_cfi01_register()
-> and pflash_cfi02_register().  All callers pass NULL.  Remove.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/arm/collie.c                          | 4 ++--
->  hw/arm/digic_boards.c                    | 2 +-
->  hw/arm/gumstix.c                         | 4 ++--
->  hw/arm/mainstone.c                       | 2 +-
->  hw/arm/musicpal.c                        | 4 ++--
->  hw/arm/omap_sx1.c                        | 4 ++--
->  hw/arm/versatilepb.c                     | 2 +-
->  hw/arm/xilinx_zynq.c                     | 2 +-
->  hw/arm/z2.c                              | 3 +--
->  hw/block/pflash_cfi01.c                  | 2 +-
->  hw/block/pflash_cfi02.c                  | 2 +-
->  hw/i386/pc_sysfw.c                       | 2 +-
->  hw/lm32/lm32_boards.c                    | 4 ++--
->  hw/lm32/milkymist.c                      | 2 +-
->  hw/microblaze/petalogix_ml605_mmu.c      | 3 +--
->  hw/microblaze/petalogix_s3adsp1800_mmu.c | 2 +-
->  hw/mips/mips_malta.c                     | 2 +-
->  hw/mips/mips_r4k.c                       | 2 +-
->  hw/ppc/ppc405_boards.c                   | 6 +++---
->  hw/ppc/sam460ex.c                        | 2 +-
->  hw/ppc/virtex_ml507.c                    | 2 +-
->  hw/sh4/r2d.c                             | 2 +-
->  include/hw/block/flash.h                 | 4 ++--
->  23 files changed, 31 insertions(+), 33 deletions(-)
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+IEluc3RlYWQgb2YgaW1wbHlpbmcg
+YSBsb2NrZWQgc3RhdHVzLCBtYWtlIGl0IGV4cGxpY2l0Lg0KDQpsb2NrZWQgaW50ZXJmZXJlcyB3
+aXRoIGJpdG1hcCBtdXRleCwgc28gbWF5IGJlIGJldHRlciAicW1wX2xvY2tlZCBzdGF0ZSIsIGJ1
+dCBub3Qgc3VyZS4NCg0KPiBOb3csIGJpdG1hcHMgaW4gdXNlIGJ5IG1pZ3JhdGlvbiwgTkJEIG9y
+IGJhY2t1cCBvcGVyYXRpb25zDQo+IGFyZSBhbGwgdHJlYXRlZCB0aGUgc2FtZSB3YXkgd2l0aCB0
+aGUgc2FtZSBjb2RlIHBhdGhzLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25v
+d0ByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5j
+b20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
+c292QHZpcnR1b3p6by5jb20+DQoNCkhtbS4gSXNuJ3QgaXQgYmV0dGVyIHRvIG1ha2Ugc3VjY2Vz
+c29yLXJlbGF0ZWQgc3RhZmYgdW5yZWxhdGVkIHRvIGxvY2tpbmcgYXQgYWxsPw0KU28sIGJhY2t1
+cCB3aWxsIGNhbGwgc2V0X3FtcF9sb2NrZWQgbGlrZSBvdGhlcnM/IEFuZCB0aGVuIGRvIGNyZWF0
+ZV9zdWNjZXNzb3IsDQphYmRpY2F0ZSwgcmVjbGFpbSwgd2hhdGV2ZXIgaXQgd2FudHMsIGFuZCBm
+aW5hbGx5IHNldF9xbXBfbG9ja2VkKGZhbHNlKSA/DQpUbyBtYWtlIGl0IHdvcmsgZXZlbiBtb3Jl
+IGluIHRoZSBzYW1lIHBhdGguIEJ1dCBpdCBtYXkgYmUgZG9uZSBzZXBhcmF0ZWx5LCBpZiB3ZQ0K
+d2FudC4NCg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyB8IDkgKysrKystLS0tDQo+
+ICAgMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+
+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
+DQo+IGluZGV4IGJiMmUxOWUwZDguLjIwNDJjNjI2MDIgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Rp
+cnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBAIC0xODgsMTAg
+KzE4OCw4IEBAIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihCZHJ2RGlydHlC
+aXRtYXAgKmJpdG1hcCkNCj4gICAgICAgcmV0dXJuIGJpdG1hcC0+c3VjY2Vzc29yOw0KPiAgIH0N
+Cj4gICANCj4gLS8qIEJvdGggY29uZGl0aW9ucyBkaXNhbGxvdyB1c2VyLW1vZGlmaWNhdGlvbiB2
+aWEgUU1QLiAqLw0KPiAgIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfdXNlcl9sb2NrZWQoQmRydkRp
+cnR5Qml0bWFwICpiaXRtYXApIHsNCj4gLSAgICByZXR1cm4gYmRydl9kaXJ0eV9iaXRtYXBfaGFz
+X3N1Y2Nlc3NvcihiaXRtYXApIHx8DQo+IC0gICAgICAgICAgIGJkcnZfZGlydHlfYml0bWFwX3Ft
+cF9sb2NrZWQoYml0bWFwKTsNCj4gKyAgICByZXR1cm4gYmRydl9kaXJ0eV9iaXRtYXBfcW1wX2xv
+Y2tlZChiaXRtYXApOw0KPiAgIH0NCj4gICANCj4gICB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3Nl
+dF9xbXBfbG9ja2VkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBib29sIHFtcF9sb2NrZWQpDQo+
+IEBAIC0yNjYsOCArMjY0LDkgQEAgaW50IGJkcnZfZGlydHlfYml0bWFwX2NyZWF0ZV9zdWNjZXNz
+b3IoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgIGNoaWxkLT5kaXNhYmxlZCA9IGJpdG1h
+cC0+ZGlzYWJsZWQ7DQo+ICAgICAgIGJpdG1hcC0+ZGlzYWJsZWQgPSB0cnVlOw0KPiAgIA0KPiAt
+ICAgIC8qIEluc3RhbGwgdGhlIHN1Y2Nlc3NvciBhbmQgZnJlZXplIHRoZSBwYXJlbnQgKi8NCj4g
+KyAgICAvKiBJbnN0YWxsIHRoZSBzdWNjZXNzb3IgYW5kIGxvY2sgdGhlIHBhcmVudCAqLw0KPiAg
+ICAgICBiaXRtYXAtPnN1Y2Nlc3NvciA9IGNoaWxkOw0KPiArICAgIGJpdG1hcC0+cW1wX2xvY2tl
+ZCA9IHRydWU7DQo+ICAgICAgIHJldHVybiAwOw0KPiAgIH0NCj4gICANCj4gQEAgLTMyMSw2ICsz
+MjAsNyBAQCBCZHJ2RGlydHlCaXRtYXAgKmJkcnZfZGlydHlfYml0bWFwX2FiZGljYXRlKEJsb2Nr
+RHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICBiaXRtYXAtPnN1Y2Nlc3NvciA9IE5VTEw7DQo+ICAg
+ICAgIHN1Y2Nlc3Nvci0+cGVyc2lzdGVudCA9IGJpdG1hcC0+cGVyc2lzdGVudDsNCj4gICAgICAg
+Yml0bWFwLT5wZXJzaXN0ZW50ID0gZmFsc2U7DQo+ICsgICAgYml0bWFwLT5xbXBfbG9ja2VkID0g
+ZmFsc2U7DQo+ICAgICAgIGJkcnZfcmVsZWFzZV9kaXJ0eV9iaXRtYXAoYnMsIGJpdG1hcCk7DQo+
+ICAgDQo+ICAgICAgIHJldHVybiBzdWNjZXNzb3I7DQo+IEBAIC0zNDksNiArMzQ5LDcgQEAgQmRy
+dkRpcnR5Qml0bWFwICpiZHJ2X3JlY2xhaW1fZGlydHlfYml0bWFwX2xvY2tlZChCbG9ja0RyaXZl
+clN0YXRlICpicywNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBwYXJlbnQtPmRpc2FibGVkID0g
+c3VjY2Vzc29yLT5kaXNhYmxlZDsNCj4gKyAgICBwYXJlbnQtPnFtcF9sb2NrZWQgPSBmYWxzZTsN
+Cj4gICAgICAgYmRydl9yZWxlYXNlX2RpcnR5X2JpdG1hcF9sb2NrZWQoc3VjY2Vzc29yKTsNCj4g
+ICAgICAgcGFyZW50LT5zdWNjZXNzb3IgPSBOVUxMOw0KPiAgIA0KPiANCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
