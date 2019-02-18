@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45627)
+Received: from eggs.gnu.org ([209.51.188.92]:50204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gviWf-0002cY-FE
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:00:03 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gviri-0004Dj-UM
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gviWd-00041T-QG
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:00:01 -0500
-Resent-Message-Id: <E1gviWd-00041T-QG@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155049477241.18484.2908958682722850023@49fa7ef69f7b>
-In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
+	(envelope-from <richard.weiyang@gmail.com>) id 1gvirY-00026F-Pc
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:21:39 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:43388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1gvirW-000241-KR
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:21:36 -0500
+Received: by mail-ed1-x543.google.com with SMTP id m35so9836073ede.10
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 05:21:32 -0800 (PST)
+Date: Mon, 18 Feb 2019 13:21:29 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190218132129.pcb4jl63om3f37ew@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190218011333.13976-1-richardw.yang@linux.intel.com>
+	<20190218105034.167293f4@Igors-MacBook-Pro.local>
+	<20190218121324.utxt2zojfjia4pjl@master>
+	<20190218135602.11a98964@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Feb 2019 04:59:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190218135602.11a98964@Igors-MacBook-Pro.local>
+Subject: Re: [Qemu-devel] [PATCH v2] i386,
+ acpi: check acpi_memory_hotplug capacity in pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,143 +34,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cohuck@redhat.com
-Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Wei Yang <richard.weiyang@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODExMTE1My4yMjY4
-MS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODExMTE1My4yMjY4MS0xLWNvaHVja0ByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gczM5MHggdXBkYXRlClR5
-cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBk
-YXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tAcmVkaGF0LmNv
-bSAtPiBwYXRjaGV3LzIwMTkwMjE4MTExMTUzLjIyNjgxLTEtY29odWNrQHJlZGhhdC5jb20KU3Vi
-bW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1v
-ZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11
-TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMn
-ClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0
-KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAo
-aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1
-Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3Bl
-bmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1
-Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVt
-dS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1
-Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3Mu
-Z2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMv
-c2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXRodWIuY29tL2hkZWxsZXIvc2VhYmlvcy1ocHBhLmdp
-dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnClN1Ym1vZHVsZSAncm9t
-cy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NnYWJpb3MuZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9za2lib290JyAoaHR0
-cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1v
-ZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1i
-b290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYw
-ZXgnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dp
-dGh1Yi5jb20vY290YS9iZXJrZWxleS1zb2Z0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
-dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2Vs
-ZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS10ZXN0Zmxv
-YXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMn
-ClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2tl
-eWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xv
-bmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0b25lJzogY2hlY2tl
-ZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2YmYnCkNsb25pbmcg
-aW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzg4ZjE4OTA5
-ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50byAncm9tcy9RZW11
-TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnOiBjaGVj
-a2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVhODY5ZGYxYzJkOWM4ZTI2NicKQ2xvbmlu
-ZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NMT0YnOiBjaGVja2Vk
-IG91dCAnYTViNDI4ZTFjMWVhZTcwM2JkZDYyYTNmNTI3MjIzYzI5MWVlM2ZkYycKQ2xvbmluZyBp
-bnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91
-dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRv
-ICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNr
-ZWQgb3V0ICczNDY0NjgxYjJiNTk4M2RmODAwODZhNDAxNzlkMzI0MTAyMzQ3ZGEzJwpDbG9uaW5n
-IGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFj
-a3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1
-NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJzUxYzIzN2Q3ZTIwZDA1MTAwZWFjYWRl
-ZTJmNjFhYmMxN2U2YmMwOTcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E2OThjODk5NWZmYjI4MzgyOTZl
-YzI4NGZlM2M0YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcxZWY5OWEw
-MTU3MmMyNTgxYzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2UwJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dh
-YmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFl
-ZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMv
-c2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICdl
-MGVlMjRjMjdhMTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFjMTM0YmNjJwpDbG9uaW5nIGludG8gJ3Jv
-bXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAn
-ZDg1Y2EwMjlmMjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEwMDNhOTk0MycKQ2xvbmluZyBpbnRvICdy
-b21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2
-MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1
-ODgnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1v
-ZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdi
-NjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rl
-c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAv
-YmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFh
-MTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4uClN1
-Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0
-NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwphZDE4YTFlIHMzOTB4OiB1cGdyYWRlIHN0YXR1cyBvZiBLVk0gY29yZXMgdG8gInN1cHBv
-cnRlZCIKZjUxZGNiMSBzMzkweC9rdm06IGFkZCB0cmFjZXBvaW50IHRvIGlvZXZlbnRmZCBpbnRl
-cmZhY2UKNDRhNWVmZCBzMzkweC9jcHVtb2RlbDogYWRkIHoxNCBHQTIgbW9kZWwKNzNmOTg0MSBz
-MzkweC9jcHVtb2RlbDogZGVmYXVsdCBlbmFibGUgbWVwb2NoIGZvciB6MTQgYW5kIGxhdGVyCmUz
-ZGUzOTggczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBvY2ggYW5k
-IHJlLWFsaWduIGdyb3VwIGluaXQKYjU2NzVjNCBzMzkweDogYWRkIHpQQ0kgZmVhdHVyZSB0byAi
-cWVtdSIgQ1BVIG1vZGVsCjk5OGFhOTcgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgU1RDSyBldCBh
-bCBmb3IgQ09ORklHX1VTRVJfT05MWQpmNDA4ZjRkIHRhcmdldC9zMzkweDogU3BsaXQgb3V0IHMz
-OTAtdG9kLmgKMDJlOGJiYyBzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQKMzIxZDNi
-ZiBzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRlci0yMDEyIGxpY2Vu
-c2Ugc3RhdGVtZW50cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21taXQg
-MzIxZDNiZmViYzQ2IChzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRl
-ci0yMDEyIGxpY2Vuc2Ugc3RhdGVtZW50cykKMi8xMCBDaGVja2luZyBjb21taXQgMDJlOGJiY2Ez
-MGI1IChzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzQwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDQ3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KMy8xMCBDaGVja2luZyBjb21taXQgZjQwOGY0ZDE1MmIzICh0YXJnZXQvczM5MHg6IFNwbGl0
-IG91dCBzMzkwLXRvZC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU3IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMCBDaGVja2luZyBjb21taXQgOTk4
-YWE5NzVjNWY5ICh0YXJnZXQvczM5MHg6IEltcGxlbWVudCBTVENLIGV0IGFsIGZvciBDT05GSUdf
-VVNFUl9PTkxZKQo1LzEwIENoZWNraW5nIGNvbW1pdCBiNTY3NWM0YWZkYTcgKHMzOTB4OiBhZGQg
-elBDSSBmZWF0dXJlIHRvICJxZW11IiBDUFUgbW9kZWwpCjYvMTAgQ2hlY2tpbmcgY29tbWl0IGUz
-ZGUzOTgwMzhiZCAoczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBv
-Y2ggYW5kIHJlLWFsaWduIGdyb3VwIGluaXQpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojMzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0Njg6CisgICAgRkVBVF9H
-Uk9VUF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5oYW5j
-ZW1lbnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKdG90YWw6
-IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEwIENoZWNraW5nIGNvbW1pdCA3M2Y5ODQxZWJlOTIg
-KHMzOTB4L2NwdW1vZGVsOiBkZWZhdWx0IGVuYWJsZSBtZXBvY2ggZm9yIHoxNCBhbmQgbGF0ZXIp
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogaHcvczM5MHgvczM5
-MC12aXJ0aW8tY2N3LmM6NjYzOgorICAgIHMzOTBfY3B1ZGVmX2dyb3VwX2ZlYXRvZmZfZ3JlYXRl
-cigxNCwgMSwgUzM5MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYpOwoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEwIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjgvMTAgQ2hlY2tpbmcgY29tbWl0IDQ0YTVlZmRhM2RjZiAoczM5
-MHgvY3B1bW9kZWw6IGFkZCB6MTQgR0EyIG1vZGVsKQo5LzEwIENoZWNraW5nIGNvbW1pdCBmNTFk
-Y2IxZGU3Y2UgKHMzOTB4L2t2bTogYWRkIHRyYWNlcG9pbnQgdG8gaW9ldmVudGZkIGludGVyZmFj
-ZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IGFkMThhMWU4ZjkwOCAoczM5MHg6IHVwZ3JhZGUgc3Rh
-dHVzIG9mIEtWTSBjb3JlcyB0byAic3VwcG9ydGVkIikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tA
-cmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Mon, Feb 18, 2019 at 01:56:02PM +0100, Igor Mammedov wrote:
+>On Mon, 18 Feb 2019 12:13:24 +0000
+>Wei Yang <richard.weiyang@gmail.com> wrote:
+>
+>> On Mon, Feb 18, 2019 at 10:50:34AM +0100, Igor Mammedov wrote:
+>> >On Mon, 18 Feb 2019 09:13:33 +0800
+>> >Wei Yang <richardw.yang@linux.intel.com> wrote:
+>> >
+>> >> Currently we do device realization like below:
+>> >> 
+>> >>    hotplug_handler_pre_plug()
+>> >>    dc->realize()
+>> >>    hotplug_handler_plug()
+>> >> 
+>> >> Before we do device realization and plug, we should allocate necessary
+>> >> resources and check if memory-hotplug-support property is enabled.
+>> >> 
+>> >> At the piix4 and ich9, the acpi_memory_hotplug property is checked in
+>> >                             ^^^^^^^ is field name and not a property so
+>> >s/acpi_memory_hotplug/memory-hotplug-support/
+>> >s/in/at/
+>> >
+>> >> plug stage. This means that device has been realized and mapped into
+>> >> guest address space 'pc_dimm_plug()' by the time acpi plug handler is
+>> >> called, where it might fail and crash QEMU due to reaching
+>> >> g_assert_not_reached() (piix4) or error_abort (ich9).
+>> >
+>> >
+>> >> This patch abstract the check on acpi_memory_hotplug capacity in
+>> >> pre_plug stage.
+>> >maybe better would be:
+>> >"Fix it by checking if memory hotplug is enabled at pre_plug stage
+>> >where we can gracefully abort hotplug request."
+>> >
+>> >> [changelog rephrase from imammedo@redhat.com]
+>> >this provides zero information for a commit reader,
+>> >it should go under --- to chagelog
+>> > 
+>> 
+>> Ok, maybe different community has different convention.
+>> 
+>> Linux kernel mm subsystem maintainer suggest me to add above line.
+>> 
+>> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> >> CC: Igor Mammedov <imammedo@redhat.com>
+>> >> CC: Eric Blake <eblake@redhat.com>
+>> >> 
+>> >> ---
+>> >> v2:
+>> >>    * rephrase change log
+>> >one usually adds commenter's name here
+>> >   * like this (someone@foo.bar)
+>> >or
+>> >   * (someone@foo.bar)
+>> >     - entry 1
+>> >     - entry 2
+>> >   * (someone-else@foo.bar)
+>> >     - ...
+>> >
+>> 
+>> Well, I would change to this style.
+>> 
+>> >>    * apply this change to ich9
+>> >>    * use hotplug_handler_pre_plug() instead of open-coding check
+>> >> ---
+>> >>  hw/acpi/ich9.c         | 14 ++++++++++++--
+>> >>  hw/acpi/piix4.c        | 14 ++++++++++++--
+>> >>  hw/i386/pc.c           |  5 +++++
+>> >>  hw/isa/lpc_ich9.c      |  1 +
+>> >>  include/hw/acpi/ich9.h |  2 ++
+>> >>  5 files changed, 32 insertions(+), 4 deletions(-)
+>> >> 
+>> >> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+>> >> index c5d8646abc..906a10f09a 100644
+>> >> --- a/hw/acpi/ich9.c
+>> >> +++ b/hw/acpi/ich9.c
+>> >> @@ -483,13 +483,23 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
+>> >>                               NULL);
+>> >>  }
+>> >>  
+>> >> +void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> >> +                            Error **errp)
+>> >broken alignment?
+>> >
+>> >run /scripts/checkpatch.pl on patches before submitting them
+>> 
+>> I copied this from ich9_pm_device_plug_cb(), so thought this is the
+>> correct style.
+>> 
+>> Will adjust this according to checkpatch.pl.
+>
+>see CODING_STYLE
+>
+
+Went throught this file, but not find the description of function
+definition's second line.
+
+I guess it should start after '(', right?
+
+>> 
+>> >
+>> >> +{
+>> >> +    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+>> >> +
+>> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+>> >> +        !lpc->pm.acpi_memory_hotplug.is_enabled)
+>> >> +        error_setg(errp,
+>> >> +            "memory hotplug is not enabled: ICH9 memory hotplug disabled");
+>> >I'd give a hint where it's disabled, something like
+>> >
+>> >"memory hotplug is not enabled: %s.memory-hotplug-support is not set", object_get_typename(lpc)
+>> >
+>> >the same for piix4
+>> >
+>> >> +}
+>> >> +
+>> >>  void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> >>                              Error **errp)
+>> >>  {
+>> >>      ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+>> >>  
+>> >> -    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
+>> >> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>> >>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+>> >>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
+>> >>          } else {
+>> >> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+>> >> index e330f24c71..c97b747496 100644
+>> >> --- a/hw/acpi/piix4.c
+>> >> +++ b/hw/acpi/piix4.c
+>> >> @@ -370,13 +370,22 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
+>> >>      acpi_pm1_evt_power_down(&s->ar);
+>> >>  }
+>> >>  
+>> >> +static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>> >> +                                 DeviceState *dev, Error **errp)
+>> >> +{
+>> >> +    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+>> >> +
+>> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+>> >> +        !s->acpi_memory_hotplug.is_enabled)
+>> >> +        error_setg(errp,
+>> >> +            "memory hotplug is not enabled: PIIX4 memory hotplug disabled");
+>> >> +}
+>> >>  static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+>> >>                                   DeviceState *dev, Error **errp)
+>> >>  {
+>> >>      PIIX4PMState *s = PIIX4_PM(hotplug_dev);
+>> >>  
+>> >> -    if (s->acpi_memory_hotplug.is_enabled &&
+>> >> -        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>> >>          if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
+>> >>              nvdimm_acpi_plug_cb(hotplug_dev, dev);
+>> >>          } else {
+>> >> @@ -702,6 +711,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
+>> >>       */
+>> >>      dc->user_creatable = false;
+>> >>      dc->hotpluggable = false;
+>> >> +    hc->pre_plug = piix4_device_pre_plug_cb;
+>> >>      hc->plug = piix4_device_plug_cb;
+>> >>      hc->unplug_request = piix4_device_unplug_request_cb;
+>> >>      hc->unplug = piix4_device_unplug_cb;
+>> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> >> index 734d3268fa..59c8ccf0ff 100644
+>> >> --- a/hw/i386/pc.c
+>> >> +++ b/hw/i386/pc.c
+>> >> @@ -1674,6 +1674,11 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> >>          return;
+>> >>      }
+>> >>  
+>> >> +    /*
+>> >> +     * Check acpi_dev memory-hotplug-support property
+>> >> +     */
+>> >> +    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
+>> >> +
+>> >>      if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+>> >>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>> >>          return;
+>> >> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>> >> index e692b9fdc1..ac44aa53be 100644
+>> >> --- a/hw/isa/lpc_ich9.c
+>> >> +++ b/hw/isa/lpc_ich9.c
+>> >> @@ -805,6 +805,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
+>> >>       * pc_q35_init()
+>> >>       */
+>> >>      dc->user_creatable = false;
+>> >> +    hc->pre_plug = ich9_pm_device_pre_plug_cb;
+>> >>      hc->plug = ich9_pm_device_plug_cb;
+>> >>      hc->unplug_request = ich9_pm_device_unplug_request_cb;
+>> >>      hc->unplug = ich9_pm_device_unplug_cb;
+>> >> diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+>> >> index 59aeb06393..428af0b0be 100644
+>> >> --- a/include/hw/acpi/ich9.h
+>> >> +++ b/include/hw/acpi/ich9.h
+>> >> @@ -74,6 +74,8 @@ extern const VMStateDescription vmstate_ich9_pm;
+>> >>  
+>> >>  void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp);
+>> >>  
+>> >> +void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> >> +                            Error **errp);
+>> >>  void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>> >>                              Error **errp);
+>> >>  void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>> >
+>> 
+
+-- 
+Wei Yang
+Help you, Help me
