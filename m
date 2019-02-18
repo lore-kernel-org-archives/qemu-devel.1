@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48294)
+Received: from eggs.gnu.org ([209.51.188.92]:44128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gvc54-0002Eu-Vg
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 01:07:07 -0500
+	(envelope-from <copymaster@howtolinux.de>) id 1gvgCd-000239-Tk
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gvc54-0007jb-AR
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 01:07:06 -0500
-Received: from mail-it1-x132.google.com ([2607:f8b0:4864:20::132]:52308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1gvc54-0007in-1r
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 01:07:06 -0500
-Received: by mail-it1-x132.google.com with SMTP id r11so38579818itc.2
-	for <qemu-devel@nongnu.org>; Sun, 17 Feb 2019 22:07:05 -0800 (PST)
-Received: from worksec.oberlin.net (ip-210-181.oberlin.net. [208.66.210.181])
-	by smtp.gmail.com with ESMTPSA id
-	d6sm5245395ioc.44.2019.02.17.22.07.03 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 17 Feb 2019 22:07:03 -0800 (PST)
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Message-Id: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
-Date: Mon, 18 Feb 2019 01:07:02 -0500
-Subject: [Qemu-devel] Testing sysbus devices
+	(envelope-from <copymaster@howtolinux.de>) id 1gvgCc-0007uG-Qx
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:31:11 -0500
+References: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
+	<20190218095141.GA5303@dhcp-200-176.str.redhat.com>
+From: Alexander Marx <copymaster@howtolinux.de>
+Message-ID: <ad648f62-2be8-5d24-3e5c-040830073b12@howtolinux.de>
+Date: Mon, 18 Feb 2019 11:31:01 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190218095141.GA5303@dhcp-200-176.str.redhat.com>
+Content-Language: de-DE
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Please help corrupt filesystem image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Hi all,
+Thank you for replying.
 
-I've been working on some improvements to the pflash_cfi02 block device =
-(interleaved flash devices similar to pflash_cfi01, multi-sector erase, =
-nonuniform sector sizes, and some bug fixes and I'm planning on =
-implementing sector erase suspend/resume commands in the near future).
+The error was in the underlying filesystem. I had to setup new servers.
 
-There appear to be no existing tests for this device and I'm unsure what =
-the appropriate way to add tests for sysbus devices is. -device can't be =
-used because sysbus devices aren't user-creatable (and even if they =
-were, creating the device wouldn't be sufficient since it wouldn't =
-connect it to the sysbus).
+Alex
 
-Any suggestions would be appreciated.
 
-Thank you,
-
---=20
-Stephen Checkoway
+Am 18.02.19 um 10:51 schrieb Kevin Wolf:
+> Am 17.02.2019 um 05:13 hat Alexander Marx geschrieben:
+>> Dear List!
+>>
+>> I have a big problem and hope you can help me.
+>> I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
+>> hosts.
+>> I was nearly finished with the setup and ready to migrate the users from
+>> old to new domain.
+>>
+>> Then i had to restart the physical servers. Unfortunately 1 dc and 2 rds
+>> hosts could not be startet anymore.
+>> Error says:
+>>
+>> qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
+>> header: Input/output error
+> The very first thing the qcow2 driver in QEMU does is reading in the
+> image file header, and this is the step that produces the error message
+> you quoted. This is before even looking at any content of the file. So
+> it looks to me as if the image file was corrupted on the file system
+> level or even had bad sectors on the physical hard disk.
+>
+> You can try running 'qemu-img check' under 'strace -f' and double check
+> which syscall returns an error before it errors out. I think it will be
+> the first pread64() call, returning EIO. If not, please post the output
+> you're getting.
+>
+> Another thing you could try is whether the image file is still
+> accessible for tools like cp, dd or hexdump.
+>
+> If these tests confirm that there is a more general problem with the
+> file, running fsck for your host file system that contains the image
+> might be a good idea.
+>
+>> Even worst, a qemu-img check  also gave that error. and i was not able
+>> to do anything i found in the internet to fix it.
+>> always that error or the qemu-img could not determine the format.
+>>
+>> Is there a chance to fix these images? What can i do?
+>>
+>> I have no backup because the domain was not fully configured. But if i
+>> have to rebuild the whole domain, i will need several weeks for it.
+>> Any help is appreciated.
+> If only the header is inaccessible, reconstructing it may be possible.
+> Otherwise, probably not.
+>
+> We can look into this if your results for the above show that you can
+> still access the image outside of QEMU, and what exactly is even going
+> wrong.
+>
+> Kevin
