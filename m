@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39362)
+Received: from eggs.gnu.org ([209.51.188.92]:39420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxu-0006aX-If
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:20 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxw-0006d3-Qd
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxs-0003Ae-SQ
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxt-0003CM-OY
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:16 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:31 +1100
-Message-Id: <20190218143049.17142-26-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:32 +1100
+Message-Id: <20190218143049.17142-27-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 25/43] spapr/irq: Use the "simple" ICS class for
- KVM
+Subject: [Qemu-devel] [PULL 26/43] xics: Drop the KVM ICS class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,102 @@ Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Da
 
 From: Greg Kurz <groug@kaod.org>
 
-The "simple" ICS class knows how to interract with KVM. Adapt sPAPR to us=
-e
-it instead of the ICS KVM class.
+The KVM ICS class isn't used anymore. Drop it.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155023083585.1011724.2868047424353921455.stgit@bahia.lan>
+Message-Id: <155023084177.1011724.14693955932559990358.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_irq.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ hw/intc/xics_kvm.c    | 40 ----------------------------------------
+ hw/ppc/spapr_irq.c    |  2 +-
+ include/hw/ppc/xics.h |  3 ---
+ 3 files changed, 1 insertion(+), 44 deletions(-)
 
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index f34eacda03..a00d0a7962 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -279,39 +279,6 @@ void ics_kvm_set_irq(ICSState *ics, int srcno, int v=
+al)
+     }
+ }
+=20
+-static void ics_kvm_realize(DeviceState *dev, Error **errp)
+-{
+-    ICSState *ics =3D ICS_KVM(dev);
+-    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
+-    Error *local_err =3D NULL;
+-
+-    icsc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-}
+-
+-static void ics_kvm_class_init(ObjectClass *klass, void *data)
+-{
+-    ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
+-    DeviceClass *dc =3D DEVICE_CLASS(klass);
+-
+-    device_class_set_parent_realize(dc, ics_kvm_realize,
+-                                    &icsc->parent_realize);
+-}
+-
+-static const TypeInfo ics_kvm_info =3D {
+-    .name =3D TYPE_ICS_KVM,
+-    .parent =3D TYPE_ICS_BASE,
+-    .instance_size =3D sizeof(ICSState),
+-    .class_init =3D ics_kvm_class_init,
+-};
+-
+-/*
+- * XICS-KVM
+- */
+-
+ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                        uint32_t token,
+                        uint32_t nargs, target_ulong args,
+@@ -381,10 +348,3 @@ fail:
+     kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
+     return -1;
+ }
+-
+-static void xics_kvm_register_types(void)
+-{
+-    type_register_static(&ics_kvm_info);
+-}
+-
+-type_init(xics_kvm_register_types)
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 9f43b7b3bf..4aa8165307 100644
+index 4aa8165307..4297eed600 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -67,13 +67,12 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr)
-  */
+@@ -208,7 +208,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
+neState *spapr,
 =20
- static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
--                                  const char *type_ics,
-                                   int nr_irqs, Error **errp)
+ static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int versio=
+n_id)
  {
-     Error *local_err =3D NULL;
-     Object *obj;
+-    if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
++    if (!kvm_irqchip_in_kernel()) {
+         CPUState *cs;
+         CPU_FOREACH(cs) {
+             PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 61bd0fb978..d36bbe11ee 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -95,9 +95,6 @@ struct PnvICPState {
+ #define TYPE_ICS_SIMPLE "ics"
+ #define ICS_SIMPLE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SIMPLE)
 =20
--    obj =3D object_new(type_ics);
-+    obj =3D object_new(TYPE_ICS_SIMPLE);
-     object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
-     object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
-                                    &error_abort);
-@@ -98,14 +97,14 @@ static void spapr_irq_init_xics(sPAPRMachineState *sp=
-apr, int nr_irqs,
- {
-     MachineState *machine =3D MACHINE(spapr);
-     Error *local_err =3D NULL;
-+    bool xics_kvm =3D false;
-=20
-     if (kvm_enabled()) {
-         if (machine_kernel_irqchip_allowed(machine) &&
-             !xics_kvm_init(spapr, &local_err)) {
--            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs=
-,
--                                          &local_err);
-+            xics_kvm =3D true;
-         }
--        if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
-+        if (machine_kernel_irqchip_required(machine) && !xics_kvm) {
-             error_prepend(&local_err,
-                           "kernel_irqchip requested but unavailable: ");
-             goto error;
-@@ -114,12 +113,12 @@ static void spapr_irq_init_xics(sPAPRMachineState *=
-spapr, int nr_irqs,
-         local_err =3D NULL;
-     }
-=20
--    if (!spapr->ics) {
-+    if (!xics_kvm) {
-         xics_spapr_init(spapr);
--        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
--                                      &local_err);
-     }
-=20
-+    spapr->ics =3D spapr_ics_create(spapr, nr_irqs, &local_err);
-+
- error:
-     error_propagate(errp, local_err);
- }
+-#define TYPE_ICS_KVM "icskvm"
+-#define ICS_KVM(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_KVM)
+-
+ #define ICS_BASE_CLASS(klass) \
+      OBJECT_CLASS_CHECK(ICSStateClass, (klass), TYPE_ICS_BASE)
+ #define ICS_BASE_GET_CLASS(obj) \
 --=20
 2.20.1
