@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39226)
+Received: from eggs.gnu.org ([209.51.188.92]:39533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvfpm-0007lg-Ks
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:07:36 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvfr6-0008PO-0v
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:08:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvfpk-0002Uq-OY
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:07:34 -0500
-Date: Mon, 18 Feb 2019 11:07:01 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190218110701.7349c698@Igors-MacBook-Pro.local>
-In-Reply-To: <20190205173306.20483-10-eric.auger@redhat.com>
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-10-eric.auger@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvfr3-0003CE-P4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:08:55 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 10:08:40 +0000
+Message-ID: <0a42b9c6-9bc6-b826-b90e-226ab4c122e2@virtuozzo.com>
+References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w51o97m8ltv.fsf@maestria.local.igalia.com>
+	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
+	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
+	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
+	<w51mun2uxts.fsf@maestria.local.igalia.com>
+	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
+	<w51mun18cjy.fsf@maestria.local.igalia.com>
+	<839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
+In-Reply-To: <839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3F86121E2A7C454BB521B7EE95DD6CAD@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 09/18] hw/arm/virt: Implement kvm_type
- function for 4.0 machine
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
+ involves copy-on-read filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,162 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Tue,  5 Feb 2019 18:32:57 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
-
-> This patch implements the machine class kvm_type() callback.
-> It returns the max IPA shift needed to implement the whole GPA
-> range including the RAM and IO regions located beyond.
-> The returned value in passed though the KVM_CREATE_VM ioctl and
-> this allows KVM to set the stage2 tables dynamically.
-> 
-> At this stage the RAM limit still is limited to 255GB.
-> 
-> Setting all the existing highmem IO regions beyond the RAM
-> allows to have a single contiguous RAM region (initial RAM and
-> possible hotpluggable device memory). That way we do not need
-> to do invasive changes in the EDK2 FW to support a dynamic
-> RAM base.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v5 -> v6:
-> - add some comments
-> - high IO region cannot start before 256GiB
-> ---
->  hw/arm/virt.c         | 52 +++++++++++++++++++++++++++++++++++++++++--
->  include/hw/arm/virt.h |  2 ++
->  2 files changed, 52 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 2b15839d0b..b90ffc2e5d 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1366,6 +1366,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
->  
->  static void virt_set_memmap(VirtMachineState *vms)
->  {
-> +    MachineState *ms = MACHINE(vms);
->      hwaddr base;
->      int i;
->  
-> @@ -1375,7 +1376,17 @@ static void virt_set_memmap(VirtMachineState *vms)
->          vms->memmap[i] = a15memmap[i];
->      }
->  
-> -    vms->high_io_base = 256 * GiB; /* Top of the legacy initial RAM region */
-> +    /*
-> +     * We now compute the base of the high IO region depending on the
-> +     * amount of initial and device memory. The device memory start/size
-> +     * is aligned on 1GiB. We never put the high IO region below 256GiB
-> +     * so that if maxram_size is < 255GiB we keep the legacy memory map
-> +     */
-> +    vms->high_io_base = ROUND_UP(GiB + ms->ram_size, GiB) +
-> +                        ROUND_UP(ms->maxram_size - ms->ram_size, GiB);
-> +    if (vms->high_io_base < 256 * GiB) {
-> +        vms->high_io_base = 256 * GiB;
-> +    }
->      base = vms->high_io_base;
->  
->      for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
-> @@ -1386,6 +1397,7 @@ static void virt_set_memmap(VirtMachineState *vms)
->          vms->memmap[i].size = size;
->          base += size;
->      }
-> +    vms->highest_gpa = base - 1;
->  }
->  
->  static void machvirt_init(MachineState *machine)
-> @@ -1402,7 +1414,9 @@ static void machvirt_init(MachineState *machine)
->      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
->      bool aarch64 = true;
->  
-> -    virt_set_memmap(vms);
-> +    if (!vms->extended_memmap) {
-> +        virt_set_memmap(vms);
-> +    }
->  
->      /* We can probe only here because during property set
->       * KVM is not available yet
-> @@ -1784,6 +1798,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
->      return NULL;
->  }
->  
-> +/*
-> + * for arm64 kvm_type [7-0] encodes the IPA size shift
-> + */
-> +static int virt_kvm_type(MachineState *ms, const char *type_str)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(ms);
-> +    int max_vm_phys_shift = kvm_arm_get_max_vm_phys_shift(ms);
-> +    int max_pa_shift;
-> +
-> +    vms->extended_memmap = true;
-> +
-> +    virt_set_memmap(vms);
-> +
-> +    max_pa_shift = 64 - clz64(vms->highest_gpa);
-> +
-> +    if (max_pa_shift > max_vm_phys_shift) {
-> +        error_report("-m and ,maxmem option values "
-> +                     "require an IPA range (%d bits) larger than "
-> +                     "the one supported by the host (%d bits)",
-> +                     max_pa_shift, max_vm_phys_shift);
-> +       exit(1);
-> +    }
-> +    /*
-> +     * By default we return 0 which corresponds to an implicit legacy
-> +     * 40b IPA setting. Otherwise we return the actual requested IPA
-> +     * logsize
-> +     */
-> +    return max_pa_shift > 40 ? max_pa_shift : 0;
-> +}
-> +
->  static void virt_machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> @@ -1808,6 +1852,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
->      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
->      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> +    mc->kvm_type = virt_kvm_type;
->      assert(!mc->get_hotplug_handler);
->      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
->      hc->plug = virt_machine_device_plug_cb;
-> @@ -1911,6 +1956,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
->  {
->      virt_machine_4_0_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-> +
-> +    /* extended memory map is enabled from 4.0 onwards */
-> +    mc->kvm_type = NULL;
-it's quite confusing, you have vms->extended_memmap and mc->kvm_type and
-the later for some reason enables device memory.
-
-to me it seems that both are not related, device memory should work just fine
-without kvm nor dynamic IPA (within TCG supported limits).
-
-I'd make extended_memmap virt machine class member the will enable pc-dimm support
-and then it add checks for supported IPA range on top
-
->  }
->  DEFINE_VIRT_MACHINE(3, 1)
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 3dc7a6c5d5..c88f67a492 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -132,6 +132,8 @@ typedef struct {
->      uint32_t iommu_phandle;
->      int psci_conduit;
->      hwaddr high_io_base;
-> +    hwaddr highest_gpa;
-> +    bool extended_memmap;
->  } VirtMachineState;
->  
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+MTQuMDIuMjAxOSAxNjo0MywgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IA0KPiANCj4gT24g
+MTIvMDIvMjAxOSAxNDozNSwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+PiBPbiBNb24gMTEgRmVi
+IDIwMTkgMDU6NTg6MDUgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
+Og0KPj4+Pj4gVGhlIHByb2JsZW0gaXMgaW4gdGhlIGNvbmNlcHQgb2YgImJhc2UiIG5vZGUuIFRo
+ZSBjb2RlIHdyaXR0ZW4gaW4NCj4+Pj4+IG1hbm5lciB0aGF0IGJhc2UgaXMgbm90IGNoYW5nZWQg
+ZHVyaW5nIGJsb2NrIGpvYi4gSG93ZXZlciwgam9iIGRvbid0DQo+Pj4+PiBvd24gYmFzZSBhbmQg
+dGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgaXQgd2lsbCBub3QgY2hhbmdlIGR1cmluZw0KPj4+
+Pj4gdGhlIGpvYi4NCj4+Pj4NCj4+Pj4gQnV0IGlmIHRoYXQncyB0aGUgY2FzZSB0aGVuIHdlIGhh
+dmUgYSBwcm9ibGVtIGFscmVhZHksIGJlY2F1c2UgJ2Jhc2UnDQo+Pj4+IGlzIGEgbWVtYmVyIG9m
+IFN0cmVhbUJsb2NrSm9iIGFuZCBpcyB1c2VkIGluIHRoZSBleGlzdGluZw0KPj4+PiBzdHJlYW1f
+cnVuKCkgY29kZS4NCj4+Pg0KPj4+IEkgdGhpbmsgaXQgc2hvdWxkIGJlIHBvc3NpYmxlIHRvIHJl
+cHJvZHVjZSwgdXNpbmcgYmxvY2stY29tbWl0ICh3aGljaA0KPj4+IGFscmVhZHkgaGFzIGZpbHRl
+cikgd2l0aCBibG9jay1zdHJlYW0gaW4gcGFyYWxsZWwsIHdlJ2xsIHRyeS4NCj4+DQo+PiBJdCdz
+IG5vdCBwb3NzaWJsZSB0byBydW4gYmxvY2stc3RyZWFtIGFuZCBibG9jay1jb21taXQgaW4gcGFy
+YWxsZWwgb24NCj4+IHRoZSBzYW1lIG5vZGVzLiBTZWUgaW90ZXN0IDAzMCBmb3IgYSBmZXcgZXhh
+bXBsZXMuDQo+Pg0KPj4gU28gdW5sZXNzIHRoZXJlJ3MgYSBidWcgaXQgc2hvdWxkIGJlIHNhZmUu
+DQo+Pg0KPj4+PiBTbyBpZiB0aGVyZSdzIGEgd2F5IHRvIG1ha2UgJ2Jhc2UnIGRpc2FwcGVhciBk
+dXJpbmcgdGhlIGpvYiAoaG93PykNCj4+Pj4gdGhlbiB3ZSBjb3VsZCBwcm90ZWN0IGl0IHdpdGgg
+YmxvY2tfam9iX2FkZF9iZHJ2KCkuDQo+Pj4NCj4+PiBJJ20gbm90IHN1cmUgdGhpcyBpcyBjb3Jy
+ZWN0LiBXaGF0IGlzIHRoZSByZWFzb24gZm9yIHN0cmVhbSB0byBvd24NCj4+PiBiYXNlPyBJdCdz
+IG5vdCByZWFsbHkgaW50ZXJlc3RlZCBpbiBpdC4NCj4+DQo+PiBzdHJlYW0gZG9lcyBub3QgbmVl
+ZCB0byB3cml0ZSBvciBtb2RpZnkgYmFzZSwgYnV0IGl0IGRvZXMgbmVlZCB0byBrZWVwIGENCj4+
+IHJlZmVyZW5jZSB0byBpdCBpbiBvcmRlciB0byBub3cgd2hlcmUgdG8gc3RvcCBjb3B5aW5nIGRh
+dGEuDQo+Pg0KPj4gQXMgSSBzYWlkIGVhcmxpZXIgYmFzZSBpcyBhIG1lbWJlciBvZiBTdHJlYW1C
+bG9ja0pvYiwgc28gaXQgc2hvdWxkIG5vdA0KPj4gZGlzYXBwZWFyIGR1cmluZyB0aGUgam9iLg0K
+Pj4NCj4+IEJlcnRvDQo+Pg0KPiANCj4gTm8gZG91YnQgdGhhdCBhIHJlZmVyZW5jZSB0byB0aGUg
+YmFzZSBub2RlIGlzIG5lZWRlZCBhcyBhIGxpbWl0IGZvciB0aGUNCj4gQ09SIHdvcmsuIFRoZSBi
+YXNlIGlzIHN0aWxsIGluIHRoZSBnYW1lLiBBY3R1YWxseSwgd2UgZW5jb3VudGVyIGFuIGlzc3Vl
+DQo+IHdoZW4gQmxvY2tEcml2ZXJTdGF0ZSBvZiB0aGUgQ09SLWZpbHRlciBjb21lcyBpbnRvIHBs
+YXkgaW5zdGVhZCBvZiB0aGUNCj4gYmFzZS4gSXQgaXMgaW5oZXJpdGVkIGZyb20gYSBwYXJhbGxl
+bCBqb2IuIEJhc2VkIG9uIHRoZSBjYXNlDQo+IHRlc3Rfc3RyZWFtX3BhcmFsbGVsIGZyb20gdGhl
+IHFlbXUtaW90ZXN0cy8wMzAsIGl0IHdvcmtzIGxpa2UgdGhpczoNCj4gMS4gSm9iIzEgaXMgc3Rh
+cnRlZCBhbmQgaW5zZXJ0cyBhIENPUi1maWx0ZXIgYWJvdmUgdGhlIHRvcCBub2RlLg0KPiAyLiBD
+b250ZXh0IHN3aXRjaC4NCj4gMy4gSm9iIzIgaXMgc3RhcnRlZCBhbmQgaW5oZXJpdHMgdGhlIENP
+Ui1maWx0ZXIgYXMgdGhlIGJhc2UuDQo+IDQuIENvbnRleHQgc3dpdGNoLg0KPiA1LiBKb2IjMSBj
+b21lcyB0byB0aGUgZW5kIGFuZCByZW1vdmVzIGl0cyBDT1ItZmlsdGVyIHJlZmVyZW5jZWQgYnkN
+Cj4gICAgICBqb2IjMi4NCj4gNi4gQ29udGV4dCBzd2l0Y2guDQo+IDcuIEpvYiMyIGNvbWVzIHRv
+IHRoZSBlbmQgYW5kIHVzZXMgdGhlIGRlbGV0ZWQgQ09SLWZpbHRlciBub2RlLg0KPiA4LiBXZSBh
+cmUgaW4gdHJvdWJsZS4NCj4gDQo+IE9yIGFub3RoZXIgc2NlbmFyaW86DQo+IDEtNC4gQXMgYWJv
+dmUNCj4gNS4gSm9iIzIgY29tZXMgdG8gdGhlIGVuZCBmaXJzdCBhbmQga2VlcHMgdGhlIENPUi1m
+aWx0ZXIgYXMgdGhlDQo+ICAgICAgYmFja2luZyBub2RlLg0KPiA2LiBUaGUgYXNzZXJ0KCkgZmFp
+bHMgYXMgdGhlIHJlZmVyZW5jZWQgQ09SLWZpbHRlciB3YXMgbm90IGRlbGV0ZWQNCj4gICAgICBv
+biBleGl0Lg0KPiA3LiBUaGUgZ2FtZSBpcyBvdmVyIHdpdGggYSBwb29yIHNjb3JlLg0KPiANCj4g
+SWYgd2UganVzdCBrZWVwIHRoZSBpbnRlcm1lZGlhdGUgYm90dG9tIG5vZGUgaW5zdGVhZCBvZiB0
+aGUgYmFzZSwgd2UNCj4gd2lsbCBoYXZlIGEgc2ltaWxhciBpc3N1ZS4gT24gdGhlIGpvYiBleGl0
+LCB3ZSBjaGFuZ2UgdGhlIGJhY2tpbmcgZmlsZS4NCj4gSWYgd2UgY2FsbCB0aGUgYmFja2luZ19i
+cyhib3R0b21fbm9kZV9icyksIHdlIHdpbGwga2VlcCB0aGUgQ09SLWZpbHRlcg0KPiBub2RlIGlu
+c3RlYWQsIHdoZXJlYXMgaXQgaGFzIG5vdCBiZWVuIHJlbW92ZWQgamV0IGJ5IHRoZSB1bmZpbmlz
+aGVkDQo+IGpvYiMxIChzZWUgdGhlIHNlY29uZCBzY2VuYXJpbyBhYm92ZSkuDQoNCkhvbmVzdGx5
+LCBkb24ndCBzZWUgYW55IHByb2JsZW0gd2l0aCBpdC4NCg0KPiANCj4gSWYgd2UgaW5jbHVkZSB0
+aGUgYmFzZSBub2RlIGludG8gdGhlIGpvYiBub2RlIGxpc3Qgd2l0aCBzb21lIHByb3RlY3RpbmcN
+Cj4gZmxhZ3MsIHRoYXQncyBibG9ja19qb2JfYWRkX2JkcnYoJnMtPmNvbW1vbiwgImJhc2UiLCBi
+YXNlLCAuLiksIHdlIGNhbg0KPiBlbmQgdXAgd2l0aCBhIGZhaWx1cmUgb2YgdGhlIGJkcnZfY2hl
+Y2tfdXBkYXRlX3Blcm0oKSBjYWxsZWQgYnkgdGhlDQo+IGJkcnZfcm9vdF9hdHRhY2hfY2hpbGQo
+KSBiZWNhdXNlIHRoZSBwcmV2aW91cyBqb2IjMSBoYXMgdGhlIHJvb3QNCj4gcmVmZXJlbmNlIHRv
+IHRoZSBzYW1lIG5vZGUgd2l0aCBvdGhlciBwZXJtaXNzaW9ucy4gU28sIHRoZSBuZXh0IGpvYiB3
+aWxsDQo+IGZhaWwgdG8gc3RhcnQgYW5kIHRoZSB0ZXN0IGNhc2VzIHdvbid0IHBhc3MuDQoNCllv
+dSBtZWFuIHRlc3QgMzAgIyB0ZXN0Y2FzZSBhYm91dCBwYXJhbGxlbCBzdHJlYW0gam9icywgd2hp
+Y2ggc3RhcnRzIHN0cmVhbXMsDQpzaGFyaW5nIG9uZSBub2RlIGFzIGJhc2UgZm9yIG9uZSBhbmQg
+dG9wIGZvciBhbm90aGVyLiBBbmQgaWYgd2UgbG9jayBiYXNlIGluDQpzdHJlYW0gam9iIHRoZSB0
+ZXN0IGZhaWxzLiBJIHRoaW5rLCB3ZSBqdXN0IG5lZWQgdG8gdXBkYXRlIHRoZSB0ZXN0LCBieSBp
+bnNlcnRpbmcNCmFkZGl0aW9uYWwgZW1wdHkgcWNvdzIgbm9kZXMgYmVsb3cgc2hhcmVkIG9uZXMs
+IGFuZCBtYWtlIG5ldyBpbnNlcnRlZCBub2Rlcw0KdG8gYmUgdG9wIG5vZGVzIG9mIHN0cmVhbSBq
+b2JzLCBzbyB0aGVyZSBubyBtb3JlIG5vZGUtc2hhcmluZyBiZXR3ZWVuIGpvYnMuDQoNCj4gDQo+
+IEl0IHdlIHNldCB0aGUgZm9sbG93aW5nIGZsYWdzLCB0aGVyZSB3aWxsIGJlIG5vIGZhaWx1cmU6
+DQo+IGJsb2NrX2pvYl9hZGRfYmRydigmcy0+Y29tbW9uLCAiYmFzZSIsIGJhc2UsIDAsIEJMS19Q
+RVJNX0NPTlNJU1RFTlRfUkVBRA0KPiB8IEJMS19QRVJNX1dSSVRFX1VOQ0hBTkdFRCB8IEJMS19Q
+RVJNX0dSQVBIX01PRCwgJmVycm9yX2Fib3J0KTsNCj4gQnV0IHdoYXQgbWFyZ2luIHdpbGwgd2Ug
+Z2Fpbj8gV2Ugd2lsbCBoYXZlIHRoZSBzYW1lIGlzc3VlcyBhcyBhYm92ZS4NCg0KV2UgbWVlZCBm
+bGFncyAuLi4sIEJMS19QRVJNX0dSQVBIX01PRCwgQkxLX1BFUk1fQUxMICYgfkJMS19QRVJNX0dS
+QVBIX01PRCwgLi4uDQpmb3IgYmFzZSBub2RlLg0KDQo+IA0KPiBJbiBtYW55IG90aGVyIGNhc2Vz
+LCB3aGVuIHRoZSBmaWx0ZXIgaGFzIG5vdCBiZWVuIGlkZW50aWZpZWQsIHdlIGNhbg0KPiBnZXQg
+YSBicm9rZW4gY2hhaW4gd2hpbGUgY2FsbGluZyB0byB0aGUgYmFja2luZ19icyhicz1maWx0ZXIp
+IGFzIHRoZQ0KPiBiYWNraW5nIG5vZGUgb2YgdGhlIGZpbHRlciBpcyB0aGUgemVybyBwb2ludGVy
+Lg0KPiANCj4gVGhhdCdzIHdoeSBJIGltcGxlbWVudGVkIHRoZSBza2lwX2ZpbHRlcigpIGZ1bmN0
+aW9uIGluIHRoaXMgc2VyaWVzIGFzDQo+IGEgc29tZSBzb3J0IG9mIHNvbHV0aW9uIG9yIHdvcmth
+cm91bmQuIE1heSB3ZSBwcm9jZWVkIHdpdGggdGhhdD8NCj4gSXMgdGhlcmUgYW55IGJldHRlciBp
+ZGVhPw0KPiANCg0KSSB0aGluayBub3csIHRoYXQgYmVzdCB3YXkgaXMgdG8gbG9jayBiYXNlIG5v
+ZGUuIEFzIGl0IGlzIHRoZSBzaW1wbGVzdCBvbmUuIEFuZCBpdA0KY29ycmVzcG9uZHMgdG8gY3Vy
+cmVudCBjb2RlLCB3aGljaCBhY3R1YWxseSBrZWVwcyBpbGxlZ2FsIHBvaW50ZXIgdG8gYmFzZSBu
+b2RlLA0Kd2l0aG91dCBhbnkgYWNjZXNzIHJpZ2h0cy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQo=
