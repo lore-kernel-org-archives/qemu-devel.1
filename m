@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46248)
+Received: from eggs.gnu.org ([209.51.188.92]:48142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gvsTB-0007pE-3L
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:37:05 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gvseD-0000ic-LB
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gvsTA-0005pV-6X
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:37:05 -0500
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-8-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bb6ada92-7cb5-7171-2424-e048f954a878@redhat.com>
-Date: Tue, 19 Feb 2019 00:36:56 +0100
+	(envelope-from <jsnow@redhat.com>) id 1gvseB-0002GV-Ok
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:48:28 -0500
+References: <20190213233618.22484-1-jsnow@redhat.com>
+	<20190213233618.22484-3-jsnow@redhat.com>
+	<c79e69af-6d00-074a-fc02-5f0808048f4d@virtuozzo.com>
+	<7248815e-1fcc-ec24-6463-0467df773af5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <dfa46dbe-df0d-8c77-8f86-cc634d1b5772@redhat.com>
+Date: Mon, 18 Feb 2019 18:48:16 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190131175549.11691-8-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="t1cAeK5PRj8gCsrXNzQwpG6IX6xmSEE2x"
-Subject: Re: [Qemu-devel] [RFC PATCH 07/11] qcow2: External file I/O
+In-Reply-To: <7248815e-1fcc-ec24-6463-0467df773af5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 2/2] block/dirty-bitmap: implement
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---t1cAeK5PRj8gCsrXNzQwpG6IX6xmSEE2x
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <bb6ada92-7cb5-7171-2424-e048f954a878@redhat.com>
-Subject: Re: [RFC PATCH 07/11] qcow2: External file I/O
-References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-8-kwolf@redhat.com>
-In-Reply-To: <20190131175549.11691-8-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 31.01.19 18:55, Kevin Wolf wrote:
-> This changes the qcow2 implementation to direct all guest data I/O to
-> s->data_file rather than bs->file, while metadata I/O still uses
-> bs->file. At the moment, this is still always the same, but soon we'll
-> add options to set s->data_file to an external data file.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qcow2.h          |  2 +-
->  block/qcow2-bitmap.c   |  7 ++++---
->  block/qcow2-cache.c    |  6 +++---
->  block/qcow2-cluster.c  | 46 +++++++++++++++++++++++++++++++++++-------=
-
->  block/qcow2-refcount.c | 30 +++++++++++++++++++--------
->  block/qcow2-snapshot.c |  7 ++++---
->  block/qcow2.c          | 39 +++++++++++++++++++++++++----------
->  7 files changed, 101 insertions(+), 36 deletions(-)
-
-[...]
-
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2b81cf839d..ac9934b3ed 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-
-[...]
-
-> @@ -3598,6 +3598,16 @@ static int coroutine_fn qcow2_co_truncate(BlockD=
-riverState *bs, int64_t offset,
->          int64_t old_file_size, new_file_size;
->          uint64_t nb_new_data_clusters, nb_new_l2_tables;
-> =20
-> +        /* With a data file, preallocation means just allocating the m=
-etadata
-> +         * and forwarding the truncate request to the data file */
-
-That's true, but...
-
-> +        if (has_data_file(bs)) {
-> +            ret =3D preallocate_co(bs, old_length, offset);
-> +            if (ret < 0) {
-> +                error_setg_errno(errp, -ret, "Preallocation failed");
-> +                goto fail;
-> +            }
-
-=2E..without a break here we're still going to preallocate bs->file as be=
-fore.
-
-Max
-
-> +        }
-> +
->          old_file_size =3D bdrv_getlength(bs->file->bs);
->          if (old_file_size < 0) {
->              error_setg_errno(errp, -old_file_size,
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 
---t1cAeK5PRj8gCsrXNzQwpG6IX6xmSEE2x
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 2/18/19 3:37 PM, Eric Blake wrote:
+> On 2/18/19 12:13 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> 14.02.2019 2:36, John Snow wrote:
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>   block/dirty-bitmap.c         | 15 +++++++++++++
+>>>   block/qcow2-bitmap.c         | 42 ++++++++++++++++++-----------------
+>>>   blockdev.c                   | 43 ++++++++++++++++++++++++++++++++++++
+>>>   include/block/dirty-bitmap.h |  1 +
+>>>   4 files changed, 81 insertions(+), 20 deletions(-)
+> 
+>>> +void bdrv_dirty_bitmap_add_inconsistent_hint(Error **errp)
+>>> +{
+>>> +    error_append_hint(errp, "Try block-dirty-bitmap-clear to mark this "
+>>> +                      "bitmap consistent again, or block-dirty-bitmap-remove "
+>>> +                      "to delete it.");
+>>
+>> bitmaps created by libvirt (or somebody) are related to some checkpoint. And their name is
+>> probably (Eric?) related to this checkpoint too. So, clear will never make them consistent..
+>> Only clear :)
+>>
+>> So, I don't like idea of clearing in-use bitmaps.
+> 
+> It's always possible to delete a bitmap and then create a new one by the
+> same name, to get the same effect of clearing an in-use bitmap. So let's
+> start simple and declare that the only valid operation on an
+> inconsistent bitmap is deletion.
+> 
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxrQZgACgkQ9AfbAGHV
-z0CEWwf/UA230ZIfo1DW34++iQKJFsUeHYCDtZvyBKv0fzO8ZXUuyr6Ke5m/NjB2
-yDMwW323CcK3dfvgB83yMBrHGtPmtZRXfyin52XDVbPFK/KPY6TKkqKLs+Hw/tTy
-UIpUxmve1XARZXf7VIqGaEqdavPbC7Lq3ITs9yms2eaopu3+H7NekUA7bQYTUzha
-lelTI+I5lbeMd5wDfc2WWQuihH8t7GCN54JB9sappCQVU2iWgBg9DpveBWpYZ/XO
-p6PE5hKZh9qX26+ZTWhRQx3tdSbQjU/DnVv7aScjW/8H+DGVMGqsQE2RAFDyrQ3y
-ecK7DUysayNsyFX9L9D82gX9yf5aqg==
-=oPnQ
------END PGP SIGNATURE-----
+OK, from the viewpoint of checkpoints specifically, that's a convincing
+argument against it for now.
 
---t1cAeK5PRj8gCsrXNzQwpG6IX6xmSEE2x--
+I'll tighten this.
