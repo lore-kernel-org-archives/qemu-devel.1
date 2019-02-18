@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36699)
+Received: from eggs.gnu.org ([209.51.188.92]:38762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gvnST-0001Bt-Dc
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:16:02 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gvnX2-0002SS-Q1
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gvnSS-0001n7-8j
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:16:01 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gvnWz-0006IR-As
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:20:43 -0500
+Date: Mon, 18 Feb 2019 23:50:22 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-Date: Mon, 18 Feb 2019 23:43:49 +0530
-Message-Id: <20190218181349.23885-1-ppandit@redhat.com>
+In-Reply-To: <20190218135724.0dc82c32@bahia.lan>
+Message-ID: <nycvar.YSQ.7.76.1902182347220.12428@xnncv>
+References: <20190218101218.4177-1-ppandit@redhat.com>
+	<20190218123811.5b7a1d61@bahia.lan>
+	<20190218115218.GF32287@redhat.com>
+	<20190218135724.0dc82c32@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4] ppc: add host-serial and host-model machine
- attributes
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: add host-serial and
+ host-model machine attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,168 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Greg Kurz <groug@kaod.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+  Hello Greg, Dan,
 
-On ppc hosts, hypervisor shares following system attributes
++-- On Mon, 18 Feb 2019, Greg Kurz wrote --+
+| >>> +    spapr->host_model = NULL;  
+| >> 
+| >> This isn't needed since object_initialize_with_type() already takes care
+| >> of zeroing the instance for us.
+| >>   
+| >>> +    spapr->host_serial = NULL;  
+| >> 
+| >> Same here.
+| 
+| Alright then if there's prior consensus on compatibility versus security.
+| 
+| So, with or without the unneeded zeroing of the spapr->host_* fields:
+| 
+| Reviewed-by: Greg Kurz <groug@kaod.org>
 
-  - /proc/device-tree/system-id
-  - /proc/device-tree/model
+I have sent a revised patch v4 removing above NULL initialisations. Thank you 
+for the review.
 
-with a guest. This could lead to information leakage and misuse.[*]
-Add machine attributes to control such system information exposure
-to a guest.
-
-[*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
-
-Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++----
- include/hw/ppc/spapr.h |  2 ++
- 2 files changed, 72 insertions(+), 6 deletions(-)
-
-Update v4: remove NULL initializations in spapr_instance_init()
-  -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04554.html
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0942f35bf8..8786c4c4ca 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-      * Add info to guest to indentify which host is it being run on
-      * and what is the uuid of the guest
-      */
--    if (kvmppc_get_host_model(&buf)) {
--        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
--        g_free(buf);
-+    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")) {
-+        if (g_str_equal(spapr->host_model, "passthrough")) {
-+            /* -M host-model=3Dpassthrough */
-+            if (kvmppc_get_host_model(&buf)) {
-+                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-+                g_free(buf);
-+            }
-+        } else {
-+            /* -M host-model=3D<user-string> */
-+            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->host_mo=
-del));
-+        }
-     }
--    if (kvmppc_get_host_serial(&buf)) {
--        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
--        g_free(buf);
-+
-+    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none")) =
-{
-+        if (g_str_equal(spapr->host_serial, "passthrough")) {
-+            /* -M host-serial=3Dpassthrough */
-+            if (kvmppc_get_host_serial(&buf)) {
-+                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-+                g_free(buf);
-+            }
-+        } else {
-+            /* -M host-serial=3D<user-string> */
-+            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->host_s=
-erial));
-+        }
-     }
-=20
-     buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-@@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, const c=
-har *value, Error **errp)
-     }
- }
-=20
-+static char *spapr_get_host_model(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    return g_strdup(spapr->host_model);
-+}
-+
-+static void spapr_set_host_model(Object *obj, const char *value, Error *=
-*errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    g_free(spapr->host_model);
-+    spapr->host_model =3D g_strdup(value);
-+}
-+
-+static char *spapr_get_host_serial(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    return g_strdup(spapr->host_serial);
-+}
-+
-+static void spapr_set_host_serial(Object *obj, const char *value, Error =
-**errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    g_free(spapr->host_serial);
-+    spapr->host_serial =3D g_strdup(value);
-+}
-+
- static void spapr_instance_init(Object *obj)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-@@ -3183,6 +3230,17 @@ static void spapr_instance_init(Object *obj)
-     object_property_set_description(obj, "ic-mode",
-                  "Specifies the interrupt controller mode (xics, xive, d=
-ual)",
-                  NULL);
-+
-+    object_property_add_str(obj, "host-model",
-+        spapr_get_host_model, spapr_set_host_model,
-+        &error_abort);
-+    object_property_set_description(obj, "host-model",
-+        "Set host's model-id to use - none|passthrough|string", &error_a=
-bort);
-+    object_property_add_str(obj, "host-serial",
-+        spapr_get_host_serial, spapr_set_host_serial,
-+        &error_abort);
-+    object_property_set_description(obj, "host-serial",
-+        "Set host's system-id to use - none|passthrough|string", &error_=
-abort);
- }
-=20
- static void spapr_machine_finalizefn(Object *obj)
-@@ -4080,9 +4138,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
- static void spapr_machine_3_1_class_options(MachineClass *mc)
- {
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+    static GlobalProperty compat[] =3D {
-+        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-+        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-+    };
-=20
-     spapr_machine_4_0_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
-;
-+    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled =3D false;
- }
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index a947a0a0dc..e004a570d8 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -177,6 +177,8 @@ struct sPAPRMachineState {
-=20
-     /*< public >*/
-     char *kvm_type;
-+    char *host_model;
-+    char *host_serial;
-=20
-     const char *icp_type;
-     int32_t irq_map_nr;
---=20
-2.20.1
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
