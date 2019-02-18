@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52442)
+Received: from eggs.gnu.org ([209.51.188.92]:52461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gvgqU-000773-JB
+	(envelope-from <cohuck@redhat.com>) id 1gvgqW-00077l-UW
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gvgqT-0006s1-PP
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:22 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gvgqW-0006t4-5r
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:24 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 18 Feb 2019 12:11:51 +0100
-Message-Id: <20190218111153.22681-9-cohuck@redhat.com>
+Date: Mon, 18 Feb 2019 12:11:52 +0100
+Message-Id: <20190218111153.22681-10-cohuck@redhat.com>
 In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
 References: <20190218111153.22681-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 08/10] s390x/cpumodel: add z14 GA2 model
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 09/10] s390x/kvm: add tracepoint to ioeventfd
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,74 +24,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Collin Walling <walling@linux.ibm.com>
+Trace when assigning/unassigning.
 
-Introduce the z14 GA2 cpu model for QEMU. There are no new features
-introduced with this model, and will inherit the same feature set as
-z14 GA1.
-
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190212011657.18324-3-walling@linux.ibm.com>
+Message-Id: <20190212153025.25425-1-cohuck@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_models.c   | 1 +
- target/s390x/gen-features.c | 7 +++++++
- 2 files changed, 8 insertions(+)
+ target/s390x/kvm.c        | 2 ++
+ target/s390x/trace-events | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 4e7e8cab0198..54026c3c0013 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -79,6 +79,7 @@ static S390CPUDef s390_cpu_defs[] = {
-     CPUDEF_INIT(0x2964, 13, 2, 47, 0x08000000U, "z13.2", "IBM z13 GA2"),
-     CPUDEF_INIT(0x2965, 13, 2, 47, 0x08000000U, "z13s", "IBM z13s GA1"),
-     CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
-+    CPUDEF_INIT(0x3906, 14, 2, 47, 0x08000000U, "z14.2", "IBM z14 GA2"),
-     CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
- };
- 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index dd6e8458ef00..44eca4547475 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -353,6 +353,8 @@ static uint16_t base_GEN14_GA1[] = {
-     S390_FEAT_ORDER_PRESERVING_COMPRESSION,
- };
- 
-+#define base_GEN14_GA2 EmptyFeat
-+
- /* Full features (in order of release)
-  * Automatically includes corresponding base features.
-  * Full features are all features this hardware supports even if kvm/QEMU do not
-@@ -480,6 +482,8 @@ static uint16_t full_GEN14_GA1[] = {
-     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
- };
- 
-+#define full_GEN14_GA2 EmptyFeat
-+
- /* Default features (in order of release)
-  * Automatically includes corresponding base features.
-  * Default features are all features this version of QEMU supports for this
-@@ -554,6 +558,8 @@ static uint16_t default_GEN14_GA1[] = {
-     S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
- };
- 
-+#define default_GEN14_GA2 EmptyFeat
-+
- /* QEMU (CPU model) features */
- 
- static uint16_t qemu_V2_11[] = {
-@@ -664,6 +670,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
-     CPU_FEAT_INITIALIZER(GEN13_GA1),
-     CPU_FEAT_INITIALIZER(GEN13_GA2),
-     CPU_FEAT_INITIALIZER(GEN14_GA1),
-+    CPU_FEAT_INITIALIZER(GEN14_GA2),
- };
- 
- #define FEAT_GROUP_INITIALIZER(_name)                  \
--- 
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 15fdc168e1c5..19530fb94e5a 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1886,6 +1886,8 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *=
+notifier, uint32_t sch,
+         .addr =3D sch,
+         .len =3D 8,
+     };
++    trace_kvm_assign_subch_ioeventfd(kick.fd, kick.addr, assign,
++                                     kick.datamatch);
+     if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
+         return -ENOSYS;
+     }
+diff --git a/target/s390x/trace-events b/target/s390x/trace-events
+index a84e316e4937..e509b08799c6 100644
+--- a/target/s390x/trace-events
++++ b/target/s390x/trace-events
+@@ -14,6 +14,7 @@ ioinst_chsc_cmd(uint16_t cmd, uint16_t len) "IOINST: ch=
+sc command 0x%04x, len 0x
+ kvm_enable_cmma(int rc) "CMMA: enabling with result code %d"
+ kvm_clear_cmma(int rc) "CMMA: clearing with result code %d"
+ kvm_failed_cpu_state_set(int cpu_index, uint8_t state, const char *msg) =
+"Warning: Unable to set cpu %d state %" PRIu8 " to KVM: %s"
++kvm_assign_subch_ioeventfd(int fd, uint32_t addr, bool assign, int datam=
+atch) "fd: %d sch: @0x%x assign: %d vq: %d"
+=20
+ # target/s390x/cpu.c
+ cpu_set_state(int cpu_index, uint8_t state) "setting cpu %d state to %" =
+PRIu8
+--=20
 2.17.2
