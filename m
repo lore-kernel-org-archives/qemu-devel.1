@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42479)
+Received: from eggs.gnu.org ([209.51.188.92]:43289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvg5s-0007Uk-4u
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:24:13 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gvgA5-0008U9-MY
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:28:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvg5r-0003X6-4t
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:24:12 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 10:24:03 +0000
-Message-ID: <3b789e65-4d40-b69d-9e2d-cd838000ea99@virtuozzo.com>
-References: <20190207102445.71998-1-vsementsov@virtuozzo.com>
-	<20190213081951.GA13081@stefanha-x1.localdomain>
-In-Reply-To: <20190213081951.GA13081@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <E238794D714EE44CB44945D6E4CD2F3A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 00/17] block: local qiov helper
+	(envelope-from <elohimes@gmail.com>) id 1gvg9t-00064G-8G
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:28:26 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42042)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gvg9n-0005yp-0y
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:28:16 -0500
+Received: by mail-pl1-x643.google.com with SMTP id s1so8579082plp.9
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 02:28:13 -0800 (PST)
+From: elohimes@gmail.com
+Date: Mon, 18 Feb 2019 18:27:41 +0800
+Message-Id: <20190218102748.2242-1-xieyongji@baidu.com>
+Subject: [Qemu-devel] [PATCH v6 0/7] vhost-user-blk: Add support for backend
+ reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>, "fam@euphon.net" <fam@euphon.net>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>
+To: mst@redhat.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru
+Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-13.02.2019 11:19, Stefan Hajnoczi wrote:
-> On Thu, Feb 07, 2019 at 01:24:28PM +0300, Vladimir Sementsov-Ogievskiy wr=
-ote:
->> Hi all!
->>
->> Here is a new simple helper for a very often patter
->> around qemu_iovec_init_external, when we need simple qiov with only
->> one iov, initialized from external buffer.
->>
->> v3:
->=20
-> Hi Vladimir,
-> "make check" is failing:
->=20
->    TEST    check-qtest-x86_64: tests/ide-test
-> qemu-system-x86_64: /home/stefanha/qemu/include/qemu/iov.h:195: qemu_iove=
-c_get_buf: Assertion `qiov->niov =3D=3D -1 && qiov->iov =3D=3D &qiov->local=
-_iov' failed.
->=20
-> Please take a look and send v4.
->=20
-> Stefan
->=20
+From: Xie Yongji <xieyongji@baidu.com>
 
-Oops, sorry for this, it obviously should be qiov->nalloc =3D=3D -1 in asse=
-rtion. I'll resend and rename s/qemu_iovec_get_buf/qemu_iovec_embedded_buf/=
- to make it more obvious.
+This patchset is aimed at supporting qemu to reconnect
+vhost-user-blk backend after vhost-user-blk backend crash or
+restart.
 
---=20
-Best regards,
-Vladimir
+The patch 1 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
+and VHOST_USER_SET_INFLIGHT_FD to support transferring shared
+buffer between qemu and backend.
+
+The patch 2 deletes some redundant check in contrib/libvhost-user.c.
+
+The patch 3,4 are the corresponding libvhost-user patches of
+patch 1. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
+and VHOST_USER_SET_INFLIGHT_FD.
+
+The patch 5 allows vhost-user-blk to use the two new messages
+to get/set inflight buffer from/to backend.
+
+The patch 6 supports vhost-user-blk to reconnect backend when
+connection closed.
+
+The patch 7 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
+to vhost-user-blk backend which is used to tell qemu that
+we support reconnecting now.
+
+To use it, we could start qemu with:
+
+qemu-system-x86_64 \
+        -chardev socket,id=char0,path=/path/vhost.socket,reconnect=1, \
+        -device vhost-user-blk-pci,chardev=char0 \
+
+and start vhost-user-blk backend with:
+
+vhost-user-blk -b /path/file -s /path/vhost.socket
+
+Then we can restart vhost-user-blk at any time during VM running.
+
+V5 to V6:
+- Document the layout in inflight buffer for packed virtqueue
+- Rework the layout in inflight buffer for split virtqueue
+- Remove version field in VhostUserInflight
+- Add a patch to remove some redundant check in
+  contrib/libvhost-user.c
+- Document more details in vhost-user.txt
+
+V4 to V5:
+- Drop patch that enables "nowait" option on client sockets
+- Support resubmitting inflight I/O in order
+- Make inflight I/O tracking more robust
+- Remove align field and add queue size field in VhostUserInflight
+- Document more details in vhost-user.txt
+
+V3 to V4:
+- Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
+- Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
+  and VHOST_USER_SET_INFLIGHT_FD
+- Allocate inflight buffer in backend rather than in qemu
+- Document a recommended format for inflight buffer
+
+V2 to V3:
+- Using exisiting wait/nowait options to control connection on
+  client sockets instead of introducing "disconnected" option.
+- Support the case that vhost-user backend restart during initialzation
+  of vhost-user-blk device.
+
+V1 to V2:
+- Introduce "disconnected" option for chardev instead of reuse "wait"
+  option
+- Support the case that QEMU starts before vhost-user backend
+- Drop message VHOST_USER_SET_VRING_INFLIGHT
+- Introduce two new messages VHOST_USER_GET_SHM_SIZE
+  and VHOST_USER_SET_SHM_FD
+
+Xie Yongji (7):
+  vhost-user: Support transferring inflight buffer between qemu and
+    backend
+  libvhost-user: Remove unnecessary FD flag check for event file
+    descriptors
+  libvhost-user: Introduce vu_queue_map_desc()
+  libvhost-user: Support tracking inflight I/O in shared memory
+  vhost-user-blk: Add support to get/set inflight buffer
+  vhost-user-blk: Add support to reconnect backend
+  contrib/vhost-user-blk: enable inflight I/O tracking
+
+ Makefile                                |   2 +-
+ contrib/libvhost-user/libvhost-user.c   | 400 ++++++++++++++++++++----
+ contrib/libvhost-user/libvhost-user.h   |  58 ++++
+ contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
+ docs/interop/vhost-user.txt             | 264 ++++++++++++++++
+ hw/block/vhost-user-blk.c               | 229 +++++++++++---
+ hw/virtio/vhost-user.c                  | 107 +++++++
+ hw/virtio/vhost.c                       |  96 ++++++
+ include/hw/virtio/vhost-backend.h       |  10 +
+ include/hw/virtio/vhost-user-blk.h      |   5 +
+ include/hw/virtio/vhost.h               |  18 ++
+ 11 files changed, 1084 insertions(+), 108 deletions(-)
+
+-- 
+2.17.1
