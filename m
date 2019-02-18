@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33100)
+Received: from eggs.gnu.org ([209.51.188.92]:33114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcX-000568-9s
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:10:10 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcY-00056o-3t
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:10:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcW-0007Sa-Aa
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:10:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcW-0007Ro-2v
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:10:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 17:09:19 +0300
-Message-Id: <20190218140926.333779-11-vsementsov@virtuozzo.com>
-In-Reply-To: <20190218140926.333779-1-vsementsov@virtuozzo.com>
-References: <20190218140926.333779-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 10/17] block/qed: use qemu_iovec_init_buf
+Date: Mon, 18 Feb 2019 17:09:09 +0300
+Message-Id: <20190218140926.333779-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 00/17] block: local qiov helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,143 +20,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com
 
-Use new qemu_iovec_init_buf() instead of
-qemu_iovec_init_external( ... , 1), which simplifies the code.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/qed-table.c | 16 +++-------------
- block/qed.c       | 31 +++++++++----------------------
- 2 files changed, 12 insertions(+), 35 deletions(-)
+Here is a new simple helper for a very often patter
+around qemu_iovec_init_external, when we need simple qiov with only
+one iov, initialized from external buffer.
 
-diff --git a/block/qed-table.c b/block/qed-table.c
-index 7df5680adb..c497bd4aec 100644
---- a/block/qed-table.c
-+++ b/block/qed-table.c
-@@ -21,16 +21,11 @@
- /* Called with table_lock held.  */
- static int qed_read_table(BDRVQEDState *s, uint64_t offset, QEDTable *table)
- {
--    QEMUIOVector qiov;
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(
-+        qiov, table->offsets, s->header.cluster_size * s->header.table_size);
-     int noffsets;
-     int i, ret;
- 
--    struct iovec iov = {
--        .iov_base = table->offsets,
--        .iov_len = s->header.cluster_size * s->header.table_size,
--    };
--    qemu_iovec_init_external(&qiov, &iov, 1);
--
-     trace_qed_read_table(s, offset, table);
- 
-     qemu_co_mutex_unlock(&s->table_lock);
-@@ -71,7 +66,6 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     unsigned int sector_mask = BDRV_SECTOR_SIZE / sizeof(uint64_t) - 1;
-     unsigned int start, end, i;
-     QEDTable *new_table;
--    struct iovec iov;
-     QEMUIOVector qiov;
-     size_t len_bytes;
-     int ret;
-@@ -85,11 +79,7 @@ static int qed_write_table(BDRVQEDState *s, uint64_t offset, QEDTable *table,
-     len_bytes = (end - start) * sizeof(uint64_t);
- 
-     new_table = qemu_blockalign(s->bs, len_bytes);
--    iov = (struct iovec) {
--        .iov_base = new_table->offsets,
--        .iov_len = len_bytes,
--    };
--    qemu_iovec_init_external(&qiov, &iov, 1);
-+    qemu_iovec_init_buf(&qiov, new_table->offsets, len_bytes);
- 
-     /* Byteswap table */
-     for (i = start; i < end; i++) {
-diff --git a/block/qed.c b/block/qed.c
-index 1280870024..c5e6d6ad41 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -113,18 +113,13 @@ static int coroutine_fn qed_write_header(BDRVQEDState *s)
-     int nsectors = DIV_ROUND_UP(sizeof(QEDHeader), BDRV_SECTOR_SIZE);
-     size_t len = nsectors * BDRV_SECTOR_SIZE;
-     uint8_t *buf;
--    struct iovec iov;
-     QEMUIOVector qiov;
-     int ret;
- 
-     assert(s->allocating_acb || s->allocating_write_reqs_plugged);
- 
-     buf = qemu_blockalign(s->bs, len);
--    iov = (struct iovec) {
--        .iov_base = buf,
--        .iov_len = len,
--    };
--    qemu_iovec_init_external(&qiov, &iov, 1);
-+    qemu_iovec_init_buf(&qiov, buf, len);
- 
-     ret = bdrv_co_preadv(s->bs->file, 0, qiov.size, &qiov, 0);
-     if (ret < 0) {
-@@ -913,7 +908,6 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
- {
-     QEMUIOVector qiov;
-     QEMUIOVector *backing_qiov = NULL;
--    struct iovec iov;
-     int ret;
- 
-     /* Skip copy entirely if there is no work to do */
-@@ -921,11 +915,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
-         return 0;
-     }
- 
--    iov = (struct iovec) {
--        .iov_base = qemu_blockalign(s->bs, len),
--        .iov_len = len,
--    };
--    qemu_iovec_init_external(&qiov, &iov, 1);
-+    qemu_iovec_init_buf(&qiov, qemu_blockalign(s->bs, len), len);
- 
-     ret = qed_read_backing_file(s, pos, &qiov, &backing_qiov);
- 
-@@ -946,7 +936,7 @@ static int coroutine_fn qed_copy_from_backing_file(BDRVQEDState *s,
-     }
-     ret = 0;
- out:
--    qemu_vfree(iov.iov_base);
-+    qemu_vfree(qemu_iovec_buf(&qiov));
-     return ret;
- }
- 
-@@ -1447,8 +1437,12 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-                                                   BdrvRequestFlags flags)
- {
-     BDRVQEDState *s = bs->opaque;
--    QEMUIOVector qiov;
--    struct iovec iov;
-+
-+    /*
-+     * Zero writes start without an I/O buffer.  If a buffer becomes necessary
-+     * then it will be allocated during request processing.
-+     */
-+    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
- 
-     /* Fall back if the request is not aligned */
-     if (qed_offset_into_cluster(s, offset) ||
-@@ -1456,13 +1450,6 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-         return -ENOTSUP;
-     }
- 
--    /* Zero writes start without an I/O buffer.  If a buffer becomes necessary
--     * then it will be allocated during request processing.
--     */
--    iov.iov_base = NULL;
--    iov.iov_len = bytes;
--
--    qemu_iovec_init_external(&qiov, &iov, 1);
-     return qed_co_request(bs, offset >> BDRV_SECTOR_BITS, &qiov,
-                           bytes >> BDRV_SECTOR_BITS,
-                           QED_AIOCB_WRITE | QED_AIOCB_ZERO);
+v4:
+ 01: tiny improvements by Eric
+     + fix bug: s/niov/nalloc in assertion
+     + rename s/qemu_iovec_get_buf/qemu_iovec_buf,
+       to don't look like getter, which in turn should not return
+       pointer to something internal to be freed separately.
+     So, no r-b's in 01 
+ 07,10,16
+    - rebase on new function name qemu_iovec_buf 
+    - save r-b's by Eric and Stefan
+ others unchanged, add r-b's by Eric and Stefan
+
+v3:
+  01-02: tiny improvements, described in patch-emails
+  03-17: new patches
+
+  Note: only hw/scsi/scsi-disk.c not updated, as it has too tricky
+        logic around @iov fields of structures. So, it is simpler to
+        keep it as is.
+
+v2 was "[PATCH v2 0/2] block: local qiov helper: part I"
+https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01610.html
+
+Vladimir Sementsov-Ogievskiy (17):
+  block: enhance QEMUIOVector structure
+  block/io: use qemu_iovec_init_buf
+  block/block-backend: use QEMU_IOVEC_INIT_BUF
+  block/backup: use qemu_iovec_init_buf
+  block/commit: use QEMU_IOVEC_INIT_BUF
+  block/stream: use QEMU_IOVEC_INIT_BUF
+  block/parallels: use QEMU_IOVEC_INIT_BUF
+  block/qcow: use qemu_iovec_init_buf
+  block/qcow2: use qemu_iovec_init_buf
+  block/qed: use qemu_iovec_init_buf
+  block/vmdk: use qemu_iovec_init_buf
+  qemu-img: use qemu_iovec_init_buf
+  migration/block: use qemu_iovec_init_buf
+  tests/test-bdrv-drain: use QEMU_IOVEC_INIT_BUF
+  hw/ide: drop iov field from IDEState
+  hw/ide: drop iov field from IDEBufferedRequest
+  hw/ide: drop iov field from IDEDMA
+
+ include/hw/ide/internal.h |  3 --
+ include/qemu/iov.h        | 64 +++++++++++++++++++++++++++-
+ block/backup.c            |  5 +--
+ block/block-backend.c     | 13 +-----
+ block/commit.c            |  7 +--
+ block/io.c                | 89 +++++++++------------------------------
+ block/parallels.c         | 13 +++---
+ block/qcow.c              | 21 ++-------
+ block/qcow2.c             | 12 +-----
+ block/qed-table.c         | 16 ++-----
+ block/qed.c               | 31 ++++----------
+ block/stream.c            |  7 +--
+ block/vmdk.c              |  7 +--
+ hw/ide/atapi.c            | 14 +++---
+ hw/ide/core.c             | 19 ++++-----
+ migration/block.c         | 10 ++---
+ qemu-img.c                | 10 +----
+ tests/test-bdrv-drain.c   | 29 ++-----------
+ 18 files changed, 134 insertions(+), 236 deletions(-)
+
 -- 
 2.18.0
