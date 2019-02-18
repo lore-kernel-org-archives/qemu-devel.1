@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36412)
+Received: from eggs.gnu.org ([209.51.188.92]:36428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gvpAl-0007m6-Hh
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:05:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1gvpAn-0007mB-RC
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gvpAi-0002H6-G9
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:05:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gvpAe-0002DX-AA
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:05:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gvpAb-0005fj-NK
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 20:05:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AC2B72E8070
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 20:05:41 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1gvpAk-0002II-Fs
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:05:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gvpAi-0002CO-D4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:05:48 -0500
+References: <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2cbb158f-a869-e24c-96cc-23f7f61a946b@redhat.com>
+Date: Mon, 18 Feb 2019 14:05:35 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 Feb 2019 19:56:22 -0000
-From: John Snow <1808928@bugs.launchpad.net>
-Reply-To: Bug 1808928 <1808928@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154511858636.8591.3431958243733477284.malonedeb@gac.canonical.com>
-Message-Id: <155051978212.28678.14987935362706104563.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1808928] Re: Bitmap Extra data is not supported
+In-Reply-To: <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: handle TypeError for Python3 in
+ test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, Eduardo Habkost <ehabkost@redhat.com>
 
-OK, I think it is a bug that you cannot at least repair the image,
-though the cause of corruption is still unknown to me. Do you have
-libvirt/QEMU logs from when then VM was shut down, before it wouldn't
-boot properly again?
+[adding Eduardo for some python 2-vs-3 advice]
 
--- =
+On 2/18/19 1:59 PM, Andrey Shinkevich wrote:
+> To write one byte to disk, Python2 may use 'chr' type.
+> In Python3, conversion to 'byte' type is required.
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/242 | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+> index 16c65ed..6b1f7b8 100755
+> --- a/tests/qemu-iotests/242
+> +++ b/tests/qemu-iotests/242
+> @@ -65,9 +65,14 @@ def toggle_flag(offset):
+>      with open(disk, "r+b") as f:
+>          f.seek(offset, 0)
+>          c = f.read(1)
+> -        toggled = chr(ord(c) ^ bitmap_flag_unknown)
+> +        toggled = ord(c) ^ bitmap_flag_unknown
+>          f.seek(-1, 1)
+> -        f.write(toggled)
+> +        try:
+> +            # python2
+> +            f.write(chr(toggled))
+> +        except TypeError:
+> +            # python3
+> +            f.write(bytes([toggled]))
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1808928
+Looks like it works, but I'm not enough of a python expert to know if
+there is a more Pythonic elegant approach.
 
-Title:
-  Bitmap Extra data is not supported
+If someone else picks it up before my next NBD pull request,
+Acked-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  New
-
-Bug description:
-  i am using dirty bitmaps and drive-backup. It works as aspected.
-
-  Lately, i encounter a disastrous error. There is not any information
-  about that situation. I cannot reach/open/attach/info or anything with
-  a qcow2 file.
-
-  virsh version
-  Compiled against library: libvirt 4.10.0
-  Using library: libvirt 4.10.0
-  Using API: QEMU 4.10.0
-  Running hypervisor: QEMU 2.12.0
-
-  "qemu-img: Could not open '/var/lib/libvirt/images/test.qcow2': Bitmap
-  extra data is not supported"
-
-  what is that mean? what should i do?
-  i cannot remove bitmap. i cannot open image or query.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1808928/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
