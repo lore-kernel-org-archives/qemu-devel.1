@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33447)
+Received: from eggs.gnu.org ([209.51.188.92]:42448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1gvaTb-00069W-PO
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 23:24:20 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gvbN9-0005Gv-W4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 00:21:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1gvaTZ-0006zP-Om
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 23:24:19 -0500
-Received: from mga05.intel.com ([192.55.52.43]:46578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1gvaTW-0006tN-1G
-	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 23:24:15 -0500
-References: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
-	<20190205164716.79b9cd08@Igors-MacBook-Pro.local>
-	<c6e1d704-e0da-215e-40c7-6db3daa66da1@linux.intel.com>
-	<20190214123140.53d3cdf6@redhat.com>
-	<6cd527d2-b8d8-0eb9-78eb-a59c3ee4ccc7@gmail.com>
-	<20190214151520.2763805d@redhat.com>
-	<ff00462b-a46f-a937-d9f0-cc37ab4957b9@gmail.com>
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <f991498e-3d3f-ddae-f4b5-f592dcdee466@linux.intel.com>
-Date: Mon, 18 Feb 2019 12:24:02 +0800
+	(envelope-from <dovgaluk@ispras.ru>) id 1gvbN9-0001EM-AF
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 00:21:43 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:34676)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gvbN9-000186-2X
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 00:21:43 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <154935478086.7509.4349987292919289245.stgit@pasha-VirtualBox>	<002301d4c207$27d88d50$7789a7f0$@ru>	<87y36lpjfa.fsf@dusky.pond.sub.org>	<a44a588734f7101b8a9e1f76c1044e41@ispras.ru>
+	<87mun1nz3x.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mun1nz3x.fsf@dusky.pond.sub.org>
+Date: Mon, 18 Feb 2019 08:21:30 +0300
+Message-ID: <000c01d4c749$ce3bc2b0$6ab34810$@ru>
 MIME-Version: 1.0
-In-Reply-To: <ff00462b-a46f-a937-d9f0-cc37ab4957b9@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Issues] PCI hotplug does not work well on pc
- platform?
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v12 00/25] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: yang.zhong@intel.com, qemu-devel <qemu-devel@nongnu.org>
+To: 'Markus Armbruster' <armbru@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-Hi Marcel and Igor,
+> From: Markus Armbruster [mailto:armbru@redhat.com]
+> dovgaluk <dovgaluk@ispras.ru> writes:
+>=20
+> > Markus Armbruster =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2019-02-12 10:14:
+> >> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> writes:
+> >>
+> >>> Ping?
+> >>
+> >> Are you pinging for more review, or for someone to merge this?
+> >
+> > From my point of view this patch set is ready.
+>=20
+> MAINTAINERS
+>=20
+>     Record/replay
+>     M: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+>     R: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> makes me think either Paolo should pick it up, or he should tell you =
+to
+> post a pull request yourself.
 
-Thanks very much for your help!
+True, but we are still waiting for formal (I hope)
+reviewed-by for the block-related patches.
 
-On 2/14/2019 10:42 PM, Marcel Apfelbaum wrote:
-> 
-> 
-[...]
->>>>>>> I have two questions.
->>>>>>> 1. PCI hotplug on pci.0 must manually rescan in guest. The ACPI 
->>>>>>> hotplug
->>>>>>> handler sends the GPE event to guest but it seems guest doesn't 
->>>>>>> receive
->>>>>>> it? I tried to open ACPI debug level/layer to 0xffffffff, in 
->>>>>>> order to
->>>>>>> see if there is any message after device_add in monitor, but no 
->>>>>>> message
->>>>>>> comes out until I manually rescan. Also tried printk in
->>>>>>> acpi_ev_gpe_xrupt_handler() and acpi_ev_sci_xrupt_handler(). No 
->>>>>>> output
->>>>>>> in dmesg.
->>>>>>> (I'm sure that CONFIG_HOTPLUG_PCI_PCIE=y, CONFIG_HOTPLUG_PCI_CPCI=y,
->>>>>>> CONFIG_HOTPLUG_PCI=y, CONFIG_HOTPLUG_PCI_ACPI=y)
->>> What about |CONFIG_HOTPLUG_PCI_SHPC=y ?
->>>
-
-Thanks and I finally found it is because I set hardware reduced acpi 
-before and now it is correct.
-
->>> |
->>>>>>> Whether this is a kind of design or a known issue? Does guest 
->>>>>>> receive
->>>>>>> the request, where can I find the
->>>>>> does it work with known to work kernels (RHEL7)?
->>>>>>
->>>>>> Also sharing used QEMU version and command line could help.
->>>>> Is there any key config of kernel in guest, besides those I listed 
->>>>> above?
->>>> Maybe Marcel knows something about it
->>>> (CCed)
->>> May I ask why do you need SHPC hotplug and not the ACPI based hotplug?
-Oh, it is some customer's requests. And the method to set PIIX4_PM 
-property works.
-
-
-Thanks!
-Jing
+Pavel Dovgalyuk
