@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58451)
+Received: from eggs.gnu.org ([209.51.188.92]:58465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gvf8d-0002HE-H2
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:23:00 -0500
+	(envelope-from <david@redhat.com>) id 1gvf8d-0002HW-RQ
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:23:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gvf8c-00039O-Gi
+	(envelope-from <david@redhat.com>) id 1gvf8c-00039i-It
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:22:59 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Feb 2019 10:22:02 +0100
-Message-Id: <20190218092202.26683-7-david@redhat.com>
+Date: Mon, 18 Feb 2019 10:22:00 +0100
+Message-Id: <20190218092202.26683-5-david@redhat.com>
 In-Reply-To: <20190218092202.26683-1-david@redhat.com>
 References: <20190218092202.26683-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 6/6] tests/device-plug: Add memory unplug
- request test for spapr
+Subject: [Qemu-devel] [PATCH v3 4/6] tests/device-plug: Add CCW unplug test
+ for s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
 
-We can easily test this, just like PCI. On x86 ACPI, we need guest
-interaction to make it work, so it is not that easy to test. We might
-add tests for that later on.
+As CCW unplugs are surprise removals without asking the guest first,
+we can test this without any guest interaction.
 
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- tests/device-plug-test.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ tests/device-plug-test.c | 41 +++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 36 insertions(+), 5 deletions(-)
 
 diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
-index 0262ad6be6..87593d9ecf 100644
+index cd9ada539d..d1a6c94af2 100644
 --- a/tests/device-plug-test.c
 +++ b/tests/device-plug-test.c
-@@ -116,6 +116,22 @@ static void test_spapr_cpu_unplug_request(void)
+@@ -15,17 +15,26 @@
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
+ 
+-static void device_del_request(QTestState *qtest, const char *id)
++static void device_del_start(QTestState *qtest, const char *id)
+ {
+-    QDict *resp;
++    qtest_qmp_send(qtest,
++                   "{'execute': 'device_del', 'arguments': { 'id': %s } }", id);
++}
++
++static void device_del_finish(QTestState *qtest)
++{
++    QDict *resp = qtest_qmp_receive(qtest);
+ 
+-    resp = qtest_qmp(qtest,
+-                     "{'execute': 'device_del', 'arguments': { 'id': %s } }",
+-                     id);
+     g_assert(qdict_haskey(resp, "return"));
+     qobject_unref(resp);
+ }
+ 
++static void device_del_request(QTestState *qtest, const char *id)
++{
++    device_del_start(qtest, id);
++    device_del_finish(qtest);
++}
++
+ static void system_reset(QTestState *qtest)
+ {
+     QDict *resp;
+@@ -77,8 +86,25 @@ static void test_pci_unplug_request(void)
      qtest_quit(qtest);
  }
  
-+static void test_spapr_memory_unplug_request(void)
++static void test_ccw_unplug(void)
 +{
-+    QTestState *qtest;
++    QTestState *qtest = qtest_initf("-device virtio-balloon-ccw,id=dev0");
 +
-+    qtest = qtest_initf("-m 256M,slots=1,maxmem=768M "
-+                        "-object memory-backend-ram,id=mem0,size=512M "
-+                        "-device pc-dimm,id=dev0,memdev=mem0");
-+
-+    /* similar to test_pci_unplug_request */
-+    device_del_request(qtest, "dev0");
-+    system_reset(qtest);
++    /*
++     * The DEVICE_DELETED events will be sent before the command
++     * completes.
++     */
++    device_del_start(qtest, "dev0");
 +    wait_device_deleted_event(qtest, "dev0");
++    device_del_finish(qtest);
 +
 +    qtest_quit(qtest);
 +}
 +
  int main(int argc, char **argv)
  {
-     const char *arch = qtest_get_arch();
-@@ -138,6 +154,8 @@ int main(int argc, char **argv)
-     if (!strcmp(arch, "ppc64")) {
-         qtest_add_func("/device-plug/spapr-cpu-unplug-request",
-                        test_spapr_cpu_unplug_request);
-+        qtest_add_func("/device-plug/spapr-memory-unplug-request",
-+                       test_spapr_memory_unplug_request);
-     }
++    const char *arch = qtest_get_arch();
++
+     g_test_init(&argc, &argv, NULL);
  
+     /*
+@@ -89,5 +115,10 @@ int main(int argc, char **argv)
+     qtest_add_func("/device-plug/pci-unplug-request",
+                    test_pci_unplug_request);
+ 
++    if (!strcmp(arch, "s390x")) {
++        qtest_add_func("/device-plug/ccw-unplug",
++                       test_ccw_unplug);
++    }
++
      return g_test_run();
+ }
 -- 
 2.17.2
