@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51181)
+Received: from eggs.gnu.org ([209.51.188.92]:55641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmiN-0006Vx-E4
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:28:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1gvmpi-00080W-Jk
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmiC-0008HH-DD
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:28:22 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 17:27:52 +0000
-Message-ID: <bfa23558-e7f3-cfc8-21a5-dd544ea56ad2@virtuozzo.com>
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-6-jsnow@redhat.com>
-In-Reply-To: <20190213232356.21034-6-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4EFEF66B901DC34688BF29822090948D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gvmpg-0007KW-I4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:35:58 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-3-armbru@redhat.com>
+	<03d52136-9abf-7035-7152-c2551061dab7@redhat.com>
+Date: Mon, 18 Feb 2019 18:35:20 +0100
+In-Reply-To: <03d52136-9abf-7035-7152-c2551061dab7@redhat.com> (Laszlo Ersek's
+	message of "Mon, 18 Feb 2019 17:43:59 +0100")
+Message-ID: <877edx57af.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] block/dirty-bitmaps: unify
- qmp_locked and user_locked calls
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
+ just once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-ppc@nongnu.org, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+IFRoZXNlIG1lYW4gdGhlIHNhbWUg
-dGhpbmcgbm93LiBVbmlmeSB0aGVtIGFuZCByZW5hbWUgdGhlIG1lcmdlZCBjYWxsDQo+IGJkcnZf
-ZGlydHlfYml0bWFwX2J1c3kgdG8gaW5kaWNhdGUgc2VtYW50aWNhbGx5IHdoYXQgd2UgYXJlIGRl
-c2NyaWJpbmcsDQo+IGFzIHdlbGwgYXMgaGVscCBkaXNhbWJpZ3VhdGUgZnJvbSB0aGUgdmFyaW91
-cyBfbG9ja2VkIGFuZCBfdW5sb2NrZWQNCj4gdmVyc2lvbnMgb2YgYml0bWFwIGhlbHBlcnMgdGhh
-dCByZWZlciB0byBtdXRleCBsb2Nrcy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8
-anNub3dAcmVkaGF0LmNvbT4NCj4gUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRo
-YXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyAgICAgICAgICAgfCA0MSAr
-KysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgYmxvY2tkZXYuYyAgICAgICAg
-ICAgICAgICAgICAgIHwgMTggKysrKysrKy0tLS0tLS0tDQo+ICAgaW5jbHVkZS9ibG9jay9kaXJ0
-eS1iaXRtYXAuaCAgIHwgIDUgKystLS0NCj4gICBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFw
-LmMgfCAgNiArKy0tLQ0KPiAgIG5iZC9zZXJ2ZXIuYyAgICAgICAgICAgICAgICAgICB8ICA2ICsr
-LS0tDQo+ICAgNSBmaWxlcyBjaGFuZ2VkLCAzNSBpbnNlcnRpb25zKCspLCA0MSBkZWxldGlvbnMo
-LSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5
-LWJpdG1hcC5jDQo+IGluZGV4IDIwNDJjNjI2MDIuLjhhYjA0ODM4NWEgMTAwNjQ0DQo+IC0tLSBh
-L2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBA
-IC00OCw5ICs0OCw5IEBAIHN0cnVjdCBCZHJ2RGlydHlCaXRtYXAgew0KPiAgICAgICBRZW11TXV0
-ZXggKm11dGV4Ow0KPiAgICAgICBIQml0bWFwICpiaXRtYXA7ICAgICAgICAgICAgLyogRGlydHkg
-Yml0bWFwIGltcGxlbWVudGF0aW9uICovDQo+ICAgICAgIEhCaXRtYXAgKm1ldGE7ICAgICAgICAg
-ICAgICAvKiBNZXRhIGRpcnR5IGJpdG1hcCAqLw0KPiAtICAgIGJvb2wgcW1wX2xvY2tlZDsgICAg
-ICAgICAgICAvKiBCaXRtYXAgaXMgbG9ja2VkLCBpdCBjYW4ndCBiZSBtb2RpZmllZA0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aHJvdWdoIFFNUCAqLw0KPiAtICAgIEJk
-cnZEaXJ0eUJpdG1hcCAqc3VjY2Vzc29yOyAvKiBBbm9ueW1vdXMgY2hpbGQ7IGltcGxpZXMgdXNl
-cl9sb2NrZWQgc3RhdGUgKi8NCj4gKyAgICBib29sIGJ1c3k7ICAgICAgICAgICAgICAgICAgLyog
-Qml0bWFwIGlzIGJ1c3ksIGl0IGNhbid0IGJlIG1vZGlmaWVkIHRocm91Z2gNCj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgUU1QICovDQoNCmJldHRlciBub3QgIm1vZGlmaWVk
-IiBidXQgInVzZWQiLi4gZm9yIGV4YW1wbGUsIGV4cG9ydCB0aHJvdWdoIE5CRCBpcyBub3QgYSBt
-b2RpZmljYXRpb24uDQoNCj4gKyAgICBCZHJ2RGlydHlCaXRtYXAgKnN1Y2Nlc3NvcjsgLyogQW5v
-bnltb3VzIGNoaWxkLCBpZiBhbnkuICovDQoNCmhtIHRoaXMgY29tbWVudCBjaGFuZ2UgYWJvdXQg
-c3VjY2Vzc29yIHJlbGF0ZXMgbW9yZSB0byBwcmV2aW91cyBwYXRjaCwgYnV0IEkgZG9uJ3QgcmVh
-bGx5IGNhcmUuDQoNCj4gICAgICAgY2hhciAqbmFtZTsgICAgICAgICAgICAgICAgIC8qIE9wdGlv
-bmFsIG5vbi1lbXB0eSB1bmlxdWUgSUQgKi8NCj4gICAgICAgaW50NjRfdCBzaXplOyAgICAgICAg
-ICAgICAgIC8qIFNpemUgb2YgdGhlIGJpdG1hcCwgaW4gYnl0ZXMgKi8NCj4gICAgICAgYm9vbCBk
-aXNhYmxlZDsgICAgICAgICAgICAgIC8qIEJpdG1hcCBpcyBkaXNhYmxlZC4gSXQgaWdub3JlcyBh
-bGwgd3JpdGVzIHRvDQo+IEBAIC0xODgsMjIgKzE4OCwxNyBAQCBib29sIGJkcnZfZGlydHlfYml0
-bWFwX2hhc19zdWNjZXNzb3IoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+ICAgICAgIHJldHVy
-biBiaXRtYXAtPnN1Y2Nlc3NvcjsNCj4gICB9DQo+ICAgDQoNCg0KSW4gY29tbWVudCBmb3IgYmRy
-dl9kaXJ0eV9iaXRtYXBfY3JlYXRlX3N1Y2Nlc3NvciwgdGhlcmUgaXMgImxvY2tlZCIgd29yZCwg
-d2hpY2ggeW91IGZvcmdldCB0byBmaXggdG8gImJ1c3kiDQp3aXRoIGF0IGxlYXN0IHRoaXMgZml4
-ZWQ6DQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Laszlo Ersek <lersek@redhat.com> writes:
+
+> On 02/18/19 13:56, Markus Armbruster wrote:
+>> PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
+>> BUG", which sounds like a warning, then calls exit(1), followed by
+>> unreachable goto reset_flash.  All this commit does is expanding the
+>> macro, so the smell becomes more poignant, and the macro can be
+>> deleted.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/block/pflash_cfi01.c | 10 ++--------
+>>  1 file changed, 2 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+>> index 9efa7aa9af..f73c30a3ee 100644
+>> --- a/hw/block/pflash_cfi01.c
+>> +++ b/hw/block/pflash_cfi01.c
+>> @@ -49,12 +49,6 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "trace.h"
+>>  
+>> -#define PFLASH_BUG(fmt, ...) \
+>> -do { \
+>> -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
+>> -    exit(1); \
+>> -} while(0)
+>> -
+>>  /* #define PFLASH_DEBUG */
+>>  #ifdef PFLASH_DEBUG
+>>  #define DPRINTF(fmt, ...)                                   \
+>> @@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+>>                  pfl->status |= 0x80;
+>>              } else {
+>>                  DPRINTF("%s: unknown command for \"write block\"\n", __func__);
+>> -                PFLASH_BUG("Write block confirm");
+>> -                goto reset_flash;
+>> +                fprintf(stderr, "PFLASH: Possible BUG - Write block confirm");
+>> +                exit(1);
+>>              }
+>>              break;
+>>          default:
+>> 
+>
+> Technically speaking, the commit message is slightly incorrect, where it
+> says "all this commit does is expanding the macro" -- the "goto" is
+> being removed as well.
+
+You're right.  I'll amend the commit message.
+
+> I like the attention to detail in that you didn't add the missing
+> newline character in the expanded fprintf() ;)
+
+I wish I could claim it was intentional preservation of a bad smell as
+fair warning to future readers...
+
+> With the commit message tweaked, or not:
+>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks!
