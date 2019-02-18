@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46622)
+Received: from eggs.gnu.org ([209.51.188.92]:46699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gvmRU-0008NO-VT
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:10:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmS6-0000I6-F1
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gvmRS-0006KN-Ur
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:10:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gvmRM-0006An-L2
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:10:50 -0500
-Date: Tue, 19 Feb 2019 01:07:25 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190218170725.GB28793@wei-ubt>
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-7-git-send-email-wexu@redhat.com>
-	<e847bd20-e6be-758c-4163-bb28ad4be7f5@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmS5-0006e4-Lx
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:11:34 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:11:27 +0000
+Message-ID: <3b02bf4c-f6ce-5767-d456-82b6a1111007@virtuozzo.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-3-jsnow@redhat.com>
+	<b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
+In-Reply-To: <b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7CE269D76342024CB94424DE668F6B9F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e847bd20-e6be-758c-4163-bb28ad4be7f5@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 06/11] virtio: get avail bytes check for
- packed ring
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
+ predicate helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,317 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, tiwei.bie@intel.com, jfreiman@redhat.com, mst@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, Feb 18, 2019 at 03:27:21PM +0800, Jason Wang wrote:
->=20
-> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26, wexu@redhat.com wrote:
-> >From: Wei Xu <wexu@redhat.com>
-> >
-> >Add packed ring headcount check.
-> >
-> >Common part of split/packed ring are kept.
-> >
-> >Signed-off-by: Wei Xu <wexu@redhat.com>
-> >---
-> >  hw/virtio/virtio.c | 197 +++++++++++++++++++++++++++++++++++++++++++=
-+++++-----
-> >  1 file changed, 179 insertions(+), 18 deletions(-)
-> >
-> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> >index f2ff980..832287b 100644
-> >--- a/hw/virtio/virtio.c
-> >+++ b/hw/virtio/virtio.c
-> >@@ -368,6 +368,17 @@ int virtio_queue_ready(VirtQueue *vq)
-> >      return vq->vring.avail !=3D 0;
-> >  }
-> >+static void vring_packed_desc_read(VirtIODevice *vdev, VRingPackedDes=
-c *desc,
-> >+                            MemoryRegionCache *cache, int i)
-> >+{
-> >+    address_space_read_cached(cache, i * sizeof(VRingPackedDesc),
-> >+                              desc, sizeof(VRingPackedDesc));
-> >+    virtio_tswap16s(vdev, &desc->flags);
-> >+    virtio_tswap64s(vdev, &desc->addr);
-> >+    virtio_tswap32s(vdev, &desc->len);
-> >+    virtio_tswap16s(vdev, &desc->id);
-> >+}
-> >+
-> >  static void vring_packed_desc_read_flags(VirtIODevice *vdev,
-> >                      VRingPackedDesc *desc, MemoryRegionCache *cache,=
- int i)
-> >  {
-> >@@ -667,9 +678,9 @@ static int virtqueue_read_next_desc(VirtIODevice *=
-vdev, VRingDesc *desc,
-> >      return VIRTQUEUE_READ_DESC_MORE;
-> >  }
-> >-void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-> >-                               unsigned int *out_bytes,
-> >-                               unsigned max_in_bytes, unsigned max_ou=
-t_bytes)
-> >+static void virtqueue_split_get_avail_bytes(VirtQueue *vq,
-> >+                            unsigned int *in_bytes, unsigned int *out=
-_bytes,
-> >+                            unsigned max_in_bytes, unsigned max_out_b=
-ytes)
-> >  {
-> >      VirtIODevice *vdev =3D vq->vdev;
-> >      unsigned int max, idx;
-> >@@ -679,27 +690,12 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, un=
-signed int *in_bytes,
-> >      int64_t len =3D 0;
-> >      int rc;
-> >-    if (unlikely(!vq->vring.desc)) {
-> >-        if (in_bytes) {
-> >-            *in_bytes =3D 0;
-> >-        }
-> >-        if (out_bytes) {
-> >-            *out_bytes =3D 0;
-> >-        }
-> >-        return;
-> >-    }
-> >-
-> >      rcu_read_lock();
-> >      idx =3D vq->last_avail_idx;
-> >      total_bufs =3D in_total =3D out_total =3D 0;
-> >      max =3D vq->vring.num;
-> >      caches =3D vring_get_region_caches(vq);
-> >-    if (caches->desc.len < max * sizeof(VRingDesc)) {
-> >-        virtio_error(vdev, "Cannot map descriptor ring");
-> >-        goto err;
-> >-    }
-> >-
-> >      while ((rc =3D virtqueue_num_heads(vq, idx)) > 0) {
-> >          MemoryRegionCache *desc_cache =3D &caches->desc;
-> >          unsigned int num_bufs;
-> >@@ -792,6 +788,171 @@ err:
-> >      goto done;
-> >  }
-> >+static void virtqueue_packed_get_avail_bytes(VirtQueue *vq,
-> >+                            unsigned int *in_bytes, unsigned int *out=
-_bytes,
-> >+                            unsigned max_in_bytes, unsigned max_out_b=
-ytes)
-> >+{
-> >+    VirtIODevice *vdev =3D vq->vdev;
-> >+    unsigned int max, idx;
-> >+    unsigned int total_bufs, in_total, out_total;
-> >+    MemoryRegionCache *desc_cache;
-> >+    VRingMemoryRegionCaches *caches;
-> >+    MemoryRegionCache indirect_desc_cache =3D MEMORY_REGION_CACHE_INV=
-ALID;
-> >+    int64_t len =3D 0;
-> >+    VRingPackedDesc desc;
-> >+    bool wrap_counter;
-> >+
-> >+    rcu_read_lock();
-> >+    idx =3D vq->last_avail_idx;
-> >+    wrap_counter =3D vq->last_avail_wrap_counter;
-> >+    total_bufs =3D in_total =3D out_total =3D 0;
-> >+
-> >+    max =3D vq->vring.num;
-> >+    caches =3D vring_get_region_caches(vq);
-> >+    desc_cache =3D &caches->desc;
-> >+    vring_packed_desc_read_flags(vdev, &desc, desc_cache, idx);
-> >+    while (is_desc_avail(&desc, wrap_counter)) {
-> >+        unsigned int num_bufs;
-> >+        unsigned int i =3D 0;
-> >+
-> >+        num_bufs =3D total_bufs;
-> >+
-> >+        /* Make sure flags has been read before all the fields. */
-> >+        smp_rmb();
-> >+        vring_packed_desc_read(vdev, &desc, desc_cache, idx);
->=20
->=20
-> It's better to have single function to deal with reading flags and
-> descriptors and check its availability like packed ring.
-
-There is something different between split and packed ring here.
-For split ring, 'avail_idx' and descriptor are separately used so the
-interfaces of them are straightforward, while the flag and data fields
-of the descriptors for packed ring are mixed and independent accesses to
-them have been brought in, it is good to use them as what they are suppos=
-ed
-to work. :)
-
-Another neat way is to pack the two operations to a new one, but it would
-introduce memory cache parameter passing.
-
-So personally I prefer to keep it unchanged, still want to sort it out?
-
->=20
->=20
-> >+
-> >+        if (desc.flags & VRING_DESC_F_INDIRECT) {
-> >+            if (desc.len % sizeof(VRingPackedDesc)) {
-> >+                virtio_error(vdev, "Invalid size for indirect buffer =
-table");
-> >+                goto err;
-> >+            }
-> >+
-> >+            /* If we've got too many, that implies a descriptor loop.=
- */
-> >+            if (num_bufs >=3D max) {
-> >+                virtio_error(vdev, "Looped descriptor");
-> >+                goto err;
-> >+            }
-> >+
-> >+            /* loop over the indirect descriptor table */
-> >+            len =3D address_space_cache_init(&indirect_desc_cache,
-> >+                                           vdev->dma_as,
-> >+                                           desc.addr, desc.len, false=
-);
-> >+            desc_cache =3D &indirect_desc_cache;
-> >+            if (len < desc.len) {
-> >+                virtio_error(vdev, "Cannot map indirect buffer");
-> >+                goto err;
-> >+            }
-> >+
-> >+            max =3D desc.len / sizeof(VRingPackedDesc);
-> >+            num_bufs =3D i =3D 0;
-> >+            vring_packed_desc_read(vdev, &desc, desc_cache, i);
-> >+        }
-> >+
-> >+        do {
-> >+            /* If we've got too many, that implies a descriptor loop.=
- */
-> >+            if (++num_bufs > max) {
-> >+                virtio_error(vdev, "Looped descriptor");
-> >+                goto err;
-> >+            }
-> >+
-> >+            if (desc.flags & VRING_DESC_F_WRITE) {
-> >+                in_total +=3D desc.len;
-> >+            } else {
-> >+                out_total +=3D desc.len;
-> >+            }
-> >+            if (in_total >=3D max_in_bytes && out_total >=3D max_out_=
-bytes) {
-> >+                goto done;
-> >+            }
-> >+
-> >+            if (desc_cache =3D=3D &indirect_desc_cache) {
-> >+                if (++i >=3D max) {
-> >+                    break;
-> >+                }
-> >+                vring_packed_desc_read(vdev, &desc, desc_cache, i);
-> >+            } else {
-> >+                if (++idx >=3D vq->vring.num) {
-> >+                    idx -=3D vq->vring.num;
-> >+                    wrap_counter ^=3D 1;
-> >+                }
-> >+                vring_packed_desc_read(vdev, &desc, desc_cache, idx);
-> >+            }
-> >+            /* Make sure flags has been read after all the other fiel=
-ds */
-> >+            smp_rmb();
->=20
->=20
-> I don't think we need this according to the spec:
->=20
-> "
->=20
-> The driver always makes the first descriptor in the list
-> available after the rest of the list has been written out into
-> the ring. This guarantees that the device will never observe a
-> partial scatter/gather list in the ring.
->=20
-> "
->=20
-> So when the first is available, the rest of the chain should be availab=
-le,
-> otherwise device may see partial chain.
-
-As always, I will remove it, thanks a lot.
-
-Wei
-
->=20
-> Thanks
->=20
->=20
-> >+        } while (desc.flags & VRING_DESC_F_NEXT);
-> >+
-> >+        if (desc_cache =3D=3D &indirect_desc_cache) {
-> >+            address_space_cache_destroy(&indirect_desc_cache);
-> >+            total_bufs++;
-> >+            /* We missed one step on for indirect desc */
-> >+            idx++;
-> >+            if (++idx >=3D vq->vring.num) {
-> >+                idx -=3D vq->vring.num;
-> >+                wrap_counter ^=3D 1;
-> >+            }
-> >+        } else {
-> >+            total_bufs =3D num_bufs;
-> >+        }
-> >+
-> >+        desc_cache =3D &caches->desc;
-> >+        vring_packed_desc_read_flags(vdev, &desc, desc_cache, idx);
-> >+    }
-> >+
-> >+    /* Record the index and wrap counter for a kick we want */
-> >+    vq->shadow_avail_idx =3D idx;
-> >+    vq->avail_wrap_counter =3D wrap_counter;
-> >+done:
-> >+    address_space_cache_destroy(&indirect_desc_cache);
-> >+    if (in_bytes) {
-> >+        *in_bytes =3D in_total;
-> >+    }
-> >+    if (out_bytes) {
-> >+        *out_bytes =3D out_total;
-> >+    }
-> >+    rcu_read_unlock();
-> >+    return;
-> >+
-> >+err:
-> >+    in_total =3D out_total =3D 0;
-> >+    goto done;
-> >+}
-> >+
-> >+void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-> >+                               unsigned int *out_bytes,
-> >+                               unsigned max_in_bytes, unsigned max_ou=
-t_bytes)
-> >+{
-> >+    uint16_t desc_size;
-> >+    VRingMemoryRegionCaches *caches;
-> >+
-> >+    if (unlikely(!vq->vring.desc)) {
-> >+        goto err;
-> >+    }
-> >+
-> >+    caches =3D vring_get_region_caches(vq);
-> >+    desc_size =3D virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PAC=
-KED) ?
-> >+                                sizeof(VRingPackedDesc) : sizeof(VRin=
-gDesc);
-> >+    if (caches->desc.len < vq->vring.num * desc_size) {
-> >+        virtio_error(vq->vdev, "Cannot map descriptor ring");
-> >+        goto err;
-> >+    }
-> >+
-> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-> >+        virtqueue_packed_get_avail_bytes(vq, in_bytes, out_bytes,
-> >+                                         max_in_bytes, max_out_bytes)=
-;
-> >+    } else {
-> >+        virtqueue_split_get_avail_bytes(vq, in_bytes, out_bytes,
-> >+                                        max_in_bytes, max_out_bytes);
-> >+    }
-> >+
-> >+    return;
-> >+err:
-> >+    if (in_bytes) {
-> >+        *in_bytes =3D 0;
-> >+    }
-> >+    if (out_bytes) {
-> >+        *out_bytes =3D 0;
-> >+    }
-> >+}
-> >+
-> >  int virtqueue_avail_bytes(VirtQueue *vq, unsigned int in_bytes,
-> >                            unsigned int out_bytes)
-> >  {
->=20
+MTguMDIuMjAxOSAxNjo1NywgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+PiAiRnJvemVuIiB3YXMgYSBnb29k
+IGRlc2NyaXB0aW9uIGEgbG9uZyB0aW1lIGFnbywgYnV0IGl0IGlzbid0IGFkZXF1YXRlIG5vdy4N
+Cj4+IFJlbmFtZSB0aGUgZnJvemVuIHByZWRpY2F0ZSB0byBoYXNfc3VjY2Vzc29yIHRvIG1ha2Ug
+dGhlIHNlbWFudGljcyBvZiB0aGUNCj4+IHByZWRpY2F0ZSBtb3JlIGNsZWFyIHRvIG91dHNpZGUg
+Y2FsbGVycy4NCj4+DQo+PiBJbiB0aGUgcHJvY2VzcywgcmVtb3ZlIHNvbWUgY2FsbHMgdG8gZnJv
+emVuKCkgdGhhdCBubyBsb25nZXIgc2VtYW50aWNhbGx5DQo+PiBtYWtlIHNlbnNlLiBGb3IgZW5h
+YmxlZCBhbmQgZGlzYWJsZWQgaW4gcGFydGljdWxhciwgaXQncyBhY3R1YWxseSBva2F5IGZvcg0K
+Pj4gdGhlIGludGVybmFscyB0byBkbyB0aGlzIGJ1dCBvbmx5IGZvcmJpZGRlbiBmb3IgdXNlcnMg
+dG8gaW52b2tlIHRoZW0sIGFuZA0KPiANCj4gSSdtIGEgYml0IGxvc3QgaW4gdGhpcyBwYXJhZ3Jh
+cGguLiB0byB0aGlzIC0gd2hhdD8sIHRvIGludm9rZSB0aGVtIC0gd2hvbT8NCj4gSSB0aGluaywg
+aXQgd291bGQgYmUgc2ltcGxlciBmb3IgbWUgdG8gcmVhZCBwYXRjaCBpdHNlbGYgOikNCj4gDQo+
+PiBhbGwgb2YgdGhlIFFNUCBlbnRyeSB1c2VzIGFscmVhZHkgY2hlY2sgYWdhaW5zdCBxbXBfbG9j
+a2VkLg0KPj4NCj4+IFNldmVyYWwgb3RoZXIgYXNzZXJ0aW9ucyByZWFsbHkgd2FudCB0byBjaGVj
+ayB0aGF0IHRoZSBiaXRtYXAgaXNuJ3QgaW4tdXNlDQo+PiBieSBhbm90aGVyIG9wZXJhdGlvbiAt
+LSB1c2UgdGhlIHFtcF9sb2NrZWQgZnVuY3Rpb24gZm9yIHRoaXMgaW5zdGVhZCwgd2hpY2gNCj4+
+IHByZXNlbnRseSBhbHNvIGNoZWNrcyBmb3IgaGFzX3N1Y2Nlc3Nvci4NCj4gDQo+IGhtLCB5b3Ug
+bWVhbiB1c2VyX2xvY2tlZCwgbm90IHFtcF9sb2NrZWQuDQo+IA0KPj4NCj4+IFNpZ25lZC1vZmYt
+Ynk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4gwqAgYmxvY2svZGly
+dHktYml0bWFwLmPCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDMyICsrKysrKysrKysrKysrKysrLS0t
+LS0tLS0tLS0tLS0tDQo+PiDCoCBpbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5owqDCoCB8wqAg
+MiArLQ0KPj4gwqAgbWlncmF0aW9uL2Jsb2NrLWRpcnR5LWJpdG1hcC5jIHzCoCAyICstDQo+PiDC
+oCAzIGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQ0KPj4N
+Cj4+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1h
+cC5jDQo+PiBpbmRleCAxMDEzODNiM2FmLi42MzllYmMwNjQ1IDEwMDY0NA0KPj4gLS0tIGEvYmxv
+Y2svZGlydHktYml0bWFwLmMNCj4+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+PiBAQCAt
+NTAsNyArNTAsNyBAQCBzdHJ1Y3QgQmRydkRpcnR5Qml0bWFwIHsNCj4+IMKgwqDCoMKgwqAgSEJp
+dG1hcCAqbWV0YTvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBNZXRhIGRpcnR5IGJpdG1h
+cCAqLw0KPj4gwqDCoMKgwqDCoCBib29sIHFtcF9sb2NrZWQ7wqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAvKiBCaXRtYXAgaXMgbG9ja2VkLCBpdCBjYW4ndCBiZSBtb2RpZmllZA0KPj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHRocm91Z2ggUU1QICovDQo+PiAtwqDCoMKgIEJkcnZEaXJ0eUJpdG1hcCAqc3VjY2Vz
+c29yOyAvKiBBbm9ueW1vdXMgY2hpbGQ7IGltcGxpZXMgZnJvemVuIHN0YXR1cyAqLw0KPj4gK8Kg
+wqDCoCBCZHJ2RGlydHlCaXRtYXAgKnN1Y2Nlc3NvcjsgLyogQW5vbnltb3VzIGNoaWxkOyBpbXBs
+aWVzIHVzZXJfbG9ja2VkIHN0YXRlICovDQo+IA0KPiBhaGEsIGxvb2tzIGxpa2UgYSBnb29kIG1v
+bWVudCB0byBmaXggcHJlZXhpc3RpbmcgbWlzYWxpZ25tZW50IG9mIHRoZSBjb21tZW50LA0KPiBi
+dXQgbmV3IGxpbmUgaXMgZXhhY3RseSA4MCBjaGFyYWN0ZXJzIGxlbmd0aCwgc28sIG5vdCBhIGdv
+b2QgbW9tZW50KQ0KDQphbmQgdGhlcmUgd2FzIG5vIGFueSBtaXNhbGlnbm1lbnQsIG9ubHkgdGh1
+bmRlcmJpcmQgYnVnLi4uDQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
