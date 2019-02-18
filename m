@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48017)
+Received: from eggs.gnu.org ([209.51.188.92]:54107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvkUn-0000pj-Bq
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:06:14 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gvkuj-0004zJ-76
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvkUm-00007K-4I
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:06:13 -0500
-Resent-Message-Id: <E1gvkUm-00007K-4I@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155050235308.18484.17005692357071314611@49fa7ef69f7b>
-In-Reply-To: <20190218140301.197408-1-sgarzare@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Feb 2019 07:05:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5 00/10] virtio-blk: add DISCARD and
- WRITE_ZEROES features
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gvkuh-0001wq-Ta
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:01 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:36983 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gvkuf-0001Ed-Tp
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:32:58 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon, 18 Feb 2019 16:31:30 +0100
+Message-Id: <1550503897-31141-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 0/7] Misc target/mips fixes and improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +22,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sgarzare@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, peter.maydell@linaro.org, arikalo@wavecomp.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODE0MDMwMS4xOTc0
-MDgtMS1zZ2FyemFyZUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODE0MDMwMS4xOTc0MDgtMS1zZ2FyemFy
-ZUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMDAvMTBdIHZpcnRp
-by1ibGs6IGFkZCBESVNDQVJEIGFuZCBXUklURV9aRVJPRVMgZmVhdHVyZXMKVHlwZTogc2VyaWVz
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgMWUzNjIzMjk5NC4uMWM1ZDlk
-OGYxMSAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0
-Y2hldy8yMDE5MDIxODE0MDMwMS4xOTc0MDgtMS1zZ2FyemFyZUByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMjAxOTAyMTgxNDAzMDEuMTk3NDA4LTEtc2dhcnphcmVAcmVkaGF0LmNvbQogKiBbbmV3IHRh
-Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTkwMjE4MTQwNjA3LjMxOTk4LTEtYXJtYnJ1QHJl
-ZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDIxODE0MDYwNy4zMTk5OC0xLWFybWJydUByZWRoYXQu
-Y29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGUzODdiZmY3YiB0ZXN0cy92aXJ0
-aW8tYmxrOiBhZGQgdGVzdCBmb3IgRElTQ0FSRCBjb21tYW5kCjlkYmY2NjY0N2YgdGVzdHMvdmly
-dGlvLWJsazogYWRkIHRlc3QgZm9yIFdSSVRFX1pFUk9FUyBjb21tYW5kCjFlNzQ1NzVhMmUgdGVz
-dHMvdmlydGlvLWJsazogYWRkIHZpcnRpb19ibGtfZml4X2R3el9oZHIoKSBmdW5jdGlvbgowNjc3
-YTA2NTMxIHRlc3RzL3ZpcnRpby1ibGs6IGNoYW5nZSBhc3NlcnQgb24gZGF0YV9zaXplIGluIHZp
-cnRpb19ibGtfcmVxdWVzdCgpCmYyZDQ1YzFhMTQgdmlydGlvLWJsazogYWRkIERJU0NBUkQgYW5k
-IFdSSVRFX1pFUk9FUyBmZWF0dXJlcwo3Y2M0NmMyNWQyIHZpcnRpby1ibGs6IHNldCBjb25maWcg
-c2l6ZSBkZXBlbmRpbmcgb24gdGhlIGZlYXR1cmVzIGVuYWJsZWQKMjZmNDZhNTU1MCB2aXJ0aW8t
-bmV0OiBtYWtlIFZpcnRJT0ZlYXR1cmUgdXNhYmxlIGZvciBvdGhlciB2aXJ0aW8gZGV2aWNlcwoy
-M2IwN2IzOWZiIHZpcnRpby1ibGs6IGFkZCAiZGlzY2FyZCIgYW5kICJ3cml0ZS16ZXJvZXMiIHBy
-b3BlcnRpZXMKOWQ2NzM0YTBmZSB2aXJ0aW8tYmxrOiBhZGQgaG9zdF9mZWF0dXJlcyBmaWVsZCBp
-biBWaXJ0SU9CbG9jawo5NzQyN2Y0ZDM4IHZpcnRpby1ibGs6IGFkZCBhY2N0X2ZhaWxlZCBwYXJh
-bSB0byB2aXJ0aW9fYmxrX2hhbmRsZV9yd19lcnJvcigpCgo9PT0gT1VUUFVUIEJFR0lOID09PQox
-LzEwIENoZWNraW5nIGNvbW1pdCA5NzQyN2Y0ZDM4YTYgKHZpcnRpby1ibGs6IGFkZCBhY2N0X2Zh
-aWxlZCBwYXJhbSB0byB2aXJ0aW9fYmxrX2hhbmRsZV9yd19lcnJvcigpKQoyLzEwIENoZWNraW5n
-IGNvbW1pdCA5ZDY3MzRhMGZlZDUgKHZpcnRpby1ibGs6IGFkZCBob3N0X2ZlYXR1cmVzIGZpZWxk
-IGluIFZpcnRJT0Jsb2NrKQozLzEwIENoZWNraW5nIGNvbW1pdCAyM2IwN2IzOWZiOTMgKHZpcnRp
-by1ibGs6IGFkZCAiZGlzY2FyZCIgYW5kICJ3cml0ZS16ZXJvZXMiIHByb3BlcnRpZXMpCjQvMTAg
-Q2hlY2tpbmcgY29tbWl0IDI2ZjQ2YTU1NTBmOCAodmlydGlvLW5ldDogbWFrZSBWaXJ0SU9GZWF0
-dXJlIHVzYWJsZSBmb3Igb3RoZXIgdmlydGlvIGRldmljZXMpCjUvMTAgQ2hlY2tpbmcgY29tbWl0
-IDdjYzQ2YzI1ZDJlMyAodmlydGlvLWJsazogc2V0IGNvbmZpZyBzaXplIGRlcGVuZGluZyBvbiB0
-aGUgZmVhdHVyZXMgZW5hYmxlZCkKNi8xMCBDaGVja2luZyBjb21taXQgZjJkNDVjMWExNDhjICh2
-aXJ0aW8tYmxrOiBhZGQgRElTQ0FSRCBhbmQgV1JJVEVfWkVST0VTIGZlYXR1cmVzKQo3LzEwIENo
-ZWNraW5nIGNvbW1pdCAwNjc3YTA2NTMxMTUgKHRlc3RzL3ZpcnRpby1ibGs6IGNoYW5nZSBhc3Nl
-cnQgb24gZGF0YV9zaXplIGluIHZpcnRpb19ibGtfcmVxdWVzdCgpKQo4LzEwIENoZWNraW5nIGNv
-bW1pdCAxZTc0NTc1YTJlODkgKHRlc3RzL3ZpcnRpby1ibGs6IGFkZCB2aXJ0aW9fYmxrX2ZpeF9k
-d3pfaGRyKCkgZnVuY3Rpb24pCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAg
-b3IgTlVMTAojMjQ6IEZJTEU6IHRlc3RzL3ZpcnRpby1ibGstdGVzdC5jOjUyOgorY29uc3QgYm9v
-bCBob3N0X2lzX2JpZ19lbmRpYW4gPSBmYWxzZTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgNDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKOS8xMCBDaGVja2luZyBjb21taXQgOWRiZjY2NjQ3ZjBiICh0ZXN0cy92aXJ0aW8tYmxrOiBh
-ZGQgdGVzdCBmb3IgV1JJVEVfWkVST0VTIGNvbW1hbmQpCjEwLzEwIENoZWNraW5nIGNvbW1pdCA0
-ZTM4N2JmZjdiYjkgKHRlc3RzL3ZpcnRpby1ibGs6IGFkZCB0ZXN0IGZvciBESVNDQVJEIGNvbW1h
-bmQpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MTkwMjE4MTQwMzAxLjE5NzQwOC0xLXNnYXJ6YXJlQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3Bh
-dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+A collection of misc target/mips fixes and improvements for
+February 2019.
+
+Aleksandar Markovic (7):
+  hw/misc: mips_itu: Fix 32/64 bit issue in a line involving shift
+    operator
+  tests/tcg: target/mips: Correct path to headers in some test source
+    files
+  tests/tcg: target/mips: Change directory name 'bit-counting' to
+    'bit-count'
+  tests/tcg: target/mips: Add wrappers for MSA integer compare
+    instructions
+  tests/tcg: target/mips: Add tests for MSA integer compare instructions
+  disas: nanoMIPS: Correct comments to handlers of some DSP instructions
+  disas: nanoMIPS: Fix a function misnomer
+
+ disas/nanomips.cpp                                 | 224 +++++++++++----------
+ disas/nanomips.h                                   |   2 +-
+ hw/misc/mips_itu.c                                 |   2 +-
+ tests/tcg/mips/include/wrappers_msa.h              |  25 +++
+ .../{bit-counting => bit-count}/test_msa_nloc_b.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nloc_d.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nloc_h.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nloc_w.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nlzc_b.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nlzc_d.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nlzc_h.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_nlzc_w.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_pcnt_b.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_pcnt_d.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_pcnt_h.c  |   6 +-
+ .../{bit-counting => bit-count}/test_msa_pcnt_w.c  |   6 +-
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_b.c | 153 ++++++++++++++
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_d.c | 153 ++++++++++++++
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_h.c | 153 ++++++++++++++
+ .../mips/user/ase/msa/int-compare/test_msa_ceq_w.c | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_s_b.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_s_d.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_s_h.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_s_w.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_u_b.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_u_d.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_u_h.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_cle_u_w.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_s_b.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_s_d.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_s_h.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_s_w.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_u_b.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_u_d.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_u_h.c    | 153 ++++++++++++++
+ .../user/ase/msa/int-compare/test_msa_clt_u_w.c    | 153 ++++++++++++++
+ 36 files changed, 3238 insertions(+), 147 deletions(-)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nloc_b.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nloc_d.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nloc_h.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nloc_w.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nlzc_b.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nlzc_d.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nlzc_h.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_nlzc_w.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_pcnt_b.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_pcnt_d.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_pcnt_h.c (98%)
+ rename tests/tcg/mips/user/ase/msa/{bit-counting => bit-count}/test_msa_pcnt_w.c (98%)
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_ceq_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_ceq_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_ceq_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_ceq_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_cle_u_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_s_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_s_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_u_b.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_u_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_u_h.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/int-compare/test_msa_clt_u_w.c
+
+-- 
+2.7.4
