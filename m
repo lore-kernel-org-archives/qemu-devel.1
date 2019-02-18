@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36131)
+Received: from eggs.gnu.org ([209.51.188.92]:36699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvnPt-0000C3-E0
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:13:22 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gvnST-0001Bt-Dc
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:16:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvnPs-00059u-G5
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:13:21 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 18:13:07 +0000
-Message-ID: <c79e69af-6d00-074a-fc02-5f0808048f4d@virtuozzo.com>
-References: <20190213233618.22484-1-jsnow@redhat.com>
-	<20190213233618.22484-3-jsnow@redhat.com>
-In-Reply-To: <20190213233618.22484-3-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D7F24D3B9F19CF439465D599605095A1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ppandit@redhat.com>) id 1gvnSS-0001n7-8j
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 13:16:01 -0500
+From: P J P <ppandit@redhat.com>
+Date: Mon, 18 Feb 2019 23:43:49 +0530
+Message-Id: <20190218181349.23885-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] block/dirty-bitmap: implement
- inconsistent bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4] ppc: add host-serial and host-model machine
+ attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +21,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Greg Kurz <groug@kaod.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-MTQuMDIuMjAxOSAyOjM2LCBKb2huIFNub3cgd3JvdGU6DQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4g
-U25vdyA8anNub3dAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAgYmxvY2svZGlydHktYml0bWFwLmMg
-ICAgICAgICB8IDE1ICsrKysrKysrKysrKysNCj4gICBibG9jay9xY293Mi1iaXRtYXAuYyAgICAg
-ICAgIHwgNDIgKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0NCj4gICBibG9ja2Rl
-di5jICAgICAgICAgICAgICAgICAgIHwgNDMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrDQo+ICAgaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRtYXAuaCB8ICAxICsNCj4gICA0IGZp
-bGVzIGNoYW5nZWQsIDgxIGluc2VydGlvbnMoKyksIDIwIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlm
-ZiAtLWdpdCBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4g
-aW5kZXggYjE4NzlkN2ZiZC4uMDZkOGVlMGQ3OSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svZGlydHkt
-Yml0bWFwLmMNCj4gKysrIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4gQEAgLTU4OSw2ICs1ODks
-NyBAQCB2b2lkIGJkcnZfY2xlYXJfZGlydHlfYml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFw
-LCBIQml0bWFwICoqb3V0KQ0KPiAgICAgICAgICAgKm91dCA9IGJhY2t1cDsNCj4gICAgICAgfQ0K
-PiAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF91bmxvY2soYml0bWFwKTsNCj4gKyAgICBiZHJ2X2Rp
-cnR5X2JpdG1hcF9zZXRfaW5jb25zaXN0ZW50KGJpdG1hcCwgZmFsc2UpOw0KPiAgIH0NCj4gICAN
-Cj4gICB2b2lkIGJkcnZfcmVzdG9yZV9kaXJ0eV9iaXRtYXAoQmRydkRpcnR5Qml0bWFwICpiaXRt
-YXAsIEhCaXRtYXAgKmJhY2t1cCkNCj4gQEAgLTc3Niw2ICs3NzcsMTMgQEAgYm9vbCBiZHJ2X2Rp
-cnR5X2JpdG1hcF9uZXh0X2RpcnR5X2FyZWEoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsDQo+ICAg
-ICAgIHJldHVybiBoYml0bWFwX25leHRfZGlydHlfYXJlYShiaXRtYXAtPmJpdG1hcCwgb2Zmc2V0
-LCBieXRlcyk7DQo+ICAgfQ0KPiAgIA0KPiArdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9hZGRfaW5j
-b25zaXN0ZW50X2hpbnQoRXJyb3IgKiplcnJwKQ0KPiArew0KPiArICAgIGVycm9yX2FwcGVuZF9o
-aW50KGVycnAsICJUcnkgYmxvY2stZGlydHktYml0bWFwLWNsZWFyIHRvIG1hcmsgdGhpcyAiDQo+
-ICsgICAgICAgICAgICAgICAgICAgICAgImJpdG1hcCBjb25zaXN0ZW50IGFnYWluLCBvciBibG9j
-ay1kaXJ0eS1iaXRtYXAtcmVtb3ZlICINCj4gKyAgICAgICAgICAgICAgICAgICAgICAidG8gZGVs
-ZXRlIGl0LiIpOw0KDQpiaXRtYXBzIGNyZWF0ZWQgYnkgbGlidmlydCAob3Igc29tZWJvZHkpIGFy
-ZSByZWxhdGVkIHRvIHNvbWUgY2hlY2twb2ludC4gQW5kIHRoZWlyIG5hbWUgaXMNCnByb2JhYmx5
-IChFcmljPykgcmVsYXRlZCB0byB0aGlzIGNoZWNrcG9pbnQgdG9vLiBTbywgY2xlYXIgd2lsbCBu
-ZXZlciBtYWtlIHRoZW0gY29uc2lzdGVudC4uDQpPbmx5IGNsZWFyIDopDQoNClNvLCBJIGRvbid0
-IGxpa2UgaWRlYSBvZiBjbGVhcmluZyBpbi11c2UgYml0bWFwcy4NCg0KPiArfQ0KPiArDQo+ICAg
-dm9pZCBiZHJ2X21lcmdlX2RpcnR5X2JpdG1hcChCZHJ2RGlydHlCaXRtYXAgKmRlc3QsIGNvbnN0
-IEJkcnZEaXJ0eUJpdG1hcCAqc3JjLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-SEJpdG1hcCAqKmJhY2t1cCwgRXJyb3IgKiplcnJwKQ0KPiAgIHsNCj4gQEAgLTc5OCw2ICs4MDYs
-MTMgQEAgdm9pZCBiZHJ2X21lcmdlX2RpcnR5X2JpdG1hcChCZHJ2RGlydHlCaXRtYXAgKmRlc3Qs
-IGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqc3JjLA0KPiAgICAgICAgICAgZ290byBvdXQ7DQo+ICAg
-ICAgIH0NCj4gICANCj4gKyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfaW5jb25zaXN0ZW50KGRl
-c3QpKSB7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJXMnIGlzIGluY29u
-c2lzdGVudCBhbmQgY2Fubm90IGJlIHVzZWQgYXMiDQo+ICsgICAgICAgICAgICAgICAgICAgIiBh
-IG1lcmdlIHRhcmdldCIsIGRlc3QtPm5hbWUpOw0KPiArICAgICAgICBiZHJ2X2RpcnR5X2JpdG1h
-cF9hZGRfaW5jb25zaXN0ZW50X2hpbnQoZXJycCk7DQo+ICsgICAgICAgIGdvdG8gb3V0Ow0KPiAr
-ICAgIH0NCg0KSSB0aGluaywgd2UgbmVlZCBjb21tb24gcHJlZGljYXRlIHdoaWNoIHdpbGwgY29t
-YmluZSBidXN5IGFuZCBpbmNvbnNpc3RlbnQsIGFzIGFsbW9zdCBpbiBhbGwgY2FzZXMNCndlIG5l
-ZWQgYm90aCB0byBiZSBmYWxzZSB0byBkbyBhbnkgb3BlcmF0aW9uLg0KDQpiZHJ2X2RpcnR5X2Jp
-dG1hcF91c2FibGUoKSA/IDopDQoNCmFuZCBwYXNzIGVycnAgdG8gdGhpcyBoZWxwZXIuDQoNCkFj
-dHVhbGx5LCB3ZSBhbHJlYWR5IG5lZWQgaXQsIHRvIGZpbGwgZXJycCwgd2hpY2ggd2UgYWxtb3N0
-IGFsd2F5cyBmaWxsIGluIHRoZSBzYW1lIG1hbm5lci4NCg0KPiArDQo+ICAgICAgIGlmICghaGJp
-dG1hcF9jYW5fbWVyZ2UoZGVzdC0+Yml0bWFwLCBzcmMtPmJpdG1hcCkpIHsNCj4gICAgICAgICAg
-IGVycm9yX3NldGcoZXJycCwgIkJpdG1hcHMgYXJlIGluY29tcGF0aWJsZSBhbmQgY2FuJ3QgYmUg
-bWVyZ2VkIik7DQo+ICAgICAgICAgICBnb3RvIG91dDsNCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
-b3cyLWJpdG1hcC5jIGIvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gaW5kZXggM2VlNTI0ZGE0Yi4u
-OWJkOGJjNDE3ZiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzItYml0bWFwLmMNCj4gKysrIGIv
-YmxvY2svcWNvdzItYml0bWFwLmMNCg0KaG1tLCBJIGFsc28gdGhpbmsgd2Ugc2hvdWxkIHJlcG9y
-dCBvdXIgZGVwcmVjYXRlZCBzdGF0dXMgYXMgbG9ja2VkIGZvciBpbmNvbnNpc3RlbnQgYml0bWFw
-cy4uDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+From: Prasad J Pandit <pjp@fedoraproject.org>
+
+On ppc hosts, hypervisor shares following system attributes
+
+  - /proc/device-tree/system-id
+  - /proc/device-tree/model
+
+with a guest. This could lead to information leakage and misuse.[*]
+Add machine attributes to control such system information exposure
+to a guest.
+
+[*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+
+Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++----
+ include/hw/ppc/spapr.h |  2 ++
+ 2 files changed, 72 insertions(+), 6 deletions(-)
+
+Update v4: remove NULL initializations in spapr_instance_init()
+  -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04554.html
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0942f35bf8..8786c4c4ca 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
+papr,
+      * Add info to guest to indentify which host is it being run on
+      * and what is the uuid of the guest
+      */
+-    if (kvmppc_get_host_model(&buf)) {
+-        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
+-        g_free(buf);
++    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")) {
++        if (g_str_equal(spapr->host_model, "passthrough")) {
++            /* -M host-model=3Dpassthrough */
++            if (kvmppc_get_host_model(&buf)) {
++                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
++                g_free(buf);
++            }
++        } else {
++            /* -M host-model=3D<user-string> */
++            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->host_mo=
+del));
++        }
+     }
+-    if (kvmppc_get_host_serial(&buf)) {
+-        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
+-        g_free(buf);
++
++    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none")) =
+{
++        if (g_str_equal(spapr->host_serial, "passthrough")) {
++            /* -M host-serial=3Dpassthrough */
++            if (kvmppc_get_host_serial(&buf)) {
++                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
++                g_free(buf);
++            }
++        } else {
++            /* -M host-serial=3D<user-string> */
++            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->host_s=
+erial));
++        }
+     }
+=20
+     buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
+@@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, const c=
+har *value, Error **errp)
+     }
+ }
+=20
++static char *spapr_get_host_model(Object *obj, Error **errp)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    return g_strdup(spapr->host_model);
++}
++
++static void spapr_set_host_model(Object *obj, const char *value, Error *=
+*errp)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    g_free(spapr->host_model);
++    spapr->host_model =3D g_strdup(value);
++}
++
++static char *spapr_get_host_serial(Object *obj, Error **errp)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    return g_strdup(spapr->host_serial);
++}
++
++static void spapr_set_host_serial(Object *obj, const char *value, Error =
+**errp)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
++
++    g_free(spapr->host_serial);
++    spapr->host_serial =3D g_strdup(value);
++}
++
+ static void spapr_instance_init(Object *obj)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+@@ -3183,6 +3230,17 @@ static void spapr_instance_init(Object *obj)
+     object_property_set_description(obj, "ic-mode",
+                  "Specifies the interrupt controller mode (xics, xive, d=
+ual)",
+                  NULL);
++
++    object_property_add_str(obj, "host-model",
++        spapr_get_host_model, spapr_set_host_model,
++        &error_abort);
++    object_property_set_description(obj, "host-model",
++        "Set host's model-id to use - none|passthrough|string", &error_a=
+bort);
++    object_property_add_str(obj, "host-serial",
++        spapr_get_host_serial, spapr_set_host_serial,
++        &error_abort);
++    object_property_set_description(obj, "host-serial",
++        "Set host's system-id to use - none|passthrough|string", &error_=
+abort);
+ }
+=20
+ static void spapr_machine_finalizefn(Object *obj)
+@@ -4080,9 +4138,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+ static void spapr_machine_3_1_class_options(MachineClass *mc)
+ {
+     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
++    static GlobalProperty compat[] =3D {
++        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
++        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
++    };
+=20
+     spapr_machine_4_0_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
+;
++    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
++
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+     smc->update_dt_enabled =3D false;
+ }
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index a947a0a0dc..e004a570d8 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -177,6 +177,8 @@ struct sPAPRMachineState {
+=20
+     /*< public >*/
+     char *kvm_type;
++    char *host_model;
++    char *host_serial;
+=20
+     const char *icp_type;
+     int32_t irq_map_nr;
+--=20
+2.20.1
