@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55889)
+Received: from eggs.gnu.org ([209.51.188.92]:57770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gvd2y-0000zx-VI
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:09:01 -0500
+	(envelope-from <casasfernando@outlook.com>) id 1gvdFO-0003Bh-Es
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:21:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gvd2y-00054c-CU
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:09:00 -0500
-Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:48665)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gvd2y-0004sA-5t
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:09:00 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.143.72])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 578D5158E8B
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 08:08:43 +0100 (CET)
-References: <155023078266.1011724.5995737218088270486.stgit@bahia.lan>
-	<155023081228.1011724.12474992370439652538.stgit@bahia.lan>
-	<4690ad87-f634-4f3b-a39c-ee61bfc64e75@kaod.org>
-	<20190215141824.3549d285@bahia.lan>
-	<2237cc20-ffcd-4a9b-944a-392520127432@kaod.org>
-	<20190217233711.GF2765@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c6472757-5a18-258b-de5f-a7471b4e675c@kaod.org>
-Date: Mon, 18 Feb 2019 08:08:37 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190217233711.GF2765@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <casasfernando@outlook.com>) id 1gvdFC-0008R9-MG
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 02:21:40 -0500
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+Date: Mon, 18 Feb 2019 07:21:25 +0000
+Message-ID: <VI1PR0602MB3245424120D151F29884A7E2A4630@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+References: <CABdb7377U9SpZno1kU6+TuARUmqfMMcC2uuwXTHqSZpLsqB7Gw@mail.gmail.com>
+	<1498199343.2815.0@smtp-mail.outlook.com>
+	<VI1PR1001MB13731EF256C1E7380E1D657AB7D90@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<VI1PR0602MB324559765BFE372F75D52E57A4910@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190201054849.GH23131@stefanha-x1.localdomain>
+	<VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190204060636.GF29758@stefanha-x1.localdomain>
+	<AM5PR0602MB32368CB5ADDEC05F42D8BC8FA46D0@AM5PR0602MB3236.eurprd06.prod.outlook.com>
+	<AM5PR0602MB32368CB5ADDEC05F42D8BC8FA46D0@AM5PR0602MB3236.eurprd06.prod.outlo>
+	<VI1PR0602MB3245FD0A939EC3E28CA0F740A46F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190211031725.GB18083@stefanha-x1.localdomain>
+In-Reply-To: <20190211031725.GB18083@stefanha-x1.localdomain>
 Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/10] xics: Drop the KVM ICP class
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 2/18/19 12:37 AM, David Gibson wrote:
-> On Fri, Feb 15, 2019 at 02:35:03PM +0100, C=E9dric Le Goater wrote:
->> On 2/15/19 2:18 PM, Greg Kurz wrote:
->>> On Fri, 15 Feb 2019 13:55:53 +0100
->>> C=E9dric Le Goater <clg@kaod.org> wrote:
->>>
->>>> On 2/15/19 12:40 PM, Greg Kurz wrote:
->>>>> The KVM ICP class isn't used anymore. Drop it. =20
->>>>
->>>> Isn't migration complaining ?  If not,
->>>>
->>>
->>> Hm.. no, but why would migration complain ?
->>
->> You are changing the type name of the object being transferred:
->>
->> "icp-kcm" -> "icp"
->=20
-> It's a little more complex than that.  The way migration works, the
-> state associated with the base class is transferred under the name
-> "icp" and the state associated with the derived class is transferred
-> under the name "icp-kvm".
->=20
->> Isn't that an issue ?
->=20
-> It would be.. except that there is no extra state in the derived
-> class, which is why we got away with this not-very-good solution at
-> all in the first place.
+It took a few days but last night the problem was reproduced.
+This is the information from the log:
 
-Ah good. Another reason to get rid of the sub-class.
+vdev 0x55f261d940f0 ("virtio-blk")
+vq 0x55f261d9ee40 (idx 0)
+inuse 128 vring.num 128
+old_shadow_avail_idx 58874 last_avail_idx 58625 avail_idx 58874
+avail 0x3d87a800 avail_idx (cache bypassed) 58625
+used_idx 58497
+2019-02-18 03:20:08.605+0000: shutting down, reason=3Dcrashed
 
-C.
- =20
+The dump file, including guest memory, was generated successfully (after gz=
+ip the file is around 492MB).
+I switched the guest now to virtio-scsi to get the information and dump wit=
+h this setup as well.
+
+How should we proceed?
+
+Thanks.
+
+On lun, feb 11, 2019 at 4:17 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote=
+:
+Thanks for collecting the data! The fact that both virtio-blk and virtio-sc=
+si failed suggests it's not a virtqueue element leak in the virtio-blk or v=
+irtio-scsi device emulation code. The hung task error messages from inside =
+the guest are a consequence of QEMU hitting the "Virtqueue size exceeded" e=
+rror. QEMU refuses to process further requests after the error, causing tas=
+ks inside the guest to get stuck on I/O. I don't have a good theory regardi=
+ng the root cause. Two ideas: 1. The guest is corrupting the vring or submi=
+tting more requests than will fit into the ring. Somewhat unlikely because =
+it happens with both Windows and Linux guests. 2. QEMU's virtqueue code is =
+buggy, maybe the memory region cache which is used for fast guest RAM acces=
+ses. Here is an expanded version of the debug patch which might help identi=
+fy which of these scenarios is likely. Sorry, it requires running the guest=
+ again! This time let's make QEMU dump core so both QEMU state and guest RA=
+M are captured for further debugging. That way it will be possible to extra=
+ct more information using gdb without rerunning. Stefan --- diff --git a/hw=
+/virtio/virtio.c b/hw/virtio/virtio.c index a1ff647a66..28d89fcbcb 100644 -=
+-- a/hw/virtio/virtio.c +++ b/hw/virtio/virtio.c @@ -866,6 +866,7 @@ void *=
+virtqueue_pop(VirtQueue *vq, size_t sz) return NULL; } rcu_read_lock(); + u=
+int16_t old_shadow_avail_idx =3D vq->shadow_avail_idx; if (virtio_queue_emp=
+ty_rcu(vq)) { goto done; } @@ -879,6 +880,12 @@ void *virtqueue_pop(VirtQue=
+ue *vq, size_t sz) max =3D vq->vring.num; if (vq->inuse >=3D vq->vring.num)=
+ { + fprintf(stderr, "vdev %p (\"%s\")\n", vdev, vdev->name); + fprintf(std=
+err, "vq %p (idx %u)\n", vq, (unsigned int)(vq - vdev->vq)); + fprintf(stde=
+rr, "inuse %u vring.num %u\n", vq->inuse, vq->vring.num); + fprintf(stderr,=
+ "old_shadow_avail_idx %u last_avail_idx %u avail_idx %u\n", old_shadow_ava=
+il_idx, vq->last_avail_idx, vq->shadow_avail_idx); + fprintf(stderr, "avail=
+ %#" HWADDR_PRIx " avail_idx (cache bypassed) %u\n", vq->vring.avail, virti=
+o_lduw_phys(vdev, vq->vring.avail + offsetof(VRingAvail, idx))); + fprintf(=
+stderr, "used_idx %u\n", vq->used_idx); + abort(); /* <--- core dump! */ vi=
+rtio_error(vdev, "Virtqueue size exceeded"); goto done; }
