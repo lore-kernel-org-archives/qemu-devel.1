@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54441)
+Received: from eggs.gnu.org ([209.51.188.92]:54535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gvoHG-0004pk-Ma
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:08:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1gvoI1-0005Cy-8c
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gvoHF-0003i2-W5
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:08:30 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43420
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gvoHE-0003el-9z
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:08:28 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1IJ3xa0138016
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:08:25 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qr1tya94t-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:08:25 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Mon, 18 Feb 2019 19:08:24 -0000
-References: <1550512800-9922-1-git-send-email-akrowiak@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Mon, 18 Feb 2019 14:08:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1gvoHz-0004PU-Ol
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:09:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvoHu-00047A-2E
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 14:09:12 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87wom249zf.fsf@dusky.pond.sub.org>
+	<CAFEAcA-9rhR3qiTZQx=oYtodfpo81wMWKFafboHR7uN0wRNccw@mail.gmail.com>
+Date: Mon, 18 Feb 2019 20:08:48 +0100
+In-Reply-To: <CAFEAcA-9rhR3qiTZQx=oYtodfpo81wMWKFafboHR7uN0wRNccw@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 14 Feb 2019 16:33:52 +0000")
+Message-ID: <87r2c429tr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1550512800-9922-1-git-send-email-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b712101f-49dd-0ba7-0e8e-f90e4c34dbee@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] s390x/vfio-ap: hot plug/unplug
- vfio-ap device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Object instantiation vs. device realization: what
+ to do when?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,48 +28,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com, fiuczy@linux.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
-On 2/18/19 12:59 PM, Tony Krowiak wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
+> On Thu, 14 Feb 2019 at 16:21, Markus Armbruster <armbru@redhat.com> wrote:
+>>
+>> One of qdev's perennial sources of confusion is what to do at object
+>> instantiation time, i.e. in TypeInfo::instance_init(), and what to do at
+>> device realization time, i.e. in DeviceClass::realize().
+>
+> Thanks for opening this topic. It's been on my todo list for a
+> long time to try to figure out what the answer is...
+>
+>>  qdev-core.h's
+>> comment falls short:
+>>
+>>  * # Realization #
+>>  * Devices are constructed in two stages,
+>>  * 1) object instantiation via object_initialize() and
+>>  * 2) device realization via #DeviceState:realized property.
+>>  * The former may not fail (and must not abort or exit, since it is called
+>>  * during device introspection already), and the latter may return error
+>>  * information to the caller and must be re-entrant.
+>>  * Trivial field initializations should go into #TypeInfo.instance_init.
+>>
+>> As usual, "trivial" was too trivial to explain; the reader is trusted to
+>> figure it out himself.  Well, I'm afraid I'm not to be trusted.
+>>
+>> The easy part is "can fail means it's not trivial", because
+>> ::instance_init() must not fail.
+>>
+>> What about side effects?  If you already understand how introspection
+>> works, or perhaps even if you read carefully and paranoidly, then "since
+>> it is called during device introspection already" implies "guest-visible
+>> side-effects would be disastrous".  So guest-visible side-effect also
+>> means it's not trivial.
+>
+> I think the other question here is "what about stuff that has
+> to be undone/freed/etc". Can I, for instance, allocate memory
+> in the initialize function?
 
-PLEASE IGNORE THIS PATCH SERIES. A v3 VERSION IS FORTHCOMING. VERSION
-v2 has already been posted and reviewed.
+Yes, but since .instance_init() can't fail, you have to treat OOM as
+fatal.
 
-> This patch series introduces hot plug/unplug of a vfio-ap device.
-> 
-> A vfio-ap device can be hot plugged only if:
-> 
-> 1. The guest does not yet have a vfio-ap device (only one is allowed
->     per guest)
-> 
-> 2. The guest was started with the following CPU model features enabled:
->     * ap=on
->     * apft=on
-> 
-> To hot plug a vfio-ap device, the QEMU device_add function may be used:
-> 
->     (qemu) device_add vfio-ap,sysfsdev=$path-to-mdev
-> 
->     Where $path-to-mdev is the absolute path to the mediated matrix device
->     to be used to configure the guest's AP device matrix.
-> 
-> A vfio-ap device can be hot unplugged only if:
-> 
-> 1. The guest was started with a vfio-ap device configured for it:
-> 
->     -device vfio-ap,sysfsdev=$path-to-mdev
-> 
-> 2. The guest was started with the following CPU model features enabled:
->     * ap=on
-> 
-> Tony Krowiak (2):
->    s390x/vfio-ap: Implement hot plug/unplug of vfio-ap device
->    s390x/vfio-ap: document hot plug/unplug of vfio-ap device
-> 
->   docs/vfio-ap.txt     | 58 +++++++++++++++++++++++++++++++++++++++++++++++-----
->   hw/s390x/ap-bridge.c | 12 ++++++++++-
->   hw/vfio/ap.c         |  2 +-
->   3 files changed, 65 insertions(+), 7 deletions(-)
-> 
+>                             If so, where do I need to put the
+> corresponding memory-free?
+
+.instance_finalize().
+
+>                            Similar but harder to figure out:
+> what about things which are ref-counted like memory_region_init()?
+> Can I pass a pointer to 'obj' as the "owner" to memory_region_init()
+> from its initialize function and trust that the refcounting will
+> result in the MR being suitably destroyed when whatever the
+> reverse of initialize happens? Or does this only work for really
+> initialized objects and so has to be postponed to realize time?
+
+Hmm.
+
+I'm not really familiar with this stuff, but I can try to reason anyway.
+
+Passing @dev memory_region_init() as owner along with a non-null name
+makes the memory region a child of @dev.  When object_finalize()
+destroys @dev, it deletes all properties, which runs their release()
+method.  I figure this is the automatic destruction you mean.
+
+Since object_initialize() cannot fail, destruction must run
+object_finalize().  
+
+I guess the answer to your question is "can do in instance_init()".
+
+Perhaps we should ask another question first: is it useful to do these
+things in .instance_init()?
+
+> A lot of our devices get away with shortcuts because (apart from
+> the introspection special case) they're created once at startup
+> and never destroyed, but perhaps we should be stricter about requiring
+> everything to support the full create-and-destroy lifecycle (and
+> testing it)?
+
+I'm afraid the shortcuts sow confusion and breed bugs.  They get
+imitated in places where they're invalid.  They also bite us in the
+posterior when we make devices unpluggable.
+
+However, we might have dug ourselves into a pretty deep hole there.
+
+>              At least, we should ensure our documentation describes
+> the 'destroy' part of things so that if you are writing a properly
+> destroyable device you can get it right.
+
+Documentation and good examples will certainly help.
+
+Sadly, bad examples will continue to hurt anyway.
+
+>>  * Operations depending on @props static properties should go into @realize.
+>>
+>> Actually, these *have* to go into realize(), because properties get set
+>> between ::instance_init() and ::realize().
+>
+> Yes; this is using 'should' in the sense "is required to",
+> not in the RFC2119 sense. We could reasonably tighten the wording
+> to be clearer though.
+>
+>> Even if I had a precise definition of "trivial field initializations",
+>> I'd still wonder where operations should go that are neither such
+>> trivial field initializations, nor depend on @props.
+>
+> Yes. We should have some kind of design rule-of-thumb, either
+> "put things in initialize unless they must go in realize", or
+> "put things in realize unless they must go in initialize".
+
+Ideally with an exhaustive list of the "must go" things.
+
+Let's try to start with an easy question: what must go into
+.instance_init()?
+
+Here's my guess:
+
+* Property default values
+
+* Children with properties
+
+Please add to this list.
+
+>>  * After successful realization, setting static properties will fail.
+>>  *
+>>  * As an interim step, the #DeviceState:realized property can also be
+>>  * set with qdev_init_nofail().
+>>  * In the future, devices will propagate this state change to their children
+>>  * and along busses they expose.
+>>
+>> This sentence is five years old.  Any progress?  If not, any intentions
+>> to make progress?
+>>
+>>  * The point in time will be deferred to machine creation, so that values
+>>  * set in @realize will not be introspectable beforehand. Therefore devices
+>>  * must not create children during @realize; they should initialize them via
+>>  * object_initialize() in their own #TypeInfo.instance_init and forward the
+>>  * realization events appropriately.
+>>
+>> This is mostly greek to me.  Pity the developer who knows less about
+>> qdev than I do.
+>
+> Also, if you need to create a child based on the value of a
+> static property then you're a bit stuck because you have a
+> rule saying it must be done in realize and also one that says
+> it must not be done in realize. (Not a hypothetical -- see
+> for instance the TYPE_ARMV7M object, which creates the CPU with
+> a type dependent on a QOM property.)
+
+Sucks.  Creating the child in .instance_init() is impossible, because
+the required configuration bits aren't there, yet.  But creating the
+child in .realize() makes the child's properties impossible to
+configure.  Catch 22.
+
+Similar for dynamic properties that aren't children.  As far as I can
+see (and I'm half-blind in QOM-land), the only reason for having dynamic
+properties rather than just static ones is to create them based on some
+configuration, i.e. other properties.  The obvious place to act on
+configuration in properties is .realize().  But any properties created
+there cannot be used for configuration.  What's the use case again?
+
+You could of course create the dynamic property earlier, in the property
+setters of all the properties it depends on.  If there's more than one,
+you'll create and destroy it several times.  If intermediate
+configuration state is invalid, it gets even funnier.  Feels like
+madness to me.
+
+>>  *
+>>  * Any type may override the @realize and/or @unrealize callbacks but needs
+>>  * to call the parent type's implementation if keeping their functionality
+>>  * is desired. Refer to QOM documentation for further discussion and examples.
+>>
+>> "Refer to QOM documentation"... okay, but this comment needs to make
+>> sense without having to read the 3000+ lines under include/qom/ (which
+>> by the way requires finding it first; I'd expect the naive reader to
+>> look under docs/ and draw a blank).
+>
+> The parent_realize mechanism is also very clunky...
+>
+> thanks
+> -- PMM
