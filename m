@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39370)
+Received: from eggs.gnu.org ([209.51.188.92]:39361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxv-0006bK-3S
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxu-0006aV-Ie
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxt-0003Ax-3B
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:15 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxs-0003Ak-Ty
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:14 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:30 +1100
-Message-Id: <20190218143049.17142-25-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:35 +1100
+Message-Id: <20190218143049.17142-30-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 24/43] xics: Handle KVM interrupt presentation
- from "simple" ICS code
+Subject: [Qemu-devel] [PULL 29/43] target/ppc: convert vspltis[bhw] to use
+ vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +23,168 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-We want to use the "simple" ICS type in both KVM and non-KVM setups.
-Teach the "simple" ICS how to present interrupts to KVM and adapt
-sPAPR accordingly.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155023082996.1011724.16237920586343905010.stgit@bahia.lan>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190215100058.20015-4-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 5 +++++
- hw/intc/xics_kvm.c    | 3 +--
- hw/ppc/spapr_irq.c    | 7 +------
- include/hw/ppc/xics.h | 2 +-
- 4 files changed, 8 insertions(+), 9 deletions(-)
+ target/ppc/helper.h                 |  3 ---
+ target/ppc/int_helper.c             | 15 ------------
+ target/ppc/translate/vmx-impl.inc.c | 36 +++++++----------------------
+ 3 files changed, 8 insertions(+), 46 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 49401745c4..3009fa7472 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -466,6 +466,11 @@ void ics_simple_set_irq(void *opaque, int srcno, int=
- val)
- {
-     ICSState *ics =3D (ICSState *)opaque;
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 553ff500c8..2aa60e5d36 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -246,9 +246,6 @@ DEF_HELPER_3(vrld, void, avr, avr, avr)
+ DEF_HELPER_3(vsl, void, avr, avr, avr)
+ DEF_HELPER_3(vsr, void, avr, avr, avr)
+ DEF_HELPER_4(vsldoi, void, avr, avr, avr, i32)
+-DEF_HELPER_2(vspltisb, void, avr, i32)
+-DEF_HELPER_2(vspltish, void, avr, i32)
+-DEF_HELPER_2(vspltisw, void, avr, i32)
+ DEF_HELPER_3(vspltb, void, avr, avr, i32)
+ DEF_HELPER_3(vsplth, void, avr, avr, i32)
+ DEF_HELPER_3(vspltw, void, avr, avr, i32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index ffccda8b9b..2f793a3543 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1998,21 +1998,6 @@ VNEG(vnegw, s32)
+ VNEG(vnegd, s64)
+ #undef VNEG
 =20
-+    if (kvm_irqchip_in_kernel()) {
-+        ics_kvm_set_irq(ics, srcno, val);
-+        return;
-+    }
-+
-     if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-         ics_simple_set_irq_lsi(ics, srcno, val);
-     } else {
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index e7b8d4c29c..f34eacda03 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -259,9 +259,8 @@ int ics_set_kvm_state(ICSState *ics)
-     return 0;
- }
-=20
--void ics_kvm_set_irq(void *opaque, int srcno, int val)
-+void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
- {
--    ICSState *ics =3D opaque;
-     struct kvm_irq_level args;
-     int rc;
-=20
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index e6893df61e..9f43b7b3bf 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -222,13 +222,8 @@ static int spapr_irq_post_load_xics(sPAPRMachineStat=
-e *spapr, int version_id)
- static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
- {
-     sPAPRMachineState *spapr =3D opaque;
--    MachineState *machine =3D MACHINE(opaque);
-=20
--    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
--        ics_kvm_set_irq(spapr->ics, srcno, val);
--    } else {
--        ics_simple_set_irq(spapr->ics, srcno, val);
+-#define VSPLTI(suffix, element, splat_type)                     \
+-    void helper_vspltis##suffix(ppc_avr_t *r, uint32_t splat)   \
+-    {                                                           \
+-        splat_type x =3D (int8_t)(splat << 3) >> 3;               \
+-        int i;                                                  \
+-                                                                \
+-        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {          \
+-            r->element[i] =3D x;                                  \
+-        }                                                       \
 -    }
-+    ics_simple_set_irq(spapr->ics, srcno, val);
- }
+-VSPLTI(b, s8, int8_t)
+-VSPLTI(h, s16, int16_t)
+-VSPLTI(w, s32, int32_t)
+-#undef VSPLTI
+-
+ #define VSR(suffix, element, mask)                                      =
+\
+     void helper_vsr##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   =
+\
+     {                                                                   =
+\
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+index b104c6e38e..c26c342e16 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -704,25 +704,21 @@ GEN_VXRFORM_DUAL(vcmpbfp, PPC_ALTIVEC, PPC_NONE, \
+ GEN_VXRFORM_DUAL(vcmpgtfp, PPC_ALTIVEC, PPC_NONE, \
+                  vcmpgtud, PPC_NONE, PPC2_ALTIVEC_207)
 =20
- static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 06e87128f8..61bd0fb978 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -180,7 +180,6 @@ void icp_eoi(ICPState *icp, uint32_t xirr);
- void ics_simple_write_xive(ICSState *ics, int nr, int server,
-                            uint8_t priority, uint8_t saved_priority);
- void ics_simple_set_irq(void *opaque, int srcno, int val);
--void ics_kvm_set_irq(void *opaque, int srcno, int val);
+-#define GEN_VXFORM_SIMM(name, opc2, opc3)                               =
+\
++#define GEN_VXFORM_DUPI(name, tcg_op, opc2, opc3)                       =
+\
+ static void glue(gen_, name)(DisasContext *ctx)                         =
+\
+     {                                                                   =
+\
+-        TCGv_ptr rd;                                                    =
+\
+-        TCGv_i32 simm;                                                  =
+\
++        int simm;                                                       =
+\
+         if (unlikely(!ctx->altivec_enabled)) {                          =
+\
+             gen_exception(ctx, POWERPC_EXCP_VPU);                       =
+\
+             return;                                                     =
+\
+         }                                                               =
+\
+-        simm =3D tcg_const_i32(SIMM5(ctx->opcode));                     =
+  \
+-        rd =3D gen_avr_ptr(rD(ctx->opcode));                            =
+  \
+-        gen_helper_##name (rd, simm);                                   =
+\
+-        tcg_temp_free_i32(simm);                                        =
+\
+-        tcg_temp_free_ptr(rd);                                          =
+\
++        simm =3D SIMM5(ctx->opcode);                                    =
+  \
++        tcg_op(avr64_offset(rD(ctx->opcode), true), 16, 16, simm);      =
+\
+     }
 =20
- void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
- void icp_pic_print_info(ICPState *icp, Monitor *mon);
-@@ -201,5 +200,6 @@ void icp_kvm_realize(DeviceState *dev, Error **errp);
- void ics_get_kvm_state(ICSState *ics);
- int ics_set_kvm_state(ICSState *ics);
- void ics_synchronize_state(ICSState *ics);
-+void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
+-GEN_VXFORM_SIMM(vspltisb, 6, 12);
+-GEN_VXFORM_SIMM(vspltish, 6, 13);
+-GEN_VXFORM_SIMM(vspltisw, 6, 14);
++GEN_VXFORM_DUPI(vspltisb, tcg_gen_gvec_dup8i, 6, 12);
++GEN_VXFORM_DUPI(vspltish, tcg_gen_gvec_dup16i, 6, 13);
++GEN_VXFORM_DUPI(vspltisw, tcg_gen_gvec_dup32i, 6, 14);
 =20
- #endif /* XICS_H */
+ #define GEN_VXFORM_NOA(name, opc2, opc3)                                =
+\
+ static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
+@@ -802,22 +798,6 @@ GEN_VXFORM_NOA(vprtybw, 1, 24);
+ GEN_VXFORM_NOA(vprtybd, 1, 24);
+ GEN_VXFORM_NOA(vprtybq, 1, 24);
+=20
+-#define GEN_VXFORM_SIMM(name, opc2, opc3)                               =
+\
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
+-    {                                                                   =
+\
+-        TCGv_ptr rd;                                                    =
+\
+-        TCGv_i32 simm;                                                  =
+\
+-        if (unlikely(!ctx->altivec_enabled)) {                          =
+\
+-            gen_exception(ctx, POWERPC_EXCP_VPU);                       =
+\
+-            return;                                                     =
+\
+-        }                                                               =
+\
+-        simm =3D tcg_const_i32(SIMM5(ctx->opcode));                     =
+  \
+-        rd =3D gen_avr_ptr(rD(ctx->opcode));                            =
+  \
+-        gen_helper_##name (rd, simm);                                   =
+\
+-        tcg_temp_free_i32(simm);                                        =
+\
+-        tcg_temp_free_ptr(rd);                                          =
+\
+-    }
+-
+ #define GEN_VXFORM_UIMM(name, opc2, opc3)                               =
+\
+ static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
+     {                                                                   =
+\
+@@ -1240,7 +1220,7 @@ GEN_VXFORM_DUAL(vsldoi, PPC_ALTIVEC, PPC_NONE,
+ #undef GEN_VXRFORM_DUAL
+ #undef GEN_VXRFORM1
+ #undef GEN_VXRFORM
+-#undef GEN_VXFORM_SIMM
++#undef GEN_VXFORM_DUPI
+ #undef GEN_VXFORM_NOA
+ #undef GEN_VXFORM_UIMM
+ #undef GEN_VAFORM_PAIRED
 --=20
 2.20.1
