@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52402)
+Received: from eggs.gnu.org ([209.51.188.92]:52421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gvgqQ-00072L-2x
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:18 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gvgqS-00074v-Dx
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gvgqP-0006q2-9D
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:18 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gvgqR-0006qz-GB
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 06:12:20 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 18 Feb 2019 12:11:49 +0100
-Message-Id: <20190218111153.22681-7-cohuck@redhat.com>
+Date: Mon, 18 Feb 2019 12:11:50 +0100
+Message-Id: <20190218111153.22681-8-cohuck@redhat.com>
 In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
 References: <20190218111153.22681-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 06/10] s390x/cpumodel: mepochptff: warn when no
- mepoch and re-align group init
+Subject: [Qemu-devel] [PULL 07/10] s390x/cpumodel: default enable mepoch for
+ z14 and later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,99 @@ Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Collin Walling <walling@linux.
 
 From: Collin Walling <walling@linux.ibm.com>
 
-The extended PTFF features (qsie, qtoue, stoe, stoue) are dependent
-on the multiple-epoch facility (mepoch). Let's print a warning if these
-features are enabled without mepoch.
+Latest systems and host kernels support mepoch, which is a
+feature that was meant to be supported for z14 GA1 from the
+get-go. Let's copy it to the z14 GA1 default CPU model.
 
-While we're at it, let's move the FEAT_GROUP_INIT for mepochptff down
-the s390_feature_groups list so it can be properly indexed with its
-generated S390FeatGroup enum.
+Machines s390-ccw-virtio-3.1 and older will retain the old CPU
+models and will not provide this bit nor the extended PTFF
+functions in the default model.
 
 Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Message-Id: <20190212011657.18324-1-walling@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20190212011657.18324-2-walling@linux.ibm.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_features.c | 2 +-
- target/s390x/cpu_models.c   | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ hw/s390x/s390-virtio-ccw.c  |  3 ++-
+ target/s390x/cpu_models.c   | 24 ++++++++++++++++++++++++
+ target/s390x/cpu_models.h   |  2 ++
+ target/s390x/gen-features.c |  2 ++
+ 4 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 60cfeba48f4e..1843c84aaadc 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -456,7 +456,6 @@ static S390FeatGroupDef s390_feature_groups[] = {
-     FEAT_GROUP_INIT("plo", PLO, "Perform-locked-operation facility"),
-     FEAT_GROUP_INIT("tods", TOD_CLOCK_STEERING, "Tod-clock-steering facility"),
-     FEAT_GROUP_INIT("gen13ptff", GEN13_PTFF, "PTFF enhancements introduced with z13"),
--    FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
-     FEAT_GROUP_INIT("msa", MSA, "Message-security-assist facility"),
-     FEAT_GROUP_INIT("msa1", MSA_EXT_1, "Message-security-assist-extension 1 facility"),
-     FEAT_GROUP_INIT("msa2", MSA_EXT_2, "Message-security-assist-extension 2 facility"),
-@@ -466,6 +465,7 @@ static S390FeatGroupDef s390_feature_groups[] = {
-     FEAT_GROUP_INIT("msa6", MSA_EXT_6, "Message-security-assist-extension 6 facility"),
-     FEAT_GROUP_INIT("msa7", MSA_EXT_7, "Message-security-assist-extension 7 facility"),
-     FEAT_GROUP_INIT("msa8", MSA_EXT_8, "Message-security-assist-extension 8 facility"),
-+    FEAT_GROUP_INIT("mepochptff", MULTIPLE_EPOCH_PTFF, "PTFF enhancements introduced with Multiple-epoch facility"),
- };
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1a3414b64280..d11069b860b4 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -659,7 +659,8 @@ static void ccw_machine_3_1_instance_options(MachineState *machine)
+ {
+     static const S390FeatInit qemu_cpu_feat = { S390_FEAT_LIST_QEMU_V3_1 };
+     ccw_machine_4_0_instance_options(machine);
+-
++    s390_cpudef_featoff_greater(14, 1, S390_FEAT_MULTIPLE_EPOCH);
++    s390_cpudef_group_featoff_greater(14, 1, S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF);
+     s390_set_qemu_cpu_model(0x2827, 12, 2, qemu_cpu_feat);
+ }
  
- const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group)
 diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 249011fd62f5..8002412f9af1 100644
+index 8002412f9af1..4e7e8cab0198 100644
 --- a/target/s390x/cpu_models.c
 +++ b/target/s390x/cpu_models.c
-@@ -788,6 +788,10 @@ static void check_consistency(const S390CPUModel *model)
-         { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
-         { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
-         { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
-+        { S390_FEAT_PTFF_QSIE, S390_FEAT_MULTIPLE_EPOCH },
-+        { S390_FEAT_PTFF_QTOUE, S390_FEAT_MULTIPLE_EPOCH },
-+        { S390_FEAT_PTFF_STOE, S390_FEAT_MULTIPLE_EPOCH },
-+        { S390_FEAT_PTFF_STOUE, S390_FEAT_MULTIPLE_EPOCH },
-     };
-     int i;
+@@ -117,6 +117,30 @@ void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat feat)
+     }
+ }
  
++void s390_cpudef_group_featoff_greater(uint8_t gen, uint8_t ec_ga,
++                                       S390FeatGroup group)
++{
++    const S390FeatGroupDef *group_def = s390_feat_group_def(group);
++    S390FeatBitmap group_def_off;
++    int i;
++
++    bitmap_complement(group_def_off, group_def->feat, S390_FEAT_MAX);
++
++    for (i = 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
++        const S390CPUDef *cpu_def = &s390_cpu_defs[i];
++
++        if (cpu_def->gen < gen) {
++            continue;
++        }
++        if (cpu_def->gen == gen && cpu_def->ec_ga < ec_ga) {
++            continue;
++        }
++
++        bitmap_and((unsigned long *)&cpu_def->default_feat,
++                   cpu_def->default_feat, group_def_off, S390_FEAT_MAX);
++    }
++}
++
+ uint32_t s390_get_hmfai(void)
+ {
+     static S390CPU *cpu;
+diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
+index 11cf5386fbcf..174a99e56149 100644
+--- a/target/s390x/cpu_models.h
++++ b/target/s390x/cpu_models.h
+@@ -75,6 +75,8 @@ struct S390CPUModel {
+ 
+ void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat);
+ void s390_cpudef_featoff_greater(uint8_t gen, uint8_t ec_ga, S390Feat feat);
++void s390_cpudef_group_featoff_greater(uint8_t gen, uint8_t ec_ga,
++                                       S390FeatGroup group);
+ uint32_t s390_get_hmfai(void);
+ uint8_t s390_get_mha_pow(void);
+ uint32_t s390_get_ibc_val(void);
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 19bb8ac7f890..dd6e8458ef00 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -550,6 +550,8 @@ static uint16_t default_GEN14_GA1[] = {
+     S390_FEAT_GROUP_MSA_EXT_6,
+     S390_FEAT_GROUP_MSA_EXT_7,
+     S390_FEAT_GROUP_MSA_EXT_8,
++    S390_FEAT_MULTIPLE_EPOCH,
++    S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
+ };
+ 
+ /* QEMU (CPU model) features */
 -- 
 2.17.2
