@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60972)
+Received: from eggs.gnu.org ([209.51.188.92]:60970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcD-0004kF-Fs
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:51 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcD-0004kE-Fj
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc2-00076Y-T1
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjc2-00075m-1n
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:45 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 17:09:26 +0300
-Message-Id: <20190218140926.333779-18-vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:09:24 +0300
+Message-Id: <20190218140926.333779-16-vsementsov@virtuozzo.com>
 In-Reply-To: <20190218140926.333779-1-vsementsov@virtuozzo.com>
 References: <20190218140926.333779-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 17/17] hw/ide: drop iov field from IDEDMA
+Subject: [Qemu-devel] [PATCH v4 15/17] hw/ide: drop iov field from IDEState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +30,72 @@ Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
  include/hw/ide/internal.h | 1 -
- hw/ide/atapi.c            | 5 ++---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ hw/ide/atapi.c            | 9 ++++-----
+ hw/ide/core.c             | 8 ++------
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 1b02bb9151..8efd03132b 100644
+index 880413ddc7..fa99486d7a 100644
 --- a/include/hw/ide/internal.h
 +++ b/include/hw/ide/internal.h
-@@ -455,7 +455,6 @@ struct IDEDMAOps {
- 
- struct IDEDMA {
-     const struct IDEDMAOps *ops;
+@@ -405,7 +405,6 @@ struct IDEState {
+     int atapi_dma; /* true if dma is requested for the packet cmd */
+     BlockAcctCookie acct;
+     BlockAIOCB *pio_aiocb;
 -    struct iovec iov;
      QEMUIOVector qiov;
-     BlockAIOCB *aiocb;
- };
+     QLIST_HEAD(, IDEBufferedRequest) buffered_requests;
+     /* ATA DMA state */
 diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index 4de86555d9..1b0f66cc08 100644
+index 39e473f9c2..4de86555d9 100644
 --- a/hw/ide/atapi.c
 +++ b/hw/ide/atapi.c
-@@ -420,9 +420,8 @@ static void ide_atapi_cmd_read_dma_cb(void *opaque, int ret)
-         data_offset = 0;
-     }
-     trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
--    s->bus->dma->iov.iov_base = (void *)(s->io_buffer + data_offset);
--    s->bus->dma->iov.iov_len = n * ATAPI_SECTOR_SIZE;
--    qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov, 1);
-+    qemu_iovec_init_buf(&s->bus->dma->qiov, s->io_buffer + data_offset,
-+                        n * ATAPI_SECTOR_SIZE);
+@@ -174,16 +174,15 @@ static void cd_read_sector_cb(void *opaque, int ret)
  
-     s->bus->dma->aiocb = ide_buffered_readv(s, (int64_t)s->lba << 2,
-                                             &s->bus->dma->qiov, n * 4,
+ static int cd_read_sector(IDEState *s)
+ {
++    void *buf;
++
+     if (s->cd_sector_size != 2048 && s->cd_sector_size != 2352) {
+         block_acct_invalid(blk_get_stats(s->blk), BLOCK_ACCT_READ);
+         return -EINVAL;
+     }
+ 
+-    s->iov.iov_base = (s->cd_sector_size == 2352) ?
+-                      s->io_buffer + 16 : s->io_buffer;
+-
+-    s->iov.iov_len = ATAPI_SECTOR_SIZE;
+-    qemu_iovec_init_external(&s->qiov, &s->iov, 1);
++    buf = (s->cd_sector_size == 2352) ? s->io_buffer + 16 : s->io_buffer;
++    qemu_iovec_init_buf(&s->qiov, buf, ATAPI_SECTOR_SIZE);
+ 
+     trace_cd_read_sector(s->lba);
+ 
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 84832008b8..13f8f78ca6 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -774,9 +774,7 @@ static void ide_sector_read(IDEState *s)
+         return;
+     }
+ 
+-    s->iov.iov_base = s->io_buffer;
+-    s->iov.iov_len  = n * BDRV_SECTOR_SIZE;
+-    qemu_iovec_init_external(&s->qiov, &s->iov, 1);
++    qemu_iovec_init_buf(&s->qiov, s->io_buffer, n * BDRV_SECTOR_SIZE);
+ 
+     block_acct_start(blk_get_stats(s->blk), &s->acct,
+                      n * BDRV_SECTOR_SIZE, BLOCK_ACCT_READ);
+@@ -1045,9 +1043,7 @@ static void ide_sector_write(IDEState *s)
+         return;
+     }
+ 
+-    s->iov.iov_base = s->io_buffer;
+-    s->iov.iov_len  = n * BDRV_SECTOR_SIZE;
+-    qemu_iovec_init_external(&s->qiov, &s->iov, 1);
++    qemu_iovec_init_buf(&s->qiov, s->io_buffer, n * BDRV_SECTOR_SIZE);
+ 
+     block_acct_start(blk_get_stats(s->blk), &s->acct,
+                      n * BDRV_SECTOR_SIZE, BLOCK_ACCT_WRITE);
 -- 
 2.18.0
