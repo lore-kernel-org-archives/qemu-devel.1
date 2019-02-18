@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56722)
+Received: from eggs.gnu.org ([209.51.188.92]:56720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gva2I-0001vP-M5
+	(envelope-from <dgibson@ozlabs.org>) id 1gva2I-0001vO-Kf
 	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 22:56:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gva2H-0007XN-NP
+	(envelope-from <dgibson@ozlabs.org>) id 1gva2H-0007Xb-QA
 	for qemu-devel@nongnu.org; Sun, 17 Feb 2019 22:56:06 -0500
-Date: Mon, 18 Feb 2019 14:23:34 +1100
+Date: Mon, 18 Feb 2019 14:24:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190218032334.GA9345@umbus.fritz.box>
+Message-ID: <20190218032444.GB9345@umbus.fritz.box>
 References: <20190215133005.15955-1-david@redhat.com>
-	<20190215133005.15955-7-david@redhat.com>
-	<0d3aba1b-2a6c-c8a8-b421-c6c2ad55e494@redhat.com>
+	<20190215162652-mutt-send-email-mst@kernel.org>
+	<1fd9fd75-6bd3-c120-22cf-495c1aab0652@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FCuugMFkClbJLl1L"
+	protocol="application/pgp-signature"; boundary="7iMSBzlTiPOCCT2k"
 Content-Disposition: inline
-In-Reply-To: <0d3aba1b-2a6c-c8a8-b421-c6c2ad55e494@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] tests/device-plug: Add memory
- unplug request test for spapr
+In-Reply-To: <1fd9fd75-6bd3-c120-22cf-495c1aab0652@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] tests: Add device unplug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 
---FCuugMFkClbJLl1L
+--7iMSBzlTiPOCCT2k
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 15, 2019 at 04:56:53PM +0100, Thomas Huth wrote:
-> On 15/02/2019 14.30, David Hildenbrand wrote:
-> > We can easily test this, just like PCI.
+On Fri, Feb 15, 2019 at 11:09:32PM +0100, David Hildenbrand wrote:
+> On 15.02.19 22:27, Michael S. Tsirkin wrote:
+> > On Fri, Feb 15, 2019 at 02:29:59PM +0100, David Hildenbrand wrote:
+> >> This is a set of tests to test basic device unplugging functionality f=
+or
+> >> - some PCI implementations
+> >> - CCW devices on s390x
+> >> - spapr memory and cpu core devices
+> >>
+> >> I plaed with ACPI CPU unplug but getting that to run with qtest is more
+> >> involved. (remove devices on reset, trick cpu-hotplug-legacy property,
+> >> somehow create cpu hotplug state objects ...). Well we no have at least
+> >> one unplug test for DIMMs and one for CPUs.
+> >>
+> >> @David, I dropped you t-b and r-b due to many changes but would be hap=
+py
+> >> to readd them ;)
 > >=20
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > ---
-> >  tests/device-plug-test.c | 21 +++++++++++++++++++++
-> >  1 file changed, 21 insertions(+)
 > >=20
-> > diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
-> > index ec6cb5de7b..4c581319c0 100644
-> > --- a/tests/device-plug-test.c
-> > +++ b/tests/device-plug-test.c
-> > @@ -116,6 +116,22 @@ static void test_spapr_cpu_unplug_request(void)
-> >      qtest_quit(qtest);
-> >  }
-> > =20
-> > +static void test_spapr_memory_unplug_request(void)
-> > +{
-> > +    QTestState *qtest;
-> > +
-> > +    qtest =3D qtest_initf("-m 1G,slots=3D1,maxmem=3D2G "
-> > +                        "-object memory-backend-ram,id=3Dmem0,size=3D1=
-G "
-> > +                        "-device pc-dimm,id=3Ddev0,memdev=3Dmem0");
-> > +
-> > +    /* similar to test_pci_unplug_request */
-> > +    device_del_request(qtest, "dev0");
-> > +    system_reset(qtest);
-> > +    wait_device_deleted_event(qtest, "dev0");
-> > +
-> > +    qtest_quit(qtest);
-> > +}
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> >      const char *arch =3D qtest_get_arch();
-> > @@ -140,5 +156,10 @@ int main(int argc, char **argv)
-> >                         test_spapr_cpu_unplug_request);
-> >      }
-> > =20
-> > +    if (!strcmp(arch, "ppc64")) {
-> > +        qtest_add_func("/device-plug/spapr_memory_unplug_request",
-> > +                       test_spapr_memory_unplug_request);
-> > +    }
-> > +
-> >      return g_test_run();
-> >  }
+> > Series:
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> >=20
+> >=20
+> > I think it's mostly spapr things so feel free to merge through
+> > that tree.
 >=20
-> I think I'd maybe use a smaller DIMM (256 MiB? 512 MiB), just in case
-> the test runs on an overloaded CI system with memory constraints ... but
-> anyway:
+> Thanks, I'll address the minor review comments next week and most
+> probably resend on Monday. I also agree that spapr would be a good fit.
 
-256MiB is the smallest we can do - that's the LMB size.  I'd suggest
-512MiB so we're testing the logic that gathers the multiple LMBs for
-the DIMM, since that's kind of hairy (it's basically the bridge
-between the PAPR and qemu hotplug models which are quite different for
-memory).
+Ah, ok.  I can do that.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -100,24 +71,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---FCuugMFkClbJLl1L
+--7iMSBzlTiPOCCT2k
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxqJTYACgkQbDjKyiDZ
-s5KrYhAAryeMGrVp6IQGAwiHhK+CG4M3xoxj+djufRavPWA3aE9ArOY6wevlsARV
-Ol2yW9MWqdt15/NBYRHjAZFs+gqhSOk5TVhXxvnO/z8Cc1jK+c+QUAGeFhQPpGEA
-OKSA9vszbJz70cQzUtHp7jbIzJI0Yw/XLXhjelMZE8vy+Y/WG55RYyNTn+4aCUCW
-W89qS7sHpLn6phkKTQNGUUBgxCY++8TBbHkNVvOwdetMsWSsaukLxHevSSmz7z1B
-GMlBcwnK6LIN9O396qQtzfrHOWaE7LqXvcK3kbXMF/05mUmyR1B7fPlXMEBc3sj9
-h58DjRwUO/iTLPu8zWjDayR6c7G5OZk9s5+K0EqisBdkzvaNs8IFZjBtmTu0YxvT
-X+SHF+N4c9SJwPToLddYpDGtzvFZFa9qNCsUnPBo8j/YHgjF+5cONwinAirbwRS5
-+/tLZ9EI6W2YgBSUbrk+V0mSfuXWmVRm4IZgqgABrkmsD3enpZbC9vDW55gdfu37
-PErnaxDccGLYg7vOhn/ujPquZWl2BhpovD8pdvsDvH4+Ylr92UwYHN8Oq0F8Ly8q
-xOAFbbYNjUxLlWKY0sVDJgXkwnMp2iFB/KtoF6fkJkDHmAPsCbwIhiAeaC8Mt2ne
-XLjDO7OYmWNSWFnZI7GXSiJtVCVmm8uiM9XK8AMty3zCCK1Rcrw=
-=bvKQ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxqJXsACgkQbDjKyiDZ
+s5KL+BAArIJTnT6BnhglJD+PBEUGcdnRjQzRCaHd9tUE8kSIkMfKpd8mKc/+nJdf
+LZuqknISfQ35q3CNNDLgKEPMWCR3DFKBFQOAaF/BRF2ti1ths0FjoIuC6TBSQ8Pv
+T7TB9l/kQcVFr1CglMx32dLCR8BusVn1kNep2eEYJ0KItZJOKF3JOsY+rLbdCsOX
+M79Zz878hx1IOPyo8M2dZLRetPGWDIKoWlkxNk01mzV6vAq/aGzjBRmdwYf7cYMf
+9kwy+MJksc4kcCuhYoKPbwqoCHFd9/2bVexDtWUpJCEQZRfp+D1hjFVVfPfS5j5V
+Gi2n/jEUlMcHIFplXw0ffN2xa/gbwfPJAVN48oKiqnGmAKF8udvulFmP9HfujhcQ
+oW/nnA7JoOa+bMZVSYVo9Ho/LtA8pn7uWZtHRACF7eGfnbK3WWtZ7CssxbjX12B/
+fpyAzdrGpGnEHMdJLiWnmMNS32ofdD0AL2e6FR+AncvjsSB/LJWFSxCDieXv5vn5
+4XI2plchfHebz1sUjv4x5FuBgH9W0WmjtGuSAG6VgB+IrP2IXsNioV8ZIVqL//5r
+O6RIZYodqlTxuQ1KNZax4ag7PkbpuhWh6+xjWD3qruIQE7M9dUTizHQWzp8CiDta
+THVhpV7vo3hP+lyWY6Z26aPnJU5P+Gyqb80VU4HHN1Clp46eL34=
+=08OX
 -----END PGP SIGNATURE-----
 
---FCuugMFkClbJLl1L--
+--7iMSBzlTiPOCCT2k--
