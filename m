@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54268)
+Received: from eggs.gnu.org ([209.51.188.92]:54250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gvkuq-00054o-Fo
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:09 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gvkuo-00053O-S7
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gvkuj-0001yx-DO
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:08 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:43889 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gvkul-00021E-3F
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:06 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:44007 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gvkui-0001xL-W7
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:01 -0500
+	id 1gvkuk-0001z9-Hr
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:33:02 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 18 Feb 2019 16:31:36 +0100
-Message-Id: <1550503897-31141-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 18 Feb 2019 16:31:37 +0100
+Message-Id: <1550503897-31141-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550503897-31141-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550503897-31141-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 6/7] disas: nanoMIPS: Correct comments to
- handlers of some DSP instructions
+Subject: [Qemu-devel] [PATCH 7/7] disas: nanoMIPS: Fix a function misnomer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,384 +29,462 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, peter.maydell@linaro.org, arik
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Correct comments to handlers of some DSP instructions.
+Rename function extract_ac_13_12() to extract_ac_15_14().
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- disas/nanomips.cpp | 128 ++++++++++++++++++++++++++++-------------------------
- 1 file changed, 67 insertions(+), 61 deletions(-)
+ disas/nanomips.cpp | 96 +++++++++++++++++++++++++++---------------------------
+ disas/nanomips.h   |  2 +-
+ 2 files changed, 49 insertions(+), 49 deletions(-)
 
 diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index f90f1a9..33fb045 100644
+index 33fb045..db6d4c6 100644
 --- a/disas/nanomips.cpp
 +++ b/disas/nanomips.cpp
-@@ -10183,14 +10183,13 @@ std::string NMD::MFHGC0(uint64 instruction)
+@@ -1058,7 +1058,7 @@ uint64 NMD::extract_stripe_6(uint64 instruction)
+ }
  
  
- /*
-- *
-+ * [DSP] MFHI rs, ac - Move from HI register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000     xxxxx  00000001111111
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *               ac --
-  */
+-uint64 NMD::extract_ac_13_12(uint64 instruction)
++uint64 NMD::extract_ac_15_14(uint64 instruction)
+ {
+     uint64 value = 0;
+     value |= extract_bits(instruction, 14, 2);
+@@ -6375,7 +6375,7 @@ std::string NMD::DPA_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6399,7 +6399,7 @@ std::string NMD::DPAQ_SA_L_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6423,7 +6423,7 @@ std::string NMD::DPAQ_S_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6447,7 +6447,7 @@ std::string NMD::DPAQX_SA_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6471,7 +6471,7 @@ std::string NMD::DPAQX_S_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6495,7 +6495,7 @@ std::string NMD::DPAU_H_QBL(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6519,7 +6519,7 @@ std::string NMD::DPAU_H_QBR(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6543,7 +6543,7 @@ std::string NMD::DPAX_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6567,7 +6567,7 @@ std::string NMD::DPS_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6591,7 +6591,7 @@ std::string NMD::DPSQ_SA_L_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6615,7 +6615,7 @@ std::string NMD::DPSQ_S_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6639,7 +6639,7 @@ std::string NMD::DPSQX_SA_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6663,7 +6663,7 @@ std::string NMD::DPSQX_S_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6687,7 +6687,7 @@ std::string NMD::DPSU_H_QBL(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6711,7 +6711,7 @@ std::string NMD::DPSU_H_QBR(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -6735,7 +6735,7 @@ std::string NMD::DPSX_W_PH(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -7373,7 +7373,7 @@ std::string NMD::EXTPDP(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 size_value = extract_size_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7397,7 +7397,7 @@ std::string NMD::EXTPDPV(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7421,7 +7421,7 @@ std::string NMD::EXTP(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 size_value = extract_size_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7445,7 +7445,7 @@ std::string NMD::EXTPV(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7469,7 +7469,7 @@ std::string NMD::EXTR_RS_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 shift_value = extract_shift_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7493,7 +7493,7 @@ std::string NMD::EXTR_R_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 shift_value = extract_shift_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7517,7 +7517,7 @@ std::string NMD::EXTR_S_H(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 shift_value = extract_shift_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7541,7 +7541,7 @@ std::string NMD::EXTR_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 shift_value = extract_shift_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7565,7 +7565,7 @@ std::string NMD::EXTRV_RS_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7589,7 +7589,7 @@ std::string NMD::EXTRV_R_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7613,7 +7613,7 @@ std::string NMD::EXTRV_S_H(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -7637,7 +7637,7 @@ std::string NMD::EXTRV_W(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -9719,7 +9719,7 @@ std::string NMD::MADD_DSP_(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -9792,7 +9792,7 @@ std::string NMD::MADDU_DSP_(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -9817,7 +9817,7 @@ std::string NMD::MAQ_S_W_PHL(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -9842,7 +9842,7 @@ std::string NMD::MAQ_S_W_PHR(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -9867,7 +9867,7 @@ std::string NMD::MAQ_SA_W_PHL(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -9892,7 +9892,7 @@ std::string NMD::MAQ_SA_W_PHR(uint64 instruction)
+ {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -10194,7 +10194,7 @@ std::string NMD::MFHGC0(uint64 instruction)
  std::string NMD::MFHI_DSP_(uint64 instruction)
  {
-@@ -10231,14 +10230,13 @@ std::string NMD::MFHTR(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- *
-+ * [DSP] MFLO rs, ac - Move from HI register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000     xxxxx  01000001111111
-  *     rt -----
-- *          rs -----
-- *               rd -----
-+ *               ac --
-  */
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -10241,7 +10241,7 @@ std::string NMD::MFHTR(uint64 instruction)
  std::string NMD::MFLO_DSP_(uint64 instruction)
  {
-@@ -10399,7 +10397,7 @@ std::string NMD::MOD(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- *
-+ * [DSP] MODSUB rd, rs, rt - Modular subtraction on an index value
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -10427,7 +10425,7 @@ std::string NMD::MODSUB(uint64 instruction)
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               x1110000101
-+ *  001000               x1010010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -10639,14 +10637,14 @@ std::string NMD::MOVZ(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MSUB ac, rs, rt - Multiply word and subtract from accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            10101010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MSUB_DSP_(uint64 instruction)
+     std::string rt = GPR(copy(rt_value));
+     std::string ac = AC(copy(ac_value));
+@@ -10650,7 +10650,7 @@ std::string NMD::MSUB_DSP_(uint64 instruction)
  {
-@@ -10711,14 +10709,13 @@ std::string NMD::MSUBF_S(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-- *
-+ * [DSP] MSUBU ac, rs, rt - Multiply word and add to
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            11101010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MSUBU_DSP_(uint64 instruction)
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -10721,7 +10721,7 @@ std::string NMD::MSUBU_DSP_(uint64 instruction)
  {
-@@ -10919,14 +10916,13 @@ std::string NMD::MTHGC0(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MTHI rs, ac - Move to HI register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-- *     rt -----
-+ *  001000xxxxx       10000001111111
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -10927,7 +10927,7 @@ std::string NMD::MTHGC0(uint64 instruction)
  std::string NMD::MTHI_DSP_(uint64 instruction)
  {
-@@ -10941,14 +10937,13 @@ std::string NMD::MTHI_DSP_(uint64 instruction)
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MTHLIP rs, ac - Copy LO to HI and a GPR to LO and increment pos by 32
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-- *     rt -----
-+ *  001000xxxxx       00001001111111
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
+     std::string rs = GPR(copy(rs_value));
+     std::string ac = AC(copy(ac_value));
+@@ -10948,7 +10948,7 @@ std::string NMD::MTHI_DSP_(uint64 instruction)
  std::string NMD::MTHLIP(uint64 instruction)
  {
-@@ -10989,14 +10984,13 @@ std::string NMD::MTHTR(uint64 instruction)
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MTLO rs, ac - Move to LO register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-- *     rt -----
-+ *  001000xxxxx       11000001111111
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
+     std::string rs = GPR(copy(rs_value));
+     std::string ac = AC(copy(ac_value));
+@@ -10995,7 +10995,7 @@ std::string NMD::MTHTR(uint64 instruction)
  std::string NMD::MTLO_DSP_(uint64 instruction)
  {
-@@ -11155,11 +11149,12 @@ std::string NMD::MUL_D(uint64 instruction)
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MUL.PH rd, rs, rt - Multiply vector integer half words to same size
-+ *   products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               00000101101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11179,11 +11174,12 @@ std::string NMD::MUL_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MUL_S.PH rd, rs, rt - Multiply vector integer half words to same size
-+ *   products (saturated)
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               10000101101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11227,11 +11223,12 @@ std::string NMD::MUL_S(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEQ_S.W.PHL rd, rs, rt - Multiply vector fractional left halfwords
-+ *   to expanded width products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0000100101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11251,11 +11248,12 @@ std::string NMD::MULEQ_S_W_PHL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEQ_S.W.PHR rd, rs, rt - Multiply vector fractional right halfwords
-+ *   to expanded width products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0001100101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11275,11 +11273,12 @@ std::string NMD::MULEQ_S_W_PHR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEU_S.PH.QBL rd, rs, rt - Multiply vector fractional left bytes
-+ *   by halfwords to halfword products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0010010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11299,11 +11298,12 @@ std::string NMD::MULEU_S_PH_QBL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULEU_S.PH.QBR rd, rs, rt - Multiply vector fractional right bytes
-+ *   by halfwords to halfword products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0011010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11323,11 +11323,12 @@ std::string NMD::MULEU_S_PH_QBR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_RS.PH rd, rs, rt - Multiply vector fractional halfwords
-+ *   to fractional halfword products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0100010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11347,11 +11348,12 @@ std::string NMD::MULQ_RS_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_RS.W rd, rs, rt - Multiply fractional words to same size
-+ *   product with saturation and rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0110010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11371,11 +11373,12 @@ std::string NMD::MULQ_RS_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_S.PH rd, rs, rt - Multiply fractional halfwords to same size
-+ *   products
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0101010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11395,11 +11398,12 @@ std::string NMD::MULQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULQ_S.W rd, rs, rt - Multiply fractional words to same size product
-+ *   with saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000               x0111010101
-  *     rt -----
-  *          rs -----
-  *               rd -----
-@@ -11419,14 +11423,15 @@ std::string NMD::MULQ_S_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULSA.W.PH ac, rs, rt - Multiply and subtract vector integer halfword
-+ *   elements and accumulate
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            10110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULSA_W_PH(uint64 instruction)
+     std::string rs = GPR(copy(rs_value));
+     std::string ac = AC(copy(ac_value));
+@@ -11437,7 +11437,7 @@ std::string NMD::MULSA_W_PH(uint64 instruction)
  {
-@@ -11443,14 +11448,15 @@ std::string NMD::MULSA_W_PH(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULSAQ_S.W.PH ac, rs, rt - Multiply and subtract vector fractional
-+ *   halfwords and accumulate
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            11110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULSAQ_S_W_PH(uint64 instruction)
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -11462,7 +11462,7 @@ std::string NMD::MULSAQ_S_W_PH(uint64 instruction)
  {
-@@ -11467,14 +11473,14 @@ std::string NMD::MULSAQ_S_W_PH(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULT ac, rs, rt - Multiply word
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            00110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULT_DSP_(uint64 instruction)
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -11486,7 +11486,7 @@ std::string NMD::MULT_DSP_(uint64 instruction)
  {
-@@ -11491,14 +11497,14 @@ std::string NMD::MULT_DSP_(uint64 instruction)
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
  
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] MULTU ac, rs, rt - Multiply unsigned word
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-- *  001000               00010001101
-+ *  001000            01110010111111
-  *     rt -----
-  *          rs -----
-- *               rd -----
-+ *               ac --
-  */
- std::string NMD::MULTU_DSP_(uint64 instruction)
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -11510,7 +11510,7 @@ std::string NMD::MULTU_DSP_(uint64 instruction)
  {
+     uint64 rt_value = extract_rt_25_24_23_22_21(instruction);
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string ac = AC(copy(ac_value));
+     std::string rs = GPR(copy(rs_value));
+@@ -13938,7 +13938,7 @@ std::string NMD::SHE(uint64 instruction)
+ std::string NMD::SHILO(uint64 instruction)
+ {
+     int64 shift_value = extract_shift__se5_21_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string shift = IMMEDIATE(copy(shift_value));
+     std::string ac = AC(copy(ac_value));
+@@ -13960,7 +13960,7 @@ std::string NMD::SHILO(uint64 instruction)
+ std::string NMD::SHILOV(uint64 instruction)
+ {
+     uint64 rs_value = extract_rs_20_19_18_17_16(instruction);
+-    uint64 ac_value = extract_ac_13_12(instruction);
++    uint64 ac_value = extract_ac_15_14(instruction);
+ 
+     std::string rs = GPR(copy(rs_value));
+     std::string ac = AC(copy(ac_value));
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index 6482eda..243c3e3 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -159,7 +159,7 @@ private:
+     int64 extract_s__se31_0_11_to_2_20_to_12_s12(uint64 instruction);
+     int64 extract_shift__se5_21_20_19_18_17_16(uint64 instruction);
+ 
+-    uint64 extract_ac_13_12(uint64 instruction);
++    uint64 extract_ac_15_14(uint64 instruction);
+     uint64 extract_bit_16_15_14_13_12_11(uint64 instruction);
+     uint64 extract_bit_23_22_21(uint64 instruction);
+     uint64 extract_c0s_20_19_18_17_16(uint64 instruction);
 -- 
 2.7.4
