@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44971)
+Received: from eggs.gnu.org ([209.51.188.92]:45627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gviUM-0000Yk-BO
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:57:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gviWf-0002cY-FE
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:00:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gviUK-0001k4-D8
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:57:38 -0500
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:54173)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gviUK-0001cK-2E
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:57:36 -0500
-Received: from player697.ha.ovh.net (unknown [10.109.159.20])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A4DD110F907
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 13:57:31 +0100 (CET)
-Date: Mon, 18 Feb 2019 13:57:24 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190218135724.0dc82c32@bahia.lan>
-In-Reply-To: <20190218115218.GF32287@redhat.com>
-References: <20190218101218.4177-1-ppandit@redhat.com>
-	<20190218123811.5b7a1d61@bahia.lan>
-	<20190218115218.GF32287@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gviWd-00041T-QG
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:00:01 -0500
+Resent-Message-Id: <E1gviWd-00041T-QG@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155049477241.18484.2908958682722850023@49fa7ef69f7b>
+In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: add host-serial and
- host-model machine attributes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 18 Feb 2019 04:59:33 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,195 +23,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: P J P <ppandit@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: cohuck@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 18 Feb 2019 11:52:18 +0000
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-
-> On Mon, Feb 18, 2019 at 12:38:11PM +0100, Greg Kurz wrote:
-> > On Mon, 18 Feb 2019 15:42:18 +0530
-> > P J P <ppandit@redhat.com> wrote:
-> >  =20
-> > > From: Prasad J Pandit <pjp@fedoraproject.org>
-> > >=20
-> > > On ppc hosts, hypervisor shares following system attributes
-> > >=20
-> > >   - /proc/device-tree/system-id
-> > >   - /proc/device-tree/model
-> > >=20
-> > > with a guest. This could lead to information leakage and misuse.[*]
-> > > Add machine attributes to control such system information exposure
-> > > to a guest.
-> > >=20
-> > > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
-> > >=20
-> > > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> > > ---
-> > >  hw/ppc/spapr.c         | 79 ++++++++++++++++++++++++++++++++++++++--=
---
-> > >  include/hw/ppc/spapr.h |  2 ++
-> > >  2 files changed, 75 insertions(+), 6 deletions(-)
-> > >=20
-> > > Update v3: move host-serial,host-model options to ppc sPAPR machine =
-=20
-> > >   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg03182.h=
-tml   =20
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 0942f35bf8..666e500376 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineStat=
-e *spapr,
-> > >       * Add info to guest to indentify which host is it being run on
-> > >       * and what is the uuid of the guest
-> > >       */
-> > > -    if (kvmppc_get_host_model(&buf)) {
-> > > -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> > > -        g_free(buf);
-> > > +    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")=
-) {
-> > > +        if (g_str_equal(spapr->host_model, "passthrough")) {
-> > > +            /* -M host-model=3Dpassthrough */
-> > > +            if (kvmppc_get_host_model(&buf)) {
-> > > +                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> > > +                g_free(buf);
-> > > +            }
-> > > +        } else {
-> > > +            /* -M host-model=3D<user-string> */
-> > > +            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->hos=
-t_model));
-> > > +        }
-> > >      }
-> > > -    if (kvmppc_get_host_serial(&buf)) {
-> > > -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> > > -        g_free(buf);
-> > > +
-> > > +    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none=
-")) {
-> > > +        if (g_str_equal(spapr->host_serial, "passthrough")) {
-> > > +            /* -M host-serial=3Dpassthrough */
-> > > +            if (kvmppc_get_host_serial(&buf)) {
-> > > +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> > > +                g_free(buf);
-> > > +            }
-> > > +        } else {
-> > > +            /* -M host-serial=3D<user-string> */
-> > > +            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->ho=
-st_serial));
-> > > +        }
-> > >      }
-> > > =20
-> > >      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-> > > @@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, con=
-st char *value, Error **errp)
-> > >      }
-> > >  }
-> > > =20
-> > > +static char *spapr_get_host_model(Object *obj, Error **errp)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > +
-> > > +    return g_strdup(spapr->host_model);
-> > > +}
-> > > +
-> > > +static void spapr_set_host_model(Object *obj, const char *value, Err=
-or **errp)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > +
-> > > +    g_free(spapr->host_model);
-> > > +    spapr->host_model =3D g_strdup(value);
-> > > +}
-> > > +
-> > > +static char *spapr_get_host_serial(Object *obj, Error **errp)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > +
-> > > +    return g_strdup(spapr->host_serial);
-> > > +}
-> > > +
-> > > +static void spapr_set_host_serial(Object *obj, const char *value, Er=
-ror **errp)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > +
-> > > +    g_free(spapr->host_serial);
-> > > +    spapr->host_serial =3D g_strdup(value);
-> > > +}
-> > > +
-> > >  static void spapr_instance_init(Object *obj)
-> > >  {
-> > >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > @@ -3183,6 +3230,20 @@ static void spapr_instance_init(Object *obj)
-> > >      object_property_set_description(obj, "ic-mode",
-> > >                   "Specifies the interrupt controller mode (xics, xiv=
-e, dual)",
-> > >                   NULL);
-> > > +
-> > > +    spapr->host_model =3D NULL; =20
-> >=20
-> > This isn't needed since object_initialize_with_type() already takes care
-> > of zeroing the instance for us.
-> >  =20
-> > > +    object_property_add_str(obj, "host-model",
-> > > +        spapr_get_host_model, spapr_set_host_model,
-> > > +        &error_abort);
-> > > +    object_property_set_description(obj, "host-model",
-> > > +        "Set host's model-id to use - none|passthrough|string", &err=
-or_abort);
-> > > +
-> > > +    spapr->host_serial =3D NULL; =20
-> >=20
-> > Same here.
-> >  =20
-> > > +    object_property_add_str(obj, "host-serial",
-> > > +        spapr_get_host_serial, spapr_set_host_serial,
-> > > +        &error_abort);
-> > > +    object_property_set_description(obj, "host-serial",
-> > > +        "Set host's system-id to use - none|passthrough|string", &er=
-ror_abort);
-> > >  }
-> > > =20
-> > >  static void spapr_machine_finalizefn(Object *obj)
-> > > @@ -4080,9 +4141,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-> > >  static void spapr_machine_3_1_class_options(MachineClass *mc)
-> > >  {
-> > >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > > +    static GlobalProperty compat[] =3D {
-> > > +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-> > > +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-> > > +    };
-> > >   =20
-> >=20
-> > So... we don't fix the information leak for older machines by default ?=
- From
-> > previous discussions, I understand it is for the sake of compatibility,=
- but
-> > leaving the burden of securing the host to downstream or to the user st=
-ill
-> > looks unsecure to me FWIW. =20
->=20
-> Maintaining guest ABI compatibility has to take priority, even over
-> fixing security issues, because we must never intentionally break
-> guest OS/applications by silently altering guest ABI. This is one of
-> the two reasons why machine type versioning exists (the other reason
-> being live migration data stream).
->=20
-> This is nothing new - we've done it before for security flaws where
-> a fix would involve changing guest ABI. This particular security flaw
-> is pretty minor compared to other cases that we've left unfixed by
-> default eg Meltdown / Spectre and is easily addressed by the user if
-> needed.
->=20
-> Regards,
-> Daniel
-
-Alright then if there's prior consensus on compatibility versus security.
-
-So, with or without the unneeded zeroing of the spapr->host_* fields:
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODExMTE1My4yMjY4
+MS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODExMTE1My4yMjY4MS0xLWNvaHVja0ByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gczM5MHggdXBkYXRlClR5
+cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBk
+YXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tAcmVkaGF0LmNv
+bSAtPiBwYXRjaGV3LzIwMTkwMjE4MTExMTUzLjIyNjgxLTEtY29odWNrQHJlZGhhdC5jb20KU3Vi
+bW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQp
+IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8v
+Z2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1v
+ZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11
+TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMn
+ClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAo
+aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1
+Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3Bl
+bmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1
+Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVt
+dS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1
+Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3Mu
+Z2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMv
+c2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXRodWIuY29tL2hkZWxsZXIvc2VhYmlvcy1ocHBhLmdp
+dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnClN1Ym1vZHVsZSAncm9t
+cy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NnYWJpb3MuZ2l0KSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9za2lib290JyAoaHR0
+cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9y
+Zy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1v
+ZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1i
+b290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYw
+ZXgnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dp
+dGh1Yi5jb20vY290YS9iZXJrZWxleS1zb2Z0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
+dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2Vs
+ZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS10ZXN0Zmxv
+YXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMn
+ClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2tl
+eWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xv
+bmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0b25lJzogY2hlY2tl
+ZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2YmYnCkNsb25pbmcg
+aW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzg4ZjE4OTA5
+ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50byAncm9tcy9RZW11
+TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnOiBjaGVj
+a2VkIG91dCAnOTBjNDg4ZDVmNGE0MDczNDIyNDdiOWVhODY5ZGYxYzJkOWM4ZTI2NicKQ2xvbmlu
+ZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NMT0YnOiBjaGVja2Vk
+IG91dCAnYTViNDI4ZTFjMWVhZTcwM2JkZDYyYTNmNTI3MjIzYzI5MWVlM2ZkYycKQ2xvbmluZyBp
+bnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91
+dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRv
+ICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNr
+ZWQgb3V0ICczNDY0NjgxYjJiNTk4M2RmODAwODZhNDAxNzlkMzI0MTAyMzQ3ZGEzJwpDbG9uaW5n
+IGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFj
+a3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1
+NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJzUxYzIzN2Q3ZTIwZDA1MTAwZWFjYWRl
+ZTJmNjFhYmMxN2U2YmMwOTcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1
+bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E2OThjODk5NWZmYjI4MzgyOTZl
+YzI4NGZlM2M0YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4u
+ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcxZWY5OWEw
+MTU3MmMyNTgxYzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2UwJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dh
+YmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFl
+ZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMv
+c2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICdl
+MGVlMjRjMjdhMTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFjMTM0YmNjJwpDbG9uaW5nIGludG8gJ3Jv
+bXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAn
+ZDg1Y2EwMjlmMjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEwMDNhOTk0MycKQ2xvbmluZyBpbnRvICdy
+b21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2
+MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1
+ODgnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1v
+ZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdi
+NjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rl
+c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAv
+YmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFh
+MTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4uClN1
+Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0
+NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwphZDE4YTFlIHMzOTB4OiB1cGdyYWRlIHN0YXR1cyBvZiBLVk0gY29yZXMgdG8gInN1cHBv
+cnRlZCIKZjUxZGNiMSBzMzkweC9rdm06IGFkZCB0cmFjZXBvaW50IHRvIGlvZXZlbnRmZCBpbnRl
+cmZhY2UKNDRhNWVmZCBzMzkweC9jcHVtb2RlbDogYWRkIHoxNCBHQTIgbW9kZWwKNzNmOTg0MSBz
+MzkweC9jcHVtb2RlbDogZGVmYXVsdCBlbmFibGUgbWVwb2NoIGZvciB6MTQgYW5kIGxhdGVyCmUz
+ZGUzOTggczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBvY2ggYW5k
+IHJlLWFsaWduIGdyb3VwIGluaXQKYjU2NzVjNCBzMzkweDogYWRkIHpQQ0kgZmVhdHVyZSB0byAi
+cWVtdSIgQ1BVIG1vZGVsCjk5OGFhOTcgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgU1RDSyBldCBh
+bCBmb3IgQ09ORklHX1VTRVJfT05MWQpmNDA4ZjRkIHRhcmdldC9zMzkweDogU3BsaXQgb3V0IHMz
+OTAtdG9kLmgKMDJlOGJiYyBzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQKMzIxZDNi
+ZiBzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRlci0yMDEyIGxpY2Vu
+c2Ugc3RhdGVtZW50cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21taXQg
+MzIxZDNiZmViYzQ2IChzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRl
+ci0yMDEyIGxpY2Vuc2Ugc3RhdGVtZW50cykKMi8xMCBDaGVja2luZyBjb21taXQgMDJlOGJiY2Ez
+MGI1IChzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBt
+b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
+IzQwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
+Z3MsIDQ3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KMy8xMCBDaGVja2luZyBjb21taXQgZjQwOGY0ZDE1MmIzICh0YXJnZXQvczM5MHg6IFNwbGl0
+IG91dCBzMzkwLXRvZC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU3IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMCBDaGVja2luZyBjb21taXQgOTk4
+YWE5NzVjNWY5ICh0YXJnZXQvczM5MHg6IEltcGxlbWVudCBTVENLIGV0IGFsIGZvciBDT05GSUdf
+VVNFUl9PTkxZKQo1LzEwIENoZWNraW5nIGNvbW1pdCBiNTY3NWM0YWZkYTcgKHMzOTB4OiBhZGQg
+elBDSSBmZWF0dXJlIHRvICJxZW11IiBDUFUgbW9kZWwpCjYvMTAgQ2hlY2tpbmcgY29tbWl0IGUz
+ZGUzOTgwMzhiZCAoczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBv
+Y2ggYW5kIHJlLWFsaWduIGdyb3VwIGluaXQpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojMzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0Njg6CisgICAgRkVBVF9H
+Uk9VUF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5oYW5j
+ZW1lbnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKdG90YWw6
+IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEwIENoZWNraW5nIGNvbW1pdCA3M2Y5ODQxZWJlOTIg
+KHMzOTB4L2NwdW1vZGVsOiBkZWZhdWx0IGVuYWJsZSBtZXBvY2ggZm9yIHoxNCBhbmQgbGF0ZXIp
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogaHcvczM5MHgvczM5
+MC12aXJ0aW8tY2N3LmM6NjYzOgorICAgIHMzOTBfY3B1ZGVmX2dyb3VwX2ZlYXRvZmZfZ3JlYXRl
+cigxNCwgMSwgUzM5MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYpOwoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEwIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjgvMTAgQ2hlY2tpbmcgY29tbWl0IDQ0YTVlZmRhM2RjZiAoczM5
+MHgvY3B1bW9kZWw6IGFkZCB6MTQgR0EyIG1vZGVsKQo5LzEwIENoZWNraW5nIGNvbW1pdCBmNTFk
+Y2IxZGU3Y2UgKHMzOTB4L2t2bTogYWRkIHRyYWNlcG9pbnQgdG8gaW9ldmVudGZkIGludGVyZmFj
+ZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IGFkMThhMWU4ZjkwOCAoczM5MHg6IHVwZ3JhZGUgc3Rh
+dHVzIG9mIEtWTSBjb3JlcyB0byAic3VwcG9ydGVkIikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tA
+cmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
