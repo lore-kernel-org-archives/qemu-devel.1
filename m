@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44336)
+Received: from eggs.gnu.org ([209.51.188.92]:44362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gviTM-00084V-90
+	(envelope-from <armbru@redhat.com>) id 1gviTM-000851-OC
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gviTL-0000lN-6L
+	(envelope-from <armbru@redhat.com>) id 1gviTL-0000lb-ER
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:36 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 13:56:12 +0100
-Message-Id: <20190218125615.18970-8-armbru@redhat.com>
+Date: Mon, 18 Feb 2019 13:56:07 +0100
+Message-Id: <20190218125615.18970-3-armbru@redhat.com>
 In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 References: <20190218125615.18970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/10] mips_malta: Clean up definition of flash
- memory size somewhat
+Subject: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used just
+ once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,44 +21,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
-pflash_cfi01_register() takes a size in bytes, a block size in bytes
-and a number of blocks.  mips_malta_init() passes BIOS_SIZE, 65536,
-FLASH_SIZE >> 16.  Actually consistent only because BIOS_SIZE (defined
-in include/hw/mips/bios.h as (4 * MiB)) matches FLASH_SIZE (defined
-locally as 0x400000).  Confusing all the same.
+PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
+BUG", which sounds like a warning, then calls exit(1), followed by
+unreachable goto reset_flash.  All this commit does is expanding the
+macro, so the smell becomes more poignant, and the macro can be
+deleted.
 
-Pass FLASH_SIZE instead of BIOS_SIZE.
-
-There are more uses of BIOS_SIZE, but I don't sufficiently understand
-them to attempt cleanup.
-
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/mips/mips_malta.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/block/pflash_cfi01.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index fff5ed19bd..65cdda4881 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1269,12 +1269,12 @@ void mips_malta_init(MachineState *machine)
-     if (dinfo) {
-         printf("Register parallel flash %d size " TARGET_FMT_lx " at "
-                "addr %08llx '%s' %x\n",
--               fl_idx, bios_size, FLASH_ADDRESS,
-+               fl_idx, FLASH_SIZE, FLASH_ADDRESS,
-                blk_name(dinfo->bdrv), fl_sectors);
-     }
- #endif
-     fl = pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
--                               BIOS_SIZE,
-+                               FLASH_SIZE,
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                65536, fl_sectors,
-                                4, 0x0000, 0x0000, 0x0000, 0x0000, be);
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 9efa7aa9af..f73c30a3ee 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -49,12 +49,6 @@
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+-#define PFLASH_BUG(fmt, ...) \
+-do { \
+-    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
+-    exit(1); \
+-} while(0)
+-
+ /* #define PFLASH_DEBUG */
+ #ifdef PFLASH_DEBUG
+ #define DPRINTF(fmt, ...)                                   \
+@@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+                 pfl->status |= 0x80;
+             } else {
+                 DPRINTF("%s: unknown command for \"write block\"\n", __func__);
+-                PFLASH_BUG("Write block confirm");
+-                goto reset_flash;
++                fprintf(stderr, "PFLASH: Possible BUG - Write block confirm");
++                exit(1);
+             }
+             break;
+         default:
 -- 
 2.17.2
