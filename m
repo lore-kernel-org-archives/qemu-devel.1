@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49372)
+Received: from eggs.gnu.org ([209.51.188.92]:51181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gvmdm-0005R8-Mw
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:23:39 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmiN-0006Vx-E4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:28:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gvmdl-0004tl-Px
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:23:38 -0500
-References: <20190218161822.3573-1-kwolf@redhat.com>
-	<20190218161822.3573-8-kwolf@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9fe39150-f308-8f2e-0c9d-6d0a31d9329d@redhat.com>
-Date: Mon, 18 Feb 2019 18:22:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190218161822.3573-8-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmiC-0008HH-DD
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:28:22 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:27:52 +0000
+Message-ID: <bfa23558-e7f3-cfc8-21a5-dd544ea56ad2@virtuozzo.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-6-jsnow@redhat.com>
+In-Reply-To: <20190213232356.21034-6-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/12] nbd: Increase bs->in_flight during
- AioContext switch
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4EFEF66B901DC34688BF29822090948D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] block/dirty-bitmaps: unify
+ qmp_locked and user_locked calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, eblake@redhat.com, stefanha@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 18/02/19 17:18, Kevin Wolf wrote:
-> +            /* aio_ctx_switch is only supposed to be set if we're sitting in
-> +             * the qio_channel_yield() below. */
-> +            assert(!*aio_ctx_switch);
->              bdrv_dec_in_flight(bs);
->              qio_channel_yield(ioc, G_IO_IN);
-> -            bdrv_inc_in_flight(bs);
-> +            if (*aio_ctx_switch) {
-> +                /* nbd_client_attach_aio_context() already increased in_flight
-> +                 * when scheduling this coroutine for reentry */
-> +                *aio_ctx_switch = false;
-> +            } else {
-> +                bdrv_inc_in_flight(bs);
-> +            }
-
-Hmm, my first thought would have been to do the bdrv_inc_in_flight(bs);
-unconditionally here, and in nbd_connection_entry do the opposite, like
-
-	if (s->aio_ctx_switch) {
-	    s->aio_ctx_switch = false;
-	    bdrv_dec_in_flight(bs);
-	}
-
-but I guess the problem is that then bdrv_drain could hang.
-
-So my question is:
-
-1) is there a testcase that shows the problem with this "obvious"
-refactoring;
-
-2) maybe instead of aio_co_schedul-ing client->connection_co and having
-the s->aio_ctx_switch flag, you could go through a bottom half that does
-the bdrv_inc_in_flight and then enters client->connection_co?
-
-Paolo
+MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+IFRoZXNlIG1lYW4gdGhlIHNhbWUg
+dGhpbmcgbm93LiBVbmlmeSB0aGVtIGFuZCByZW5hbWUgdGhlIG1lcmdlZCBjYWxsDQo+IGJkcnZf
+ZGlydHlfYml0bWFwX2J1c3kgdG8gaW5kaWNhdGUgc2VtYW50aWNhbGx5IHdoYXQgd2UgYXJlIGRl
+c2NyaWJpbmcsDQo+IGFzIHdlbGwgYXMgaGVscCBkaXNhbWJpZ3VhdGUgZnJvbSB0aGUgdmFyaW91
+cyBfbG9ja2VkIGFuZCBfdW5sb2NrZWQNCj4gdmVyc2lvbnMgb2YgYml0bWFwIGhlbHBlcnMgdGhh
+dCByZWZlciB0byBtdXRleCBsb2Nrcy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8
+anNub3dAcmVkaGF0LmNvbT4NCj4gUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRo
+YXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyAgICAgICAgICAgfCA0MSAr
+KysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgYmxvY2tkZXYuYyAgICAgICAg
+ICAgICAgICAgICAgIHwgMTggKysrKysrKy0tLS0tLS0tDQo+ICAgaW5jbHVkZS9ibG9jay9kaXJ0
+eS1iaXRtYXAuaCAgIHwgIDUgKystLS0NCj4gICBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFw
+LmMgfCAgNiArKy0tLQ0KPiAgIG5iZC9zZXJ2ZXIuYyAgICAgICAgICAgICAgICAgICB8ICA2ICsr
+LS0tDQo+ICAgNSBmaWxlcyBjaGFuZ2VkLCAzNSBpbnNlcnRpb25zKCspLCA0MSBkZWxldGlvbnMo
+LSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5
+LWJpdG1hcC5jDQo+IGluZGV4IDIwNDJjNjI2MDIuLjhhYjA0ODM4NWEgMTAwNjQ0DQo+IC0tLSBh
+L2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBA
+IC00OCw5ICs0OCw5IEBAIHN0cnVjdCBCZHJ2RGlydHlCaXRtYXAgew0KPiAgICAgICBRZW11TXV0
+ZXggKm11dGV4Ow0KPiAgICAgICBIQml0bWFwICpiaXRtYXA7ICAgICAgICAgICAgLyogRGlydHkg
+Yml0bWFwIGltcGxlbWVudGF0aW9uICovDQo+ICAgICAgIEhCaXRtYXAgKm1ldGE7ICAgICAgICAg
+ICAgICAvKiBNZXRhIGRpcnR5IGJpdG1hcCAqLw0KPiAtICAgIGJvb2wgcW1wX2xvY2tlZDsgICAg
+ICAgICAgICAvKiBCaXRtYXAgaXMgbG9ja2VkLCBpdCBjYW4ndCBiZSBtb2RpZmllZA0KPiAtICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aHJvdWdoIFFNUCAqLw0KPiAtICAgIEJk
+cnZEaXJ0eUJpdG1hcCAqc3VjY2Vzc29yOyAvKiBBbm9ueW1vdXMgY2hpbGQ7IGltcGxpZXMgdXNl
+cl9sb2NrZWQgc3RhdGUgKi8NCj4gKyAgICBib29sIGJ1c3k7ICAgICAgICAgICAgICAgICAgLyog
+Qml0bWFwIGlzIGJ1c3ksIGl0IGNhbid0IGJlIG1vZGlmaWVkIHRocm91Z2gNCj4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgUU1QICovDQoNCmJldHRlciBub3QgIm1vZGlmaWVk
+IiBidXQgInVzZWQiLi4gZm9yIGV4YW1wbGUsIGV4cG9ydCB0aHJvdWdoIE5CRCBpcyBub3QgYSBt
+b2RpZmljYXRpb24uDQoNCj4gKyAgICBCZHJ2RGlydHlCaXRtYXAgKnN1Y2Nlc3NvcjsgLyogQW5v
+bnltb3VzIGNoaWxkLCBpZiBhbnkuICovDQoNCmhtIHRoaXMgY29tbWVudCBjaGFuZ2UgYWJvdXQg
+c3VjY2Vzc29yIHJlbGF0ZXMgbW9yZSB0byBwcmV2aW91cyBwYXRjaCwgYnV0IEkgZG9uJ3QgcmVh
+bGx5IGNhcmUuDQoNCj4gICAgICAgY2hhciAqbmFtZTsgICAgICAgICAgICAgICAgIC8qIE9wdGlv
+bmFsIG5vbi1lbXB0eSB1bmlxdWUgSUQgKi8NCj4gICAgICAgaW50NjRfdCBzaXplOyAgICAgICAg
+ICAgICAgIC8qIFNpemUgb2YgdGhlIGJpdG1hcCwgaW4gYnl0ZXMgKi8NCj4gICAgICAgYm9vbCBk
+aXNhYmxlZDsgICAgICAgICAgICAgIC8qIEJpdG1hcCBpcyBkaXNhYmxlZC4gSXQgaWdub3JlcyBh
+bGwgd3JpdGVzIHRvDQo+IEBAIC0xODgsMjIgKzE4OCwxNyBAQCBib29sIGJkcnZfZGlydHlfYml0
+bWFwX2hhc19zdWNjZXNzb3IoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+ICAgICAgIHJldHVy
+biBiaXRtYXAtPnN1Y2Nlc3NvcjsNCj4gICB9DQo+ICAgDQoNCg0KSW4gY29tbWVudCBmb3IgYmRy
+dl9kaXJ0eV9iaXRtYXBfY3JlYXRlX3N1Y2Nlc3NvciwgdGhlcmUgaXMgImxvY2tlZCIgd29yZCwg
+d2hpY2ggeW91IGZvcmdldCB0byBmaXggdG8gImJ1c3kiDQp3aXRoIGF0IGxlYXN0IHRoaXMgZml4
+ZWQ6DQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
+dkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
