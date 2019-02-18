@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32911)
+Received: from eggs.gnu.org ([209.51.188.92]:33108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gvjcL-0004ss-Md
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:59 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcX-00056c-RB
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gvjcJ-0007Hi-Na
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:57 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:44041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gvjcG-00078d-2C
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:09:55 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id g1so28353638otj.11
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 06:09:43 -0800 (PST)
-MIME-Version: 1.0
-References: <20190218111153.22681-1-cohuck@redhat.com>
-In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Feb 2019 14:09:30 +0000
-Message-ID: <CAFEAcA97EXY_nxt5L07vFv56Fd+zrovVko7WEa5-ZfSosSVENQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvjcW-0007S4-3n
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:10:09 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:09:14 +0300
+Message-Id: <20190218140926.333779-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190218140926.333779-1-vsementsov@virtuozzo.com>
+References: <20190218140926.333779-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4 05/17] block/commit: use QEMU_IOVEC_INIT_BUF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +19,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, jsnow@redhat.com, den@openvz.org, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com
 
-On Mon, 18 Feb 2019 at 11:11, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> The following changes since commit 1e36232994c8ad01774501d2e299deba3a2469af:
->
->   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-20190215' into staging (2019-02-15 11:12:14 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20190218
->
-> for you to fetch changes up to 0922e8c093a564219fcb7f43b18ceb12714dd931:
->
->   s390x: upgrade status of KVM cores to "supported" (2019-02-18 12:00:44 +0100)
->
-> ----------------------------------------------------------------
-> s390x updates:
-> - tcg: implement STCK and friends for CONFIG_USER_ONLY
-> - add zpci to qemu cpu model, as pci is now always built
-> - add mepoch to default z14 cpu model
-> - add cpu model for z14 GA2
-> - various improvements
->
+Use new QEMU_IOVEC_INIT_BUF() instead of
+qemu_iovec_init_external( ... , 1), which simplifies the code.
 
-Applied, thanks.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/commit.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+diff --git a/block/commit.c b/block/commit.c
+index 53148e610b..d500a93068 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -47,14 +47,9 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
+                                         void *buf)
+ {
+     int ret = 0;
+-    QEMUIOVector qiov;
+-    struct iovec iov = {
+-        .iov_base = buf,
+-        .iov_len = bytes,
+-    };
++    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+ 
+     assert(bytes < SIZE_MAX);
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+     ret = blk_co_preadv(bs, offset, qiov.size, &qiov, 0);
+     if (ret < 0) {
+-- 
+2.18.0
