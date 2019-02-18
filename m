@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44614)
+Received: from eggs.gnu.org ([209.51.188.92]:44971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gviTW-0008GW-2k
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:48 -0500
+	(envelope-from <groug@kaod.org>) id 1gviUM-0000Yk-BO
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:57:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gviTS-0000uS-Cr
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:46 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 13:56:06 +0100
-Message-Id: <20190218125615.18970-2-armbru@redhat.com>
-In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/10] pflash: Rename pflash_t to PFlashCFI01,
- PFlashCFI02
+	(envelope-from <groug@kaod.org>) id 1gviUK-0001k4-D8
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:57:38 -0500
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:54173)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gviUK-0001cK-2E
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:57:36 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.159.20])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id A4DD110F907
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 13:57:31 +0100 (CET)
+Date: Mon, 18 Feb 2019 13:57:24 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190218135724.0dc82c32@bahia.lan>
+In-Reply-To: <20190218115218.GF32287@redhat.com>
+References: <20190218101218.4177-1-ppandit@redhat.com>
+	<20190218123811.5b7a1d61@bahia.lan>
+	<20190218115218.GF32287@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: add host-serial and
+ host-model machine attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,577 +32,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: P J P <ppandit@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-flash.h's incomplete struct pflash_t is completed both in
-pflash_cfi01.c and in pflash_cfi02.c.  The complete types are
-incompatible.  This can hide type errors, such as passing a pflash_t
-created with pflash_cfi02_register() to pflash_cfi01_get_memory().
+On Mon, 18 Feb 2019 11:52:18 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Furthermore, POSIX reserves typedef names ending with _t.
+> On Mon, Feb 18, 2019 at 12:38:11PM +0100, Greg Kurz wrote:
+> > On Mon, 18 Feb 2019 15:42:18 +0530
+> > P J P <ppandit@redhat.com> wrote:
+> >  =20
+> > > From: Prasad J Pandit <pjp@fedoraproject.org>
+> > >=20
+> > > On ppc hosts, hypervisor shares following system attributes
+> > >=20
+> > >   - /proc/device-tree/system-id
+> > >   - /proc/device-tree/model
+> > >=20
+> > > with a guest. This could lead to information leakage and misuse.[*]
+> > > Add machine attributes to control such system information exposure
+> > > to a guest.
+> > >=20
+> > > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+> > >=20
+> > > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> > > ---
+> > >  hw/ppc/spapr.c         | 79 ++++++++++++++++++++++++++++++++++++++--=
+--
+> > >  include/hw/ppc/spapr.h |  2 ++
+> > >  2 files changed, 75 insertions(+), 6 deletions(-)
+> > >=20
+> > > Update v3: move host-serial,host-model options to ppc sPAPR machine =
+=20
+> > >   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg03182.h=
+tml   =20
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 0942f35bf8..666e500376 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineStat=
+e *spapr,
+> > >       * Add info to guest to indentify which host is it being run on
+> > >       * and what is the uuid of the guest
+> > >       */
+> > > -    if (kvmppc_get_host_model(&buf)) {
+> > > -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
+> > > -        g_free(buf);
+> > > +    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")=
+) {
+> > > +        if (g_str_equal(spapr->host_model, "passthrough")) {
+> > > +            /* -M host-model=3Dpassthrough */
+> > > +            if (kvmppc_get_host_model(&buf)) {
+> > > +                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
+> > > +                g_free(buf);
+> > > +            }
+> > > +        } else {
+> > > +            /* -M host-model=3D<user-string> */
+> > > +            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->hos=
+t_model));
+> > > +        }
+> > >      }
+> > > -    if (kvmppc_get_host_serial(&buf)) {
+> > > -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
+> > > -        g_free(buf);
+> > > +
+> > > +    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none=
+")) {
+> > > +        if (g_str_equal(spapr->host_serial, "passthrough")) {
+> > > +            /* -M host-serial=3Dpassthrough */
+> > > +            if (kvmppc_get_host_serial(&buf)) {
+> > > +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
+> > > +                g_free(buf);
+> > > +            }
+> > > +        } else {
+> > > +            /* -M host-serial=3D<user-string> */
+> > > +            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->ho=
+st_serial));
+> > > +        }
+> > >      }
+> > > =20
+> > >      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
+> > > @@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, con=
+st char *value, Error **errp)
+> > >      }
+> > >  }
+> > > =20
+> > > +static char *spapr_get_host_model(Object *obj, Error **errp)
+> > > +{
+> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > > +
+> > > +    return g_strdup(spapr->host_model);
+> > > +}
+> > > +
+> > > +static void spapr_set_host_model(Object *obj, const char *value, Err=
+or **errp)
+> > > +{
+> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > > +
+> > > +    g_free(spapr->host_model);
+> > > +    spapr->host_model =3D g_strdup(value);
+> > > +}
+> > > +
+> > > +static char *spapr_get_host_serial(Object *obj, Error **errp)
+> > > +{
+> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > > +
+> > > +    return g_strdup(spapr->host_serial);
+> > > +}
+> > > +
+> > > +static void spapr_set_host_serial(Object *obj, const char *value, Er=
+ror **errp)
+> > > +{
+> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > > +
+> > > +    g_free(spapr->host_serial);
+> > > +    spapr->host_serial =3D g_strdup(value);
+> > > +}
+> > > +
+> > >  static void spapr_instance_init(Object *obj)
+> > >  {
+> > >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > > @@ -3183,6 +3230,20 @@ static void spapr_instance_init(Object *obj)
+> > >      object_property_set_description(obj, "ic-mode",
+> > >                   "Specifies the interrupt controller mode (xics, xiv=
+e, dual)",
+> > >                   NULL);
+> > > +
+> > > +    spapr->host_model =3D NULL; =20
+> >=20
+> > This isn't needed since object_initialize_with_type() already takes care
+> > of zeroing the instance for us.
+> >  =20
+> > > +    object_property_add_str(obj, "host-model",
+> > > +        spapr_get_host_model, spapr_set_host_model,
+> > > +        &error_abort);
+> > > +    object_property_set_description(obj, "host-model",
+> > > +        "Set host's model-id to use - none|passthrough|string", &err=
+or_abort);
+> > > +
+> > > +    spapr->host_serial =3D NULL; =20
+> >=20
+> > Same here.
+> >  =20
+> > > +    object_property_add_str(obj, "host-serial",
+> > > +        spapr_get_host_serial, spapr_set_host_serial,
+> > > +        &error_abort);
+> > > +    object_property_set_description(obj, "host-serial",
+> > > +        "Set host's system-id to use - none|passthrough|string", &er=
+ror_abort);
+> > >  }
+> > > =20
+> > >  static void spapr_machine_finalizefn(Object *obj)
+> > > @@ -4080,9 +4141,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+> > >  static void spapr_machine_3_1_class_options(MachineClass *mc)
+> > >  {
+> > >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> > > +    static GlobalProperty compat[] =3D {
+> > > +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
+> > > +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
+> > > +    };
+> > >   =20
+> >=20
+> > So... we don't fix the information leak for older machines by default ?=
+ From
+> > previous discussions, I understand it is for the sake of compatibility,=
+ but
+> > leaving the burden of securing the host to downstream or to the user st=
+ill
+> > looks unsecure to me FWIW. =20
+>=20
+> Maintaining guest ABI compatibility has to take priority, even over
+> fixing security issues, because we must never intentionally break
+> guest OS/applications by silently altering guest ABI. This is one of
+> the two reasons why machine type versioning exists (the other reason
+> being live migration data stream).
+>=20
+> This is nothing new - we've done it before for security flaws where
+> a fix would involve changing guest ABI. This particular security flaw
+> is pretty minor compared to other cases that we've left unfixed by
+> default eg Meltdown / Spectre and is easily addressed by the user if
+> needed.
+>=20
+> Regards,
+> Daniel
 
-Rename the two structs to PFlashCFI01 and PFlashCFI02.
+Alright then if there's prior consensus on compatibility versus security.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/arm/vexpress.c        |  8 ++--
- hw/block/pflash_cfi01.c  | 87 +++++++++++++++++++++-------------------
- hw/block/pflash_cfi02.c  | 67 ++++++++++++++++---------------
- hw/i386/pc_sysfw.c       |  2 +-
- hw/mips/mips_malta.c     |  2 +-
- hw/xtensa/xtfpga.c       | 10 ++---
- include/hw/block/flash.h | 53 ++++++++++++++----------
- 7 files changed, 122 insertions(+), 107 deletions(-)
+So, with or without the unneeded zeroing of the spapr->host_* fields:
 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index c02d18ee61..ed46d2e730 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -512,8 +512,8 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
- /* Open code a private version of pflash registration since we
-  * need to set non-default device width for VExpress platform.
-  */
--static pflash_t *ve_pflash_cfi01_register(hwaddr base, const char *name,
--                                          DriveInfo *di)
-+static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
-+                                             DriveInfo *di)
- {
-     DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
- 
-@@ -536,7 +536,7 @@ static pflash_t *ve_pflash_cfi01_register(hwaddr base, const char *name,
-     qdev_init_nofail(dev);
- 
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
--    return OBJECT_CHECK(pflash_t, (dev), "cfi.pflash01");
-+    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
- }
- 
- static void vexpress_common_init(MachineState *machine)
-@@ -548,7 +548,7 @@ static void vexpress_common_init(MachineState *machine)
-     qemu_irq pic[64];
-     uint32_t sys_id;
-     DriveInfo *dinfo;
--    pflash_t *pflash0;
-+    PFlashCFI01 *pflash0;
-     I2CBus *i2c;
-     ram_addr_t vram_size, sram_size;
-     MemoryRegion *sysmem = get_system_memory();
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index bffb4c40e7..9efa7aa9af 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -65,12 +65,13 @@ do {                                                        \
- #define DPRINTF(fmt, ...) do { } while (0)
- #endif
- 
--#define CFI_PFLASH01(obj) OBJECT_CHECK(pflash_t, (obj), TYPE_CFI_PFLASH01)
-+#define CFI_PFLASH01(obj) \
-+    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
- 
- #define PFLASH_BE          0
- #define PFLASH_SECURE      1
- 
--struct pflash_t {
-+struct PFlashCFI01 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
-@@ -109,17 +110,17 @@ static const VMStateDescription vmstate_pflash = {
-     .minimum_version_id = 1,
-     .post_load = pflash_post_load,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT8(wcycle, pflash_t),
--        VMSTATE_UINT8(cmd, pflash_t),
--        VMSTATE_UINT8(status, pflash_t),
--        VMSTATE_UINT64(counter, pflash_t),
-+        VMSTATE_UINT8(wcycle, PFlashCFI01),
-+        VMSTATE_UINT8(cmd, PFlashCFI01),
-+        VMSTATE_UINT8(status, PFlashCFI01),
-+        VMSTATE_UINT64(counter, PFlashCFI01),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
- static void pflash_timer (void *opaque)
- {
--    pflash_t *pfl = opaque;
-+    PFlashCFI01 *pfl = opaque;
- 
-     trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
-@@ -133,7 +134,7 @@ static void pflash_timer (void *opaque)
-  * If this code is called we know we have a device_width set for
-  * this flash.
-  */
--static uint32_t pflash_cfi_query(pflash_t *pfl, hwaddr offset)
-+static uint32_t pflash_cfi_query(PFlashCFI01 *pfl, hwaddr offset)
- {
-     int i;
-     uint32_t resp = 0;
-@@ -193,7 +194,7 @@ static uint32_t pflash_cfi_query(pflash_t *pfl, hwaddr offset)
- 
- 
- /* Perform a device id query based on the bank width of the flash. */
--static uint32_t pflash_devid_query(pflash_t *pfl, hwaddr offset)
-+static uint32_t pflash_devid_query(PFlashCFI01 *pfl, hwaddr offset)
- {
-     int i;
-     uint32_t resp;
-@@ -241,7 +242,7 @@ static uint32_t pflash_devid_query(pflash_t *pfl, hwaddr offset)
-     return resp;
- }
- 
--static uint32_t pflash_data_read(pflash_t *pfl, hwaddr offset,
-+static uint32_t pflash_data_read(PFlashCFI01 *pfl, hwaddr offset,
-                                  int width, int be)
- {
-     uint8_t *p;
-@@ -284,7 +285,7 @@ static uint32_t pflash_data_read(pflash_t *pfl, hwaddr offset,
-     return ret;
- }
- 
--static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-+static uint32_t pflash_read (PFlashCFI01 *pfl, hwaddr offset,
-                              int width, int be)
- {
-     hwaddr boff;
-@@ -398,7 +399,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
- }
- 
- /* update flash content on disk */
--static void pflash_update(pflash_t *pfl, int offset,
-+static void pflash_update(PFlashCFI01 *pfl, int offset,
-                           int size)
- {
-     int offset_end;
-@@ -412,7 +413,7 @@ static void pflash_update(pflash_t *pfl, int offset,
-     }
- }
- 
--static inline void pflash_data_write(pflash_t *pfl, hwaddr offset,
-+static inline void pflash_data_write(PFlashCFI01 *pfl, hwaddr offset,
-                                      uint32_t value, int width, int be)
- {
-     uint8_t *p = pfl->storage;
-@@ -448,7 +449,7 @@ static inline void pflash_data_write(pflash_t *pfl, hwaddr offset,
- 
- }
- 
--static void pflash_write(pflash_t *pfl, hwaddr offset,
-+static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
-                          uint32_t value, int width, int be)
- {
-     uint8_t *p;
-@@ -654,7 +655,7 @@ static void pflash_write(pflash_t *pfl, hwaddr offset,
- static MemTxResult pflash_mem_read_with_attrs(void *opaque, hwaddr addr, uint64_t *value,
-                                               unsigned len, MemTxAttrs attrs)
- {
--    pflash_t *pfl = opaque;
-+    PFlashCFI01 *pfl = opaque;
-     bool be = !!(pfl->features & (1 << PFLASH_BE));
- 
-     if ((pfl->features & (1 << PFLASH_SECURE)) && !attrs.secure) {
-@@ -668,7 +669,7 @@ static MemTxResult pflash_mem_read_with_attrs(void *opaque, hwaddr addr, uint64_
- static MemTxResult pflash_mem_write_with_attrs(void *opaque, hwaddr addr, uint64_t value,
-                                                unsigned len, MemTxAttrs attrs)
- {
--    pflash_t *pfl = opaque;
-+    PFlashCFI01 *pfl = opaque;
-     bool be = !!(pfl->features & (1 << PFLASH_BE));
- 
-     if ((pfl->features & (1 << PFLASH_SECURE)) && !attrs.secure) {
-@@ -687,7 +688,7 @@ static const MemoryRegionOps pflash_cfi01_ops = {
- 
- static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
- {
--    pflash_t *pfl = CFI_PFLASH01(dev);
-+    PFlashCFI01 *pfl = CFI_PFLASH01(dev);
-     uint64_t total_len;
-     int ret;
-     uint64_t blocks_per_device, sector_len_per_device, device_len;
-@@ -864,14 +865,14 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
- }
- 
- static Property pflash_cfi01_properties[] = {
--    DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
-+    DEFINE_PROP_DRIVE("drive", PFlashCFI01, blk),
-     /* num-blocks is the number of blocks actually visible to the guest,
-      * ie the total size of the device divided by the sector length.
-      * If we're emulating flash devices wired in parallel the actual
-      * number of blocks per indvidual device will differ.
-      */
--    DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
--    DEFINE_PROP_UINT64("sector-length", struct pflash_t, sector_len, 0),
-+    DEFINE_PROP_UINT32("num-blocks", PFlashCFI01, nb_blocs, 0),
-+    DEFINE_PROP_UINT64("sector-length", PFlashCFI01, sector_len, 0),
-     /* width here is the overall width of this QEMU device in bytes.
-      * The QEMU device may be emulating a number of flash devices
-      * wired up in parallel; the width of each individual flash
-@@ -888,17 +889,17 @@ static Property pflash_cfi01_properties[] = {
-      * 16 bit devices making up a 32 bit wide QEMU device. This
-      * is deprecated for new uses of this device.
-      */
--    DEFINE_PROP_UINT8("width", struct pflash_t, bank_width, 0),
--    DEFINE_PROP_UINT8("device-width", struct pflash_t, device_width, 0),
--    DEFINE_PROP_UINT8("max-device-width", struct pflash_t, max_device_width, 0),
--    DEFINE_PROP_BIT("big-endian", struct pflash_t, features, PFLASH_BE, 0),
--    DEFINE_PROP_BIT("secure", struct pflash_t, features, PFLASH_SECURE, 0),
--    DEFINE_PROP_UINT16("id0", struct pflash_t, ident0, 0),
--    DEFINE_PROP_UINT16("id1", struct pflash_t, ident1, 0),
--    DEFINE_PROP_UINT16("id2", struct pflash_t, ident2, 0),
--    DEFINE_PROP_UINT16("id3", struct pflash_t, ident3, 0),
--    DEFINE_PROP_STRING("name", struct pflash_t, name),
--    DEFINE_PROP_BOOL("old-multiple-chip-handling", struct pflash_t,
-+    DEFINE_PROP_UINT8("width", PFlashCFI01, bank_width, 0),
-+    DEFINE_PROP_UINT8("device-width", PFlashCFI01, device_width, 0),
-+    DEFINE_PROP_UINT8("max-device-width", PFlashCFI01, max_device_width, 0),
-+    DEFINE_PROP_BIT("big-endian", PFlashCFI01, features, PFLASH_BE, 0),
-+    DEFINE_PROP_BIT("secure", PFlashCFI01, features, PFLASH_SECURE, 0),
-+    DEFINE_PROP_UINT16("id0", PFlashCFI01, ident0, 0),
-+    DEFINE_PROP_UINT16("id1", PFlashCFI01, ident1, 0),
-+    DEFINE_PROP_UINT16("id2", PFlashCFI01, ident2, 0),
-+    DEFINE_PROP_UINT16("id3", PFlashCFI01, ident3, 0),
-+    DEFINE_PROP_STRING("name", PFlashCFI01, name),
-+    DEFINE_PROP_BOOL("old-multiple-chip-handling", PFlashCFI01,
-                      old_multiple_chip_handling, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -917,7 +918,7 @@ static void pflash_cfi01_class_init(ObjectClass *klass, void *data)
- static const TypeInfo pflash_cfi01_info = {
-     .name           = TYPE_CFI_PFLASH01,
-     .parent         = TYPE_SYS_BUS_DEVICE,
--    .instance_size  = sizeof(struct pflash_t),
-+    .instance_size  = sizeof(PFlashCFI01),
-     .class_init     = pflash_cfi01_class_init,
- };
- 
-@@ -928,13 +929,15 @@ static void pflash_cfi01_register_types(void)
- 
- type_init(pflash_cfi01_register_types)
- 
--pflash_t *pflash_cfi01_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk,
--                                uint32_t sector_len, int nb_blocs,
--                                int bank_width, uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3, int be)
-+PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int bank_width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   int be)
- {
-     DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
- 
-@@ -956,14 +959,14 @@ pflash_t *pflash_cfi01_register(hwaddr base,
-     return CFI_PFLASH01(dev);
- }
- 
--MemoryRegion *pflash_cfi01_get_memory(pflash_t *fl)
-+MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
- {
-     return &fl->mem;
- }
- 
- static void postload_update_cb(void *opaque, int running, RunState state)
- {
--    pflash_t *pfl = opaque;
-+    PFlashCFI01 *pfl = opaque;
- 
-     /* This is called after bdrv_invalidate_cache_all.  */
-     qemu_del_vm_change_state_handler(pfl->vmstate);
-@@ -975,7 +978,7 @@ static void postload_update_cb(void *opaque, int running, RunState state)
- 
- static int pflash_post_load(void *opaque, int version_id)
- {
--    pflash_t *pfl = opaque;
-+    PFlashCFI01 *pfl = opaque;
- 
-     if (!pfl->ro) {
-         pfl->vmstate = qemu_add_vm_change_state_handler(postload_update_cb,
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 0f8b7b8c7b..424cc106d6 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -57,9 +57,10 @@ do {                                                       \
- 
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
- 
--#define CFI_PFLASH02(obj) OBJECT_CHECK(pflash_t, (obj), TYPE_CFI_PFLASH02)
-+#define CFI_PFLASH02(obj) \
-+    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
- 
--struct pflash_t {
-+struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
-@@ -101,7 +102,7 @@ struct pflash_t {
- /*
-  * Set up replicated mappings of the same region.
-  */
--static void pflash_setup_mappings(pflash_t *pfl)
-+static void pflash_setup_mappings(PFlashCFI02 *pfl)
- {
-     unsigned i;
-     hwaddr size = memory_region_size(&pfl->orig_mem);
-@@ -115,7 +116,7 @@ static void pflash_setup_mappings(pflash_t *pfl)
-     }
- }
- 
--static void pflash_register_memory(pflash_t *pfl, int rom_mode)
-+static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
- {
-     memory_region_rom_device_set_romd(&pfl->orig_mem, rom_mode);
-     pfl->rom_mode = rom_mode;
-@@ -123,7 +124,7 @@ static void pflash_register_memory(pflash_t *pfl, int rom_mode)
- 
- static void pflash_timer (void *opaque)
- {
--    pflash_t *pfl = opaque;
-+    PFlashCFI02 *pfl = opaque;
- 
-     trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
-@@ -137,7 +138,7 @@ static void pflash_timer (void *opaque)
-     pfl->cmd = 0;
- }
- 
--static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-+static uint32_t pflash_read (PFlashCFI02 *pfl, hwaddr offset,
-                              int width, int be)
- {
-     hwaddr boff;
-@@ -246,7 +247,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
- }
- 
- /* update flash content on disk */
--static void pflash_update(pflash_t *pfl, int offset,
-+static void pflash_update(PFlashCFI02 *pfl, int offset,
-                           int size)
- {
-     int offset_end;
-@@ -260,7 +261,7 @@ static void pflash_update(pflash_t *pfl, int offset,
-     }
- }
- 
--static void pflash_write (pflash_t *pfl, hwaddr offset,
-+static void pflash_write (PFlashCFI02 *pfl, hwaddr offset,
-                           uint32_t value, int width, int be)
- {
-     hwaddr boff;
-@@ -533,7 +534,7 @@ static const MemoryRegionOps pflash_cfi02_ops_le = {
- 
- static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- {
--    pflash_t *pfl = CFI_PFLASH02(dev);
-+    PFlashCFI02 *pfl = CFI_PFLASH02(dev);
-     uint32_t chip_len;
-     int ret;
-     Error *local_err = NULL;
-@@ -679,19 +680,19 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- }
- 
- static Property pflash_cfi02_properties[] = {
--    DEFINE_PROP_DRIVE("drive", struct pflash_t, blk),
--    DEFINE_PROP_UINT32("num-blocks", struct pflash_t, nb_blocs, 0),
--    DEFINE_PROP_UINT32("sector-length", struct pflash_t, sector_len, 0),
--    DEFINE_PROP_UINT8("width", struct pflash_t, width, 0),
--    DEFINE_PROP_UINT8("mappings", struct pflash_t, mappings, 0),
--    DEFINE_PROP_UINT8("big-endian", struct pflash_t, be, 0),
--    DEFINE_PROP_UINT16("id0", struct pflash_t, ident0, 0),
--    DEFINE_PROP_UINT16("id1", struct pflash_t, ident1, 0),
--    DEFINE_PROP_UINT16("id2", struct pflash_t, ident2, 0),
--    DEFINE_PROP_UINT16("id3", struct pflash_t, ident3, 0),
--    DEFINE_PROP_UINT16("unlock-addr0", struct pflash_t, unlock_addr0, 0),
--    DEFINE_PROP_UINT16("unlock-addr1", struct pflash_t, unlock_addr1, 0),
--    DEFINE_PROP_STRING("name", struct pflash_t, name),
-+    DEFINE_PROP_DRIVE("drive", PFlashCFI02, blk),
-+    DEFINE_PROP_UINT32("num-blocks", PFlashCFI02, nb_blocs, 0),
-+    DEFINE_PROP_UINT32("sector-length", PFlashCFI02, sector_len, 0),
-+    DEFINE_PROP_UINT8("width", PFlashCFI02, width, 0),
-+    DEFINE_PROP_UINT8("mappings", PFlashCFI02, mappings, 0),
-+    DEFINE_PROP_UINT8("big-endian", PFlashCFI02, be, 0),
-+    DEFINE_PROP_UINT16("id0", PFlashCFI02, ident0, 0),
-+    DEFINE_PROP_UINT16("id1", PFlashCFI02, ident1, 0),
-+    DEFINE_PROP_UINT16("id2", PFlashCFI02, ident2, 0),
-+    DEFINE_PROP_UINT16("id3", PFlashCFI02, ident3, 0),
-+    DEFINE_PROP_UINT16("unlock-addr0", PFlashCFI02, unlock_addr0, 0),
-+    DEFINE_PROP_UINT16("unlock-addr1", PFlashCFI02, unlock_addr1, 0),
-+    DEFINE_PROP_STRING("name", PFlashCFI02, name),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -707,7 +708,7 @@ static void pflash_cfi02_class_init(ObjectClass *klass, void *data)
- static const TypeInfo pflash_cfi02_info = {
-     .name           = TYPE_CFI_PFLASH02,
-     .parent         = TYPE_SYS_BUS_DEVICE,
--    .instance_size  = sizeof(struct pflash_t),
-+    .instance_size  = sizeof(PFlashCFI02),
-     .class_init     = pflash_cfi02_class_init,
- };
- 
-@@ -718,15 +719,17 @@ static void pflash_cfi02_register_types(void)
- 
- type_init(pflash_cfi02_register_types)
- 
--pflash_t *pflash_cfi02_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk, uint32_t sector_len,
--                                int nb_blocs, int nb_mappings, int width,
--                                uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3,
--                                uint16_t unlock_addr0, uint16_t unlock_addr1,
--                                int be)
-+PFlashCFI02 *pflash_cfi02_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int nb_mappings, int width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   uint16_t unlock_addr0,
-+                                   uint16_t unlock_addr1,
-+                                   int be)
- {
-     DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH02);
- 
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 091e22dd60..67e55342f6 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -111,7 +111,7 @@ static void pc_system_flash_init(MemoryRegion *rom_memory)
-     char *fatal_errmsg = NULL;
-     hwaddr phys_addr = 0x100000000ULL;
-     int sector_bits, sector_size;
--    pflash_t *system_flash;
-+    PFlashCFI01 *system_flash;
-     MemoryRegion *flash_mem;
-     char name[64];
-     void *flash_ptr;
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 74667766c2..fff5ed19bd 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1189,7 +1189,7 @@ void mips_malta_init(MachineState *machine)
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-     char *filename;
--    pflash_t *fl;
-+    PFlashCFI01 *fl;
-     MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *ram_high = g_new(MemoryRegion, 1);
-     MemoryRegion *ram_low_preio = g_new(MemoryRegion, 1);
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index ab3e52b415..3d59a7a356 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -162,9 +162,9 @@ static void xtfpga_net_init(MemoryRegion *address_space,
-     memory_region_add_subregion(address_space, buffers, ram);
- }
- 
--static pflash_t *xtfpga_flash_init(MemoryRegion *address_space,
--                                   const XtfpgaBoardDesc *board,
--                                   DriveInfo *dinfo, int be)
-+static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
-+                                      const XtfpgaBoardDesc *board,
-+                                      DriveInfo *dinfo, int be)
- {
-     SysBusDevice *s;
-     DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
-@@ -181,7 +181,7 @@ static pflash_t *xtfpga_flash_init(MemoryRegion *address_space,
-     s = SYS_BUS_DEVICE(dev);
-     memory_region_add_subregion(address_space, board->flash->base,
-                                 sysbus_mmio_get_region(s, 0));
--    return OBJECT_CHECK(pflash_t, (dev), "cfi.pflash01");
-+    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
- }
- 
- static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-@@ -229,7 +229,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-     XtensaMxPic *mx_pic = NULL;
-     qemu_irq *extints;
-     DriveInfo *dinfo;
--    pflash_t *flash = NULL;
-+    PFlashCFI01 *flash = NULL;
-     QemuOpts *machine_opts = qemu_get_machine_opts();
-     const char *kernel_filename = qemu_opt_get(machine_opts, "kernel");
-     const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
-diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-index 67c3aa329e..51d8f60c65 100644
---- a/include/hw/block/flash.h
-+++ b/include/hw/block/flash.h
-@@ -5,32 +5,41 @@
- 
- #include "exec/memory.h"
- 
--#define TYPE_CFI_PFLASH01 "cfi.pflash01"
--#define TYPE_CFI_PFLASH02 "cfi.pflash02"
--
--typedef struct pflash_t pflash_t;
--
- /* pflash_cfi01.c */
--pflash_t *pflash_cfi01_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk,
--                                uint32_t sector_len, int nb_blocs, int width,
--                                uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3, int be);
-+
-+#define TYPE_CFI_PFLASH01 "cfi.pflash01"
-+
-+typedef struct PFlashCFI01 PFlashCFI01;
-+
-+PFlashCFI01 *pflash_cfi01_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   int be);
-+MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
- 
- /* pflash_cfi02.c */
--pflash_t *pflash_cfi02_register(hwaddr base,
--                                DeviceState *qdev, const char *name,
--                                hwaddr size,
--                                BlockBackend *blk, uint32_t sector_len,
--                                int nb_blocs, int nb_mappings, int width,
--                                uint16_t id0, uint16_t id1,
--                                uint16_t id2, uint16_t id3,
--                                uint16_t unlock_addr0, uint16_t unlock_addr1,
--                                int be);
- 
--MemoryRegion *pflash_cfi01_get_memory(pflash_t *fl);
-+#define TYPE_CFI_PFLASH02 "cfi.pflash02"
-+
-+typedef struct PFlashCFI02 PFlashCFI02;
-+
-+PFlashCFI02 *pflash_cfi02_register(hwaddr base,
-+                                   DeviceState *qdev, const char *name,
-+                                   hwaddr size,
-+                                   BlockBackend *blk,
-+                                   uint32_t sector_len, int nb_blocs,
-+                                   int nb_mappings,
-+                                   int width,
-+                                   uint16_t id0, uint16_t id1,
-+                                   uint16_t id2, uint16_t id3,
-+                                   uint16_t unlock_addr0,
-+                                   uint16_t unlock_addr1,
-+                                   int be);
- 
- /* nand.c */
- DeviceState *nand_init(BlockBackend *blk, int manf_id, int chip_id);
--- 
-2.17.2
+Reviewed-by: Greg Kurz <groug@kaod.org>
