@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60112)
+Received: from eggs.gnu.org ([209.51.188.92]:60140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjZ0-00024J-Ay
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:31 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjZ2-00026T-AG
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjYu-0005X5-TP
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvjYs-0005UQ-Li
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:24 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB6A1C010930
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:18 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 15:06:01 +0100
-Message-Id: <20190218140607.31998-13-armbru@redhat.com>
-In-Reply-To: <20190218140607.31998-1-armbru@redhat.com>
-References: <20190218140607.31998-1-armbru@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gvjZ0-0005am-AF
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:32 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Mon, 18 Feb 2019 15:03:01 +0100
+Message-Id: <20190218140301.197408-11-sgarzare@redhat.com>
+In-Reply-To: <20190218140301.197408-1-sgarzare@redhat.com>
+References: <20190218140301.197408-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/18] qapi: make query-gic-capabilities depend
- on TARGET_ARM
+Subject: [Qemu-devel] [PATCH v5 10/10] tests/virtio-blk: add test for
+ DISCARD command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,172 +23,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+If the DISCARD feature is enabled, we try this command in the
+test_basic(), checking only the status returned by the request.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190214152251.2073-13-armbru@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- monitor.c            | 11 -----------
- qapi/misc.json       | 43 ------------------------------------------
- qapi/target.json     | 45 ++++++++++++++++++++++++++++++++++++++++++++
- target/arm/monitor.c |  2 +-
- 4 files changed, 46 insertions(+), 55 deletions(-)
+ tests/virtio-blk-test.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/monitor.c b/monitor.c
-index 621e26cc94..33a0d81677 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1145,9 +1145,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
-ect **ret_data,
-  */
- static void qmp_unregister_commands_hack(void)
- {
--#ifndef TARGET_ARM
--    qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
--#endif
- #if !defined(TARGET_S390X) && !defined(TARGET_I386)
-     qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
- #endif
-@@ -4657,14 +4654,6 @@ QemuOptsList qemu_mon_opts =3D {
-     },
- };
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index cfc560be46..0bdbee32ba 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -317,6 +317,33 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
+ocator *alloc,
+         guest_free(alloc, req_addr);
+     }
 =20
--#ifndef TARGET_ARM
--GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
--{
--    error_setg(errp, QERR_FEATURE_DISABLED, "query-gic-capabilities");
--    return NULL;
--}
--#endif
--
- HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
- {
-     MachineState *ms =3D MACHINE(qdev_get_machine());
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 431de64590..9df45a27ca 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3044,49 +3044,6 @@
- ##
- { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
-=20
--##
--# @GICCapability:
--#
--# The struct describes capability for a specific GIC (Generic
--# Interrupt Controller) version. These bits are not only decided by
--# QEMU/KVM software version, but also decided by the hardware that
--# the program is running upon.
--#
--# @version:  version of GIC to be described. Currently, only 2 and 3
--#            are supported.
--#
--# @emulated: whether current QEMU/hardware supports emulated GIC
--#            device in user space.
--#
--# @kernel:   whether current QEMU/hardware supports hardware
--#            accelerated GIC device in kernel.
--#
--# Since: 2.6
--##
--{ 'struct': 'GICCapability',
--  'data': { 'version': 'int',
--            'emulated': 'bool',
--            'kernel': 'bool' } }
--
--##
--# @query-gic-capabilities:
--#
--# This command is ARM-only. It will return a list of GICCapability
--# objects that describe its capability bits.
--#
--# Returns: a list of GICCapability objects.
--#
--# Since: 2.6
--#
--# Example:
--#
--# -> { "execute": "query-gic-capabilities" }
--# <- { "return": [{ "version": 2, "emulated": true, "kernel": false },
--#                 { "version": 3, "emulated": false, "kernel": true } ] =
-}
--#
--##
--{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'] }
--
- ##
- # @CpuInstanceProperties:
- #
-diff --git a/qapi/target.json b/qapi/target.json
-index 010df35ebb..f4a7054921 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -328,3 +328,48 @@
-             'modelb': 'CpuModelInfo' },
-   'returns': 'CpuModelBaselineInfo',
-   'if': 'defined(TARGET_S390X)' }
++    if (features & (1u << VIRTIO_BLK_F_DISCARD)) {
++        struct virtio_blk_discard_write_zeroes dwz_hdr;
 +
-+##
-+# @GICCapability:
-+#
-+# The struct describes capability for a specific GIC (Generic
-+# Interrupt Controller) version. These bits are not only decided by
-+# QEMU/KVM software version, but also decided by the hardware that
-+# the program is running upon.
-+#
-+# @version:  version of GIC to be described. Currently, only 2 and 3
-+#            are supported.
-+#
-+# @emulated: whether current QEMU/hardware supports emulated GIC
-+#            device in user space.
-+#
-+# @kernel:   whether current QEMU/hardware supports hardware
-+#            accelerated GIC device in kernel.
-+#
-+# Since: 2.6
-+##
-+{ 'struct': 'GICCapability',
-+  'data': { 'version': 'int',
-+            'emulated': 'bool',
-+            'kernel': 'bool' },
-+  'if': 'defined(TARGET_ARM)' }
++        req.type =3D VIRTIO_BLK_T_DISCARD;
++        req.data =3D (char *) &dwz_hdr;
++        dwz_hdr.sector =3D 0;
++        dwz_hdr.num_sectors =3D 1;
++        dwz_hdr.flags =3D 0;
 +
-+##
-+# @query-gic-capabilities:
-+#
-+# This command is ARM-only. It will return a list of GICCapability
-+# objects that describe its capability bits.
-+#
-+# Returns: a list of GICCapability objects.
-+#
-+# Since: 2.6
-+#
-+# Example:
-+#
-+# -> { "execute": "query-gic-capabilities" }
-+# <- { "return": [{ "version": 2, "emulated": true, "kernel": false },
-+#                 { "version": 3, "emulated": false, "kernel": true } ] =
-}
-+#
-+##
-+{ 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-+  'if': 'defined(TARGET_ARM)' }
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 4cdd2676dd..41b32b94b2 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -23,7 +23,7 @@
- #include "qemu/osdep.h"
- #include "hw/boards.h"
- #include "kvm_arm.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-target.h"
-=20
- static GICCapability *gic_cap_new(int version)
- {
++        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
++
++        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
+));
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
++        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
+se);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        guest_free(alloc, req_addr);
++    }
++
+     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
+         /* Write and read with 2 descriptor layout */
+         /* Write request */
 --=20
-2.17.2
+2.20.1
