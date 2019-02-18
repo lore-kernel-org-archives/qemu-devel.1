@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39202)
+Received: from eggs.gnu.org ([209.51.188.92]:39245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxp-0006SR-Uf
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:11 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxr-0006Un-SC
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxo-00036m-3i
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxq-00038l-1X
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:11 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:28 +1100
-Message-Id: <20190218143049.17142-23-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:33 +1100
+Message-Id: <20190218143049.17142-28-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/43] xics: Explicitely call KVM ICS methods
- from the common code
+Subject: [Qemu-devel] [PULL 27/43] target/ppc: convert VMX logical
+ instructions to use vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,166 +23,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The pre_save(), post_load() and synchronize_state() methods of the
-ICSStateClass type are really KVM only things. Make that obvious
-by dropping the indirections and directly calling the KVM functions
-instead.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155023081817.1011724.14078777320394028836.stgit@bahia.lan>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20190215100058.20015-2-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 23 ++++++++++-------------
- hw/intc/xics_kvm.c    | 12 ++++--------
- include/hw/ppc/xics.h |  7 ++++---
- 3 files changed, 18 insertions(+), 24 deletions(-)
+ target/ppc/translate.c              |  1 +
+ target/ppc/translate/vmx-impl.inc.c | 47 ++++++++++-------------------
+ 2 files changed, 17 insertions(+), 31 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index acd63ab5e0..ae5d5ea135 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -58,7 +58,6 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index d5f29d3536..f4d70e725a 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -24,6 +24,7 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
++#include "tcg-op-gvec.h"
+ #include "qemu/host-utils.h"
+ #include "exec/cpu_ldst.h"
 =20
- void ics_pic_print_info(ICSState *ics, Monitor *mon)
- {
--    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
-     uint32_t i;
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+index f99d0284c2..c74932e5ee 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -266,45 +266,30 @@ GEN_VX_VMUL10(vmul10euq, 1, 0);
+ GEN_VX_VMUL10(vmul10cuq, 0, 1);
+ GEN_VX_VMUL10(vmul10ecuq, 1, 1);
 =20
-     monitor_printf(mon, "ICS %4x..%4x %p\n",
-@@ -68,8 +67,8 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
-         return;
-     }
-=20
--    if (icsc->synchronize_state) {
--        icsc->synchronize_state(ics);
-+    if (kvm_irqchip_in_kernel()) {
-+        ics_synchronize_state(ics);
-     }
-=20
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-@@ -647,25 +646,23 @@ static void ics_base_instance_init(Object *obj)
-     ics->offset =3D XICS_IRQ_BASE;
+-/* Logical operations */
+-#define GEN_VX_LOGICAL(name, tcg_op, opc2, opc3)                        =
+\
+-static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
++#define GEN_VXFORM_V(name, vece, tcg_op, opc2, opc3)                    =
+\
++static void glue(gen_, name)(DisasContext *ctx)                         =
+\
+ {                                                                       =
+\
+-    TCGv_i64 t0;                                                        =
+\
+-    TCGv_i64 t1;                                                        =
+\
+-    TCGv_i64 avr;                                                       =
+\
+-                                                                        =
+\
+     if (unlikely(!ctx->altivec_enabled)) {                              =
+\
+         gen_exception(ctx, POWERPC_EXCP_VPU);                           =
+\
+         return;                                                         =
+\
+     }                                                                   =
+\
+-    t0 =3D tcg_temp_new_i64();                                          =
+  \
+-    t1 =3D tcg_temp_new_i64();                                          =
+  \
+-    avr =3D tcg_temp_new_i64();                                         =
+  \
+-                                                                        =
+\
+-    get_avr64(t0, rA(ctx->opcode), true);                               =
+\
+-    get_avr64(t1, rB(ctx->opcode), true);                               =
+\
+-    tcg_op(avr, t0, t1);                                                =
+\
+-    set_avr64(rD(ctx->opcode), avr, true);                              =
+\
+-                                                                        =
+\
+-    get_avr64(t0, rA(ctx->opcode), false);                              =
+\
+-    get_avr64(t1, rB(ctx->opcode), false);                              =
+\
+-    tcg_op(avr, t0, t1);                                                =
+\
+-    set_avr64(rD(ctx->opcode), avr, false);                             =
+\
+                                                                         =
+\
+-    tcg_temp_free_i64(t0);                                              =
+\
+-    tcg_temp_free_i64(t1);                                              =
+\
+-    tcg_temp_free_i64(avr);                                             =
+\
++    tcg_op(vece,                                                        =
+\
++           avr64_offset(rD(ctx->opcode), true),                         =
+\
++           avr64_offset(rA(ctx->opcode), true),                         =
+\
++           avr64_offset(rB(ctx->opcode), true),                         =
+\
++           16, 16);                                                     =
+\
  }
 =20
--static int ics_base_dispatch_pre_save(void *opaque)
-+static int ics_base_pre_save(void *opaque)
- {
-     ICSState *ics =3D opaque;
--    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
+-GEN_VX_LOGICAL(vand, tcg_gen_and_i64, 2, 16);
+-GEN_VX_LOGICAL(vandc, tcg_gen_andc_i64, 2, 17);
+-GEN_VX_LOGICAL(vor, tcg_gen_or_i64, 2, 18);
+-GEN_VX_LOGICAL(vxor, tcg_gen_xor_i64, 2, 19);
+-GEN_VX_LOGICAL(vnor, tcg_gen_nor_i64, 2, 20);
+-GEN_VX_LOGICAL(veqv, tcg_gen_eqv_i64, 2, 26);
+-GEN_VX_LOGICAL(vnand, tcg_gen_nand_i64, 2, 22);
+-GEN_VX_LOGICAL(vorc, tcg_gen_orc_i64, 2, 21);
++/* Logical operations */
++GEN_VXFORM_V(vand, MO_64, tcg_gen_gvec_and, 2, 16);
++GEN_VXFORM_V(vandc, MO_64, tcg_gen_gvec_andc, 2, 17);
++GEN_VXFORM_V(vor, MO_64, tcg_gen_gvec_or, 2, 18);
++GEN_VXFORM_V(vxor, MO_64, tcg_gen_gvec_xor, 2, 19);
++GEN_VXFORM_V(vnor, MO_64, tcg_gen_gvec_nor, 2, 20);
++GEN_VXFORM_V(veqv, MO_64, tcg_gen_gvec_eqv, 2, 26);
++GEN_VXFORM_V(vnand, MO_64, tcg_gen_gvec_nand, 2, 22);
++GEN_VXFORM_V(vorc, MO_64, tcg_gen_gvec_orc, 2, 21);
 =20
--    if (info->pre_save) {
--        info->pre_save(ics);
-+    if (kvm_irqchip_in_kernel()) {
-+        ics_get_kvm_state(ics);
-     }
-=20
-     return 0;
- }
-=20
--static int ics_base_dispatch_post_load(void *opaque, int version_id)
-+static int ics_base_post_load(void *opaque, int version_id)
- {
-     ICSState *ics =3D opaque;
--    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
-=20
--    if (info->post_load) {
--        return info->post_load(ics, version_id);
-+    if (kvm_irqchip_in_kernel()) {
-+        return ics_set_kvm_state(ics);
-     }
-=20
-     return 0;
-@@ -689,8 +686,8 @@ static const VMStateDescription vmstate_ics_base =3D =
-{
-     .name =3D "ics",
-     .version_id =3D 1,
-     .minimum_version_id =3D 1,
--    .pre_save =3D ics_base_dispatch_pre_save,
--    .post_load =3D ics_base_dispatch_post_load,
-+    .pre_save =3D ics_base_pre_save,
-+    .post_load =3D ics_base_post_load,
-     .fields =3D (VMStateField[]) {
-         /* Sanity check */
-         VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index fae4ac431f..642351e579 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -155,7 +155,7 @@ void icp_kvm_realize(DeviceState *dev, Error **errp)
- /*
-  * ICS-KVM
-  */
--static void ics_get_kvm_state(ICSState *ics)
-+void ics_get_kvm_state(ICSState *ics)
- {
-     uint64_t state;
-     int i;
-@@ -208,12 +208,12 @@ static void ics_get_kvm_state(ICSState *ics)
-     }
- }
-=20
--static void ics_synchronize_state(ICSState *ics)
-+void ics_synchronize_state(ICSState *ics)
- {
-     ics_get_kvm_state(ics);
- }
-=20
--static int ics_set_kvm_state(ICSState *ics, int version_id)
-+int ics_set_kvm_state(ICSState *ics)
- {
-     uint64_t state;
-     int i;
-@@ -286,7 +286,7 @@ static void ics_kvm_reset(DeviceState *dev)
-=20
-     icsc->parent_reset(dev);
-=20
--    ics_set_kvm_state(ICS_KVM(dev), 1);
-+    ics_set_kvm_state(ICS_KVM(dev));
- }
-=20
- static void ics_kvm_reset_handler(void *dev)
-@@ -318,10 +318,6 @@ static void ics_kvm_class_init(ObjectClass *klass, v=
-oid *data)
-                                     &icsc->parent_realize);
-     device_class_set_parent_reset(dc, ics_kvm_reset,
-                                   &icsc->parent_reset);
--
--    icsc->pre_save =3D ics_get_kvm_state;
--    icsc->post_load =3D ics_set_kvm_state;
--    icsc->synchronize_state =3D ics_synchronize_state;
- }
-=20
- static const TypeInfo ics_kvm_info =3D {
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index fae54e6f28..06e87128f8 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -109,12 +109,9 @@ struct ICSStateClass {
-     DeviceRealize parent_realize;
-     DeviceReset parent_reset;
-=20
--    void (*pre_save)(ICSState *s);
--    int (*post_load)(ICSState *s, int version_id);
-     void (*reject)(ICSState *s, uint32_t irq);
-     void (*resend)(ICSState *s);
-     void (*eoi)(ICSState *s, uint32_t irq);
--    void (*synchronize_state)(ICSState *s);
- };
-=20
- struct ICSState {
-@@ -201,4 +198,8 @@ int icp_set_kvm_state(ICPState *icp);
- void icp_synchronize_state(ICPState *icp);
- void icp_kvm_realize(DeviceState *dev, Error **errp);
-=20
-+void ics_get_kvm_state(ICSState *ics);
-+int ics_set_kvm_state(ICSState *ics);
-+void ics_synchronize_state(ICSState *ics);
-+
- #endif /* XICS_H */
+ #define GEN_VXFORM(name, opc2, opc3)                                    =
+\
+ static void glue(gen_, name)(DisasContext *ctx)                         =
+        \
 --=20
 2.20.1
