@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38135)
+Received: from eggs.gnu.org ([209.51.188.92]:44170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gvi1d-0003ys-IR
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:27:58 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gviSn-0007jK-Aa
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gvi1c-0004Xq-NV
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:27:57 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Feb 2019 13:27:10 +0100
-Message-Id: <20190218122710.23639-16-david@redhat.com>
-In-Reply-To: <20190218122710.23639-1-david@redhat.com>
-References: <20190218122710.23639-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 15/15] s390x: Add floating-point extension
- facility to "qemu" cpu model
+	(envelope-from <no-reply@patchew.org>) id 1gviSm-0000Hn-3K
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 07:56:01 -0500
+Resent-Message-Id: <E1gviSm-0000Hn-3K@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155049452977.18484.9425436854834146807@49fa7ef69f7b>
+In-Reply-To: <20190218111153.22681-1-cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 18 Feb 2019 04:55:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/10] s390x update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: cohuck@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-The floating-point extension facility implemented certain changes to
-BFP, HFP and DFP instructions.
-
-As we don't implement HFP/DFP, we can ignore those completely. Related
-to BFP, the changes include
-- SET BFP ROUNDING MODE (SRNMB) instruction
-- BFP-rounding-mode field in the FPC register is changed to 3 bits
-- CONVERT FROM LOGICAL instructions
-- CONVERT TO LOGICAL instructions
-- Changes (rounding mode + XxC) added to
--- CONVERT TO FIXED
--- CONVERT FROM FIXED
--- LOAD FP INTEGER
--- LOAD ROUNDED
--- DIVIDE TO INTEGER
-
-For TCG, we don't implement DIVIDE TO INTEGER, and it is harder to
-implement, so skip that. Also, as we don't implement PFPO, we can skip
-changes to that as well. The other parts are now implemented, we can
-indicate the facility.
-
-z14 PoP mentiones that "The floating-point extension facility is installed
-in the z/Architecture architectural mode. When bit 37 is one, bit 42 is
-also one.", meaning that the DFP (decimal-floating-point) facility also
-has to be inidicated. We can ignore that for now.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/gen-features.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 44eca45474..e4739a6b9f 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -601,6 +601,11 @@ static uint16_t qemu_V3_1[] = {
- };
- 
- static uint16_t qemu_LATEST[] = {
-+    /*
-+     * Only BFP bits are implemented (HFP, DFP, PFPO and DIVIDE TO INTEGER not
-+     * implemented yet).
-+     */
-+    S390_FEAT_FLOATING_POINT_EXT,
-     S390_FEAT_ZPCI,
- };
- 
--- 
-2.17.2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODExMTE1My4yMjY4
+MS0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODExMTE1My4yMjY4MS0xLWNvaHVja0ByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMF0gczM5MHggdXBkYXRlClR5
+cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBk
+YXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1Y2tAcmVk
+aGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTExMTUzLjIyNjgxLTEtY29odWNrQHJlZGhhdC5j
+b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphZDE4YTFlOGY5IHMzOTB4OiB1cGdy
+YWRlIHN0YXR1cyBvZiBLVk0gY29yZXMgdG8gInN1cHBvcnRlZCIKZjUxZGNiMWRlNyBzMzkweC9r
+dm06IGFkZCB0cmFjZXBvaW50IHRvIGlvZXZlbnRmZCBpbnRlcmZhY2UKNDRhNWVmZGEzZCBzMzkw
+eC9jcHVtb2RlbDogYWRkIHoxNCBHQTIgbW9kZWwKNzNmOTg0MWViZSBzMzkweC9jcHVtb2RlbDog
+ZGVmYXVsdCBlbmFibGUgbWVwb2NoIGZvciB6MTQgYW5kIGxhdGVyCmUzZGUzOTgwMzggczM5MHgv
+Y3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBtZXBvY2ggYW5kIHJlLWFsaWduIGdy
+b3VwIGluaXQKYjU2NzVjNGFmZCBzMzkweDogYWRkIHpQQ0kgZmVhdHVyZSB0byAicWVtdSIgQ1BV
+IG1vZGVsCjk5OGFhOTc1YzUgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgU1RDSyBldCBhbCBmb3Ig
+Q09ORklHX1VTRVJfT05MWQpmNDA4ZjRkMTUyIHRhcmdldC9zMzkweDogU3BsaXQgb3V0IHMzOTAt
+dG9kLmgKMDJlOGJiY2EzMCBzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQKMzIxZDNi
+ZmViYyBzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1hZnRlci0yMDEyIGxp
+Y2Vuc2Ugc3RhdGVtZW50cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2luZyBjb21t
+aXQgMzIxZDNiZmViYzQ2IChzMzkweDogRml4IHRoZSBjb25mdXNpbmcgY29udHJpYnV0aW9ucy1h
+ZnRlci0yMDEyIGxpY2Vuc2Ugc3RhdGVtZW50cykKMi8xMCBDaGVja2luZyBjb21taXQgMDJlOGJi
+Y2EzMGI1IChzMzkweDogYWx3YXlzIHByb3ZpZGUgcGNpIHN1cHBvcnQpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQ3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KMy8xMCBDaGVja2luZyBjb21taXQgZjQwOGY0ZDE1MmIzICh0YXJnZXQvczM5MHg6IFNw
+bGl0IG91dCBzMzkwLXRvZC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU3IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDMvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xMCBDaGVja2luZyBjb21taXQg
+OTk4YWE5NzVjNWY5ICh0YXJnZXQvczM5MHg6IEltcGxlbWVudCBTVENLIGV0IGFsIGZvciBDT05G
+SUdfVVNFUl9PTkxZKQo1LzEwIENoZWNraW5nIGNvbW1pdCBiNTY3NWM0YWZkYTcgKHMzOTB4OiBh
+ZGQgelBDSSBmZWF0dXJlIHRvICJxZW11IiBDUFUgbW9kZWwpCjYvMTAgQ2hlY2tpbmcgY29tbWl0
+IGUzZGUzOTgwMzhiZCAoczM5MHgvY3B1bW9kZWw6IG1lcG9jaHB0ZmY6IHdhcm4gd2hlbiBubyBt
+ZXBvY2ggYW5kIHJlLWFsaWduIGdyb3VwIGluaXQpCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMzg6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0Njg6CisgICAgRkVB
+VF9HUk9VUF9JTklUKCJtZXBvY2hwdGZmIiwgTVVMVElQTEVfRVBPQ0hfUFRGRiwgIlBURkYgZW5o
+YW5jZW1lbnRzIGludHJvZHVjZWQgd2l0aCBNdWx0aXBsZS1lcG9jaCBmYWNpbGl0eSIpLAoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEwIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzEwIENoZWNraW5nIGNvbW1pdCA3M2Y5ODQxZWJl
+OTIgKHMzOTB4L2NwdW1vZGVsOiBkZWZhdWx0IGVuYWJsZSBtZXBvY2ggZm9yIHoxNCBhbmQgbGF0
+ZXIpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogaHcvczM5MHgv
+czM5MC12aXJ0aW8tY2N3LmM6NjYzOgorICAgIHMzOTBfY3B1ZGVmX2dyb3VwX2ZlYXRvZmZfZ3Jl
+YXRlcigxNCwgMSwgUzM5MF9GRUFUX0dST1VQX01VTFRJUExFX0VQT0NIX1BURkYpOwoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzEwIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMTAgQ2hlY2tpbmcgY29tbWl0IDQ0YTVlZmRhM2RjZiAo
+czM5MHgvY3B1bW9kZWw6IGFkZCB6MTQgR0EyIG1vZGVsKQo5LzEwIENoZWNraW5nIGNvbW1pdCBm
+NTFkY2IxZGU3Y2UgKHMzOTB4L2t2bTogYWRkIHRyYWNlcG9pbnQgdG8gaW9ldmVudGZkIGludGVy
+ZmFjZSkKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IGFkMThhMWU4ZjkwOCAoczM5MHg6IHVwZ3JhZGUg
+c3RhdHVzIG9mIEtWTSBjb3JlcyB0byAic3VwcG9ydGVkIikKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMTgxMTExNTMuMjI2ODEtMS1jb2h1
+Y2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
+IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
+LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
