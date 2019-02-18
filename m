@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44243)
+Received: from eggs.gnu.org ([209.51.188.92]:44984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gvpr6-0002M1-S1
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:49:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1gvptf-0003Ws-21
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:52:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gvpr2-0000jP-63
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:49:34 -0500
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:45534)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
-	id 1gvpqr-0000b8-N2
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:49:24 -0500
-Received: by mail-yb1-xb42.google.com with SMTP id n134so4439629ybg.12
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 12:49:19 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gvpte-0002bz-Bm
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:52:15 -0500
+References: <20190218161822.3573-1-kwolf@redhat.com>
+	<20190218161822.3573-9-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <05748c04-36b1-add4-a78d-f26e1708cf95@redhat.com>
+Date: Mon, 18 Feb 2019 14:52:07 -0600
 MIME-Version: 1.0
-References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
-	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
-	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
-	<20190218113447-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190218113447-mutt-send-email-mst@kernel.org>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Mon, 18 Feb 2019 22:49:08 +0200
-Message-ID: <CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
- not enabled by the guest
+In-Reply-To: <20190218161822.3573-9-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 08/12] block: Don't poll in
+ bdrv_set_aio_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, stefanha@redhat.com, berrange@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
-> > On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> wrote:
-> > >
-> > >
-> > > On 2019/2/13 =E4=B8=8B=E5=8D=8810:51, Yuri Benditovich wrote:
-> > > > https://bugzilla.redhat.com/show_bug.cgi?id=3D1608226
-> > > > On startup/link-up in multiqueue configuration the virtio-net
-> > > > tries to starts all the queues, including those that the guest
-> > > > will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
-> > > > If the guest driver does not allocate queues that it will not
-> > > > use (for example, Windows driver does not) and number of actually
-> > > > used queues is less that maximal number supported by the device,
-> > >
-> > >
-> > > Is this a requirement of e.g NDIS? If not, could we simply allocate a=
-ll
-> > > queues in this case. This is usually what normal Linux driver did.
-> > >
-> > >
-> > > > this causes vhost_net_start to fail and actually disables vhost
-> > > > for all the queues, reducing the performance.
-> > > > Current commit fixes this: initially only first queue is started,
-> > > > upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
-> > > > requested by the guest.
-> > > >
-> > > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> > > > ---
-> > > >   hw/net/virtio-net.c | 7 +++++--
-> > > >   1 file changed, 5 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > > index 3f319ef723..d3b1ac6d3a 100644
-> > > > --- a/hw/net/virtio-net.c
-> > > > +++ b/hw/net/virtio-net.c
-> > > > @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet *=
-n, uint8_t status)
-> > > >   {
-> > > >       VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
-> > > >       NetClientState *nc =3D qemu_get_queue(n->nic);
-> > > > -    int queues =3D n->multiqueue ? n->max_queues : 1;
-> > > > +    int queues =3D n->multiqueue ? n->curr_queues : 1;
-> > > >
-> > > >       if (!get_vhost_net(nc->peer)) {
-> > > >           return;
-> > > > @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *n=
-, uint8_t cmd,
-> > > >           return VIRTIO_NET_ERR;
-> > > >       }
-> > > >
-> > > > -    n->curr_queues =3D queues;
-> > > >       /* stop the backend before changing the number of queues to a=
-void handling a
-> > > >        * disabled queue */
-> > > > +    virtio_net_set_status(vdev, 0);
-> > >
-> > >
-> > > Any reason for doing this?
-> >
-> > I think there are 2 reasons:
-> > 1. The spec does not require guest SW to allocate unused queues.
-> > 2. We spend guest's physical memory to just make vhost happy when it
-> > touches queues that it should not use.
-> >
-> > Thanks,
-> > Yuri Benditovich
->
-> The spec also says:
->         queue_enable The driver uses this to selectively prevent the devi=
-ce from executing requests from this
->         virtqueue. 1 - enabled; 0 - disabled.
->
-> While this is not a conformance clause this strongly implies that
-> queues which are not enabled are never accessed by device.
->
-> Yuri I am guessing you are not enabling these unused queues right?
+On 2/18/19 10:18 AM, Kevin Wolf wrote:
+> The explicit aio_poll() call in bdrv_set_aio_context() was added in
+> commit c2b6428d388 as a workaround for bdrv_drain() failing to achieve
+> to actually quiesce everything (specifically the NBD client code to
+> switch AioContext).
+> 
+> Now that the NBD client has been fixed to complete this operation during
+> bdrv_drain(), we don't need the workaround any more.
+> 
+> It was wrong anyway: aio_poll() must always be run in the home thread of
+> the AioContext.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c | 4 ----
+>  1 file changed, 4 deletions(-)
 
-Of course, we (Windows driver) do not.
-The code of virtio-net passes max_queues to vhost and this causes
-vhost to try accessing all the queues, fail on unused ones and finally
-leave vhost disabled at all.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
->
->
->
-> > >
-> > > Thanks
-> > >
-> > >
-> > > > +
-> > > > +    n->curr_queues =3D queues;
-> > > > +
-> > > >       virtio_net_set_status(vdev, vdev->status);
-> > > >       virtio_net_set_queues(n);
-> > > >
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
