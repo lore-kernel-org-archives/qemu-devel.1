@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55179)
+Received: from eggs.gnu.org ([209.51.188.92]:56157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvkyc-0000Oi-UN
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:37:03 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1gvl2Z-0003qB-Lo
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:41:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvkyb-0004zG-SA
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:37:02 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 15:36:33 +0000
-Message-ID: <5c72aad4-d1bc-7241-a972-32dd07ef23b0@virtuozzo.com>
-References: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1549974951-731285-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D95651981C63CF449ACF9A62C0F670A1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jjherne@linux.ibm.com>) id 1gvl2X-0007lg-JK
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:41:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41788
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1gvl2V-0007eU-48
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 10:41:03 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1IFef42042058
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 10:40:55 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qqx32dkya-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 10:40:54 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Mon, 18 Feb 2019 15:40:54 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
+	<a9633e15-13c7-70a5-17c2-2204dd174335@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Mon, 18 Feb 2019 10:40:45 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Discard old bitmap directories in QCOW2
- image
+In-Reply-To: <a9633e15-13c7-70a5-17c2-2204dd174335@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <30de3db1-c1df-1aed-8dac-5d0e446b7ca4@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 08/15] s390-bios: Map low core
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +46,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-MTIuMDIuMjAxOSAxNTozNSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IENsZWFuIFFDT1cy
-IGltYWdlIGZyb20gYml0bWFwIG9ic29sZXRlIGRpcmVjdG9yeSB3aGVuIGEgbmV3IG9uZQ0KPiBp
-cyBhbGxvY2F0ZWQgYW5kIHN0b3JlZC4gSXQgc2xvd3MgZG93biB0aGUgaW1hZ2UgZ3Jvd3RoIGEg
-bGl0dGxlIGJpdC4NCj4gVGhlIGZsYWcgUUNPVzJfRElTQ0FSRF9BTFdBWVMgYWxsb3dzIGEgY2Fs
-bCB0byByYXdfY29fcGRpc2NhcmQoKQ0KPiB0aGF0IGRvZXMgdGhlIGFjdHVhbCBjbGVhbmluZyBv
-ZiB0aGUgaW1hZ2Ugb24gZGlzay4NCj4gV2l0aCB0aGUgZmxhZyBRQ09XMl9ESVNDQVJEX09USEVS
-LCBhIHJlZmVyZW5jZSBjb3VudCBvZiB0aGUgY2x1c3Rlcg0KPiBpcyB1cGRhdGVkIG9ubHkuDQo+
-IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hA
-dmlydHVvenpvLmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0Kc2lkZSBxdWVzdGlvbjogc2hvdWxkIG5v
-dCB3ZSBjaGFuZ2UgZGlzY2FyZF9wYXNzdGhyb3VnaFtRQ09XMl9ESVNDQVJEX09USEVSXSB0bw0K
-dHJ1ZSBvciBhdCBsZWFzdCBmbGFncyZCRFJWX09fVU5NQVAgYnkgZGVmYXVsdD8gV2hhdCBpcyB0
-aGUgcmVhc29uIG9mIG5vdCBkaXNjYXJkaW5nDQp0aGluZ3MgaW4gcWNvdzItY2x1c3Rlcj8NCg0K
-PiAtLS0NCj4gICBibG9jay9xY293Mi1iaXRtYXAuYyB8IDEyICsrKysrKy0tLS0tLQ0KPiAgIDEg
-ZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZm
-IC0tZ2l0IGEvYmxvY2svcWNvdzItYml0bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAuYw0KPiBp
-bmRleCBiOTQ2MzAxLi42ODJjYjA5IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi1iaXRtYXAu
-Yw0KPiArKysgYi9ibG9jay9xY293Mi1iaXRtYXAuYw0KPiBAQCAtMjAyLDcgKzIwMiw3IEBAIHN0
-YXRpYyB2b2lkIGNsZWFyX2JpdG1hcF90YWJsZShCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0
-X3QgKmJpdG1hcF90YWJsZSwNCj4gICAgICAgICAgICAgICBjb250aW51ZTsNCj4gICAgICAgICAg
-IH0NCj4gICANCj4gLSAgICAgICAgcWNvdzJfZnJlZV9jbHVzdGVycyhicywgYWRkciwgcy0+Y2x1
-c3Rlcl9zaXplLCBRQ09XMl9ESVNDQVJEX09USEVSKTsNCj4gKyAgICAgICAgcWNvdzJfZnJlZV9j
-bHVzdGVycyhicywgYWRkciwgcy0+Y2x1c3Rlcl9zaXplLCBRQ09XMl9ESVNDQVJEX0FMV0FZUyk7
-DQo+ICAgICAgICAgICBiaXRtYXBfdGFibGVbaV0gPSAwOw0KPiAgICAgICB9DQo+ICAgfQ0KPiBA
-QCAtMjU3LDcgKzI1Nyw3IEBAIHN0YXRpYyBpbnQgZnJlZV9iaXRtYXBfY2x1c3RlcnMoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMsIFFjb3cyQml0bWFwVGFibGUgKnRiKQ0KPiAgIA0KPiAgICAgICBjbGVh
-cl9iaXRtYXBfdGFibGUoYnMsIGJpdG1hcF90YWJsZSwgdGItPnNpemUpOw0KPiAgICAgICBxY293
-Ml9mcmVlX2NsdXN0ZXJzKGJzLCB0Yi0+b2Zmc2V0LCB0Yi0+c2l6ZSAqIHNpemVvZih1aW50NjRf
-dCksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICBRQ09XMl9ESVNDQVJEX09USEVSKTsNCj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgIFFDT1cyX0RJU0NBUkRfQUxXQVlTKTsNCj4gICAgICAg
-Z19mcmVlKGJpdG1hcF90YWJsZSk7DQo+ICAgDQo+ICAgICAgIHRiLT5vZmZzZXQgPSAwOw0KPiBA
-QCAtODAxLDcgKzgwMSw3IEBAIGZhaWw6DQo+ICAgICAgIGdfZnJlZShkaXIpOw0KPiAgIA0KPiAg
-ICAgICBpZiAoIWluX3BsYWNlICYmIGRpcl9vZmZzZXQgPiAwKSB7DQo+IC0gICAgICAgIHFjb3cy
-X2ZyZWVfY2x1c3RlcnMoYnMsIGRpcl9vZmZzZXQsIGRpcl9zaXplLCBRQ09XMl9ESVNDQVJEX09U
-SEVSKTsNCj4gKyAgICAgICAgcWNvdzJfZnJlZV9jbHVzdGVycyhicywgZGlyX29mZnNldCwgZGly
-X3NpemUsIFFDT1cyX0RJU0NBUkRfQUxXQVlTKTsNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBy
-ZXR1cm4gcmV0Ow0KPiBAQCAtOTA0LDE0ICs5MDQsMTQgQEAgc3RhdGljIGludCB1cGRhdGVfZXh0
-X2hlYWRlcl9hbmRfZGlyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICB9DQo+ICAgDQo+
-ICAgICAgIGlmIChvbGRfc2l6ZSA+IDApIHsNCj4gLSAgICAgICAgcWNvdzJfZnJlZV9jbHVzdGVy
-cyhicywgb2xkX29mZnNldCwgb2xkX3NpemUsIFFDT1cyX0RJU0NBUkRfT1RIRVIpOw0KPiArICAg
-ICAgICBxY293Ml9mcmVlX2NsdXN0ZXJzKGJzLCBvbGRfb2Zmc2V0LCBvbGRfc2l6ZSwgUUNPVzJf
-RElTQ0FSRF9BTFdBWVMpOw0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIHJldHVybiAwOw0KPiAg
-IA0KPiAgIGZhaWw6DQo+ICAgICAgIGlmIChuZXdfb2Zmc2V0ID4gMCkgew0KPiAtICAgICAgICBx
-Y293Ml9mcmVlX2NsdXN0ZXJzKGJzLCBuZXdfb2Zmc2V0LCBuZXdfc2l6ZSwgUUNPVzJfRElTQ0FS
-RF9PVEhFUik7DQo+ICsgICAgICAgIHFjb3cyX2ZyZWVfY2x1c3RlcnMoYnMsIG5ld19vZmZzZXQs
-IG5ld19zaXplLCBRQ09XMl9ESVNDQVJEX0FMV0FZUyk7DQo+ICAgICAgIH0NCj4gICANCj4gICAg
-ICAgcy0+Yml0bWFwX2RpcmVjdG9yeV9vZmZzZXQgPSBvbGRfb2Zmc2V0Ow0KPiBAQCAtMTI0Miw3
-ICsxMjQyLDcgQEAgZmFpbDoNCj4gICANCj4gICAgICAgaWYgKHRiX29mZnNldCA+IDApIHsNCj4g
-ICAgICAgICAgIHFjb3cyX2ZyZWVfY2x1c3RlcnMoYnMsIHRiX29mZnNldCwgdGJfc2l6ZSAqIHNp
-emVvZih0YlswXSksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgUUNPVzJfRElTQ0FS
-RF9PVEhFUik7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgUUNPVzJfRElTQ0FSRF9B
-TFdBWVMpOw0KPiAgICAgICB9DQo+ICAgDQo+ICAgICAgIGdfZnJlZSh0Yik7DQo+IA0KDQoNCi0t
-IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 2/12/19 7:47 AM, Thomas Huth wrote:
+> On 2019-01-29 14:29, Jason J. Herne wrote:
+>> Create a new header for basic architecture specific definitions and add a
+>> mapping of low core memory. This mapping will be used by the real dasd boot
+>> process.
+>>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/main.c      |   2 +
+>>   pc-bios/s390-ccw/s390-arch.h | 100 +++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 102 insertions(+)
+>>   create mode 100644 pc-bios/s390-ccw/s390-arch.h
+>>
+>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>> index 1bc61b5..fa90aa3 100644
+>> --- a/pc-bios/s390-ccw/main.c
+>> +++ b/pc-bios/s390-ccw/main.c
+>> @@ -9,6 +9,7 @@
+>>    */
+>>   
+>>   #include "libc.h"
+>> +#include "s390-arch.h"
+>>   #include "s390-ccw.h"
+>>   #include "cio.h"
+>>   #include "virtio.h"
+>> @@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>>   QemuIplParameters qipl;
+>>   IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>>   static bool have_iplb;
+>> +const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+>>   
+>>   #define LOADPARM_PROMPT "PROMPT  "
+>>   #define LOADPARM_EMPTY  "        "
+>> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
+>> new file mode 100644
+>> index 0000000..47eaa04
+>> --- /dev/null
+>> +++ b/pc-bios/s390-ccw/s390-arch.h
+>> @@ -0,0 +1,100 @@
+>> +/*
+>> + * S390 Basic Architecture
+>> + *
+>> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
+> 
+> 2019 ?
+> 
+
+Yep, I will update this,
+
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>> + * your option) any later version. See the COPYING file in the top-level
+>> + * directory.
+>> + */
+>> +
+>> +#ifndef S390_ARCH_H
+>> +#define S390_ARCH_H
+>> +
+>> +typedef struct PSW {
+>> +    uint64_t mask;
+>> +    uint64_t addr;
+>> +} __attribute__ ((packed, aligned(8))) PSW;
+> 
+> We've seen quite some trouble with "packed" in the past... See
+> 3b8afb41bc8e or 55281a2c53b884d0 for example ... This is only the
+> s390-ccw bios code here, so it is likely ok, but still, since this
+> structure is "naturally" packed, I'd rather go without that attribute
+> here (even if it's only to allow the compiler to generate better code in
+> some cases). You could still _Static_assert(sizeof(struct PSW) == 16)
+> afterwards, just to be sure.
+> 
+
+So the problem is that this struct, if baked into another struct, will not be aligned 
+properly? Given that this struct is only two 64-bit fields I guess we could get away 
+without packed.
+
+>> +
+>> +/* Older PSW format used by LPSW instruction */
+>> +typedef struct PSWLegacy {
+>> +    uint32_t mask;
+>> +    uint32_t addr;
+>> +} __attribute__ ((packed, aligned(8))) PSWLegacy;
+> 
+> dito, I'd drop the packed attribute here.
+> 
+
+Are we sure the compiler will never insert space here if we drop packed? I don't see why 
+it would but I'll admit that I don't fully know all of the rules.
+
+>> +/* s390 psw bit masks */
+>> +#define PSW_MASK_IOINT      0x0200000000000000ULL
+>> +#define PSW_MASK_WAIT       0x0002000000000000ULL
+>> +#define PSW_MASK_EAMODE     0x0000000100000000ULL
+>> +#define PSW_MASK_BAMODE     0x0000000080000000ULL
+>> +#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
+>> +
+>> +/* Low core mapping */
+>> +typedef struct LowCore {
+>> +    /* prefix area: defined by architecture */
+>> +    uint64_t        ipl_psw;                  /* 0x000 */
+> 
+> No PSWLegacy here? ;-)
+> 
+
+I could *probably* use PSWLegacy here.
+
+>> +    uint32_t        ccw1[2];                  /* 0x008 */
+>> +    uint32_t        ccw2[2];                  /* 0x010 */
+>> +    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
+>> +    uint32_t        ext_params;               /* 0x080 */
+>> +    uint16_t        cpu_addr;                 /* 0x084 */
+>> +    uint16_t        ext_int_code;             /* 0x086 */
+>> +    uint16_t        svc_ilen;                 /* 0x088 */
+>> +    uint16_t        svc_code;                 /* 0x08a */
+>> +    uint16_t        pgm_ilen;                 /* 0x08c */
+>> +    uint16_t        pgm_code;                 /* 0x08e */
+>> +    uint32_t        data_exc_code;            /* 0x090 */
+>> +    uint16_t        mon_class_num;            /* 0x094 */
+>> +    uint16_t        per_perc_atmid;           /* 0x096 */
+>> +    uint64_t        per_address;              /* 0x098 */
+>> +    uint8_t         exc_access_id;            /* 0x0a0 */
+>> +    uint8_t         per_access_id;            /* 0x0a1 */
+>> +    uint8_t         op_access_id;             /* 0x0a2 */
+>> +    uint8_t         ar_access_id;             /* 0x0a3 */
+>> +    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
+>> +    uint64_t        trans_exc_code;           /* 0x0a8 */
+>> +    uint64_t        monitor_code;             /* 0x0b0 */
+>> +    uint16_t        subchannel_id;            /* 0x0b8 */
+>> +    uint16_t        subchannel_nr;            /* 0x0ba */
+>> +    uint32_t        io_int_parm;              /* 0x0bc */
+>> +    uint32_t        io_int_word;              /* 0x0c0 */
+>> +    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
+>> +    uint32_t        stfl_fac_list;            /* 0x0c8 */
+>> +    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
+>> +    uint64_t        mcic;                     /* 0x0e8 */
+>> +    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
+>> +    uint32_t        external_damage_code;     /* 0x0f4 */
+>> +    uint64_t        failing_storage_address;  /* 0x0f8 */
+>> +    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
+>> +    uint64_t        per_breaking_event_addr;  /* 0x110 */
+>> +    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
+>> +    PSW             restart_old_psw;          /* 0x120 */
+>> +    PSW             external_old_psw;         /* 0x130 */
+>> +    PSW             svc_old_psw;              /* 0x140 */
+>> +    PSW             program_old_psw;          /* 0x150 */
+>> +    PSW             mcck_old_psw;             /* 0x160 */
+>> +    PSW             io_old_psw;               /* 0x170 */
+>> +    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
+>> +    PSW             restart_new_psw;          /* 0x1a0 */
+>> +    PSW             external_new_psw;         /* 0x1b0 */
+>> +    PSW             svc_new_psw;              /* 0x1c0 */
+>> +    PSW             program_new_psw;          /* 0x1d0 */
+>> +    PSW             mcck_new_psw;             /* 0x1e0 */
+>> +    PSW             io_new_psw;               /* 0x1f0 */
+>> +    PSW             return_psw;               /* 0x200 */
+>> +    uint8_t         irb[64];                  /* 0x210 */
+>> +    uint64_t        sync_enter_timer;         /* 0x250 */
+>> +    uint64_t        async_enter_timer;        /* 0x258 */
+>> +    uint64_t        exit_timer;               /* 0x260 */
+>> +    uint64_t        last_update_timer;        /* 0x268 */
+>> +    uint64_t        user_timer;               /* 0x270 */
+>> +    uint64_t        system_timer;             /* 0x278 */
+>> +    uint64_t        last_update_clock;        /* 0x280 */
+>> +    uint64_t        steal_clock;              /* 0x288 */
+>> +    PSW             return_mcck_psw;          /* 0x290 */
+>> +    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+>> +} __attribute__((packed, aligned(8192))) LowCore;
+> 
+> dito, please avoid packed, use _Static_assert instead.
+> 
+
+I'm not convinced this is a good thing to do. Lowcore freely mixes fields of size 64, 32, 
+and 8 bits. If we drop packed then the compiler will perform all sorts of automatic 
+alignment thereby completely messing up offsets.
+
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
