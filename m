@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46042)
+Received: from eggs.gnu.org ([209.51.188.92]:46260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gvpyd-0005pT-Eg
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:57:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1gvpzW-0006JE-Kd
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gvpyc-00050Y-Hb
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:57:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1gvpzV-0005JM-DE
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 15:58:18 -0500
 References: <20190218161822.3573-1-kwolf@redhat.com>
-	<20190218161822.3573-12-kwolf@redhat.com>
+	<20190218161822.3573-13-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3efe273b-16af-4927-b684-57cf71275923@redhat.com>
-Date: Mon, 18 Feb 2019 14:57:13 -0600
+Message-ID: <8512108c-9716-dbfc-0075-2ec18f975bb9@redhat.com>
+Date: Mon, 18 Feb 2019 14:58:08 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190218161822.3573-12-kwolf@redhat.com>
+In-Reply-To: <20190218161822.3573-13-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/12] block: Use normal drain for
- bdrv_set_aio_context()
+Subject: Re: [Qemu-devel] [PATCH 12/12] aio-posix: Assert that aio_poll() is
+ always called in home thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +29,40 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, stefanha@redhat.com, berrange@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
 On 2/18/19 10:18 AM, Kevin Wolf wrote:
-> Now that bdrv_set_aio_context() works inside drained sections, it can
-> also use the real drain function instead of open coding something
-> similar.
+> aio_poll() has an existing assertion that the function is only called
+> from the AioContext's home thread if blocking is allowed.
+> 
+> This is not enough, some handlers make assumptions about the thread they
+> run in. Extend the assertion to non-blocking calls, too.
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
+>  util/aio-posix.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block.c b/block.c
-> index aefb5701f5..7024172db8 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -5268,18 +5268,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
->      bs->walking_aio_notifiers = false;
->  }
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> index 8640dfde9f..6fbfa7924f 100644
+> --- a/util/aio-posix.c
+> +++ b/util/aio-posix.c
+> @@ -613,6 +613,8 @@ bool aio_poll(AioContext *ctx, bool blocking)
+>      int64_t timeout;
+>      int64_t start = 0;
 >  
-> +/* The caller must own the AioContext lock for the old AioContext of bs, but it
-> + * must not own the AioContext lock for new_context. */
-
-Is this comment still accurate, given
-
->  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
->  {
-> -    AioContext *ctx = bdrv_get_aio_context(bs);
-> -
-> -    if (ctx == new_context) {
-> +    if (bdrv_get_aio_context(bs) == new_context) {
->          return;
->      }
-
-the short-circuiting when the old context is the new context?
-
->  
-> -    aio_disable_external(ctx);
-> -    bdrv_parent_drained_begin(bs, NULL, false);
-> -    bdrv_drain(bs); /* ensure there are no in-flight requests */
-> -
-> +    bdrv_drained_begin(bs);
->      bdrv_detach_aio_context(bs);
->  
->      /* This function executes in the old AioContext so acquire the new one in
-> @@ -5287,8 +5284,7 @@ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
+> +    assert(in_aio_context_home_thread(ctx));
+> +
+>      /* aio_notify can avoid the expensive event_notifier_set if
+>       * everything (file descriptors, bottom halves, timers) will
+>       * be re-evaluated before the next blocking poll().  This is
+> @@ -621,7 +623,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
+>       * so disable the optimization now.
 >       */
->      aio_context_acquire(new_context);
->      bdrv_attach_aio_context(bs, new_context);
-> -    bdrv_parent_drained_end(bs, NULL, false);
-> -    aio_enable_external(ctx);
-> +    bdrv_drained_end(bs);
->      aio_context_release(new_context);
->  }
+>      if (blocking) {
+> -        assert(in_aio_context_home_thread(ctx));
+>          atomic_add(&ctx->notify_me, 2);
+>      }
 >  
 > 
 
