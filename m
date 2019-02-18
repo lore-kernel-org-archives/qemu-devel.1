@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46750)
+Received: from eggs.gnu.org ([209.51.188.92]:49748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gvgRB-000133-P1
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:46:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gvgdY-00044i-Ug
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gvgR6-0006YE-07
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:46:13 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 18 Feb 2019 10:45:25 +0000
-Message-Id: <20190218104525.23674-3-stefanha@redhat.com>
-In-Reply-To: <20190218104525.23674-1-stefanha@redhat.com>
-References: <20190218104525.23674-1-stefanha@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gvgdX-0005rA-Ej
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:59:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gvgdX-0005qK-8H
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:58:59 -0500
+Date: Mon, 18 Feb 2019 11:58:55 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190218105855.GC5303@dhcp-200-176.str.redhat.com>
+References: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
+	<596fc361faea408cabae8a5f41df2e41@AMSPEX02CL03.citrite.net>
+	<61c2a38ace454e2d963dcdd89d53737d@AMSPEX02CL03.citrite.net>
+	<20190218100919.GB5303@dhcp-200-176.str.redhat.com>
+	<1dd9342a7ee149f2beaaebc27c72fd15@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/2] iotests: add LUKS payload overhead to
- 178 qemu-img measure test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1dd9342a7ee149f2beaaebc27c72fd15@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] QEMU xen coverity issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Daniel Berrange <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, 'Peter Maydell' <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The previous patch includes the LUKS payload overhead into the qemu-img
-measure calculation for qcow2.  Update qemu-iotests 178 to exercise this
-new code path.
+Am 18.02.2019 um 11:28 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Sent: 18 February 2019 10:09
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: 'Peter Maydell' <peter.maydell@linaro.org>; QEMU Developers <qemu-
+> > devel@nongnu.org>; Anthony Perard <anthony.perard@citrix.com>
+> > Subject: Re: [Qemu-devel] QEMU xen coverity issues
+> > 
+> > Am 15.02.2019 um 17:20 hat Paul Durrant geschrieben:
+> > > > -----Original Message-----
+> > > [snip]
+> > > > >
+> > > > > (5) CID 1398649: resource leak in xen_block_drive_create():
+> > > > >
+> > > > > In hw/block/xen-block.c xen_block_drive_create() Coverity
+> > > > > complains that the call "driver_layer = qdict_new()" allocates
+> > > > > memory that's leaked because we don't save the pointer anywhere
+> > > > > but don't deallocate it before the end of the function either.
+> > > > > Coverity is not great at understanding our refcounting objects,
+> > > > > but this does look like either we're missing a qobject_unref()
+> > > > > or something should be keeping hold of the dictionary. Probably
+> > > > > best to ask a block layer expert.
+> > > >
+> > > > AFAICT nothing will consume the dictionary so it does appear that
+> > we're
+> > > > missing an unref here.
+> > >
+> > > Testing proves me wrong... This one is a false positive.
+> > 
+> > Hm, but where is it freed?
+> > 
+> > xen_block_blockdev_add() only feeds it to an input visitor, which
+> > doesn't take ownership of the QDict (and in the first error path, it
+> > hasn't even done that yet).
+> 
+> Agreed that error path does not free things... that's definitely a
+> leak... but attempting to free the QDict's on return from
+> xen_block_blockdev_add() certainly causes a seg fault. My assumption
+> was that, having been fed through the input visitor and then through
+> the output visitor in qmp_blockdev_add() that the BlockDriverState
+> eventually takes ownership... but maybe that's not true?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/178           |  8 ++++++++
- tests/qemu-iotests/178.out.qcow2 | 24 ++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+qmp_blockdev_add() only ever sees the QAPI object, not the original
+QDict, so it should be able to take ownership of it. If anything, the
+visitor could do so, but I don't think it does (it takes an extra
+reference, which it frees at the end, but it doesn't free the reference
+it was originally passed).
 
-diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-index 3f4b4a4564..927bf06e4d 100755
---- a/tests/qemu-iotests/178
-+++ b/tests/qemu-iotests/178
-@@ -142,6 +142,14 @@ for ofmt in human json; do
-             # The backing file doesn't need to exist :)
-             $QEMU_IMG measure --output=3D$ofmt -o backing_file=3Dx \
-                               -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
-+
-+            echo
-+            echo "=3D=3D $fmt input image and LUKS encryption =3D=3D"
-+            echo
-+            $QEMU_IMG measure --output=3D$ofmt \
-+                              --object secret,id=3Dsec0,data=3Dbase \
-+                              -o encrypt.format=3Dluks,encrypt.key-secre=
-t=3Dsec0,encrypt.iter-time=3D10 \
-+                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
-         fi
-=20
-         echo
-diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.ou=
-t.qcow2
-index d42d4a4597..55a8dc926f 100644
---- a/tests/qemu-iotests/178.out.qcow2
-+++ b/tests/qemu-iotests/178.out.qcow2
-@@ -68,6 +68,11 @@ converted image file size in bytes: 458752
- required size: 1074135040
- fully allocated size: 1074135040
-=20
-+=3D=3D qcow2 input image and LUKS encryption =3D=3D
-+
-+required size: 2686976
-+fully allocated size: 1076232192
-+
- =3D=3D qcow2 input image and preallocation (human) =3D=3D
-=20
- required size: 1074135040
-@@ -114,6 +119,11 @@ converted image file size in bytes: 524288
- required size: 1074135040
- fully allocated size: 1074135040
-=20
-+=3D=3D raw input image and LUKS encryption =3D=3D
-+
-+required size: 2686976
-+fully allocated size: 1076232192
-+
- =3D=3D raw input image and preallocation (human) =3D=3D
-=20
- required size: 1074135040
-@@ -205,6 +215,13 @@ converted image file size in bytes: 458752
-     "fully-allocated": 1074135040
- }
-=20
-+=3D=3D qcow2 input image and LUKS encryption =3D=3D
-+
-+{
-+    "required": 2686976,
-+    "fully-allocated": 1076232192
-+}
-+
- =3D=3D qcow2 input image and preallocation (json) =3D=3D
-=20
- {
-@@ -263,6 +280,13 @@ converted image file size in bytes: 524288
-     "fully-allocated": 1074135040
- }
-=20
-+=3D=3D raw input image and LUKS encryption =3D=3D
-+
-+{
-+    "required": 2686976,
-+    "fully-allocated": 1076232192
-+}
-+
- =3D=3D raw input image and preallocation (json) =3D=3D
-=20
- {
---=20
-2.20.1
+Maybe worth having another look at that segfault? It could point to a
+related, but separate bug.
+
+Kevin
