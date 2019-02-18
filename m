@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55641)
+Received: from eggs.gnu.org ([209.51.188.92]:56949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvmpi-00080W-Jk
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:35:59 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmtB-0000eK-GE
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:39:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvmpg-0007KW-I4
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:35:58 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-3-armbru@redhat.com>
-	<03d52136-9abf-7035-7152-c2551061dab7@redhat.com>
-Date: Mon, 18 Feb 2019 18:35:20 +0100
-In-Reply-To: <03d52136-9abf-7035-7152-c2551061dab7@redhat.com> (Laszlo Ersek's
-	message of "Mon, 18 Feb 2019 17:43:59 +0100")
-Message-ID: <877edx57af.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvmt8-0001L0-E5
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:39:33 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 17:39:25 +0000
+Message-ID: <13aee80d-3e4b-4c1c-b731-57c066bf9a72@virtuozzo.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-7-jsnow@redhat.com>
+In-Reply-To: <20190213232356.21034-7-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8A3CD6930B8842488C8CE3E1CB526FCC@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
- just once, expand
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] block/dirty-bitmaps: move comment
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-ppc@nongnu.org, alex.bennee@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
-
-> On 02/18/19 13:56, Markus Armbruster wrote:
->> PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
->> BUG", which sounds like a warning, then calls exit(1), followed by
->> unreachable goto reset_flash.  All this commit does is expanding the
->> macro, so the smell becomes more poignant, and the macro can be
->> deleted.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/block/pflash_cfi01.c | 10 ++--------
->>  1 file changed, 2 insertions(+), 8 deletions(-)
->> 
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 9efa7aa9af..f73c30a3ee 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -49,12 +49,6 @@
->>  #include "sysemu/sysemu.h"
->>  #include "trace.h"
->>  
->> -#define PFLASH_BUG(fmt, ...) \
->> -do { \
->> -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
->> -    exit(1); \
->> -} while(0)
->> -
->>  /* #define PFLASH_DEBUG */
->>  #ifdef PFLASH_DEBUG
->>  #define DPRINTF(fmt, ...)                                   \
->> @@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
->>                  pfl->status |= 0x80;
->>              } else {
->>                  DPRINTF("%s: unknown command for \"write block\"\n", __func__);
->> -                PFLASH_BUG("Write block confirm");
->> -                goto reset_flash;
->> +                fprintf(stderr, "PFLASH: Possible BUG - Write block confirm");
->> +                exit(1);
->>              }
->>              break;
->>          default:
->> 
->
-> Technically speaking, the commit message is slightly incorrect, where it
-> says "all this commit does is expanding the macro" -- the "goto" is
-> being removed as well.
-
-You're right.  I'll amend the commit message.
-
-> I like the attention to detail in that you didn't add the missing
-> newline character in the expanded fprintf() ;)
-
-I wish I could claim it was intentional preservation of a bad smell as
-fair warning to future readers...
-
-> With the commit message tweaked, or not:
->
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks!
+MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+IFNpbXBseSBtb3ZlIHRoZSBiaWcg
+c3RhdHVzIGVudW0gY29tbWVudCBibG9jayB0byBhYm92ZSB0aGUgc3RhdHVzDQo+IGZ1bmN0aW9u
+LCBhbmQgZG9jdW1lbnQgaXQgYXMgYmVpbmcgZGVwcmVjYXRlZC4gVGhlIHdob2xlIGNvbmZ1c2lu
+Zw0KPiBibG9jayBjYW4gZ2V0IGRlbGV0ZWQgaW4gdGhyZWUgcmVsZWFzZXMgdGltZS4NCj4gDQo+
+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT4NCg0KDQpSZXZpZXdl
+ZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tPg0KDQpCdXQgSSB0aGluaywgaXQncyBPSyB0byByZW1vdmUgaXQgbm93LiBJdCBtb3N0bHkg
+dW5yZWxhdGVkIHRvIGNvZGUgbm93LCBzbywNCmlzIGl0IG5lZWRlZD8gQW5kIGl0IGlzIHVucmVs
+YXRlZCB0byBkZXByZWNhdGlvbi4gQXMgSSB1bmRlcnN0YW5kLCB1c2VyLXNlZW4NCmluZm9ybWF0
+aW9uIGlzIERpcnR5Qml0bWFwU3RhdHVzIGRlY2xhcmF0aW9uIGluIHFhcGksIGFuZCBpdCBpcyBk
+ZXByZWNhdGVkDQphbmQgdG8gYmUgcmVtb3ZlZCBpbiB0aHJlZSByZWxlYXNlcy4NCg0KPiAtLS0N
+Cj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyB8IDM2ICsrKysrKysrKysrKysrKysrKystLS0tLS0t
+LS0tLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspLCAxNyBkZWxl
+dGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2Nr
+L2RpcnR5LWJpdG1hcC5jDQo+IGluZGV4IDhhYjA0ODM4NWEuLmZjMzkwY2FlOTQgMTAwNjQ0DQo+
+IC0tLSBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
+DQo+IEBAIC0yOCwyMiArMjgsNiBAQA0KPiAgICNpbmNsdWRlICJibG9jay9ibG9ja19pbnQuaCIN
+Cj4gICAjaW5jbHVkZSAiYmxvY2svYmxvY2tqb2IuaCINCj4gICANCj4gLS8qKg0KPiAtICogQSBC
+ZHJ2RGlydHlCaXRtYXAgY2FuIGJlIGluIGZvdXIgcG9zc2libGUgdXNlci12aXNpYmxlIHN0YXRl
+czoNCj4gLSAqICgxKSBBY3RpdmU6ICAgc3VjY2Vzc29yIGlzIE5VTEwsIGFuZCBkaXNhYmxlZCBp
+cyBmYWxzZTogZnVsbCByL3cgbW9kZQ0KPiAtICogKDIpIERpc2FibGVkOiBzdWNjZXNzb3IgaXMg
+TlVMTCwgYW5kIGRpc2FibGVkIGlzIHRydWU6IHF1YWxpZmllZCByL3cgbW9kZSwNCj4gLSAqICAg
+ICAgICAgICAgICAgZ3Vlc3Qgd3JpdGVzIGFyZSBkcm9wcGVkLCBidXQgbW9uaXRvciB3cml0ZXMg
+YXJlIHBvc3NpYmxlLA0KPiAtICogICAgICAgICAgICAgICB0aHJvdWdoIGNvbW1hbmRzIGxpa2Ug
+bWVyZ2UgYW5kIGNsZWFyLg0KPiAtICogKDMpIEZyb3plbjogICBzdWNjZXNzb3IgaXMgbm90IE5V
+TEwuDQo+IC0gKiAgICAgICAgICAgICAgIEEgZnJvemVuIGJpdG1hcCBjYW5ub3QgYmUgcmVuYW1l
+ZCwgZGVsZXRlZCwgY2xlYXJlZCwgc2V0LA0KPiAtICogICAgICAgICAgICAgICBlbmFibGVkLCBt
+ZXJnZWQgdG8sIGV0Yy4gQSBmcm96ZW4gYml0bWFwIGNhbiBvbmx5IGFiZGljYXRlKCkNCj4gLSAq
+ICAgICAgICAgICAgICAgb3IgcmVjbGFpbSgpLg0KPiAtICogICAgICAgICAgICAgICBJbiB0aGlz
+IHN0YXRlLCB0aGUgYW5vbnltb3VzIHN1Y2Nlc3NvciBiaXRtYXAgbWF5IGJlIGVpdGhlcg0KPiAt
+ICogICAgICAgICAgICAgICBBY3RpdmUgYW5kIHJlY29yZGluZyB3cml0ZXMgZnJvbSB0aGUgZ3Vl
+c3QgKGUuZy4gYmFja3VwIGpvYnMpLA0KPiAtICogICAgICAgICAgICAgICBidXQgaXQgY2FuIGJl
+IERpc2FibGVkIGFuZCBub3QgcmVjb3JkaW5nIHdyaXRlcy4NCj4gLSAqICg0KSBMb2NrZWQ6ICAg
+V2hldGhlciBBY3RpdmUgb3IgRGlzYWJsZWQsIHRoZSB1c2VyIGNhbm5vdCBtb2RpZnkgdGhpcyBi
+aXRtYXANCj4gLSAqICAgICAgICAgICAgICAgaW4gYW55IHdheSBmcm9tIHRoZSBtb25pdG9yLg0K
+PiAtICovDQo+ICAgc3RydWN0IEJkcnZEaXJ0eUJpdG1hcCB7DQo+ICAgICAgIFFlbXVNdXRleCAq
+bXV0ZXg7DQo+ICAgICAgIEhCaXRtYXAgKmJpdG1hcDsgICAgICAgICAgICAvKiBEaXJ0eSBiaXRt
+YXAgaW1wbGVtZW50YXRpb24gKi8NCj4gQEAgLTIwNSw3ICsxODksMjUgQEAgYm9vbCBiZHJ2X2Rp
+cnR5X2JpdG1hcF9lbmFibGVkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKQ0KPiAgICAgICByZXR1
+cm4gIWJpdG1hcC0+ZGlzYWJsZWQ7DQo+ICAgfQ0KPiAgIA0KPiAtLyogQ2FsbGVkIHdpdGggQlFM
+IHRha2VuLiAgKi8NCj4gKy8qKg0KPiArICogYmRydl9kaXJ0eV9iaXRtYXBfc3RhdHVzOiBUaGlz
+IEFQSSBpcyBub3cgZGVwcmVjYXRlZC4NCj4gKyAqIENhbGxlZCB3aXRoIEJRTCB0YWtlbi4NCj4g
+KyAqDQo+ICsgKiBBIEJkcnZEaXJ0eUJpdG1hcCBjYW4gYmUgaW4gZm91ciBwb3NzaWJsZSB1c2Vy
+LXZpc2libGUgc3RhdGVzOg0KPiArICogKDEpIEFjdGl2ZTogICBzdWNjZXNzb3IgaXMgTlVMTCwg
+YW5kIGRpc2FibGVkIGlzIGZhbHNlOiBmdWxsIHIvdyBtb2RlDQo+ICsgKiAoMikgRGlzYWJsZWQ6
+IHN1Y2Nlc3NvciBpcyBOVUxMLCBhbmQgZGlzYWJsZWQgaXMgdHJ1ZTogcXVhbGlmaWVkIHIvdyBt
+b2RlLA0KPiArICogICAgICAgICAgICAgICBndWVzdCB3cml0ZXMgYXJlIGRyb3BwZWQsIGJ1dCBt
+b25pdG9yIHdyaXRlcyBhcmUgcG9zc2libGUsDQo+ICsgKiAgICAgICAgICAgICAgIHRocm91Z2gg
+Y29tbWFuZHMgbGlrZSBtZXJnZSBhbmQgY2xlYXIuDQo+ICsgKiAoMykgRnJvemVuOiAgIHN1Y2Nl
+c3NvciBpcyBub3QgTlVMTC4NCj4gKyAqICAgICAgICAgICAgICAgQSBmcm96ZW4gYml0bWFwIGNh
+bm5vdCBiZSByZW5hbWVkLCBkZWxldGVkLCBjbGVhcmVkLCBzZXQsDQo+ICsgKiAgICAgICAgICAg
+ICAgIGVuYWJsZWQsIG1lcmdlZCB0bywgZXRjLiBBIGZyb3plbiBiaXRtYXAgY2FuIG9ubHkgYWJk
+aWNhdGUoKQ0KPiArICogICAgICAgICAgICAgICBvciByZWNsYWltKCkuDQo+ICsgKiAgICAgICAg
+ICAgICAgIEluIHRoaXMgc3RhdGUsIHRoZSBhbm9ueW1vdXMgc3VjY2Vzc29yIGJpdG1hcCBtYXkg
+YmUgZWl0aGVyDQo+ICsgKiAgICAgICAgICAgICAgIEFjdGl2ZSBhbmQgcmVjb3JkaW5nIHdyaXRl
+cyBmcm9tIHRoZSBndWVzdCAoZS5nLiBiYWNrdXAgam9icyksDQo+ICsgKiAgICAgICAgICAgICAg
+IGJ1dCBpdCBjYW4gYmUgRGlzYWJsZWQgYW5kIG5vdCByZWNvcmRpbmcgd3JpdGVzLg0KPiArICog
+KDQpIExvY2tlZDogICBXaGV0aGVyIEFjdGl2ZSBvciBEaXNhYmxlZCwgdGhlIHVzZXIgY2Fubm90
+IG1vZGlmeSB0aGlzIGJpdG1hcA0KPiArICogICAgICAgICAgICAgICBpbiBhbnkgd2F5IGZyb20g
+dGhlIG1vbml0b3IuDQo+ICsgKi8NCj4gICBEaXJ0eUJpdG1hcFN0YXR1cyBiZHJ2X2RpcnR5X2Jp
+dG1hcF9zdGF0dXMoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApDQo+ICAgew0KPiAgICAgICBpZiAo
+YmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihiaXRtYXApKSB7DQo+IA0KDQoNCi0tIA0K
+QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
