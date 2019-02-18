@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44128)
+Received: from eggs.gnu.org ([209.51.188.92]:51674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <copymaster@howtolinux.de>) id 1gvgCd-000239-Tk
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:31:14 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvixr-0007mq-UA
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <copymaster@howtolinux.de>) id 1gvgCc-0007uG-Qx
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:31:11 -0500
-References: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
-	<20190218095141.GA5303@dhcp-200-176.str.redhat.com>
-From: Alexander Marx <copymaster@howtolinux.de>
-Message-ID: <ad648f62-2be8-5d24-3e5c-040830073b12@howtolinux.de>
-Date: Mon, 18 Feb 2019 11:31:01 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gvixl-0004a4-RT
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 08:28:07 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 18 Feb 2019 13:27:47 +0000
+Message-ID: <1ecf68cb-4199-7381-8747-cffc8380c0c4@virtuozzo.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-2-jsnow@redhat.com>
+In-Reply-To: <20190213232356.21034-2-jsnow@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FA556D7E017CE64A9AC4CDDCD903CB1D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190218095141.GA5303@dhcp-200-176.str.redhat.com>
-Content-Language: de-DE
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Please help corrupt filesystem image
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] block/dirty-bitmap: add recording
+ and busy properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Thank you for replying.
-
-The error was in the underlying filesystem. I had to setup new servers.
-
-Alex
-
-
-Am 18.02.19 um 10:51 schrieb Kevin Wolf:
-> Am 17.02.2019 um 05:13 hat Alexander Marx geschrieben:
->> Dear List!
->>
->> I have a big problem and hope you can help me.
->> I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
->> hosts.
->> I was nearly finished with the setup and ready to migrate the users from
->> old to new domain.
->>
->> Then i had to restart the physical servers. Unfortunately 1 dc and 2 rds
->> hosts could not be startet anymore.
->> Error says:
->>
->> qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
->> header: Input/output error
-> The very first thing the qcow2 driver in QEMU does is reading in the
-> image file header, and this is the step that produces the error message
-> you quoted. This is before even looking at any content of the file. So
-> it looks to me as if the image file was corrupted on the file system
-> level or even had bad sectors on the physical hard disk.
->
-> You can try running 'qemu-img check' under 'strace -f' and double check
-> which syscall returns an error before it errors out. I think it will be
-> the first pread64() call, returning EIO. If not, please post the output
-> you're getting.
->
-> Another thing you could try is whether the image file is still
-> accessible for tools like cp, dd or hexdump.
->
-> If these tests confirm that there is a more general problem with the
-> file, running fsck for your host file system that contains the image
-> might be a good idea.
->
->> Even worst, a qemu-img check  also gave that error. and i was not able
->> to do anything i found in the internet to fix it.
->> always that error or the qemu-img could not determine the format.
->>
->> Is there a chance to fix these images? What can i do?
->>
->> I have no backup because the domain was not fully configured. But if i
->> have to rebuild the whole domain, i will need several weeks for it.
->> Any help is appreciated.
-> If only the header is inaccessible, reconstructing it may be possible.
-> Otherwise, probably not.
->
-> We can look into this if your results for the above show that you can
-> still access the image outside of QEMU, and what exactly is even going
-> wrong.
->
-> Kevin
+MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+IFRoZSBjdXJyZW50IEFQSSBhbGxv
+d3MgdXMgdG8gcmVwb3J0IGEgc2luZ2xlIHN0YXR1cywgd2hpY2ggd2UndmUgZGVmaW5lZCBhczoN
+Cj4gDQo+IEZyb3plbjogaGFzIGEgc3VjY2Vzc29yLCB0cmVhdGVkIGFzIHFtcF9sb2NrZWQsIG1h
+eSBvciBtYXkgbm90IGJlIGVuYWJsZWQuDQo+IExvY2tlZDogbm8gc3VjY2Vzc29yLCBxbXBfbG9j
+a2VkLiBtYXkgb3IgbWF5IG5vdCBiZSBlbmFibGVkLg0KPiBEaXNhYmxlZDogTm90IGZyb3plbiBv
+ciBsb2NrZWQsIGRpc2FibGVkLg0KPiBBY3RpdmU6IE5vdCBmcm96ZW4sIGxvY2tlZCwgb3IgZGlz
+YWJsZWQuDQo+IA0KPiBUaGUgcHJvYmxlbSBpcyB0aGF0IGJvdGggIkZyb3plbiIgYW5kICJMb2Nr
+ZWQiIG1lYW4gbmVhcmx5IHRoZSBzYW1lIHRoaW5nLA0KPiBhbmQgdGhhdCBib3RoIG9mIHRoZW0g
+ZG8gbm90IGludHVpdCB3aGV0aGVyIHRoZXkgYXJlIHJlY29yZGluZyBndWVzdCB3cml0ZXMNCj4g
+b3Igbm90Lg0KPiANCj4gVGhpcyBwYXRjaCBkZXByZWNhdGVzIHRoYXQgc3RhdHVzIGZpZWxkIGFu
+ZCBpbnRyb2R1Y2VzIHR3byBvcnRob2dvbmFsDQo+IHByb3BlcnRpZXMgaW5zdGVhZCB0byByZXBs
+YWNlIGl0Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29t
+Pg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyAgICAgICB8ICA5ICsrKysrKysrKw0K
+PiAgIHFhcGkvYmxvY2stY29yZS5qc29uICAgICAgIHwgMTAgKysrKysrKysrLQ0KPiAgIHFlbXUt
+ZGVwcmVjYXRlZC50ZXhpICAgICAgIHwgIDYgKysrKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzIzNi5vdXQgfCAyOCArKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgNCBmaWxlcyBj
+aGFuZ2VkLCA1MiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0
+IGEvYmxvY2svZGlydHktYml0bWFwLmMgYi9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPiBpbmRleCBj
+NmQ0YWNlYmZhLi4xMDEzODNiM2FmIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAu
+Yw0KPiArKysgYi9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPiBAQCAtMjI2LDYgKzIyNiwxMyBAQCBE
+aXJ0eUJpdG1hcFN0YXR1cyBiZHJ2X2RpcnR5X2JpdG1hcF9zdGF0dXMoQmRydkRpcnR5Qml0bWFw
+ICpiaXRtYXApDQo+ICAgICAgIH0NCj4gICB9DQo+ICAgDQo+ICsvKiBDYWxsZWQgd2l0aCBCUUwg
+dGFrZW4uICAqLw0KPiArc3RhdGljIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfcmVjb3JkaW5nKEJk
+cnZEaXJ0eUJpdG1hcCAqYml0bWFwKQ0KPiArew0KPiArICAgIHJldHVybiAhYml0bWFwLT5kaXNh
+YmxlZCB8fCAoYml0bWFwLT5zdWNjZXNzb3IgJiYNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICFiaXRtYXAtPnN1Y2Nlc3Nvci0+ZGlzYWJsZWQpOw0KPiArfQ0KPiArDQo+ICAg
+LyoqDQo+ICAgICogQ3JlYXRlIGEgc3VjY2Vzc29yIGJpdG1hcCBkZXN0aW5lZCB0byByZXBsYWNl
+IHRoaXMgYml0bWFwIGFmdGVyIGFuIG9wZXJhdGlvbi4NCj4gICAgKiBSZXF1aXJlcyB0aGF0IHRo
+ZSBiaXRtYXAgaXMgbm90IGZyb3plbiBhbmQgaGFzIG5vIHN1Y2Nlc3Nvci4NCj4gQEAgLTQ0OCw2
+ICs0NTUsOCBAQCBCbG9ja0RpcnR5SW5mb0xpc3QgKmJkcnZfcXVlcnlfZGlydHlfYml0bWFwcyhC
+bG9ja0RyaXZlclN0YXRlICpicykNCj4gICAgICAgICAgIGluZm8tPmhhc19uYW1lID0gISFibS0+
+bmFtZTsNCj4gICAgICAgICAgIGluZm8tPm5hbWUgPSBnX3N0cmR1cChibS0+bmFtZSk7DQo+ICAg
+ICAgICAgICBpbmZvLT5zdGF0dXMgPSBiZHJ2X2RpcnR5X2JpdG1hcF9zdGF0dXMoYm0pOw0KPiAr
+ICAgICAgICBpbmZvLT5yZWNvcmRpbmcgPSBiZHJ2X2RpcnR5X2JpdG1hcF9yZWNvcmRpbmcoYm0p
+Ow0KPiArICAgICAgICBpbmZvLT5idXN5ID0gYmRydl9kaXJ0eV9iaXRtYXBfdXNlcl9sb2NrZWQo
+Ym0pOw0KPiAgICAgICAgICAgaW5mby0+cGVyc2lzdGVudCA9IGJtLT5wZXJzaXN0ZW50Ow0KPiAg
+ICAgICAgICAgZW50cnktPnZhbHVlID0gaW5mbzsNCj4gICAgICAgICAgICpwbGlzdCA9IGVudHJ5
+Ow0KPiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Jsb2NrLWNvcmUu
+anNvbg0KPiBpbmRleCA4ZjIzZjJlYmI4Li41ZDFkMTgyNDQ3IDEwMDY0NA0KPiAtLS0gYS9xYXBp
+L2Jsb2NrLWNvcmUuanNvbg0KPiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPiBAQCAtNDU4
+LDcgKzQ1OCwxNCBAQA0KPiAgICMNCj4gICAjIEBncmFudWxhcml0eTogZ3JhbnVsYXJpdHkgb2Yg
+dGhlIGRpcnR5IGJpdG1hcCBpbiBieXRlcyAoc2luY2UgMS40KQ0KPiAgICMNCj4gLSMgQHN0YXR1
+czogY3VycmVudCBzdGF0dXMgb2YgdGhlIGRpcnR5IGJpdG1hcCAoc2luY2UgMi40KQ0KPiArIyBA
+c3RhdHVzOiBEZXByZWNhdGVkIGluIGZhdm9yIG9mIEByZWNvcmRpbmcgYW5kIEBsb2NrZWQuIChz
+aW5jZSAyLjQpDQo+ICsjDQo+ICsjIEByZWNvcmRpbmc6IHRydWUgaWYgdGhlIGJpdG1hcCBpcyBy
+ZWNvcmRpbmcgbmV3IHdyaXRlcyBmcm9tIHRoZSBndWVzdC4NCj4gKyMgICAgICAgICAgICAgUmVw
+bGFjZXMgYGFjdGl2ZWAgYW5kIGBkaXNhYmxlZGAgc3RhdHVzZXMuIChzaW5jZSA0LjApDQo+ICsj
+DQo+ICsjIEBidXN5OiB0cnVlIGlmIHRoZSBiaXRtYXAgaXMgaW4tdXNlIGJ5IHNvbWUgb3BlcmF0
+aW9uIChOQkQgb3Igam9icykNCj4gKyMgICAgICAgIGFuZCBjYW5ub3QgYmUgbW9kaWZpZWQgdmlh
+IFFNUCBvciB1c2VkIGJ5IGFub3RoZXIgb3BlcmF0aW9uLg0KPiArIyAgICAgICAgUmVwbGFjZXMg
+YGxvY2tlZGAgYW5kIGBmcm96ZW5gIHN0YXR1c2VzLiAoc2luY2UgNC4wKQ0KPiAgICMNCj4gICAj
+IEBwZXJzaXN0ZW50OiB0cnVlIGlmIHRoZSBiaXRtYXAgd2lsbCBldmVudHVhbGx5IGJlIGZsdXNo
+ZWQgdG8gcGVyc2lzdGVudA0KPiAgICMgICAgICAgICAgICAgIHN0b3JhZ2UgKHNpbmNlIDQuMCkN
+Cj4gQEAgLTQ2Nyw2ICs0NzQsNyBAQA0KPiAgICMjDQo+ICAgeyAnc3RydWN0JzogJ0Jsb2NrRGly
+dHlJbmZvJywNCj4gICAgICdkYXRhJzogeycqbmFtZSc6ICdzdHInLCAnY291bnQnOiAnaW50Jywg
+J2dyYW51bGFyaXR5JzogJ3VpbnQzMicsDQo+ICsgICAgICAgICAgICdyZWNvcmRpbmcnOiAnYm9v
+bCcsICdidXN5JzogJ2Jvb2wnLA0KPiAgICAgICAgICAgICAgJ3N0YXR1cyc6ICdEaXJ0eUJpdG1h
+cFN0YXR1cycsICdwZXJzaXN0ZW50JzogJ2Jvb2wnIH0gfQ0KPiAgIA0KPiAgICMjDQo+IGRpZmYg
+LS1naXQgYS9xZW11LWRlcHJlY2F0ZWQudGV4aSBiL3FlbXUtZGVwcmVjYXRlZC50ZXhpDQo+IGlu
+ZGV4IDgwYjA3MDJhZDUuLmY3YzlmNGMxMDEgMTAwNjQ0DQo+IC0tLSBhL3FlbXUtZGVwcmVjYXRl
+ZC50ZXhpDQo+ICsrKyBiL3FlbXUtZGVwcmVjYXRlZC50ZXhpDQo+IEBAIC04NCw2ICs4NCwxMiBA
+QCB0b3BvbG9naWVzIGRlc2NyaWJlZCB3aXRoIC1zbXAgaW5jbHVkZSBhbGwgcG9zc2libGUgY3B1
+cywgaS5lLg0KPiAgICJhdXRvbG9hZCIgcGFyYW1ldGVyIGlzIG5vdyBpZ25vcmVkLiBBbGwgYml0
+bWFwcyBhcmUgYXV0b21hdGljYWxseSBsb2FkZWQNCj4gICBmcm9tIHFjb3cyIGltYWdlcy4NCj4g
+ICANCj4gK0BzdWJzZWN0aW9uIHF1ZXJ5LWJsb2NrIGRpcnR5LWJpdG1hcHMuc3RhdHVzIHBhcmFt
+ZXRlciAoc2luY2UgNC4wKQ0KDQpJdCBpcyBub3QgYSBwYXJhbWV0ZXIuIEl0J3MgYSBmaWVsZCBv
+ZiByZXN1bHQgc3RydWN0dXJlLi4NCg0KbWF5YmUNCkBzdWJzZWN0aW9uIHF1ZXJ5LWJsb2NrIHJl
+c3VsdCBmaWVsZCAnZGlydHktYml0bWFwc1tpXS5zdGF0dXMnIChzaW5jZSA0LjApDQoNCg0Kd2l0
+aCBvciB3aXRob3V0IGl0Og0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiArDQo+ICtUaGUgYGBzdGF0dXMnJyBm
+aWVsZCBvZiB0aGUgYGBCbG9ja0RpcnR5SW5mbycnIHN0cnVjdHVyZSwgcmV0dXJuZWQgYnkNCj4g
+K3RoZSBxdWVyeS1ibG9jayBjb21tYW5kIGlzIGRlcHJlY2F0ZWQuIFR3byBuZXcgYm9vbGVhbiBm
+aWVsZHMsDQo+ICtgYHJlY29yZGluZycnIGFuZCBgYGJ1c3knJyBlZmZlY3RpdmVseSByZXBsYWNl
+IGl0Lg0KDQpIbSwgcHJlZXhpc3RpbmcsIGJ1dCBkbyB3ZSBoYXZlIHNvbWUgZ29vZCBhbHRlcm5h
+dGl2ZSB0byBgYCAnJyBwYWlyPyBNYXliZSBhIGtpbmQNCm9mIEB2YXJ7fSBvciBzb21ldGhpbmc/
+DQoNCj4gKw0KPiAgIEBzdWJzZWN0aW9uIHF1ZXJ5LWNwdXMgKHNpbmNlIDIuMTIuMCkNCj4gICAN
+Cj4gICBUaGUgYGBxdWVyeS1jcHVzJycgY29tbWFuZCBpcyByZXBsYWNlZCBieSB0aGUgYGBxdWVy
+eS1jcHVzLWZhc3QnJyBjb21tYW5kLg0KDQoNCg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
+ZGltaXINCg==
