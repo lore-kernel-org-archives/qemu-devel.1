@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46704)
+Received: from eggs.gnu.org ([209.51.188.92]:46750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gvgQq-0000nX-Hx
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:45:53 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gvgRB-000133-P1
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:46:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gvgQp-0006Qu-Lh
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:45:52 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gvgR6-0006YE-07
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:46:13 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 18 Feb 2019 10:45:24 +0000
-Message-Id: <20190218104525.23674-2-stefanha@redhat.com>
+Date: Mon, 18 Feb 2019 10:45:25 +0000
+Message-Id: <20190218104525.23674-3-stefanha@redhat.com>
 In-Reply-To: <20190218104525.23674-1-stefanha@redhat.com>
 References: <20190218104525.23674-1-stefanha@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/2] qcow2: include LUKS payload overhead in
- qemu-img measure
+Subject: [Qemu-devel] [PATCH v3 2/2] iotests: add LUKS payload overhead to
+ 178 qemu-img measure test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +26,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Daniel Berrange <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-LUKS encryption reserves clusters for its own payload data.  The size of
-this area must be included in the qemu-img measure calculation so that
-we arrive at the correct minimum required image size.
+The previous patch includes the LUKS payload overhead into the qemu-img
+measure calculation for qcow2.  Update qemu-iotests 178 to exercise this
+new code path.
 
-(Ab)use the qcrypto_block_create() API to determine the payload
-overhead.  We discard the payload data that qcrypto thinks will be
-written to the image.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qcow2.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 71 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/178           |  8 ++++++++
+ tests/qemu-iotests/178.out.qcow2 | 24 ++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 65a54c9ac6..81722177d6 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4232,6 +4232,60 @@ static coroutine_fn int qcow2_co_flush_to_os(Block=
-DriverState *bs)
-     return ret;
+diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
+index 3f4b4a4564..927bf06e4d 100755
+--- a/tests/qemu-iotests/178
++++ b/tests/qemu-iotests/178
+@@ -142,6 +142,14 @@ for ofmt in human json; do
+             # The backing file doesn't need to exist :)
+             $QEMU_IMG measure --output=3D$ofmt -o backing_file=3Dx \
+                               -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++
++            echo
++            echo "=3D=3D $fmt input image and LUKS encryption =3D=3D"
++            echo
++            $QEMU_IMG measure --output=3D$ofmt \
++                              --object secret,id=3Dsec0,data=3Dbase \
++                              -o encrypt.format=3Dluks,encrypt.key-secre=
+t=3Dsec0,encrypt.iter-time=3D10 \
++                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
+         fi
+=20
+         echo
+diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.ou=
+t.qcow2
+index d42d4a4597..55a8dc926f 100644
+--- a/tests/qemu-iotests/178.out.qcow2
++++ b/tests/qemu-iotests/178.out.qcow2
+@@ -68,6 +68,11 @@ converted image file size in bytes: 458752
+ required size: 1074135040
+ fully allocated size: 1074135040
+=20
++=3D=3D qcow2 input image and LUKS encryption =3D=3D
++
++required size: 2686976
++fully allocated size: 1076232192
++
+ =3D=3D qcow2 input image and preallocation (human) =3D=3D
+=20
+ required size: 1074135040
+@@ -114,6 +119,11 @@ converted image file size in bytes: 524288
+ required size: 1074135040
+ fully allocated size: 1074135040
+=20
++=3D=3D raw input image and LUKS encryption =3D=3D
++
++required size: 2686976
++fully allocated size: 1076232192
++
+ =3D=3D raw input image and preallocation (human) =3D=3D
+=20
+ required size: 1074135040
+@@ -205,6 +215,13 @@ converted image file size in bytes: 458752
+     "fully-allocated": 1074135040
  }
 =20
-+static ssize_t qcow2_measure_crypto_hdr_init_func(QCryptoBlock *block,
-+        size_t headerlen, void *opaque, Error **errp)
-+{
-+    size_t *headerlenp =3D opaque;
++=3D=3D qcow2 input image and LUKS encryption =3D=3D
 +
-+    /* Stash away the payload size */
-+    *headerlenp =3D headerlen;
-+    return 0;
++{
++    "required": 2686976,
++    "fully-allocated": 1076232192
 +}
 +
-+static ssize_t qcow2_measure_crypto_hdr_write_func(QCryptoBlock *block,
-+        size_t offset, const uint8_t *buf, size_t buflen,
-+        void *opaque, Error **errp)
-+{
-+    /* Discard the bytes, we're not actually writing to an image */
-+    return buflen;
-+}
-+
-+/* Determine the number of bytes for the LUKS payload */
-+static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
-+                                         Error **errp)
-+{
-+    QDict *opts_qdict;
-+    QDict *cryptoopts_qdict;
-+    QCryptoBlockCreateOptions *cryptoopts;
-+    QCryptoBlock *crypto;
-+
-+    /* Extract "encrypt." options into a qdict */
-+    opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
-+    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
-+    qobject_unref(opts_qdict);
-+
-+    /* Build QCryptoBlockCreateOptions object from qdict */
-+    qdict_put_str(cryptoopts_qdict, "format", "luks");
-+    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp)=
-;
-+    qobject_unref(cryptoopts_qdict);
-+    if (!cryptoopts) {
-+        return false;
-+    }
-+
-+    /* Fake LUKS creation in order to determine the payload size */
-+    crypto =3D qcrypto_block_create(cryptoopts, "encrypt.",
-+                                  qcow2_measure_crypto_hdr_init_func,
-+                                  qcow2_measure_crypto_hdr_write_func,
-+                                  len, errp);
-+    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
-+    if (!crypto) {
-+        return false;
-+    }
-+
-+    qcrypto_block_free(crypto);
-+    return true;
-+}
-+
- static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState =
-*in_bs,
-                                        Error **errp)
+ =3D=3D qcow2 input image and preallocation (json) =3D=3D
+=20
  {
-@@ -4241,11 +4295,13 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *=
-opts, BlockDriverState *in_bs,
-     uint64_t virtual_size; /* disk size as seen by guest */
-     uint64_t refcount_bits;
-     uint64_t l2_tables;
-+    uint64_t luks_payload_size =3D 0;
-     size_t cluster_size;
-     int version;
-     char *optstr;
-     PreallocMode prealloc;
-     bool has_backing_file;
-+    bool has_luks;
+@@ -263,6 +280,13 @@ converted image file size in bytes: 524288
+     "fully-allocated": 1074135040
+ }
 =20
-     /* Parse image creation options */
-     cluster_size =3D qcow2_opt_get_cluster_size_del(opts, &local_err);
-@@ -4275,6 +4331,20 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *o=
-pts, BlockDriverState *in_bs,
-     has_backing_file =3D !!optstr;
-     g_free(optstr);
++=3D=3D raw input image and LUKS encryption =3D=3D
++
++{
++    "required": 2686976,
++    "fully-allocated": 1076232192
++}
++
+ =3D=3D raw input image and preallocation (json) =3D=3D
 =20
-+    optstr =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-+    has_luks =3D optstr && strcmp(optstr, "luks") =3D=3D 0;
-+    g_free(optstr);
-+
-+    if (has_luks) {
-+        size_t headerlen;
-+
-+        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err))=
  {
-+            goto err;
-+        }
-+
-+        luks_payload_size =3D ROUND_UP(headerlen, cluster_size);
-+    }
-+
-     virtual_size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-     virtual_size =3D ROUND_UP(virtual_size, cluster_size);
-=20
-@@ -4345,7 +4415,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *op=
-ts, BlockDriverState *in_bs,
-     info =3D g_new(BlockMeasureInfo, 1);
-     info->fully_allocated =3D
-         qcow2_calc_prealloc_size(virtual_size, cluster_size,
--                                 ctz32(refcount_bits));
-+                                 ctz32(refcount_bits)) + luks_payload_si=
-ze;
-=20
-     /* Remove data clusters that are not required.  This overestimates t=
-he
-      * required size because metadata needed for the fully allocated fil=
-e is
 --=20
 2.20.1
