@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40270)
+Received: from eggs.gnu.org ([209.51.188.92]:41116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gvlyX-0003Q3-ER
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:41:02 -0500
+	(envelope-from <lersek@redhat.com>) id 1gvm1g-000566-1P
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:44:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gvlyU-0008TR-Tk
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:41:01 -0500
+	(envelope-from <lersek@redhat.com>) id 1gvm1e-0001aa-5h
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:44:16 -0500
 References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-2-armbru@redhat.com>
+	<20190218125615.18970-3-armbru@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a8aa118f-419c-580b-bb9f-38fbabbe4606@redhat.com>
-Date: Mon, 18 Feb 2019 17:40:27 +0100
+Message-ID: <03d52136-9abf-7035-7152-c2551061dab7@redhat.com>
+Date: Mon, 18 Feb 2019 17:43:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190218125615.18970-2-armbru@redhat.com>
+In-Reply-To: <20190218125615.18970-3-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/10] pflash: Rename pflash_t to
- PFlashCFI01, PFlashCFI02
+Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
+ just once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,57 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
 On 02/18/19 13:56, Markus Armbruster wrote:
-> flash.h's incomplete struct pflash_t is completed both in
-> pflash_cfi01.c and in pflash_cfi02.c.  The complete types are
-> incompatible.
-
-O_o
-
-> This can hide type errors, such as passing a pflash_t
-> created with pflash_cfi02_register() to pflash_cfi01_get_memory().
-> 
-> Furthermore, POSIX reserves typedef names ending with _t.
-> 
-> Rename the two structs to PFlashCFI01 and PFlashCFI02.
+> PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
+> BUG", which sounds like a warning, then calls exit(1), followed by
+> unreachable goto reset_flash.  All this commit does is expanding the
+> macro, so the smell becomes more poignant, and the macro can be
+> deleted.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  hw/arm/vexpress.c        |  8 ++--
->  hw/block/pflash_cfi01.c  | 87 +++++++++++++++++++++-------------------
->  hw/block/pflash_cfi02.c  | 67 ++++++++++++++++---------------
->  hw/i386/pc_sysfw.c       |  2 +-
->  hw/mips/mips_malta.c     |  2 +-
->  hw/xtensa/xtfpga.c       | 10 ++---
->  include/hw/block/flash.h | 53 ++++++++++++++----------
->  7 files changed, 122 insertions(+), 107 deletions(-)
+>  hw/block/pflash_cfi01.c | 10 ++--------
+>  1 file changed, 2 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index 9efa7aa9af..f73c30a3ee 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -49,12 +49,6 @@
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
+>  
+> -#define PFLASH_BUG(fmt, ...) \
+> -do { \
+> -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
+> -    exit(1); \
+> -} while(0)
+> -
+>  /* #define PFLASH_DEBUG */
+>  #ifdef PFLASH_DEBUG
+>  #define DPRINTF(fmt, ...)                                   \
+> @@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
+>                  pfl->status |= 0x80;
+>              } else {
+>                  DPRINTF("%s: unknown command for \"write block\"\n", __func__);
+> -                PFLASH_BUG("Write block confirm");
+> -                goto reset_flash;
+> +                fprintf(stderr, "PFLASH: Possible BUG - Write block confirm");
+> +                exit(1);
+>              }
+>              break;
+>          default:
+> 
 
-I didn't check larger contexts in the modified files. I also didn't look
-for typos or try to verify the patch by recreating it from scratch, and
-by comparison. I read through the posted patch and it looks OK to me.
+Technically speaking, the commit message is slightly incorrect, where it
+says "all this commit does is expanding the macro" -- the "goto" is
+being removed as well.
+
+I like the attention to detail in that you didn't add the missing
+newline character in the expanded fprintf() ;)
+
+With the commit message tweaked, or not:
 
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Thanks
+Thakns
 Laszlo
