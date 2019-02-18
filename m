@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60676)
+Received: from eggs.gnu.org ([209.51.188.92]:60891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvfHP-0007wv-DW
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:32:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gvfHw-0008Fp-8M
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvfHO-0007nx-GY
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:32:03 -0500
-Date: Mon, 18 Feb 2019 10:31:38 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gvfHq-000867-De
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:32:32 -0500
+Date: Mon, 18 Feb 2019 10:31:55 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190218103138.21aa9c05@Igors-MacBook-Pro.local>
-In-Reply-To: <b94c91de-5390-b04f-27d3-f183d010f730@redhat.com>
-References: <20190214140714.15738-1-imammedo@redhat.com>
-	<4d8518f7-5272-fc18-d5c7-20c4cafdf7e8@redhat.com>
-	<20190215123317.6903b818@Igors-MacBook-Pro.local>
-	<2d99aca8-5ed0-bea3-4a4f-7b2a8e89b049@redhat.com>
-	<20190215164209.54a6f747@Igors-MacBook-Pro.local>
-	<b94c91de-5390-b04f-27d3-f183d010f730@redhat.com>
+Message-ID: <20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
+In-Reply-To: <20190205173306.20483-15-eric.auger@redhat.com>
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-15-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] memory: use memory_region_init_ram() instead
- of memory_region_allocate_system_memory()
+Subject: Re: [Qemu-devel] [PATCH v6 14/18] hw/arm/virt: Allocate
+ device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org, qemu-arm@nongnu.org, jan.kiszka@web.de, atar4qemu@gmail.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-On Fri, 15 Feb 2019 19:18:50 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue,  5 Feb 2019 18:33:02 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-> On 15/02/19 16:42, Igor Mammedov wrote:
-> >>
-> >> What about -m, too?  Then you'd specify a memdev instead of the initial
-> >> memory size.
-> > that somewhat what I've planned,
-> > make -m X translate into -object memory-backend-ram,id=magically-get-what-board-uses-now,size=X -machine memdev=thatid
-> > 
-> > one more reason for memdev vs device is that -numa now uses memdevs and so far it
-> > doesn't look that non-numa initial RAM would get immediate benefits from using -device
-> > on most boards (well, I couldn't come up with any modulo backend/frontend consistent usage)
+> The device memory region is located after the initial RAM.
+> its start/size are 1GB aligned.
 > 
-> What I meant is what about making the non-NUMA option -m memdev=thatid
-> (and the automatic translation you mention too).  Yes, bikeshedding. :)
-sure, I can add it,
-it would be just an alias to machine.memdev
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
+> ---
+> v4 -> v5:
+> - device memory set after the initial RAM
+> 
+> v3 -> v4:
+> - remove bootinfo.device_memory_start/device_memory_size
+> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+> ---
+>  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 783468ba77..b683902991 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -61,6 +61,7 @@
+>  #include "hw/arm/smmuv3.h"
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/mem/nvdimm.h"
+> +#include "hw/acpi/acpi.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1260,6 +1261,37 @@ static void create_secure_ram(VirtMachineState *vms,
+>      g_free(nodename);
+>  }
+>  
+> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+> +{
+> +    MachineState *ms = MACHINE(vms);
+> +    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;
+should size it with 1Gb alignment per slot from the start (to avoid x86 mistakes),
+see enforce_aligned_dimm usage and associated commit for more details
+
+> +    uint64_t align = GiB;
+> +
+> +    if (!device_memory_size) {
+> +        return;
+> +    }
+> +
+> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+> +        error_report("unsupported number of memory slots: %"PRIu64,
+> +                     ms->ram_slots);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
+> +        error_report("maximum memory size must be aligned to multiple of 0x%"
+> +                     PRIx64, align);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+> +    ms->device_memory->base = QEMU_ALIGN_UP(GiB + ms->ram_size, GiB);
+                                               ^^^ where does this come from?
 
 
-> 
-> Paolo
-> 
+> +
+> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+> +                       "device-memory", device_memory_size);
+> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
+> +                                &ms->device_memory->mr);
+> +}
+> +
+>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+>  {
+>      const VirtMachineState *board = container_of(binfo, VirtMachineState,
+> @@ -1569,6 +1601,10 @@ static void machvirt_init(MachineState *machine)
+>                                           machine->ram_size);
+>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>  
+> +    if (vms->extended_memmap) {
+> +        create_device_memory(vms, sysmem);
+> +    }
+> +
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>  
+>      create_gic(vms, pic);
