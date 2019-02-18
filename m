@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36904)
+Received: from eggs.gnu.org ([209.51.188.92]:36957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gvfh5-0003kG-8N
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:58:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1gvfhS-0003kZ-O4
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gvfgu-0006Ug-C1
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:58:27 -0500
-Date: Mon, 18 Feb 2019 10:51:41 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190218095141.GA5303@dhcp-200-176.str.redhat.com>
-References: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
+	(envelope-from <armbru@redhat.com>) id 1gvfec-0005R8-Ce
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:56:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvfea-0005Ov-IY
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:56:01 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C844B59448
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 09:55:59 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1550227757-10869-2-git-send-email-pbonzini@redhat.com>
+Date: Mon, 18 Feb 2019 10:55:53 +0100
+In-Reply-To: <1550227757-10869-2-git-send-email-pbonzini@redhat.com> (Paolo
+	Bonzini's message of "Fri, 15 Feb 2019 11:49:16 +0100")
+Message-ID: <877edxpgie.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Please help corrupt filesystem image
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] build: remove unnecessary assignments from
+ Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Marx <copymaster@howtolinux.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-Am 17.02.2019 um 05:13 hat Alexander Marx geschrieben:
-> Dear List!
->=20
-> I have a big problem and hope you can help me.
-> I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
-> hosts.
-> I was nearly finished with the setup and ready to migrate the users fro=
-m
-> old to new domain.
->=20
-> Then i had to restart the physical servers. Unfortunately 1 dc and 2 rd=
-s
-> hosts could not be startet anymore.
-> Error says:
->=20
-> qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
-> header: Input/output error
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-The very first thing the qcow2 driver in QEMU does is reading in the
-image file header, and this is the step that produces the error message
-you quoted. This is before even looking at any content of the file. So
-it looks to me as if the image file was corrupted on the file system
-level or even had bad sectors on the physical hard disk.
+> It is only necessary to clear block-obj-y because Makefile.objs
+> uses "+=" instead of "="; fix that and remove the assignment.
+> The other variables need not be cleared at all.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-You can try running 'qemu-img check' under 'strace -f' and double check
-which syscall returns an error before it errors out. I think it will be
-the first pread64() call, returning EIO. If not, please post the output
-you're getting.
-
-Another thing you could try is whether the image file is still
-accessible for tools like cp, dd or hexdump.
-
-If these tests confirm that there is a more general problem with the
-file, running fsck for your host file system that contains the image
-might be a good idea.
-
-> Even worst, a qemu-img check=A0 also gave that error. and i was not abl=
-e
-> to do anything i found in the internet to fix it.
-> always that error or the qemu-img could not determine the format.
->=20
-> Is there a chance to fix these images? What can i do?
->=20
-> I have no backup because the domain was not fully configured. But if i
-> have to rebuild the whole domain, i will need several weeks for it.
-> Any help is appreciated.
-
-If only the header is inaccessible, reconstructing it may be possible.
-Otherwise, probably not.
-
-We can look into this if your results for the above show that you can
-still access the image outside of QEMU, and what exactly is even going
-wrong.
-
-Kevin
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
