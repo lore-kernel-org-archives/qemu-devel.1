@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60891)
+Received: from eggs.gnu.org ([209.51.188.92]:36904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvfHw-0008Fp-8M
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:32:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gvfh5-0003kG-8N
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvfHq-000867-De
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:32:32 -0500
-Date: Mon, 18 Feb 2019 10:31:55 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
-In-Reply-To: <20190205173306.20483-15-eric.auger@redhat.com>
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-15-eric.auger@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gvfgu-0006Ug-C1
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:58:27 -0500
+Date: Mon, 18 Feb 2019 10:51:41 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190218095141.GA5303@dhcp-200-176.str.redhat.com>
+References: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 14/18] hw/arm/virt: Allocate
- device_memory
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1ee13520-b5f2-b539-7112-4e7de79e7c16@howtolinux.de>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Please help corrupt filesystem image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+To: Alexander Marx <copymaster@howtolinux.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue,  5 Feb 2019 18:33:02 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
+Am 17.02.2019 um 05:13 hat Alexander Marx geschrieben:
+> Dear List!
+>=20
+> I have a big problem and hope you can help me.
+> I built a new windows 2016 domain with virtual servers. 2 dc and 9 rds
+> hosts.
+> I was nearly finished with the setup and ready to migrate the users fro=
+m
+> old to new domain.
+>=20
+> Then i had to restart the physical servers. Unfortunately 1 dc and 2 rd=
+s
+> hosts could not be startet anymore.
+> Error says:
+>=20
+> qemu-img: Could not open 'vm-150-disk-0.qcow2': Could not read qcow2
+> header: Input/output error
 
-> The device memory region is located after the initial RAM.
-> its start/size are 1GB aligned.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> 
-> ---
-> v4 -> v5:
-> - device memory set after the initial RAM
-> 
-> v3 -> v4:
-> - remove bootinfo.device_memory_start/device_memory_size
-> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
-> ---
->  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 783468ba77..b683902991 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -61,6 +61,7 @@
->  #include "hw/arm/smmuv3.h"
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/mem/nvdimm.h"
-> +#include "hw/acpi/acpi.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1260,6 +1261,37 @@ static void create_secure_ram(VirtMachineState *vms,
->      g_free(nodename);
->  }
->  
-> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
-> +{
-> +    MachineState *ms = MACHINE(vms);
-> +    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;
-should size it with 1Gb alignment per slot from the start (to avoid x86 mistakes),
-see enforce_aligned_dimm usage and associated commit for more details
+The very first thing the qcow2 driver in QEMU does is reading in the
+image file header, and this is the step that produces the error message
+you quoted. This is before even looking at any content of the file. So
+it looks to me as if the image file was corrupted on the file system
+level or even had bad sectors on the physical hard disk.
 
-> +    uint64_t align = GiB;
-> +
-> +    if (!device_memory_size) {
-> +        return;
-> +    }
-> +
-> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
-> +        error_report("unsupported number of memory slots: %"PRIu64,
-> +                     ms->ram_slots);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
-> +    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
-> +        error_report("maximum memory size must be aligned to multiple of 0x%"
-> +                     PRIx64, align);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
-> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
-> +    ms->device_memory->base = QEMU_ALIGN_UP(GiB + ms->ram_size, GiB);
-                                               ^^^ where does this come from?
+You can try running 'qemu-img check' under 'strace -f' and double check
+which syscall returns an error before it errors out. I think it will be
+the first pread64() call, returning EIO. If not, please post the output
+you're getting.
 
+Another thing you could try is whether the image file is still
+accessible for tools like cp, dd or hexdump.
 
-> +
-> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
-> +                       "device-memory", device_memory_size);
-> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
-> +                                &ms->device_memory->mr);
-> +}
-> +
->  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
->  {
->      const VirtMachineState *board = container_of(binfo, VirtMachineState,
-> @@ -1569,6 +1601,10 @@ static void machvirt_init(MachineState *machine)
->                                           machine->ram_size);
->      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
->  
-> +    if (vms->extended_memmap) {
-> +        create_device_memory(vms, sysmem);
-> +    }
-> +
->      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
->  
->      create_gic(vms, pic);
+If these tests confirm that there is a more general problem with the
+file, running fsck for your host file system that contains the image
+might be a good idea.
+
+> Even worst, a qemu-img check=A0 also gave that error. and i was not abl=
+e
+> to do anything i found in the internet to fix it.
+> always that error or the qemu-img could not determine the format.
+>=20
+> Is there a chance to fix these images? What can i do?
+>=20
+> I have no backup because the domain was not fully configured. But if i
+> have to rebuild the whole domain, i will need several weeks for it.
+> Any help is appreciated.
+
+If only the header is inaccessible, reconstructing it may be possible.
+Otherwise, probably not.
+
+We can look into this if your results for the above show that you can
+still access the image outside of QEMU, and what exactly is even going
+wrong.
+
+Kevin
