@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39407)
+Received: from eggs.gnu.org ([209.51.188.92]:39406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxw-0006ce-Fv
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxw-0006cd-FU
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvjxt-0003Cj-Vd
+	(envelope-from <dgibson@ozlabs.org>) id 1gvjxt-0003CD-MP
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:32:16 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Feb 2019 01:30:27 +1100
-Message-Id: <20190218143049.17142-22-david@gibson.dropbear.id.au>
+Date: Tue, 19 Feb 2019 01:30:26 +1100
+Message-Id: <20190218143049.17142-21-david@gibson.dropbear.id.au>
 In-Reply-To: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/43] xics: Drop the KVM ICP class
+Subject: [Qemu-devel] [PULL 20/43] spapr/irq: Use the base ICP class for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +27,62 @@ Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Da
 
 From: Greg Kurz <groug@kaod.org>
 
-The KVM ICP class isn't used anymore. Drop it.
+The base ICP class knows how to interact with KVM. Adapt sPAPR to use it
+instead of the ICP KVM class.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155023081228.1011724.12474992370439652538.stgit@bahia.lan>
+Message-Id: <155023080638.1011724.792095453419098948.stgit@bahia.lan>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics_kvm.c    | 18 ------------------
- include/hw/ppc/xics.h |  3 ---
- 2 files changed, 21 deletions(-)
+ hw/ppc/spapr_irq.c     | 4 +---
+ include/hw/ppc/spapr.h | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 4eebced516..fae4ac431f 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -152,23 +152,6 @@ void icp_kvm_realize(DeviceState *dev, Error **errp)
-     QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
- }
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 48d6b2daed..e6893df61e 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -102,7 +102,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *sp=
+apr, int nr_irqs,
+     if (kvm_enabled()) {
+         if (machine_kernel_irqchip_allowed(machine) &&
+             !xics_kvm_init(spapr, &local_err)) {
+-            spapr->icp_type =3D TYPE_KVM_ICP;
+             spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs=
+,
+                                           &local_err);
+         }
+@@ -117,7 +116,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *sp=
+apr, int nr_irqs,
 =20
--static void icp_kvm_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
--    ICPStateClass *icpc =3D ICP_CLASS(klass);
--
--    device_class_set_parent_realize(dc, icp_kvm_realize,
--                                    &icpc->parent_realize);
--}
--
--static const TypeInfo icp_kvm_info =3D {
--    .name =3D TYPE_KVM_ICP,
--    .parent =3D TYPE_ICP,
--    .instance_size =3D sizeof(ICPState),
--    .class_init =3D icp_kvm_class_init,
--    .class_size =3D sizeof(ICPStateClass),
--};
--
- /*
-  * ICS-KVM
-  */
-@@ -425,7 +408,6 @@ fail:
- static void xics_kvm_register_types(void)
- {
-     type_register_static(&ics_kvm_info);
--    type_register_static(&icp_kvm_info);
- }
+     if (!spapr->ics) {
+         xics_spapr_init(spapr);
+-        spapr->icp_type =3D TYPE_ICP;
+         spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
+                                       &local_err);
+     }
+@@ -199,7 +197,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
+neState *spapr,
+     Object *obj;
+     sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
 =20
- type_init(xics_kvm_register_types)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index ab61dc2401..fae54e6f28 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -50,9 +50,6 @@ typedef struct XICSFabric XICSFabric;
- #define TYPE_ICP "icp"
- #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+-    obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr),
++    obj =3D icp_create(OBJECT(cpu), TYPE_ICP, XICS_FABRIC(spapr),
+                      &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index cbd276ed2b..631fc5103b 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -178,7 +178,6 @@ struct sPAPRMachineState {
+     /*< public >*/
+     char *kvm_type;
 =20
--#define TYPE_KVM_ICP "icp-kvm"
--#define KVM_ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_KVM_ICP)
--
- #define TYPE_PNV_ICP "pnv-icp"
- #define PNV_ICP(obj) OBJECT_CHECK(PnvICPState, (obj), TYPE_PNV_ICP)
-=20
+-    const char *icp_type;
+     int32_t irq_map_nr;
+     unsigned long *irq_map;
+     sPAPRXive  *xive;
 --=20
 2.20.1
