@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53827)
+Received: from eggs.gnu.org ([209.51.188.92]:53987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvenc-0002cj-Rn
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:01:21 -0500
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gvenl-0002oz-UD
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:01:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gvelP-0004wY-Jd
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 03:59:00 -0500
-Date: Mon, 18 Feb 2019 09:58:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190218095838.048819c5@Igors-MacBook-Pro.local>
-In-Reply-To: <20190205173306.20483-13-eric.auger@redhat.com>
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-13-eric.auger@redhat.com>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gvend-000650-Fl
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:01:24 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1gvend-00064G-3b
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 04:01:17 -0500
+Received: by mail-pl1-x641.google.com with SMTP id c4so3426515pls.11
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 01:01:17 -0800 (PST)
+References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
+	<20190111063732.10484-4-xiaoguangrong@tencent.com>
+	<20190116064028.GC29461@xz-x1>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <b2e2de1f-c85a-016c-b0c8-f2c1cfd7ef94@gmail.com>
+Date: Mon, 18 Feb 2019 17:01:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190116064028.GC29461@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 12/18] hw/arm/boot: Expose the PC-DIMM
- nodes in the DT
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] migration: introduce adaptive model
+ for waiting thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +33,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+To: Peter Xu <peterx@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, wei.w.wang@intel.com, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Tue,  5 Feb 2019 18:33:00 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
 
-> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+On 1/16/19 2:40 PM, Peter Xu wrote:
+> On Fri, Jan 11, 2019 at 02:37:32PM +0800, guangrong.xiao@gmail.com wrote:
+
+>> +
+>> +static void update_compress_wait_thread(MigrationState *s)
+>> +{
+>> +    s->compress_wait_thread = get_compress_wait_thread(&s->parameters);
+>> +    assert(s->compress_wait_thread != COMPRESS_WAIT_THREAD_ERR);
+>> +}
 > 
-> This patch add memory nodes corresponding to PC-DIMM regions.
-s/add/adds/ or s/This patch add/Add/
+> We can probably deprecate these chunk of codes if you're going to use
+> alternative structs or enum as suggested by Markus...
+> 
+
+Yes, indeed.
+
+> I think Libvirt is not using this parameter, right?  And I believe the
+> parameter "compress-wait-thread" was just introduced since QEMU 3.1.
+> I'm not sure whether we can directly change it to an enum assuming
+> that no one is really using it in production yet which could possibly
+> break nobody.
+
+I did a check in libvirt's code:
+$ git grep compress-wait-thread
+tests/qemucapabilitiesdata/caps_3.1.0.ppc64.replies:          "name": "compress-wait-thread",
+tests/qemucapabilitiesdata/caps_3.1.0.ppc64.replies:          "name": "compress-wait-thread",
+tests/qemucapabilitiesdata/caps_3.1.0.x86_64.replies:          "name": "compress-wait-thread",
+tests/qemucapabilitiesdata/caps_3.1.0.x86_64.replies:          "name": "compress-wait-thread",
+tests/qemucapabilitiesdata/caps_4.0.0.x86_64.replies:          "name": "compress-wait-thread",
+tests/qemucapabilitiesdata/caps_4.0.0.x86_64.replies:          "name": "compress-wait-thread",
+
+It seems changing this parameter will break libvirt's self-test?
 
 > 
-> NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
-> don't need to care about NV-DIMM at this stage.
+> Maybe we still have chance to quickly switch back to the name
+> "x-compress-wait-thread" just like the -global interface then we don't
+> need to worry much on QAPI breakage so far until the parameter proves
+> itself to remove the "x-".
 > 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v3 -> v4:
-> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
-> 
-> v1 -> v2:
-> - added qapi_free_MemoryDeviceInfoList and simplify the loop
-> ---
->  hw/arm/boot.c | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 2ef367e15b..2a70e8aa82 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -19,6 +19,7 @@
->  #include "sysemu/numa.h"
->  #include "hw/boards.h"
->  #include "hw/loader.h"
-> +#include "hw/mem/memory-device.h"
->  #include "elf.h"
->  #include "sysemu/device_tree.h"
->  #include "qemu/config-file.h"
-> @@ -526,6 +527,34 @@ static void fdt_add_psci_node(void *fdt)
->      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->  }
->  
-> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
-> +                                             uint32_t acells, uint32_t scells) {
-> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
-> +    MemoryDeviceInfo *mi;
-> +    PCDIMMDeviceInfo *di;
-> +    bool is_nvdimm;
-> +    int ret = 0;
-> +
-> +    for (info = info_list; info != NULL; info = info->next) {
-> +        mi = info->value;
-> +        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-> +        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-> +
-> +        if (is_nvdimm) {
-> +            ret = -ENOENT; /* NV-DIMM not yet supported */
-> +        } else {
-> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
-> +                                      scells, di->size, di->node);
-> +        }
-> +        if (ret < 0) {
-> +            goto out;
-> +        }
-> +    }
-> +out:
-> +    qapi_free_MemoryDeviceInfoList(info_list);
-> +    return ret;
-> +}
-> +
->  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->                   hwaddr addr_limit, AddressSpace *as)
->  {
-> @@ -621,6 +650,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->          }
->      }
->  
-> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
-> +    if (rc < 0) {
-> +            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
-error message is rather vague, user using nvdimms + pc-dimms on CLI won't have
-a clue that the former is not supported.
-Suggest pass in error_fatal as argument and report more specific error from
-fdt_add_hotpluggable_memory_nodes()
 
-does this run on reboot?
+Er... i am not sure i can follow it clearly. :(
 
-> +            goto fail;
-> +    }
-> +
->      rc = fdt_path_offset(fdt, "/chosen");
->      if (rc < 0) {
->          qemu_fdt_add_subnode(fdt, "/chosen");
+> [...]
+> 
+>> @@ -1917,40 +2000,40 @@ bool migrate_postcopy_blocktime(void)
+>>       return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
+>>   }
+>>   
+>> -bool migrate_use_compression(void)
+>> +int64_t migrate_max_bandwidth(void)
+>>   {
+>>       MigrationState *s;
+>>   
+>>       s = migrate_get_current();
+>>   
+>> -    return s->enabled_capabilities[MIGRATION_CAPABILITY_COMPRESS];
+>> +    return s->parameters.max_bandwidth;
+>>   }
+>>   
+>> -int migrate_compress_level(void)
+>> +bool migrate_use_compression(void)
+>>   {
+>>       MigrationState *s;
+>>   
+>>       s = migrate_get_current();
+>>   
+>> -    return s->parameters.compress_level;
+>> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_COMPRESS];
+>>   }
+>>   
+>> -int migrate_compress_threads(void)
+>> +int migrate_compress_level(void)
+>>   {
+>>       MigrationState *s;
+>>   
+>>       s = migrate_get_current();
+>>   
+>> -    return s->parameters.compress_threads;
+>> +    return s->parameters.compress_level;
+>>   }
+>>   
+>> -int migrate_compress_wait_thread(void)
+>> +int migrate_compress_threads(void)
+>>   {
+>>       MigrationState *s;
+>>   
+>>       s = migrate_get_current();
+>>   
+>> -    return s->parameters.compress_wait_thread;
+>> +    return s->parameters.compress_threads;
+> 
+> I'm a bit confused on these diff... are you only adding
+> migrate_max_bandwidth() and not changing anything else?
+
+I guess so.
+
+>  I'm curious
+> on how these chunk is generated since it looks really weird...
+
+Looks weird for me too. :(
+
+> 
+> [...]
+> 
+>>   /* State of RAM for migration */
+>>   struct RAMState {
+>>       /* QEMUFile used for this migration */
+>> @@ -292,6 +294,19 @@ struct RAMState {
+>>       bool ram_bulk_stage;
+>>       /* How many times we have dirty too many pages */
+>>       int dirty_rate_high_cnt;
+>> +
+>> +    /* used by by compress-wait-thread-adaptive */
+> 
+> compress-wait-thread-adaptive is gone?
+
+It's a typo, will fix.
+
+>> +
+>> +    max_bw = (max_bw >> 20) * 8;
+>> +    remain_bw = abs(max_bw - (int64_t)(mbps));
+>> +    if (remain_bw <= (max_bw / 20)) {
+>> +        /* if we have used all the bandwidth, let's compress more. */
+>> +        if (compression_counters.compress_no_wait_weight) {
+>> +            compression_counters.compress_no_wait_weight--;
+>> +        }
+>> +        goto exit;
+>> +    }
+>> +
+>> +    /* have enough bandwidth left, do not need to compress so aggressively */
+>> +    if (compression_counters.compress_no_wait_weight !=
+>> +        COMPRESS_BUSY_COUNT_PERIOD) {
+>> +        compression_counters.compress_no_wait_weight++;
+>> +    }
+>> +
+>> +exit:
+>> +    ram_state->compress_busy_count = 0;
+>> +    ram_state->compress_no_wait_left =
+>> +                            compression_counters.compress_no_wait_weight;
+> 
+> The "goto" and the chunk seems awkward to me...  How about this?
+> 
+>    if (not_enough_remain_bw && weight)
+>      weight--;
+>    else if (weight <= MAX)
+>      weight++;
+> 
+>    (do the rest...)
+> 
+
+Okay, will address your style.
+
+
+> Also, would you like to add some documentation to these compression
+> features into docs/devel/migration.rst?  It'll be good, but it's your
+> call. :)
+
+It's useful indeed. I will do it.
+
+>>   static void migration_update_rates(RAMState *rs, int64_t end_time)
+>>   {
+>>       uint64_t page_count = rs->target_page_count - rs->target_page_count_prev;
+>> @@ -1975,7 +2057,11 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
+>>                                              ram_addr_t offset)
+>>   {
+>>       int idx, thread_count, bytes_xmit = -1, pages = -1;
+>> -    bool wait = migrate_compress_wait_thread();
+>> +    int compress_wait_thread = migrate_compress_wait_thread();
+>> +    bool wait, adaptive;
+>> +
+>> +    wait = (adaptive == COMPRESS_WAIT_THREAD_ON);
+>> +    adaptive = (adaptive == COMPRESS_WAIT_THREAD_ADAPTIVE);
+> 
+> Should s/adaptive/compress_wait_thread/ for both lines on the right?
+> 
+
+Oops! I made the patches based on the wrong code base. :(
+
+> It seems that you'll probably want to update the performance numbers
+> too in the next post since current test number might depend on a
+> random stack variable. :)
+> 
+
+Yes, indeed, will update the number.
+
+>>   
+>>       thread_count = migrate_compress_threads();
+>>       qemu_mutex_lock(&comp_done_lock);
+>> @@ -1990,20 +2076,29 @@ retry:
+>>               qemu_mutex_unlock(&comp_param[idx].mutex);
+>>               pages = 1;
+>>               update_compress_thread_counts(&comp_param[idx], bytes_xmit);
+>> -            break;
+>> +            goto exit;
+>>           }
+>>       }
+>>   
+>> +    if (adaptive && !wait) {
+>> +        /* it is the first time go to the loop */
+>> +        wait = compress_adaptive_need_wait();
+>> +    }
+> 
+> IIUC if adaptive==true then wait must be false.
+> 
+> I would really make this simpler like:
+> 
+>    if (compress_wait_thread == ON)
+>      wait = on;
+>    else if (compress_wait_thread == OFF)
+>      wait = off;
+>    else
+>      wait = compress_adaptive_need_wait();
+> 
+
+I am afraid it is not the one we want. :(
+
+We do not always go to compress_adaptive_need_wait() for 'adaptive',
+instead, we do it only for the first time in the loop:
+
+     if (adaptive && !wait) {
+         /* it is the first time go to the loop */
+         wait = compress_adaptive_need_wait();
+     }
+
+Thanks!
