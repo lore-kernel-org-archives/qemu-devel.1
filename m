@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43435)
+Received: from eggs.gnu.org ([209.51.188.92]:43451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gvgAZ-0000Lj-Pb
+	(envelope-from <prvs=945ec5b1b=Paul.Durrant@citrix.com>)
+	id 1gvgAb-0000Lm-NQ
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gvgAU-0006Qy-8S
+	(envelope-from <prvs=945ec5b1b=Paul.Durrant@citrix.com>)
+	id 1gvgAZ-0006UP-Qp
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:29:05 -0500
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:7487
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=945ec5b1b=Paul.Durrant@citrix.com>)
+	id 1gvgAV-000647-Ne
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:29:00 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34737)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gvgAQ-0006Ag-HT
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:28:56 -0500
-Received: by mail-pf1-x444.google.com with SMTP id u9so1088382pfn.1
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 02:28:32 -0800 (PST)
-From: elohimes@gmail.com
-Date: Mon, 18 Feb 2019 18:27:47 +0800
-Message-Id: <20190218102748.2242-7-xieyongji@baidu.com>
-In-Reply-To: <20190218102748.2242-1-xieyongji@baidu.com>
-References: <20190218102748.2242-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v6 6/7] vhost-user-blk: Add support to
- reconnect backend
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Mon, 18 Feb 2019 10:28:20 +0000
+Message-ID: <1dd9342a7ee149f2beaaebc27c72fd15@AMSPEX02CL03.citrite.net>
+References: <CAFEAcA-W7AAFsrEkmUSpwqoQic7TDHnPGwnpFB_FQ25ad32n0A@mail.gmail.com>
+	<596fc361faea408cabae8a5f41df2e41@AMSPEX02CL03.citrite.net>
+	<61c2a38ace454e2d963dcdd89d53737d@AMSPEX02CL03.citrite.net>
+	<20190218100919.GB5303@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190218100919.GB5303@dhcp-200-176.str.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] QEMU xen coverity issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,365 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru
-Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>
 
-From: Xie Yongji <xieyongji@baidu.com>
+> -----Original Message-----
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Sent: 18 February 2019 10:09
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: 'Peter Maydell' <peter.maydell@linaro.org>; QEMU Developers <qemu-
+> devel@nongnu.org>; Anthony Perard <anthony.perard@citrix.com>
+> Subject: Re: [Qemu-devel] QEMU xen coverity issues
+>=20
+> Am 15.02.2019 um 17:20 hat Paul Durrant geschrieben:
+> > > -----Original Message-----
+> > [snip]
+> > > >
+> > > > (5) CID 1398649: resource leak in xen_block_drive_create():
+> > > >
+> > > > In hw/block/xen-block.c xen_block_drive_create() Coverity
+> > > > complains that the call "driver_layer =3D qdict_new()" allocates
+> > > > memory that's leaked because we don't save the pointer anywhere
+> > > > but don't deallocate it before the end of the function either.
+> > > > Coverity is not great at understanding our refcounting objects,
+> > > > but this does look like either we're missing a qobject_unref()
+> > > > or something should be keeping hold of the dictionary. Probably
+> > > > best to ask a block layer expert.
+> > >
+> > > AFAICT nothing will consume the dictionary so it does appear that
+> we're
+> > > missing an unref here.
+> >
+> > Testing proves me wrong... This one is a false positive.
+>=20
+> Hm, but where is it freed?
+>=20
+> xen_block_blockdev_add() only feeds it to an input visitor, which
+> doesn't take ownership of the QDict (and in the first error path, it
+> hasn't even done that yet).
 
-Since we now support the message VHOST_USER_GET_INFLIGHT_FD
-and VHOST_USER_SET_INFLIGHT_FD. The backend is able to restart
-safely because it can track inflight I/O in shared memory.
-This patch allows qemu to reconnect the backend after
-connection closed.
+Agreed that error path does not free things... that's definitely a leak... =
+but attempting to free the QDict's on return from xen_block_blockdev_add() =
+certainly causes a seg fault. My assumption was that, having been fed throu=
+gh the input visitor and then through the output visitor in qmp_blockdev_ad=
+d() that the BlockDriverState eventually takes ownership... but maybe that'=
+s not true?
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Ni Xun <nixun@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
- hw/block/vhost-user-blk.c          | 205 +++++++++++++++++++++++------
- include/hw/virtio/vhost-user-blk.h |   4 +
- 2 files changed, 167 insertions(+), 42 deletions(-)
+  Paul
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 9682df1a7b..539ea2e571 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -103,7 +103,7 @@ const VhostDevConfigOps blk_ops = {
-     .vhost_dev_config_notifier = vhost_user_blk_handle_config_change,
- };
- 
--static void vhost_user_blk_start(VirtIODevice *vdev)
-+static int vhost_user_blk_start(VirtIODevice *vdev)
- {
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-@@ -112,13 +112,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
- 
-     if (!k->set_guest_notifiers) {
-         error_report("binding does not support guest notifiers");
--        return;
-+        return -ENOSYS;
-     }
- 
-     ret = vhost_dev_enable_notifiers(&s->dev, vdev);
-     if (ret < 0) {
-         error_report("Error enabling host notifiers: %d", -ret);
--        return;
-+        return ret;
-     }
- 
-     ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
-@@ -157,12 +157,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
-         vhost_virtqueue_mask(&s->dev, vdev, i, false);
-     }
- 
--    return;
-+    return ret;
- 
- err_guest_notifiers:
-     k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
- err_host_notifiers:
-     vhost_dev_disable_notifiers(&s->dev, vdev);
-+    return ret;
- }
- 
- static void vhost_user_blk_stop(VirtIODevice *vdev)
-@@ -181,7 +182,6 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
-     ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
-     if (ret < 0) {
-         error_report("vhost guest notifier cleanup failed: %d", ret);
--        return;
-     }
- 
-     vhost_dev_disable_notifiers(&s->dev, vdev);
-@@ -191,21 +191,43 @@ static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
- {
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-     bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
-+    int ret;
- 
-     if (!vdev->vm_running) {
-         should_start = false;
-     }
- 
--    if (s->dev.started == should_start) {
-+    if (s->should_start == should_start) {
-+        return;
-+    }
-+
-+    if (!s->connected || s->dev.started == should_start) {
-+        s->should_start = should_start;
-         return;
-     }
- 
-     if (should_start) {
--        vhost_user_blk_start(vdev);
-+        s->should_start = true;
-+        /*
-+         * make sure vhost_user_blk_handle_output() ignores fake
-+         * guest kick by vhost_dev_enable_notifiers()
-+         */
-+        barrier();
-+        ret = vhost_user_blk_start(vdev);
-+        if (ret < 0) {
-+            error_report("vhost-user-blk: vhost start failed: %s",
-+                         strerror(-ret));
-+            qemu_chr_fe_disconnect(&s->chardev);
-+        }
-     } else {
-         vhost_user_blk_stop(vdev);
-+        /*
-+         * make sure vhost_user_blk_handle_output() ignore fake
-+         * guest kick by vhost_dev_disable_notifiers()
-+         */
-+        barrier();
-+        s->should_start = false;
-     }
--
- }
- 
- static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-@@ -237,13 +259,22 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
- static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
--    int i;
-+    int i, ret;
- 
-     if (!(virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
-         !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))) {
-         return;
-     }
- 
-+    if (s->should_start) {
-+        return;
-+    }
-+    s->should_start = true;
-+
-+    if (!s->connected) {
-+        return;
-+    }
-+
-     if (s->dev.started) {
-         return;
-     }
-@@ -251,7 +282,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-     /* Some guests kick before setting VIRTIO_CONFIG_S_DRIVER_OK so start
-      * vhost here instead of waiting for .set_status().
-      */
--    vhost_user_blk_start(vdev);
-+    ret = vhost_user_blk_start(vdev);
-+    if (ret < 0) {
-+        error_report("vhost-user-blk: vhost start failed: %s",
-+                     strerror(-ret));
-+        qemu_chr_fe_disconnect(&s->chardev);
-+        return;
-+    }
- 
-     /* Kick right away to begin processing requests already in vring */
-     for (i = 0; i < s->dev.nvqs; i++) {
-@@ -271,13 +308,106 @@ static void vhost_user_blk_reset(VirtIODevice *vdev)
-     vhost_dev_free_inflight(s->inflight);
- }
- 
-+static int vhost_user_blk_connect(DeviceState *dev)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    int ret = 0;
-+
-+    if (s->connected) {
-+        return 0;
-+    }
-+    s->connected = true;
-+
-+    s->dev.nvqs = s->num_queues;
-+    s->dev.vqs = s->vqs;
-+    s->dev.vq_index = 0;
-+    s->dev.backend_features = 0;
-+
-+    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
-+
-+    ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
-+    if (ret < 0) {
-+        error_report("vhost-user-blk: vhost initialization failed: %s",
-+                     strerror(-ret));
-+        return ret;
-+    }
-+
-+    /* restore vhost state */
-+    if (s->should_start) {
-+        ret = vhost_user_blk_start(vdev);
-+        if (ret < 0) {
-+            error_report("vhost-user-blk: vhost start failed: %s",
-+                         strerror(-ret));
-+            return ret;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static void vhost_user_blk_disconnect(DeviceState *dev)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+
-+    if (!s->connected) {
-+        return;
-+    }
-+    s->connected = false;
-+
-+    if (s->dev.started) {
-+        vhost_user_blk_stop(vdev);
-+    }
-+
-+    vhost_dev_cleanup(&s->dev);
-+}
-+
-+static gboolean vhost_user_blk_watch(GIOChannel *chan, GIOCondition cond,
-+                                     void *opaque)
-+{
-+    DeviceState *dev = opaque;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+
-+    qemu_chr_fe_disconnect(&s->chardev);
-+
-+    return true;
-+}
-+
-+static void vhost_user_blk_event(void *opaque, int event)
-+{
-+    DeviceState *dev = opaque;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+
-+    switch (event) {
-+    case CHR_EVENT_OPENED:
-+        if (vhost_user_blk_connect(dev) < 0) {
-+            qemu_chr_fe_disconnect(&s->chardev);
-+            return;
-+        }
-+        s->watch = qemu_chr_fe_add_watch(&s->chardev, G_IO_HUP,
-+                                         vhost_user_blk_watch, dev);
-+        break;
-+    case CHR_EVENT_CLOSED:
-+        vhost_user_blk_disconnect(dev);
-+        if (s->watch) {
-+            g_source_remove(s->watch);
-+            s->watch = 0;
-+        }
-+        break;
-+    }
-+}
-+
-+
- static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-     VhostUserState *user;
--    struct vhost_virtqueue *vqs = NULL;
-     int i, ret;
-+    Error *err = NULL;
- 
-     if (!s->chardev.chr) {
-         error_setg(errp, "vhost-user-blk: chardev is mandatory");
-@@ -312,27 +442,28 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-     }
- 
-     s->inflight = g_new0(struct vhost_inflight, 1);
--
--    s->dev.nvqs = s->num_queues;
--    s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
--    s->dev.vq_index = 0;
--    s->dev.backend_features = 0;
--    vqs = s->dev.vqs;
--
--    vhost_dev_set_config_notifier(&s->dev, &blk_ops);
--
--    ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
--    if (ret < 0) {
--        error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
--                   strerror(-ret));
--        goto virtio_err;
--    }
-+    s->vqs = g_new(struct vhost_virtqueue, s->num_queues);
-+    s->watch = 0;
-+    s->should_start = false;
-+    s->connected = false;
-+
-+    qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, vhost_user_blk_event,
-+                             NULL, (void *)dev, NULL, true);
-+
-+reconnect:
-+    do {
-+        if (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
-+            error_report_err(err);
-+            err = NULL;
-+            sleep(1);
-+        }
-+    } while (!s->connected);
- 
-     ret = vhost_dev_get_config(&s->dev, (uint8_t *)&s->blkcfg,
--                              sizeof(struct virtio_blk_config));
-+                               sizeof(struct virtio_blk_config));
-     if (ret < 0) {
--        error_setg(errp, "vhost-user-blk: get block config failed");
--        goto vhost_err;
-+        error_report("vhost-user-blk: get block config failed");
-+        goto reconnect;
-     }
- 
-     if (s->blkcfg.num_queues != s->num_queues) {
-@@ -340,29 +471,19 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-     }
- 
-     return;
--
--vhost_err:
--    vhost_dev_cleanup(&s->dev);
--virtio_err:
--    g_free(vqs);
--    g_free(s->inflight);
--    virtio_cleanup(vdev);
--
--    vhost_user_cleanup(user);
--    g_free(user);
--    s->vhost_user = NULL;
- }
- 
- static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(dev);
--    struct vhost_virtqueue *vqs = s->dev.vqs;
- 
-     vhost_user_blk_set_status(vdev, 0);
-+    qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, NULL,
-+                             NULL, NULL, NULL, false);
-     vhost_dev_cleanup(&s->dev);
-     vhost_dev_free_inflight(s->inflight);
--    g_free(vqs);
-+    g_free(s->vqs);
-     g_free(s->inflight);
-     virtio_cleanup(vdev);
- 
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
-index 445516604a..4849aa5eb5 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -38,6 +38,10 @@ typedef struct VHostUserBlk {
-     struct vhost_dev dev;
-     struct vhost_inflight *inflight;
-     VhostUserState *vhost_user;
-+    struct vhost_virtqueue *vqs;
-+    guint watch;
-+    bool should_start;
-+    bool connected;
- } VHostUserBlk;
- 
- #endif
--- 
-2.17.1
+>=20
+> Kevin
