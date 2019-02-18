@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56983)
+Received: from eggs.gnu.org ([209.51.188.92]:57241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvmtL-0000lG-Na
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:39:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gvmuF-0001Q6-FX
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:40:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gvmtJ-0001Q2-3Q
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:39:43 -0500
-Resent-Message-Id: <E1gvmtJ-0001Q2-3Q@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155051155495.18484.7298078403746502978@49fa7ef69f7b>
-In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1gvmuE-00020J-Gp
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 12:40:39 -0500
+References: <20190218104525.23674-1-stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cc3964e3-5763-34d7-af12-b5303aa709a4@redhat.com>
+Date: Mon, 18 Feb 2019 18:30:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Feb 2019 09:39:16 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
+In-Reply-To: <20190218104525.23674-1-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RNpOQYGdnJXQqWXl1xhP8KQTLgIo1COZc"
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] qcow2: include LUKS payload
+ overhead in qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Daniel Berrange <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
-MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
-YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
-NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
-YXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4ZjkxN2Zj
-OTk2IGh3L2FybSBody94dGVuc2E6IERlLWR1cGxpY2F0ZSBwZmxhc2ggY3JlYXRpb24gY29kZSBz
-b21lCmY2M2VlY2VlNmMgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIg
-cGFydCAyCjNiMjIzMGE4MjcgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYw
-MmIgcGFydCAxCmY5NmZkYTgyZjggbWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBm
-bGFzaCBtZW1vcnkgc2l6ZSBzb21ld2hhdAowZDJjNjU1YWQ4IHIyZDogRmxhc2ggbWVtb3J5IGNy
-ZWF0aW9uIGlzIGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUKNzJmM2ZlYzRjNCBwcGM0
-MDVfYm9hcmRzOiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdl
-CjI1N2YwYWM3MWMgc2FtNDYwZXg6IERvbid0IHNpemUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJh
-Y2tpbmcgaW1hZ2UKZWMyYjllMTliMSBodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
-X0NGSV9QRkxBU0gwezEsIDJ9CmYxMTIyY2M0ZDkgcGZsYXNoOiBNYWNybyBQRkxBU0hfQlVHKCkg
-aXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZApmMTgzMmM5ODA5IHBmbGFzaDogUmVuYW1lIHBmbGFz
-aF90IHRvIFBGbGFzaENGSTAxLCBQRmxhc2hDRkkwMgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8x
-MCBDaGVja2luZyBjb21taXQgZjE4MzJjOTgwOWZkIChwZmxhc2g6IFJlbmFtZSBwZmxhc2hfdCB0
-byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
-ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyODogRklMRTogaHcv
-YmxvY2svcGZsYXNoX2NmaTAxLmM6Mjg4Ogorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFkIChQ
-Rmxhc2hDRkkwMSAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzQwOiBGSUxF
-OiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoxNDE6CitzdGF0aWMgdWludDMyX3QgcGZsYXNoX3Jl
-YWQgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgpFUlJPUjogc3BhY2UgcHJvaGli
-aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTg6
-IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjI2NDoKK3N0YXRpYyB2b2lkIHBmbGFzaF93
-cml0ZSAoUEZsYXNoQ0ZJMDIgKnBmbCwgaHdhZGRyIG9mZnNldCwKCnRvdGFsOiAzIGVycm9ycywg
-MCB3YXJuaW5ncywgNDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCjIvMTAgQ2hlY2tpbmcgY29tbWl0IGYxMTIyY2M0ZDk5ZiAocGZsYXNoOiBN
-YWNybyBQRkxBU0hfQlVHKCkgaXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZCkKMy8xMCBDaGVja2lu
-ZyBjb21taXQgZWMyYjllMTliMTc5IChodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
-X0NGSV9QRkxBU0gwezEsIDJ9KQo0LzEwIENoZWNraW5nIGNvbW1pdCAyNTdmMGFjNzFjODEgKHNh
-bTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo1
-LzEwIENoZWNraW5nIGNvbW1pdCA3MmYzZmVjNGM0OTUgKHBwYzQwNV9ib2FyZHM6IERvbid0IHNp
-emUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UpCjYvMTAgQ2hlY2tpbmcgY29t
-bWl0IDBkMmM2NTVhZDgyNiAocjJkOiBGbGFzaCBtZW1vcnkgY3JlYXRpb24gaXMgY29uZnVzZWQg
-YWJvdXQgc2l6ZSwgbWFyayBGSVhNRSkKNy8xMCBDaGVja2luZyBjb21taXQgZjk2ZmRhODJmODA1
-IChtaXBzX21hbHRhOiBDbGVhbiB1cCBkZWZpbml0aW9uIG9mIGZsYXNoIG1lbW9yeSBzaXplIHNv
-bWV3aGF0KQo4LzEwIENoZWNraW5nIGNvbW1pdCAzYjIyMzBhODI3ZWUgKHBmbGFzaDogQ2xlYW4g
-dXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMSkKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM5MDogRklMRTogaHcvYXJtL211c2ljcGFsLmM6
-MTYzOToKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZM
-QVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzk4
-OiBGSUxFOiBody9hcm0vbXVzaWNwYWwuYzoxNjQ2OgorICAgICAgICBwZmxhc2hfY2ZpMDJfcmVn
-aXN0ZXIoMHgxMDAwMDAwMDBVTEwtTVBfRkxBU0hfU0laRV9NQVgsCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
-cywgMjQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjkvMTAgQ2hlY2tpbmcgY29tbWl0IGY2M2VlY2VlNmM5MSAocGZsYXNoOiBDbGVhbiB1cCBh
-ZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAyKQoxMC8xMCBDaGVja2luZyBjb21taXQgOGY5
-MTdmYzk5NjllIChody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9u
-IGNvZGUgc29tZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTAyMTgxMjU2MTUuMTg5NzAtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNo
-ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RNpOQYGdnJXQqWXl1xhP8KQTLgIo1COZc
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Daniel Berrange <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <cc3964e3-5763-34d7-af12-b5303aa709a4@redhat.com>
+Subject: Re: [PATCH v3 0/2] qcow2: include LUKS payload overhead in qemu-img
+ measure
+References: <20190218104525.23674-1-stefanha@redhat.com>
+In-Reply-To: <20190218104525.23674-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 18.02.19 11:45, Stefan Hajnoczi wrote:
+> v3:
+>  * Use encrypt.iter-time=3D10 to speed up qemu-iotests 178 [Max]
+
+Thanks!
+
+> v2:
+>  * Take into account all "encrypt." image creation options since the LU=
+KS
+>    payload size varies depending on the cipher [Max]
+>=20
+> The LUKS payload has a significant size (>1 MB).  It must be included i=
+n the
+> qemu-img measure calculation so we arrive at the correct minimum image =
+size.
+>=20
+> Stefan Hajnoczi (2):
+>   qcow2: include LUKS payload overhead in qemu-img measure
+>   iotests: add LUKS payload overhead to 178 qemu-img measure test
+>=20
+>  block/qcow2.c                    | 72 +++++++++++++++++++++++++++++++-=
+
+>  tests/qemu-iotests/178           |  8 ++++
+>  tests/qemu-iotests/178.out.qcow2 | 24 +++++++++++
+>  3 files changed, 103 insertions(+), 1 deletion(-)
+
+Applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+--RNpOQYGdnJXQqWXl1xhP8KQTLgIo1COZc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxq69AACgkQ9AfbAGHV
+z0C7cAf/QvvsBjqA8EX76jHc97FPJWYyppG9ImOBZ+Hz+maQml9Yg34o3OtX/zvN
+aWsTE0oetrl+8yHSsjjz+c3GalhRP7ki7GA1RsC7tMxohNnoffqQ0YZ2Srvna8RR
+PCh7RvX/4e8iBKVFp/dOKOF/vwooT37GP81FUQ6GTfz/7YBJ+QgERPuI2FzcZOID
+TyqSfkwpgkZ55zcMijSXuQDWIq+N/c85cWEWo4C3kXzaSKhGSitEonPwvbZVwhkQ
+G47oCgyYLylm7aFruPSmfbxPZlSa3lttkvn891GFJNVN5hkIqXw4aoMfoRIbW1QO
+NClUzKFU219zis4MoNg2zYT2RvQx4w==
+=smX4
+-----END PGP SIGNATURE-----
+
+--RNpOQYGdnJXQqWXl1xhP8KQTLgIo1COZc--
