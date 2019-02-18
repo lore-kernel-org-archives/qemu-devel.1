@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43577)
+Received: from eggs.gnu.org ([209.51.188.92]:43427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gvsJp-0004EH-I8
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:27:26 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gvsJx-00047s-I5
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gvs8L-0003oR-2K
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:15:34 -0500
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-4-jsnow@redhat.com>
-	<bed70b4c-618f-b0c7-c7b8-6365a38b9d35@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <6d42cbe7-cbb8-daf8-7ce1-54c00653917a@redhat.com>
-Date: Mon, 18 Feb 2019 18:15:15 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gvs6E-00038s-JZ
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:13:24 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-7-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e8d7022b-5946-381f-262c-47b1596cc2a6@redhat.com>
+Date: Tue, 19 Feb 2019 00:13:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <bed70b4c-618f-b0c7-c7b8-6365a38b9d35@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] block/dirty-bitmap: change
- semantics of enabled predicate
+In-Reply-To: <20190131175549.11691-7-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD"
+Subject: Re: [Qemu-devel] [RFC PATCH 06/11] qcow2: Don't assume 0 is an
+ invalid cluster offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,155 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, qemu-devel@nongnu.org
+Message-ID: <e8d7022b-5946-381f-262c-47b1596cc2a6@redhat.com>
+Subject: Re: [RFC PATCH 06/11] qcow2: Don't assume 0 is an invalid cluster
+ offset
+References: <20190131175549.11691-1-kwolf@redhat.com>
+ <20190131175549.11691-7-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-7-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 31.01.19 18:55, Kevin Wolf wrote:
+> The cluster allocation code uses 0 as an invalid offset that is used in=
+
+> case of errors or as "offset not yet determined". With external data
+> files, a host cluster offset of 0 becomes valid, though.
+>=20
+> Define a constant INV_OFFSET (which is not cluster aligned and will
+> therefore never be a valid offset) that can be used for such purposes.
+>=20
+> This removes the additional host_offset =3D=3D 0 check that commit
+> ff52aab2df5 introduced; the confusion between an invalid offset and
+> (erroneous) allocation at offset 0 is removed with this change.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qcow2.h         |  2 ++
+>  block/qcow2-cluster.c | 59 ++++++++++++++++++++-----------------------=
+
+>  2 files changed, 29 insertions(+), 32 deletions(-)
+
+qcow2_get_cluster_offset() still returns 0 for unallocated clusters.
+(And qcow2_co_block_status() tests for that, so it would never report a
+valid offset for the first cluster in an externally allocated qcow2 file.=
+)
+
+qcow2_alloc_compressed_cluster_offset() should return INV_OFFSET on
+error (yeah, there are no compressed clusters in external files, but
+this seems like the right thing to do still).
+
+(And there are cases like qcow2_co_preadv(), where cluster_offset is
+initialized to 0 -- it doesn't make a difference what it's initialized
+to (it's just to silence the compiler, I suppose), but it should still
+use this new constant now.  I think.)
+
+Now bikeshedding begins: Also, s->free_byte_offset is initialized to 0
+and that is the expected value for "nothing allocated yet".  I think I'd
+prefer all of the qocw2 code to use a common invalidity constant, even
+thought it would make things like that more complicated.  But then we
+might get into the metadata territory (how bad is it that
+s->bitmap_directory_offset too is 0 when there is no directory?),
+because compressed clusters are not allowed in external files, just like
+metadata is not...
+So my bikeshedding result is "I think it would be nice if all of the
+qcow2 code made use of this constant, but it may also be pretty stupid
+to enforce that now."
+
+Max
 
 
+--rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 2/18/19 11:39 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 14.02.2019 2:23, John Snow wrote:
->> Currently, enabled means something like "the status of the bitmap
->> is ACTIVE." After this patch, it should mean exclusively: "This
->> bitmap is recording guest writes, and is allowed to do so."
->>
->> In many places, this is how this predicate was already used.
->> We'll allow users to call user_locked if they're really curious about
->> finding out if the bitmap is in use by an operation.
->>
->> To accommodate this, modify the create_successor routine to now
->> explicitly disable the parent bitmap at creation time.
->>
->>
->> Justifications:
->>
->> 1. bdrv_dirty_bitmap_status suffers no change from the lack of
->>     1:1 parity with the new predicates because of the order in which
->>     the predicates are checked. This is now only for compatibility.
->>
->> 2. bdrv_set_dirty_bitmap is only used by mirror, which does not use
->>     disabled bitmaps -- all of these writes are internal usages.
->>     Therefore, we should allow writes even in the disabled state.
->>     The condition is removed.
->>
->> 3. bdrv_reset_dirty_bitmap Similarly, this is only used internally by
->>     mirror and migration. In these contexts it is always enabled anyway,
->>     but our API does not need to enforce this.
->>
->> 4. bdrv_set_dirty() is unchanged: pre-patch, it was skipping bitmaps that were
->>     disabled or had a successor, while post-patch it is only skipping bitmaps
->>     that are disabled. To accommodate this, create_successor now ensures that
->>     any bitmap with a successor is explicitly disabled.
->>
-> 
-> 5-8 are examples of "this is how this predicate was already used"
-> 
->> 5. qcow2_store_persistent_dirty_bitmaps: This only ever wanted to check if the
->>     bitmap was enabled or not. Theoretically if we save during an operation,
->>     this now gets set as enabled instead of disabled,
-> 
-> No, as you explicitly disable bitmap in create_successor, so bitmaps with successor
-> will be disabled anyway.
-> 
+-----BEGIN PGP SIGNATURE-----
 
-Well, yeah. There's no way it happens in practice currently. It's just
-"theoretically" from the viewpoint of the API call itself. There's
-nothing stopping a developer from making that call, and this is a
-potential change in behavior that we don't expect to observe. Just
-noting it down.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxrPAkACgkQ9AfbAGHV
+z0DydQf/ZEB2AoJYG35qqmCixLXBXi1Ah+cYgn9SgYXpY/jWi5MwTtnhkeSfNLJb
+gjnf3T/2uFEcuzNSslU/zi+wvEPgd+jnrLgwkj/fSso9lEbXR0aEoVLR2W7211m9
+bZg4JJhkGnQbmolcVKxho39qMDYcWvSSZxL9vOMvkbpZ44P8rduZ5Ptnq3ZHyCS2
+1dpNFJ0NO3cnm8fbWn8hoHn0NJt+acjEzgpjeLtsTcDlLR2YiDI6382HlUFCxyOp
+/GGYS71YEsCgHqyY0LTxEKwkvpBSxM1g0ZIrCQ06ZlsLeXU/y9fBxc4QcT6NDxWk
+SY01sTES9K1akEnfsT8qbfIDnJ3XEw==
+=tm7w
+-----END PGP SIGNATURE-----
 
-> Hmm, and this shows, that actually, you don't need this big description for all calls,
-> as actually nothing changed and all calls may be described like (4.). Except (2. and 3.),
-> as these calls are removed (so, is it worth to split them into separate previous patch?)
-> 
-
-I could, to at least have its own justification in a commit message
-apart from these -- but at this point it's primarily a benefit for Eric,
-You, and myself.
-
->   but this cannot happen
->>     in practice because jobs must be finished before we close the disk.
->>
->> 6. block_dirty_bitmap_enable_prepare only ever cared about the
->>     literal bit, and already checked for user_locked beforehand.
->>
->> 7. block_dirty_bitmap_disable_prepare ditto as above.
->>
->> 8. init_dirty_bitmap_migration also already checks user_locked,
->>     so this call can be a simple enabled/disabled check.
-> 
-> 
-> hmmm
-> 9. nbd_export_new, which too checks bdrv_dirty_bitmap_user_locked but _after_
->     call to bdrv_dirty_bitmap_enabled. Anyway it's not changed as described in (4.),
->     I think it is better to check _user_locked first.
-> 
-
-You're right, and Eric left a similar feedback elsewhere. user_locked is
-the more obvious disqualifier. I think this ought to be its own small
-patch because it has nothing much to do with this one.
-
-> 
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
->>   block/dirty-bitmap.c | 7 ++++---
->>   1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 639ebc0645..bb2e19e0d8 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -209,7 +209,7 @@ bool bdrv_dirty_bitmap_qmp_locked(BdrvDirtyBitmap *bitmap)
->>   /* Called with BQL taken.  */
->>   bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap)
->>   {
->> -    return !(bitmap->disabled || bitmap->successor);
->> +    return !bitmap->disabled;
->>   }
->>   
->>   /* Called with BQL taken.  */
->> @@ -264,6 +264,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
->>   
->>       /* Successor will be on or off based on our current state. */
->>       child->disabled = bitmap->disabled;
->> +    bitmap->disabled = true;
->>   
->>       /* Install the successor and freeze the parent */
->>       bitmap->successor = child;
->> @@ -346,6 +347,8 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->>           error_setg(errp, "Merging of parent and successor bitmap failed");
->>           return NULL;
->>       }
->> +
->> +    parent->disabled = successor->disabled;
-> 
-> at this point comment to the function
-> "The merged parent will not be user_locked, nor explicitly re-enabled."
-> becomes really weird. Need to reword it somehow..
-> 
-
-It is a pretty awkward comment. I'll try to touch it up here.
-
->>       bdrv_release_dirty_bitmap_locked(successor);
->>       parent->successor = NULL;
->>   
->> @@ -542,7 +545,6 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
->>   void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
->>                                     int64_t offset, int64_t bytes)
->>   {
->> -    assert(bdrv_dirty_bitmap_enabled(bitmap));
->>       assert(!bdrv_dirty_bitmap_readonly(bitmap));
->>       hbitmap_set(bitmap->bitmap, offset, bytes);
->>   }
->> @@ -559,7 +561,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>   void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
->>                                       int64_t offset, int64_t bytes)
->>   {
->> -    assert(bdrv_dirty_bitmap_enabled(bitmap));
->>       assert(!bdrv_dirty_bitmap_readonly(bitmap));
->>       hbitmap_reset(bitmap->bitmap, offset, bytes);
->>   }
->>
-> 
-> 
+--rzRzRyyvvTY0IelUB9srbk0eLr3UrVmpD--
