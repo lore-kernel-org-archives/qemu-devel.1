@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40967)
+Received: from eggs.gnu.org ([209.51.188.92]:42090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gvfxm-0004WK-Du
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:15:51 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gvg48-0006n6-0C
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:22:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gvfxk-0006r2-8l
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:15:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gvfxk-0006qN-0S
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:15:48 -0500
-From: P J P <ppandit@redhat.com>
-Date: Mon, 18 Feb 2019 15:42:18 +0530
-Message-Id: <20190218101218.4177-1-ppandit@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gvg45-0002MV-MS
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 05:22:23 -0500
+Date: Mon, 18 Feb 2019 11:21:44 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190218112144.48ac3ebc@Igors-MacBook-Pro.local>
+In-Reply-To: <20190205173306.20483-16-eric.auger@redhat.com>
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-16-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] ppc: add host-serial and host-model machine
- attributes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 15/18] nvdimm: use configurable ACPI IO
+ base and size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,171 +24,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+On Tue,  5 Feb 2019 18:33:03 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On ppc hosts, hypervisor shares following system attributes
+> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
+> This patch uses configurable IO base and size to create NPIO AML for
+> ACPI NFIT. Since a different architecture like AArch64 does not use
+> port-mapped IO, a configurable IO base is required to create correct
+> mapping of ACPI IO address and size.
+> 
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v2 -> v3:
+> - s/size/len in pc_piix.c and pc_q35.c
+> ---
+>  hw/acpi/nvdimm.c        | 28 +++++++++++++++++++---------
+>  hw/i386/pc_piix.c       |  8 +++++++-
+>  hw/i386/pc_q35.c        |  8 +++++++-
+>  include/hw/mem/nvdimm.h | 12 ++++++++++++
+>  4 files changed, 45 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index e53b2cb681..da68de5535 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -929,8 +929,8 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
+>                              FWCfgState *fw_cfg, Object *owner)
+>  {
+>      memory_region_init_io(&state->io_mr, owner, &nvdimm_dsm_ops, state,
+> -                          "nvdimm-acpi-io", NVDIMM_ACPI_IO_LEN);
+> -    memory_region_add_subregion(io, NVDIMM_ACPI_IO_BASE, &state->io_mr);
+> +                          "nvdimm-acpi-io", state->dsm_io.len);
+> +    memory_region_add_subregion(io, state->dsm_io.base, &state->io_mr);
+>  
+>      state->dsm_mem = g_array_new(false, true /* clear */, 1);
+>      acpi_data_push(state->dsm_mem, sizeof(NvdimmDsmIn));
+> @@ -959,12 +959,14 @@ void nvdimm_init_acpi_state(AcpiNVDIMMState *state, MemoryRegion *io,
+>  
+>  #define NVDIMM_QEMU_RSVD_UUID   "648B9CF2-CDA1-4312-8AD9-49C4AF32BD62"
+>  
+> -static void nvdimm_build_common_dsm(Aml *dev)
+> +static void nvdimm_build_common_dsm(Aml *dev,
+> +                                    AcpiNVDIMMState *acpi_nvdimm_state)
+>  {
+>      Aml *method, *ifctx, *function, *handle, *uuid, *dsm_mem, *elsectx2;
+>      Aml *elsectx, *unsupport, *unpatched, *expected_uuid, *uuid_invalid;
+>      Aml *pckg, *pckg_index, *pckg_buf, *field, *dsm_out_buf, *dsm_out_buf_size;
+>      uint8_t byte_list[1];
+> +    AmlRegionSpace rs;
+>  
+>      method = aml_method(NVDIMM_COMMON_DSM, 5, AML_SERIALIZED);
+>      uuid = aml_arg(0);
+> @@ -975,9 +977,16 @@ static void nvdimm_build_common_dsm(Aml *dev)
+>  
+>      aml_append(method, aml_store(aml_name(NVDIMM_ACPI_MEM_ADDR), dsm_mem));
+>  
+> +    if (acpi_nvdimm_state->dsm_io.type == NVDIMM_ACPI_IO_PORT) {
+> +        rs = AML_SYSTEM_IO;
+> +    } else {
+> +        rs = AML_SYSTEM_MEMORY;
+> +    }
+> +
+>      /* map DSM memory and IO into ACPI namespace. */
+> -    aml_append(method, aml_operation_region(NVDIMM_DSM_IOPORT, AML_SYSTEM_IO,
+> -               aml_int(NVDIMM_ACPI_IO_BASE), NVDIMM_ACPI_IO_LEN));
+> +    aml_append(method, aml_operation_region(NVDIMM_DSM_IOPORT, rs,
+> +               aml_int(acpi_nvdimm_state->dsm_io.base),
+> +               acpi_nvdimm_state->dsm_io.len));
+>      aml_append(method, aml_operation_region(NVDIMM_DSM_MEMORY,
+>                 AML_SYSTEM_MEMORY, dsm_mem, sizeof(NvdimmDsmIn)));
+>  
+> @@ -1260,7 +1269,8 @@ static void nvdimm_build_nvdimm_devices(Aml *root_dev, uint32_t ram_slots)
+>  }
+>  
+>  static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
+> -                              BIOSLinker *linker, GArray *dsm_dma_arrea,
+> +                              BIOSLinker *linker,
+> +                              AcpiNVDIMMState *acpi_nvdimm_state,
+>                                uint32_t ram_slots)
+>  {
+>      Aml *ssdt, *sb_scope, *dev;
+> @@ -1288,7 +1298,7 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
+>       */
+>      aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0012")));
+>  
+> -    nvdimm_build_common_dsm(dev);
+> +    nvdimm_build_common_dsm(dev, acpi_nvdimm_state);
+>  
+>      /* 0 is reserved for root device. */
+>      nvdimm_build_device_dsm(dev, 0);
+> @@ -1307,7 +1317,7 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
+>                                                 NVDIMM_ACPI_MEM_ADDR);
+>  
+>      bios_linker_loader_alloc(linker,
+> -                             NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
+> +                             NVDIMM_DSM_MEM_FILE, acpi_nvdimm_state->dsm_mem,
+>                               sizeof(NvdimmDsmIn), false /* high memory */);
+>      bios_linker_loader_add_pointer(linker,
+>          ACPI_BUILD_TABLE_FILE, mem_addr_offset, sizeof(uint32_t),
+> @@ -1329,7 +1339,7 @@ void nvdimm_build_acpi(GArray *table_offsets, GArray *table_data,
+>          return;
+>      }
+>  
+> -    nvdimm_build_ssdt(table_offsets, table_data, linker, state->dsm_mem,
+> +    nvdimm_build_ssdt(table_offsets, table_data, linker, state,
+>                        ram_slots);
+>  
+>      device_list = nvdimm_get_device_list();
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 63c84e3827..d9c81c9aa6 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -298,7 +298,13 @@ static void pc_init1(MachineState *machine,
+>      }
+>  
+>      if (pcms->acpi_nvdimm_state.is_enabled) {
+> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
+> +        AcpiNVDIMMState *acpi_nvdimm_state = &pcms->acpi_nvdimm_state;
+> +
+> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_PORT;
 
-  - /proc/device-tree/system-id
-  - /proc/device-tree/model
+> +        acpi_nvdimm_state->dsm_io.base = NVDIMM_ACPI_IO_BASE;
+> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
+above constants probably should by moved to target a specific header
 
-with a guest. This could lead to information leakage and misuse.[*]
-Add machine attributes to control such system information exposure
-to a guest.
+> +
+> +        nvdimm_init_acpi_state(acpi_nvdimm_state, system_io,
+>                                 pcms->fw_cfg, OBJECT(pcms));
+>      }
+>  }
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index b7b7959934..1110a26e34 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -330,7 +330,13 @@ static void pc_q35_init(MachineState *machine)
+>      pc_nic_init(pcmc, isa_bus, host_bus);
+>  
+>      if (pcms->acpi_nvdimm_state.is_enabled) {
+> -        nvdimm_init_acpi_state(&pcms->acpi_nvdimm_state, system_io,
+> +        AcpiNVDIMMState *acpi_nvdimm_state = &pcms->acpi_nvdimm_state;
+> +
+> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_PORT;
+> +        acpi_nvdimm_state->dsm_io.base = NVDIMM_ACPI_IO_BASE;
+> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
+> +
+> +        nvdimm_init_acpi_state(acpi_nvdimm_state, system_io,
+>                                 pcms->fw_cfg, OBJECT(pcms));
+>      }
+>  }
+> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+> index c5c9b3c7f8..af8a5fd034 100644
+> --- a/include/hw/mem/nvdimm.h
+> +++ b/include/hw/mem/nvdimm.h
+> @@ -123,6 +123,17 @@ struct NvdimmFitBuffer {
+>  };
+>  typedef struct NvdimmFitBuffer NvdimmFitBuffer;
+>  
 
-[*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+> +typedef enum {
+> +    NVDIMM_ACPI_IO_PORT,
+> +    NVDIMM_ACPI_IO_MEMORY,
+> +} AcpiNVDIMMIOType;
+> +
+> +typedef struct AcpiNVDIMMIOEntry {
+> +    AcpiNVDIMMIOType type;
+> +    hwaddr base;
+> +    hwaddr len;
+> +} AcpiNVDIMMIOEntry;
+This one very much resembles AcpiGenericAddress, 
+why not to reuse it?
 
-Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/ppc/spapr.c         | 79 ++++++++++++++++++++++++++++++++++++++----
- include/hw/ppc/spapr.h |  2 ++
- 2 files changed, 75 insertions(+), 6 deletions(-)
-
-Update v3: move host-serial,host-model options to ppc sPAPR machine
-  -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg03182.html
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0942f35bf8..666e500376 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-      * Add info to guest to indentify which host is it being run on
-      * and what is the uuid of the guest
-      */
--    if (kvmppc_get_host_model(&buf)) {
--        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
--        g_free(buf);
-+    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")) {
-+        if (g_str_equal(spapr->host_model, "passthrough")) {
-+            /* -M host-model=3Dpassthrough */
-+            if (kvmppc_get_host_model(&buf)) {
-+                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-+                g_free(buf);
-+            }
-+        } else {
-+            /* -M host-model=3D<user-string> */
-+            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->host_mo=
-del));
-+        }
-     }
--    if (kvmppc_get_host_serial(&buf)) {
--        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
--        g_free(buf);
-+
-+    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none")) =
-{
-+        if (g_str_equal(spapr->host_serial, "passthrough")) {
-+            /* -M host-serial=3Dpassthrough */
-+            if (kvmppc_get_host_serial(&buf)) {
-+                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-+                g_free(buf);
-+            }
-+        } else {
-+            /* -M host-serial=3D<user-string> */
-+            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->host_s=
-erial));
-+        }
-     }
-=20
-     buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-@@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, const c=
-har *value, Error **errp)
-     }
- }
-=20
-+static char *spapr_get_host_model(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    return g_strdup(spapr->host_model);
-+}
-+
-+static void spapr_set_host_model(Object *obj, const char *value, Error *=
-*errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    g_free(spapr->host_model);
-+    spapr->host_model =3D g_strdup(value);
-+}
-+
-+static char *spapr_get_host_serial(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    return g_strdup(spapr->host_serial);
-+}
-+
-+static void spapr_set_host_serial(Object *obj, const char *value, Error =
-**errp)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+
-+    g_free(spapr->host_serial);
-+    spapr->host_serial =3D g_strdup(value);
-+}
-+
- static void spapr_instance_init(Object *obj)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-@@ -3183,6 +3230,20 @@ static void spapr_instance_init(Object *obj)
-     object_property_set_description(obj, "ic-mode",
-                  "Specifies the interrupt controller mode (xics, xive, d=
-ual)",
-                  NULL);
-+
-+    spapr->host_model =3D NULL;
-+    object_property_add_str(obj, "host-model",
-+        spapr_get_host_model, spapr_set_host_model,
-+        &error_abort);
-+    object_property_set_description(obj, "host-model",
-+        "Set host's model-id to use - none|passthrough|string", &error_a=
-bort);
-+
-+    spapr->host_serial =3D NULL;
-+    object_property_add_str(obj, "host-serial",
-+        spapr_get_host_serial, spapr_set_host_serial,
-+        &error_abort);
-+    object_property_set_description(obj, "host-serial",
-+        "Set host's system-id to use - none|passthrough|string", &error_=
-abort);
- }
-=20
- static void spapr_machine_finalizefn(Object *obj)
-@@ -4080,9 +4141,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
- static void spapr_machine_3_1_class_options(MachineClass *mc)
- {
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+    static GlobalProperty compat[] =3D {
-+        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-+        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-+    };
-=20
-     spapr_machine_4_0_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
-;
-+    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled =3D false;
- }
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index a947a0a0dc..e004a570d8 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -177,6 +177,8 @@ struct sPAPRMachineState {
-=20
-     /*< public >*/
-     char *kvm_type;
-+    char *host_model;
-+    char *host_serial;
-=20
-     const char *icp_type;
-     int32_t irq_map_nr;
---=20
-2.20.1
+>  struct AcpiNVDIMMState {
+>      /* detect if NVDIMM support is enabled. */
+>      bool is_enabled;
+> @@ -140,6 +151,7 @@ struct AcpiNVDIMMState {
+>       */
+>      int32_t persistence;
+>      char    *persistence_string;
+> +    AcpiNVDIMMIOEntry dsm_io;
+>  };
+>  typedef struct AcpiNVDIMMState AcpiNVDIMMState;
+>  
