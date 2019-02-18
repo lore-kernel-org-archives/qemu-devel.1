@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42692)
+Received: from eggs.gnu.org ([209.51.188.92]:42731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvm9Q-0008Oq-K0
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:52:17 -0500
+	(envelope-from <thuth@redhat.com>) id 1gvm9l-00007i-7r
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:52:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gvm9P-0005YS-B7
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:52:16 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Feb 2019 16:52:09 +0000
-Message-ID: <957f3ab5-d5b7-b44d-9bc5-89a4ff78d87f@virtuozzo.com>
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-5-jsnow@redhat.com>
-In-Reply-To: <20190213232356.21034-5-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A0C5E95679D475489934E706692D1C1A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gvm9j-0005hT-GM
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 11:52:36 -0500
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
+	<a9633e15-13c7-70a5-17c2-2204dd174335@redhat.com>
+	<30de3db1-c1df-1aed-8dac-5d0e446b7ca4@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9e467b63-519a-a3a4-de7e-e38d7d89dfa4@redhat.com>
+Date: Mon, 18 Feb 2019 17:52:30 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] block/dirty-bitmap: explicitly lock
- bitmaps with successors
+In-Reply-To: <30de3db1-c1df-1aed-8dac-5d0e446b7ca4@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 08/15] s390-bios: Map low core
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +27,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: jjherne@linux.ibm.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-MTQuMDIuMjAxOSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+IEluc3RlYWQgb2YgaW1wbHlpbmcg
-YSBsb2NrZWQgc3RhdHVzLCBtYWtlIGl0IGV4cGxpY2l0Lg0KDQpsb2NrZWQgaW50ZXJmZXJlcyB3
-aXRoIGJpdG1hcCBtdXRleCwgc28gbWF5IGJlIGJldHRlciAicW1wX2xvY2tlZCBzdGF0ZSIsIGJ1
-dCBub3Qgc3VyZS4NCg0KPiBOb3csIGJpdG1hcHMgaW4gdXNlIGJ5IG1pZ3JhdGlvbiwgTkJEIG9y
-IGJhY2t1cCBvcGVyYXRpb25zDQo+IGFyZSBhbGwgdHJlYXRlZCB0aGUgc2FtZSB3YXkgd2l0aCB0
-aGUgc2FtZSBjb2RlIHBhdGhzLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25v
-d0ByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5j
-b20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
-c292QHZpcnR1b3p6by5jb20+DQoNCkhtbS4gSXNuJ3QgaXQgYmV0dGVyIHRvIG1ha2Ugc3VjY2Vz
-c29yLXJlbGF0ZWQgc3RhZmYgdW5yZWxhdGVkIHRvIGxvY2tpbmcgYXQgYWxsPw0KU28sIGJhY2t1
-cCB3aWxsIGNhbGwgc2V0X3FtcF9sb2NrZWQgbGlrZSBvdGhlcnM/IEFuZCB0aGVuIGRvIGNyZWF0
-ZV9zdWNjZXNzb3IsDQphYmRpY2F0ZSwgcmVjbGFpbSwgd2hhdGV2ZXIgaXQgd2FudHMsIGFuZCBm
-aW5hbGx5IHNldF9xbXBfbG9ja2VkKGZhbHNlKSA/DQpUbyBtYWtlIGl0IHdvcmsgZXZlbiBtb3Jl
-IGluIHRoZSBzYW1lIHBhdGguIEJ1dCBpdCBtYXkgYmUgZG9uZSBzZXBhcmF0ZWx5LCBpZiB3ZQ0K
-d2FudC4NCg0KPiAtLS0NCj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyB8IDkgKysrKystLS0tDQo+
-ICAgMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+
-IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
-DQo+IGluZGV4IGJiMmUxOWUwZDguLjIwNDJjNjI2MDIgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Rp
-cnR5LWJpdG1hcC5jDQo+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+IEBAIC0xODgsMTAg
-KzE4OCw4IEBAIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihCZHJ2RGlydHlC
-aXRtYXAgKmJpdG1hcCkNCj4gICAgICAgcmV0dXJuIGJpdG1hcC0+c3VjY2Vzc29yOw0KPiAgIH0N
-Cj4gICANCj4gLS8qIEJvdGggY29uZGl0aW9ucyBkaXNhbGxvdyB1c2VyLW1vZGlmaWNhdGlvbiB2
-aWEgUU1QLiAqLw0KPiAgIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfdXNlcl9sb2NrZWQoQmRydkRp
-cnR5Qml0bWFwICpiaXRtYXApIHsNCj4gLSAgICByZXR1cm4gYmRydl9kaXJ0eV9iaXRtYXBfaGFz
-X3N1Y2Nlc3NvcihiaXRtYXApIHx8DQo+IC0gICAgICAgICAgIGJkcnZfZGlydHlfYml0bWFwX3Ft
-cF9sb2NrZWQoYml0bWFwKTsNCj4gKyAgICByZXR1cm4gYmRydl9kaXJ0eV9iaXRtYXBfcW1wX2xv
-Y2tlZChiaXRtYXApOw0KPiAgIH0NCj4gICANCj4gICB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3Nl
-dF9xbXBfbG9ja2VkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBib29sIHFtcF9sb2NrZWQpDQo+
-IEBAIC0yNjYsOCArMjY0LDkgQEAgaW50IGJkcnZfZGlydHlfYml0bWFwX2NyZWF0ZV9zdWNjZXNz
-b3IoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgIGNoaWxkLT5kaXNhYmxlZCA9IGJpdG1h
-cC0+ZGlzYWJsZWQ7DQo+ICAgICAgIGJpdG1hcC0+ZGlzYWJsZWQgPSB0cnVlOw0KPiAgIA0KPiAt
-ICAgIC8qIEluc3RhbGwgdGhlIHN1Y2Nlc3NvciBhbmQgZnJlZXplIHRoZSBwYXJlbnQgKi8NCj4g
-KyAgICAvKiBJbnN0YWxsIHRoZSBzdWNjZXNzb3IgYW5kIGxvY2sgdGhlIHBhcmVudCAqLw0KPiAg
-ICAgICBiaXRtYXAtPnN1Y2Nlc3NvciA9IGNoaWxkOw0KPiArICAgIGJpdG1hcC0+cW1wX2xvY2tl
-ZCA9IHRydWU7DQo+ICAgICAgIHJldHVybiAwOw0KPiAgIH0NCj4gICANCj4gQEAgLTMyMSw2ICsz
-MjAsNyBAQCBCZHJ2RGlydHlCaXRtYXAgKmJkcnZfZGlydHlfYml0bWFwX2FiZGljYXRlKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICBiaXRtYXAtPnN1Y2Nlc3NvciA9IE5VTEw7DQo+ICAg
-ICAgIHN1Y2Nlc3Nvci0+cGVyc2lzdGVudCA9IGJpdG1hcC0+cGVyc2lzdGVudDsNCj4gICAgICAg
-Yml0bWFwLT5wZXJzaXN0ZW50ID0gZmFsc2U7DQo+ICsgICAgYml0bWFwLT5xbXBfbG9ja2VkID0g
-ZmFsc2U7DQo+ICAgICAgIGJkcnZfcmVsZWFzZV9kaXJ0eV9iaXRtYXAoYnMsIGJpdG1hcCk7DQo+
-ICAgDQo+ICAgICAgIHJldHVybiBzdWNjZXNzb3I7DQo+IEBAIC0zNDksNiArMzQ5LDcgQEAgQmRy
-dkRpcnR5Qml0bWFwICpiZHJ2X3JlY2xhaW1fZGlydHlfYml0bWFwX2xvY2tlZChCbG9ja0RyaXZl
-clN0YXRlICpicywNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBwYXJlbnQtPmRpc2FibGVkID0g
-c3VjY2Vzc29yLT5kaXNhYmxlZDsNCj4gKyAgICBwYXJlbnQtPnFtcF9sb2NrZWQgPSBmYWxzZTsN
-Cj4gICAgICAgYmRydl9yZWxlYXNlX2RpcnR5X2JpdG1hcF9sb2NrZWQoc3VjY2Vzc29yKTsNCj4g
-ICAgICAgcGFyZW50LT5zdWNjZXNzb3IgPSBOVUxMOw0KPiAgIA0KPiANCg0KDQotLSANCkJlc3Qg
-cmVnYXJkcywNClZsYWRpbWlyDQo=
+On 18/02/2019 16.40, Jason J. Herne wrote:
+> On 2/12/19 7:47 AM, Thomas Huth wrote:
+>> On 2019-01-29 14:29, Jason J. Herne wrote:
+>>> Create a new header for basic architecture specific definitions and
+>>> add a
+>>> mapping of low core memory. This mapping will be used by the real
+>>> dasd boot
+>>> process.
+>>>
+>>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>>> ---
+>>> =C2=A0 pc-bios/s390-ccw/main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=
+=A0 2 +
+>>> =C2=A0 pc-bios/s390-ccw/s390-arch.h | 100
+>>> +++++++++++++++++++++++++++++++++++++++++++
+>>> =C2=A0 2 files changed, 102 insertions(+)
+>>> =C2=A0 create mode 100644 pc-bios/s390-ccw/s390-arch.h
+>>>
+>>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>>> index 1bc61b5..fa90aa3 100644
+>>> --- a/pc-bios/s390-ccw/main.c
+>>> +++ b/pc-bios/s390-ccw/main.c
+>>> @@ -9,6 +9,7 @@
+>>> =C2=A0=C2=A0 */
+>>> =C2=A0 =C2=A0 #include "libc.h"
+>>> +#include "s390-arch.h"
+>>> =C2=A0 #include "s390-ccw.h"
+>>> =C2=A0 #include "cio.h"
+>>> =C2=A0 #include "virtio.h"
+>>> @@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] =3D { 0,
+>>> 0, 0, 0, 0, 0, 0, 0, 0 };
+>>> =C2=A0 QemuIplParameters qipl;
+>>> =C2=A0 IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)))=
+;
+>>> =C2=A0 static bool have_iplb;
+>>> +const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+>>> =C2=A0 =C2=A0 #define LOADPARM_PROMPT "PROMPT=C2=A0 "
+>>> =C2=A0 #define LOADPARM_EMPTY=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 "
+>>> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arc=
+h.h
+>>> new file mode 100644
+>>> index 0000000..47eaa04
+>>> --- /dev/null
+>>> +++ b/pc-bios/s390-ccw/s390-arch.h
+>>> @@ -0,0 +1,100 @@
+>>> +/*
+>>> + * S390 Basic Architecture
+>>> + *
+>>> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
+>>
+>> 2019 ?
+>>
+>=20
+> Yep, I will update this,
+>=20
+>>> + * This work is licensed under the terms of the GNU GPL, version 2
+>>> or (at
+>>> + * your option) any later version. See the COPYING file in the
+>>> top-level
+>>> + * directory.
+>>> + */
+>>> +
+>>> +#ifndef S390_ARCH_H
+>>> +#define S390_ARCH_H
+>>> +
+>>> +typedef struct PSW {
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t mask;
+>>> +=C2=A0=C2=A0=C2=A0 uint64_t addr;
+>>> +} __attribute__ ((packed, aligned(8))) PSW;
+>>
+>> We've seen quite some trouble with "packed" in the past... See
+>> 3b8afb41bc8e or 55281a2c53b884d0 for example ... This is only the
+>> s390-ccw bios code here, so it is likely ok, but still, since this
+>> structure is "naturally" packed, I'd rather go without that attribute
+>> here (even if it's only to allow the compiler to generate better code =
+in
+>> some cases). You could still _Static_assert(sizeof(struct PSW) =3D=3D =
+16)
+>> afterwards, just to be sure.
+>=20
+> So the problem is that this struct, if baked into another struct, will
+> not be aligned properly?
+
+Yeah, stuff like that. Maybe you can get along here because you also
+specified aligned(8) ... but from my experience, it's better to avoid
+"packed" if possible.
+
+>>> +
+>>> +/* Older PSW format used by LPSW instruction */
+>>> +typedef struct PSWLegacy {
+>>> +=C2=A0=C2=A0=C2=A0 uint32_t mask;
+>>> +=C2=A0=C2=A0=C2=A0 uint32_t addr;
+>>> +} __attribute__ ((packed, aligned(8))) PSWLegacy;
+>>
+>> dito, I'd drop the packed attribute here.
+>=20
+> Are we sure the compiler will never insert space here if we drop packed=
+?
+> I don't see why it would but I'll admit that I don't fully know all of
+> the rules.
+
+That's why I suggested to also use _Static_assert(sizeof(x) =3D=3D y). Th=
+at
+way you can be sure that the compiler does not add any unwanted padding.
+
+[...]
+>>> +} __attribute__((packed, aligned(8192))) LowCore;
+>>
+>> dito, please avoid packed, use _Static_assert instead.
+>=20
+> I'm not convinced this is a good thing to do. Lowcore freely mixes
+> fields of size 64, 32, and 8 bits. If we drop packed then the compiler
+> will perform all sorts of automatic alignment thereby completely messin=
+g
+> up offsets.
+
+You should be fine if you also use _Static_assert() afterwards here.
+
+... but since this is the s390-ccw bios and we can be sure that we only
+compile this code for s390x and with gcc, I'm also fine if you keep the
+attribute here. The problems we've seen so far only occurred on
+non-s390x systems (Sparc...) or with Clang, so unlike we want to share
+this header with the common QEMU code later, it should not really matter.
+
+ Thomas
