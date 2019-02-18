@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60028)
+Received: from eggs.gnu.org ([209.51.188.92]:60113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjYu-0001yL-TS
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:29 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gvjZ0-00024L-Aw
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gvjYm-0005SU-R5
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39348)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gvjYm-0005OW-BH
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:16 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E22551301A5
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-92.ams2.redhat.com
-	[10.36.116.92])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 849405D717
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 14:06:09 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Feb 2019 15:05:52 +0100
-Message-Id: <20190218140607.31998-4-armbru@redhat.com>
-In-Reply-To: <20190218140607.31998-1-armbru@redhat.com>
-References: <20190218140607.31998-1-armbru@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gvjYu-0005Wd-PS
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 09:06:28 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Mon, 18 Feb 2019 15:03:00 +0100
+Message-Id: <20190218140301.197408-10-sgarzare@redhat.com>
+In-Reply-To: <20190218140301.197408-1-sgarzare@redhat.com>
+References: <20190218140301.197408-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/18] qapi: Clean up modular built-in code
- generation a bit
+Subject: [Qemu-devel] [PATCH v5 09/10] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,285 +23,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-We neglect to call .visit_module() for the special module we use for
-built-ins.  Harmless, but clean it up anyway.  The
-tests/qapi-schema/*.out now show the built-in module as 'module None'.
+If the WRITE_ZEROES feature is enabled, we check this command
+in the test_basic().
 
-Subclasses of QAPISchemaModularCVisitor need to ._add_module() this
-special module to enable code generation for built-ins.  When this
-hasn't been done, QAPISchemaModularCVisitor.visit_module() does
-nothing for the special module.  That looks like built-ins could
-accidentally be generated into the wrong module when a subclass
-neglects to call ._add_module().  Can't happen, because built-ins are
-all visited before any other module.  But that's non-obvious.  Switch
-off code generation explicitly.
-
-Rename QAPISchemaModularCVisitor._begin_module() to
-._begin_user_module().
-
-New QAPISchemaModularCVisitor._is_builtin_module(), for clarity.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190214152251.2073-4-armbru@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- scripts/qapi/commands.py                 |  2 +-
- scripts/qapi/common.py                   | 24 ++++++++++++++++++------
- scripts/qapi/events.py                   |  2 +-
- scripts/qapi/types.py                    |  2 +-
- scripts/qapi/visit.py                    |  2 +-
- tests/qapi-schema/comments.out           |  1 +
- tests/qapi-schema/doc-bad-section.out    |  1 +
- tests/qapi-schema/doc-good.out           |  1 +
- tests/qapi-schema/empty.out              |  1 +
- tests/qapi-schema/event-case.out         |  1 +
- tests/qapi-schema/ident-with-escape.out  |  1 +
- tests/qapi-schema/include-relpath.out    |  1 +
- tests/qapi-schema/include-repetition.out |  1 +
- tests/qapi-schema/include-simple.out     |  1 +
- tests/qapi-schema/indented-expr.out      |  1 +
- tests/qapi-schema/qapi-schema-test.out   |  1 +
- 16 files changed, 33 insertions(+), 10 deletions(-)
+ tests/virtio-blk-test.c | 62 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 0f3c991918..ebf488953d 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -242,7 +242,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
-isitor):
-         self._regy =3D QAPIGenCCode()
-         self._visited_ret_types =3D {}
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index b51c4f2697..cfc560be46 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -255,6 +255,68 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
+ocator *alloc,
 =20
--    def _begin_module(self, name):
-+    def _begin_user_module(self, name):
-         self._visited_ret_types[self._genc] =3D set()
-         commands =3D self._module_basename('qapi-commands', name)
-         types =3D self._module_basename('qapi-types', name)
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index c89edc0cb0..0e3ec598a4 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1868,6 +1868,7 @@ class QAPISchema(object):
-     def visit(self, visitor):
-         visitor.visit_begin(self)
-         module =3D None
-+        visitor.visit_module(module)
-         for entity in self._entity_list:
-             if visitor.visit_needed(entity):
-                 if entity.module !=3D module:
-@@ -2321,9 +2322,15 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor)=
-:
-         self._what =3D what
-         self._blurb =3D blurb
-         self._pydoc =3D pydoc
-+        self._genc =3D None
-+        self._genh =3D None
-         self._module =3D {}
-         self._main_module =3D None
+     guest_free(alloc, req_addr);
 =20
-+    @staticmethod
-+    def _is_builtin_module(name):
-+        return not name
++    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
++        struct virtio_blk_discard_write_zeroes dwz_hdr;
++        void *expected;
 +
-     def _module_basename(self, what, name):
-         if name is None:
-             return re.sub(r'-', '-builtin-', what)
-@@ -2334,7 +2341,7 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
-         return basename + '-' + os.path.splitext(os.path.basename(name))=
-[0]
-=20
-     def _add_module(self, name, blurb):
--        if self._main_module is None and name is not None:
-+        if self._main_module is None and not self._is_builtin_module(nam=
-e):
-             self._main_module =3D name
-         genc =3D QAPIGenC(blurb, self._pydoc)
-         genh =3D QAPIGenH(blurb, self._pydoc)
-@@ -2346,22 +2353,27 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor=
-):
-=20
-     def write(self, output_dir, opt_builtins=3DFalse):
-         for name in self._module:
--            if name is None and not opt_builtins:
-+            if self._is_builtin_module(name) and not opt_builtins:
-                 continue
-             basename =3D self._module_basename(self._what, name)
-             (genc, genh) =3D self._module[name]
-             genc.write(output_dir, basename + '.c')
-             genh.write(output_dir, basename + '.h')
-=20
--    def _begin_module(self, name):
-+    def _begin_user_module(self, name):
-         pass
-=20
-     def visit_module(self, name):
-         if name in self._module:
-             self._set_module(name)
--            return
--        self._add_module(name, self._blurb)
--        self._begin_module(name)
-+        elif self._is_builtin_module(name):
-+            # The built-in module has not been created.  No code may
-+            # be generated.
-+            self._genc =3D None
-+            self._genh =3D None
-+        else:
-+            self._add_module(name, self._blurb)
-+            self._begin_user_module(name)
-=20
-     def visit_include(self, name, info):
-         basename =3D self._module_basename(self._what, name)
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index d86a2d2b3e..6f39cf8196 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -142,7 +142,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
-itor):
-         self._event_enum_members =3D []
-         self._event_emit_name =3D c_name(prefix + 'qapi_event_emit')
-=20
--    def _begin_module(self, name):
-+    def _begin_user_module(self, name):
-         types =3D self._module_basename('qapi-types', name)
-         visit =3D self._module_basename('qapi-visit', name)
-         self._genc.add(mcgen('''
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 62d4cf9f95..9fa510f7df 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -194,7 +194,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
-tor):
- #include "qapi/util.h"
- '''))
-=20
--    def _begin_module(self, name):
-+    def _begin_user_module(self, name):
-         types =3D self._module_basename('qapi-types', name)
-         visit =3D self._module_basename('qapi-visit', name)
-         self._genc.preamble_add(mcgen('''
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 82eab72b21..ca86009398 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -298,7 +298,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
-itor):
- ''',
-                                       prefix=3Dprefix))
-=20
--    def _begin_module(self, name):
-+    def _begin_user_module(self, name):
-         types =3D self._module_basename('qapi-types', name)
-         visit =3D self._module_basename('qapi-visit', name)
-         self._genc.preamble_add(mcgen('''
-diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
-out
-index d1abc4b5a1..273f0f54e1 100644
---- a/tests/qapi-schema/comments.out
-+++ b/tests/qapi-schema/comments.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
-c-bad-section.out
-index db8014eed0..367e2a1c3e 100644
---- a/tests/qapi-schema/doc-bad-section.out
-+++ b/tests/qapi-schema/doc-bad-section.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-index 21bf345ff0..d3bca343eb 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/empty.out b/tests/qapi-schema/empty.out
-index 5483cb7bc6..5b53d00702 100644
---- a/tests/qapi-schema/empty.out
-+++ b/tests/qapi-schema/empty.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
-ase.out
-index f69d4ffe4e..ec8a1406e4 100644
---- a/tests/qapi-schema/event-case.out
-+++ b/tests/qapi-schema/event-case.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
-ident-with-escape.out
-index 7f891f7e90..39754eba8c 100644
---- a/tests/qapi-schema/ident-with-escape.out
-+++ b/tests/qapi-schema/ident-with-escape.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
-clude-relpath.out
-index 783ccfc855..cf8636b78f 100644
---- a/tests/qapi-schema/include-relpath.out
-+++ b/tests/qapi-schema/include-relpath.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
-/include-repetition.out
-index d45977ee56..5423983239 100644
---- a/tests/qapi-schema/include-repetition.out
-+++ b/tests/qapi-schema/include-repetition.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
-lude-simple.out
-index 1afe20802a..061f81e509 100644
---- a/tests/qapi-schema/include-simple.out
-+++ b/tests/qapi-schema/include-simple.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
-nted-expr.out
-index c0cf3243f3..bffdf6756d 100644
---- a/tests/qapi-schema/indented-expr.out
-+++ b/tests/qapi-schema/indented-expr.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 9464101d26..d8aec17115 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -1,3 +1,4 @@
-+module None
- object q_empty
- enum QType
-     prefix QTYPE
++        /*
++         * WRITE_ZEROES request on the same sector of previous test wher=
+e
++         * we wrote "TEST".
++         */
++        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
++        req.data =3D (char *) &dwz_hdr;
++        dwz_hdr.sector =3D 0;
++        dwz_hdr.num_sectors =3D 1;
++        dwz_hdr.flags =3D 0;
++
++        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
++
++        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
+));
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
++        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
+se);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        guest_free(alloc, req_addr);
++
++        /* Read request to check if the sector contains all zeroes */
++        req.type =3D VIRTIO_BLK_T_IN;
++        req.ioprio =3D 1;
++        req.sector =3D 0;
++        req.data =3D g_malloc0(512);
++
++        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
++        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 528);
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        data =3D g_malloc(512);
++        expected =3D g_malloc0(512);
++        memread(req_addr + 16, data, 512);
++        g_assert_cmpmem(data, 512, expected, 512);
++        g_free(expected);
++        g_free(data);
++
++        guest_free(alloc, req_addr);
++    }
++
+     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
+         /* Write and read with 2 descriptor layout */
+         /* Write request */
 --=20
-2.17.2
+2.20.1
