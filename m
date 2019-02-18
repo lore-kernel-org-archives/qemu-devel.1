@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34880)
+Received: from eggs.gnu.org ([209.51.188.92]:37920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gvrSw-00062i-Od
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 17:32:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1gvrkK-0001da-RR
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 17:50:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gvrSu-0002aG-5H
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 17:32:46 -0500
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-3-jsnow@redhat.com>
-	<b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <fa012e63-2a85-6c7b-bb92-75974d0d3033@redhat.com>
-Date: Mon, 18 Feb 2019 17:32:31 -0500
+	(envelope-from <bounces@canonical.com>) id 1gvrkJ-0003Hy-PG
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 17:50:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gvrkJ-0003Ed-CF
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 17:50:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gvrkE-0007tW-5q
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:50:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 072BC2E80CC
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:50:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
- predicate helper
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Feb 2019 22:37:54 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
+Message-Id: <155052947493.5891.12654195437565640283.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
+ memory hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
+OVMF places the 64-bit PCI MMIO aperture after the memory hotplug area.
+If you specify `-m maxmem=3D1024G`, then accessing 64-bit MMIO BARs of
+PCI(e) devices, allocated from the aperture, will require at least 41
+address bits. If you use KVM, and nested paging (EPT on Intel, NPT on
+AMD) is enabled, and your /proc/cpuinfo on the host reports a smaller
+phys address width than 41, then 64-bit PCI MMIO accesses in the guest
+will silently fail. You can read more details in
+<https://bugzilla.redhat.com/show_bug.cgi?id=3D1353591#c8>.
 
+SeaBIOS uses an independent algorithm for aperture placement and BAR
+allocation.
 
-On 2/18/19 8:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 14.02.2019 2:23, John Snow wrote:
->> "Frozen" was a good description a long time ago, but it isn't adequate now.
->> Rename the frozen predicate to has_successor to make the semantics of the
->> predicate more clear to outside callers.
->>
->> In the process, remove some calls to frozen() that no longer semantically
->> make sense. For enabled and disabled in particular, it's actually okay for
->> the internals to do this but only forbidden for users to invoke them, and
-> 
-> I'm a bit lost in this paragraph.. to this - what?, to invoke them - whom?
-> I think, it would be simpler for me to read patch itself :)
-> 
+If you remove virtio-net-pci, then your command line ends up without any
+PCI(e) device that has a 64-bit MMIO BAR. So the issue is not triggered.
 
-Touched this up. I meant enable and disable, not enabled and disabled.
+If you use a maxmem of 512G, then 40 bits might suffice. It's possible
+that your physical CPU has precisely that many address bits, and so the
+behavior could change.
 
->> all of the QMP entry uses already check against qmp_locked.
->>
->> Several other assertions really want to check that the bitmap isn't in-use
->> by another operation -- use the qmp_locked function for this instead, which
->> presently also checks for has_successor.
-> 
-> hm, you mean user_locked, not qmp_locked.
-> 
+If you attach the OVMF debug log (capture `-debugcon file:debug.log
+-global isa-debugcon.iobase=3D0x402`), I could say more.
 
-Yes.
+Thus far this ticket looks like "NOTABUG" -- use a smaller memory
+hotplug area, or disable nested paging (which will come with a
+performance penalty).
 
-[...]
+** Bug watch added: Red Hat Bugzilla #1353591
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1353591
 
->>   /**
->>    * Create a successor bitmap destined to replace this bitmap after an operation.
->> - * Requires that the bitmap is not frozen and has no successor.
->> + * Requires that the bitmap is not locked and has no successor.
-> 
-> I think, user_locked, to not interfere with bitmaps mutex. And you use user_locked in
-> other comments in this patch.
-> 
+-- =
 
-You're right. It gets changed again later, but I didn't make this easy
-to read.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1685242
 
->>    * Called with BQL taken.
->>    */
->>   int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
->> @@ -244,12 +244,16 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
->>       uint64_t granularity;
->>       BdrvDirtyBitmap *child;
->>   
->> -    if (bdrv_dirty_bitmap_frozen(bitmap)) {
->> -        error_setg(errp, "Cannot create a successor for a bitmap that is "
->> -                   "currently frozen");
->> +    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
->> +        error_setg(errp, "Cannot create a successor for a bitmap that is in-use "
->> +                   "by an operation");
->> +        return -1;
->> +    }
->> +    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
->> +        error_setg(errp, "Cannot create a successor for a bitmap that already "
->> +                   "has one");
-> 
-> 
-> Amm, dead code? _user_locked() implies no successor, so we instead can keep an assertion..
-> 
+Title:
+  ovmf hangs at efi with virtio-net memory hotplug
 
-It gets changed later in the series, but I didn't do a great job of
-explaining that in advance. I'll amend the commit message to explain
-what I'm trying to do.
+Status in QEMU:
+  New
 
-I tried to hint at this with: "which presently also checks for
-has_successor" as an admission that it was redundant, but I need to call
-it out in stronger language.
+Bug description:
+  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
+  and it has a virtio-net devices
+
+  the ovmf images where compiled from https://github.com/tianocore/edk2
+  (current master)
+
+  reproducer:
+
+  qemu-system-x86_64 -drive
+  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
+  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
+std
+  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
+  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
+
+  interestingly, it works when you do the following:
+
+  - omit the virtio-net-pci device
+  - use seabios
+  - use less maxmem, e.g. 512G
+
+  qemu was compiled from source (v2.9.0) with following options:
+
+  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
+--enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
+artcard --audio-drv-list=3D"alsa" --enable
+  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
+k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
+virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
+-agent-msi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
