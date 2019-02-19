@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37299)
+Received: from eggs.gnu.org ([209.51.188.92]:37858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw5gr-000762-7c
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:44:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1gw5jL-0000fM-PU
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw5gq-0005Cu-BC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:44:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1gw5jK-0007Zj-O2
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:46:39 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-8-armbru@redhat.com>
-	<816c0dd9-9213-cda9-2fa1-611c0cacf9a1@redhat.com>
-Date: Tue, 19 Feb 2019 14:43:51 +0100
-In-Reply-To: <816c0dd9-9213-cda9-2fa1-611c0cacf9a1@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue,
-	19 Feb 2019 14:02:09 +0100")
-Message-ID: <87h8czuc4o.fsf@dusky.pond.sub.org>
+	<20190218125615.18970-3-armbru@redhat.com>
+	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
+	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
+Date: Tue, 19 Feb 2019 14:46:20 +0100
+In-Reply-To: <CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
+	(Peter Maydell's message of "Tue, 19 Feb 2019 13:11:22 +0000")
+Message-ID: <875ztfuc0j.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/10] mips_malta: Clean up definition of
- flash memory size somewhat
+Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
+ just once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, Aleksandar Rikalo <arikalo@wavecomp.com>, lersek@redhat.com, mreitz@redhat.com, qemu-ppc@nongnu.org, alex.bennee@linaro.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 2/18/19 1:56 PM, Markus Armbruster wrote:
->> pflash_cfi01_register() takes a size in bytes, a block size in bytes
->> and a number of blocks.  mips_malta_init() passes BIOS_SIZE, 65536,
->> FLASH_SIZE >> 16.  Actually consistent only because BIOS_SIZE (defined
->> in include/hw/mips/bios.h as (4 * MiB)) matches FLASH_SIZE (defined
->> locally as 0x400000).  Confusing all the same.
->>=20
->> Pass FLASH_SIZE instead of BIOS_SIZE.
+> On Tue, 19 Feb 2019 at 12:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>>
+>> On 2/18/19 1:56 PM, Markus Armbruster wrote:
+>> > PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
+>> > BUG", which sounds like a warning, then calls exit(1), followed by
+>> > unreachable goto reset_flash.  All this commit does is expanding the
+>> > macro, so the smell becomes more poignant, and the macro can be
+>> > deleted.
+>> >
+>> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> > ---
+>> >  hw/block/pflash_cfi01.c | 10 ++--------
+>> >  1 file changed, 2 insertions(+), 8 deletions(-)
+>> >
+>> > diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+>> > index 9efa7aa9af..f73c30a3ee 100644
+>> > --- a/hw/block/pflash_cfi01.c
+>> > +++ b/hw/block/pflash_cfi01.c
+>> > @@ -49,12 +49,6 @@
+>> >  #include "sysemu/sysemu.h"
+>> >  #include "trace.h"
+>> >
+>> > -#define PFLASH_BUG(fmt, ...) \
+>> > -do { \
+>> > -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
+>> > -    exit(1); \
+>> > -} while(0)
+>> > -
+>> >  /* #define PFLASH_DEBUG */
+>> >  #ifdef PFLASH_DEBUG
+>> >  #define DPRINTF(fmt, ...)                                   \
+>> > @@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr =
+offset,
+>> >                  pfl->status |=3D 0x80;
+>> >              } else {
+>> >                  DPRINTF("%s: unknown command for \"write block\"\n", =
+__func__);
+>> > -                PFLASH_BUG("Write block confirm");
+>> > -                goto reset_flash;
+>> > +                fprintf(stderr, "PFLASH: Possible BUG - Write block c=
+onfirm");
+>> > +                exit(1);
+>>
+>> Don't you want to use hw_error here?
+>>
+>>       hw_error("PFLASH: Possible BUG - Write block confirm");
 >
-> Your cleanup is correct.
+> This should just be
+>    qemu_log_mask(LOG_GUEST_ERROR, ...);
+> (replacing both the DPRINTF and the PFLASH_BUG()).
 >
->>=20
->> There are more uses of BIOS_SIZE, but I don't sufficiently understand
->> them to attempt cleanup.
->
-> BIOS_SIZE is a MIPS architecture definition, incorrectly used around.
-> This simply means "Top of 32bit address space - Boot Vector address".
-> There is nothing wrong in plugging bigger/smaller flashes around the
-> boot vector.
-> (I have a series cleaning this definition, but I'm throttling my MIPS
-> apports).
->
->>=20
->> Cc: Aurelien Jarno <aurelien@aurel32.net>
->> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/mips/mips_malta.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
->> index fff5ed19bd..65cdda4881 100644
->> --- a/hw/mips/mips_malta.c
->> +++ b/hw/mips/mips_malta.c
->> @@ -1269,12 +1269,12 @@ void mips_malta_init(MachineState *machine)
->>      if (dinfo) {
->>          printf("Register parallel flash %d size " TARGET_FMT_lx " at "
->>                 "addr %08llx '%s' %x\n",
->> -               fl_idx, bios_size, FLASH_ADDRESS,
->> +               fl_idx, FLASH_SIZE, FLASH_ADDRESS,
->>                 blk_name(dinfo->bdrv), fl_sectors);
->>      }
->>  #endif
->>      fl =3D pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
->> -                               BIOS_SIZE,
->> +                               FLASH_SIZE,
->>                                 dinfo ? blk_by_legacy_dinfo(dinfo) : NUL=
-L,
->>                                 65536, fl_sectors,
->>                                 4, 0x0000, 0x0000, 0x0000, 0x0000, be);
->>=20
->
-> Does that mean you can remove the "hw/mips/bios.h" include now?
+> It's triggerable by a guest (if it puts the device into write-block
+> mode and then feeds it a bogus command byte), so it's just a guest
+> error, not an issue with our model of the pflash.
 
-No, since there are more uses of BIOS_SIZE in this file.  They feel
-inappropriate to me, but I don't feel confident enough to attempt
-cleanup.
-
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Thanks!
+I can do that.  Thanks!
