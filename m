@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41486)
+Received: from eggs.gnu.org ([209.51.188.92]:41941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw4DR-0003AE-Cx
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:09:38 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gw4FQ-0003yM-7W
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:11:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw4DQ-00034N-Fj
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:09:37 -0500
-References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
-	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
-	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
-	<20190219075333.GA4727@localhost.localdomain>
-	<d7a55ce9-a83c-12fe-fd16-d45dff67630a@redhat.com>
-	<20190219093716.GF4727@localhost.localdomain>
-	<6d9d1a3c-7310-3134-ea5c-a03d451b8982@redhat.com>
-	<20190219113840.GK4727@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4ea52831-3f8d-75aa-ea17-53614dc96594@redhat.com>
-Date: Tue, 19 Feb 2019 13:09:13 +0100
+	(envelope-from <balaton@eik.bme.hu>) id 1gw4FO-0004B7-NK
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:11:39 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:20105)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gw4FM-00045t-Lm
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:11:38 -0500
+Date: Tue, 19 Feb 2019 13:11:23 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA84=uU8XTy=4jXdM80XBnn3CS0gJxspakhZpdxWnvo_+A@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.9999.1902191300340.87875@zero.eik.bme.hu>
+References: <20190211040434.1C98674569F@zero.eik.bme.hu>
+	<8962bd1d-267d-2edf-b5ce-9b67896a2b2e@redhat.com>
+	<alpine.BSF.2.21.9999.1902122354210.68636@zero.eik.bme.hu>
+	<CAFEAcA84=uU8XTy=4jXdM80XBnn3CS0gJxspakhZpdxWnvo_+A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190219113840.GK4727@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Failing iotests in CI (was: Add a gitlab-ci file
- for Continuous Integration testing on Gitlab)
+Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, berrange@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 19/02/2019 12.38, Kevin Wolf wrote:
-> Am 19.02.2019 um 11:11 hat Thomas Huth geschrieben:
->> On 19/02/2019 10.37, Kevin Wolf wrote:
->>> Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
->>>> On 19/02/2019 08.53, Kevin Wolf wrote:
-[...]
->> 169 got killed via abort():
->>
->> 169                [08:34:39] [08:34:46] [failed, exit status 1] - out=
-put mismatch (see 169.out.bad)
->> --- /builds/huth/qemu/tests/qemu-iotests/169.out	2019-02-19 08:23:54.0=
-00000000 +0000
->> +++ /builds/huth/qemu/tests/qemu-iotests/169.out.bad	2019-02-19 08:34:=
-46.000000000 +0000
->> @@ -1,5 +1,29 @@
->> -....................
->> +WARNING:qemu:qemu received signal 6: /builds/huth/qemu/tests/qemu-iot=
-ests/../../x86_64-softmmu/qemu-system-x86_64 -chardev socket,id=3Dmon,pat=
-h=3D/tmp/qemu-iotests-quick-25045/tmpGQOExQ/qemua-13044-monitor.sock -mon=
- chardev=3Dmon,mode=3Dcontrol -display none -vga none -qtest unix:path=3D=
-/tmp/qemu-iotests-quick-25045/qemua-13044-qtest.sock -machine accel=3Dqte=
-st -nodefaults -machine accel=3Dqtest -drive if=3Dvirtio,id=3Ddrive0,file=
-=3D/tmp/qemu-iotests-quick-25045/disk_a,format=3Dqcow2,cache=3Dwriteback
+On Tue, 19 Feb 2019, Peter Maydell wrote:
+> On Tue, 12 Feb 2019 at 23:59, BALATON Zoltan <balaton@eik.bme.hu> wrote=
+:
+>> On Tue, 12 Feb 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 2/11/19 4:19 AM, BALATON Zoltan wrote:
 >> [...]
->>
->> No clue why.
->=20
-> In order to debug failures like this, I usually enable core dumps.
-
-It's only failing for me on the gitlab-CI system. I don't think that
-I've got the possibility to grab coredumps there...
-
->> 232 is also strange, no idea what is going on here:
->>
->> 232                [08:38:53] [08:38:56] - output mismatch (see 232.ou=
-t.bad)
->> --- /builds/huth/qemu/tests/qemu-iotests/232.out	2019-02-19 08:23:54.0=
-00000000 +0000
->> +++ /builds/huth/qemu/tests/qemu-iotests/232.out.bad	2019-02-19 08:38:=
-56.000000000 +0000
->> @@ -21,13 +21,13 @@
->>  NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->>  NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> =20
->> -QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,re=
-ad-only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': P=
-ermission denied
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> -
->> -QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,au=
-to-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
->> +
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
->=20
-> Do you run the tests as root? This messes with any tests that try to
-> test read-only cases because root can write to everything, no matter
-> what the permissions say.
-
-I don't know whether gitlab runs the CI pipelines as root, but I doubt
-it. Looking at the shell "prompts" that they show inbetween ("$") it
-looks like they are running the CI tests as a normal user, though.
-
->>>> By the way, 235 and 238 also fail on my normal laptop with RHEL7:
->>>> [...]
->>>> Any ideas what might be going on here?
+>>>> +
+>>>> +static void ati_reg_write_offs(uint32_t *reg, int offs,
+>>>> +                               uint64_t data, unsigned int size)
+>>>> +{
+>>>> +    int shift, i;
+>>>> +    uint32_t mask;
+>>>> +
+>>>> +    for (i =3D 0; i < size; i++) {
+>>>> +        shift =3D (offs + i) * 8;
+>>>> +        mask =3D 0xffUL << shift;
+>>>> +        *reg &=3D ~mask;
+>>>> +        *reg |=3D (data & 0xff) << shift;
+>>>> +        data >>=3D 8;
 >>>
->>> I think it's most likely that QEMU just prints an error message on
->>> startup and exits.
->> Right, I finally found the issue:
+>>> I'd have use a pair of extract32/deposit32 but this is probably easie=
+r
+>>> to singlestep.
 >>
->> qemu-system-x86_64: -machine accel=3Dkvm: No accelerator found
->>
->> I apparently compiled my QEMU with --disable-kvm at one point in time =
-and
->> forgot to enable it later again. =3D=3D> These tests should really che=
-ck whether
->> KVM is available in QEMU before they blindly use this feature.
->=20
-> Ideally, they shouldn't use it at all.
+>> You've told me that before but I have concerns about the asserts in th=
+ose
+>> functions which to me seem like unnecessary overhead in such low level
+>> functions so unless these are removed or *_noassert versions introduce=
+d
+>> I'll stay away from them.
+>
+> The code above is IMHO pretty hard to read -- you have to
+> think through all the shifts and masks to figure out exactly
+> what is being done. I would definitely recommend extract32/deposit32,
+> as they convey the intent much better. You're already inside a
+> register accessor for a device model, there is much more overhead
+> on this path than a few assert condition checks. (And they do
+> catch bugs -- they found one in the arm code last month.)
+>
+> (Alternatively, if you believe the overhead of the asserts matters,
+> then provide benchmarking demonstrating it, and we could look
+> at restricting this assert to the case where start and length are
+> compile-time constant, or to only the --enable-debug build.)
+>
+>> But I'm also not too happy about these *_offs functions but some regis=
+ters
+>> support 8/16/32 bit access and guest code seems to actually do this to
+>> update bits in the middle of the register at an odd address. Best woul=
+d be
+>> if I could just set .impl.min =3D 4, .impl.max =3D 4 and .valid.min =3D=
+ 1
+>> .valid.max =3D 4 for the mem region ops but I'm not sure that would wo=
+rk or
+>> would it? If that's working maybe I should just go with that instead.
+>
+> This will work, but only if all the registers in the memory region
+> are happy with "read 32 bits, write back 32 bits", ie they have
+> no "write-1-to-clear", "special behaviour on read", etc. (The
+> memory system will implement byte reads as "read 32 bits, modify,
+> write back".) If it does work then that's a nice way to do it.
 
-235 seems to use KVM on purpose according to the commit description...?
+OK, I'll try this and if it works that should be the best until a w1tc re=
+g=20
+is found.
 
-But maybe we can change it to "-M accel=3Dkvm:qtest" somehow ... though
-this currently seems to hang the test, as far as I can see... Maybe
-"accel=3Dkvm:tcg", so that it works at least without kvm?
+>> I won't and here's why: This is not a finished device model and I expe=
+ct
+>> to need to add debug logs and change them frequently during further
+>> development and for such ad-hoc debugging DPRINF is still easier to us=
+e
+>> because I don't have to define the format string at one file and use t=
+hem
+>> somewhere else.
+>
+> If you want to use local debug printfs for your convenience that's fine=
+.
+> You don't have to submit them in the patches you send. (I use them
+> quite a bit in development, and my stack of patches usually has a
+> patch at the end called "debug junk" with that kind of thing in it.)
+> But new code we take into upstream should be preferring trace events
+> over ad-hoc DPRINTF.
 
-According to Stefan, 238 does not need KVM at all (see his patch that he
-just sent).
+I could do that but that wouldn't help anyone but me. Since the device=20
+model is far from finished at the moment I expect anyone who tries it wit=
+h=20
+anything more complex than Linux framebuffer and maybe X driver will need=
+=20
+to debug and fix it to add more features their drivers need and I'd like=20
+to make their job easier because I'd like to encourage people to help=20
+finishing this. (It would probably take me alone about 2 years=20
+otherwise with the current rate of effort I can put in this.) So not=20
+having any debug facilities to help this is counterproductive at this=20
+stage. Once the model is more finished these can be removed or turned int=
+o=20
+trace points but not yet I think. This wouldn't be the only device with=20
+DPRINTFs in QEMU so as a special case I think this makes sense to allow i=
+t=20
+to use DPRINTF as well for development.
 
- Thomas
+>> Anything that
+>> distracts from actual values and makes it harder to read (such as
+>> timestamps and pids added by trace)
+>
+> -d trace:your_trace_event doesn't add timestamps or PIDs, FWIW.
+
+Thanks, I was looking for that option but couldn't find yet.
+
+Regards,
+BALATON Zoltan
