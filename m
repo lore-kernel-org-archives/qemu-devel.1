@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46044)
+Received: from eggs.gnu.org ([209.51.188.92]:46504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gw2Qr-0005Pj-Th
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:15:23 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2T4-00065q-9O
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gw2Qr-00080i-1m
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:15:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gw2Qq-0007zF-R2
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:15:20 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B7AAC13A40
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 10:15:19 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 19 Feb 2019 11:15:10 +0100
-Message-Id: <20190219101510.9356-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] audio: don't use alsa by default
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2T3-0000Ag-4N
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:17:38 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 19 Feb 2019 10:17:28 +0000
+Message-ID: <3a5b7941-c8c8-8421-2cbf-ef6bf3583634@virtuozzo.com>
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-3-jsnow@redhat.com>
+	<b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
+	<fa012e63-2a85-6c7b-bb92-75974d0d3033@redhat.com>
+In-Reply-To: <fa012e63-2a85-6c7b-bb92-75974d0d3033@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <40673E4BEBB065428A02DAAE22C8771B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
+ predicate helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, berrange@redhat.com, david@redhat.com
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-In case no sound hardware is present the driver initializes
-successfully and throws errors later on, i.e. effectively the
-automatic probing doesn't work.  So the driver should not be
-used by default (until that is fixed).  Drop the can_be_default
-flag.
-
-Explicitly picking the alsa driver (using QEMU_AUDIO_DRV=alsa
-environment variable) will continue to work.
-
-Buglink: https://bugs.launchpad.net/qemu/+bug/1816052
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/alsaaudio.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index 635be73bf4..1cc570e30b 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -1218,7 +1218,6 @@ static struct audio_driver alsa_audio_driver = {
-     .init           = alsa_audio_init,
-     .fini           = alsa_audio_fini,
-     .pcm_ops        = &alsa_pcm_ops,
--    .can_be_default = 1,
-     .max_voices_out = INT_MAX,
-     .max_voices_in  = INT_MAX,
-     .voice_size_out = sizeof (ALSAVoiceOut),
--- 
-2.9.3
+MTkuMDIuMjAxOSAxOjMyLCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMi8xOC8xOSA4
+OjU3IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTQuMDIuMjAx
+OSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+Pj4gIkZyb3plbiIgd2FzIGEgZ29vZCBkZXNjcmlw
+dGlvbiBhIGxvbmcgdGltZSBhZ28sIGJ1dCBpdCBpc24ndCBhZGVxdWF0ZSBub3cuDQo+Pj4gUmVu
+YW1lIHRoZSBmcm96ZW4gcHJlZGljYXRlIHRvIGhhc19zdWNjZXNzb3IgdG8gbWFrZSB0aGUgc2Vt
+YW50aWNzIG9mIHRoZQ0KPj4+IHByZWRpY2F0ZSBtb3JlIGNsZWFyIHRvIG91dHNpZGUgY2FsbGVy
+cy4NCj4+Pg0KPj4+IEluIHRoZSBwcm9jZXNzLCByZW1vdmUgc29tZSBjYWxscyB0byBmcm96ZW4o
+KSB0aGF0IG5vIGxvbmdlciBzZW1hbnRpY2FsbHkNCj4+PiBtYWtlIHNlbnNlLiBGb3IgZW5hYmxl
+ZCBhbmQgZGlzYWJsZWQgaW4gcGFydGljdWxhciwgaXQncyBhY3R1YWxseSBva2F5IGZvcg0KPj4+
+IHRoZSBpbnRlcm5hbHMgdG8gZG8gdGhpcyBidXQgb25seSBmb3JiaWRkZW4gZm9yIHVzZXJzIHRv
+IGludm9rZSB0aGVtLCBhbmQNCj4+DQo+PiBJJ20gYSBiaXQgbG9zdCBpbiB0aGlzIHBhcmFncmFw
+aC4uIHRvIHRoaXMgLSB3aGF0PywgdG8gaW52b2tlIHRoZW0gLSB3aG9tPw0KPj4gSSB0aGluaywg
+aXQgd291bGQgYmUgc2ltcGxlciBmb3IgbWUgdG8gcmVhZCBwYXRjaCBpdHNlbGYgOikNCj4+DQo+
+IA0KPiBUb3VjaGVkIHRoaXMgdXAuIEkgbWVhbnQgZW5hYmxlIGFuZCBkaXNhYmxlLCBub3QgZW5h
+YmxlZCBhbmQgZGlzYWJsZWQuDQo+IA0KPj4+IGFsbCBvZiB0aGUgUU1QIGVudHJ5IHVzZXMgYWxy
+ZWFkeSBjaGVjayBhZ2FpbnN0IHFtcF9sb2NrZWQuDQo+Pj4NCj4+PiBTZXZlcmFsIG90aGVyIGFz
+c2VydGlvbnMgcmVhbGx5IHdhbnQgdG8gY2hlY2sgdGhhdCB0aGUgYml0bWFwIGlzbid0IGluLXVz
+ZQ0KPj4+IGJ5IGFub3RoZXIgb3BlcmF0aW9uIC0tIHVzZSB0aGUgcW1wX2xvY2tlZCBmdW5jdGlv
+biBmb3IgdGhpcyBpbnN0ZWFkLCB3aGljaA0KPj4+IHByZXNlbnRseSBhbHNvIGNoZWNrcyBmb3Ig
+aGFzX3N1Y2Nlc3Nvci4NCj4+DQo+PiBobSwgeW91IG1lYW4gdXNlcl9sb2NrZWQsIG5vdCBxbXBf
+bG9ja2VkLg0KPj4NCj4gDQo+IFllcy4NCj4gDQo+IFsuLi5dDQo+IA0KPj4+ICAgIC8qKg0KPj4+
+ICAgICAqIENyZWF0ZSBhIHN1Y2Nlc3NvciBiaXRtYXAgZGVzdGluZWQgdG8gcmVwbGFjZSB0aGlz
+IGJpdG1hcCBhZnRlciBhbiBvcGVyYXRpb24uDQo+Pj4gLSAqIFJlcXVpcmVzIHRoYXQgdGhlIGJp
+dG1hcCBpcyBub3QgZnJvemVuIGFuZCBoYXMgbm8gc3VjY2Vzc29yLg0KPj4+ICsgKiBSZXF1aXJl
+cyB0aGF0IHRoZSBiaXRtYXAgaXMgbm90IGxvY2tlZCBhbmQgaGFzIG5vIHN1Y2Nlc3Nvci4NCj4+
+DQo+PiBJIHRoaW5rLCB1c2VyX2xvY2tlZCwgdG8gbm90IGludGVyZmVyZSB3aXRoIGJpdG1hcHMg
+bXV0ZXguIEFuZCB5b3UgdXNlIHVzZXJfbG9ja2VkIGluDQo+PiBvdGhlciBjb21tZW50cyBpbiB0
+aGlzIHBhdGNoLg0KPj4NCj4gDQo+IFlvdSdyZSByaWdodC4gSXQgZ2V0cyBjaGFuZ2VkIGFnYWlu
+IGxhdGVyLCBidXQgSSBkaWRuJ3QgbWFrZSB0aGlzIGVhc3kNCj4gdG8gcmVhZC4NCj4gDQo+Pj4g
+ICAgICogQ2FsbGVkIHdpdGggQlFMIHRha2VuLg0KPj4+ICAgICAqLw0KPj4+ICAgIGludCBiZHJ2
+X2RpcnR5X2JpdG1hcF9jcmVhdGVfc3VjY2Vzc29yKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4+
+IEBAIC0yNDQsMTIgKzI0NCwxNiBAQCBpbnQgYmRydl9kaXJ0eV9iaXRtYXBfY3JlYXRlX3N1Y2Nl
+c3NvcihCbG9ja0RyaXZlclN0YXRlICpicywNCj4+PiAgICAgICAgdWludDY0X3QgZ3JhbnVsYXJp
+dHk7DQo+Pj4gICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqY2hpbGQ7DQo+Pj4gICAgDQo+Pj4gLSAg
+ICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfZnJvemVuKGJpdG1hcCkpIHsNCj4+PiAtICAgICAgICBl
+cnJvcl9zZXRnKGVycnAsICJDYW5ub3QgY3JlYXRlIGEgc3VjY2Vzc29yIGZvciBhIGJpdG1hcCB0
+aGF0IGlzICINCj4+PiAtICAgICAgICAgICAgICAgICAgICJjdXJyZW50bHkgZnJvemVuIik7DQo+
+Pj4gKyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfdXNlcl9sb2NrZWQoYml0bWFwKSkgew0KPj4+
+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkNhbm5vdCBjcmVhdGUgYSBzdWNjZXNzb3IgZm9y
+IGEgYml0bWFwIHRoYXQgaXMgaW4tdXNlICINCj4+PiArICAgICAgICAgICAgICAgICAgICJieSBh
+biBvcGVyYXRpb24iKTsNCj4+PiArICAgICAgICByZXR1cm4gLTE7DQo+Pj4gKyAgICB9DQo+Pj4g
+KyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihiaXRtYXApKSB7DQo+Pj4g
+KyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQ2Fubm90IGNyZWF0ZSBhIHN1Y2Nlc3NvciBmb3Ig
+YSBiaXRtYXAgdGhhdCBhbHJlYWR5ICINCj4+PiArICAgICAgICAgICAgICAgICAgICJoYXMgb25l
+Iik7DQo+Pg0KPj4NCj4+IEFtbSwgZGVhZCBjb2RlPyBfdXNlcl9sb2NrZWQoKSBpbXBsaWVzIG5v
+IHN1Y2Nlc3Nvciwgc28gd2UgaW5zdGVhZCBjYW4ga2VlcCBhbiBhc3NlcnRpb24uLg0KPj4NCj4g
+DQo+IEl0IGdldHMgY2hhbmdlZCBsYXRlciBpbiB0aGUgc2VyaWVzLCBidXQgSSBkaWRuJ3QgZG8g
+YSBncmVhdCBqb2Igb2YNCj4gZXhwbGFpbmluZyB0aGF0IGluIGFkdmFuY2UuIEknbGwgYW1lbmQg
+dGhlIGNvbW1pdCBtZXNzYWdlIHRvIGV4cGxhaW4NCj4gd2hhdCBJJ20gdHJ5aW5nIHRvIGRvLg0K
+PiANCj4gSSB0cmllZCB0byBoaW50IGF0IHRoaXMgd2l0aDogIndoaWNoIHByZXNlbnRseSBhbHNv
+IGNoZWNrcyBmb3INCj4gaGFzX3N1Y2Nlc3NvciIgYXMgYW4gYWRtaXNzaW9uIHRoYXQgaXQgd2Fz
+IHJlZHVuZGFudCwgYnV0IEkgbmVlZCB0byBjYWxsDQo+IGl0IG91dCBpbiBzdHJvbmdlciBsYW5n
+dWFnZS4NCj4gDQoNCkhtbSwgaXNuJ3QgaXQgYmV0dGVyIHRvIGtlZXAgYW4gYXNzZXJ0aW9uLCB0
+aGFuIGFkZCBkZWFkIGNvZGUsIHRvIGJlIGZpeGVkIGluIGxhdGVyIGNvbW1pdHM/DQoNCi0tIA0K
+QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
