@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59510)
+Received: from eggs.gnu.org ([209.51.188.92]:33442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw8xv-00013Z-Ub
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:13:56 -0500
+	(envelope-from <groug@kaod.org>) id 1gw925-0002II-Ui
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw8xp-00040T-GU
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:13:50 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gw8xe-0003pu-Sz
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:13:43 -0500
-Received: by mail-ot1-x343.google.com with SMTP id z19so35507552otm.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 09:13:27 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1gw922-0007Ib-5b
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:12 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48650)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw91y-0006pM-9C
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:08 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1JHEGHV115975
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:17:42 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrmfgddsy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:17:42 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 19 Feb 2019 17:17:39 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 19 Feb 2019 18:17:33 +0100
 MIME-Version: 1.0
-References: <20190215192302.27855-1-richard.henderson@linaro.org>
-	<20190215192302.27855-9-richard.henderson@linaro.org>
-In-Reply-To: <20190215192302.27855-9-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Feb 2019 17:13:13 +0000
-Message-ID: <CAFEAcA-0SrtsyH2GFPQT84LOxY4wd49YQgnxA7E87dU0WgpRig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 8/8] target/arm: Enable ARMv8.2-FHM for
- -cpu max
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 00/17] spapr: Add support for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, 15 Feb 2019 at 19:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.c   | 1 +
->  target/arm/cpu64.c | 2 ++
->  2 files changed, 3 insertions(+)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 8ea6569088..b9fa548718 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -2003,6 +2003,7 @@ static void arm_max_initfn(Object *obj)
->              t = cpu->isar.id_isar6;
->              t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
->              t = FIELD_DP32(t, ID_ISAR6, DP, 1);
-> +            t = FIELD_DP32(t, ID_ISAR6, FHM, 1);
->              cpu->isar.id_isar6 = t;
->
->              t = cpu->id_mmfr4;
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 69e4134f79..1b0c427277 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -308,6 +308,7 @@ static void aarch64_max_initfn(Object *obj)
->          t = FIELD_DP64(t, ID_AA64ISAR0, SM3, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR0, SM4, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR0, DP, 1);
-> +        t = FIELD_DP64(t, ID_AA64ISAR0, FHM, 1);
->          cpu->isar.id_aa64isar0 = t;
->
->          t = cpu->isar.id_aa64isar1;
-> @@ -347,6 +348,7 @@ static void aarch64_max_initfn(Object *obj)
->          u = cpu->isar.id_isar6;
->          u = FIELD_DP32(u, ID_ISAR6, JSCVT, 1);
->          u = FIELD_DP32(u, ID_ISAR6, DP, 1);
-> +        u = FIELD_DP32(u, ID_ISAR6, FHM, 1);
->          cpu->isar.id_isar6 = u;
->
->          /*
+This allows to hotplug/unplug PHBs. I could successfully test:
+- using in-kernel XICS, emulated XICS and XIVE
+- hotplug/unplug with e1000 device to validate LSIs
+- hotplug/unplug with virtio-net device to validate MSIs
+- some simple migration scenarios
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Based on David's ppc-for-4.0 branch SHA1:
 
-We also need to set the HWCAP_ASIMDFHM and HWCAP_JSCVT hwcaps
-for linux-user based on the ID regs, but we can do that as
-an extra patch on top of this set.
+6f585625d0d1 target/ppc: Basic POWER9 bare-metal radix MMU support
 
-thanks
--- PMM
+Please comment.
+
+Changes in v5:
+- all DRC subtypes generate FDT fragment at configure connector time
+- Drop all the LSI bitmap and allocation/typing disintricate stuff
+- set IRQ type in KVM at claim time
+- fix hotplug call chain
+- added PHB unplug test to tests/device-plug-test
+
+Changes in v4:
+- added a LSI bitmap to XICS
+- no longer need compat property in XICS
+- simplified the patches to access the name and the phandle of the
+  interrupt controller
+- delay the creation of the PHB drc->fdt to RTAS ibm,configure-connector
+
+Change in v3:
+- reworked phandle related code some more
+- disintricate allocation/"type setting" of interrupts
+- identify LSIs at machine init
+
+Changes in v2:
+- rebased on current ppc-for-4.0
+- added some preliminary cleanup
+- call unrealize from realize error path
+- advertise PHB hotplug in last patch
+- reworked phandle related code
+- sync LSIs to KVM
+
+--
+Greg
+
+---
+
+Greg Kurz (11):
+      spapr_drc: Allow FDT fragment to be added later
+      spapr: Generate FDT fragment for LMBs at configure connector time
+      spapr: Generate FDT fragment for CPUs at configure connector time
+      spapr/pci: Generate FDT fragment at configure connector time
+      spapr/drc: Drop spapr_drc_attach() fdt argument
+      xics: Write source state to KVM at claim time
+      spapr: Expose the name of the interrupt controller node
+      spapr_irq: Expose the phandle of the interrupt controller
+      spapr_pci: add PHB unrealize
+      spapr: add hotplug hooks for PHB hotplug
+      tests/device-plug: Add PHB unplug request test for spapr
+
+Michael Roth (5):
+      spapr: create DR connectors for PHBs
+      spapr_events: add support for phb hotplug events
+      spapr_pci: provide node start offset via spapr_populate_pci_dt()
+      spapr_pci: add ibm, my-drc-index property for PHB hotplug
+      spapr: enable PHB hotplug for default pseries machine type
+
+Nathan Fontenot (1):
+      spapr: populate PHB DRC entries for root DT node
+
+
+ hw/intc/spapr_xive.c        |    9 +-
+ hw/intc/xics.c              |    4 +
+ hw/intc/xics_kvm.c          |   74 ++++++++-----
+ hw/intc/xics_spapr.c        |    2 
+ hw/ppc/spapr.c              |  238 +++++++++++++++++++++++++++++++++++--------
+ hw/ppc/spapr_drc.c          |   51 ++++++++-
+ hw/ppc/spapr_events.c       |    3 +
+ hw/ppc/spapr_irq.c          |   42 +++++++-
+ hw/ppc/spapr_pci.c          |  135 ++++++++++++++++++++----
+ include/hw/pci-host/spapr.h |   11 ++
+ include/hw/ppc/spapr.h      |   10 ++
+ include/hw/ppc/spapr_drc.h  |   17 +++
+ include/hw/ppc/spapr_irq.h  |    2 
+ include/hw/ppc/spapr_xive.h |    3 +
+ include/hw/ppc/xics.h       |    1 
+ include/hw/ppc/xics_spapr.h |    2 
+ tests/device-plug-test.c    |   16 +++
+ 17 files changed, 497 insertions(+), 123 deletions(-)
