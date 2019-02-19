@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40616)
+Received: from eggs.gnu.org ([209.51.188.92]:41486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw48f-0000PQ-Tj
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:04:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1gw4DR-0003AE-Cx
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:09:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw48e-0008Lb-IX
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:04:41 -0500
-Date: Tue, 19 Feb 2019 12:04:13 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190219120413.GA9981@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1gw4DQ-00034N-Fj
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:09:37 -0500
 References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
 	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
 	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
 	<20190219075333.GA4727@localhost.localdomain>
 	<d7a55ce9-a83c-12fe-fd16-d45dff67630a@redhat.com>
 	<20190219093716.GF4727@localhost.localdomain>
-	<20190219110626.GC7154@redhat.com>
-	<20190219113141.GJ4727@localhost.localdomain>
-	<20190219120128.GF7154@redhat.com>
+	<6d9d1a3c-7310-3134-ea5c-a03d451b8982@redhat.com>
+	<20190219113840.GK4727@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4ea52831-3f8d-75aa-ea17-53614dc96594@redhat.com>
+Date: Tue, 19 Feb 2019 13:09:13 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190219113840.GK4727@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190219120128.GF7154@redhat.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] Failing iotests in CI (was: Add a gitlab-ci file
  for Continuous Integration testing on Gitlab)
@@ -34,105 +32,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, berrange@redhat.com
 
-On Tue, Feb 19, 2019 at 12:01:28PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Feb 19, 2019 at 12:31:41PM +0100, Kevin Wolf wrote:
-> > Am 19.02.2019 um 12:06 hat Daniel P. Berrang=C3=A9 geschrieben:
-> > > On Tue, Feb 19, 2019 at 10:37:16AM +0100, Kevin Wolf wrote:
-> > > > Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
-> > > > >=20
-> > > > >  https://gitlab.com/huth/qemu/-/jobs/163680780
-> > > > >=20
-> > > > > Some of them apparently need encryption to be enabled (as alrea=
-dy
-> > > > > mentioned by Cleber in his patch) - thus should they really be =
-in the
-> > > > > quick check, too? Or could they at least check whether QEMU has=
- been
-> > > > > built with encryption?
-> > > >=20
-> > > > The correct solution would be that they detect the situation
-> > > > automatically and skip the test by calling _notrun.
-> > > >=20
-> > > > I'm not sure how to detect if a given QEMU binary supports encryp=
-tion,
-> > > > but Dan might know.
-> > >=20
-> > > It isn't easy & depends which encryption feature you're trying to u=
-se.
-> > >=20
-> > > For TLS related features you can do something gross like
-> > >=20
-> > >     qemu-img info --object tls-creds-anon,id=3Ddummy README 2>&1
-> > >     test $? !=3D 0 && exit 0
-> > >=20
-> > > This relies on fact that 'tls-creds-anon' object type will report a
-> > > runtime error during initialization if gnutls isn't enabled.
-> > >=20
-> > > For more general ciphers you pretty much have to just try the highe=
-r level
-> > > feature and see if it fails.
-> >=20
-> > Actually, I think for test cases we should see 'qemu-img create' fail=
-ing
-> > and could just skip the test if it returns a non-zero exit code.
-> >=20
-> > But then I looked at Thomas' output again:
-> >=20
-> >     --- /builds/huth/qemu/tests/qemu-iotests/188.out	2019-02-19 08:23=
-:54.000000000 +0000
-> >     +++ /builds/huth/qemu/tests/qemu-iotests/188.out.bad	2019-02-19 0=
-8:34:54.000000000 +0000
-> >     @@ -1,4 +1,5 @@
-> >      QA output created by 188
-> >     +qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKDF =
-in this build: Function not implemented
-> >      Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 enc=
-rypt.format=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
-> >=20
-> >      =3D=3D reading whole image =3D=3D--- /builds/huth/qemu/tests/qem=
-u-iotests/188.out	2019-02-19 08:23:54.000000000 +0000
-> >=20
-> > What is it actually doing there? There's clearly an error message, bu=
-t
-> > it almost looks like it's creating some kind of image anyway? The
-> > following I/O works fine (i.e. this created image can even be opened
-> > again with the luks driver), except that you can also access the imag=
-e
-> > with the wrong password.
-> >=20
-> > Is this a real bug in either qcow2 or luks?
+On 19/02/2019 12.38, Kevin Wolf wrote:
+> Am 19.02.2019 um 11:11 hat Thomas Huth geschrieben:
+>> On 19/02/2019 10.37, Kevin Wolf wrote:
+>>> Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
+>>>> On 19/02/2019 08.53, Kevin Wolf wrote:
+[...]
+>> 169 got killed via abort():
+>>
+>> 169                [08:34:39] [08:34:46] [failed, exit status 1] - out=
+put mismatch (see 169.out.bad)
+>> --- /builds/huth/qemu/tests/qemu-iotests/169.out	2019-02-19 08:23:54.0=
+00000000 +0000
+>> +++ /builds/huth/qemu/tests/qemu-iotests/169.out.bad	2019-02-19 08:34:=
+46.000000000 +0000
+>> @@ -1,5 +1,29 @@
+>> -....................
+>> +WARNING:qemu:qemu received signal 6: /builds/huth/qemu/tests/qemu-iot=
+ests/../../x86_64-softmmu/qemu-system-x86_64 -chardev socket,id=3Dmon,pat=
+h=3D/tmp/qemu-iotests-quick-25045/tmpGQOExQ/qemua-13044-monitor.sock -mon=
+ chardev=3Dmon,mode=3Dcontrol -display none -vga none -qtest unix:path=3D=
+/tmp/qemu-iotests-quick-25045/qemua-13044-qtest.sock -machine accel=3Dqte=
+st -nodefaults -machine accel=3Dqtest -drive if=3Dvirtio,id=3Ddrive0,file=
+=3D/tmp/qemu-iotests-quick-25045/disk_a,format=3Dqcow2,cache=3Dwriteback
+>> [...]
+>>
+>> No clue why.
 >=20
-> It is an artifact of the way qcow2 image creation happens in multiple
-> phases. qcow2_co_create first creates a minimal qcow2 file, and then
-> opens it and updates it to add in the various extra features, including
-> luks encryption. We fail to create the luks encryption, but enough of
-> the qcow2 file has been created that it is able to still do plain text
-> I/O.
+> In order to debug failures like this, I usually enable core dumps.
+
+It's only failing for me on the gitlab-CI system. I don't think that
+I've got the possibility to grab coredumps there...
+
+>> 232 is also strange, no idea what is going on here:
+>>
+>> 232                [08:38:53] [08:38:56] - output mismatch (see 232.ou=
+t.bad)
+>> --- /builds/huth/qemu/tests/qemu-iotests/232.out	2019-02-19 08:23:54.0=
+00000000 +0000
+>> +++ /builds/huth/qemu/tests/qemu-iotests/232.out.bad	2019-02-19 08:38:=
+56.000000000 +0000
+>> @@ -21,13 +21,13 @@
+>>  NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+>>  NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+>> =20
+>> -QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,re=
+ad-only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': P=
+ermission denied
+>> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+>> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+>> -
+>> -QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,au=
+to-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
+>> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+>> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+>> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
+>> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
+>> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
+>> +
+>> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
+>> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
+>> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
 >=20
-> Essentially the problem is that qcow2_co_create() doesn't unlink() the
-> partially created image when things fail. This is a generic problem
-> which can affect any part of qcow2_co_create that might fail, but it
-> is especially problematic with luks.
+> Do you run the tests as root? This messes with any tests that try to
+> test read-only cases because root can write to everything, no matter
+> what the permissions say.
+
+I don't know whether gitlab runs the CI pipelines as root, but I doubt
+it. Looking at the shell "prompts" that they show inbetween ("$") it
+looks like they are running the CI tests as a normal user, though.
+
+>>>> By the way, 235 and 238 also fail on my normal laptop with RHEL7:
+>>>> [...]
+>>>> Any ideas what might be going on here?
+>>>
+>>> I think it's most likely that QEMU just prints an error message on
+>>> startup and exits.
+>> Right, I finally found the issue:
+>>
+>> qemu-system-x86_64: -machine accel=3Dkvm: No accelerator found
+>>
+>> I apparently compiled my QEMU with --disable-kvm at one point in time =
+and
+>> forgot to enable it later again. =3D=3D> These tests should really che=
+ck whether
+>> KVM is available in QEMU before they blindly use this feature.
 >=20
-> The complication in fixing this is that can't just do an unlink() as
-> we can't assume a local file. We need to have a bdrv_unlink() driver
-> callback we can use to delegate to the right block driver APIs for
-> deletion.
+> Ideally, they shouldn't use it at all.
 
-As a quick hack we could perhaps overwrite the qcow2 header with
-garbage or all-zeros on failure to avoid it being mistakenly
-interpreted as a valid qcow2 file on failure (could still be
-mistakenly probed as raw but we tell people not to allow probing)
+235 seems to use KVM on purpose according to the commit description...?
 
+But maybe we can change it to "-M accel=3Dkvm:qtest" somehow ... though
+this currently seems to hang the test, as far as I can see... Maybe
+"accel=3Dkvm:tcg", so that it works at least without kvm?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+According to Stefan, 238 does not need KVM at all (see his patch that he
+just sent).
+
+ Thomas
