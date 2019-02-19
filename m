@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45976)
+Received: from eggs.gnu.org ([209.51.188.92]:46961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwBYO-0007cR-CD
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:59:45 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gwBe6-0000yV-7c
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 15:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwBYM-0000TM-I7
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:59:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwBYL-0000R0-QL
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:59:42 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46F753DFCD
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 19:59:32 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 19 Feb 2019 19:59:28 +0000
-Message-Id: <20190219195928.12289-1-dgilbert@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1gwBe5-0002Km-9p
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 15:05:38 -0500
+References: <20190213232356.21034-1-jsnow@redhat.com>
+	<20190213232356.21034-3-jsnow@redhat.com>
+	<b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
+	<fa012e63-2a85-6c7b-bb92-75974d0d3033@redhat.com>
+	<3a5b7941-c8c8-8421-2cbf-ef6bf3583634@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4dc94825-98ac-7dc0-0204-d0f64fada599@redhat.com>
+Date: Tue, 19 Feb 2019 15:05:17 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration: Fix cancel state
+In-Reply-To: <3a5b7941-c8c8-8421-2cbf-ef6bf3583634@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
+ predicate helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-During a cancelled migration there's a race where the fd can
-go into an error state before we get back around the migration loop
-and migration_detect_error transitions from cancelling->failed.
 
-Check for cancelled/cancelling and don't change the state.
+On 2/19/19 5:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 19.02.2019 1:32, John Snow wrote:
+>>
+>>
+>> On 2/18/19 8:57 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 14.02.2019 2:23, John Snow wrote:
+>>>> "Frozen" was a good description a long time ago, but it isn't adequate now.
+>>>> Rename the frozen predicate to has_successor to make the semantics of the
+>>>> predicate more clear to outside callers.
+>>>>
+>>>> In the process, remove some calls to frozen() that no longer semantically
+>>>> make sense. For enabled and disabled in particular, it's actually okay for
+>>>> the internals to do this but only forbidden for users to invoke them, and
+>>>
+>>> I'm a bit lost in this paragraph.. to this - what?, to invoke them - whom?
+>>> I think, it would be simpler for me to read patch itself :)
+>>>
+>>
+>> Touched this up. I meant enable and disable, not enabled and disabled.
+>>
+>>>> all of the QMP entry uses already check against qmp_locked.
+>>>>
+>>>> Several other assertions really want to check that the bitmap isn't in-use
+>>>> by another operation -- use the qmp_locked function for this instead, which
+>>>> presently also checks for has_successor.
+>>>
+>>> hm, you mean user_locked, not qmp_locked.
+>>>
+>>
+>> Yes.
+>>
+>> [...]
+>>
+>>>>    /**
+>>>>     * Create a successor bitmap destined to replace this bitmap after an operation.
+>>>> - * Requires that the bitmap is not frozen and has no successor.
+>>>> + * Requires that the bitmap is not locked and has no successor.
+>>>
+>>> I think, user_locked, to not interfere with bitmaps mutex. And you use user_locked in
+>>> other comments in this patch.
+>>>
+>>
+>> You're right. It gets changed again later, but I didn't make this easy
+>> to read.
+>>
+>>>>     * Called with BQL taken.
+>>>>     */
+>>>>    int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+>>>> @@ -244,12 +244,16 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+>>>>        uint64_t granularity;
+>>>>        BdrvDirtyBitmap *child;
+>>>>    
+>>>> -    if (bdrv_dirty_bitmap_frozen(bitmap)) {
+>>>> -        error_setg(errp, "Cannot create a successor for a bitmap that is "
+>>>> -                   "currently frozen");
+>>>> +    if (bdrv_dirty_bitmap_user_locked(bitmap)) {
+>>>> +        error_setg(errp, "Cannot create a successor for a bitmap that is in-use "
+>>>> +                   "by an operation");
+>>>> +        return -1;
+>>>> +    }
+>>>> +    if (bdrv_dirty_bitmap_has_successor(bitmap)) {
+>>>> +        error_setg(errp, "Cannot create a successor for a bitmap that already "
+>>>> +                   "has one");
+>>>
+>>>
+>>> Amm, dead code? _user_locked() implies no successor, so we instead can keep an assertion..
+>>>
+>>
+>> It gets changed later in the series, but I didn't do a great job of
+>> explaining that in advance. I'll amend the commit message to explain
+>> what I'm trying to do.
+>>
+>> I tried to hint at this with: "which presently also checks for
+>> has_successor" as an admission that it was redundant, but I need to call
+>> it out in stronger language.
+>>
+> 
+> Hmm, isn't it better to keep an assertion, than add dead code, to be fixed in later commits?
+> 
 
-Red Hat bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1608649
+Eh. I wrote code that looked semantically correct without worrying about
+what the calls actually do:
 
-Fixes: b23c2ade250
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+- We want to make sure this bitmap is not in use (user_locked,
+qmp_locked, or busy -- however you want to spell it), and
 
-diff --git a/migration/migration.c b/migration/migration.c
-index c39d3054ec..e44f77af02 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2911,6 +2911,13 @@ static MigThrError postcopy_pause(MigrationState *=
-s)
- static MigThrError migration_detect_error(MigrationState *s)
- {
-     int ret;
-+    int state =3D s->state;
-+
-+    if (state =3D=3D MIGRATION_STATUS_CANCELLING ||
-+        state =3D=3D MIGRATION_STATUS_CANCELLED) {
-+        /* End the migration, but don't set the state to failed */
-+        return MIG_THR_ERR_FATAL;
-+    }
-=20
-     /* Try to detect any file errors */
-     ret =3D qemu_file_get_error(s->to_dst_file);
-@@ -2920,7 +2927,7 @@ static MigThrError migration_detect_error(Migration=
-State *s)
-         return MIG_THR_ERR_NONE;
-     }
-=20
--    if (s->state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE && ret =3D=3D -=
-EIO) {
-+    if (state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE && ret =3D=3D -EIO=
-) {
-         /*
-          * For postcopy, we allow the network to be down for a
-          * while. After that, it can be continued by a
-@@ -2932,7 +2939,7 @@ static MigThrError migration_detect_error(Migration=
-State *s)
-          * For precopy (or postcopy with error outside IO), we fail
-          * with no time.
-          */
--        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
-+        migrate_set_state(&s->state, state, MIGRATION_STATUS_FAILED);
-         trace_migration_thread_file_err();
-=20
-         /* Time to stop the migration, now. */
---=20
-2.20.1
+- We want to make sure this bitmap doesn't have a successor.
+
+Now, you and I happen to know that these two conditions aren't actually
+independent, but that's not necessarily obvious from this one function
+to a new reader. Adding the second check gives some assurance to the reader.
+
+In my mind, the concept of having a successor is now distinct from that
+of being busy, and create_successor actually wants to check both things:
+(1) That is able to create a successor, because it doesn't have one, and
+(2) That it is not modifying a bitmap in use by some operation.
+
+But, you're right, there's no way to have a bitmap with a successor that
+isn't busy, so an assertion will suffice for the instructional purpose.
+
+I'll change it.
+
+--js
