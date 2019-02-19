@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46118)
+Received: from eggs.gnu.org ([209.51.188.92]:46971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gw6FS-0004SX-69
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:19:51 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gw6IT-0005GZ-0o
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:22:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gw6FQ-0003FW-Tg
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:19:50 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:40723)
+	(envelope-from <alex.bennee@linaro.org>) id 1gw6IO-0005IH-Hf
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:22:53 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gw6FQ-0003FJ-Mj
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:19:48 -0500
-Received: by mail-qt1-f196.google.com with SMTP id j36so23230765qta.7
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 06:19:48 -0800 (PST)
-Date: Tue, 19 Feb 2019 09:19:45 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190219091849-mutt-send-email-mst@kernel.org>
-References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
-	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
-	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
-	<20190218113447-mutt-send-email-mst@kernel.org>
-	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
-	<20190218183353-mutt-send-email-mst@kernel.org>
-	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gw6IN-00059h-HL
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:22:52 -0500
+Received: by mail-wr1-x443.google.com with SMTP id r5so8818891wrg.9
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 06:22:40 -0800 (PST)
+References: <20190215143115.28777-1-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190215143115.28777-1-alex.bennee@linaro.org>
+Date: Tue, 19 Feb 2019 14:22:37 +0000
+Message-ID: <87d0nn6eoi.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
- not enabled by the guest
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH  v3 0/3] softmmu demacro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,115 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
-
-On Tue, Feb 19, 2019 at 02:27:35PM +0800, Jason Wang wrote:
-> 
-> On 2019/2/19 上午7:34, Michael S. Tsirkin wrote:
-> > On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
-> > > On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
-> > > > > On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> wrote:
-> > > > > > 
-> > > > > > On 2019/2/13 下午10:51, Yuri Benditovich wrote:
-> > > > > > > https://bugzilla.redhat.com/show_bug.cgi?id=1608226
-> > > > > > > On startup/link-up in multiqueue configuration the virtio-net
-> > > > > > > tries to starts all the queues, including those that the guest
-> > > > > > > will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
-> > > > > > > If the guest driver does not allocate queues that it will not
-> > > > > > > use (for example, Windows driver does not) and number of actually
-> > > > > > > used queues is less that maximal number supported by the device,
-> > > > > > 
-> > > > > > Is this a requirement of e.g NDIS? If not, could we simply allocate all
-> > > > > > queues in this case. This is usually what normal Linux driver did.
-> > > > > > 
-> > > > > > 
-> > > > > > > this causes vhost_net_start to fail and actually disables vhost
-> > > > > > > for all the queues, reducing the performance.
-> > > > > > > Current commit fixes this: initially only first queue is started,
-> > > > > > > upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
-> > > > > > > requested by the guest.
-> > > > > > > 
-> > > > > > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> > > > > > > ---
-> > > > > > >    hw/net/virtio-net.c | 7 +++++--
-> > > > > > >    1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > 
-> > > > > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > > > > > index 3f319ef723..d3b1ac6d3a 100644
-> > > > > > > --- a/hw/net/virtio-net.c
-> > > > > > > +++ b/hw/net/virtio-net.c
-> > > > > > > @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
-> > > > > > >    {
-> > > > > > >        VirtIODevice *vdev = VIRTIO_DEVICE(n);
-> > > > > > >        NetClientState *nc = qemu_get_queue(n->nic);
-> > > > > > > -    int queues = n->multiqueue ? n->max_queues : 1;
-> > > > > > > +    int queues = n->multiqueue ? n->curr_queues : 1;
-> > > > > > > 
-> > > > > > >        if (!get_vhost_net(nc->peer)) {
-> > > > > > >            return;
-> > > > > > > @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
-> > > > > > >            return VIRTIO_NET_ERR;
-> > > > > > >        }
-> > > > > > > 
-> > > > > > > -    n->curr_queues = queues;
-> > > > > > >        /* stop the backend before changing the number of queues to avoid handling a
-> > > > > > >         * disabled queue */
-> > > > > > > +    virtio_net_set_status(vdev, 0);
-> > > > > > 
-> > > > > > Any reason for doing this?
-> > > > > I think there are 2 reasons:
-> > > > > 1. The spec does not require guest SW to allocate unused queues.
-> > > > > 2. We spend guest's physical memory to just make vhost happy when it
-> > > > > touches queues that it should not use.
-> > > > > 
-> > > > > Thanks,
-> > > > > Yuri Benditovich
-> > > > The spec also says:
-> > > >          queue_enable The driver uses this to selectively prevent the device from executing requests from this
-> > > >          virtqueue. 1 - enabled; 0 - disabled.
-> > > > 
-> > > > While this is not a conformance clause this strongly implies that
-> > > > queues which are not enabled are never accessed by device.
-> > > > 
-> > > > Yuri I am guessing you are not enabling these unused queues right?
-> > > Of course, we (Windows driver) do not.
-> > > The code of virtio-net passes max_queues to vhost and this causes
-> > > vhost to try accessing all the queues, fail on unused ones and finally
-> > > leave vhost disabled at all.
-> > 
-> > Jason, at least for 1.0 accessing disabled queues looks like a spec
-> > violation. What do you think?
-> 
-> 
-> Yes, but there's some issues:
-> 
-> - How to detect a disabled queue for 0.9x device? Looks like there's no way
-> according to the spec, so device must assume all queues was enabled.
-
-Traditionally devices assumed that queue address 0 implies not enabled.
-
-> - For 1.0, if we depends on queue_enable, we should implement the callback
-> for vhost I think. Otherwise it's still buggy.
-> 
-> So it looks tricky to enable and disable queues through set status
-> 
-> Thanks
+To: qemu-devel@nongnu.org
+Cc: cota@braap.org, mark.cave-ayland@ilande.co.uk
 
 
-Do you agree it's a compliance issue though?
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> 
-> > 
-> > > > 
-> > > > 
-> > > > > > Thanks
-> > > > > > 
-> > > > > > 
-> > > > > > > +
-> > > > > > > +    n->curr_queues = queues;
-> > > > > > > +
-> > > > > > >        virtio_net_set_status(vdev, vdev->status);
-> > > > > > >        virtio_net_set_queues(n);
-> > > > > > > 
+> Hi,
+>
+> This is hopefully the final version of the softmmu demacro series. I
+> tracked down the remaining failures to:
+>
+>   - not always using the correct victim tlb
+>   - not masking reads when we unrolled the unaligned helpers
+>
+> Other than that I've rolled in the changes that were made to support
+> dynamic TLB code and the follow-up fixes. All patches need some review
+> before we can merge them.
+
+Measurements:
+
+Before
+
+hyperfine -w 2 './aarch64-softmmu/qemu-system-aarch64 -machine virt,graphic=
+s=3Don,gic-version=3D3,virtualization=3Don -cpu cortex-a53 -serial mon:stdi=
+o -nic user,model=3Dvirtio-net-
+pci,hostfwd=3Dtcp::2222-:22 -device virtio-scsi-pci -device scsi-hd,drive=
+=3Dhd0 -blockdev driver=3Draw,node-name=3Dhd0,discard=3Dunmap,file.driver=
+=3Dhost_device,file.filename=3D/dev/zvol/
+hackpool-0/debian-buster-arm64 -kernel ../linux.git/builds/arm64.nopreempt/=
+arch/arm64/boot/Image -append "console=3DttyAMA0 root=3D/dev/sda2 systemd.u=
+nit=3Dbenchmark-pigz.service"
+ -display none -m 8192 -smp 4 --snapshot'
+Benchmark #1: ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=
+=3Don,gic-version=3D3,virtualization=3Don -cpu cortex-a53 -serial mon:stdio=
+ -nic user,model=3Dvirtio-net-pci,hostfwd=3Dtcp::2222-:22 -device virtio-sc=
+si-pci -device scsi-hd,drive=3Dhd0 -blockdev driver=3Draw,node-name=3Dhd0,d=
+iscard=3Dunmap,file.driver=3Dhost_device,file.filename=3D/dev/zvol/hackpool=
+-0/debian-buster-arm64 -kernel ../linux.git/builds/arm64.nopreempt/arch/arm=
+64/boot/Image -append "console=3DttyAMA0 root=3D/dev/sda2 systemd.unit=3Dbe=
+nchmark-pigz.service" -display none -m 8192 -smp 4 --snapshot
+  Time (mean =C2=B1 =CF=83):     66.035 s =C2=B1  1.425 s    [User: 241.495=
+ s, System: 2.327 s]
+  Range (min =E2=80=A6 max):   64.718 s =E2=80=A6 68.944 s    10 runs
+
+After
+
+hyperfine -w 2 './aarch64-softmmu/qemu-system-aarch64 -machine virt,graphic=
+s=3Don,gic-version=3D3,virtualization=3Don -cpu cortex-a53 -serial mon:stdi=
+o -nic user,model=3Dvirtio-net-pci,hostfwd=3Dtcp::2222-:22 -device virtio-s=
+csi-pci -device scsi-hd,drive=3Dhd0 -blockdev driver=3Draw,node-name=3Dhd0,=
+discard=3Dunmap,file.driver=3Dhost_device,file.filename=3D/dev/zvol/hackpoo=
+l-0/debian-buster-arm64 -kernel ../linux.git/builds/arm64.nopreempt/arch/ar=
+m64/boot/Image -append "console=3DttyAMA0 root=3D/dev/sda2 systemd.unit=3Db=
+enchmark-pigz.service" -display none -m 8192 -smp 4 --snapshot'
+Benchmark #1: ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=
+=3Don,gic-version=3D3,virtualization=3Don -cpu cortex-a53 -serial mon:stdio=
+ -nic user,model=3Dvirtio-net-pci,hostfwd=3Dtcp::2222-:22 -device virtio-sc=
+si-pci -device scsi-hd,drive=3Dhd0 -blockdev driver=3Draw,node-name=3Dhd0,d=
+iscard=3Dunmap,file.driver=3Dhost_device,file.filename=3D/dev/zvol/hackpool=
+-0/debian-buster-arm64 -kernel ../linux.git/builds/arm64.nopreempt/arch/arm=
+64/boot/Image -append "console=3DttyAMA0 root=3D/dev/sda2 systemd.unit=3Dbe=
+nchmark-pigz.service" -display none -m 8192 -smp 4 --snapshot
+  Time (mean =C2=B1 =CF=83):     65.331 s =C2=B1  0.684 s    [User: 240.528=
+ s, System: 2.306 s]
+  Range (min =E2=80=A6 max):   64.624 s =E2=80=A6 66.914 s    10 runs
+
+Although I'm not going to claim a performance boost, just that it's in
+the noise.
+
+Emilio,
+
+Any chance you could run it through your benchmark suite?
+
+>
+> Alex Benn=C3=A9e (3):
+>   accel/tcg: demacro cputlb
+>   accel/tcg: remove softmmu_template.h
+>   accel/tcg: move unaligned helpers out of core helpers
+>
+>  accel/tcg/cputlb.c           | 501 +++++++++++++++++++++++++++++++++--
+>  accel/tcg/softmmu_template.h | 454 -------------------------------
+>  2 files changed, 475 insertions(+), 480 deletions(-)
+>  delete mode 100644 accel/tcg/softmmu_template.h
+
+
+--
+Alex Benn=C3=A9e
