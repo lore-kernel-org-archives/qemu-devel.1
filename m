@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47633)
+Received: from eggs.gnu.org ([209.51.188.92]:48792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gw2Zl-0007XE-1u
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:24:33 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2fi-00012c-2X
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:30:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gw2ZV-00025x-K6
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:24:27 -0500
-Date: Tue, 19 Feb 2019 11:24:00 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190219102400.GG4727@localhost.localdomain>
-References: <20190218161822.3573-1-kwolf@redhat.com>
-	<20190218161822.3573-5-kwolf@redhat.com>
-	<0e7acbc6-9e05-abd0-852b-5c76ce084dff@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2fh-0004nC-As
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:30:42 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 19 Feb 2019 10:30:23 +0000
+Message-ID: <bb07067b-561d-7836-fc5d-a8bf687bb2d2@virtuozzo.com>
+References: <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1550519997-253534-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A9466E0BA9A18746939C627F0D2E5489@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e7acbc6-9e05-abd0-852b-5c76ce084dff@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/12] io: Make qio_channel_yield()
- interruptible
+Subject: Re: [Qemu-devel] [PATCH] iotests: handle TypeError for Python3 in
+ test 242
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, stefanha@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "eblake@redhat.com" <eblake@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Am 18.02.2019 um 18:11 hat Paolo Bonzini geschrieben:
-> On 18/02/19 17:18, Kevin Wolf wrote:
-> > Similar to how qemu_co_sleep_ns() allows to be preempted by an external
-> > coroutine entry, allow reentering qio_channel_yield() early.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  include/io/channel.h |  9 ++++++---
-> >  io/channel.c         | 10 ++++++++++
-> >  2 files changed, 16 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/include/io/channel.h b/include/io/channel.h
-> > index da2f138200..59460cb1ec 100644
-> > --- a/include/io/channel.h
-> > +++ b/include/io/channel.h
-> > @@ -739,10 +739,13 @@ void qio_channel_detach_aio_context(QIOChannel *ioc);
-> >   * addition, no two coroutine can be waiting on the same condition
-> >   * and channel at the same time.
-> >   *
-> > - * This must only be called from coroutine context
-> > + * This must only be called from coroutine context. It is safe to
-> > + * reenter the coroutine externally while it is waiting; in this
-> > + * case the function will return even if @condition is not yet
-> > + * available.
-> >   */
-> > -void qio_channel_yield(QIOChannel *ioc,
-> > -                       GIOCondition condition);
-> > +void coroutine_fn qio_channel_yield(QIOChannel *ioc,
-> > +                                    GIOCondition condition);
-> >  
-> >  /**
-> >   * qio_channel_wait:
-> > diff --git a/io/channel.c b/io/channel.c
-> > index 8dd0684f5d..303376e08d 100644
-> > --- a/io/channel.c
-> > +++ b/io/channel.c
-> > @@ -469,6 +469,16 @@ void coroutine_fn qio_channel_yield(QIOChannel *ioc,
-> >      }
-> >      qio_channel_set_aio_fd_handlers(ioc);
-> >      qemu_coroutine_yield();
-> > +
-> > +    /* Allow interrupting the operation by reentering the coroutine other than
-> > +     * through the aio_fd_handlers. */
-> > +    if (condition == G_IO_IN && ioc->read_coroutine) {
-> > +        ioc->read_coroutine = NULL;
-> > +        qio_channel_set_aio_fd_handlers(ioc);
-> > +    } else if (condition == G_IO_OUT && ioc->write_coroutine) {
-> > +        ioc->write_coroutine = NULL;
-> > +        qio_channel_set_aio_fd_handlers(ioc);
-> > +    }
-> >  }
-> 
-> Perhaps it's a bit cleaner to remove the ioc->..._coroutine assignments,
-> and the call to qio_channel_set_aio_fd_handlers, from
-> qio_channel_restart_read and qio_channel_restart_write.
-
-I wasn't sure if this was correct because aio_co_wake() doesn't
-necessarily enter the coroutine immediately, so the value between there
-and actually entering the coroutine would change compared to the old
-state.
-
-On closer look, these handlers are never in coroutine context, and
-qio_channel_attach_aio_context() asserts that the handlers are inactive,
-so I guess we could replace the aio_co_wake() with a direct
-qemu_coroutine_enter() and possibly an assertion that we're already in
-the right AioContext.
-
-That would make it obvious that removing the assignment and call to
-qio_channel_set_aio_fd_handlers() there is safe.
-
-In any case, I think this needs to be a separate patch where the commit
-message can explain the above.
-
-Kevin
+MTguMDIuMjAxOSAyMjo1OSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRvIHdyaXRlIG9u
+ZSBieXRlIHRvIGRpc2ssIFB5dGhvbjIgbWF5IHVzZSAnY2hyJyB0eXBlLg0KPiBJbiBQeXRob24z
+LCBjb252ZXJzaW9uIHRvICdieXRlJyB0eXBlIGlzIHJlcXVpcmVkLg0KPiANCj4gU2lnbmVkLW9m
+Zi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+
+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+DQoNCkZvcmdldCB0byBzYXkgdG8gQW5kcmV5IHRoYXQgd2Ugc2hvdWxk
+IGFkZA0KDQpSZXBvcnRlZC1ieTogS2V2aW4gV29sZiA8a3dvbGZAcmVkaGF0LmNvbT4NCg0KPiAt
+LS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjQyIHwgOSArKysrKysrLS0NCj4gICAxIGZpbGUg
+Y2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdp
+dCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNDIgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjQyDQo+IGlu
+ZGV4IDE2YzY1ZWQuLjZiMWY3YjggMTAwNzU1DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
+NDINCj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI0Mg0KPiBAQCAtNjUsOSArNjUsMTQgQEAg
+ZGVmIHRvZ2dsZV9mbGFnKG9mZnNldCk6DQo+ICAgICAgIHdpdGggb3BlbihkaXNrLCAicitiIikg
+YXMgZjoNCj4gICAgICAgICAgIGYuc2VlayhvZmZzZXQsIDApDQo+ICAgICAgICAgICBjID0gZi5y
+ZWFkKDEpDQo+IC0gICAgICAgIHRvZ2dsZWQgPSBjaHIob3JkKGMpIF4gYml0bWFwX2ZsYWdfdW5r
+bm93bikNCj4gKyAgICAgICAgdG9nZ2xlZCA9IG9yZChjKSBeIGJpdG1hcF9mbGFnX3Vua25vd24N
+Cj4gICAgICAgICAgIGYuc2VlaygtMSwgMSkNCj4gLSAgICAgICAgZi53cml0ZSh0b2dnbGVkKQ0K
+PiArICAgICAgICB0cnk6DQo+ICsgICAgICAgICAgICAjIHB5dGhvbjINCj4gKyAgICAgICAgICAg
+IGYud3JpdGUoY2hyKHRvZ2dsZWQpKQ0KPiArICAgICAgICBleGNlcHQgVHlwZUVycm9yOg0KPiAr
+ICAgICAgICAgICAgIyBweXRob24zDQo+ICsgICAgICAgICAgICBmLndyaXRlKGJ5dGVzKFt0b2dn
+bGVkXSkpDQo+ICAgDQo+ICAgDQo+ICAgcWVtdV9pbWdfY3JlYXRlKCctZicsIGlvdGVzdHMuaW1n
+Zm10LCBkaXNrLCAnMU0nKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
