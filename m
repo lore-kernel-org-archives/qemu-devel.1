@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49481)
+Received: from eggs.gnu.org ([209.51.188.92]:49493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydZ-0005Hs-30
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:13 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydf-0005Mw-Gw
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydY-00074Y-8d
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:13 -0500
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:35131)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvyda-00075D-9S
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:16 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:38326)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydX-00074B-Se
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:12 -0500
-Received: by mail-lf1-x141.google.com with SMTP id v7so14039250lfd.2
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvyda-000754-2J
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:14 -0500
+Received: by mail-lf1-x142.google.com with SMTP id n15so14019057lfe.5
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:13 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 18 Feb 2019 22:10:56 -0800
-Message-Id: <20190219061111.10231-9-jcmvbkbc@gmail.com>
+Date: Mon, 18 Feb 2019 22:10:57 -0800
+Message-Id: <20190219061111.10231-10-jcmvbkbc@gmail.com>
 In-Reply-To: <20190219061111.10231-1-jcmvbkbc@gmail.com>
 References: <20190219061111.10231-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 08/23] tests/tcg/xtensa: conditionalize debug
+Subject: [Qemu-devel] [PATCH 09/23] tests/tcg/xtensa: conditionalize cache
  option tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,136 +29,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Make debug tests conditional on the presence of the debug option in the
-config and tests that depend on the presence/number of instruction or
-data breakpoint registers on the corresponding definitions. Use
-configured debug interrupt level instead of the hardcoded value to set
-up IRQ handler and access debug EPC register.
+Make data/instruction tests conditional on the presence of
+data/instruction cache, whether they're lockable and whether data cache
+is writeback.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/macros.inc   |  3 +++
- tests/tcg/xtensa/test_break.S | 27 ++++++++++++++++++---------
- 2 files changed, 21 insertions(+), 9 deletions(-)
+ tests/tcg/xtensa/test_cache.S | 62 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 50 insertions(+), 12 deletions(-)
 
-diff --git a/tests/tcg/xtensa/macros.inc b/tests/tcg/xtensa/macros.inc
-index 93825dc7b513..5265c8606bff 100644
---- a/tests/tcg/xtensa/macros.inc
-+++ b/tests/tcg/xtensa/macros.inc
-@@ -97,3 +97,6 @@ test_\name:
-     movi    a3, \addr
-     s32i    a3, a2, 0
- .endm
-+
-+#define glue(a, b) _glue(a, b)
-+#define _glue(a, b) a ## b
-diff --git a/tests/tcg/xtensa/test_break.S b/tests/tcg/xtensa/test_break.S
-index 775cd7c26063..3379a3f9f06e 100644
---- a/tests/tcg/xtensa/test_break.S
-+++ b/tests/tcg/xtensa/test_break.S
-@@ -1,10 +1,13 @@
- #include "macros.inc"
+diff --git a/tests/tcg/xtensa/test_cache.S b/tests/tcg/xtensa/test_cache.S
+index 6b2df9734b2e..7e6ba4c18a2b 100644
+--- a/tests/tcg/xtensa/test_cache.S
++++ b/tests/tcg/xtensa/test_cache.S
+@@ -7,6 +7,8 @@
  
--#define debug_level 6
--#define debug_vector level6
+ test_suite cache
+ 
++#if XCHAL_HAVE_PTP_MMU
++
+ .macro      pf_op op
+     \op     a2, 0
+     \op     a3, 0
+@@ -18,14 +20,23 @@ test prefetch
+     movi    a3, 0xd8000000 /* non-cacheable */
+     movi    a4, 0x00001235 /* unmapped */
+ 
++#if XCHAL_DCACHE_SIZE
+     pf_op   dpfr
+     pf_op   dpfro
+     pf_op   dpfw
+     pf_op   dpfwo
++#endif
++#ifdef XCHAL_ICACHE_SIZE
+     pf_op   ipf
 -
- test_suite break
- 
-+#if XCHAL_HAVE_DEBUG
-+
-+#define debug_level XCHAL_DEBUGLEVEL
-+#define debug_vector glue(level, XCHAL_DEBUGLEVEL)
-+#define EPC_DEBUG glue(epc, XCHAL_DEBUGLEVEL)
-+
- test break
-     set_vector debug_vector, 0
-     rsil    a2, debug_level
-@@ -21,7 +24,7 @@ test break
-     and     a2, a2, a3
-     movi    a3, 0x10 | debug_level
-     assert  eq, a2, a3
--    rsr     a2, epc6
-+    rsr     a2, EPC_DEBUG
-     movi    a3, 1b
-     assert  eq, a2, a3
-     rsr     a2, debugcause
-@@ -45,7 +48,7 @@ test breakn
-     and     a2, a2, a3
-     movi    a3, 0x10 | debug_level
-     assert  eq, a2, a3
--    rsr     a2, epc6
-+    rsr     a2, EPC_DEBUG
-     movi    a3, 1b
-     assert  eq, a2, a3
-     rsr     a2, debugcause
-@@ -53,6 +56,7 @@ test breakn
-     assert  eq, a2, a3
++#endif
++#if XCHAL_HAVE_PTP_MMU && !XCHAL_HAVE_SPANNING_WAY
++#if XCHAL_DCACHE_LINE_LOCKABLE
+     dpfl    a2, 0
++#endif
++#if XCHAL_ICACHE_LINE_LOCKABLE
+     ipfl    a2, 0
++#endif
++#endif
  test_end
  
-+#if XCHAL_NUM_IBREAK
- test ibreak
-     set_vector debug_vector, 0
-     rsil    a2, debug_level
-@@ -83,7 +87,7 @@ test ibreak
-     and     a2, a2, a3
-     movi    a3, 0x10 | debug_level
+ .macro cache_fault op, addr, exc_code
+@@ -46,10 +57,16 @@ test_end
      assert  eq, a2, a3
--    rsr     a2, epc6
-+    rsr     a2, EPC_DEBUG
-     movi    a3, 1b
-     assert  eq, a2, a3
-     rsr     a2, debugcause
-@@ -110,7 +114,7 @@ test ibreak_remove
-     and     a2, a2, a3
-     movi    a3, 0x10 | debug_level
-     assert  eq, a2, a3
--    rsr     a2, epc6
-+    rsr     a2, EPC_DEBUG
-     movi    a3, 2b
-     assert  eq, a2, a3
-     rsr     a2, debugcause
-@@ -141,6 +145,7 @@ test ibreak_priority
-     movi    a3, 0x2
-     assert  eq, a2, a3
+ .endm
+ 
++#if XCHAL_HAVE_PTP_MMU && !XCHAL_HAVE_SPANNING_WAY
++
++#if XCHAL_DCACHE_LINE_LOCKABLE
+ test dpfl_tlb_miss
+     cache_fault dpfl, 0x00002345, 24
  test_end
 +#endif
  
- test icount
-     set_vector debug_vector, 2f
-@@ -158,7 +163,7 @@ test icount
- 2:
-     movi    a2, 0
-     wsr     a2, icountlevel
--    rsr     a2, epc6
-+    rsr     a2, EPC_DEBUG
-     movi    a3, 1b
-     assert  eq, a2, a3
-     rsr     a2, debugcause
-@@ -167,7 +172,7 @@ test icount
++#if XCHAL_DCACHE_SIZE
++#if XCHAL_DCACHE_IS_WRITEBACK
+ test dhwb_tlb_miss
+     cache_fault dhwb, 0x00002345, 24
+ test_end
+@@ -57,16 +74,21 @@ test_end
+ test dhwbi_tlb_miss
+     cache_fault dhwbi, 0x00002345, 24
+ test_end
++#endif
+ 
+ test dhi_tlb_miss
+     cache_fault dhi, 0x00002345, 24
  test_end
  
- .macro check_dbreak dr
--    rsr     a2, epc6
-+    rsr     a2, EPC_DEBUG
-     movi    a3, 1b
-     assert  eq, a2, a3
-     rsr     a2, debugcause
-@@ -194,6 +199,7 @@ test_end
-     reset_ps
- .endm
- 
-+#if XCHAL_NUM_DBREAK
- test dbreak_exact
-     dbreak_test 0, 0x4000003f, 0xd000007f, 0xd000007f, l8ui
-     dbreak_test 1, 0x4000003e, 0xd000007e, 0xd000007e, l16ui
-@@ -253,5 +259,8 @@ test dbreak_invalid
-     dbreak_test 0, 0x40000030, 0xd0000071, 0xd0000070, l16ui
-     dbreak_test 1, 0x40000035, 0xd0000072, 0xd0000070, l32i
++#if XCHAL_DCACHE_LINE_LOCKABLE
+ test dhu_tlb_miss
+     cache_fault dhu, 0x00002345, 24
  test_end
++#endif
++#endif
+ 
+-
++#if XCHAL_ICACHE_SIZE
++#if XCHAL_ICACHE_LINE_LOCKABLE
+ test ipfl_tlb_miss
+     cache_fault ipfl, 0x00002345, 16
+ test_end
+@@ -74,24 +96,40 @@ test_end
+ test ihu_tlb_miss
+     cache_fault ihu, 0x00002345, 16
+ test_end
++#endif
+ 
+ test ihi_tlb_miss
+     cache_fault ihi, 0x00002345, 16
+ test_end
++#endif
++
 +#endif
 +
 +#endif
  
  test_suite_end
+ 
+-.macro cache_all op1, op2, size, linesize
++cache_unlock_invalidate:
++#if XCHAL_DCACHE_SIZE
+     movi    a2, 0
+-    movi    a3, \size
++    movi    a3, XCHAL_DCACHE_SIZE
+ 1:
+-    \op1    a2, 0
+-    \op2    a2, 0
+-    addi    a2, a2, \linesize
++#if XCHAL_DCACHE_LINE_LOCKABLE
++    diu     a2, 0
++#endif
++    dii     a2, 0
++    addi    a2, a2, XCHAL_DCACHE_LINESIZE
+     bltu    a2, a3, 1b
+-.endm
+-
+-cache_unlock_invalidate:
+-    cache_all diu, dii, XCHAL_DCACHE_SIZE, XCHAL_DCACHE_LINESIZE
+-    cache_all iiu, iii, XCHAL_ICACHE_SIZE, XCHAL_ICACHE_LINESIZE
++#endif
++#if XCHAL_ICACHE_SIZE
++    movi    a2, 0
++    movi    a3, XCHAL_ICACHE_SIZE
++1:
++#if XCHAL_ICACHE_LINE_LOCKABLE
++    iiu     a2, 0
++#endif
++    iii     a2, 0
++    addi    a2, a2, XCHAL_ICACHE_LINESIZE
++    bltu    a2, a3, 1b
++#endif
+     ret
 -- 
 2.11.0
