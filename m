@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49442)
+Received: from eggs.gnu.org ([209.51.188.92]:49471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydS-0005Bx-HX
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:11 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydY-0005Gs-7X
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydR-00073L-Tm
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:06 -0500
-Received: from mail-lj1-x22a.google.com ([2a00:1450:4864:20::22a]:38870)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydX-00074H-ET
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:12 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33323)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydR-000731-M4
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:05 -0500
-Received: by mail-lj1-x22a.google.com with SMTP id j19so15591480ljg.5
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:05 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydV-00073t-On
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:11 -0500
+Received: by mail-lj1-x242.google.com with SMTP id f24-v6so16402592ljk.0
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:09 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 18 Feb 2019 22:10:53 -0800
-Message-Id: <20190219061111.10231-6-jcmvbkbc@gmail.com>
+Date: Mon, 18 Feb 2019 22:10:55 -0800
+Message-Id: <20190219061111.10231-8-jcmvbkbc@gmail.com>
 In-Reply-To: <20190219061111.10231-1-jcmvbkbc@gmail.com>
 References: <20190219061111.10231-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 05/23] tests/tcg/xtensa: don't use optional
- opcodes in generic code
+Subject: [Qemu-devel] [PATCH 07/23] tests/tcg/xtensa: enable boolean tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +28,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Don't use 'loop' opcode in generic testsuite completion code, only use
-core opcodes to make it work with any configuration.
+Uncomment test_boolean in the test makefile. Make actual tests code
+conditional on the presence of boolean option in the config.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/macros.inc | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ tests/tcg/xtensa/Makefile       | 2 +-
+ tests/tcg/xtensa/test_boolean.S | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/tests/tcg/xtensa/macros.inc b/tests/tcg/xtensa/macros.inc
-index 25c7ee479e6c..93825dc7b513 100644
---- a/tests/tcg/xtensa/macros.inc
-+++ b/tests/tcg/xtensa/macros.inc
-@@ -23,11 +23,14 @@ main:
-     movi    a0, result
-     sub     a2, a2, a0
-     movi    a3, 0
--    loopnez a2, 1f
--    l8ui    a2, a0, 0
--    or      a3, a3, a2
--    addi    a0, a0, 1
-+    beqz    a2, 2f
- 1:
-+    l8ui    a1, a0, 0
-+    or      a3, a3, a1
-+    addi    a0, a0, 1
-+    addi    a2, a2, -1
-+    bnez    a2, 1b
-+2:
-     exit
- .endm
+diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
+index b3693809372b..aee0134ef5b9 100644
+--- a/tests/tcg/xtensa/Makefile
++++ b/tests/tcg/xtensa/Makefile
+@@ -31,7 +31,7 @@ CRT        = crt.o vectors.o
  
+ TESTCASES += test_b.tst
+ TESTCASES += test_bi.tst
+-#TESTCASES += test_boolean.tst
++TESTCASES += test_boolean.tst
+ TESTCASES += test_break.tst
+ TESTCASES += test_bz.tst
+ TESTCASES += test_cache.tst
+diff --git a/tests/tcg/xtensa/test_boolean.S b/tests/tcg/xtensa/test_boolean.S
+index eac40e0973a3..5a850bfe7eac 100644
+--- a/tests/tcg/xtensa/test_boolean.S
++++ b/tests/tcg/xtensa/test_boolean.S
+@@ -2,6 +2,8 @@
+ 
+ test_suite boolean
+ 
++#if XCHAL_HAVE_BOOLEANS
++
+ test all4
+     movi    a2, 0xfec0
+     wsr     a2, br
+@@ -20,4 +22,6 @@ test all4
+     assert  eq, a2, a3
+ test_end
+ 
++#endif
++
+ test_suite_end
 -- 
 2.11.0
