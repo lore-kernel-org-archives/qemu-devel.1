@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41834)
+Received: from eggs.gnu.org ([209.51.188.92]:42095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gwDbW-0000V5-UG
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:11:07 -0500
+	(envelope-from <palmer@sifive.com>) id 1gwDba-00018q-5X
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:11:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gwDRS-000169-QN
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:00:43 -0500
-References: <20190213233618.22484-1-jsnow@redhat.com>
-	<20190213233618.22484-3-jsnow@redhat.com>
-	<c79e69af-6d00-074a-fc02-5f0808048f4d@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c2188cb6-31fe-28e2-647d-42ae2f12212a@redhat.com>
-Date: Tue, 19 Feb 2019 17:00:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <c79e69af-6d00-074a-fc02-5f0808048f4d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] block/dirty-bitmap: implement
- inconsistent bit
+	(envelope-from <palmer@sifive.com>) id 1gwDMw-0007Ci-FN
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:56:03 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39651)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gwDMw-000777-7e
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:56:02 -0500
+Received: by mail-pl1-x643.google.com with SMTP id 101so11073337pld.6
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 13:55:57 -0800 (PST)
+Date: Tue, 19 Feb 2019 13:55:54 -0800 (PST)
+In-Reply-To: <1550565421-10944-12-git-send-email-thuth@redhat.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-6f2b26db-fa0b-4d44-95e0-be09a173fb72@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 11/14] MAINTAINERS: Clean up the RISC-V TCG
+ backend section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: thuth@redhat.com
+Cc: qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>
 
+On Tue, 19 Feb 2019 00:36:58 PST (-0800), thuth@redhat.com wrote:
+> The e-mail address mjc@sifive.com of Micheal is not valid anymore.
+> Commit 7d04ac38959f8115f2a02 removed the entry already from the main
+> RISC-V section, but apparently forgot to remove it from the TCG
+> backend section, too.
+>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Fixes: 7d04ac38959f8115f2a029d81db1c8aac179aa95
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
-On 2/18/19 1:13 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 14.02.2019 2:36, John Snow wrote:
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   block/dirty-bitmap.c         | 15 +++++++++++++
->>   block/qcow2-bitmap.c         | 42 ++++++++++++++++++-----------------
->>   blockdev.c                   | 43 ++++++++++++++++++++++++++++++++++++
->>   include/block/dirty-bitmap.h |  1 +
->>   4 files changed, 81 insertions(+), 20 deletions(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index b1879d7fbd..06d8ee0d79 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -589,6 +589,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
->>           *out = backup;
->>       }
->>       bdrv_dirty_bitmap_unlock(bitmap);
->> +    bdrv_dirty_bitmap_set_inconsistent(bitmap, false);
->>   }
->>   
->>   void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)
->> @@ -776,6 +777,13 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
->>       return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
->>   }
->>   
->> +void bdrv_dirty_bitmap_add_inconsistent_hint(Error **errp)
->> +{
->> +    error_append_hint(errp, "Try block-dirty-bitmap-clear to mark this "
->> +                      "bitmap consistent again, or block-dirty-bitmap-remove "
->> +                      "to delete it.");
-> 
-> bitmaps created by libvirt (or somebody) are related to some checkpoint. And their name is
-> probably (Eric?) related to this checkpoint too. So, clear will never make them consistent..
-> Only clear :)
-> 
-> So, I don't like idea of clearing in-use bitmaps.
-> 
->> +}
->> +
->>   void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->>                                HBitmap **backup, Error **errp)
->>   {
->> @@ -798,6 +806,13 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->>           goto out;
->>       }
->>   
->> +    if (bdrv_dirty_bitmap_inconsistent(dest)) {
->> +        error_setg(errp, "Bitmap '%s' is inconsistent and cannot be used as"
->> +                   " a merge target", dest->name);
->> +        bdrv_dirty_bitmap_add_inconsistent_hint(errp);
->> +        goto out;
->> +    }
-> 
-> I think, we need common predicate which will combine busy and inconsistent, as almost in all cases
-> we need both to be false to do any operation.
-> 
-> bdrv_dirty_bitmap_usable() ? :)
-> 
-> and pass errp to this helper.
-> 
-> Actually, we already need it, to fill errp, which we almost always fill in the same manner.
-> 
->> +
->>       if (!hbitmap_can_merge(dest->bitmap, src->bitmap)) {
->>           error_setg(errp, "Bitmaps are incompatible and can't be merged");
->>           goto out;
->> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->> index 3ee524da4b..9bd8bc417f 100644
->> --- a/block/qcow2-bitmap.c
->> +++ b/block/qcow2-bitmap.c
-> 
-> hmm, I also think we should report our deprecated status as locked for inconsistent bitmaps..
-> 
-> 
+I'm assuming this is going in through another tree, but let me know if you want 
+me to take it.
 
-Though we're trying to deprecate the field altogether, I *could* add a
-special status flag that makes it unambiguous. This will catch the
-attention of anyone using the old API.
+Thanks!
 
---js
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index b00caaf..1d0dcde 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2232,7 +2232,6 @@ F: tcg/ppc/
+>  F: disas/ppc.c
+>
+>  RISC-V
+> -M: Michael Clark <mjc@sifive.com>
+>  M: Palmer Dabbelt <palmer@sifive.com>
+>  M: Alistair Francis <Alistair.Francis@wdc.com>
+>  L: qemu-riscv@nongnu.org
