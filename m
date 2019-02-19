@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39443)
+Received: from eggs.gnu.org ([209.51.188.92]:39733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw7jn-0001wV-LY
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:55:16 -0500
+	(envelope-from <thuth@redhat.com>) id 1gw7kr-0002mY-Vo
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw7jm-0000XQ-TC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:55:15 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-6-armbru@redhat.com>
-	<alpine.BSF.2.21.9999.1902191623570.24309@zero.eik.bme.hu>
-Date: Tue, 19 Feb 2019 16:55:01 +0100
-In-Reply-To: <alpine.BSF.2.21.9999.1902191623570.24309@zero.eik.bme.hu>
-	(BALATON Zoltan's message of "Tue, 19 Feb 2019 16:28:04 +0100 (CET)")
-Message-ID: <87tvgzrcx6.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 05/10] ppc405_boards: Don't size
- flash memory to match backing image
+	(envelope-from <thuth@redhat.com>) id 1gw7kp-0001oF-KX
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:56:21 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 19 Feb 2019 16:55:57 +0100
+Message-Id: <1550591757-6192-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/ide/ich: Compile ich.c only if CONFIG_PCI
+ is also set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +18,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, lersek@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, alex.bennee@linaro.org, David Gibson <david@gibson.dropbear.id.au>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+With the upcoming Kconfig-like build system, it will be easy to
+build also version of QEMU that only contain a single machine. Some
+of these machines (like the ARM cubieboard) use CONFIG_AHCI for an
+AHCI sysbus device, but do not use CONFIG_PCI since they do not feature
+a PCI bus. In this case linking fails:
 
-> On Mon, 18 Feb 2019, Markus Armbruster wrote:
->> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
->> Image size is rounded up to the next multiple of 64KiB.  Useless,
->> because pflash_cfi02_realize() fails with "failed to read the initial
->> flash content" unless the rounding is a no-op.
->>
->> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
->> other stuff.  No idea how that would play out, but a useful outcomes
->> seem unlikely.
->>
->> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
->> regardless of image size, to match the physical hardware.
->
-> If PPC405 behaves the same as PPC440 and starts at 0xfffffffc then
-> this won't boot. It's maybe better to keep 2^32 - image_size but
-> assert image is not bigger than 512kB. But I don't know anything about
-> these boards so just sharing this comment for your consideration. I'm
-> fine with any decision you take.
+../hw/ide/ich.o: In function `pci_ich9_ahci_realize':
+hw/ide/ich.c:124: undefined reference to `pci_allocate_irq'
+hw/ide/ich.c:126: undefined reference to `pci_register_bar'
+hw/ide/ich.c:128: undefined reference to `pci_register_bar'
+hw/ide/ich.c:131: undefined reference to `pci_add_capability'
+hw/ide/ich.c:147: undefined reference to `msi_init'
+../hw/ide/ich.o: In function `pci_ich9_uninit':
+hw/ide/ich.c:158: undefined reference to `msi_uninit'
+../hw/ide/ich.o:(.data.rel+0x50): undefined reference to `vmstate_pci_device'
 
-If the image is smaller than 512KiB, pflash_cfi02_realize() fails with
-"failed to read the initial flash content".
+Thus we must only compile ich.c if CONFIG_PCI is also set.
 
-Alex Benn=C3=A9e has a patch that'll make it fail for any size mismatch, wi=
-th
-a much nicer error message.  I like it; silently truncating firmware
-images is unlikely to be useful.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/ide/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-For what it's worth, my patch brings this board into line with most
-other boards: create flash memory of fixed size at a fixed address,
-matching the physical machine we emulate.
+diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+index a142add..dfe53af 100644
+--- a/hw/ide/Makefile.objs
++++ b/hw/ide/Makefile.objs
+@@ -9,6 +9,6 @@ common-obj-$(CONFIG_IDE_MMIO) += mmio.o
+ common-obj-$(CONFIG_IDE_VIA) += via.o
+ common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
+ common-obj-$(CONFIG_AHCI) += ahci.o
+-common-obj-$(CONFIG_AHCI) += ich.o
++common-obj-$(call land,$(CONFIG_AHCI),$(CONFIG_PCI)) += ich.o
+ common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
+ common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
+-- 
+1.8.3.1
