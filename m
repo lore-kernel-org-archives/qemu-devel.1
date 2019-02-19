@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57490)
+Received: from eggs.gnu.org ([209.51.188.92]:57496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwEuK-0007Xh-Bo
+	(envelope-from <richard.henderson@linaro.org>) id 1gwEuK-0007Xr-LB
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 18:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwEuJ-0001Wd-If
+	(envelope-from <richard.henderson@linaro.org>) id 1gwEuJ-0001WZ-IN
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 18:34:36 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33000)
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38557)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gwEuH-0001Rn-MF
+	id 1gwEuI-0001RL-IU
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 18:34:35 -0500
-Received: by mail-pg1-x542.google.com with SMTP id h11so8511917pgl.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 15:34:28 -0800 (PST)
+Received: by mail-pf1-x442.google.com with SMTP id n125so3674815pfn.5
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 15:34:27 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 19 Feb 2019 15:34:21 -0800
-Message-Id: <20190219233421.388-4-richard.henderson@linaro.org>
+Date: Tue, 19 Feb 2019 15:34:20 -0800
+Message-Id: <20190219233421.388-3-richard.henderson@linaro.org>
 In-Reply-To: <20190219233421.388-1-richard.henderson@linaro.org>
 References: <20190219233421.388-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 3/3] target/arm: Rely on hflags correct in
- cpu_get_tb_cpu_state
+Subject: [Qemu-devel] [PATCH v2 2/3] target/arm: Rebuild hflags at el
+ changes and MSR writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +30,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, cota@braap.org
 
-This is the payoff.
-
->From perf record -g data of ubuntu 18 boot and shutdown:
-
-BEFORE:
-
--   23.02%     2.82%  qemu-system-aar  [.] helper_lookup_tb_ptr
-   - 20.22% helper_lookup_tb_ptr
-      + 10.05% tb_htable_lookup
-      - 9.13% cpu_get_tb_cpu_state
-           3.20% aa64_va_parameters_both
-           0.55% fp_exception_el
-
--   11.66%     4.74%  qemu-system-aar  [.] cpu_get_tb_cpu_state
-   - 6.96% cpu_get_tb_cpu_state
-        3.63% aa64_va_parameters_both
-        0.60% fp_exception_el
-        0.53% sve_exception_el
-
-AFTER:
-
--   16.40%     3.40%  qemu-system-aar  [.] helper_lookup_tb_ptr
-   - 13.03% helper_lookup_tb_ptr
-      + 11.19% tb_htable_lookup
-        0.55% cpu_get_tb_cpu_state
-
-     0.98%     0.71%  qemu-system-aar  [.] cpu_get_tb_cpu_state
-
-     0.87%     0.24%  qemu-system-aar  [.] rebuild_hflags_a64
-
-Before, helper_lookup_tb_ptr is the second hottest function in the
-application, consuming almost a quarter of the runtime.  Within the
-entire execution, cpu_get_tb_cpu_state consumes about 12%.
-
-After, helper_lookup_tb_ptr has dropped to the fourth hottest function,
-with consumption dropping to a sixth of the runtime.  Within the
-entire execution, cpu_get_tb_cpu_state has dropped below 1%, and the
-supporting function to rebuild hflags also consumes about 1%.
-
-Assertions are retained for --enable-debug-tcg.
+Now setting, but not relying upon, env->hflags.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Retain asserts for future debugging.
+v2: Fixed partial conversion to assignment to env->hflags.
 ---
- target/arm/helper.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ target/arm/internals.h     |  1 +
+ linux-user/syscall.c       |  1 +
+ target/arm/cpu.c           |  1 +
+ target/arm/helper-a64.c    |  3 +++
+ target/arm/helper.c        |  2 ++
+ target/arm/machine.c       |  1 +
+ target/arm/op_helper.c     |  1 +
+ target/arm/translate-a64.c |  6 +++++-
+ target/arm/translate.c     | 14 ++++++++++++--
+ 9 files changed, 27 insertions(+), 3 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 8c1b813364..235f4fafec 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -970,5 +970,6 @@ ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
+ 
+ uint32_t rebuild_hflags_a32(CPUARMState *env, int el);
+ uint32_t rebuild_hflags_a64(CPUARMState *env, int el);
++void rebuild_hflags_any(CPUARMState *env);
+ 
+ #endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 5bbb72f3d5..123f342bdc 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -9691,6 +9691,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                     aarch64_sve_narrow_vq(env, vq);
+                 }
+                 env->vfp.zcr_el[1] = vq - 1;
++                arm_rebuild_hflags(env);
+                 ret = vq * 16;
+             }
+             return ret;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index edf6e0e1f1..e4da513eb3 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -390,6 +390,7 @@ static void arm_cpu_reset(CPUState *s)
+ 
+     hw_breakpoint_update_all(cpu);
+     hw_watchpoint_update_all(cpu);
++    arm_rebuild_hflags(env);
+ }
+ 
+ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 70850e564d..17200f1288 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -995,6 +995,7 @@ void HELPER(exception_return)(CPUARMState *env, uint64_t new_pc)
+         } else {
+             env->regs[15] = new_pc & ~0x3;
+         }
++        env->hflags = rebuild_hflags_a32(env, new_el);
+         qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+                       "AArch32 EL%d PC 0x%" PRIx32 "\n",
+                       cur_el, new_el, env->regs[15]);
+@@ -1006,10 +1007,12 @@ void HELPER(exception_return)(CPUARMState *env, uint64_t new_pc)
+         }
+         aarch64_restore_sp(env, new_el);
+         env->pc = new_pc;
++        env->hflags = rebuild_hflags_a64(env, new_el);
+         qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+                       "AArch64 EL%d PC 0x%" PRIx64 "\n",
+                       cur_el, new_el, env->pc);
+     }
++
+     /*
+      * Note that cur_el can never be 0.  If new_el is 0, then
+      * el0_a64 is return_to_aa64, else el0_a64 is ignored.
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 909535a3e3..990a87876f 100644
+index 189e97a083..909535a3e3 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -14034,19 +14034,29 @@ void HELPER(rebuild_hflags_a64)(CPUARMState *env, uint32_t el)
- void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
- {
--    int current_el = arm_current_el(env);
--    uint32_t flags;
-+    uint32_t flags = env->hflags;
-     uint32_t pstate_for_ss;
+@@ -9201,6 +9201,7 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+         env->regs[14] = env->regs[15] + offset;
+     }
+     env->regs[15] = newpc;
++    env->hflags = rebuild_hflags_a32(env, arm_current_el(env));
+ }
  
-+#ifdef CONFIG_DEBUG_TCG
-+    {
-+        int el = arm_current_el(env);
-+        uint32_t check_flags;
-+        if (is_a64(env)) {
-+            check_flags = rebuild_hflags_a64(env, el);
-+        } else {
-+            check_flags = rebuild_hflags_a32(env, el);
-+        }
-+        g_assert_cmphex(flags, ==, check_flags);
+ static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
+@@ -9546,6 +9547,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+ 
+     pstate_write(env, PSTATE_DAIF | new_mode);
+     env->aarch64 = 1;
++    env->hflags = rebuild_hflags_a64(env, new_el);
+     aarch64_restore_sp(env, new_el);
+ 
+     env->pc = addr;
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 124192bfc2..e944d6b736 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -743,6 +743,7 @@ static int cpu_post_load(void *opaque, int version_id)
+     if (!kvm_enabled()) {
+         pmu_op_finish(&cpu->env);
+     }
++    arm_rebuild_hflags(&cpu->env);
+ 
+     return 0;
+ }
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index c998eadfaa..f82eeae7e4 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -571,6 +571,7 @@ void HELPER(cpsr_write_eret)(CPUARMState *env, uint32_t val)
+      */
+     env->regs[15] &= (env->thumb ? ~1 : ~3);
+ 
++    env->hflags = rebuild_hflags_a32(env, arm_current_el(env));
+     qemu_mutex_lock_iothread();
+     arm_call_el_change_hook(arm_env_get_cpu(env));
+     qemu_mutex_unlock_iothread();
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index af8e4fd4be..a786c7ef5f 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1841,11 +1841,15 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+         /* I/O operations must end the TB here (whether read or write) */
+         gen_io_end();
+         s->base.is_jmp = DISAS_UPDATE;
+-    } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
 +    }
-+#endif
++    if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+         /* We default to ending the TB on a coprocessor register write,
+          * but allow this to be suppressed by the register definition
+          * (usually only necessary to work around guest bugs).
+          */
++        TCGv_i32 tcg_el = tcg_const_i32(s->current_el);
++        gen_helper_rebuild_hflags_a64(cpu_env, tcg_el);
++        tcg_temp_free_i32(tcg_el);
+         s->base.is_jmp = DISAS_UPDATE;
+     }
+ }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index dac737f6ca..1cdb575ccd 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -8563,6 +8563,8 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+     ri = get_arm_cp_reginfo(s->cp_regs,
+             ENCODE_CP_REG(cpnum, is64, s->ns, crn, crm, opc1, opc2));
+     if (ri) {
++        bool need_exit_tb;
 +
-     *cs_base = 0;
--    if (is_a64(env)) {
-+    if (FIELD_EX32(flags, TBFLAG_ANY, AARCH64_STATE)) {
-         *pc = env->pc;
--        flags = rebuild_hflags_a64(env, current_el);
-         flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
-         pstate_for_ss = env->pstate;
-     } else {
-         *pc = env->regs[15];
--        flags = rebuild_hflags_a32(env, current_el);
-         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
-         flags = FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_bits);
-         pstate_for_ss = env->uncached_cpsr;
+         /* Check access permissions */
+         if (!cp_access_ok(s->current_el, ri, isread)) {
+             return 1;
+@@ -8735,15 +8737,23 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+             }
+         }
+ 
++        need_exit_tb = false;
+         if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_CP_IO)) {
+             /* I/O operations must end the TB here (whether read or write) */
+             gen_io_end();
+-            gen_lookup_tb(s);
+-        } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
++            need_exit_tb = true;
++        }
++        if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+             /* We default to ending the TB on a coprocessor register write,
+              * but allow this to be suppressed by the register definition
+              * (usually only necessary to work around guest bugs).
+              */
++            TCGv_i32 tcg_el = tcg_const_i32(s->current_el);
++            gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
++            tcg_temp_free_i32(tcg_el);
++            need_exit_tb = true;
++        }
++        if (need_exit_tb) {
+             gen_lookup_tb(s);
+         }
+ 
 -- 
 2.17.1
