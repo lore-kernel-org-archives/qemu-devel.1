@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38988)
+Received: from eggs.gnu.org ([209.51.188.92]:40034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gw9CO-0002lN-2O
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:28:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1gw9Ee-00057E-9P
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gw9CC-000757-MR
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:28:46 -0500
-Resent-Message-Id: <E1gw9CC-000757-MR@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gw9C8-0006zK-Qs
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:28:38 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155059728646.18484.13270574475653522421@49fa7ef69f7b>
-In-Reply-To: <20190215192302.27855-1-richard.henderson@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1gw9Eb-0000Xi-IJ
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:31:12 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-7-armbru@redhat.com>
+	<CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
+	<87d0nnsrx0.fsf@dusky.pond.sub.org>
+	<c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com>
+Date: Tue, 19 Feb 2019 18:30:31 +0100
+In-Reply-To: <c6d4c021-8d62-ada0-d152-b1d4f2b7aff2@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue,
+	19 Feb 2019 16:53:04 +0100")
+Message-ID: <87ftsjptxk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Feb 2019 09:28:07 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] target/arm: Implement
- ARMv8.3-JSConv & ARMv8.2-FHM
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
+ confused about size, mark FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,166 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxNTE5MjMwMi4yNzg1
-NS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMjE1MTkyMzAyLjI3ODU1LTEt
-cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
-IHY0IDAvOF0gdGFyZ2V0L2FybTogSW1wbGVtZW50IEFSTXY4LjMtSlNDb252ICYgQVJNdjguMi1G
-SE0KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplY2NiZDUyN2NhIHRhcmdldC9h
-cm06IEVuYWJsZSBBUk12OC4yLUZITSBmb3IgLWNwdSBtYXgKODYzMjZhNTA1YiB0YXJnZXQvYXJt
-OiBJbXBsZW1lbnQgVkZNQUwgYW5kIFZGTVNMIGZvciBhYXJjaDMyCjJhZTQ1MGI3NjkgdGFyZ2V0
-L2FybTogSW1wbGVtZW50IEZNTEFMIGFuZCBGTUxTTCBmb3IgYWFyY2g2NAowOWUwMmRlMDZkIHRh
-cmdldC9hcm06IEFkZCBoZWxwZXJzIGZvciBGTUxBTAplYmM5ZDRlNTIzIHRhcmdldC9hcm06IElt
-cGxlbWVudCBBUk12OC4zLUpTQ29udgpmNTE3NDJiNGFiIHRhcmdldC9hcm06IFJlYXJyYW5nZSBG
-bG9hdGluZy1wb2ludCBkYXRhLXByb2Nlc3NpbmcgKDIgcmVncykKNjVhNDM3ODM0ZiB0YXJnZXQv
-YXJtOiBTcGxpdCBvdXQgdmZwX2hlbHBlci5jCmI4M2E2OTViNDMgdGFyZ2V0L2FybTogUmVzdHJ1
-Y3R1cmUgZGlzYXNfZnBfaW50X2NvbnYKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOCBDaGVja2lu
-ZyBjb21taXQgYjgzYTY5NWI0MzQyICh0YXJnZXQvYXJtOiBSZXN0cnVjdHVyZSBkaXNhc19mcF9p
-bnRfY29udikKMi84IENoZWNraW5nIGNvbW1pdCA2NWE0Mzc4MzRmYWMgKHRhcmdldC9hcm06IFNw
-bGl0IG91dCB2ZnBfaGVscGVyLmMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzExMDI6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzExMzQ6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjI4Ogor
-LyogVkZQIHN1cHBvcnQuICBXZSBmb2xsb3cgdGhlIGNvbnZlbnRpb24gdXNlZCBmb3IgVkZQIGlu
-c3RydWN0aW9uczoKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1YnNlcXVlbnQg
-bGluZXMKIzExMzU6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjI5OgorLyogVkZQIHN1
-cHBvcnQuICBXZSBmb2xsb3cgdGhlIGNvbnZlbnRpb24gdXNlZCBmb3IgVkZQIGluc3RydWN0aW9u
-czoKKyAgIFNpbmdsZSBwcmVjaXNpb24gcm91dGluZXMgaGF2ZSBhICJzIiBzdWZmaXgsIGRvdWJs
-ZSBwcmVjaXNpb24gYQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8g
-b24gYSBzZXBhcmF0ZSBsaW5lCiMxMTM2OiBGSUxFOiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIuYzoz
-MDoKKyAgICJkIiBzdWZmaXguICAqLwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
-ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTE0MzogRklMRTogdGFyZ2V0L2FybS92ZnBf
-aGVscGVyLmM6Mzc6CisgICAgaWYgKGhvc3RfYml0cyAmIGZsb2F0X2ZsYWdfaW52YWxpZCkKWy4u
-Ll0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
-dGF0ZW1lbnQKIzExNDU6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjM5OgorICAgIGlm
-IChob3N0X2JpdHMgJiBmbG9hdF9mbGFnX2RpdmJ5emVybykKWy4uLl0KCkVSUk9SOiBicmFjZXMg
-e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzExNDc6IEZJ
-TEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjQxOgorICAgIGlmIChob3N0X2JpdHMgJiBmbG9h
-dF9mbGFnX292ZXJmbG93KQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
-ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTE0OTogRklMRTogdGFyZ2V0L2FybS92ZnBf
-aGVscGVyLmM6NDM6CisgICAgaWYgKGhvc3RfYml0cyAmIChmbG9hdF9mbGFnX3VuZGVyZmxvdyB8
-IGZsb2F0X2ZsYWdfb3V0cHV0X2Rlbm9ybWFsKSkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJl
-IG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzExNTE6IEZJTEU6IHRh
-cmdldC9hcm0vdmZwX2hlbHBlci5jOjQ1OgorICAgIGlmIChob3N0X2JpdHMgJiBmbG9hdF9mbGFn
-X2luZXhhY3QpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBh
-cm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMTUzOiBGSUxFOiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIu
-Yzo0NzoKKyAgICBpZiAoaG9zdF9iaXRzICYgZmxvYXRfZmxhZ19pbnB1dF9kZW5vcm1hbCkKWy4u
-Ll0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
-dGF0ZW1lbnQKIzExODk6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjgzOgorICAgIGlm
-ICh0YXJnZXRfYml0cyAmIDEpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
-Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMTkxOiBGSUxFOiB0YXJnZXQvYXJtL3Zm
-cF9oZWxwZXIuYzo4NToKKyAgICBpZiAodGFyZ2V0X2JpdHMgJiAyKQpbLi4uXQoKRVJST1I6IGJy
-YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTE5
-MzogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6ODc6CisgICAgaWYgKHRhcmdldF9iaXRz
-ICYgNCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
-b2YgdGhpcyBzdGF0ZW1lbnQKIzExOTU6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjg5
-OgorICAgIGlmICh0YXJnZXRfYml0cyAmIDgpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBu
-ZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMTk3OiBGSUxFOiB0YXJn
-ZXQvYXJtL3ZmcF9oZWxwZXIuYzo5MToKKyAgICBpZiAodGFyZ2V0X2JpdHMgJiAweDEwKQpbLi4u
-XQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
-YXRlbWVudAojMTE5OTogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6OTM6CisgICAgaWYg
-KHRhcmdldF9iaXRzICYgMHg4MCkKWy4uLl0KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBh
-IGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMjcxOiBGSUxFOiB0YXJnZXQvYXJtL3Zm
-cF9oZWxwZXIuYzoxNjU6CisgICAgLyogVGhlIGV4Y2VwdGlvbiBmbGFncyBhcmUgT1JlZCB0b2dl
-dGhlciB3aGVuIHdlIHJlYWQgZnBzY3Igc28gd2UKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRl
-ciB0aGF0ICcsJyAoY3R4OlZ4VikKIzEyODY6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5j
-OjE4MDoKKyNkZWZpbmUgVkZQX0hFTFBFUihuYW1lLCBwKSBIRUxQRVIoZ2x1ZShnbHVlKHZmcF8s
-bmFtZSkscCkpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMTI4
-NjogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6MTgwOgorI2RlZmluZSBWRlBfSEVMUEVS
-KG5hbWUsIHApIEhFTFBFUihnbHVlKGdsdWUodmZwXyxuYW1lKSxwKSkKICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWFjcm9z
-IHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdo
-aWxlIGxvb3AKIzEyODg6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjE4MjoKKyNkZWZp
-bmUgVkZQX0JJTk9QKG5hbWUpIFwKK2Zsb2F0MzIgVkZQX0hFTFBFUihuYW1lLCBzKShmbG9hdDMy
-IGEsIGZsb2F0MzIgYiwgdm9pZCAqZnBzdHApIFwKK3sgXAorICAgIGZsb2F0X3N0YXR1cyAqZnBz
-dCA9IGZwc3RwOyBcCisgICAgcmV0dXJuIGZsb2F0MzJfICMjIG5hbWUoYSwgYiwgZnBzdCk7IFwK
-K30gXAorZmxvYXQ2NCBWRlBfSEVMUEVSKG5hbWUsIGQpKGZsb2F0NjQgYSwgZmxvYXQ2NCBiLCB2
-b2lkICpmcHN0cCkgXAoreyBcCisgICAgZmxvYXRfc3RhdHVzICpmcHN0ID0gZnBzdHA7IFwKKyAg
-ICByZXR1cm4gZmxvYXQ2NF8gIyMgbmFtZShhLCBiLCBmcHN0KTsgXAorfQoKRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMxNDAwOiBGSUxF
-OiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIuYzoyOTQ6CisgICAgQ09OVl9GVE9JKHZmcF90byMjbmFt
-ZSMjcCwgZnR5cGUsIGZzeiwgc2lnbiwgKSAgICAgICAgXAoKRVJST1I6IHNwYWNlIHByb2hpYml0
-ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMxNDAzOiBGSUxFOiB0YXJnZXQv
-YXJtL3ZmcF9oZWxwZXIuYzoyOTc6CitGTE9BVF9DT05WUyhzaSwgaCwgdWludDMyX3QsIDE2LCAp
-CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAn
-KScKIzE0MDQ6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjI5ODoKK0ZMT0FUX0NPTlZT
-KHNpLCBzLCBmbG9hdDMyLCAzMiwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRo
-YXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMxNDA1OiBGSUxFOiB0YXJnZXQvYXJtL3ZmcF9oZWxw
-ZXIuYzoyOTk6CitGTE9BVF9DT05WUyhzaSwgZCwgZmxvYXQ2NCwgNjQsICkKCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMTQ0NzogRklM
-RTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6MzQxOgorICAgICAgICAgICAgICAgICAgICAgICAg
-IGdldF9mbG9hdF9yb3VuZGluZ19tb2RlKGZwc3QpLCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzE0NTI6IEZJTEU6IHRhcmdldC9h
-cm0vdmZwX2hlbHBlci5jOjM0NjoKKyAgICAgICAgICAgICAgICAgICAgICAgICBnZXRfZmxvYXRf
-cm91bmRpbmdfbW9kZShmcHN0KSwgKQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVh
-ZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE1NTI6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hl
-bHBlci5jOjQ0NjoKKy8qIFNldCB0aGUgY3VycmVudCBmcCByb3VuZGluZyBtb2RlIGFuZCByZXR1
-cm4gdGhlIG9sZCBvbmUuCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8q
-IG9uIGEgc2VwYXJhdGUgbGluZQojMTU2NTogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6
-NDU5OgorLyogU2V0IHRoZSBjdXJyZW50IGZwIHJvdW5kaW5nIG1vZGUgaW4gdGhlIHN0YW5kYXJk
-IGZwIHN0YXR1cyBhbmQgcmV0dXJuCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
-aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTU4NTogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVs
-cGVyLmM6NDc5OgorICAgIC8qIFNxdWFzaCBGWjE2IHRvIDAgZm9yIHRoZSBkdXJhdGlvbiBvZiBj
-b252ZXJzaW9uLiAgSW4gdGhpcyBjYXNlLAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEg
-bGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE1OTg6IEZJTEU6IHRhcmdldC9hcm0vdmZw
-X2hlbHBlci5jOjQ5MjoKKyAgICAvKiBTcXVhc2ggRloxNiB0byAwIGZvciB0aGUgZHVyYXRpb24g
-b2YgY29udmVyc2lvbi4gIEluIHRoaXMgY2FzZSwKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
-ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxNjExOiBGSUxFOiB0YXJnZXQvYXJt
-L3ZmcF9oZWxwZXIuYzo1MDU6CisgICAgLyogU3F1YXNoIEZaMTYgdG8gMCBmb3IgdGhlIGR1cmF0
-aW9uIG9mIGNvbnZlcnNpb24uICBJbiB0aGlzIGNhc2UsCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTYyNDogRklMRTogdGFyZ2V0
-L2FybS92ZnBfaGVscGVyLmM6NTE4OgorICAgIC8qIFNxdWFzaCBGWjE2IHRvIDAgZm9yIHRoZSBk
-dXJhdGlvbiBvZiBjb252ZXJzaW9uLiAgSW4gdGhpcyBjYXNlLAoKV0FSTklORzogQmxvY2sgY29t
-bWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzE2Njk6IEZJTEU6IHRh
-cmdldC9hcm0vdmZwX2hlbHBlci5jOjU2MzoKKy8qIENvbnN0YW50cyAyNTYgYW5kIDUxMiBhcmUg
-dXNlZCBpbiBzb21lIGhlbHBlcnM7IHdlIGF2b2lkIHJlbHlpbmcgb24KCldBUk5JTkc6IEJsb2Nr
-IGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMTY3MDogRklM
-RTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6NTY0OgorICogaW50LT5mbG9hdCBjb252ZXJzaW9u
-cyBhdCBydW4tdGltZS4gICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5n
-IC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTY3NzogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVy
-LmM6NTcxOgorLyogUmVjaXByb2NhbCBmdW5jdGlvbnMKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
-IHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxNjgzOiBGSUxFOiB0YXJnZXQv
-YXJtL3ZmcF9oZWxwZXIuYzo1Nzc6CisvKiBTZWUgUmVjaXBFc3RpbWF0ZSgpCgpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTkwMzog
-RklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6Nzk3OgorLyogVGhlIGFsZ29yaXRobSB0aGF0
-IG11c3QgYmUgdXNlZCB0byBjYWxjdWxhdGUgdGhlIGVzdGltYXRlCgpXQVJOSU5HOiBCbG9jayBj
-b21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTk4NTogRklMRTog
-dGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6ODc5OgorICAgIC8qIFNjYWxlIGFuZCBub3JtYWxpemUg
-dG8gYSBkb3VibGUtcHJlY2lzaW9uIHZhbHVlIGJldHdlZW4gMC4yNSBhbmQgMS4wLAoKV0FSTklO
-RzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMx
-OTg2OiBGSUxFOiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIuYzo4ODA6CisgICAgICogcHJlc2Vydmlu
-ZyB0aGUgcGFyaXR5IG9mIHRoZSBleHBvbmVudC4gICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjAyOTogRklMRTogdGFyZ2V0
-L2FybS92ZnBfaGVscGVyLmM6OTIzOgorICAgIC8qIFNjYWxlIGFuZCBub3JtYWxpemUgdG8gYSBk
-b3VibGUtcHJlY2lzaW9uIHZhbHVlIGJldHdlZW4gMC4yNSBhbmQgMS4wLAoKV0FSTklORzogQmxv
-Y2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMyMDMwOiBG
-SUxFOiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIuYzo5MjQ6CisgICAgICogcHJlc2VydmluZyB0aGUg
-cGFyaXR5IG9mIHRoZSBleHBvbmVudC4gICovCgp0b3RhbDogMjEgZXJyb3JzLCAyMCB3YXJuaW5n
-cywgMjE2NCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjMvOCBDaGVja2luZyBjb21taXQgZjUxNzQyYjRhYmY2ICh0YXJnZXQvYXJtOiBSZWFycmFu
-Z2UgRmxvYXRpbmctcG9pbnQgZGF0YS1wcm9jZXNzaW5nICgyIHJlZ3MpKQo0LzggQ2hlY2tpbmcg
-Y29tbWl0IGViYzlkNGU1MjMxYiAodGFyZ2V0L2FybTogSW1wbGVtZW50IEFSTXY4LjMtSlNDb252
-KQo1LzggQ2hlY2tpbmcgY29tbWl0IDA5ZTAyZGUwNmQxZiAodGFyZ2V0L2FybTogQWRkIGhlbHBl
-cnMgZm9yIEZNTEFMKQo2LzggQ2hlY2tpbmcgY29tbWl0IDJhZTQ1MGI3NjkxNyAodGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IEZNTEFMIGFuZCBGTUxTTCBmb3IgYWFyY2g2NCkKNy84IENoZWNraW5nIGNv
-bW1pdCA4NjMyNmE1MDViNmQgKHRhcmdldC9hcm06IEltcGxlbWVudCBWRk1BTCBhbmQgVkZNU0wg
-Zm9yIGFhcmNoMzIpCjgvOCBDaGVja2luZyBjb21taXQgZWNjYmQ1MjdjYWUxICh0YXJnZXQvYXJt
-OiBFbmFibGUgQVJNdjguMi1GSE0gZm9yIC1jcHUgbWF4KQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIxNTE5MjMwMi4yNzg1NS0xLXJpY2hh
-cmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 2/19/19 4:45 PM, Markus Armbruster wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>=20
+>>> On Mon, 18 Feb 2019 at 13:07, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>>>
+>>>> pflash_cfi02_register() takes a size in bytes, a block size in bytes
+>>>> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
+>>>> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
+>>>> number of blocks.  The latter happens to win.  I tried to find
+>>>> documentation on the physcial hardware, no luck.
+>
+> "physical"
+
+Thanks, will fix.
+
+>>>>
+>>>> For now, adjust the byte size passed to match the actual size created,
+>>>> and add a FIXME comment.
+>>>
+>>> I'm pretty sure that FLASH_SIZE here is supposed to be a
+>>> byte count of the size of the pflash. That matches what
+>>> Linux has in arch/sh/boards/mach-r2d/setup.c where it
+>>> sets up the flash_resource struct.
+>>=20
+>> Okay, that's some evidence for size 0x02000000 (32MiB).
+>>=20
+>> However, we've created size (16 * KiB) * (FLASH_SIZE >> 16), i.e. 8MiB,
+>> since at least commit 368a354f02b (v1.3.0), possibly since forever.
+>>=20
+>>> The r2dplus board is also I think known as RTS7751R2D. That
+>>> takes us to https://elinux.org/RTS7751R2D_Handling_Manual
+>>> (sadly the link to the "hardware manual" is broken).
+>>=20
+>> Quote section Flash ROM Mapping:
+>>=20
+>>     Currently, MTD device mapping on Flash ROM is set as below.
+>>     0x00000000-0x00020000 	"bootloader"=20=09
+>>     0x00020000-0x00320000 	"mtdblock1" 	XIP kernel
+>>     0x00320000-0x00520000 	"mtdblock2"=20=09
+>>     0x00520000-0x01000000 	"mtdblock3"=20=09
+>>=20
+>> Suggests a size of 0x01000000 (16MiB).  Now we have three candidates.
+>>=20
+>> Pick one, any one, and I'll adjust my patch.  All I really care about is
+>> getting argument @size consistent with arguments @sector_len and
+>> @nb_blocs, so I can ditch @nb_blocs in PATCH 09.
+>>=20
+>>> No idea what the block size would be.
+>>=20
+>> As long as that's the case, inertia wins by default.
+>
+> There is also a paper [*]:
+>
+>   The Renesas Technology R0P751RLC001RL (R2DPLUS) board was used
+>   as our target device.
+>   This board is often used to evaluate software for CE devices.
+>   The specification is shown below.
+>     CPU: SH7751R(SH4) 240Mhz
+>     RAM: 64Mbyte
+>     Compact flash: 512Mbyte
+>     Flash ROM: 64Mbyte (32Mbyte available for root file system)
+
+Candidate #4: 64MiB.  Bring 'em on!
+
+>
+> Let's use at least 16MB to be able to run the elinux cited kernel.
+>
+> [*] https://www.kernel.org/doc/ols/2008/ols2008v2-pages-125-134.pdf
+
+That's a vote for changing the status quo (8 MiB).
+
+Perhaps Magnus, who maintains the machine, can pick a new value for us.
