@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38269)
+Received: from eggs.gnu.org ([209.51.188.92]:38974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gvzzC-00036h-3K
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:38:38 -0500
+	(envelope-from <david@redhat.com>) id 1gw02P-00049c-MX
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:41:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1gvzz9-00037P-Lh
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:38:37 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:47182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1gvzz5-00035q-Q7
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:38:32 -0500
-Date: Tue, 19 Feb 2019 08:38:24 +0100
-From: Sven Schnelle <svens@stackframe.org>
-Message-ID: <20190219073824.GA7584@t470p.stackframe.org>
-References: <20190218175529.11237-1-svens@stackframe.org>
-	<20190218175529.11237-2-svens@stackframe.org>
-	<861e47de-978b-b48c-d144-e50040d45bf4@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gw02O-0004aw-UE
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:41:57 -0500
+References: <20190218092202.26683-1-david@redhat.com>
+	<20190219025851.GO9345@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <247e2e86-c740-170e-8844-0ec96f6bcecf@redhat.com>
+Date: Tue, 19 Feb 2019 08:41:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <861e47de-978b-b48c-d144-e50040d45bf4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] lsi: use ldn_le_p()/stn_le_p()
+In-Reply-To: <20190219025851.GO9345@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] tests: Add device unplug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, deller@gmx.de, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Philippe,
-
-On Mon, Feb 18, 2019 at 10:39:54PM +0100, Philippe Mathieu-Daudé wrote:
-
-> > -    newval = s->script_ram[addr >> 2];
-> > -    shift = (addr & 3) * 8;
-> > -    mask = ((uint64_t)1 << (size * 8)) - 1;
-> > -    newval &= ~(mask << shift);
-> > -    newval |= val << shift;
-> > -    s->script_ram[addr >> 2] = newval;
-> > +    stn_le_p(((void*)s->script_ram) + addr, size, val);
+On 19.02.19 03:58, David Gibson wrote:
+> On Mon, Feb 18, 2019 at 10:21:56AM +0100, David Hildenbrand wrote:
+>> This is a set of tests to test basic device unplugging functionality for
+>> - some PCI implementations
+>> - CCW devices on s390x
+>> - spapr memory and cpu core devices
+>>
+>> I plaed with ACPI CPU unplug but getting that to run with qtest is more
+>> involved. (remove devices on reset, trick cpu-hotplug-legacy property,
+>> somehow create cpu hotplug state objects ...). Well we no have at least
+>> one unplug test for DIMMs and one for CPUs.
 > 
-> If you want to do pointer arithmetic, it is safer to cast to a uintptr_t.
-> But since you update all the places that use script_ram[], it seems
-> pointless to keep it as an array of uint32_t. We can simply convert it
-> to an array of char.
+> I believe we were talking about merging this via the ppc tree, so I've
+> merged it into ppc-for-4.0 (with Connie's acks).
+> 
+> If I was mistaken about that, let me know and I'll pull them out
+> before I send my next pull request.
 
-You're right, i was assuming that the array is used somewhere else in the code,
-but all the accesses are routed through these two functions, so it makes sense
-to convert the type. However, i'm not sure whether i have to increase the version
-number in the VMSTATE_BUFFER_UNSAFE() macro in that case? Are there possible
-endianess issues with that change?
+That's also how I understood it :)
 
-My current version looks like this:
+Thanks David!
 
+-- 
 
-commit 286d45946e235d5fdf2f95bf349b3048e3180392
-Author: Sven Schnelle <svens@stackframe.org>
-Date:   Tue Feb 19 06:59:23 2019 +0100
+Thanks,
 
-    lsi: use ldn_le_p()/stn_le_p()
-    
-    Signed-off-by: Sven Schnelle <svens@stackframe.org>
-
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index c493e3c4c7..0f9591016a 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -290,7 +290,7 @@ typedef struct {
-     uint32_t adder;
- 
-     /* Script ram is stored as 32-bit words in host byteorder.  */
--    uint32_t script_ram[2048];
-+    uint8_t script_ram[8192];
- } LSIState;
- 
- #define TYPE_LSI53C810  "lsi53c810"
-@@ -2078,29 +2078,14 @@ static void lsi_ram_write(void *opaque, hwaddr addr,
-                           uint64_t val, unsigned size)
- {
-     LSIState *s = opaque;
--    uint32_t newval;
--    uint32_t mask;
--    int shift;
--
--    newval = s->script_ram[addr >> 2];
--    shift = (addr & 3) * 8;
--    mask = ((uint64_t)1 << (size * 8)) - 1;
--    newval &= ~(mask << shift);
--    newval |= val << shift;
--    s->script_ram[addr >> 2] = newval;
-+    stn_le_p(s->script_ram + addr, size, val);
- }
- 
- static uint64_t lsi_ram_read(void *opaque, hwaddr addr,
-                              unsigned size)
- {
-     LSIState *s = opaque;
--    uint32_t val;
--    uint32_t mask;
--
--    val = s->script_ram[addr >> 2];
--    mask = ((uint64_t)1 << (size * 8)) - 1;
--    val >>= (addr & 3) * 8;
--    return val & mask;
-+    return ldn_le_p(s->script_ram + addr, size);
- }
- 
- static const MemoryRegionOps lsi_ram_ops = {
-@@ -2243,7 +2228,7 @@ static const VMStateDescription vmstate_lsi_scsi = {
-         VMSTATE_BUFFER_UNSAFE(scratch, LSIState, 0, 18 * sizeof(uint32_t)),
-         VMSTATE_UINT8(sbr, LSIState),
- 
--        VMSTATE_BUFFER_UNSAFE(script_ram, LSIState, 0, 2048 * sizeof(uint32_t)),
-+        VMSTATE_BUFFER_UNSAFE(script_ram, LSIState, 0, 8192),
-         VMSTATE_END_OF_LIST()
-     }
- };
+David / dhildenb
