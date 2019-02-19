@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55900)
+Received: from eggs.gnu.org ([209.51.188.92]:55918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gw56r-0000Ig-AP
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:06:54 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gw56w-0000NI-65
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gw56h-0008A3-Ki
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:06:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gw56d-00084r-8S
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:06:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D20F87628
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 13:06:36 +0000 (UTC)
-References: <20190219124257.3001-1-kraxel@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fa45ba19-b6e0-7a85-e370-ca19f31d9b7f@redhat.com>
-Date: Tue, 19 Feb 2019 14:06:34 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gw56o-0008G6-Tf
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:06:52 -0500
+Resent-Message-Id: <E1gw56o-0008G6-Tf@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155058156322.18484.17590207278252701832@49fa7ef69f7b>
+In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190219124257.3001-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] audio: don't build alsa and sdl by
- default on linux
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Feb 2019 05:06:04 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +23,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On 19.02.19 13:42, Gerd Hoffmann wrote:
-> In case no sound hardware is present both alsa and sdl drivers
-> initialize successfully and throw errors later on, i.e. effectively
-> the automatic probing doesn't work.  Drop them from the list of
-> default audio drivers for linux because of that.
-> 
-> Fixes: 6a48541873 audio: probe audio drivers by default
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1816052
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index fbd0825488..651b4f7514 100755
-> --- a/configure
-> +++ b/configure
-> @@ -877,7 +877,7 @@ Haiku)
->    LIBS="-lposix_error_mapper -lnetwork $LIBS"
->  ;;
->  Linux)
-> -  audio_drv_list="try-pa try-alsa try-sdl oss"
-> +  audio_drv_list="try-pa oss"
->    audio_possible_drivers="oss alsa sdl pa"
->    linux="yes"
->    linux_user="yes"
-> 
-
-It makes it work under my crazy environment again.
-
-Tested-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David / dhildenb
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
+MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
+YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
+NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
+YXJtYnJ1QHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5
+MDIxOTA2MDcxOS44MjExLTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20gLT4gcGF0Y2hl
+dy8yMDE5MDIxOTA2MDcxOS44MjExLTEtcmljaGFyZHcueWFuZ0BsaW51eC5pbnRlbC5jb20KICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIxOTEyNDI1Ny4zMDAxLTEta3Jh
+eGVsQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDIxOTEyNDI1Ny4zMDAxLTEta3JheGVsQHJl
+ZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplYWRiZGRlOTNiIGh3L2Fy
+bSBody94dGVuc2E6IERlLWR1cGxpY2F0ZSBwZmxhc2ggY3JlYXRpb24gY29kZSBzb21lCjY2Yjk2
+MmRiZjMgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAyCjUy
+ODQ1MDBhNzQgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAx
+CjA5ZDJjNGE3MDggbWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBmbGFzaCBtZW1v
+cnkgc2l6ZSBzb21ld2hhdAozNzBmMGI1OTI5IHIyZDogRmxhc2ggbWVtb3J5IGNyZWF0aW9uIGlz
+IGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUKYTQ0MzY1ZmVjZSBwcGM0MDVfYm9hcmRz
+OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlCmU2ZGNjMjhi
+ODkgc2FtNDYwZXg6IERvbid0IHNpemUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1h
+Z2UKYjU1NDQ4MGVmNSBodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBFX0NGSV9QRkxB
+U0gwezEsIDJ9CmQ3NTA5MDViY2MgcGZsYXNoOiBNYWNybyBQRkxBU0hfQlVHKCkgaXMgdXNlZCBq
+dXN0IG9uY2UsIGV4cGFuZAplYzNlODc0NWNkIHBmbGFzaDogUmVuYW1lIHBmbGFzaF90IHRvIFBG
+bGFzaENGSTAxLCBQRmxhc2hDRkkwMgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMCBDaGVja2lu
+ZyBjb21taXQgZWMzZTg3NDVjZGQ4IChwZmxhc2g6IFJlbmFtZSBwZmxhc2hfdCB0byBQRmxhc2hD
+RkkwMSwgUEZsYXNoQ0ZJMDIpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rp
+b24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyODogRklMRTogaHcvYmxvY2svcGZs
+YXNoX2NmaTAxLmM6Mjg4Ogorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFkIChQRmxhc2hDRkkw
+MSAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzQwOiBGSUxFOiBody9ibG9j
+ay9wZmxhc2hfY2ZpMDIuYzoxNDE6CitzdGF0aWMgdWludDMyX3QgcGZsYXNoX3JlYWQgKFBGbGFz
+aENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3
+ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTg6IEZJTEU6IGh3
+L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjI2NDoKK3N0YXRpYyB2b2lkIHBmbGFzaF93cml0ZSAoUEZs
+YXNoQ0ZJMDIgKnBmbCwgaHdhZGRyIG9mZnNldCwKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5n
+cywgNDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjIvMTAgQ2hlY2tpbmcgY29tbWl0IGQ3NTA5MDViY2M1OSAocGZsYXNoOiBNYWNybyBQRkxB
+U0hfQlVHKCkgaXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZCkKMy8xMCBDaGVja2luZyBjb21taXQg
+YjU1NDQ4MGVmNWU2IChodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBFX0NGSV9QRkxB
+U0gwezEsIDJ9KQo0LzEwIENoZWNraW5nIGNvbW1pdCBlNmRjYzI4Yjg5OTQgKHNhbTQ2MGV4OiBE
+b24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo1LzEwIENoZWNr
+aW5nIGNvbW1pdCBhNDQzNjVmZWNlN2MgKHBwYzQwNV9ib2FyZHM6IERvbid0IHNpemUgZmxhc2gg
+bWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UpCjYvMTAgQ2hlY2tpbmcgY29tbWl0IDM3MGYw
+YjU5Mjk0YiAocjJkOiBGbGFzaCBtZW1vcnkgY3JlYXRpb24gaXMgY29uZnVzZWQgYWJvdXQgc2l6
+ZSwgbWFyayBGSVhNRSkKNy8xMCBDaGVja2luZyBjb21taXQgMDlkMmM0YTcwODE3IChtaXBzX21h
+bHRhOiBDbGVhbiB1cCBkZWZpbml0aW9uIG9mIGZsYXNoIG1lbW9yeSBzaXplIHNvbWV3aGF0KQo4
+LzEwIENoZWNraW5nIGNvbW1pdCA1Mjg0NTAwYTc0NjggKHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIg
+Y29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMSkKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
+dGhhdCAnLScgKGN0eDpWeFYpCiM5MDogRklMRTogaHcvYXJtL211c2ljcGFsLmM6MTYzOToKKyAg
+ICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVf
+TUFYLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
+Ujogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzk4OiBGSUxFOiBo
+dy9hcm0vbXVzaWNwYWwuYzoxNjQ2OgorICAgICAgICBwZmxhc2hfY2ZpMDJfcmVnaXN0ZXIoMHgx
+MDAwMDAwMDBVTEwtTVBfRkxBU0hfU0laRV9NQVgsCiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMjQ4IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDgvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTAg
+Q2hlY2tpbmcgY29tbWl0IDY2Yjk2MmRiZjM5MiAocGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21t
+aXQgMzY4YTM1NGYwMmIgcGFydCAyKQoxMC8xMCBDaGVja2luZyBjb21taXQgZWFkYmRkZTkzYjM5
+IChody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9uIGNvZGUgc29t
+ZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
+OTAyMTgxMjU2MTUuMTg5NzAtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
