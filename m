@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46504)
+Received: from eggs.gnu.org ([209.51.188.92]:47633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2T4-00065q-9O
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:17:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gw2Zl-0007XE-1u
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:24:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2T3-0000Ag-4N
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:17:38 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Feb 2019 10:17:28 +0000
-Message-ID: <3a5b7941-c8c8-8421-2cbf-ef6bf3583634@virtuozzo.com>
-References: <20190213232356.21034-1-jsnow@redhat.com>
-	<20190213232356.21034-3-jsnow@redhat.com>
-	<b0847f1f-c142-0c35-f04a-7436f840af25@virtuozzo.com>
-	<fa012e63-2a85-6c7b-bb92-75974d0d3033@redhat.com>
-In-Reply-To: <fa012e63-2a85-6c7b-bb92-75974d0d3033@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <40673E4BEBB065428A02DAAE22C8771B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1gw2ZV-00025x-K6
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:24:27 -0500
+Date: Tue, 19 Feb 2019 11:24:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190219102400.GG4727@localhost.localdomain>
+References: <20190218161822.3573-1-kwolf@redhat.com>
+	<20190218161822.3573-5-kwolf@redhat.com>
+	<0e7acbc6-9e05-abd0-852b-5c76ce084dff@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] block/dirty-bitmaps: rename frozen
- predicate helper
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0e7acbc6-9e05-abd0-852b-5c76ce084dff@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/12] io: Make qio_channel_yield()
+ interruptible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>, "libvir-list@redhat.com" <libvir-list@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, stefanha@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-MTkuMDIuMjAxOSAxOjMyLCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMi8xOC8xOSA4
-OjU3IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTQuMDIuMjAx
-OSAyOjIzLCBKb2huIFNub3cgd3JvdGU6DQo+Pj4gIkZyb3plbiIgd2FzIGEgZ29vZCBkZXNjcmlw
-dGlvbiBhIGxvbmcgdGltZSBhZ28sIGJ1dCBpdCBpc24ndCBhZGVxdWF0ZSBub3cuDQo+Pj4gUmVu
-YW1lIHRoZSBmcm96ZW4gcHJlZGljYXRlIHRvIGhhc19zdWNjZXNzb3IgdG8gbWFrZSB0aGUgc2Vt
-YW50aWNzIG9mIHRoZQ0KPj4+IHByZWRpY2F0ZSBtb3JlIGNsZWFyIHRvIG91dHNpZGUgY2FsbGVy
-cy4NCj4+Pg0KPj4+IEluIHRoZSBwcm9jZXNzLCByZW1vdmUgc29tZSBjYWxscyB0byBmcm96ZW4o
-KSB0aGF0IG5vIGxvbmdlciBzZW1hbnRpY2FsbHkNCj4+PiBtYWtlIHNlbnNlLiBGb3IgZW5hYmxl
-ZCBhbmQgZGlzYWJsZWQgaW4gcGFydGljdWxhciwgaXQncyBhY3R1YWxseSBva2F5IGZvcg0KPj4+
-IHRoZSBpbnRlcm5hbHMgdG8gZG8gdGhpcyBidXQgb25seSBmb3JiaWRkZW4gZm9yIHVzZXJzIHRv
-IGludm9rZSB0aGVtLCBhbmQNCj4+DQo+PiBJJ20gYSBiaXQgbG9zdCBpbiB0aGlzIHBhcmFncmFw
-aC4uIHRvIHRoaXMgLSB3aGF0PywgdG8gaW52b2tlIHRoZW0gLSB3aG9tPw0KPj4gSSB0aGluaywg
-aXQgd291bGQgYmUgc2ltcGxlciBmb3IgbWUgdG8gcmVhZCBwYXRjaCBpdHNlbGYgOikNCj4+DQo+
-IA0KPiBUb3VjaGVkIHRoaXMgdXAuIEkgbWVhbnQgZW5hYmxlIGFuZCBkaXNhYmxlLCBub3QgZW5h
-YmxlZCBhbmQgZGlzYWJsZWQuDQo+IA0KPj4+IGFsbCBvZiB0aGUgUU1QIGVudHJ5IHVzZXMgYWxy
-ZWFkeSBjaGVjayBhZ2FpbnN0IHFtcF9sb2NrZWQuDQo+Pj4NCj4+PiBTZXZlcmFsIG90aGVyIGFz
-c2VydGlvbnMgcmVhbGx5IHdhbnQgdG8gY2hlY2sgdGhhdCB0aGUgYml0bWFwIGlzbid0IGluLXVz
-ZQ0KPj4+IGJ5IGFub3RoZXIgb3BlcmF0aW9uIC0tIHVzZSB0aGUgcW1wX2xvY2tlZCBmdW5jdGlv
-biBmb3IgdGhpcyBpbnN0ZWFkLCB3aGljaA0KPj4+IHByZXNlbnRseSBhbHNvIGNoZWNrcyBmb3Ig
-aGFzX3N1Y2Nlc3Nvci4NCj4+DQo+PiBobSwgeW91IG1lYW4gdXNlcl9sb2NrZWQsIG5vdCBxbXBf
-bG9ja2VkLg0KPj4NCj4gDQo+IFllcy4NCj4gDQo+IFsuLi5dDQo+IA0KPj4+ICAgIC8qKg0KPj4+
-ICAgICAqIENyZWF0ZSBhIHN1Y2Nlc3NvciBiaXRtYXAgZGVzdGluZWQgdG8gcmVwbGFjZSB0aGlz
-IGJpdG1hcCBhZnRlciBhbiBvcGVyYXRpb24uDQo+Pj4gLSAqIFJlcXVpcmVzIHRoYXQgdGhlIGJp
-dG1hcCBpcyBub3QgZnJvemVuIGFuZCBoYXMgbm8gc3VjY2Vzc29yLg0KPj4+ICsgKiBSZXF1aXJl
-cyB0aGF0IHRoZSBiaXRtYXAgaXMgbm90IGxvY2tlZCBhbmQgaGFzIG5vIHN1Y2Nlc3Nvci4NCj4+
-DQo+PiBJIHRoaW5rLCB1c2VyX2xvY2tlZCwgdG8gbm90IGludGVyZmVyZSB3aXRoIGJpdG1hcHMg
-bXV0ZXguIEFuZCB5b3UgdXNlIHVzZXJfbG9ja2VkIGluDQo+PiBvdGhlciBjb21tZW50cyBpbiB0
-aGlzIHBhdGNoLg0KPj4NCj4gDQo+IFlvdSdyZSByaWdodC4gSXQgZ2V0cyBjaGFuZ2VkIGFnYWlu
-IGxhdGVyLCBidXQgSSBkaWRuJ3QgbWFrZSB0aGlzIGVhc3kNCj4gdG8gcmVhZC4NCj4gDQo+Pj4g
-ICAgICogQ2FsbGVkIHdpdGggQlFMIHRha2VuLg0KPj4+ICAgICAqLw0KPj4+ICAgIGludCBiZHJ2
-X2RpcnR5X2JpdG1hcF9jcmVhdGVfc3VjY2Vzc29yKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4+
-IEBAIC0yNDQsMTIgKzI0NCwxNiBAQCBpbnQgYmRydl9kaXJ0eV9iaXRtYXBfY3JlYXRlX3N1Y2Nl
-c3NvcihCbG9ja0RyaXZlclN0YXRlICpicywNCj4+PiAgICAgICAgdWludDY0X3QgZ3JhbnVsYXJp
-dHk7DQo+Pj4gICAgICAgIEJkcnZEaXJ0eUJpdG1hcCAqY2hpbGQ7DQo+Pj4gICAgDQo+Pj4gLSAg
-ICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfZnJvemVuKGJpdG1hcCkpIHsNCj4+PiAtICAgICAgICBl
-cnJvcl9zZXRnKGVycnAsICJDYW5ub3QgY3JlYXRlIGEgc3VjY2Vzc29yIGZvciBhIGJpdG1hcCB0
-aGF0IGlzICINCj4+PiAtICAgICAgICAgICAgICAgICAgICJjdXJyZW50bHkgZnJvemVuIik7DQo+
-Pj4gKyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfdXNlcl9sb2NrZWQoYml0bWFwKSkgew0KPj4+
-ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkNhbm5vdCBjcmVhdGUgYSBzdWNjZXNzb3IgZm9y
-IGEgYml0bWFwIHRoYXQgaXMgaW4tdXNlICINCj4+PiArICAgICAgICAgICAgICAgICAgICJieSBh
-biBvcGVyYXRpb24iKTsNCj4+PiArICAgICAgICByZXR1cm4gLTE7DQo+Pj4gKyAgICB9DQo+Pj4g
-KyAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfaGFzX3N1Y2Nlc3NvcihiaXRtYXApKSB7DQo+Pj4g
-KyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQ2Fubm90IGNyZWF0ZSBhIHN1Y2Nlc3NvciBmb3Ig
-YSBiaXRtYXAgdGhhdCBhbHJlYWR5ICINCj4+PiArICAgICAgICAgICAgICAgICAgICJoYXMgb25l
-Iik7DQo+Pg0KPj4NCj4+IEFtbSwgZGVhZCBjb2RlPyBfdXNlcl9sb2NrZWQoKSBpbXBsaWVzIG5v
-IHN1Y2Nlc3Nvciwgc28gd2UgaW5zdGVhZCBjYW4ga2VlcCBhbiBhc3NlcnRpb24uLg0KPj4NCj4g
-DQo+IEl0IGdldHMgY2hhbmdlZCBsYXRlciBpbiB0aGUgc2VyaWVzLCBidXQgSSBkaWRuJ3QgZG8g
-YSBncmVhdCBqb2Igb2YNCj4gZXhwbGFpbmluZyB0aGF0IGluIGFkdmFuY2UuIEknbGwgYW1lbmQg
-dGhlIGNvbW1pdCBtZXNzYWdlIHRvIGV4cGxhaW4NCj4gd2hhdCBJJ20gdHJ5aW5nIHRvIGRvLg0K
-PiANCj4gSSB0cmllZCB0byBoaW50IGF0IHRoaXMgd2l0aDogIndoaWNoIHByZXNlbnRseSBhbHNv
-IGNoZWNrcyBmb3INCj4gaGFzX3N1Y2Nlc3NvciIgYXMgYW4gYWRtaXNzaW9uIHRoYXQgaXQgd2Fz
-IHJlZHVuZGFudCwgYnV0IEkgbmVlZCB0byBjYWxsDQo+IGl0IG91dCBpbiBzdHJvbmdlciBsYW5n
-dWFnZS4NCj4gDQoNCkhtbSwgaXNuJ3QgaXQgYmV0dGVyIHRvIGtlZXAgYW4gYXNzZXJ0aW9uLCB0
-aGFuIGFkZCBkZWFkIGNvZGUsIHRvIGJlIGZpeGVkIGluIGxhdGVyIGNvbW1pdHM/DQoNCi0tIA0K
-QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Am 18.02.2019 um 18:11 hat Paolo Bonzini geschrieben:
+> On 18/02/19 17:18, Kevin Wolf wrote:
+> > Similar to how qemu_co_sleep_ns() allows to be preempted by an external
+> > coroutine entry, allow reentering qio_channel_yield() early.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  include/io/channel.h |  9 ++++++---
+> >  io/channel.c         | 10 ++++++++++
+> >  2 files changed, 16 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/io/channel.h b/include/io/channel.h
+> > index da2f138200..59460cb1ec 100644
+> > --- a/include/io/channel.h
+> > +++ b/include/io/channel.h
+> > @@ -739,10 +739,13 @@ void qio_channel_detach_aio_context(QIOChannel *ioc);
+> >   * addition, no two coroutine can be waiting on the same condition
+> >   * and channel at the same time.
+> >   *
+> > - * This must only be called from coroutine context
+> > + * This must only be called from coroutine context. It is safe to
+> > + * reenter the coroutine externally while it is waiting; in this
+> > + * case the function will return even if @condition is not yet
+> > + * available.
+> >   */
+> > -void qio_channel_yield(QIOChannel *ioc,
+> > -                       GIOCondition condition);
+> > +void coroutine_fn qio_channel_yield(QIOChannel *ioc,
+> > +                                    GIOCondition condition);
+> >  
+> >  /**
+> >   * qio_channel_wait:
+> > diff --git a/io/channel.c b/io/channel.c
+> > index 8dd0684f5d..303376e08d 100644
+> > --- a/io/channel.c
+> > +++ b/io/channel.c
+> > @@ -469,6 +469,16 @@ void coroutine_fn qio_channel_yield(QIOChannel *ioc,
+> >      }
+> >      qio_channel_set_aio_fd_handlers(ioc);
+> >      qemu_coroutine_yield();
+> > +
+> > +    /* Allow interrupting the operation by reentering the coroutine other than
+> > +     * through the aio_fd_handlers. */
+> > +    if (condition == G_IO_IN && ioc->read_coroutine) {
+> > +        ioc->read_coroutine = NULL;
+> > +        qio_channel_set_aio_fd_handlers(ioc);
+> > +    } else if (condition == G_IO_OUT && ioc->write_coroutine) {
+> > +        ioc->write_coroutine = NULL;
+> > +        qio_channel_set_aio_fd_handlers(ioc);
+> > +    }
+> >  }
+> 
+> Perhaps it's a bit cleaner to remove the ioc->..._coroutine assignments,
+> and the call to qio_channel_set_aio_fd_handlers, from
+> qio_channel_restart_read and qio_channel_restart_write.
+
+I wasn't sure if this was correct because aio_co_wake() doesn't
+necessarily enter the coroutine immediately, so the value between there
+and actually entering the coroutine would change compared to the old
+state.
+
+On closer look, these handlers are never in coroutine context, and
+qio_channel_attach_aio_context() asserts that the handlers are inactive,
+so I guess we could replace the aio_co_wake() with a direct
+qemu_coroutine_enter() and possibly an assertion that we're already in
+the right AioContext.
+
+That would make it obvious that removing the assignment and call to
+qio_channel_set_aio_fd_handlers() there is safe.
+
+In any case, I think this needs to be a separate patch where the commit
+message can explain the above.
+
+Kevin
