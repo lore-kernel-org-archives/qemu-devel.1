@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44471)
+Received: from eggs.gnu.org ([209.51.188.92]:46118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw69F-0002DF-7y
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:13:26 -0500
+	(envelope-from <mst@redhat.com>) id 1gw6FS-0004SX-69
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw69E-0006kn-46
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:13:25 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33766)
+	(envelope-from <mst@redhat.com>) id 1gw6FQ-0003FW-Tg
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:19:50 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:40723)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gw69C-0006ip-BQ
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:13:23 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i20so34419123otl.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 06:13:21 -0800 (PST)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gw6FQ-0003FJ-Mj
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:19:48 -0500
+Received: by mail-qt1-f196.google.com with SMTP id j36so23230765qta.7
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 06:19:48 -0800 (PST)
+Date: Tue, 19 Feb 2019 09:19:45 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190219091849-mutt-send-email-mst@kernel.org>
+References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
+	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
+	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
+	<20190218113447-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
+	<20190218183353-mutt-send-email-mst@kernel.org>
+	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
 MIME-Version: 1.0
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-11-armbru@redhat.com>
-In-Reply-To: <20190218125615.18970-11-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Feb 2019 14:13:09 +0000
-Message-ID: <CAFEAcA9NLjpoB47vG-vhTpp1zKdrFb3FRXjNUbzjxVCb4soRyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 10/10] hw/arm hw/xtensa: De-duplicate
- pflash creation code some
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
+ not enabled by the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +36,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
 
-On Mon, 18 Feb 2019 at 13:08, Markus Armbruster <armbru@redhat.com> wrote:
->
-> pflash_cfi01_register() creates a TYPE_CFI_PFLASH01 device, sets
-> properties, realizes, and wires up.
->
-> We have three modified copies of it, because their users need to set
-> additional properties, or have the wiring done differently.
->
-> Factor out their common part into pflash_cfi01_create().
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/arm/vexpress.c        | 22 +++++-----------------
->  hw/arm/virt.c            | 26 +++++++++-----------------
->  hw/block/pflash_cfi01.c  | 39 +++++++++++++++++++++++++++------------
->  hw/xtensa/xtfpga.c       | 18 +++++++-----------
->  include/hw/block/flash.h |  8 ++++++++
->  5 files changed, 56 insertions(+), 57 deletions(-)
->
-> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-> index 00913f2655..b23c63ed24 100644
-> --- a/hw/arm/vexpress.c
-> +++ b/hw/arm/vexpress.c
-> @@ -515,26 +515,14 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
->  static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
->                                               DriveInfo *di)
->  {
-> -    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
-> +    DeviceState *dev;
->
-> -    if (di) {
-> -        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
-> -                            &error_abort);
-> -    }
-> -
-> -    qdev_prop_set_uint32(dev, "num-blocks",
-> -                         VEXPRESS_FLASH_SIZE / VEXPRESS_FLASH_SECT_SIZE);
-> -    qdev_prop_set_uint64(dev, "sector-length", VEXPRESS_FLASH_SECT_SIZE);
-> -    qdev_prop_set_uint8(dev, "width", 4);
-> +    dev = DEVICE(pflash_cfi01_create(name, VEXPRESS_FLASH_SIZE,
-> +                                     di ? blk_by_legacy_dinfo(di) : NULL,
-> +                                     VEXPRESS_FLASH_SECT_SIZE,
-> +                                     4, 0x89, 0x18, 0x00, 0x00, false));
->      qdev_prop_set_uint8(dev, "device-width", 2);
-> -    qdev_prop_set_bit(dev, "big-endian", false);
-> -    qdev_prop_set_uint16(dev, "id0", 0x89);
-> -    qdev_prop_set_uint16(dev, "id1", 0x18);
-> -    qdev_prop_set_uint16(dev, "id2", 0x00);
-> -    qdev_prop_set_uint16(dev, "id3", 0x00);
-> -    qdev_prop_set_string(dev, "name", name);
->      qdev_init_nofail(dev);
-> -
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
->      return CFI_PFLASH01(dev);
->  }
+On Tue, Feb 19, 2019 at 02:27:35PM +0800, Jason Wang wrote:
+> 
+> On 2019/2/19 上午7:34, Michael S. Tsirkin wrote:
+> > On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
+> > > On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
+> > > > > On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> wrote:
+> > > > > > 
+> > > > > > On 2019/2/13 下午10:51, Yuri Benditovich wrote:
+> > > > > > > https://bugzilla.redhat.com/show_bug.cgi?id=1608226
+> > > > > > > On startup/link-up in multiqueue configuration the virtio-net
+> > > > > > > tries to starts all the queues, including those that the guest
+> > > > > > > will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
+> > > > > > > If the guest driver does not allocate queues that it will not
+> > > > > > > use (for example, Windows driver does not) and number of actually
+> > > > > > > used queues is less that maximal number supported by the device,
+> > > > > > 
+> > > > > > Is this a requirement of e.g NDIS? If not, could we simply allocate all
+> > > > > > queues in this case. This is usually what normal Linux driver did.
+> > > > > > 
+> > > > > > 
+> > > > > > > this causes vhost_net_start to fail and actually disables vhost
+> > > > > > > for all the queues, reducing the performance.
+> > > > > > > Current commit fixes this: initially only first queue is started,
+> > > > > > > upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
+> > > > > > > requested by the guest.
+> > > > > > > 
+> > > > > > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > > > > > > ---
+> > > > > > >    hw/net/virtio-net.c | 7 +++++--
+> > > > > > >    1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > > > > > > index 3f319ef723..d3b1ac6d3a 100644
+> > > > > > > --- a/hw/net/virtio-net.c
+> > > > > > > +++ b/hw/net/virtio-net.c
+> > > > > > > @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+> > > > > > >    {
+> > > > > > >        VirtIODevice *vdev = VIRTIO_DEVICE(n);
+> > > > > > >        NetClientState *nc = qemu_get_queue(n->nic);
+> > > > > > > -    int queues = n->multiqueue ? n->max_queues : 1;
+> > > > > > > +    int queues = n->multiqueue ? n->curr_queues : 1;
+> > > > > > > 
+> > > > > > >        if (!get_vhost_net(nc->peer)) {
+> > > > > > >            return;
+> > > > > > > @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
+> > > > > > >            return VIRTIO_NET_ERR;
+> > > > > > >        }
+> > > > > > > 
+> > > > > > > -    n->curr_queues = queues;
+> > > > > > >        /* stop the backend before changing the number of queues to avoid handling a
+> > > > > > >         * disabled queue */
+> > > > > > > +    virtio_net_set_status(vdev, 0);
+> > > > > > 
+> > > > > > Any reason for doing this?
+> > > > > I think there are 2 reasons:
+> > > > > 1. The spec does not require guest SW to allocate unused queues.
+> > > > > 2. We spend guest's physical memory to just make vhost happy when it
+> > > > > touches queues that it should not use.
+> > > > > 
+> > > > > Thanks,
+> > > > > Yuri Benditovich
+> > > > The spec also says:
+> > > >          queue_enable The driver uses this to selectively prevent the device from executing requests from this
+> > > >          virtqueue. 1 - enabled; 0 - disabled.
+> > > > 
+> > > > While this is not a conformance clause this strongly implies that
+> > > > queues which are not enabled are never accessed by device.
+> > > > 
+> > > > Yuri I am guessing you are not enabling these unused queues right?
+> > > Of course, we (Windows driver) do not.
+> > > The code of virtio-net passes max_queues to vhost and this causes
+> > > vhost to try accessing all the queues, fail on unused ones and finally
+> > > leave vhost disabled at all.
+> > 
+> > Jason, at least for 1.0 accessing disabled queues looks like a spec
+> > violation. What do you think?
+> 
+> 
+> Yes, but there's some issues:
+> 
+> - How to detect a disabled queue for 0.9x device? Looks like there's no way
+> according to the spec, so device must assume all queues was enabled.
 
-I prefer this code the way it stands. In particular the
-"call another function but then set the 'device-width'
-property here" looks dubious. But broadly speaking the
-"do all the property setting directly rather than calling
-a helper function" is the style choice I think we should
-be aiming for. (The prevalence of the other approach is
-due to a mix of (1) older code we haven't updated and
-(2) property-setting being annoyingly heavyweight
-syntax.)
+Traditionally devices assumed that queue address 0 implies not enabled.
 
-thanks
--- PMM
+> - For 1.0, if we depends on queue_enable, we should implement the callback
+> for vhost I think. Otherwise it's still buggy.
+> 
+> So it looks tricky to enable and disable queues through set status
+> 
+> Thanks
+
+
+Do you agree it's a compliance issue though?
+
+> 
+> > 
+> > > > 
+> > > > 
+> > > > > > Thanks
+> > > > > > 
+> > > > > > 
+> > > > > > > +
+> > > > > > > +    n->curr_queues = queues;
+> > > > > > > +
+> > > > > > >        virtio_net_set_status(vdev, vdev->status);
+> > > > > > >        virtio_net_set_queues(n);
+> > > > > > > 
