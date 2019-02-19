@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41967)
+Received: from eggs.gnu.org ([209.51.188.92]:44367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw5zm-0007qB-SJ
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:03:44 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gw68t-0001zK-RH
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:13:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw5zk-0001Po-Ov
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:03:38 -0500
-Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:41824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gw5zf-0001OA-Ut
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:03:33 -0500
-Received: by mail-ot1-x32a.google.com with SMTP id t7so17869836otk.8
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 06:03:28 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1gw68t-0006b7-1t
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:13:03 -0500
+References: <20190218161822.3573-1-kwolf@redhat.com>
+	<20190218161822.3573-8-kwolf@redhat.com>
+	<9fe39150-f308-8f2e-0c9d-6d0a31d9329d@redhat.com>
+	<20190219111116.GH4727@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <563879c5-5c25-052f-c28e-0c647a687c1d@redhat.com>
+Date: Tue, 19 Feb 2019 15:12:35 +0100
 MIME-Version: 1.0
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-7-armbru@redhat.com>
-In-Reply-To: <20190218125615.18970-7-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Feb 2019 14:03:16 +0000
-Message-ID: <CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
- confused about size, mark FIXME
+In-Reply-To: <20190219111116.GH4727@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 07/12] nbd: Increase bs->in_flight during
+ AioContext switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Magnus Damm <magnus.damm@gmail.com>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, stefanha@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 18 Feb 2019 at 13:07, Markus Armbruster <armbru@redhat.com> wrote:
->
-> pflash_cfi02_register() takes a size in bytes, a block size in bytes
-> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
-> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
-> number of blocks.  The latter happens to win.  I tried to find
-> documentation on the physcial hardware, no luck.
->
-> For now, adjust the byte size passed to match the actual size created,
-> and add a FIXME comment.
+On 19/02/19 12:11, Kevin Wolf wrote:
+>> 2) maybe instead of aio_co_schedul-ing client->connection_co and having
+>> the s->aio_ctx_switch flag, you could go through a bottom half that does
+>> the bdrv_inc_in_flight and then enters client->connection_co?
+> That would be too easy. :-)
+> 
+> But I agree, that might indeed be the better solution.
+> 
+> I think I'd keep patch 6 anyway so that we know the exact yield that
+> we'll interrupt, even if it's not strictly necessary as long as we know
+> that nbd_receive_reply() can only yield in places that are safe to be
+> interrupted. While intuitively I think it's true, I don't feel like
+> actually auditing the code, and at some point we'd probably fail to
+> check that new code won't violate this invariant.
 
-I'm pretty sure that FLASH_SIZE here is supposed to be a
-byte count of the size of the pflash. That matches what
-Linux has in arch/sh/boards/mach-r2d/setup.c where it
-sets up the flash_resource struct.
+Yes, I agree with keeping patch 6.
 
-The r2dplus board is also I think known as RTS7751R2D. That
-takes us to https://elinux.org/RTS7751R2D_Handling_Manual
-(sadly the link to the "hardware manual" is broken).
-
-No idea what the block size would be.
-
-
-thanks
--- PMM
+Paolo
