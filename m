@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41787)
+Received: from eggs.gnu.org ([209.51.188.92]:41834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gwDao-0000TE-6x
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:10:22 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gwDax-0000V5-Lk
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:10:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gwDWf-0004Og-6h
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:06:05 -0500
-Date: Tue, 19 Feb 2019 22:05:44 +0000
+	(envelope-from <richard.weiyang@gmail.com>) id 1gwDV0-0002uC-CS
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:04:24 -0500
+Date: Tue, 19 Feb 2019 22:04:18 +0000
 From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190219220544.g5uyxxxedmjuzfm3@master>
+Message-ID: <20190219220418.qle4kfetwcdagr4q@master>
 Reply-To: Wei Yang <richard.weiyang@gmail.com>
 References: <20190219013106.17538-1-richardw.yang@linux.intel.com>
-	<20190219013106.17538-3-richardw.yang@linux.intel.com>
-	<ba83c335-c0f1-5190-33a9-f2f7f44c55f0@redhat.com>
+	<20190219013106.17538-2-richardw.yang@linux.intel.com>
+	<baff8fc6-8d22-02c8-6bea-5b1ede1d4bfa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ba83c335-c0f1-5190-33a9-f2f7f44c55f0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] CODING_STYLE: indent example code as
- all others
+In-Reply-To: <baff8fc6-8d22-02c8-6bea-5b1ede1d4bfa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] CODING_STYLE: specify the indent rule
+ for multiline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +26,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>
 Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, imammedo@redhat.com, mjt@tls.msk.ru
 
-On Tue, Feb 19, 2019 at 06:38:54PM +0100, Philippe Mathieu-Daudé wrote:
->On 2/19/19 2:31 AM, Wei Yang wrote:
->> All the example code are indented with four spaces except this one.
+On Tue, Feb 19, 2019 at 11:52:29AM -0600, Eric Blake wrote:
+>On 2/18/19 7:31 PM, Wei Yang wrote:
+>> We didn't specify the indent rule for multiline code here, which may
+>> misleading users. And in current code, the code use different rules.
 >> 
->> Fix this by adding four spaces here.
+>> Add this rule in CODING_STYLE to make sure this is clear to every one.
 >> 
 >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
 >> ---
->>  CODING_STYLE | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>  CODING_STYLE | 26 ++++++++++++++++++++++++++
+>>  1 file changed, 26 insertions(+)
 >> 
 >> diff --git a/CODING_STYLE b/CODING_STYLE
->> index 73f66ca185..27581d80c1 100644
+>> index ec075dedc4..73f66ca185 100644
 >> --- a/CODING_STYLE
 >> +++ b/CODING_STYLE
->> @@ -134,10 +134,10 @@ block to a separate function altogether.
->>  When comparing a variable for (in)equality with a constant, list the
->>  constant on the right, as in:
+>> @@ -29,6 +29,32 @@ Spaces of course are superior to tabs because:
 >>  
->> -if (a == 1) {
->> -    /* Reads like: "If a equals 1" */
->> -    do_something();
->> -}
->> +    if (a == 1) {
->> +        /* Reads like: "If a equals 1" */
-
-I don't get your point.
-
-You mean to put it into multiline comments?
-
->
->I guess you found a bug in the documentation :)
->
->Since 8c06fbdf36bf4d the style asked is:
->
->    We now require Linux-kernel-style multiline comments:
->        /*
->         * line one
->         * line two
->         */
->
->> +        do_something();
->> +    }
+>>  Do not leave whitespace dangling off the ends of lines.
 >>  
->>  Rationale: Yoda conditions (as in 'if (1 == a)') are awkward to read.
->>  Besides, good compilers already warn users when '==' is mis-typed as '=',
+>> +1.1 Multiline Indent
+>> +
+>> +There are several places where indent is necessary:
+>> +
+>> + - struct definition
+>> + - if/else
+>> + - while/for
+>> + - function definition & call
+>> +
+>> +All the above cases apply the same rule: indent with four spaces.
+>
+>Is this redundant with the earlier statement that "QEMU indents are four
+>spaces."?
+>
+>> +
+>> +While the last three case may face another situation: code should spread into
+>> +several lines. In this case the rule is align the new line with first
+>> +parentheses.
+>
+>Grammar is awkward - the leading 'while' makes it sound like that you
+>have a dependent clause, but then never provide the independent clause.
+>Maybe a completely different wording is better:
+>
+>When breaking up a long line to fit within line widths, align the
+>secondary lines just after the opening parenthesis of the first.
+>
+
+Sounds better.
+
+>> +
+>> +For example:
+>> +
+>> +    if (a == 1 &&
+>> +        b == 2)
+>> +
+>
+>Maybe:
+>
+>if (a == 1 &&
+>    b == 2) {
+>
+>to match our later recommendations on always using {}.
+>
+
+Yep.
+
+>> +    while (a == 1 &&
+>> +           b == 2)
+>> +
+>
+>Similar.
+>
+>> +    do_something(arg1, arg2
+>> +                 arg3)
+>> +
+>
+>and here, I'd include the ';' to make it a valid statement.
+>
+
+Reasonable.
+
+>>  2. Line width
+>>  
+>>  Lines should be 80 characters; try not to make them longer.
 >> 
+>
+>-- 
+>Eric Blake, Principal Software Engineer
+>Red Hat, Inc.           +1-919-301-3226
+>Virtualization:  qemu.org | libvirt.org
 
 -- 
 Wei Yang
