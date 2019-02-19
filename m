@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44951)
+Received: from eggs.gnu.org ([209.51.188.92]:46219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw833-0000KU-L1
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:15:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1gw87P-0003Xm-Jg
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:19:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw831-0003Ju-QT
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:15:09 -0500
-Date: Tue, 19 Feb 2019 16:14:33 +0000
+	(envelope-from <berrange@redhat.com>) id 1gw87O-0006Nz-Hi
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:19:39 -0500
+Date: Tue, 19 Feb 2019 16:19:28 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190219161433.GO7154@redhat.com>
+Message-ID: <20190219161928.GP7154@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190219160920.32705-1-eblake@redhat.com>
+References: <20190219125044.5416-1-berrange@redhat.com>
+	<20190219125044.5416-3-berrange@redhat.com>
+	<42f0ea75-99c6-6e6d-2fd5-b3b59f4a781c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190219160920.32705-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Avoid SIGPIPE death to certtool
+In-Reply-To: <42f0ea75-99c6-6e6d-2fd5-b3b59f4a781c@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: mark image as corrupt if
+ failing during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +28,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, thuth@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Tue, Feb 19, 2019 at 10:09:20AM -0600, Eric Blake wrote:
-> Our use of 'head -1' to log less output of certtool during
-> iotest 233 could result in certtool dying early due to SIGPIPE
-> if it generates enough output; if that happens, the certificate
-> it was supposed to generate may be zero length, which causes
-> failures such as:
-> 
->   == check TLS client to plain server fails ==
->  -qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': Denied by server for option 5 (starttls)
->  -server reported: TLS not configured
->  -qemu-nbd: Denied by server for option 5 (starttls)
->  -server reported: TLS not configured
->  +qemu-nbd: Unable to import client certificate /tmp/qemu-iotests-quick-28354/tls/client1/client-cert.pem: Base64 unexpected header error.
-> 
-> Fix the pipelines to consume all output.
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/common.tls | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tls
-> index eae81789bbc..15c6e8c8425 100644
-> --- a/tests/qemu-iotests/common.tls
-> +++ b/tests/qemu-iotests/common.tls
-> @@ -74,7 +74,7 @@ EOF
->      certtool --generate-self-signed \
->               --load-privkey "${tls_dir}/key.pem" \
->               --template "${tls_dir}/ca.info" \
-> -             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
-> +             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | sed -n 1p
+On Tue, Feb 19, 2019 at 10:11:58AM -0600, Eric Blake wrote:
+> On 2/19/19 6:50 AM, Daniel P. Berrang=C3=A9 wrote:
+> > During creation we write a minimal qcow2 header and then update it wi=
+th
+> > extra features. If the updating fails for some reason we might still =
+be
+> > left with a valid qcow2 image that will be mistakenly used for I/O. W=
+e
+> > cannot delete the image, since we don't know if we created the
+> > underlying storage or not. Thus we mark the header as corrupt to
+> > prevents its later usage.
+>=20
+> Should we unconditionally mark the image as corrupt at the time we writ=
+e
+> the minimal qcow2 header, and then update the image to non-corrupt on
+> the final update?
 
-I've actually prepared a patch which gets rid of the pipe entirely,
-because in debugging this problem I found it unhelpful that we culled
-stderr when certtool failed.
+That's a nice idea, but we call blk_new_open() half way through to
+qcow2_co_create method to open the minimal image. If we mark it
+corrupt upfront we'll never be able to open this minimal image.
+
+Adding a flag to allow blk_new_open to ignore the "corrupt" marker
+feels unplesant to me.
+
+>=20
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  block/qcow2.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index ecc577175f..338513e652 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -3104,6 +3104,9 @@ qcow2_co_create(BlockdevCreateOptions *create_o=
+ptions, Error **errp)
+> > =20
+> >      ret =3D 0;
+> >  out:
+> > +    if (ret < 0) {
+> > +        qcow2_mark_corrupt(blk_bs(blk));
+> > +    }
+>=20
+> If ret < 0 because of an EIO error, this may also fail to write the
+> change to the header. Hence my question as to whether this is too late.
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
