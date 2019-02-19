@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54836)
+Received: from eggs.gnu.org ([209.51.188.92]:54866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gw52Q-0005IV-1A
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1gw52c-0005Rn-Mn
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gw52N-0005TN-17
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:17 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gw52L-0005R4-5R
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:13 -0500
-Received: by mail-wm1-f66.google.com with SMTP id x7so2734750wmj.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 05:02:12 -0800 (PST)
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-8-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <816c0dd9-9213-cda9-2fa1-611c0cacf9a1@redhat.com>
-Date: Tue, 19 Feb 2019 14:02:09 +0100
+	(envelope-from <berrange@redhat.com>) id 1gw52O-0005Ue-JN
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44176)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gw52M-0005RW-VQ
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:16 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7ED2C11DB94
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 13:02:12 +0000 (UTC)
+Date: Tue, 19 Feb 2019 13:01:54 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190219130154.GI7154@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190219124257.3001-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190218125615.18970-8-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/10] mips_malta: Clean up definition of
- flash memory size somewhat
+Content-Disposition: inline
+In-Reply-To: <20190219124257.3001-1-kraxel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] audio: don't build alsa and sdl by
+ default on linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Aleksandar Rikalo <arikalo@wavecomp.com>, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com, Aurelien Jarno <aurelien@aurel32.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, david@redhat.com
 
-On 2/18/19 1:56 PM, Markus Armbruster wrote:
-> pflash_cfi01_register() takes a size in bytes, a block size in bytes
-> and a number of blocks.  mips_malta_init() passes BIOS_SIZE, 65536,
-> FLASH_SIZE >> 16.  Actually consistent only because BIOS_SIZE (defined
-> in include/hw/mips/bios.h as (4 * MiB)) matches FLASH_SIZE (defined
-> locally as 0x400000).  Confusing all the same.
-> 
-> Pass FLASH_SIZE instead of BIOS_SIZE.
-
-Your cleanup is correct.
-
-> 
-> There are more uses of BIOS_SIZE, but I don't sufficiently understand
-> them to attempt cleanup.
-
-BIOS_SIZE is a MIPS architecture definition, incorrectly used around.
-This simply means "Top of 32bit address space - Boot Vector address".
-There is nothing wrong in plugging bigger/smaller flashes around the
-boot vector.
-(I have a series cleaning this definition, but I'm throttling my MIPS
-apports).
-
-> 
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Tue, Feb 19, 2019 at 01:42:57PM +0100, Gerd Hoffmann wrote:
+> In case no sound hardware is present both alsa and sdl drivers
+> initialize successfully and throw errors later on, i.e. effectively
+> the automatic probing doesn't work.  Drop them from the list of
+> default audio drivers for linux because of that.
+>=20
+> Fixes: 6a48541873 audio: probe audio drivers by default
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1816052
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/mips/mips_malta.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index fff5ed19bd..65cdda4881 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1269,12 +1269,12 @@ void mips_malta_init(MachineState *machine)
->      if (dinfo) {
->          printf("Register parallel flash %d size " TARGET_FMT_lx " at "
->                 "addr %08llx '%s' %x\n",
-> -               fl_idx, bios_size, FLASH_ADDRESS,
-> +               fl_idx, FLASH_SIZE, FLASH_ADDRESS,
->                 blk_name(dinfo->bdrv), fl_sectors);
->      }
->  #endif
->      fl = pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
-> -                               BIOS_SIZE,
-> +                               FLASH_SIZE,
->                                 dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                                 65536, fl_sectors,
->                                 4, 0x0000, 0x0000, 0x0000, 0x0000, be);
-> 
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/configure b/configure
+> index fbd0825488..651b4f7514 100755
+> --- a/configure
+> +++ b/configure
+> @@ -877,7 +877,7 @@ Haiku)
+>    LIBS=3D"-lposix_error_mapper -lnetwork $LIBS"
+>  ;;
+>  Linux)
+> -  audio_drv_list=3D"try-pa try-alsa try-sdl oss"
+> +  audio_drv_list=3D"try-pa oss"
+>    audio_possible_drivers=3D"oss alsa sdl pa"
+>    linux=3D"yes"
+>    linux_user=3D"yes"
 
-Does that mean you can remove the "hw/mips/bios.h" include now?
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
