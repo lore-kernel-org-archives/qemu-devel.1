@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40927)
+Received: from eggs.gnu.org ([209.51.188.92]:41967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw5vL-0005cN-Pb
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:59:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gw5zm-0007qB-SJ
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw5vK-000717-IJ
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:59:03 -0500
-References: <20190219115937.21587-1-stefanha@redhat.com>
-	<2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
-	<30c66aaa-2807-69cd-2395-dcd49e59b136@virtuozzo.com>
-	<CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
-	<acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
-	<2cdd547c-0b67-8569-13cd-64e2c2c2a564@virtuozzo.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <57e56932-ccc7-a36e-ecfd-83f7bca2c4c4@redhat.com>
-Date: Tue, 19 Feb 2019 14:58:42 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gw5zk-0001Po-Ov
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:03:38 -0500
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:41824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gw5zf-0001OA-Ut
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 09:03:33 -0500
+Received: by mail-ot1-x32a.google.com with SMTP id t7so17869836otk.8
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 06:03:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2cdd547c-0b67-8569-13cd-64e2c2c2a564@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: drop unnecessary
- accel=kvm
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-7-armbru@redhat.com>
+In-Reply-To: <20190218125615.18970-7-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Feb 2019 14:03:16 +0000
+Message-ID: <CAFEAcA_OLYno=YNS6bHOemwEp0gnc3fwRn8Rjvmo9v-i89xrMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
+ confused about size, mark FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Magnus Damm <magnus.damm@gmail.com>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
 
-On 19/02/2019 14.36, Vladimir Sementsov-Ogievskiy wrote:
-> 19.02.2019 16:20, Thomas Huth wrote:
->> On 19/02/2019 14.07, Stefan Hajnoczi wrote:
->>> On Tue, Feb 19, 2019 at 12:12 PM Vladimir Sementsov-Ogievskiy
->>> <vsementsov@virtuozzo.com> wrote:
->>>> 19.02.2019 15:02, Thomas Huth wrote:
->>>>> On 19/02/2019 12.59, Stefan Hajnoczi wrote:
->>>>>> Tests 235 and 238 do not require the kvm accelerator.  TCG works fine.
->>>>>>
->>>>>> Use the default accelerator instead of requiring kvm.
->>>>>>
->>>>>> Suggested-by: Thomas Huth <thuth@redhat.com>
->>>>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>>> ---
->>>>>>    tests/qemu-iotests/235 | 1 -
->>>>>>    tests/qemu-iotests/238 | 1 -
->>>>>>    2 files changed, 2 deletions(-)
->>>>>>
->>>>>> diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
->>>>>> index d6edd97ab4..329da8f0c2 100755
->>>>>> --- a/tests/qemu-iotests/235
->>>>>> +++ b/tests/qemu-iotests/235
->>>>>> @@ -49,7 +49,6 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
->>>>>>                    str(size))
->>>>>>
->>>>>>    vm = QEMUMachine(iotests.qemu_prog)
->>>>>> -vm.add_args('-machine', 'accel=kvm')
->>>>>
->>>>> According to the initial commit log of 235:
->>>>>
->>>>>    "iotests: simple mirror test with kvm on 1G image"
->>>>>
->>>>> ... so I assume KVM was used on purpose here?
->>>>
->>>> As I remember kvm is not really necessary, and test have a comment about it:
->>>> # And it didn't reproduce if at least one of the following:
->>>> ...
->>>> # 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
->>>> #    reproduces, if just drop kvm, but gdb failed to produce full backtraces
->>>> #    for me)
->>>>
->>>> But the comment should be updated with this patch.
->>>
->>> Will fix in v2.
->>
->> Any chance that you could even make it somehow work with -M accel=qtest
->> instead? ... in case someone compiled their QEMU with --disable-tcg, too
->> ...?
-> 
-> I didn't investigate why bug not reproduced with qtest.. I think, the simplest
-> option should be a helper like iotests.needs_tcg(), to skip the test if
-> it is unsupported.
-> 
-> Or you case is that kvm is OK for you but tcg is not? Stefan, do you have strong reason
-> for removing kvm from iotests? Could it be something like
-> 
->    if not iotests.supports_tcg():
->       vm.add_args('-machine', 'accel=kvm')
-> 
-> ?
+On Mon, 18 Feb 2019 at 13:07, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> pflash_cfi02_register() takes a size in bytes, a block size in bytes
+> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
+> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
+> number of blocks.  The latter happens to win.  I tried to find
+> documentation on the physcial hardware, no luck.
+>
+> For now, adjust the byte size passed to match the actual size created,
+> and add a FIXME comment.
 
-You can also use "accel=kvm:tcg" which tries to use kvm first and then
-falls back to tcg if KVM is not available.
+I'm pretty sure that FLASH_SIZE here is supposed to be a
+byte count of the size of the pflash. That matches what
+Linux has in arch/sh/boards/mach-r2d/setup.c where it
+sets up the flash_resource struct.
 
-I just have this weird condition where I try to compile qemu with
---disable-tcg, and then run the iotests on a CI system where KVM is also
-not available at runtime. So qtest is the only available accelerator
-there...
+The r2dplus board is also I think known as RTS7751R2D. That
+takes us to https://elinux.org/RTS7751R2D_Handling_Manual
+(sadly the link to the "hardware manual" is broken).
 
- Thomas
+No idea what the block size would be.
+
+
+thanks
+-- PMM
