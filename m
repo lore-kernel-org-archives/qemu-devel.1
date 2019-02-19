@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51762)
+Received: from eggs.gnu.org ([209.51.188.92]:52715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2oy-0004jW-4M
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:19 -0500
+	(envelope-from <wexu@redhat.com>) id 1gw2sc-0006FO-Cj
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:44:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2ow-0003ru-0Z
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:16 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Feb 2019 10:40:03 +0000
-Message-ID: <1b25b3e6-dcb7-31b0-d9db-1590ef9ed71e@virtuozzo.com>
-References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
-	<20190211125601.86533-4-vsementsov@virtuozzo.com>
-	<487bcf49-65fb-16eb-0d0e-978fa324817a@redhat.com>
-In-Reply-To: <487bcf49-65fb-16eb-0d0e-978fa324817a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EC1E6CAA28850A4886313724F32C6FD9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <wexu@redhat.com>) id 1gw2sa-0006Ql-E3
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:44:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gw2sY-0006H4-AQ
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:43:58 -0500
+Date: Tue, 19 Feb 2019 18:40:44 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20190219104044.GC15343@wei-ubt>
+References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
+	<1550118402-4057-9-git-send-email-wexu@redhat.com>
+	<91bf74af-5e22-c6fc-eae5-16b03b1493a1@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/4] nbd: do qemu_coroutine_yield during
- tls handshake
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <91bf74af-5e22-c6fc-eae5-16b03b1493a1@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 08/11] virtio: event suppression support
+ for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +30,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "berrange@redhat.com" <berrange@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, tiwei.bie@intel.com, jfreiman@redhat.com, mst@redhat.com
 
-MTIuMDIuMjAxOSAwOjU1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAyLzExLzE5IDY6NTYgQU0s
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBXZSBhbHdheXMgY2FsbCBx
-aW9fY2hhbm5lbF90bHNfaGFuZHNoYWtlIGluIG5iZCBmcm9tIGNvdXJvdXRpbmUuIFRha2UNCj4+
-IGJlbmVmaXQgb2YgaXQgYW5kIGp1c3QgeWllbGQgaW5zdGVhZCBvZiBjcmVhdGluZyBwZXJzb25h
-bCBtYWluIGxvb3AuDQo+Pg0KPj4gTWFyayBhbmQgcmVuYW1lIHRoZSBmdW5jdGlvbiBhbmQgaXQn
-cyBjYWxsZXJzIGNvcnJlc3BvbmRpbmdseSBhbmQNCj4+IHRyYWNlLXBvaW50cyB0b28uDQo+Pg0K
-Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIG5iZC9jbGllbnQuYyAgICAgfCAyNiArKysr
-KysrKystLS0tLS0tLS0tLS0tLS0tLQ0KPj4gICBuYmQvY29tbW9uLmMgICAgIHwgIDYgKystLS0t
-DQo+PiAgIG5iZC9zZXJ2ZXIuYyAgICAgfCA0NSArKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0NCj4+ICAgbmJkL3RyYWNlLWV2ZW50cyB8IDE1ICsrKysrKystLS0t
-LS0tLQ0KPj4gICA0IGZpbGVzIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDU3IGRlbGV0aW9u
-cygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4+
-IGluZGV4IDJiYTIyMjBhNGEuLmUzOTE5YmUzMGUgMTAwNjQ0DQo+PiAtLS0gYS9uYmQvY2xpZW50
-LmMNCj4+ICsrKyBiL25iZC9jbGllbnQuYw0KPj4gQEAgLTU3OCwxMyArNTc4LDE0IEBAIHN0YXRp
-YyBpbnQgbmJkX3JlcXVlc3Rfc2ltcGxlX29wdGlvbihRSU9DaGFubmVsICppb2MsIGludCBvcHQs
-IEVycm9yICoqZXJycCkNCj4+ICAgICAgIHJldHVybiAxOw0KPj4gICB9DQo+PiAgIA0KPj4gLXN0
-YXRpYyBRSU9DaGFubmVsICpuYmRfcmVjZWl2ZV9zdGFydHRscyhRSU9DaGFubmVsICppb2MsDQo+
-PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFDcnlwdG9UTFNDcmVk
-cyAqdGxzY3JlZHMsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IGNvbnN0IGNoYXIgKmhvc3RuYW1lLCBFcnJvciAqKmVycnApDQo+PiArc3RhdGljIFFJT0NoYW5u
-ZWwgKm5iZF9jb19yZWNlaXZlX3N0YXJ0dGxzKA0KPiANCj4gTWlzc2luZyBjb3JvdXRpbmVfZm4g
-Pw0KDQpobW0sIHllcy4NCg0KPiANCj4+ICsgICAgICAgIFFJT0NoYW5uZWwgKmlvYywgUUNyeXB0
-b1RMU0NyZWRzICp0bHNjcmVkcywgY29uc3QgY2hhciAqaG9zdG5hbWUsDQo+PiArICAgICAgICBF
-cnJvciAqKmVycnApDQo+PiAgIHsNCj4+ICAgICAgIGludCByZXQ7DQo+PiAgICAgICBRSU9DaGFu
-bmVsVExTICp0aW9jOw0KPj4gLSAgICBzdHJ1Y3QgTkJEVExTSGFuZHNoYWtlRGF0YSBkYXRhID0g
-eyAwIH07DQo+PiArDQo+PiArICAgIGFzc2VydChxZW11X2luX2Nvcm91dGluZSgpKTsNCj4gDQo+
-IEFnYWluLCBJJ20gbm90IHN1cmUgdGhlc2UgYXNzZXJ0aW9ucyBhZGQgbXVjaC4NCj4gDQo+PiAg
-IA0KPj4gICAgICAgcmV0ID0gbmJkX3JlcXVlc3Rfc2ltcGxlX29wdGlvbihpb2MsIE5CRF9PUFRf
-U1RBUlRUTFMsIGVycnApOw0KPiANCj4gU2hvdWxkIHdlIGFsc28gYmUgbWFya2luZyB0aGVzZSBo
-ZWxwZXIgZnVuY3Rpb25zIGFzIGNvcm91dGluZV9mbiBieSB0aGUNCj4gZW5kIG9mIHRoZSBzZXJp
-ZXMsIG9uY2UgYWxsIGNhbGxlcnMgYXJlIG1hcmtlZCB0aGF0IHdheT8NCg0KSSB0aGluaywgbm90
-LiBJdCBzdGlsbCBtYXkgYmUgY2FsbGVkIGZyb20gbm9uLWNvcm91dGluZSBjb250ZXh0Lg0KDQo+
-IA0KPj4gICAgICAgaWYgKHJldCA8PSAwKSB7DQo+PiBAQCAtNjAxLDIzICs2MDIsMTMgQEAgc3Rh
-dGljIFFJT0NoYW5uZWwgKm5iZF9yZWNlaXZlX3N0YXJ0dGxzKFFJT0NoYW5uZWwgKmlvYywNCj4+
-ICAgICAgICAgICByZXR1cm4gTlVMTDsNCj4+ICAgICAgIH0NCj4+ICAgICAgIHFpb19jaGFubmVs
-X3NldF9uYW1lKFFJT19DSEFOTkVMKHRpb2MpLCAibmJkLWNsaWVudC10bHMiKTsNCj4+IC0gICAg
-ZGF0YS5sb29wID0gZ19tYWluX2xvb3BfbmV3KGdfbWFpbl9jb250ZXh0X2RlZmF1bHQoKSwgRkFM
-U0UpOw0KPj4gICAgICAgdHJhY2VfbmJkX3JlY2VpdmVfc3RhcnR0bHNfdGxzX2hhbmRzaGFrZSgp
-Ow0KPj4gICAgICAgcWlvX2NoYW5uZWxfdGxzX2hhbmRzaGFrZSh0aW9jLA0KPj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBuYmRfdGxzX2hhbmRzaGFrZSwNCj4+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAmZGF0YSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBxZW11X2Nvcm91dGluZV9zZWxmKCksDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIE5VTEwsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5VTEwpOw0K
-Pj4gLQ0KPj4gLSAgICBpZiAoIWRhdGEuY29tcGxldGUpIHsNCj4+IC0gICAgICAgIGdfbWFpbl9s
-b29wX3J1bihkYXRhLmxvb3ApOw0KPj4gLSAgICB9DQo+PiAtICAgIGdfbWFpbl9sb29wX3VucmVm
-KGRhdGEubG9vcCk7DQo+PiAtICAgIGlmIChkYXRhLmVycm9yKSB7DQo+PiAtICAgICAgICBlcnJv
-cl9wcm9wYWdhdGUoZXJycCwgZGF0YS5lcnJvcik7DQo+PiAtICAgICAgICBvYmplY3RfdW5yZWYo
-T0JKRUNUKHRpb2MpKTsNCj4+IC0gICAgICAgIHJldHVybiBOVUxMOw0KPj4gLSAgICB9DQo+PiAr
-ICAgIHFlbXVfY29yb3V0aW5lX3lpZWxkKCk7DQo+IA0KPiBOaWNlLg0KPiANCj4+ICsrKyBiL25i
-ZC9zZXJ2ZXIuYw0KPj4gQEAgLTY2OCwxNiArNjY4LDE1IEBAIHN0YXRpYyBpbnQgbmJkX25lZ290
-aWF0ZV9oYW5kbGVfaW5mbyhOQkRDbGllbnQgKmNsaWVudCwgdWludDE2X3QgbXlmbGFncywNCj4+
-ICAgDQo+PiAgIC8qIEhhbmRsZSBOQkRfT1BUX1NUQVJUVExTLiBSZXR1cm4gTlVMTCB0byBkcm9w
-IGNvbm5lY3Rpb24sIG9yIGVsc2UgdGhlDQo+PiAgICAqIG5ldyBjaGFubmVsIGZvciBhbGwgZnVy
-dGhlciAobm93LWVuY3J5cHRlZCkgY29tbXVuaWNhdGlvbi4gKi8NCj4+IC1zdGF0aWMgUUlPQ2hh
-bm5lbCAqbmJkX25lZ290aWF0ZV9oYW5kbGVfc3RhcnR0bHMoTkJEQ2xpZW50ICpjbGllbnQsDQo+
-PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9y
-ICoqZXJycCkNCj4+ICtzdGF0aWMgUUlPQ2hhbm5lbCBjb3JvdXRpbmVfZm4gKm5iZF9jb19uZWdv
-dGlhdGVfaGFuZGxlX3N0YXJ0dGxzKA0KPiANCj4gQXdrd2FyZCBzcGxpdCBvZiB0aGUgcmV0dXJu
-IHR5cGU7IHRoZSBjb3JvdXRpbmVfZm4gc2hvdWxkIGluc3RlYWQgYmUNCj4gcGxhY2VkIGFmdGVy
-IHRoZSAqLCBhcyBpbjoNCg0KT29wcywgYWdyZWUuDQoNCj4gDQo+IGJsb2NrL21pcnJvci5jOnN0
-YXRpYyBNaXJyb3JPcCAqY29yb3V0aW5lX2ZuIGFjdGl2ZV93cml0ZV9wcmVwYXJlKC4uLg0KPiAN
-Cj4+ICsgICAgICAgIE5CRENsaWVudCAqY2xpZW50LCBFcnJvciAqKmVycnApDQo+PiAgIHsNCj4+
-ICAgICAgIFFJT0NoYW5uZWwgKmlvYzsNCj4+ICAgICAgIFFJT0NoYW5uZWxUTFMgKnRpb2M7DQo+
-PiAtICAgIHN0cnVjdCBOQkRUTFNIYW5kc2hha2VEYXRhIGRhdGEgPSB7IDAgfTsNCj4gDQo+IEFs
-bCB1c2VzIG9mIHRoaXMgdHlwZSBoYXZlIGJlZW4gZGVsZXRlZDsgeW91IHNob3VsZCBhbHNvIHJl
-bW92ZSBpdCBmcm9tDQo+IG5iZC1pbnRlcm5hbC5oLg0KDQpPSw0KDQo+IA0KPiANCj4+IEBAIC0x
-MDkzLDcgKzEwODIsNyBAQCBzdGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfb3B0aW9ucyhOQkRDbGll
-bnQgKmNsaWVudCwgdWludDE2X3QgbXlmbGFncywNCj4+ICAgICAgICAgICAgICAgcmV0dXJuIC1F
-SU5WQUw7DQo+PiAgICAgICAgICAgfQ0KPj4gICANCj4+IC0gICAgICAgIHRyYWNlX25iZF9uZWdv
-dGlhdGVfb3B0aW9uc19jaGVja19vcHRpb24ob3B0aW9uLA0KPj4gKyAgICAgICAgdHJhY2VfbmJk
-X2NvX25lZ290aWF0ZV9vcHRpb25zX2NoZWNrX29wdGlvbihvcHRpb24sDQo+PiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYmRfb3B0X2xvb2t1cChv
-cHRpb24pKTsNCj4gDQo+IEluZGVudGF0aW9uIGxvb2tzIG9mZi4NCj4gDQoNCg0KLS0gDQpCZXN0
-IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Tue, Feb 19, 2019 at 03:19:58PM +0800, Jason Wang wrote:
+>=20
+> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26, wexu@redhat.com wrote:
+> >From: Wei Xu <wexu@redhat.com>
+> >
+> >Difference between 'avail_wrap_counter' and 'last_avail_wrap_counter':
+> >For Tx(guest transmitting), they are the same after each pop of a desc=
+.
+> >
+> >For Rx(guest receiving), they are also the same when there are enough
+> >descriptors to carry the payload for a packet(e.g. usually 16 descs ar=
+e
+> >needed for a 64k packet in typical iperf tcp connection with tso enabl=
+ed),
+> >however, when the ring is running out of descriptors while there are
+> >still a few free ones, e.g. 6 descriptors are available which is not
+> >enough to carry an entire packet which needs 16 descriptors, in this
+> >case the 'avail_wrap_counter' should be set as the first one pending
+> >being handled by guest driver in order to get a notification, and the
+> >'last_avail_wrap_counter' should stay unchanged to the head of availab=
+le
+> >descriptors, like below:
+> >
+> >Mark meaning:
+> >     | | -- available
+> >     |*| -- used
+> >
+> >A Snapshot of the queue:
+> >                                       last_avail_idx =3D 253
+> >                                       last_avail_wrap_counter =3D 1
+> >                                              |
+> >     +---------------------------------------------+
+> >  0  | | | |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| | | | 255
+> >     +---------------------------------------------+
+> >            |
+> >   shadow_avail_idx =3D 3
+> >   avail_wrap_counter =3D 0
+>=20
+>=20
+> Well this might not be the good place to describe the difference betwee=
+n
+> shadow_avail_idx and last_avail_idx. And the comments above their defin=
+ition
+> looks good enough?
+
+Sorry, I do not get it, can you elaborate more?=20
+
+This is one of the buggy parts of packed ring, it is good to make it clea=
+r here.
+
+>=20
+> =C2=A0=C2=A0=C2=A0 /* Next head to pop */
+> =C2=A0=C2=A0=C2=A0 uint16_t last_avail_idx;
+>=20
+> =C2=A0=C2=A0=C2=A0 /* Last avail_idx read from VQ. */
+> =C2=A0=C2=A0=C2=A0 uint16_t shadow_avail_idx;
+>=20
+
+What is the meaning of these comment? Do you mean I should replace put th=
+em=20
+to the comments also? thanks.
+
+> Instead, how or why need event suppress is not mentioned ...
+
+Yes, but presumably this knowledge has been acquired from reading through=
+ the
+spec, so I skipped this part.
+
+Wei
+
+>=20
+>=20
+>=20
+> >
+> >Signed-off-by: Wei Xu <wexu@redhat.com>
+> >---
+> >  hw/virtio/virtio.c | 137 +++++++++++++++++++++++++++++++++++++++++++=
+++++++----
+> >  1 file changed, 128 insertions(+), 9 deletions(-)
+> >
+> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >index 7e276b4..8cfc7b6 100644
+> >--- a/hw/virtio/virtio.c
+> >+++ b/hw/virtio/virtio.c
+> >@@ -234,6 +234,34 @@ static void vring_desc_read(VirtIODevice *vdev, V=
+RingDesc *desc,
+> >      virtio_tswap16s(vdev, &desc->next);
+> >  }
+> >+static void vring_packed_event_read(VirtIODevice *vdev,
+> >+                            MemoryRegionCache *cache, VRingPackedDesc=
+Event *e)
+> >+{
+> >+    address_space_read_cached(cache, 0, e, sizeof(*e));
+> >+    virtio_tswap16s(vdev, &e->off_wrap);
+> >+    virtio_tswap16s(vdev, &e->flags);
+> >+}
+> >+
+> >+static void vring_packed_off_wrap_write(VirtIODevice *vdev,
+> >+                            MemoryRegionCache *cache, uint16_t off_wr=
+ap)
+> >+{
+> >+    virtio_tswap16s(vdev, &off_wrap);
+> >+    address_space_write_cached(cache, offsetof(VRingPackedDescEvent, =
+off_wrap),
+> >+                            &off_wrap, sizeof(off_wrap));
+> >+    address_space_cache_invalidate(cache,
+> >+                offsetof(VRingPackedDescEvent, off_wrap), sizeof(off_=
+wrap));
+> >+}
+> >+
+> >+static void vring_packed_flags_write(VirtIODevice *vdev,
+> >+                            MemoryRegionCache *cache, uint16_t flags)
+> >+{
+> >+    virtio_tswap16s(vdev, &flags);
+> >+    address_space_write_cached(cache, offsetof(VRingPackedDescEvent, =
+flags),
+> >+                            &flags, sizeof(flags));
+> >+    address_space_cache_invalidate(cache,
+> >+                        offsetof(VRingPackedDescEvent, flags), sizeof=
+(flags));
+> >+}
+> >+
+> >  static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQ=
+ueue *vq)
+> >  {
+> >      VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+> >@@ -340,14 +368,8 @@ static inline void vring_set_avail_event(VirtQueu=
+e *vq, uint16_t val)
+> >      address_space_cache_invalidate(&caches->used, pa, sizeof(val));
+> >  }
+> >-void virtio_queue_set_notification(VirtQueue *vq, int enable)
+> >+static void virtio_queue_set_notification_split(VirtQueue *vq, int en=
+able)
+> >  {
+> >-    vq->notification =3D enable;
+> >-
+> >-    if (!vq->vring.desc) {
+> >-        return;
+> >-    }
+> >-
+> >      rcu_read_lock();
+> >      if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) =
+{
+> >          vring_set_avail_event(vq, vring_avail_idx(vq));
+> >@@ -363,6 +385,57 @@ void virtio_queue_set_notification(VirtQueue *vq,=
+ int enable)
+> >      rcu_read_unlock();
+> >  }
+> >+static void virtio_queue_set_notification_packed(VirtQueue *vq, int e=
+nable)
+> >+{
+> >+    VRingPackedDescEvent e;
+> >+    VRingMemoryRegionCaches *caches;
+> >+
+> >+    rcu_read_lock();
+> >+    caches  =3D vring_get_region_caches(vq);
+> >+    vring_packed_event_read(vq->vdev, &caches->used, &e);
+> >+
+> >+    if (!enable) {
+> >+        if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX=
+)) {
+> >+            /* no need to write device area since this is outdated. *=
+/
+>=20
+>=20
+> We should advertise off and wrap in this case as well, otherwise we may=
+ get
+> notifications earlier than expected.
+
+Is it necessary? Supposing offset & wrap_counter are always set before up=
+date
+notification flags, it is reliable to skip this for disabling, isn't it?
+
+While the logic here is unclear, I did a concise one like below
+which doesn't use the 'vq->notification' as in your comment for v2,
+I think this should work for packed ring as well, anything I missed?
+
+    if (!enable) {
+        e.flags =3D VRING_PACKED_EVENT_FLAG_DISABLE;
+    } else if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)=
+) {
+        uint16_t off_wrap;
+
+        off_wrap =3D vq->shadow_avail_idx | vq->shadow_avail_wrap_counter=
+ << 15;
+        vring_packed_off_wrap_write(vq->vdev, &caches->used, off_wrap);
+
+        /* Make sure off_wrap is wrote before flags */
+        smp_wmb();
+        e.flags =3D VRING_PACKED_EVENT_FLAG_DESC;
+    } else {
+        e.flags =3D VRING_PACKED_EVENT_FLAG_ENABLE;
+    }
+
+    vring_packed_flags_write(vq->vdev, &caches->used, e.flags);
+
+>=20
+>=20
+> >+            goto out;
+> >+        }
+> >+
+> >+        e.flags =3D VRING_PACKED_EVENT_FLAG_DISABLE;
+> >+        goto update;
+> >+    }
+> >+
+> >+    e.flags =3D VRING_PACKED_EVENT_FLAG_ENABLE;
+>=20
+>=20
+> Here and the above goto could be eliminated by:
+>=20
+> if (even idx) {
+>=20
+> ...
+>=20
+> } else if (enable) {
+>=20
+> ...
+>=20
+> } else {
+>=20
+> ...
+>=20
+> }
+>=20
+
+thanks, I have removed it in above snippet.
+
+Wei
+>=20
+> Thanks
+>=20
+>=20
+> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+> >+        uint16_t off_wrap =3D vq->shadow_avail_idx | vq->avail_wrap_c=
+ounter << 15;
+> >+
+> >+        vring_packed_off_wrap_write(vq->vdev, &caches->used, off_wrap=
+);
+> >+        /* Make sure off_wrap is wrote before flags */
+> >+        smp_wmb();
+> >+
+> >+        e.flags =3D VRING_PACKED_EVENT_FLAG_DESC;
+> >+    }
+> >+
+> >+update:
+> >+    vring_packed_flags_write(vq->vdev, &caches->used, e.flags);
+> >+out:
+> >+    rcu_read_unlock();
+> >+}
+> >+
+> >+void virtio_queue_set_notification(VirtQueue *vq, int enable)
+> >+{
+> >+    vq->notification =3D enable;
+> >+
+> >+    if (!vq->vring.desc) {
+> >+        return;
+> >+    }
+> >+
+> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> >+        virtio_queue_set_notification_packed(vq, enable);
+> >+    } else {
+> >+        virtio_queue_set_notification_split(vq, enable);
+> >+    }
+> >+}
+> >+
+> >  int virtio_queue_ready(VirtQueue *vq)
+> >  {
+> >      return vq->vring.avail !=3D 0;
+> >@@ -2117,8 +2190,7 @@ static void virtio_set_isr(VirtIODevice *vdev, i=
+nt value)
+> >      }
+> >  }
+> >-/* Called within rcu_read_lock().  */
+> >-static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+> >+static bool virtio_split_should_notify(VirtIODevice *vdev, VirtQueue =
+*vq)
+> >  {
+> >      uint16_t old, new;
+> >      bool v;
+> >@@ -2141,6 +2213,53 @@ static bool virtio_should_notify(VirtIODevice *=
+vdev, VirtQueue *vq)
+> >      return !v || vring_need_event(vring_get_used_event(vq), new, old=
+);
+> >  }
+> >+static bool vring_packed_need_event(VirtQueue *vq, bool wrap,
+> >+                            uint16_t off_wrap, uint16_t new, uint16_t=
+ old)
+> >+{
+> >+    int off =3D off_wrap & ~(1 << 15);
+> >+
+> >+    if (wrap !=3D off_wrap >> 15) {
+> >+        off -=3D vq->vring.num;
+> >+    }
+> >+
+> >+    return vring_need_event(off, new, old);
+> >+}
+> >+
+> >+static bool virtio_packed_should_notify(VirtIODevice *vdev, VirtQueue=
+ *vq)
+> >+{
+> >+    VRingPackedDescEvent e;
+> >+    uint16_t old, new;
+> >+    bool v;
+> >+    VRingMemoryRegionCaches *caches;
+> >+
+> >+    caches  =3D vring_get_region_caches(vq);
+> >+    vring_packed_event_read(vdev, &caches->avail, &e);
+> >+
+> >+    old =3D vq->signalled_used;
+> >+    new =3D vq->signalled_used =3D vq->used_idx;
+> >+    v =3D vq->signalled_used_valid;
+> >+    vq->signalled_used_valid =3D true;
+> >+
+> >+    if (e.flags =3D=3D VRING_PACKED_EVENT_FLAG_DISABLE) {
+> >+        return false;
+> >+    } else if (e.flags =3D=3D VRING_PACKED_EVENT_FLAG_ENABLE) {
+> >+        return true;
+> >+    }
+> >+
+> >+    return !v || vring_packed_need_event(vq,
+> >+        vq->used_wrap_counter, e.off_wrap, new, old);
+> >+}
+> >+
+> >+/* Called within rcu_read_lock().  */
+> >+static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+> >+{
+> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> >+        return virtio_packed_should_notify(vdev, vq);
+> >+    } else {
+> >+        return virtio_split_should_notify(vdev, vq);
+> >+    }
+> >+}
+> >+
+> >  void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
+> >  {
+> >      bool should_notify;
+>=20
