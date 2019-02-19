@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44520)
+Received: from eggs.gnu.org ([209.51.188.92]:44521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw81w-0007gR-7v
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1gw81w-0007gS-7i
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw81s-0002pk-1K
+	(envelope-from <thuth@redhat.com>) id 1gw81s-0002pl-1H
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:00 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 19 Feb 2019 16:13:19 +0000
-Message-Id: <20190219161321.15012-1-berrange@redhat.com>
+References: <20190219160920.32705-1-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cf588063-baf0-5f43-62bf-0af542ffd799@redhat.com>
+Date: Tue, 19 Feb 2019 17:13:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/2] Fix NBD TLS iotests on RHEL-7
+In-Reply-To: <20190219160920.32705-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: Avoid SIGPIPE death to certtool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,19 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, berrange@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-This fixes a failure of iotest 233 due to certtool problesm in RHEL7 wrt
-to SIGPIPE
+On 19/02/2019 17.09, Eric Blake wrote:
+> Our use of 'head -1' to log less output of certtool during
+> iotest 233 could result in certtool dying early due to SIGPIPE
+> if it generates enough output; if that happens, the certificate
+> it was supposed to generate may be zero length, which causes
+> failures such as:
+> 
+>   == check TLS client to plain server fails ==
+>  -qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': Denied by server for option 5 (starttls)
+>  -server reported: TLS not configured
+>  -qemu-nbd: Denied by server for option 5 (starttls)
+>  -server reported: TLS not configured
+>  +qemu-nbd: Unable to import client certificate /tmp/qemu-iotests-quick-28354/tls/client1/client-cert.pem: Base64 unexpected header error.
+> 
+> Fix the pipelines to consume all output.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/qemu-iotests/common.tls | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tls
+> index eae81789bbc..15c6e8c8425 100644
+> --- a/tests/qemu-iotests/common.tls
+> +++ b/tests/qemu-iotests/common.tls
+> @@ -74,7 +74,7 @@ EOF
+>      certtool --generate-self-signed \
+>               --load-privkey "${tls_dir}/key.pem" \
+>               --template "${tls_dir}/ca.info" \
+> -             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
+> +             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | sed -n 1p
+> 
+>      rm -f "${tls_dir}/ca.info"
+>  }
+> @@ -103,7 +103,7 @@ EOF
+>               --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+>               --load-privkey "${tls_dir}/key.pem" \
+>               --template "${tls_dir}/cert.info" \
+> -             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | head -1
+> +             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | sed -n 1p
+>      ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+>      ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/server-key.pem"
+> 
+> @@ -132,7 +132,7 @@ EOF
+>               --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+>               --load-privkey "${tls_dir}/key.pem" \
+>               --template "${tls_dir}/cert.info" \
+> -             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | head -1
+> +             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | sed -n 1p
+>      ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+>      ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/client-key.pem"
+> 
 
-Daniel P. Berrang=C3=A9 (2):
-  iotests: ensure we print nbd server log on error
-  iotests: avoid broken pipe with certtool
+Thanks, this fixes the issue for me!
 
- tests/qemu-iotests/233        |  3 +++
- tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
- 2 files changed, 35 insertions(+), 16 deletions(-)
-
---=20
-2.20.1
+Tested-by: Thomas Huth <thuth@redhat.com>
