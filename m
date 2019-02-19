@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33739)
+Received: from eggs.gnu.org ([209.51.188.92]:33788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw7KU-0005HU-RK
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:29:08 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gw7KX-0005Jd-CK
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw7KR-0005U3-Dc
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:29:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gw7KQ-0004y3-UE
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:29:03 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
-	<ab1a67c0-8872-6e22-fc70-946bbcabb8a1@redhat.com>
-	<BD5AEBD4-0B91-4756-B8D6-C0E643CF1F42@oberlin.edu>
-	<87ftsl2clg.fsf@dusky.pond.sub.org>
-	<91720BD9-D5A6-4457-BC99-D2132550BEDA@oberlin.edu>
-	<87ef84z4v6.fsf@dusky.pond.sub.org>
-	<62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu>
-Date: Tue, 19 Feb 2019 16:28:22 +0100
-In-Reply-To: <62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu> (Stephen
-	Checkoway's message of "Tue, 19 Feb 2019 09:42:21 -0500")
-Message-ID: <87imxfssq1.fsf@dusky.pond.sub.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1gw7KW-0005c9-3x
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:29:09 -0500
+Date: Tue, 19 Feb 2019 16:28:04 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190218125615.18970-6-armbru@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1902191623570.24309@zero.eik.bme.hu>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-6-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Testing sysbus devices
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 05/10] ppc405_boards: Don't size
+ flash memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +23,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Stephen Checkoway <stephen.checkoway@oberlin.edu> writes:
-
-> On Feb 19, 2019, at 01:09, Markus Armbruster <armbru@redhat.com> wrote:
+On Mon, 18 Feb 2019, Markus Armbruster wrote:
+> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+> Image size is rounded up to the next multiple of 64KiB.  Useless,
+> because pflash_cfi02_realize() fails with "failed to read the initial
+> flash content" unless the rounding is a no-op.
 >
->> Stephen Checkoway <stephen.checkoway@oberlin.edu> writes:
->> 
->>> On Feb 18, 2019, at 13:08, Markus Armbruster <armbru@redhat.com> wrote:
->>> 
->>>> Any chance you could do multiple region support, too?
->>> 
->>> Can you point me at the data sheet for a flash chip with multiple region support? For my purposes, I only need the features I mentioned, but if it's a simple change, I'll consider it.
->> 
->> I'm not familiar with CFI pflash, but I can operate a search engine.
->> Have a look at page 27 and 56 of
->> 
->> https://media.digikey.com/pdf/Data%20Sheets/Intel%20PDFs/28F160C3,320C3,640C3,800C3%20(x16).pdf
->> 
->> and tell us whether it's helpful.
+> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+> other stuff.  No idea how that would play out, but a useful outcomes
+> seem unlikely.
 >
-> That's a flash chip that uses the Intel command set (pflash_cfi01.c in
-> qemu), I'm only touching the AMD command set (pflash_cfi02.c). Also
-> those pages seem to be about block locking, not multiple regions.
+> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+> regardless of image size, to match the physical hardware.
+
+If PPC405 behaves the same as PPC440 and starts at 0xfffffffc then this 
+won't boot. It's maybe better to keep 2^32 - image_size but assert image 
+is not bigger than 512kB. But I don't know anything about these boards so 
+just sharing this comment for your consideration. I'm fine with any 
+decision you take.
+
+Regards,
+BALATON Zoltan
+
+> Machine "taihu" maps its boot flash memory similarly.  The code even
+> has a comment /* XXX: should check that size is 2MB */, followed by
+> disabled code to adjust the size to 2MiB regardless of image size.
 >
-> I'm not entirely sure what you meant by multiple regions. If you meant
-> blocks* having different sizes (usually in the top or bottom of the
-> flash as boot blocks), then I've implemented that (the nonuniform
-> sectors* I mentioned in my first email).
+> Its code to map its application flash memory looks the same, except
+> there the XXX comment asks for 32MiB, and the code to adjust the size
+> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+> to read the initial flash content" for images smaller than 32MiB.
 >
-> * Some flash chips differentiate between sectors and blocks. E.g., the
-> flash chip used by hw/arm/musicpal.c
-> <http://ww1.microchip.com/downloads/en/DeviceDoc/SST39VF6401B-SST39VF6402B-64-Mbit-x16-Multi-Purpose-Flash-Plus-Data-Sheet-DS20005008C.pdf>
-> has sectors and blocks with separate erase commands. Qemu treats these
-> the same and does not support separate erase commands.
-
-My terminology might be confused...
-
-Let me backtrack a bit an explain my use case.  On physical PCs, the
-single flash chip is commonly configured to have a read-only part and a
-read/write part.  The read-only part holds UEFI code, and the read-write
-part holds its persistent state.
-
-Since our virtual flash chips lack this feature, our virtual PCs have
-*two* of them: one configured read-only, and one configured read/write.
-Cleaning that up would be nice.
-
-The comment "It does not implement software data protection as found in
-many real chips" in both pflash_cfi0*.c might be referring to this
-missing feature.
-
->> I think a test would be quite welcome even if it only tests what's
->> testable now with reasonable effort.
+> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+> to match the physical hardware.  Delete dead code from application
+> flash mapping, and simplify some.
 >
-> I used Thomas Huth's suggestion for testing the autoselect, CFI,
-> sector erase, chip erase, programming, and reset commands. I'll see
-> how much I can test.
-
-Sounds good!
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> hw/ppc/ppc405_boards.c | 53 +++++++++++++-----------------------------
+> 1 file changed, 16 insertions(+), 37 deletions(-)
+>
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index f47b15f10e..728154aebb 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+>     target_ulong kernel_base, initrd_base;
+>     long kernel_size, initrd_size;
+>     int linux_boot;
+> -    int fl_idx, fl_sectors, len;
+> +    int len;
+>     DriveInfo *dinfo;
+>     MemoryRegion *sysmem = get_system_memory();
+>
+> @@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+> #ifdef DEBUG_BOARD_INIT
+>     printf("%s: register BIOS\n", __func__);
+> #endif
+> -    fl_idx = 0;
+> #ifdef USE_FLASH_BIOS
+> -    dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+> +    dinfo = drive_get(IF_PFLASH, 0, 0);
+>     if (dinfo) {
+> -        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size = blk_getlength(blk);
+> -        fl_sectors = (bios_size + 65535) >> 16;
+> #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register parallel flash\n");
+> #endif
+> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> +        bios_size = 0x80000;
+> +        pflash_cfi02_register(0xFFF80000,
+>                               NULL, "ef405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              65536, bios_size / 65536, 1,
+>                               2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+>                               1);
+> -        fl_idx++;
+>     } else
+> #endif
+>     {
+> @@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
+>     target_ulong kernel_base, initrd_base;
+>     long kernel_size, initrd_size;
+>     int linux_boot;
+> -    int fl_idx, fl_sectors;
+> +    int fl_idx;
+>     DriveInfo *dinfo;
+>
+>     /* RAM is soldered to the board so the size cannot be changed */
+> @@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
+> #if defined(USE_FLASH_BIOS)
+>     dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+>     if (dinfo) {
+> -        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size = blk_getlength(blk);
+> -        /* XXX: should check that size is 2MB */
+> -        //        bios_size = 2 * 1024 * 1024;
+> -        fl_sectors = (bios_size + 65535) >> 16;
+> #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register boot flash\n");
+> #endif
+> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> +        bios_size = 2 * MiB;
+> +        pflash_cfi02_register(0xFFE00000,
+>                               NULL, "taihu_405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              65536, bios_size / 65536, 1,
+>                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+>                               1);
+>         fl_idx++;
+> @@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
+>     /* Register Linux flash */
+>     dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+>     if (dinfo) {
+> -        BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size = blk_getlength(blk);
+> -        /* XXX: should check that size is 32MB */
+>         bios_size = 32 * MiB;
+> -        fl_sectors = (bios_size + 65535) >> 16;
+> #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr " TARGET_FMT_lx " '%s'\n",
+> -               fl_idx, bios_size, (target_ulong)0xfc000000,
+> -               blk_name(blk));
+> +        printf("Register application flash\n"
+> #endif
+>         pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              65536, bios_size / 65536, 1,
+>                               4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, 0x2AA,
+>                               1);
+>         fl_idx++;
+>
