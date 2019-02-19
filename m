@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45692)
+Received: from eggs.gnu.org ([209.51.188.92]:45778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gw9bg-0002tM-Px
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:55:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gw9bs-00037N-Q1
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:55:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gw9be-0002wp-Ry
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:55:00 -0500
-Received: from mail-co1nam05on070e.outbound.protection.outlook.com
-	([2a01:111:f400:fe50::70e]:13298
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gw9bb-0002oI-GX
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:54:57 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 19 Feb 2019 17:54:34 +0000
-Message-ID: <BN6PR2201MB1251A4E97F48E4ABBB007AD1C67C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190204202609.26956-1-philmd@redhat.com>,
-	<20190204202609.26956-7-philmd@redhat.com>
-In-Reply-To: <20190204202609.26956-7-philmd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1gw9bs-00037H-2W
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:55:12 -0500
+References: <20190219013106.17538-1-richardw.yang@linux.intel.com>
+	<20190219013106.17538-2-richardw.yang@linux.intel.com>
+	<e59b0920-4698-a0d1-7990-77d9e2202f9b@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <83037dad-5d57-2ebd-0038-27dd38975d3f@redhat.com>
+Date: Tue, 19 Feb 2019 11:55:04 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] mips: Express dependencies of the
- Loongson 2E machine with kconfig
+In-Reply-To: <e59b0920-4698-a0d1-7990-77d9e2202f9b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] CODING_STYLE: specify the indent rule
+ for multiline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: =?iso-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>, Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: imammedo@redhat.com, mjt@tls.msk.ru
 
-> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Subject: [PATCH v2 6/6] mips: Express dependencies of the Loongson 2E mac=
-hine with kconfig
+On 2/19/19 11:34 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+
 >=20
-> The Loongson 2E uses a Bonito64 system controller as North Bridge and a
-> VT82C686 chipset as South Bridge. The network card chipset is a RTL8139D.
+> What is still unclear is what to do when a function name is over 60
+> characters (you follow a library/API and can not shorten it), for examp=
+le:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
+> static void ccid_card_vscard_handle_message(PassthruState *card,
+>     const VSCMsgHeader *scr_msg_header);
+>=20
+> What is the project guideline in this case?
 
-Hello, Philippe.
+I don't know that we have an official guideline, but I've seen enough
+code doing that. I've also seen this style:
 
-"Loongson 2E" is rather a name for an ISA, used also as a name for CPU that
-supports that ISA, while "Fulong 2E" (that uses Loongson 2E as a CPU) is th=
-e
-proper machine name that should be used in the title and commit message of
-this patch, IMHO.
+static void long_func_name(
+    parameter one, parameter two)
+{
+    if (condition) {
+        call_some_really_long_name(
+            arg1,
+            arg2);
+    }
 
-Aleksandar
+where even the first argument is put at an indentation of 4 from the
+primary line.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
