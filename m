@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33462)
+Received: from eggs.gnu.org ([209.51.188.92]:33466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gwCyO-00068t-SQ
+	(envelope-from <kwankhede@nvidia.com>) id 1gwCyP-00068w-1G
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gwCyL-0005fx-Qs
+	(envelope-from <kwankhede@nvidia.com>) id 1gwCyM-0005ga-6i
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:30:40 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:7150)
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:7148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1gwCyL-0005c1-DY
+	id 1gwCyL-0005b8-BF
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:30:37 -0500
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Date: Wed, 20 Feb 2019 02:53:17 +0530
-Message-ID: <1550611400-13703-3-git-send-email-kwankhede@nvidia.com>
+Date: Wed, 20 Feb 2019 02:53:16 +0530
+Message-ID: <1550611400-13703-2-git-send-email-kwankhede@nvidia.com>
 In-Reply-To: <1550611400-13703-1-git-send-email-kwankhede@nvidia.com>
 References: <1550611400-13703-1-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/5] Add save and load functions for VFIO
- PCI devices
+Subject: [Qemu-devel] [PATCH v3 1/5] VFIO KABI for migration interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,178 +29,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: alex.williamson@redhat.com, cjia@nvidia.com
 Cc: kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com, yulei.zhang@intel.com, qemu-devel@nongnu.org, Kirti Wankhede <kwankhede@nvidia.com>
 
-These functions save and restore PCI device specific data - config
-space of PCI device.
-Tested save and restore with MSI and MSIX type.
+- Defined MIGRATION region type and sub-type.
+- Used 2 bits to define VFIO device states.
+    Bit 0 => 0/1 => _STOPPED/_RUNNING
+    Bit 1 => 0/1 => _RESUMING/_SAVING
+    Combination of these bits defines VFIO device's state during migration
+    _RUNNING => Normal VFIO device running state.
+    _STOPPED => VFIO device stopped.
+    _SAVING | _RUNNING => vCPUs are running, VFIO device is running but start
+                          saving state of device i.e. pre-copy state
+    _SAVING | _STOPPED => vCPUs are stoppped, VFIO device should be stopped, and
+                          save device state,i.e. stop-n-copy state
+    _RESUMING => VFIO device resuming state.
+- Defined vfio_device_migration_info structure which will be placed at 0th
+  offset of migration region to get/set VFIO device related information.
+  Defined members of structure and usage on read/write access:
+    * device_state: (write only)
+        To convey VFIO device state to be transitioned to.
+    * pending bytes: (read only)
+        To get pending bytes yet to be migrated for VFIO device
+    * data_offset: (read/write)
+        To get or set data offset in migration from where data exist
+        during _SAVING and _RESUMING state
+    * data_size: (write only)
+        To convey size of data copied in migration region during _RESUMING
+        state
+    * start_pfn, page_size, total_pfns: (write only)
+        To get bitmap of dirty pages from vendor driver from given
+        start address for total_pfns.
+    * copied_pfns: (read only)
+        To get number of pfns bitmap copied in migration region.
+        Vendor driver should copy the bitmap with bits set only for
+        pages to be marked dirty in migration region. Vendor driver
+        should return 0 if there are 0 pages dirty in requested
+        range.
+
+Migration region looks like:
+ ------------------------------------------------------------------
+|vfio_device_migration_info|    data section                      |
+|                          |     ///////////////////////////////  |
+ ------------------------------------------------------------------
+ ^                              ^                              ^
+ offset 0-trapped part        data.offset                 data.size
+
+Data section is always followed by vfio_device_migration_info
+structure in the region, so data.offset will always be none-0.
+Offset from where data is copied is decided by kernel driver, data
+section can be trapped or mapped depending on how kernel driver
+defines data section. If mmapped, then data.offset should be page
+aligned, where as initial section which contain
+vfio_device_migration_info structure might not end at offset which
+is page aligned.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- hw/vfio/pci.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.h |  29 ++++++++++++++++
- 2 files changed, 135 insertions(+)
+ linux-headers/linux/vfio.h | 65 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index dd12f363915d..e87a8a03d3f3 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1237,6 +1237,112 @@ void vfio_pci_write_config(PCIDevice *pdev,
-     }
- }
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 12a7b1dc53c8..1b12a9b95e00 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -368,6 +368,71 @@ struct vfio_region_gfx_edid {
+  */
+ #define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
  
-+void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-+{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+    PCIDevice *pdev = &vdev->pdev;
-+    int i;
++/* Migration region type and sub-type */
++#define VFIO_REGION_TYPE_MIGRATION	        (2)
++#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
 +
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        uint32_t bar;
++/**
++ * Structure vfio_device_migration_info is placed at 0th offset of
++ * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
++ * information. Field accesses from this structure are only supported at their
++ * native width and alignment, otherwise should return error.
++ *
++ * device_state: (write only)
++ *      To indicate vendor driver the state VFIO device should be transitioned
++ *      to. If device state transition fails, write to this field return error.
++ *      It consists of 2 bits.
++ *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
++ *        _STOPPED state. When device is changed to _STOPPED, driver should stop
++ *        device before write returns.
++ *      - If bit 1 set, indicates _SAVING state. When its reset, that indicates
++ *        _RESUMING state.
++ *
++ * pending bytes: (read only)
++ *      Read pending bytes yet to be migrated from vendor driver
++ *
++ * data_offset: (read/write)
++ *      User application should read data_offset in migration region from where
++ *      user application should read data during _SAVING state.
++ *      User application would write data_offset in migration region from where
++ *      user application is had written data during _RESUMING state.
++ *
++ * data_size: (write only)
++ *      User application should write size of data copied in migration region
++ *      during _RESUMING state.
++ *
++ * start_pfn: (write only)
++ *      Start address pfn to get bitmap of dirty pages from vendor driver duing
++ *      _SAVING state.
++ *
++ * page_size: (write only)
++ *      User application should write the page_size of pfn.
++ *
++ * total_pfns: (write only)
++ *      Total pfn count from start_pfn for which dirty bitmap is requested.
++ *
++ * copied_pfns: (read only)
++ *      pfn count for which dirty bitmap is copied to migration region.
++ *      Vendor driver should copy the bitmap with bits set only for pages to be
++ *      marked dirty in migration region.
++ *      Vendor driver should return 0 if there are 0 pages dirty in requested
++ *      range.
++ */
 +
-+        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
-+        qemu_put_be32(f, bar);
-+    }
-+
-+    qemu_put_be32(f, vdev->interrupt);
-+    if (vdev->interrupt == VFIO_INT_MSI) {
-+        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-+        bool msi_64bit;
-+
-+        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                                            2);
-+        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-+
-+        msi_addr_lo = pci_default_read_config(pdev,
-+                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-+        qemu_put_be32(f, msi_addr_lo);
-+
-+        if (msi_64bit) {
-+            msi_addr_hi = pci_default_read_config(pdev,
-+                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-+                                             4);
-+        }
-+        qemu_put_be32(f, msi_addr_hi);
-+
-+        msi_data = pci_default_read_config(pdev,
-+                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-+                2);
-+        qemu_put_be32(f, msi_data);
-+    } else if (vdev->interrupt == VFIO_INT_MSIX) {
-+        uint16_t offset;
-+
-+        /* save enable bit and maskall bit */
-+        offset = pci_default_read_config(pdev,
-+                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
-+        qemu_put_be16(f, offset);
-+        msix_save(pdev, f);
-+    }
-+}
-+
-+void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-+{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+    PCIDevice *pdev = &vdev->pdev;
-+    uint32_t pci_cmd, interrupt_type;
-+    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
-+    bool msi_64bit;
-+    int i;
-+
-+    /* retore pci bar configuration */
-+    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-+    vfio_pci_write_config(pdev, PCI_COMMAND,
-+                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        uint32_t bar = qemu_get_be32(f);
-+
-+        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
-+    }
-+    vfio_pci_write_config(pdev, PCI_COMMAND,
-+                          pci_cmd | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
-+
-+    interrupt_type = qemu_get_be32(f);
-+
-+    if (interrupt_type == VFIO_INT_MSI) {
-+        /* restore msi configuration */
-+        msi_flags = pci_default_read_config(pdev,
-+                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
-+        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
-+
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
-+
-+        msi_addr_lo = qemu_get_be32(f);
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
-+                              msi_addr_lo, 4);
-+
-+        msi_addr_hi = qemu_get_be32(f);
-+        if (msi_64bit) {
-+            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-+                                  msi_addr_hi, 4);
-+        }
-+        msi_data = qemu_get_be32(f);
-+        vfio_pci_write_config(pdev,
-+                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-+                msi_data, 2);
-+
-+        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-+                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
-+    } else if (interrupt_type == VFIO_INT_MSIX) {
-+        uint16_t offset = qemu_get_be16(f);
-+
-+        /* load enable bit and maskall bit */
-+        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
-+                              offset, 2);
-+        msix_load(pdev, f);
-+    }
-+}
++struct vfio_device_migration_info {
++        __u32 device_state;         /* VFIO device state */
++#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
++#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
++        __u32 reserved;
++        __u64 pending_bytes;
++        __u64 data_offset;
++        __u64 data_size;
++        __u64 start_pfn;
++        __u64 page_size;
++        __u64 total_pfns;
++        __u64 copied_pfns;
++} __attribute__((packed));
 +
  /*
-  * Interrupt setup
-  */
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index b1ae4c07549a..77d3223481b4 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -20,6 +20,7 @@
- #include "qemu/queue.h"
- #include "qemu/timer.h"
- 
-+#ifdef CONFIG_LINUX
- #define PCI_ANY_ID (~0)
- 
- struct VFIOPCIDevice;
-@@ -199,4 +200,32 @@ void vfio_display_reset(VFIOPCIDevice *vdev);
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
- void vfio_display_finalize(VFIOPCIDevice *vdev);
- 
-+void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f);
-+void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f);
-+
-+static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
-+{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+
-+    return OBJECT(vdev);
-+}
-+
-+#else
-+static inline void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-+{
-+    g_assert(false);
-+}
-+
-+static inline void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-+{
-+    g_assert(false);
-+}
-+
-+static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
-+{
-+    return NULL;
-+}
-+
-+#endif
-+
- #endif /* HW_VFIO_VFIO_PCI_H */
+  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+  * which allows direct access to non-MSIX registers which happened to be within
 -- 
 2.7.0
