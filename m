@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52307)
+Received: from eggs.gnu.org ([209.51.188.92]:54561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gw8Ua-0008SH-R3
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gw8hy-0002sF-8l
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:57:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gw8UZ-0006xa-OP
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:36 -0500
-Resent-Message-Id: <E1gw8UZ-0006xa-OP@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155059458199.18484.15780340201087895544@49fa7ef69f7b>
-In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gw8hw-0003lh-Mt
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:57:26 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33622)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gw8hw-0003jR-7v
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:57:24 -0500
+Received: by mail-ot1-x342.google.com with SMTP id i20so35428532otl.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 08:57:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Feb 2019 08:43:03 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
+References: <20190215192302.27855-1-richard.henderson@linaro.org>
+	<20190215192302.27855-4-richard.henderson@linaro.org>
+In-Reply-To: <20190215192302.27855-4-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Feb 2019 16:57:08 +0000
+Message-ID: <CAFEAcA8x7d6LKBLjuEz61hSPt5cEuT9MfmAJ+GH+QCGCctTe8Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 3/8] target/arm: Rearrange
+ Floating-point data-processing (2 regs)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
-MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
-YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
-NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
-YXJtYnJ1QHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5
-MDIxOTExNDYwOS4xNTgyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE5
-MTE0NjA5LjE1ODItMS1iZXJyYW5nZUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKOTE4YjUxMTg1NyBody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNo
-IGNyZWF0aW9uIGNvZGUgc29tZQo1NzNhM2NiNmVlIHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29t
-bWl0IDM2OGEzNTRmMDJiIHBhcnQgMgpjZDZjODg3NGM5IHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIg
-Y29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMQo0N2Q2YjA1ZGJmIG1pcHNfbWFsdGE6IENsZWFuIHVw
-IGRlZmluaXRpb24gb2YgZmxhc2ggbWVtb3J5IHNpemUgc29tZXdoYXQKNGQ3NzY5OTdjYiByMmQ6
-IEZsYXNoIG1lbW9yeSBjcmVhdGlvbiBpcyBjb25mdXNlZCBhYm91dCBzaXplLCBtYXJrIEZJWE1F
-CjhlZjY0OWI2MjIgcHBjNDA1X2JvYXJkczogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0
-Y2ggYmFja2luZyBpbWFnZQowNWU1ZWZjZTEyIHNhbTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1l
-bW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlCjgzNDU0MjcyZjkgaHc6IFVzZSBDRklfUEZMQVNI
-MHsxLCAyfSBhbmQgVFlQRV9DRklfUEZMQVNIMHsxLCAyfQplMjU0ODlmNjY3IHBmbGFzaDogTWFj
-cm8gUEZMQVNIX0JVRygpIGlzIHVzZWQganVzdCBvbmNlLCBleHBhbmQKMjNjZWRjYzE5OCBwZmxh
-c2g6IFJlbmFtZSBwZmxhc2hfdCB0byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CjEvMTAgQ2hlY2tpbmcgY29tbWl0IDIzY2VkY2MxOThiNyAocGZsYXNoOiBS
-ZW5hbWUgcGZsYXNoX3QgdG8gUEZsYXNoQ0ZJMDEsIFBGbGFzaENGSTAyKQpFUlJPUjogc3BhY2Ug
-cHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygn
-CiMxMjg6IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMS5jOjI4ODoKK3N0YXRpYyB1aW50MzJf
-dCBwZmxhc2hfcmVhZCAoUEZsYXNoQ0ZJMDEgKnBmbCwgaHdhZGRyIG9mZnNldCwKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNp
-cyAnKCcKIzM0MDogRklMRTogaHcvYmxvY2svcGZsYXNoX2NmaTAyLmM6MTQxOgorc3RhdGljIHVp
-bnQzMl90IHBmbGFzaF9yZWFkIChQRmxhc2hDRkkwMiAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVu
-dGhlc2lzICcoJwojMzU4OiBGSUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoyNjQ6CitzdGF0
-aWMgdm9pZCBwZmxhc2hfd3JpdGUgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgp0
-b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzEw
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzEwIENoZWNraW5nIGNvbW1pdCBlMjU0ODlm
-NjY3NzkgKHBmbGFzaDogTWFjcm8gUEZMQVNIX0JVRygpIGlzIHVzZWQganVzdCBvbmNlLCBleHBh
-bmQpCjMvMTAgQ2hlY2tpbmcgY29tbWl0IDgzNDU0MjcyZjk1MiAoaHc6IFVzZSBDRklfUEZMQVNI
-MHsxLCAyfSBhbmQgVFlQRV9DRklfUEZMQVNIMHsxLCAyfSkKNC8xMCBDaGVja2luZyBjb21taXQg
-MDVlNWVmY2UxMjczIChzYW00NjBleDogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0Y2gg
-YmFja2luZyBpbWFnZSkKNS8xMCBDaGVja2luZyBjb21taXQgOGVmNjQ5YjYyMmNmIChwcGM0MDVf
-Ym9hcmRzOiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo2
-LzEwIENoZWNraW5nIGNvbW1pdCA0ZDc3Njk5N2NiN2QgKHIyZDogRmxhc2ggbWVtb3J5IGNyZWF0
-aW9uIGlzIGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUpCjcvMTAgQ2hlY2tpbmcgY29t
-bWl0IDQ3ZDZiMDVkYmYxMCAobWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBmbGFz
-aCBtZW1vcnkgc2l6ZSBzb21ld2hhdCkKOC8xMCBDaGVja2luZyBjb21taXQgY2Q2Yzg4NzRjOWY0
-IChwZmxhc2g6IENsZWFuIHVwIGFmdGVyIGNvbW1pdCAzNjhhMzU0ZjAyYiBwYXJ0IDEpCkVSUk9S
-OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojOTE6IEZJTEU6IGh3
-L2FybS9tdXNpY3BhbC5jOjE2Mzk6CisgICAgICAgIHBmbGFzaF9jZmkwMl9yZWdpc3RlcigweDEw
-MDAwMDAwMFVMTC1NUF9GTEFTSF9TSVpFX01BWCwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
-LScgKGN0eDpWeFYpCiM5OTogRklMRTogaHcvYXJtL211c2ljcGFsLmM6MTY0NjoKKyAgICAgICAg
-cGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVfTUFYLAog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBl
-cnJvcnMsIDAgd2FybmluZ3MsIDI0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzEwIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgo5LzEwIENoZWNraW5nIGNvbW1pdCA1NzNhM2NiNmVlYWMgKHBm
-bGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMikKMTAvMTAgQ2hl
-Y2tpbmcgY29tbWl0IDkxOGI1MTE4NTczYiAoaHcvYXJtIGh3L3h0ZW5zYTogRGUtZHVwbGljYXRl
-IHBmbGFzaCBjcmVhdGlvbiBjb2RlIHNvbWUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEtYXJtYnJ1QHJlZGhh
-dC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, 15 Feb 2019 at 19:23, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> There are lots of special cases within these insns.  Split the
+> major argument decode/loading/saving into no_output (compares),
+> rd_is_dp, and rm_is_dp.
+>
+> We still need to special case argument load for compare (rd as
+> input, rm as zero) and vcvt fixed (rd as input+output), but lots
+> of special cases do disappear.
+>
+> Now that we have a full switch at the beginning, hoist the ISA
+> checks from the code generation.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
