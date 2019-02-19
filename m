@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39514)
+Received: from eggs.gnu.org ([209.51.188.92]:39714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gw43y-0006Bs-Iw
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:59:52 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gw450-0006la-3E
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gw43u-0003xE-C5
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:59:48 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 19 Feb 2019 11:59:37 +0000
-Message-Id: <20190219115937.21587-1-stefanha@redhat.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1gw44m-0004pn-LN
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:00:48 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28805)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gw44i-0004fV-8i
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:00:38 -0500
+Date: Tue, 19 Feb 2019 13:00:31 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.21.9999.1902191234580.87875@zero.eik.bme.hu>
+References: <20190211040434.1C98674569F@zero.eik.bme.hu>
+	<20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] iotests: drop unnecessary accel=kvm
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,44 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Tests 235 and 238 do not require the kvm accelerator.  TCG works fine.
+On Tue, 19 Feb 2019, Gerd Hoffmann wrote:
+> On Mon, Feb 11, 2019 at 04:19:14AM +0100, BALATON Zoltan wrote:
+>> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
+>> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
+>> guests running on these and the PMON2000 firmware of the fulong2e
+>> expect this to be available. Fortunately these are very similar chips
+>> so they can be mostly emulated in the same device model. This patch
+>> adds basic emulation of these ATI VGA chips.
+>>
+>> While this is incomplete and currently only enough to run the MIPS
+>> firmware and get console output with Linux,
+>
+> Which linux driver is this?
 
-Use the default accelerator instead of requiring kvm.
+Those in linux/drivers/video/fbdev/aty/. This ati-vga model defaults to 
+Rage 128 Pro (what PoweMac3,1 has, device id 0x5046) which is handled by 
+the aty128fb driver under Linux. MIPS fulong2e has Mobility Radeon M6 
+(RV100, device id 0x5159) that you can also use as -device 
+ati-vga,device_id=0x5159 which is driven by radeonfb under Linux.
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/235 | 1 -
- tests/qemu-iotests/238 | 1 -
- 2 files changed, 2 deletions(-)
+> If linux has a native driver it might make sense to also enable it on
+> x86.  Makes testing easier.
 
-diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
-index d6edd97ab4..329da8f0c2 100755
---- a/tests/qemu-iotests/235
-+++ b/tests/qemu-iotests/235
-@@ -49,7 +49,6 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocat=
-ion=3Dmetadata', disk,
-                 str(size))
-=20
- vm =3D QEMUMachine(iotests.qemu_prog)
--vm.add_args('-machine', 'accel=3Dkvm')
- if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
-         vm.add_args('-no-shutdown')
- vm.add_args('-drive', 'id=3Dsrc,file=3D' + disk)
-diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
-index f81ee1112f..e490bb4298 100755
---- a/tests/qemu-iotests/238
-+++ b/tests/qemu-iotests/238
-@@ -33,7 +33,6 @@ else:
-     virtio_scsi_device =3D 'virtio-scsi-pci'
-=20
- vm =3D QEMUMachine(iotests.qemu_prog)
--vm.add_args('-machine', 'accel=3Dkvm')
- vm.launch()
-=20
- log(vm.qmp('blockdev-add', node_name=3D'hd0', driver=3D'null-co'))
---=20
-2.20.1
+Yes it could work on all archs under Linux but I've only enabled it on the 
+two I've tried. It could be added instead to the same place where vga is 
+added in pci.mak if you like.
+
+> You can add the driver to default_list[] in vl.c, then you don't need
+> -vga none to remove the default vga when adding -device ati-vga.
+
+I could do that but since it's a bit unfinished (lacks advanced features 
+such as video overlay, 3D accel, command FIFO, etc.) and only a basic 
+implementation at the moment to work with Linux framebuffer that doesn't 
+use these features I thought it might be a godd idea to make it a bit 
+harder to access yet to avoid problem of someone trying it with a Windows 
+guest with drivers from ATI which probably will result in bad picture. But 
+it's up to you to decide if you want to add it to -vga option from the 
+start or have it as optional device and only add to -vga when it's more 
+fully implemented and tested.
+
+Regards,
+BALATON Zoltan
