@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49764)
+Received: from eggs.gnu.org ([209.51.188.92]:53218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gvsnF-0002Ol-3V
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:57:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gvt6v-0004aU-Uw
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:18:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gvsnB-0005np-8i
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 18:57:47 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gvt6u-0004gq-Va
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:18:09 -0500
 References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-9-kwolf@redhat.com>
+	<20190131175549.11691-11-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <67996e1d-1d6f-2990-3b96-22554f261029@redhat.com>
-Date: Tue, 19 Feb 2019 00:57:21 +0100
+Message-ID: <0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
+Date: Tue, 19 Feb 2019 01:18:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190131175549.11691-9-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-11-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="YXILkOyToyd4ggV1CmgNTeuvlpjx5SJfh"
-Subject: Re: [Qemu-devel] [RFC PATCH 08/11] qcow2: Add basic data-file
- infrastructure
+	boundary="cGPDNHmVPvoehgLns0eerG2E3UcPvjN2I"
+Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
+ the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +29,159 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: eblake@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YXILkOyToyd4ggV1CmgNTeuvlpjx5SJfh
+--cGPDNHmVPvoehgLns0eerG2E3UcPvjN2I
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: eblake@redhat.com, qemu-devel@nongnu.org
-Message-ID: <67996e1d-1d6f-2990-3b96-22554f261029@redhat.com>
-Subject: Re: [RFC PATCH 08/11] qcow2: Add basic data-file infrastructure
+Message-ID: <0e4a0d3a-832b-e8aa-7ea0-acce96e513d5@redhat.com>
+Subject: Re: [RFC PATCH 10/11] qcow2: Store data file name in the image
 References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-9-kwolf@redhat.com>
-In-Reply-To: <20190131175549.11691-9-kwolf@redhat.com>
+ <20190131175549.11691-11-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-11-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 31.01.19 18:55, Kevin Wolf wrote:
-> This adds a .bdrv_open option to specify the external data file node.
+> Rather than requiring that the external data file node is passed
+> explicitly when creating the qcow2 node, store the filename in the
+> designated header extension during .bdrv_create and read it from there
+> as a default during .bdrv_open.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  qapi/block-core.json |  3 ++-
->  block/qcow2.h        |  4 +++-
->  block/qcow2.c        | 25 +++++++++++++++++++++++--
->  3 files changed, 28 insertions(+), 4 deletions(-)
+>  block/qcow2.h              |  1 +
+>  block/qcow2.c              | 69 +++++++++++++++++++++++++++++++++++++-=
+
+>  tests/qemu-iotests/082.out | 27 +++++++++++++++
+>  3 files changed, 96 insertions(+), 1 deletion(-)
 
 [...]
 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index c161970882..e2114900b4 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-
-[...]
-
-> @@ -205,7 +206,8 @@ enum {
->      QCOW2_INCOMPAT_DATA_FILE        =3D 1 << QCOW2_INCOMPAT_DATA_FILE_=
-BITNR,
-> =20
->      QCOW2_INCOMPAT_MASK          =3D QCOW2_INCOMPAT_DIRTY
-> -                                 | QCOW2_INCOMPAT_CORRUPT,
-> +                                 | QCOW2_INCOMPAT_CORRUPT
-> +                                 | QCOW2_INCOMPAT_DATA_FILE,
-
-This hunk seems to belong somewhere else.
-
->  };
-> =20
->  /* Compatible feature bits */
 > diff --git a/block/qcow2.c b/block/qcow2.c
-> index ac9934b3ed..376232d3f0 100644
+> index 6cf862e8b9..4959bf16a4 100644
 > --- a/block/qcow2.c
 > +++ b/block/qcow2.c
-> @@ -1441,8 +1441,22 @@ static int coroutine_fn qcow2_do_open(BlockDrive=
+> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriverState =
+*bs, uint64_t start_offset,
+>  #endif
+>              break;
+> =20
+> +        case QCOW2_EXT_MAGIC_DATA_FILE:
+> +        {
+> +            s->image_data_file =3D g_malloc0(ext.len + 1);
+> +            ret =3D bdrv_pread(bs->file, offset, s->image_data_file, e=
+xt.len);
+> +            if (ret < 0) {
+> +                error_setg_errno(errp, -ret, "ERROR: Could not data fi=
+le name");
+
+I think you accidentally a word.
+
+> +                return ret;
+> +            }
+> +#ifdef DEBUG_EXT
+> +            printf("Qcow2: Got external data file %s\n", s->image_data=
+_file);
+> +#endif
+> +            break;
+> +        }
+> +
+>          default:
+>              /* unknown magic - save it in case we need to rewrite the =
+header */
+>              /* If you add a new feature, make sure to also update the =
+fast
+> @@ -1444,7 +1458,18 @@ static int coroutine_fn qcow2_do_open(BlockDrive=
 rState *bs, QDict *options,
->          goto fail;
+>      /* Open external data file */
+>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+>          s->data_file =3D bdrv_open_child(NULL, options, "data-file", b=
+s,
+> -                                       &child_file, false, errp);
+> +                                       &child_file, false, &local_err)=
+;
+> +        if (!s->data_file) {
+> +            if (s->image_data_file) {
+> +                error_free(local_err);
+> +                local_err =3D NULL;
+
+This looked a bit weird to me at first because I was wondering why you
+wouldn't just pass allow_none=3Dtrue and then handle errors (by passing
+them on).  But right, we want to retry with a filename set, maybe that
+makes more sense of the options.
+
+Hm.  But then again, do we really?  It matches what we do with backing
+files, but that does give at least me headaches from time to time.  How
+bad would it be to allow either passing all valid options through
+@options (which would make qcow2 ignore the string in the header), or
+use the filename given in the header alone?
+
+> +                s->data_file =3D bdrv_open_child(s->image_data_file, o=
+ptions,
+> +                                               "data-file", bs, &child=
+_file,
+> +                                               false, errp);
+> +            } else {
+> +                error_propagate(errp, local_err);
+> +            }
+> +        }
+>          if (!s->data_file) {
+>              ret =3D -EINVAL;
+>              goto fail;
+
+[...]
+
+> @@ -3229,6 +3270,26 @@ static int coroutine_fn qcow2_co_create_opts(con=
+st char *filename, QemuOpts *opt
+>          goto finish;
 >      }
 > =20
-> -    /* TODO Open external data file */
-> -    s->data_file =3D bs->file;
-> +    /* Open external data file */
-> +    if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
-> +        s->data_file =3D bdrv_open_child(NULL, options, "data-file", b=
-s,
-> +                                       &child_file, false, errp);
-> +        if (!s->data_file) {
-> +            ret =3D -EINVAL;
-> +            goto fail;
-> +        }
-> +    } else if (qdict_get(options, QCOW2_OPT_DATA_FILE)) {
+> +    /* Create and open an external data file (protocol layer) */
+> +    val =3D qdict_get_try_str(qdict, BLOCK_OPT_DATA_FILE);
+> +    if (val) {
+> +        ret =3D bdrv_create_file(val, opts, errp);
 
-I get the idea, but this isn't crumpled so this key may not exist (but
-data-file.driver and data-file.filename may).  Of course the fact that
-these options remain unused will be caught by the block layer, but that
-makes the error message below a bit less useful.
+I suppose taking an existing file is saved for later?
 
 Max
 
-> +        error_setg(errp, "'data-file' can only be set for images with =
-an "
-> +                         "external data file");
-> +        ret =3D -EINVAL;
-> +        goto fail;
-> +    } else {
-> +        s->data_file =3D bs->file;
+> +        if (ret < 0) {
+> +            goto finish;
+> +        }
+> +
+> +        data_bs =3D bdrv_open(val, NULL, NULL,
+> +                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTO=
+COL,
+> +                            errp);
+> +        if (data_bs =3D=3D NULL) {
+> +            ret =3D -EIO;
+> +            goto finish;
+> +        }
+> +
+> +        qdict_del(qdict, BLOCK_OPT_DATA_FILE);
+> +        qdict_put_str(qdict, "data-file", data_bs->node_name);
 > +    }
-> =20
->      /* qcow2_read_extension may have set up the crypto context
->       * if the crypt method needs a header region, some methods
+> +
+>      /* Set 'driver' and 'node' options */
+>      qdict_put_str(qdict, "driver", "qcow2");
+>      qdict_put_str(qdict, "file", bs->node_name);
 
 
---YXILkOyToyd4ggV1CmgNTeuvlpjx5SJfh
+--cGPDNHmVPvoehgLns0eerG2E3UcPvjN2I
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxrRmIACgkQ9AfbAGHV
-z0CWlQf/RpKigJFiGZ4ruLeNyqEMZgaPVMfXGePtB2uXhG55lGmZU4dMFDrlNSVa
-KwuYI2aT/XucY4eIm4V/lY08kOnEOnkhLLmVoMmVDCAN2jxYXoemSvPZ91adsFOw
-TToVEEYh9ONciWjuMauodc9CtNHYPJkYz3NHvoXck+tHPyejjBEyzUoZHmVnsOW+
-04RdHFIWYK8Y0AzuMvXlQ4BEZIA7ZWivELFxfq52rh/9RpXU7FHKdmsIRjektCB5
-RpUiMYhkYPDLcA5p0aXLmShPQ/GjDZflO3NsvhfJ3idPGthC/teJ/b0esX0UNQKy
-UEUCI/p8ClMbl4PYzdIBjyu22OS1Iw==
-=DtfG
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxrSzoACgkQ9AfbAGHV
+z0AB0Qf/SuVGd9t0gaRooN5HlZD+i4kYsNXQ4wEyARGmAijPOCBLIgOmpuO3YHhf
+CzhZeFxd1lHAE0xGbxP387XdRhfxi/7fX3Sq2gzKwiTfMbPW9za0ldpD+329qezf
+/37ZnLamqvp/A17doQI2oaGJh6AkNwHFxYwznU6ZuRUcqrq+9xsTEPXc0bvrl8go
+KeJYyQWCSgsapI4Ma7QX52Bv5pTWLCH/6U5rOABt3RrH2G5C0cb9h8qLeBb6aqiM
+Ah7UMzN6Ru+q1UUjH4RdA4Iv1el4HbtlvZ1MpQm5/sJctLe/5I6BqSNulqWwsY4C
+8TiFmy3sR+/dv/i9FSxVbRbw6jenVw==
+=MEQ5
 -----END PGP SIGNATURE-----
 
---YXILkOyToyd4ggV1CmgNTeuvlpjx5SJfh--
+--cGPDNHmVPvoehgLns0eerG2E3UcPvjN2I--
