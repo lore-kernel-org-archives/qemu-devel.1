@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37858)
+Received: from eggs.gnu.org ([209.51.188.92]:38706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw5jL-0000fM-PU
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:46:40 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gw5ms-00027C-Fq
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:50:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw5jK-0007Zj-O2
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:46:39 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-3-armbru@redhat.com>
-	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
-	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
-Date: Tue, 19 Feb 2019 14:46:20 +0100
-In-Reply-To: <CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 19 Feb 2019 13:11:22 +0000")
-Message-ID: <875ztfuc0j.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1gw5mr-0001fR-8d
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:50:18 -0500
+Resent-Message-Id: <E1gw5mr-0001fR-8d@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155058417904.18484.8089587069213176969@49fa7ef69f7b>
+In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
- just once, expand
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Feb 2019 05:49:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Tue, 19 Feb 2019 at 12:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> On 2/18/19 1:56 PM, Markus Armbruster wrote:
->> > PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
->> > BUG", which sounds like a warning, then calls exit(1), followed by
->> > unreachable goto reset_flash.  All this commit does is expanding the
->> > macro, so the smell becomes more poignant, and the macro can be
->> > deleted.
->> >
->> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> > ---
->> >  hw/block/pflash_cfi01.c | 10 ++--------
->> >  1 file changed, 2 insertions(+), 8 deletions(-)
->> >
->> > diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> > index 9efa7aa9af..f73c30a3ee 100644
->> > --- a/hw/block/pflash_cfi01.c
->> > +++ b/hw/block/pflash_cfi01.c
->> > @@ -49,12 +49,6 @@
->> >  #include "sysemu/sysemu.h"
->> >  #include "trace.h"
->> >
->> > -#define PFLASH_BUG(fmt, ...) \
->> > -do { \
->> > -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
->> > -    exit(1); \
->> > -} while(0)
->> > -
->> >  /* #define PFLASH_DEBUG */
->> >  #ifdef PFLASH_DEBUG
->> >  #define DPRINTF(fmt, ...)                                   \
->> > @@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr =
-offset,
->> >                  pfl->status |=3D 0x80;
->> >              } else {
->> >                  DPRINTF("%s: unknown command for \"write block\"\n", =
-__func__);
->> > -                PFLASH_BUG("Write block confirm");
->> > -                goto reset_flash;
->> > +                fprintf(stderr, "PFLASH: Possible BUG - Write block c=
-onfirm");
->> > +                exit(1);
->>
->> Don't you want to use hw_error here?
->>
->>       hw_error("PFLASH: Possible BUG - Write block confirm");
->
-> This should just be
->    qemu_log_mask(LOG_GUEST_ERROR, ...);
-> (replacing both the DPRINTF and the PFLASH_BUG()).
->
-> It's triggerable by a guest (if it puts the device into write-block
-> mode and then feeds it a bogus command byte), so it's just a guest
-> error, not an issue with our model of the pflash.
-
-I can do that.  Thanks!
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
+MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
+YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDM5OTgxODFk
+NSBody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9uIGNvZGUgc29t
+ZQo4OTAwZWYzZWIyIHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBh
+cnQgMgpiMmE3NTJlOTY5IHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJi
+IHBhcnQgMQo2MTYxZTliMmUxIG1pcHNfbWFsdGE6IENsZWFuIHVwIGRlZmluaXRpb24gb2YgZmxh
+c2ggbWVtb3J5IHNpemUgc29tZXdoYXQKZjYzZTFiOTViZSByMmQ6IEZsYXNoIG1lbW9yeSBjcmVh
+dGlvbiBpcyBjb25mdXNlZCBhYm91dCBzaXplLCBtYXJrIEZJWE1FCmM5NDA2MTNjNmYgcHBjNDA1
+X2JvYXJkczogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0Y2ggYmFja2luZyBpbWFnZQph
+YWZiZjJiMGNiIHNhbTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNr
+aW5nIGltYWdlCjUwYzU4YWFhZWYgaHc6IFVzZSBDRklfUEZMQVNIMHsxLCAyfSBhbmQgVFlQRV9D
+RklfUEZMQVNIMHsxLCAyfQozMmYzMDZiZTIzIHBmbGFzaDogTWFjcm8gUEZMQVNIX0JVRygpIGlz
+IHVzZWQganVzdCBvbmNlLCBleHBhbmQKYWIxZTQzY2U3YiBwZmxhc2g6IFJlbmFtZSBwZmxhc2hf
+dCB0byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTAg
+Q2hlY2tpbmcgY29tbWl0IGFiMWU0M2NlN2I4YiAocGZsYXNoOiBSZW5hbWUgcGZsYXNoX3QgdG8g
+UEZsYXNoQ0ZJMDEsIFBGbGFzaENGSTAyKQpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVu
+IGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxMjg6IEZJTEU6IGh3L2Js
+b2NrL3BmbGFzaF9jZmkwMS5jOjI4ODoKK3N0YXRpYyB1aW50MzJfdCBwZmxhc2hfcmVhZCAoUEZs
+YXNoQ0ZJMDEgKnBmbCwgaHdhZGRyIG9mZnNldCwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJl
+dHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzM0MDogRklMRTog
+aHcvYmxvY2svcGZsYXNoX2NmaTAyLmM6MTQxOgorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFk
+IChQRmxhc2hDRkkwMiAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0
+ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzU4OiBG
+SUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoyNjQ6CitzdGF0aWMgdm9pZCBwZmxhc2hfd3Jp
+dGUgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgp0b3RhbDogMyBlcnJvcnMsIDAg
+d2FybmluZ3MsIDQ4MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzEwIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgoyLzEwIENoZWNraW5nIGNvbW1pdCAzMmYzMDZiZTIzODEgKHBmbGFzaDogTWFj
+cm8gUEZMQVNIX0JVRygpIGlzIHVzZWQganVzdCBvbmNlLCBleHBhbmQpCjMvMTAgQ2hlY2tpbmcg
+Y29tbWl0IDUwYzU4YWFhZWZmNSAoaHc6IFVzZSBDRklfUEZMQVNIMHsxLCAyfSBhbmQgVFlQRV9D
+RklfUEZMQVNIMHsxLCAyfSkKNC8xMCBDaGVja2luZyBjb21taXQgYWFmYmYyYjBjYmQ1IChzYW00
+NjBleDogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0Y2ggYmFja2luZyBpbWFnZSkKNS8x
+MCBDaGVja2luZyBjb21taXQgYzk0MDYxM2M2ZmQ5IChwcGM0MDVfYm9hcmRzOiBEb24ndCBzaXpl
+IGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo2LzEwIENoZWNraW5nIGNvbW1p
+dCBmNjNlMWI5NWJlYWYgKHIyZDogRmxhc2ggbWVtb3J5IGNyZWF0aW9uIGlzIGNvbmZ1c2VkIGFi
+b3V0IHNpemUsIG1hcmsgRklYTUUpCjcvMTAgQ2hlY2tpbmcgY29tbWl0IDYxNjFlOWIyZTFhMSAo
+bWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBmbGFzaCBtZW1vcnkgc2l6ZSBzb21l
+d2hhdCkKOC8xMCBDaGVja2luZyBjb21taXQgYjJhNzUyZTk2OWUxIChwZmxhc2g6IENsZWFuIHVw
+IGFmdGVyIGNvbW1pdCAzNjhhMzU0ZjAyYiBwYXJ0IDEpCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
+YXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojOTA6IEZJTEU6IGh3L2FybS9tdXNpY3BhbC5jOjE2
+Mzk6CisgICAgICAgIHBmbGFzaF9jZmkwMl9yZWdpc3RlcigweDEwMDAwMDAwMFVMTC1NUF9GTEFT
+SF9TSVpFX01BWCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM5ODog
+RklMRTogaHcvYXJtL211c2ljcGFsLmM6MTY0NjoKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lz
+dGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDI0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cgo5LzEwIENoZWNraW5nIGNvbW1pdCA4OTAwZWYzZWIyN2EgKHBmbGFzaDogQ2xlYW4gdXAgYWZ0
+ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMikKMTAvMTAgQ2hlY2tpbmcgY29tbWl0IDAzOTk4
+MTgxZDU0OCAoaHcvYXJtIGh3L3h0ZW5zYTogRGUtZHVwbGljYXRlIHBmbGFzaCBjcmVhdGlvbiBj
+b2RlIHNvbWUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEtYXJtYnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVj
+a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
