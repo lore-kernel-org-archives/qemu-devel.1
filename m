@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52162)
+Received: from eggs.gnu.org ([209.51.188.92]:52307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gw8U5-0008C2-N9
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gw8Ua-0008SH-R3
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gw8U4-0006pQ-GA
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:05 -0500
-References: <20190219161321.15012-1-berrange@redhat.com>
-	<20190219161321.15012-3-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f9daffdc-2978-040b-062c-41448b4e890e@redhat.com>
-Date: Tue, 19 Feb 2019 10:42:50 -0600
+	(envelope-from <no-reply@patchew.org>) id 1gw8UZ-0006xa-OP
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:36 -0500
+Resent-Message-Id: <E1gw8UZ-0006xa-OP@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155059458199.18484.15780340201087895544@49fa7ef69f7b>
+In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190219161321.15012-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: avoid broken pipe with
- certtool
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Feb 2019 08:43:03 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On 2/19/19 10:13 AM, Daniel P. Berrang=C3=A9 wrote:
-> When we run "certtool | head -1" the latter command is likely to
-> complete and exit before certtool has written everything it wants to
-> stderr. In at least the RHEL-7 gnutls 3.3.29 this causes certtool to
-> quit with broken pipe before it has finished writing the desired
-> output file to disk. This causes non-deterministic failures of the
-> iotest 233 because the certs are sometimes zero length files.
-> If certtool fails the "head -1" means we also loose any useful error
-> message it would have printed.
->=20
-> Thus this patch gets rid of the pipe and post-processes the output in a
-> more flexible & reliable manner.
->=20
-
-Better than my attempt.
-
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
->  1 file changed, 32 insertions(+), 16 deletions(-)
-
-As Thomas pointed out, it is not parallel-safe, but that's a bigger
-issue with all of the iotests, so not this patch's problem.
-
->=20
-> diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.=
-tls
-> index eae81789bb..6cf11ed383 100644
-> --- a/tests/qemu-iotests/common.tls
-> +++ b/tests/qemu-iotests/common.tls
-> @@ -29,6 +29,17 @@ tls_x509_cleanup()
->  }
-> =20
-> =20
-> +tls_certtool()
-> +{
-> +    certtool "$@" 1>certtool.log 2>&1
-
-I tend to use '>' instead of '1>', but they are identical.
-
-> +    if test "$?" =3D 0; then
-> +      head -1 certtool.log
-
-Technically, POSIX says 'head -1' is not portable (it was historical
-practice, but a wording change in POSIX 2001 made it invalid, which
-wasn't fixed until POSIX 2008 - and there are historical versions of GNU
-coreutils which went out of their way to reject the usage, although that
-has since been fixed); the portable spelling these days is 'head -n1'.
-But as the test was already using 'head -1', I'm not going to make you
-switch it.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
+MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
+YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
+NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
+YXJtYnJ1QHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5
+MDIxOTExNDYwOS4xNTgyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE5
+MTE0NjA5LjE1ODItMS1iZXJyYW5nZUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKOTE4YjUxMTg1NyBody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNo
+IGNyZWF0aW9uIGNvZGUgc29tZQo1NzNhM2NiNmVlIHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29t
+bWl0IDM2OGEzNTRmMDJiIHBhcnQgMgpjZDZjODg3NGM5IHBmbGFzaDogQ2xlYW4gdXAgYWZ0ZXIg
+Y29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMQo0N2Q2YjA1ZGJmIG1pcHNfbWFsdGE6IENsZWFuIHVw
+IGRlZmluaXRpb24gb2YgZmxhc2ggbWVtb3J5IHNpemUgc29tZXdoYXQKNGQ3NzY5OTdjYiByMmQ6
+IEZsYXNoIG1lbW9yeSBjcmVhdGlvbiBpcyBjb25mdXNlZCBhYm91dCBzaXplLCBtYXJrIEZJWE1F
+CjhlZjY0OWI2MjIgcHBjNDA1X2JvYXJkczogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0
+Y2ggYmFja2luZyBpbWFnZQowNWU1ZWZjZTEyIHNhbTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1l
+bW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlCjgzNDU0MjcyZjkgaHc6IFVzZSBDRklfUEZMQVNI
+MHsxLCAyfSBhbmQgVFlQRV9DRklfUEZMQVNIMHsxLCAyfQplMjU0ODlmNjY3IHBmbGFzaDogTWFj
+cm8gUEZMQVNIX0JVRygpIGlzIHVzZWQganVzdCBvbmNlLCBleHBhbmQKMjNjZWRjYzE5OCBwZmxh
+c2g6IFJlbmFtZSBwZmxhc2hfdCB0byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CjEvMTAgQ2hlY2tpbmcgY29tbWl0IDIzY2VkY2MxOThiNyAocGZsYXNoOiBS
+ZW5hbWUgcGZsYXNoX3QgdG8gUEZsYXNoQ0ZJMDEsIFBGbGFzaENGSTAyKQpFUlJPUjogc3BhY2Ug
+cHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygn
+CiMxMjg6IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMS5jOjI4ODoKK3N0YXRpYyB1aW50MzJf
+dCBwZmxhc2hfcmVhZCAoUEZsYXNoQ0ZJMDEgKnBmbCwgaHdhZGRyIG9mZnNldCwKCkVSUk9SOiBz
+cGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNp
+cyAnKCcKIzM0MDogRklMRTogaHcvYmxvY2svcGZsYXNoX2NmaTAyLmM6MTQxOgorc3RhdGljIHVp
+bnQzMl90IHBmbGFzaF9yZWFkIChQRmxhc2hDRkkwMiAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVu
+dGhlc2lzICcoJwojMzU4OiBGSUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoyNjQ6CitzdGF0
+aWMgdm9pZCBwZmxhc2hfd3JpdGUgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgp0
+b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzEw
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzEwIENoZWNraW5nIGNvbW1pdCBlMjU0ODlm
+NjY3NzkgKHBmbGFzaDogTWFjcm8gUEZMQVNIX0JVRygpIGlzIHVzZWQganVzdCBvbmNlLCBleHBh
+bmQpCjMvMTAgQ2hlY2tpbmcgY29tbWl0IDgzNDU0MjcyZjk1MiAoaHc6IFVzZSBDRklfUEZMQVNI
+MHsxLCAyfSBhbmQgVFlQRV9DRklfUEZMQVNIMHsxLCAyfSkKNC8xMCBDaGVja2luZyBjb21taXQg
+MDVlNWVmY2UxMjczIChzYW00NjBleDogRG9uJ3Qgc2l6ZSBmbGFzaCBtZW1vcnkgdG8gbWF0Y2gg
+YmFja2luZyBpbWFnZSkKNS8xMCBDaGVja2luZyBjb21taXQgOGVmNjQ5YjYyMmNmIChwcGM0MDVf
+Ym9hcmRzOiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo2
+LzEwIENoZWNraW5nIGNvbW1pdCA0ZDc3Njk5N2NiN2QgKHIyZDogRmxhc2ggbWVtb3J5IGNyZWF0
+aW9uIGlzIGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUpCjcvMTAgQ2hlY2tpbmcgY29t
+bWl0IDQ3ZDZiMDVkYmYxMCAobWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBmbGFz
+aCBtZW1vcnkgc2l6ZSBzb21ld2hhdCkKOC8xMCBDaGVja2luZyBjb21taXQgY2Q2Yzg4NzRjOWY0
+IChwZmxhc2g6IENsZWFuIHVwIGFmdGVyIGNvbW1pdCAzNjhhMzU0ZjAyYiBwYXJ0IDEpCkVSUk9S
+OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojOTE6IEZJTEU6IGh3
+L2FybS9tdXNpY3BhbC5jOjE2Mzk6CisgICAgICAgIHBmbGFzaF9jZmkwMl9yZWdpc3RlcigweDEw
+MDAwMDAwMFVMTC1NUF9GTEFTSF9TSVpFX01BWCwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
+LScgKGN0eDpWeFYpCiM5OTogRklMRTogaHcvYXJtL211c2ljcGFsLmM6MTY0NjoKKyAgICAgICAg
+cGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZMQVNIX1NJWkVfTUFYLAog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBl
+cnJvcnMsIDAgd2FybmluZ3MsIDI0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzEwIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgo5LzEwIENoZWNraW5nIGNvbW1pdCA1NzNhM2NiNmVlYWMgKHBm
+bGFzaDogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMikKMTAvMTAgQ2hl
+Y2tpbmcgY29tbWl0IDkxOGI1MTE4NTczYiAoaHcvYXJtIGh3L3h0ZW5zYTogRGUtZHVwbGljYXRl
+IHBmbGFzaCBjcmVhdGlvbiBjb2RlIHNvbWUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEtYXJtYnJ1QHJlZGhh
+dC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
