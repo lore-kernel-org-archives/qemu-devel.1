@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49696)
+Received: from eggs.gnu.org ([209.51.188.92]:32804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvvcn-0004Aj-10
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 21:59:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvwdL-0003rJ-9t
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:03:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvvcl-0001WY-4I
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 21:59:12 -0500
-Date: Tue, 19 Feb 2019 13:55:01 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gvwdF-0002PB-MI
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:03:49 -0500
+Date: Tue, 19 Feb 2019 14:09:48 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190219025500.GN9345@umbus.fritz.box>
-References: <20190218181349.23885-1-ppandit@redhat.com>
+Message-ID: <20190219030948.GP9345@umbus.fritz.box>
+References: <20190215170029.15641-1-clg@kaod.org>
+	<20190215170029.15641-3-clg@kaod.org>
+	<20190218064709.GD9345@umbus.fritz.box>
+	<8dbdf821-503c-1811-c2ed-90efb8b7cc1b@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vDEbda84Uy/oId5W"
+	protocol="application/pgp-signature"; boundary="1BKOZKwX7DAU5odC"
 Content-Disposition: inline
-In-Reply-To: <20190218181349.23885-1-ppandit@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] ppc: add host-serial and host-model
- machine attributes
+In-Reply-To: <8dbdf821-503c-1811-c2ed-90efb8b7cc1b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/12] target/ppci/mmu: Use LPCR:HR to
+ chose radix vs. hash translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,177 +27,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Greg Kurz <groug@kaod.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
 
---vDEbda84Uy/oId5W
+--1BKOZKwX7DAU5odC
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 18, 2019 at 11:43:49PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On Mon, Feb 18, 2019 at 10:20:43PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 2/18/19 7:47 AM, David Gibson wrote:
+> > On Fri, Feb 15, 2019 at 06:00:19PM +0100, C=E9dric Le Goater wrote:
+> >> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> >>
+> >> Now that LPCR:HR is set properly for SPAPR, use it for deciding
+> >> the translation type, which also works for bare metal
 >=20
-> On ppc hosts, hypervisor shares following system attributes
->=20
->   - /proc/device-tree/system-id
->   - /proc/device-tree/model
->=20
-> with a guest. This could lead to information leakage and misuse.[*]
-> Add machine attributes to control such system information exposure
-> to a guest.
->=20
-> [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
->=20
-> Reported-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Fix-suggested-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> "ppci" -> "ppc" in patch title.
 
-Applied to ppc-for-4.0, thanks.
+Fixed up inline.
 
-> ---
->  hw/ppc/spapr.c         | 76 ++++++++++++++++++++++++++++++++++++++----
->  include/hw/ppc/spapr.h |  2 ++
->  2 files changed, 72 insertions(+), 6 deletions(-)
 >=20
-> Update v4: remove NULL initializations in spapr_instance_init()
->   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04554.html
+> >>
+> >> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> >> ---
+> >>  target/ppc/mmu-book3s-v3.h | 14 +++++++++-----
+> >>  target/ppc/mmu-book3s-v3.c | 11 ++++++++++-
+> >>  target/ppc/mmu_helper.c    |  9 ++-------
+> >>  3 files changed, 21 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
+> >> index fdf80987d7b2..41b77158622a 100644
+> >> --- a/target/ppc/mmu-book3s-v3.h
+> >> +++ b/target/ppc/mmu-book3s-v3.h
+> >> @@ -43,14 +43,18 @@ static inline bool ppc64_use_proc_tbl(PowerPCCPU *=
+cpu)
+> >>      return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
+> >>  }
+> >> =20
+> >> -static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
+> >> +/*
+> >> + * The LPCR:HR bit is a shortcut that avoids having to
+> >> + * dig out the partition table in the fast path. This is
+> >> + * also how the HW uses it.
+> >> + */
+> >> +static inline bool ppc64_v3_radix(PowerPCCPU *cpu)
+> >>  {
+> >> -    PPCVirtualHypervisorClass *vhc =3D
+> >> -        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+> >> -
+> >> -    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
+> >> +    return !!(cpu->env.spr[SPR_LPCR] & LPCR_HR);
+> >>  }
+> >> =20
+> >> +hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, vaddr eaddr);
+> >> +
+> >>  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+> >>                                int mmu_idx);
+> >> =20
+> >> diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
+> >> index b60df4408f3b..a174e7efc57c 100644
+> >> --- a/target/ppc/mmu-book3s-v3.c
+> >> +++ b/target/ppc/mmu-book3s-v3.c
+> >> @@ -26,9 +26,18 @@
+> >>  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+> >>                                int mmu_idx)
+> >>  {
+> >> -    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
+> >> +    if (ppc64_v3_radix(cpu)) { /* Guest uses radix */
+> >>          return ppc_radix64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
+> >>      } else { /* Guest uses hash */
+> >>          return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
+> >>      }
+> >>  }
+> >> +
+> >> +hwaddr ppc64_v3_get_phys_page_debug(PowerPCCPU *cpu, vaddr eaddr)
+> >> +{
+> >> +    if (ppc64_v3_radix(cpu)) {
+> >> +        return ppc_radix64_get_phys_page_debug(cpu, eaddr);
+> >> +    } else {
+> >> +        return ppc_hash64_get_phys_page_debug(cpu, eaddr);
+> >> +    }
+> >> +}
+> >> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> >> index cefed34da4f2..ae81ee18ae95 100644
+> >> --- a/target/ppc/mmu_helper.c
+> >> +++ b/target/ppc/mmu_helper.c
+> >> @@ -1342,7 +1342,7 @@ void dump_mmu(FILE *f, fprintf_function cpu_fpri=
+ntf, CPUPPCState *env)
+> >>          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+> >>          break;
+> >>      case POWERPC_MMU_3_00:
+> >> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
+> >> +        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
+> >>              /* TODO - Unsupported */
+> >>          } else {
+> >>              dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+> >> @@ -1497,12 +1497,7 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs=
+, vaddr addr)
+> >>      case POWERPC_MMU_2_07:
+> >>          return ppc_hash64_get_phys_page_debug(cpu, addr);
+> >>      case POWERPC_MMU_3_00:
+> >> -        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
+> >> -            return ppc_radix64_get_phys_page_debug(cpu, addr);
+> >> -        } else {
+> >> -            return ppc_hash64_get_phys_page_debug(cpu, addr);
+> >> -        }
+> >> -        break;
+> >> +        return ppc64_v3_get_phys_page_debug(cpu, addr);
+> >>  #endif
+> >> =20
+> >>      case POWERPC_MMU_32B:
+> >=20
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0942f35bf8..8786c4c4ca 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
->       * Add info to guest to indentify which host is it being run on
->       * and what is the uuid of the guest
->       */
-> -    if (kvmppc_get_host_model(&buf)) {
-> -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> -        g_free(buf);
-> +    if (spapr->host_model && !g_str_equal(spapr->host_model, "none")) {
-> +        if (g_str_equal(spapr->host_model, "passthrough")) {
-> +            /* -M host-model=3Dpassthrough */
-> +            if (kvmppc_get_host_model(&buf)) {
-> +                _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> +                g_free(buf);
-> +            }
-> +        } else {
-> +            /* -M host-model=3D<user-string> */
-> +            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr->host_mo=
-del));
-> +        }
->      }
-> -    if (kvmppc_get_host_serial(&buf)) {
-> -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> -        g_free(buf);
-> +
-> +    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "none")) {
-> +        if (g_str_equal(spapr->host_serial, "passthrough")) {
-> +            /* -M host-serial=3Dpassthrough */
-> +            if (kvmppc_get_host_serial(&buf)) {
-> +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> +                g_free(buf);
-> +            }
-> +        } else {
-> +            /* -M host-serial=3D<user-string> */
-> +            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr->host_s=
-erial));
-> +        }
->      }
-> =20
->      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-> @@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj, const c=
-har *value, Error **errp)
->      }
->  }
-> =20
-> +static char *spapr_get_host_model(Object *obj, Error **errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    return g_strdup(spapr->host_model);
-> +}
-> +
-> +static void spapr_set_host_model(Object *obj, const char *value, Error *=
-*errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    g_free(spapr->host_model);
-> +    spapr->host_model =3D g_strdup(value);
-> +}
-> +
-> +static char *spapr_get_host_serial(Object *obj, Error **errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    return g_strdup(spapr->host_serial);
-> +}
-> +
-> +static void spapr_set_host_serial(Object *obj, const char *value, Error =
-**errp)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> +
-> +    g_free(spapr->host_serial);
-> +    spapr->host_serial =3D g_strdup(value);
-> +}
-> +
->  static void spapr_instance_init(Object *obj)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> @@ -3183,6 +3230,17 @@ static void spapr_instance_init(Object *obj)
->      object_property_set_description(obj, "ic-mode",
->                   "Specifies the interrupt controller mode (xics, xive, d=
-ual)",
->                   NULL);
-> +
-> +    object_property_add_str(obj, "host-model",
-> +        spapr_get_host_model, spapr_set_host_model,
-> +        &error_abort);
-> +    object_property_set_description(obj, "host-model",
-> +        "Set host's model-id to use - none|passthrough|string", &error_a=
-bort);
-> +    object_property_add_str(obj, "host-serial",
-> +        spapr_get_host_serial, spapr_set_host_serial,
-> +        &error_abort);
-> +    object_property_set_description(obj, "host-serial",
-> +        "Set host's system-id to use - none|passthrough|string", &error_=
-abort);
->  }
-> =20
->  static void spapr_machine_finalizefn(Object *obj)
-> @@ -4080,9 +4138,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
->  static void spapr_machine_3_1_class_options(MachineClass *mc)
->  {
->      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> +    static GlobalProperty compat[] =3D {
-> +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-> +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-> +    };
-> =20
->      spapr_machine_4_0_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-> +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> +
->      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
->      smc->update_dt_enabled =3D false;
->  }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a947a0a0dc..e004a570d8 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -177,6 +177,8 @@ struct sPAPRMachineState {
-> =20
->      /*< public >*/
->      char *kvm_type;
-> +    char *host_model;
-> +    char *host_serial;
-> =20
->      const char *icp_type;
->      int32_t irq_map_nr;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -202,24 +152,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---vDEbda84Uy/oId5W
+--1BKOZKwX7DAU5odC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrcAQACgkQbDjKyiDZ
-s5KhNg/+Nn2nck5t/4USBbzxOUoyHHhhg364TW+l7AlL4U4eMxxd+L2OZfyNvtUe
-Q0KfBXaUScGwGZ4/2fySvvUqaU79tezhhlvRDHPDbTZfMWB9SXN1ZZOBt2aOjzKg
-TPoYdVy43h8Ma6C1JzKcfKKew4YScJ9bn1JhGTZZl7sSnM1mWGLuSrlVf6CWdye+
-/myh/dsV4HmtSmKePJ7DKZe1jXlnCXV1joCyfqYyydOJGr7IYopbKO6JGIMqPzet
-Pam4KthldLcWConDF162cTFKTUqnQVeb2NxOK6YORJp86NZ9hjOLa7wc6I+MtCnd
-iyea+wguj/TSRi6aIVbngcP1QdCGSuqlKeph1vjbDYPxJlpLhclEw/YTueVYJ/DZ
-ouyyjKqVjIiznZI4iYGNU5EyjuUMGLZGG2pPDvVEPVwbpR+EPVQiZGNqdhSDBoW1
-PK5il4smNo7VdIcTw80qbZaR6JJVHvVbLhbpsdgQ3NqTgKj2/9t0PRKPqiBQsu92
-xz2Q+cvDTFptSwPeLDZkVuP+tCs27ZfnipUgCqYy6dpvhsn48kZCuboobW7UghHf
-EtIwr9xbSSLHraGgcQrGliBy50kRoHAIbd6pInp0E1ioFhDPhvIJFMD5oulNJZfK
-JF5g2pXR9G+HNdOSnah6UHM+XgQ/IKhLQoCjHSMXOqAIuP7W94M=
-=StOi
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrc3oACgkQbDjKyiDZ
+s5L2DA//ZkvZ2M+o8muW6BLpctKKQgvMl8ODooAfzpQs1MifMjr+MFKl7y/ksM/g
+oLM+X2sZNd1mHIvl1CfEjSJogjFoZKkqM2TH5QjKI2DcHtRzxGAIudep8T4uH9DW
+hup7fcDv03hPx6kCtN8r2F7gSGrBjsaCgqfVywqrOJrdpIkPlIdX4sLnz616eb05
+g4xWcOPIRTsHFk4ZZwo+LYtctZshTGUOvWqfIq0G7FJof/kfHh60jW8JojD0tD1P
+xHCU/XK4PNsf45DdPjBdMd9vjqInPup9eXKRp0tOWJ9gnZfu/l+nC9jhD4RgRptb
+lvZxp9y4IL9D+tlHmF1duX0J2K3GGZbJbxd25osyItHcsu5PXLd0ckxHCT/FMr98
+n2M2WQvVsU3JXluRyWcDKgIqP76XJ0GoQxgeemBnDIpko/faRQOIqRxTCWDdfJYh
+yfEUuSPGqtWkf8905KPeKJspkWwOd/lj1nj6mbVEIXc5/eiSkqT2EI7Pmh4AcVu0
+ekusJuuKTUfVfZpbhcrBvOjd84fvqMV9RRLJp9Euq92wUkoAeLgzgzCMLCPYcNQW
+02VQQYX4q4IAvk0/08MF+D6jVSeUBJ7DCN/txX4GpCrPk/B0PcEPO83Zzy0sXwwi
+B+RMdN5eqTHetd/01jC2KTDnu7f0/HeBWcJlIe7euK+HQlnS/JM=
+=+yIt
 -----END PGP SIGNATURE-----
 
---vDEbda84Uy/oId5W--
+--1BKOZKwX7DAU5odC--
