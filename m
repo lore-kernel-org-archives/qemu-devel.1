@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51635)
+Received: from eggs.gnu.org ([209.51.188.92]:51762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gw2ok-0004bV-8c
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:03 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2oy-0004jW-4M
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gw2oj-0003io-8v
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gw2oh-0003gR-Pf
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:00 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 27B5E2F5D
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 10:39:53 +0000 (UTC)
-References: <20190219101510.9356-1-kraxel@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <a7050f62-b56f-cc1a-7600-5197b83a27ac@redhat.com>
-Date: Tue, 19 Feb 2019 11:39:49 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190219101510.9356-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw2ow-0003ru-0Z
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:40:16 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 19 Feb 2019 10:40:03 +0000
+Message-ID: <1b25b3e6-dcb7-31b0-d9db-1590ef9ed71e@virtuozzo.com>
+References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
+	<20190211125601.86533-4-vsementsov@virtuozzo.com>
+	<487bcf49-65fb-16eb-0d0e-978fa324817a@redhat.com>
+In-Reply-To: <487bcf49-65fb-16eb-0d0e-978fa324817a@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] audio: don't use alsa by default
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EC1E6CAA28850A4886313724F32C6FD9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 3/4] nbd: do qemu_coroutine_yield during
+ tls handshake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +27,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "berrange@redhat.com" <berrange@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 19.02.19 11:15, Gerd Hoffmann wrote:
-> ardware is present the driver initializes
-> successfully and throws errors later on, i.e. effectively the
-> automatic probing doesn't work.  So the driver should not be
-> used by default (until that is fixed).  Drop the can_be_default
-> flag.
->=20
-> Explicitly picking the alsa driver (using QEMU_AUDIO_DRV=3Dalsa
-> environment variable) will continue to work.
-
-Just pointing out that with this patch, audio initialization still
-hinders me from starting guests on my Fedora 29 when running under root
-(I don't think this patch was also intended to fix that, just pointing
-out for me the problem still exists).
-
-
-ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
-Connection refused
-
-sdl: SDL_OpenAudio failed
-sdl: Reason: ALSA: Couldn't open audio device: Connection refused
-ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
-Connection refused
-
-sdl: SDL_OpenAudio failed
-sdl: Reason: ALSA: Couldn't open audio device: Connection refused
-audio: Failed to create voice `pcspk'
-qemu-system-x86_64: Initialization of device isa-pcspk failed:
-Initializing audio voice failed
-
-
-For whatever reason, on my Fedora29 root cannot access alsa devices.
-Maybe it is a Fedora 29 problem, maybe only my setup is messed up (e.g.
-because of an upgrade). The workaround for me is to not run QEMU as
-root. (I don't have time to look into the details)
-
---=20
-
-Thanks,
-
-David / dhildenb
+MTIuMDIuMjAxOSAwOjU1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAyLzExLzE5IDY6NTYgQU0s
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBXZSBhbHdheXMgY2FsbCBx
+aW9fY2hhbm5lbF90bHNfaGFuZHNoYWtlIGluIG5iZCBmcm9tIGNvdXJvdXRpbmUuIFRha2UNCj4+
+IGJlbmVmaXQgb2YgaXQgYW5kIGp1c3QgeWllbGQgaW5zdGVhZCBvZiBjcmVhdGluZyBwZXJzb25h
+bCBtYWluIGxvb3AuDQo+Pg0KPj4gTWFyayBhbmQgcmVuYW1lIHRoZSBmdW5jdGlvbiBhbmQgaXQn
+cyBjYWxsZXJzIGNvcnJlc3BvbmRpbmdseSBhbmQNCj4+IHRyYWNlLXBvaW50cyB0b28uDQo+Pg0K
+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
+dkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIG5iZC9jbGllbnQuYyAgICAgfCAyNiArKysr
+KysrKystLS0tLS0tLS0tLS0tLS0tLQ0KPj4gICBuYmQvY29tbW9uLmMgICAgIHwgIDYgKystLS0t
+DQo+PiAgIG5iZC9zZXJ2ZXIuYyAgICAgfCA0NSArKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0NCj4+ICAgbmJkL3RyYWNlLWV2ZW50cyB8IDE1ICsrKysrKystLS0t
+LS0tLQ0KPj4gICA0IGZpbGVzIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDU3IGRlbGV0aW9u
+cygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9uYmQvY2xpZW50LmMgYi9uYmQvY2xpZW50LmMNCj4+
+IGluZGV4IDJiYTIyMjBhNGEuLmUzOTE5YmUzMGUgMTAwNjQ0DQo+PiAtLS0gYS9uYmQvY2xpZW50
+LmMNCj4+ICsrKyBiL25iZC9jbGllbnQuYw0KPj4gQEAgLTU3OCwxMyArNTc4LDE0IEBAIHN0YXRp
+YyBpbnQgbmJkX3JlcXVlc3Rfc2ltcGxlX29wdGlvbihRSU9DaGFubmVsICppb2MsIGludCBvcHQs
+IEVycm9yICoqZXJycCkNCj4+ICAgICAgIHJldHVybiAxOw0KPj4gICB9DQo+PiAgIA0KPj4gLXN0
+YXRpYyBRSU9DaGFubmVsICpuYmRfcmVjZWl2ZV9zdGFydHRscyhRSU9DaGFubmVsICppb2MsDQo+
+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFDcnlwdG9UTFNDcmVk
+cyAqdGxzY3JlZHMsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IGNvbnN0IGNoYXIgKmhvc3RuYW1lLCBFcnJvciAqKmVycnApDQo+PiArc3RhdGljIFFJT0NoYW5u
+ZWwgKm5iZF9jb19yZWNlaXZlX3N0YXJ0dGxzKA0KPiANCj4gTWlzc2luZyBjb3JvdXRpbmVfZm4g
+Pw0KDQpobW0sIHllcy4NCg0KPiANCj4+ICsgICAgICAgIFFJT0NoYW5uZWwgKmlvYywgUUNyeXB0
+b1RMU0NyZWRzICp0bHNjcmVkcywgY29uc3QgY2hhciAqaG9zdG5hbWUsDQo+PiArICAgICAgICBF
+cnJvciAqKmVycnApDQo+PiAgIHsNCj4+ICAgICAgIGludCByZXQ7DQo+PiAgICAgICBRSU9DaGFu
+bmVsVExTICp0aW9jOw0KPj4gLSAgICBzdHJ1Y3QgTkJEVExTSGFuZHNoYWtlRGF0YSBkYXRhID0g
+eyAwIH07DQo+PiArDQo+PiArICAgIGFzc2VydChxZW11X2luX2Nvcm91dGluZSgpKTsNCj4gDQo+
+IEFnYWluLCBJJ20gbm90IHN1cmUgdGhlc2UgYXNzZXJ0aW9ucyBhZGQgbXVjaC4NCj4gDQo+PiAg
+IA0KPj4gICAgICAgcmV0ID0gbmJkX3JlcXVlc3Rfc2ltcGxlX29wdGlvbihpb2MsIE5CRF9PUFRf
+U1RBUlRUTFMsIGVycnApOw0KPiANCj4gU2hvdWxkIHdlIGFsc28gYmUgbWFya2luZyB0aGVzZSBo
+ZWxwZXIgZnVuY3Rpb25zIGFzIGNvcm91dGluZV9mbiBieSB0aGUNCj4gZW5kIG9mIHRoZSBzZXJp
+ZXMsIG9uY2UgYWxsIGNhbGxlcnMgYXJlIG1hcmtlZCB0aGF0IHdheT8NCg0KSSB0aGluaywgbm90
+LiBJdCBzdGlsbCBtYXkgYmUgY2FsbGVkIGZyb20gbm9uLWNvcm91dGluZSBjb250ZXh0Lg0KDQo+
+IA0KPj4gICAgICAgaWYgKHJldCA8PSAwKSB7DQo+PiBAQCAtNjAxLDIzICs2MDIsMTMgQEAgc3Rh
+dGljIFFJT0NoYW5uZWwgKm5iZF9yZWNlaXZlX3N0YXJ0dGxzKFFJT0NoYW5uZWwgKmlvYywNCj4+
+ICAgICAgICAgICByZXR1cm4gTlVMTDsNCj4+ICAgICAgIH0NCj4+ICAgICAgIHFpb19jaGFubmVs
+X3NldF9uYW1lKFFJT19DSEFOTkVMKHRpb2MpLCAibmJkLWNsaWVudC10bHMiKTsNCj4+IC0gICAg
+ZGF0YS5sb29wID0gZ19tYWluX2xvb3BfbmV3KGdfbWFpbl9jb250ZXh0X2RlZmF1bHQoKSwgRkFM
+U0UpOw0KPj4gICAgICAgdHJhY2VfbmJkX3JlY2VpdmVfc3RhcnR0bHNfdGxzX2hhbmRzaGFrZSgp
+Ow0KPj4gICAgICAgcWlvX2NoYW5uZWxfdGxzX2hhbmRzaGFrZSh0aW9jLA0KPj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBuYmRfdGxzX2hhbmRzaGFrZSwNCj4+IC0gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAmZGF0YSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBxZW11X2Nvcm91dGluZV9zZWxmKCksDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIE5VTEwsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5VTEwpOw0K
+Pj4gLQ0KPj4gLSAgICBpZiAoIWRhdGEuY29tcGxldGUpIHsNCj4+IC0gICAgICAgIGdfbWFpbl9s
+b29wX3J1bihkYXRhLmxvb3ApOw0KPj4gLSAgICB9DQo+PiAtICAgIGdfbWFpbl9sb29wX3VucmVm
+KGRhdGEubG9vcCk7DQo+PiAtICAgIGlmIChkYXRhLmVycm9yKSB7DQo+PiAtICAgICAgICBlcnJv
+cl9wcm9wYWdhdGUoZXJycCwgZGF0YS5lcnJvcik7DQo+PiAtICAgICAgICBvYmplY3RfdW5yZWYo
+T0JKRUNUKHRpb2MpKTsNCj4+IC0gICAgICAgIHJldHVybiBOVUxMOw0KPj4gLSAgICB9DQo+PiAr
+ICAgIHFlbXVfY29yb3V0aW5lX3lpZWxkKCk7DQo+IA0KPiBOaWNlLg0KPiANCj4+ICsrKyBiL25i
+ZC9zZXJ2ZXIuYw0KPj4gQEAgLTY2OCwxNiArNjY4LDE1IEBAIHN0YXRpYyBpbnQgbmJkX25lZ290
+aWF0ZV9oYW5kbGVfaW5mbyhOQkRDbGllbnQgKmNsaWVudCwgdWludDE2X3QgbXlmbGFncywNCj4+
+ICAgDQo+PiAgIC8qIEhhbmRsZSBOQkRfT1BUX1NUQVJUVExTLiBSZXR1cm4gTlVMTCB0byBkcm9w
+IGNvbm5lY3Rpb24sIG9yIGVsc2UgdGhlDQo+PiAgICAqIG5ldyBjaGFubmVsIGZvciBhbGwgZnVy
+dGhlciAobm93LWVuY3J5cHRlZCkgY29tbXVuaWNhdGlvbi4gKi8NCj4+IC1zdGF0aWMgUUlPQ2hh
+bm5lbCAqbmJkX25lZ290aWF0ZV9oYW5kbGVfc3RhcnR0bHMoTkJEQ2xpZW50ICpjbGllbnQsDQo+
+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9y
+ICoqZXJycCkNCj4+ICtzdGF0aWMgUUlPQ2hhbm5lbCBjb3JvdXRpbmVfZm4gKm5iZF9jb19uZWdv
+dGlhdGVfaGFuZGxlX3N0YXJ0dGxzKA0KPiANCj4gQXdrd2FyZCBzcGxpdCBvZiB0aGUgcmV0dXJu
+IHR5cGU7IHRoZSBjb3JvdXRpbmVfZm4gc2hvdWxkIGluc3RlYWQgYmUNCj4gcGxhY2VkIGFmdGVy
+IHRoZSAqLCBhcyBpbjoNCg0KT29wcywgYWdyZWUuDQoNCj4gDQo+IGJsb2NrL21pcnJvci5jOnN0
+YXRpYyBNaXJyb3JPcCAqY29yb3V0aW5lX2ZuIGFjdGl2ZV93cml0ZV9wcmVwYXJlKC4uLg0KPiAN
+Cj4+ICsgICAgICAgIE5CRENsaWVudCAqY2xpZW50LCBFcnJvciAqKmVycnApDQo+PiAgIHsNCj4+
+ICAgICAgIFFJT0NoYW5uZWwgKmlvYzsNCj4+ICAgICAgIFFJT0NoYW5uZWxUTFMgKnRpb2M7DQo+
+PiAtICAgIHN0cnVjdCBOQkRUTFNIYW5kc2hha2VEYXRhIGRhdGEgPSB7IDAgfTsNCj4gDQo+IEFs
+bCB1c2VzIG9mIHRoaXMgdHlwZSBoYXZlIGJlZW4gZGVsZXRlZDsgeW91IHNob3VsZCBhbHNvIHJl
+bW92ZSBpdCBmcm9tDQo+IG5iZC1pbnRlcm5hbC5oLg0KDQpPSw0KDQo+IA0KPiANCj4+IEBAIC0x
+MDkzLDcgKzEwODIsNyBAQCBzdGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfb3B0aW9ucyhOQkRDbGll
+bnQgKmNsaWVudCwgdWludDE2X3QgbXlmbGFncywNCj4+ICAgICAgICAgICAgICAgcmV0dXJuIC1F
+SU5WQUw7DQo+PiAgICAgICAgICAgfQ0KPj4gICANCj4+IC0gICAgICAgIHRyYWNlX25iZF9uZWdv
+dGlhdGVfb3B0aW9uc19jaGVja19vcHRpb24ob3B0aW9uLA0KPj4gKyAgICAgICAgdHJhY2VfbmJk
+X2NvX25lZ290aWF0ZV9vcHRpb25zX2NoZWNrX29wdGlvbihvcHRpb24sDQo+PiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYmRfb3B0X2xvb2t1cChv
+cHRpb24pKTsNCj4gDQo+IEluZGVudGF0aW9uIGxvb2tzIG9mZi4NCj4gDQoNCg0KLS0gDQpCZXN0
+IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
