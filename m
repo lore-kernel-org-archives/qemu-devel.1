@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48114)
+Received: from eggs.gnu.org ([209.51.188.92]:48567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gw0h7-0004uk-Gu
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 03:24:02 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gw0j4-0005l6-Hm
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 03:26:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gw0h6-0006FJ-OE
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 03:24:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59960)
+	(envelope-from <kraxel@redhat.com>) id 1gw0j3-00073Z-Kg
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 03:26:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59786)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gw0h6-0006Eb-HP
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 03:24:00 -0500
-Date: Tue, 19 Feb 2019 16:21:01 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190219082101.GA15343@wei-ubt>
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-8-git-send-email-wexu@redhat.com>
-	<7d71fb88-2651-41eb-023e-63a11a83cd38@redhat.com>
-	<20190218144640.GA28793@wei-ubt>
-	<71fd17b4-9509-3f13-556d-fc4c3e617e84@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gw0j3-0006zr-DC
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 03:26:01 -0500
+Date: Tue, 19 Feb 2019 09:19:48 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190219081948.klww6y5de53s7bec@sirius.home.kraxel.org>
+References: <RO1P152MB1483088A66FD63B63FD7279A97650@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190212131136.GH9386@redhat.com>
+	<875ztokz0g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <71fd17b4-9509-3f13-556d-fc4c3e617e84@redhat.com>
+In-Reply-To: <875ztokz0g.fsf@dusky.pond.sub.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 07/11] virtio: fill/flush/pop for packed
- ring
+Subject: Re: [Qemu-devel] Key repeat is no longer working on TTY and grub
+ menu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com, tiwei.bie@intel.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Leonardo Soares =?utf-8?Q?M=C3=BCller?= <leozinho29_eu@hotmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Tue, Feb 19, 2019 at 02:49:42PM +0800, Jason Wang wrote:
+On Wed, Feb 13, 2019 at 07:01:35AM +0100, Markus Armbruster wrote:
+> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
 >=20
-> On 2019/2/18 =E4=B8=8B=E5=8D=8810:46, Wei Xu wrote:
-> >>Do we allow chain more descriptors than vq size in the case of indire=
-ct?
-> >>According to the spec:
-> >>
-> >>"
-> >>
-> >>The device limits the number of descriptors in a list through a
-> >>transport-specific and/or device-specific value. If not limited,
-> >>the maximum number of descriptors in a list is the virt queue
-> >>size.
-> >>"
-> >>
-> >>This looks possible, so the above is probably wrong if the max number=
- of
-> >>chained descriptors is negotiated through a device specific way.
-> >>
-> >OK, I will remove this check, while it is necessary to have a limitati=
-on
-> >for indirect descriptor anyway, otherwise it is possible to hit an ove=
-rflow
-> >since presumably u16 is used for most number/size in the spec.
+> > Yes, this is another regression accidentally introduced by the keyboa=
+rd
+> > state tracker.
 > >
+> > When GTK does key repeat it omits the Up event for repeated keys.
+> >
+> > IOW, you get
+> >
+> >     Press (a)
+> >     Press (a)
+> >     Press (a)
+> >     Release (a)
 >=20
-> Please try to test block and scsi device for you changes as well.
+> This is how keyboards commonly do it, if I remember correctly.
 
-Any idea about what kind of test should be covered? AFAICT, currently
-packed ring is targeted for virtio-net as discussed during voting spec.
+Yes, this is pretty much what the hardware sends, intentionally, so the
+software can figure whenever the event is a autorepeat event or not.
 
-Wei
+These days most software just ignores repeated events from the hardware
+and generates them in software instead, to not depend on the keyboard
+hardware capabilities for autorepeat.
 
+> > This might affect other frontends too if they use the same trick for
+> > key repeat
 >=20
-> Thanks
->=20
->=20
+> Plausible.
+
+UIs are not consistent here.  But, yes, we probably should just allow
+down events even if the key is already in down state.
+
+cheers,
+  Gerd
