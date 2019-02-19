@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48117)
+Received: from eggs.gnu.org ([209.51.188.92]:54976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwE4C-0004zH-0K
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:40:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gwEfs-0004Tu-BU
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 18:19:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwE49-0008Nm-By
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:40:43 -0500
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:43379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gwE47-0008Lz-HE
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:40:41 -0500
-Received: by mail-pg1-x530.google.com with SMTP id v28so10799867pgk.10
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 14:40:37 -0800 (PST)
-References: <20190214040652.4811-1-richard.henderson@linaro.org>
-	<20190214040652.4811-5-richard.henderson@linaro.org>
-	<8736oj5y8s.fsf@zen.linaroharston>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7b7a1ab1-d156-bd86-ca89-f85e4f2046a3@linaro.org>
-Date: Tue, 19 Feb 2019 14:40:32 -0800
+	(envelope-from <pbonzini@redhat.com>) id 1gwEfn-0002nX-Cu
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 18:19:38 -0500
+Date: Tue, 19 Feb 2019 18:19:30 -0500 (EST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1590333482.2281318.1550618370282.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190219152040-mutt-send-email-mst@kernel.org>
+References: <1550592459-7286-1-git-send-email-thuth@redhat.com>
+	<a7eb2932-c72d-f9cf-c3c4-010f967ca743@redhat.com>
+	<20190219152040-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <8736oj5y8s.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/arm: Rely on hflags correct in
- cpu_get_tb_cpu_state
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pci/pci-stub: Add msi_enabled() and
+ msi_notify() to the pci stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, yang zhong <yang.zhong@intel.com>
 
-On 2/19/19 12:17 PM, Alex Bennée wrote:
-> While debugging I came up with this monstrosity:
+
+> > Makes sense, but it is also abstraction time. :)  What if instead there
+> > was a function
+> > 
+> > void msi_allocate_irqs(PCIDevice *pdev, int num, bool fallback_to_intx);
+> > 
+> > and then ich.c did
+> > 
+> >     irqs = msi_allocate_irqs(pdev, 1, true);
+> >     s->irq = irqs[0];
+> >     g_free(irqs);
+> > 
+> > ?  "if msi_enabled raise MSI else raise INTX" is really a common idiom.
+> > 
+> > Thanks,
+> > 
+> > Paolo
 > 
->     if (FIELD_EX32(flags, TBFLAG_ANY, AARCH64_STATE)) {
-> #ifdef CONFIG_DEBUG_TCG
->         static uint32_t tb_state = 0;
->         uint32_t recalc_flags = rebuild_hflags_a64(env, arm_current_el(env));
->         tb_state++;
->         if (flags != recalc_flags) {
->             fprintf(stderr, "%s: flags %#x, should be %#x (%#x/%d)\n", __func__,
->                     flags, recalc_flags, flags ^ recalc_flags, tb_state);
->             abort();
->         }
-> #endif
->         *pc = env->pc;
->         flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
->         pstate_for_ss = env->pstate;
->     } else {
+> Maybe it is but the specific issue is not about fallback to INTX of PCI
+> (is the fallback broken for ahci? I don't know).
 
-I have now included
+It works, the above is just a new abstraction.
 
-+#ifdef CONFIG_DEBUG_TCG
-+    {
-+        int el = arm_current_el(env);
-+        uint32_t check_flags;
-+        if (is_a64(env)) {
-+            check_flags = rebuild_hflags_a64(env, el);
-+        } else {
-+            check_flags = rebuild_hflags_a32(env, el);
-+        }
-+        g_assert_cmphex(flags, ==, check_flags);
-+    }
-+#endif
+> The trick is there's no pdev at all.
 
+The trick :) is that in ich.c there is a pdev.  Right now we are assigning to
+s->irq either the INTX irq (if PCI) or a sysbus irq (if sysbus), but then
+we need to know about MSI with a wrapper around s->irq.
 
-r~
+Instead, my suggestion is to put the wrapper in the PCI core as a qemu_irq
+callback---or perhaps in ich.c, but anyway ahci.c should not care that there
+could be a PCI AHCI device and it would have two different interrupt modes.
+In fact, doing this would also remove the need for s->container, I think.
+
+Paolo
