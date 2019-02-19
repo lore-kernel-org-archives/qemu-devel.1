@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34683)
+Received: from eggs.gnu.org ([209.51.188.92]:35357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gw5Wv-0000wL-NN
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:33:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5ZH-0002El-Tx
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:36:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gw5Wt-00074U-Vm
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:33:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gw5Wt-00070a-Ow
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:33:47 -0500
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-12-git-send-email-wexu@redhat.com>
-	<ba86ca50-73e8-1c06-8ab0-0e8b74aeac58@redhat.com>
-	<20190219112312.GA1582@wei-ubt>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4e786e43-4ef0-f463-5be4-7d264d6d35be@redhat.com>
-Date: Tue, 19 Feb 2019 21:33:40 +0800
-MIME-Version: 1.0
-In-Reply-To: <20190219112312.GA1582@wei-ubt>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5ZG-0000Kh-VX
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:36:15 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 19 Feb 2019 13:36:08 +0000
+Message-ID: <2cdd547c-0b67-8569-13cd-64e2c2c2a564@virtuozzo.com>
+References: <20190219115937.21587-1-stefanha@redhat.com>
+	<2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
+	<30c66aaa-2807-69cd-2395-dcd49e59b136@virtuozzo.com>
+	<CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
+	<acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
+In-Reply-To: <acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 11/11] virtio: CLI and provide packed
- ring feature bit by default
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2F70BC61F8915E4DA1FA3873DA1B5E0F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: drop unnecessary
+ accel=kvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <wexu@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, jfreiman@redhat.com, tiwei.bie@intel.com, mst@redhat.com
+To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-On 2019/2/19 =E4=B8=8B=E5=8D=887:23, Wei Xu wrote:
-> On Tue, Feb 19, 2019 at 03:32:19PM +0800, Jason Wang wrote:
->> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26,wexu@redhat.com  wrote:
->>> From: Wei Xu<wexu@redhat.com>
->>>
->>> Add userspace and vhost kernel/user support.
->>>
->>> Add CLI "ring_packed=3Dtrue/false" to enable/disable packed ring prov=
-ision.
->>> Usage:
->>>      -device virtio-net-pci,netdev=3Dxx,mac=3Dxx:xx:xx:xx:xx:xx,ring_=
-packed=3Dfalse
->>>
->>> By default it is provided.
->> Please compat this for old machine types.
-> It is provided by default, how to make it compatible for old machine ty=
-pes?
-> Hide or provide it?
->
-> Wei
->
-
-Take a look at e.g how pc_compat_3_1 and hw_compat_3_1 was used.
-
-Thanks
+MTkuMDIuMjAxOSAxNjoyMCwgVGhvbWFzIEh1dGggd3JvdGU6DQo+IE9uIDE5LzAyLzIwMTkgMTQu
+MDcsIFN0ZWZhbiBIYWpub2N6aSB3cm90ZToNCj4+IE9uIFR1ZSwgRmViIDE5LCAyMDE5IGF0IDEy
+OjEyIFBNIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkNCj4+IDx2c2VtZW50c292QHZpcnR1
+b3p6by5jb20+IHdyb3RlOg0KPj4+IDE5LjAyLjIwMTkgMTU6MDIsIFRob21hcyBIdXRoIHdyb3Rl
+Og0KPj4+PiBPbiAxOS8wMi8yMDE5IDEyLjU5LCBTdGVmYW4gSGFqbm9jemkgd3JvdGU6DQo+Pj4+
+PiBUZXN0cyAyMzUgYW5kIDIzOCBkbyBub3QgcmVxdWlyZSB0aGUga3ZtIGFjY2VsZXJhdG9yLiAg
+VENHIHdvcmtzIGZpbmUuDQo+Pj4+Pg0KPj4+Pj4gVXNlIHRoZSBkZWZhdWx0IGFjY2VsZXJhdG9y
+IGluc3RlYWQgb2YgcmVxdWlyaW5nIGt2bS4NCj4+Pj4+DQo+Pj4+PiBTdWdnZXN0ZWQtYnk6IFRo
+b21hcyBIdXRoIDx0aHV0aEByZWRoYXQuY29tPg0KPj4+Pj4gU2lnbmVkLW9mZi1ieTogU3RlZmFu
+IEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPg0KPj4+Pj4gLS0tDQo+Pj4+PiAgICB0ZXN0
+cy9xZW11LWlvdGVzdHMvMjM1IHwgMSAtDQo+Pj4+PiAgICB0ZXN0cy9xZW11LWlvdGVzdHMvMjM4
+IHwgMSAtDQo+Pj4+PiAgICAyIGZpbGVzIGNoYW5nZWQsIDIgZGVsZXRpb25zKC0pDQo+Pj4+Pg0K
+Pj4+Pj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzUgYi90ZXN0cy9xZW11LWlv
+dGVzdHMvMjM1DQo+Pj4+PiBpbmRleCBkNmVkZDk3YWI0Li4zMjlkYThmMGMyIDEwMDc1NQ0KPj4+
+Pj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNQ0KPj4+Pj4gKysrIGIvdGVzdHMvcWVtdS1p
+b3Rlc3RzLzIzNQ0KPj4+Pj4gQEAgLTQ5LDcgKzQ5LDYgQEAgcWVtdV9pbWdfY3JlYXRlKCctZics
+IGlvdGVzdHMuaW1nZm10LCAnLW8nLCAncHJlYWxsb2NhdGlvbj1tZXRhZGF0YScsIGRpc2ssDQo+
+Pj4+PiAgICAgICAgICAgICAgICAgICAgc3RyKHNpemUpKQ0KPj4+Pj4NCj4+Pj4+ICAgIHZtID0g
+UUVNVU1hY2hpbmUoaW90ZXN0cy5xZW11X3Byb2cpDQo+Pj4+PiAtdm0uYWRkX2FyZ3MoJy1tYWNo
+aW5lJywgJ2FjY2VsPWt2bScpDQo+Pj4+DQo+Pj4+IEFjY29yZGluZyB0byB0aGUgaW5pdGlhbCBj
+b21taXQgbG9nIG9mIDIzNToNCj4+Pj4NCj4+Pj4gICAgImlvdGVzdHM6IHNpbXBsZSBtaXJyb3Ig
+dGVzdCB3aXRoIGt2bSBvbiAxRyBpbWFnZSINCj4+Pj4NCj4+Pj4gLi4uIHNvIEkgYXNzdW1lIEtW
+TSB3YXMgdXNlZCBvbiBwdXJwb3NlIGhlcmU/DQo+Pj4+DQo+Pj4+ICAgIFRob21hcw0KPj4+Pg0K
+Pj4+DQo+Pj4gQXMgSSByZW1lbWJlciBrdm0gaXMgbm90IHJlYWxseSBuZWNlc3NhcnksIGFuZCB0
+ZXN0IGhhdmUgYSBjb21tZW50IGFib3V0IGl0Og0KPj4+ICMgQW5kIGl0IGRpZG4ndCByZXByb2R1
+Y2UgaWYgYXQgbGVhc3Qgb25lIG9mIHRoZSBmb2xsb3dpbmc6DQo+Pj4gLi4uDQo+Pj4gIyAzLiBk
+cm9wIGt2bSBhbmQgdXNlIGlvdGVzdHMuVk0oKSAobWF5YmUsIGJlY2F1c2Ugb2YgcXRlc3QpICho
+b3dldmVyLCBpdCBzdGlsbA0KPj4+ICMgICAgcmVwcm9kdWNlcywgaWYganVzdCBkcm9wIGt2bSwg
+YnV0IGdkYiBmYWlsZWQgdG8gcHJvZHVjZSBmdWxsIGJhY2t0cmFjZXMNCj4+PiAjICAgIGZvciBt
+ZSkNCj4+Pg0KPj4+IEJ1dCB0aGUgY29tbWVudCBzaG91bGQgYmUgdXBkYXRlZCB3aXRoIHRoaXMg
+cGF0Y2guDQo+Pg0KPj4gV2lsbCBmaXggaW4gdjIuDQo+IA0KPiBBbnkgY2hhbmNlIHRoYXQgeW91
+IGNvdWxkIGV2ZW4gbWFrZSBpdCBzb21laG93IHdvcmsgd2l0aCAtTSBhY2NlbD1xdGVzdA0KPiBp
+bnN0ZWFkPyAuLi4gaW4gY2FzZSBzb21lb25lIGNvbXBpbGVkIHRoZWlyIFFFTVUgd2l0aCAtLWRp
+c2FibGUtdGNnLCB0b28NCj4gLi4uPw0KPiANCg0KSSBkaWRuJ3QgaW52ZXN0aWdhdGUgd2h5IGJ1
+ZyBub3QgcmVwcm9kdWNlZCB3aXRoIHF0ZXN0Li4gSSB0aGluaywgdGhlIHNpbXBsZXN0DQpvcHRp
+b24gc2hvdWxkIGJlIGEgaGVscGVyIGxpa2UgaW90ZXN0cy5uZWVkc190Y2coKSwgdG8gc2tpcCB0
+aGUgdGVzdCBpZg0KaXQgaXMgdW5zdXBwb3J0ZWQuDQoNCk9yIHlvdSBjYXNlIGlzIHRoYXQga3Zt
+IGlzIE9LIGZvciB5b3UgYnV0IHRjZyBpcyBub3Q/IFN0ZWZhbiwgZG8geW91IGhhdmUgc3Ryb25n
+IHJlYXNvbg0KZm9yIHJlbW92aW5nIGt2bSBmcm9tIGlvdGVzdHM/IENvdWxkIGl0IGJlIHNvbWV0
+aGluZyBsaWtlDQoNCiAgIGlmIG5vdCBpb3Rlc3RzLnN1cHBvcnRzX3RjZygpOg0KICAgICAgdm0u
+YWRkX2FyZ3MoJy1tYWNoaW5lJywgJ2FjY2VsPWt2bScpDQoNCj8NCg0KSG1tLCBtYXliZSwgZ29v
+ZCBvcHRpb24gd291bGQgYmUgdG9wbW9zdCBvcHRpb24sIGxpa2Ugd2UgaGF2ZSBmb3IgZm9ybWF0
+IC1xY293MiwgLXJhdywgZXRjLiBTbywNCml0IHdvdWxkIGJlIC1xdGVzdCwgLWt2bSwgLXRjZy4u
+IEJ1dCBpbiB0aGlzIGNhc2Ugbm9ib2R5IHdpbGwgcnVuIGFsbCB0ZXN0IG9uIHNvbWV0aGluZyBv
+dGhlcg0KdGhhbiBxdGVzdC4uDQoNCkl0J3Mgbm90IGJhZCB0byBydW4gdGhpcyB0ZXN0IG9uIHF0
+ZXN0LiBUaGUgcHJvYmxlbSBpcyB3ZSBjYW4gbWlzcyB0aGUgYnVnLCBpZiBub3QgcnVuIHRoaXMN
+CnRlc3Qgb24ga3ZtIG9yIHRjZy4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
