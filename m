@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35357)
+Received: from eggs.gnu.org ([209.51.188.92]:35580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5ZH-0002El-Tx
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:36:17 -0500
+	(envelope-from <arikalo@wavecomp.com>) id 1gw5aN-0002lN-5k
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:37:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5ZG-0000Kh-VX
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:36:15 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Feb 2019 13:36:08 +0000
-Message-ID: <2cdd547c-0b67-8569-13cd-64e2c2c2a564@virtuozzo.com>
-References: <20190219115937.21587-1-stefanha@redhat.com>
-	<2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
-	<30c66aaa-2807-69cd-2395-dcd49e59b136@virtuozzo.com>
-	<CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
-	<acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
-In-Reply-To: <acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
+	(envelope-from <arikalo@wavecomp.com>) id 1gw5aF-0000p2-GX
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:37:18 -0500
+Received: from mail-dm3nam03on072e.outbound.protection.outlook.com
+	([2a01:111:f400:fe49::72e]:34363
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+	id 1gw5aE-0000nH-HD
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:37:15 -0500
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+Date: Tue, 19 Feb 2019 13:37:09 +0000
+Message-ID: <DM5PR22MB16582397BD1BF3BC280AF4A0D27C0@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1550503897-31141-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1550503897-31141-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1550503897-31141-3-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2F70BC61F8915E4DA1FA3873DA1B5E0F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: drop unnecessary
- accel=kvm
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/7] tests/tcg: target/mips: Correct path
+ to headers in some test source files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +32,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 
-MTkuMDIuMjAxOSAxNjoyMCwgVGhvbWFzIEh1dGggd3JvdGU6DQo+IE9uIDE5LzAyLzIwMTkgMTQu
-MDcsIFN0ZWZhbiBIYWpub2N6aSB3cm90ZToNCj4+IE9uIFR1ZSwgRmViIDE5LCAyMDE5IGF0IDEy
-OjEyIFBNIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkNCj4+IDx2c2VtZW50c292QHZpcnR1
-b3p6by5jb20+IHdyb3RlOg0KPj4+IDE5LjAyLjIwMTkgMTU6MDIsIFRob21hcyBIdXRoIHdyb3Rl
-Og0KPj4+PiBPbiAxOS8wMi8yMDE5IDEyLjU5LCBTdGVmYW4gSGFqbm9jemkgd3JvdGU6DQo+Pj4+
-PiBUZXN0cyAyMzUgYW5kIDIzOCBkbyBub3QgcmVxdWlyZSB0aGUga3ZtIGFjY2VsZXJhdG9yLiAg
-VENHIHdvcmtzIGZpbmUuDQo+Pj4+Pg0KPj4+Pj4gVXNlIHRoZSBkZWZhdWx0IGFjY2VsZXJhdG9y
-IGluc3RlYWQgb2YgcmVxdWlyaW5nIGt2bS4NCj4+Pj4+DQo+Pj4+PiBTdWdnZXN0ZWQtYnk6IFRo
-b21hcyBIdXRoIDx0aHV0aEByZWRoYXQuY29tPg0KPj4+Pj4gU2lnbmVkLW9mZi1ieTogU3RlZmFu
-IEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPg0KPj4+Pj4gLS0tDQo+Pj4+PiAgICB0ZXN0
-cy9xZW11LWlvdGVzdHMvMjM1IHwgMSAtDQo+Pj4+PiAgICB0ZXN0cy9xZW11LWlvdGVzdHMvMjM4
-IHwgMSAtDQo+Pj4+PiAgICAyIGZpbGVzIGNoYW5nZWQsIDIgZGVsZXRpb25zKC0pDQo+Pj4+Pg0K
-Pj4+Pj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzUgYi90ZXN0cy9xZW11LWlv
-dGVzdHMvMjM1DQo+Pj4+PiBpbmRleCBkNmVkZDk3YWI0Li4zMjlkYThmMGMyIDEwMDc1NQ0KPj4+
-Pj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNQ0KPj4+Pj4gKysrIGIvdGVzdHMvcWVtdS1p
-b3Rlc3RzLzIzNQ0KPj4+Pj4gQEAgLTQ5LDcgKzQ5LDYgQEAgcWVtdV9pbWdfY3JlYXRlKCctZics
-IGlvdGVzdHMuaW1nZm10LCAnLW8nLCAncHJlYWxsb2NhdGlvbj1tZXRhZGF0YScsIGRpc2ssDQo+
-Pj4+PiAgICAgICAgICAgICAgICAgICAgc3RyKHNpemUpKQ0KPj4+Pj4NCj4+Pj4+ICAgIHZtID0g
-UUVNVU1hY2hpbmUoaW90ZXN0cy5xZW11X3Byb2cpDQo+Pj4+PiAtdm0uYWRkX2FyZ3MoJy1tYWNo
-aW5lJywgJ2FjY2VsPWt2bScpDQo+Pj4+DQo+Pj4+IEFjY29yZGluZyB0byB0aGUgaW5pdGlhbCBj
-b21taXQgbG9nIG9mIDIzNToNCj4+Pj4NCj4+Pj4gICAgImlvdGVzdHM6IHNpbXBsZSBtaXJyb3Ig
-dGVzdCB3aXRoIGt2bSBvbiAxRyBpbWFnZSINCj4+Pj4NCj4+Pj4gLi4uIHNvIEkgYXNzdW1lIEtW
-TSB3YXMgdXNlZCBvbiBwdXJwb3NlIGhlcmU/DQo+Pj4+DQo+Pj4+ICAgIFRob21hcw0KPj4+Pg0K
-Pj4+DQo+Pj4gQXMgSSByZW1lbWJlciBrdm0gaXMgbm90IHJlYWxseSBuZWNlc3NhcnksIGFuZCB0
-ZXN0IGhhdmUgYSBjb21tZW50IGFib3V0IGl0Og0KPj4+ICMgQW5kIGl0IGRpZG4ndCByZXByb2R1
-Y2UgaWYgYXQgbGVhc3Qgb25lIG9mIHRoZSBmb2xsb3dpbmc6DQo+Pj4gLi4uDQo+Pj4gIyAzLiBk
-cm9wIGt2bSBhbmQgdXNlIGlvdGVzdHMuVk0oKSAobWF5YmUsIGJlY2F1c2Ugb2YgcXRlc3QpICho
-b3dldmVyLCBpdCBzdGlsbA0KPj4+ICMgICAgcmVwcm9kdWNlcywgaWYganVzdCBkcm9wIGt2bSwg
-YnV0IGdkYiBmYWlsZWQgdG8gcHJvZHVjZSBmdWxsIGJhY2t0cmFjZXMNCj4+PiAjICAgIGZvciBt
-ZSkNCj4+Pg0KPj4+IEJ1dCB0aGUgY29tbWVudCBzaG91bGQgYmUgdXBkYXRlZCB3aXRoIHRoaXMg
-cGF0Y2guDQo+Pg0KPj4gV2lsbCBmaXggaW4gdjIuDQo+IA0KPiBBbnkgY2hhbmNlIHRoYXQgeW91
-IGNvdWxkIGV2ZW4gbWFrZSBpdCBzb21laG93IHdvcmsgd2l0aCAtTSBhY2NlbD1xdGVzdA0KPiBp
-bnN0ZWFkPyAuLi4gaW4gY2FzZSBzb21lb25lIGNvbXBpbGVkIHRoZWlyIFFFTVUgd2l0aCAtLWRp
-c2FibGUtdGNnLCB0b28NCj4gLi4uPw0KPiANCg0KSSBkaWRuJ3QgaW52ZXN0aWdhdGUgd2h5IGJ1
-ZyBub3QgcmVwcm9kdWNlZCB3aXRoIHF0ZXN0Li4gSSB0aGluaywgdGhlIHNpbXBsZXN0DQpvcHRp
-b24gc2hvdWxkIGJlIGEgaGVscGVyIGxpa2UgaW90ZXN0cy5uZWVkc190Y2coKSwgdG8gc2tpcCB0
-aGUgdGVzdCBpZg0KaXQgaXMgdW5zdXBwb3J0ZWQuDQoNCk9yIHlvdSBjYXNlIGlzIHRoYXQga3Zt
-IGlzIE9LIGZvciB5b3UgYnV0IHRjZyBpcyBub3Q/IFN0ZWZhbiwgZG8geW91IGhhdmUgc3Ryb25n
-IHJlYXNvbg0KZm9yIHJlbW92aW5nIGt2bSBmcm9tIGlvdGVzdHM/IENvdWxkIGl0IGJlIHNvbWV0
-aGluZyBsaWtlDQoNCiAgIGlmIG5vdCBpb3Rlc3RzLnN1cHBvcnRzX3RjZygpOg0KICAgICAgdm0u
-YWRkX2FyZ3MoJy1tYWNoaW5lJywgJ2FjY2VsPWt2bScpDQoNCj8NCg0KSG1tLCBtYXliZSwgZ29v
-ZCBvcHRpb24gd291bGQgYmUgdG9wbW9zdCBvcHRpb24sIGxpa2Ugd2UgaGF2ZSBmb3IgZm9ybWF0
-IC1xY293MiwgLXJhdywgZXRjLiBTbywNCml0IHdvdWxkIGJlIC1xdGVzdCwgLWt2bSwgLXRjZy4u
-IEJ1dCBpbiB0aGlzIGNhc2Ugbm9ib2R5IHdpbGwgcnVuIGFsbCB0ZXN0IG9uIHNvbWV0aGluZyBv
-dGhlcg0KdGhhbiBxdGVzdC4uDQoNCkl0J3Mgbm90IGJhZCB0byBydW4gdGhpcyB0ZXN0IG9uIHF0
-ZXN0LiBUaGUgcHJvYmxlbSBpcyB3ZSBjYW4gbWlzcyB0aGUgYnVnLCBpZiBub3QgcnVuIHRoaXMN
-CnRlc3Qgb24ga3ZtIG9yIHRjZy4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Monday, February 18, 2019 4:31 PM
+> To: qemu-devel@nongnu.org
+> Cc: aurelien@aurel32.net; Aleksandar Markovic; peter.maydell@linaro.org; =
+Aleksandar Rikalo
+> Subject: [PATCH 2/7] tests/tcg: target/mips: Correct path to headers in s=
+ome test source files
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Correct path to headers in tests/tcg/mips/user/ase/msa/bit-counting/*
+> source files.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c | 6 +++---
+>  tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c | 6 +++---
+>  12 files changed, 36 insertions(+), 36 deletions(-)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
+> index eb46290..d629431 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
+> index bb1c0cf..fad220c 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
+> index da1cd83..84cf974 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
+> index a059763..a0ed202 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
+> index 9616d6e..9906eae 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
+> index 801c4bc..21222e3 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
+> index 03cb4cd..fbab9c3 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
+> index 2ca93de..dc33366 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
+> index b4cad43..f9033c7 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
+> index d6a8b0d..132b4d0 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
+> index 1cdcabd..f469c09 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c b=
+/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
+> index 38ddc14..d73eff7 100644
+> --- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
+> +++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
+> @@ -22,9 +22,9 @@
+>  #include <sys/time.h>
+>  #include <stdint.h>
+>
+> -#include "../../../include/wrappers_msa.h"
+> -#include "../../../include/test_inputs.h"
+> -#include "../../../include/test_utils.h"
+> +#include "../../../../include/wrappers_msa.h"
+> +#include "../../../../include/test_inputs.h"
+> +#include "../../../../include/test_utils.h"
+>
+>  #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+>
+> --
+> 2.7.4
+
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
