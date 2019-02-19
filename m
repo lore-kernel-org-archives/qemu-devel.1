@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59265)
+Received: from eggs.gnu.org ([209.51.188.92]:59731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gvtfe-0002Wn-Gy
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:54:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvtiV-0003Ir-RW
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gvtfd-0000kN-Eg
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:54:02 -0500
-Received: from mga05.intel.com ([192.55.52.43]:45969)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1gvtfc-0000gE-O7
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:54:01 -0500
-From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Tue, 19 Feb 2019 08:53:22 +0800
-Message-Id: <20190219005322.16679-1-richardw.yang@linux.intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gvtiU-0003qK-TV
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 19:56:59 -0500
+Date: Tue, 19 Feb 2019 11:44:56 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190219004456.GE9345@umbus.fritz.box>
+References: <20190215161648.9600-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] i386,
- acpi: check acpi_memory_hotplug capacity in pre_plug
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="hwvH6HDNit2nSK4j"
+Content-Disposition: inline
+In-Reply-To: <20190215161648.9600-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 00/10] ppc: Add Hypervisor Virtualization
+ Interrupt on POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, imammedo@redhat.com, eblake@redhat.com, Wei Yang <richardw.yang@linux.intel.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Currently we do device realization like below:
 
-   hotplug_handler_pre_plug()
-   dc->realize()
-   hotplug_handler_plug()
+--hwvH6HDNit2nSK4j
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Before we do device realization and plug, we should allocate necessary
-resources and check if memory-hotplug-support property is enabled.
+On Fri, Feb 15, 2019 at 05:16:38PM +0100, C=E9dric Le Goater wrote:
+> Hello,
+>=20
+> Here is a series of fixes and extensions provided by Ben which modify
+> the POWER9 interrupt model to prepare ground for the support of the
+> XIVE interrupt controller as found on POWER9 PowerNV machines.
 
-At the piix4 and ich9, the memory-hotplug-support property is checked at
-plug stage. This means that device has been realized and mapped into guest
-address space 'pc_dimm_plug()' by the time acpi plug handler is called,
-where it might fail and crash QEMU due to reaching g_assert_not_reached()
-(piix4) or error_abort (ich9).
+Applied to ppc-for-4.0 (but after yesterday's pull request).
 
-Fix it by checking if memory hotplug is enabled at pre_plug stage
-where we can gracefully abort hotplug request.
+>=20
+> Thanks
+>=20
+> C.
+>=20
+> Changes since initial patchset :
+>=20
+>  - modified the commit log to comment the use of EXCP_HLT instead
+>    of POWERPC_EXCP_STOP
+>  - modified the icp_realize() and xive_tctx_realize() to take
+>    into account explicitely the POWER9 interrupt model
+>  - introduced a specific power9_set_irq for POWER9
+>=20
+>=20
+> Benjamin Herrenschmidt (10):
+>   target/ppc: Fix nip on power management instructions
+>   target/ppc: Don't clobber MSR:EE on PM instructions
+>   target/ppc: Fix support for "STOP light" states on POWER9
+>   target/ppc: Move "wakeup reset" code to a separate function
+>   target/ppc: Rename "in_pm_state" to "resume_as_sreset"
+>   target/ppc: Add POWER9 exception model
+>   target/ppc: Detect erroneous condition in interrupt delivery
+>   target/ppc: Add Hypervisor Virtualization Interrupt on POWER9
+>   target/ppc: Add POWER9 external interrupt model
+>   target/ppc: Add support for LPCR:HEIC on POWER9
+>=20
+>  include/hw/ppc/ppc.h            |   2 +
+>  target/ppc/cpu-qom.h            |   5 +
+>  target/ppc/cpu.h                |  26 ++++-
+>  hw/intc/xics.c                  |   3 +
+>  hw/intc/xive.c                  |   3 +
+>  hw/ppc/ppc.c                    |  44 ++++++++-
+>  target/ppc/excp_helper.c        | 164 +++++++++++++++++++++-----------
+>  target/ppc/translate.c          |  28 ++++--
+>  target/ppc/translate_init.inc.c |  34 ++++++-
+>  9 files changed, 238 insertions(+), 71 deletions(-)
+>=20
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-CC: Igor Mammedov <imammedo@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
----
-v3:
-   * replace acpi_memory_hotplug with memory-hotplug-support in changelog
-   * fix code alignment of ich9_pm_device_pre_plug_cb
-   * print which device type memory-hotplug-support is disabled in
-     ich9_pm_device_pre_plug_cb and piix4_device_pre_plug_cb
-v2:
-   * (imammedo@redhat.com)
-     - Almost the whole third paragraph
-   * apply this change to ich9
-   * use hotplug_handler_pre_plug() instead of open-coding check
----
- hw/acpi/ich9.c         | 15 +++++++++++++--
- hw/acpi/piix4.c        | 15 +++++++++++++--
- hw/i386/pc.c           |  5 +++++
- hw/isa/lpc_ich9.c      |  1 +
- include/hw/acpi/ich9.h |  2 ++
- 5 files changed, 34 insertions(+), 4 deletions(-)
+--hwvH6HDNit2nSK4j
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index c5d8646abc..e53dfe1ee3 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -483,13 +483,24 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
-                              NULL);
- }
- 
-+void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                Error **errp)
-+{
-+    ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
-+        !lpc->pm.acpi_memory_hotplug.is_enabled)
-+        error_setg(errp,
-+                   "memory hotplug is not enabled: %s.memory-hotplug-support "
-+                   "is not set", object_get_typename(OBJECT(lpc)));
-+}
-+
- void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                             Error **errp)
- {
-     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
- 
--    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
--        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-             nvdimm_acpi_plug_cb(hotplug_dev, dev);
-         } else {
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index e330f24c71..f7e3c2018d 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -370,13 +370,23 @@ static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
-     acpi_pm1_evt_power_down(&s->ar);
- }
- 
-+static void piix4_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                 DeviceState *dev, Error **errp)
-+{
-+    PIIX4PMState *s = PIIX4_PM(hotplug_dev);
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
-+        !s->acpi_memory_hotplug.is_enabled)
-+        error_setg(errp,
-+                   "memory hotplug is not enabled: %s.memory-hotplug-support "
-+                   "is not set", object_get_typename(OBJECT(s)));
-+}
- static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
-                                  DeviceState *dev, Error **errp)
- {
-     PIIX4PMState *s = PIIX4_PM(hotplug_dev);
- 
--    if (s->acpi_memory_hotplug.is_enabled &&
--        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-             nvdimm_acpi_plug_cb(hotplug_dev, dev);
-         } else {
-@@ -702,6 +712,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
-      */
-     dc->user_creatable = false;
-     dc->hotpluggable = false;
-+    hc->pre_plug = piix4_device_pre_plug_cb;
-     hc->plug = piix4_device_plug_cb;
-     hc->unplug_request = piix4_device_unplug_request_cb;
-     hc->unplug = piix4_device_unplug_cb;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0f61314b79..0b11ebe2c9 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1674,6 +1674,11 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
-+    /*
-+     * Check acpi_dev memory-hotplug-support property
-+     */
-+    hotplug_handler_pre_plug(pcms->acpi_dev, dev, errp);
-+
-     if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
-         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-         return;
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index e692b9fdc1..ac44aa53be 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -805,6 +805,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
-      * pc_q35_init()
-      */
-     dc->user_creatable = false;
-+    hc->pre_plug = ich9_pm_device_pre_plug_cb;
-     hc->plug = ich9_pm_device_plug_cb;
-     hc->unplug_request = ich9_pm_device_unplug_request_cb;
-     hc->unplug = ich9_pm_device_unplug_cb;
-diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
-index 59aeb06393..428af0b0be 100644
---- a/include/hw/acpi/ich9.h
-+++ b/include/hw/acpi/ich9.h
-@@ -74,6 +74,8 @@ extern const VMStateDescription vmstate_ich9_pm;
- 
- void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp);
- 
-+void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                            Error **errp);
- void ich9_pm_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                             Error **errp);
- void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
--- 
-2.19.1
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrUYYACgkQbDjKyiDZ
+s5JekxAA4W1DnNzkquAjXpG2s2qAqxQnnNwCwoRC2YCCbpMdbq6vanRJbGpJvLZg
+B1NAtuB/3Uph3ZJD5kVmKw67bpQN1mvBQ4AOFKjeHYHYcUOZIHrtsFryNlVXfzAG
+GxAoJxNIfK6qWlsbR2051b2HKTLUDi/IdzPCdjmoVuzWZs6bK80Di68xXls9oZjz
+602UFsWJqpsxwg4OT9LRhwU6k2XA37K5ELBUnMFZ6lC9WRJ5BKDclBzQ/sYRC46C
+VhHJvyHvqJFVvh70P4ZolmqueAUj7jCPSTSa8tQyWHFSoUXJGiRKQknahhdx42qo
+fruvAi1o0QLVg++PworGrDWMpW8UMgzxkkQZvSe/JROVdGGKU40ZH/MXe6TwfJ3A
+0eZfjvupTGTYOSKoA1wnOxon5k3+BEEErBVFUp14qZ4qLPY0bodEgTEQ9/TuHLbR
+saJcw8fyGUyWm2lIvAsQPe31DhdzuXS/zFQ8d3onE4AShvoDXcRKZcHRUhF+1dky
+ytCELvNXOFSTb9vo+JA3Dy4mSoc4VTlLhgkLsDwhObGAgtfrs9Ap7FCX1/0jLnUL
+UAc67HIvxtlLxp4ax5hDSq4T9fuG6T93yY9t9w41HdvzKVkxpQcb6fw0ChMM2cVR
+Ly7hKFR/IsVwfBBqXIgcepBRgUmauqH9Lx6JAMR6bXsDpfsTmN0=
+=EhQz
+-----END PGP SIGNATURE-----
+
+--hwvH6HDNit2nSK4j--
