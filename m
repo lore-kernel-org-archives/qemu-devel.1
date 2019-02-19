@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36903)
+Received: from eggs.gnu.org ([209.51.188.92]:37639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw1kq-0002Q9-OP
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:31:59 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gw1n0-00040d-CN
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw1ka-0006qI-Ee
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:31:51 -0500
-Date: Tue, 19 Feb 2019 09:31:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190219093132.GA7154@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190218101218.4177-1-ppandit@redhat.com>
-	<20190218123811.5b7a1d61@bahia.lan>
-	<20190218115218.GF32287@redhat.com>
-	<20190219012104.GG9345@umbus.fritz.box>
+	(envelope-from <jasowang@redhat.com>) id 1gw1mz-0000GV-JO
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:34:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34522)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gw1mz-0000G9-C6
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:34:09 -0500
+References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
+	<1550118402-4057-8-git-send-email-wexu@redhat.com>
+	<7d71fb88-2651-41eb-023e-63a11a83cd38@redhat.com>
+	<20190218144640.GA28793@wei-ubt>
+	<71fd17b4-9509-3f13-556d-fc4c3e617e84@redhat.com>
+	<20190219082101.GA15343@wei-ubt>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <d265bbf7-0bb7-9fa6-a8db-e123e5b30795@redhat.com>
+Date: Tue, 19 Feb 2019 17:33:57 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190219012104.GG9345@umbus.fritz.box>
+In-Reply-To: <20190219082101.GA15343@wei-ubt>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] ppc: add host-serial and
- host-model machine attributes
+Subject: Re: [Qemu-devel] [PATCH v4 07/11] virtio: fill/flush/pop for packed
+ ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,230 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, P J P <ppandit@redhat.com>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Wei Xu <wexu@redhat.com>
+Cc: tiwei.bie@intel.com, maxime.coquelin@redhat.com, qemu-devel@nongnu.org, jfreiman@redhat.com, mst@redhat.com
 
-On Tue, Feb 19, 2019 at 12:21:04PM +1100, David Gibson wrote:
-> On Mon, Feb 18, 2019 at 11:52:18AM +0000, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Mon, Feb 18, 2019 at 12:38:11PM +0100, Greg Kurz wrote:
-> > > On Mon, 18 Feb 2019 15:42:18 +0530
-> > > P J P <ppandit@redhat.com> wrote:
-> > >=20
-> > > > From: Prasad J Pandit <pjp@fedoraproject.org>
-> > > >=20
-> > > > On ppc hosts, hypervisor shares following system attributes
-> > > >=20
-> > > >   - /proc/device-tree/system-id
-> > > >   - /proc/device-tree/model
-> > > >=20
-> > > > with a guest. This could lead to information leakage and misuse.[=
-*]
-> > > > Add machine attributes to control such system information exposur=
-e
-> > > > to a guest.
-> > > >=20
-> > > > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
-> > > >=20
-> > > > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> > > > ---
-> > > >  hw/ppc/spapr.c         | 79 ++++++++++++++++++++++++++++++++++++=
-++----
-> > > >  include/hw/ppc/spapr.h |  2 ++
-> > > >  2 files changed, 75 insertions(+), 6 deletions(-)
-> > > >=20
-> > > > Update v3: move host-serial,host-model options to ppc sPAPR machi=
-ne
-> > > >   -> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg031=
-82.html =20
-> > > >=20
-> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > index 0942f35bf8..666e500376 100644
-> > > > --- a/hw/ppc/spapr.c
-> > > > +++ b/hw/ppc/spapr.c
-> > > > @@ -1249,13 +1249,30 @@ static void *spapr_build_fdt(sPAPRMachine=
-State *spapr,
-> > > >       * Add info to guest to indentify which host is it being run=
- on
-> > > >       * and what is the uuid of the guest
-> > > >       */
-> > > > -    if (kvmppc_get_host_model(&buf)) {
-> > > > -        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
-> > > > -        g_free(buf);
-> > > > +    if (spapr->host_model && !g_str_equal(spapr->host_model, "no=
-ne")) {
-> > > > +        if (g_str_equal(spapr->host_model, "passthrough")) {
-> > > > +            /* -M host-model=3Dpassthrough */
-> > > > +            if (kvmppc_get_host_model(&buf)) {
-> > > > +                _FDT(fdt_setprop_string(fdt, 0, "host-model", bu=
-f));
-> > > > +                g_free(buf);
-> > > > +            }
-> > > > +        } else {
-> > > > +            /* -M host-model=3D<user-string> */
-> > > > +            _FDT(fdt_setprop_string(fdt, 0, "host-model", spapr-=
->host_model));
-> > > > +        }
-> > > >      }
-> > > > -    if (kvmppc_get_host_serial(&buf)) {
-> > > > -        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
-> > > > -        g_free(buf);
-> > > > +
-> > > > +    if (spapr->host_serial && !g_str_equal(spapr->host_serial, "=
-none")) {
-> > > > +        if (g_str_equal(spapr->host_serial, "passthrough")) {
-> > > > +            /* -M host-serial=3Dpassthrough */
-> > > > +            if (kvmppc_get_host_serial(&buf)) {
-> > > > +                _FDT(fdt_setprop_string(fdt, 0, "host-serial", b=
-uf));
-> > > > +                g_free(buf);
-> > > > +            }
-> > > > +        } else {
-> > > > +            /* -M host-serial=3D<user-string> */
-> > > > +            _FDT(fdt_setprop_string(fdt, 0, "host-serial", spapr=
-->host_serial));
-> > > > +        }
-> > > >      }
-> > > > =20
-> > > >      buf =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-> > > > @@ -3138,6 +3155,36 @@ static void spapr_set_ic_mode(Object *obj,=
- const char *value, Error **errp)
-> > > >      }
-> > > >  }
-> > > > =20
-> > > > +static char *spapr_get_host_model(Object *obj, Error **errp)
-> > > > +{
-> > > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > +
-> > > > +    return g_strdup(spapr->host_model);
-> > > > +}
-> > > > +
-> > > > +static void spapr_set_host_model(Object *obj, const char *value,=
- Error **errp)
-> > > > +{
-> > > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > +
-> > > > +    g_free(spapr->host_model);
-> > > > +    spapr->host_model =3D g_strdup(value);
-> > > > +}
-> > > > +
-> > > > +static char *spapr_get_host_serial(Object *obj, Error **errp)
-> > > > +{
-> > > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > +
-> > > > +    return g_strdup(spapr->host_serial);
-> > > > +}
-> > > > +
-> > > > +static void spapr_set_host_serial(Object *obj, const char *value=
-, Error **errp)
-> > > > +{
-> > > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > +
-> > > > +    g_free(spapr->host_serial);
-> > > > +    spapr->host_serial =3D g_strdup(value);
-> > > > +}
-> > > > +
-> > > >  static void spapr_instance_init(Object *obj)
-> > > >  {
-> > > >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > @@ -3183,6 +3230,20 @@ static void spapr_instance_init(Object *ob=
-j)
-> > > >      object_property_set_description(obj, "ic-mode",
-> > > >                   "Specifies the interrupt controller mode (xics,=
- xive, dual)",
-> > > >                   NULL);
-> > > > +
-> > > > +    spapr->host_model =3D NULL;
-> > >=20
-> > > This isn't needed since object_initialize_with_type() already takes=
- care
-> > > of zeroing the instance for us.
-> > >=20
-> > > > +    object_property_add_str(obj, "host-model",
-> > > > +        spapr_get_host_model, spapr_set_host_model,
-> > > > +        &error_abort);
-> > > > +    object_property_set_description(obj, "host-model",
-> > > > +        "Set host's model-id to use - none|passthrough|string", =
-&error_abort);
-> > > > +
-> > > > +    spapr->host_serial =3D NULL;
-> > >=20
-> > > Same here.
-> > >=20
-> > > > +    object_property_add_str(obj, "host-serial",
-> > > > +        spapr_get_host_serial, spapr_set_host_serial,
-> > > > +        &error_abort);
-> > > > +    object_property_set_description(obj, "host-serial",
-> > > > +        "Set host's system-id to use - none|passthrough|string",=
- &error_abort);
-> > > >  }
-> > > > =20
-> > > >  static void spapr_machine_finalizefn(Object *obj)
-> > > > @@ -4080,9 +4141,15 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-> > > >  static void spapr_machine_3_1_class_options(MachineClass *mc)
-> > > >  {
-> > > >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > > > +    static GlobalProperty compat[] =3D {
-> > > > +        { TYPE_SPAPR_MACHINE, "host-model", "passthrough" },
-> > > > +        { TYPE_SPAPR_MACHINE, "host-serial", "passthrough" },
-> > > > +    };
-> > > > =20
-> > >=20
-> > > So... we don't fix the information leak for older machines by defau=
-lt ? From
-> > > previous discussions, I understand it is for the sake of compatibil=
-ity, but
-> > > leaving the burden of securing the host to downstream or to the use=
-r still
-> > > looks unsecure to me FWIW.
-> >=20
-> > Maintaining guest ABI compatibility has to take priority, even over
-> > fixing security issues, because we must never intentionally break
-> > guest OS/applications by silently altering guest ABI. This is one of
-> > the two reasons why machine type versioning exists (the other reason
-> > being live migration data stream).
-> >=20
-> > This is nothing new - we've done it before for security flaws where
-> > a fix would involve changing guest ABI. This particular security flaw
-> > is pretty minor compared to other cases that we've left unfixed by
-> > default eg Meltdown / Spectre and is easily addressed by the user if
-> > needed.
->=20
-> So, Markus was saying at the last KVM Forum - and I agree with him -
-> that using "must maintain compatibility" as if its holy writ isn't
-> actually very sensible.  It's always a tradeoff, and we need to engage
-> with that tradeoff on a case by case basis.
+
+On 2019/2/19 =E4=B8=8B=E5=8D=884:21, Wei Xu wrote:
+> On Tue, Feb 19, 2019 at 02:49:42PM +0800, Jason Wang wrote:
+>> On 2019/2/18 =E4=B8=8B=E5=8D=8810:46, Wei Xu wrote:
+>>>> Do we allow chain more descriptors than vq size in the case of indir=
+ect?
+>>>> According to the spec:
+>>>>
+>>>> "
+>>>>
+>>>> The device limits the number of descriptors in a list through a
+>>>> transport-specific and/or device-specific value. If not limited,
+>>>> the maximum number of descriptors in a list is the virt queue
+>>>> size.
+>>>> "
+>>>>
+>>>> This looks possible, so the above is probably wrong if the max numbe=
+r of
+>>>> chained descriptors is negotiated through a device specific way.
+>>>>
+>>> OK, I will remove this check, while it is necessary to have a limitat=
+ion
+>>> for indirect descriptor anyway, otherwise it is possible to hit an ov=
+erflow
+>>> since presumably u16 is used for most number/size in the spec.
+>>>
+>> Please try to test block and scsi device for you changes as well.
+> Any idea about what kind of test should be covered? AFAICT, currently
+> packed ring is targeted for virtio-net as discussed during voting spec.
 >
-> In this case the security hole it fixes is pretty small - but the
-> chances of realistically breaking the guests is also very small.
+> Wei
 
-There's many different areas of QEMU were maintaining compatibility is
-relevant and they are varying degrees of importance in their effect.
-HMP is one where we've been most flexible in accepting incompatible
-changes since we explicitly don't promise stability. We are stricter
-for CLI and QMP, requiring deprecation cycle for incompatibilities
-unless we can see the change in question can't affect users (because
-it was already long broken or impossible to use).
 
-Guest ABI and migration stream are areas where we strive to never
-(knowingly) make incompatibile changes. When we do make guest ABI changes=
-,
-we always tie them into the machine type version. I don't see any compell=
-ing
-reason to diverge from our historic practice and knowingly break guest AB=
-I
-in already released machine types, as the cost of doing the preserving AB=
-I
-is negligible.
+Well it's not only for net for sure, it should support all kinds of=20
+device. For testing, you should test basic function plus migration.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks
+
+
+>
+>> Thanks
+>>
+>>
