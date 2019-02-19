@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32803)
+Received: from eggs.gnu.org ([209.51.188.92]:32805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvwdL-0003rI-As
+	(envelope-from <dgibson@ozlabs.org>) id 1gvwdL-0003rK-9U
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:03:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvwdF-0002PK-MK
+	(envelope-from <dgibson@ozlabs.org>) id 1gvwdF-0002PM-MN
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:03:49 -0500
-Date: Tue, 19 Feb 2019 14:46:49 +1100
+Date: Tue, 19 Feb 2019 14:49:17 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190219034649.GQ9345@umbus.fritz.box>
+Message-ID: <20190219034917.GS9345@umbus.fritz.box>
 References: <20190215170029.15641-1-clg@kaod.org>
-	<20190215170029.15641-4-clg@kaod.org>
+	<20190215170029.15641-6-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wr1Q/2bz0MCWWNYv"
+	protocol="application/pgp-signature"; boundary="3sseE1tnmEs+TkKq"
 Content-Disposition: inline
-In-Reply-To: <20190215170029.15641-4-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 03/12] target/ppc: Re-enable RMLS on POWER9
- for virtual hypervisors
+In-Reply-To: <20190215170029.15641-6-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 05/12] target/ppc: Cleanup 64-bit MMU
+ includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,100 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---wr1Q/2bz0MCWWNYv
+--3sseE1tnmEs+TkKq
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 15, 2019 at 06:00:20PM +0100, C=E9dric Le Goater wrote:
+On Fri, Feb 15, 2019 at 06:00:22PM +0100, C=E9dric Le Goater wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> Historically the 64-bit server MMU supports two way of configuring the
-> guest "real mode" mapping:
+> To enable inlining more things, move #include of mmu-hash64.h and
+> mmu-radix64.h to mmu-book3s-v3.h
 >=20
->  - The "RMA" with is a single chunk of physically contiguous
-> memory remapped as guest real, and controlled by the RMLS
-> field in the LPCR register and the RMOR register.
->=20
->  - The "VRMA" which uses special PTEs inserted in the partition
-> hash table by the hypervisor.
->=20
-> POWER9 deprecates the former, which is reflected by the filtering
-> done in ppc_store_lpcr() which effectively prevents setting of
-> the RMLS field.
->=20
-> However, when using fully emulated SPAPR machines, our qemu code
-> currently only knows how to define the guest real mode memory using
-> RMLS.
->=20
-> Thus you cannot run a SPAPR machine anymore with a POWER9 CPU
-> model today.
->=20
-> This works around it with a quirk in ppc_store_lpcr() to continue
-> allowing the RMLS field to be set when using a virtual hypervisor.
->=20
-> Ultimately we will want to implement configuring a VRMA instead
-> which will also be necessary if we want to migrate a SPAPR guest
-> between TCG and KVM but this is a lot more work.
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Urgh.  I'm applying this because it fixes a real bug, but it's not
-really the right solution.
+I don't really get what this is in aid of, and it doesn't seem quite
+right.
 
-We will want to support VRMAs at some point in order to let emulated
-powernv machines run guests, but implementing VRMA doesn't really make
-sense in the context of a PAPR machine.
+It's fair enough in mmu-book3s-v3.c.   But mmu-hash64.c handles 64-bit
+hash MMUs earlier than V3 as well, so it doesn't really make sense for
+it to get to mmu-hash64.c via an indirect include.
 
-The real problem here is that we're using the LPCR - which notionally
-doesn't even exist in a PAPR machine - to trick the softmmu code,
-which is written from the point of view of bare metal - into doing
-more or less the right thing for a PAPR machine.
-
-The correct solution, I think, is to put a test on cpu->vhyp into the
-guts of the softmmu code so that in non-HV real mode it doesn't even
-consult the LPCR and just goes directly to GPAs (which is the only
-think that the pseries machine knows about).
-
-Although then I guess we'd need some way in the vhyp of representing
-the permissible max address of real mode accesses.
+> ---
+>  target/ppc/mmu-book3s-v3.h | 3 +++
+>  hw/ppc/spapr_hcall.c       | 1 -
+>  target/ppc/mmu-book3s-v3.c | 2 --
+>  target/ppc/mmu-hash64.c    | 1 -
+>  target/ppc/mmu-radix64.c   | 1 -
+>  5 files changed, 3 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
+> index 12ec0054c207..4e59742d7eac 100644
+> --- a/target/ppc/mmu-book3s-v3.h
+> +++ b/target/ppc/mmu-book3s-v3.h
+> @@ -22,6 +22,9 @@
+> =20
+>  #ifndef CONFIG_USER_ONLY
+> =20
+> +#include "mmu-hash64.h"
+> +#include "mmu-radix64.h"
+> +
+>  /*
+>   * Partition table definitions
+>   */
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index b47241ace62a..2f64c69a6abf 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -9,7 +9,6 @@
+>  #include "helper_regs.h"
+>  #include "hw/ppc/spapr.h"
+>  #include "hw/ppc/spapr_cpu_core.h"
+> -#include "mmu-hash64.h"
+>  #include "cpu-models.h"
+>  #include "trace.h"
+>  #include "kvm_ppc.h"
+> diff --git a/target/ppc/mmu-book3s-v3.c b/target/ppc/mmu-book3s-v3.c
+> index a174e7efc57c..ccbae3213cc1 100644
+> --- a/target/ppc/mmu-book3s-v3.c
+> +++ b/target/ppc/mmu-book3s-v3.c
+> @@ -19,9 +19,7 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+> -#include "mmu-hash64.h"
+>  #include "mmu-book3s-v3.h"
+> -#include "mmu-radix64.h"
+> =20
+>  int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+>                                int mmu_idx)
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 1175b991d994..f6c822ef917b 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -24,7 +24,6 @@
+>  #include "qemu/error-report.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "kvm_ppc.h"
+> -#include "mmu-hash64.h"
+>  #include "exec/log.h"
+>  #include "hw/hw.h"
+>  #include "mmu-book3s-v3.h"
+> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+> index ab76cbc83530..5881efeb8598 100644
+> --- a/target/ppc/mmu-radix64.c
+> +++ b/target/ppc/mmu-radix64.c
+> @@ -25,7 +25,6 @@
+>  #include "sysemu/kvm.h"
+>  #include "kvm_ppc.h"
+>  #include "exec/log.h"
+> -#include "mmu-radix64.h"
+>  #include "mmu-book3s-v3.h"
+> =20
+>  static bool ppc_radix64_get_fully_qualified_addr(CPUPPCState *env, vaddr=
+ eaddr,
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -91,24 +130,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---wr1Q/2bz0MCWWNYv
+--3sseE1tnmEs+TkKq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrfCMACgkQbDjKyiDZ
-s5KXQhAAy2mFMmlsQdxwesUSvjkEQiSPMMOpkZ0CCiOwGGKWuL3QKEFCpeDRugkz
-R3KSxY65Dn6/x7ZTAygjhA86yaUDK85+w4hoF61BD/Zznbitg86P6MNc/KYq0tUP
-9HdoYyUcmv8jRx0kllKaWkGFrRyy4ERTw0cflFMOzLrzp7Op6CF355uNK4/iIDwe
-63e2fvxmF1zGGJvh+hQvMNF10/i8wtsjCIKBd+en9sXnBSSqKg6P0dOxC1UCOV1H
-Zl7vTn4Jbr/010k52OgNetijWjTT8/aGc3640kFHgNDUwdJ1goFBTwjfYCSLGx5d
-1cSITyQMuTrv1WoPc8suyPxrv42kxs9lSlRMqXiRfv/zcUi4lq3VMSlc/LD6dP+n
-bVGORUxtgiQcugmkh+4q6RfoCGH+Fi2VfmC25QStjh/xKbkOBWTYTIf7h862k4fs
-fxjjyq+SWVq2E/r1Gfld9LwNg+Xr51JpZvy+f1RBOW4c6+wwV+yE1mLzrOjGMJiu
-sav1v8mS1U0kyJjdbQsDBXYGrHx/YyNiKa0a1mXaP7XKsBC7fAuPt1pf8Y4CNdPI
-z7F/lab+pxvZsjhUfIs2Yeki+i5UvzNyyzHT1EV/kyjEydDHNOQ0c4ZL2ziwKfSV
-MpMBYsFOsxhRhmDq98/TXIrIpzQ3DnU6P/8VeYC7soj/u0JIW50=
-=B/Vn
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrfL0ACgkQbDjKyiDZ
+s5KBeQ/8CW9pcagUXoRw0h9B6xq0qcn9Me637dYstUA3ppoTKnahnpz0/21ifF3W
+5VkU6qHnq5+5WzycLZUVZL3rtWizWltX/ajolgOosWJNzV5e5MHcOaHOjhvlV/QF
+O+9Mdtg7Td2OSXSeh2g7+a3S8RIRplaMPutHcNaHLlFpxZvlDAhf7FhwS2Xz8jTd
+vF5aHUUQxyPCkKBZ6fUeBJQwfv1l0a8iv1p9M/JbN1uC/WwHdjlbSxS7xbkS9AFg
+bFXqb77fFFb35a4VB6fYkcfJG13PGtOtsxm3fT/gOaHSCCbEzUUMUxqR2YcUN0J1
+0dMjYiFj90ApcSti0Ftuztx5xTcyjYGshULRQ9UWp9+np/FOwQTxD28WpiS3pNs9
+ZUU+PXvBCuvblLYunIqNkZ0lJr4OgG69AHvW9M2KkFVYReLEqAFPqxIzh66DhLB0
+XOZGAuB0/5Q6+gWlXSTisMXKXfNXa25tDmDGGMS9npDKVah2oTq3s3+4z5Fa2cye
+qjb3Hymia/6fnOYT90Qjtf/MO+E6FkKvhgXuz13fordmEyZALgaR0VRS3G1eCMy0
+rkgcEYJyvnREImrLvBZhoJjwKxIhkjKv9+DHGIazQF8oECTlMq4YFVcaMAUhWslH
+lPH5iSXY2Ux2m+ohanazVfP7DJlLNrwxLG0kKt1imbmWRvTY7JI=
+=HpDu
 -----END PGP SIGNATURE-----
 
---wr1Q/2bz0MCWWNYv--
+--3sseE1tnmEs+TkKq--
