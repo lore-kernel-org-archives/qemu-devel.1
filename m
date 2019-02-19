@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46506)
+Received: from eggs.gnu.org ([209.51.188.92]:48703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gvyNm-0000sr-WC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 00:55:56 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gvyZc-0002iP-LT
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gvyNk-0002VQ-TS
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 00:55:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gvyNh-0002PU-84
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 00:55:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gvyNX-0005q1-7H
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 05:55:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 35F852E80C8
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 05:55:39 +0000 (UTC)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gvyZc-0006D0-3m
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:08:08 -0500
+Received: from mga03.intel.com ([134.134.136.65]:53031)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1gvyZb-0006CZ-Rj
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:08:08 -0500
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Tue, 19 Feb 2019 14:07:17 +0800
+Message-Id: <20190219060719.8211-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Feb 2019 05:47:45 -0000
-From: Kris M <krislema2@gmail.com>
-Reply-To: Bug 1816052 <1816052@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155024186658.3618.3655538630796654144.malonedeb@wampee.canonical.com>
-Message-Id: <155055526556.3540.9614471061602294493.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1816052] Re: qemu system emulator fails to start
- if no sound card is present on host
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/2] PCDIMM cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,116 +25,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, xiaoguangrong.eric@gmail.com, Wei Yang <richardw.yang@linux.intel.com>
 
-I agree. Thanks. :)
+Two trivial cleanup for pc-dimm.
 
--- =
+Patch [1] remove the check on class->hotpluggable since pc-dimm is always
+hotpluggable.
+Patch [2] remove realized callback since the task is done in pre_plug stage.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1816052
+Wei Yang (2):
+  pc-dimm: remove check on pc-dimm hotpluggable
+  pc-dimm: remove realize callback
 
-Title:
-  qemu system emulator fails to start if no sound card is present on
-  host
+ hw/acpi/memory_hotplug.c |  5 -----
+ hw/mem/nvdimm.c          | 11 -----------
+ hw/mem/pc-dimm.c         |  5 -----
+ include/hw/mem/pc-dimm.h |  3 ---
+ 4 files changed, 24 deletions(-)
 
-Status in QEMU:
-  New
-
-Bug description:
-  A plain build from git master at
-  81dbcfa9e1d8bab3f7c4cc923c0b40cd666f374f on Fedora 29 x86_64 host,
-  with no options passed to configure.
-
-  Trying to launch QEMU on a  host with no audio card present:
-
-  # ls /dev/snd/
-  seq  timer
-
-  It will fail to initialize alsa and abort startup:
-
-  # qemu-system-x86_64 -cdrom Fedora-Workstation-Live-x86_64-29-1.2.iso  -m=
- 4000 -vnc 0.0.0.0:1 =
-
-  ALSA lib confmisc.c:767:(parse_card) cannot find card '0'
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_card_driver=
- returned error: No such file or directory
-  ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_concat retu=
-rned error: No such file or directory
-  ALSA lib confmisc.c:1246:(snd_func_refer) error evaluating name
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_refer retur=
-ned error: No such file or directory
-  ALSA lib conf.c:5034:(snd_config_expand) Evaluate error: No such file or =
-directory
-  ALSA lib pcm.c:2565:(snd_pcm_open_noupdate) Unknown PCM default
-  alsa: Could not initialize DAC
-  alsa: Failed to open `default':
-  alsa: Reason: No such file or directory
-  ALSA lib confmisc.c:767:(parse_card) cannot find card '0'
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_card_driver=
- returned error: No such file or directory
-  ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_concat retu=
-rned error: No such file or directory
-  ALSA lib confmisc.c:1246:(snd_func_refer) error evaluating name
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_refer retur=
-ned error: No such file or directory
-  ALSA lib conf.c:5034:(snd_config_expand) Evaluate error: No such file or =
-directory
-  ALSA lib pcm.c:2565:(snd_pcm_open_noupdate) Unknown PCM default
-  alsa: Could not initialize DAC
-  alsa: Failed to open `default':
-  alsa: Reason: No such file or directory
-  init fail
-  audio: Failed to create voice `pcspk'
-  qemu-system-x86_64: Initialization of device isa-pcspk failed: Initializi=
-ng audio voice failed
-
-  =
-
-  git bisect blames this change:
-
-  =
-
-    commit 6a48541873f14b597630283f8f5397674ad82ea9 (HEAD, refs/bisect/bad)
-    Author: Gerd Hoffmann <kraxel@redhat.com>
-    Date:   Thu Jan 24 12:20:55 2019 +0100
-
-      audio: probe audio drivers by default
-      =
-
-      Add the drivers listed in audio_possible_drivers to audio_drv_list,
-      using the try-* variants.  That way the probable drivers are compiled=
- by
-      default if possible.
-      =
-
-      Additioal tweaks:
-        linux: reorder to: pa alsa sdl oss.
-        *bsd: drop pa.
-      =
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Message-id: 20190124112055.547-7-kraxel@redhat.com
-
-  =
-
-  This changed our probe order:
-
-     Linux)
-    -  audio_drv_list=3D"oss"
-    +  audio_drv_list=3D"try-pa try-alsa try-sdl oss"
-
-  After some debugging I can see that 'audio_init' successfully
-  initializes the alsa driver.
-
-  When the pcspk devices goes to AUD_open_out though, the alsa driver
-  fails spewing the above text to stderr and thus causes QEMU to fail.
-
-  This looks very much like the ALSA driver in QEMU is broken -
-  audio_init() should not have succeeded unless the ALSA driver knew it
-  could later succesfully honour AUD_open_out.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1816052/+subscriptions
+-- 
+2.19.1
