@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43871)
+Received: from eggs.gnu.org ([209.51.188.92]:45108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw9U4-0007iK-Bc
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:47:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1gw9ZI-0001Es-GL
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:52:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw9U2-0007tG-Ee
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:47:08 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41887)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gw9U0-0007kV-LG
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:47:05 -0500
-Received: by mail-ot1-x343.google.com with SMTP id t7so19244082otk.8
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 09:46:53 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gw9ZH-0001qP-M1
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:52:32 -0500
+References: <20190219013106.17538-1-richardw.yang@linux.intel.com>
+	<20190219013106.17538-2-richardw.yang@linux.intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <baff8fc6-8d22-02c8-6bea-5b1ede1d4bfa@redhat.com>
+Date: Tue, 19 Feb 2019 11:52:29 -0600
 MIME-Version: 1.0
-References: <20190215192302.27855-1-richard.henderson@linaro.org>
-In-Reply-To: <20190215192302.27855-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Feb 2019 17:46:38 +0000
-Message-ID: <CAFEAcA8vxWuhv5Nkz+EhmH5fw7bLCe0WGOF1ZbqgER-8bT7NRA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] target/arm: Implement
- ARMv8.3-JSConv & ARMv8.2-FHM
+In-Reply-To: <20190219013106.17538-2-richardw.yang@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] CODING_STYLE: specify the indent rule
+ for multiline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: imammedo@redhat.com, mjt@tls.msk.ru
 
-On Fri, 15 Feb 2019 at 19:23, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
->
-> Changes since v3:
->
-> Rebased on master, and combined the JSConv and FHM patch sets.
-> There were a number of patch conflicts which needed fixing up.
->
-> Changes since v2:
->
-> Patch 2 splits out vfp_helper.c, which I wrote for something else.
-> But while rebasing it occured to me that helper_vjcvt is better placed
-> in vfp_helper.c than op_helper.c, so why not include it here and now.
->
-> Patch 3 corresponds to the v2 patch 1, but totally rewritten.  What
-> I missed the first time around is that register Sn is encoded differenly
-> than Dn, so merely setting dp = 0 doesn't help because we've already
-> decoded the register number incorrectly.  Therefore, replace some really
-> ugly if conditions and set some variables as appropriate.
->
-> Patch 4 is adjusted to match the change in decode from patch 2, and
-> putting the aa32 flags in the right place.
+On 2/18/19 7:31 PM, Wei Yang wrote:
+> We didn't specify the indent rule for multiline code here, which may
+> misleading users. And in current code, the code use different rules.
+> 
+> Add this rule in CODING_STYLE to make sure this is clear to every one.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  CODING_STYLE | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index ec075dedc4..73f66ca185 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -29,6 +29,32 @@ Spaces of course are superior to tabs because:
+>  
+>  Do not leave whitespace dangling off the ends of lines.
+>  
+> +1.1 Multiline Indent
+> +
+> +There are several places where indent is necessary:
+> +
+> + - struct definition
+> + - if/else
+> + - while/for
+> + - function definition & call
+> +
+> +All the above cases apply the same rule: indent with four spaces.
 
-I've applied patches 1-4 to target-arm.next; patches 5, 6, 8 I've
-commented on. 7 I'll leave until you've dealt with the fpstatus
-stuff in your next version of the patchset.
+Is this redundant with the earlier statement that "QEMU indents are four
+spaces."?
 
-thanks
--- PMM
+> +
+> +While the last three case may face another situation: code should spread into
+> +several lines. In this case the rule is align the new line with first
+> +parentheses.
+
+Grammar is awkward - the leading 'while' makes it sound like that you
+have a dependent clause, but then never provide the independent clause.
+Maybe a completely different wording is better:
+
+When breaking up a long line to fit within line widths, align the
+secondary lines just after the opening parenthesis of the first.
+
+> +
+> +For example:
+> +
+> +    if (a == 1 &&
+> +        b == 2)
+> +
+
+Maybe:
+
+if (a == 1 &&
+    b == 2) {
+
+to match our later recommendations on always using {}.
+
+> +    while (a == 1 &&
+> +           b == 2)
+> +
+
+Similar.
+
+> +    do_something(arg1, arg2
+> +                 arg3)
+> +
+
+and here, I'd include the ';' to make it a valid statement.
+
+>  2. Line width
+>  
+>  Lines should be 80 characters; try not to make them longer.
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
