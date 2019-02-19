@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58988)
+Received: from eggs.gnu.org ([209.51.188.92]:59661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5I9-0001GE-09
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:18:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1gw5K0-0002d6-Sa
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5I8-0006l3-5T
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:18:32 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Feb 2019 13:18:23 +0000
-Message-ID: <5c06341a-3299-c43f-6f0f-983ad8db93c6@virtuozzo.com>
-References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
-	<20190211125601.86533-5-vsementsov@virtuozzo.com>
-	<dcf92fc1-21d9-ea3b-5267-6c76f747cbc0@redhat.com>
-In-Reply-To: <dcf92fc1-21d9-ea3b-5267-6c76f747cbc0@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8B0F7D40E4EAF34AA489853EBAE8C60E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gw5Jx-0007dm-Ft
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:20:28 -0500
+References: <20190219115937.21587-1-stefanha@redhat.com>
+	<2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
+	<30c66aaa-2807-69cd-2395-dcd49e59b136@virtuozzo.com>
+	<CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
+Date: Tue, 19 Feb 2019 14:20:15 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 4/4] block/nbd-client: use non-blocking io
- channel for nbd negotiation
+In-Reply-To: <CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: drop unnecessary
+ accel=kvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "berrange@redhat.com" <berrange@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-MTIuMDIuMjAxOSAxOjAyLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAyLzExLzE5IDY6NTYgQU0s
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBOb3cgbmVnb3RpYXRpb24g
-aXMgZG9uZSBpbiBjb3JvdXRpbmUsIHNvIHRvIHRha2UgYmVuZWZpdCBvZiBpdCBsZXQncw0KPj4g
-dXNlIG5vbi1ibG9ja2luZyBtb2RlbC4NCj4+DQo+PiBOb3RlIHRoYXQgUUlPQ2hhbm5lbCBoYW5k
-bGUgc3luY2hyb25vdXMgaW8gY2FsbHMgY29ycmVjdGx5IGFueXdheSwgc28NCj4gDQo+IHMvaGFu
-ZGxlL2hhbmRsZXMvDQo+IA0KPj4gaXQncyBub3QgYSBwcm9ibGVtIHRvIHNlbmQgZmluYWwgTkJE
-X0NNRF9ESVNDIHRvIG5vbi1ibG9ja2luZyBjaGFubmVsDQo+PiBidXQgdXNpbmcgc3luYyBxaW8g
-aW50ZXJmYWNlLCBldmVuIG5vdCBpbiBjb3JvdXRpbmUuDQo+IA0KPiBzL25vdCBpbi93aGVuIG5v
-dCBpbiBhLw0KPiANCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
-ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2svbmJk
-LWNsaWVudC5jIHwgMTAgKysrLS0tLS0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRp
-b25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPiANCj4gVGhpcyBmaXhlcyBxZW11IGFzIE5CRCBjbGll
-bnQgZm9yIHVzZSBpbiBibG9jayBkZXZpY2VzLCBidXQgd2hhdCBhYm91dA0KPiBxZW11IGFzIE5C
-RCBjbGllbnQgaW4gcWVtdS1uYmQ/ICBEb2VzIHRoYXQgbmVlZCBhbnkgdXBkYXRlcz8gIFRoZW4N
-Cj4gYWdhaW4sIHlvdXIgb2JzZXJ2YXRpb24gYWJvdXQgUUlPIGRvaW5nIHRoZSByaWdodCB0aGlu
-ZyBmb3IgYm90aA0KPiBibG9ja2luZyAocWVtdS1uYmQpIGFuZCBub24tYmxvY2tpbmcgKGJsb2Nr
-IGxheWVyKSBjaGFubmVscyBzZWVtcyB0bw0KPiBjb3ZlciB0aGF0Lg0KDQpJbiBxZW11LW5iZCBj
-bGllbnQgd29ya3MgaW4gYSBzZXBhcmF0ZSB0aHJlYWQsIHNvLCBJIHRoaW5rLCB3ZSBkb24ndCBu
-ZWVkDQpub25ibG9ja2luZzogd2UgaGF2ZSBhIHRocmVhZCBhbnl3YXkuDQoNCk9uIHRoZSBvdGhl
-ciBoYW5kLCBpcyBteSBjb2RlIGluIG5iZF9yZWFjZWl2ZV9jb21tb24gc2FmZSwga2VlcGluZyBp
-biBtaW5kDQp0aGF0IHdlIGNhbGwgaXQgZnJvbSBzZXBhcmF0ZSB0aHJlYWQ/DQoNCkFyZSBxaW9f
-Y2hhbm5lbF9hdHRhY2hfYWlvX2NvbnRleHQsIHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciwgQUlP
-X1dBSVRfV0hJTEUNCnRocmVhZC1zYWZlPw0KDQo+IA0KPj4gQEAgLTEwNzIsOSArMTA3Miw2IEBA
-IHN0YXRpYyBpbnQgbmJkX2NsaWVudF9jb25uZWN0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4g
-ICAgICAgICAgIG9iamVjdF9yZWYoT0JKRUNUKGNsaWVudC0+aW9jKSk7DQo+PiAgICAgICB9DQo+
-PiAgIA0KPj4gLSAgICAvKiBOb3cgdGhhdCB3ZSdyZSBjb25uZWN0ZWQsIHNldCB0aGUgc29ja2V0
-IHRvIGJlIG5vbi1ibG9ja2luZyBhbmQNCj4+IC0gICAgICoga2ljayB0aGUgcmVwbHkgbWVjaGFu
-aXNtLiAgKi8NCj4+IC0gICAgcWlvX2NoYW5uZWxfc2V0X2Jsb2NraW5nKFFJT19DSEFOTkVMKHNp
-b2MpLCBmYWxzZSwgTlVMTCk7DQo+PiAgICAgICBjbGllbnQtPmNvbm5lY3Rpb25fY28gPSBxZW11
-X2Nvcm91dGluZV9jcmVhdGUobmJkX2Nvbm5lY3Rpb25fZW50cnksIGNsaWVudCk7DQo+PiAgICAg
-ICBuYmRfY2xpZW50X2F0dGFjaF9haW9fY29udGV4dChicywgYmRydl9nZXRfYWlvX2NvbnRleHQo
-YnMpKTsNCj4+ICAgDQo+PiBAQCAtMTA4Myw5ICsxMDgwLDggQEAgc3RhdGljIGludCBuYmRfY2xp
-ZW50X2Nvbm5lY3QoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiAgIA0KPj4gICAgZmFpbDoNCj4+
-ICAgICAgIC8qDQo+PiAtICAgICAqIFdlIGhhdmUgY29ubmVjdGVkLCBidXQgbXVzdCBmYWlsIGZv
-ciBvdGhlciByZWFzb25zLiBUaGUNCj4+IC0gICAgICogY29ubmVjdGlvbiBpcyBzdGlsbCBibG9j
-a2luZzsgc2VuZCBOQkRfQ01EX0RJU0MgYXMgYSBjb3VydGVzeQ0KPj4gLSAgICAgKiB0byB0aGUg
-c2VydmVyLg0KPj4gKyAgICAgKiBXZSBoYXZlIGNvbm5lY3RlZCwgYnV0IG11c3QgZmFpbCBmb3Ig
-b3RoZXIgcmVhc29ucy4NCj4+ICsgICAgICogU2VuZCBOQkRfQ01EX0RJU0MgYXMgYSBjb3VydGVz
-eSB0byB0aGUgc2VydmVyLg0KPj4gICAgICAgICovDQo+PiAgICAgICB7DQo+PiAgICAgICAgICAg
-TkJEUmVxdWVzdCByZXF1ZXN0ID0geyAudHlwZSA9IE5CRF9DTURfRElTQyB9Ow0KPj4NCj4gDQoN
-Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On 19/02/2019 14.07, Stefan Hajnoczi wrote:
+> On Tue, Feb 19, 2019 at 12:12 PM Vladimir Sementsov-Ogievskiy
+> <vsementsov@virtuozzo.com> wrote:
+>> 19.02.2019 15:02, Thomas Huth wrote:
+>>> On 19/02/2019 12.59, Stefan Hajnoczi wrote:
+>>>> Tests 235 and 238 do not require the kvm accelerator.  TCG works fine.
+>>>>
+>>>> Use the default accelerator instead of requiring kvm.
+>>>>
+>>>> Suggested-by: Thomas Huth <thuth@redhat.com>
+>>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>>> ---
+>>>>   tests/qemu-iotests/235 | 1 -
+>>>>   tests/qemu-iotests/238 | 1 -
+>>>>   2 files changed, 2 deletions(-)
+>>>>
+>>>> diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+>>>> index d6edd97ab4..329da8f0c2 100755
+>>>> --- a/tests/qemu-iotests/235
+>>>> +++ b/tests/qemu-iotests/235
+>>>> @@ -49,7 +49,6 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
+>>>>                   str(size))
+>>>>
+>>>>   vm = QEMUMachine(iotests.qemu_prog)
+>>>> -vm.add_args('-machine', 'accel=kvm')
+>>>
+>>> According to the initial commit log of 235:
+>>>
+>>>   "iotests: simple mirror test with kvm on 1G image"
+>>>
+>>> ... so I assume KVM was used on purpose here?
+>>>
+>>>   Thomas
+>>>
+>>
+>> As I remember kvm is not really necessary, and test have a comment about it:
+>> # And it didn't reproduce if at least one of the following:
+>> ...
+>> # 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
+>> #    reproduces, if just drop kvm, but gdb failed to produce full backtraces
+>> #    for me)
+>>
+>> But the comment should be updated with this patch.
+> 
+> Will fix in v2.
+
+Any chance that you could even make it somehow work with -M accel=qtest
+instead? ... in case someone compiled their QEMU with --disable-tcg, too
+...?
+
+ Thomas
