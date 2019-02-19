@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32913)
+Received: from eggs.gnu.org ([209.51.188.92]:33715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gw3XR-0003hw-S4
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:26:14 -0500
+	(envelope-from <david@redhat.com>) id 1gw3b6-0005YF-Dv
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:30:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gw3XQ-0003pp-E1
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:26:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37726)
+	(envelope-from <david@redhat.com>) id 1gw3b2-0004jM-3F
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:29:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gw3XQ-0003p5-7H
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:26:12 -0500
-Date: Tue, 19 Feb 2019 19:23:12 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190219112312.GA1582@wei-ubt>
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-12-git-send-email-wexu@redhat.com>
-	<ba86ca50-73e8-1c06-8ab0-0e8b74aeac58@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gw3az-0004ht-FF
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:29:54 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14318637E5
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 11:29:47 +0000 (UTC)
+References: <20190219101510.9356-1-kraxel@redhat.com>
+	<a7050f62-b56f-cc1a-7600-5197b83a27ac@redhat.com>
+	<20190219111755.GE7154@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3493d414-d1a7-9db7-90f8-ef70dfa2c4d9@redhat.com>
+Date: Tue, 19 Feb 2019 12:29:43 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190219111755.GE7154@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ba86ca50-73e8-1c06-8ab0-0e8b74aeac58@redhat.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 11/11] virtio: CLI and provide packed
- ring feature bit by default
+Subject: Re: [Qemu-devel] [PATCH] audio: don't use alsa by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +35,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, jfreiman@redhat.com, tiwei.bie@intel.com, mst@redhat.com
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Feb 19, 2019 at 03:32:19PM +0800, Jason Wang wrote:
+On 19.02.19 12:17, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Feb 19, 2019 at 11:39:49AM +0100, David Hildenbrand wrote:
+>> On 19.02.19 11:15, Gerd Hoffmann wrote:
+>>> ardware is present the driver initializes
+>>> successfully and throws errors later on, i.e. effectively the
+>>> automatic probing doesn't work.  So the driver should not be
+>>> used by default (until that is fixed).  Drop the can_be_default
+>>> flag.
+>>>
+>>> Explicitly picking the alsa driver (using QEMU_AUDIO_DRV=3Dalsa
+>>> environment variable) will continue to work.
+>>
+>> Just pointing out that with this patch, audio initialization still
+>> hinders me from starting guests on my Fedora 29 when running under roo=
+t
+>> (I don't think this patch was also intended to fix that, just pointing
+>> out for me the problem still exists).
+>>
+>>
+>> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+>> Connection refused
+>>
+>> sdl: SDL_OpenAudio failed
+>> sdl: Reason: ALSA: Couldn't open audio device: Connection refused
+>> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+>> Connection refused
+>>
+>> sdl: SDL_OpenAudio failed
+>> sdl: Reason: ALSA: Couldn't open audio device: Connection refused
+>> audio: Failed to create voice `pcspk'
+>> qemu-system-x86_64: Initialization of device isa-pcspk failed:
+>> Initializing audio voice failed
+>>
+>>
+>> For whatever reason, on my Fedora29 root cannot access alsa devices.
+>> Maybe it is a Fedora 29 problem, maybe only my setup is messed up (e.g=
+.
+>> because of an upgrade). The workaround for me is to not run QEMU as
+>> root. (I don't have time to look into the details)
 >=20
-> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26, wexu@redhat.com wrote:
-> >From: Wei Xu <wexu@redhat.com>
-> >
-> >Add userspace and vhost kernel/user support.
-> >
-> >Add CLI "ring_packed=3Dtrue/false" to enable/disable packed ring provi=
-sion.
-> >Usage:
-> >     -device virtio-net-pci,netdev=3Dxx,mac=3Dxx:xx:xx:xx:xx:xx,ring_p=
-acked=3Dfalse
-> >
-> >By default it is provided.
->=20
->=20
-> Please compat this for old machine types.
+> Does your machine actually have any sound card in it ?  ie does
+> /dev/snd/ report any pcm*  devices ?
 
-It is provided by default, how to make it compatible for old machine type=
-s?
-Hide or provide it?
+Well, I can listen to audio, so I assume yes ;) Let's check
 
-Wei
+t460s: ~  $ ls -la /dev/snd/
+insgesamt 0
+drwxr-xr-x   4 root root      360 19. Feb 08:39 .
+drwxr-xr-x  22 root root     4400 19. Feb 08:40 ..
+drwxr-xr-x   2 root root       60 19. Feb 08:39 by-id
+drwxr-xr-x   2 root root       80 19. Feb 08:39 by-path
+crw-rw----+  1 root audio 116,  3 19. Feb 08:39 controlC0
+crw-rw----+  1 root audio 116, 13 19. Feb 08:39 controlC1
+crw-rw----+  1 root audio 116, 11 19. Feb 08:39 hwC1D0
+crw-rw----+  1 root audio 116, 12 19. Feb 08:39 hwC1D2
+crw-rw----+  1 root audio 116,  2 19. Feb 08:40 pcmC0D0c
+crw-rw----+  1 root audio 116,  5 19. Feb 08:40 pcmC1D0c
+crw-rw----+  1 root audio 116,  4 19. Feb 11:40 pcmC1D0p
+crw-rw----+  1 root audio 116, 10 19. Feb 08:40 pcmC1D10p
+crw-rw----+  1 root audio 116,  6 19. Feb 08:40 pcmC1D3p
+crw-rw----+  1 root audio 116,  7 19. Feb 08:40 pcmC1D7p
+crw-rw----+  1 root audio 116,  8 19. Feb 08:40 pcmC1D8p
+crw-rw----+  1 root audio 116,  9 19. Feb 08:40 pcmC1D9p
 
 >=20
-> Thanks
->=20
->=20
-> >
-> >Signed-off-by: Wei Xu <wexu@redhat.com>
-> >---
-> >  hw/net/vhost_net.c         | 2 ++
-> >  include/hw/virtio/virtio.h | 4 +++-
-> >  2 files changed, 5 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> >index e037db6..f593086 100644
-> >--- a/hw/net/vhost_net.c
-> >+++ b/hw/net/vhost_net.c
-> >@@ -53,6 +53,7 @@ static const int kernel_feature_bits[] =3D {
-> >      VIRTIO_F_VERSION_1,
-> >      VIRTIO_NET_F_MTU,
-> >      VIRTIO_F_IOMMU_PLATFORM,
-> >+    VIRTIO_F_RING_PACKED,
-> >      VHOST_INVALID_FEATURE_BIT
-> >  };
-> >@@ -78,6 +79,7 @@ static const int user_feature_bits[] =3D {
-> >      VIRTIO_NET_F_MRG_RXBUF,
-> >      VIRTIO_NET_F_MTU,
-> >      VIRTIO_F_IOMMU_PLATFORM,
-> >+    VIRTIO_F_RING_PACKED,
-> >      /* This bit implies RARP isn't sent by QEMU out of band */
-> >      VIRTIO_NET_F_GUEST_ANNOUNCE,
-> >diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> >index 9c1fa07..2eb27d2 100644
-> >--- a/include/hw/virtio/virtio.h
-> >+++ b/include/hw/virtio/virtio.h
-> >@@ -264,7 +264,9 @@ typedef struct VirtIORNGConf VirtIORNGConf;
-> >      DEFINE_PROP_BIT64("any_layout", _state, _field, \
-> >                        VIRTIO_F_ANY_LAYOUT, true), \
-> >      DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
-> >-                      VIRTIO_F_IOMMU_PLATFORM, false)
-> >+                      VIRTIO_F_IOMMU_PLATFORM, false), \
-> >+    DEFINE_PROP_BIT64("ring_packed", _state, _field, \
-> >+                      VIRTIO_F_RING_PACKED, true)
-> >  hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
-> >  hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
->=20
+> Based on your logs here, I suspect it has no sound card. The reason
+> it will work as non-root, is that QEMU will activate the pulseaudio
+> backend that works fine [1] even if no sound card is present.
+
+The thing is, I can play audio as normal user, but not as root
+
+t460s: ~  $ LANG=3DC speaker-test -d default
+
+speaker-test 1.1.6
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 1 channels
+Using 16 octaves of pink noise
+Rate set to 48000Hz (requested 48000Hz)
+Buffer size range from 192 to 2097152
+Period size range from 64 to 699051
+Using max buffer size 2097152
+Periods =3D 4
+was set period_size =3D 524288
+was set buffer_size =3D 2097152
+ALSA <-> PulseAudio PCM I/O Plugin
+
+t460s: ~  $ LANG=3DC sudo speaker-test -d default
+
+speaker-test 1.1.6
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 1 channels
+Using 16 octaves of pink noise
+ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+Connection refused
+
+
+Again, this might be an issue on my system. But as I never touched any
+of the configuration it either is broken on all Fedora 29 installations
+or only on mine due to system upgrades. I already tried downgrading
+pulse audio without luck.
+
+--=20
+
+Thanks,
+
+David / dhildenb
