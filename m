@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51535)
+Received: from eggs.gnu.org ([209.51.188.92]:52162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=946e8a4f0=Paul.Durrant@citrix.com>)
-	id 1gw8RT-0006pl-Fr
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:40:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1gw8U5-0008C2-N9
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=946e8a4f0=Paul.Durrant@citrix.com>)
-	id 1gw8RR-0005W4-HB
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:40:23 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 19 Feb 2019 16:36:28 +0000
-Message-ID: <9510cf48c9064c0fb1e6eb64b414a7ea@AMSPEX02CL03.citrite.net>
-References: <20190219163440.15702-1-paul.durrant@citrix.com>
-In-Reply-To: <20190219163440.15702-1-paul.durrant@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1gw8U4-0006pQ-GA
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:43:05 -0500
+References: <20190219161321.15012-1-berrange@redhat.com>
+	<20190219161321.15012-3-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f9daffdc-2978-040b-062c-41448b4e890e@redhat.com>
+Date: Tue, 19 Feb 2019 10:42:50 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] xen-block: stop leaking memory in
- xen_block_drive_create()
+In-Reply-To: <20190219161321.15012-3-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: avoid broken pipe with
+ certtool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,103 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Apologies... typo-ed qemu-devel...
+On 2/19/19 10:13 AM, Daniel P. Berrang=C3=A9 wrote:
+> When we run "certtool | head -1" the latter command is likely to
+> complete and exit before certtool has written everything it wants to
+> stderr. In at least the RHEL-7 gnutls 3.3.29 this causes certtool to
+> quit with broken pipe before it has finished writing the desired
+> output file to disk. This causes non-deterministic failures of the
+> iotest 233 because the certs are sometimes zero length files.
+> If certtool fails the "head -1" means we also loose any useful error
+> message it would have printed.
+>=20
+> Thus this patch gets rid of the pipe and post-processes the output in a
+> more flexible & reliable manner.
+>=20
 
-> -----Original Message-----
-> From: Paul Durrant [mailto:paul.durrant@citrix.com]
-> Sent: 19 February 2019 16:35
-> To: qeme-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org
-> Cc: Paul Durrant <Paul.Durrant@citrix.com>; Peter Maydell
-> <peter.maydell@linaro.org>; Stefano Stabellini <sstabellini@kernel.org>;
-> Anthony Perard <anthony.perard@citrix.com>; Kevin Wolf <kwolf@redhat.com>=
-;
-> Max Reitz <mreitz@redhat.com>
-> Subject: [PATCH] xen-block: stop leaking memory in
-> xen_block_drive_create()
->=20
-> The locally allocated QDict-s need to be freed. ('file_layer' will be
-> freed implicitly since it is added as an object to 'driver_layer').
->=20
-> Spotted by Coverity: CID 1398649
->=20
-> While in the neighbourhood free 'driver' and 'filename' as soon as they
-> are
-> added to the QDicts. Freeing after the 'done' label doesn't make that muc=
-h
-> sense as, if the error path jumps to that label, the values would be NULL
-> anyway.
->=20
-> This patch also makes that more obvious by taking the error path if
-> 'params' is NULL and then asserting that both driver and filename are
-> non-NULL in the normal path.
->=20
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Better than my attempt.
+
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> ---
->  hw/block/xen-block.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
+>  tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
+>  1 file changed, 32 insertions(+), 16 deletions(-)
+
+As Thomas pointed out, it is not parallel-safe, but that's a bigger
+issue with all of the iotests, so not this patch's problem.
+
 >=20
-> diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-> index 37a456c207..70fc2455e8 100644
-> --- a/hw/block/xen-block.c
-> +++ b/hw/block/xen-block.c
-> @@ -743,12 +743,12 @@ static XenBlockDrive *xen_block_drive_create(const
-> char *id,
->          }
->=20
->          g_strfreev(v);
-> -    }
-> -
-> -    if (!filename) {
-> -        error_setg(errp, "no filename");
-> +    } else {
-> +        error_setg(errp, "no params");
->          goto done;
->      }
-> +
-> +    assert(filename);
->      assert(driver);
->=20
->      drive =3D g_new0(XenBlockDrive, 1);
-> @@ -758,6 +758,7 @@ static XenBlockDrive *xen_block_drive_create(const
-> char *id,
->=20
->      qdict_put_str(file_layer, "driver", "file");
->      qdict_put_str(file_layer, "filename", filename);
-> +    g_free(filename);
->=20
->      if (mode && *mode !=3D 'w') {
->          qdict_put_bool(file_layer, "read-only", true);
-> @@ -793,16 +794,17 @@ static XenBlockDrive *xen_block_drive_create(const
-> char *id,
->      driver_layer =3D qdict_new();
->=20
->      qdict_put_str(driver_layer, "driver", driver);
-> +    g_free(driver);
-> +
->      qdict_put_obj(driver_layer, "file", QOBJECT(file_layer));
->=20
->      g_assert(!drive->node_name);
->      drive->node_name =3D xen_block_blockdev_add(drive->id, driver_layer,
->                                                &local_err);
->=20
-> -done:
-> -    g_free(driver);
-> -    g_free(filename);
-> +    qobject_unref(driver_layer);
->=20
-> +done:
->      if (local_err) {
->          error_propagate(errp, local_err);
->          xen_block_drive_destroy(drive, NULL);
-> --
-> 2.20.1.2.gb21ebb6
+> diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.=
+tls
+> index eae81789bb..6cf11ed383 100644
+> --- a/tests/qemu-iotests/common.tls
+> +++ b/tests/qemu-iotests/common.tls
+> @@ -29,6 +29,17 @@ tls_x509_cleanup()
+>  }
+> =20
+> =20
+> +tls_certtool()
+> +{
+> +    certtool "$@" 1>certtool.log 2>&1
+
+I tend to use '>' instead of '1>', but they are identical.
+
+> +    if test "$?" =3D 0; then
+> +      head -1 certtool.log
+
+Technically, POSIX says 'head -1' is not portable (it was historical
+practice, but a wording change in POSIX 2001 made it invalid, which
+wasn't fixed until POSIX 2008 - and there are historical versions of GNU
+coreutils which went out of their way to reject the usage, although that
+has since been fixed); the portable spelling these days is 'head -n1'.
+But as the test was already using 'head -1', I'm not going to make you
+switch it.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
