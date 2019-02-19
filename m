@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56077)
+Received: from eggs.gnu.org ([209.51.188.92]:56425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gw3A6-00027G-Hp
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:02:12 -0500
+	(envelope-from <wexu@redhat.com>) id 1gw3BH-0002bc-Lg
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gw3A1-0005Z0-8C
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:02:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34242)
+	(envelope-from <wexu@redhat.com>) id 1gw3B7-0005yR-Rc
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:03:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37435)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gw3A0-0005Xw-Nu
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:02:01 -0500
-Date: Tue, 19 Feb 2019 11:01:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190219110144.GA2941@work-vm>
-References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
-	<1550566347-3648-1-git-send-email-yan.y.zhao@intel.com>
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gw3B5-0005vO-Rv
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:03:08 -0500
+Date: Tue, 19 Feb 2019 19:00:03 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20190219110003.GE15343@wei-ubt>
+References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
+	<1550118402-4057-11-git-send-email-wexu@redhat.com>
+	<af2abdf0-3f96-6e97-d5c0-5ab2211222e1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1550566347-3648-1-git-send-email-yan.y.zhao@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] vfio/migration: support device of
- device config capability
+In-Reply-To: <af2abdf0-3f96-6e97-d5c0-5ab2211222e1@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 10/11] virtio: migration support for
+ packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,782 +30,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: alex.williamson@redhat.com, qemu-devel@nongnu.org, intel-gvt-dev@lists.freedesktop.org, Zhengxiao.zx@alibaba-inc.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com, kwankhede@nvidia.com, kevin.tian@intel.com, cjia@nvidia.com, arei.gonglei@huawei.com, kvm@vger.kernel.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> Device config is the default data that every device should have. so
-> device config capability is by default on, no need to set.
-> 
-> - Currently two type of resources are saved/loaded for device of device
->   config capability:
->   General PCI config data, and Device config data.
->   They are copies as a whole when precopy is stopped.
-> 
-> Migration setup flow:
-> - Setup device state regions, check its device state version and capabilities.
->   Mmap Device Config Region and Dirty Bitmap Region, if available.
-> - If device state regions are failed to get setup, a migration blocker is
->   registered instead.
-> - Added SaveVMHandlers to register device state save/load handlers.
-> - Register VM state change handler to set device's running/stop states.
-> - On migration startup on source machine, set device's state to
->   VFIO_DEVICE_STATE_LOGGING
-> 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
-> ---
->  hw/vfio/Makefile.objs         |   2 +-
->  hw/vfio/migration.c           | 633 ++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/pci.c                 |   1 -
->  hw/vfio/pci.h                 |  25 +-
->  include/hw/vfio/vfio-common.h |   1 +
->  5 files changed, 659 insertions(+), 3 deletions(-)
->  create mode 100644 hw/vfio/migration.c
-> 
-> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-> index 8b3f664..f32ff19 100644
-> --- a/hw/vfio/Makefile.objs
-> +++ b/hw/vfio/Makefile.objs
-> @@ -1,6 +1,6 @@
->  ifeq ($(CONFIG_LINUX), y)
->  obj-$(CONFIG_SOFTMMU) += common.o
-> -obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
-> +obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o migration.o
->  obj-$(CONFIG_VFIO_CCW) += ccw.o
->  obj-$(CONFIG_SOFTMMU) += platform.o
->  obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> new file mode 100644
-> index 0000000..16d6395
-> --- /dev/null
-> +++ b/hw/vfio/migration.c
-> @@ -0,0 +1,633 @@
-> +#include "qemu/osdep.h"
-> +
-> +#include "hw/vfio/vfio-common.h"
-> +#include "migration/blocker.h"
-> +#include "migration/register.h"
-> +#include "qapi/error.h"
-> +#include "pci.h"
-> +#include "sysemu/kvm.h"
-> +#include "exec/ram_addr.h"
-> +
-> +#define VFIO_SAVE_FLAG_SETUP 0
-> +#define VFIO_SAVE_FLAG_PCI 1
-> +#define VFIO_SAVE_FLAG_DEVCONFIG 2
-> +#define VFIO_SAVE_FLAG_DEVMEMORY 4
-> +#define VFIO_SAVE_FLAG_CONTINUE 8
-> +
-> +static int vfio_device_state_region_setup(VFIOPCIDevice *vdev,
-> +        VFIORegion *region, uint32_t subtype, const char *name)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    struct vfio_region_info *info;
-> +    int ret;
-> +
-> +    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_DEVICE_STATE,
-> +            subtype, &info);
-> +    if (ret) {
-> +        error_report("Failed to get info of region %s", name);
-> +        return ret;
-> +    }
-> +
-> +    if (vfio_region_setup(OBJECT(vdev), vbasedev,
-> +            region, info->index, name)) {
-> +        error_report("Failed to setup migrtion region %s", name);
-> +        return ret;
-> +    }
-> +
-> +    if (vfio_region_mmap(region)) {
-> +        error_report("Failed to mmap migrtion region %s", name);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +bool vfio_device_data_cap_system_memory(VFIOPCIDevice *vdev)
-> +{
-> +   return !!(vdev->migration->data_caps & VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY);
-> +}
-> +
-> +bool vfio_device_data_cap_device_memory(VFIOPCIDevice *vdev)
-> +{
-> +   return !!(vdev->migration->data_caps & VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY);
-> +}
-> +
-> +static bool vfio_device_state_region_mmaped(VFIORegion *region)
-> +{
-> +    bool mmaped = true;
-> +    if (region->nr_mmaps != 1 || region->mmaps[0].offset ||
-> +            (region->size != region->mmaps[0].size) ||
-> +            (region->mmaps[0].mmap == NULL)) {
-> +        mmaped = false;
-> +    }
-> +
-> +    return mmaped;
-> +}
-> +
-> +static int vfio_get_device_config_size(VFIOPCIDevice *vdev)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region_ctl =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +    VFIORegion *region_config =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
-> +    uint64_t len;
-> +    int sz;
-> +
-> +    sz = sizeof(len);
-> +    if (pread(vbasedev->fd, &len, sz,
-> +                region_ctl->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, device_config.size))
-> +            != sz) {
-> +        error_report("vfio: Failed to get length of device config");
-> +        return -1;
-> +    }
-> +    if (len > region_config->size) {
-> +        error_report("vfio: Error device config length");
-> +        return -1;
-> +    }
-> +    vdev->migration->devconfig_size = len;
-> +
-> +    return 0;
-> +}
-> +
-> +static int vfio_set_device_config_size(VFIOPCIDevice *vdev, uint64_t size)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region_ctl =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +    VFIORegion *region_config =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
-> +    int sz;
-> +
-> +    if (size > region_config->size) {
-> +        return -1;
-> +    }
-> +
-> +    sz = sizeof(size);
-> +    if (pwrite(vbasedev->fd, &size, sz,
-> +                region_ctl->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, device_config.size))
-> +            != sz) {
-> +        error_report("vfio: Failed to set length of device config");
-> +        return -1;
-> +    }
-> +    vdev->migration->devconfig_size = size;
-> +    return 0;
-> +}
-> +
-> +static int vfio_save_data_device_config(VFIOPCIDevice *vdev, QEMUFile *f)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region_ctl =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +    VFIORegion *region_config =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
-> +    void *dest;
-> +    uint32_t sz;
-> +    uint8_t *buf = NULL;
-> +    uint32_t action = VFIO_DEVICE_DATA_ACTION_GET_BUFFER;
-> +    uint64_t len = vdev->migration->devconfig_size;
-> +
-> +    qemu_put_be64(f, len);
-> +
-> +    sz = sizeof(action);
-> +    if (pwrite(vbasedev->fd, &action, sz,
-> +                region_ctl->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, device_config.action))
-> +            != sz) {
-> +        error_report("vfio: action failure for device config get buffer");
-> +        return -1;
-> +    }
-> +
-> +    if (!vfio_device_state_region_mmaped(region_config)) {
-> +        buf = g_malloc(len);
-> +        if (buf == NULL) {
-> +            error_report("vfio: Failed to allocate memory for migrate");
-> +            return -1;
-> +        }
+On Tue, Feb 19, 2019 at 03:30:41PM +0800, Jason Wang wrote:
+>=20
+> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26, wexu@redhat.com wrote:
+> >From: Wei Xu <wexu@redhat.com>
+> >
+> >Both userspace and vhost-net/user are supported with this patch.
+> >
+> >A new subsection is introduced for packed ring, only 'last_avail_idx'
+> >and 'last_avail_wrap_counter' are saved/loaded presumably based on
+> >all the others relevant data(inuse, used/avail index and wrap count
+> >should be the same.
+>=20
+>=20
+> This is probably only true for net device, see comment in virtio_load()=
+:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ * Some devices migrate VirtQueueElements that have been popped
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ * from the avail ring but not yet returned to the used ring.
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ * Since max ring size < UINT16_MAX it's safe to use modulo
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ * UINT16_MAX + 1 subtraction.
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdev=
+->vq[i].inuse =3D (uint16_t)(vdev->vq[i].last_avail_idx -
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdev->vq[i].used_idx);
+>=20
+>=20
+> So you need to migrate used_idx and used_wrap_counter since we don't ha=
+ve
+> used idx.
 
-g_malloc never returns NULL; it aborts on failure to allocate.
-So you can either drop the check, or my preference is to use
-g_try_malloc for large/unknown areas, and it can return NULL.
+This is trying to align with vhost-net/user as we discussed, since all we
+have done is to support  virtio-net device for packed ring, maybe we can
+consider supporting other devices after we have got it verified.
 
-> +        if (pread(vbasedev->fd, buf, len, region_config->fd_offset) != len) {
-> +            error_report("vfio: Failed read device config buffer");
-> +            return -1;
-> +        }
-> +        qemu_put_buffer(f, buf, len);
-> +        g_free(buf);
-> +    } else {
-> +        dest = region_config->mmaps[0].mmap;
-> +        qemu_put_buffer(f, dest, len);
-> +    }
-> +    return 0;
-> +}
-> +
-> +static int vfio_load_data_device_config(VFIOPCIDevice *vdev,
-> +                            QEMUFile *f, uint64_t len)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region_ctl =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +    VFIORegion *region_config =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
-> +    void *dest;
-> +    uint32_t sz;
-> +    uint8_t *buf = NULL;
-> +    uint32_t action = VFIO_DEVICE_DATA_ACTION_SET_BUFFER;
-> +
-> +    vfio_set_device_config_size(vdev, len);
-> +
-> +    if (!vfio_device_state_region_mmaped(region_config)) {
-> +        buf = g_malloc(len);
-> +        if (buf == NULL) {
-> +            error_report("vfio: Failed to allocate memory for migrate");
-> +            return -1;
-> +        }
-> +        qemu_get_buffer(f, buf, len);
-> +        if (pwrite(vbasedev->fd, buf, len,
-> +                    region_config->fd_offset) != len) {
-> +            error_report("vfio: Failed to write devie config buffer");
-> +            return -1;
-> +        }
-> +        g_free(buf);
-> +    } else {
-> +        dest = region_config->mmaps[0].mmap;
-> +        qemu_get_buffer(f, dest, len);
-> +    }
-> +
-> +    sz = sizeof(action);
-> +    if (pwrite(vbasedev->fd, &action, sz,
-> +                region_ctl->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, device_config.action))
-> +            != sz) {
-> +        error_report("vfio: action failure for device config set buffer");
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int vfio_set_dirty_page_bitmap_chunk(VFIOPCIDevice *vdev,
-> +        uint64_t start_addr, uint64_t page_nr)
-> +{
-> +
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region_ctl =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +    VFIORegion *region_bitmap =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_BITMAP];
-> +    unsigned long bitmap_size =
-> +                    BITS_TO_LONGS(page_nr) * sizeof(unsigned long);
-> +    uint32_t sz;
-> +
-> +    struct {
-> +        __u64 start_addr;
-> +        __u64 page_nr;
-> +    } system_memory;
-> +    system_memory.start_addr = start_addr;
-> +    system_memory.page_nr = page_nr;
-> +    sz = sizeof(system_memory);
-> +    if (pwrite(vbasedev->fd, &system_memory, sz,
-> +                region_ctl->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, system_memory))
-> +            != sz) {
-> +        error_report("vfio: Failed to set system memory range for dirty pages");
-> +        return -1;
-> +    }
-> +
-> +    if (!vfio_device_state_region_mmaped(region_bitmap)) {
-> +        void *bitmap = g_malloc0(bitmap_size);
-> +
-> +        if (pread(vbasedev->fd, bitmap, bitmap_size,
-> +                    region_bitmap->fd_offset) != bitmap_size) {
-> +            error_report("vfio: Failed to read dirty bitmap data");
-> +            return -1;
-> +        }
-> +
-> +        cpu_physical_memory_set_dirty_lebitmap(bitmap, start_addr, page_nr);
-> +
-> +        g_free(bitmap);
-> +    } else {
-> +        cpu_physical_memory_set_dirty_lebitmap(
-> +                    region_bitmap->mmaps[0].mmap,
-> +                    start_addr, page_nr);
-> +    }
-> +   return 0;
-> +}
-> +
-> +int vfio_set_dirty_page_bitmap(VFIOPCIDevice *vdev,
-> +        uint64_t start_addr, uint64_t page_nr)
-> +{
-> +    VFIORegion *region_bitmap =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_BITMAP];
-> +    unsigned long chunk_size = region_bitmap->size;
-> +    uint64_t chunk_pg_nr = (chunk_size / sizeof(unsigned long)) *
-> +                                BITS_PER_LONG;
-> +
-> +    uint64_t cnt_left;
-> +    int rc = 0;
-> +
-> +    cnt_left = page_nr;
-> +
-> +    while (cnt_left >= chunk_pg_nr) {
-> +        rc = vfio_set_dirty_page_bitmap_chunk(vdev, start_addr, chunk_pg_nr);
-> +        if (rc) {
-> +            goto exit;
-> +        }
-> +        cnt_left -= chunk_pg_nr;
-> +        start_addr += start_addr;
-> +   }
-> +   rc = vfio_set_dirty_page_bitmap_chunk(vdev, start_addr, cnt_left);
-> +
-> +exit:
-> +   return rc;
-> +}
-> +
-> +static int vfio_set_device_state(VFIOPCIDevice *vdev,
-> +        uint32_t dev_state)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +    uint32_t sz = sizeof(dev_state);
-> +
-> +    if (!vdev->migration) {
-> +        return -1;
-> +    }
-> +
-> +    if (pwrite(vbasedev->fd, &dev_state, sz,
-> +              region->fd_offset +
-> +              offsetof(struct vfio_device_state_ctl, device_state))
-> +            != sz) {
-> +        error_report("vfio: Failed to set device state %d", dev_state);
-> +        return -1;
-> +    }
-> +    vdev->migration->device_state = dev_state;
-> +    return 0;
-> +}
-> +
-> +static int vfio_get_device_data_caps(VFIOPCIDevice *vdev)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +
-> +    uint32_t caps;
-> +    uint32_t size = sizeof(caps);
-> +
-> +    if (pread(vbasedev->fd, &caps, size,
-> +                region->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, caps))
-> +            != size) {
-> +        error_report("%s Failed to read data caps of device states",
-> +                vbasedev->name);
-> +        return -1;
-> +    }
-> +    vdev->migration->data_caps = caps;
-> +    return 0;
-> +}
-> +
-> +
-> +static int vfio_check_devstate_version(VFIOPCIDevice *vdev)
-> +{
-> +    VFIODevice *vbasedev = &vdev->vbasedev;
-> +    VFIORegion *region =
-> +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> +
-> +    uint32_t version;
-> +    uint32_t size = sizeof(version);
-> +
-> +    if (pread(vbasedev->fd, &version, size,
-> +                region->fd_offset +
-> +                offsetof(struct vfio_device_state_ctl, version))
-> +            != size) {
-> +        error_report("%s Failed to read version of device state interfaces",
-> +                vbasedev->name);
-> +        return -1;
-> +    }
-> +
-> +    if (version != VFIO_DEVICE_STATE_INTERFACE_VERSION) {
-> +        error_report("%s migration version mismatch, right version is %d",
-> +                vbasedev->name, VFIO_DEVICE_STATE_INTERFACE_VERSION);
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
-> +{
-> +    VFIOPCIDevice *vdev = pv;
-> +    uint32_t dev_state = vdev->migration->device_state;
-> +
-> +    if (!running) {
-> +        dev_state |= VFIO_DEVICE_STATE_STOP;
-> +    } else {
-> +        dev_state &= ~VFIO_DEVICE_STATE_STOP;
-> +    }
-> +
-> +    vfio_set_device_state(vdev, dev_state);
-> +}
-> +
-> +static void vfio_save_live_pending(QEMUFile *f, void *opaque,
-> +                                   uint64_t max_size,
-> +                                   uint64_t *res_precopy_only,
-> +                                   uint64_t *res_compatible,
-> +                                   uint64_t *res_post_copy_only)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +
-> +    if (!vfio_device_data_cap_device_memory(vdev)) {
-> +        return;
-> +    }
-> +
-> +    return;
-> +}
-> +
-> +static int vfio_save_iterate(QEMUFile *f, void *opaque)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +
-> +    if (!vfio_device_data_cap_device_memory(vdev)) {
-> +        return 0;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void vfio_pci_load_config(VFIOPCIDevice *vdev, QEMUFile *f)
-> +{
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
-> +    bool msi_64bit;
-> +
-> +    /* retore pci bar configuration */
-> +    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> +            ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
-> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> +        bar_cfg = qemu_get_be32(f);
-> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar_cfg, 4);
-> +    }
-> +    vfio_pci_write_config(pdev, PCI_COMMAND,
-> +            ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
-> +
-> +    /* restore msi configuration */
-> +    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
-> +    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
-> +
-> +    vfio_pci_write_config(&vdev->pdev,
-> +            pdev->msi_cap + PCI_MSI_FLAGS,
-> +            ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
-> +
-> +    msi_lo = qemu_get_be32(f);
-> +    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
-> +
-> +    if (msi_64bit) {
-> +        msi_hi = qemu_get_be32(f);
-> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> +                msi_hi, 4);
-> +    }
-> +    msi_data = qemu_get_be32(f);
-> +    vfio_pci_write_config(pdev,
-> +            pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> +            msi_data, 2);
-> +
-> +    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
-> +            ctl | PCI_MSI_FLAGS_ENABLE, 2);
+>=20
+>=20
+> >
+> >Signed-off-by: Wei Xu <wexu@redhat.com>
+> >---
+> >  hw/virtio/virtio.c | 69 ++++++++++++++++++++++++++++++++++++++++++++=
++++++++---
+> >  1 file changed, 66 insertions(+), 3 deletions(-)
+> >
+> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >index 8cfc7b6..7c5de07 100644
+> >--- a/hw/virtio/virtio.c
+> >+++ b/hw/virtio/virtio.c
+> >@@ -2349,6 +2349,13 @@ static bool virtio_virtqueue_needed(void *opaqu=
+e)
+> >      return virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1);
+> >  }
+> >+static bool virtio_packed_virtqueue_needed(void *opaque)
+> >+{
+> >+    VirtIODevice *vdev =3D opaque;
+> >+
+> >+    return virtio_host_has_feature(vdev, VIRTIO_F_RING_PACKED);
+> >+}
+> >+
+> >  static bool virtio_ringsize_needed(void *opaque)
+> >  {
+> >      VirtIODevice *vdev =3D opaque;
+> >@@ -2390,6 +2397,17 @@ static const VMStateDescription vmstate_virtque=
+ue =3D {
+> >      }
+> >  };
+> >+static const VMStateDescription vmstate_packed_virtqueue =3D {
+> >+    .name =3D "packed_virtqueue_state",
+> >+    .version_id =3D 1,
+> >+    .minimum_version_id =3D 1,
+> >+    .fields =3D (VMStateField[]) {
+> >+        VMSTATE_UINT16(last_avail_idx, struct VirtQueue),
+> >+        VMSTATE_BOOL(last_avail_wrap_counter, struct VirtQueue),
+> >+        VMSTATE_END_OF_LIST()
+> >+    }
+> >+};
+> >+
+> >  static const VMStateDescription vmstate_virtio_virtqueues =3D {
+> >      .name =3D "virtio/virtqueues",
+> >      .version_id =3D 1,
+> >@@ -2402,6 +2420,18 @@ static const VMStateDescription vmstate_virtio_=
+virtqueues =3D {
+> >      }
+> >  };
+> >+static const VMStateDescription vmstate_virtio_packed_virtqueues =3D =
+{
+> >+    .name =3D "virtio/packed_virtqueues",
+> >+    .version_id =3D 1,
+> >+    .minimum_version_id =3D 1,
+> >+    .needed =3D &virtio_packed_virtqueue_needed,
+> >+    .fields =3D (VMStateField[]) {
+> >+        VMSTATE_STRUCT_VARRAY_POINTER_KNOWN(vq, struct VirtIODevice,
+> >+                      VIRTIO_QUEUE_MAX, 0, vmstate_packed_virtqueue, =
+VirtQueue),
+> >+        VMSTATE_END_OF_LIST()
+> >+    }
+> >+};
+> >+
+> >  static const VMStateDescription vmstate_ringsize =3D {
+> >      .name =3D "ringsize_state",
+> >      .version_id =3D 1,
+> >@@ -2522,6 +2552,7 @@ static const VMStateDescription vmstate_virtio =3D=
+ {
+> >          &vmstate_virtio_ringsize,
+> >          &vmstate_virtio_broken,
+> >          &vmstate_virtio_extra_state,
+> >+        &vmstate_virtio_packed_virtqueues,
+> >          NULL
+> >      }
+> >  };
+> >@@ -2794,6 +2825,17 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f=
+, int version_id)
+> >                  virtio_queue_update_rings(vdev, i);
+> >              }
+> >+            if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) =
+{
+> >+                vdev->vq[i].shadow_avail_idx =3D vdev->vq[i].last_ava=
+il_idx;
+> >+                vdev->vq[i].avail_wrap_counter =3D
+> >+                                        vdev->vq[i].last_avail_wrap_c=
+ounter;
+> >+
+> >+                vdev->vq[i].used_idx =3D vdev->vq[i].last_avail_idx;
+> >+                vdev->vq[i].used_wrap_counter =3D
+> >+                                        vdev->vq[i].last_avail_wrap_c=
+ounter;
+> >+                continue;
+> >+            }
+> >+
+> >              nheads =3D vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].l=
+ast_avail_idx;
+> >              /* Check it isn't doing strange things with descriptor n=
+umbers. */
+> >              if (nheads > vdev->vq[i].vring.num) {
+> >@@ -2955,17 +2997,34 @@ hwaddr virtio_queue_get_used_size(VirtIODevice=
+ *vdev, int n)
+> >  uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
+> >  {
+> >-    return vdev->vq[n].last_avail_idx;
+> >+    uint16_t idx;
+> >+
+> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> >+        idx =3D vdev->vq[n].last_avail_idx;
+> >+        idx |=3D ((int)vdev->vq[n].avail_wrap_counter) << 15;
+> >+    } else {
+> >+        idx =3D (int)vdev->vq[n].last_avail_idx;
+> >+    }
+> >+    return idx;
+> >  }
+> >  void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint=
+16_t idx)
+> >  {
+> >-    vdev->vq[n].last_avail_idx =3D idx;
+> >-    vdev->vq[n].shadow_avail_idx =3D idx;
+> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> >+        vdev->vq[n].last_avail_idx =3D idx & 0x7fff;
+> >+        vdev->vq[n].avail_wrap_counter =3D !!(idx & 0x8000);
+>=20
+>=20
+> Let's define some macros for those magic number.
 
-It would probably be best to use a VMStateDescription and the macros
-for this if possible; I bet you'll want to add more fields in the future
-for example.
-Also what happens if the data read from the migration stream is bad or
-doesn't agree with this devices hardware? How does this fail?
+OK.
 
-> +}
-> +
-> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +    int flag;
-> +    uint64_t len;
-> +    int ret = 0;
-> +
-> +    if (version_id != VFIO_DEVICE_STATE_INTERFACE_VERSION) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    do {
-> +        flag = qemu_get_byte(f);
-> +
-> +        switch (flag & ~VFIO_SAVE_FLAG_CONTINUE) {
-> +        case VFIO_SAVE_FLAG_SETUP:
-> +            break;
-> +        case VFIO_SAVE_FLAG_PCI:
-> +            vfio_pci_load_config(vdev, f);
-> +            break;
-> +        case VFIO_SAVE_FLAG_DEVCONFIG:
-> +            len = qemu_get_be64(f);
-> +            vfio_load_data_device_config(vdev, f, len);
-> +            break;
-> +        default:
-> +            ret = -EINVAL;
-> +        }
-> +    } while (flag & VFIO_SAVE_FLAG_CONTINUE);
-> +
-> +    return ret;
-> +}
-> +
-> +static void vfio_pci_save_config(VFIOPCIDevice *vdev, QEMUFile *f)
-> +{
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
-> +    bool msi_64bit;
-> +
-> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
-> +        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
-> +        qemu_put_be32(f, bar_cfg);
-> +    }
-> +
-> +    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
-> +    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
-> +
-> +    msi_lo = pci_default_read_config(pdev,
-> +            pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
-> +    qemu_put_be32(f, msi_lo);
-> +
-> +    if (msi_64bit) {
-> +        msi_hi = pci_default_read_config(pdev,
-> +                pdev->msi_cap + PCI_MSI_ADDRESS_HI,
-> +                4);
-> +        qemu_put_be32(f, msi_hi);
-> +    }
-> +
-> +    msi_data = pci_default_read_config(pdev,
-> +            pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
-> +            2);
-> +    qemu_put_be32(f, msi_data);
-> +
-> +}
-> +
-> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +    int rc = 0;
-> +
-> +    qemu_put_byte(f, VFIO_SAVE_FLAG_PCI | VFIO_SAVE_FLAG_CONTINUE);
-> +    vfio_pci_save_config(vdev, f);
-> +
-> +    qemu_put_byte(f, VFIO_SAVE_FLAG_DEVCONFIG);
-> +    rc += vfio_get_device_config_size(vdev);
-> +    rc += vfio_save_data_device_config(vdev, f);
-> +
-> +    return rc;
-> +}
-> +
-> +static int vfio_save_setup(QEMUFile *f, void *opaque)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +    qemu_put_byte(f, VFIO_SAVE_FLAG_SETUP);
-> +
-> +    vfio_set_device_state(vdev, VFIO_DEVICE_STATE_RUNNING |
-> +            VFIO_DEVICE_STATE_LOGGING);
-> +    return 0;
-> +}
-> +
-> +static int vfio_load_setup(QEMUFile *f, void *opaque)
-> +{
-> +    return 0;
-> +}
-> +
-> +static void vfio_save_cleanup(void *opaque)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +    uint32_t dev_state = vdev->migration->device_state;
-> +
-> +    dev_state &= ~VFIO_DEVICE_STATE_LOGGING;
-> +
-> +    vfio_set_device_state(vdev, dev_state);
-> +}
-> +
-> +static SaveVMHandlers savevm_vfio_handlers = {
-> +    .save_setup = vfio_save_setup,
-> +    .save_live_pending = vfio_save_live_pending,
-> +    .save_live_iterate = vfio_save_iterate,
-> +    .save_live_complete_precopy = vfio_save_complete_precopy,
-> +    .save_cleanup = vfio_save_cleanup,
-> +    .load_setup = vfio_load_setup,
-> +    .load_state = vfio_load_state,
-> +};
-> +
-> +int vfio_migration_init(VFIOPCIDevice *vdev, Error **errp)
-> +{
-> +    int ret;
-> +    Error *local_err = NULL;
-> +    vdev->migration = g_new0(VFIOMigration, 1);
-> +
-> +    if (vfio_device_state_region_setup(vdev,
-> +              &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL],
-> +              VFIO_REGION_SUBTYPE_DEVICE_STATE_CTL,
-> +              "device-state-ctl")) {
-> +        goto error;
-> +    }
-> +
-> +    if (vfio_check_devstate_version(vdev)) {
-> +        goto error;
-> +    }
-> +
-> +    if (vfio_get_device_data_caps(vdev)) {
-> +        goto error;
-> +    }
-> +
-> +    if (vfio_device_state_region_setup(vdev,
-> +              &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG],
-> +              VFIO_REGION_SUBTYPE_DEVICE_STATE_DATA_CONFIG,
-> +              "device-state-data-device-config")) {
-> +        goto error;
-> +    }
-> +
-> +    if (vfio_device_data_cap_device_memory(vdev)) {
-> +        error_report("No suppport of data cap device memory Yet");
-> +        goto error;
-> +    }
-> +
-> +    if (vfio_device_data_cap_system_memory(vdev) &&
-> +            vfio_device_state_region_setup(vdev,
-> +              &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_BITMAP],
-> +              VFIO_REGION_SUBTYPE_DEVICE_STATE_DATA_DIRTYBITMAP,
-> +              "device-state-data-dirtybitmap")) {
-> +        goto error;
-> +    }
-> +
-> +    vdev->migration->device_state = VFIO_DEVICE_STATE_RUNNING;
-> +
-> +    register_savevm_live(NULL, TYPE_VFIO_PCI, -1,
-> +            VFIO_DEVICE_STATE_INTERFACE_VERSION,
-> +            &savevm_vfio_handlers,
-> +            vdev);
-> +
-> +    vdev->migration->vm_state =
-> +        qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
-> +
-> +    return 0;
-> +error:
-> +    error_setg(&vdev->migration_blocker,
-> +            "VFIO device doesn't support migration");
-> +    ret = migrate_add_blocker(vdev->migration_blocker, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        error_free(vdev->migration_blocker);
-> +    }
-> +
-> +    g_free(vdev->migration);
-> +    vdev->migration = NULL;
-> +
-> +    return ret;
-> +}
-> +
-> +void vfio_migration_finalize(VFIOPCIDevice *vdev)
-> +{
-> +    if (vdev->migration) {
-> +        int i;
-> +        qemu_del_vm_change_state_handler(vdev->migration->vm_state);
-> +        unregister_savevm(NULL, TYPE_VFIO_PCI, vdev);
-> +        for (i = 0; i < VFIO_DEVSTATE_REGION_NUM; i++) {
-> +            vfio_region_finalize(&vdev->migration->region[i]);
-> +        }
-> +        g_free(vdev->migration);
-> +        vdev->migration = NULL;
-> +    } else if (vdev->migration_blocker) {
-> +        migrate_del_blocker(vdev->migration_blocker);
-> +        error_free(vdev->migration_blocker);
-> +    }
-> +}
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index c0cb1ec..b8e006b 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -37,7 +37,6 @@
->  
->  #define MSIX_CAP_LENGTH 12
->  
-> -#define TYPE_VFIO_PCI "vfio-pci"
->  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
->  
->  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index b1ae4c0..4b7b1bb 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -19,6 +19,7 @@
->  #include "qemu/event_notifier.h"
->  #include "qemu/queue.h"
->  #include "qemu/timer.h"
-> +#include "sysemu/sysemu.h"
->  
->  #define PCI_ANY_ID (~0)
->  
-> @@ -56,6 +57,21 @@ typedef struct VFIOBAR {
->      QLIST_HEAD(, VFIOQuirk) quirks;
->  } VFIOBAR;
->  
-> +enum {
-> +    VFIO_DEVSTATE_REGION_CTL = 0,
-> +    VFIO_DEVSTATE_REGION_DATA_CONFIG,
-> +    VFIO_DEVSTATE_REGION_DATA_DEVICE_MEMORY,
-> +    VFIO_DEVSTATE_REGION_DATA_BITMAP,
-> +    VFIO_DEVSTATE_REGION_NUM,
-> +};
-> +typedef struct VFIOMigration {
-> +    VFIORegion region[VFIO_DEVSTATE_REGION_NUM];
-> +    uint32_t data_caps;
-> +    uint32_t device_state;
-> +    uint64_t devconfig_size;
-> +    VMChangeStateEntry *vm_state;
-> +} VFIOMigration;
-> +
->  typedef struct VFIOVGARegion {
->      MemoryRegion mem;
->      off_t offset;
-> @@ -132,6 +148,8 @@ typedef struct VFIOPCIDevice {
->      VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
->      VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
->      void *igd_opregion;
-> +    VFIOMigration *migration;
-> +    Error *migration_blocker;
->      PCIHostDeviceAddress host;
->      EventNotifier err_notifier;
->      EventNotifier req_notifier;
-> @@ -198,5 +216,10 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
->  void vfio_display_reset(VFIOPCIDevice *vdev);
->  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
->  void vfio_display_finalize(VFIOPCIDevice *vdev);
-> -
-> +bool vfio_device_data_cap_system_memory(VFIOPCIDevice *vdev);
-> +bool vfio_device_data_cap_device_memory(VFIOPCIDevice *vdev);
-> +int vfio_set_dirty_page_bitmap(VFIOPCIDevice *vdev,
-> +         uint64_t start_addr, uint64_t page_nr);
-> +int vfio_migration_init(VFIOPCIDevice *vdev, Error **errp);
-> +void vfio_migration_finalize(VFIOPCIDevice *vdev);
->  #endif /* HW_VFIO_VFIO_PCI_H */
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 1b434d0..ed43613 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -32,6 +32,7 @@
->  #endif
->  
->  #define VFIO_MSG_PREFIX "vfio %s: "
-> +#define TYPE_VFIO_PCI "vfio-pci"
->  
->  enum {
->      VFIO_DEVICE_TYPE_PCI = 0,
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+>=20
+> >+    } else {
+> >+        vdev->vq[n].last_avail_idx =3D idx;
+> >+        vdev->vq[n].shadow_avail_idx =3D idx;
+> >+    }
+> >  }
+> >  void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
+> >  {
+> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> >+        return;
+> >+    }
+>=20
+>=20
+> Why doesn't packed ring care about this?
+
+As elaborated above, used idx/wrap_counter are supposed to be the
+same with avail ones for vhost-net/user.
+
+>=20
+>=20
+> >+
+> >      rcu_read_lock();
+> >      if (vdev->vq[n].vring.desc) {
+> >          vdev->vq[n].last_avail_idx =3D vring_used_idx(&vdev->vq[n]);
+> >@@ -2976,6 +3035,10 @@ void virtio_queue_restore_last_avail_idx(VirtIO=
+Device *vdev, int n)
+> >  void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
+> >  {
+> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> >+        return;
+> >+    }
+>=20
+>=20
+> And this?
+
+Same as above.
+
+Wei
+
+>=20
+> Thanks
+>=20
+>=20
+> >+
+> >      rcu_read_lock();
+> >      if (vdev->vq[n].vring.desc) {
+> >          vdev->vq[n].used_idx =3D vring_used_idx(&vdev->vq[n]);
