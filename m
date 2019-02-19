@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49604)
+Received: from eggs.gnu.org ([209.51.188.92]:49660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydz-0005YL-1j
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:40 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvye2-0005cX-Gv
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydx-0007CK-Pq
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:39 -0500
-Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:40340)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvye1-0007EL-HG
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:42 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:37955)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydx-0007Ao-F4
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:37 -0500
-Received: by mail-lj1-x234.google.com with SMTP id w6so11593870ljd.7
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:36 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvye1-0007E5-9X
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:41 -0500
+Received: by mail-lj1-x243.google.com with SMTP id j19so15592599ljg.5
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:41 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 18 Feb 2019 22:11:08 -0800
-Message-Id: <20190219061111.10231-21-jcmvbkbc@gmail.com>
+Date: Mon, 18 Feb 2019 22:11:10 -0800
+Message-Id: <20190219061111.10231-23-jcmvbkbc@gmail.com>
 In-Reply-To: <20190219061111.10231-1-jcmvbkbc@gmail.com>
 References: <20190219061111.10231-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 20/23] tests/tcg/xtensa: add FP0 group
- arithmetic tests
+Subject: [Qemu-devel] [PATCH 22/23] tests/tcg/xtensa: add FP1 group tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +28,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Test arithmetic operations for normal, NaN and Inf arguments.
+Test comparisons and conditional move operations.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/Makefile         |   1 +
- tests/tcg/xtensa/macros.inc       |  17 ++++
- tests/tcg/xtensa/test_fp0_arith.S | 173 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 191 insertions(+)
- create mode 100644 tests/tcg/xtensa/test_fp0_arith.S
+ tests/tcg/xtensa/Makefile   |   1 +
+ tests/tcg/xtensa/test_fp1.S | 141 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 142 insertions(+)
+ create mode 100644 tests/tcg/xtensa/test_fp1.S
 
 diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
-index c2bc278be5e7..eea269a36e7a 100644
+index b1d9953f6704..2b323adb8d46 100644
 --- a/tests/tcg/xtensa/Makefile
 +++ b/tests/tcg/xtensa/Makefile
-@@ -39,6 +39,7 @@ TESTCASES += test_clamps.tst
- TESTCASES += test_extui.tst
- TESTCASES += test_fail.tst
+@@ -41,6 +41,7 @@ TESTCASES += test_fail.tst
  TESTCASES += test_flix.tst
-+TESTCASES += test_fp0_arith.tst
+ TESTCASES += test_fp0_arith.tst
+ TESTCASES += test_fp0_conv.tst
++TESTCASES += test_fp1.tst
  TESTCASES += test_interrupt.tst
  TESTCASES += test_loop.tst
  TESTCASES += test_lsc.tst
-diff --git a/tests/tcg/xtensa/macros.inc b/tests/tcg/xtensa/macros.inc
-index 36536ed8a4bc..aa8f95bce879 100644
---- a/tests/tcg/xtensa/macros.inc
-+++ b/tests/tcg/xtensa/macros.inc
-@@ -98,6 +98,23 @@ test_\name:
-     s32i    a3, a2, 0
- .endm
- 
-+.macro dump r
-+#ifdef DEBUG
-+.data
-+.align 4
-+1: .word 0
-+.text
-+    movi    a4, 1b
-+    s32i    a2, a4, 0
-+    movi    a2, 4
-+    movi    a3, 1
-+    movi    a5, 4
-+    simcall
-+    movi    a4, 1b
-+    l32i    a2, a4, 0
-+#endif
-+.endm
-+
- #define glue(a, b) _glue(a, b)
- #define _glue(a, b) a ## b
- 
-diff --git a/tests/tcg/xtensa/test_fp0_arith.S b/tests/tcg/xtensa/test_fp0_arith.S
+diff --git a/tests/tcg/xtensa/test_fp1.S b/tests/tcg/xtensa/test_fp1.S
 new file mode 100644
-index 000000000000..253d033a3398
+index 000000000000..6e182e5964bd
 --- /dev/null
-+++ b/tests/tcg/xtensa/test_fp0_arith.S
-@@ -0,0 +1,173 @@
++++ b/tests/tcg/xtensa/test_fp1.S
+@@ -0,0 +1,141 @@
 +#include "macros.inc"
 +
-+test_suite fp0_arith
++test_suite fp1
 +
 +#if XCHAL_HAVE_FP
 +
@@ -96,163 +66,131 @@ index 000000000000..253d033a3398
 +    wfr     \fr, a2
 +.endm
 +
-+.macro check_res fr, r
-+    rfr     a2, \fr
-+    dump    a2
-+    movi    a3, \r
-+    assert  eq, a2, a3
++.macro test_ord_ex op, br, fr0, fr1, v0, v1, r
++    movi    a2, 0
++    wur     a2, fsr
++    movfp   \fr0, \v0
++    movfp   \fr1, \v1
++    \op     \br, \fr0, \fr1
++    movi    a2, 0
++    movi    a3, 1
++    movt    a2, a3, \br
++    assert  eqi, a2, \r
 +    rur     a2, fsr
 +    assert  eqi, a2, 0
 +.endm
 +
-+.macro test_op2_rm op, fr0, fr1, fr2, v0, v1, r
++.macro test_ord op, br, fr0, fr1, v0, v1, r
 +    movi    a2, 0
-+    wur     a2, fsr
-+    movfp   \fr0, \v0
-+    movfp   \fr1, \v1
-+    \op     \fr2, \fr0, \fr1
-+    check_res \fr2, \r
-+.endm
-+
-+.macro test_op3_rm op, fr0, fr1, fr2, fr3, v0, v1, v2, r
-+    movi    a2, 0
-+    wur     a2, fsr
-+    movfp   \fr0, \v0
-+    movfp   \fr1, \v1
-+    movfp   \fr2, \v2
-+    \op     \fr0, \fr1, \fr2
-+    check_res \fr3, \r
-+.endm
-+
-+.macro test_op2_ex op, fr0, fr1, fr2, v0, v1, rm, r
-+    movi    a2, \rm
 +    wur     a2, fcr
-+    test_op2_rm \op, \fr0, \fr1, \fr2, \v0, \v1, \r
-+    movi    a2, (\rm) | 0x7c
++    test_ord_ex \op, \br, \fr0, \fr1, \v0, \v1, \r
++    movi    a2, 0x7c
 +    wur     a2, fcr
-+    test_op2_rm \op, \fr0, \fr1, \fr2, \v0, \v1, \r
++    test_ord_ex \op, \br, \fr0, \fr1, \v0, \v1, \r
 +.endm
 +
-+.macro test_op3_ex op, fr0, fr1, fr2, fr3, v0, v1, v2, rm, r
-+    movi    a2, \rm
-+    wur     a2, fcr
-+    test_op3_rm \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, \r
-+    movi    a2, (\rm) | 0x7c
-+    wur     a2, fcr
-+    test_op3_rm \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, \r
++.macro test_ord_all op, aa, ab, ba, aPI, PIa, aN, Na, II, IN, NI
++    test_ord \op  b0,  f0,  f1, 0x3f800000, 0x3f800000, \aa
++    test_ord \op  b1,  f2,  f3, 0x3f800000, 0x3fc00000, \ab
++    test_ord \op  b2,  f4,  f5, 0x3fc00000, 0x3f800000, \ba
++    test_ord \op  b3,  f6,  f7, 0x3f800000, 0x7f800000, \aPI
++    test_ord \op  b4,  f8,  f9, 0x7f800000, 0x3f800000, \PIa
++    test_ord \op  b5, f10, f11, 0x3f800000, 0xffc00001, \aN
++    test_ord \op  b6, f12, f13, 0x3f800000, 0xff800001, \aN
++    test_ord \op  b7, f14, f15, 0x3f800000, 0x7f800001, \aN
++    test_ord \op  b8,  f0,  f1, 0x3f800000, 0x7fc00000, \aN
++    test_ord \op  b9,  f2,  f3, 0xffc00001, 0x3f800000, \Na
++    test_ord \op b10,  f4,  f5, 0xff800001, 0x3f800000, \Na
++    test_ord \op b11,  f6,  f7, 0x7f800001, 0x3f800000, \Na
++    test_ord \op b12,  f8,  f9, 0x7fc00000, 0x3f800000, \Na
++    test_ord \op b13, f10, f11, 0x7f800000, 0x7f800000, \II
++    test_ord \op b14, f12, f13, 0x7f800000, 0x7fc00000, \IN
++    test_ord \op b15, f14, f15, 0x7fc00000, 0x7f800000, \NI
 +.endm
 +
-+.macro test_op2 op, fr0, fr1, fr2, v0, v1, r0, r1, r2, r3
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 0, \r0
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 1, \r1
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 2, \r2
-+    test_op2_ex \op, \fr0, \fr1, \fr2, \v0, \v1, 3, \r3
-+.endm
-+
-+.macro test_op3 op, fr0, fr1, fr2, fr3, v0, v1, v2, r0, r1, r2, r3
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 0, \r0
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 1, \r1
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 2, \r2
-+    test_op3_ex \op, \fr0, \fr1, \fr2, \fr3, \v0, \v1, \v2, 3, \r3
-+.endm
-+
-+.macro test_op2_cpe op
-+    set_vector  kernel, 2f
-+    movi    a2, 0
-+    wsr     a2, cpenable
-+1:
-+    \op     f2, f0, f1
-+    test_fail
-+2:
-+    rsr     a2, excvaddr
-+    movi    a3, 1b
-+    assert  eq, a2, a3
-+    rsr     a2, exccause
-+    movi    a3, 32
-+    assert  eq, a2, a3
-+
-+    set_vector  kernel, 0
++test un_s
 +    movi    a2, 1
 +    wsr     a2, cpenable
++    test_ord_all un.s, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1
++test_end
++
++test oeq_s
++    test_ord_all oeq.s, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0
++test_end
++
++test ueq_s
++    test_ord_all ueq.s, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1
++test_end
++
++test olt_s
++    test_ord_all olt.s, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0
++test_end
++
++test ult_s
++    test_ord_all ult.s, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1
++test_end
++
++test ole_s
++    test_ord_all ole.s, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0
++test_end
++
++test ule_s
++    test_ord_all ule.s, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1
++test_end
++
++.macro test_cond op, fr0, fr1, cr, v0, v1, r
++    movfp   \fr0, \v0
++    movfp   \fr1, \v1
++    \op     \fr0, \fr1, \cr
++    rfr     a2, \fr0
++    movi    a3, \r
++    assert  eq, a2, a3
 +.endm
 +
-+test add_s
-+    movi    a2, 1
-+    wsr     a2, cpenable
-+
-+    test_op2 add.s, f0, f1, f2, 0x3fc00000, 0x34400000, \
-+        0x3fc00002, 0x3fc00001, 0x3fc00002, 0x3fc00001
-+    test_op2 add.s, f3, f4, f5, 0x3fc00000, 0x34a00000, \
-+        0x3fc00002, 0x3fc00002, 0x3fc00003, 0x3fc00002
-+
-+    /* MAX_FLOAT + MAX_FLOAT = +inf/MAX_FLOAT  */
-+    test_op2 add.s, f6, f7, f8, 0x7f7fffff, 0x7f7fffff, \
-+        0x7f800000, 0x7f7fffff, 0x7f800000, 0x7f7fffff
++test moveqz_s
++    movi    a3, 0
++    test_cond moveqz.s, f0, f1, a3, 0, 0x3f800000, 0x3f800000
++    movi    a3, 1
++    test_cond moveqz.s, f0, f1, a3, 0, 0x3f800000, 0
 +test_end
 +
-+test add_s_inf
-+    /* 1 + +inf = +inf  */
-+    test_op2 add.s, f6, f7, f8, 0x3fc00000, 0x7f800000, \
-+        0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000
-+
-+    /* +inf + -inf = default NaN */
-+    test_op2 add.s, f0, f1, f2, 0x7f800000, 0xff800000, \
-+        0x7fc00000, 0x7fc00000, 0x7fc00000, 0x7fc00000
++test movnez_s
++    movi    a3, 0
++    test_cond movnez.s, f0, f1, a3, 0, 0x3f800000, 0
++    movi    a3, 1
++    test_cond movnez.s, f0, f1, a3, 0, 0x3f800000, 0x3f800000
 +test_end
 +
-+test add_s_nan
-+    /* 1 + NaN = NaN  */
-+    test_op2 add.s, f9, f10, f11, 0x3fc00000, 0x7fc00001, \
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001
-+    test_op2 add.s, f12, f13, f14, 0x3fc00000, 0x7f800001, \
-+        0x7f800001, 0x7f800001, 0x7f800001, 0x7f800001
-+
-+    /* NaN1 + NaN2 = NaN1 */
-+    test_op2 add.s, f15, f0, f1, 0x7f800001, 0x7fbfffff, \
-+        0x7f800001, 0x7f800001, 0x7f800001, 0x7f800001
-+    test_op2 add.s, f2, f3, f4, 0x7fbfffff, 0x7f800001, \
-+        0x7fbfffff, 0x7fbfffff, 0x7fbfffff, 0x7fbfffff
-+    test_op2 add.s, f5, f6, f7, 0x7fc00001, 0x7fbfffff, \
-+        0x7fc00001, 0x7fc00001, 0x7fc00001, 0x7fc00001
-+    test_op2 add.s, f8, f9, f10, 0x7fbfffff, 0x7fc00001, \
-+        0x7fbfffff, 0x7fbfffff, 0x7fbfffff, 0x7fbfffff
++test movltz_s
++    movi    a3, -1
++    test_cond movltz.s, f0, f1, a3, 0, 0x3f800000, 0x3f800000
++    movi    a3, 0
++    test_cond movltz.s, f0, f1, a3, 0, 0x3f800000, 0
++    movi    a3, 1
++    test_cond movltz.s, f0, f1, a3, 0, 0x3f800000, 0
 +test_end
 +
-+test sub_s
-+    test_op2 sub.s, f0, f1, f0, 0x3f800001, 0x33800000, \
-+        0x3f800000, 0x3f800000, 0x3f800001, 0x3f800000
-+    test_op2 sub.s, f0, f1, f1, 0x3f800002, 0x33800000, \
-+        0x3f800002, 0x3f800001, 0x3f800002, 0x3f800001
-+
-+    /* norm - norm = denorm */
-+    test_op2 sub.s, f6, f7, f8, 0x00800001, 0x00800000, \
-+        0x00000001, 0x00000001, 0x00000001, 0x00000001
++test movgez_s
++    movi    a3, -1
++    test_cond movgez.s, f0, f1, a3, 0, 0x3f800000, 0
++    movi    a3, 0
++    test_cond movgez.s, f0, f1, a3, 0, 0x3f800000, 0x3f800000
++    movi    a3, 1
++    test_cond movgez.s, f0, f1, a3, 0, 0x3f800000, 0x3f800000
 +test_end
 +
-+test mul_s
-+    test_op2 mul.s, f0, f1, f2, 0x3f800001, 0x3f800001, \
-+        0x3f800002, 0x3f800002, 0x3f800003, 0x3f800002
-+
-+    /* MAX_FLOAT/2 * MAX_FLOAT/2 = +inf/MAX_FLOAT  */
-+    test_op2 mul.s, f6, f7, f8, 0x7f000000, 0x7f000000, \
-+        0x7f800000, 0x7f7fffff, 0x7f800000, 0x7f7fffff
-+    /* min norm * min norm = 0/denorm */
-+    test_op2 mul.s, f6, f7, f8, 0x00800001, 0x00800000, \
-+        0x00000000, 0x00000000, 0x00000001, 0x00000000
-+
-+    /* inf * 0 = default NaN */
-+    test_op2 mul.s, f6, f7, f8, 0x7f800000, 0x00000000, \
-+        0x7fc00000, 0x7fc00000, 0x7fc00000, 0x7fc00000
++test movf_s
++    olt.s   b0, f0, f0
++    test_cond movf.s, f0, f1, b0, 0, 0x3f800000, 0x3f800000
++    ueq.s   b0, f0, f0
++    test_cond movf.s, f0, f1, b0, 0, 0x3f800000, 0
 +test_end
 +
-+test madd_s
-+    test_op3 madd.s, f0, f1, f2, f0, 0, 0x3f800001, 0x3f800001, \
-+        0x3f800002, 0x3f800002, 0x3f800003, 0x3f800002
-+test_end
-+
-+test msub_s
-+    test_op3 msub.s, f0, f1, f2, f0, 0x3f800000, 0x3f800001, 0x3f800001, \
-+        0xb4800000, 0xb4800000, 0xb4800000, 0xb4800001
++test movt_s
++    ueq.s   b0, f0, f0
++    test_cond movt.s, f0, f1, b0, 0, 0x3f800000, 0x3f800000
++    olt.s   b0, f0, f0
++    test_cond movt.s, f0, f1, b0, 0, 0x3f800000, 0
 +test_end
 +
 +#endif
