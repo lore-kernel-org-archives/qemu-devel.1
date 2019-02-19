@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42680)
+Received: from eggs.gnu.org ([209.51.188.92]:45345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw2AG-0000w3-Fw
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:58:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1gw2NK-0004D9-7d
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:11:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw2AF-0007KO-IL
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:58:12 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42079)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gw2AF-0007Jz-3X
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:58:11 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i5so33140330oto.9
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 01:58:11 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gw2NI-0006sv-Ow
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 05:11:42 -0500
+References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
+	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
+	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
+	<20190219075333.GA4727@localhost.localdomain>
+	<d7a55ce9-a83c-12fe-fd16-d45dff67630a@redhat.com>
+	<20190219093716.GF4727@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6d9d1a3c-7310-3134-ea5c-a03d451b8982@redhat.com>
+Date: Tue, 19 Feb 2019 11:11:25 +0100
 MIME-Version: 1.0
-References: <20190211040434.1C98674569F@zero.eik.bme.hu>
-	<8962bd1d-267d-2edf-b5ce-9b67896a2b2e@redhat.com>
-	<alpine.BSF.2.21.9999.1902122354210.68636@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.9999.1902122354210.68636@zero.eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Feb 2019 09:57:58 +0000
-Message-ID: <CAFEAcA84=uU8XTy=4jXdM80XBnn3CS0gJxspakhZpdxWnvo_+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190219093716.GF4727@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
+Subject: Re: [Qemu-devel] Failing iotests in CI (was: Add a gitlab-ci file
+ for Continuous Integration testing on Gitlab)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +29,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, berrange@redhat.com
 
-On Tue, 12 Feb 2019 at 23:59, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->
-> Hello,
->
-> On Tue, 12 Feb 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Hi Zoltan,
->
-> Thanks for the quick review and testing. I'll use your suggestions for th=
+On 19/02/2019 10.37, Kevin Wolf wrote:
+> Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
+>> On 19/02/2019 08.53, Kevin Wolf wrote:
+[...]
+>>> Which are the cases that fail for you with '--disable-tcg'?
+>>
+>> These tests are failing: 087 169 188 232 235 238
+>=20
+> Hm, 087 and 232 just do something like:
+>=20
+>     $QEMU_PROG -nodefaults -machine accel=3Dqtest -nographic \
+>                -qmp stdio -serial none \
+>                ...some -drive and -object options...
+>=20
+> This should be fine with --disable-tcg, I think?
+>=20
+> 169 runs a VM, but I don't see anything that makes it use TCG.
+>=20
+> 188 doesn't even run QEMU at all, it's only qemu-io. I don't see how
+> this could be possibly related to --disable-tcg.
+
+087 and 188 obviously simply lack a check for the required crypto support=
+.
+
+
+Output of 087:
+
+087                [08:33:55] [08:33:56] - output mismatch (see 087.out.b=
+ad)
+--- /builds/huth/qemu/tests/qemu-iotests/087.out	2019-02-19 08:23:54.0000=
+00000 +0000
++++ /builds/huth/qemu/tests/qemu-iotests/087.out.bad	2019-02-19 08:33:56.=
+000000000 +0000
+@@ -46,12 +46,13 @@
+=20
+ =3D=3D=3D Encrypted image LUKS =3D=3D=3D
+=20
++qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKDF in this =
+build: Function not implemented
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encrypt.fo=
+rmat=3Dluks encrypt.key-secret=3Dsec0
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+-{"return": {}}
++{"error": {"class": "GenericError", "desc": "No encryption in image head=
+er, but options specified format 'luks'"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
+
+
+And the output of 188:
+
+188                [08:34:53] [08:34:54] - output mismatch (see 188.out.b=
+ad)
+--- /builds/huth/qemu/tests/qemu-iotests/188.out	2019-02-19 08:23:54.0000=
+00000 +0000
++++ /builds/huth/qemu/tests/qemu-iotests/188.out.bad	2019-02-19 08:34:54.=
+000000000 +0000
+@@ -1,4 +1,5 @@
+ QA output created by 188
++qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKDF in this =
+build: Function not implemented
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 encrypt.for=
+mat=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
+=20
+ =3D=3D reading whole image =3D=3D
+@@ -14,5 +15,6 @@
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ =3D=3D verify open failure with wrong password =3D=3D
+-can't open: Invalid password, cannot unlock any keyslot
++read 16777216/16777216 bytes at offset 0
++16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ *** done
+
+
+169 got killed via abort():
+
+169                [08:34:39] [08:34:46] [failed, exit status 1] - output=
+ mismatch (see 169.out.bad)
+--- /builds/huth/qemu/tests/qemu-iotests/169.out	2019-02-19 08:23:54.0000=
+00000 +0000
++++ /builds/huth/qemu/tests/qemu-iotests/169.out.bad	2019-02-19 08:34:46.=
+000000000 +0000
+@@ -1,5 +1,29 @@
+-....................
++WARNING:qemu:qemu received signal 6: /builds/huth/qemu/tests/qemu-iotest=
+s/../../x86_64-softmmu/qemu-system-x86_64 -chardev socket,id=3Dmon,path=3D=
+/tmp/qemu-iotests-quick-25045/tmpGQOExQ/qemua-13044-monitor.sock -mon cha=
+rdev=3Dmon,mode=3Dcontrol -display none -vga none -qtest unix:path=3D/tmp=
+/qemu-iotests-quick-25045/qemua-13044-qtest.sock -machine accel=3Dqtest -=
+nodefaults -machine accel=3Dqtest -drive if=3Dvirtio,id=3Ddrive0,file=3D/=
+tmp/qemu-iotests-quick-25045/disk_a,format=3Dqcow2,cache=3Dwriteback
+[...]
+
+No clue why.
+
+
+232 is also strange, no idea what is going on here:
+
+232                [08:38:53] [08:38:56] - output mismatch (see 232.out.b=
+ad)
+--- /builds/huth/qemu/tests/qemu-iotests/232.out	2019-02-19 08:23:54.0000=
+00000 +0000
++++ /builds/huth/qemu/tests/qemu-iotests/232.out.bad	2019-02-19 08:38:56.=
+000000000 +0000
+@@ -21,13 +21,13 @@
+ NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+ NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+=20
+-QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,read-=
+only=3Doff,auto-read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Perm=
+ission denied
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-
+-QEMU_PROG: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone,auto-=
+read-only=3Doff: Could not open 'TEST_DIR/t.IMGFMT': Permission denied
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
+
+>> 235 and 238 apparently try to use accel=3Dkvm, so they likely should n=
+ot
+>> be in the "quick" group.
+>=20
+> Yes, I agree.
+>=20
+> Or maybe we should check again why they need kvm at all, in theory they
+> shouldn't. They are throttling tests, so the obvious reason seems to be
+> that they need a running clock. Using -M qtest and advancing the clock
+> manually could do the trick then (and would even be more reliable).
+>=20
+>> The other tests seem to fail for different reasons, see:
+>>
+>>  https://gitlab.com/huth/qemu/-/jobs/163680780
+>>
+>> Some of them apparently need encryption to be enabled (as already
+>> mentioned by Cleber in his patch) - thus should they really be in the
+>> quick check, too? Or could they at least check whether QEMU has been
+>> built with encryption?
+>=20
+> The correct solution would be that they detect the situation
+> automatically and skip the test by calling _notrun.
+>=20
+> I'm not sure how to detect if a given QEMU binary supports encryption,
+> but Dan might know.
+>=20
+>> By the way, 235 and 238 also fail on my normal laptop with RHEL7:
+>>
+>> 235 2s ...        [07:29:31] [07:29:31] [failed, exit status 1] - outp=
+ut
+>> mismatch (see 235.out.bad)
+>> --- /home/thuth/devel/qemu/tests/qemu-iotests/235.out	2019-02-19
+>> 07:14:45.000000000 +0100
+>> +++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/235.out.bad	2019-02-=
+19
+>> 07:29:31.000000000 +0100
+>> @@ -1,3 +1,14 @@
+>> -{"return": {}}
+>> -{"return": {}}
+>> -{"return": {}}
+>> +Traceback (most recent call last):
+>> +  File "235", line 56, in <module>
+>> +    vm.launch()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qemu.py", lin=
 e
-> other (mips) patches in a v2. For this one I'm not convinced.
->
-> > On 2/11/19 4:19 AM, BALATON Zoltan wrote:
-> [...]
-> >> +
-> >> +static void ati_reg_write_offs(uint32_t *reg, int offs,
-> >> +                               uint64_t data, unsigned int size)
-> >> +{
-> >> +    int shift, i;
-> >> +    uint32_t mask;
-> >> +
-> >> +    for (i =3D 0; i < size; i++) {
-> >> +        shift =3D (offs + i) * 8;
-> >> +        mask =3D 0xffUL << shift;
-> >> +        *reg &=3D ~mask;
-> >> +        *reg |=3D (data & 0xff) << shift;
-> >> +        data >>=3D 8;
-> >
-> > I'd have use a pair of extract32/deposit32 but this is probably easier
-> > to singlestep.
->
-> You've told me that before but I have concerns about the asserts in those
-> functions which to me seem like unnecessary overhead in such low level
-> functions so unless these are removed or *_noassert versions introduced
-> I'll stay away from them.
-
-The code above is IMHO pretty hard to read -- you have to
-think through all the shifts and masks to figure out exactly
-what is being done. I would definitely recommend extract32/deposit32,
-as they convey the intent much better. You're already inside a
-register accessor for a device model, there is much more overhead
-on this path than a few assert condition checks. (And they do
-catch bugs -- they found one in the arm code last month.)
-
-(Alternatively, if you believe the overhead of the asserts matters,
-then provide benchmarking demonstrating it, and we could look
-at restricting this assert to the case where start and length are
-compile-time constant, or to only the --enable-debug build.)
-
-> But I'm also not too happy about these *_offs functions but some register=
-s
-> support 8/16/32 bit access and guest code seems to actually do this to
-> update bits in the middle of the register at an odd address. Best would b=
+>> 303, in launch
+>> +    self._launch()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qemu.py", lin=
 e
-> if I could just set .impl.min =3D 4, .impl.max =3D 4 and .valid.min =3D 1
-> .valid.max =3D 4 for the mem region ops but I'm not sure that would work =
-or
-> would it? If that's working maybe I should just go with that instead.
+>> 329, in _launch
+>> +    self._post_launch()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qemu.py", lin=
+e
+>> 274, in _post_launch
+>> +    self._qmp.accept()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py",
+>> line 157, in accept
+>> +    return self.__negotiate_capabilities()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py",
+>> line 73, in __negotiate_capabilities
+>> +    raise QMPConnectError
+>> +qmp.qmp.QMPConnectError
+>> 236 0s ...        [07:29:31] [07:29:31]
+>> 237                [07:29:31] [07:29:31] [not run]
+>>         237 -- not suitable for this image format: qcow2
+>> 238                [07:29:31] [07:29:31] [failed, exit status 1] -
+>> output mismatch (see 238.out.bad)
+>> --- /home/thuth/devel/qemu/tests/qemu-iotests/238.out	2019-02-19
+>> 07:17:39.000000000 +0100
+>> +++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/238.out.bad	2019-02-=
+19
+>> 07:29:31.000000000 +0100
+>> @@ -1,6 +1,14 @@
+>> -{"return": {}}
+>> -{"return": {}}
+>> -{"return": {}}
+>> -{"return": {}}
+>> -{"return": {}}
+>> -{"return": {}}
+>> +Traceback (most recent call last):
+>> +  File "238", line 37, in <module>
+>> +    vm.launch()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qemu.py", lin=
+e
+>> 303, in launch
+>> +    self._launch()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qemu.py", lin=
+e
+>> 329, in _launch
+>> +    self._post_launch()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qemu.py", lin=
+e
+>> 274, in _post_launch
+>> +    self._qmp.accept()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py",
+>> line 157, in accept
+>> +    return self.__negotiate_capabilities()
+>> +  File
+>> "/home/thuth/devel/qemu/tests/qemu-iotests/../../scripts/qmp/qmp.py",
+>> line 73, in __negotiate_capabilities
+>> +    raise QMPConnectError
+>> +qmp.qmp.QMPConnectError
+>>
+>> Any ideas what might be going on here?
+>=20
+> I think it's most likely that QEMU just prints an error message on
+> startup and exits.
+Right, I finally found the issue:
 
-This will work, but only if all the registers in the memory region
-are happy with "read 32 bits, write back 32 bits", ie they have
-no "write-1-to-clear", "special behaviour on read", etc. (The
-memory system will implement byte reads as "read 32 bits, modify,
-write back".) If it does work then that's a nice way to do it.
+qemu-system-x86_64: -machine accel=3Dkvm: No accelerator found
 
-> I won't and here's why: This is not a finished device model and I expect
-> to need to add debug logs and change them frequently during further
-> development and for such ad-hoc debugging DPRINF is still easier to use
-> because I don't have to define the format string at one file and use them
-> somewhere else.
+I apparently compiled my QEMU with --disable-kvm at one point in time and
+forgot to enable it later again. =3D=3D> These tests should really check =
+whether
+KVM is available in QEMU before they blindly use this feature.
 
-If you want to use local debug printfs for your convenience that's fine.
-You don't have to submit them in the patches you send. (I use them
-quite a bit in development, and my stack of patches usually has a
-patch at the end called "debug junk" with that kind of thing in it.)
-But new code we take into upstream should be preferring trace events
-over ad-hoc DPRINTF.
-
-> Anything that
-> distracts from actual values and makes it harder to read (such as
-> timestamps and pids added by trace)
-
--d trace:your_trace_event doesn't add timestamps or PIDs, FWIW.
-
-thanks
--- PMM
+ Thomas
