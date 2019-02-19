@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50066)
+Received: from eggs.gnu.org ([209.51.188.92]:56706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gvwzQ-0001qh-Kt
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:26:41 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gvxCY-0003mO-VM
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:40:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gvwzL-0004cW-RL
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:26:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gvwzC-0004TV-9q
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:26:27 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gvwyi-0005ww-Qr
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:25:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9BAE82E80D4
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:25:56 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1gvxCW-0002ab-SF
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:40:14 -0500
+Resent-Message-Id: <E1gvxCW-0002ab-SF@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <155055118429.18484.14132250548131931547@49fa7ef69f7b>
+In-Reply-To: <20190218125615.18970-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Feb 2019 04:18:10 -0000
-From: Launchpad Bug Tracker <1737883@bugs.launchpad.net>
-Reply-To: Bug 1737883 <1737883@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151314764536.10749.10688753671340892012.malonedeb@wampee.canonical.com>
-Message-Id: <155054989070.31536.4613822163706254657.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1737883] Re: Cannot boot FreeBSD on versatilepb
- machine
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 18 Feb 2019 20:39:45 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] pflash: Fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: armbru@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
-[Expired for QEMU because there has been no activity for 60 days.]
-
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1737883
-
-Title:
-  Cannot boot FreeBSD on versatilepb machine
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  I know some years ago it was possible to boot FreeBSD in QEMU versatilepb=
- machine
-  https://kernelnomicon.org/?p=3D229 (you can download image and kernel usi=
-ng web.archive.org)
-  Now when I try to do that I get only black screen with no output even in =
-QEMU console.
-  I also added -global versatile_pci.broken-irq-mapping=3D1, but this seem =
-to have no effect.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1737883/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxODEyNTYxNS4xODk3
+MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxODEyNTYxNS4xODk3MC0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTBdIHBmbGFzaDogRml4ZXMg
+YW5kIGNsZWFudXBzClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAyMTgxMjU2MTUuMTg5
+NzAtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjE4MTI1NjE1LjE4OTcwLTEt
+YXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3MDAzZDcy
+YTVmIGh3L2FybSBody94dGVuc2E6IERlLWR1cGxpY2F0ZSBwZmxhc2ggY3JlYXRpb24gY29kZSBz
+b21lCjBmNWJiMTQ4OTMgcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYwMmIg
+cGFydCAyCjBkZGZjNTJmYjggcGZsYXNoOiBDbGVhbiB1cCBhZnRlciBjb21taXQgMzY4YTM1NGYw
+MmIgcGFydCAxCmE4OGNmYzViYmYgbWlwc19tYWx0YTogQ2xlYW4gdXAgZGVmaW5pdGlvbiBvZiBm
+bGFzaCBtZW1vcnkgc2l6ZSBzb21ld2hhdAowNmI1OGViMGE4IHIyZDogRmxhc2ggbWVtb3J5IGNy
+ZWF0aW9uIGlzIGNvbmZ1c2VkIGFib3V0IHNpemUsIG1hcmsgRklYTUUKZmQyODBjNmFiYyBwcGM0
+MDVfYm9hcmRzOiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdl
+Cjg1YTViYjU2ZWMgc2FtNDYwZXg6IERvbid0IHNpemUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJh
+Y2tpbmcgaW1hZ2UKNGY2NjcyOGYyZiBodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
+X0NGSV9QRkxBU0gwezEsIDJ9CjM2OGM1MTA2MGEgcGZsYXNoOiBNYWNybyBQRkxBU0hfQlVHKCkg
+aXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZAoyMDlkOTBlOGYxIHBmbGFzaDogUmVuYW1lIHBmbGFz
+aF90IHRvIFBGbGFzaENGSTAxLCBQRmxhc2hDRkkwMgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8x
+MCBDaGVja2luZyBjb21taXQgMjA5ZDkwZThmMTYzIChwZmxhc2g6IFJlbmFtZSBwZmxhc2hfdCB0
+byBQRmxhc2hDRkkwMSwgUEZsYXNoQ0ZJMDIpCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
+ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEyODogRklMRTogaHcv
+YmxvY2svcGZsYXNoX2NmaTAxLmM6Mjg4Ogorc3RhdGljIHVpbnQzMl90IHBmbGFzaF9yZWFkIChQ
+Rmxhc2hDRkkwMSAqcGZsLCBod2FkZHIgb2Zmc2V0LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
+YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzQwOiBGSUxF
+OiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzoxNDE6CitzdGF0aWMgdWludDMyX3QgcGZsYXNoX3Jl
+YWQgKFBGbGFzaENGSTAyICpwZmwsIGh3YWRkciBvZmZzZXQsCgpFUlJPUjogc3BhY2UgcHJvaGli
+aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTg6
+IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5jOjI2NDoKK3N0YXRpYyB2b2lkIHBmbGFzaF93
+cml0ZSAoUEZsYXNoQ0ZJMDIgKnBmbCwgaHdhZGRyIG9mZnNldCwKCnRvdGFsOiAzIGVycm9ycywg
+MCB3YXJuaW5ncywgNDgzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMTAgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCjIvMTAgQ2hlY2tpbmcgY29tbWl0IDM2OGM1MTA2MGFmZiAocGZsYXNoOiBN
+YWNybyBQRkxBU0hfQlVHKCkgaXMgdXNlZCBqdXN0IG9uY2UsIGV4cGFuZCkKMy8xMCBDaGVja2lu
+ZyBjb21taXQgNGY2NjcyOGYyZjVhIChodzogVXNlIENGSV9QRkxBU0gwezEsIDJ9IGFuZCBUWVBF
+X0NGSV9QRkxBU0gwezEsIDJ9KQo0LzEwIENoZWNraW5nIGNvbW1pdCA4NWE1YmI1NmVjMTggKHNh
+bTQ2MGV4OiBEb24ndCBzaXplIGZsYXNoIG1lbW9yeSB0byBtYXRjaCBiYWNraW5nIGltYWdlKQo1
+LzEwIENoZWNraW5nIGNvbW1pdCBmZDI4MGM2YWJjYTcgKHBwYzQwNV9ib2FyZHM6IERvbid0IHNp
+emUgZmxhc2ggbWVtb3J5IHRvIG1hdGNoIGJhY2tpbmcgaW1hZ2UpCjYvMTAgQ2hlY2tpbmcgY29t
+bWl0IDA2YjU4ZWIwYThlOSAocjJkOiBGbGFzaCBtZW1vcnkgY3JlYXRpb24gaXMgY29uZnVzZWQg
+YWJvdXQgc2l6ZSwgbWFyayBGSVhNRSkKNy8xMCBDaGVja2luZyBjb21taXQgYTg4Y2ZjNWJiZjk4
+IChtaXBzX21hbHRhOiBDbGVhbiB1cCBkZWZpbml0aW9uIG9mIGZsYXNoIG1lbW9yeSBzaXplIHNv
+bWV3aGF0KQo4LzEwIENoZWNraW5nIGNvbW1pdCAwZGRmYzUyZmI4NTIgKHBmbGFzaDogQ2xlYW4g
+dXAgYWZ0ZXIgY29tbWl0IDM2OGEzNTRmMDJiIHBhcnQgMSkKRVJST1I6IHNwYWNlcyByZXF1aXJl
+ZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM5MDogRklMRTogaHcvYXJtL211c2ljcGFsLmM6
+MTYzOToKKyAgICAgICAgcGZsYXNoX2NmaTAyX3JlZ2lzdGVyKDB4MTAwMDAwMDAwVUxMLU1QX0ZM
+QVNIX1NJWkVfTUFYLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzk4
+OiBGSUxFOiBody9hcm0vbXVzaWNwYWwuYzoxNjQ2OgorICAgICAgICBwZmxhc2hfY2ZpMDJfcmVn
+aXN0ZXIoMHgxMDAwMDAwMDBVTEwtTVBfRkxBU0hfU0laRV9NQVgsCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
+cywgMjQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjkvMTAgQ2hlY2tpbmcgY29tbWl0IDBmNWJiMTQ4OTMwYSAocGZsYXNoOiBDbGVhbiB1cCBh
+ZnRlciBjb21taXQgMzY4YTM1NGYwMmIgcGFydCAyKQoxMC8xMCBDaGVja2luZyBjb21taXQgNzAw
+M2Q3MmE1ZjBmIChody9hcm0gaHcveHRlbnNhOiBEZS1kdXBsaWNhdGUgcGZsYXNoIGNyZWF0aW9u
+IGNvZGUgc29tZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAxOTAyMTgxMjU2MTUuMTg5NzAtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNo
+ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
