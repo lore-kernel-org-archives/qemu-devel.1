@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49538)
+Received: from eggs.gnu.org ([209.51.188.92]:49540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydx-0005X9-87
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydx-0005XA-9A
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydw-0007Ab-6O
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydw-0007Ae-6S
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:37 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:46473)
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:41296)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydr-00076p-Gf
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydr-00076H-Hv
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:33 -0500
-Received: by mail-lj1-x243.google.com with SMTP id v16so16355753ljg.13
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:28 -0800 (PST)
+Received: by mail-lj1-x243.google.com with SMTP id z25so8553538ljk.8
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:12:22 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 18 Feb 2019 22:11:04 -0800
-Message-Id: <20190219061111.10231-17-jcmvbkbc@gmail.com>
+Date: Mon, 18 Feb 2019 22:11:01 -0800
+Message-Id: <20190219061111.10231-14-jcmvbkbc@gmail.com>
 In-Reply-To: <20190219061111.10231-1-jcmvbkbc@gmail.com>
 References: <20190219061111.10231-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 16/23] tests/tcg/xtensa: conditionalize
- windowed register tests
+Subject: [Qemu-devel] [PATCH 13/23] tests/tcg/xtensa: conditionalize and
+ expand SR tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +29,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Make windowed register tests conditional on the presence of this option.
-Fix tests to work correctly for both 32 and 64 physical registers.
+Make tests for specific special registers conditional on the presence of
+the options that add these registers and test that the registers are not
+accessible otherwise.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- tests/tcg/xtensa/test_windowed.S | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
+ tests/tcg/xtensa/test_sr.S | 133 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
 
-diff --git a/tests/tcg/xtensa/test_windowed.S b/tests/tcg/xtensa/test_windowed.S
-index d851e8f43c5c..5ead90a790ed 100644
---- a/tests/tcg/xtensa/test_windowed.S
-+++ b/tests/tcg/xtensa/test_windowed.S
-@@ -2,10 +2,12 @@
- 
- test_suite windowed
- 
-+#if XCHAL_HAVE_WINDOWED
-+
- .altmacro
- 
- .macro reset_window start
--    movi    a2, 0xff
-+    movi    a2, 0xffff
-     wsr     a2, windowstart
-     rsync
-     movi    a2, 0
-@@ -105,7 +107,8 @@ test_end
-     movi    a3, 0x4001f
-     assert  eq, a2, a3
-     rsr     a2, windowbase
--    assert  eqi, a2, 8 - ((\window) / 4)
-+    movi    a3, (XCHAL_NUM_AREGS - (\window)) / 4
-+    assert  eq, a2, a3
-     rsr     a2, windowstart
-     assert  eqi, a2, 1
-     rfwu
-@@ -116,8 +119,8 @@ test_end
-     rsr     a2, windowbase
-     assert  eqi, a2, 0
-     rsr     a2, windowstart
--    assert  bsi, a2, 0
--    assert  bsi, a2, 8 - ((\window) / 4)
-+    assert  bsi.l, a2, 0
-+    assert  bsi.l, a2, (XCHAL_NUM_AREGS - (\window)) / 4
+diff --git a/tests/tcg/xtensa/test_sr.S b/tests/tcg/xtensa/test_sr.S
+index 052f1e04a72c..e64653b8771e 100644
+--- a/tests/tcg/xtensa/test_sr.S
++++ b/tests/tcg/xtensa/test_sr.S
+@@ -42,50 +42,183 @@ test_end
+     test_sr_mask    \sr, \conf, 7
  .endm
  
- test underflow
-@@ -132,7 +135,7 @@ test_end
- 
- 
- .macro retw_test window
--    reset_window %(1 | (1 << (8 - (\window) / 4)))
-+    reset_window %(1 | (1 << ((XCHAL_NUM_AREGS - \window) / 4)))
-     reset_ps
- 
-     ssai    2
-@@ -147,10 +150,11 @@ test_end
-     movi    a3, 0x4000f
-     assert  eq, a2, a3
-     rsr     a2, windowbase
--    assert  eqi, a2, 8 - ((\window) / 4)
-+    movi    a3, (XCHAL_NUM_AREGS - (\window)) / 4
-+    assert  eq, a2, a3
-     rsr     a2, windowstart
--    assert  bci, a2, 0
--    assert  bsi, a2, 8 - ((\window) / 4)
-+    assert  bci.l, a2, 0
-+    assert  bsi.l, a2, (XCHAL_NUM_AREGS - (\window)) / 4
- .endm
- 
- test retw
-@@ -180,7 +184,7 @@ test movsp
- 
-     set_vector kernel, 0
- 
--    reset_window 0x81
-+    reset_window %(0x1 | (1 << ((XCHAL_NUM_AREGS / 4) - 1)))
-     reset_ps
- 
-     movsp   a2, a3
-@@ -211,8 +215,16 @@ test rotw
-     movi    a3, 0x16
-     movi    a7, 0x17
- 
-+#if XCHAL_NUM_AREGS == 32
-     movi    a2, 0x44
-     wsr     a2, windowstart
-+#elif XCHAL_NUM_AREGS == 64
-+    movi    a2, 0x4004
-+    wsr     a2, windowstart
-+    rotw    -8
++#if XCHAL_HAVE_MAC16
+ test_sr acchi, 1
+ test_sr acclo, 1
 +#else
-+#error XCHAL_NUM_AREGS unsupported
-+#endif
-     rsync
- 
-     movi    a2, 0x10
-@@ -350,4 +362,6 @@ test entry_overflow
-     all_entry_overflow_tests
- test_end
- 
++test_sr_mask /*acchi*/17, 0, 0
++test_sr_mask /*acclo*/16, 0, 0
 +#endif
 +
++#if XCHAL_HAVE_S32C1I && XCHAL_HW_VERSION >= 230000
++test_sr atomctl, 1
++#else
+ test_sr_mask /*atomctl*/99, 0, 0
++#endif
++
++#if XCHAL_HAVE_BOOLEANS
++test_sr br, 1
++#else
+ test_sr_mask /*br*/4, 0, 0
++#endif
++
+ test_sr_mask /*cacheattr*/98, 0, 0
++
++#if XCHAL_HAVE_CCOUNT
+ test_sr ccompare0, 1
+ test_sr ccount, 1
++#else
++test_sr_mask /*ccompare0*/240, 0, 0
++test_sr_mask /*ccount*/234, 0, 0
++#endif
++
++#if XCHAL_HAVE_CP
+ test_sr cpenable, 1
++#else
++test_sr_mask /*cpenable*/224, 0, 0
++#endif
++
++#if XCHAL_HAVE_DEBUG
++#if XCHAL_NUM_DBREAK
+ test_sr dbreaka0, 1
+ test_sr dbreakc0, 1
++#endif
+ test_sr_mask debugcause, 1, 1
++#else
++test_sr_mask /*dbreaka0*/144, 0, 0
++test_sr_mask /*dbreakc0*/160, 0, 0
++test_sr_mask /*debugcause*/233, 0, 0
++#endif
++
+ test_sr depc, 1
++
++#if XCHAL_HAVE_PTP_MMU
+ test_sr dtlbcfg, 1
++#else
++test_sr_mask /*dtlbcfg*/92, 0, 0
++#endif
++
+ test_sr epc1, 1
++
++#if XCHAL_NUM_INTLEVELS > 1
+ test_sr epc2, 1
+ test_sr eps2, 1
++#else
++test_sr_mask /*epc2*/178, 0, 0
++test_sr_mask /*eps2*/194, 0, 0
++#endif
++
+ test_sr exccause, 1
+ test_sr excsave1, 1
++
++#if XCHAL_NUM_INTLEVELS > 1
+ test_sr excsave2, 1
++#else
++test_sr_mask /*excsave2*/210, 0, 0
++#endif
++
+ test_sr excvaddr, 1
++
++#if XCHAL_HAVE_DEBUG
++#if XCHAL_NUM_IBREAK
+ test_sr ibreaka0, 1
+ test_sr ibreakenable, 1
++#endif
+ test_sr icount, 1
+ test_sr icountlevel, 1
++#else
++test_sr_mask /*ibreaka0*/128, 0, 0
++test_sr_mask /*ibreakenable*/96, 0, 0
++test_sr_mask /*icount*/236, 0, 0
++test_sr_mask /*icountlevel*/237, 0, 0
++#endif
++
+ test_sr_mask /*intclear*/227, 0, 2
+ test_sr_mask /*interrupt*/226, 0, 3
+ test_sr intenable, 1
++
++#if XCHAL_HAVE_PTP_MMU
+ test_sr itlbcfg, 1
++#else
++test_sr_mask /*itlbcfg*/91, 0, 0
++#endif
++
++#if XCHAL_HAVE_LOOPS
+ test_sr lbeg, 1
+ test_sr lcount, 1
+ test_sr lend, 1
++#else
++test_sr_mask /*lbeg*/0, 0, 0
++test_sr_mask /*lcount*/2, 0, 0
++test_sr_mask /*lend*/1, 0, 0
++#endif
++
++#if XCHAL_HAVE_ABSOLUTE_LITERALS
+ test_sr litbase, 1
++#else
++test_sr_mask /*litbase*/5, 0, 0
++#endif
++
++#if XCHAL_HAVE_MAC16
+ test_sr m0, 1
++#else
++test_sr_mask /*m0*/32, 0, 0
++#endif
++
++#if XCHAL_HW_VERSION >= 250000
++test_sr_mask /*memctl*/97, 0, 7
++#else
+ test_sr_mask /*memctl*/97, 0, 0
++#endif
++
++#if XCHAL_NUM_MISC_REGS
+ test_sr misc0, 1
++#else
++test_sr_mask /*misc0*/244, 0, 0
++#endif
++
++#if XCHAL_HAVE_PREFETCH
++test_sr prefctl, 1
++#else
+ test_sr_mask /*prefctl*/40, 0, 0
++#endif
++
++#if XCHAL_HAVE_PRID
+ test_sr_mask /*prid*/235, 0, 1
++#else
++test_sr_mask /*prid*/235, 0, 0
++#endif
++
+ test_sr ps, 1
++
++#if XCHAL_HAVE_PTP_MMU
+ test_sr ptevaddr, 1
+ test_sr rasid, 1
++#else
++test_sr_mask /*ptevaddr*/83, 0, 0
++test_sr_mask /*rasid*/90, 0, 0
++#endif
++
+ test_sr sar, 1
++
++#if XCHAL_HAVE_S32C1I
+ test_sr scompare1, 1
++#else
++test_sr_mask /*scompare1*/12, 0, 0
++#endif
++
++#if XCHAL_HAVE_VECBASE
+ test_sr vecbase, 1
++#else
++test_sr_mask /*vecbase*/231, 0, 0
++#endif
++
++#if XCHAL_HAVE_WINDOWED
+ test_sr windowbase, 1
+ test_sr windowstart, 1
++#else
++test_sr_mask /*windowbase*/72, 0, 0
++test_sr_mask /*windowstart*/73, 0, 0
++#endif
+ 
  test_suite_end
 -- 
 2.11.0
