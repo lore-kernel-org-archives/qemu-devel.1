@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40939)
+Received: from eggs.gnu.org ([209.51.188.92]:40951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gw7oj-000680-Tv
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:00:22 -0500
+	(envelope-from <berto@igalia.com>) id 1gw7ol-00069F-KE
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:00:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephen.checkoway@oberlin.edu>) id 1gw7oh-00049f-RC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:00:21 -0500
-Received: from mail-it1-x12f.google.com ([2607:f8b0:4864:20::12f]:33536)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephen.checkoway@oberlin.edu>)
-	id 1gw7oh-00049S-Aa
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:00:19 -0500
-Received: by mail-it1-x12f.google.com with SMTP id g137so3339590ita.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 08:00:19 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-In-Reply-To: <87imxfssq1.fsf@dusky.pond.sub.org>
-Date: Tue, 19 Feb 2019 11:00:16 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E3178A67-9CFC-4CD5-921F-4EE5CCB46F62@oberlin.edu>
-References: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
-	<ab1a67c0-8872-6e22-fc70-946bbcabb8a1@redhat.com>
-	<BD5AEBD4-0B91-4756-B8D6-C0E643CF1F42@oberlin.edu>
-	<87ftsl2clg.fsf@dusky.pond.sub.org>
-	<91720BD9-D5A6-4457-BC99-D2132550BEDA@oberlin.edu>
-	<87ef84z4v6.fsf@dusky.pond.sub.org>
-	<62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu>
-	<87imxfssq1.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Testing sysbus devices
+	(envelope-from <berto@igalia.com>) id 1gw7ok-0004AD-AF
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:00:23 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190212162806.GF5283@localhost.localdomain>
+References: <cover.1547739122.git.berto@igalia.com>
+	<f112a3019e4e1dfc2de6c275edadb5fc3a58ade0.1547739122.git.berto@igalia.com>
+	<20190212162806.GF5283@localhost.localdomain>
+Date: Tue, 19 Feb 2019 17:00:03 +0100
+Message-ID: <w51va1fahvg.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 06/13] block: Handle child references in
+ bdrv_reopen_queue()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +24,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+On Tue 12 Feb 2019 05:28:06 PM CET, Kevin Wolf wrote:
+>>    1) Set of child options: the options are removed from the parent's
+>>       options QDict and are passed to the child with a recursive
+>>       bdrv_reopen_queue() call. This case was already working fine.
+>
+> Small addition: This is only allowed if the child was implicitly
+> created (i.e. it inherits from the parent we're coming from).
 
+Ok, fixed.
 
-> On Feb 19, 2019, at 10:28, Markus Armbruster <armbru@redhat.com> =
-wrote:
->=20
-> My terminology might be confused...
->=20
-> Let me backtrack a bit an explain my use case.  On physical PCs, the
-> single flash chip is commonly configured to have a read-only part and =
-a
-> read/write part.  The read-only part holds UEFI code, and the =
-read-write
-> part holds its persistent state.
->=20
-> Since our virtual flash chips lack this feature, our virtual PCs have
-> *two* of them: one configured read-only, and one configured =
-read/write.
-> Cleaning that up would be nice.
->=20
-> The comment "It does not implement software data protection as found =
-in
-> many real chips" in both pflash_cfi0*.c might be referring to this
-> missing feature.
+>>    2) Child reference: there's two possibilites here.
+>> 
+>>       2a) Reference to the current child: the child is put in the
+>>           reopen queue, keeping its current set of options (since this
+>>           was a child reference there was no way to specify a
+>>           different set of options).
+>
+> Why even put it in the reopen queue when nothing is going to change?
+>
+> Ah, it's because inherited options might change, right?
+>
+> But if the child did not inherit from this parent, we don't need to
+> put it into the queue anyway. The operation should still be allowed.
 
-I understand now, thank you for explaining. I noticed the comments about =
-software data protection in the code, but I didn't investigate.
+I updated the comment to clarify that.
 
-=46rom a quick look at <https://www.cypress.com/file/195291/download> =
-Table 27 on page 8, I see there are at least 4 different protection =
-modes. I think the most common one (based on my reading of a handful of =
-data sheets for flash chips) is the high voltage one. Essentially, there =
-are sector groups that can be locked/unlocked using high voltage. It =
-seems easy enough to model this by configuring sectors as locked and =
-refusing to erase or program them.
+>>       2b) Reference to a different BDS: the current child is not put
+>>           in the reopen queue at all. Passing a reference to a
+>>           different BDS can be used to replace a child, although at
+>>           the moment no driver implements this, so it results in an
+>>           error. In any case, the current child is not going to be
+>>           reopened (and might in fact disappear if it's replaced)
+>
+> Do we need to break a possible inheritance relationship between the
+> parent and the old child node in this case?
 
-Software command locking would probably involve implementing a few =
-additional commands.
+Actually I think it makes sense (but not in this patch). I guess that
+should be done in bdrv_set_backing_hd().
 
-I'm not sure what the others are.
+>>    4) Missing option: at the moment "backing" is the only case where
+>>       this can happen. With "blockdev-add", leaving "backing" out
+>>       means that the default backing file is opened. We don't want to
+>>       open a new image during reopen, so we require that "backing" is
+>>       always present. We'll relax this requirement a bit in the next
+>>       patch.
+>
+> I think this is only for keep_old_opts == false; otherwise it should
+> be treated the same as 2a to avoid breaking compatibility.
 
-Which locking method do you need?
+Ok, I clarified that too.
 
---=20
-Stephen Checkoway
+>>      QLIST_FOREACH(child, &bs->children, next) {
+>> -        QDict *new_child_options;
+>> -        char *child_key_dot;
+>> +        QDict *new_child_options = NULL;
+>> +        bool child_keep_old = keep_old_opts;
+>>  
+>>          /* reopen can only change the options of block devices that were
+>>           * implicitly created and inherited options. For other (referenced)
+>> @@ -3043,13 +3055,31 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+>>              continue;
+>>          }
+>
+> The 'continue' in the context just skipped any children that don't
+> inherit from this parent. Child options for those will stay unmodified
+> in the options dict.
+>
+> For case 1, we'll later get an error because keys like 'child.foo'
+> will still be present and can't be processed by the driver. Implements
+> exactly what I commented above.
+>
+> For case 2, the child isn't put in the reopen queue, and the child
+> reference can be used later. Matches my comment as well.
+>
+> Good.
+
+That's correct.
+
+>> -        child_key_dot = g_strdup_printf("%s.", child->name);
+>> -        qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
+>> -        qdict_extract_subqdict(options, &new_child_options, child_key_dot);
+>> -        g_free(child_key_dot);
+>> +        /* Check if the options contain a child reference */
+>> +        if (qdict_haskey(options, child->name)) {
+>> +            const char *childref = qdict_get_try_str(options, child->name);
+>> +            /*
+>> +             * The current child must not be reopened if the child
+>> +             * reference does not point to it.
+>> +             */
+>> +            if (g_strcmp0(childref, child->bs->node_name)) {
+>
+> This is where we would break the inheritance relationship.
+>
+> Is this the code path that a QNull should take as well? (case 3)
+
+Yes, I updated the comment to mention the null case explicitly.
+
+>> +    if (reopen_state->backing_missing) {
+>> +        error_setg(errp, "backing is missing for '%s'",
+>> +                   reopen_state->bs->node_name);
+>> +        ret = -EINVAL;
+>> +        goto error;
+>> +    }
+>
+> What about drivers that don't even support backing files?
+
+In practice this doesn't matter much because of the changes in patch 7,
+but I think it's a good idea to make it explicit and set backing_missing
+only when bs->drv->supports_backing is true (because it doesn't make
+sense otherwise).
+
+Berto
