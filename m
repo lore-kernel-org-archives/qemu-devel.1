@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44549)
+Received: from eggs.gnu.org ([209.51.188.92]:44683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw81z-0007kZ-Sv
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:04 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gw82B-0007w3-FD
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw81w-0002qy-7H
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:02 -0500
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 19 Feb 2019 16:13:21 +0000
-Message-Id: <20190219161321.15012-3-berrange@redhat.com>
-In-Reply-To: <20190219161321.15012-1-berrange@redhat.com>
-References: <20190219161321.15012-1-berrange@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gw82A-0002yx-Qm
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:15 -0500
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:46616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gw82A-0002xq-Jq
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:14 -0500
+Received: by mail-wr1-f48.google.com with SMTP id i16so14384921wrs.13
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 08:14:13 -0800 (PST)
+Date: Tue, 19 Feb 2019 17:14:09 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190219161409.7qzohiyfhv3qpafl@steredhat>
+References: <20190219114609.1582-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] iotests: avoid broken pipe with certtool
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190219114609.1582-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix error reporting for -object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-stable@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-When we run "certtool | head -1" the latter command is likely to
-complete and exit before certtool has written everything it wants to
-stderr. In at least the RHEL-7 gnutls 3.3.29 this causes certtool to
-quit with broken pipe before it has finished writing the desired
-output file to disk. This causes non-deterministic failures of the
-iotest 233 because the certs are sometimes zero length files.
-If certtool fails the "head -1" means we also loose any useful error
-message it would have printed.
+On Tue, Feb 19, 2019 at 11:46:09AM +0000, Daniel P. Berrangé wrote:
+> Error reporting for user_creatable_add_opts_foreach was changed so that
+> it no longer called 'error_report_err' in:
+> 
+>   commit 7e1e0c11127bde81cff260fc6859690435c509d6
+>   Author: Markus Armbruster <armbru@redhat.com>
+>   Date:   Wed Oct 17 10:26:43 2018 +0200
+> 
+>     qom: Clean up error reporting in user_creatable_add_opts_foreach()
+> 
+> Some callers were updated to pass in "&error_fatal" but all the ones in
+> qemu-img were left passing NULL. As a result all errors went to
+> /dev/null instead of being reported to the user.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  qemu-img.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
 
-Thus this patch gets rid of the pipe and post-processes the output in a
-more flexible & reliable manner.
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
-
-diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tl=
-s
-index eae81789bb..6cf11ed383 100644
---- a/tests/qemu-iotests/common.tls
-+++ b/tests/qemu-iotests/common.tls
-@@ -29,6 +29,17 @@ tls_x509_cleanup()
- }
-=20
-=20
-+tls_certtool()
-+{
-+    certtool "$@" 1>certtool.log 2>&1
-+    if test "$?" =3D 0; then
-+      head -1 certtool.log
-+    else
-+      cat certtool.log
-+    fi
-+    rm -f certtool.log
-+}
-+
- tls_x509_init()
- {
-     (certtool --help) >/dev/null 2>&1 || \
-@@ -71,10 +82,11 @@ ca
- cert_signing_key
- EOF
-=20
--    certtool --generate-self-signed \
--             --load-privkey "${tls_dir}/key.pem" \
--             --template "${tls_dir}/ca.info" \
--             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
-+    tls_certtool \
-+        --generate-self-signed \
-+        --load-privkey "${tls_dir}/key.pem" \
-+        --template "${tls_dir}/ca.info" \
-+        --outfile "${tls_dir}/$name-cert.pem"
-=20
-     rm -f "${tls_dir}/ca.info"
- }
-@@ -98,12 +110,14 @@ encryption_key
- signing_key
- EOF
-=20
--    certtool --generate-certificate \
--             --load-ca-privkey "${tls_dir}/key.pem" \
--             --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
--             --load-privkey "${tls_dir}/key.pem" \
--             --template "${tls_dir}/cert.info" \
--             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | head -1
-+    tls_certtool \
-+        --generate-certificate \
-+        --load-ca-privkey "${tls_dir}/key.pem" \
-+        --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
-+        --load-privkey "${tls_dir}/key.pem" \
-+        --template "${tls_dir}/cert.info" \
-+        --outfile "${tls_dir}/$name/server-cert.pem"
-+
-     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
-     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/server-key.pem"
-=20
-@@ -127,12 +141,14 @@ encryption_key
- signing_key
- EOF
-=20
--    certtool --generate-certificate \
--             --load-ca-privkey "${tls_dir}/key.pem" \
--             --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
--             --load-privkey "${tls_dir}/key.pem" \
--             --template "${tls_dir}/cert.info" \
--             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | head -1
-+    tls_certtool \
-+        --generate-certificate \
-+        --load-ca-privkey "${tls_dir}/key.pem" \
-+        --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
-+        --load-privkey "${tls_dir}/key.pem" \
-+        --template "${tls_dir}/cert.info" \
-+        --outfile "${tls_dir}/$name/client-cert.pem"
-+
-     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
-     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/client-key.pem"
-=20
---=20
-2.20.1
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
