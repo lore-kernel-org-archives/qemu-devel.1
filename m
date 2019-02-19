@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33602)
+Received: from eggs.gnu.org ([209.51.188.92]:33524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw92B-0002K9-CO
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:20 -0500
+	(envelope-from <groug@kaod.org>) id 1gw928-0002JM-4d
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw928-0007Qs-N3
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51028)
+	(envelope-from <groug@kaod.org>) id 1gw920-0007Gm-6s
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:15 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40148
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw928-0007Li-1P
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:16 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw91y-0006yP-5h
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:06 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1JHES9o017163
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:18:13 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrkyryhfr-1
+	x1JHENSL132123
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:17:53 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrn0bumpv-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:18:12 -0500
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:17:52 -0500
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 19 Feb 2019 17:18:10 -0000
+	Tue, 19 Feb 2019 17:17:50 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 19 Feb 2019 18:18:03 +0100
+Date: Tue, 19 Feb 2019 18:17:43 +0100
 In-Reply-To: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <155059668360.1466090.5969630516627776426.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 06/17] xics: Write source state to KVM at
- claim time
+Message-Id: <155059666331.1466090.6766540766297333313.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 02/17] spapr: Generate FDT fragment for LMBs
+ at configure connector time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,140 +44,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-The pseries machine only uses LSIs to support legacy PCI devices. Every
-PHB claims 4 LSIs at realize time. When using in-kernel XICS (or upcoming
-in-kernel XIVE), QEMU synchronizes the state of all irqs, including these
-LSIs, later on at machine reset.
-
-In order to support PHB hotplug, we need a way to tell KVM about the LSIs
-that doesn't require a machine reset. An easy way to do that is to always
-inform KVM when an interrupt is claimed, which really isn't a performance
-path.
-
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/xics.c        |    4 +++
- hw/intc/xics_kvm.c    |   74 ++++++++++++++++++++++++++++---------------------
- include/hw/ppc/xics.h |    1 +
- 3 files changed, 48 insertions(+), 31 deletions(-)
+ hw/ppc/spapr.c         |   33 ++++++++++++++++++---------------
+ hw/ppc/spapr_drc.c     |    1 +
+ include/hw/ppc/spapr.h |    4 +++-
+ 3 files changed, 22 insertions(+), 16 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 767fdeb82900..af7dc709abab 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -758,6 +758,10 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
- 
-     ics->irqs[srcno].flags |=
-         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        ics_set_kvm_state_one(ics, srcno);
-+    }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 00eb3b643c03..b92deee771b9 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3333,14 +3333,26 @@ static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
  }
  
- static void xics_register_types(void)
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index a00d0a7962e1..c6e1b630a404 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -213,45 +213,57 @@ void ics_synchronize_state(ICSState *ics)
-     ics_get_kvm_state(ics);
- }
- 
--int ics_set_kvm_state(ICSState *ics)
-+int ics_set_kvm_state_one(ICSState *ics, int srcno)
- {
-     uint64_t state;
--    int i;
-     Error *local_err = NULL;
-+    ICSIRQState *irq = &ics->irqs[srcno];
-+    int ret;
- 
--    for (i = 0; i < ics->nr_irqs; i++) {
--        ICSIRQState *irq = &ics->irqs[i];
--        int ret;
--
--        state = irq->server;
--        state |= (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
--            << KVM_XICS_PRIORITY_SHIFT;
--        if (irq->priority != irq->saved_priority) {
--            assert(irq->priority == 0xff);
--            state |= KVM_XICS_MASKED;
--        }
-+    state = irq->server;
-+    state |= (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
-+        << KVM_XICS_PRIORITY_SHIFT;
-+    if (irq->priority != irq->saved_priority) {
-+        assert(irq->priority == 0xff);
-+        state |= KVM_XICS_MASKED;
-+    }
- 
--        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
--            state |= KVM_XICS_LEVEL_SENSITIVE;
--            if (irq->status & XICS_STATUS_ASSERTED) {
--                state |= KVM_XICS_PENDING;
--            }
--        } else {
--            if (irq->status & XICS_STATUS_MASKED_PENDING) {
--                state |= KVM_XICS_PENDING;
--            }
-+    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
-+        state |= KVM_XICS_LEVEL_SENSITIVE;
-+        if (irq->status & XICS_STATUS_ASSERTED) {
-+            state |= KVM_XICS_PENDING;
-         }
--        if (irq->status & XICS_STATUS_PRESENTED) {
--                state |= KVM_XICS_PRESENTED;
--        }
--        if (irq->status & XICS_STATUS_QUEUED) {
--                state |= KVM_XICS_QUEUED;
-+    } else {
-+        if (irq->status & XICS_STATUS_MASKED_PENDING) {
-+            state |= KVM_XICS_PENDING;
-         }
-+    }
-+    if (irq->status & XICS_STATUS_PRESENTED) {
-+        state |= KVM_XICS_PRESENTED;
-+    }
-+    if (irq->status & XICS_STATUS_QUEUED) {
-+        state |= KVM_XICS_QUEUED;
-+    }
++int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spapr,
++                          void *fdt, int *fdt_start_offset, Error **errp)
++{
++    uint64_t addr;
++    uint32_t node;
 +
-+    ret = kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-+                            srcno + ics->offset, &state, true, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return ret;
-+    }
-+
++    addr = spapr_drc_index(drc) * SPAPR_MEMORY_BLOCK_SIZE;
++    node = object_property_get_uint(OBJECT(drc->dev), PC_DIMM_NODE_PROP,
++                                    &error_abort);
++    *fdt_start_offset = spapr_populate_memory_node(fdt, node, addr,
++                                                   SPAPR_MEMORY_BLOCK_SIZE);
 +    return 0;
 +}
 +
-+int ics_set_kvm_state(ICSState *ics)
-+{
+ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+-                           uint32_t node, bool dedicated_hp_event_source,
+-                           Error **errp)
++                           bool dedicated_hp_event_source, Error **errp)
+ {
+     sPAPRDRConnector *drc;
+     uint32_t nr_lmbs = size/SPAPR_MEMORY_BLOCK_SIZE;
+-    int i, fdt_offset, fdt_size;
+-    void *fdt;
 +    int i;
-+
-+    for (i = 0; i < ics->nr_irqs; i++) {
-+        int ret;
+     uint64_t addr = addr_start;
+     bool hotplugged = spapr_drc_hotplugged(dev);
+     Error *local_err = NULL;
+@@ -3350,11 +3362,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+                               addr / SPAPR_MEMORY_BLOCK_SIZE);
+         g_assert(drc);
  
--        ret = kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
--                                i + ics->offset, &state, true, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
-+        ret = ics_set_kvm_state_one(ics, i);
-+        if (ret) {
-             return ret;
+-        fdt = create_device_tree(&fdt_size);
+-        fdt_offset = spapr_populate_memory_node(fdt, node, addr,
+-                                                SPAPR_MEMORY_BLOCK_SIZE);
+-
+-        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
++        spapr_drc_attach(drc, dev, NULL, 0, &local_err);
+         if (local_err) {
+             while (addr > addr_start) {
+                 addr -= SPAPR_MEMORY_BLOCK_SIZE;
+@@ -3362,7 +3370,6 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+                                       addr / SPAPR_MEMORY_BLOCK_SIZE);
+                 spapr_drc_detach(drc);
+             }
+-            g_free(fdt);
+             error_propagate(errp, local_err);
+             return;
          }
-     }
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index d36bbe11ee2e..eb65ad7e43b7 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -195,6 +195,7 @@ void icp_synchronize_state(ICPState *icp);
- void icp_kvm_realize(DeviceState *dev, Error **errp);
+@@ -3395,7 +3402,6 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     uint64_t size, addr;
+-    uint32_t node;
  
- void ics_get_kvm_state(ICSState *ics);
-+int ics_set_kvm_state_one(ICSState *ics, int srcno);
- int ics_set_kvm_state(ICSState *ics);
- void ics_synchronize_state(ICSState *ics);
- void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
+     size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
+ 
+@@ -3410,10 +3416,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         goto out_unplug;
+     }
+ 
+-    node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
+-                                    &error_abort);
+-    spapr_add_lmbs(dev, addr, size, node,
+-                   spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
++    spapr_add_lmbs(dev, addr, size, spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+                    &local_err);
+     if (local_err) {
+         goto out_unplug;
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 66b965a0a7c2..634c28695a1c 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -700,6 +700,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+     drck->typename = "MEM";
+     drck->drc_name_prefix = "LMB ";
+     drck->release = spapr_lmb_release;
++    drck->dt_populate = spapr_lmb_dt_populate;
+ }
+ 
+ static const TypeInfo spapr_dr_connector_info = {
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 659204ea93f0..0ec309da497e 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -764,9 +764,11 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+ void spapr_clear_pending_events(sPAPRMachineState *spapr);
+ int spapr_max_server_number(sPAPRMachineState *spapr);
+ 
+-/* CPU and LMB DRC release callbacks. */
++/* DRC callbacks. */
+ void spapr_core_release(DeviceState *dev);
+ void spapr_lmb_release(DeviceState *dev);
++int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spapr,
++                          void *fdt, int *fdt_start_offset, Error **errp);
+ 
+ void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+ int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
