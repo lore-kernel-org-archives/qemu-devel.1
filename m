@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40991)
+Received: from eggs.gnu.org ([209.51.188.92]:42000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gw0A7-0006Us-9H
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:49:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gw0E5-0007ZC-U4
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gw0A5-0007gH-FF
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:49:55 -0500
-Date: Tue, 19 Feb 2019 08:49:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190219084938.2b434a4a@redhat.com>
-In-Reply-To: <4b104c37-58f4-76c1-1141-8952523ae0d7@redhat.com>
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-10-eric.auger@redhat.com>
-	<CAFEAcA-d1nMJkFpWmbVD7i=FF8C8irzNkLpOukkGx4=i=g_MTQ@mail.gmail.com>
-	<4b104c37-58f4-76c1-1141-8952523ae0d7@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gw0E4-0001AH-9f
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 02:54:01 -0500
+Date: Tue, 19 Feb 2019 08:53:33 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190219075333.GA4727@localhost.localdomain>
+References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
+	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
+	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 09/18] hw/arm/virt: Implement kvm_type
- function for 4.0 machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] Add a gitlab-ci file for
+ Continuous Integration testing on Gitlab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,211 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Auger <eric.auger.pro@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-On Mon, 18 Feb 2019 22:29:40 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
-
-> Hi Peter,
-> 
-> On 2/14/19 6:29 PM, Peter Maydell wrote:
-> > On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:  
+Am 19.02.2019 um 07:44 hat Thomas Huth geschrieben:
+> On 18/02/2019 19.22, Cleber Rosa wrote:
+> > 
+> > 
+> > On 2/13/19 6:54 AM, Thomas Huth wrote:
+> >> This is very convenient for people like me who store their QEMU git trees
+> >> on gitlab.com: Automatic CI pipelines are now run for each branch that is
+> >> pushed to the server - useful for some extra-testing before sending PULL-
+> >> requests for example. Since the runtime of the jobs is limited to 1h, the
+> >> jobs are distributed into multiple pipelines - this way everything finishs
+> >> fine within time (ca. 30 minutes currently).
 > >>
-> >> This patch implements the machine class kvm_type() callback.
-> >> It returns the max IPA shift needed to implement the whole GPA
-> >> range including the RAM and IO regions located beyond.
-> >> The returned value in passed though the KVM_CREATE_VM ioctl and
-> >> this allows KVM to set the stage2 tables dynamically.
-> >>
-> >> At this stage the RAM limit still is limited to 255GB.
-> >>
-> >> Setting all the existing highmem IO regions beyond the RAM
-> >> allows to have a single contiguous RAM region (initial RAM and
-> >> possible hotpluggable device memory). That way we do not need
-> >> to do invasive changes in the EDK2 FW to support a dynamic
-> >> RAM base.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > >> ---
+> >>  An example can be seen here: https://gitlab.com/huth/qemu/pipelines/
 > >>
-> >> v5 -> v6:
-> >> - add some comments
-> >> - high IO region cannot start before 256GiB
-> >> ---
-> >>  hw/arm/virt.c         | 52 +++++++++++++++++++++++++++++++++++++++++--
-> >>  include/hw/arm/virt.h |  2 ++
-> >>  2 files changed, 52 insertions(+), 2 deletions(-)
+> >>  I'd really like to get this into the main QEMU repository, so that I don't
+> >>  have to cherry-pick this patch onto my testing branches anymore each time
+> >>  I want to test before sending a PULL request...
 > >>
-> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> >> index 2b15839d0b..b90ffc2e5d 100644
-> >> --- a/hw/arm/virt.c
-> >> +++ b/hw/arm/virt.c
-> >> @@ -1366,6 +1366,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+> >>  .gitlab-ci.yml | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  MAINTAINERS    |  5 ++++
+> >>  2 files changed, 78 insertions(+)
+> >>  create mode 100644 .gitlab-ci.yml
 > >>
-> >>  static void virt_set_memmap(VirtMachineState *vms)
-> >>  {
-> >> +    MachineState *ms = MACHINE(vms);
-> >>      hwaddr base;
-> >>      int i;
-> >>
-> >> @@ -1375,7 +1376,17 @@ static void virt_set_memmap(VirtMachineState *vms)
-> >>          vms->memmap[i] = a15memmap[i];
-> >>      }
-> >>
-> >> -    vms->high_io_base = 256 * GiB; /* Top of the legacy initial RAM region */
-> >> +    /*
-> >> +     * We now compute the base of the high IO region depending on the
-> >> +     * amount of initial and device memory. The device memory start/size
-> >> +     * is aligned on 1GiB. We never put the high IO region below 256GiB
-> >> +     * so that if maxram_size is < 255GiB we keep the legacy memory map
-> >> +     */
-> >> +    vms->high_io_base = ROUND_UP(GiB + ms->ram_size, GiB) +
-> >> +                        ROUND_UP(ms->maxram_size - ms->ram_size, GiB);  
+> >> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> >> new file mode 100644
+> >> index 0000000..79d02cf
+> >> --- /dev/null
+> >> +++ b/.gitlab-ci.yml
+> >> @@ -0,0 +1,73 @@
+> >> +before_script:
+> >> + - apt-get update -qq
+> >> + - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev genisoimage
+> >> +
+> >> +build-system1:
+> >> + script:
+> >> + - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-dev
+> >> +      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
+> >> + - ./configure --enable-werror --target-list="aarch64-softmmu alpha-softmmu
+> >> +      cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazeel-softmmu
+> >> +      mips64el-softmmu m68k-softmmu ppc-softmmu riscv64-softmmu sparc-softmmu"
+> >> + - make -j2
+> >> + - make -j2 check
+> >> +
+> >> +build-system2:
+> >> + script:
+> >> + - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio-dev
+> >> +      libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
+> >> + - ./configure --enable-werror --target-list="tricore-softmmu unicore32-softmmu
+> >> +      microblaze-softmmu mips-softmmu riscv32-softmmu s390x-softmmu sh4-softmmu
+> >> +      sparc64-softmmu x86_64-softmmu xtensa-softmmu nios2-softmmu or1k-softmmu"
+> >> + - make -j2
+> >> + - make -j2 check
+> >> +
+> >> +build-disabled:
+> >> + script:
+> >> + - ./configure --enable-werror --disable-rdma --disable-slirp --disable-curl
+> >> +      --disable-capstone --disable-live-block-migration --disable-glusterfs
+> >> +      --disable-replication --disable-coroutine-pool --disable-smartcard
+> >> +      --disable-guest-agent --disable-curses --disable-libxml2 --disable-tpm
+> >> +      --disable-qom-cast-debug --disable-spice --disable-vhost-vsock
+> >> +      --disable-vhost-net --disable-vhost-crypto --disable-vhost-user
+> >> +      --target-list="i386-softmmu ppc64-softmmu mips64-softmmu i386-linux-user"
+> >> + - make -j2
+> >> + - make -j2 check-qtest SPEED=slow
+> >> +
+> >> +build-tcg-disabled:
+> >> + script:
+> >> + - apt-get install -y -qq clang libgtk-3-dev libbluetooth-dev libusb-dev
+> >> + - ./configure --cc=clang --enable-werror --disable-tcg --audio-drv-list=""
+> >> + - make -j2
+> >> + - make check-unit
+> >> + - make check-qapi-schema
+> >> + - cd tests/qemu-iotests/
+> >> + - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 033 048
+> >> +            052 063 077 086 101 104 106 113 147 148 150 151 152 157 159 160
+> >> +            163 170 171 183 184 192 194 197 205 208 215 221 222 226 227 236
+> >> + - ./check -qcow2 001 002 003 004 005 007 008 009 010 011 012 013 017 018 019
+> >> +            020 021 022 024 025 027 028 029 031 032 033 034 035 036 037 038
+> >> +            039 040 042 043 046 047 048 049 050 051 052 053 054 056 057 058
+> >> +            060 061 062 063 065 066 067 068 069 071 072 073 074 079 080 082
+> >> +            085 086 089 090 091 095 096 097 098 099 102 103 104 105 107 108
+> >> +            110 111 114 117 120 122 124 126 127 129 130 132 133 134 137 138
+> >> +            139 140 141 142 143 144 145 147 150 151 152 154 155 156 157 158
+> >> +            161 165 170 172 174 176 177 179 184 186 187 190 192 194 195 196
+> >> +            197 200 202 203 205 208 209 214 215 216 217 218 222 226 227 229 234
+> >> +
 > > 
-> > I don't understand this expression...  
-> My intent was to align the start of the device memory on a GiB boundary,
-> just after the initial RAM (ram_size). And then align the floating IO
-> region on a GiB boundary after the device memory (of size
-> ms->maxram_size - ms->ram_size). What do I miss?
-
-It's not obvious what "GiB +  ms->ram_size" means and where it comes from,
-maybe substitute GiB with properly named constant/macro that's also re-used in
-memmap definition so it would be obvious that's it's where initial RAM
-is mapped. Also I'd move both ROUND_UPs into separate expressions using
-reasonable named local vars and possible overflow checks on top of that,
-so one won't have to guess that it's initial RAM end + device RAM end.
-
-> >   
-> >> +    if (vms->high_io_base < 256 * GiB) {
-> >> +        vms->high_io_base = 256 * GiB;
-> >> +    }
-> >>      base = vms->high_io_base;
-> >>
-> >>      for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
-> >> @@ -1386,6 +1397,7 @@ static void virt_set_memmap(VirtMachineState *vms)
-> >>          vms->memmap[i].size = size;
-> >>          base += size;
-> >>      }
-> >> +    vms->highest_gpa = base - 1;
-> >>  }
-> >>
-> >>  static void machvirt_init(MachineState *machine)
-> >> @@ -1402,7 +1414,9 @@ static void machvirt_init(MachineState *machine)
-> >>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-> >>      bool aarch64 = true;
-> >>
-> >> -    virt_set_memmap(vms);
-> >> +    if (!vms->extended_memmap) {
-> >> +        virt_set_memmap(vms);
-> >> +    }
-> >>
-> >>      /* We can probe only here because during property set
-> >>       * KVM is not available yet
-> >> @@ -1784,6 +1798,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-> >>      return NULL;
-> >>  }
-> >>
-> >> +/*
-> >> + * for arm64 kvm_type [7-0] encodes the IPA size shift
-> >> + */
-> >> +static int virt_kvm_type(MachineState *ms, const char *type_str)
-> >> +{
-> >> +    VirtMachineState *vms = VIRT_MACHINE(ms);
-> >> +    int max_vm_phys_shift = kvm_arm_get_max_vm_phys_shift(ms);
-> >> +    int max_pa_shift;
-> >> +
-> >> +    vms->extended_memmap = true;
-> >> +
-> >> +    virt_set_memmap(vms);
-> >> +
-> >> +    max_pa_shift = 64 - clz64(vms->highest_gpa);
-> >> +
-> >> +    if (max_pa_shift > max_vm_phys_shift) {
-> >> +        error_report("-m and ,maxmem option values "
-> >> +                     "require an IPA range (%d bits) larger than "
-> >> +                     "the one supported by the host (%d bits)",
-> >> +                     max_pa_shift, max_vm_phys_shift);
-> >> +       exit(1);
-> >> +    }  
+> > On the matter of "make check-block" or "./check xxx", I've seen
+> > arguments for both sides.  I've sent a similar (but using make
+> > check-block) patch for Travis:
 > > 
-> > Presumably we should have some equivalent check for TCG, so
-> > that we don't let the user create a setup which wants more
-> > bits of physical address than the TCG CPU allows ?  
-> kvm_type() sets the new memory map. For TCG we should stick to the 1TB
-> GPA address space which should be consistent with the existing
-> ID_AA64MMFR0_EL1 settings (arm/internals.h implements arm_pamax(ARMCPU
-> *cpu) which decodes hardcoded cpu->id_aa64mmfr0).
-> >   
-> >> +    /*
-> >> +     * By default we return 0 which corresponds to an implicit legacy
-> >> +     * 40b IPA setting. Otherwise we return the actual requested IPA
-> >> +     * logsize
-> >> +     */
-> >> +    return max_pa_shift > 40 ? max_pa_shift : 0;
-> >> +}
-> >> +
-> >>  static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >>  {
-> >>      MachineClass *mc = MACHINE_CLASS(oc);
-> >> @@ -1808,6 +1852,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-> >>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-> >>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> >> +    mc->kvm_type = virt_kvm_type;
-> >>      assert(!mc->get_hotplug_handler);
-> >>      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-> >>      hc->plug = virt_machine_device_plug_cb;
-> >> @@ -1911,6 +1956,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
-> >>  {
-> >>      virt_machine_4_0_options(mc);
-> >>      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-> >> +
-> >> +    /* extended memory map is enabled from 4.0 onwards */
-> >> +    mc->kvm_type = NULL;  
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02334.html
 > > 
-> > When is there a difference between setting this to NULL,
-> > and setting it to virt_kvm_type but having the memory
-> > size be <= 256GiB ?  
-> There shouldn't be any difference. When size <= 255GiB we stick to the
-> 1TB PA address space.
-> > 
-> > If there isn't any difference, why can't we just let the
-> > pre-4.0 versions behave like the new ones? No existing
-> > VM setup will have > 256GB of memory, so as long as there's
-> > no behaviour change for the <=256GB case we don't need to
-> > take special effort to ensure that the >256GB case continues
-> > to give an error message, do we ?  
-> But don't we want to forbid any pre-4.0 machvirt to run with more than
-> 255GiB RAM?
-Why would we if it doesn't break migration?
-
- 
-> Thanks
+> > I'd be nice to hear from the qemu-iotest's maintainers which approach
+> > is preferable for upstream + shared computing resources kind of environment.
 > 
-> Eric
-> >   
-> >>  }
-> >>  DEFINE_VIRT_MACHINE(3, 1)
-> >>
-> >> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> >> index 3dc7a6c5d5..c88f67a492 100644
-> >> --- a/include/hw/arm/virt.h
-> >> +++ b/include/hw/arm/virt.h
-> >> @@ -132,6 +132,8 @@ typedef struct {
-> >>      uint32_t iommu_phandle;
-> >>      int psci_conduit;
-> >>      hwaddr high_io_base;
-> >> +    hwaddr highest_gpa;
-> >> +    bool extended_memmap;
-> >>  } VirtMachineState;
-> >>
-> >>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> >> --
-> >> 2.20.1  
-> > 
-> > thanks
-> > -- PMM
-> >   
+> I think "make check-block" should likely be the preferred way to run the
+> tests for normal builds (and by the way, why don't we always run this
+> during "make check" yet?).
 > 
+> But in this CI file here, I'm running the tests for the "--disable-tcg"
+> build - simply because this test finishes way earlier than the other
+> tests otherwise. Unfortunately --disable-tcg causes some of the iotests
+> to fail - expected, since you also can not use KVM on the CI server, so
+> there is no way to execute guest code with this build (e.g. I'm also not
+> running the qtests in this pipe). Thus I had to limit the iotests to the
+> ones that also work without TCG, i.e. I have to run the check script
+> directly here with a list of tests that seem to be working in this
+> environment.
+
+qemu-iotests doesn't run any guest code and I think almost all tests
+only use the qtest or none machines. We can make sure that the remaining
+one or two tests that do need TCG/KVM for some reason are not in 'quick'
+group, so that './check -T -qcow2 -g quick' does the right thing (which
+is also what 'make check-block' does internally).
+
+Which are the cases that fail for you with '--disable-tcg'?
+
+Kevin
