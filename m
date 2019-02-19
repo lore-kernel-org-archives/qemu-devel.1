@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59661)
+Received: from eggs.gnu.org ([209.51.188.92]:34531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw5K0-0002d6-Sa
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:20:30 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gw5WP-0000e0-5I
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:33:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw5Jx-0007dm-Ft
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:20:28 -0500
-References: <20190219115937.21587-1-stefanha@redhat.com>
-	<2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
-	<30c66aaa-2807-69cd-2395-dcd49e59b136@virtuozzo.com>
-	<CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <acd120ca-6e26-ab84-b0f7-39e0f2e56b75@redhat.com>
-Date: Tue, 19 Feb 2019 14:20:15 +0100
+	(envelope-from <wainersm@redhat.com>) id 1gw5WK-0006fr-Rj
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:33:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gw5WK-0006eC-Ey
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:33:12 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B329DC047B7A
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 13:27:31 +0000 (UTC)
+References: <20190218173723.26120-1-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <ce1919d4-64d6-fd5d-c9de-6697a20751c8@redhat.com>
+Date: Tue, 19 Feb 2019 10:27:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QVk-aisqUW8feav3XNLebC182TRY7LaMrVa-cP87n43ig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190218173723.26120-1-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: drop unnecessary
- accel=kvm
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] Acceptance tests: drop usage of ":avocado:
+ enable"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +34,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On 19/02/2019 14.07, Stefan Hajnoczi wrote:
-> On Tue, Feb 19, 2019 at 12:12 PM Vladimir Sementsov-Ogievskiy
-> <vsementsov@virtuozzo.com> wrote:
->> 19.02.2019 15:02, Thomas Huth wrote:
->>> On 19/02/2019 12.59, Stefan Hajnoczi wrote:
->>>> Tests 235 and 238 do not require the kvm accelerator.  TCG works fine.
->>>>
->>>> Use the default accelerator instead of requiring kvm.
->>>>
->>>> Suggested-by: Thomas Huth <thuth@redhat.com>
->>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>> ---
->>>>   tests/qemu-iotests/235 | 1 -
->>>>   tests/qemu-iotests/238 | 1 -
->>>>   2 files changed, 2 deletions(-)
->>>>
->>>> diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
->>>> index d6edd97ab4..329da8f0c2 100755
->>>> --- a/tests/qemu-iotests/235
->>>> +++ b/tests/qemu-iotests/235
->>>> @@ -49,7 +49,6 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
->>>>                   str(size))
->>>>
->>>>   vm = QEMUMachine(iotests.qemu_prog)
->>>> -vm.add_args('-machine', 'accel=kvm')
->>>
->>> According to the initial commit log of 235:
->>>
->>>   "iotests: simple mirror test with kvm on 1G image"
->>>
->>> ... so I assume KVM was used on purpose here?
->>>
->>>   Thomas
->>>
->>
->> As I remember kvm is not really necessary, and test have a comment about it:
->> # And it didn't reproduce if at least one of the following:
->> ...
->> # 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
->> #    reproduces, if just drop kvm, but gdb failed to produce full backtraces
->> #    for me)
->>
->> But the comment should be updated with this patch.
-> 
-> Will fix in v2.
 
-Any chance that you could even make it somehow work with -M accel=qtest
-instead? ... in case someone compiled their QEMU with --disable-tcg, too
-...?
+On 02/18/2019 02:37 PM, Cleber Rosa wrote:
+> The Avocado test runner attemps to find its INSTRUMENTED (that is,
+> Python based tests) in a manner that is as safe as possible to the
+> user.  Different from plain Python unittest, it won't load or
+> execute test code on an operation such as:
+>
+>   $ avocado list tests/acceptance/
+>
+> Before version 68.0, the logic implemented to identify INSTRUMENTED
+> tests would require either the ":avocado: enable" or ":avocado:
+> recursive" statement as a flag for tests that would not inherit
+> directly from "avocado.Test".  This is not necessary anymore,
+> and because of that the boiler plate statements can now be removed.
+>
+> Reference: https://avocado-framework.readthedocs.io/en/68.0/release_notes/68_0.html#users-test-writers
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   docs/devel/testing.rst                 | 1 -
+>   tests/acceptance/boot_linux_console.py | 1 -
+>   tests/acceptance/linux_initrd.py       | 1 -
+>   tests/acceptance/version.py            | 1 -
+>   tests/acceptance/virtio_version.py     | 1 -
+>   tests/acceptance/vnc.py                | 1 -
+>   tests/requirements.txt                 | 2 +-
+>   7 files changed, 1 insertion(+), 7 deletions(-)
 
- Thomas
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+
+
+>
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index 135743a2bf..3ce171829d 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -600,7 +600,6 @@ the ``avocado_qemu.Test`` class.  Here's a simple usage example:
+>   
+>     class Version(Test):
+>         """
+> -      :avocado: enable
+>         :avocado: tags=quick
+>         """
+>         def test_qmp_human_info_version(self):
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index 98324f7591..beeb1e59e8 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -18,7 +18,6 @@ class BootLinuxConsole(Test):
+>       Boots a x86_64 Linux kernel and checks that the console is operational
+>       and the kernel command line is properly passed from QEMU to the kernel
+>   
+> -    :avocado: enable
+>       :avocado: tags=x86_64
+>       """
+>   
+> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
+> index 737355c2ef..5a15fc4347 100644
+> --- a/tests/acceptance/linux_initrd.py
+> +++ b/tests/acceptance/linux_initrd.py
+> @@ -18,7 +18,6 @@ class LinuxInitrd(Test):
+>       """
+>       Checks QEMU evaluates correctly the initrd file passed as -initrd option.
+>   
+> -    :avocado: enable
+>       :avocado: tags=x86_64
+>       """
+>   
+> diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
+> index 13b0a7440d..67c2192c93 100644
+> --- a/tests/acceptance/version.py
+> +++ b/tests/acceptance/version.py
+> @@ -14,7 +14,6 @@ from avocado_qemu import Test
+>   
+>   class Version(Test):
+>       """
+> -    :avocado: enable
+>       :avocado: tags=quick
+>       """
+>       def test_qmp_human_info_version(self):
+> diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
+> index ce990250d8..464d75aa4e 100644
+> --- a/tests/acceptance/virtio_version.py
+> +++ b/tests/acceptance/virtio_version.py
+> @@ -61,7 +61,6 @@ class VirtioVersionCheck(Test):
+>       same device tree created by `disable-modern` and
+>       `disable-legacy`.
+>   
+> -    :avocado: enable
+>       :avocado: tags=x86_64
+>       """
+>   
+> diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
+> index b1ef9d71b1..064ceabcc1 100644
+> --- a/tests/acceptance/vnc.py
+> +++ b/tests/acceptance/vnc.py
+> @@ -13,7 +13,6 @@ from avocado_qemu import Test
+>   
+>   class Vnc(Test):
+>       """
+> -    :avocado: enable
+>       :avocado: tags=vnc,quick
+>       """
+>       def test_no_vnc(self):
+> diff --git a/tests/requirements.txt b/tests/requirements.txt
+> index 64c6e27a94..002ded6a22 100644
+> --- a/tests/requirements.txt
+> +++ b/tests/requirements.txt
+> @@ -1,4 +1,4 @@
+>   # Add Python module requirements, one per line, to be installed
+>   # in the tests/venv Python virtual environment. For more info,
+>   # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> -avocado-framework==65.0
+> +avocado-framework==68.0
