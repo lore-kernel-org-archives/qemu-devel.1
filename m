@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56425)
+Received: from eggs.gnu.org ([209.51.188.92]:57155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gw3BH-0002bc-Lg
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:03:30 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gw3Ee-0003pD-6i
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:06:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gw3B7-0005yR-Rc
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:03:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37435)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gw3B5-0005vO-Rv
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:03:08 -0500
-Date: Tue, 19 Feb 2019 19:00:03 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190219110003.GE15343@wei-ubt>
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-11-git-send-email-wexu@redhat.com>
-	<af2abdf0-3f96-6e97-d5c0-5ab2211222e1@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gw3EV-00080R-WB
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:06:45 -0500
+Date: Tue, 19 Feb 2019 12:06:30 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190219120630.5a2f3042.cohuck@redhat.com>
+In-Reply-To: <2da327e8-d6cd-2350-31e1-d99edb0f2980@linux.ibm.com>
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-5-cohuck@redhat.com>
+	<2da327e8-d6cd-2350-31e1-d99edb0f2980@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <af2abdf0-3f96-6e97-d5c0-5ab2211222e1@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 10/11] virtio: migration support for
- packed ring
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] vfio-ccw: add capabilities chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,224 +24,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Tue, Feb 19, 2019 at 03:30:41PM +0800, Jason Wang wrote:
->=20
-> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26, wexu@redhat.com wrote:
-> >From: Wei Xu <wexu@redhat.com>
-> >
-> >Both userspace and vhost-net/user are supported with this patch.
-> >
-> >A new subsection is introduced for packed ring, only 'last_avail_idx'
-> >and 'last_avail_wrap_counter' are saved/loaded presumably based on
-> >all the others relevant data(inuse, used/avail index and wrap count
-> >should be the same.
->=20
->=20
-> This is probably only true for net device, see comment in virtio_load()=
-:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- * Some devices migrate VirtQueueElements that have been popped
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- * from the avail ring but not yet returned to the used ring.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- * Since max ring size < UINT16_MAX it's safe to use modulo
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- * UINT16_MAX + 1 subtraction.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdev=
-->vq[i].inuse =3D (uint16_t)(vdev->vq[i].last_avail_idx -
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdev->vq[i].used_idx);
->=20
->=20
-> So you need to migrate used_idx and used_wrap_counter since we don't ha=
-ve
-> used idx.
+On Fri, 15 Feb 2019 10:46:08 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
-This is trying to align with vhost-net/user as we discussed, since all we
-have done is to support  virtio-net device for packed ring, maybe we can
-consider supporting other devices after we have got it verified.
+> On 01/30/2019 08:22 AM, Cornelia Huck wrote:
+> > Allow to extend the regions used by vfio-ccw. The first user will be
+> > handling of halt and clear subchannel.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   drivers/s390/cio/vfio_ccw_ops.c     | 181 ++++++++++++++++++++++++----
+> >   drivers/s390/cio/vfio_ccw_private.h |  38 ++++++
+> >   include/uapi/linux/vfio.h           |   2 +
+> >   3 files changed, 195 insertions(+), 26 deletions(-)
 
->=20
->=20
-> >
-> >Signed-off-by: Wei Xu <wexu@redhat.com>
-> >---
-> >  hw/virtio/virtio.c | 69 ++++++++++++++++++++++++++++++++++++++++++++=
-+++++++---
-> >  1 file changed, 66 insertions(+), 3 deletions(-)
-> >
-> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> >index 8cfc7b6..7c5de07 100644
-> >--- a/hw/virtio/virtio.c
-> >+++ b/hw/virtio/virtio.c
-> >@@ -2349,6 +2349,13 @@ static bool virtio_virtqueue_needed(void *opaqu=
-e)
-> >      return virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1);
-> >  }
-> >+static bool virtio_packed_virtqueue_needed(void *opaque)
-> >+{
-> >+    VirtIODevice *vdev =3D opaque;
-> >+
-> >+    return virtio_host_has_feature(vdev, VIRTIO_F_RING_PACKED);
-> >+}
-> >+
-> >  static bool virtio_ringsize_needed(void *opaque)
-> >  {
-> >      VirtIODevice *vdev =3D opaque;
-> >@@ -2390,6 +2397,17 @@ static const VMStateDescription vmstate_virtque=
-ue =3D {
-> >      }
-> >  };
-> >+static const VMStateDescription vmstate_packed_virtqueue =3D {
-> >+    .name =3D "packed_virtqueue_state",
-> >+    .version_id =3D 1,
-> >+    .minimum_version_id =3D 1,
-> >+    .fields =3D (VMStateField[]) {
-> >+        VMSTATE_UINT16(last_avail_idx, struct VirtQueue),
-> >+        VMSTATE_BOOL(last_avail_wrap_counter, struct VirtQueue),
-> >+        VMSTATE_END_OF_LIST()
-> >+    }
-> >+};
-> >+
-> >  static const VMStateDescription vmstate_virtio_virtqueues =3D {
-> >      .name =3D "virtio/virtqueues",
-> >      .version_id =3D 1,
-> >@@ -2402,6 +2420,18 @@ static const VMStateDescription vmstate_virtio_=
-virtqueues =3D {
-> >      }
-> >  };
-> >+static const VMStateDescription vmstate_virtio_packed_virtqueues =3D =
-{
-> >+    .name =3D "virtio/packed_virtqueues",
-> >+    .version_id =3D 1,
-> >+    .minimum_version_id =3D 1,
-> >+    .needed =3D &virtio_packed_virtqueue_needed,
-> >+    .fields =3D (VMStateField[]) {
-> >+        VMSTATE_STRUCT_VARRAY_POINTER_KNOWN(vq, struct VirtIODevice,
-> >+                      VIRTIO_QUEUE_MAX, 0, vmstate_packed_virtqueue, =
-VirtQueue),
-> >+        VMSTATE_END_OF_LIST()
-> >+    }
-> >+};
-> >+
-> >  static const VMStateDescription vmstate_ringsize =3D {
-> >      .name =3D "ringsize_state",
-> >      .version_id =3D 1,
-> >@@ -2522,6 +2552,7 @@ static const VMStateDescription vmstate_virtio =3D=
- {
-> >          &vmstate_virtio_ringsize,
-> >          &vmstate_virtio_broken,
-> >          &vmstate_virtio_extra_state,
-> >+        &vmstate_virtio_packed_virtqueues,
-> >          NULL
-> >      }
-> >  };
-> >@@ -2794,6 +2825,17 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f=
-, int version_id)
-> >                  virtio_queue_update_rings(vdev, i);
-> >              }
-> >+            if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) =
-{
-> >+                vdev->vq[i].shadow_avail_idx =3D vdev->vq[i].last_ava=
-il_idx;
-> >+                vdev->vq[i].avail_wrap_counter =3D
-> >+                                        vdev->vq[i].last_avail_wrap_c=
-ounter;
-> >+
-> >+                vdev->vq[i].used_idx =3D vdev->vq[i].last_avail_idx;
-> >+                vdev->vq[i].used_wrap_counter =3D
-> >+                                        vdev->vq[i].last_avail_wrap_c=
-ounter;
-> >+                continue;
-> >+            }
-> >+
-> >              nheads =3D vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].l=
-ast_avail_idx;
-> >              /* Check it isn't doing strange things with descriptor n=
-umbers. */
-> >              if (nheads > vdev->vq[i].vring.num) {
-> >@@ -2955,17 +2997,34 @@ hwaddr virtio_queue_get_used_size(VirtIODevice=
- *vdev, int n)
-> >  uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
-> >  {
-> >-    return vdev->vq[n].last_avail_idx;
-> >+    uint16_t idx;
-> >+
-> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >+        idx =3D vdev->vq[n].last_avail_idx;
-> >+        idx |=3D ((int)vdev->vq[n].avail_wrap_counter) << 15;
-> >+    } else {
-> >+        idx =3D (int)vdev->vq[n].last_avail_idx;
-> >+    }
-> >+    return idx;
-> >  }
-> >  void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint=
-16_t idx)
-> >  {
-> >-    vdev->vq[n].last_avail_idx =3D idx;
-> >-    vdev->vq[n].shadow_avail_idx =3D idx;
-> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >+        vdev->vq[n].last_avail_idx =3D idx & 0x7fff;
-> >+        vdev->vq[n].avail_wrap_counter =3D !!(idx & 0x8000);
->=20
->=20
-> Let's define some macros for those magic number.
+(...)
 
-OK.
+> > @@ -237,9 +301,51 @@ static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
+> >   		info->flags = VFIO_REGION_INFO_FLAG_READ
+> >   			      | VFIO_REGION_INFO_FLAG_WRITE;
+> >   		return 0;
+> > -	default:
+> > -		return -EINVAL;
+> > +	default: /* all other regions are handled via capability chain */
+> > +	{
+> > +		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+> > +		struct vfio_region_info_cap_type cap_type = {
+> > +			.header.id = VFIO_REGION_INFO_CAP_TYPE,
+> > +			.header.version = 1 };
+> > +		int ret;
+> > +
+> > +		if (info->index >=
+> > +		    VFIO_CCW_NUM_REGIONS + private->num_regions)
+> > +			return -EINVAL;  
+> 
+> I notice the similarity of this hunk to drivers/vfio/pci/vfio_pci.c ... 
+> While I was trying to discern the likelihood/possibility/usefulness of 
+> combining the two, I noticed that there is one difference at this point 
+> in the other file, which was added by commit 0e714d27786c ("vfio/pci: 
+> Fix potential Spectre v1")
+> 
+> This got me off on a tangent of setting up smatch in my environment, and 
+> sure enough it flags this point [1] as being problematic:
+> 
+> drivers/s390/cio/vfio_ccw_ops.c:328 vfio_ccw_mdev_get_region_info() 
+> warn: potential spectre issue 'private->region' [r]
 
->=20
->=20
-> >+    } else {
-> >+        vdev->vq[n].last_avail_idx =3D idx;
-> >+        vdev->vq[n].shadow_avail_idx =3D idx;
-> >+    }
-> >  }
-> >  void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
-> >  {
-> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >+        return;
-> >+    }
->=20
->=20
-> Why doesn't packed ring care about this?
+This makes sense, added.
 
-As elaborated above, used idx/wrap_counter are supposed to be the
-same with avail ones for vhost-net/user.
+> 
+> Might need to consider the same?  (And lends credence to my concern 
+> about the capability chain code being duplicated.)
 
->=20
->=20
-> >+
-> >      rcu_read_lock();
-> >      if (vdev->vq[n].vring.desc) {
-> >          vdev->vq[n].last_avail_idx =3D vring_used_idx(&vdev->vq[n]);
-> >@@ -2976,6 +3035,10 @@ void virtio_queue_restore_last_avail_idx(VirtIO=
-Device *vdev, int n)
-> >  void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
-> >  {
-> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >+        return;
-> >+    }
->=20
->=20
-> And this?
+Yeah, there's definitely duplication there. I initially tried to make
+this use some common infrastructure, but I remember that it was harder
+than it looked and that I stopped trying (don't remember the details,
+sorry).
 
-Same as above.
+> 
+> > +
+> > +		i = info->index - VFIO_CCW_NUM_REGIONS;
+> > +
+> > +		info->offset = VFIO_CCW_INDEX_TO_OFFSET(info->index);
+> > +		info->size = private->region[i].size;  
+> 
+> [1] smatch actually points to this line, though the referenced commit 
+> inserts a line up there.
+> 
+> > +		info->flags = private->region[i].flags;
+> > +
+> > +		cap_type.type = private->region[i].type;
+> > +		cap_type.subtype = private->region[i].subtype;
+> > +
+> > +		ret = vfio_info_add_capability(&caps, &cap_type.header,
+> > +					       sizeof(cap_type));
+> > +		if (ret)
+> > +			return ret;
+> > +
+> > +		info->flags |= VFIO_REGION_INFO_FLAG_CAPS;
+> > +		if (info->argsz < sizeof(*info) + caps.size) {
+> > +			info->argsz = sizeof(*info) + caps.size;
+> > +			info->cap_offset = 0;
+> > +		} else {
+> > +			vfio_info_cap_shift(&caps, sizeof(*info));
+> > +			if (copy_to_user((void __user *)arg + sizeof(*info),
+> > +					 caps.buf, caps.size)) {
+> > +				kfree(caps.buf);
+> > +				return -EFAULT;
+> > +			}
+> > +			info->cap_offset = sizeof(*info);
+> > +		}
+> > +
+> > +		kfree(caps.buf);
+> > +
+> > +	}
+> >   	}
+> > +	return 0;
+> >   }
 
-Wei
+(...)
 
->=20
-> Thanks
->=20
->=20
-> >+
-> >      rcu_read_lock();
-> >      if (vdev->vq[n].vring.desc) {
-> >          vdev->vq[n].used_idx =3D vring_used_idx(&vdev->vq[n]);
+> > @@ -19,6 +21,38 @@
+> >   #include "css.h"
+> >   #include "vfio_ccw_cp.h"
+> >   
+> > +#define VFIO_CCW_OFFSET_SHIFT   40
+> > +#define VFIO_CCW_OFFSET_TO_INDEX(off)	(off >> VFIO_CCW_OFFSET_SHIFT)
+> > +#define VFIO_CCW_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_CCW_OFFSET_SHIFT)
+> > +#define VFIO_CCW_OFFSET_MASK	(((u64)(1) << VFIO_CCW_OFFSET_SHIFT) - 1)  
+> 
+> I know Farhan asked this back in v1, but I'd still love a better answer 
+> than "vfio-pci did this" to what this is.  There's a lot more regions 
+> prior to the capability chain in vfio-pci than here (9 versus 1), so I'd 
+> like to be certain it's not related to that.
+
+If we assume that we'll only add new regions via the capability chain
+(and I think we can assume that), we can probably change that value. I
+tried with a value of 10 (should be enough) and things still seem to
+work, so that might be a nice, round value.
+
+(...)
+
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 02bb7ad6e986..56e2413d3e00 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -353,6 +353,8 @@ struct vfio_region_gfx_edid {
+> >   #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
+> >   };
+> >   
+> > +#define VFIO_REGION_TYPE_CCW			(2)
+> > +  
+> 
+> I'm not sure if this should be here to keep it in its own area (esp. for 
+> when patch 6 comes along), or with VFIO_REGION_TYPE_GFX to make it 
+> noticeable where we are in the list without grepping for 
+> VFIO_REGION_TYPE.  I guess it's just what it is, even if I'm not 
+> thrilled about it.
+
+I'm not really sure where it makes the most sense to put it, TBH. Maybe
+it should be moved below the recently added nvlink stuff? My idea was
+to keep the subtype (added in patch 6) close to the type; but they can
+easily move to a different place in the file.
+
+> 
+> >   /*
+> >    * 10de vendor sub-type
+> >    *
+> >   
+> 
+> This generally looks sane to me, even though I can't get past the idea 
+> that there's opportunities for improvement between the two.  Maybe 
+> that's refactoring for a day when someone is bored.  ;-)
+
+Yeah, if someone has time, they could try to refactor :) I'm not sure
+what made it complicated when I first tried it, maybe I should try
+again ;)
+
+Thanks for looking!
