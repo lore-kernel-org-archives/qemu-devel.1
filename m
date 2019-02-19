@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42745)
+Received: from eggs.gnu.org ([209.51.188.92]:43228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw7w6-00034X-Hc
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:08:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1gw7xf-0004Lz-3E
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:09:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw7w5-0008V1-FW
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:07:58 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 19 Feb 2019 17:07:39 +0100
-Message-Id: <1550592459-7286-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/pci/pci-stub: Add msi_enabled() and
- msi_notify() to the pci stubs
+	(envelope-from <eblake@redhat.com>) id 1gw7xd-0000uF-40
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:09:35 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 19 Feb 2019 10:09:20 -0600
+Message-Id: <20190219160920.32705-1-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] iotests: Avoid SIGPIPE death to certtool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,39 +19,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, thuth@redhat.com, berrange@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Some machines have an AHCI adapter, but no PCI. To be able to
-compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
-functions msi_enabled() and msi_notify() for linking.
-This is required for the upcoming Kconfig-like build system, if
-a user wants to compile a QEMU binary with just one machine that
-has AHCI, but no PCI, like the ARM "cubieboard" for example.
+Our use of 'head -1' to log less output of certtool during
+iotest 233 could result in certtool dying early due to SIGPIPE
+if it generates enough output; if that happens, the certificate
+it was supposed to generate may be zero length, which causes
+failures such as:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+  =3D=3D check TLS client to plain server fails =3D=3D
+ -qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3DPORT,tls=
+-creds=3Dtls0': Denied by server for option 5 (starttls)
+ -server reported: TLS not configured
+ -qemu-nbd: Denied by server for option 5 (starttls)
+ -server reported: TLS not configured
+ +qemu-nbd: Unable to import client certificate /tmp/qemu-iotests-quick-2=
+8354/tls/client1/client-cert.pem: Base64 unexpected header error.
+
+Fix the pipelines to consume all output.
+
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- hw/pci/pci-stub.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ tests/qemu-iotests/common.tls | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-index b941a0e..c04a5df 100644
---- a/hw/pci/pci-stub.c
-+++ b/hw/pci/pci-stub.c
-@@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
-     g_assert(false);
-     return 0;
+diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tl=
+s
+index eae81789bbc..15c6e8c8425 100644
+--- a/tests/qemu-iotests/common.tls
++++ b/tests/qemu-iotests/common.tls
+@@ -74,7 +74,7 @@ EOF
+     certtool --generate-self-signed \
+              --load-privkey "${tls_dir}/key.pem" \
+              --template "${tls_dir}/ca.info" \
+-             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
++             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | sed -n 1p
+
+     rm -f "${tls_dir}/ca.info"
  }
-+
-+/* Required by ahci.c */
-+bool msi_enabled(const PCIDevice *dev)
-+{
-+    return false;
-+}
-+
-+void msi_notify(PCIDevice *dev, unsigned int vector)
-+{
-+    g_assert_not_reached();
-+}
--- 
-1.8.3.1
+@@ -103,7 +103,7 @@ EOF
+              --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+              --load-privkey "${tls_dir}/key.pem" \
+              --template "${tls_dir}/cert.info" \
+-             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | head -1
++             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | sed -n =
+1p
+     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/server-key.pem"
+
+@@ -132,7 +132,7 @@ EOF
+              --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+              --load-privkey "${tls_dir}/key.pem" \
+              --template "${tls_dir}/cert.info" \
+-             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | head -1
++             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | sed -n =
+1p
+     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/client-key.pem"
+
+--=20
+2.20.1
