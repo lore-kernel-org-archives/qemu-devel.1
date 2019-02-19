@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46741)
+Received: from eggs.gnu.org ([209.51.188.92]:47876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gw4YL-0005PS-5Q
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:31:14 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gw4dV-0007J9-G8
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gw4YH-0000JB-8a
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:31:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60542)
+	(envelope-from <kraxel@redhat.com>) id 1gw4dT-0001sD-R1
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:36:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gw4YG-0000Ea-VW
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:31:09 -0500
-Date: Tue, 19 Feb 2019 13:30:52 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gw4dR-0001qR-Rz
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:36:30 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 167AE8667D
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:36:19 +0000 (UTC)
+Date: Tue, 19 Feb 2019 13:36:13 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190219123052.dop3kpgowi2apitq@sirius.home.kraxel.org>
-References: <20190211040434.1C98674569F@zero.eik.bme.hu>
-	<20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.9999.1902191234580.87875@zero.eik.bme.hu>
+Message-ID: <20190219123613.amgwx7sgzbcgazic@sirius.home.kraxel.org>
+References: <20190219101510.9356-1-kraxel@redhat.com>
+	<a7050f62-b56f-cc1a-7600-5197b83a27ac@redhat.com>
+	<20190219121258.rua536oattwkwgkc@sirius.home.kraxel.org>
+	<20190219121946.GG7154@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1902191234580.87875@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
+In-Reply-To: <20190219121946.GG7154@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] audio: don't use alsa by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 
-  Hi,
-
-> > Which linux driver is this?
+> > So SDL has the same problem (possibly only when using alsa).
+> > 
+> > Hmm.  Dropping can_be_default here will too break sound on BSD ...
 > 
-> Those in linux/drivers/video/fbdev/aty/. This ati-vga model defaults to Rage
-> 128 Pro (what PoweMac3,1 has, device id 0x5046) which is handled by the
-> aty128fb driver under Linux. MIPS fulong2e has Mobility Radeon M6 (RV100,
-> device id 0x5159) that you can also use as -device ati-vga,device_id=0x5159
-> which is driven by radeonfb under Linux.
+> We could temporarily put the Linux default ordering back to have "oss"
+> before sdl/alsa until the initialization code in sdl/alsa can be fixed to
+> correctly detect working audio.
 
-So it could be tested with linux guests on x86 too I guess?
-Can the radeon drm driver handle the devices too?
+Reordering doesn't help, they would still probe successfully and fail
+later, only after oss probe failed ...
 
-I'd also use model=<name> instead of device_id=... to switch between
-different devices.
-
-> > If linux has a native driver it might make sense to also enable it on
-> > x86.  Makes testing easier.
-> 
-> Yes it could work on all archs under Linux but I've only enabled it on the
-> two I've tried. It could be added instead to the same place where vga is
-> added in pci.mak if you like.
-
-Makes sense IMHO.
-
-> > You can add the driver to default_list[] in vl.c, then you don't need
-> > -vga none to remove the default vga when adding -device ati-vga.
-> 
-> I could do that but since it's a bit unfinished (lacks advanced features
-> such as video overlay, 3D accel, command FIFO, etc.) and only a basic
-> implementation at the moment to work with Linux framebuffer that doesn't use
-> these features I thought it might be a godd idea to make it a bit harder to
-> access yet to avoid problem of someone trying it with a Windows guest with
-> drivers from ATI which probably will result in bad picture. But it's up to
-> you to decide if you want to add it to -vga option from the start or have it
-> as optional device and only add to -vga when it's more fully implemented and
-> tested.
-
-It's not about "-vga ati".  This is about adding ati-vga to the list of
-display devices, so qemu will not try to add a vga automatically in case
-it finds "-device ati-vga" on the command line.  That way "qemu -device
-ati-vga" will work fine, without "-vga none".
-
-Adding -vga ati indeed only makes sense once the implementation is more
-complete.
+pa is ok, when the daemon isn't running init() fails properly.
 
 cheers,
   Gerd
