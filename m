@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33524)
+Received: from eggs.gnu.org ([209.51.188.92]:33534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw928-0002JM-4d
+	(envelope-from <groug@kaod.org>) id 1gw928-0002Jd-Hs
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw920-0007Gm-6s
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40148
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1gw926-0007N0-8L
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54764)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw91y-0006yP-5h
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:06 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw924-00075K-00
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:18:13 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1JHENSL132123
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:17:53 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrn0bumpv-1
+	x1JHEH91115996
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:18:02 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrmfgdeen-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:17:52 -0500
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:18:02 -0500
 Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 19 Feb 2019 17:17:50 -0000
+	Tue, 19 Feb 2019 17:17:59 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 19 Feb 2019 18:17:43 +0100
+Date: Tue, 19 Feb 2019 18:17:53 +0100
 In-Reply-To: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <155059666331.1466090.6766540766297333313.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 02/17] spapr: Generate FDT fragment for LMBs
- at configure connector time
+Message-Id: <155059667346.1466090.326696113231137772.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 04/17] spapr/pci: Generate FDT fragment at
+ configure connector time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,113 +45,87 @@ Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |   33 ++++++++++++++++++---------------
- hw/ppc/spapr_drc.c     |    1 +
- include/hw/ppc/spapr.h |    4 +++-
- 3 files changed, 22 insertions(+), 16 deletions(-)
+ hw/ppc/spapr_drc.c          |    1 +
+ hw/ppc/spapr_pci.c          |   19 ++++++++++++-------
+ include/hw/pci-host/spapr.h |    4 +++-
+ 3 files changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 00eb3b643c03..b92deee771b9 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3333,14 +3333,26 @@ static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
-     }
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index aa26aa40be39..248eb8a93d6d 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -691,6 +691,7 @@ static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
+     drck->typename = "28";
+     drck->drc_name_prefix = "C";
+     drck->release = spapr_phb_remove_pci_device_cb;
++    drck->dt_populate = spapr_pci_dt_populate;
  }
  
-+int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spapr,
+ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 60777b2355db..b22c9f57b2dd 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1408,6 +1408,17 @@ static uint32_t spapr_phb_get_pci_drc_index(sPAPRPHBState *phb,
+     return spapr_drc_index(drc);
+ }
+ 
++int spapr_pci_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spapr,
 +                          void *fdt, int *fdt_start_offset, Error **errp)
 +{
-+    uint64_t addr;
-+    uint32_t node;
++    HotplugHandler *plug_handler = qdev_get_hotplug_handler(drc->dev);
++    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(plug_handler);
++    PCIDevice *pdev = PCI_DEVICE(drc->dev);
 +
-+    addr = spapr_drc_index(drc) * SPAPR_MEMORY_BLOCK_SIZE;
-+    node = object_property_get_uint(OBJECT(drc->dev), PC_DIMM_NODE_PROP,
-+                                    &error_abort);
-+    *fdt_start_offset = spapr_populate_memory_node(fdt, node, addr,
-+                                                   SPAPR_MEMORY_BLOCK_SIZE);
++    *fdt_start_offset = spapr_create_pci_child_dt(sphb, pdev, fdt, 0);
 +    return 0;
 +}
 +
- static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
--                           uint32_t node, bool dedicated_hp_event_source,
--                           Error **errp)
-+                           bool dedicated_hp_event_source, Error **errp)
+ static void spapr_pci_plug(HotplugHandler *plug_handler,
+                            DeviceState *plugged_dev, Error **errp)
  {
-     sPAPRDRConnector *drc;
-     uint32_t nr_lmbs = size/SPAPR_MEMORY_BLOCK_SIZE;
--    int i, fdt_offset, fdt_size;
--    void *fdt;
-+    int i;
-     uint64_t addr = addr_start;
-     bool hotplugged = spapr_drc_hotplugged(dev);
+@@ -1417,8 +1428,6 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
      Error *local_err = NULL;
-@@ -3350,11 +3362,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-                               addr / SPAPR_MEMORY_BLOCK_SIZE);
-         g_assert(drc);
+     PCIBus *bus = PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
+     uint32_t slotnr = PCI_SLOT(pdev->devfn);
+-    void *fdt = NULL;
+-    int fdt_start_offset, fdt_size;
  
--        fdt = create_device_tree(&fdt_size);
--        fdt_offset = spapr_populate_memory_node(fdt, node, addr,
--                                                SPAPR_MEMORY_BLOCK_SIZE);
--
--        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-+        spapr_drc_attach(drc, dev, NULL, 0, &local_err);
-         if (local_err) {
-             while (addr > addr_start) {
-                 addr -= SPAPR_MEMORY_BLOCK_SIZE;
-@@ -3362,7 +3370,6 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-                                       addr / SPAPR_MEMORY_BLOCK_SIZE);
-                 spapr_drc_detach(drc);
-             }
--            g_free(fdt);
-             error_propagate(errp, local_err);
-             return;
-         }
-@@ -3395,7 +3402,6 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     uint64_t size, addr;
--    uint32_t node;
- 
-     size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
- 
-@@ -3410,10 +3416,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         goto out_unplug;
+     /* if DR is disabled we don't need to do anything in the case of
+      * hotplug or coldplug callbacks
+@@ -1448,10 +1457,7 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+         goto out;
      }
  
--    node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
--                                    &error_abort);
--    spapr_add_lmbs(dev, addr, size, node,
--                   spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-+    spapr_add_lmbs(dev, addr, size, spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-                    &local_err);
+-    fdt = create_device_tree(&fdt_size);
+-    fdt_start_offset = spapr_create_pci_child_dt(phb, pdev, fdt, 0);
+-
+-    spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset, &local_err);
++    spapr_drc_attach(drc, DEVICE(pdev), NULL, 0, &local_err);
      if (local_err) {
-         goto out_unplug;
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 66b965a0a7c2..634c28695a1c 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -700,6 +700,7 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
-     drck->typename = "MEM";
-     drck->drc_name_prefix = "LMB ";
-     drck->release = spapr_lmb_release;
-+    drck->dt_populate = spapr_lmb_dt_populate;
+         goto out;
+     }
+@@ -1483,7 +1489,6 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+ out:
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        g_free(fdt);
+     }
  }
  
- static const TypeInfo spapr_dr_connector_info = {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 659204ea93f0..0ec309da497e 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -764,9 +764,11 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
- void spapr_clear_pending_events(sPAPRMachineState *spapr);
- int spapr_max_server_number(sPAPRMachineState *spapr);
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 51d81c4b7ce8..f6e43f48fefa 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -121,8 +121,10 @@ sPAPRPHBState *spapr_pci_find_phb(sPAPRMachineState *spapr, uint64_t buid);
+ PCIDevice *spapr_pci_find_dev(sPAPRMachineState *spapr, uint64_t buid,
+                               uint32_t config_addr);
  
--/* CPU and LMB DRC release callbacks. */
-+/* DRC callbacks. */
- void spapr_core_release(DeviceState *dev);
- void spapr_lmb_release(DeviceState *dev);
-+int spapr_lmb_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spapr,
+-/* PCI release callback. */
++/* DRC callbacks */
+ void spapr_phb_remove_pci_device_cb(DeviceState *dev);
++int spapr_pci_dt_populate(sPAPRDRConnector *drc, sPAPRMachineState *spapr,
 +                          void *fdt, int *fdt_start_offset, Error **errp);
  
- void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
- int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+ /* VFIO EEH hooks */
+ #ifdef CONFIG_LINUX
