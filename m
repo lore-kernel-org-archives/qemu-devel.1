@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51571)
+Received: from eggs.gnu.org ([209.51.188.92]:53113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw4sI-0006aF-Dz
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:51:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gw4yV-0001fP-6O
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw4s9-0008Is-Qi
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:51:44 -0500
-Date: Tue, 19 Feb 2019 12:51:16 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190219125116.GH7154@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
-	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
-	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
-	<20190219075333.GA4727@localhost.localdomain>
-	<d7a55ce9-a83c-12fe-fd16-d45dff67630a@redhat.com>
-	<20190219093716.GF4727@localhost.localdomain>
-	<20190219110626.GC7154@redhat.com>
-	<20190219113141.GJ4727@localhost.localdomain>
-	<20190219120128.GF7154@redhat.com>
-	<20190219121657.GL4727@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1gw4yU-0002mg-65
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:58:15 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53228)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gw4yT-0002lm-Fb
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:58:14 -0500
+Received: by mail-wm1-x344.google.com with SMTP id m1so2730391wml.2
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:58:12 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Feb 2019 12:58:00 +0000
+Message-Id: <20190219125808.25174-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190219121657.GL4727@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Failing iotests in CI (was: Add a gitlab-ci file
- for Continuous Integration testing on Gitlab)
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/8] ARMSSE: Implement MHUs and dual-core
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,129 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Tue, Feb 19, 2019 at 01:16:57PM +0100, Kevin Wolf wrote:
-> Am 19.02.2019 um 13:01 hat Daniel P. Berrang=C3=A9 geschrieben:
-> > On Tue, Feb 19, 2019 at 12:31:41PM +0100, Kevin Wolf wrote:
-> > > Am 19.02.2019 um 12:06 hat Daniel P. Berrang=C3=A9 geschrieben:
-> > > > On Tue, Feb 19, 2019 at 10:37:16AM +0100, Kevin Wolf wrote:
-> > > > > Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
-> > > > > >=20
-> > > > > >  https://gitlab.com/huth/qemu/-/jobs/163680780
-> > > > > >=20
-> > > > > > Some of them apparently need encryption to be enabled (as alr=
-eady
-> > > > > > mentioned by Cleber in his patch) - thus should they really b=
-e in the
-> > > > > > quick check, too? Or could they at least check whether QEMU h=
-as been
-> > > > > > built with encryption?
-> > > > >=20
-> > > > > The correct solution would be that they detect the situation
-> > > > > automatically and skip the test by calling _notrun.
-> > > > >=20
-> > > > > I'm not sure how to detect if a given QEMU binary supports encr=
-yption,
-> > > > > but Dan might know.
-> > > >=20
-> > > > It isn't easy & depends which encryption feature you're trying to=
- use.
-> > > >=20
-> > > > For TLS related features you can do something gross like
-> > > >=20
-> > > >     qemu-img info --object tls-creds-anon,id=3Ddummy README 2>&1
-> > > >     test $? !=3D 0 && exit 0
-> > > >=20
-> > > > This relies on fact that 'tls-creds-anon' object type will report=
- a
-> > > > runtime error during initialization if gnutls isn't enabled.
-> > > >=20
-> > > > For more general ciphers you pretty much have to just try the hig=
-her level
-> > > > feature and see if it fails.
-> > >=20
-> > > Actually, I think for test cases we should see 'qemu-img create' fa=
-iling
-> > > and could just skip the test if it returns a non-zero exit code.
-> > >=20
-> > > But then I looked at Thomas' output again:
-> > >=20
-> > >     --- /builds/huth/qemu/tests/qemu-iotests/188.out	2019-02-19 08:=
-23:54.000000000 +0000
-> > >     +++ /builds/huth/qemu/tests/qemu-iotests/188.out.bad	2019-02-19=
- 08:34:54.000000000 +0000
-> > >     @@ -1,4 +1,5 @@
-> > >      QA output created by 188
-> > >     +qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKD=
-F in this build: Function not implemented
-> > >      Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 e=
-ncrypt.format=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
-> > >=20
-> > >      =3D=3D reading whole image =3D=3D--- /builds/huth/qemu/tests/q=
-emu-iotests/188.out	2019-02-19 08:23:54.000000000 +0000
-> > >=20
-> > > What is it actually doing there? There's clearly an error message, =
-but
-> > > it almost looks like it's creating some kind of image anyway? The
-> > > following I/O works fine (i.e. this created image can even be opene=
-d
-> > > again with the luks driver), except that you can also access the im=
-age
-> > > with the wrong password.
-> > >=20
-> > > Is this a real bug in either qcow2 or luks?
-> >=20
-> > It is an artifact of the way qcow2 image creation happens in multiple
-> > phases. qcow2_co_create first creates a minimal qcow2 file, and then
-> > opens it and updates it to add in the various extra features, includi=
-ng
-> > luks encryption. We fail to create the luks encryption, but enough of
-> > the qcow2 file has been created that it is able to still do plain tex=
-t
-> > I/O.
->=20
-> But why doesn't qcow2_update_options_prepare() fail then? If you pass
-> encryption options like 188 does, but the image isn't encrypted, then
-> the function at least attempts to error out. Where is this failing?
+This patchset adds support for running dual-core guest images on
+the boards using the SSE-200 (mps2-tz, musca-a, musca-b1):
+ * it implements the Message Handling Units (MHUs), which dual-core
+   guests typically use to signal interrupts to each other
+ * it implements the handling in the sysctl register block of the
+   CPUWAIT register, which is how a guest powers up the second core
+ * it adds support for the INITSVTOR[01] registers in the sysctl
+   block, which guests typically use to make the second core start
+   with a different exception vector table from the first one
 
-Oh, its because we check for "encrypt.format", but we made that field
-optional when opening the image, allowing other encrypt.* fields to be
-set and just pulling format from the header. I'v sent a patch for this.
+The support for the MHUs has not yet landed in the Zephyr RTOS,
+but this has been tested with the code and test application
+in this pending pull request:
+https://github.com/zephyrproject-rtos/zephyr/pull/12722
 
-> > Essentially the problem is that qcow2_co_create() doesn't unlink() th=
-e
-> > partially created image when things fail. This is a generic problem
-> > which can affect any part of qcow2_co_create that might fail, but it
-> > is especially problematic with luks.
-> >=20
-> > The complication in fixing this is that can't just do an unlink() as
-> > we can't assume a local file. We need to have a bdrv_unlink() driver
-> > callback we can use to delegate to the right block driver APIs for
-> > deletion.
->=20
-> .bdrv_co_create can't unlink at all, because that would be undoing
-> something that it didn't even do itself. If I created a file (local or
-> on a remote server that is accessed over a network protocol) and my
-> blockdev-create command to create the qcow2 layer fails, I certainly
-> don't expect the resource that I manually created to go away.
+$ qemu-system-arm -M musca-a -kernel zephyr.elf \
+  -device loader,file=zephyr-ns.elf \
+  -serial null -serial stdio -display none -d unimp,guest_errors
+pl011_read: Bad offset 0x44
+pl011_read: Bad offset 0x44
+***** Booting Zephyr OS zephyr-v1.13.0-3378-g1a0632c8b0 *****
+IPM MHU sample on musca_a
+CPU 0, get MHU0 success!
+pl011_read: Bad offset 0x44
+pl011_read: Bad offset 0x44
+***** Booting Zephyr OS zephyr-v1.13.0-3378-g1a0632c8b0 *****
+IPM MHU sample on musca_a_nonsecure
+CPU 1, get MHU0 success!
+MHU ISR on CPU 0
+MHU ISR on CPU 1
+MHU Test Done.
 
-Oh, I forgot that we unconditionally call bdrv_create_file even if
-we might have a pre-existing file, expecting it to be a no-op.
+(The pl011 messages are a Zephyr bug which I have reported to them.)
 
-> What .bdrv_co_create could and probably should do is make the header
-> invalid so that it's still recognised as qcow2 (to avoid probing it as
-> raw), but opening it fails.
 
-Yes, good idea. I've sent a patch for this too
+Based-on: 20190214125107.22178-1-peter.maydell@linaro.org
+("Add model of the Arm Musca devboards")
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+thanks
+-- PMM
+
+Peter Maydell (8):
+  hw/misc/armsse-mhu.c: Model the SSE-200 Message Handling Unit
+  hw/arm/armsse: Wire up the MHUs
+  target/arm/cpu: Allow init-svtor property to be set after realize
+  target/arm/arm-powerctl: Add new arm_set_cpu_on_and_reset()
+  hw/misc/iotkit-sysctl: Correct typo in INITSVTOR0 register name
+  hw/arm/iotkit-sysctl: Add SSE-200 registers
+  hw/arm/iotkit-sysctl: Implement CPUWAIT and INITSVTOR*
+  hw/arm/armsse: Unify init-svtor and cpuwait handling
+
+ hw/misc/Makefile.objs           |   1 +
+ include/hw/arm/armsse.h         |   3 +-
+ include/hw/misc/armsse-mhu.h    |  44 +++++
+ include/hw/misc/iotkit-sysctl.h |  25 ++-
+ target/arm/arm-powerctl.h       |  16 ++
+ hw/arm/armsse.c                 |  91 +++++++---
+ hw/misc/armsse-mhu.c            | 198 +++++++++++++++++++++
+ hw/misc/iotkit-sysctl.c         | 294 ++++++++++++++++++++++++++++++--
+ target/arm/arm-powerctl.c       |  56 ++++++
+ target/arm/cpu.c                |  29 +++-
+ MAINTAINERS                     |   2 +
+ default-configs/arm-softmmu.mak |   1 +
+ hw/misc/trace-events            |   4 +
+ 13 files changed, 714 insertions(+), 50 deletions(-)
+ create mode 100644 include/hw/misc/armsse-mhu.h
+ create mode 100644 hw/misc/armsse-mhu.c
+
+-- 
+2.20.1
