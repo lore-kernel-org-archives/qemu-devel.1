@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54866)
+Received: from eggs.gnu.org ([209.51.188.92]:54996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw52c-0005Rn-Mn
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:32 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gw539-0005ph-F8
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:03:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gw52O-0005Ue-JN
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44176)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gw52M-0005RW-VQ
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:02:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7ED2C11DB94
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 13:02:12 +0000 (UTC)
-Date: Tue, 19 Feb 2019 13:01:54 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190219130154.GI7154@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190219124257.3001-1-kraxel@redhat.com>
+	(envelope-from <richard.weiyang@gmail.com>) id 1gw538-0006A0-Gs
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:03:03 -0500
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:39939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1gw538-00065t-93
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:03:02 -0500
+Received: by mail-ed1-x544.google.com with SMTP id 10so16642470eds.7
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 05:02:58 -0800 (PST)
+Date: Tue, 19 Feb 2019 13:02:55 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190219130255.yjxmge3uz754h3fr@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190219060719.8211-1-richardw.yang@linux.intel.com>
+	<20190219060719.8211-2-richardw.yang@linux.intel.com>
+	<44d5032e-7271-3779-c7e2-d0edd3e1c7fb@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190219124257.3001-1-kraxel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] audio: don't build alsa and sdl by
- default on linux
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <44d5032e-7271-3779-c7e2-d0edd3e1c7fb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] pc-dimm: remove check on pc-dimm
+ hotpluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, david@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, imammedo@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com
 
-On Tue, Feb 19, 2019 at 01:42:57PM +0100, Gerd Hoffmann wrote:
-> In case no sound hardware is present both alsa and sdl drivers
-> initialize successfully and throw errors later on, i.e. effectively
-> the automatic probing doesn't work.  Drop them from the list of
-> default audio drivers for linux because of that.
->=20
-> Fixes: 6a48541873 audio: probe audio drivers by default
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1816052
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/configure b/configure
-> index fbd0825488..651b4f7514 100755
-> --- a/configure
-> +++ b/configure
-> @@ -877,7 +877,7 @@ Haiku)
->    LIBS=3D"-lposix_error_mapper -lnetwork $LIBS"
->  ;;
->  Linux)
-> -  audio_drv_list=3D"try-pa try-alsa try-sdl oss"
-> +  audio_drv_list=3D"try-pa oss"
->    audio_possible_drivers=3D"oss alsa sdl pa"
->    linux=3D"yes"
->    linux_user=3D"yes"
+On Tue, Feb 19, 2019 at 01:29:38PM +0100, Philippe Mathieu-Daudé wrote:
+>On 2/19/19 7:07 AM, Wei Yang wrote:
+>> Function acpi_memory_plug_cb() is only invoked when dev is a PCDIMM,
+>> which is hotpluggable. This means it is not necessary to check this
+>> property again.
+>> 
+>> This patch removes this check.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  hw/acpi/memory_hotplug.c | 4 ----
+>>  1 file changed, 4 deletions(-)
+>> 
+>> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+>> index 8c7c1013f3..b19673d337 100644
+>> --- a/hw/acpi/memory_hotplug.c
+>> +++ b/hw/acpi/memory_hotplug.c
+>> @@ -266,10 +266,6 @@ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+>>      MemStatus *mdev;
+>>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
+>
+>You have to remove the 'dc' variable now:
+>
+>  CC      hw/acpi/memory_hotplug.o
+>hw/acpi/memory_hotplug.c: In function ‘acpi_memory_plug_cb’:
+>hw/acpi/memory_hotplug.c:267:18: error: unused variable ‘dc’
+>[-Werror=unused-variable]
+>     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+>                  ^~
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Thanks, I didn't notice this warning.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>
+>Once removed:
+>Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>
+>>  
+>> -    if (!dc->hotpluggable) {
+>> -        return;
+>> -    }
+>> -
+>>      mdev = acpi_memory_slot_status(mem_st, dev, errp);
+>>      if (!mdev) {
+>>          return;
+>> 
+
+-- 
+Wei Yang
+Help you, Help me
