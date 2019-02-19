@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40294)
+Received: from eggs.gnu.org ([209.51.188.92]:40463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw46g-0007bB-Gs
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:02:44 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gw48G-0008Uk-0A
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw46e-0006gf-Ny
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:02:38 -0500
-References: <20190219115937.21587-1-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
-Date: Tue, 19 Feb 2019 13:02:24 +0100
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gw48D-0007v4-4r
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:04:15 -0500
+References: <20190214154053.15050-1-marcel.apfelbaum@gmail.com>
+	<d1b36054-424a-e492-402f-0a3019953d05@gmail.com>
+	<36096697-95c3-46c6-17f8-f40320111491@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <79797be5-38c3-13ff-80e3-6cf6d98e418e@gmail.com>
+Date: Tue, 19 Feb 2019 14:04:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190219115937.21587-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <36096697-95c3-46c6-17f8-f40320111491@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] iotests: drop unnecessary accel=kvm
+Subject: Re: [Qemu-devel] [PATCH] hw/rdma: another clang compilation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: kamalheib1@gmail.com, qemu-stable@nongnu.org, yuval.shaia@oracle.com
 
-On 19/02/2019 12.59, Stefan Hajnoczi wrote:
-> Tests 235 and 238 do not require the kvm accelerator.  TCG works fine.
-> 
-> Use the default accelerator instead of requiring kvm.
-> 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/235 | 1 -
->  tests/qemu-iotests/238 | 1 -
->  2 files changed, 2 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
-> index d6edd97ab4..329da8f0c2 100755
-> --- a/tests/qemu-iotests/235
-> +++ b/tests/qemu-iotests/235
-> @@ -49,7 +49,6 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=metadata', disk,
->                  str(size))
->  
->  vm = QEMUMachine(iotests.qemu_prog)
-> -vm.add_args('-machine', 'accel=kvm')
 
-According to the initial commit log of 235:
+Hi Philippe,
 
- "iotests: simple mirror test with kvm on 1G image"
+On 2/19/19 12:05 AM, Philippe Mathieu-Daudé wrote:
+> On 2/17/19 8:51 AM, Marcel Apfelbaum wrote:
+>> Cc:qemu-stable@nongnu.org
+> I doubt this is a security issue worth Cc'ing qemu-stable :)
+>
 
-... so I assume KVM was used on purpose here?
+I thought it worth adding a compilation fix to the stable branch.
 
- Thomas
+Thanks,
+Marcel
+
+>> Thanks,
+>> Marcel
+>>
+>> On 2/14/19 5:40 PM, Marcel Apfelbaum wrote:
+>>> Configuring QEMU with:
+>>>      configure --target-list="x86_64-softmmu" --cc=clang --enable-pvrdma
+>>> Results in:
+>>>      qemu/hw/rdma/rdma_rm_defs.h:108:3: error: redefinition of typedef
+>>> 'RdmaDeviceResources' is a C11 feature [-Werror,-Wtypedef-redefinition]
+>>>      } RdmaDeviceResources;
+>>>        ^
+>>>      qemu/hw/rdma/rdma_backend_defs.h:24:36: note: previous definition
+>>> is here
+>>>      typedef struct RdmaDeviceResources RdmaDeviceResources;
+>>>
+>>> Fix by removing one of the 'typedef' definitions.
+>>>
+>>> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>
+>>> ---
+>>>    hw/rdma/rdma_rm_defs.h | 4 ++--
+>>>    1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
+>>> index 0ba61d1838..5e877c1fd9 100644
+>>> --- a/hw/rdma/rdma_rm_defs.h
+>>> +++ b/hw/rdma/rdma_rm_defs.h
+>>> @@ -96,7 +96,7 @@ typedef struct RdmaRmPort {
+>>>        enum ibv_port_state state;
+>>>    } RdmaRmPort;
+>>>    -typedef struct RdmaDeviceResources {
+>>> +struct RdmaDeviceResources {
+>>>        RdmaRmPort port;
+>>>        RdmaRmResTbl pd_tbl;
+>>>        RdmaRmResTbl mr_tbl;
+>>> @@ -105,6 +105,6 @@ typedef struct RdmaDeviceResources {
+>>>        RdmaRmResTbl cq_tbl;
+>>>        RdmaRmResTbl cqe_ctx_tbl;
+>>>        GHashTable *qp_hash; /* Keeps mapping between real and emulated */
+>>> -} RdmaDeviceResources;
+>>> +};
+>>>      #endif
+>>
