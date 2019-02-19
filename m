@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33715)
+Received: from eggs.gnu.org ([209.51.188.92]:34341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gw3b6-0005YF-Dv
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:30:01 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gw3d6-0006br-T7
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:32:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gw3b2-0004jM-3F
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:29:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gw3az-0004ht-FF
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:29:54 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 14318637E5
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 11:29:47 +0000 (UTC)
-References: <20190219101510.9356-1-kraxel@redhat.com>
-	<a7050f62-b56f-cc1a-7600-5197b83a27ac@redhat.com>
-	<20190219111755.GE7154@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3493d414-d1a7-9db7-90f8-ef70dfa2c4d9@redhat.com>
-Date: Tue, 19 Feb 2019 12:29:43 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gw3d5-0005RL-Tk
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 06:32:04 -0500
+Date: Tue, 19 Feb 2019 12:31:41 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190219113141.GJ4727@localhost.localdomain>
+References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
+	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
+	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
+	<20190219075333.GA4727@localhost.localdomain>
+	<d7a55ce9-a83c-12fe-fd16-d45dff67630a@redhat.com>
+	<20190219093716.GF4727@localhost.localdomain>
+	<20190219110626.GC7154@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190219111755.GE7154@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190219110626.GC7154@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] audio: don't use alsa by default
+Subject: Re: [Qemu-devel] Failing iotests in CI (was: Add a gitlab-ci file
+ for Continuous Integration testing on Gitlab)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,114 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-On 19.02.19 12:17, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Feb 19, 2019 at 11:39:49AM +0100, David Hildenbrand wrote:
->> On 19.02.19 11:15, Gerd Hoffmann wrote:
->>> ardware is present the driver initializes
->>> successfully and throws errors later on, i.e. effectively the
->>> automatic probing doesn't work.  So the driver should not be
->>> used by default (until that is fixed).  Drop the can_be_default
->>> flag.
->>>
->>> Explicitly picking the alsa driver (using QEMU_AUDIO_DRV=3Dalsa
->>> environment variable) will continue to work.
->>
->> Just pointing out that with this patch, audio initialization still
->> hinders me from starting guests on my Fedora 29 when running under roo=
-t
->> (I don't think this patch was also intended to fix that, just pointing
->> out for me the problem still exists).
->>
->>
->> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
->> Connection refused
->>
->> sdl: SDL_OpenAudio failed
->> sdl: Reason: ALSA: Couldn't open audio device: Connection refused
->> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
->> Connection refused
->>
->> sdl: SDL_OpenAudio failed
->> sdl: Reason: ALSA: Couldn't open audio device: Connection refused
->> audio: Failed to create voice `pcspk'
->> qemu-system-x86_64: Initialization of device isa-pcspk failed:
->> Initializing audio voice failed
->>
->>
->> For whatever reason, on my Fedora29 root cannot access alsa devices.
->> Maybe it is a Fedora 29 problem, maybe only my setup is messed up (e.g=
-.
->> because of an upgrade). The workaround for me is to not run QEMU as
->> root. (I don't have time to look into the details)
+Am 19.02.2019 um 12:06 hat Daniel P. Berrang=E9 geschrieben:
+> On Tue, Feb 19, 2019 at 10:37:16AM +0100, Kevin Wolf wrote:
+> > Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
+> > >=20
+> > >  https://gitlab.com/huth/qemu/-/jobs/163680780
+> > >=20
+> > > Some of them apparently need encryption to be enabled (as already
+> > > mentioned by Cleber in his patch) - thus should they really be in t=
+he
+> > > quick check, too? Or could they at least check whether QEMU has bee=
+n
+> > > built with encryption?
+> >=20
+> > The correct solution would be that they detect the situation
+> > automatically and skip the test by calling _notrun.
+> >=20
+> > I'm not sure how to detect if a given QEMU binary supports encryption=
+,
+> > but Dan might know.
 >=20
-> Does your machine actually have any sound card in it ?  ie does
-> /dev/snd/ report any pcm*  devices ?
-
-Well, I can listen to audio, so I assume yes ;) Let's check
-
-t460s: ~  $ ls -la /dev/snd/
-insgesamt 0
-drwxr-xr-x   4 root root      360 19. Feb 08:39 .
-drwxr-xr-x  22 root root     4400 19. Feb 08:40 ..
-drwxr-xr-x   2 root root       60 19. Feb 08:39 by-id
-drwxr-xr-x   2 root root       80 19. Feb 08:39 by-path
-crw-rw----+  1 root audio 116,  3 19. Feb 08:39 controlC0
-crw-rw----+  1 root audio 116, 13 19. Feb 08:39 controlC1
-crw-rw----+  1 root audio 116, 11 19. Feb 08:39 hwC1D0
-crw-rw----+  1 root audio 116, 12 19. Feb 08:39 hwC1D2
-crw-rw----+  1 root audio 116,  2 19. Feb 08:40 pcmC0D0c
-crw-rw----+  1 root audio 116,  5 19. Feb 08:40 pcmC1D0c
-crw-rw----+  1 root audio 116,  4 19. Feb 11:40 pcmC1D0p
-crw-rw----+  1 root audio 116, 10 19. Feb 08:40 pcmC1D10p
-crw-rw----+  1 root audio 116,  6 19. Feb 08:40 pcmC1D3p
-crw-rw----+  1 root audio 116,  7 19. Feb 08:40 pcmC1D7p
-crw-rw----+  1 root audio 116,  8 19. Feb 08:40 pcmC1D8p
-crw-rw----+  1 root audio 116,  9 19. Feb 08:40 pcmC1D9p
-
+> It isn't easy & depends which encryption feature you're trying to use.
 >=20
-> Based on your logs here, I suspect it has no sound card. The reason
-> it will work as non-root, is that QEMU will activate the pulseaudio
-> backend that works fine [1] even if no sound card is present.
+> For TLS related features you can do something gross like
+>=20
+>     qemu-img info --object tls-creds-anon,id=3Ddummy README 2>&1
+>     test $? !=3D 0 && exit 0
+>=20
+> This relies on fact that 'tls-creds-anon' object type will report a
+> runtime error during initialization if gnutls isn't enabled.
+>=20
+> For more general ciphers you pretty much have to just try the higher le=
+vel
+> feature and see if it fails.
 
-The thing is, I can play audio as normal user, but not as root
+Actually, I think for test cases we should see 'qemu-img create' failing
+and could just skip the test if it returns a non-zero exit code.
 
-t460s: ~  $ LANG=3DC speaker-test -d default
+But then I looked at Thomas' output again:
 
-speaker-test 1.1.6
+    --- /builds/huth/qemu/tests/qemu-iotests/188.out	2019-02-19 08:23:54.=
+000000000 +0000
+    +++ /builds/huth/qemu/tests/qemu-iotests/188.out.bad	2019-02-19 08:34=
+:54.000000000 +0000
+    @@ -1,4 +1,5 @@
+     QA output created by 188
+    +qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKDF in t=
+his build: Function not implemented
+     Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 encrypt=
+.format=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
 
-Playback device is default
-Stream parameters are 48000Hz, S16_LE, 1 channels
-Using 16 octaves of pink noise
-Rate set to 48000Hz (requested 48000Hz)
-Buffer size range from 192 to 2097152
-Period size range from 64 to 699051
-Using max buffer size 2097152
-Periods =3D 4
-was set period_size =3D 524288
-was set buffer_size =3D 2097152
-ALSA <-> PulseAudio PCM I/O Plugin
+     =3D=3D reading whole image =3D=3D--- /builds/huth/qemu/tests/qemu-io=
+tests/188.out	2019-02-19 08:23:54.000000000 +0000
 
-t460s: ~  $ LANG=3DC sudo speaker-test -d default
+What is it actually doing there? There's clearly an error message, but
+it almost looks like it's creating some kind of image anyway? The
+following I/O works fine (i.e. this created image can even be opened
+again with the luks driver), except that you can also access the image
+with the wrong password.
 
-speaker-test 1.1.6
+Is this a real bug in either qcow2 or luks?
 
-Playback device is default
-Stream parameters are 48000Hz, S16_LE, 1 channels
-Using 16 octaves of pink noise
-ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
-Connection refused
-
-
-Again, this might be an issue on my system. But as I never touched any
-of the configuration it either is broken on all Fedora 29 installations
-or only on mine due to system upgrades. I already tried downgrading
-pulse audio without luck.
-
---=20
-
-Thanks,
-
-David / dhildenb
+Kevin
