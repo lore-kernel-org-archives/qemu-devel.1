@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33610)
+Received: from eggs.gnu.org ([209.51.188.92]:34036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gw1X1-0006B5-MZ
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:17:40 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gw1YO-0006zz-FQ
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gw1Wz-0002qO-QT
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:17:39 -0500
-Date: Tue, 19 Feb 2019 10:17:29 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190219091729.GE4727@localhost.localdomain>
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-12-kwolf@redhat.com>
-	<d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1gw1YN-0003Ga-CU
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:19:04 -0500
+Received: from mga09.intel.com ([134.134.136.24]:29925)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gw1YM-0003C8-U3
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:19:03 -0500
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Tue, 19 Feb 2019 09:18:51 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
+	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
+	<20181214111705.GD2454@work-vm>
+In-Reply-To: <20181214111705.GD2454@work-vm>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="SFyWQ0h3ruR435lw"
-Content-Disposition: inline
-In-Reply-To: <d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 11/11] qcow2: Add data file to
- ImageInfoSpecificQCow2
+Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,124 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+To: "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-
---SFyWQ0h3ruR435lw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 19.02.2019 um 01:47 hat Max Reitz geschrieben:
-> On 31.01.19 18:55, Kevin Wolf wrote:
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block-core.json | 1 +
-> >  block/qcow2.c        | 6 +++++-
-> >  2 files changed, 6 insertions(+), 1 deletion(-)
+On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
+> > On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
+> > > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > > > On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
+> > > > > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > > > > > The new feature enables the virtio-balloon device to receive
+> > > > > > hints of guest free pages from the free page vq.
+> > > > > >
+> > > > > > A notifier is registered to the migration precopy notifier
+> > > > > > chain. The notifier calls free_page_start after the migration
+> > > > > > thread syncs the dirty bitmap, so that the free page
+> > > > > > optimization starts to clear bits of free pages from the
+> > > > > > bitmap. It calls the free_page_stop before the migration
+> > > > > > thread syncs the bitmap, which is the end of the current round
+> > > > > > of ram save. The free_page_stop is also called to stop the
+> optimization in the case when there is an error occurred in the process o=
+f
+> ram saving.
+> > > > > >
+> > > > > > Note: balloon will report pages which were free at the time of =
+this
+> call.
+> > > > > > As the reporting happens asynchronously, dirty bit logging
+> > > > > > must be enabled before this free_page_start call is made.
+> > > > > > Guest reporting must be disabled before the migration dirty bit=
+map
+> is synchronized.
+> > > > > >
+> > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > > CC: Juan Quintela <quintela@redhat.com>
+> > > > > > CC: Peter Xu <peterx@redhat.com>
+> > > > > I think I'm OK for this from the migration side, I'd appreciate
+> > > > > someone checking the virtio and aio bits.
+> > > > >
+> > > > > I'm not too sure how it gets switched on and off - i.e. if we
+> > > > > get a nice new qemu on a new kernel, what happens when I try and
+> > > > > migrate to the same qemu on an older kernel without these hints?
+> > > > >
+> > > > This feature doesn't rely on the host kernel. Those hints are
+> > > > reported from the guest kernel.
+> > > > So migration across different hosts wouldn't affect the use of this
+> feature.
+> > > > Please correct me if I didn't get your point.
+> > > Ah OK, yes;  now what about migrating from new->old qemu with a new
+> > > guest but old machine type?
+> > >
+> >
+> > I think normally, the source QEMU and destination QEMU should have the
+> > same QEMU booting parameter. If the destination QEMU doesn't support
+> > "--device virtio-balloon,free-page-hint=3Dtrue", which the source QEMU
+> > has, the destination side QEMU will fail to boot, and migration will
+> > not happen then.
 >=20
-> [...]
+> Ah that's OK; as long as free-page-hint is false by default that will wor=
+k fine.
 >=20
-> > diff --git a/block/qcow2.c b/block/qcow2.c
-> > index 4959bf16a4..e3427f9fcd 100644
-> > --- a/block/qcow2.c
-> > +++ b/block/qcow2.c
-> > @@ -1459,7 +1459,9 @@ static int coroutine_fn qcow2_do_open(BlockDriver=
-State *bs, QDict *options,
-> >      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
-> >          s->data_file =3D bdrv_open_child(NULL, options, "data-file", b=
-s,
-> >                                         &child_file, false, &local_err);
-> > -        if (!s->data_file) {
-> > +        if (s->data_file) {
-> > +            s->image_data_file =3D g_strdup(s->data_file->bs->filename=
-);
-> > +        } else {
-> >              if (s->image_data_file) {
-> >                  error_free(local_err);
-> >                  local_err =3D NULL;
+> Dave
 >=20
-> Ah, this is what I looked for in the last patch. :-)
->=20
-> (i.e. it should be in the last patch, not here)
 
-[RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
+Hi Dave,
 
-This is the last patch. :-P
+Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
 
-> I think as it is it is just wrong, though.  If I pass enough options at
-> runtime, this will overwrite the image header:
->=20
-> $ ./qemu-img create -f qcow2 -o data_file=3Dfoo.raw foo.qcow2 64M
-> $ ./qemu-img create -f raw bar.raw 64M
-> $ ./qemu-img info foo.qcow2
-> [...]
->     data file: foo.raw
-> [...]
-> $ ./qemu-io --image-opts \
->     file.filename=3Dfoo.qcow2,data-file.driver=3Dfile,\
-> data-file.filename=3Dbar.raw,lazy-refcounts=3Don \
->     -c 'write 0 64k'
-> # (The lazy-refcounts is so the image header is updated)
-> $ ./qemu-img info foo.qcow2
-> [...]
->     data file: bar.raw
-> [...]
->=20
-> The right thing would probably to check whether the header extension
-> exists (i.e. if s->image_data_file is non-NULL) and if it does not (it
-> is NULL), s->image_data_file gets set; because there are no valid images
-> with the external data file flag set where there is no such header
-> extension.  So we must be in the process of creating the image right now.
->=20
-> But even then, I don't quite like setting it here and not creating the
-> header extension as part of qcow2_co_create().  I can see why you've
-> done it this way, but creating a "bad" image on purpose (one with the
-> external data file bit set, but no such header extension present yet) in
-> order to detect and rectify this case when it is first opened (and the
-> opening code assuming that any such broken image must be one that is
-> opened the first time) is a bit weird.
-
-It's not really a bad image, just one that's a bit cumbersome to use
-because you need to specify the 'data-file' option manually.
-
-> I suppose doing it right (if you agree with the paragraph before the
-> last one) and adding a comment would make it less weird
-> ("s->image_data_file must be non-NULL for any valid image, so this image
-> must be one we are creating right now" or something like that).
->=20
-> But still, the issue you point out in your cover letter remains; which
-> is that the node's filename and the filename given by the user may be
-> two different things.
-
-I think what I was planning to do was leaving the path from the image
-header in s->image_data_file even when a runtime option overrides it.
-After all, ImageInfo is about the image, not about the runtime state.
-
-Image creation would just manually set s->image_data_file before
-updating the header.
-
-Kevin
-
---SFyWQ0h3ruR435lw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJca8mpAAoJEH8JsnLIjy/WBqwP/A0WHlAihWU2jSMdnAIWTeJk
-iUTpBxrey6MUXZ/zW3MK6QZmoudgjnLARCcQg38dw6fQzanhm6ulsznZRMCYkVKY
-5YzLn+cb6zSrA6taXbTq+y/Q9KZHBWAZ+rggLBLVgn467fkbN/7YLDWoQpf/fjO/
-5mj8blpM6fV6gOik2y3ZqreC/mPXkpauTToWbmogsN+yjsznBXr4pEzcDO1/H8M8
-rJ3eOVV1SFGLoOywm9KuSKRgdVALrQ5daAc3+49Jn31v7DRx4VPuno0en0+UaVvD
-Czcd/tTS9xOH8dasWl72aZoyaCpO5/wFsDxsKdBFH+znsQqOsSzFNp7NI7Rewalv
-tQVMOeR6lfIHJtALgScUTW96LmzT4NlXsFCOjTM8mNdHKar/HV8ymsY3IBqZ8AAD
-Utjjh86bUUrtm0zIASWBbXLlPts1IHUBqdkrTHkZgQ/Y222bZStgcGGIlgS7iA6O
-LnVcgwCZ8be6DI12vAHIhzByXiQh/CBWCYszJbm7xjONiQ0eRdRaNKR68hwtVFg1
-tyjUTGRfLA6scfQWrVyvMqo9YEfPrrcW8rEnotZTmGgsqQXHOI1yDpvjiizTeU+h
-udy5+UAV3AtALTDh/+OgxSxaRkWZVkYB/zo3pw04is91iQQCLQmW//VkDS9kCyJj
-/DcPBVvb2H7IabddVIcQ
-=0GxW
------END PGP SIGNATURE-----
-
---SFyWQ0h3ruR435lw--
+Best,
+Wei
