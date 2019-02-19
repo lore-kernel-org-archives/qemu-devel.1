@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34350)
+Received: from eggs.gnu.org ([209.51.188.92]:34456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw934-00039P-Uy
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:15 -0500
+	(envelope-from <groug@kaod.org>) id 1gw93O-0003P8-Te
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw934-0000AG-1B
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33136
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1gw93K-0000W2-E5
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35154)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw933-0008O6-OC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:13 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1JHEX4D088327
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:19:03 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qrkdr1fpr-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw93E-0008U6-3W
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:27 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x1JHEUE6126718
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:19:09 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrm1aya1c-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:19:03 -0500
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:19:09 -0500
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 19 Feb 2019 17:19:01 -0000
+	Tue, 19 Feb 2019 17:19:06 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 19 Feb 2019 18:18:54 +0100
+Date: Tue, 19 Feb 2019 18:18:59 +0100
 In-Reply-To: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <155059673433.1466090.6188091133769611501.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 16/17] spapr: enable PHB hotplug for default
- pseries machine type
+Message-Id: <155059673939.1466090.14354001937819612724.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 17/17] tests/device-plug: Add PHB unplug
+ request test for spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,41 +43,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
+We can easily test this, just like PCI. PHB unplug is not supported
+on s390x and x86 ACPI.
 
-The 'dr_phb_enabled' field of that class can be set as part of
-machine-specific init code. It will be used to conditionally
-enable creation of DRC objects and device-tree description to
-facilitate hotplug of PHBs.
-
-Since we can't migrate this state to older machine types,
-default the option to true and disable it for older machine
-types.
-
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c |    2 ++
- 1 file changed, 2 insertions(+)
+ tests/device-plug-test.c |   16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7422c0525494..5d8b8c9e53cf 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4290,6 +4290,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_xics;
-+    smc->dr_phb_enabled = true;
+diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
+index 87593d9ecfda..318e422d518c 100644
+--- a/tests/device-plug-test.c
++++ b/tests/device-plug-test.c
+@@ -132,6 +132,20 @@ static void test_spapr_memory_unplug_request(void)
+     qtest_quit(qtest);
  }
  
- static const TypeInfo spapr_machine_info = {
-@@ -4361,6 +4362,7 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
++static void test_spapr_phb_unplug_request(void)
++{
++    QTestState *qtest;
++
++    qtest = qtest_initf("-device spapr-pci-host-bridge,index=1,id=dev0");
++
++    /* similar to test_pci_unplug_request */
++    device_del_request(qtest, "dev0");
++    system_reset(qtest);
++    wait_device_deleted_event(qtest, "dev0");
++
++    qtest_quit(qtest);
++}
++
+ int main(int argc, char **argv)
+ {
+     const char *arch = qtest_get_arch();
+@@ -156,6 +170,8 @@ int main(int argc, char **argv)
+                        test_spapr_cpu_unplug_request);
+         qtest_add_func("/device-plug/spapr-memory-unplug-request",
+                        test_spapr_memory_unplug_request);
++        qtest_add_func("/device-plug/spapr-phb-unplug-request",
++                       test_spapr_phb_unplug_request);
+     }
  
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled = false;
-+    smc->dr_phb_enabled = false;
- }
- 
- DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+     return g_test_run();
