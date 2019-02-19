@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49388)
+Received: from eggs.gnu.org ([209.51.188.92]:49390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydO-0005AG-NS
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydO-0005AH-Nb
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydM-00071S-RY
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gvydM-000717-Pi
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:02 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:44796)
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:42524)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydK-0006zz-Se
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:12:00 -0500
-Received: by mail-lj1-x242.google.com with SMTP id q128so16334334ljb.11
-	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:11:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gvydK-0006zB-6G
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 01:11:58 -0500
+Received: by mail-lf1-x144.google.com with SMTP id l10so13995929lfh.9
+	for <qemu-devel@nongnu.org>; Mon, 18 Feb 2019 22:11:54 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 18 Feb 2019 22:10:49 -0800
-Message-Id: <20190219061111.10231-2-jcmvbkbc@gmail.com>
-In-Reply-To: <20190219061111.10231-1-jcmvbkbc@gmail.com>
-References: <20190219061111.10231-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 01/23] target/xtensa: implement PREFCTL SR
+Date: Mon, 18 Feb 2019 22:10:48 -0800
+Message-Id: <20190219061111.10231-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 00/23] tests/tcg/xtensa: conditionalize xtensa
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +27,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Cache prefetch option adds an unprivileged SR PREFCTL. Add trivial
-implementation for this SR.
+Hello,
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/cpu.h       |  1 +
- target/xtensa/translate.c | 16 ++++++++++++++++
- 2 files changed, 17 insertions(+)
+this series reorganizes xtensa tests so that they can be run on various
+xtensa core configurations. It adds new tests for FPU2000 opcodes and
+for FLIX. It also adds support for printing test execution trace when
+preprocessor macro DEBUG is defined.
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index a01a94e2a683..4d8152682fe1 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -131,6 +131,7 @@ enum {
-     ACCLO = 16,
-     ACCHI = 17,
-     MR = 32,
-+    PREFCTL = 40,
-     WINDOW_BASE = 72,
-     WINDOW_START = 73,
-     PTEVADDR = 83,
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 2fd64f8d995d..cbc52ecd8fa4 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -134,6 +134,7 @@ static const XtensaReg sregnames[256] = {
-     [MR + 1] = XTENSA_REG("MR1", XTENSA_OPTION_MAC16),
-     [MR + 2] = XTENSA_REG("MR2", XTENSA_OPTION_MAC16),
-     [MR + 3] = XTENSA_REG("MR3", XTENSA_OPTION_MAC16),
-+    [PREFCTL] = XTENSA_REG_BITS("PREFCTL", XTENSA_OPTION_ALL),
-     [WINDOW_BASE] = XTENSA_REG("WINDOW_BASE", XTENSA_OPTION_WINDOWED_REGISTER),
-     [WINDOW_START] = XTENSA_REG("WINDOW_START",
-             XTENSA_OPTION_WINDOWED_REGISTER),
-@@ -4152,6 +4153,11 @@ static const XtensaOpcodeOps core_ops[] = {
-         .par = (const uint32_t[]){MISC + 3},
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
-+        .name = "rsr.prefctl",
-+        .translate = translate_rsr,
-+        .test_ill = test_ill_rsr,
-+        .par = (const uint32_t[]){PREFCTL},
-+    }, {
-         .name = "rsr.prid",
-         .translate = translate_rsr,
-         .test_ill = test_ill_rsr,
-@@ -4777,6 +4783,11 @@ static const XtensaOpcodeOps core_ops[] = {
-         .par = (const uint32_t[]){MMID},
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
-+        .name = "wsr.prefctl",
-+        .translate = translate_wsr,
-+        .test_ill = test_ill_wsr,
-+        .par = (const uint32_t[]){PREFCTL},
-+    }, {
-         .name = "wsr.prid",
-         .translate = translate_wsr,
-         .test_ill = test_ill_wsr,
-@@ -5265,6 +5276,11 @@ static const XtensaOpcodeOps core_ops[] = {
-         .par = (const uint32_t[]){MISC + 3},
-         .op_flags = XTENSA_OP_PRIVILEGED,
-     }, {
-+        .name = "xsr.prefctl",
-+        .translate = translate_xsr,
-+        .test_ill = test_ill_xsr,
-+        .par = (const uint32_t[]){PREFCTL},
-+    }, {
-         .name = "xsr.prid",
-         .translate = translate_xsr,
-         .test_ill = test_ill_xsr,
+Max Filippov (23):
+  target/xtensa: implement PREFCTL SR
+  tests/tcg/xtensa: indicate failed tests
+  tests/tcg/xtensa: support configurations w/o vecbase
+  tests/tcg/xtensa: support configs with LITBASE
+  tests/tcg/xtensa: don't use optional opcodes in generic code
+  tests/tcg/xtensa: fix endianness issues in test_b
+  tests/tcg/xtensa: enable boolean tests
+  tests/tcg/xtensa: conditionalize debug option tests
+  tests/tcg/xtensa: conditionalize cache option tests
+  tests/tcg/xtensa: add straightforward conditionals
+  tests/tcg/xtensa: conditionalize interrupt tests
+  tests/tcg/xtensa: conditionalize timer/CCOUNT tests
+  tests/tcg/xtensa: conditionalize and expand SR tests
+  tests/tcg/xtensa: fix SR tests for big endian configs
+  tests/tcg/xtensa: conditionalize and fix s32c1i tests
+  tests/tcg/xtensa: conditionalize windowed register tests
+  tests/tcg/xtensa: conditionalize MMU-related tests
+  tests/tcg/xtensa: add test for FLIX
+  tests/tcg/xtensa: add LSCI/LSCX group tests
+  tests/tcg/xtensa: add FP0 group arithmetic tests
+  tests/tcg/xtensa: add FP0 group conversion tests
+  tests/tcg/xtensa: add FP1 group tests
+  tests/tcg/xtensa: add FPU2000 coprocessor tests
+
+ target/xtensa/cpu.h                 |   1 +
+ target/xtensa/translate.c           |  16 ++
+ tests/tcg/xtensa/Makefile           |  13 +-
+ tests/tcg/xtensa/linker.ld.S        |  67 +++++---
+ tests/tcg/xtensa/macros.inc         |  41 ++++-
+ tests/tcg/xtensa/test_b.S           |  40 ++++-
+ tests/tcg/xtensa/test_boolean.S     |   4 +
+ tests/tcg/xtensa/test_break.S       |  27 ++--
+ tests/tcg/xtensa/test_cache.S       |  62 ++++++--
+ tests/tcg/xtensa/test_clamps.S      |   4 +
+ tests/tcg/xtensa/test_flix.S        |  60 +++++++
+ tests/tcg/xtensa/test_fp0_arith.S   | 173 ++++++++++++++++++++
+ tests/tcg/xtensa/test_fp0_conv.S    | 304 ++++++++++++++++++++++++++++++++++++
+ tests/tcg/xtensa/test_fp1.S         | 141 +++++++++++++++++
+ tests/tcg/xtensa/test_fp_cpenable.S |  27 ++++
+ tests/tcg/xtensa/test_interrupt.S   |  88 ++++++++---
+ tests/tcg/xtensa/test_loop.S        |   4 +
+ tests/tcg/xtensa/test_lsc.S         | 122 +++++++++++++++
+ tests/tcg/xtensa/test_mac16.S       |   4 +
+ tests/tcg/xtensa/test_max.S         |   4 +
+ tests/tcg/xtensa/test_min.S         |   4 +
+ tests/tcg/xtensa/test_mmu.S         |   4 +
+ tests/tcg/xtensa/test_mul16.S       |   4 +
+ tests/tcg/xtensa/test_mul32.S       |   4 +
+ tests/tcg/xtensa/test_nsa.S         |   4 +
+ tests/tcg/xtensa/test_phys_mem.S    |   4 +
+ tests/tcg/xtensa/test_quo.S         |   4 +
+ tests/tcg/xtensa/test_rem.S         |   4 +
+ tests/tcg/xtensa/test_rst0.S        |   8 +
+ tests/tcg/xtensa/test_s32c1i.S      |  12 ++
+ tests/tcg/xtensa/test_sext.S        |   4 +
+ tests/tcg/xtensa/test_sr.S          | 153 +++++++++++++++++-
+ tests/tcg/xtensa/test_timer.S       |  48 +++++-
+ tests/tcg/xtensa/test_windowed.S    |  32 ++--
+ tests/tcg/xtensa/vectors.S          |  14 +-
+ 35 files changed, 1413 insertions(+), 92 deletions(-)
+ create mode 100644 tests/tcg/xtensa/test_flix.S
+ create mode 100644 tests/tcg/xtensa/test_fp0_arith.S
+ create mode 100644 tests/tcg/xtensa/test_fp0_conv.S
+ create mode 100644 tests/tcg/xtensa/test_fp1.S
+ create mode 100644 tests/tcg/xtensa/test_fp_cpenable.S
+ create mode 100644 tests/tcg/xtensa/test_lsc.S
+
 -- 
 2.11.0
