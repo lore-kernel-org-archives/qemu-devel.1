@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34456)
+Received: from eggs.gnu.org ([209.51.188.92]:35968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw93O-0003P8-Te
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:35 -0500
+	(envelope-from <philmd@redhat.com>) id 1gw96K-0005qk-7c
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:22:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gw93K-0000W2-E5
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gw93E-0008U6-3W
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:19:27 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1JHEUE6126718
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:19:09 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qrm1aya1c-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:19:09 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 19 Feb 2019 17:19:06 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 19 Feb 2019 18:18:59 +0100
-In-Reply-To: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1gw96I-0002Xd-Eb
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:22:36 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:37181)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gw96I-0002St-40
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 12:22:34 -0500
+Received: by mail-wm1-f66.google.com with SMTP id x10so3596840wmg.2
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 09:22:26 -0800 (PST)
+References: <20190219153727.62279-1-stephen.checkoway@oberlin.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <94a5fb9b-0e86-fe7b-9a29-f62838300420@redhat.com>
+Date: Tue, 19 Feb 2019 18:22:24 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <155059673939.1466090.14354001937819612724.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 17/17] tests/device-plug: Add PHB unplug
- request test for spapr
+In-Reply-To: <20190219153727.62279-1-stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] block/pflash_cfi02: Fix memory leak and
+ potential use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,48 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-We can easily test this, just like PCI. PHB unplug is not supported
-on s390x and x86 ACPI.
+On 2/19/19 4:37 PM, Stephen Checkoway wrote:
+> Don't dynamically allocate the pflash's timer. But do use timer_del in
+> an unrealize function to make sure that the timer can't fire after the
+> pflash_t has been freed.
+> 
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+> ---
+>  hw/block/pflash_cfi02.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index 0f8b7b8c7b..1588aeff5a 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -84,7 +84,7 @@ struct pflash_t {
+>      uint16_t unlock_addr0;
+>      uint16_t unlock_addr1;
+>      uint8_t cfi_table[0x52];
+> -    QEMUTimer *timer;
+> +    QEMUTimer timer;
+>      /* The device replicates the flash memory across its memory space.  Emulate
+>       * that by having a container (.mem) filled with an array of aliases
+>       * (.mem_mappings) pointing to the flash memory (.orig_mem).
+> @@ -429,7 +429,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>              }
+>              pfl->status = 0x00;
+>              /* Let's wait 5 seconds before chip erase is done */
+> -            timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> +            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>                        (NANOSECONDS_PER_SECOND * 5));
+>              break;
+>          case 0x30:
+> @@ -444,7 +444,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>              }
+>              pfl->status = 0x00;
+>              /* Let's wait 1/2 second before sector erase is done */
+> -            timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> +            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>                        (NANOSECONDS_PER_SECOND / 2));
+>              break;
+>          default:
+> @@ -596,7 +596,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+>      pfl->rom_mode = 1;
+>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
+>  
+> -    pfl->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
+> +    timer_init_ns(&pfl->timer, QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- tests/device-plug-test.c |   16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/tests/device-plug-test.c b/tests/device-plug-test.c
-index 87593d9ecfda..318e422d518c 100644
---- a/tests/device-plug-test.c
-+++ b/tests/device-plug-test.c
-@@ -132,6 +132,20 @@ static void test_spapr_memory_unplug_request(void)
-     qtest_quit(qtest);
- }
- 
-+static void test_spapr_phb_unplug_request(void)
-+{
-+    QTestState *qtest;
-+
-+    qtest = qtest_initf("-device spapr-pci-host-bridge,index=1,id=dev0");
-+
-+    /* similar to test_pci_unplug_request */
-+    device_del_request(qtest, "dev0");
-+    system_reset(qtest);
-+    wait_device_deleted_event(qtest, "dev0");
-+
-+    qtest_quit(qtest);
-+}
-+
- int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
-@@ -156,6 +170,8 @@ int main(int argc, char **argv)
-                        test_spapr_cpu_unplug_request);
-         qtest_add_func("/device-plug/spapr-memory-unplug-request",
-                        test_spapr_memory_unplug_request);
-+        qtest_add_func("/device-plug/spapr-phb-unplug-request",
-+                       test_spapr_phb_unplug_request);
-     }
- 
-     return g_test_run();
+>      pfl->wcycle = 0;
+>      pfl->cmd = 0;
+>      pfl->status = 0;
+> @@ -695,11 +695,18 @@ static Property pflash_cfi02_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static void pflash_cfi02_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    pflash_t *pfl = CFI_PFLASH02(dev);
+> +    timer_del(&pfl->timer);
+> +}
+> +
+>  static void pflash_cfi02_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->realize = pflash_cfi02_realize;
+> +    dc->unrealize = pflash_cfi02_unrealize;
+>      dc->props = pflash_cfi02_properties;
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>  }
+> 
