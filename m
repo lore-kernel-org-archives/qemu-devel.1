@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39733)
+Received: from eggs.gnu.org ([209.51.188.92]:39881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw7kr-0002mY-Vo
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:56:22 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gw7lS-0003KA-Ra
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:56:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gw7kp-0001oF-KX
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:56:21 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 19 Feb 2019 16:55:57 +0100
-Message-Id: <1550591757-6192-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/ide/ich: Compile ich.c only if CONFIG_PCI
- is also set
+	(envelope-from <eric.auger@redhat.com>) id 1gw7lL-0002Pb-59
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:56:56 -0500
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-10-eric.auger@redhat.com>
+	<20190218110701.7349c698@Igors-MacBook-Pro.local>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d5e51dee-8f28-f8a8-1da8-ef9f4c48576c@redhat.com>
+Date: Tue, 19 Feb 2019 16:56:08 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190218110701.7349c698@Igors-MacBook-Pro.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 09/18] hw/arm/virt: Implement kvm_type
+ function for 4.0 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,43 +26,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-With the upcoming Kconfig-like build system, it will be easy to
-build also version of QEMU that only contain a single machine. Some
-of these machines (like the ARM cubieboard) use CONFIG_AHCI for an
-AHCI sysbus device, but do not use CONFIG_PCI since they do not feature
-a PCI bus. In this case linking fails:
+Hi Igor,
+On 2/18/19 11:07 AM, Igor Mammedov wrote:
+> On Tue,  5 Feb 2019 18:32:57 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> This patch implements the machine class kvm_type() callback.
+>> It returns the max IPA shift needed to implement the whole GPA
+>> range including the RAM and IO regions located beyond.
+>> The returned value in passed though the KVM_CREATE_VM ioctl and
+>> this allows KVM to set the stage2 tables dynamically.
+>>
+>> At this stage the RAM limit still is limited to 255GB.
+>>
+>> Setting all the existing highmem IO regions beyond the RAM
+>> allows to have a single contiguous RAM region (initial RAM and
+>> possible hotpluggable device memory). That way we do not need
+>> to do invasive changes in the EDK2 FW to support a dynamic
+>> RAM base.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v5 -> v6:
+>> - add some comments
+>> - high IO region cannot start before 256GiB
+>> ---
+>>  hw/arm/virt.c         | 52 +++++++++++++++++++++++++++++++++++++++++--
+>>  include/hw/arm/virt.h |  2 ++
+>>  2 files changed, 52 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 2b15839d0b..b90ffc2e5d 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1366,6 +1366,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>>  
+>>  static void virt_set_memmap(VirtMachineState *vms)
+>>  {
+>> +    MachineState *ms = MACHINE(vms);
+>>      hwaddr base;
+>>      int i;
+>>  
+>> @@ -1375,7 +1376,17 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>          vms->memmap[i] = a15memmap[i];
+>>      }
+>>  
+>> -    vms->high_io_base = 256 * GiB; /* Top of the legacy initial RAM region */
+>> +    /*
+>> +     * We now compute the base of the high IO region depending on the
+>> +     * amount of initial and device memory. The device memory start/size
+>> +     * is aligned on 1GiB. We never put the high IO region below 256GiB
+>> +     * so that if maxram_size is < 255GiB we keep the legacy memory map
+>> +     */
+>> +    vms->high_io_base = ROUND_UP(GiB + ms->ram_size, GiB) +
+>> +                        ROUND_UP(ms->maxram_size - ms->ram_size, GiB);
+>> +    if (vms->high_io_base < 256 * GiB) {
+>> +        vms->high_io_base = 256 * GiB;
+>> +    }
+>>      base = vms->high_io_base;
+>>  
+>>      for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
+>> @@ -1386,6 +1397,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>          vms->memmap[i].size = size;
+>>          base += size;
+>>      }
+>> +    vms->highest_gpa = base - 1;
+>>  }
+>>  
+>>  static void machvirt_init(MachineState *machine)
+>> @@ -1402,7 +1414,9 @@ static void machvirt_init(MachineState *machine)
+>>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>>      bool aarch64 = true;
+>>  
+>> -    virt_set_memmap(vms);
+>> +    if (!vms->extended_memmap) {
+>> +        virt_set_memmap(vms);
+>> +    }
+>>  
+>>      /* We can probe only here because during property set
+>>       * KVM is not available yet
+>> @@ -1784,6 +1798,36 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+>>      return NULL;
+>>  }
+>>  
+>> +/*
+>> + * for arm64 kvm_type [7-0] encodes the IPA size shift
+>> + */
+>> +static int virt_kvm_type(MachineState *ms, const char *type_str)
+>> +{
+>> +    VirtMachineState *vms = VIRT_MACHINE(ms);
+>> +    int max_vm_phys_shift = kvm_arm_get_max_vm_phys_shift(ms);
+>> +    int max_pa_shift;
+>> +
+>> +    vms->extended_memmap = true;
+>> +
+>> +    virt_set_memmap(vms);
+>> +
+>> +    max_pa_shift = 64 - clz64(vms->highest_gpa);
+>> +
+>> +    if (max_pa_shift > max_vm_phys_shift) {
+>> +        error_report("-m and ,maxmem option values "
+>> +                     "require an IPA range (%d bits) larger than "
+>> +                     "the one supported by the host (%d bits)",
+>> +                     max_pa_shift, max_vm_phys_shift);
+>> +       exit(1);
+>> +    }
+>> +    /*
+>> +     * By default we return 0 which corresponds to an implicit legacy
+>> +     * 40b IPA setting. Otherwise we return the actual requested IPA
+>> +     * logsize
+>> +     */
+>> +    return max_pa_shift > 40 ? max_pa_shift : 0;
+>> +}
+>> +
+>>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>>  {
+>>      MachineClass *mc = MACHINE_CLASS(oc);
+>> @@ -1808,6 +1852,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>>      mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+>>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+>>      mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
+>> +    mc->kvm_type = virt_kvm_type;
+>>      assert(!mc->get_hotplug_handler);
+>>      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+>>      hc->plug = virt_machine_device_plug_cb;
+>> @@ -1911,6 +1956,9 @@ static void virt_machine_3_1_options(MachineClass *mc)
+>>  {
+>>      virt_machine_4_0_options(mc);
+>>      compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
+>> +
+>> +    /* extended memory map is enabled from 4.0 onwards */
+>> +    mc->kvm_type = NULL;
+> it's quite confusing, you have vms->extended_memmap and mc->kvm_type and
+> the later for some reason enables device memory.
+> 
+> to me it seems that both are not related, device memory should work just fine
+> without kvm nor dynamic IPA (within TCG supported limits).
+> 
+> I'd make extended_memmap virt machine class member the will enable pc-dimm support
+> and then it add checks for supported IPA range on top
+I agree I did not take into account the TCG use case and this series
+does not enable device memory with TCG which is a pitty. I will
+decorrelate things.
 
-../hw/ide/ich.o: In function `pci_ich9_ahci_realize':
-hw/ide/ich.c:124: undefined reference to `pci_allocate_irq'
-hw/ide/ich.c:126: undefined reference to `pci_register_bar'
-hw/ide/ich.c:128: undefined reference to `pci_register_bar'
-hw/ide/ich.c:131: undefined reference to `pci_add_capability'
-hw/ide/ich.c:147: undefined reference to `msi_init'
-../hw/ide/ich.o: In function `pci_ich9_uninit':
-hw/ide/ich.c:158: undefined reference to `msi_uninit'
-../hw/ide/ich.o:(.data.rel+0x50): undefined reference to `vmstate_pci_device'
+Thanks!
 
-Thus we must only compile ich.c if CONFIG_PCI is also set.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/ide/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-index a142add..dfe53af 100644
---- a/hw/ide/Makefile.objs
-+++ b/hw/ide/Makefile.objs
-@@ -9,6 +9,6 @@ common-obj-$(CONFIG_IDE_MMIO) += mmio.o
- common-obj-$(CONFIG_IDE_VIA) += via.o
- common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
- common-obj-$(CONFIG_AHCI) += ahci.o
--common-obj-$(CONFIG_AHCI) += ich.o
-+common-obj-$(call land,$(CONFIG_AHCI),$(CONFIG_PCI)) += ich.o
- common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
- common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
--- 
-1.8.3.1
+Eric
+> 
+>>  }
+>>  DEFINE_VIRT_MACHINE(3, 1)
+>>  
+>> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+>> index 3dc7a6c5d5..c88f67a492 100644
+>> --- a/include/hw/arm/virt.h
+>> +++ b/include/hw/arm/virt.h
+>> @@ -132,6 +132,8 @@ typedef struct {
+>>      uint32_t iommu_phandle;
+>>      int psci_conduit;
+>>      hwaddr high_io_base;
+>> +    hwaddr highest_gpa;
+>> +    bool extended_memmap;
+>>  } VirtMachineState;
+>>  
+>>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+> 
