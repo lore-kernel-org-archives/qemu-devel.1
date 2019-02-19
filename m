@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42095)
+Received: from eggs.gnu.org ([209.51.188.92]:44191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gwDba-00018q-5X
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:11:10 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gwDkn-0006Ae-KN
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gwDMw-0007Ci-FN
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:56:03 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39651)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gwDMw-000777-7e
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 16:56:02 -0500
-Received: by mail-pl1-x643.google.com with SMTP id 101so11073337pld.6
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 13:55:57 -0800 (PST)
-Date: Tue, 19 Feb 2019 13:55:54 -0800 (PST)
-In-Reply-To: <1550565421-10944-12-git-send-email-thuth@redhat.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-6f2b26db-fa0b-4d44-95e0-be09a173fb72@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <richard.weiyang@gmail.com>) id 1gwDkm-0006Sd-L1
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 17:20:41 -0500
+Date: Tue, 19 Feb 2019 22:20:28 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190219222028.y3wt6bgihmx73ptw@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190219013106.17538-1-richardw.yang@linux.intel.com>
+	<20190219013106.17538-3-richardw.yang@linux.intel.com>
+	<ba83c335-c0f1-5190-33a9-f2f7f44c55f0@redhat.com>
+	<77cf32b1-6a4a-33c5-4b3c-8ba3245a4b23@redhat.com>
+	<2e584c55-5b40-4a29-b0ae-e53039e38a7d@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 11/14] MAINTAINERS: Clean up the RISC-V TCG
- backend section
+In-Reply-To: <2e584c55-5b40-4a29-b0ae-e53039e38a7d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] CODING_STYLE: indent example code as
+ all others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, imammedo@redhat.com, mjt@tls.msk.ru
 
-On Tue, 19 Feb 2019 00:36:58 PST (-0800), thuth@redhat.com wrote:
-> The e-mail address mjc@sifive.com of Micheal is not valid anymore.
-> Commit 7d04ac38959f8115f2a02 removed the entry already from the main
-> RISC-V section, but apparently forgot to remove it from the TCG
-> backend section, too.
+On Tue, Feb 19, 2019 at 07:55:31PM +0100, Philippe Mathieu-Daudé wrote:
+>On 2/19/19 6:56 PM, Eric Blake wrote:
+>> On 2/19/19 11:38 AM, Philippe Mathieu-Daudé wrote:
+>> 
+>>>> +    if (a == 1) {
+>>>> +        /* Reads like: "If a equals 1" */
+>>>
+>>> I guess you found a bug in the documentation :)
+>>>
+>>> Since 8c06fbdf36bf4d the style asked is:
+>>>
+>>>     We now require Linux-kernel-style multiline comments:
+>>>         /*
+>>>          * line one
+>>>          * line two
+>>>          */
+>>>
+>>>> +        do_something();
+>> 
+>> We only require winged multiline comments when the comment is actually
+>> multiline.  In this case, the comment is a one-liner, and is just fine
+>> as written.
 >
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Fixes: 7d04ac38959f8115f2a029d81db1c8aac179aa95
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-
-I'm assuming this is going in through another tree, but let me know if you want 
-me to take it.
-
-Thanks!
-
-> ---
->  MAINTAINERS | 1 -
->  1 file changed, 1 deletion(-)
+>Hmm I have a series where I moved code and changed from /* one line */
+>to the multi-line style, I wonder why and remember checkpatch errors.
+>Maybe a side-effect from what b94e809d3e fixed.
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b00caaf..1d0dcde 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2232,7 +2232,6 @@ F: tcg/ppc/
->  F: disas/ppc.c
+>Anyway, Wei do you mind adding a multi-line example here too?
 >
->  RISC-V
-> -M: Michael Clark <mjc@sifive.com>
->  M: Palmer Dabbelt <palmer@sifive.com>
->  M: Alistair Francis <Alistair.Francis@wdc.com>
->  L: qemu-riscv@nongnu.org
+
+A multi-line example for multiline comments?
+
+This looks not relavant to this sectioin. I am afraid I will not add
+this example here. Sorry for that.
+
+>With/without multi-line example:
+>Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>
+>Thanks!
+>
+>Phil.
+
+-- 
+Wei Yang
+Help you, Help me
