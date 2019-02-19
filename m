@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39714)
+Received: from eggs.gnu.org ([209.51.188.92]:40161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gw450-0006la-3E
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:00:54 -0500
+	(envelope-from <berrange@redhat.com>) id 1gw46K-0007Ma-K2
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:02:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gw44m-0004pn-LN
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:00:48 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28805)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gw44i-0004fV-8i
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:00:38 -0500
-Date: Tue, 19 Feb 2019 13:00:31 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
-Message-ID: <alpine.BSF.2.21.9999.1902191234580.87875@zero.eik.bme.hu>
-References: <20190211040434.1C98674569F@zero.eik.bme.hu>
-	<20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
+	(envelope-from <berrange@redhat.com>) id 1gw46F-0006Dc-Bw
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:02:16 -0500
+Date: Tue, 19 Feb 2019 12:01:28 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190219120128.GF7154@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
+	<3374c532-c885-d26e-2d34-0454943c3905@redhat.com>
+	<28c77705-33c2-f10b-9dae-331bc15c9596@redhat.com>
+	<20190219075333.GA4727@localhost.localdomain>
+	<d7a55ce9-a83c-12fe-fd16-d45dff67630a@redhat.com>
+	<20190219093716.GF4727@localhost.localdomain>
+	<20190219110626.GC7154@redhat.com>
+	<20190219113141.GJ4727@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190219113141.GJ4727@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Failing iotests in CI (was: Add a gitlab-ci file
+ for Continuous Integration testing on Gitlab)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +32,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Qemu-block <qemu-block@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Tue, 19 Feb 2019, Gerd Hoffmann wrote:
-> On Mon, Feb 11, 2019 at 04:19:14AM +0100, BALATON Zoltan wrote:
->> At least two machines, the PPC mac99 and MIPS fulong2e, have an ATI
->> gfx chip by default (Rage 128 Pro and M6/RV100 respectively) and
->> guests running on these and the PMON2000 firmware of the fulong2e
->> expect this to be available. Fortunately these are very similar chips
->> so they can be mostly emulated in the same device model. This patch
->> adds basic emulation of these ATI VGA chips.
->>
->> While this is incomplete and currently only enough to run the MIPS
->> firmware and get console output with Linux,
->
-> Which linux driver is this?
+On Tue, Feb 19, 2019 at 12:31:41PM +0100, Kevin Wolf wrote:
+> Am 19.02.2019 um 12:06 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > On Tue, Feb 19, 2019 at 10:37:16AM +0100, Kevin Wolf wrote:
+> > > Am 19.02.2019 um 10:04 hat Thomas Huth geschrieben:
+> > > >=20
+> > > >  https://gitlab.com/huth/qemu/-/jobs/163680780
+> > > >=20
+> > > > Some of them apparently need encryption to be enabled (as already
+> > > > mentioned by Cleber in his patch) - thus should they really be in=
+ the
+> > > > quick check, too? Or could they at least check whether QEMU has b=
+een
+> > > > built with encryption?
+> > >=20
+> > > The correct solution would be that they detect the situation
+> > > automatically and skip the test by calling _notrun.
+> > >=20
+> > > I'm not sure how to detect if a given QEMU binary supports encrypti=
+on,
+> > > but Dan might know.
+> >=20
+> > It isn't easy & depends which encryption feature you're trying to use=
+.
+> >=20
+> > For TLS related features you can do something gross like
+> >=20
+> >     qemu-img info --object tls-creds-anon,id=3Ddummy README 2>&1
+> >     test $? !=3D 0 && exit 0
+> >=20
+> > This relies on fact that 'tls-creds-anon' object type will report a
+> > runtime error during initialization if gnutls isn't enabled.
+> >=20
+> > For more general ciphers you pretty much have to just try the higher =
+level
+> > feature and see if it fails.
+>=20
+> Actually, I think for test cases we should see 'qemu-img create' failin=
+g
+> and could just skip the test if it returns a non-zero exit code.
+>=20
+> But then I looked at Thomas' output again:
+>=20
+>     --- /builds/huth/qemu/tests/qemu-iotests/188.out	2019-02-19 08:23:5=
+4.000000000 +0000
+>     +++ /builds/huth/qemu/tests/qemu-iotests/188.out.bad	2019-02-19 08:=
+34:54.000000000 +0000
+>     @@ -1,4 +1,5 @@
+>      QA output created by 188
+>     +qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKDF in=
+ this build: Function not implemented
+>      Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 encry=
+pt.format=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
+>=20
+>      =3D=3D reading whole image =3D=3D--- /builds/huth/qemu/tests/qemu-=
+iotests/188.out	2019-02-19 08:23:54.000000000 +0000
+>=20
+> What is it actually doing there? There's clearly an error message, but
+> it almost looks like it's creating some kind of image anyway? The
+> following I/O works fine (i.e. this created image can even be opened
+> again with the luks driver), except that you can also access the image
+> with the wrong password.
+>=20
+> Is this a real bug in either qcow2 or luks?
 
-Those in linux/drivers/video/fbdev/aty/. This ati-vga model defaults to 
-Rage 128 Pro (what PoweMac3,1 has, device id 0x5046) which is handled by 
-the aty128fb driver under Linux. MIPS fulong2e has Mobility Radeon M6 
-(RV100, device id 0x5159) that you can also use as -device 
-ati-vga,device_id=0x5159 which is driven by radeonfb under Linux.
+It is an artifact of the way qcow2 image creation happens in multiple
+phases. qcow2_co_create first creates a minimal qcow2 file, and then
+opens it and updates it to add in the various extra features, including
+luks encryption. We fail to create the luks encryption, but enough of
+the qcow2 file has been created that it is able to still do plain text
+I/O.
 
-> If linux has a native driver it might make sense to also enable it on
-> x86.  Makes testing easier.
+Essentially the problem is that qcow2_co_create() doesn't unlink() the
+partially created image when things fail. This is a generic problem
+which can affect any part of qcow2_co_create that might fail, but it
+is especially problematic with luks.
 
-Yes it could work on all archs under Linux but I've only enabled it on the 
-two I've tried. It could be added instead to the same place where vga is 
-added in pci.mak if you like.
+The complication in fixing this is that can't just do an unlink() as
+we can't assume a local file. We need to have a bdrv_unlink() driver
+callback we can use to delegate to the right block driver APIs for
+deletion.
 
-> You can add the driver to default_list[] in vl.c, then you don't need
-> -vga none to remove the default vga when adding -device ati-vga.
+This is something I think could be useful in general, to expose as a
+"qemu-img delete" command - especially for non-local formats like
+rbd, sheepdog, glusterfs the mgmt app can't simply run "rm $img".
+QEMU already knows how to talk to the native APis for these network
+drivers so can make life easier by exposing a 'delete' op.
 
-I could do that but since it's a bit unfinished (lacks advanced features 
-such as video overlay, 3D accel, command FIFO, etc.) and only a basic 
-implementation at the moment to work with Linux framebuffer that doesn't 
-use these features I thought it might be a godd idea to make it a bit 
-harder to access yet to avoid problem of someone trying it with a Windows 
-guest with drivers from ATI which probably will result in bad picture. But 
-it's up to you to decide if you want to add it to -vga option from the 
-start or have it as optional device and only add to -vga when it's more 
-fully implemented and tested.
+For luks it would be desirable to allow options to the 'delete'
+operation, for example to request scrubbing of the key material
+headers.
 
 Regards,
-BALATON Zoltan
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
