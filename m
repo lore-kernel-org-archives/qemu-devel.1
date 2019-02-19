@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44683)
+Received: from eggs.gnu.org ([209.51.188.92]:44951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gw82B-0007w3-FD
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:16 -0500
+	(envelope-from <berrange@redhat.com>) id 1gw833-0000KU-L1
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:15:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gw82A-0002yx-Qm
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:15 -0500
-Received: from mail-wr1-f48.google.com ([209.85.221.48]:46616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gw82A-0002xq-Jq
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:14:14 -0500
-Received: by mail-wr1-f48.google.com with SMTP id i16so14384921wrs.13
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 08:14:13 -0800 (PST)
-Date: Tue, 19 Feb 2019 17:14:09 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190219161409.7qzohiyfhv3qpafl@steredhat>
-References: <20190219114609.1582-1-berrange@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gw831-0003Ju-QT
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:15:09 -0500
+Date: Tue, 19 Feb 2019 16:14:33 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190219161433.GO7154@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190219160920.32705-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190219114609.1582-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix error reporting for -object
+In-Reply-To: <20190219160920.32705-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Avoid SIGPIPE death to certtool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-stable@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, thuth@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Feb 19, 2019 at 11:46:09AM +0000, Daniel P. Berrangé wrote:
-> Error reporting for user_creatable_add_opts_foreach was changed so that
-> it no longer called 'error_report_err' in:
+On Tue, Feb 19, 2019 at 10:09:20AM -0600, Eric Blake wrote:
+> Our use of 'head -1' to log less output of certtool during
+> iotest 233 could result in certtool dying early due to SIGPIPE
+> if it generates enough output; if that happens, the certificate
+> it was supposed to generate may be zero length, which causes
+> failures such as:
 > 
->   commit 7e1e0c11127bde81cff260fc6859690435c509d6
->   Author: Markus Armbruster <armbru@redhat.com>
->   Date:   Wed Oct 17 10:26:43 2018 +0200
+>   == check TLS client to plain server fails ==
+>  -qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': Denied by server for option 5 (starttls)
+>  -server reported: TLS not configured
+>  -qemu-nbd: Denied by server for option 5 (starttls)
+>  -server reported: TLS not configured
+>  +qemu-nbd: Unable to import client certificate /tmp/qemu-iotests-quick-28354/tls/client1/client-cert.pem: Base64 unexpected header error.
 > 
->     qom: Clean up error reporting in user_creatable_add_opts_foreach()
+> Fix the pipelines to consume all output.
 > 
-> Some callers were updated to pass in "&error_fatal" but all the ones in
-> qemu-img were left passing NULL. As a result all errors went to
-> /dev/null instead of being reported to the user.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  qemu-img.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+>  tests/qemu-iotests/common.tls | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tls
+> index eae81789bbc..15c6e8c8425 100644
+> --- a/tests/qemu-iotests/common.tls
+> +++ b/tests/qemu-iotests/common.tls
+> @@ -74,7 +74,7 @@ EOF
+>      certtool --generate-self-signed \
+>               --load-privkey "${tls_dir}/key.pem" \
+>               --template "${tls_dir}/ca.info" \
+> -             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
+> +             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | sed -n 1p
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+I've actually prepared a patch which gets rid of the pipe entirely,
+because in debugging this problem I found it unhelpful that we culled
+stderr when certtool failed.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
