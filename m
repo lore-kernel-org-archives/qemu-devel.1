@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32875)
+Received: from eggs.gnu.org ([209.51.188.92]:32898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvwdT-0003wS-Rb
-	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:04:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gvwdV-0003y3-M2
+	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:04:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gvwdS-0002Rw-HA
+	(envelope-from <dgibson@ozlabs.org>) id 1gvwdS-0002Rh-Gl
 	for qemu-devel@nongnu.org; Mon, 18 Feb 2019 23:03:59 -0500
-Date: Tue, 19 Feb 2019 14:52:28 +1100
+Date: Tue, 19 Feb 2019 14:55:16 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190219035228.GT9345@umbus.fritz.box>
-References: <20190215170029.15641-1-clg@kaod.org>
-	<20190215170029.15641-7-clg@kaod.org>
+Message-ID: <20190219035516.GU9345@umbus.fritz.box>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-6-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vru7fAags9pVPvn5"
+	protocol="application/pgp-signature"; boundary="f6M9UaX53EEZorp0"
 Content-Disposition: inline
-In-Reply-To: <20190215170029.15641-7-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 06/12] target/ppc: Fix ordering of hash MMU
- accesses
+In-Reply-To: <20190218125615.18970-6-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/10] ppc405_boards: Don't size flash
+ memory to match backing image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
 
---vru7fAags9pVPvn5
-Content-Type: text/plain; charset=iso-8859-1
+--f6M9UaX53EEZorp0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 15, 2019 at 06:00:23PM +0100, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+On Mon, Feb 18, 2019 at 01:56:10PM +0100, Markus Armbruster wrote:
+> Machine "ref405ep" maps its flash memory at address 2^32 - image size.
+> Image size is rounded up to the next multiple of 64KiB.  Useless,
+> because pflash_cfi02_realize() fails with "failed to read the initial
+> flash content" unless the rounding is a no-op.
 >=20
-> With mttcg, we can have MMU lookups happening at the same time
-> as the guest modifying the page tables.
+> If the image size exceeds 0x80000 Bytes, we overlap first SRAM, then
+> other stuff.  No idea how that would play out, but a useful outcomes
+> seem unlikely.
 >=20
-> Since the HPTEs of the hash table MMU contains two words (or
-> double worlds on 64-bit), we need to make sure we read them
-> in the right order, with the correct memory barrier.
+> Map the flash memory at fixed address 0xFFF80000 with size 512KiB,
+> regardless of image size, to match the physical hardware.
 >=20
-> Additionally, when using emulated SPAPR mode, the hypercalls
-> writing to the hash table must also perform the udpates in
-> the right order.
+> Machine "taihu" maps its boot flash memory similarly.  The code even
+> has a comment /* XXX: should check that size is 2MB */, followed by
+> disabled code to adjust the size to 2MiB regardless of image size.
 >=20
-> Note: This part is still not entirely correct
+> Its code to map its application flash memory looks the same, except
+> there the XXX comment asks for 32MiB, and the code to adjust the size
+> isn't disabled.  Note that pflash_cfi02_realize() fails with "failed
+> to read the initial flash content" for images smaller than 32MiB.
 >=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Map the boot flash memory at fixed address 0xFFE00000 with size 2MiB,
+> to match the physical hardware.  Delete dead code from application
+> flash mapping, and simplify some.
+>=20
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Yeah, this stuff was written under the assumption it was protected by
-the BQL, which is getting less true all the time.
-
-Applied.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/ppc/spapr.c          | 21 +++++++++++++++++++--
->  target/ppc/mmu-hash32.c |  6 ++++++
->  target/ppc/mmu-hash64.c |  6 ++++++
->  3 files changed, 31 insertions(+), 2 deletions(-)
+>  hw/ppc/ppc405_boards.c | 53 +++++++++++++-----------------------------
+>  1 file changed, 16 insertions(+), 37 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 60572eb59275..1afe31ee6163 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1507,8 +1507,25 @@ static void spapr_store_hpte(PPCVirtualHypervisor =
-*vhyp, hwaddr ptex,
->      if (!spapr->htab) {
->          kvmppc_write_hpte(ptex, pte0, pte1);
->      } else {
-> -        stq_p(spapr->htab + offset, pte0);
-> -        stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-> +        if (pte0 & HPTE64_V_VALID) {
-> +            stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-> +            /*
-> +             * When setting valid, we write PTE1 first. This ensures
-> +             * proper synchronization with the reading code in
-> +             * ppc_hash64_pteg_search()
-> +             */
-> +            smp_wmb();
-> +            stq_p(spapr->htab + offset, pte0);
-> +        } else {
-> +            stq_p(spapr->htab + offset, pte0);
-> +            /*
-> +             * When clearing it we set PTE0 first. This ensures proper
-> +             * synchronization with the reading code in
-> +             * ppc_hash64_pteg_search()
-> +             */
-> +            smp_wmb();
-> +            stq_p(spapr->htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-> +        }
->      }
->  }
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index f47b15f10e..728154aebb 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -158,7 +158,7 @@ static void ref405ep_init(MachineState *machine)
+>      target_ulong kernel_base, initrd_base;
+>      long kernel_size, initrd_size;
+>      int linux_boot;
+> -    int fl_idx, fl_sectors, len;
+> +    int len;
+>      DriveInfo *dinfo;
+>      MemoryRegion *sysmem =3D get_system_memory();
 > =20
-> diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
-> index 03ae3c127985..e8562a7c8780 100644
-> --- a/target/ppc/mmu-hash32.c
-> +++ b/target/ppc/mmu-hash32.c
-> @@ -319,6 +319,12 @@ static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu=
-, hwaddr pteg_off,
+> @@ -185,26 +185,19 @@ static void ref405ep_init(MachineState *machine)
+>  #ifdef DEBUG_BOARD_INIT
+>      printf("%s: register BIOS\n", __func__);
+>  #endif
+> -    fl_idx =3D 0;
+>  #ifdef USE_FLASH_BIOS
+> -    dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+> +    dinfo =3D drive_get(IF_PFLASH, 0, 0);
+>      if (dinfo) {
+> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size =3D blk_getlength(blk);
+> -        fl_sectors =3D (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register parallel flash\n");
+>  #endif
+> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> +        bios_size =3D 0x80000;
+> +        pflash_cfi02_register(0xFFF80000,
+>                                NULL, "ef405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              65536, bios_size / 65536, 1,
+>                                2, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+>                                1);
+> -        fl_idx++;
+>      } else
+>  #endif
+>      {
+> @@ -455,7 +448,7 @@ static void taihu_405ep_init(MachineState *machine)
+>      target_ulong kernel_base, initrd_base;
+>      long kernel_size, initrd_size;
+>      int linux_boot;
+> -    int fl_idx, fl_sectors;
+> +    int fl_idx;
+>      DriveInfo *dinfo;
 > =20
->      for (i =3D 0; i < HPTES_PER_GROUP; i++) {
->          pte0 =3D ppc_hash32_load_hpte0(cpu, pte_offset);
-> +        /*
-> +         * pte0 contains the valid bit and must be read before pte1,
-> +         * otherwise we might see an old pte1 with a new valid bit and
-> +         * thus an inconsistent hpte value
-> +         */
-> +        smp_rmb();
->          pte1 =3D ppc_hash32_load_hpte1(cpu, pte_offset);
-> =20
->          if ((pte0 & HPTE32_V_VALID)
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index f6c822ef917b..b3c4d33faa55 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -506,6 +506,12 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu=
-, hwaddr hash,
->      }
->      for (i =3D 0; i < HPTES_PER_GROUP; i++) {
->          pte0 =3D ppc_hash64_hpte0(cpu, pteg, i);
-> +        /*
-> +         * pte0 contains the valid bit and must be read before pte1,
-> +         * otherwise we might see an old pte1 with a new valid bit and
-> +         * thus an inconsistent hpte value
-> +         */
-> +        smp_rmb();
->          pte1 =3D ppc_hash64_hpte1(cpu, pteg, i);
-> =20
->          /* This compares V, B, H (secondary) and the AVPN */
+>      /* RAM is soldered to the board so the size cannot be changed */
+> @@ -486,21 +479,14 @@ static void taihu_405ep_init(MachineState *machine)
+>  #if defined(USE_FLASH_BIOS)
+>      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+>      if (dinfo) {
+> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size =3D blk_getlength(blk);
+> -        /* XXX: should check that size is 2MB */
+> -        //        bios_size =3D 2 * 1024 * 1024;
+> -        fl_sectors =3D (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr %lx '%s' %d\n",
+> -               fl_idx, bios_size, -bios_size,
+> -               blk_name(blk), fl_sectors);
+> +        printf("Register boot flash\n");
+>  #endif
+> -        pflash_cfi02_register((uint32_t)(-bios_size),
+> +        bios_size =3D 2 * MiB;
+> +        pflash_cfi02_register(0xFFE00000,
+>                                NULL, "taihu_405ep.bios", bios_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              65536, bios_size / 65536, 1,
+>                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+>                                1);
+>          fl_idx++;
+> @@ -536,20 +522,13 @@ static void taihu_405ep_init(MachineState *machine)
+>      /* Register Linux flash */
+>      dinfo =3D drive_get(IF_PFLASH, 0, fl_idx);
+>      if (dinfo) {
+> -        BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
+> -
+> -        bios_size =3D blk_getlength(blk);
+> -        /* XXX: should check that size is 32MB */
+>          bios_size =3D 32 * MiB;
+> -        fl_sectors =3D (bios_size + 65535) >> 16;
+>  #ifdef DEBUG_BOARD_INIT
+> -        printf("Register parallel flash %d size %lx"
+> -               " at addr " TARGET_FMT_lx " '%s'\n",
+> -               fl_idx, bios_size, (target_ulong)0xfc000000,
+> -               blk_name(blk));
+> +        printf("Register application flash\n"
+>  #endif
+>          pflash_cfi02_register(0xfc000000, NULL, "taihu_405ep.flash", bio=
+s_size,
+> -                              blk, 65536, fl_sectors, 1,
+> +                              dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+> +                              65536, bios_size / 65536, 1,
+>                                4, 0x0001, 0x22DA, 0x0000, 0x0000, 0x555, =
+0x2AA,
+>                                1);
+>          fl_idx++;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -140,24 +186,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---vru7fAags9pVPvn5
+--f6M9UaX53EEZorp0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrfXwACgkQbDjKyiDZ
-s5KFyBAA3Bk6HAPNACm1ipqmddVRq1e8ozCKHpU71KyLOddu0JPAC0oViin/6dyi
-jbUKYB6PPIA8XUEpOI5vWtMV3KIyfVhkhrcBMGKmasUlY3km/WD6wy0Pnx6aAFkU
-kLkUOg77/G9r8qfe44B6Gyo3g1lRvg/QpuK1BHArljHbE5wdAHwlHu/6+huvFqPS
-H2eASdQLAEmWMnO9SjyOnUEjxikDsv6dW3OvbagpA2LvkgcIcHkgH+obYoZI58rL
-9OBO/gmS4zTluVT8XU6/4eADljvzPVgxKHu05vD+8sJcKfLnarEUPQLnjkOO3x7g
-hte7C2cHbP5B0+QFWf7iiEWgKKafFXfiy5Gu25+EODg4Gph66Zowjsk5Tp649Lh0
-eXNsBNSaJu9lGEy8qid8irR2y+Yo7rUE23gdi52xxxp624RmIYw7dU3A4dNB45ps
-rgUZOxoR7Pl3TkEgR+ieksE1lkjqUxUoFsp2VESeaO7dNOxo3ctRWLmBzGAZxhqU
-jDyfXk4ZAOpeS/voYXVWPxCMYV791ds4LMxiyO83Mm1fkl5Z7I5edW+VXqGA74BN
-zxFnIzEMOaPOXFad0/GTUWCE02NLhIlsV6OLEBDIyCMXFMRP9pSByEYOP5FpHeLW
-Xs6apZzZk0e0OwXCZFI6+3GCW3jd+jslggYW1oaBxHmz2/T5a4o=
-=fkoY
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxrfiQACgkQbDjKyiDZ
+s5KBNRAAp450aX6XfCQOfGnHKTQfJitgfeSj2t+elfRWgRhgO77CcA9iYpo9u4y/
+coTjnmMgAzdblGbQq8PSX2kMB1NvCSU45h5jRzJZmZ6KZE8JL1IbxOdgmd4hSha2
+BmJm+e0bSubl9C2NDYmCxXsL/vrvWvFxKp+ZgwLpVortJfEkvZ5Wf8abNGnFPsqZ
+jM2aPDP90VhvE9C7X7+U5dIgEWNjhZovZDrv31SdntC3KxNlH59IUzQV1oDR9fwm
+tl4TctUQNQPhG8ldGJ8MRq/1FgXia59qv4mgsS5voP6fC3FukrTArN3cckihke5h
+72QmUwkAm1I8CMQZGnMbbmdP+ZeZWcZCvWvbtG1Jys0dET7gTLuBzBklngyQgBcS
+IHPfrjEJyuUWf3Xah/YiuRIny54Cu5NRlg/kvN1rLHVq7Ixc4y1LGOv+qqk03Y7p
+jvmVg6sVVsUA5IMWC/5I1gvPq9OZGRTTQjdnk2xTd7i8k3KgSp7z6sFPNwkm3Qj/
+jxYIiqgSAawG+lOiGiIcWcaHkr2nqHbT+hKqyW4iPPJhnXp8tghDxwg1SDEPWGq/
+O3aem6hyGWhwNhXs3yF8qA9uWIxckUsFMHa9LbYND7NI+7xn0O+ayLqynt3sehyp
++QhAUS4qxjxNDbRvyyKYunoQKK83ATPDXRgh/3X1rzmdeIckqxc=
+=fLek
 -----END PGP SIGNATURE-----
 
---vru7fAags9pVPvn5--
+--f6M9UaX53EEZorp0--
