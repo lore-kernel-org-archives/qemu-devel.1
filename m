@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49541)
+Received: from eggs.gnu.org ([209.51.188.92]:50671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gw4jo-0002EM-Pb
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:43:05 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw4no-0003pD-0G
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gw4jo-0003vU-0U
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:43:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gw4jn-0003tN-OC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:43:03 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7C79683F44
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:43:02 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 19 Feb 2019 13:42:57 +0100
-Message-Id: <20190219124257.3001-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] audio: don't build alsa and sdl by default
- on linux
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw4nn-00065x-5k
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:47:11 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 19 Feb 2019 12:46:46 +0000
+Message-ID: <90c25ba4-f729-3587-7335-9f2406917b34@virtuozzo.com>
+References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
+	<20190211125601.86533-2-vsementsov@virtuozzo.com>
+	<20190212103316.GG9386@redhat.com>
+In-Reply-To: <20190212103316.GG9386@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <327BAA9D3EC5C945BCC86066585F8EBF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/4] io/channel: add
+ qio_channel_get_attached_aio_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, david@redhat.com
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-In case no sound hardware is present both alsa and sdl drivers
-initialize successfully and throw errors later on, i.e. effectively
-the automatic probing doesn't work.  Drop them from the list of
-default audio drivers for linux because of that.
-
-Fixes: 6a48541873 audio: probe audio drivers by default
-Buglink: https://bugs.launchpad.net/qemu/+bug/1816052
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index fbd0825488..651b4f7514 100755
---- a/configure
-+++ b/configure
-@@ -877,7 +877,7 @@ Haiku)
-   LIBS="-lposix_error_mapper -lnetwork $LIBS"
- ;;
- Linux)
--  audio_drv_list="try-pa try-alsa try-sdl oss"
-+  audio_drv_list="try-pa oss"
-   audio_possible_drivers="oss alsa sdl pa"
-   linux="yes"
-   linux_user="yes"
--- 
-2.9.3
+MTIuMDIuMjAxOSAxMzozMywgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gTW9uLCBG
+ZWIgMTEsIDIwMTkgYXQgMDM6NTU6NThQTSArMDMwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2
+c2tpeSB3cm90ZToNCj4+IEV4cG9zZSBhdHRhY2hlZCBhaW8gY29udGV4dC4gSXQgd2lsbCBiZSB1
+c2VkIGluIG5iZCBjb2RlLCB0bw0KPj4gdW5kZXJzdGFuZCwgaW4gd2hpY2ggYWlvIGNvbnRleHQg
+bmVnb3RpYXRpb24gc2hvdWxkIGJlIGRvbmUuDQo+IA0KPiBJJ20gbm90IGVzcGVjaWFsbHkgb2Jq
+ZWN0aW5nIHRvIHRoZSBpZGVhIG9mIGFkZGluZyB0aGUgQVBJIHRvIHRoZQ0KPiBRSU9DaGFubmVs
+IGNsYXNzLCBidXQgSSdtIHN1cnByaXNlZCB0aGF0IE5CRCBuZWVkcyB0aGlzLiBTdXJlbHkgaXQN
+Cj4gYWxyZWFkeSBrbm93cyB3aGF0IEFJTyBjb250ZXh0IGl0IGFzc2lnbmVkIHRvIHRoZSBjaGFu
+bmVsIGluIHRoZQ0KPiBmaXJzdCBwbGFjZS4NCg0KQWN0dWFsbHkgbm90LCBuYmQvY2xpZW50LmMg
+ZG9uJ3Qga25vdyBpdCwgaXQgZ2V0cyBAaW9jIGFzIGEgcGFyYW10ZXIgb2YgbmJkX3JlY2VpdmVf
+bmVnb3RpYXRlDQphbmQgbmJkX3JlY2VpdmVfZXhwb3J0X2xpc3QsIHdoaWNoIG1heSBiZSBjYWxs
+ZWQgZnJvbSBibG9jay9uYmQtY2xpZW50LmMgYW5kIHFlbXUtbmJkLmMuLg0KDQpmb3IgZXhhbXBs
+ZSwgbmJkLWNsaWVudC5jIGRvDQoNCm5iZF9jbGllbnRfYXR0YWNoX2Fpb19jb250ZXh0KGJzLCBi
+ZHJ2X2dldF9haW9fY29udGV4dChicykpOw0KDQp3aGVyZSBuYmRfY2xpZW50X2F0dGFjaF9haW9f
+Y29udGV4dCBpcw0KDQp2b2lkIG5iZF9jbGllbnRfYXR0YWNoX2Fpb19jb250ZXh0KEJsb2NrRHJp
+dmVyU3RhdGUgKmJzLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQWlvQ29u
+dGV4dCAqbmV3X2NvbnRleHQpDQp7DQogICAgIE5CRENsaWVudFNlc3Npb24gKmNsaWVudCA9IG5i
+ZF9nZXRfY2xpZW50X3Nlc3Npb24oYnMpOw0KICAgICBxaW9fY2hhbm5lbF9hdHRhY2hfYWlvX2Nv
+bnRleHQoUUlPX0NIQU5ORUwoY2xpZW50LT5pb2MpLCBuZXdfY29udGV4dCk7DQogICAgIGFpb19j
+b19zY2hlZHVsZShuZXdfY29udGV4dCwgY2xpZW50LT5jb25uZWN0aW9uX2NvKTsNCn0NCg0KSXQg
+ZG9lcyBpdCBhZnRlciBuYmRfcmVjZWl2ZV9uZWdvdGlhdGUoKSwgYnV0IEkgdGhpbmssIGl0IHNo
+b3VsZCBiZSBzcGxpdCBpbiB0aGVzZSBzZXJpZXMgaW4gbmJkX2NsaWVudF9jb25uZWN0KCksDQpz
+byB0aGF0IHdlIGF0dGFjaCBhaW8gY29udGV4dCBiZWZvcmUgbmVnb3RpYXRpb24gYW5kIHNjaGVk
+dWxlIGNvbm5lY3Rpb25fY28gYWZ0ZXIgaXQuDQoNCmFuZCBOQkRDbGllbnRTZXNzaW9uIGlzIGJs
+b2NrLyogcmVsYXRlZCBvYmplY3QuIFNvLCBuYmQvY2xpZW50LmMgc2VlcyBvbmx5IHJlc3VsdGlu
+ZyBpb2MuDQpBbmQgaXQgc2VlbXMgYmV0dGVyIHRvIGdldCBhaW8gY29udGV4dCBmcm9tIGlvYywg
+dGhhbiBwYXNzIGFkZGl0aW9uYWwgcGFyYW1ldGVyIHRvIG5iZF9yZWNlaXZlX25lZ290aWF0ZSgp
+DQp0b2dldGhlciB3aXRoIGlvYy4NCg0KICBJT1csIGl0IGZlZWxzIGxpa2UgdGhpcyBpcyBwYXBl
+cmluZyBvdmVyIGEgbGltaXRhdGlvbg0KPiBpbiBOQkQgbm90IGtlZXBpbmcgdHJhY2sgb2Ygd2hh
+dCBBSU8gY29udGV4dCBpdCBzaG91bGQgYmUgdXNpbmcuDQo+IA0KPj4NCj4+IFNpZ25lZC1vZmYt
+Ynk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
+bT4NCj4+IC0tLQ0KPj4gICBpbmNsdWRlL2lvL2NoYW5uZWwuaCB8IDkgKysrKysrKysrDQo+PiAg
+IGlvL2NoYW5uZWwuYyAgICAgICAgIHwgNSArKysrKw0KPj4gICAyIGZpbGVzIGNoYW5nZWQsIDE0
+IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9pby9jaGFubmVsLmgg
+Yi9pbmNsdWRlL2lvL2NoYW5uZWwuaA0KPj4gaW5kZXggZGEyZjEzODIwMC4uMWExZTRhMDFiMCAx
+MDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUvaW8vY2hhbm5lbC5oDQo+PiArKysgYi9pbmNsdWRlL2lv
+L2NoYW5uZWwuaA0KPj4gQEAgLTcxOCw2ICs3MTgsMTUgQEAgR1NvdXJjZSAqcWlvX2NoYW5uZWxf
+YWRkX3dhdGNoX3NvdXJjZShRSU9DaGFubmVsICppb2MsDQo+PiAgIHZvaWQgcWlvX2NoYW5uZWxf
+YXR0YWNoX2Fpb19jb250ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgQWlvQ29udGV4dCAqY3R4KTsNCj4+ICAgDQo+PiArLyoNCj4+
+ICsgKiBxaW9fY2hhbm5lbF9nZXRfYWlvX2NvbnRleHQNCj4+ICsgKiBAaW9jOiB0aGUgY2hhbm5l
+bCBvYmplY3QNCj4+ICsgKg0KPj4gKyAqIFJldHVybnMgY2hhbm5lbCBBaW9Db250ZXh0IGlmIGFu
+eSBhdHRhY2hlZCBieQ0KPj4gKyAqIHFpb19jaGFubmVsX2F0dGFjaF9haW9fY29udGV4dCgpLCBv
+dGhlcndpc2UgTlVMTC4NCj4+ICsgKi8NCj4+ICtBaW9Db250ZXh0ICpxaW9fY2hhbm5lbF9nZXRf
+YXR0YWNoZWRfYWlvX2NvbnRleHQoUUlPQ2hhbm5lbCAqaW9jKTsNCj4+ICsNCj4+ICAgLyoqDQo+
+PiAgICAqIHFpb19jaGFubmVsX2RldGFjaF9haW9fY29udGV4dDoNCj4+ICAgICogQGlvYzogdGhl
+IGNoYW5uZWwgb2JqZWN0DQo+PiBkaWZmIC0tZ2l0IGEvaW8vY2hhbm5lbC5jIGIvaW8vY2hhbm5l
+bC5jDQo+PiBpbmRleCA4ZGQwNjg0ZjVkLi5hMWI5MzdiYjZiIDEwMDY0NA0KPj4gLS0tIGEvaW8v
+Y2hhbm5lbC5jDQo+PiArKysgYi9pby9jaGFubmVsLmMNCj4+IEBAIC00NTQsNiArNDU0LDExIEBA
+IHZvaWQgcWlvX2NoYW5uZWxfZGV0YWNoX2Fpb19jb250ZXh0KFFJT0NoYW5uZWwgKmlvYykNCj4+
+ICAgICAgIGlvYy0+Y3R4ID0gTlVMTDsNCj4+ICAgfQ0KPj4gICANCj4+ICtBaW9Db250ZXh0ICpx
+aW9fY2hhbm5lbF9nZXRfYXR0YWNoZWRfYWlvX2NvbnRleHQoUUlPQ2hhbm5lbCAqaW9jKQ0KPj4g
+K3sNCj4+ICsgICAgcmV0dXJuIGlvYy0+Y3R4Ow0KPj4gK30NCj4+ICsNCj4+ICAgdm9pZCBjb3Jv
+dXRpbmVfZm4gcWlvX2NoYW5uZWxfeWllbGQoUUlPQ2hhbm5lbCAqaW9jLA0KPj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBHSU9Db25kaXRpb24gY29uZGl0aW9uKQ0KPj4g
+ICB7DQo+PiAtLSANCj4+IDIuMTguMA0KPj4NCj4gDQo+IFJlZ2FyZHMsDQo+IERhbmllbA0KPiAN
+Cg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
