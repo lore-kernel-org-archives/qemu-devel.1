@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39026)
+Received: from eggs.gnu.org ([209.51.188.92]:39044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gw7iH-0000qB-1u
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:53:41 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gw7iI-0000rB-4x
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:53:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gw7iG-0008CU-1q
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:53:40 -0500
-References: <cd28473f-b768-0c3e-82be-1e07e9c3e786@redhat.com>
-	<20190219104445.GB7154@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2ac61a17-6018-8d8f-fe8f-6137f8ec2fe4@redhat.com>
-Date: Tue, 19 Feb 2019 09:53:23 -0600
+	(envelope-from <eric.auger@redhat.com>) id 1gw7iH-0008Db-4o
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:53:42 -0500
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-15-eric.auger@redhat.com>
+	<20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <852c526c-42fd-4ff4-d00e-1a44e1561e67@redhat.com>
+Date: Tue, 19 Feb 2019 16:53:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190219104445.GB7154@redhat.com>
+In-Reply-To: <20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Failing qemu-iotest 233
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 14/18] hw/arm/virt: Allocate
+ device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +26,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-On 2/19/19 4:44 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Feb 19, 2019 at 07:36:07AM +0100, Thomas Huth wrote:
->>
->>  Hi Eric, hi Daniel,
->>
->> QEMU iotest 233 is failing for me on RHEL7:
->>
->> 233                [07:29:30] [07:29:30] [failed, exit status 1] - out=
-put mismatch (see 233.out.bad)
->> --- /home/thuth/devel/qemu/tests/qemu-iotests/233.out	2019-02-19 07:14=
-:45.000000000 +0100
->> +++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/233.out.bad	2019-02-=
-19 07:29:30.000000000 +0100
->> @@ -13,45 +13,7 @@
->>  1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->> =20
->>  =3D=3D check TLS client to plain server fails =3D=3D
->> -qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3DPORT,t=
-ls-creds=3Dtls0': Denied by server for option 5 (starttls)
->> -server reported: TLS not configured
->> -qemu-nbd: Denied by server for option 5 (starttls)
->> -server reported: TLS not configured
->> +qemu-nbd: Unable to import client certificate /tmp/qemu-iotests-quick=
--28354/tls/client1/client-cert.pem: Base64 unexpected header error.
->=20
-> This is fun, because it is actually non-determinstic, failing in a diff=
-erent
-> place in the test everytime it is run !
->=20
-> Turns out that piping certtool to "head -1" is bad because it causes
-> certtool to get a broken pipe making it quit before it has written
-> the certificate to disk leaving a zero length file. This in turn
-> causes the base64 error above.
+Hi Igor,
 
-Changing 'head -1' to 'sed -n 1p' should prevent certtool from seeing
-SIGPIPE.
+On 2/18/19 10:31 AM, Igor Mammedov wrote:
+> On Tue,  5 Feb 2019 18:33:02 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> The device memory region is located after the initial RAM.
+>> its start/size are 1GB aligned.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>
+>> ---
+>> v4 -> v5:
+>> - device memory set after the initial RAM
+>>
+>> v3 -> v4:
+>> - remove bootinfo.device_memory_start/device_memory_size
+>> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+>> ---
+>>  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 36 insertions(+)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 783468ba77..b683902991 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -61,6 +61,7 @@
+>>  #include "hw/arm/smmuv3.h"
+>>  #include "hw/mem/pc-dimm.h"
+>>  #include "hw/mem/nvdimm.h"
+>> +#include "hw/acpi/acpi.h"
+>>  
+>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>> @@ -1260,6 +1261,37 @@ static void create_secure_ram(VirtMachineState *vms,
+>>      g_free(nodename);
+>>  }
+>>  
+>> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+>> +{
+>> +    MachineState *ms = MACHINE(vms);
+>> +    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;
+> should size it with 1Gb alignment per slot from the start (to avoid x86 mistakes),
+> see enforce_aligned_dimm usage and associated commit for more details
+I don't understand the computation done in pc machine. eventually we are
+likely to have more device memory than requested by the user. Why don't
+we check (machine->maxram_size - machine->ram_size) >=
+machine->ram_slots * GiB
+instead of adding 1GiB/slot to the initial user requirements?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Also machine->maxram_size - machine->ram_size is checked to be aligned
+with TARGET_PAGE_SIZE. Is TARGET_PAGE_SIZE representative of the guest
+PAGE in accelerated mode? Is it valid ro require an alignment on 1GB
+boundary as I do in this patch?
+
+> 
+>> +    uint64_t align = GiB;
+>> +
+>> +    if (!device_memory_size) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+>> +        error_report("unsupported number of memory slots: %"PRIu64,
+>> +                     ms->ram_slots);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
+>> +        error_report("maximum memory size must be aligned to multiple of 0x%"
+>> +                     PRIx64, align);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>> +    ms->device_memory->base = QEMU_ALIGN_UP(GiB + ms->ram_size, GiB);
+>                                                ^^^ where does this come from?
+OK, introduced RAMBASE macro
+
+Thanks
+
+Eric
+> 
+> 
+>> +
+>> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+>> +                       "device-memory", device_memory_size);
+>> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
+>> +                                &ms->device_memory->mr);
+>> +}
+>> +
+>>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+>>  {
+>>      const VirtMachineState *board = container_of(binfo, VirtMachineState,
+>> @@ -1569,6 +1601,10 @@ static void machvirt_init(MachineState *machine)
+>>                                           machine->ram_size);
+>>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>>  
+>> +    if (vms->extended_memmap) {
+>> +        create_device_memory(vms, sysmem);
+>> +    }
+>> +
+>>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>>  
+>>      create_gic(vms, pic);
+> 
