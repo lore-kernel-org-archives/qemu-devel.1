@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41584)
+Received: from eggs.gnu.org ([209.51.188.92]:42195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gw7rD-00085b-RD
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:02:56 -0500
+	(envelope-from <eblake@redhat.com>) id 1gw7uC-0001aO-H5
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gw7rD-0005Tc-15
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:02:55 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42003)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gw7rB-0005QF-Ud
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:02:54 -0500
-Received: by mail-wr1-f67.google.com with SMTP id r5so9215941wrg.9
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 08:02:50 -0800 (PST)
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-7-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <15b742d6-18e9-dfd6-dac2-2613c0b93e76@redhat.com>
-Date: Tue, 19 Feb 2019 17:02:47 +0100
+	(envelope-from <eblake@redhat.com>) id 1gw7uB-0007S2-N4
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 11:06:00 -0500
+References: <20190218161822.3573-1-kwolf@redhat.com>
+	<20190218161822.3573-12-kwolf@redhat.com>
+	<3efe273b-16af-4927-b684-57cf71275923@redhat.com>
+	<20190219112308.GI4727@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c06a66f0-5883-613d-59c0-160b0fd27925@redhat.com>
+Date: Tue, 19 Feb 2019 10:04:54 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190218125615.18970-7-armbru@redhat.com>
+In-Reply-To: <20190219112308.GI4727@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/10] r2d: Flash memory creation is
- confused about size, mark FIXME
+Subject: Re: [Qemu-devel] [PATCH 11/12] block: Use normal drain for
+ bdrv_set_aio_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, Magnus Damm <magnus.damm@gmail.com>, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, berrange@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On 2/18/19 1:56 PM, Markus Armbruster wrote:
-> pflash_cfi02_register() takes a size in bytes, a block size in bytes
-> and a number of blocks.  r2d_init() passes FLASH_SIZE, 16 * KiB,
-> FLASH_SIZE >> 16.  Does not compute: size doesn't match block size *
-> number of blocks.  The latter happens to win.  I tried to find
-> documentation on the physcial hardware, no luck.
+On 2/19/19 5:23 AM, Kevin Wolf wrote:
+> Am 18.02.2019 um 21:57 hat Eric Blake geschrieben:
+>> On 2/18/19 10:18 AM, Kevin Wolf wrote:
+>>> Now that bdrv_set_aio_context() works inside drained sections, it can
+>>> also use the real drain function instead of open coding something
+>>> similar.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+
+>>> +/* The caller must own the AioContext lock for the old AioContext of bs, but it
+>>> + * must not own the AioContext lock for new_context. */
+>>
+>> Is this comment still accurate, given
+>>
+>>>  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
+>>>  {
+>>> -    AioContext *ctx = bdrv_get_aio_context(bs);
+>>> -
+>>> -    if (ctx == new_context) {
+>>> +    if (bdrv_get_aio_context(bs) == new_context) {
+>>>          return;
+>>>      }
+>>
+>> the short-circuiting when the old context is the new context?
 > 
-> For now, adjust the byte size passed to match the actual size created,
-> and add a FIXME comment.
+> Hm, yes, old == new is an exception where you quite obviously can't have
+> old locked and new unlocked at the same time.
 > 
-> Cc: Magnus Damm <magnus.damm@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/sh4/r2d.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+> So is adding this enough?
 > 
-> diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-> index dcdb3728cb..ed18d1f351 100644
-> --- a/hw/sh4/r2d.c
-> +++ b/hw/sh4/r2d.c
-> @@ -290,7 +290,14 @@ static void r2d_init(MachineState *machine)
->  
->      /* onboard flash memory */
->      dinfo = drive_get(IF_PFLASH, 0, 0);
-> -    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE,
-> +    /*
-> +     * FIXME The code is confused about the size of the flash.  It
-> +     * used to pass FLASH_SIZE bytes, in FLASH_SIZE >> 16 blocks of
-> +     * 16KiB each, which does not compute, but creates one of
-> +     * FLASH_SIZE / 4 bytes anyway.  The current code does so too, but
-> +     * whether it's the right size is anybody's guess.
-> +     */
-> +    pflash_cfi02_register(0x0, NULL, "r2d.flash", FLASH_SIZE / 4,
->                            dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                            16 * KiB, FLASH_SIZE >> 16,
->                            1, 4, 0x0000, 0x0000, 0x0000, 0x0000,
+>     (unless new_context is the same as the current context of bs)
 
-Good news: when you read (0x0000, 0x0000, 0x0000, 0x0000) pflash IDs,
-that means the code uses the "Virt PFlash". IOW this is not a physical
-model, since the guest obviously doesn't care about checking the flash
-model.
-The "VirtPFlash" only has 64KiB sectors.
+Works for me.
 
-I suggest we add a pflash_cfi02_create_virt(reduced args) helper to make
-this obvious:
-
-  pflash_cfi02_create_virt(paddr, name, size_bytes, mapping?).
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
