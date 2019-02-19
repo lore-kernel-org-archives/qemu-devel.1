@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48909)
+Received: from eggs.gnu.org ([209.51.188.92]:49276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gw4hJ-0000tz-3V
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:40:29 -0500
+	(envelope-from <philmd@redhat.com>) id 1gw4it-0001fu-76
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gw4hB-0002zf-DA
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:40:23 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40165)
+	(envelope-from <philmd@redhat.com>) id 1gw4ir-0003Zo-Al
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:42:07 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50836)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gw4h7-0002yK-QV
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:40:19 -0500
-Received: by mail-wm1-f66.google.com with SMTP id t15so2604912wmi.5
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:40:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gw4in-0003Wp-Ds
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:42:03 -0500
+Received: by mail-wm1-f68.google.com with SMTP id x7so2669685wmj.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:42:00 -0800 (PST)
 References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-3-armbru@redhat.com>
+	<20190218125615.18970-4-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
-Date: Tue, 19 Feb 2019 13:40:15 +0100
+Message-ID: <48c4a8a2-4f6e-e540-4d26-583ae87e28a9@redhat.com>
+Date: Tue, 19 Feb 2019 13:41:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190218125615.18970-3-armbru@redhat.com>
+In-Reply-To: <20190218125615.18970-4-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
- just once, expand
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/10] hw: Use CFI_PFLASH0{1,
+ 2} and TYPE_CFI_PFLASH0{1, 2}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +35,140 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, alex.bennee@linaro.org, mreitz@redhat.com, qemu-ppc@nongnu.org, lersek@redhat.com
 
 On 2/18/19 1:56 PM, Markus Armbruster wrote:
-> PFLASH_BUG()'s lone use has a suspicious smell: it prints "Possible
-> BUG", which sounds like a warning, then calls exit(1), followed by
-> unreachable goto reset_flash.  All this commit does is expanding the
-> macro, so the smell becomes more poignant, and the macro can be
-> deleted.
+> We have two open-coded copies of macro CFI_PFLASH01().  Move the macro
+> to the header, so we can ditch the copies.  Move CFI_PFLASH02() to the
+> header for symmetry.
+> 
+> We define macros TYPE_CFI_PFLASH01 and TYPE_CFI_PFLASH02 for type name
+> strings, then mostly use the strings.  If the macros are worth
+> defining, they are worth using.  Replace the strings by the macros.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  hw/block/pflash_cfi01.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+>  hw/arm/vexpress.c        | 4 ++--
+>  hw/arm/virt.c            | 3 ++-
+>  hw/block/pflash_cfi01.c  | 3 ---
+>  hw/block/pflash_cfi02.c  | 3 ---
+>  hw/xtensa/xtfpga.c       | 4 ++--
+>  include/hw/block/flash.h | 4 ++++
+>  6 files changed, 10 insertions(+), 11 deletions(-)
 > 
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index ed46d2e730..00913f2655 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
+>  static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
+>                                               DriveInfo *di)
+>  {
+> -    DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
+> +    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
+>  
+>      if (di) {
+>          qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
+> @@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
+>      qdev_init_nofail(dev);
+>  
+>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+> -    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
+> +    return CFI_PFLASH01(dev);
+>  }
+>  
+>  static void vexpress_common_init(MachineState *machine)
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 99c2b6e60d..b7d53b2b87 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -34,6 +34,7 @@
+>  #include "hw/arm/arm.h"
+>  #include "hw/arm/primecell.h"
+>  #include "hw/arm/virt.h"
+> +#include "hw/block/flash.h"
+>  #include "hw/vfio/vfio-calxeda-xgmac.h"
+>  #include "hw/vfio/vfio-amd-xgbe.h"
+>  #include "hw/display/ramfb.h"
+> @@ -874,7 +875,7 @@ static void create_one_flash(const char *name, hwaddr flashbase,
+>       * parameters as the flash devices on the Versatile Express board.
+>       */
+>      DriveInfo *dinfo = drive_get_next(IF_PFLASH);
+> -    DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
+> +    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>      const uint64_t sectorlength = 256 * 1024;
+>  
 > diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index 9efa7aa9af..f73c30a3ee 100644
+> index f73c30a3ee..43dbb7db26 100644
 > --- a/hw/block/pflash_cfi01.c
 > +++ b/hw/block/pflash_cfi01.c
-> @@ -49,12 +49,6 @@
->  #include "sysemu/sysemu.h"
->  #include "trace.h"
+> @@ -59,9 +59,6 @@ do {                                                        \
+>  #define DPRINTF(fmt, ...) do { } while (0)
+>  #endif
 >  
-> -#define PFLASH_BUG(fmt, ...) \
-> -do { \
-> -    fprintf(stderr, "PFLASH: Possible BUG - " fmt, ## __VA_ARGS__); \
-> -    exit(1); \
-> -} while(0)
+> -#define CFI_PFLASH01(obj) \
+> -    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
 > -
->  /* #define PFLASH_DEBUG */
->  #ifdef PFLASH_DEBUG
->  #define DPRINTF(fmt, ...)                                   \
-> @@ -624,8 +618,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
->                  pfl->status |= 0x80;
->              } else {
->                  DPRINTF("%s: unknown command for \"write block\"\n", __func__);
-> -                PFLASH_BUG("Write block confirm");
-> -                goto reset_flash;
-> +                fprintf(stderr, "PFLASH: Possible BUG - Write block confirm");
-> +                exit(1);
-
-Don't you want to use hw_error here?
-
-      hw_error("PFLASH: Possible BUG - Write block confirm");
-
->              }
->              break;
->          default:
+>  #define PFLASH_BE          0
+>  #define PFLASH_SECURE      1
+>  
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index 424cc106d6..e9c76d6cfb 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -57,9 +57,6 @@ do {                                                       \
+>  
+>  #define PFLASH_LAZY_ROMD_THRESHOLD 42
+>  
+> -#define CFI_PFLASH02(obj) \
+> -    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
+> -
+>  struct PFlashCFI02 {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+> index 3d59a7a356..a726d5632a 100644
+> --- a/hw/xtensa/xtfpga.c
+> +++ b/hw/xtensa/xtfpga.c
+> @@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
+>                                        DriveInfo *dinfo, int be)
+>  {
+>      SysBusDevice *s;
+> -    DeviceState *dev = qdev_create(NULL, "cfi.pflash01");
+> +    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
+>  
+>      qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
+>                          &error_abort);
+> @@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *address_space,
+>      s = SYS_BUS_DEVICE(dev);
+>      memory_region_add_subregion(address_space, board->flash->base,
+>                                  sysbus_mmio_get_region(s, 0));
+> -    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
+> +    return CFI_PFLASH01(dev);
+>  }
+>  
+>  static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
+> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+> index 51d8f60c65..1078dc7238 100644
+> --- a/include/hw/block/flash.h
+> +++ b/include/hw/block/flash.h
+> @@ -8,6 +8,8 @@
+>  /* pflash_cfi01.c */
+>  
+>  #define TYPE_CFI_PFLASH01 "cfi.pflash01"
+> +#define CFI_PFLASH01(obj) \
+> +    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
+>  
+>  typedef struct PFlashCFI01 PFlashCFI01;
+>  
+> @@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
+>  /* pflash_cfi02.c */
+>  
+>  #define TYPE_CFI_PFLASH02 "cfi.pflash02"
+> +#define CFI_PFLASH02(obj) \
+> +    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
+>  
+>  typedef struct PFlashCFI02 PFlashCFI02;
+>  
 > 
