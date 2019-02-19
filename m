@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41413)
+Received: from eggs.gnu.org ([209.51.188.92]:43043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gwBBS-00073N-7W
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:36:03 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gwBIo-0001WU-AK
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gwBBK-0003j9-V5
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:35:57 -0500
-Received: from mail-dm3nam03on0725.outbound.protection.outlook.com
-	([2a01:111:f400:fe49::725]:47760
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gwBBF-0003bk-Ng
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:35:51 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 19 Feb 2019 19:35:44 +0000
-Message-ID: <BN6PR2201MB1251EBFAF8B62C02D7FB734DC67C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1550600059-5789-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1550600059-5789-3-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<CAMo8BfJxnZE=c6Co5UEi=W+ey=JQt4N70KEimr5YEbSQxQb9yg@mail.gmail.com>
-In-Reply-To: <CAMo8BfJxnZE=c6Co5UEi=W+ey=JQt4N70KEimr5YEbSQxQb9yg@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <alex.bennee@linaro.org>) id 1gwBIm-0000Ay-Po
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:43:38 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50983)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gwBIm-00004u-8V
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:43:36 -0500
+Received: by mail-wm1-x342.google.com with SMTP id x7so4087658wmj.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 11:43:32 -0800 (PST)
+References: <20190214040652.4811-1-richard.henderson@linaro.org>
+	<20190214040652.4811-3-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190214040652.4811-3-richard.henderson@linaro.org>
+Date: Tue, 19 Feb 2019 19:43:29 +0000
+Message-ID: <874l8z5ztq.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/9] tests/tcg: target/mips: Correct
- path to headers in some test source files
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/4] target/arm: Rebuild hflags at el
+ changes and MSR writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org
 
-Hello, Max!
 
-> From: Max Filippov <jcmvbkbc@gmail.com>
-> Subject: Re: [Qemu-devel] [PATCH v2 2/9] tests/tcg: target/mips: Correct =
-path to headers in some test source files
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> > -#include "../../../include/wrappers_msa.h"
-> > -#include "../../../include/test_inputs.h"
-> > -#include "../../../include/test_utils.h"
-> > +#include "../../../../include/wrappers_msa.h"
-> > +#include "../../../../include/test_inputs.h"
-> > +#include "../../../../include/test_utils.h"
+> Now setting, but not relying upon, env->hflags.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/internals.h     |  1 +
+>  linux-user/syscall.c       |  1 +
+>  target/arm/cpu.c           |  1 +
+>  target/arm/helper-a64.c    |  3 +++
+>  target/arm/helper.c        |  2 ++
+>  target/arm/machine.c       |  1 +
+>  target/arm/op_helper.c     |  1 +
+>  target/arm/translate-a64.c |  6 +++++-
+>  target/arm/translate.c     | 14 ++++++++++++--
+>  9 files changed, 27 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 8c1b813364..235f4fafec 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -970,5 +970,6 @@ ARMVAParameters aa64_va_parameters(CPUARMState *env, =
+uint64_t va,
+>
+>  uint32_t rebuild_hflags_a32(CPUARMState *env, int el);
+>  uint32_t rebuild_hflags_a64(CPUARMState *env, int el);
+> +void rebuild_hflags_any(CPUARMState *env);
+>
+>  #endif
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 5bbb72f3d5..123f342bdc 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -9691,6 +9691,7 @@ static abi_long do_syscall1(void *cpu_env, int num,=
+ abi_long arg1,
+>                      aarch64_sve_narrow_vq(env, vq);
+>                  }
+>                  env->vfp.zcr_el[1] =3D vq - 1;
+> +                arm_rebuild_hflags(env);
+>                  ret =3D vq * 16;
+>              }
+>              return ret;
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index edf6e0e1f1..e4da513eb3 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -390,6 +390,7 @@ static void arm_cpu_reset(CPUState *s)
+>
+>      hw_breakpoint_update_all(cpu);
+>      hw_watchpoint_update_all(cpu);
+> +    arm_rebuild_hflags(env);
+>  }
+>
+>  bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+> index 101fa6d3ea..f51cb75444 100644
+> --- a/target/arm/helper-a64.c
+> +++ b/target/arm/helper-a64.c
+> @@ -995,6 +995,7 @@ void HELPER(exception_return)(CPUARMState *env, uint6=
+4_t new_pc)
+>          } else {
+>              env->regs[15] =3D new_pc & ~0x3;
+>          }
+> +        rebuild_hflags_a32(env, new_el);
 
-> Wouldn't it be better to have path to include directory
-> somewhere in the CPPFLAGS, outside the test source code?
+env->hflags =3D rebuild_hflags_a32(env, new_el);
 
-Eventually these paths will be covered by CPPFLAGS, or similar.
-However, the whole directory tests/tcg/mips is undergoing a serious
-reorganization, and I have a strong impression that build/makefile
-infrastructure would be better off added at the end of that process.
-The additional challenge is that all these tests (like any other ones
-in tests/tcg) are supposed to be cross-compiled.
+>          qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d t=
+o "
+>                        "AArch32 EL%d PC 0x%" PRIx32 "\n",
+>                        cur_el, new_el, env->regs[15]);
+> @@ -1006,10 +1007,12 @@ void HELPER(exception_return)(CPUARMState *env, u=
+int64_t new_pc)
+>          }
+>          aarch64_restore_sp(env, new_el);
+>          env->pc =3D new_pc;
+> +        rebuild_hflags_a64(env, new_el);
 
-That said, all added files are tested via manual build and execution
-both on hardware and within QEMU (but the mistake that this patch
-fixes slipped thorough the cracks). Large number of tests cases (in
-the range of thousands so far) are executed in fairly short amount
-of time (matter of seconds).
+env->flags =3D rebuild_hflags_a64(env, new_el);
 
-In any case, thanks!
+Or possibly call arm_rebuild_hflags() instead.
 
-Aleksandar=
+>          qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d t=
+o "
+>                        "AArch64 EL%d PC 0x%" PRIx64 "\n",
+>                        cur_el, new_el, env->pc);
+>      }
+> +
+>      /*
+>       * Note that cur_el can never be 0.  If new_el is 0, then
+>       * el0_a64 is return_to_aa64, else el0_a64 is ignored.
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 7a77f53ba8..d8249f0eae 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -9081,6 +9081,7 @@ static void take_aarch32_exception(CPUARMState *env=
+, int new_mode,
+>          env->regs[14] =3D env->regs[15] + offset;
+>      }
+>      env->regs[15] =3D newpc;
+> +    env->hflags =3D rebuild_hflags_a32(env, arm_current_el(env));
+>  }
+>
+>  static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
+> @@ -9426,6 +9427,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *=
+cs)
+>
+>      pstate_write(env, PSTATE_DAIF | new_mode);
+>      env->aarch64 =3D 1;
+> +    env->hflags =3D rebuild_hflags_a64(env, new_el);
+>      aarch64_restore_sp(env, new_el);
+>
+>      env->pc =3D addr;
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index b292549614..61889801dd 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -743,6 +743,7 @@ static int cpu_post_load(void *opaque, int version_id)
+>      if (!kvm_enabled()) {
+>          pmu_op_finish(&cpu->env);
+>      }
+> +    arm_rebuild_hflags(&cpu->env);
+>
+>      return 0;
+>  }
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index c998eadfaa..8d459d9a84 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -571,6 +571,7 @@ void HELPER(cpsr_write_eret)(CPUARMState *env, uint32=
+_t val)
+>       */
+>      env->regs[15] &=3D (env->thumb ? ~1 : ~3);
+>
+> +    rebuild_hflags_a32(env, arm_current_el(env));
+>      qemu_mutex_lock_iothread();
+>      arm_call_el_change_hook(arm_env_get_cpu(env));
+>      qemu_mutex_unlock_iothread();
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index e002251ac6..ad665c1609 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1841,11 +1841,15 @@ static void handle_sys(DisasContext *s, uint32_t =
+insn, bool isread,
+>          /* I/O operations must end the TB here (whether read or write) */
+>          gen_io_end();
+>          s->base.is_jmp =3D DISAS_UPDATE;
+> -    } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+> +    }
+> +    if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+>          /* We default to ending the TB on a coprocessor register write,
+>           * but allow this to be suppressed by the register definition
+>           * (usually only necessary to work around guest bugs).
+>           */
+> +        TCGv_i32 tcg_el =3D tcg_const_i32(s->current_el);
+> +        gen_helper_rebuild_hflags_a64(cpu_env, tcg_el);
+> +        tcg_temp_free_i32(tcg_el);
+>          s->base.is_jmp =3D DISAS_UPDATE;
+>      }
+>  }
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 66cf28c8cb..36842a27b3 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -8432,6 +8432,8 @@ static int disas_coproc_insn(DisasContext *s, uint3=
+2_t insn)
+>      ri =3D get_arm_cp_reginfo(s->cp_regs,
+>              ENCODE_CP_REG(cpnum, is64, s->ns, crn, crm, opc1, opc2));
+>      if (ri) {
+> +        bool need_exit_tb;
+> +
+>          /* Check access permissions */
+>          if (!cp_access_ok(s->current_el, ri, isread)) {
+>              return 1;
+> @@ -8604,15 +8606,23 @@ static int disas_coproc_insn(DisasContext *s, uin=
+t32_t insn)
+>              }
+>          }
+>
+> +        need_exit_tb =3D false;
+>          if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_C=
+P_IO)) {
+>              /* I/O operations must end the TB here (whether read or writ=
+e) */
+>              gen_io_end();
+> -            gen_lookup_tb(s);
+> -        } else if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+> +            need_exit_tb =3D true;
+> +        }
+> +        if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+>              /* We default to ending the TB on a coprocessor register wri=
+te,
+>               * but allow this to be suppressed by the register definition
+>               * (usually only necessary to work around guest bugs).
+>               */
+> +            TCGv_i32 tcg_el =3D tcg_const_i32(s->current_el);
+> +            gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
+> +            tcg_temp_free_i32(tcg_el);
+> +            need_exit_tb =3D true;
+> +        }
+> +        if (need_exit_tb) {
+>              gen_lookup_tb(s);
+>          }
+
+
+--
+Alex Benn=C3=A9e
