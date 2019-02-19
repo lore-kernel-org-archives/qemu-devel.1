@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57292)
+Received: from eggs.gnu.org ([209.51.188.92]:58988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gw5CL-0004jk-Cm
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:12:34 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5I9-0001GE-09
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:18:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gw5CE-0003Zg-67
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:12:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gw5C8-0003WR-Lm
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:12:22 -0500
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-11-git-send-email-wexu@redhat.com>
-	<af2abdf0-3f96-6e97-d5c0-5ab2211222e1@redhat.com>
-	<20190219110003.GE15343@wei-ubt>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <73de72fc-07b2-8a70-f2d6-edfa26b1e989@redhat.com>
-Date: Tue, 19 Feb 2019 21:12:05 +0800
-MIME-Version: 1.0
-In-Reply-To: <20190219110003.GE15343@wei-ubt>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gw5I8-0006l3-5T
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 08:18:32 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 19 Feb 2019 13:18:23 +0000
+Message-ID: <5c06341a-3299-c43f-6f0f-983ad8db93c6@virtuozzo.com>
+References: <20190211125601.86533-1-vsementsov@virtuozzo.com>
+	<20190211125601.86533-5-vsementsov@virtuozzo.com>
+	<dcf92fc1-21d9-ea3b-5267-6c76f747cbc0@redhat.com>
+In-Reply-To: <dcf92fc1-21d9-ea3b-5267-6c76f747cbc0@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 10/11] virtio: migration support for
- packed ring
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8B0F7D40E4EAF34AA489853EBAE8C60E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 4/4] block/nbd-client: use non-blocking io
+ channel for nbd negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <wexu@redhat.com>
-Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "berrange@redhat.com" <berrange@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-
-On 2019/2/19 =E4=B8=8B=E5=8D=887:00, Wei Xu wrote:
-> On Tue, Feb 19, 2019 at 03:30:41PM +0800, Jason Wang wrote:
->> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26,wexu@redhat.com  wrote:
->>> From: Wei Xu<wexu@redhat.com>
->>>
->>> Both userspace and vhost-net/user are supported with this patch.
->>>
->>> A new subsection is introduced for packed ring, only 'last_avail_idx'
->>> and 'last_avail_wrap_counter' are saved/loaded presumably based on
->>> all the others relevant data(inuse, used/avail index and wrap count
->>> should be the same.
->> This is probably only true for net device, see comment in virtio_load(=
-):
->>
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 * Some devices migrate VirtQueueElements that have been popped
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 * from the avail ring but not yet returned to the used ring.
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 * Since max ring size < UINT16_MAX it's safe to use modulo
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 * UINT16_MAX + 1 subtraction.
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 */
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vd=
-ev->vq[i].inuse =3D (uint16_t)(vdev->vq[i].last_avail_idx -
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdev->vq[i].used_idx);
->>
->>
->> So you need to migrate used_idx and used_wrap_counter since we don't h=
-ave
->> used idx.
-> This is trying to align with vhost-net/user as we discussed, since all =
-we
-> have done is to support  virtio-net device for packed ring,
-
-
-Well, what you did probably work for virtio-net. But again, virtio-net=20
-is not the only device we want to support.
-
-
->   maybe we can
-> consider supporting other devices after we have got it verified.
->
-
-Please don't and fix the issue, packed virtqueue is a generic layout=20
-changes that should work for all kinds of virtio devices. It should be=20
-specially optimized for net, but it doesn't mean it was only designed=20
-for net.
-
-Thanks
+MTIuMDIuMjAxOSAxOjAyLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAyLzExLzE5IDY6NTYgQU0s
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBOb3cgbmVnb3RpYXRpb24g
+aXMgZG9uZSBpbiBjb3JvdXRpbmUsIHNvIHRvIHRha2UgYmVuZWZpdCBvZiBpdCBsZXQncw0KPj4g
+dXNlIG5vbi1ibG9ja2luZyBtb2RlbC4NCj4+DQo+PiBOb3RlIHRoYXQgUUlPQ2hhbm5lbCBoYW5k
+bGUgc3luY2hyb25vdXMgaW8gY2FsbHMgY29ycmVjdGx5IGFueXdheSwgc28NCj4gDQo+IHMvaGFu
+ZGxlL2hhbmRsZXMvDQo+IA0KPj4gaXQncyBub3QgYSBwcm9ibGVtIHRvIHNlbmQgZmluYWwgTkJE
+X0NNRF9ESVNDIHRvIG5vbi1ibG9ja2luZyBjaGFubmVsDQo+PiBidXQgdXNpbmcgc3luYyBxaW8g
+aW50ZXJmYWNlLCBldmVuIG5vdCBpbiBjb3JvdXRpbmUuDQo+IA0KPiBzL25vdCBpbi93aGVuIG5v
+dCBpbiBhLw0KPiANCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
+ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2svbmJk
+LWNsaWVudC5jIHwgMTAgKysrLS0tLS0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRp
+b25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPiANCj4gVGhpcyBmaXhlcyBxZW11IGFzIE5CRCBjbGll
+bnQgZm9yIHVzZSBpbiBibG9jayBkZXZpY2VzLCBidXQgd2hhdCBhYm91dA0KPiBxZW11IGFzIE5C
+RCBjbGllbnQgaW4gcWVtdS1uYmQ/ICBEb2VzIHRoYXQgbmVlZCBhbnkgdXBkYXRlcz8gIFRoZW4N
+Cj4gYWdhaW4sIHlvdXIgb2JzZXJ2YXRpb24gYWJvdXQgUUlPIGRvaW5nIHRoZSByaWdodCB0aGlu
+ZyBmb3IgYm90aA0KPiBibG9ja2luZyAocWVtdS1uYmQpIGFuZCBub24tYmxvY2tpbmcgKGJsb2Nr
+IGxheWVyKSBjaGFubmVscyBzZWVtcyB0bw0KPiBjb3ZlciB0aGF0Lg0KDQpJbiBxZW11LW5iZCBj
+bGllbnQgd29ya3MgaW4gYSBzZXBhcmF0ZSB0aHJlYWQsIHNvLCBJIHRoaW5rLCB3ZSBkb24ndCBu
+ZWVkDQpub25ibG9ja2luZzogd2UgaGF2ZSBhIHRocmVhZCBhbnl3YXkuDQoNCk9uIHRoZSBvdGhl
+ciBoYW5kLCBpcyBteSBjb2RlIGluIG5iZF9yZWFjZWl2ZV9jb21tb24gc2FmZSwga2VlcGluZyBp
+biBtaW5kDQp0aGF0IHdlIGNhbGwgaXQgZnJvbSBzZXBhcmF0ZSB0aHJlYWQ/DQoNCkFyZSBxaW9f
+Y2hhbm5lbF9hdHRhY2hfYWlvX2NvbnRleHQsIHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciwgQUlP
+X1dBSVRfV0hJTEUNCnRocmVhZC1zYWZlPw0KDQo+IA0KPj4gQEAgLTEwNzIsOSArMTA3Miw2IEBA
+IHN0YXRpYyBpbnQgbmJkX2NsaWVudF9jb25uZWN0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4g
+ICAgICAgICAgIG9iamVjdF9yZWYoT0JKRUNUKGNsaWVudC0+aW9jKSk7DQo+PiAgICAgICB9DQo+
+PiAgIA0KPj4gLSAgICAvKiBOb3cgdGhhdCB3ZSdyZSBjb25uZWN0ZWQsIHNldCB0aGUgc29ja2V0
+IHRvIGJlIG5vbi1ibG9ja2luZyBhbmQNCj4+IC0gICAgICoga2ljayB0aGUgcmVwbHkgbWVjaGFu
+aXNtLiAgKi8NCj4+IC0gICAgcWlvX2NoYW5uZWxfc2V0X2Jsb2NraW5nKFFJT19DSEFOTkVMKHNp
+b2MpLCBmYWxzZSwgTlVMTCk7DQo+PiAgICAgICBjbGllbnQtPmNvbm5lY3Rpb25fY28gPSBxZW11
+X2Nvcm91dGluZV9jcmVhdGUobmJkX2Nvbm5lY3Rpb25fZW50cnksIGNsaWVudCk7DQo+PiAgICAg
+ICBuYmRfY2xpZW50X2F0dGFjaF9haW9fY29udGV4dChicywgYmRydl9nZXRfYWlvX2NvbnRleHQo
+YnMpKTsNCj4+ICAgDQo+PiBAQCAtMTA4Myw5ICsxMDgwLDggQEAgc3RhdGljIGludCBuYmRfY2xp
+ZW50X2Nvbm5lY3QoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiAgIA0KPj4gICAgZmFpbDoNCj4+
+ICAgICAgIC8qDQo+PiAtICAgICAqIFdlIGhhdmUgY29ubmVjdGVkLCBidXQgbXVzdCBmYWlsIGZv
+ciBvdGhlciByZWFzb25zLiBUaGUNCj4+IC0gICAgICogY29ubmVjdGlvbiBpcyBzdGlsbCBibG9j
+a2luZzsgc2VuZCBOQkRfQ01EX0RJU0MgYXMgYSBjb3VydGVzeQ0KPj4gLSAgICAgKiB0byB0aGUg
+c2VydmVyLg0KPj4gKyAgICAgKiBXZSBoYXZlIGNvbm5lY3RlZCwgYnV0IG11c3QgZmFpbCBmb3Ig
+b3RoZXIgcmVhc29ucy4NCj4+ICsgICAgICogU2VuZCBOQkRfQ01EX0RJU0MgYXMgYSBjb3VydGVz
+eSB0byB0aGUgc2VydmVyLg0KPj4gICAgICAgICovDQo+PiAgICAgICB7DQo+PiAgICAgICAgICAg
+TkJEUmVxdWVzdCByZXF1ZXN0ID0geyAudHlwZSA9IE5CRF9DTURfRElTQyB9Ow0KPj4NCj4gDQoN
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
