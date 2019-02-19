@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33497)
+Received: from eggs.gnu.org ([209.51.188.92]:33808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwArR-0007SS-0R
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:15:21 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gwAss-0008Cz-Kz
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwArQ-0000Xm-0V
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:15:20 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:45710 helo=mail.rt-rk.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1gwAsq-0000zz-Nd
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:16:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwArP-0000We-Gl
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:15:19 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 19 Feb 2019 20:15:04 +0100
-Message-Id: <1550603704-22474-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gwAsp-0000zT-PF
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 14:16:48 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 19 Feb 2019 12:06:43 -0700
+Message-ID: <155060310248.19547.14979269067689441201.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] target/mips: implement QMP
- query-cpu-definitions command
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] pci: Sanity test minimum downstream LNKSTA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +26,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, dovgaluk@ispras.ru, armbru@redhat.com, philmd@redhat.com, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, natalia.fursova@ispras.ru, arikalo@wavecomp.com
+Cc: Jens Freimann <jfreimann@redhat.com>, mst@redhat.com, marcel.apfelbaum@gmail.com
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+The entire link status register for SR-IOV VFs is defined as RsvdZ,
+reads simply return zero.  Usually this is nothing more than lspci
+reporting inconsequentially broken values:
 
-This patch enables QMP-based querying of the available CPU types for
-MIPS and MIPS64 platforms.
+    LnkSta: Speed unknown, Width x0, ...
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+However, now that we're using the downstream endpoint link status to
+fill in the value at the parent downstream port, invalid values become
+a problem.  In particular, the PCIe hotplug driver in Linux looks for
+a valid negotiated link width and will fail to enumerate hot-added
+downstream endpoints without non-zero value here, ex:
+
+    pciehp 0000:00:02.0:pcie004: Slot(0): Attention button pressed
+    pciehp 0000:00:02.0:pcie004: Slot(0) Powering on due to button press
+    pciehp 0000:00:02.0:pcie004: Slot(0): Card present
+    pciehp 0000:00:02.0:pcie004: Slot(0): Link Up
+    pciehp 0000:00:02.0:pcie004: link training error: status 0x2000
+    pciehp 0000:00:02.0:pcie004: Failed to check link status
+
+Resolve by using minimum width and speed values for the downstream
+port link status when the endpoint fails to provide valid values.
+Long term, we may want to implement emulation in the vfio-pci host
+driver to suppliment this field with the PF value as the SR-IOV spec
+seems to allow, but the solution here is compatible should that be
+implemented later.
+
+Fixes: 727b48661f75 ("pci: Sync PCIe downstream port LNKSTA on read")
+Reported-by: Jens Freimann <jfreimann@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
+ hw/pci/pcie.c |   13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-v1->v2:
-
-  - rebased to the latest QAPI code
-
- qapi/target.json     |  4 ++--
- target/mips/helper.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
-
-diff --git a/qapi/target.json b/qapi/target.json
-index da7b4be..1d4d54b 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -499,7 +499,7 @@
-             'static': 'bool',
-             '*unavailable-features': [ 'str' ],
-             'typename': 'str' },
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-=20
- ##
- # @query-cpu-definitions:
-@@ -511,4 +511,4 @@
- # Since: 1.2.0
- ##
- { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 944f094..c44cdca 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -24,6 +24,7 @@
- #include "exec/cpu_ldst.h"
- #include "exec/log.h"
- #include "hw/mips/cpudevs.h"
-+#include "qapi/qapi-commands-target.h"
-=20
- enum {
-     TLBRET_XI =3D -6,
-@@ -1470,3 +1471,35 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSS=
-tate *env,
-=20
-     cpu_loop_exit_restore(cs, pc);
- }
-+
-+static void mips_cpu_add_definition(gpointer data, gpointer user_data)
-+{
-+    ObjectClass *oc =3D data;
-+    CpuDefinitionInfoList **cpu_list =3D user_data;
-+    CpuDefinitionInfoList *entry;
-+    CpuDefinitionInfo *info;
-+    const char *typename;
-+
-+    typename =3D object_class_get_name(oc);
-+    info =3D g_malloc0(sizeof(*info));
-+    info->name =3D g_strndup(typename,
-+                           strlen(typename) - strlen("-" TYPE_MIPS_CPU))=
-;
-+    info->q_typename =3D g_strdup(typename);
-+
-+    entry =3D g_malloc0(sizeof(*entry));
-+    entry->value =3D info;
-+    entry->next =3D *cpu_list;
-+    *cpu_list =3D entry;
-+}
-+
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
-+{
-+    CpuDefinitionInfoList *cpu_list =3D NULL;
-+    GSList *list;
-+
-+    list =3D object_class_get_list(TYPE_MIPS_CPU, false);
-+    g_slist_foreach(list, mips_cpu_add_definition, &cpu_list);
-+    g_slist_free(list);
-+
-+    return cpu_list;
-+}
---=20
-2.7.4
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 3f7c36609313..3618d6ab2e1a 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -834,9 +834,12 @@ void pcie_add_capability(PCIDevice *dev,
+ /*
+  * Sync the PCIe Link Status negotiated speed and width of a bridge with the
+  * downstream device.  If downstream device is not present, re-write with the
+- * Link Capability fields.  Limit width and speed to bridge capabilities for
+- * compatibility.  Use config_read to access the downstream device since it
+- * could be an assigned device with volatile link information.
++ * Link Capability fields.  If downstream device reports invalid width or
++ * speed, replace with minimum values (LnkSta fields are RsvdZ on VFs but such
++ * values interfere with PCIe native hotplug detecting new devices).  Limit
++ * width and speed to bridge capabilities for compatibility.  Use config_read
++ * to access the downstream device since it could be an assigned device with
++ * volatile link information.
+  */
+ void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
+ {
+@@ -856,11 +859,15 @@ void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
+         if ((lnksta & PCI_EXP_LNKSTA_NLW) > (lnkcap & PCI_EXP_LNKCAP_MLW)) {
+             lnksta &= ~PCI_EXP_LNKSTA_NLW;
+             lnksta |= lnkcap & PCI_EXP_LNKCAP_MLW;
++        } else if (!(lnksta & PCI_EXP_LNKSTA_NLW)) {
++            lnksta |= QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1);
+         }
+ 
+         if ((lnksta & PCI_EXP_LNKSTA_CLS) > (lnkcap & PCI_EXP_LNKCAP_SLS)) {
+             lnksta &= ~PCI_EXP_LNKSTA_CLS;
+             lnksta |= lnkcap & PCI_EXP_LNKCAP_SLS;
++        } else if (!(lnksta & PCI_EXP_LNKSTA_CLS)) {
++            lnksta |= QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT);
+         }
+     }
+ 
