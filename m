@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46334)
+Received: from eggs.gnu.org ([209.51.188.92]:46433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw4X4-0004CX-G4
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:29:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1gw4XE-0004Oq-Ct
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gw4Wz-0007mi-Tv
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:29:52 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42583)
+	(envelope-from <philmd@redhat.com>) id 1gw4XC-0007tY-Kv
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:30:04 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gw4Wy-0007Q4-Ui
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:29:49 -0500
-Received: by mail-ot1-x344.google.com with SMTP id i5so33768423oto.9
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:29:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gw4XC-0007Ua-Ch
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:30:02 -0500
+Received: by mail-wm1-f66.google.com with SMTP id j125so2574936wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 04:29:40 -0800 (PST)
+References: <20190219060719.8211-1-richardw.yang@linux.intel.com>
+	<20190219060719.8211-2-richardw.yang@linux.intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <44d5032e-7271-3779-c7e2-d0edd3e1c7fb@redhat.com>
+Date: Tue, 19 Feb 2019 13:29:38 +0100
 MIME-Version: 1.0
-References: <20190214125107.22178-1-peter.maydell@linaro.org>
-	<20190214125107.22178-13-peter.maydell@linaro.org>
-In-Reply-To: <20190214125107.22178-13-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Feb 2019 12:29:11 +0000
-Message-ID: <CAFEAcA_Q-ZSnaCE2-xQii4gGwwDDck6BM8PvRxs8d0xRMMtogQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 12/14] hw/arm/musca: Add MPCs
+In-Reply-To: <20190219060719.8211-2-richardw.yang@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] pc-dimm: remove check on pc-dimm
+ hotpluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, xiaoguangrong.eric@gmail.com, mst@redhat.com
 
-On Thu, 14 Feb 2019 at 12:51, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> The Musca board puts its SRAM and flash behind TrustZone
-> Memory Protection Controllers (MPCs). Each MPC sits between
-> the CPU and the RAM/flash, and also has a set of memory mapped
-> control registers. Wire up the MPCs, and the memory behind them.
-> For the moment we implement the flash as simple ROM, which
-> cannot be reprogrammed by the guest.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 2/19/19 7:07 AM, Wei Yang wrote:
+> Function acpi_memory_plug_cb() is only invoked when dev is a PCDIMM,
+> which is hotpluggable. This means it is not necessary to check this
+> property again.
+> 
+> This patch removes this check.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->  hw/arm/musca.c | 155 ++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 147 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/arm/musca.c b/hw/arm/musca.c
-> index 8774e0b87b7..5fadac8c09b 100644
-> --- a/hw/arm/musca.c
-> +++ b/hw/arm/musca.c
-> @@ -27,11 +27,15 @@
->  #include "hw/arm/armsse.h"
->  #include "hw/boards.h"
->  #include "hw/core/split-irq.h"
-> +#include "hw/misc/tz-mpc.h"
->  #include "hw/misc/tz-ppc.h"
->  #include "hw/misc/unimp.h"
->
->  #define MUSCA_NUMIRQ_MAX 96
->  #define MUSCA_PPC_MAX 3
-> +#define MUSCA_MPC_MAX 5
-> +
-> +typedef struct MPCInfo MPCInfo;
+>  hw/acpi/memory_hotplug.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+> index 8c7c1013f3..b19673d337 100644
+> --- a/hw/acpi/memory_hotplug.c
+> +++ b/hw/acpi/memory_hotplug.c
+> @@ -266,10 +266,6 @@ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+>      MemStatus *mdev;
+>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
 
-[...]
+You have to remove the 'dc' variable now:
 
-> +typedef struct MPCInfo {
-> +    const char *name;
-> +    hwaddr addr;
-> +    hwaddr size;
-> +    MPCInfoType type;
-> +} MPCInfo;
+  CC      hw/acpi/memory_hotplug.o
+hw/acpi/memory_hotplug.c: In function ‘acpi_memory_plug_cb’:
+hw/acpi/memory_hotplug.c:267:18: error: unused variable ‘dc’
+[-Werror=unused-variable]
+     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+                  ^~
 
-This should just be "struct MPCInfo { ... };" to avoid clang
-complaining:
+Once removed:
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-hw/arm/musca.c:165:3: error: redefinition of typedef 'MPCInfo' is a C11
-      feature [-Werror,-Wtypedef-redefinition]
-
-Since it's a minor thing I'll just squash it in when I
-apply this series, assuming I don't need to respin for
-anything else.
-
-thanks
--- PMM
+>  
+> -    if (!dc->hotpluggable) {
+> -        return;
+> -    }
+> -
+>      mdev = acpi_memory_slot_status(mem_st, dev, errp);
+>      if (!mdev) {
+>          return;
+> 
