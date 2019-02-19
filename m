@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60345)
+Received: from eggs.gnu.org ([209.51.188.92]:33610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gw1Qj-0004PC-7K
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:11:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gw1X1-0006B5-MZ
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:17:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gw1Qd-0000Zh-Gj
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:11:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59686)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gw1QV-0000WK-8t
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:10:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gw1QL-00010I-Ik
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 09:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8A1672E80C7
-	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 09:10:45 +0000 (UTC)
+	(envelope-from <kwolf@redhat.com>) id 1gw1Wz-0002qO-QT
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 04:17:39 -0500
+Date: Tue, 19 Feb 2019 10:17:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190219091729.GE4727@localhost.localdomain>
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-12-kwolf@redhat.com>
+	<d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Feb 2019 09:02:32 -0000
-From: Gerd Hoffmann <1816052@bugs.launchpad.net>
-Reply-To: Bug 1816052 <1816052@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155024186658.3618.3655538630796654144.malonedeb@wampee.canonical.com>
-Message-Id: <155056695230.4038.14679219329213440549.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1816052] Re: qemu system emulator fails to start
- if no sound card is present on host
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="SFyWQ0h3ruR435lw"
+Content-Disposition: inline
+In-Reply-To: <d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 11/11] qcow2: Add data file to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,117 +26,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
 
-What happens if you remove "try-alsa" from the configure line?
 
--- =
+--SFyWQ0h3ruR435lw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1816052
+Am 19.02.2019 um 01:47 hat Max Reitz geschrieben:
+> On 31.01.19 18:55, Kevin Wolf wrote:
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  qapi/block-core.json | 1 +
+> >  block/qcow2.c        | 6 +++++-
+> >  2 files changed, 6 insertions(+), 1 deletion(-)
+>=20
+> [...]
+>=20
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 4959bf16a4..e3427f9fcd 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -1459,7 +1459,9 @@ static int coroutine_fn qcow2_do_open(BlockDriver=
+State *bs, QDict *options,
+> >      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+> >          s->data_file =3D bdrv_open_child(NULL, options, "data-file", b=
+s,
+> >                                         &child_file, false, &local_err);
+> > -        if (!s->data_file) {
+> > +        if (s->data_file) {
+> > +            s->image_data_file =3D g_strdup(s->data_file->bs->filename=
+);
+> > +        } else {
+> >              if (s->image_data_file) {
+> >                  error_free(local_err);
+> >                  local_err =3D NULL;
+>=20
+> Ah, this is what I looked for in the last patch. :-)
+>=20
+> (i.e. it should be in the last patch, not here)
 
-Title:
-  qemu system emulator fails to start if no sound card is present on
-  host
+[RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
 
-Status in QEMU:
-  New
+This is the last patch. :-P
 
-Bug description:
-  A plain build from git master at
-  81dbcfa9e1d8bab3f7c4cc923c0b40cd666f374f on Fedora 29 x86_64 host,
-  with no options passed to configure.
+> I think as it is it is just wrong, though.  If I pass enough options at
+> runtime, this will overwrite the image header:
+>=20
+> $ ./qemu-img create -f qcow2 -o data_file=3Dfoo.raw foo.qcow2 64M
+> $ ./qemu-img create -f raw bar.raw 64M
+> $ ./qemu-img info foo.qcow2
+> [...]
+>     data file: foo.raw
+> [...]
+> $ ./qemu-io --image-opts \
+>     file.filename=3Dfoo.qcow2,data-file.driver=3Dfile,\
+> data-file.filename=3Dbar.raw,lazy-refcounts=3Don \
+>     -c 'write 0 64k'
+> # (The lazy-refcounts is so the image header is updated)
+> $ ./qemu-img info foo.qcow2
+> [...]
+>     data file: bar.raw
+> [...]
+>=20
+> The right thing would probably to check whether the header extension
+> exists (i.e. if s->image_data_file is non-NULL) and if it does not (it
+> is NULL), s->image_data_file gets set; because there are no valid images
+> with the external data file flag set where there is no such header
+> extension.  So we must be in the process of creating the image right now.
+>=20
+> But even then, I don't quite like setting it here and not creating the
+> header extension as part of qcow2_co_create().  I can see why you've
+> done it this way, but creating a "bad" image on purpose (one with the
+> external data file bit set, but no such header extension present yet) in
+> order to detect and rectify this case when it is first opened (and the
+> opening code assuming that any such broken image must be one that is
+> opened the first time) is a bit weird.
 
-  Trying to launch QEMU on a  host with no audio card present:
+It's not really a bad image, just one that's a bit cumbersome to use
+because you need to specify the 'data-file' option manually.
 
-  # ls /dev/snd/
-  seq  timer
+> I suppose doing it right (if you agree with the paragraph before the
+> last one) and adding a comment would make it less weird
+> ("s->image_data_file must be non-NULL for any valid image, so this image
+> must be one we are creating right now" or something like that).
+>=20
+> But still, the issue you point out in your cover letter remains; which
+> is that the node's filename and the filename given by the user may be
+> two different things.
 
-  It will fail to initialize alsa and abort startup:
+I think what I was planning to do was leaving the path from the image
+header in s->image_data_file even when a runtime option overrides it.
+After all, ImageInfo is about the image, not about the runtime state.
 
-  # qemu-system-x86_64 -cdrom Fedora-Workstation-Live-x86_64-29-1.2.iso  -m=
- 4000 -vnc 0.0.0.0:1 =
+Image creation would just manually set s->image_data_file before
+updating the header.
 
-  ALSA lib confmisc.c:767:(parse_card) cannot find card '0'
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_card_driver=
- returned error: No such file or directory
-  ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_concat retu=
-rned error: No such file or directory
-  ALSA lib confmisc.c:1246:(snd_func_refer) error evaluating name
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_refer retur=
-ned error: No such file or directory
-  ALSA lib conf.c:5034:(snd_config_expand) Evaluate error: No such file or =
-directory
-  ALSA lib pcm.c:2565:(snd_pcm_open_noupdate) Unknown PCM default
-  alsa: Could not initialize DAC
-  alsa: Failed to open `default':
-  alsa: Reason: No such file or directory
-  ALSA lib confmisc.c:767:(parse_card) cannot find card '0'
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_card_driver=
- returned error: No such file or directory
-  ALSA lib confmisc.c:392:(snd_func_concat) error evaluating strings
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_concat retu=
-rned error: No such file or directory
-  ALSA lib confmisc.c:1246:(snd_func_refer) error evaluating name
-  ALSA lib conf.c:4555:(_snd_config_evaluate) function snd_func_refer retur=
-ned error: No such file or directory
-  ALSA lib conf.c:5034:(snd_config_expand) Evaluate error: No such file or =
-directory
-  ALSA lib pcm.c:2565:(snd_pcm_open_noupdate) Unknown PCM default
-  alsa: Could not initialize DAC
-  alsa: Failed to open `default':
-  alsa: Reason: No such file or directory
-  init fail
-  audio: Failed to create voice `pcspk'
-  qemu-system-x86_64: Initialization of device isa-pcspk failed: Initializi=
-ng audio voice failed
+Kevin
 
-  =
+--SFyWQ0h3ruR435lw
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  git bisect blames this change:
+-----BEGIN PGP SIGNATURE-----
 
-  =
+iQIcBAEBAgAGBQJca8mpAAoJEH8JsnLIjy/WBqwP/A0WHlAihWU2jSMdnAIWTeJk
+iUTpBxrey6MUXZ/zW3MK6QZmoudgjnLARCcQg38dw6fQzanhm6ulsznZRMCYkVKY
+5YzLn+cb6zSrA6taXbTq+y/Q9KZHBWAZ+rggLBLVgn467fkbN/7YLDWoQpf/fjO/
+5mj8blpM6fV6gOik2y3ZqreC/mPXkpauTToWbmogsN+yjsznBXr4pEzcDO1/H8M8
+rJ3eOVV1SFGLoOywm9KuSKRgdVALrQ5daAc3+49Jn31v7DRx4VPuno0en0+UaVvD
+Czcd/tTS9xOH8dasWl72aZoyaCpO5/wFsDxsKdBFH+znsQqOsSzFNp7NI7Rewalv
+tQVMOeR6lfIHJtALgScUTW96LmzT4NlXsFCOjTM8mNdHKar/HV8ymsY3IBqZ8AAD
+Utjjh86bUUrtm0zIASWBbXLlPts1IHUBqdkrTHkZgQ/Y222bZStgcGGIlgS7iA6O
+LnVcgwCZ8be6DI12vAHIhzByXiQh/CBWCYszJbm7xjONiQ0eRdRaNKR68hwtVFg1
+tyjUTGRfLA6scfQWrVyvMqo9YEfPrrcW8rEnotZTmGgsqQXHOI1yDpvjiizTeU+h
+udy5+UAV3AtALTDh/+OgxSxaRkWZVkYB/zo3pw04is91iQQCLQmW//VkDS9kCyJj
+/DcPBVvb2H7IabddVIcQ
+=0GxW
+-----END PGP SIGNATURE-----
 
-    commit 6a48541873f14b597630283f8f5397674ad82ea9 (HEAD, refs/bisect/bad)
-    Author: Gerd Hoffmann <kraxel@redhat.com>
-    Date:   Thu Jan 24 12:20:55 2019 +0100
-
-      audio: probe audio drivers by default
-      =
-
-      Add the drivers listed in audio_possible_drivers to audio_drv_list,
-      using the try-* variants.  That way the probable drivers are compiled=
- by
-      default if possible.
-      =
-
-      Additioal tweaks:
-        linux: reorder to: pa alsa sdl oss.
-        *bsd: drop pa.
-      =
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Message-id: 20190124112055.547-7-kraxel@redhat.com
-
-  =
-
-  This changed our probe order:
-
-     Linux)
-    -  audio_drv_list=3D"oss"
-    +  audio_drv_list=3D"try-pa try-alsa try-sdl oss"
-
-  After some debugging I can see that 'audio_init' successfully
-  initializes the alsa driver.
-
-  When the pcspk devices goes to AUD_open_out though, the alsa driver
-  fails spewing the above text to stderr and thus causes QEMU to fail.
-
-  This looks very much like the ALSA driver in QEMU is broken -
-  audio_init() should not have succeeded unless the ALSA driver knew it
-  could later succesfully honour AUD_open_out.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1816052/+subscriptions
+--SFyWQ0h3ruR435lw--
