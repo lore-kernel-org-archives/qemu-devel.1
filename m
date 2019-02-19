@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37502)
+Received: from eggs.gnu.org ([209.51.188.92]:38131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw7bc-0005Pz-PD
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:46:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1gw7eH-00077e-5U
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:49:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gw7bY-0002lt-Bq
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:46:46 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-11-armbru@redhat.com>
-	<CAFEAcA9NLjpoB47vG-vhTpp1zKdrFb3FRXjNUbzjxVCb4soRyg@mail.gmail.com>
-Date: Tue, 19 Feb 2019 16:46:39 +0100
-In-Reply-To: <CAFEAcA9NLjpoB47vG-vhTpp1zKdrFb3FRXjNUbzjxVCb4soRyg@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 19 Feb 2019 14:13:09 +0000")
-Message-ID: <878sybsrvk.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1gw7eE-0005LH-JA
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 10:49:33 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-12-kwolf@redhat.com>
+	<d38f5705-598a-38e6-d98e-e2241ba83056@redhat.com>
+	<20190219091729.GE4727@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <70913fa3-0db6-cc31-8b99-380d4c8ca65b@redhat.com>
+Date: Tue, 19 Feb 2019 09:49:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 10/10] hw/arm hw/xtensa: De-duplicate
- pflash creation code some
+In-Reply-To: <20190219091729.GE4727@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 11/11] qcow2: Add data file to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 2/19/19 3:17 AM, Kevin Wolf wrote:
 
-> On Mon, 18 Feb 2019 at 13:08, Markus Armbruster <armbru@redhat.com> wrote:
 >>
->> pflash_cfi01_register() creates a TYPE_CFI_PFLASH01 device, sets
->> properties, realizes, and wires up.
+>> Ah, this is what I looked for in the last patch. :-)
 >>
->> We have three modified copies of it, because their users need to set
->> additional properties, or have the wiring done differently.
->>
->> Factor out their common part into pflash_cfi01_create().
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/arm/vexpress.c        | 22 +++++-----------------
->>  hw/arm/virt.c            | 26 +++++++++-----------------
->>  hw/block/pflash_cfi01.c  | 39 +++++++++++++++++++++++++++------------
->>  hw/xtensa/xtfpga.c       | 18 +++++++-----------
->>  include/hw/block/flash.h |  8 ++++++++
->>  5 files changed, 56 insertions(+), 57 deletions(-)
->>
->> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
->> index 00913f2655..b23c63ed24 100644
->> --- a/hw/arm/vexpress.c
->> +++ b/hw/arm/vexpress.c
->> @@ -515,26 +515,14 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
->>  static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *name,
->>                                               DriveInfo *di)
->>  {
->> -    DeviceState *dev = qdev_create(NULL, TYPE_CFI_PFLASH01);
->> +    DeviceState *dev;
->>
->> -    if (di) {
->> -        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
->> -                            &error_abort);
->> -    }
->> -
->> -    qdev_prop_set_uint32(dev, "num-blocks",
->> -                         VEXPRESS_FLASH_SIZE / VEXPRESS_FLASH_SECT_SIZE);
->> -    qdev_prop_set_uint64(dev, "sector-length", VEXPRESS_FLASH_SECT_SIZE);
->> -    qdev_prop_set_uint8(dev, "width", 4);
->> +    dev = DEVICE(pflash_cfi01_create(name, VEXPRESS_FLASH_SIZE,
->> +                                     di ? blk_by_legacy_dinfo(di) : NULL,
->> +                                     VEXPRESS_FLASH_SECT_SIZE,
->> +                                     4, 0x89, 0x18, 0x00, 0x00, false));
->>      qdev_prop_set_uint8(dev, "device-width", 2);
->> -    qdev_prop_set_bit(dev, "big-endian", false);
->> -    qdev_prop_set_uint16(dev, "id0", 0x89);
->> -    qdev_prop_set_uint16(dev, "id1", 0x18);
->> -    qdev_prop_set_uint16(dev, "id2", 0x00);
->> -    qdev_prop_set_uint16(dev, "id3", 0x00);
->> -    qdev_prop_set_string(dev, "name", name);
->>      qdev_init_nofail(dev);
->> -
->>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
->>      return CFI_PFLASH01(dev);
->>  }
->
-> I prefer this code the way it stands. In particular the
-> "call another function but then set the 'device-width'
-> property here" looks dubious. But broadly speaking the
-> "do all the property setting directly rather than calling
-> a helper function" is the style choice I think we should
-> be aiming for. (The prevalence of the other approach is
-> due to a mix of (1) older code we haven't updated and
-> (2) property-setting being annoyingly heavyweight
-> syntax.)
+>> (i.e. it should be in the last patch, not here)
+> 
+> [RFC PATCH 11/11] qcow2: Add data file to ImageInfoSpecificQCow2
+> 
+> This is the last patch. :-P
 
-Okay, no problem.
+"last"=="previous" (10/11), not "last"=="final" (11/11). Isn't English
+great?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
