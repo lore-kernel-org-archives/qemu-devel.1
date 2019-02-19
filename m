@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42028)
+Received: from eggs.gnu.org ([209.51.188.92]:42330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw4Fl-0004AK-SH
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:12:02 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gw4Gu-0004sY-O8
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:13:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gw4Fl-0004Ky-2A
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:12:01 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Feb 2019 12:11:51 +0000
-Message-ID: <30c66aaa-2807-69cd-2395-dcd49e59b136@virtuozzo.com>
-References: <20190219115937.21587-1-stefanha@redhat.com>
-	<2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
-In-Reply-To: <2598979f-d8b5-4324-3ca4-f87802d4a9d1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <629FEF5409206F4FB194EECCFDEA0DD5@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kraxel@redhat.com>) id 1gw4Gt-0004j7-Tb
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:13:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gw4Gt-0004iv-MM
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 07:13:11 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3EC711BB50
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 12:13:10 +0000 (UTC)
+Date: Tue, 19 Feb 2019 13:12:58 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190219121258.rua536oattwkwgkc@sirius.home.kraxel.org>
+References: <20190219101510.9356-1-kraxel@redhat.com>
+	<a7050f62-b56f-cc1a-7600-5197b83a27ac@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] iotests: drop unnecessary accel=kvm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a7050f62-b56f-cc1a-7600-5197b83a27ac@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] audio: don't use alsa by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com
 
-MTkuMDIuMjAxOSAxNTowMiwgVGhvbWFzIEh1dGggd3JvdGU6DQo+IE9uIDE5LzAyLzIwMTkgMTIu
-NTksIFN0ZWZhbiBIYWpub2N6aSB3cm90ZToNCj4+IFRlc3RzIDIzNSBhbmQgMjM4IGRvIG5vdCBy
-ZXF1aXJlIHRoZSBrdm0gYWNjZWxlcmF0b3IuICBUQ0cgd29ya3MgZmluZS4NCj4+DQo+PiBVc2Ug
-dGhlIGRlZmF1bHQgYWNjZWxlcmF0b3IgaW5zdGVhZCBvZiByZXF1aXJpbmcga3ZtLg0KPj4NCj4+
-IFN1Z2dlc3RlZC1ieTogVGhvbWFzIEh1dGggPHRodXRoQHJlZGhhdC5jb20+DQo+PiBTaWduZWQt
-b2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+DQo+PiAtLS0NCj4+
-ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNSB8IDEgLQ0KPj4gICB0ZXN0cy9xZW11LWlvdGVzdHMv
-MjM4IHwgMSAtDQo+PiAgIDIgZmlsZXMgY2hhbmdlZCwgMiBkZWxldGlvbnMoLSkNCj4+DQo+PiBk
-aWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
-MzUNCj4+IGluZGV4IGQ2ZWRkOTdhYjQuLjMyOWRhOGYwYzIgMTAwNzU1DQo+PiAtLS0gYS90ZXN0
-cy9xZW11LWlvdGVzdHMvMjM1DQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjM1DQo+PiBA
-QCAtNDksNyArNDksNiBAQCBxZW11X2ltZ19jcmVhdGUoJy1mJywgaW90ZXN0cy5pbWdmbXQsICct
-bycsICdwcmVhbGxvY2F0aW9uPW1ldGFkYXRhJywgZGlzaywNCj4+ICAgICAgICAgICAgICAgICAg
-IHN0cihzaXplKSkNCj4+ICAgDQo+PiAgIHZtID0gUUVNVU1hY2hpbmUoaW90ZXN0cy5xZW11X3By
-b2cpDQo+PiAtdm0uYWRkX2FyZ3MoJy1tYWNoaW5lJywgJ2FjY2VsPWt2bScpDQo+IA0KPiBBY2Nv
-cmRpbmcgdG8gdGhlIGluaXRpYWwgY29tbWl0IGxvZyBvZiAyMzU6DQo+IA0KPiAgICJpb3Rlc3Rz
-OiBzaW1wbGUgbWlycm9yIHRlc3Qgd2l0aCBrdm0gb24gMUcgaW1hZ2UiDQo+IA0KPiAuLi4gc28g
-SSBhc3N1bWUgS1ZNIHdhcyB1c2VkIG9uIHB1cnBvc2UgaGVyZT8NCj4gDQo+ICAgVGhvbWFzDQo+
-IA0KDQpBcyBJIHJlbWVtYmVyIGt2bSBpcyBub3QgcmVhbGx5IG5lY2Vzc2FyeSwgYW5kIHRlc3Qg
-aGF2ZSBhIGNvbW1lbnQgYWJvdXQgaXQ6DQojIEFuZCBpdCBkaWRuJ3QgcmVwcm9kdWNlIGlmIGF0
-IGxlYXN0IG9uZSBvZiB0aGUgZm9sbG93aW5nOg0KLi4uDQojIDMuIGRyb3Aga3ZtIGFuZCB1c2Ug
-aW90ZXN0cy5WTSgpIChtYXliZSwgYmVjYXVzZSBvZiBxdGVzdCkgKGhvd2V2ZXIsIGl0IHN0aWxs
-DQojICAgIHJlcHJvZHVjZXMsIGlmIGp1c3QgZHJvcCBrdm0sIGJ1dCBnZGIgZmFpbGVkIHRvIHBy
-b2R1Y2UgZnVsbCBiYWNrdHJhY2VzDQojICAgIGZvciBtZSkNCg0KQnV0IHRoZSBjb21tZW50IHNo
-b3VsZCBiZSB1cGRhdGVkIHdpdGggdGhpcyBwYXRjaC4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+On Tue, Feb 19, 2019 at 11:39:49AM +0100, David Hildenbrand wrote:
+> On 19.02.19 11:15, Gerd Hoffmann wrote:
+> > ardware is present the driver initializes
+> > successfully and throws errors later on, i.e. effectively the
+> > automatic probing doesn't work.  So the driver should not be
+> > used by default (until that is fixed).  Drop the can_be_default
+> > flag.
+> > 
+> > Explicitly picking the alsa driver (using QEMU_AUDIO_DRV=alsa
+> > environment variable) will continue to work.
+> 
+> Just pointing out that with this patch, audio initialization still
+> hinders me from starting guests on my Fedora 29 when running under root
+> (I don't think this patch was also intended to fix that, just pointing
+> out for me the problem still exists).
+> 
+> 
+> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+> Connection refused
+> 
+> sdl: SDL_OpenAudio failed
+> sdl: Reason: ALSA: Couldn't open audio device: Connection refused
+> ALSA lib pulse.c:243:(pulse_connect) PulseAudio: Unable to connect:
+> Connection refused
+> 
+> sdl: SDL_OpenAudio failed
+> sdl: Reason: ALSA: Couldn't open audio device: Connection refused
+> audio: Failed to create voice `pcspk'
+> qemu-system-x86_64: Initialization of device isa-pcspk failed:
+> Initializing audio voice failed
+
+So SDL has the same problem (possibly only when using alsa).
+
+Hmm.  Dropping can_be_default here will too break sound on BSD ...
