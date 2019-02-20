@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44983)
+Received: from eggs.gnu.org ([209.51.188.92]:44963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gwUU5-0007mb-L3
+	(envelope-from <richard.henderson@linaro.org>) id 1gwUU4-0007mY-GY
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gwUU4-00005M-8Y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:12:33 -0500
-References: <20190220145819.30969-1-berrange@redhat.com>
-	<20190220145819.30969-3-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <52d7b4c8-4764-630b-a5ba-bc8d37359081@redhat.com>
-Date: Wed, 20 Feb 2019 10:11:40 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1gwUU3-00004u-LX
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:12:32 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gwUU3-0008UX-AO
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:12:31 -0500
+Received: by mail-pl1-x642.google.com with SMTP id q3so5065735pll.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 08:12:29 -0800 (PST)
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-8-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <751dd076-6e63-2c10-e8a3-a4a8ef2cc00a@linaro.org>
+Date: Wed, 20 Feb 2019 08:12:26 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190220145819.30969-3-berrange@redhat.com>
+In-Reply-To: <20190130004811.27372-8-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: avoid broken pipe with
- certtool
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 07/73] cpu: make per-CPU locks an alias
+ of the BQL in TCG rr mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-On 2/20/19 8:58 AM, Daniel P. Berrang=C3=A9 wrote:
-> When we run "certtool | head -1" the latter command is likely to
-> complete and exit before certtool has written everything it wants to
-> stderr. In at least the RHEL-7 gnutls 3.3.29 this causes certtool to
-
-A bit of a mismatch: had we actually used only 'certtool | head -1', it
-would be early death before writing all it wants to stdout (not stderr).
- But since the patch itself is replacing 'certtool 2>&1 | head -1',
-where stderr is also in the picture due to the additional fd
-redirection, I'm not sure if it is better to just s/"certtool
-|/"certtool 2>&1 |/ to match the patch, or to s/stderr/stdout/ for
-brevity, or to just leave things as written.  Your call.
-
-> quit with broken pipe before it has finished writing the desired
-> output file to disk. This causes non-deterministic failures of the
-> iotest 233 because the certs are sometimes zero length files.
-> If certtool fails the "head -1" means we also loose any useful error
-
-s/loose/lose/
-
-> message it would have printed.
->=20
-> Thus this patch gets rid of the pipe and post-processes the output in a
-> more flexible & reliable manner.
->=20
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 1/29/19 4:47 PM, Emilio G. Cota wrote:
+> Before we can switch from the BQL to per-CPU locks in
+> the CPU loop, we have to accommodate the fact that TCG
+> rr mode (i.e. !MTTCG) cannot work with separate per-vCPU
+> locks. That would lead to deadlock since we need a single
+> lock/condvar pair on which to wait for events that affect
+> any vCPU, e.g. in qemu_tcg_rr_wait_io_event.
+> 
+> At the same time, we are moving towards an interface where
+> the BQL and CPU locks are independent, and the only requirement
+> is that the locking order is respected, i.e. the BQL is
+> acquired first if both locks have to be held at the same time.
+> 
+> In this patch we make the BQL a recursive lock under the hood.
+> This allows us to (1) keep the BQL and CPU locks interfaces
+> separate, and (2) use a single lock for all vCPUs in TCG rr mode.
+> 
+> Note that the BQL's API (qemu_mutex_lock/unlock_iothread) remains
+> non-recursive.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
->  1 file changed, 32 insertions(+), 16 deletions(-)
->=20
+>  include/qom/cpu.h |  2 +-
+>  cpus-common.c     |  2 +-
+>  cpus.c            | 90 +++++++++++++++++++++++++++++++++++++++++------
+>  qom/cpu.c         |  3 +-
+>  stubs/cpu-lock.c  |  6 ++--
+>  5 files changed, 86 insertions(+), 17 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-As the fix is for an iotest using NBD, I can take this through my tree
-if no one else picks it up through some other block or iotests tree first=
-.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+r~
