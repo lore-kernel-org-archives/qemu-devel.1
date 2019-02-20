@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59443)
+Received: from eggs.gnu.org ([209.51.188.92]:59442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwO3h-00008O-B1
+	(envelope-from <bounces@canonical.com>) id 1gwO3h-00008N-B3
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwO3f-0006sp-Bk
+	(envelope-from <bounces@canonical.com>) id 1gwO3f-0006sy-EH
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52720)
+Received: from indium.canonical.com ([91.189.90.7]:52656)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gwO3d-0006py-C1
+	id 1gwO3f-0006pS-79
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:51 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gwO3a-0004E0-Kj
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:46 +0000
+	id 1gwO3Z-0004FK-W3
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 97C112E80CB
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F0CCE2E80CB
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Feb 2019 09:07:13 -0000
+Date: Wed, 20 Feb 2019 09:06:45 -0000
 From: flumm <dominik.csapak@gmail.com>
 Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
-Message-Id: <155065363404.1080.10967298812122879257.malone@gac.canonical.com>
+Message-Id: <155065360538.6115.6359100533119477455.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
  memory hotplug
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "debug-working-novirtio-net.log"
-   https://bugs.launchpad.net/qemu/+bug/1685242/+attachment/5240137/+files/=
-debug-working-novirtio-net.log
+** Attachment added: "debug-working-222G.log"
+   https://bugs.launchpad.net/qemu/+bug/1685242/+attachment/5240135/+files/=
+debug-working-222G.log
 
 -- =
 
