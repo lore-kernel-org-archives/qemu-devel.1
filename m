@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50104)
+Received: from eggs.gnu.org ([209.51.188.92]:50292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwVuS-0001F5-Dk
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:43:53 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gwVv6-0001nC-R1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:44:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwVuK-00025V-8L
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:43:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35460)
+	(envelope-from <pbonzini@redhat.com>) id 1gwVv2-0002T2-Mh
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:44:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62119)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwVuE-0001xj-Fu
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:43:40 -0500
-Date: Wed, 20 Feb 2019 17:43:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190220174326.GO2608@work-vm>
-References: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
-	<155025464362.24.1200537447541094855@49fa7ef69f7b>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gwVv0-0002Qz-P1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:44:27 -0500
+References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+	<1549562254-41157-6-git-send-email-pbonzini@redhat.com>
+	<CAMo8BfJW6xg=K1Z+3K_Gckx=P5Vrbve2+rR52DygajoF5TJtnw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <69c3b817-f4d1-16e0-8f63-d6e1bbb21fcd@redhat.com>
+Date: Wed, 20 Feb 2019 18:44:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <155025464362.24.1200537447541094855@49fa7ef69f7b>
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration
- capability
+In-Reply-To: <CAMo8BfJW6xg=K1Z+3K_Gckx=P5Vrbve2+rR52DygajoF5TJtnw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/51] kconfig: introduce kconfig files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yury-kotov@yandex-team.ru, fam@euphon.net, ehabkost@redhat.com, eblake@redhat.com, imammedo@redhat.com, quintela@redhat.com, lvivier@redhat.com, armbru@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, thuth@redhat.com, peter.maydell@linaro.org, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, wrfsh@yandex-team.ru
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Yang Zhong <yang.zhong@intel.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-* no-reply@patchew.org (no-reply@patchew.org) wrote:
-> Patchew URL: https://patchew.org/QEMU/20190215174548.2630-1-yury-kotov@yandex-team.ru/
+On 20/02/19 17:55, Max Filippov wrote:
+> On Thu, Feb 7, 2019 at 10:05 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> diff --git a/hw/xtensa/Kconfig b/hw/xtensa/Kconfig
+>> new file mode 100644
+>> index 0000000..97543a9
+>> --- /dev/null
+>> +++ b/hw/xtensa/Kconfig
+>> @@ -0,0 +1,5 @@
+>> +config XTENSA_SIM
+>> +    bool
+>> +
+>> +config XTENSA_FPGA
 > 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Message-id: 20190215174548.2630-1-yury-kotov@yandex-team.ru
-> Subject: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration capability
-> Type: series
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> 5f9e90967e migration: Add capabilities validation
-> fad48088a8 tests/migration-test: Add a test for ignore-shared capability
-> 68347ad2eb migration: Add an ability to ignore shared RAM blocks
-> e3d2fd0298 migration: Introduce ignore-shared capability
-> 73d9e23937 exec: Change RAMBlockIterFunc definition
-> 
-> === OUTPUT BEGIN ===
-> 1/5 Checking commit 73d9e23937e9 (exec: Change RAMBlockIterFunc definition)
-> 2/5 Checking commit e3d2fd0298a4 (migration: Introduce ignore-shared capability)
-> 3/5 Checking commit 68347ad2eb24 (migration: Add an ability to ignore shared RAM blocks)
-> ERROR: Macros with multiple statements should be enclosed in a do - while loop
-> #146: FILE: migration/ram.c:169:
-> +#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-> +    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-> +        if (ramblock_is_ignored(block)) {} else
+> Can it please be called XTENSA_XTFPGA, as the corresponding
+> source file and as it's called in other places (e.g. in linux)?
 
-This is OK, it's just a copy of the existing macro we have for the loop
+This is just matching the existing
 
-> ERROR: trailing statements should be on next line
-> #148: FILE: migration/ram.c:171:
-> +        if (ramblock_is_ignored(block)) {} else
-> 
-> total: 2 errors, 0 warnings, 386 lines checked
-> 
-> Patch 3/5 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 4/5 Checking commit fad48088a805 (tests/migration-test: Add a test for ignore-shared capability)
-> 5/5 Checking commit 5f9e90967e69 (migration: Add capabilities validation)
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20190215174548.2630-1-yury-kotov@yandex-team.ru/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+    obj-$(CONFIG_XTENSA_FPGA) += xtfpga.o
+
+but yes, I can rename it.
+
+Paolo
