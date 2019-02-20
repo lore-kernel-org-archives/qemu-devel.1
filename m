@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41935)
+Received: from eggs.gnu.org ([209.51.188.92]:42121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwTjG-0007na-Ne
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:15 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gwTjV-0007xn-IJ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwTjE-0007Nq-CQ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:10 -0500
-Received: from mail-ot1-f42.google.com ([209.85.210.42]:45286)
+	(envelope-from <richard.henderson@linaro.org>) id 1gwTjG-0007PP-1m
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:15 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:46813)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gwTjC-0006eN-Lo
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:08 -0500
-Received: by mail-ot1-f42.google.com with SMTP id 32so40610622ota.12
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:21:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gwTjF-0007Ff-9m
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:09 -0500
+Received: by mail-pl1-f193.google.com with SMTP id o6so12371683pls.13
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:23:54 -0800 (PST)
+References: <20190220050451.10939-1-richard.henderson@linaro.org>
+	<CABoDooNvVGXeh9rKDzzagkz0pUgx0A4rgWvr_kpLKAHL4dfTRQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7fd5995b-0e82-d52b-d7c4-4910d36520ca@linaro.org>
+Date: Wed, 20 Feb 2019 07:18:49 -0800
 MIME-Version: 1.0
-References: <1550565421-10944-1-git-send-email-thuth@redhat.com>
-	<1550565421-10944-12-git-send-email-thuth@redhat.com>
-In-Reply-To: <1550565421-10944-12-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Feb 2019 13:42:28 +0000
-Message-ID: <CAFEAcA_jzA+Cz5d8wOm=f_ccE998icD4p+kWD_5tMxuLQj_Wgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 11/14] MAINTAINERS: Clean up the RISC-V TCG
- backend section
+In-Reply-To: <CABoDooNvVGXeh9rKDzzagkz0pUgx0A4rgWvr_kpLKAHL4dfTRQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] target/arm: Implement ARMv8.5-CondM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +31,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
+To: Laurent Desnogues <laurent.desnogues@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Tue, 19 Feb 2019 at 08:44, Thomas Huth <thuth@redhat.com> wrote:
->
-> The e-mail address mjc@sifive.com of Micheal is not valid anymore.
+On 2/20/19 2:07 AM, Laurent Desnogues wrote:
+> I tested xaflag/axflag (after setting the ID_AA64ISAR0 TS field to 2).
 
-Typo: "Michael".
+Whoops, at least that line is missing.  ;-)
 
 
-thanks
--- PMM
+r~
