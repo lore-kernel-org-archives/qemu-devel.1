@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52675)
+Received: from eggs.gnu.org ([209.51.188.92]:52779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTwH-0002KT-Kv
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:37:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1gwTwI-0002LV-FG
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:37:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTvv-000634-0T
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:37:27 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37318)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTvq-0004yZ-Ub
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:37:14 -0500
-Received: by mail-ot1-x343.google.com with SMTP id b3so40817683otp.4
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:35:25 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:50 -0600
-Message-Id: <20190220135956.22589-14-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 13/19] i2c:pm_smbus: Fix state transfer
+	(envelope-from <berrange@redhat.com>) id 1gwTwC-0006OA-OQ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:37:36 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 20 Feb 2019 14:58:19 +0000
+Message-Id: <20190220145819.30969-3-berrange@redhat.com>
+In-Reply-To: <20190220145819.30969-1-berrange@redhat.com>
+References: <20190220145819.30969-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/2] iotests: avoid broken pipe with certtool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,142 +23,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+When we run "certtool | head -1" the latter command is likely to
+complete and exit before certtool has written everything it wants to
+stderr. In at least the RHEL-7 gnutls 3.3.29 this causes certtool to
+quit with broken pipe before it has finished writing the desired
+output file to disk. This causes non-deterministic failures of the
+iotest 233 because the certs are sometimes zero length files.
+If certtool fails the "head -1" means we also loose any useful error
+message it would have printed.
 
-Transfer the state information for the SMBus registers and
-internal data so it will work on a VM transfer.
+Thus this patch gets rid of the pipe and post-processes the output in a
+more flexible & reliable manner.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- hw/acpi/piix4.c           |  7 +++++++
- hw/i2c/pm_smbus.c         | 31 +++++++++++++++++++++++++++++++
- hw/i2c/smbus_ich9.c       | 10 +++++++++-
- include/hw/i2c/pm_smbus.h |  9 +++++++++
- 4 files changed, 56 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/common.tls | 48 +++++++++++++++++++++++------------
+ 1 file changed, 32 insertions(+), 16 deletions(-)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 88f9a9ec09..7f8efe9997 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -302,6 +302,11 @@ static const VMStateDescription vmstate_cpuhp_state = {
-     }
- };
- 
-+static bool piix4_vmstate_need_smbus(void *opaque, int version_id)
+diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tl=
+s
+index eae81789bb..3caf989d28 100644
+--- a/tests/qemu-iotests/common.tls
++++ b/tests/qemu-iotests/common.tls
+@@ -29,6 +29,17 @@ tls_x509_cleanup()
+ }
+=20
+=20
++tls_certtool()
 +{
-+    return pm_smbus_vmstate_needed();
++    certtool "$@" 1>"${tls_dir}"/certtool.log 2>&1
++    if test "$?" =3D 0; then
++      head -1 "${tls_dir}"/certtool.log
++    else
++      cat "${tls_dir}"/certtool.log
++    fi
++    rm -f "${tls_dir}"/certtool.log
 +}
 +
- /* qemu-kvm 1.2 uses version 3 but advertised as 2
-  * To support incoming qemu-kvm 1.2 migration, change version_id
-  * and minimum_version_id to 2 below (which breaks migration from
-@@ -321,6 +326,8 @@ static const VMStateDescription vmstate_acpi = {
-         VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
-         VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
-         VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
-+        VMSTATE_STRUCT_TEST(smb, PIIX4PMState, piix4_vmstate_need_smbus, 3,
-+                            pmsmb_vmstate, PMSMBus),
-         VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
-         VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
-         VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 81d2a425ec..e48544f909 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -19,6 +19,7 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
-+#include "hw/boards.h"
- #include "hw/i2c/pm_smbus.h"
- #include "hw/i2c/smbus_master.h"
- 
-@@ -453,6 +454,36 @@ static const MemoryRegionOps pm_smbus_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
-+bool pm_smbus_vmstate_needed(void)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
-+
-+    return !mc->smbus_no_migration_support;
-+}
-+
-+const VMStateDescription pmsmb_vmstate = {
-+    .name = "pmsmb",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(smb_stat, PMSMBus),
-+        VMSTATE_UINT8(smb_ctl, PMSMBus),
-+        VMSTATE_UINT8(smb_cmd, PMSMBus),
-+        VMSTATE_UINT8(smb_addr, PMSMBus),
-+        VMSTATE_UINT8(smb_data0, PMSMBus),
-+        VMSTATE_UINT8(smb_data1, PMSMBus),
-+        VMSTATE_UINT32(smb_index, PMSMBus),
-+        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
-+        VMSTATE_UINT8(smb_auxctl, PMSMBus),
-+        VMSTATE_UINT8(smb_blkdata, PMSMBus),
-+        VMSTATE_BOOL(i2c_enable, PMSMBus),
-+        VMSTATE_BOOL(op_done, PMSMBus),
-+        VMSTATE_BOOL(in_i2c_block_read, PMSMBus),
-+        VMSTATE_BOOL(start_transaction_on_status_read, PMSMBus),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
+ tls_x509_init()
  {
-     smb->op_done = true;
-diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-index e6d8d28194..7b24be8256 100644
---- a/hw/i2c/smbus_ich9.c
-+++ b/hw/i2c/smbus_ich9.c
-@@ -43,12 +43,20 @@ typedef struct ICH9SMBState {
-     PMSMBus smb;
- } ICH9SMBState;
- 
-+static bool ich9_vmstate_need_smbus(void *opaque, int version_id)
-+{
-+    return pm_smbus_vmstate_needed();
-+}
+     (certtool --help) >/dev/null 2>&1 || \
+@@ -71,10 +82,11 @@ ca
+ cert_signing_key
+ EOF
+=20
+-    certtool --generate-self-signed \
+-             --load-privkey "${tls_dir}/key.pem" \
+-             --template "${tls_dir}/ca.info" \
+-             --outfile "${tls_dir}/$name-cert.pem" 2>&1 | head -1
++    tls_certtool \
++        --generate-self-signed \
++        --load-privkey "${tls_dir}/key.pem" \
++        --template "${tls_dir}/ca.info" \
++        --outfile "${tls_dir}/$name-cert.pem"
+=20
+     rm -f "${tls_dir}/ca.info"
+ }
+@@ -98,12 +110,14 @@ encryption_key
+ signing_key
+ EOF
+=20
+-    certtool --generate-certificate \
+-             --load-ca-privkey "${tls_dir}/key.pem" \
+-             --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+-             --load-privkey "${tls_dir}/key.pem" \
+-             --template "${tls_dir}/cert.info" \
+-             --outfile "${tls_dir}/$name/server-cert.pem" 2>&1 | head -1
++    tls_certtool \
++        --generate-certificate \
++        --load-ca-privkey "${tls_dir}/key.pem" \
++        --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
++        --load-privkey "${tls_dir}/key.pem" \
++        --template "${tls_dir}/cert.info" \
++        --outfile "${tls_dir}/$name/server-cert.pem"
 +
- static const VMStateDescription vmstate_ich9_smbus = {
-     .name = "ich9_smb",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
-+        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
-+        VMSTATE_BOOL_TEST(irq_enabled, ICH9SMBState, ich9_vmstate_need_smbus),
-+        VMSTATE_STRUCT_TEST(smb, ICH9SMBState, ich9_vmstate_need_smbus, 1,
-+                            pmsmb_vmstate, PMSMBus),
-         VMSTATE_END_OF_LIST()
-     }
- };
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index 7bcca97672..fb55c44444 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -43,4 +43,13 @@ typedef struct PMSMBus {
- 
- void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
- 
-+/*
-+ * For backwards compatibility on migration, older versions don't have
-+ * working migration for pm_smbus, this lets us ignore the migrations
-+ * for older machine versions.
-+ */
-+bool pm_smbus_vmstate_needed(void);
+     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/server-key.pem"
+=20
+@@ -127,12 +141,14 @@ encryption_key
+ signing_key
+ EOF
+=20
+-    certtool --generate-certificate \
+-             --load-ca-privkey "${tls_dir}/key.pem" \
+-             --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
+-             --load-privkey "${tls_dir}/key.pem" \
+-             --template "${tls_dir}/cert.info" \
+-             --outfile "${tls_dir}/$name/client-cert.pem" 2>&1 | head -1
++    tls_certtool \
++        --generate-certificate \
++        --load-ca-privkey "${tls_dir}/key.pem" \
++        --load-ca-certificate "${tls_dir}/$caname-cert.pem" \
++        --load-privkey "${tls_dir}/key.pem" \
++        --template "${tls_dir}/cert.info" \
++        --outfile "${tls_dir}/$name/client-cert.pem"
 +
-+extern const VMStateDescription pmsmb_vmstate;
-+
- #endif /* PM_SMBUS_H */
--- 
-2.17.1
+     ln -s "${tls_dir}/$caname-cert.pem" "${tls_dir}/$name/ca-cert.pem"
+     ln -s "${tls_dir}/key.pem" "${tls_dir}/$name/client-key.pem"
+=20
+--=20
+2.20.1
