@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35838)
+Received: from eggs.gnu.org ([209.51.188.92]:36592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gwFhA-0001ar-4x
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 19:25:05 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gwFqY-0003aW-AL
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 19:34:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gwFh8-00040d-Ru
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 19:25:04 -0500
-Resent-Message-Id: <E1gwFh8-00040d-Ru@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gwFh8-0003Pk-I0
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 19:25:02 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <155062102551.18484.1282656614310183451@49fa7ef69f7b>
-In-Reply-To: <20190219233421.388-1-richard.henderson@linaro.org>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gwFqI-0007AU-DX
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 19:34:34 -0500
+From: Wei Yang <richardw.yang@linux.intel.com>
+Date: Wed, 20 Feb 2019 08:31:13 +0800
+Message-Id: <20190220003113.20746-3-richardw.yang@linux.intel.com>
+In-Reply-To: <20190220003113.20746-1-richardw.yang@linux.intel.com>
+References: <20190220003113.20746-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Feb 2019 16:03:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/arm: Reduce overhead of
- cpu_get_tb_cpu_state
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 2/2] CODING_STYLE: indent example code as
+ all others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, cota@braap.org, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: mjt@tls.msk.ru, imammedo@redhat.com, philmd@redhat.com, eblake@redhat.com, peter.maydell@linaro.org, Wei Yang <richardw.yang@linux.intel.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIxOTIzMzQyMS4zODgt
-MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIxOTIzMzQyMS4zODgtMS1yaWNo
-YXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIg
-MC8zXSB0YXJnZXQvYXJtOiBSZWR1Y2Ugb3ZlcmhlYWQgb2YgY3B1X2dldF90Yl9jcHVfc3RhdGUK
-VHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
-YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIxOTIzMzQyMS4zODgtMS1yaWNoYXJkLmhl
-bmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAyMTkyMzM0MjEuMzg4LTEtcmljaGFy
-ZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmZk
-Y2E2YjY3ZDMgdGFyZ2V0L2FybTogUmVseSBvbiBoZmxhZ3MgY29ycmVjdCBpbiBjcHVfZ2V0X3Ri
-X2NwdV9zdGF0ZQo4NjE1NDgwNjI5IHRhcmdldC9hcm06IFJlYnVpbGQgaGZsYWdzIGF0IGVsIGNo
-YW5nZXMgYW5kIE1TUiB3cml0ZXMKMGQyYTgzY2NmZCB0YXJnZXQvYXJtOiBTcGxpdCBvdXQgcmVj
-b21wdXRlX2hmbGFncyBldCBhbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zIENoZWNraW5nIGNv
-bW1pdCAwZDJhODNjY2ZkNWUgKHRhcmdldC9hcm06IFNwbGl0IG91dCByZWNvbXB1dGVfaGZsYWdz
-IGV0IGFsKQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2Vw
-YXJhdGUgbGluZQojMjc3OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjEzOTcyOgorICAgICAg
-ICAvKiBJZiBTVkUgaXMgZGlzYWJsZWQsIGJ1dCBGUCBpcyBlbmFibGVkLAoKV0FSTklORzogQmxv
-Y2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzM1ODogRklM
-RTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxNDA1MzoKKyAgICAvKiBUaGUgU1NfQUNUSVZFIGFuZCBQ
-U1RBVEVfU1MgYml0cyBjb3JyZXNwb25kIHRvIHRoZSBzdGF0ZSBtYWNoaW5lCgp0b3RhbDogMCBl
-cnJvcnMsIDIgd2FybmluZ3MsIDM2MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzMgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KMi8zIENoZWNraW5nIGNvbW1pdCA4NjE1NDgwNjI5OWMgKHRhcmdl
-dC9hcm06IFJlYnVpbGQgaGZsYWdzIGF0IGVsIGNoYW5nZXMgYW5kIE1TUiB3cml0ZXMpCjMvMyBD
-aGVja2luZyBjb21taXQgZmRjYTZiNjdkMzI0ICh0YXJnZXQvYXJtOiBSZWx5IG9uIGhmbGFncyBj
-b3JyZWN0IGluIGNwdV9nZXRfdGJfY3B1X3N0YXRlKQpFUlJPUjogVXNlIGdfYXNzZXJ0IG9yIGdf
-YXNzZXJ0X25vdF9yZWFjaGVkCiM3MzogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxNDA0OToK
-KyAgICAgICAgZ19hc3NlcnRfY21waGV4KGZsYWdzLCA9PSwgY2hlY2tfZmxhZ3MpOwoKdG90YWw6
-IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjE5MjMzNDIxLjM4OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxp
-bmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+All the example code are indented with four spaces except this one.
+
+Fix this by adding four spaces here.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ CODING_STYLE | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CODING_STYLE b/CODING_STYLE
+index 403904667a..5679b2fd69 100644
+--- a/CODING_STYLE
++++ b/CODING_STYLE
+@@ -131,10 +131,10 @@ block to a separate function altogether.
+ When comparing a variable for (in)equality with a constant, list the
+ constant on the right, as in:
+ 
+-if (a == 1) {
+-    /* Reads like: "If a equals 1" */
+-    do_something();
+-}
++    if (a == 1) {
++        /* Reads like: "If a equals 1" */
++        do_something();
++    }
+ 
+ Rationale: Yoda conditions (as in 'if (1 == a)') are awkward to read.
+ Besides, good compilers already warn users when '==' is mis-typed as '=',
+-- 
+2.19.1
