@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51004)
+Received: from eggs.gnu.org ([209.51.188.92]:51433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwUcY-0006Zq-IO
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:21:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gwUdH-00079A-BE
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:22:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwUcW-00062z-Cs
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:21:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwUcV-0005tc-VY
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:21:16 -0500
-Date: Wed, 20 Feb 2019 13:12:24 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190220131224.GF2608@work-vm>
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
-	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
-	<20181214111705.GD2454@work-vm>
-	<286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gwUdG-0006XM-Au
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:22:03 -0500
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:41174)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gwUdF-00069s-Q3
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:22:02 -0500
+Received: by mail-pf1-x42e.google.com with SMTP id d25so3788906pfn.8
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 08:21:24 -0800 (PST)
+References: <20190130004811.27372-1-cota@braap.org>
+	<20190130004811.27372-32-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3c7bc8fc-b4a1-7771-5a2b-4f3f8fe8c742@linaro.org>
+Date: Wed, 20 Feb 2019 08:21:20 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+In-Reply-To: <20190130004811.27372-32-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 31/73] cpu: convert to cpu_halted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-* Wang, Wei W (wei.w.wang@intel.com) wrote:
-> On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
-> > > On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
-> > > > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > > > On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
-> > > > > > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > > > > > The new feature enables the virtio-balloon device to receive
-> > > > > > > hints of guest free pages from the free page vq.
-> > > > > > >
-> > > > > > > A notifier is registered to the migration precopy notifier
-> > > > > > > chain. The notifier calls free_page_start after the migration
-> > > > > > > thread syncs the dirty bitmap, so that the free page
-> > > > > > > optimization starts to clear bits of free pages from the
-> > > > > > > bitmap. It calls the free_page_stop before the migration
-> > > > > > > thread syncs the bitmap, which is the end of the current round
-> > > > > > > of ram save. The free_page_stop is also called to stop the
-> > optimization in the case when there is an error occurred in the process of
-> > ram saving.
-> > > > > > >
-> > > > > > > Note: balloon will report pages which were free at the time of this
-> > call.
-> > > > > > > As the reporting happens asynchronously, dirty bit logging
-> > > > > > > must be enabled before this free_page_start call is made.
-> > > > > > > Guest reporting must be disabled before the migration dirty bitmap
-> > is synchronized.
-> > > > > > >
-> > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > > CC: Juan Quintela <quintela@redhat.com>
-> > > > > > > CC: Peter Xu <peterx@redhat.com>
-> > > > > > I think I'm OK for this from the migration side, I'd appreciate
-> > > > > > someone checking the virtio and aio bits.
-> > > > > >
-> > > > > > I'm not too sure how it gets switched on and off - i.e. if we
-> > > > > > get a nice new qemu on a new kernel, what happens when I try and
-> > > > > > migrate to the same qemu on an older kernel without these hints?
-> > > > > >
-> > > > > This feature doesn't rely on the host kernel. Those hints are
-> > > > > reported from the guest kernel.
-> > > > > So migration across different hosts wouldn't affect the use of this
-> > feature.
-> > > > > Please correct me if I didn't get your point.
-> > > > Ah OK, yes;  now what about migrating from new->old qemu with a new
-> > > > guest but old machine type?
-> > > >
-> > >
-> > > I think normally, the source QEMU and destination QEMU should have the
-> > > same QEMU booting parameter. If the destination QEMU doesn't support
-> > > "--device virtio-balloon,free-page-hint=true", which the source QEMU
-> > > has, the destination side QEMU will fail to boot, and migration will
-> > > not happen then.
-> > 
-> > Ah that's OK; as long as free-page-hint is false by default that will work fine.
-> > 
-> > Dave
-> > 
+On 1/29/19 4:47 PM, Emilio G. Cota wrote:
+> This finishes the conversion to cpu_halted.
 > 
-> Hi Dave,
-> 
-> Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  cpus.c    | 8 ++++----
+>  qom/cpu.c | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 
-I think so; can you remind me where we're up to:
-  a) It looks like you've already got the kernel changes merged -
-correct?
-  b) What about the virtio spec changes - where are they upto?
-  c) Where are the other reviews upto - I think most are reviewed - is
-it just 7/7 that is missing the review-by?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Dave
 
-> Best,
-> Wei
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+r~
