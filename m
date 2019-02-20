@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41360)
+Received: from eggs.gnu.org ([209.51.188.92]:41615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwTiF-0006d9-GG
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:23:08 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTiz-0007Jn-4K
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwTiC-0006yt-G0
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:23:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gwTiC-0006GF-3r
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:23:04 -0500
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-17-eric.auger@redhat.com>
-	<20190218113008.18ead6cb@Igors-MacBook-Pro.local>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8d996c45-a338-cc5a-a740-28168c9ba8fc@redhat.com>
-Date: Wed, 20 Feb 2019 16:21:05 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190218113008.18ead6cb@Igors-MacBook-Pro.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 16/18] hw/arm/virt: Add nvdimm hot-plug
- infrastructure
+	(envelope-from <tcminyard@gmail.com>) id 1gwTiT-00075J-4y
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:23:40 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40085)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTiL-0006vA-Bo
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:23:17 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v20so8767573otk.7
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:22:50 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:44 -0600
+Message-Id: <20190220135956.22589-8-minyard@acm.org>
+In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
+References: <20190220135956.22589-1-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH 07/19] i2c:smbus: Simplify read handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,148 +26,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-Hi Igor,
+From: Corey Minyard <cminyard@mvista.com>
 
-On 2/18/19 11:30 AM, Igor Mammedov wrote:
-> On Tue,  5 Feb 2019 18:33:04 +0100
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>
->> Pre-plug and plug handlers are prepared for NVDIMM support.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
->> ---
->>  default-configs/arm-softmmu.mak |  2 ++
->>  hw/arm/virt-acpi-build.c        |  6 ++++++
->>  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
->>  include/hw/arm/virt.h           |  3 +++
->>  4 files changed, 33 insertions(+)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index dc4624794f..ddbe87ed15 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -162,3 +162,5 @@ CONFIG_HIGHBANK=y
->>  CONFIG_MUSICPAL=y
->>  CONFIG_MEM_DEVICE=y
->>  CONFIG_DIMM=y
->> +CONFIG_NVDIMM=y
->> +CONFIG_ACPI_NVDIMM=y
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 781eafaf5e..f086adfa82 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -784,6 +784,7 @@ static
->>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>  {
->>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->> +    MachineState *ms = MACHINE(vms);
->>      GArray *table_offsets;
->>      unsigned dsdt, xsdt;
->>      GArray *tables_blob = tables->table_data;
->> @@ -824,6 +825,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>          }
->>      }
->>  
->> +    if (vms->acpi_nvdimm_state.is_enabled) {
->> +        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
->> +                          &vms->acpi_nvdimm_state, ms->ram_slots);
->> +    }
->> +
->>      if (its_class_name() && !vmc->no_its) {
->>          acpi_add_table(table_offsets, tables_blob);
->>          build_iort(tables_blob, tables->linker, vms);
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index b683902991..0c8c2cc191 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -132,6 +132,7 @@ static const MemMapEntry a15memmap[] = {
->>      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->>      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
->> +    [VIRT_ACPI_IO] =            { 0x09070000, 0x00010000 },
-> where does this range come from and is its size sufficient?
-I understand it can be anywhere in low mem and must be large enough to
-contain [NVDIMM_ACPI_IO_BASE, NDIMM_ACPI_IO_BASE + NVDIMM_ACPI_IO_LEN].
-So one 64kB page should do the job?
+There were two different read functions, and with the removal of
+the command passed in there is no functional difference.  So remove
+one of them.  With that you don't need one of the states, so that
+can be removed, too.
 
-Thanks
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+---
+ hw/i2c/smbus_eeprom.c        |  8 --------
+ hw/i2c/smbus_slave.c         | 21 +++------------------
+ include/hw/i2c/smbus_slave.h | 17 ++++++++++-------
+ 3 files changed, 13 insertions(+), 33 deletions(-)
 
-Eric
-> 
->>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
->> @@ -1637,6 +1638,18 @@ static void machvirt_init(MachineState *machine)
->>  
->>      create_platform_bus(vms, pic);
->>  
->> +    if (vms->acpi_nvdimm_state.is_enabled) {
->> +        AcpiNVDIMMState *acpi_nvdimm_state = &vms->acpi_nvdimm_state;
->> +
->> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_MEMORY;
->> +        acpi_nvdimm_state->dsm_io.base =
->> +                vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE;
->> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
->> +
->> +        nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
->> +                               vms->fw_cfg, OBJECT(vms));
->> +    }
->> +
->>      vms->bootinfo.ram_size = machine->ram_size;
->>      vms->bootinfo.kernel_filename = machine->kernel_filename;
->>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
->> @@ -1822,10 +1835,19 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->>                               DeviceState *dev, Error **errp)
->>  {
->>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->> +    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>      Error *local_err = NULL;
->>  
->>      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
->> +    if (local_err) {
->> +        goto out;
->> +    }
->>  
->> +    if (is_nvdimm) {
->> +        nvdimm_plug(&vms->acpi_nvdimm_state);
->> +    }
->> +
->> +out:
->>      error_propagate(errp, local_err);
->>  }
->>  
->> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->> index c88f67a492..56d73b0e86 100644
->> --- a/include/hw/arm/virt.h
->> +++ b/include/hw/arm/virt.h
->> @@ -37,6 +37,7 @@
->>  #include "hw/arm/arm.h"
->>  #include "sysemu/kvm.h"
->>  #include "hw/intc/arm_gicv3_common.h"
->> +#include "hw/mem/nvdimm.h"
->>  
->>  #define NUM_GICV2M_SPIS       64
->>  #define NUM_VIRTIO_TRANSPORTS 32
->> @@ -77,6 +78,7 @@ enum {
->>      VIRT_GPIO,
->>      VIRT_SECURE_UART,
->>      VIRT_SECURE_MEM,
->> +    VIRT_ACPI_IO,
->>      VIRT_LOWMEMMAP_LAST,
->>  };
->>  
->> @@ -134,6 +136,7 @@ typedef struct {
->>      hwaddr high_io_base;
->>      hwaddr highest_gpa;
->>      bool extended_memmap;
->> +    AcpiNVDIMMState acpi_nvdimm_state;
->>  } VirtMachineState;
->>  
->>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> 
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 3f9ed266f8..c2b9e3383e 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -77,13 +77,6 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+     return 0;
+ }
+ 
+-static uint8_t eeprom_read_data(SMBusDevice *dev, int n)
+-{
+-    /* As with writes, we implement block reads without the
+-       SMBus length byte.  */
+-    return eeprom_receive_byte(dev);
+-}
+-
+ static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ {
+     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
+@@ -105,7 +98,6 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+     sc->quick_cmd = eeprom_quick_cmd;
+     sc->receive_byte = eeprom_receive_byte;
+     sc->write_data = eeprom_write_data;
+-    sc->read_data = eeprom_read_data;
+     dc->props = smbus_eeprom_properties;
+     /* Reason: pointer property "data" */
+     dc->user_creatable = false;
+diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
+index 92c7a5086c..52a57423ee 100644
+--- a/hw/i2c/smbus_slave.c
++++ b/hw/i2c/smbus_slave.c
+@@ -34,7 +34,6 @@ do { fprintf(stderr, "smbus: error: " fmt , ## __VA_ARGS__);} while (0)
+ enum {
+     SMBUS_IDLE,
+     SMBUS_WRITE_DATA,
+-    SMBUS_RECV_BYTE,
+     SMBUS_READ_DATA,
+     SMBUS_DONE,
+     SMBUS_CONFUSED = -1
+@@ -82,7 +81,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
+         switch (dev->mode) {
+         case SMBUS_IDLE:
+             DPRINTF("Read mode\n");
+-            dev->mode = SMBUS_RECV_BYTE;
++            dev->mode = SMBUS_READ_DATA;
+             break;
+         case SMBUS_WRITE_DATA:
+             if (dev->data_len == 0) {
+@@ -91,7 +90,6 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
+             } else {
+                 smbus_do_write(dev);
+                 DPRINTF("Read mode\n");
+-                dev->data_len = 0;
+                 dev->mode = SMBUS_READ_DATA;
+             }
+             break;
+@@ -148,31 +146,18 @@ static uint8_t smbus_i2c_recv(I2CSlave *s)
+ {
+     SMBusDevice *dev = SMBUS_DEVICE(s);
+     SMBusDeviceClass *sc = SMBUS_DEVICE_GET_CLASS(dev);
+-    uint8_t ret;
++    uint8_t ret = 0xff;
+ 
+     switch (dev->mode) {
+-    case SMBUS_RECV_BYTE:
++    case SMBUS_READ_DATA:
+         if (sc->receive_byte) {
+             ret = sc->receive_byte(dev);
+-        } else {
+-            ret = 0;
+-        }
+-        DPRINTF("Receive Byte %02x\n", ret);
+-        dev->mode = SMBUS_DONE;
+-        break;
+-    case SMBUS_READ_DATA:
+-        if (sc->read_data) {
+-            ret = sc->read_data(dev, dev->data_len);
+-            dev->data_len++;
+-        } else {
+-            ret = 0;
+         }
+         DPRINTF("Read data %02x\n", ret);
+         break;
+     default:
+         BADF("Unexpected read in state %d\n", dev->mode);
+         dev->mode = SMBUS_CONFUSED;
+-        ret = 0;
+         break;
+     }
+     return ret;
+diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
+index fa92201ec6..79050fb92d 100644
+--- a/include/hw/i2c/smbus_slave.h
++++ b/include/hw/i2c/smbus_slave.h
+@@ -47,8 +47,6 @@ typedef struct SMBusDeviceClass
+      */
+     void (*quick_cmd)(SMBusDevice *dev, uint8_t read);
+ 
+-    uint8_t (*receive_byte)(SMBusDevice *dev);
+-
+     /*
+      * We can't distinguish between a word write and a block write with
+      * length 1, so pass the whole data block including the length byte
+@@ -59,11 +57,16 @@ typedef struct SMBusDeviceClass
+      */
+     int (*write_data)(SMBusDevice *dev, uint8_t *buf, uint8_t len);
+ 
+-    /* Likewise we can't distinguish between different reads, or even know
+-       the length of the read until the read is complete, so read data a
+-       byte at a time.  The device is responsible for adding the length
+-       byte on block reads.  */
+-    uint8_t (*read_data)(SMBusDevice *dev, int n);
++    /*
++     * Likewise we can't distinguish between different reads, or even know
++     * the length of the read until the read is complete, so read data a
++     * byte at a time.  The device is responsible for adding the length
++     * byte on block reads.  This call cannot fail, it should return
++     * something, preferably 0xff if nothing is available.
++     * This may be NULL if no data is read from the device.  Reads will
++     * return 0xff in that case.
++     */
++    uint8_t (*receive_byte)(SMBusDevice *dev);
+ } SMBusDeviceClass;
+ 
+ struct SMBusDevice {
+-- 
+2.17.1
