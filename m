@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58236)
+Received: from eggs.gnu.org ([209.51.188.92]:58761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwU4s-0001GH-7d
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:46:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gwU5X-0001if-JL
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:47:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwU4p-00035T-S1
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:46:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43004)
+	(envelope-from <pbonzini@redhat.com>) id 1gwU5W-0003Sv-6l
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:47:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37361)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwU4p-00033X-EX
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:46:27 -0500
-Date: Wed, 20 Feb 2019 15:46:16 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190220154615.GI2608@work-vm>
-References: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
-	<20190215174548.2630-2-yury-kotov@yandex-team.ru>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gwU5V-0003Jc-Rb
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:47:10 -0500
+References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+	<1549562254-41157-6-git-send-email-pbonzini@redhat.com>
+	<b48ecdfe-ab7c-9fde-89fd-0296863648eb@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <69b61fc5-2d4e-2982-92b5-c651cbf23c30@redhat.com>
+Date: Wed, 20 Feb 2019 16:46:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190215174548.2630-2-yury-kotov@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] exec: Change RAMBlockIterFunc
- definition
+In-Reply-To: <b48ecdfe-ab7c-9fde-89fd-0296863648eb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/51] kconfig: introduce kconfig files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,263 +29,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, wrfsh@yandex-team.ru, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>, philmd@redhat.com
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> Currently, qemu_ram_foreach_* calls RAMBlockIterFunc with many
-> block-specific arguments. But often iter func needs RAMBlock*.
-> This refactoring is needed for fast access to RAMBlock flags from
-> qemu_ram_foreach_block's callback. The only way to achieve this now
-> is to call qemu_ram_block_from_host (which also enumerates blocks).
+On 20/02/19 16:42, Thomas Huth wrote:
+> On 07/02/2019 18.56, Paolo Bonzini wrote:
+>> The Kconfig files were generated mostly with this script:
+>>
+>>   for i in `grep -ho CONFIG_[A-Z0-9_]* default-configs/* | sort -u`; do
+>>     set fnord `git grep -lw $i -- 'hw/*/Makefile.objs' `
+>>     shift
+>>     if test $# = 1; then
+>>       cat >> $(dirname $1)/Kconfig << EOF
+>> config ${i#CONFIG_}
+>>     bool
+>>
+>> EOF
+>>       git add $(dirname $1)/Kconfig
+>>     else
+>>       echo $i $*
+>>     fi
+>>   done
+>>   sed -i '$d' hw/*/Kconfig
+>>   for i in hw/*; do
+>>     if test -d $i && ! test -f $i/Kconfig; then
+>>       touch $i/Kconfig
+>>       git add $i/Kconfig
+>>     fi
+>>   done
+>>
+>> Whenever a symbol is referenced from multiple subdirectories, the
+>> script prints the list of directories that reference the symbol.
+>> These symbols have to be added manually to the Kconfig files.
+>>
+>> Kconfig.host and hw/Kconfig were created manually.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+>> Message-Id: <20190123065618.3520-27-yang.zhong@intel.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+> [...]
+>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>> new file mode 100644
+>> index 0000000..64cd698
+>> --- /dev/null
+>> +++ b/hw/arm/Kconfig
+>> @@ -0,0 +1,119 @@
+>> +config ARM_VIRT
+>> +    bool
+>> +
+>> +config DIGIC
+>> +    bool
+>> +
+>> +config EXYNOS4
+>> +    bool
+>> +
+>> +config HIGHBANK
+>> +    bool
+>> +
+>> +config INTEGRATOR
+>> +    bool
+>> +
+>> +config MAINSTONE
+>> +    bool
+>> +
+>> +config MUSICPAL
+>> +    bool
+>> +
+>> +config NETDUINO2
+>> +    bool
+>> +
+>> +config NSERIES
+>> +    bool
+>> +
+>> +config OMAP
+>> +    bool
+>> +
+>> +config PXA2XX
+>> +    bool
+>> +
+>> +config REALVIEW
+>> +    bool
+>> +
+>> +config STELLARIS
+>> +    bool
+>> +
+>> +config STRONGARM
+>> +    bool
+>> +
+>> +config VERSATILE
+>> +    bool
+>> +
+>> +config ZYNQ
+>> +    bool
+>> +
+>> +config ARM_V7M
+>> +    bool
+>> +
+>> +config EXYNOS4
+>> +    bool
 > 
-> So, this patch reduces complexity of
-> qemu_ram_foreach_block() -> cb() -> qemu_ram_block_from_host()
-> from O(n^2) to O(n).
+> I just noticed: EXYNOS4 is defined twice in this file (it's also the
+> third entry from the top). You can remove one of those.
 > 
-> Fix RAMBlockIterFunc definition and add some functions to read
-> RAMBlock* fields witch were passed.
+>> +config ALLWINNER_A10
+>> +    bool
+>> +
+>> +config RASPI
+>> +    bool
+>> +
+>> +config STM32F205_SOC
+>> +    bool
+>> +
+>> +config XLNX_ZYNQMP_ARM
+>> +    bool
+>> +
+>> +config XLNX_VERSAL
+>> +    bool
+>> +
+>> +config FSL_IMX25
+>> +    bool
+>> +
+>> +config FSL_IMX31
+>> +    bool
+>> +
+>> +config FSL_IMX6
+>> +    bool
+>> +
+>> +config ASPEED_SOC
+>> +    bool
+>> +
+>> +config MPS2
+>> +    bool
+>> +
+>> +config IOTKIT
+>> +    bool
 > 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> Are we using IOTKIT anywhere?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+It's been renamed to ARMSSE.  I'll fix both.
 
-(Please keep the review-by's if you've not changed stuff)
-
-> ---
->  exec.c                    | 21 +++++++++++++++++----
->  include/exec/cpu-common.h |  6 ++++--
->  migration/postcopy-ram.c  | 36 +++++++++++++++++++++---------------
->  migration/rdma.c          |  7 +++++--
->  stubs/ram-block.c         | 15 +++++++++++++++
->  util/vfio-helpers.c       |  6 +++---
->  6 files changed, 65 insertions(+), 26 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 518064530b..bf71462929 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1972,6 +1972,21 @@ const char *qemu_ram_get_idstr(RAMBlock *rb)
->      return rb->idstr;
->  }
->  
-> +void *qemu_ram_get_host_addr(RAMBlock *rb)
-> +{
-> +    return rb->host;
-> +}
-> +
-> +ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
-> +{
-> +    return rb->offset;
-> +}
-> +
-> +ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
-> +{
-> +    return rb->used_length;
-> +}
-> +
->  bool qemu_ram_is_shared(RAMBlock *rb)
->  {
->      return rb->flags & RAM_SHARED;
-> @@ -3961,8 +3976,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
->  
->      rcu_read_lock();
->      RAMBLOCK_FOREACH(block) {
-> -        ret = func(block->idstr, block->host, block->offset,
-> -                   block->used_length, opaque);
-> +        ret = func(block, opaque);
->          if (ret) {
->              break;
->          }
-> @@ -3981,8 +3995,7 @@ int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaque)
->          if (!qemu_ram_is_migratable(block)) {
->              continue;
->          }
-> -        ret = func(block->idstr, block->host, block->offset,
-> -                   block->used_length, opaque);
-> +        ret = func(block, opaque);
->          if (ret) {
->              break;
->          }
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index 63ec1f9b37..9cd1f94bc5 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -72,6 +72,9 @@ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
->  void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
->  void qemu_ram_unset_idstr(RAMBlock *block);
->  const char *qemu_ram_get_idstr(RAMBlock *rb);
-> +void *qemu_ram_get_host_addr(RAMBlock *rb);
-> +ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
-> +ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
->  bool qemu_ram_is_shared(RAMBlock *rb);
->  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
->  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-> @@ -116,8 +119,7 @@ void cpu_flush_icache_range(hwaddr start, hwaddr len);
->  extern struct MemoryRegion io_mem_rom;
->  extern struct MemoryRegion io_mem_notdirty;
->  
-> -typedef int (RAMBlockIterFunc)(const char *block_name, void *host_addr,
-> -    ram_addr_t offset, ram_addr_t length, void *opaque);
-> +typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
->  
->  int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
->  int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaque);
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index fa09dba534..b098816221 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -319,10 +319,10 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
->  
->  /* Callback from postcopy_ram_supported_by_host block iterator.
->   */
-> -static int test_ramblock_postcopiable(const char *block_name, void *host_addr,
-> -                             ram_addr_t offset, ram_addr_t length, void *opaque)
-> +static int test_ramblock_postcopiable(RAMBlock *rb, void *opaque)
->  {
-> -    RAMBlock *rb = qemu_ram_block_by_name(block_name);
-> +    const char *block_name = qemu_ram_get_idstr(rb);
-> +    ram_addr_t length = qemu_ram_get_used_length(rb);
->      size_t pagesize = qemu_ram_pagesize(rb);
->  
->      if (length % pagesize) {
-> @@ -443,9 +443,12 @@ out:
->   * must be done right at the start prior to pre-copy.
->   * opaque should be the MIS.
->   */
-> -static int init_range(const char *block_name, void *host_addr,
-> -                      ram_addr_t offset, ram_addr_t length, void *opaque)
-> +static int init_range(RAMBlock *rb, void *opaque)
->  {
-> +    const char *block_name = qemu_ram_get_idstr(rb);
-> +    void *host_addr = qemu_ram_get_host_addr(rb);
-> +    ram_addr_t offset = qemu_ram_get_offset(rb);
-> +    ram_addr_t length = qemu_ram_get_used_length(rb);
->      trace_postcopy_init_range(block_name, host_addr, offset, length);
->  
->      /*
-> @@ -465,9 +468,12 @@ static int init_range(const char *block_name, void *host_addr,
->   * At the end of migration, undo the effects of init_range
->   * opaque should be the MIS.
->   */
-> -static int cleanup_range(const char *block_name, void *host_addr,
-> -                        ram_addr_t offset, ram_addr_t length, void *opaque)
-> +static int cleanup_range(RAMBlock *rb, void *opaque)
->  {
-> +    const char *block_name = qemu_ram_get_idstr(rb);
-> +    void *host_addr = qemu_ram_get_host_addr(rb);
-> +    ram_addr_t offset = qemu_ram_get_offset(rb);
-> +    ram_addr_t length = qemu_ram_get_used_length(rb);
->      MigrationIncomingState *mis = opaque;
->      struct uffdio_range range_struct;
->      trace_postcopy_cleanup_range(block_name, host_addr, offset, length);
-> @@ -586,9 +592,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->  /*
->   * Disable huge pages on an area
->   */
-> -static int nhp_range(const char *block_name, void *host_addr,
-> -                    ram_addr_t offset, ram_addr_t length, void *opaque)
-> +static int nhp_range(RAMBlock *rb, void *opaque)
->  {
-> +    const char *block_name = qemu_ram_get_idstr(rb);
-> +    void *host_addr = qemu_ram_get_host_addr(rb);
-> +    ram_addr_t offset = qemu_ram_get_offset(rb);
-> +    ram_addr_t length = qemu_ram_get_used_length(rb);
->      trace_postcopy_nhp_range(block_name, host_addr, offset, length);
->  
->      /*
-> @@ -626,15 +635,13 @@ int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
->   *   opaque: MigrationIncomingState pointer
->   * Returns 0 on success
->   */
-> -static int ram_block_enable_notify(const char *block_name, void *host_addr,
-> -                                   ram_addr_t offset, ram_addr_t length,
-> -                                   void *opaque)
-> +static int ram_block_enable_notify(RAMBlock *rb, void *opaque)
->  {
->      MigrationIncomingState *mis = opaque;
->      struct uffdio_register reg_struct;
->  
-> -    reg_struct.range.start = (uintptr_t)host_addr;
-> -    reg_struct.range.len = length;
-> +    reg_struct.range.start = (uintptr_t)qemu_ram_get_host_addr(rb);
-> +    reg_struct.range.len = qemu_ram_get_used_length(rb);
->      reg_struct.mode = UFFDIO_REGISTER_MODE_MISSING;
->  
->      /* Now tell our userfault_fd that it's responsible for this area */
-> @@ -647,7 +654,6 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->          return -1;
->      }
->      if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
-> -        RAMBlock *rb = qemu_ram_block_by_name(block_name);
->          qemu_ram_set_uf_zeroable(rb);
->      }
->  
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 54a3c11540..7eb38ee764 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -624,9 +624,12 @@ static int rdma_add_block(RDMAContext *rdma, const char *block_name,
->   * in advanced before the migration starts. This tells us where the RAM blocks
->   * are so that we can register them individually.
->   */
-> -static int qemu_rdma_init_one_block(const char *block_name, void *host_addr,
-> -    ram_addr_t block_offset, ram_addr_t length, void *opaque)
-> +static int qemu_rdma_init_one_block(RAMBlock *rb, void *opaque)
->  {
-> +    const char *block_name = qemu_ram_get_idstr(rb);
-> +    void *host_addr = qemu_ram_get_host_addr(rb);
-> +    ram_addr_t block_offset = qemu_ram_get_offset(rb);
-> +    ram_addr_t length = qemu_ram_get_used_length(rb);
->      return rdma_add_block(opaque, block_name, host_addr, block_offset, length);
->  }
->  
-> diff --git a/stubs/ram-block.c b/stubs/ram-block.c
-> index cfa5d8678f..73c0a3ee08 100644
-> --- a/stubs/ram-block.c
-> +++ b/stubs/ram-block.c
-> @@ -2,6 +2,21 @@
->  #include "exec/ramlist.h"
->  #include "exec/cpu-common.h"
->  
-> +void *qemu_ram_get_host_addr(RAMBlock *rb)
-> +{
-> +    return 0;
-> +}
-> +
-> +ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
-> +{
-> +    return 0;
-> +}
-> +
-> +ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
-> +{
-> +    return 0;
-> +}
-> +
->  void ram_block_notifier_add(RAMBlockNotifier *n)
->  {
->  }
-> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index 342d4a2285..2367fe8f7f 100644
-> --- a/util/vfio-helpers.c
-> +++ b/util/vfio-helpers.c
-> @@ -391,10 +391,10 @@ static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
->      }
->  }
->  
-> -static int qemu_vfio_init_ramblock(const char *block_name, void *host_addr,
-> -                                   ram_addr_t offset, ram_addr_t length,
-> -                                   void *opaque)
-> +static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
->  {
-> +    void *host_addr = qemu_ram_get_host_addr(rb);
-> +    ram_addr_t length = qemu_ram_get_used_length(rb);
->      int ret;
->      QEMUVFIOState *s = opaque;
->  
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
