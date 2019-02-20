@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45815)
+Received: from eggs.gnu.org ([209.51.188.92]:46080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwVeN-0004Dg-06
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:27:16 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gwVfK-0004ys-Pc
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:28:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwVeK-00018R-FG
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:27:14 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40883)
+	(envelope-from <alex.bennee@linaro.org>) id 1gwVfJ-0001yN-TD
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:28:14 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54693)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gwVeI-00017U-HF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:27:11 -0500
-Received: by mail-pf1-x441.google.com with SMTP id h1so12218482pfo.7
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:27:10 -0800 (PST)
-References: <20190130004811.27372-1-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <70297ac5-defa-0d7b-b4da-44303b328ce2@linaro.org>
-Date: Wed, 20 Feb 2019 09:27:06 -0800
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gwVfJ-0001xm-Ln
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:28:13 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a62so7471465wmh.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:28:13 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 20 Feb 2019 17:28:03 +0000
+Message-Id: <20190220172811.10588-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190130004811.27372-1-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/73] per-CPU locks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH  v1 0/8] testing/next
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 1/29/19 4:46 PM, Emilio G. Cota wrote:
-> v5: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02979.html
-> 
-> For context, the goal of this series is to substitute the BQL for the
-> per-CPU locks in many places, notably the execution loop in cpus.c.
-> This leads to better scalability for MTTCG, since CPUs don't have
-> to acquire a contended global lock (the BQL) every time they
-> stop executing code.
-> 
-> See the last commit for some performance numbers.
-> 
-> After this series, the remaining obstacles to achieving KVM-like
-> scalability in MTTCG are: (1) interrupt handling, which
-> in some targets requires the BQL, and (2) frequent execution of
-> "async safe" work.
-> That said, some targets scale great on MTTCG even before this
-> series -- for instance, when running a parallel compilation job
-> in an x86_64 guest, scalability is comparable to what we get with
-> KVM.
-> 
-> This series is very long. If you only have time to look at a few patches,
-> I suggest the following, which do most of the heavy lifting and
-> have not yet been reviewed:
-> 
-> - Patch 7: cpu: make per-CPU locks an alias of the BQL in TCG rr mode
-> - Patch 70: cpu: protect CPU state with cpu->lock instead of the BQL
-> 
-> I've tested all patches with `make check-qtest -j' for all targets.
-> The series is checkpatch-clean (just some warnings about __COVERITY__).
-> 
-> You can fetch the series from:
->   https://github.com/cota/qemu/tree/cpu-lock-v6
+Hi,
 
-Thanks for the patience.  Both Alex and I have now completed review, and I
-think this is ready for merge.
+Here is the current status of testing/next which fixes some of the
+current instability as well as some totally broken builds. However we
+have two failures I'm still trying to track down:
 
-There are some patch conflicts with master, so if you can fix those and post a
-v7, we'll get it merged right away.
+  tests/boot-sector.c:161:boot_sector_test:
+    assertion failed (signature == SIGNATURE): (0x0000face == 0x0000dead)
 
+I have seen this locally and got a core dump but it doesn't show much.
+I'm going to see if I can get more out of a debug build. It is
+generated by:
 
-r~
+  tests/cdrom-test -m=quick -k --tap
+
+I think the subtest is:
+
+  /x86_64/cdrom/boot/isapc
+
+Attaching to the child QEMU looks like it is eternally returning
+-EINTR and looping around with the occasionally kvm_handle_io to port
+146 and port 112. I guess under test conditions this eventually times
+out and dies.
+
+The other is the failure in the gprof build:
+
+  PASS 55 ahci-test /x86_64/ahci/flush/migrate
+  tests/libqtest.c:143: kill_qemu() detected QEMU death from signal 11
+      (Segmentation fault) (core dumped)
+  ERROR - too few tests run (expected 66, got 55)
+  Aborted (core dumped)
+  /home/travis/build/stsquad/qemu/tests/Makefile.include:857: recipe
+      for target 'check-qtest-x86_64' failed
+
+So far attempts to re-create this locally have failed. It may be a
+Travis related environment thing.
+
+The following patches need review
+: patch 0002/.travis.yml split debug builds.patch
+: patch 0005/tests docker squash initial update and install st.patch
+: patch 0006/tests docker peg netmap code to a specific versio.patch
+: patch 0008/tests softfloat always do quick softfloat tests.patch
+
+Alex Bennée (4):
+  .travis.yml: split debug builds
+  tests/docker: squash initial update and install step for docker9
+  tests/docker: peg netmap code to a specific version
+  tests/softfloat: always do quick softfloat tests
+
+Dr. David Alan Gilbert (2):
+  .travis.yml: Test with disable-replication
+  .travis.yml: Remove disable-uuid
+
+Paolo Bonzini (1):
+  .travis.yml: the xcode10 image seems to be hosed
+
+Thomas Huth (1):
+  Add a gitlab-ci file for Continuous Integration testing on Gitlab
+
+ .gitlab-ci.yml                               | 73 ++++++++++++++++++++
+ .travis.yml                                  | 16 ++---
+ MAINTAINERS                                  |  5 ++
+ tests/Makefile.include                       |  6 +-
+ tests/docker/dockerfiles/debian-amd64.docker |  1 +
+ tests/docker/dockerfiles/debian9.docker      |  4 +-
+ 6 files changed, 90 insertions(+), 15 deletions(-)
+ create mode 100644 .gitlab-ci.yml
+
+-- 
+2.20.1
