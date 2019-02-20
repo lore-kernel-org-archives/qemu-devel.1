@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41307)
+Received: from eggs.gnu.org ([209.51.188.92]:42383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gwOnJ-0001j9-Dn
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:08:03 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gwOsn-00037T-9P
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:13:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gwOnI-0006P2-Fe
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:08:01 -0500
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:51119)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1gwOnI-0006KC-8y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:08:00 -0500
-Received: by mail-it1-x141.google.com with SMTP id m137so13947131ita.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 02:07:53 -0800 (PST)
+	(envelope-from <jasowang@redhat.com>) id 1gwOsm-0008Pw-0G
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:13:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53844)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gwOsl-0008PP-Ni
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:13:39 -0500
+References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
+	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
+	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
+	<20190218113447-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
+	<20190218183353-mutt-send-email-mst@kernel.org>
+	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+	<20190219091849-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c7103251-ebf9-1922-e8a4-6149ea2bfb0e@redhat.com>
+Date: Wed, 20 Feb 2019 18:13:30 +0800
 MIME-Version: 1.0
-References: <20190220050451.10939-1-richard.henderson@linaro.org>
-In-Reply-To: <20190220050451.10939-1-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Wed, 20 Feb 2019 11:07:41 +0100
-Message-ID: <CABoDooNvVGXeh9rKDzzagkz0pUgx0A4rgWvr_kpLKAHL4dfTRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] target/arm: Implement ARMv8.5-CondM
+In-Reply-To: <20190219091849-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
+ not enabled by the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +35,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-devel@nongnu.org
 
-Hi,
 
-On Wed, Feb 20, 2019 at 6:05 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Based-on: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02733.html
-> aka the v3 ARMv8.5-MemTag patch set,
-> or at least some of the early patches that split handle_msr_i.
->
-> The v8.4 parts have been tested vs FVP, but there's no released
-> version that supports v8.5 yet, so XAFlag and AXFlag are untested.
-> But they seem fairly straightforward, unless I've done something silly.
+On 2019/2/19 =E4=B8=8B=E5=8D=8810:19, Michael S. Tsirkin wrote:
+> On Tue, Feb 19, 2019 at 02:27:35PM +0800, Jason Wang wrote:
+>> On 2019/2/19 =E4=B8=8A=E5=8D=887:34, Michael S. Tsirkin wrote:
+>>> On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
+>>>> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin<mst@redhat.com>  =
+wrote:
+>>>>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
+>>>>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang<jasowang@redhat.com>  w=
+rote:
+>>>>>>> On 2019/2/13 =E4=B8=8B=E5=8D=8810:51, Yuri Benditovich wrote:
+>>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1608226
+>>>>>>>> On startup/link-up in multiqueue configuration the virtio-net
+>>>>>>>> tries to starts all the queues, including those that the guest
+>>>>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
+>>>>>>>> If the guest driver does not allocate queues that it will not
+>>>>>>>> use (for example, Windows driver does not) and number of actuall=
+y
+>>>>>>>> used queues is less that maximal number supported by the device,
+>>>>>>> Is this a requirement of e.g NDIS? If not, could we simply alloca=
+te all
+>>>>>>> queues in this case. This is usually what normal Linux driver did=
+.
+>>>>>>>
+>>>>>>>
+>>>>>>>> this causes vhost_net_start to fail and actually disables vhost
+>>>>>>>> for all the queues, reducing the performance.
+>>>>>>>> Current commit fixes this: initially only first queue is started=
+,
+>>>>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
+>>>>>>>> requested by the guest.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Yuri Benditovich<yuri.benditovich@daynix.com>
+>>>>>>>> ---
+>>>>>>>>     hw/net/virtio-net.c | 7 +++++--
+>>>>>>>>     1 file changed, 5 insertions(+), 2 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>>>>>> index 3f319ef723..d3b1ac6d3a 100644
+>>>>>>>> --- a/hw/net/virtio-net.c
+>>>>>>>> +++ b/hw/net/virtio-net.c
+>>>>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONe=
+t *n, uint8_t status)
+>>>>>>>>     {
+>>>>>>>>         VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+>>>>>>>>         NetClientState *nc =3D qemu_get_queue(n->nic);
+>>>>>>>> -    int queues =3D n->multiqueue ? n->max_queues : 1;
+>>>>>>>> +    int queues =3D n->multiqueue ? n->curr_queues : 1;
+>>>>>>>>
+>>>>>>>>         if (!get_vhost_net(nc->peer)) {
+>>>>>>>>             return;
+>>>>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet=
+ *n, uint8_t cmd,
+>>>>>>>>             return VIRTIO_NET_ERR;
+>>>>>>>>         }
+>>>>>>>>
+>>>>>>>> -    n->curr_queues =3D queues;
+>>>>>>>>         /* stop the backend before changing the number of queues=
+ to avoid handling a
+>>>>>>>>          * disabled queue */
+>>>>>>>> +    virtio_net_set_status(vdev, 0);
+>>>>>>> Any reason for doing this?
+>>>>>> I think there are 2 reasons:
+>>>>>> 1. The spec does not require guest SW to allocate unused queues.
+>>>>>> 2. We spend guest's physical memory to just make vhost happy when =
+it
+>>>>>> touches queues that it should not use.
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Yuri Benditovich
+>>>>> The spec also says:
+>>>>>           queue_enable The driver uses this to selectively prevent =
+the device from executing requests from this
+>>>>>           virtqueue. 1 - enabled; 0 - disabled.
+>>>>>
+>>>>> While this is not a conformance clause this strongly implies that
+>>>>> queues which are not enabled are never accessed by device.
+>>>>>
+>>>>> Yuri I am guessing you are not enabling these unused queues right?
+>>>> Of course, we (Windows driver) do not.
+>>>> The code of virtio-net passes max_queues to vhost and this causes
+>>>> vhost to try accessing all the queues, fail on unused ones and final=
+ly
+>>>> leave vhost disabled at all.
+>>> Jason, at least for 1.0 accessing disabled queues looks like a spec
+>>> violation. What do you think?
+>> Yes, but there's some issues:
+>>
+>> - How to detect a disabled queue for 0.9x device? Looks like there's n=
+o way
+>> according to the spec, so device must assume all queues was enabled.
+> Traditionally devices assumed that queue address 0 implies not enabled.
 
-I tested xaflag/axflag (after setting the ID_AA64ISAR0 TS field to 2).
 
-I also tested rmif/setf8/setf16.
+So device enable the queue through write a non zero value for queue=20
+address? Unfortunately this misses the spec.
 
-Everything passes.
-
-tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-
-Thanks,
-
-Laurent
 
 >
-> r~
->
->
-> Richard Henderson (3):
->   target/arm: Rearrange disas_data_proc_reg
->   target/arm: Implement ARMv8.4-CondM
->   target/arm: Implement ARMv8.5-CondM
->
->  target/arm/cpu.h           |  10 ++
->  linux-user/elfload.c       |   1 +
->  target/arm/cpu64.c         |   1 +
->  target/arm/translate-a64.c | 249 +++++++++++++++++++++++++++++++------
->  4 files changed, 221 insertions(+), 40 deletions(-)
->
-> --
-> 2.17.2
->
->
+>> - For 1.0, if we depends on queue_enable, we should implement the call=
+back
+>> for vhost I think. Otherwise it's still buggy.
+>>
+>> So it looks tricky to enable and disable queues through set status
+>>
+>> Thanks
+> Do you agree it's a compliance issue though?
+
+
+Yes, but it needs more work than what this patch did.
+
+Thanks
