@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37104)
+Received: from eggs.gnu.org ([209.51.188.92]:37120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwQUm-0007G0-Vm
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:02 -0500
+	(envelope-from <quintela@redhat.com>) id 1gwQUp-0007J6-B8
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwQUh-00022s-3W
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51856)
+	(envelope-from <quintela@redhat.com>) id 1gwQUn-0002Vs-8c
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50402)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwQUW-00012L-5z
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:56:49 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwQUn-0001te-19
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:01 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E064681F35
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 11:56:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07E0C7518D
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 11:56:53 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Feb 2019 12:56:07 +0100
-Message-Id: <20190220115611.3192-5-quintela@redhat.com>
+Date: Wed, 20 Feb 2019 12:56:11 +0100
+Message-Id: <20190220115611.3192-9-quintela@redhat.com>
 In-Reply-To: <20190220115611.3192-1-quintela@redhat.com>
 References: <20190220115611.3192-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/8] multifd: Drop x-multifd-page-count
- parameter
+Subject: [Qemu-devel] [PATCH v2 8/8] tests: Add migration multifd test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,293 +34,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Libvirt don't want to expose (and explain it).  From now on we measure
-the number of packages in bytes instead of pages, so it is the same
-independently of architecture.  We choose the page size of x86.
-Notice that in the following patch we make this variable.
+We set multifd-channels.
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hmp.c                 |  7 -------
- migration/migration.c | 30 ------------------------------
- migration/migration.h |  1 -
- migration/ram.c       | 15 ++++++++++-----
- qapi/migration.json   | 13 +------------
- 5 files changed, 11 insertions(+), 55 deletions(-)
+ tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/hmp.c b/hmp.c
-index 8e283153b5..8bd5e48005 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -422,9 +422,6 @@ void hmp_info_migrate_parameters(Monitor *mon, const =
-QDict *qdict)
-         monitor_printf(mon, "%s: %u\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNEL=
-S),
-             params->x_multifd_channels);
--        monitor_printf(mon, "%s: %u\n",
--            MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_PAGE_CO=
-UNT),
--            params->x_multifd_page_count);
-         monitor_printf(mon, "%s: %" PRIu64 "\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE=
-),
-             params->xbzrle_cache_size);
-@@ -1772,10 +1769,6 @@ void hmp_migrate_set_parameter(Monitor *mon, const=
- QDict *qdict)
-         p->has_x_multifd_channels =3D true;
-         visit_type_int(v, param, &p->x_multifd_channels, &err);
-         break;
--    case MIGRATION_PARAMETER_X_MULTIFD_PAGE_COUNT:
--        p->has_x_multifd_page_count =3D true;
--        visit_type_int(v, param, &p->x_multifd_page_count, &err);
--        break;
-     case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
-         p->has_xbzrle_cache_size =3D true;
-         visit_type_size(v, param, &cache_size, &err);
-diff --git a/migration/migration.c b/migration/migration.c
-index 5ecf0978ac..f1b34bfe29 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -81,7 +81,6 @@
- /* The delay time (in ms) between two COLO checkpoints */
- #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
- #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
--#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
-=20
- /* Background transfer rate for postcopy, 0 means unlimited, note
-  * that page requests can still exceed this limit.
-@@ -749,8 +748,6 @@ MigrationParameters *qmp_query_migrate_parameters(Err=
-or **errp)
-     params->block_incremental =3D s->parameters.block_incremental;
-     params->has_x_multifd_channels =3D true;
-     params->x_multifd_channels =3D s->parameters.x_multifd_channels;
--    params->has_x_multifd_page_count =3D true;
--    params->x_multifd_page_count =3D s->parameters.x_multifd_page_count;
-     params->has_xbzrle_cache_size =3D true;
-     params->xbzrle_cache_size =3D s->parameters.xbzrle_cache_size;
-     params->has_max_postcopy_bandwidth =3D true;
-@@ -1112,14 +1109,6 @@ static bool migrate_params_check(MigrationParamete=
-rs *params, Error **errp)
-                    "is invalid, it should be in the range of 1 to 255");
-         return false;
-     }
--    if (params->has_x_multifd_page_count &&
--        (params->x_multifd_page_count < 1 ||
--         params->x_multifd_page_count > 10000)) {
--        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
--                   "multifd_page_count",
--                   "is invalid, it should be in the range of 1 to 10000"=
-);
--        return false;
--    }
-=20
-     if (params->has_xbzrle_cache_size &&
-         (params->xbzrle_cache_size < qemu_target_page_size() ||
-@@ -1202,9 +1191,6 @@ static void migrate_params_test_apply(MigrateSetPar=
-ameters *params,
-     if (params->has_x_multifd_channels) {
-         dest->x_multifd_channels =3D params->x_multifd_channels;
-     }
--    if (params->has_x_multifd_page_count) {
--        dest->x_multifd_page_count =3D params->x_multifd_page_count;
--    }
-     if (params->has_xbzrle_cache_size) {
-         dest->xbzrle_cache_size =3D params->xbzrle_cache_size;
-     }
-@@ -1283,9 +1269,6 @@ static void migrate_params_apply(MigrateSetParamete=
-rs *params, Error **errp)
-     if (params->has_x_multifd_channels) {
-         s->parameters.x_multifd_channels =3D params->x_multifd_channels;
-     }
--    if (params->has_x_multifd_page_count) {
--        s->parameters.x_multifd_page_count =3D params->x_multifd_page_co=
-unt;
--    }
-     if (params->has_xbzrle_cache_size) {
-         s->parameters.xbzrle_cache_size =3D params->xbzrle_cache_size;
-         xbzrle_cache_resize(params->xbzrle_cache_size, errp);
-@@ -2044,15 +2027,6 @@ int migrate_multifd_channels(void)
-     return s->parameters.x_multifd_channels;
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index a27f095b28..3e0e447f95 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -942,6 +942,53 @@ static void test_precopy_tcp(void)
+     g_free(uri);
  }
 =20
--int migrate_multifd_page_count(void)
--{
--    MigrationState *s;
--
--    s =3D migrate_get_current();
--
--    return s->parameters.x_multifd_page_count;
--}
--
- int migrate_use_xbzrle(void)
- {
-     MigrationState *s;
-@@ -3286,9 +3260,6 @@ static Property migration_properties[] =3D {
-     DEFINE_PROP_UINT8("x-multifd-channels", MigrationState,
-                       parameters.x_multifd_channels,
-                       DEFAULT_MIGRATE_MULTIFD_CHANNELS),
--    DEFINE_PROP_UINT32("x-multifd-page-count", MigrationState,
--                      parameters.x_multifd_page_count,
--                      DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT),
-     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
-                       parameters.xbzrle_cache_size,
-                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
-@@ -3366,7 +3337,6 @@ static void migration_instance_init(Object *obj)
-     params->has_x_checkpoint_delay =3D true;
-     params->has_block_incremental =3D true;
-     params->has_x_multifd_channels =3D true;
--    params->has_x_multifd_page_count =3D true;
-     params->has_xbzrle_cache_size =3D true;
-     params->has_max_postcopy_bandwidth =3D true;
-     params->has_max_cpu_throttle =3D true;
-diff --git a/migration/migration.h b/migration/migration.h
-index 837709d8a1..7e03643683 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -269,7 +269,6 @@ bool migrate_auto_converge(void);
- bool migrate_use_multifd(void);
- bool migrate_pause_before_switchover(void);
- int migrate_multifd_channels(void);
--int migrate_multifd_page_count(void);
-=20
- int migrate_use_xbzrle(void);
- int64_t migrate_xbzrle_cache_size(void);
-diff --git a/migration/ram.c b/migration/ram.c
-index 26ed26fc2d..e22d02760b 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -520,6 +520,9 @@ exit:
-=20
- #define MULTIFD_FLAG_SYNC (1 << 0)
-=20
-+/* This value needs to be a multiple of qemu_target_page_size() */
-+#define MULTIFD_PACKET_SIZE (64 * 1024)
++static void test_multifd_tcp(void)
++{
++    char *uri;
++    QTestState *from, *to;
 +
- typedef struct {
-     uint32_t magic;
-     uint32_t version;
-@@ -720,12 +723,13 @@ static void multifd_pages_clear(MultiFDPages_t *pag=
-es)
- static void multifd_send_fill_packet(MultiFDSendParams *p)
++    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false)) {
++        return;
++    }
++
++    /*
++     * We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter(from, "downtime-limit", 1);
++    /* 1GB/s */
++    migrate_set_parameter(from, "max-bandwidth", 1000000000);
++
++    migrate_set_parameter(from, "multifd-channels", 2);
++    migrate_set_parameter(to, "multifd-channels", 2);
++
++    migrate_set_capability(from, "multifd", "true");
++    migrate_set_capability(to, "multifd", "true");
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    uri =3D migrate_get_socket_address(to, "socket-address");
++
++    migrate(from, uri, "{}");
++
++    wait_for_migration_pass(from);
++
++    /* 300ms it should converge */
++    migrate_set_parameter(from, "downtime-limit", 300);
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    test_migrate_end(from, to, true);
++}
++
+ int main(int argc, char **argv)
  {
-     MultiFDPacket_t *packet =3D p->packet;
-+    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
-);
-     int i;
+     char template[] =3D "/tmp/migration-test-XXXXXX";
+@@ -995,6 +1042,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
++    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
 =20
-     packet->magic =3D cpu_to_be32(MULTIFD_MAGIC);
-     packet->version =3D cpu_to_be32(MULTIFD_VERSION);
-     packet->flags =3D cpu_to_be32(p->flags);
--    packet->pages_alloc =3D cpu_to_be32(migrate_multifd_page_count());
-+    packet->pages_alloc =3D cpu_to_be32(page_count);
-     packet->pages_used =3D cpu_to_be32(p->pages->used);
-     packet->next_packet_size =3D cpu_to_be32(p->next_packet_size);
-     packet->packet_num =3D cpu_to_be64(p->packet_num);
-@@ -742,6 +746,7 @@ static void multifd_send_fill_packet(MultiFDSendParam=
-s *p)
- static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp=
-)
- {
-     MultiFDPacket_t *packet =3D p->packet;
-+    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
-);
-     RAMBlock *block;
-     int i;
+     ret =3D g_test_run();
 =20
-@@ -764,10 +769,10 @@ static int multifd_recv_unfill_packet(MultiFDRecvPa=
-rams *p, Error **errp)
-     p->flags =3D be32_to_cpu(packet->flags);
-=20
-     packet->pages_alloc =3D be32_to_cpu(packet->pages_alloc);
--    if (packet->pages_alloc > migrate_multifd_page_count()) {
-+    if (packet->pages_alloc > page_count) {
-         error_setg(errp, "multifd: received packet "
-                    "with size %d and expected maximum size %d",
--                   packet->pages_alloc, migrate_multifd_page_count()) ;
-+                   packet->pages_alloc, page_count) ;
-         return -1;
-     }
-=20
-@@ -1099,7 +1104,7 @@ static void multifd_new_send_channel_async(QIOTask =
-*task, gpointer opaque)
- int multifd_save_setup(void)
- {
-     int thread_count;
--    uint32_t page_count =3D migrate_multifd_page_count();
-+    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
-);
-     uint8_t i;
-=20
-     if (!migrate_use_multifd()) {
-@@ -1299,7 +1304,7 @@ static void *multifd_recv_thread(void *opaque)
- int multifd_load_setup(void)
- {
-     int thread_count;
--    uint32_t page_count =3D migrate_multifd_page_count();
-+    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
-);
-     uint8_t i;
-=20
-     if (!migrate_use_multifd()) {
-diff --git a/qapi/migration.json b/qapi/migration.json
-index b62947791f..8c5db60406 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -547,9 +547,6 @@
- #                     number of sockets used for migration.  The
- #                     default value is 2 (since 2.11)
- #
--# @x-multifd-page-count: Number of pages sent together to a thread.
--#                        The default value is 16 (since 2.11)
--#
- # @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
- #                     needs to be a multiple of the target page size
- #                     and a power of 2
-@@ -569,7 +566,7 @@
-            'cpu-throttle-initial', 'cpu-throttle-increment',
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
-            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
--           'x-multifd-channels', 'x-multifd-page-count',
-+           'x-multifd-channels',
-            'xbzrle-cache-size', 'max-postcopy-bandwidth',
-            'max-cpu-throttle' ] }
-=20
-@@ -637,9 +634,6 @@
- #                     number of sockets used for migration.  The
- #                     default value is 2 (since 2.11)
- #
--# @x-multifd-page-count: Number of pages sent together to a thread.
--#                        The default value is 16 (since 2.11)
--#
- # @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
- #                     needs to be a multiple of the target page size
- #                     and a power of 2
-@@ -670,7 +664,6 @@
-             '*x-checkpoint-delay': 'int',
-             '*block-incremental': 'bool',
-             '*x-multifd-channels': 'int',
--            '*x-multifd-page-count': 'int',
-             '*xbzrle-cache-size': 'size',
-             '*max-postcopy-bandwidth': 'size',
- 	    '*max-cpu-throttle': 'int' } }
-@@ -754,9 +747,6 @@
- #                     number of sockets used for migration.
- #                     The default value is 2 (since 2.11)
- #
--# @x-multifd-page-count: Number of pages sent together to a thread.
--#                        The default value is 16 (since 2.11)
--#
- # @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
- #                     needs to be a multiple of the target page size
- #                     and a power of 2
-@@ -786,7 +776,6 @@
-             '*x-checkpoint-delay': 'uint32',
-             '*block-incremental': 'bool' ,
-             '*x-multifd-channels': 'uint8',
--            '*x-multifd-page-count': 'uint32',
-             '*xbzrle-cache-size': 'size',
- 	    '*max-postcopy-bandwidth': 'size',
-             '*max-cpu-throttle':'uint8'} }
 --=20
 2.20.1
