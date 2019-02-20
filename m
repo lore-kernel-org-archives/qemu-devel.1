@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38348)
+Received: from eggs.gnu.org ([209.51.188.92]:39926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gwVHW-0000yc-33
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:03:41 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gwVMR-0004il-O0
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:08:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gwVHU-0001A8-4H
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:03:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:25751)
+	(envelope-from <cohuck@redhat.com>) id 1gwVMO-0005Xo-VN
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:08:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gwVHS-0000ze-1h
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:03:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1550678735-25394-1-git-send-email-thuth@redhat.com>
-	<20190220161508.GN21870@redhat.com>
-Date: Wed, 20 Feb 2019 18:03:09 +0100
-In-Reply-To: <20190220161508.GN21870@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Wed, 20 Feb 2019 16:15:08 +0000")
-Message-ID: <87pnrms88i.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gwVMJ-0005Kp-Ed
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:08:37 -0500
+Date: Wed, 20 Feb 2019 18:08:13 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190220180813.17e6ab86.cohuck@redhat.com>
+In-Reply-To: <20190220073636.GD16456@joy-OptiPlex-7040>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<1550566334-3602-1-git-send-email-yan.y.zhao@intel.com>
+	<20190219140918.476ac9d1.cohuck@redhat.com>
+	<20190220073636.GD16456@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ui/gtk: Fix the license information
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] vfio/migration: define kernel
+ interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +30,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Anthony Liguori <anthony@codemonkey.ws>, qemu-devel@nongnu.org
+To: Zhao Yan <yan.y.zhao@intel.com>
+Cc: alex.williamson@redhat.com, qemu-devel@nongnu.org, intel-gvt-dev@lists.freedesktop.org, Zhengxiao.zx@Alibaba-inc.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com, kwankhede@nvidia.com, kevin.tian@intel.com, cjia@nvidia.com, arei.gonglei@huawei.com, kvm@vger.kernel.org
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Wed, 20 Feb 2019 02:36:36 -0500
+Zhao Yan <yan.y.zhao@intel.com> wrote:
 
-> On Wed, Feb 20, 2019 at 05:05:35PM +0100, Thomas Huth wrote:
->> The license information in this file is very messy. A short note at
->> the beginning says GPL first, but the long boilerplate code then
->> talks about "GNU Lesser General Public License version 2.0". First,
->> there is no such version of the "GNU Lesser GPL", it only started with
->> version 2.1. In version 2.0, it was still called "GNU Library GPL"
->> instead. Second, you can easily get the license of this file wrong
->> if you only quickly glance at the long boilerplate code.
->>=20
->> Anyway, looking at the text of the LGPL (see COPYING.LIB in the top
->> directory), the license clearly states in section "3." that one should
->> rather replace the license information with the GPL information in
->> such a case of a mixture instead. Thus let's clean up the confusing
->> statements and use the proper GPL text only.
->>=20
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  ui/gtk.c | 20 ++++++++------------
->>  1 file changed, 8 insertions(+), 12 deletions(-)
->>=20
->> diff --git a/ui/gtk.c b/ui/gtk.c
->> index 949b143..af7e5b2 100644
->> --- a/ui/gtk.c
->> +++ b/ui/gtk.c
->> @@ -6,9 +6,6 @@
->>   * Authors:
->>   *  Anthony Liguori   <aliguori@us.ibm.com>
->>   *
->> - * This work is licensed under the terms of the GNU GPL, version 2 or l=
-ater.
->> - * See the COPYING file in the top-level directory.
->
-> This part of the header was describing the license of the QEMU originated
-> code for gtk.c
->
->> - *
->>   * Portions from gtk-vnc:
->>   *
->>   * GTK VNC Widget
->> @@ -16,19 +13,18 @@
->>   * Copyright (C) 2006  Anthony Liguori <anthony@codemonkey.ws>
->>   * Copyright (C) 2009-2010 Daniel P. Berrange <dan@berrange.com>
->>   *
->> - * This library is free software; you can redistribute it and/or
->> - * modify it under the terms of the GNU Lesser General Public
->> - * License as published by the Free Software Foundation; either
->> - * version 2.0 of the License, or (at your option) any later version.
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation; either version 2 of the License, or
->> + * (at your option) any later version.
->>   *
->> - * This library is distributed in the hope that it will be useful,
->> + * This program is distributed in the hope that it will be useful,
->>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->> - * Lesser General Public License for more details.
->> + * General Public License for more details.
->>   *
->> - * You should have received a copy of the GNU Lesser General Public
->> - * License along with this library; if not, write to the Free Software
->> - * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110=
--1301 USA
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->
-> while this part of the header was describing the license of the original
-> GTK-VNC code that was copied into this file.
->
-> Changing this text is not correct, because now it no longer describes
-> the original gtk-vnc license.
->
-> If you want to change this file you'll need the main license text for
-> QEMU further up, *before* the line starting "Portions from gtk-vnc:"
+> On Tue, Feb 19, 2019 at 02:09:18PM +0100, Cornelia Huck wrote:
+> > On Tue, 19 Feb 2019 16:52:14 +0800
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+(...)
+> > > + *          Size of device config data is smaller than or equal to that of
+> > > + *          device config region.  
+> > 
+> > Not sure if I understand that sentence correctly... but what if a
+> > device has more config state than fits into this region? Is that
+> > supposed to be covered by the device memory region? Or is this assumed
+> > to be something so exotic that we don't need to plan for it?
+> >   
+> Device config data and device config region are all provided by vendor
+> driver, so vendor driver is always able to create a large enough device
+> config region to hold device config data.
+> So, if a device has data that are better to be saved after device stop and
+> saved/loaded in strict order, the data needs to be in device config region.
+> This kind of data is supposed to be small.
+> If the device data can be saved/loaded several times, it can also be put
+> into device memory region.
 
-No.  LGPL permits derived works to be licensed under GPL.
-https://www.gnu.org/licenses/gpl-faq.html#AllCompatibility
+So, it is the vendor driver's decision which device information should
+go via which region? With the device config data supposed to be
+saved/loaded in one go?
 
-Keeping the separate historical boiler-plate may feel polite.  But to
-figure out what exactly is LGPLed, you'd have to dig through history
-anyway.  So all it accomplishes is providing a hint that somewhere in
-history something could possibly be found that's still LGPLed and still
-useful.
+(...)
+> > > +/* version number of the device state interface */
+> > > +#define VFIO_DEVICE_STATE_INTERFACE_VERSION 1  
+> > 
+> > Hm. Is this supposed to be backwards-compatible, should we need to bump
+> > this?
+> >  
+> currently no backwords-compatible. we can discuss on that.
 
-> The bit about GTK-VNC could reasonably be simplified to
->
->     "Portions taken from gtk-vnc under the terms of the GNU
->      Lesser General Public License 2.1 or later."
+It might be useful if we discover that we need some extensions. But I'm
+not sure how much work it would be.
+
+(...)
+> > > +/*
+> > > + * DEVICE STATES
+> > > + *
+> > > + * Four states are defined for a VFIO device:
+> > > + * RUNNING, RUNNING & LOGGING, STOP & LOGGING, STOP.
+> > > + * They can be set by writing to device_state field of
+> > > + * vfio_device_state_ctl region.  
+> > 
+> > Who controls this? Userspace?  
+> 
+> Yes. Userspace notifies vendor driver to do the state switching.
+
+Might be good to mention this (just to make it obvious).
+
+> > > + * LOGGING state is a special state that it CANNOT exist
+> > > + * independently.  
+> > 
+> > So it's not a state, but rather a modifier?
+> >   
+> yes. or thinking LOGGING/not LOGGING as bit 1 of a device state,
+> whereas RUNNING/STOPPED is bit 0 of a device state.
+> They have to be got as a whole.
+
+So it is (on a bit level):
+RUNNING -> 00
+STOPPED -> 01
+LOGGING/RUNNING -> 10
+LOGGING/STOPPED -> 11
+ 
+> > > + * It must be set alongside with state RUNNING or STOP, i.e,
+> > > + * RUNNING & LOGGING, STOP & LOGGING.
+> > > + * It is used for dirty data logging both for device memory
+> > > + * and system memory.
+> > > + *
+> > > + * LOGGING only impacts device/system memory. In LOGGING state, get buffer
+> > > + * of device memory returns dirty pages since last call; outside LOGGING
+> > > + * state, get buffer of device memory returns whole snapshot of device
+> > > + * memory. system memory's dirty page is only available in LOGGING state.
+> > > + *
+> > > + * Device config should be always accessible and return whole config snapshot
+> > > + * regardless of LOGGING state.
+> > > + * */
+> > > +#define VFIO_DEVICE_STATE_RUNNING 0
+> > > +#define VFIO_DEVICE_STATE_STOP 1
+> > > +#define VFIO_DEVICE_STATE_LOGGING 2
+
+This makes it look a bit like LOGGING were an individual state, while 2
+is in reality LOGGING/RUNNING... not sure how to make that more
+obvious. Maybe (as we are dealing with a u32):
+
+#define VFIO_DEVICE_STATE_RUNNING 0x00000000
+#define VFIO_DEVICE_STATE_STOPPED 0x00000001
+#define VFIO_DEVICE_STATE_LOGGING_RUNNING 0x00000002
+#define VFIO_DEVICE_STATE_LOGGING_STOPPED 0x00000003
+#define VFIO_DEVICE_STATE_LOGGING_MASK 0x00000002
+
+> > > +
+> > > +/* action to get data from device memory or device config
+> > > + * the action is write to device state's control region, and data is read
+> > > + * from device memory region or device config region.
+> > > + * Each time before read device memory region or device config region,
+> > > + * action VFIO_DEVICE_DATA_ACTION_GET_BUFFER is required to write to action
+> > > + * field in control region. That is because device memory and devie config
+> > > + * region is mmaped into user space. vendor driver has to be notified of
+> > > + * the the GET_BUFFER action in advance.
+> > > + */
+> > > +#define VFIO_DEVICE_DATA_ACTION_GET_BUFFER 1
+> > > +
+> > > +/* action to set data to device memory or device config
+> > > + * the action is write to device state's control region, and data is
+> > > + * written to device memory region or device config region.
+> > > + * Each time after write to device memory region or device config region,
+> > > + * action VFIO_DEVICE_DATA_ACTION_GET_BUFFER is required to write to action
+> > > + * field in control region. That is because device memory and devie config
+> > > + * region is mmaped into user space. vendor driver has to be notified of
+> > > + * the the SET_BUFFER action after data written.
+> > > + */
+> > > +#define VFIO_DEVICE_DATA_ACTION_SET_BUFFER 2  
+> > 
+> > Let me describe this in my own words to make sure that I understand
+> > this correctly.
+> > 
+> > - The actions are set by userspace to notify the kernel that it is
+> >   going to get data or that it has just written data.
+> > - This is needed as a notification that the mmapped data should not be
+> >   changed resp. just has changed.  
+> we need this notification is because when userspace read the mmapped data,
+> it's from the ptr returned from mmap(). So, when userspace reads that ptr,
+> there will be no page fault or read/write system calls, so vendor driver
+> does not know whether read/write opertation happens or not. 
+> Therefore, before userspace reads the ptr from mmap, it first writes action
+> field in control region (through write system call), and vendor driver
+> will not return the write system call until data prepared.
+> 
+> When userspace writes to that ptr from mmap, it writes data to the data
+> region first, then writes the action field in control region (through write
+> system call) to notify vendor driver. vendor driver will return the system
+> call after it copies the buffer completely.
+> > 
+> > So, how does the kernel know whether the read action has finished resp.
+> > whether the write action has started? Even if userspace reads/writes it
+> > as a whole.
+> >   
+> kernel does not touch the data region except when in response to the
+> "action" write system call.
+
+Thanks for the explanation, that makes sense.
+(...)
