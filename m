@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35060)
+Received: from eggs.gnu.org ([209.51.188.92]:35091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaXd-00042x-0z
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:37 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaXj-00049n-0e
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaXc-0008WQ-7y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:36 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaXg-00006U-Rd
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:42 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 20 Feb 2019 23:39:51 +0100
-Message-Id: <20190220224003.4420-6-eric.auger@redhat.com>
+Date: Wed, 20 Feb 2019 23:39:52 +0100
+Message-Id: <20190220224003.4420-7-eric.auger@redhat.com>
 In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
 References: <20190220224003.4420-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 05/17] kvm: add kvm_arm_get_max_vm_ipa_size
+Subject: [Qemu-devel] [PATCH v7 06/17] vl: Set machine ram_size,
+ maxram_size and ram_slots earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +25,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-Add the kvm_arm_get_max_vm_ipa_size() helper that returns the
-number of bits in the IPA address space supported by KVM.
-
-This capability needs to be known to create the VM with a
-specific IPA max size (kvm_type passed along KVM_CREATE_VM ioctl.
+The machine RAM attributes will need to be analyzed during the
+configure_accelerator() process. especially kvm_type() arm64
+machine callback will use them to know how many IPA/GPA bits are
+needed to model the whole RAM range. So let's assign those machine
+state fields before calling configure_accelerator.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 ---
 v6 -> v7:
-- s/kvm_arm_get_max_vm_phys_shift/kvm_arm_get_max_vm_ipa_size
-- reword the comment
+- add Peter's R-b
 
-v4 -> v5:
-- return 40 if the host does not support the capability
-
-v3 -> v4:
-- s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
-- check KVM_CAP_ARM_VM_IPA_SIZE extension
-
-v1 -> v2:
-- put this in ARM specific code
+v4: new
 ---
- target/arm/kvm.c     | 10 ++++++++++
- target/arm/kvm_arm.h | 13 +++++++++++++
- 2 files changed, 23 insertions(+)
+ vl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index e00ccf9c98..79a79f0190 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -18,6 +18,7 @@
- #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/kvm_int.h"
- #include "kvm_arm.h"
- #include "cpu.h"
- #include "trace.h"
-@@ -162,6 +163,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-     env->features =3D arm_host_cpu_features.features;
- }
+diff --git a/vl.c b/vl.c
+index 502857a176..fd0d51320d 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4239,6 +4239,9 @@ int main(int argc, char **argv, char **envp)
+     machine_opts =3D qemu_get_machine_opts();
+     qemu_opt_foreach(machine_opts, machine_set_property, current_machine=
+,
+                      &error_fatal);
++    current_machine->ram_size =3D ram_size;
++    current_machine->maxram_size =3D maxram_size;
++    current_machine->ram_slots =3D ram_slots;
 =20
-+int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-+{
-+    KVMState *s =3D KVM_STATE(ms->accelerator);
-+    int ret;
-+
-+    ret =3D kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
-+    return ret > 0 ? ret : 40;
-+}
-+
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     /* For ARM interrupt delivery is always asynchronous,
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 6393455b1d..2a07333c61 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -207,6 +207,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeature=
-s *ahcf);
-  */
- void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+     configure_accelerator(current_machine, argv[0]);
 =20
-+/**
-+ * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
-+ * IPA address space supported by KVM
-+ *
-+ * @ms: Machine state handle
-+ */
-+int kvm_arm_get_max_vm_ipa_size(MachineState *ms);
-+
- /**
-  * kvm_arm_sync_mpstate_to_kvm
-  * @cpu: ARMCPU
-@@ -239,6 +247,11 @@ static inline void kvm_arm_set_cpu_features_from_hos=
-t(ARMCPU *cpu)
-     cpu->host_cpu_probe_failed =3D true;
- }
+@@ -4434,9 +4437,6 @@ int main(int argc, char **argv, char **envp)
+     replay_checkpoint(CHECKPOINT_INIT);
+     qdev_machine_init();
 =20
-+static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-+{
-+    return -ENOENT;
-+}
-+
- static inline int kvm_arm_vgic_probe(void)
- {
-     return 0;
+-    current_machine->ram_size =3D ram_size;
+-    current_machine->maxram_size =3D maxram_size;
+-    current_machine->ram_slots =3D ram_slots;
+     current_machine->boot_order =3D boot_order;
+=20
+     /* parse features once if machine provides default cpu_type */
 --=20
 2.20.1
