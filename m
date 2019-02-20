@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51755)
+Received: from eggs.gnu.org ([209.51.188.92]:51896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gwVzh-0005LD-4u
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:18 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gwW00-0005Xs-M7
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gwVzf-0005BR-5e
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gwVzw-0005Np-MR
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:35 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Feb 2019 18:48:34 +0100
-Message-Id: <20190220174843.8847-5-kwolf@redhat.com>
+Date: Wed, 20 Feb 2019 18:48:36 +0100
+Message-Id: <20190220174843.8847-7-kwolf@redhat.com>
 In-Reply-To: <20190220174843.8847-1-kwolf@redhat.com>
 References: <20190220174843.8847-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 04/13] io: Make qio_channel_yield()
- interruptible
+Subject: [Qemu-devel] [PATCH v2 06/13] nbd: Move nbd_read_eof() to
+ nbd/client.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Similar to how qemu_co_sleep_ns() allows preemption from an external
-coroutine entry, allow reentering qio_channel_yield() early.
+The only caller of nbd_read_eof() is nbd_receive_reply(), so it doesn't
+have to live in the header file, but can move next to its caller.
+
+Also add the missing coroutine_fn to the function and its caller.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/io/channel.h |  9 ++++++---
- io/channel.c         | 10 ++++++++++
- 2 files changed, 16 insertions(+), 3 deletions(-)
+ include/block/nbd.h |  3 ++-
+ nbd/nbd-internal.h  | 19 -------------------
+ nbd/client.c        | 22 +++++++++++++++++++++-
+ 3 files changed, 23 insertions(+), 21 deletions(-)
 
-diff --git a/include/io/channel.h b/include/io/channel.h
-index da2f138200..59460cb1ec 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -739,10 +739,13 @@ void qio_channel_detach_aio_context(QIOChannel *ioc=
-);
-  * addition, no two coroutine can be waiting on the same condition
-  * and channel at the same time.
-  *
-- * This must only be called from coroutine context
-+ * This must only be called from coroutine context. It is safe to
-+ * reenter the coroutine externally while it is waiting; in this
-+ * case the function will return even if @condition is not yet
-+ * available.
-  */
--void qio_channel_yield(QIOChannel *ioc,
--                       GIOCondition condition);
-+void coroutine_fn qio_channel_yield(QIOChannel *ioc,
-+                                    GIOCondition condition);
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 96cfb1d7d5..cad975e00c 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -300,7 +300,8 @@ int nbd_receive_export_list(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
+              Error **errp);
+ int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
+-int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp);
++int coroutine_fn nbd_receive_reply(QIOChannel *ioc, NBDReply *reply,
++                                   Error **errp);
+ int nbd_client(int fd);
+ int nbd_disconnect(int fd);
+ int nbd_errno_to_system_errno(int err);
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index 82aa221227..049f83df77 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -64,25 +64,6 @@
+ #define NBD_SET_TIMEOUT             _IO(0xab, 9)
+ #define NBD_SET_FLAGS               _IO(0xab, 10)
 =20
- /**
-  * qio_channel_wait:
-diff --git a/io/channel.c b/io/channel.c
-index 8dd0684f5d..303376e08d 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -469,6 +469,16 @@ void coroutine_fn qio_channel_yield(QIOChannel *ioc,
-     }
-     qio_channel_set_aio_fd_handlers(ioc);
-     qemu_coroutine_yield();
-+
-+    /* Allow interrupting the operation by reentering the coroutine othe=
-r than
-+     * through the aio_fd_handlers. */
-+    if (condition =3D=3D G_IO_IN && ioc->read_coroutine) {
-+        ioc->read_coroutine =3D NULL;
-+        qio_channel_set_aio_fd_handlers(ioc);
-+    } else if (condition =3D=3D G_IO_OUT && ioc->write_coroutine) {
-+        ioc->write_coroutine =3D NULL;
-+        qio_channel_set_aio_fd_handlers(ioc);
-+    }
+-/* nbd_read_eof
+- * Tries to read @size bytes from @ioc.
+- * Returns 1 on success
+- *         0 on eof, when no data was read (errp is not set)
+- *         negative errno on failure (errp is set)
+- */
+-static inline int nbd_read_eof(QIOChannel *ioc, void *buffer, size_t siz=
+e,
+-                               Error **errp)
+-{
+-    int ret;
+-
+-    assert(size);
+-    ret =3D qio_channel_read_all_eof(ioc, buffer, size, errp);
+-    if (ret < 0) {
+-        ret =3D -EIO;
+-    }
+-    return ret;
+-}
+-
+ /* nbd_write
+  * Writes @size bytes to @ioc. Returns 0 on success.
+  */
+diff --git a/nbd/client.c b/nbd/client.c
+index 10a52ad7d0..28d174c0f3 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -1387,12 +1387,32 @@ static int nbd_receive_structured_reply_chunk(QIO=
+Channel *ioc,
+     return 0;
  }
 =20
-=20
++/* nbd_read_eof
++ * Tries to read @size bytes from @ioc.
++ * Returns 1 on success
++ *         0 on eof, when no data was read (errp is not set)
++ *         negative errno on failure (errp is set)
++ */
++static inline int coroutine_fn
++nbd_read_eof(QIOChannel *ioc, void *buffer, size_t size, Error **errp)
++{
++    int ret;
++
++    assert(size);
++    ret =3D qio_channel_read_all_eof(ioc, buffer, size, errp);
++    if (ret < 0) {
++        ret =3D -EIO;
++    }
++    return ret;
++}
++
+ /* nbd_receive_reply
+  * Returns 1 on success
+  *         0 on eof, when no data was read (errp is not set)
+  *         negative errno on failure (errp is set)
+  */
+-int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
++int coroutine_fn nbd_receive_reply(QIOChannel *ioc, NBDReply *reply,
++                                   Error **errp)
+ {
+     int ret;
+     const char *type;
 --=20
 2.20.1
