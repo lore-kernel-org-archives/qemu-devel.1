@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42526)
+Received: from eggs.gnu.org ([209.51.188.92]:43045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTkF-0000As-RE
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:25:12 -0500
+	(envelope-from <bounces@canonical.com>) id 1gwTlf-0001U8-MA
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTkB-0007kR-8o
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:25:10 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35291)
+	(envelope-from <bounces@canonical.com>) id 1gwTlb-0008GM-BM
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTk9-000781-4r
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:25:05 -0500
-Received: by mail-ot1-x341.google.com with SMTP id z19so40799313otm.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:23:29 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:41 -0600
-Message-Id: <20190220135956.22589-5-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 04/19] i2c: Don't check return value from
- i2c_recv()
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gwTlT-00080M-HF
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:27 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gwTkp-0006SX-Rm
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 15:25:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C7B252E8058
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 15:25:47 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Feb 2019 15:20:20 -0000
+From: Stefan Hajnoczi <1815993@bugs.launchpad.net>
+Reply-To: Bug 1815993 <1815993@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155019981452.28486.1507573377077994257.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20190220152020.GA30403@stefanha-x1.localdomain>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1815993] [NEW] drive-backup with iscsi will
+ cause vm disk no response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +38,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+On Fri, Feb 15, 2019 at 03:03:34AM -0000, Cheng Chen wrote:
+> When the drive-backup is running, I manually crash the iscsi server=EF=BC=
+=88or
+> interrupt network, eg. iptables -j DROP=EF=BC=89.
+> =
 
-i2c_recv() cannot fail, so there is no need to check the return
-value.  It also returns unt8_t, so comparing with < 0 is not
-meaningful.
+> Then after less than 1 minute=EF=BC=9A
+> virsh qemu-monitor-command ${DOMAIN} --pretty '{ "execute": "query-block"=
+ }' will block and no any response, until timeout. This is still excusable.
+> But, the disk=EF=BC=88drive-virtio-disk0=EF=BC=89will occur the same situ=
+ation=EF=BC=9Ain vm os, the disk will block and no any response.
+> =
 
-Fix up various I2C controllers to remove the unneeded code.
+> In other words, when qemu and iscsi-server lose contact, It will cause
+> the vm unable.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/i2c/aspeed_i2c.c     |  9 ++-------
- hw/i2c/exynos4210_i2c.c |  8 +-------
- hw/i2c/imx_i2c.c        | 12 ++----------
- 3 files changed, 5 insertions(+), 24 deletions(-)
+I haven't tried to reproduce this but I guess QEMU reaches a
+synchronization point where it waits for all outstanding requests to
+complete.  Since the iSCSI target is unresponsive QEMU gets stuck.
 
-diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
-index a2dfa82760..a085510cfd 100644
---- a/hw/i2c/aspeed_i2c.c
-+++ b/hw/i2c/aspeed_i2c.c
-@@ -189,16 +189,11 @@ static uint8_t aspeed_i2c_get_state(AspeedI2CBus *bus)
- 
- static void aspeed_i2c_handle_rx_cmd(AspeedI2CBus *bus)
- {
--    int ret;
-+    uint8_t ret;
- 
-     aspeed_i2c_set_state(bus, I2CD_MRXD);
-     ret = i2c_recv(bus->bus);
--    if (ret < 0) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__);
--        ret = 0xff;
--    } else {
--        bus->intr_status |= I2CD_INTR_RX_DONE;
--    }
-+    bus->intr_status |= I2CD_INTR_RX_DONE;
-     bus->buf = (ret & I2CD_BYTE_BUF_RX_MASK) << I2CD_BYTE_BUF_RX_SHIFT;
-     if (bus->cmd & I2CD_M_S_RX_CMD_LAST) {
-         i2c_nack(bus->bus);
-diff --git a/hw/i2c/exynos4210_i2c.c b/hw/i2c/exynos4210_i2c.c
-index c96fa7d7be..d154b05739 100644
---- a/hw/i2c/exynos4210_i2c.c
-+++ b/hw/i2c/exynos4210_i2c.c
-@@ -106,16 +106,10 @@ static inline void exynos4210_i2c_raise_interrupt(Exynos4210I2CState *s)
- static void exynos4210_i2c_data_receive(void *opaque)
- {
-     Exynos4210I2CState *s = (Exynos4210I2CState *)opaque;
--    int ret;
- 
-     s->i2cstat &= ~I2CSTAT_LAST_BIT;
-     s->scl_free = false;
--    ret = i2c_recv(s->bus);
--    if (ret < 0 && (s->i2ccon & I2CCON_ACK_GEN)) {
--        s->i2cstat |= I2CSTAT_LAST_BIT;  /* Data is not acknowledged */
--    } else {
--        s->i2cds = ret;
--    }
-+    s->i2cds = i2c_recv(s->bus);
-     exynos4210_i2c_raise_interrupt(s);
- }
- 
-diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
-index 6c81b98ebd..6da5224e2e 100644
---- a/hw/i2c/imx_i2c.c
-+++ b/hw/i2c/imx_i2c.c
-@@ -120,7 +120,7 @@ static uint64_t imx_i2c_read(void *opaque, hwaddr offset,
-         value = s->i2dr_read;
- 
-         if (imx_i2c_is_master(s)) {
--            int ret = 0xff;
-+            uint8_t ret = 0xff;
- 
-             if (s->address == ADDR_RESET) {
-                 /* something is wrong as the address is not set */
-@@ -133,15 +133,7 @@ static uint64_t imx_i2c_read(void *opaque, hwaddr offset,
-             } else {
-                 /* get the next byte */
-                 ret = i2c_recv(s->bus);
--
--                if (ret >= 0) {
--                    imx_i2c_raise_interrupt(s);
--                } else {
--                    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: read failed "
--                                  "for device 0x%02x\n", TYPE_IMX_I2C,
--                                  __func__, s->address);
--                    ret = 0xff;
--                }
-+                imx_i2c_raise_interrupt(s);
-             }
- 
-             s->i2dr_read = ret;
--- 
-2.17.1
+These issues can sometimes be fixed by avoiding the synchronization
+point (a backtrace should reveal where the main loop thread is stuck)
+but other times it really is necessary to wait for all requests and the
+solution isn't as obvious.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1815993
+
+Title:
+  drive-backup with iscsi will cause vm disk no response
+
+Status in QEMU:
+  New
+
+Bug description:
+  virsh qemu-monitor-command ${DOMAIN} '{ "execute" : "drive-backup" ,
+  "arguments" : { "device" : "drive-virtio-disk0" , "sync" : "top" ,
+  "target" : "iscsi://192.168.1.100:3260/iqn.2019-01.com.iaas/0" } }'
+
+  When the drive-backup is running, I manually crash the iscsi server=EF=BC=
+=88or
+  interrupt network, eg. iptables -j DROP=EF=BC=89.
+
+  Then after less than 1 minute=EF=BC=9A
+  virsh qemu-monitor-command ${DOMAIN} --pretty '{ "execute": "query-block"=
+ }' will block and no any response, until timeout. This is still excusable.
+  But, the disk=EF=BC=88drive-virtio-disk0=EF=BC=89will occur the same situ=
+ation=EF=BC=9Ain vm os, the disk will block and no any response.
+
+  In other words, when qemu and iscsi-server lose contact, It will cause
+  the vm unable.
+
+  ---
+  Host: centos 7.5
+  qemu version: ovirt-4.2=EF=BC=88qemu-2.12.0=EF=BC=89
+  qemu command line: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3D=
+on -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/q=
+emu/domain-190-test./master-key.aes -machine pc-i440fx-3.1,accel=3Dkvm,usb=
+=3Doff,dump-guest-core=3Doff,mem-merge=3Doff -m 1024 -mem-prealloc -mem-pat=
+h /dev/hugepages1G/libvirt/qemu/190-test -realtime mlock=3Doff -smp 1,socke=
+ts=3D1,cores=3D1,threads=3D1 -uuid 1c8611c2-a18a-4b1c-b40b-9d82040eafa4 -sm=
+bios type=3D1,manufacturer=3DIaaS -no-user-config -nodefaults -chardev sock=
+et,id=3Dcharmonitor,fd=3D31,server,nowait -mon chardev=3Dcharmonitor,id=3Dm=
+onitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot menu=3Don,strict=
+=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device vi=
+rtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/o=
+pt/vol/sas/fb0c7c37-13e7-41fe-b3f8-f0fbaaeec7ce,format=3Dqcow2,if=3Dnone,id=
+=3Ddrive-virtio-disk0,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,b=
+us=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootinde=
+x=3D1,write-cache=3Don -drive file=3D/opt/vol/sas/bde66671-536d-49cd-8b46-a=
+4f1ea7be513,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dwriteb=
+ack -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-=
+virtio-disk1,id=3Dvirtio-disk1,write-cache=3Don -netdev tap,fd=3D33,id=3Dho=
+stnet0,vhost=3Don,vhostfd=3D34 -device virtio-net-pci,netdev=3Dhostnet0,id=
+=3Dnet0,mac=3D00:85:45:3e:d4:3a,bus=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dch=
+arserial0 -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev so=
+cket,id=3Dcharchannel0,fd=3D35,server,nowait -device virtserialport,bus=3Dv=
+irtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu=
+.guest_agent.0 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0=
+.0.0:0,password -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
+ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=
+=3Don
+
+  iscsi=EF=BC=9A
+  yum -y install targetcli python-rtslib
+  systemctl start target
+  systemctl enable target
+
+  targetcli /iscsi create iqn.2019-01.com.iaas
+
+  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1 set attribute
+  authentication=3D0 demo_mode_write_protect=3D0 generate_node_acls=3D1
+
+  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/portals create 192.168.1.100 3=
+260
+  targetcli /backstores/fileio create testfile1 /backup/file1 2G
+  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/luns create /backstores/fileio=
+/testfile1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1815993/+subscriptions
