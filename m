@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45449)
+Received: from eggs.gnu.org ([209.51.188.92]:51024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwZ49-0006QW-8b
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:06:06 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ7-0006E9-4x
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwZ47-0000kk-7i
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:06:05 -0500
-Received: from mail-ot1-f43.google.com ([209.85.210.43]:42732)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ5-0000pa-F6
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:05 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39627)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gwZ42-0000GV-Bc
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:05:58 -0500
-Received: by mail-ot1-f43.google.com with SMTP id i5so42615503oto.9
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:05:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gwZZ5-0000dl-4p
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:03 -0500
+Received: by mail-wr1-x444.google.com with SMTP id l5so26632150wrw.6
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:57 -0800 (PST)
+From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
+	<dirty.ice.hu@gmail.com>
+Date: Wed, 20 Feb 2019 22:37:41 +0100
+Message-Id: <6ae3b449a138d46395808e8f1f1a1dd9fb267c2c.1550698466.git.DirtY.iCE.hu@gmail.com>
+In-Reply-To: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
+References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
-References: <20190218140301.197408-1-sgarzare@redhat.com>
-	<20190220163058.GH30403@stefanha-x1.localdomain>
-In-Reply-To: <20190220163058.GH30403@stefanha-x1.localdomain>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 20 Feb 2019 22:05:40 +0100
-Message-ID: <CAGxU2F6NNWLNPc1v3e4ymPDyPQwErAdWzhQpL3ck1GTv5FWVRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 00/10] virtio-blk: add
- DISCARD and WRITE_ZEROES features
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 12/14] spiceaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Il giorno mer 20 feb 2019 alle 17:31 Stefan Hajnoczi <stefanha@gmail.com>
-ha scritto:
+Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+---
+ audio/spiceaudio.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-> On Mon, Feb 18, 2019 at 03:02:51PM +0100, Stefano Garzarella wrote:
-> > This series adds the support of DISCARD and WRITE_ZEROES commands
-> > and extends the virtio-blk-test to test these new commands.
-> >
-> > v5:
-> > - rebased on master
-> > - handled the config size for DISCARD and WRITE_ZEROES features as in
-> >   virtio-net (patches 4 and 5) [Michael, Stefan]
-> > - fixed an endianness issues on the WRITE_ZEROES test (patches 8 and 9)
-> > - added a test for DISCARD command to only test the status returned by
-> the
-> >   request (patch 10)
-> > - others patches are unchanged (patches 1, 2, 3, 6, 7)
->
-> Looks good.  Please fix the patchew failure and resend.
-
-
-Thanks for the review!
-I=E2=80=99ll send the new version with the fix.
-
-Cheers,
-Stefano
---=20
-Stefano Garzarella
-Software Engineer @ Red Hat
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index affc3df17f..4f7873af5a 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -373,10 +373,6 @@ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static struct audio_option audio_options[] = {
+-    { /* end of list */ },
+-};
+-
+ static struct audio_pcm_ops audio_callbacks = {
+     .init_out = line_out_init,
+     .fini_out = line_out_fini,
+@@ -394,7 +390,6 @@ static struct audio_pcm_ops audio_callbacks = {
+ static struct audio_driver spice_audio_driver = {
+     .name           = "spice",
+     .descr          = "spice audio driver",
+-    .options        = audio_options,
+     .init           = spice_audio_init,
+     .fini           = spice_audio_fini,
+     .pcm_ops        = &audio_callbacks,
+-- 
+2.20.1
