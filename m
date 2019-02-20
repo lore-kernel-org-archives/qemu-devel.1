@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44850)
+Received: from eggs.gnu.org ([209.51.188.92]:45367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTo6-0003gZ-Mu
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:12 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTow-0004eF-Ga
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTo5-00014Z-Lw
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:10 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34620)
+	(envelope-from <tcminyard@gmail.com>) id 1gwTou-0001Qy-1H
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:30:02 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42547)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTo5-00010D-Eg
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:09 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 98so40874770oty.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:28:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwToq-0001Od-2e
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:57 -0500
+Received: by mail-ot1-x344.google.com with SMTP id i5so40735901oto.9
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:29:52 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:46 -0600
-Message-Id: <20190220135956.22589-10-minyard@acm.org>
+Date: Wed, 20 Feb 2019 07:59:49 -0600
+Message-Id: <20190220135956.22589-13-minyard@acm.org>
 In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
 References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 09/19] i2c:smbus: Make white space in switch
- statements consistent
+Subject: [Qemu-devel] [PATCH 12/19] migration: Add a VMSTATE_BOOL_TEST()
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +32,27 @@ Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@red
 
 From: Corey Minyard <cminyard@mvista.com>
 
-It had spaces between cases in some places and not others.  Add a space
-for every one.
+This will be needed by coming I2C changes.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/i2c/smbus_eeprom.c | 1 +
- hw/i2c/smbus_slave.c  | 9 +++++++++
- 2 files changed, 10 insertions(+)
+ include/migration/vmstate.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 4bc579e69e..62e634c745 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -41,6 +41,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
-     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
-     uint8_t *data = eeprom->data;
-     uint8_t val = data[eeprom->offset++];
-+
- #ifdef DEBUG
-     printf("eeprom_receive_byte: addr=0x%02x val=0x%02x\n",
-            dev->i2c.address, val);
-diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-index 52a57423ee..5b3046f6a3 100644
---- a/hw/i2c/smbus_slave.c
-+++ b/hw/i2c/smbus_slave.c
-@@ -70,6 +70,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-             DPRINTF("Incoming data\n");
-             dev->mode = SMBUS_WRITE_DATA;
-             break;
-+
-         default:
-             BADF("Unexpected send start condition in state %d\n", dev->mode);
-             dev->mode = SMBUS_CONFUSED;
-@@ -83,6 +84,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-             DPRINTF("Read mode\n");
-             dev->mode = SMBUS_READ_DATA;
-             break;
-+
-         case SMBUS_WRITE_DATA:
-             if (dev->data_len == 0) {
-                 BADF("Read after write with no data\n");
-@@ -93,6 +95,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-                 dev->mode = SMBUS_READ_DATA;
-             }
-             break;
-+
-         default:
-             BADF("Unexpected recv start condition in state %d\n", dev->mode);
-             dev->mode = SMBUS_CONFUSED;
-@@ -129,9 +132,11 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-         case SMBUS_DONE:
-             /* Nothing to do.  */
-             break;
-+
-         case SMBUS_READ_DATA:
-             dev->mode = SMBUS_DONE;
-             break;
-+
-         default:
-             BADF("Unexpected NACK in state %d\n", dev->mode);
-             dev->mode = SMBUS_CONFUSED;
-@@ -155,11 +160,13 @@ static uint8_t smbus_i2c_recv(I2CSlave *s)
-         }
-         DPRINTF("Read data %02x\n", ret);
-         break;
-+
-     default:
-         BADF("Unexpected read in state %d\n", dev->mode);
-         dev->mode = SMBUS_CONFUSED;
-         break;
-     }
-+
-     return ret;
- }
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 067b126cf1..a668ec75b8 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -851,6 +851,9 @@ extern const VMStateInfo vmstate_info_qtailq;
+ #define VMSTATE_INT32_POSITIVE_LE(_f, _s)                             \
+     VMSTATE_SINGLE(_f, _s, 0, vmstate_info_int32_le, int32_t)
  
-@@ -176,10 +183,12 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
-             dev->data_buf[dev->data_len++] = data;
-         }
-         break;
++#define VMSTATE_BOOL_TEST(_f, _s, _t)                               \
++    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_bool, bool)
 +
-     default:
-         BADF("Unexpected write in state %d\n", dev->mode);
-         break;
-     }
-+
-     return 0;
- }
+ #define VMSTATE_INT8_TEST(_f, _s, _t)                               \
+     VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_int8, int8_t)
  
 -- 
 2.17.1
