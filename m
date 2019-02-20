@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34421)
+Received: from eggs.gnu.org ([209.51.188.92]:34445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwWVw-0007Xa-Pm
+	(envelope-from <pbonzini@redhat.com>) id 1gwWVx-0007Xs-Jc
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:22:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwWVw-0008OB-29
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:22:36 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:32797)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gwWVs-0008Jq-8s
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:22:32 -0500
-Received: by mail-pf1-x444.google.com with SMTP id c123so12319794pfb.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 10:22:28 -0800 (PST)
-References: <20190219125808.25174-1-peter.maydell@linaro.org>
-	<20190219125808.25174-6-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <af9298f6-15ca-fb51-9618-9cf7e3cd3d6e@linaro.org>
-Date: Wed, 20 Feb 2019 10:22:24 -0800
+	(envelope-from <pbonzini@redhat.com>) id 1gwWVw-0008Pr-Uh
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:22:37 -0500
+References: <20190220174843.8847-1-kwolf@redhat.com>
+	<20190220174843.8847-6-kwolf@redhat.com>
+	<bf7d55dc-e914-ad14-d542-175255dd0d1b@redhat.com>
+	<20190220180724.GE6281@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <46a57a6b-d4d6-62d1-20aa-64c9b5b9f91e@redhat.com>
+Date: Wed, 20 Feb 2019 19:22:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190219125808.25174-6-peter.maydell@linaro.org>
+In-Reply-To: <20190220180724.GE6281@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/8] hw/misc/iotkit-sysctl: Correct typo in
- INITSVTOR0 register name
+Subject: Re: [Qemu-devel] [PATCH v2 05/13] io: Remove redundant
+ read/write_coroutine assignments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On 2/19/19 4:58 AM, Peter Maydell wrote:
-> The iotkit-sysctl device has a register it names INITSVRTOR0.
-> This is actually a typo present in the IoTKit documentation
-> and also in part of the SSE-200 documentation:  it should be
-> INITSVTOR0 because it is specifying the initial value of the
-> Secure VTOR register in the CPU. Correct the typo.
+On 20/02/19 19:07, Kevin Wolf wrote:
+> Am 20.02.2019 um 19:01 hat Paolo Bonzini geschrieben:
+>> aio_co_wake was also acquiring/releasing the AioContext, so
+>> that needs to stay for now.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/misc/iotkit-sysctl.h |  2 +-
->  hw/misc/iotkit-sysctl.c         | 16 ++++++++--------
->  2 files changed, 9 insertions(+), 9 deletions(-)
+> True. Maybe I should leave the aio_co_wake call alone() and just add the
+> assertion to avoid complicating the code rather than simplifying it...
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Yes, I agree.
 
+Paolo
 
-r~
+ps: where is alone() defined? :)
+
+Paolo
