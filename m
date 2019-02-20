@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37981)
+Received: from eggs.gnu.org ([209.51.188.92]:39684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gwQYD-00025D-BQ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:00:40 -0500
+	(envelope-from <thuth@redhat.com>) id 1gwQeE-0006IO-A8
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gwQY5-00032c-NB
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:00:31 -0500
-Date: Wed, 20 Feb 2019 12:59:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190220115947.GC6281@localhost.localdomain>
-References: <20190219114609.1582-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190219114609.1582-1-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix error reporting for -object
+	(envelope-from <thuth@redhat.com>) id 1gwQeB-0001lL-Gh
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:06:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gwQeB-0001T8-7b
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:06:43 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 20 Feb 2019 13:06:29 +0100
+Message-Id: <1550664389-2865-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] hw/sd/sdhci: Move PCI-related code into a
+ separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +22,335 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: yang.zhong@intel.com, pbonzini@redhat.com
 
-Am 19.02.2019 um 12:46 hat Daniel P. Berrang=E9 geschrieben:
-> Error reporting for user_creatable_add_opts_foreach was changed so that
-> it no longer called 'error_report_err' in:
->=20
->   commit 7e1e0c11127bde81cff260fc6859690435c509d6
->   Author: Markus Armbruster <armbru@redhat.com>
->   Date:   Wed Oct 17 10:26:43 2018 +0200
->=20
->     qom: Clean up error reporting in user_creatable_add_opts_foreach()
->=20
-> Some callers were updated to pass in "&error_fatal" but all the ones in
-> qemu-img were left passing NULL. As a result all errors went to
-> /dev/null instead of being reported to the user.
->=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+Some machines have an SDHCI device, but no PCI. To be able to
+compile hw/sd/sdhci.c without CONFIG_PCI, we must not call functions
+like pci_get_address_space() and pci_allocate_irq() there. Thus
+move the PCI-related code into a separate file.
 
-Thanks, applied to the block branch.
+This is required for the upcoming Kconfig-like build system, e.g. it
+is needed if a user wants to compile a QEMU binary with just one machine
+that has SDHCI, but no PCI, like the ARM "raspi" machines for example.
 
-Kevin
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Note: Once we've got Kconfig in place, the "land" in the Makefile
+ should be replaced with a proper new CONFIG_SDHCI_PCI switch instead
+
+ hw/sd/Makefile.objs    |  1 +
+ hw/sd/sdhci-internal.h | 34 ++++++++++++++++++
+ hw/sd/sdhci-pci.c      | 87 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/sd/sdhci.c          | 98 +++-----------------------------------------------
+ 4 files changed, 127 insertions(+), 93 deletions(-)
+ create mode 100644 hw/sd/sdhci-pci.c
+
+diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
+index a99d9fb..58be7b3 100644
+--- a/hw/sd/Makefile.objs
++++ b/hw/sd/Makefile.objs
+@@ -2,6 +2,7 @@ common-obj-$(CONFIG_PL181) += pl181.o
+ common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
+ common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
+ common-obj-$(CONFIG_SDHCI) += sdhci.o
++common-obj-$(call land,$(CONFIG_SDHCI),$(CONFIG_PCI)) += sdhci-pci.o
+ 
+ obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
+ obj-$(CONFIG_OMAP) += omap_mmc.o
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index 19665fd..3414140 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -304,4 +304,38 @@ extern const VMStateDescription sdhci_vmstate;
+ 
+ #define ESDHC_PRNSTS_SDSTB              (1 << 3)
+ 
++/*
++ * Default SD/MMC host controller features information, which will be
++ * presented in CAPABILITIES register of generic SD host controller at reset.
++ *
++ * support:
++ * - 3.3v and 1.8v voltages
++ * - SDMA/ADMA1/ADMA2
++ * - high-speed
++ * max host controller R/W buffers size: 512B
++ * max clock frequency for SDclock: 52 MHz
++ * timeout clock frequency: 52 MHz
++ *
++ * does not support:
++ * - 3.0v voltage
++ * - 64-bit system bus
++ * - suspend/resume
++ */
++#define SDHC_CAPAB_REG_DEFAULT 0x057834b4
++
++#define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
++    DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
++    DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
++    \
++    /* Capabilities registers provide information on supported
++     * features of this specific host controller implementation */ \
++    DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
++    DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
++
++void sdhci_initfn(SDHCIState *s);
++void sdhci_uninitfn(SDHCIState *s);
++void sdhci_common_realize(SDHCIState *s, Error **errp);
++void sdhci_common_unrealize(SDHCIState *s, Error **errp);
++void sdhci_common_class_init(ObjectClass *klass, void *data);
++
+ #endif
+diff --git a/hw/sd/sdhci-pci.c b/hw/sd/sdhci-pci.c
+new file mode 100644
+index 0000000..f884661
+--- /dev/null
++++ b/hw/sd/sdhci-pci.c
+@@ -0,0 +1,87 @@
++/*
++ * SDHCI device on PCI
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/sd/sdhci.h"
++#include "sdhci-internal.h"
++
++static Property sdhci_pci_properties[] = {
++    DEFINE_SDHCI_COMMON_PROPERTIES(SDHCIState),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
++{
++    SDHCIState *s = PCI_SDHCI(dev);
++    Error *local_err = NULL;
++
++    sdhci_initfn(s);
++    sdhci_common_realize(s, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    dev->config[PCI_CLASS_PROG] = 0x01; /* Standard Host supported DMA */
++    dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
++    s->irq = pci_allocate_irq(dev);
++    s->dma_as = pci_get_address_space(dev);
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->iomem);
++}
++
++static void sdhci_pci_exit(PCIDevice *dev)
++{
++    SDHCIState *s = PCI_SDHCI(dev);
++
++    sdhci_common_unrealize(s, &error_abort);
++    sdhci_uninitfn(s);
++}
++
++static void sdhci_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = sdhci_pci_realize;
++    k->exit = sdhci_pci_exit;
++    k->vendor_id = PCI_VENDOR_ID_REDHAT;
++    k->device_id = PCI_DEVICE_ID_REDHAT_SDHCI;
++    k->class_id = PCI_CLASS_SYSTEM_SDHCI;
++    dc->props = sdhci_pci_properties;
++
++    sdhci_common_class_init(klass, data);
++}
++
++static const TypeInfo sdhci_pci_info = {
++    .name = TYPE_PCI_SDHCI,
++    .parent = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(SDHCIState),
++    .class_init = sdhci_pci_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
++};
++
++static void sdhci_pci_register_type(void)
++{
++    type_register_static(&sdhci_pci_info);
++}
++
++type_init(sdhci_pci_register_type)
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 83f1574..17ad546 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -40,24 +40,6 @@
+ 
+ #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
+ 
+-/* Default SD/MMC host controller features information, which will be
+- * presented in CAPABILITIES register of generic SD host controller at reset.
+- *
+- * support:
+- * - 3.3v and 1.8v voltages
+- * - SDMA/ADMA1/ADMA2
+- * - high-speed
+- * max host controller R/W buffers size: 512B
+- * max clock frequency for SDclock: 52 MHz
+- * timeout clock frequency: 52 MHz
+- *
+- * does not support:
+- * - 3.0v voltage
+- * - 64-bit system bus
+- * - suspend/resume
+- */
+-#define SDHC_CAPAB_REG_DEFAULT 0x057834b4
+-
+ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+ {
+     return 1 << (9 + FIELD_EX32(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH));
+@@ -1328,16 +1310,7 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+ 
+ /* --- qdev common --- */
+ 
+-#define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
+-    DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
+-    DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
+-    \
+-    /* Capabilities registers provide information on supported
+-     * features of this specific host controller implementation */ \
+-    DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
+-    DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
+-
+-static void sdhci_initfn(SDHCIState *s)
++void sdhci_initfn(SDHCIState *s)
+ {
+     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
+                         TYPE_SDHCI_BUS, DEVICE(s), "sd-bus");
+@@ -1348,7 +1321,7 @@ static void sdhci_initfn(SDHCIState *s)
+     s->io_ops = &sdhci_mmio_ops;
+ }
+ 
+-static void sdhci_uninitfn(SDHCIState *s)
++void sdhci_uninitfn(SDHCIState *s)
+ {
+     timer_del(s->insert_timer);
+     timer_free(s->insert_timer);
+@@ -1359,7 +1332,7 @@ static void sdhci_uninitfn(SDHCIState *s)
+     s->fifo_buffer = NULL;
+ }
+ 
+-static void sdhci_common_realize(SDHCIState *s, Error **errp)
++void sdhci_common_realize(SDHCIState *s, Error **errp)
+ {
+     Error *local_err = NULL;
+ 
+@@ -1375,7 +1348,7 @@ static void sdhci_common_realize(SDHCIState *s, Error **errp)
+                           SDHC_REGISTERS_MAP_SIZE);
+ }
+ 
+-static void sdhci_common_unrealize(SDHCIState *s, Error **errp)
++void sdhci_common_unrealize(SDHCIState *s, Error **errp)
+ {
+     /* This function is expected to be called only once for each class:
+      * - SysBus:    via DeviceClass->unrealize(),
+@@ -1445,7 +1418,7 @@ const VMStateDescription sdhci_vmstate = {
+     },
+ };
+ 
+-static void sdhci_common_class_init(ObjectClass *klass, void *data)
++void sdhci_common_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+@@ -1454,66 +1427,6 @@ static void sdhci_common_class_init(ObjectClass *klass, void *data)
+     dc->reset = sdhci_poweron_reset;
+ }
+ 
+-/* --- qdev PCI --- */
+-
+-static Property sdhci_pci_properties[] = {
+-    DEFINE_SDHCI_COMMON_PROPERTIES(SDHCIState),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+-{
+-    SDHCIState *s = PCI_SDHCI(dev);
+-    Error *local_err = NULL;
+-
+-    sdhci_initfn(s);
+-    sdhci_common_realize(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    dev->config[PCI_CLASS_PROG] = 0x01; /* Standard Host supported DMA */
+-    dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
+-    s->irq = pci_allocate_irq(dev);
+-    s->dma_as = pci_get_address_space(dev);
+-    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->iomem);
+-}
+-
+-static void sdhci_pci_exit(PCIDevice *dev)
+-{
+-    SDHCIState *s = PCI_SDHCI(dev);
+-
+-    sdhci_common_unrealize(s, &error_abort);
+-    sdhci_uninitfn(s);
+-}
+-
+-static void sdhci_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+-
+-    k->realize = sdhci_pci_realize;
+-    k->exit = sdhci_pci_exit;
+-    k->vendor_id = PCI_VENDOR_ID_REDHAT;
+-    k->device_id = PCI_DEVICE_ID_REDHAT_SDHCI;
+-    k->class_id = PCI_CLASS_SYSTEM_SDHCI;
+-    dc->props = sdhci_pci_properties;
+-
+-    sdhci_common_class_init(klass, data);
+-}
+-
+-static const TypeInfo sdhci_pci_info = {
+-    .name = TYPE_PCI_SDHCI,
+-    .parent = TYPE_PCI_DEVICE,
+-    .instance_size = sizeof(SDHCIState),
+-    .class_init = sdhci_pci_class_init,
+-    .interfaces = (InterfaceInfo[]) {
+-        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+-        { },
+-    },
+-};
+-
+ /* --- qdev SysBus --- */
+ 
+ static Property sdhci_sysbus_properties[] = {
+@@ -1846,7 +1759,6 @@ static const TypeInfo imx_usdhc_info = {
+ 
+ static void sdhci_register_types(void)
+ {
+-    type_register_static(&sdhci_pci_info);
+     type_register_static(&sdhci_sysbus_info);
+     type_register_static(&sdhci_bus_info);
+     type_register_static(&imx_usdhc_info);
+-- 
+1.8.3.1
