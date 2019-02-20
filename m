@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35361)
+Received: from eggs.gnu.org ([209.51.188.92]:35421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaYA-0004Py-45
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:41:11 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaYF-0004Wo-UP
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:41:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaY8-0000Vy-Kv
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:41:10 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaYE-0000oh-UG
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:41:15 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 20 Feb 2019 23:39:56 +0100
-Message-Id: <20190220224003.4420-11-eric.auger@redhat.com>
+Date: Wed, 20 Feb 2019 23:40:01 +0100
+Message-Id: <20190220224003.4420-16-eric.auger@redhat.com>
 In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
 References: <20190220224003.4420-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 10/17] hw/arm/virt: Add memory hotplug
- framework
+Subject: [Qemu-devel] [PATCH v7 15/17] hw/arm/virt: Add nvdimm hot-plug
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +25,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-This patch adds the the memory hot-plug/hot-unplug infrastructure
-in machvirt. It is still not enabled as no device memory is allocated.
+From: Kwangwoo Lee <kwangwoo.lee@sk.com>
+
+Pre-plug and plug handlers are prepared for NVDIMM support.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-
----
-v4 -> v5:
-- change in pc_dimm_pre_plug signature
-- CONFIG_MEM_HOTPLUG replaced by CONFIG_MEM_DEVICE and CONFIG_DIMM
-
-v3 -> v4:
-- check the memory device is not hotplugged
-
-v2 -> v3:
-- change in pc_dimm_plug()'s signature
-- add pc_dimm_pre_plug call
-
-v1 -> v2:
-- s/virt_dimm_plug|unplug/virt_memory_plug|unplug
-- s/pc_dimm_memory_plug/pc_dimm_plug
-- reworded title and commit message
-- added pre_plug cb
-- don't handle get_memory_region failure anymore
 ---
  default-configs/arm-softmmu.mak |  2 ++
- hw/arm/virt.c                   | 64 ++++++++++++++++++++++++++++++++-
- 2 files changed, 65 insertions(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c        |  6 ++++++
+ hw/arm/virt.c                   | 22 ++++++++++++++++++++++
+ include/hw/arm/virt.h           |  3 +++
+ 4 files changed, 33 insertions(+)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 734ca721e9..0a78421f72 100644
+index 0a78421f72..03dbebb197 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -163,3 +163,5 @@ CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
- CONFIG_STRONGARM=3Dy
- CONFIG_HIGHBANK=3Dy
+@@ -165,3 +165,5 @@ CONFIG_HIGHBANK=3Dy
  CONFIG_MUSICPAL=3Dy
-+CONFIG_MEM_DEVICE=3Dy
-+CONFIG_DIMM=3Dy
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 5b656f9db5..470ca0ce2d 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -60,6 +60,8 @@
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
- #include "target/arm/internals.h"
-+#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
-=20
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1804,6 +1806,49 @@ static const CPUArchIdList *virt_possible_cpu_arch=
-_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
-=20
-+static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceStat=
-e *dev,
-+                                 Error **errp)
-+{
-+    const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIM=
-M);
-+
-+    if (dev->hotplugged) {
-+        error_setg(errp, "memory hotplug is not supported");
-+    }
-+
-+    if (is_nvdimm) {
-+        error_setg(errp, "nvdimm is not yet supported");
-+        return;
-+    }
-+
-+    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
-+}
-+
-+static void virt_memory_plug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-+    Error *local_err =3D NULL;
-+
-+    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-+
-+    error_propagate(errp, local_err);
-+}
-+
-+static void virt_memory_unplug(HotplugHandler *hotplug_dev,
-+                               DeviceState *dev, Error **errp)
-+{
-+    pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
-+    object_unparent(OBJECT(dev));
-+}
-+
-+static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **er=
-rp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_pre_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
+ CONFIG_MEM_DEVICE=3Dy
+ CONFIG_DIMM=3Dy
++CONFIG_NVDIMM=3Dy
++CONFIG_ACPI_NVDIMM=3Dy
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 781eafaf5e..f086adfa82 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -784,6 +784,7 @@ static
+ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
  {
-@@ -1815,12 +1860,27 @@ static void virt_machine_device_plug_cb(HotplugHa=
-ndler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
+     VirtMachineClass *vmc =3D VIRT_MACHINE_GET_CLASS(vms);
++    MachineState *ms =3D MACHINE(vms);
+     GArray *table_offsets;
+     unsigned dsdt, xsdt;
+     GArray *tables_blob =3D tables->table_data;
+@@ -824,6 +825,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuil=
+dTables *tables)
          }
      }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+            virt_memory_plug(hotplug_dev, dev, errp);
+=20
++    if (vms->acpi_nvdimm_state.is_enabled) {
++        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
++                          &vms->acpi_nvdimm_state, ms->ram_slots);
 +    }
-+}
 +
-+static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp=
-)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_unplug(hotplug_dev, dev, errp);
-+    } else {
-+        error_setg(errp, "device unplug request for unsupported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
+     if (its_class_name() && !vmc->no_its) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_iort(tables_blob, tables->linker, vms);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 33ad9b3f63..1896920570 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -134,6 +134,7 @@ static const MemMapEntry base_memmap[] =3D {
+     [VIRT_GPIO] =3D               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =3D        { 0x09040000, 0x00001000 },
+     [VIRT_SMMU] =3D               { 0x09050000, 0x00020000 },
++    [VIRT_ACPI_IO] =3D            { 0x09070000, 0x00010000 },
+     [VIRT_MMIO] =3D               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that s=
+ize */
+     [VIRT_PLATFORM_BUS] =3D       { 0x0c000000, 0x02000000 },
+@@ -1675,6 +1676,18 @@ static void machvirt_init(MachineState *machine)
+=20
+     create_platform_bus(vms, pic);
+=20
++    if (vms->acpi_nvdimm_state.is_enabled) {
++        AcpiNVDIMMState *acpi_nvdimm_state =3D &vms->acpi_nvdimm_state;
++
++        acpi_nvdimm_state->dsm_io.space_id =3D AML_AS_SYSTEM_MEMORY;
++        acpi_nvdimm_state->dsm_io.address =3D
++                vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE;
++        acpi_nvdimm_state->dsm_io.bit_width =3D NVDIMM_ACPI_IO_LEN << 3;
++
++        nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
++                               vms->fw_cfg, OBJECT(vms));
 +    }
- }
-=20
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *ma=
-chine,
-                                                         DeviceState *dev=
-)
++
+     vms->bootinfo.ram_size =3D machine->ram_size;
+     vms->bootinfo.kernel_filename =3D machine->kernel_filename;
+     vms->bootinfo.kernel_cmdline =3D machine->kernel_cmdline;
+@@ -1860,10 +1873,19 @@ static void virt_memory_plug(HotplugHandler *hotp=
+lug_dev,
+                              DeviceState *dev, Error **errp)
  {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
-     }
+     VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
++    bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+     Error *local_err =3D NULL;
 =20
-@@ -1884,7 +1944,9 @@ static void virt_machine_class_init(ObjectClass *oc=
-, void *data)
-     mc->kvm_type =3D virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler =3D virt_machine_get_hotplug_handler;
-+    hc->pre_plug =3D virt_machine_device_pre_plug_cb;
-     hc->plug =3D virt_machine_device_plug_cb;
-+    hc->unplug =3D virt_machine_device_unplug_cb;
+     pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
++    if (local_err) {
++        goto out;
++    }
+=20
++    if (is_nvdimm) {
++        nvdimm_plug(&vms->acpi_nvdimm_state);
++    }
++
++out:
+     error_propagate(errp, local_err);
  }
 =20
- static void virt_instance_init(Object *obj)
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 7798462cb0..bd9cf68311 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -37,6 +37,7 @@
+ #include "hw/arm/arm.h"
+ #include "sysemu/kvm.h"
+ #include "hw/intc/arm_gicv3_common.h"
++#include "hw/mem/nvdimm.h"
+=20
+ #define NUM_GICV2M_SPIS       64
+ #define NUM_VIRTIO_TRANSPORTS 32
+@@ -77,6 +78,7 @@ enum {
+     VIRT_GPIO,
+     VIRT_SECURE_UART,
+     VIRT_SECURE_MEM,
++    VIRT_ACPI_IO,
+     VIRT_LOWMEMMAP_LAST,
+ };
+=20
+@@ -137,6 +139,7 @@ typedef struct {
+     hwaddr device_memory_base;
+     hwaddr device_memory_size;
+     bool extended_memmap;
++    AcpiNVDIMMState acpi_nvdimm_state;
+ } VirtMachineState;
+=20
+ #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
 --=20
 2.20.1
