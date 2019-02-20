@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38876)
+Received: from eggs.gnu.org ([209.51.188.92]:39222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwUK8-0006z0-PW
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:02:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gwUKV-0007IE-HB
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:02:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwUK0-0003LM-1n
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:02:16 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwThn-0005pK-TD
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:22:40 -0500
-Received: by mail-ot1-x344.google.com with SMTP id v62so31873013otb.3
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:21:15 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:43 -0600
-Message-Id: <20190220135956.22589-7-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 06/19] i2c:smbus: Simplify write operation
+	(envelope-from <stefanha@gmail.com>) id 1gwUKT-0003eL-Et
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:02:39 -0500
+Date: Wed, 20 Feb 2019 16:02:25 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190220160225.GE30403@stefanha-x1.localdomain>
+References: <20190218140301.197408-1-sgarzare@redhat.com>
+	<20190218140301.197408-6-sgarzare@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FN+gV9K+162wdwwF"
+Content-Disposition: inline
+In-Reply-To: <20190218140301.197408-6-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 05/10] virtio-blk: set
+ config size depending on the features enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,199 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Corey Minyard <cminyard@mvista.com>
 
-There were two different write functions and the SMBus code kept
-track of the command.
+--FN+gV9K+162wdwwF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Keeping track of the command wasn't useful, in fact it wasn't quite
-correct for the eeprom_smbus code.  And there is no need for two write
-functions.  Just have one write function and the first byte in the
-buffer is the command.
+On Mon, Feb 18, 2019 at 03:02:56PM +0100, Stefano Garzarella wrote:
+> Starting from DISABLE and WRITE_ZEROES features, we use an array of
+> VirtIOFeature (as virtio-net) to properly set the config size
+> depending on the features enabled.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  hw/block/virtio-blk.c          | 31 +++++++++++++++++++++++++------
+>  include/hw/virtio/virtio-blk.h |  1 +
+>  2 files changed, 26 insertions(+), 6 deletions(-)
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/i2c/smbus_eeprom.c        | 47 ++++++++++++------------------------
- hw/i2c/smbus_slave.c         | 25 ++++---------------
- include/hw/i2c/smbus_slave.h | 21 ++++++++++------
- 3 files changed, 34 insertions(+), 59 deletions(-)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index d82423aa7e..3f9ed266f8 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -43,16 +43,6 @@ static void eeprom_quick_cmd(SMBusDevice *dev, uint8_t read)
- #endif
- }
- 
--static void eeprom_send_byte(SMBusDevice *dev, uint8_t val)
--{
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
--#ifdef DEBUG
--    printf("eeprom_send_byte: addr=0x%02x val=0x%02x\n",
--           dev->i2c.address, val);
--#endif
--    eeprom->offset = val;
--}
--
- static uint8_t eeprom_receive_byte(SMBusDevice *dev)
- {
-     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
-@@ -65,34 +55,30 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
-     return val;
- }
- 
--static void eeprom_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf, int len)
-+static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
- {
-     SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
--    int n;
-+    uint8_t *data = eeprom->data;
-+
- #ifdef DEBUG
-     printf("eeprom_write_byte: addr=0x%02x cmd=0x%02x val=0x%02x\n",
--           dev->i2c.address, cmd, buf[0]);
-+           dev->i2c.address, buf[0], buf[1]);
- #endif
--    /* A page write operation is not a valid SMBus command.
--       It is a block write without a length byte.  Fortunately we
--       get the full block anyway.  */
--    /* TODO: Should this set the current location?  */
--    if (cmd + len > 256)
--        n = 256 - cmd;
--    else
--        n = len;
--    memcpy(eeprom->data + cmd, buf, n);
--    len -= n;
--    if (len)
--        memcpy(eeprom->data, buf + n, len);
-+    /* len is guaranteed to be > 0 */
-+    eeprom->offset = buf[0];
-+    buf++;
-+    len--;
-+
-+    for (; len > 0; len--) {
-+        data[eeprom->offset] = *buf++;
-+        eeprom->offset = (eeprom->offset + 1) % 256;
-+    }
-+
-+    return 0;
- }
- 
--static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
-+static uint8_t eeprom_read_data(SMBusDevice *dev, int n)
- {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
--    /* If this is the first byte then set the current position.  */
--    if (n == 0)
--        eeprom->offset = cmd;
-     /* As with writes, we implement block reads without the
-        SMBus length byte.  */
-     return eeprom_receive_byte(dev);
-@@ -117,7 +103,6 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
- 
-     dc->realize = smbus_eeprom_realize;
-     sc->quick_cmd = eeprom_quick_cmd;
--    sc->send_byte = eeprom_send_byte;
-     sc->receive_byte = eeprom_receive_byte;
-     sc->write_data = eeprom_write_data;
-     sc->read_data = eeprom_read_data;
-diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-index 6a89a286e3..92c7a5086c 100644
---- a/hw/i2c/smbus_slave.c
-+++ b/hw/i2c/smbus_slave.c
-@@ -54,18 +54,9 @@ static void smbus_do_write(SMBusDevice *dev)
- {
-     SMBusDeviceClass *sc = SMBUS_DEVICE_GET_CLASS(dev);
- 
--    if (dev->data_len == 1) {
--        DPRINTF("Send Byte\n");
--        if (sc->send_byte) {
--            sc->send_byte(dev, dev->data_buf[0]);
--        }
--    } else {
--        dev->command = dev->data_buf[0];
--        DPRINTF("Command %d len %d\n", dev->command, dev->data_len - 1);
--        if (sc->write_data) {
--            sc->write_data(dev, dev->command, dev->data_buf + 1,
--                           dev->data_len - 1);
--        }
-+    DPRINTF("Command %d len %d\n", dev->data_buf[0], dev->data_len);
-+    if (sc->write_data) {
-+        sc->write_data(dev, dev->data_buf, dev->data_len);
-     }
- }
- 
-@@ -98,13 +89,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-                 BADF("Read after write with no data\n");
-                 dev->mode = SMBUS_CONFUSED;
-             } else {
--                if (dev->data_len > 1) {
--                    smbus_do_write(dev);
--                } else {
--                    dev->command = dev->data_buf[0];
--                    DPRINTF("%02x: Command %d\n", dev->i2c.address,
--                            dev->command);
--                }
-+                smbus_do_write(dev);
-                 DPRINTF("Read mode\n");
-                 dev->data_len = 0;
-                 dev->mode = SMBUS_READ_DATA;
-@@ -177,7 +162,7 @@ static uint8_t smbus_i2c_recv(I2CSlave *s)
-         break;
-     case SMBUS_READ_DATA:
-         if (sc->read_data) {
--            ret = sc->read_data(dev, dev->command, dev->data_len);
-+            ret = sc->read_data(dev, dev->data_len);
-             dev->data_len++;
-         } else {
-             ret = 0;
-diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
-index 5ef1c72ad0..fa92201ec6 100644
---- a/include/hw/i2c/smbus_slave.h
-+++ b/include/hw/i2c/smbus_slave.h
-@@ -46,18 +46,24 @@ typedef struct SMBusDeviceClass
-      * This may be NULL, quick commands are ignore in that case.
-      */
-     void (*quick_cmd)(SMBusDevice *dev, uint8_t read);
--    void (*send_byte)(SMBusDevice *dev, uint8_t val);
-+
-     uint8_t (*receive_byte)(SMBusDevice *dev);
--    /* We can't distinguish between a word write and a block write with
--       length 1, so pass the whole data block including the length byte
--       (if present).  The device is responsible figuring out what type of
--       command  this is.  */
--    void (*write_data)(SMBusDevice *dev, uint8_t cmd, uint8_t *buf, int len);
-+
-+    /*
-+     * We can't distinguish between a word write and a block write with
-+     * length 1, so pass the whole data block including the length byte
-+     * (if present).  The device is responsible figuring out what type of
-+     * command this is.
-+     * This may be NULL if no data is written to the device.  Writes
-+     * will be ignore in that case.
-+     */
-+    int (*write_data)(SMBusDevice *dev, uint8_t *buf, uint8_t len);
-+
-     /* Likewise we can't distinguish between different reads, or even know
-        the length of the read until the read is complete, so read data a
-        byte at a time.  The device is responsible for adding the length
-        byte on block reads.  */
--    uint8_t (*read_data)(SMBusDevice *dev, uint8_t cmd, int n);
-+    uint8_t (*read_data)(SMBusDevice *dev, int n);
- } SMBusDeviceClass;
- 
- struct SMBusDevice {
-@@ -68,7 +74,6 @@ struct SMBusDevice {
-     int mode;
-     int data_len;
-     uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
--    uint8_t command;
- };
- 
- #endif
--- 
-2.17.1
+--FN+gV9K+162wdwwF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcbXoRAAoJEJykq7OBq3PIAPkH/3DRcf2+kjRBzt6dEQqay8AR
+z0fUm5fxE5EdPlsgn5Aq3z3HogNdjPLlIqLasjvIcB61mR2QlAK3OMi6j3/0suCz
+vQHuT/kl4b2QW1/viEI1rLKlQUBKJA5kHLeibFWO4Fu0LIOeCWSTqyEafKYYWyvj
+w+qps7RhHyuuaFQ+4NMYocSgf2BR4uYlmBvdJvdQx9uQKvrR1rMzL0nf2IR70aic
+cr3/4sbYoz+FF+4SeRN+rSppN+Fpmq4iC79dD+Qrio16bhktKNZ5iyXCvxHr3g8v
+HtJs/GGjgPFkWSEE7NDKNqohD8jEc8rYbILvLDeFSUdbSkW8BNtjWMC/eQOQyHI=
+=+IF3
+-----END PGP SIGNATURE-----
+
+--FN+gV9K+162wdwwF--
