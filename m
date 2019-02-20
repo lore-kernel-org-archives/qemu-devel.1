@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54099)
+Received: from eggs.gnu.org ([209.51.188.92]:55342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbZ-0005fP-KY
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:31 -0500
+	(envelope-from <mst@redhat.com>) id 1gwIg0-0000qh-1T
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:36:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbX-0003fJ-Ab
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:29 -0500
-Date: Wed, 20 Feb 2019 14:27:55 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190220032755.GK9345@umbus.fritz.box>
-References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<155059670897.1466090.10843921337591637414.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <mst@redhat.com>) id 1gwIfz-0006Sj-5O
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:36:03 -0500
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:36911)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gwIfy-0006M1-T4
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:36:02 -0500
+Received: by mail-qk1-f193.google.com with SMTP id m9so1104235qkl.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 19:35:49 -0800 (PST)
+Date: Tue, 19 Feb 2019 22:35:45 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190219222058-mutt-send-email-mst@kernel.org>
+References: <1550592459-7286-1-git-send-email-thuth@redhat.com>
+	<a7eb2932-c72d-f9cf-c3c4-010f967ca743@redhat.com>
+	<20190219152040-mutt-send-email-mst@kernel.org>
+	<1590333482.2281318.1550618370282.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mHEGYOlXWdrdotU2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <155059670897.1466090.10843921337591637414.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 11/17] spapr: populate PHB DRC entries
- for root DT node
+In-Reply-To: <1590333482.2281318.1550618370282.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/pci/pci-stub: Add msi_enabled() and
+ msi_notify() to the pci stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, yang zhong <yang.zhong@intel.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+
+On Tue, Feb 19, 2019 at 06:19:30PM -0500, Paolo Bonzini wrote:
+> 
+> > > Makes sense, but it is also abstraction time. :)  What if instead there
+> > > was a function
+> > > 
+> > > void msi_allocate_irqs(PCIDevice *pdev, int num, bool fallback_to_intx);
+> > > 
+> > > and then ich.c did
+> > > 
+> > >     irqs = msi_allocate_irqs(pdev, 1, true);
+> > >     s->irq = irqs[0];
+> > >     g_free(irqs);
+> > > 
+> > > ?  "if msi_enabled raise MSI else raise INTX" is really a common idiom.
+> > > 
+> > > Thanks,
+> > > 
+> > > Paolo
+> > 
+> > Maybe it is but the specific issue is not about fallback to INTX of PCI
+> > (is the fallback broken for ahci? I don't know).
+> 
+> It works, the above is just a new abstraction.
+> 
+> > The trick is there's no pdev at all.
+> 
+> The trick :) is that in ich.c there is a pdev.  Right now we are assigning to
+> s->irq either the INTX irq (if PCI) or a sysbus irq (if sysbus), but then
+> we need to know about MSI with a wrapper around s->irq.
+
+Oh you mean just for PCI.
+
+> Instead, my suggestion is to put the wrapper in the PCI core as a qemu_irq
+> callback---or perhaps in ich.c, but anyway ahci.c should not care that there
+> could be a PCI AHCI device and it would have two different interrupt modes.
+
+I like it very much that devices call pci_set_irq, I'd rather not
+have callbacks.
 
 
---mHEGYOlXWdrdotU2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think the wrapper thay calls either pci_set_irq isn't a problem,
+problem is MSI/X has multiple vectors, INTX doesn't.
+So for many devices there's something extra that happens
+just in one mode but not the other to deal with multiple vectors.
 
-On Tue, Feb 19, 2019 at 06:18:29PM +0100, Greg Kurz wrote:
-> From: Nathan Fontenot <nfont@linux.vnet.ibm.com>
->=20
-> This add entries to the root OF node to advertise our PHBs as being
-> DR-capable in accordance with PAPR specification.
->=20
-> Signed-off-by: Nathan Fontenot <nfont@linux.vnet.ibm.com>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+So I don't think it can be an abstraction that everyone
+uses. But yes it can be a helper function.
 
-Applied, thanks.
+In fact mptsas_update_interrupt seems not to be
+PCI spec compliant: it sets both MSI and INTX.
 
-> ---
->  hw/ppc/spapr.c |    8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 96bea7580a3f..fcda17709066 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1365,6 +1365,14 @@ static void *spapr_build_fdt(sPAPRMachineState *sp=
-apr)
->          exit(1);
->      }
-> =20
-> +    if (smc->dr_phb_enabled) {
-> +        ret =3D spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_T=
-YPE_PHB);
-> +        if (ret < 0) {
-> +            error_report("Couldn't set up PHB DR device tree properties"=
-);
-> +            exit(1);
-> +        }
-> +    }
-> +
->      return fdt;
->  }
-> =20
->=20
+CC original contributor with this question.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---mHEGYOlXWdrdotU2
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsyTsACgkQbDjKyiDZ
-s5Izpw//cnRHUfQE1UZHAw8rsJo9lzAu3D8s7AROc9m/+kZdJt8SKJAlH2vnhlOG
-+bmp2PIXU3z5HQ4dg26kYIWbH39DLcHa47gtoQZHoKTRskJauU0hVmdhqVhRPovZ
-+ZIQX4lAyW9sHGuJQKkTaq/BtWUJty4/c0xGixv2Dd+P5rbNTmUVEUx5EvgR0Pr4
-DATqrHa4tHEhbKaLV69wtbkt9jZpbLL2e6yRP4z2jg7fA8VNC89F2RTWi5PSfx+K
-qcc5Zxz+rhkCQczimlHrHoeOqMDwzLMWB3yjwCYF+sqdG7DPEDCICJbzmXEtC4Dd
-j9skZqf4q40LsU9isl8sx1jx1guIvK9PMY7z4wmXWP3Qm5ihJZaoZht7z54wdjg0
-/7jOxgKS4pU+iDDOWdzebMl4CyyLEfm3ZM4Y+zBmwLty9dwQAAt9qbDYw+IRHeJn
-kHBHTfK2+6VEA7LcvZzl1aZ80CcOm97DPfVWq+8S7jus9wBnRV/GIzjoGMCUsGFK
-COo8YLpTGAtVAg8Bu7IdLPvY7c+ufkq7ZyuH8RZlf8q8L4ujlcrOdMHMk77I+vFB
-+G+cv7D2YSkXj7pPbIiKU1zihhcuufEqgRr5+19xzTu2Gxyx5NnPQ0QQcMWYw4U7
-h5yyW/145XAOq0djjGyu2SuGIQvmA26Z9B1O3rdOgmVzR5bu6Mg=
-=TTo3
------END PGP SIGNATURE-----
-
---mHEGYOlXWdrdotU2--
+> In fact, doing this would also remove the need for s->container, I think.
+> 
+> Paolo
