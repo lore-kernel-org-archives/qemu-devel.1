@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35473)
+Received: from eggs.gnu.org ([209.51.188.92]:36746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaYa-0004po-Ee
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:41:39 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwae2-0000zD-4m
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaYT-0001fT-Fh
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:41:34 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 20 Feb 2019 23:40:03 +0100
-Message-Id: <20190220224003.4420-18-eric.auger@redhat.com>
-In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1gwae0-0007qR-K1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:47:14 -0500
 References: <20190220224003.4420-1-eric.auger@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3ad843b7-eacb-6b8c-bd2a-01491228f6b8@redhat.com>
+Date: Wed, 20 Feb 2019 23:46:57 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 17/17] hw/arm/virt: Add nvdimm and
- nvdimm-persistence options
+In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion
+ and PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,111 +24,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+To: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-Machine option nvdimm allows to turn NVDIMM support on.
+Hi Peter,
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 57 insertions(+), 2 deletions(-)
+On 2/20/19 11:39 PM, Eric Auger wrote:
+> This series aims to bump the 255GB RAM limit in machvirt and to
+> support device memory in general, and especially PCDIMM/NVDIMM.
+> 
+> In machvirt versions < 4.0, the initial RAM starts at 1GB and can
+> grow up to 255GB. From 256GB onwards we find IO regions such as the
+> additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
+> MMIO region. The address map was 1TB large. This corresponded to
+> the max IPA capacity KVM was able to manage.
+> 
+> Since 4.20, the host kernel is able to support a larger and dynamic
+> IPA range. So the guest physical address can go beyond the 1TB. The
+> max GPA size depends on the host kernel configuration and physical CPUs.
+> 
+> In this series we use this feature and allow the RAM to grow without
+> any other limit than the one put by the host kernel.
+> 
+> The RAM still starts at 1GB. First comes the initial ram (-m) of size
+> ram_size and then comes the device memory (,maxmem) of size
+> maxram_size - ram_size. The device memory is potentially hotpluggable
+> depending on the instantiated memory objects.
+> 
+> IO regions previously located between 256GB and 1TB are moved after
+> the RAM. Their offset is dynamically computed, depends on ram_size
+> and maxram_size. Size alignment is enforced.
+> 
+> In case maxmem value is inferior to 255GB, the legacy memory map
+> still is used. The change of memory map becomes effective from 4.0
+> onwards.
+> 
+> As we keep the initial RAM at 1GB base address, we do not need to do
+> invasive changes in the EDK2 FW. It seems nobody is eager to do
+> that job at the moment.
+> 
+> Device memory being put just after the initial RAM, it is possible
+> to get access to this feature while keeping a 1TB address map.
+> 
+> This series reuses/rebases patches initially submitted by Shameer
+> in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
+> 
+> Functionally, the series is split into 3 parts:
+> 1) bump of the initial RAM limit [1 - 9] and change in
+>    the memory map
+I respinned the whole series including PCDIMM and NVDIMM parts as Igor
+did a first review pass on those latter. However the first objective is
+to get [1 - 9] upstreamed as we discussed realier. So please consider
+those patches independently on the others.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 1896920570..c7e68e2428 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1814,6 +1814,47 @@ static void virt_set_iommu(Object *obj, const char=
- *value, Error **errp)
-     }
- }
-=20
-+static bool virt_get_nvdimm(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(obj);
-+
-+    return vms->acpi_nvdimm_state.is_enabled;
-+}
-+
-+static void virt_set_nvdimm(Object *obj, bool value, Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(obj);
-+
-+    vms->acpi_nvdimm_state.is_enabled =3D value;
-+}
-+
-+static char *virt_get_nvdimm_persistence(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(obj);
-+
-+    return g_strdup(vms->acpi_nvdimm_state.persistence_string);
-+}
-+
-+static void virt_set_nvdimm_persistence(Object *obj, const char *value,
-+                                        Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(obj);
-+    AcpiNVDIMMState *nvdimm_state =3D &vms->acpi_nvdimm_state;
-+
-+    if (strcmp(value, "cpu") =3D=3D 0)
-+        nvdimm_state->persistence =3D 3;
-+    else if (strcmp(value, "mem-ctrl") =3D=3D 0)
-+        nvdimm_state->persistence =3D 2;
-+    else {
-+        error_report("-machine nvdimm-persistence=3D%s: unsupported opti=
-on",
-+                     value);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    g_free(nvdimm_state->persistence_string);
-+    nvdimm_state->persistence_string =3D g_strdup(value);
-+}
-+
- static CpuInstanceProperties
- virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- {
-@@ -1856,13 +1897,14 @@ static void virt_memory_pre_plug(HotplugHandler *=
-hotplug_dev, DeviceState *dev,
-                                  Error **errp)
- {
-     const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIM=
-M);
-+    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-=20
-     if (dev->hotplugged) {
-         error_setg(errp, "memory hotplug is not supported");
-     }
-=20
--    if (is_nvdimm) {
--        error_setg(errp, "nvdimm is not yet supported");
-+    if (is_nvdimm && !vms->acpi_nvdimm_state.is_enabled) {
-+        error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M=
-'");
-         return;
-     }
-=20
-@@ -2076,6 +2118,19 @@ static void virt_instance_init(Object *obj)
-         vms->extended_memmap =3D true;
-     }
-=20
-+    object_property_add_bool(obj, "nvdimm",
-+                             virt_get_nvdimm, virt_set_nvdimm, NULL);
-+    object_property_set_description(obj, "nvdimm",
-+                                         "Set on/off to enable/disable N=
-VDIMM "
-+                                         "instantiation", NULL);
-+
-+    object_property_add_str(obj, "nvdimm-persistence",
-+                            virt_get_nvdimm_persistence,
-+                            virt_set_nvdimm_persistence, NULL);
-+    object_property_set_description(obj, "nvdimm-persistence",
-+                                    "Set NVDIMM persistence"
-+                                    "Valid values are cpu and mem-ctrl",=
- NULL);
-+
-     vms->irqmap =3D a15irqmap;
- }
-=20
---=20
-2.20.1
+Thanks
+
+Eric
+> 2) Support of PC-DIMM [10 - 13]
+> 3) Support of NV-DIMM [14 - 17]
+> 
+> 1) can be upstreamed before 2 and 2 can be upstreamed before 3.
+> 
+> Work is ongoing to transform the whole memory as device memory.
+> However this move is not trivial and to me, is independent on
+> the improvements brought by this series:
+> - if we were to use DIMM for initial RAM, those DIMMs would use
+>   use slots. Although they would not be part of the ones provided
+>   using the ",slots" options, they are ACPI limited resources.
+> - DT and ACPI description needs to be reworked
+> - NUMA integration needs special care
+> - a special device memory object may be required to avoid consuming
+>   slots and easing the FW description.
+> 
+> So I preferred to separate the concerns. This new implementation
+> based on device memory could be candidate for another virt
+> version.
+> 
+> Best Regards
+> 
+> Eric
+> 
+> References:
+> 
+> [0] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+> http://patchwork.ozlabs.org/cover/914694/
+> 
+> [1] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
+> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
+> 
+> This series can be found at:
+> https://github.com/eauger/qemu/tree/v3.1.0-dimm-v7
+> 
+> History:
+> 
+> v6 -> v7:
+> - Addressed Peter and Igor comments (exceptions sent my email)
+> - Fixed TCG case. Now device memory works also for TCG and vcpu
+>   pamax is checked
+> - See individual logs for more details
+> 
+> v5 -> v6:
+> - mingw compilation issue fix
+> - kvm_arm_get_max_vm_phys_shift always returns the number of supported
+>   IPA bits
+> - new patch "hw/arm/virt: Rename highmem IO regions" that eases the review
+>   of "hw/arm/virt: Split the memory map description"
+> - "hw/arm/virt: Move memory map initialization into machvirt_init"
+>   squashed into the previous patch
+> - change alignment of IO regions beyond the RAM so that it matches their
+>   size
+> 
+> v4 -> v5:
+> - change in the memory map
+> - see individual logs
+> 
+> v3 -> v4:
+> - rebase on David's "pc-dimm: next bunch of cleanups" and
+>   "pc-dimm: pre_plug "slot" and "addr" assignment"
+> - kvm-type option not used anymore. We directly use
+>   maxram_size and ram_size machine fields to compute the
+>   MAX IPA range. Migration is naturally handled as CLI
+>   option are kept between source and destination. This was
+>   suggested by David.
+> - device_memory_start and device_memory_size not stored
+>   anymore in vms->bootinfo
+> - I did not take into account 2 Igor's comments: the one
+>   related to the refactoring of arm_load_dtb and the one
+>   related to the generation of the dtb after system_reset
+>   which would contain nodes of hotplugged devices (we do
+>   not support hotplug at this stage)
+> - check the end-user does not attempt to hotplug a device
+> - addition of "vl: Set machine ram_size, maxram_size and
+>   ram_slots earlier"
+> 
+> v2 -> v3:
+> - fix pc_q35 and pc_piix compilation error
+> - kwangwoo's email being not valid anymore, remove his address
+> 
+> v1 -> v2:
+> - kvm_get_max_vm_phys_shift moved in arch specific file
+> - addition of NVDIMM part
+> - single series
+> - rebase on David's refactoring
+> 
+> v1:
+> - was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
+> - was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
+> 
+> Best Regards
+> 
+> Eric
+> 
+> 
+> Eric Auger (12):
+>   hw/arm/virt: Rename highmem IO regions
+>   hw/arm/virt: Split the memory map description
+>   hw/boards: Add a MachineState parameter to kvm_type callback
+>   kvm: add kvm_arm_get_max_vm_ipa_size
+>   vl: Set machine ram_size, maxram_size and ram_slots earlier
+>   hw/arm/virt: Dynamic memory map depending on RAM requirements
+>   hw/arm/virt: Implement kvm_type function for 4.0 machine
+>   hw/arm/virt: Bump the 255GB initial RAM limit
+>   hw/arm/virt: Add memory hotplug framework
+>   hw/arm/virt: Allocate device_memory
+>   hw/arm/boot: Expose the pmem nodes in the DT
+>   hw/arm/virt: Add nvdimm and nvdimm-persistence options
+> 
+> Kwangwoo Lee (2):
+>   nvdimm: use configurable ACPI IO base and size
+>   hw/arm/virt: Add nvdimm hot-plug infrastructure
+> 
+> Shameer Kolothum (3):
+>   hw/arm/boot: introduce fdt_add_memory_node helper
+>   hw/arm/boot: Expose the PC-DIMM nodes in the DT
+>   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+> 
+>  accel/kvm/kvm-all.c             |   2 +-
+>  default-configs/arm-softmmu.mak |   4 +
+>  hw/acpi/nvdimm.c                |  31 ++-
+>  hw/arm/boot.c                   | 136 ++++++++++--
+>  hw/arm/virt-acpi-build.c        |  23 +-
+>  hw/arm/virt.c                   | 364 ++++++++++++++++++++++++++++----
+>  hw/i386/pc_piix.c               |   6 +-
+>  hw/i386/pc_q35.c                |   6 +-
+>  hw/ppc/mac_newworld.c           |   3 +-
+>  hw/ppc/mac_oldworld.c           |   2 +-
+>  hw/ppc/spapr.c                  |   2 +-
+>  include/hw/arm/virt.h           |  24 ++-
+>  include/hw/boards.h             |   5 +-
+>  include/hw/mem/nvdimm.h         |   4 +
+>  target/arm/kvm.c                |  10 +
+>  target/arm/kvm_arm.h            |  13 ++
+>  vl.c                            |   6 +-
+>  17 files changed, 556 insertions(+), 85 deletions(-)
+> 
