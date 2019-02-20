@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51085)
+Received: from eggs.gnu.org ([209.51.188.92]:51092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ9-0006EF-8i
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ9-0006EG-Ch
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ5-0000ph-HT
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ5-0000qo-Sb
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:07 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33171)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32843)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gwZZ5-0000SK-4R
+	id 1gwZZ5-0000HN-8g
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:03 -0500
-Received: by mail-wm1-x344.google.com with SMTP id h22so5603236wmb.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:53 -0800 (PST)
+Received: by mail-wr1-x441.google.com with SMTP id i12so27791754wrw.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:49 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Wed, 20 Feb 2019 22:37:36 +0100
-Message-Id: <cc528e734c7d5a779f4628a83e0173a1368bde76.1550698466.git.DirtY.iCE.hu@gmail.com>
+Date: Wed, 20 Feb 2019 22:37:32 +0100
+Message-Id: <f262ecd7436fade16c88533f52c5ca4a08bc396d.1550698466.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 07/14] dsoundaudio: port to -audiodev config
+Subject: [Qemu-devel] [PATCH v5 03/14] audio: -audiodev command line option:
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,260 +32,301 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "reviewer:Incompatible changes" <libvir-list@redhat.com>
+
+This patch adds documentation of an -audiodev command line option, that
+deprecates the old QEMU_* environment variables for audio backend
+configuration.  It's syntax is similar to existing options (-netdev,
+-device, etc):
+
+  -audiodev driver_name,property=value,...
+
+Although now it's possible to specify multiple -audiodev options on
+command line, multiple audio backends are not supported yet.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/dsound_template.h |  6 ++---
- audio/audio_legacy.c    | 41 ++++++++++++++++++++++++++++
- audio/dsoundaudio.c     | 59 ++++++++++++-----------------------------
- 3 files changed, 61 insertions(+), 45 deletions(-)
 
-diff --git a/audio/dsound_template.h b/audio/dsound_template.h
-index b439f33f58..8ece870c9e 100644
---- a/audio/dsound_template.h
-+++ b/audio/dsound_template.h
-@@ -167,17 +167,18 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-     dsound *s = drv_opaque;
-     WAVEFORMATEX wfx;
-     struct audsettings obt_as;
--    DSoundConf *conf = &s->conf;
- #ifdef DSBTYPE_IN
-     const char *typ = "ADC";
-     DSoundVoiceIn *ds = (DSoundVoiceIn *) hw;
-     DSCBUFFERDESC bd;
-     DSCBCAPS bc;
-+    AudiodevPerDirectionOptions *pdo = s->dev->u.dsound.in;
- #else
-     const char *typ = "DAC";
-     DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-     DSBUFFERDESC bd;
-     DSBCAPS bc;
-+    AudiodevPerDirectionOptions *pdo = s->dev->u.dsound.out;
- #endif
+Notes:
+    Changes from v4:
+    
+    * deprecated QEMU_AUDIO_ env vars
+    * updated to reflect qapi changes
+    * added info to qemu-deprecated.texi
+
+ qemu-deprecated.texi |   7 ++
+ qemu-options.hx      | 236 ++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 240 insertions(+), 3 deletions(-)
+
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 45c57952da..5c07ad4acb 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -60,6 +60,13 @@ Support for invalid topologies will be removed, the user must ensure
+ topologies described with -smp include all possible cpus, i.e.
+   @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
  
-     if (!s->FIELD2) {
-@@ -193,8 +194,8 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-     memset (&bd, 0, sizeof (bd));
-     bd.dwSize = sizeof (bd);
-     bd.lpwfxFormat = &wfx;
-+    bd.dwBufferBytes = audio_buffer_bytes(pdo, as, 92880);
- #ifdef DSBTYPE_IN
--    bd.dwBufferBytes = conf->bufsize_in;
-     hr = IDirectSoundCapture_CreateCaptureBuffer (
-         s->dsound_capture,
-         &bd,
-@@ -203,7 +204,6 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-         );
- #else
-     bd.dwFlags = DSBCAPS_STICKYFOCUS | DSBCAPS_GETCURRENTPOSITION2;
--    bd.dwBufferBytes = conf->bufsize_out;
-     hr = IDirectSound_CreateSoundBuffer (
-         s->dsound,
-         &bd,
-diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
-index 086011fbff..17105e7239 100644
---- a/audio/audio_legacy.c
-+++ b/audio/audio_legacy.c
-@@ -120,6 +120,30 @@ static void get_frames_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
-     }
- }
- 
-+static uint32_t samples_to_usecs(uint32_t samples,
-+                                 AudiodevPerDirectionOptions *pdo)
-+{
-+    uint32_t channels = pdo->has_channels ? pdo->channels : 2;
-+    return frames_to_usecs(samples / channels, pdo);
-+}
++@subsection QEMU_AUDIO_ environment variables and -audio-help (since 4.0)
 +
-+static uint32_t bytes_to_usecs(uint32_t bytes, AudiodevPerDirectionOptions *pdo)
-+{
-+    AudioFormat fmt = pdo->has_format ? pdo->format : AUDIO_FORMAT_S16;
-+    uint32_t bytes_per_sample = audioformat_bytes_per_sample(fmt);
-+    return samples_to_usecs(bytes / bytes_per_sample, pdo);
-+}
++The ``-audiodev'' argument is now the preferred way to specify audio
++backend settings instead of environment variables.  To ease migration to
++the new format, the ``-audiodev-help'' option can be used to convert
++the current values of the environment variables to ``-audiodev'' options.
 +
-+static void get_bytes_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
-+                               AudiodevPerDirectionOptions *pdo)
-+{
-+    const char *val = getenv(env);
-+    if (val) {
-+        *dst = bytes_to_usecs(toui32(val), pdo);
-+        *has_dst = true;
-+    }
-+}
+ @section QEMU Machine Protocol (QMP) commands
+ 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 77bd98e20b..f77f4d89a7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -416,14 +416,244 @@ The default is @code{en-us}.
+ ETEXI
+ 
+ 
++HXCOMM Deprecated by -audiodev
+ DEF("audio-help", 0, QEMU_OPTION_audio_help,
+-    "-audio-help     print list of audio drivers and their options\n",
++    "-audio-help     show -audiodev equivalent of the currently specified audio settings\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -audio-help
+ @findex -audio-help
+-Will show the audio subsystem help: list of drivers, tunable
+-parameters.
++Will show the -audiodev equivalent of the currently specified
++(deprecated) environment variables.
++ETEXI
 +
- /* backend specific functions */
- /* ALSA */
- static void handle_alsa_per_direction(
-@@ -180,6 +204,19 @@ static void handle_coreaudio(Audiodev *dev)
-             &dev->u.coreaudio.out->has_buffer_count);
- }
- 
-+/* dsound */
-+static void handle_dsound(Audiodev *dev)
-+{
-+    get_millis_to_usecs("QEMU_DSOUND_LATENCY_MILLIS",
-+                        &dev->u.dsound.latency, &dev->u.dsound.has_latency);
-+    get_bytes_to_usecs("QEMU_DSOUND_BUFSIZE_OUT",
-+                       &dev->u.dsound.out->buffer_len,
-+                       &dev->u.dsound.out->has_buffer_len, dev->u.dsound.out);
-+    get_bytes_to_usecs("QEMU_DSOUND_BUFSIZE_IN",
-+                       &dev->u.dsound.in->buffer_len,
-+                       &dev->u.dsound.in->has_buffer_len, dev->u.dsound.in);
-+}
++DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
++    "-audiodev [driver=]driver,id=id[,prop[=value][,...]]\n"
++    "                specifies the audio backend to use\n"
++    "                id= identifier of the backend\n"
++    "                timer-period= timer period in microseconds\n"
++    "                in|out.fixed-settings= use fixed settings for host audio\n"
++    "                in|out.frequency= frequency to use with fixed settings\n"
++    "                in|out.channels= number of channels to use with fixed settings\n"
++    "                in|out.format= sample format to use with fixed settings\n"
++    "                valid values: s8, s16, s32, u8, u16, u32\n"
++    "                in|out.voices= number of voices to use\n"
++    "                in|out.buffer-len= length of buffer in microseconds\n"
++    "-audiodev none,id=id,[,prop[=value][,...]]\n"
++    "                dummy driver that discards all output\n"
++#ifdef CONFIG_ALSA
++    "-audiodev alsa,id=id[,prop[=value][,...]]\n"
++    "                in|out.dev= name of the audio device to use\n"
++    "                in|out.period-len= length of period in microseconds\n"
++    "                in|out.try-poll= attempt to use poll mode\n"
++    "                threshold= threshold (in microseconds) when playback starts\n"
++#endif
++#ifdef CONFIG_COREAUDIO
++    "-audiodev coreaudio,id=id[,prop[=value][,...]]\n"
++    "                in|out.buffer-count= number of buffers\n"
++#endif
++#ifdef CONFIG_DSOUND
++    "-audiodev dsound,id=id[,prop[=value][,...]]\n"
++    "                latency= add extra latency to playback in microseconds\n"
++#endif
++#ifdef CONFIG_OSS
++    "-audiodev oss,id=id[,prop[=value][,...]]\n"
++    "                in|out.dev= path of the audio device to use\n"
++    "                in|out.buffer-count= number of buffers\n"
++    "                in|out.try-poll= attempt to use poll mode\n"
++    "                try-mmap= try using memory mapped access\n"
++    "                exclusive= open device in exclusive mode\n"
++    "                dsp-policy= set timing policy (0..10), -1 to use fragment mode\n"
++#endif
++#ifdef CONFIG_PA
++    "-audiodev pa,id=id[,prop[=value][,...]]\n"
++    "                server= PulseAudio server address\n"
++    "                in|out.name= source/sink device name\n"
++#endif
++#ifdef CONFIG_SDL
++    "-audiodev sdl,id=id[,prop[=value][,...]]\n"
++#endif
++#ifdef CONFIG_SPICE
++    "-audiodev spice,id=id[,prop[=value][,...]]\n"
++#endif
++    "-audiodev wav,id=id[,prop[=value][,...]]\n"
++    "                path= path of wav file to record\n",
++    QEMU_ARCH_ALL)
++STEXI
++@item -audiodev [driver=]@var{driver},id=@var{id}[,@var{prop}[=@var{value}][,...]]
++@findex -audiodev
++Adds a new audio backend @var{driver} identified by @var{id}.  There are
++global and driver specific properties.  Some values can be set
++differently for input and output, they're marked with @code{in|out.}.
++You can set the input's property with @code{in.@var{prop}} and the
++output's property with @code{out.@var{prop}}. For example:
++@example
++-audiodev alsa,id=example,in.frequency=44110,out.frequency=8000
++-audiodev alsa,id=example,out.channels=1 # leaves in.channels unspecified
++@end example
 +
- /* general */
- static void handle_per_direction(
-     AudiodevPerDirectionOptions *pdo, const char *prefix)
-@@ -229,6 +266,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
-         handle_coreaudio(e->dev);
-         break;
- 
-+    case AUDIODEV_DRIVER_DSOUND:
-+        handle_dsound(e->dev);
-+        break;
++Valid global options are:
 +
-     default:
-         break;
-     }
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 02fe777cba..a7d04b5033 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -32,6 +32,7 @@
- 
- #define AUDIO_CAP "dsound"
- #include "audio_int.h"
-+#include "qemu/host-utils.h"
- 
- #include <windows.h>
- #include <mmsystem.h>
-@@ -42,17 +43,11 @@
- 
- /* #define DEBUG_DSOUND */
- 
--typedef struct {
--    int bufsize_in;
--    int bufsize_out;
--    int latency_millis;
--} DSoundConf;
--
- typedef struct {
-     LPDIRECTSOUND dsound;
-     LPDIRECTSOUNDCAPTURE dsound_capture;
-     struct audsettings settings;
--    DSoundConf conf;
-+    Audiodev *dev;
- } dsound;
- 
- typedef struct {
-@@ -248,9 +243,9 @@ static void GCC_FMT_ATTR (3, 4) dsound_logerr2 (
-     dsound_log_hresult (hr);
- }
- 
--static DWORD millis_to_bytes (struct audio_pcm_info *info, DWORD millis)
-+static uint64_t usecs_to_bytes(struct audio_pcm_info *info, uint32_t usecs)
- {
--    return (millis * info->bytes_per_second) / 1000;
-+    return muldiv64(usecs, info->bytes_per_second, 1000000);
- }
- 
- #ifdef DEBUG_DSOUND
-@@ -478,7 +473,7 @@ static int dsound_run_out (HWVoiceOut *hw, int live)
-     LPVOID p1, p2;
-     int bufsize;
-     dsound *s = ds->s;
--    DSoundConf *conf = &s->conf;
-+    AudiodevDsoundOptions *dso = &s->dev->u.dsound;
- 
-     if (!dsb) {
-         dolog ("Attempt to run empty with playback buffer\n");
-@@ -501,14 +496,14 @@ static int dsound_run_out (HWVoiceOut *hw, int live)
-     len = live << hwshift;
- 
-     if (ds->first_time) {
--        if (conf->latency_millis) {
-+        if (dso->latency) {
-             DWORD cur_blat;
- 
-             cur_blat = audio_ring_dist (wpos, ppos, bufsize);
-             ds->first_time = 0;
-             old_pos = wpos;
-             old_pos +=
--                millis_to_bytes (&hw->info, conf->latency_millis) - cur_blat;
-+                usecs_to_bytes(&hw->info, dso->latency) - cur_blat;
-             old_pos %= bufsize;
-             old_pos &= ~hw->info.align;
-         }
-@@ -747,12 +742,6 @@ static int dsound_run_in (HWVoiceIn *hw)
-     return decr;
- }
- 
--static DSoundConf glob_conf = {
--    .bufsize_in         = 16384,
--    .bufsize_out        = 16384,
--    .latency_millis     = 10
--};
--
- static void dsound_audio_fini (void *opaque)
- {
-     HRESULT hr;
-@@ -788,8 +777,17 @@ static void *dsound_audio_init(Audiodev *dev)
-     int err;
-     HRESULT hr;
-     dsound *s = g_malloc0(sizeof(dsound));
-+    AudiodevDsoundOptions *dso;
++@table @option
++@item id=@var{identifier}
++Identifies the audio backend.
 +
-+    assert(dev->driver == AUDIODEV_DRIVER_DSOUND);
-+    s->dev = dev;
-+    dso = &dev->u.dsound;
++@item timer-period=@var{period}
++Sets the timer @var{period} used by the audio subsystem in microseconds.
++Default is 10000 (10 ms).
 +
-+    if (!dso->has_latency) {
-+        dso->has_latency = true;
-+        dso->latency = 10000; /* 10 ms */
-+    }
++@item in|out.fixed-settings=on|off
++Use fixed settings for host audio.  When off, it will change based on
++how the guest opens the sound card.  In this case you must not specify
++@var{frequency}, @var{channels} or @var{format}.  Default is on.
++
++@item in|out.frequency=@var{frequency}
++Specify the @var{frequency} to use when using @var{fixed-settings}.
++Default is 44100Hz.
++
++@item in|out.channels=@var{channels}
++Specify the number of @var{channels} to use when using
++@var{fixed-settings}. Default is 2 (stereo).
++
++@item in|out.format=@var{format}
++Specify the sample @var{format} to use when using @var{fixed-settings}.
++Valid values are: @code{s8}, @code{s16}, @code{s32}, @code{u8},
++@code{u16}, @code{u32}. Default is @code{s16}.
++
++@item in|out.voices=@var{voices}
++Specify the number of @var{voices} to use.  Default is 1.
++
++@item in|out.buffer=@var{usecs}
++Sets the size of the buffer in microseconds.
++
++@end table
++
++@item -audiodev none,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a dummy backend that discards all outputs.  This backend has no
++backend specific properties.
++
++@item -audiodev alsa,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates backend using the ALSA.  This backend is only available on
++Linux.
++
++ALSA specific options are:
++
++@table @option
++
++@item in|out.dev=@var{device}
++Specify the ALSA @var{device} to use for input and/or output.  Default
++is @code{default}.
++
++@item in|out.period-len=@var{usecs}
++Sets the period length in microseconds.
++
++@item in|out.try-poll=on|off
++Attempt to use poll mode with the device.  Default is on.
++
++@item threshold=@var{threshold}
++Threshold (in microseconds) when playback starts.  Default is 0.
++
++@end table
++
++@item -audiodev coreaudio,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using Apple's Core Audio.  This backend is only
++available on Mac OS and only supports playback.
++
++Core Audio specific options are:
++
++@table @option
++
++@item in|out.buffer-count=@var{count}
++Sets the @var{count} of the buffers.
++
++@end table
++
++@item -audiodev dsound,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using Microsoft's DirectSound.  This backend is only
++available on Windows and only supports playback.
++
++DirectSound specific options are:
++
++@table @option
++
++@item latency=@var{usecs}
++Add extra @var{usecs} microseconds latency to playback.  Default is
++10000 (10 ms).
++
++@end table
++
++@item -audiodev oss,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using OSS.  This backend is available on most
++Unix-like systems.
++
++OSS specific options are:
++
++@table @option
++
++@item in|out.dev=@var{device}
++Specify the file name of the OSS @var{device} to use.  Default is
++@code{/dev/dsp}.
++
++@item in|out.buffer-count=@var{count}
++Sets the @var{count} of the buffers.
++
++@item in|out.try-poll=on|of
++Attempt to use poll mode with the device.  Default is on.
++
++@item try-mmap=on|off
++Try using memory mapped device access.  Default is off.
++
++@item exclusive=on|off
++Open the device in exclusive mode (vmix won't work in this case).
++Default is off.
++
++@item dsp-policy=@var{policy}
++Sets the timing policy (between 0 and 10, where smaller number means
++smaller latency but higher CPU usage).  Use -1 to use buffer sizes
++specified by @code{buffer} and @code{buffer-count}.  This option is
++ignored if you do not have OSS 4. Default is 5.
++
++@end table
++
++@item -audiodev pa,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using PulseAudio.  This backend is available on most
++systems.
++
++PulseAudio specific options are:
++
++@table @option
++
++@item server=@var{server}
++Sets the PulseAudio @var{server} to connect to.
++
++@item in|out.name=@var{sink}
++Use the specified source/sink for recording/playback.
++
++@end table
++
++@item -audiodev sdl,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend using SDL.  This backend is available on most systems,
++but you should use your platform's native backend if possible.  This
++backend has no backend specific properties.
++
++@item -audiodev spice,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend that sends audio through SPICE.  This backend requires
++@code{-spice} and automatically selected in that case, so usually you
++can ignore this option.  This backend has no backend specific
++properties.
++
++@item -audiodev wav,id=@var{id}[,@var{prop}[=@var{value}][,...]]
++Creates a backend that writes audio to a WAV file.
++
++Backend specific options are:
++
++@table @option
++
++@item path=@var{path}
++Write recorded audio into the specified file.  Default is
++@code{qemu.wav}.
++
++@end table
+ ETEXI
  
--    s->conf = glob_conf;
-     hr = CoInitialize (NULL);
-     if (FAILED (hr)) {
-         dsound_logerr (hr, "Could not initialize COM\n");
-@@ -854,28 +852,6 @@ static void *dsound_audio_init(Audiodev *dev)
-     return s;
- }
- 
--static struct audio_option dsound_options[] = {
--    {
--        .name  = "LATENCY_MILLIS",
--        .tag   = AUD_OPT_INT,
--        .valp  = &glob_conf.latency_millis,
--        .descr = "(undocumented)"
--    },
--    {
--        .name  = "BUFSIZE_OUT",
--        .tag   = AUD_OPT_INT,
--        .valp  = &glob_conf.bufsize_out,
--        .descr = "(undocumented)"
--    },
--    {
--        .name  = "BUFSIZE_IN",
--        .tag   = AUD_OPT_INT,
--        .valp  = &glob_conf.bufsize_in,
--        .descr = "(undocumented)"
--    },
--    { /* End of list */ }
--};
--
- static struct audio_pcm_ops dsound_pcm_ops = {
-     .init_out = dsound_init_out,
-     .fini_out = dsound_fini_out,
-@@ -893,7 +869,6 @@ static struct audio_pcm_ops dsound_pcm_ops = {
- static struct audio_driver dsound_audio_driver = {
-     .name           = "dsound",
-     .descr          = "DirectSound http://wikipedia.org/wiki/DirectSound",
--    .options        = dsound_options,
-     .init           = dsound_audio_init,
-     .fini           = dsound_audio_fini,
-     .pcm_ops        = &dsound_pcm_ops,
+ DEF("soundhw", HAS_ARG, QEMU_OPTION_soundhw,
 -- 
 2.20.1
