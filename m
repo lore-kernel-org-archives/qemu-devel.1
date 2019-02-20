@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58773)
+Received: from eggs.gnu.org ([209.51.188.92]:59659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gwU5Y-0001j5-1y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:47:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gwU6h-0002ii-5p
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:48:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gwU5W-0003Tm-P9
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:47:11 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35794)
+	(envelope-from <peter.maydell@linaro.org>) id 1gwU6f-0004J9-Gh
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:48:22 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gwU5W-0003Q4-Ec
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:47:10 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t18so26582925wrx.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:47:04 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Feb 2019 16:47:01 +0100
-Message-Id: <1550677621-10139-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] fixup! vhost-user-test: create a main loop per
- TestServer
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gwU6f-0004IF-8d
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:48:21 -0500
+Received: by mail-ot1-x342.google.com with SMTP id b3so40893814otp.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:48:21 -0800 (PST)
+MIME-Version: 1.0
+References: <alpine.BSF.2.21.9999.1902151046540.80982@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1902151046540.80982@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Feb 2019 15:48:08 +0000
+Message-ID: <CAFEAcA_o7eS854bC3aC4kZjyd3so3LmQzr76WMg9zWueEz8=FA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] MemoryRegionOps access sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Fix a hang that is only latent until qgraph is merged.
+On Fri, 15 Feb 2019 at 09:56, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>
+> Hello,
+>
+> Could someone please explain how the MemoryRegionOps
+> valid.{min,max}_access_size and unaligned and corresponding impl
+> constraints work and where are these implemented? And in particular if
+> this would work:
+>
+> static const MemoryRegionOps ops = {
+>      .read = readfn,
+>      .write = writefn,
+>      .valid.min_access_size = 1,
+>      .valid.max_access_size = 4,
+>      .impl.min_access_size = 4,
+>      .impl.max_access_size = 4,
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+> };
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/vhost-user-test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+These are implemented in memory.c. The documentation
+is in the comments on the MemoryRegionOps struct in
+include/exec/memory.h.
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 33030e0..527d3b3 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -557,8 +557,6 @@ static void test_server_free(TestServer *server)
-     while (g_main_context_pending(NULL)) {
-         g_main_context_iteration(NULL, TRUE);
-     }
--    g_main_loop_unref(server->loop);
--    g_main_context_unref(server->context);
- 
-     qemu_chr_fe_deinit(&server->chr, true);
- 
-@@ -580,6 +578,8 @@ static void test_server_free(TestServer *server)
-     g_assert(server->bus);
-     qpci_free_pc(server->bus);
- 
-+    g_main_loop_unref(server->loop);
-+    g_main_context_unref(server->context);
-     g_free(server);
- }
- 
--- 
-1.8.3.1
+The .valid parts should specify what the device permits
+the guest to do (and where failures result in MemTxErrors
+usually meaning bus error/data abort). These ought to be
+handled by the memory_region_access_valid() function, but
+I can't see how the logic there actually does the right
+thing. Maybe Paolo understands that part better than me.
+
+The .impl parts specify what the implementation can
+deal with, and access_with_adjusted_size() takes
+care of making multiple accesses to the underlying
+device if necessary. (The fiddling of the data to
+put it in the right place is done at the next level
+down by memory_region_shift_read_access()
+and memory_region_shift_write_access().)
+
+I think your suggested MemoryRegionOps ought to work.
+
+thanks
+-- PMM
