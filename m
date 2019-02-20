@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54481)
+Received: from eggs.gnu.org ([209.51.188.92]:54730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gwPhh-00054E-LY
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:06:18 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gwPiz-0005lN-UM
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gwPhg-0001Us-MH
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:06:17 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:41485)
+	(envelope-from <mlureau@redhat.com>) id 1gwPix-0002vs-FE
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:07:37 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:36162)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwPhg-0001U7-Ga
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:06:16 -0500
-Received: by mail-qt1-f193.google.com with SMTP id v10so26653649qtp.8
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 03:06:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwPio-0002oj-Dv
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:07:27 -0500
+Received: by mail-qk1-f194.google.com with SMTP id o125so1711513qkf.3
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 03:07:25 -0800 (PST)
 MIME-Version: 1.0
 References: <20190220010232.18731-1-philmd@redhat.com>
-	<20190220010232.18731-10-philmd@redhat.com>
-In-Reply-To: <20190220010232.18731-10-philmd@redhat.com>
+	<20190220010232.18731-12-philmd@redhat.com>
+In-Reply-To: <20190220010232.18731-12-philmd@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 20 Feb 2019 12:06:04 +0100
-Message-ID: <CAMxuvawxJf3udoJVGyQk5SkT1GBAHjpH4Bjq6=h7hMw-3zT8xQ@mail.gmail.com>
+Date: Wed, 20 Feb 2019 12:07:13 +0100
+Message-ID: <CAMxuvaxORh6Kc-rJ605fJidj1yd+e23VeeA_+O=FU1dH7Zh32w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 09/25] vhost-user: Express sizeof with
- size_t
+Subject: Re: [Qemu-devel] [PATCH v3 11/25] xen: Let xencons_send() take a
+ 'size' argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +36,58 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>,
 On Wed, Feb 20, 2019 at 2:05 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> VHOST_USER_HDR_SIZE uses offsetof(), thus is an expression of type
-> size_t. Update the format string accordingly.
+> The single caller of xencons_send(), con_event() already use the
+> difference 'con->buffer.size - con->buffer.consumed'.
+> Deduplicate by passing the difference as an argument.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+
 > ---
->  hw/virtio/vhost-user.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+>  hw/char/xen_console.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
 >
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 564a31d12c..2eb7143d3d 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -215,11 +215,12 @@ static int vhost_user_read(struct vhost_dev *dev, V=
-hostUserMsg *msg)
->      struct vhost_user *u =3D dev->opaque;
->      CharBackend *chr =3D u->user->chr;
->      uint8_t *p =3D (uint8_t *) msg;
-> -    int r, size =3D VHOST_USER_HDR_SIZE;
-> +    int r;
-> +    size_t size =3D VHOST_USER_HDR_SIZE;
+> diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
+> index 91f34ef06c..083b2c8e2a 100644
+> --- a/hw/char/xen_console.c
+> +++ b/hw/char/xen_console.c
+> @@ -144,11 +144,10 @@ static void xencons_receive(void *opaque, const uin=
+t8_t *buf, int len)
+>      xen_pv_send_notify(&con->xendev);
+>  }
 >
->      r =3D qemu_chr_fe_read_all(chr, p, size);
->      if (r !=3D size) {
-> -        error_report("Failed to read msg header. Read %d instead of %d."
-> +        error_report("Failed to read msg header. Read %d instead of %zu.=
-"
->                       " Original request %d.", r, size, msg->hdr.request)=
-;
->          goto fail;
->      }
-> @@ -235,7 +236,7 @@ static int vhost_user_read(struct vhost_dev *dev, Vho=
-stUserMsg *msg)
->      /* validate message size is sane */
->      if (msg->hdr.size > VHOST_USER_PAYLOAD_SIZE) {
->          error_report("Failed to read msg header."
-> -                " Size %d exceeds the maximum %zu.", msg->hdr.size,
-> +                " Size %u exceeds the maximum %zu.", msg->hdr.size,
->                  VHOST_USER_PAYLOAD_SIZE);
->          goto fail;
->      }
-> @@ -246,7 +247,7 @@ static int vhost_user_read(struct vhost_dev *dev, Vho=
-stUserMsg *msg)
->          r =3D qemu_chr_fe_read_all(chr, p, size);
->          if (r !=3D size) {
->              error_report("Failed to read msg payload."
-> -                         " Read %d instead of %d.", r, msg->hdr.size);
-> +                         " Read %d instead of %u.", r, msg->hdr.size);
->              goto fail;
->          }
->      }
-> @@ -300,7 +301,8 @@ static int vhost_user_write(struct vhost_dev *dev, Vh=
-ostUserMsg *msg,
+> -static void xencons_send(struct XenConsole *con)
+> +static void xencons_send(struct XenConsole *con, ssize_t size)
 >  {
->      struct vhost_user *u =3D dev->opaque;
->      CharBackend *chr =3D u->user->chr;
-> -    int ret, size =3D VHOST_USER_HDR_SIZE + msg->hdr.size;
-> +    int ret;
-> +    size_t size =3D VHOST_USER_HDR_SIZE + msg->hdr.size;
+> -    ssize_t len, size;
+> +    ssize_t len;
 >
->      /*
->       * For non-vring specific requests, like VHOST_USER_SET_MEM_TABLE,
-> @@ -320,7 +322,7 @@ static int vhost_user_write(struct vhost_dev *dev, Vh=
-ostUserMsg *msg,
->      ret =3D qemu_chr_fe_write_all(chr, (const uint8_t *) msg, size);
->      if (ret !=3D size) {
->          error_report("Failed to write msg."
-> -                     " Wrote %d instead of %d.", ret, size);
-> +                     " Wrote %d instead of %zu.", ret, size);
->          return -1;
->      }
+> -    size =3D con->buffer.size - con->buffer.consumed;
+>      if (qemu_chr_fe_backend_connected(&con->chr)) {
+>          len =3D qemu_chr_fe_write(&con->chr,
+>                                  con->buffer.data + con->buffer.consumed,
+> @@ -280,10 +279,13 @@ static void con_disconnect(struct XenLegacyDevice *=
+xendev)
+>  static void con_event(struct XenLegacyDevice *xendev)
+>  {
+>      struct XenConsole *con =3D container_of(xendev, struct XenConsole, x=
+endev);
+> +    ssize_t size;
 >
+>      buffer_append(con);
+> -    if (con->buffer.size - con->buffer.consumed)
+> -        xencons_send(con);
+> +    size =3D con->buffer.size - con->buffer.consumed;
+> +    if (size) {
+> +        xencons_send(con, size);
+> +    }
+>  }
+>
+>  /* -------------------------------------------------------------------- =
+*/
 > --
 > 2.20.1
 >
