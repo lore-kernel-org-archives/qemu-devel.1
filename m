@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34926)
+Received: from eggs.gnu.org ([209.51.188.92]:34936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaXL-0003rs-Vk
+	(envelope-from <eric.auger@redhat.com>) id 1gwaXM-0003sU-Sn
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaXK-0008PN-Hv
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:19 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaXL-0008Q0-Vf
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:20 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 20 Feb 2019 23:39:46 +0100
-Message-Id: <20190220224003.4420-1-eric.auger@redhat.com>
+Date: Wed, 20 Feb 2019 23:39:47 +0100
+Message-Id: <20190220224003.4420-2-eric.auger@redhat.com>
+In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 00/17] ARM virt: Initial RAM expansion and
- PCDIMM/NVDIMM support
+Subject: [Qemu-devel] [PATCH v7 01/17] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,186 +25,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-This series aims to bump the 255GB RAM limit in machvirt and to
-support device memory in general, and especially PCDIMM/NVDIMM.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-In machvirt versions < 4.0, the initial RAM starts at 1GB and can
-grow up to 255GB. From 256GB onwards we find IO regions such as the
-additional GICv3 RDIST region, high PCIe ECAM region and high PCIe
-MMIO region. The address map was 1TB large. This corresponded to
-the max IPA capacity KVM was able to manage.
+We introduce an helper to create a memory node.
 
-Since 4.20, the host kernel is able to support a larger and dynamic
-IPA range. So the guest physical address can go beyond the 1TB. The
-max GPA size depends on the host kernel configuration and physical CPUs.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-In this series we use this feature and allow the RAM to grow without
-any other limit than the one put by the host kernel.
-
-The RAM still starts at 1GB. First comes the initial ram (-m) of size
-ram_size and then comes the device memory (,maxmem) of size
-maxram_size - ram_size. The device memory is potentially hotpluggable
-depending on the instantiated memory objects.
-
-IO regions previously located between 256GB and 1TB are moved after
-the RAM. Their offset is dynamically computed, depends on ram_size
-and maxram_size. Size alignment is enforced.
-
-In case maxmem value is inferior to 255GB, the legacy memory map
-still is used. The change of memory map becomes effective from 4.0
-onwards.
-
-As we keep the initial RAM at 1GB base address, we do not need to do
-invasive changes in the EDK2 FW. It seems nobody is eager to do
-that job at the moment.
-
-Device memory being put just after the initial RAM, it is possible
-to get access to this feature while keeping a 1TB address map.
-
-This series reuses/rebases patches initially submitted by Shameer
-in [1] and Kwangwoo in [2] for the PC-DIMM and NV-DIMM parts.
-
-Functionally, the series is split into 3 parts:
-1) bump of the initial RAM limit [1 - 9] and change in
-   the memory map
-2) Support of PC-DIMM [10 - 13]
-3) Support of NV-DIMM [14 - 17]
-
-1) can be upstreamed before 2 and 2 can be upstreamed before 3.
-
-Work is ongoing to transform the whole memory as device memory.
-However this move is not trivial and to me, is independent on
-the improvements brought by this series:
-- if we were to use DIMM for initial RAM, those DIMMs would use
-  use slots. Although they would not be part of the ones provided
-  using the ",slots" options, they are ACPI limited resources.
-- DT and ACPI description needs to be reworked
-- NUMA integration needs special care
-- a special device memory object may be required to avoid consuming
-  slots and easing the FW description.
-
-So I preferred to separate the concerns. This new implementation
-based on device memory could be candidate for another virt
-version.
-
-Best Regards
-
-Eric
-
-References:
-
-[0] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
-http://patchwork.ozlabs.org/cover/914694/
-
-[1] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
-https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v3.1.0-dimm-v7
-
-History:
+---
 
 v6 -> v7:
-- Addressed Peter and Igor comments (exceptions sent my email)
-- Fixed TCG case. Now device memory works also for TCG and vcpu
-  pamax is checked
-- See individual logs for more details
+- msg error in the caller
+- add comment about NUMA ID
+---
+ hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 34 insertions(+), 20 deletions(-)
 
-v5 -> v6:
-- mingw compilation issue fix
-- kvm_arm_get_max_vm_phys_shift always returns the number of supported
-  IPA bits
-- new patch "hw/arm/virt: Rename highmem IO regions" that eases the revie=
-w
-  of "hw/arm/virt: Split the memory map description"
-- "hw/arm/virt: Move memory map initialization into machvirt_init"
-  squashed into the previous patch
-- change alignment of IO regions beyond the RAM so that it matches their
-  size
-
-v4 -> v5:
-- change in the memory map
-- see individual logs
-
-v3 -> v4:
-- rebase on David's "pc-dimm: next bunch of cleanups" and
-  "pc-dimm: pre_plug "slot" and "addr" assignment"
-- kvm-type option not used anymore. We directly use
-  maxram_size and ram_size machine fields to compute the
-  MAX IPA range. Migration is naturally handled as CLI
-  option are kept between source and destination. This was
-  suggested by David.
-- device_memory_start and device_memory_size not stored
-  anymore in vms->bootinfo
-- I did not take into account 2 Igor's comments: the one
-  related to the refactoring of arm_load_dtb and the one
-  related to the generation of the dtb after system_reset
-  which would contain nodes of hotplugged devices (we do
-  not support hotplug at this stage)
-- check the end-user does not attempt to hotplug a device
-- addition of "vl: Set machine ram_size, maxram_size and
-  ram_slots earlier"
-
-v2 -> v3:
-- fix pc_q35 and pc_piix compilation error
-- kwangwoo's email being not valid anymore, remove his address
-
-v1 -> v2:
-- kvm_get_max_vm_phys_shift moved in arch specific file
-- addition of NVDIMM part
-- single series
-- rebase on David's refactoring
-
-v1:
-- was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
-- was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
-
-Best Regards
-
-Eric
-
-
-Eric Auger (12):
-  hw/arm/virt: Rename highmem IO regions
-  hw/arm/virt: Split the memory map description
-  hw/boards: Add a MachineState parameter to kvm_type callback
-  kvm: add kvm_arm_get_max_vm_ipa_size
-  vl: Set machine ram_size, maxram_size and ram_slots earlier
-  hw/arm/virt: Dynamic memory map depending on RAM requirements
-  hw/arm/virt: Implement kvm_type function for 4.0 machine
-  hw/arm/virt: Bump the 255GB initial RAM limit
-  hw/arm/virt: Add memory hotplug framework
-  hw/arm/virt: Allocate device_memory
-  hw/arm/boot: Expose the pmem nodes in the DT
-  hw/arm/virt: Add nvdimm and nvdimm-persistence options
-
-Kwangwoo Lee (2):
-  nvdimm: use configurable ACPI IO base and size
-  hw/arm/virt: Add nvdimm hot-plug infrastructure
-
-Shameer Kolothum (3):
-  hw/arm/boot: introduce fdt_add_memory_node helper
-  hw/arm/boot: Expose the PC-DIMM nodes in the DT
-  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
-
- accel/kvm/kvm-all.c             |   2 +-
- default-configs/arm-softmmu.mak |   4 +
- hw/acpi/nvdimm.c                |  31 ++-
- hw/arm/boot.c                   | 136 ++++++++++--
- hw/arm/virt-acpi-build.c        |  23 +-
- hw/arm/virt.c                   | 364 ++++++++++++++++++++++++++++----
- hw/i386/pc_piix.c               |   6 +-
- hw/i386/pc_q35.c                |   6 +-
- hw/ppc/mac_newworld.c           |   3 +-
- hw/ppc/mac_oldworld.c           |   2 +-
- hw/ppc/spapr.c                  |   2 +-
- include/hw/arm/virt.h           |  24 ++-
- include/hw/boards.h             |   5 +-
- include/hw/mem/nvdimm.h         |   4 +
- target/arm/kvm.c                |  10 +
- target/arm/kvm_arm.h            |  13 ++
- vl.c                            |   6 +-
- 17 files changed, 556 insertions(+), 85 deletions(-)
-
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index d90af2f17d..a830655e1a 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -423,6 +423,32 @@ static void set_kernel_args_old(const struct arm_boo=
+t_info *info,
+     }
+ }
+=20
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_ba=
+se,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
++{
++    char *nodename;
++    int ret;
++
++    nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, m=
+em_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        goto out;
++    }
++
++    /* only set the NUMA ID if it is specified */
++    if (numa_node_id >=3D 0) {
++        ret =3D qemu_fdt_setprop_cell(fdt, nodename,
++                                    "numa-node-id", numa_node_id);
++    }
++out:
++    g_free(nodename);
++    return ret;
++}
++
+ static void fdt_add_psci_node(void *fdt)
+ {
+     uint32_t cpu_suspend_fn;
+@@ -502,7 +528,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
+nfo *binfo,
+     void *fdt =3D NULL;
+     int size, rc, n =3D 0;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
+     char **node_path;
+@@ -576,35 +601,24 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot=
+_info *binfo,
+         mem_base =3D binfo->loader_start;
+         for (i =3D 0; i < nb_numa_nodes; i++) {
+             mem_len =3D numa_info[i].node_mem;
+-            nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memor=
+y");
+-            rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc =3D fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nod=
+ename,
+-                        i);
++                fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                        mem_base);
+                 goto fail;
+             }
+=20
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base +=3D mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        nodename =3D g_strdup_printf("/memory@%" PRIx64, binfo->loader_s=
+tart);
+-        qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-
+-        rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
++        rc =3D fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set %s reg\n", nodename);
++            fprintf(stderr, "couldn't add /memory@%"PRIx64" node\n",
++                    binfo->loader_start);
+             goto fail;
+         }
+-        g_free(nodename);
+     }
+=20
+     rc =3D fdt_path_offset(fdt, "/chosen");
 --=20
 2.20.1
