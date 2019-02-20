@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46922)
+Received: from eggs.gnu.org ([209.51.188.92]:47073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gwIFu-0006GV-Np
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:09:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1gwIGR-0006eU-QB
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:09:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gwIFu-0005yw-4F
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:09:06 -0500
-Date: Wed, 20 Feb 2019 11:08:38 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190220030838.GA25911@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190220003113.20746-1-richardw.yang@linux.intel.com>
-	<20190220003113.20746-2-richardw.yang@linux.intel.com>
-	<6b850e7b-78ed-b68e-6a46-9bdbb2962507@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gwIGI-00067P-NV
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:09:34 -0500
+References: <1550652953-24393-1-git-send-email-like.xu@linux.intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <27254af5-b490-165f-8ca3-f60ab7642d72@redhat.com>
+Date: Tue, 19 Feb 2019 21:09:19 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6b850e7b-78ed-b68e-6a46-9bdbb2962507@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] CODING_STYLE: specify the indent
- rule for multiline code
+In-Reply-To: <1550652953-24393-1-git-send-email-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] doc: update .gitignore and fix typos for
+ docs in tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru, imammedo@redhat.com, philmd@redhat.com, peter.maydell@linaro.org
+To: Like Xu <like.xu@linux.intel.com>, qemu-trivial@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On Tue, Feb 19, 2019 at 09:02:34PM -0600, Eric Blake wrote:
->On 2/19/19 6:31 PM, Wei Yang wrote:
->> We didn't specify the indent rule for multiline code here, which may
->> misleading users. And in current code, the code use different rules.
->
->s/misleading/mislead/
->
->> 
->> Add this rule in CODING_STYLE to make sure this is clear to every one.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->> 
->> ---
->> v2:
->>    * rephrase changelog suggested by Eric Blake
->>      - remove one redundant line
->>      - fix some awkward grammar
->>      - add { ; at the end of example
->> ---
->>  CODING_STYLE | 23 +++++++++++++++++++++++
->>  1 file changed, 23 insertions(+)
->
->> +
->> +    do_something(arg1, arg2
->> +                 arg3);
->
->Missing a comma after arg2. With that fixed,
->Reviewed-by: Eric Blake <eblake@redhat.com>
+On 2/20/19 2:55 AM, Like Xu wrote:
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
 
-You are right.
+This feels like two independent patches - the .gitignore change is
+different from typo fixes.
 
->
->-- 
->Eric Blake, Principal Software Engineer
->Red Hat, Inc.           +1-919-301-3226
->Virtualization:  qemu.org | libvirt.org
+Actually, for .gitignore, you could just as easily do:
+
+echo '*.patch' >> .git/info/exclude
+
+and fix it so you never commit patch files locally, while still leaving
+them visible through 'git status' to other users.  I actually like
+knowing when I have stale patch files lying around, so that I can 'rm'
+them before creating my next patch batch and using 'git send-email
+*.patch' - but of course, I could just as easily add '!*.patch' to my
+.git/info/exclude to override the project default if we decide to go
+with your patch.
+
+
+> +++ b/docs/colo-proxy.txt
+> @@ -41,7 +41,7 @@ Below is a COLO proxy ascii figure:
+>  |         |  +------------------------------------------------------+  |                        |        |                              |
+>  |netfilter|  |                       |                         |    |  |   netfilter            |        |                              |
+>  | +----------+ +----------------------------+                  |    |  |  +-----------------------------------------------------------+ |
+> -| |       |  |                       |      |        out       |    |  |  |                     |        |  filter excute order       | |
+> +| |       |  |                       |      |        out       |    |  |  |                     |        |  filter execute order       | |
+
+You fixed the typo, but broke the whitespacing on this lineart. (twice)
+
+
+> +++ b/docs/qemu-block-drivers.texi
+> @@ -632,7 +632,7 @@ qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
+>  @end example
+>  
+>  
+> -Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
+> +How to set up a simple iSCSI target on loopback and accessing it via QEMU:
+
+While here, I would also: s/accessing/access/
+
+> +++ b/docs/usb-storage.txt
+> @@ -16,7 +16,7 @@ too):
+>  
+>  
+>  Number two is the newer usb attached scsi transport.  This one doesn't
+> -automagically create a scsi disk, so you have to explicitly attach one
+> +automatically create a scsi disk, so you have to explicitly attach one
+
+This one may be intentional, as a play on English words. But changing it
+may sound a bit more professional.
+
+All your other typo fixes are good.  Looking forward to v2.
 
 -- 
-Wei Yang
-Help you, Help me
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
