@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46936)
+Received: from eggs.gnu.org ([209.51.188.92]:48153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1gwKLL-0000mI-2V
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:22:52 -0500
+	(envelope-from <like.xu@linux.intel.com>) id 1gwKQW-0003Gm-0T
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:28:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1gwKLC-0005pr-Oe
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:22:46 -0500
-Received: from mga09.intel.com ([134.134.136.24]:44881)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1gwKLC-0005pB-BM
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:22:42 -0500
-Date: Wed, 20 Feb 2019 00:17:22 -0500
-From: Zhao Yan <yan.y.zhao@intel.com>
-Message-ID: <20190220051722.GB16456@joy-OptiPlex-7040>
-References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
-	<1550566380-3788-1-git-send-email-yan.y.zhao@intel.com>
-	<20190219112542.GB2941@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190219112542.GB2941@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 5/5] vfio/migration: support device memory
- capability
+	(envelope-from <like.xu@linux.intel.com>) id 1gwKQU-00009n-25
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:28:11 -0500
+From: Like Xu <like.xu@linux.intel.com>
+Date: Wed, 20 Feb 2019 13:27:26 +0800
+Message-Id: <1550640446-18788-1-git-send-email-like.xu@linux.intel.com>
+Subject: [Qemu-devel]  [PATCH v2] doc: fix typos for documents in tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,360 +17,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com, alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com, cohuck@redhat.com, zhi.a.wang@intel.com, jonathan.davies@nutanix.com
+To: qemu-trivial@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On Tue, Feb 19, 2019 at 11:25:43AM +0000, Dr. David Alan Gilbert wrote:
-> * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > If a device has device memory capability, save/load data from device memory
-> > in pre-copy and stop-and-copy phases.
-> > 
-> > LOGGING state is set for device memory for dirty page logging:
-> > in LOGGING state, get device memory returns whole device memory snapshot;
-> > outside LOGGING state, get device memory returns dirty data since last get
-> > operation.
-> > 
-> > Usually, device memory is very big, qemu needs to chunk it into several
-> > pieces each with size of device memory region.
-> > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > ---
-> >  hw/vfio/migration.c | 235 ++++++++++++++++++++++++++++++++++++++++++++++++++--
-> >  hw/vfio/pci.h       |   1 +
-> >  2 files changed, 231 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> > index 16d6395..f1e9309 100644
-> > --- a/hw/vfio/migration.c
-> > +++ b/hw/vfio/migration.c
-> > @@ -203,6 +203,201 @@ static int vfio_load_data_device_config(VFIOPCIDevice *vdev,
-> >      return 0;
-> >  }
-> >  
-> > +static int vfio_get_device_memory_size(VFIOPCIDevice *vdev)
-> > +{
-> > +    VFIODevice *vbasedev = &vdev->vbasedev;
-> > +    VFIORegion *region_ctl =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> > +    uint64_t len;
-> > +    int sz;
-> > +
-> > +    sz = sizeof(len);
-> > +    if (pread(vbasedev->fd, &len, sz,
-> > +                region_ctl->fd_offset +
-> > +                offsetof(struct vfio_device_state_ctl, device_memory.size))
-> > +            != sz) {
-> > +        error_report("vfio: Failed to get length of device memory");
-> > +        return -1;
-> > +    }
-> > +    vdev->migration->devmem_size = len;
-> > +    return 0;
-> > +}
-> > +
-> > +static int vfio_set_device_memory_size(VFIOPCIDevice *vdev, uint64_t size)
-> > +{
-> > +    VFIODevice *vbasedev = &vdev->vbasedev;
-> > +    VFIORegion *region_ctl =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> > +    int sz;
-> > +
-> > +    sz = sizeof(size);
-> > +    if (pwrite(vbasedev->fd, &size, sz,
-> > +                region_ctl->fd_offset +
-> > +                offsetof(struct vfio_device_state_ctl, device_memory.size))
-> > +            != sz) {
-> > +        error_report("vfio: Failed to set length of device comemory");
-> > +        return -1;
-> > +    }
-> > +    vdev->migration->devmem_size = size;
-> > +    return 0;
-> > +}
-> > +
-> > +static
-> > +int vfio_save_data_device_memory_chunk(VFIOPCIDevice *vdev, QEMUFile *f,
-> > +                                    uint64_t pos, uint64_t len)
-> > +{
-> > +    VFIODevice *vbasedev = &vdev->vbasedev;
-> > +    VFIORegion *region_ctl =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> > +    VFIORegion *region_devmem =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_DEVICE_MEMORY];
-> > +    void *dest;
-> > +    uint32_t sz;
-> > +    uint8_t *buf = NULL;
-> > +    uint32_t action = VFIO_DEVICE_DATA_ACTION_GET_BUFFER;
-> > +
-> > +    if (len > region_devmem->size) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    sz = sizeof(pos);
-> > +    if (pwrite(vbasedev->fd, &pos, sz,
-> > +                region_ctl->fd_offset +
-> > +                offsetof(struct vfio_device_state_ctl, device_memory.pos))
-> > +            != sz) {
-> > +        error_report("vfio: Failed to set save buffer pos");
-> > +        return -1;
-> > +    }
-> > +    sz = sizeof(action);
-> > +    if (pwrite(vbasedev->fd, &action, sz,
-> > +                region_ctl->fd_offset +
-> > +                offsetof(struct vfio_device_state_ctl, device_memory.action))
-> > +            != sz) {
-> > +        error_report("vfio: Failed to set save buffer action");
-> > +        return -1;
-> > +    }
-> > +
-> > +    if (!vfio_device_state_region_mmaped(region_devmem)) {
-> > +        buf = g_malloc(len);
-> > +        if (buf == NULL) {
-> > +            error_report("vfio: Failed to allocate memory for migrate");
-> > +            return -1;
-> > +        }
-> > +        if (pread(vbasedev->fd, buf, len, region_devmem->fd_offset) != len) {
-> > +            error_report("vfio: error load device memory buffer");
-> 
-> That's forgotten to g_free(buf)
->
-Right, I'll correct that.
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+---
+ docs/COLO-FT.txt               | 2 +-
+ docs/amd-memory-encryption.txt | 2 +-
+ docs/can.txt                   | 2 +-
+ docs/colo-proxy.txt            | 6 +++---
+ docs/cpu-hotplug.rst           | 2 +-
+ docs/qcow2-cache.txt           | 2 +-
+ docs/qemu-block-drivers.texi   | 2 +-
+ docs/qemu-cpu-models.texi      | 8 ++++----
+ docs/rdma.txt                  | 4 ++--
+ docs/replay.txt                | 2 +-
+ docs/vfio-ap.txt               | 2 +-
+ 11 files changed, 17 insertions(+), 17 deletions(-)
 
-> > +            return -1;
-> > +        }
-> > +        qemu_put_be64(f, len);
-> > +        qemu_put_be64(f, pos);
-> > +        qemu_put_buffer(f, buf, len);
-> > +        g_free(buf);
-> > +    } else {
-> > +        dest = region_devmem->mmaps[0].mmap;
-> > +        qemu_put_be64(f, len);
-> > +        qemu_put_be64(f, pos);
-> > +        qemu_put_buffer(f, dest, len);
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> > +static int vfio_save_data_device_memory(VFIOPCIDevice *vdev, QEMUFile *f)
-> > +{
-> > +    VFIORegion *region_devmem =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_DEVICE_MEMORY];
-> > +    uint64_t total_len = vdev->migration->devmem_size;
-> > +    uint64_t pos = 0;
-> > +
-> > +    qemu_put_be64(f, total_len);
-> > +    while (pos < total_len) {
-> > +        uint64_t len = region_devmem->size;
-> > +
-> > +        if (pos + len >= total_len) {
-> > +            len = total_len - pos;
-> > +        }
-> > +        if (vfio_save_data_device_memory_chunk(vdev, f, pos, len)) {
-> > +            return -1;
-> > +        }
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static
-> > +int vfio_load_data_device_memory_chunk(VFIOPCIDevice *vdev, QEMUFile *f,
-> > +                                uint64_t pos, uint64_t len)
-> > +{
-> > +    VFIODevice *vbasedev = &vdev->vbasedev;
-> > +    VFIORegion *region_ctl =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
-> > +    VFIORegion *region_devmem =
-> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_DEVICE_MEMORY];
-> > +
-> > +    void *dest;
-> > +    uint32_t sz;
-> > +    uint8_t *buf = NULL;
-> > +    uint32_t action = VFIO_DEVICE_DATA_ACTION_SET_BUFFER;
-> > +
-> > +    if (len > region_devmem->size) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    sz = sizeof(pos);
-> > +    if (pwrite(vbasedev->fd, &pos, sz,
-> > +                region_ctl->fd_offset +
-> > +                offsetof(struct vfio_device_state_ctl, device_memory.pos))
-> > +            != sz) {
-> > +        error_report("vfio: Failed to set device memory buffer pos");
-> > +        return -1;
-> > +    }
-> > +    if (!vfio_device_state_region_mmaped(region_devmem)) {
-> > +        buf = g_malloc(len);
-> > +        if (buf == NULL) {
-> > +            error_report("vfio: Failed to allocate memory for migrate");
-> > +            return -1;
-> > +        }
-> > +        qemu_get_buffer(f, buf, len);
-> > +        if (pwrite(vbasedev->fd, buf, len,
-> > +                    region_devmem->fd_offset) != len) {
-> > +            error_report("vfio: Failed to load devie memory buffer");
-> 
-> Again, failed to free buf
-> 
-Right, I'll correct that.
-> > +            return -1;
-> > +        }
-> > +        g_free(buf);
-> > +    } else {
-> > +        dest = region_devmem->mmaps[0].mmap;
-> > +        qemu_get_buffer(f, dest, len);
-> > +    }
-> 
-> You might want to use qemu_file_get_error(f)  before writing the data
-> to the device, to check for the case of a read error on the migration
-> stream that happened somewhere in the pevious qemu_get's
->
-
-ok.
-
-> > +    sz = sizeof(action);
-> > +    if (pwrite(vbasedev->fd, &action, sz,
-> > +                region_ctl->fd_offset +
-> > +                offsetof(struct vfio_device_state_ctl, device_memory.action))
-> > +            != sz) {
-> > +        error_report("vfio: Failed to set load device memory buffer action");
-> > +        return -1;
-> > +    }
-> > +
-> > +    return 0;
-> > +
-> > +}
-> > +
-> > +static int vfio_load_data_device_memory(VFIOPCIDevice *vdev,
-> > +                        QEMUFile *f, uint64_t total_len)
-> > +{
-> > +    uint64_t pos = 0, len = 0;
-> > +
-> > +    vfio_set_device_memory_size(vdev, total_len);
-> > +
-> > +    while (pos + len < total_len) {
-> > +        len = qemu_get_be64(f);
-> > +        pos = qemu_get_be64(f);
-> 
-> Please check len/pos - always assume that the migration stream could
-> be (maliciously or accidentally) corrupt.
->
-ok.
-
-> > +        vfio_load_data_device_memory_chunk(vdev, f, pos, len);
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +
-> >  static int vfio_set_dirty_page_bitmap_chunk(VFIOPCIDevice *vdev,
-> >          uint64_t start_addr, uint64_t page_nr)
-> >  {
-> > @@ -377,6 +572,10 @@ static void vfio_save_live_pending(QEMUFile *f, void *opaque,
-> >          return;
-> >      }
-> >  
-> > +    /* get dirty data size of device memory */
-> > +    vfio_get_device_memory_size(vdev);
-> > +
-> > +    *res_precopy_only += vdev->migration->devmem_size;
-> >      return;
-> >  }
-> >  
-> > @@ -388,7 +587,9 @@ static int vfio_save_iterate(QEMUFile *f, void *opaque)
-> >          return 0;
-> >      }
-> >  
-> > -    return 0;
-> > +    qemu_put_byte(f, VFIO_SAVE_FLAG_DEVMEMORY);
-> > +    /* get dirty data of device memory */
-> > +    return vfio_save_data_device_memory(vdev, f);
-> >  }
-> >  
-> >  static void vfio_pci_load_config(VFIOPCIDevice *vdev, QEMUFile *f)
-> > @@ -458,6 +659,10 @@ static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> >              len = qemu_get_be64(f);
-> >              vfio_load_data_device_config(vdev, f, len);
-> >              break;
-> > +        case VFIO_SAVE_FLAG_DEVMEMORY:
-> > +            len = qemu_get_be64(f);
-> > +            vfio_load_data_device_memory(vdev, f, len);
-> > +            break;
-> >          default:
-> >              ret = -EINVAL;
-> >          }
-> > @@ -503,6 +708,13 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> >      VFIOPCIDevice *vdev = opaque;
-> >      int rc = 0;
-> >  
-> > +    if (vfio_device_data_cap_device_memory(vdev)) {
-> > +        qemu_put_byte(f, VFIO_SAVE_FLAG_DEVMEMORY | VFIO_SAVE_FLAG_CONTINUE);
-> > +        /* get dirty data of device memory */
-> > +        vfio_get_device_memory_size(vdev);
-> > +        rc = vfio_save_data_device_memory(vdev, f);
-> > +    }
-> > +
-> >      qemu_put_byte(f, VFIO_SAVE_FLAG_PCI | VFIO_SAVE_FLAG_CONTINUE);
-> >      vfio_pci_save_config(vdev, f);
-> >  
-> > @@ -515,12 +727,22 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
-> >  
-> >  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> >  {
-> > +    int rc = 0;
-> >      VFIOPCIDevice *vdev = opaque;
-> > -    qemu_put_byte(f, VFIO_SAVE_FLAG_SETUP);
-> > +
-> > +    if (vfio_device_data_cap_device_memory(vdev)) {
-> > +        qemu_put_byte(f, VFIO_SAVE_FLAG_SETUP | VFIO_SAVE_FLAG_CONTINUE);
-> > +        qemu_put_byte(f, VFIO_SAVE_FLAG_DEVMEMORY);
-> > +        /* get whole snapshot of device memory */
-> > +        vfio_get_device_memory_size(vdev);
-> > +        rc = vfio_save_data_device_memory(vdev, f);
-> > +    } else {
-> > +        qemu_put_byte(f, VFIO_SAVE_FLAG_SETUP);
-> > +    }
-> >  
-> >      vfio_set_device_state(vdev, VFIO_DEVICE_STATE_RUNNING |
-> >              VFIO_DEVICE_STATE_LOGGING);
-> > -    return 0;
-> > +    return rc;
-> >  }
-> >  
-> >  static int vfio_load_setup(QEMUFile *f, void *opaque)
-> > @@ -576,8 +798,11 @@ int vfio_migration_init(VFIOPCIDevice *vdev, Error **errp)
-> >          goto error;
-> >      }
-> >  
-> > -    if (vfio_device_data_cap_device_memory(vdev)) {
-> > -        error_report("No suppport of data cap device memory Yet");
-> > +    if (vfio_device_data_cap_device_memory(vdev) &&
-> > +            vfio_device_state_region_setup(vdev,
-> > +              &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_DEVICE_MEMORY],
-> > +              VFIO_REGION_SUBTYPE_DEVICE_STATE_DATA_MEMORY,
-> > +              "device-state-data-device-memory")) {
-> >          goto error;
-> >      }
-> >  
-> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> > index 4b7b1bb..a2cc64b 100644
-> > --- a/hw/vfio/pci.h
-> > +++ b/hw/vfio/pci.h
-> > @@ -69,6 +69,7 @@ typedef struct VFIOMigration {
-> >      uint32_t data_caps;
-> >      uint32_t device_state;
-> >      uint64_t devconfig_size;
-> > +    uint64_t devmem_size;
-> >      VMChangeStateEntry *vm_state;
-> >  } VFIOMigration;
-> >  
-> > -- 
-> > 2.7.4
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
+index e2686bb..ad24680 100644
+--- a/docs/COLO-FT.txt
++++ b/docs/COLO-FT.txt
+@@ -102,7 +102,7 @@ to make sure the state of VM in Secondary side is always consistent with VM in
+ Primary side.
+ 
+ COLO Proxy:
+-Delivers packets to Primary and Seconday, and then compare the responses from
++Delivers packets to Primary and Secondary, and then compare the responses from
+ both side. Then decide whether to start a checkpoint according to some rules.
+ Please refer to docs/colo-proxy.txt for more information.
+ 
+diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+index f483795..43bf3ee 100644
+--- a/docs/amd-memory-encryption.txt
++++ b/docs/amd-memory-encryption.txt
+@@ -97,7 +97,7 @@ References
+ AMD Memory Encryption whitepaper:
+ http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
+ 
+-Secure Encrypted Virutualization Key Management:
++Secure Encrypted Virtualization Key Management:
+ [1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
+ 
+ KVM Forum slides:
+diff --git a/docs/can.txt b/docs/can.txt
+index 7ba23b2..9fa6ed5 100644
+--- a/docs/can.txt
++++ b/docs/can.txt
+@@ -99,7 +99,7 @@ Links to other resources
+      https://gitlab.fel.cvut.cz/canbus/qemu-canbus
+  (3) RTEMS page describing project
+      https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
+- (4) RTLWS 2015 article about the projevt and its use with CANopen emulation
++ (4) RTLWS 2015 article about the project and its use with CANopen emulation
+      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
+      Slides
+      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
+diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+index 1f8e4b4..fa1cef0 100644
+--- a/docs/colo-proxy.txt
++++ b/docs/colo-proxy.txt
+@@ -41,7 +41,7 @@ Below is a COLO proxy ascii figure:
+ |         |  +------------------------------------------------------+  |                        |        |                              |
+ |netfilter|  |                       |                         |    |  |   netfilter            |        |                              |
+ | +----------+ +----------------------------+                  |    |  |  +-----------------------------------------------------------+ |
+-| |       |  |                       |      |        out       |    |  |  |                     |        |  filter excute order       | |
++| |       |  |                       |      |        out       |    |  |  |                     |        |  filter execute order      | |
+ | |       |  |          +-----------------------------+        |    |  |  |                     |        | +------------------->      | |
+ | |       |  |          |            |      |         |        |    |  |  |                     |        |   TCP                      | |
+ | | +-----+--+-+  +-----v----+ +-----v----+ |pri +----+----+sec|    |  |  | +------------+  +---+----+---v+rewriter++  +------------+ | |
+@@ -53,7 +53,7 @@ Below is a COLO proxy ascii figure:
+ | |      |   tx        |   rx           rx  |                  |  |    |  |            tx                        all       |  rx      | |
+ | |      |             |                    |                  |  |    |  +-----------------------------------------------------------+ |
+ | |      |             +--------------+     |                  |  |    |                                                   |            |
+-| |      |   filter excute order      |     |                  |  |    |                                                   |            |
++| |      |   filter execute order     |     |                  |  |    |                                                   |            |
+ | |      |  +---------------->        |     |                  |  +--------------------------------------------------------+            |
+ | +-----------------------------------------+                  |       |                                                                |
+ |        |                            |                        |       |                                                                |
+@@ -92,7 +92,7 @@ but do nothing, just pass to next filter.
+ 
+ Redirect Server Filter --> COLO-Compare
+ COLO-compare receive primary guest packet then
+-waiting scondary redirect packet to compare it.
++waiting secondary redirect packet to compare it.
+ If packet same,send queued primary packet and clear
+ queued secondary packet, Otherwise send primary packet
+ and do checkpoint.
+diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+index 1c268e0..cfeb79f 100644
+--- a/docs/cpu-hotplug.rst
++++ b/docs/cpu-hotplug.rst
+@@ -137,6 +137,6 @@ From the 'qmp-shell', invoke the QMP ``device_del`` command::
+     vCPU hot-unplug requires guest cooperation; so the ``device_del``
+     command above does not guarantee vCPU removal -- it's a "request to
+     unplug".  At this point, the guest will get a System Control
+-    Interupt (SCI) and calls the ACPI handler for the affected vCPU
++    Interrupt (SCI) and calls the ACPI handler for the affected vCPU
+     device.  Then the guest kernel will bring the vCPU offline and tell
+     QEMU to unplug it.
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index c459bf5..c1e7751 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -55,7 +55,7 @@ value can improve the I/O performance significantly.
+ 
+ The refcount blocks
+ -------------------
+-The qcow2 format also mantains a reference count for each cluster.
++The qcow2 format also maintains a reference count for each cluster.
+ Reference counts are used for cluster allocation and internal
+ snapshots. The data is stored in a two-level structure similar to the
+ L1/L2 tables described above.
+diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+index 38e9f34..da06a9b 100644
+--- a/docs/qemu-block-drivers.texi
++++ b/docs/qemu-block-drivers.texi
+@@ -632,7 +632,7 @@ qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
+ @end example
+ 
+ 
+-Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
++How to set up a simple iSCSI target on loopback and access it via QEMU:
+ @example
+ This example shows how to set up an iSCSI target with one CDROM and one DISK
+ using the Linux STGT software target. This target is available on Red Hat based
+diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
+index 475d434..1b72584 100644
+--- a/docs/qemu-cpu-models.texi
++++ b/docs/qemu-cpu-models.texi
+@@ -49,7 +49,7 @@ live migration safe.
+ The information that follows provides recommendations for configuring
+ CPU models on x86 hosts. The goals are to maximise performance, while
+ protecting guest OS against various CPU hardware flaws, and optionally
+-enabling live migration between hosts with hetergeneous CPU models.
++enabling live migration between hosts with heterogeneous CPU models.
+ 
+ @menu
+ * preferred_cpu_models_intel_x86::       Preferred CPU models for Intel x86 hosts
+@@ -287,7 +287,7 @@ Must be explicitly turned on for all AMD CPU models.
+ This provides higher performance than virt-ssbd so should be
+ exposed to guests whenever available in the host. virt-ssbd
+ should none the less also be exposed for maximum guest
+-compatability as some kernels only know about virt-ssbd.
++compatibility as some kernels only know about virt-ssbd.
+ 
+ 
+ @item @code{amd-no-ssb}
+@@ -296,7 +296,7 @@ Recommended to indicate the host is not vulnerable CVE-2018-3639
+ 
+ Not included by default in any AMD CPU model.
+ 
+-Future hardware genarations of CPU will not be vulnerable to
++Future hardware generations of CPU will not be vulnerable to
+ CVE-2018-3639, and thus the guest should be told not to enable
+ its mitigations, by exposing amd-no-ssb. This is mutually
+ exclusive with virt-ssbd and amd-ssbd.
+@@ -451,7 +451,7 @@ MIPS64 Processor (Release 6, 2014)
+ 
+ @item @code{Loongson-2F}
+ 
+-MIPS64 Processor (Longsoon 2, 2008)
++MIPS64 Processor (Loongson 2, 2008)
+ 
+ 
+ @item @code{Loongson-2E}
+diff --git a/docs/rdma.txt b/docs/rdma.txt
+index e6f9902..a86e992 100644
+--- a/docs/rdma.txt
++++ b/docs/rdma.txt
+@@ -30,7 +30,7 @@ of the significantly lower latency and higher throughput over TCP/IP. This is
+ because the RDMA I/O architecture reduces the number of interrupts and
+ data copies by bypassing the host networking stack. In particular, a TCP-based
+ migration, under certain types of memory-bound workloads, may take a more
+-unpredicatable amount of time to complete the migration if the amount of
++unpredictable amount of time to complete the migration if the amount of
+ memory tracked during each live migration iteration round cannot keep pace
+ with the rate of dirty memory produced by the workload.
+ 
+@@ -408,7 +408,7 @@ socket is broken during a non-RDMA based migration.
+ TODO:
+ =====
+ 1. Currently, 'ulimit -l' mlock() limits as well as cgroups swap limits
+-   are not compatible with infinband memory pinning and will result in
++   are not compatible with infiniband memory pinning and will result in
+    an aborted migration (but with the source VM left unaffected).
+ 2. Use of the recent /proc/<pid>/pagemap would likely speed up
+    the use of KSM and ballooning while using RDMA.
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 3497585..ee6aee9 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -290,7 +290,7 @@ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
+ Replay log format
+ -----------------
+ 
+-Record/replay log consits of the header and the sequence of execution
++Record/replay log consists of the header and the sequence of execution
+ events. The header includes 4-byte replay version id and 8-byte reserved
+ field. Version is updated every time replay log format changes to prevent
+ using replay log created by another build of qemu.
+diff --git a/docs/vfio-ap.txt b/docs/vfio-ap.txt
+index 1233968..30f3c66 100644
+--- a/docs/vfio-ap.txt
++++ b/docs/vfio-ap.txt
+@@ -624,7 +624,7 @@ These are the steps:
+       -> IOMMU Hardware Support
+          select S390 AP IOMMU Support
+       -> VFIO Non-Privileged userspace driver framework
+-         -> Mediated device driver frramework
++         -> Mediated device driver framework
+             -> VFIO driver for Mediated devices
+    -> I/O subsystem
+       -> VFIO support for AP devices
+-- 
+1.8.3.1
