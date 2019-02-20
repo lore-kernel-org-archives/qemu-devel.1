@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42366)
+Received: from eggs.gnu.org ([209.51.188.92]:42495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTk2-0008N9-Db
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:59 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTkD-00006H-PZ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:25:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTjj-0007cZ-4o
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:53 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40082)
+	(envelope-from <tcminyard@gmail.com>) id 1gwTkB-0007kb-9G
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:25:09 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34571)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTjf-0006mH-T3
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:37 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v20so8764131otk.7
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:22:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTk9-0007cI-5P
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:25:05 -0500
+Received: by mail-ot1-f65.google.com with SMTP id 98so40817037oty.1
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:24:39 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:56 -0600
-Message-Id: <20190220135956.22589-20-minyard@acm.org>
+Date: Wed, 20 Feb 2019 07:59:52 -0600
+Message-Id: <20190220135956.22589-16-minyard@acm.org>
 In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
 References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 19/19] i2c: Verify that the count passed in to
- smbus_eeprom_init() is valid
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 15/19] i2c:smbus_eeprom: Add normal type name
+ and cast to smbus_eeprom.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +35,76 @@ Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@red
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Keep someone from passing in a bogus number
+Create a type name and a cast macro and use those through the
+code.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/i2c/smbus_eeprom.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/i2c/smbus_eeprom.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 44887b4a27..ee392f7cb1 100644
+index 62e634c745..91d68ff588 100644
 --- a/hw/i2c/smbus_eeprom.c
 +++ b/hw/i2c/smbus_eeprom.c
-@@ -178,6 +178,8 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
- {
-     int i;
-      /* XXX: make this persistent */
+@@ -30,6 +30,11 @@
+ 
+ //#define DEBUG
+ 
++#define TYPE_SMBUS_EEPROM "smbus-eeprom"
 +
-+    assert(nb_eeprom <= 8);
-     uint8_t *eeprom_buf = g_malloc0(8 * SMBUS_EEPROM_SIZE);
-     if (eeprom_spd_size > 0) {
-         memcpy(eeprom_buf, eeprom_spd, eeprom_spd_size);
++#define SMBUS_EEPROM(obj) \
++    OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
++
+ typedef struct SMBusEEPROMDevice {
+     SMBusDevice smbusdev;
+     void *data;
+@@ -38,7 +43,7 @@ typedef struct SMBusEEPROMDevice {
+ 
+ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+ {
+-    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
++    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+     uint8_t *data = eeprom->data;
+     uint8_t val = data[eeprom->offset++];
+ 
+@@ -51,7 +56,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+ 
+ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+ {
+-    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
++    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+     uint8_t *data = eeprom->data;
+ 
+ #ifdef DEBUG
+@@ -73,7 +78,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+ 
+ static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ {
+-    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
++    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+ 
+     eeprom->offset = 0;
+ }
+@@ -97,7 +102,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo smbus_eeprom_info = {
+-    .name          = "smbus-eeprom",
++    .name          = TYPE_SMBUS_EEPROM,
+     .parent        = TYPE_SMBUS_DEVICE,
+     .instance_size = sizeof(SMBusEEPROMDevice),
+     .class_init    = smbus_eeprom_class_initfn,
+@@ -114,7 +119,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf)
+ {
+     DeviceState *dev;
+ 
+-    dev = qdev_create((BusState *) smbus, "smbus-eeprom");
++    dev = qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
+     qdev_prop_set_uint8(dev, "address", address);
+     qdev_prop_set_ptr(dev, "data", eeprom_buf);
+     qdev_init_nofail(dev);
 -- 
 2.17.1
