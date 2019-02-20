@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59543)
+Received: from eggs.gnu.org ([209.51.188.92]:59808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gwQ2Q-0002oc-5u
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:27:43 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1gwQ3i-000404-P8
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:29:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gwQ2N-0002Ib-KN
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:27:42 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gwQ2N-0002ID-DF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:27:39 -0500
-Received: by mail-wm1-f67.google.com with SMTP id j125so6062690wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 03:27:38 -0800 (PST)
-References: <1550058881-16351-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9ae0bf0d-fcb7-b68f-c216-843433753576@redhat.com>
-Date: Wed, 20 Feb 2019 12:27:36 +0100
+	(envelope-from <arei.gonglei@huawei.com>) id 1gwQ3g-0002n0-7P
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:29:02 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2054 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1gwQ3e-0002jk-MQ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:28:59 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 20 Feb 2019 11:28:46 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB25D30F@dggeml511-mbx.china.huawei.com>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<20190219113212.GC2941@work-vm>
+	<20190220052838.GC16456@joy-OptiPlex-7040>
+	<20190220110142.GD2608@work-vm>
+In-Reply-To: <20190220110142.GD2608@work-vm>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <1550058881-16351-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] Add a gitlab-ci file for Continuous
- Integration testing on Gitlab
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +31,455 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Zhao Yan <yan.y.zhao@intel.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>
 
-On 13/02/19 12:54, Thomas Huth wrote:
-> This is very convenient for people like me who store their QEMU git trees
-> on gitlab.com: Automatic CI pipelines are now run for each branch that is
-> pushed to the server - useful for some extra-testing before sending PULL-
-> requests for example. Since the runtime of the jobs is limited to 1h, the
-> jobs are distributed into multiple pipelines - this way everything finishs
-> fine within time (ca. 30 minutes currently).
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  An example can be seen here: https://gitlab.com/huth/qemu/pipelines/
-> 
->  I'd really like to get this into the main QEMU repository, so that I don't
->  have to cherry-pick this patch onto my testing branches anymore each time
->  I want to test before sending a PULL request...
 
-Very good idea.  In fact, I wouldn't mind "forcing" maintainers to place
-their mirrors and signed tags on GitLab so that they get their pipelines
-for free and with less setup hassles than GitHub+Travis.
+> -----Original Message-----
+> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> Sent: Wednesday, February 20, 2019 7:02 PM
+> To: Zhao Yan <yan.y.zhao@intel.com>
+> Cc: cjia@nvidia.com; kvm@vger.kernel.org; aik@ozlabs.ru;
+> Zhengxiao.zx@alibaba-inc.com; shuangtai.tst@alibaba-inc.com;
+> qemu-devel@nongnu.org; kwankhede@nvidia.com; eauger@redhat.com;
+> yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
+> mlevitsk@redhat.com; pasic@linux.ibm.com; Gonglei (Arei)
+> <arei.gonglei@huawei.com>; felipe@nutanix.com; Ken.Xue@amd.com;
+> kevin.tian@intel.com; alex.williamson@redhat.com;
+> intel-gvt-dev@lists.freedesktop.org; changpeng.liu@intel.com;
+> cohuck@redhat.com; zhi.a.wang@intel.com; jonathan.davies@nutanix.com
+> Subject: Re: [PATCH 0/5] QEMU VFIO live migration
+>=20
+> * Zhao Yan (yan.y.zhao@intel.com) wrote:
+> > On Tue, Feb 19, 2019 at 11:32:13AM +0000, Dr. David Alan Gilbert wrote:
+> > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > > > This patchset enables VFIO devices to have live migration capabilit=
+y.
+> > > > Currently it does not support post-copy phase.
+> > > >
+> > > > It follows Alex's comments on last version of VFIO live migration p=
+atches,
+> > > > including device states, VFIO device state region layout, dirty bit=
+map's
+> > > > query.
+> > >
+> > > Hi,
+> > >   I've sent minor comments to later patches; but some minor general
+> > > comments:
+> > >
+> > >   a) Never trust the incoming migrations stream - it might be corrupt=
+,
+> > >     so check when you can.
+> > hi Dave
+> > Thanks for this suggestion. I'll add more checks for migration streams.
+> >
+> >
+> > >   b) How do we detect if we're migrating from/to the wrong device or
+> > > version of device?  Or say to a device with older firmware or perhaps
+> > > a device that has less device memory ?
+> > Actually it's still an open for VFIO migration. Need to think about
+> > whether it's better to check that in libvirt or qemu (like a device mag=
+ic
+> > along with verion ?).
 
-Paolo
+We must keep the hardware generation is the same with one POD of public clo=
+ud
+providers. But we still think about the live migration between from the the=
+ lower
+generation of hardware migrated to the higher generation.
 
->  .gitlab-ci.yml | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  MAINTAINERS    |  5 ++++
->  2 files changed, 78 insertions(+)
->  create mode 100644 .gitlab-ci.yml
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> new file mode 100644
-> index 0000000..79d02cf
-> --- /dev/null
-> +++ b/.gitlab-ci.yml
-> @@ -0,0 +1,73 @@
-> +before_script:
-> + - apt-get update -qq
-> + - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev genisoimage
-> +
-> +build-system1:
-> + script:
-> + - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-dev
-> +      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
-> + - ./configure --enable-werror --target-list="aarch64-softmmu alpha-softmmu
-> +      cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazeel-softmmu
-> +      mips64el-softmmu m68k-softmmu ppc-softmmu riscv64-softmmu sparc-softmmu"
-> + - make -j2
-> + - make -j2 check
-> +
-> +build-system2:
-> + script:
-> + - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio-dev
-> +      libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
-> + - ./configure --enable-werror --target-list="tricore-softmmu unicore32-softmmu
-> +      microblaze-softmmu mips-softmmu riscv32-softmmu s390x-softmmu sh4-softmmu
-> +      sparc64-softmmu x86_64-softmmu xtensa-softmmu nios2-softmmu or1k-softmmu"
-> + - make -j2
-> + - make -j2 check
-> +
-> +build-disabled:
-> + script:
-> + - ./configure --enable-werror --disable-rdma --disable-slirp --disable-curl
-> +      --disable-capstone --disable-live-block-migration --disable-glusterfs
-> +      --disable-replication --disable-coroutine-pool --disable-smartcard
-> +      --disable-guest-agent --disable-curses --disable-libxml2 --disable-tpm
-> +      --disable-qom-cast-debug --disable-spice --disable-vhost-vsock
-> +      --disable-vhost-net --disable-vhost-crypto --disable-vhost-user
-> +      --target-list="i386-softmmu ppc64-softmmu mips64-softmmu i386-linux-user"
-> + - make -j2
-> + - make -j2 check-qtest SPEED=slow
-> +
-> +build-tcg-disabled:
-> + script:
-> + - apt-get install -y -qq clang libgtk-3-dev libbluetooth-dev libusb-dev
-> + - ./configure --cc=clang --enable-werror --disable-tcg --audio-drv-list=""
-> + - make -j2
-> + - make check-unit
-> + - make check-qapi-schema
-> + - cd tests/qemu-iotests/
-> + - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 033 048
-> +            052 063 077 086 101 104 106 113 147 148 150 151 152 157 159 160
-> +            163 170 171 183 184 192 194 197 205 208 215 221 222 226 227 236
-> + - ./check -qcow2 001 002 003 004 005 007 008 009 010 011 012 013 017 018 019
-> +            020 021 022 024 025 027 028 029 031 032 033 034 035 036 037 038
-> +            039 040 042 043 046 047 048 049 050 051 052 053 054 056 057 058
-> +            060 061 062 063 065 066 067 068 069 071 072 073 074 079 080 082
-> +            085 086 089 090 091 095 096 097 098 099 102 103 104 105 107 108
-> +            110 111 114 117 120 122 124 126 127 129 130 132 133 134 137 138
-> +            139 140 141 142 143 144 145 147 150 151 152 154 155 156 157 158
-> +            161 165 170 172 174 176 177 179 184 186 187 190 192 194 195 196
-> +            197 200 202 203 205 208 209 214 215 216 217 218 222 226 227 229 234
-> +
-> +build-user:
-> + script:
-> + - ./configure --enable-werror --disable-system --disable-guest-agent
-> +               --disable-capstone --disable-slirp --disable-fdt
-> + - make -j2
-> + - make run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
-> +
-> +build-clang:
-> + script:
-> + - apt-get install -y -qq clang libsdl2-dev
-> +      xfslibs-dev libiscsi-dev libnfs-dev libseccomp-dev gnutls-dev librbd-dev
-> + - ./configure --cc=clang --cxx=clang++ --enable-werror
-> +      --target-list="alpha-softmmu arm-softmmu m68k-softmmu mips64-softmmu
-> +                     ppc-softmmu s390x-softmmu x86_64-softmmu arm-linux-user"
-> + - make -j2
-> + - make -j2 check
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index a2da141..191138c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2484,6 +2484,11 @@ S: Maintained
->  F: .cirrus.yml
->  W: https://cirrus-ci.com/github/qemu/qemu
->  
-> +GitLab Continuous Integration
-> +M: Thomas Huth <thuth@redhat.com>
-> +S: Maintained
-> +F: .gitlab-ci.yml
-> +
->  Guest Test Compilation Support
->  M: Alex Bennée <alex.bennee@linaro.org>
->  R: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
+> > This patchset is intended to settle down the main device state interfac=
+es
+> > for VFIO migration. So that we can work on that and improve it.
+> >
+> >
+> > >   c) Consider using the trace_ mechanism - it's really useful to
+> > > add to loops writing/reading data so that you can see when it fails.
+> > >
+> > > Dave
+> > >
+> > Got it. many thanks~~
+> >
+> >
+> > > (P.S. You have a few typo's grep your code for 'devcie', 'devie' and
+> > > 'migrtion'
+> >
+> > sorry :)
+>=20
+> No problem.
+>=20
+> Given the mails, I'm guessing you've mostly tested this on graphics
+> devices?  Have you also checked with VFIO network cards?
+>=20
+> Also see the mail I sent in reply to Kirti's series; we need to boil
+> these down to one solution.
+>=20
+> Dave
+>=20
+> > >
+> > > > Device Data
+> > > > -----------
+> > > > Device data is divided into three types: device memory, device conf=
+ig,
+> > > > and system memory dirty pages produced by device.
+> > > >
+> > > > Device config: data like MMIOs, page tables...
+> > > >         Every device is supposed to possess device config data.
+> > > >     	Usually device config's size is small (no big than 10M), and i=
+t
+> > > >         needs to be loaded in certain strict order.
+> > > >         Therefore, device config only needs to be saved/loaded in
+> > > >         stop-and-copy phase.
+> > > >         The data of device config is held in device config region.
+> > > >         Size of device config data is smaller than or equal to that=
+ of
+> > > >         device config region.
+> > > >
+> > > > Device Memory: device's internal memory, standalone and outside
+> system
+> > > >         memory. It is usually very big.
+> > > >         This kind of data needs to be saved / loaded in pre-copy an=
+d
+> > > >         stop-and-copy phase.
+> > > >         The data of device memory is held in device memory region.
+> > > >         Size of devie memory is usually larger than that of device
+> > > >         memory region. qemu needs to save/load it in chunks of size=
+ of
+> > > >         device memory region.
+> > > >         Not all device has device memory. Like IGD only uses system
+> memory.
+> > > >
+> > > > System memory dirty pages: If a device produces dirty pages in syst=
+em
+> > > >         memory, it is able to get dirty bitmap for certain range of
+> system
+> > > >         memory. This dirty bitmap is queried in pre-copy and
+> stop-and-copy
+> > > >         phase in .log_sync callback. By setting dirty bitmap in .lo=
+g_sync
+> > > >         callback, dirty pages in system memory will be save/loaded =
+by
+> ram's
+> > > >         live migration code.
+> > > >         The dirty bitmap of system memory is held in dirty bitmap
+> region.
+> > > >         If system memory range is larger than that dirty bitmap reg=
+ion
+> can
+> > > >         hold, qemu will cut it into several chunks and get dirty bi=
+tmap in
+> > > >         succession.
+> > > >
+> > > >
+> > > > Device State Regions
+> > > > --------------------
+> > > > Vendor driver is required to expose two mandatory regions and anoth=
+er
+> two
+> > > > optional regions if it plans to support device state management.
+> > > >
+> > > > So, there are up to four regions in total.
+> > > > One control region: mandatory.
+> > > >         Get access via read/write system call.
+> > > >         Its layout is defined in struct vfio_device_state_ctl
+> > > > Three data regions: mmaped into qemu.
+> > > >         device config region: mandatory, holding data of device con=
+fig
+> > > >         device memory region: optional, holding data of device memo=
+ry
+> > > >         dirty bitmap region: optional, holding bitmap of system
+> memory
+> > > >                             dirty pages
+> > > >
+> > > > (The reason why four seperate regions are defined is that the unit =
+of
+> mmap
+> > > > system call is PAGE_SIZE, i.e. 4k bytes. So one read/write region f=
+or
+> > > > control and three mmaped regions for data seems better than one big
+> region
+> > > > padded and sparse mmaped).
+> > > >
+> > > >
+> > > > kernel device state interface [1]
+> > > > --------------------------------------
+> > > > #define VFIO_DEVICE_STATE_INTERFACE_VERSION 1
+> > > > #define VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY 1
+> > > > #define VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY 2
+> > > >
+> > > > #define VFIO_DEVICE_STATE_RUNNING 0
+> > > > #define VFIO_DEVICE_STATE_STOP 1
+> > > > #define VFIO_DEVICE_STATE_LOGGING 2
+> > > >
+> > > > #define VFIO_DEVICE_DATA_ACTION_GET_BUFFER 1
+> > > > #define VFIO_DEVICE_DATA_ACTION_SET_BUFFER 2
+> > > > #define VFIO_DEVICE_DATA_ACTION_GET_BITMAP 3
+> > > >
+> > > > struct vfio_device_state_ctl {
+> > > > 	__u32 version;		  /* ro */
+> > > > 	__u32 device_state;       /* VFIO device state, wo */
+> > > > 	__u32 caps;		 /* ro */
+> > > >         struct {
+> > > > 		__u32 action;  /* wo, GET_BUFFER or SET_BUFFER */
+> > > > 		__u64 size;    /*rw*/
+> > > > 	} device_config;
+> > > > 	struct {
+> > > > 		__u32 action;    /* wo, GET_BUFFER or SET_BUFFER */
+> > > > 		__u64 size;     /* rw */
+> > > >                 __u64 pos; /*the offset in total buffer of device
+> memory*/
+> > > > 	} device_memory;
+> > > > 	struct {
+> > > > 		__u64 start_addr; /* wo */
+> > > > 		__u64 page_nr;   /* wo */
+> > > > 	} system_memory;
+> > > > };
+> > > >
+> > > > Devcie States
+> > > > -------------
+> > > > After migration is initialzed, it will set device state via writing=
+ to
+> > > > device_state field of control region.
+> > > >
+> > > > Four states are defined for a VFIO device:
+> > > >         RUNNING, RUNNING & LOGGING, STOP & LOGGING, STOP
+> > > >
+> > > > RUNNING: In this state, a VFIO device is in active state ready to r=
+eceive
+> > > >         commands from device driver.
+> > > >         It is the default state that a VFIO device enters initially=
+.
+> > > >
+> > > > STOP:  In this state, a VFIO device is deactivated to interact with
+> > > >        device driver.
+> > > >
+> > > > LOGGING: a special state that it CANNOT exist independently. It mus=
+t be
+> > > >        set alongside with state RUNNING or STOP (i.e. RUNNING &
+> LOGGING,
+> > > >        STOP & LOGGING).
+> > > >        Qemu will set LOGGING state on in .save_setup callbacks, the=
+n
+> vendor
+> > > >        driver can start dirty data logging for device memory and sy=
+stem
+> > > >        memory.
+> > > >        LOGGING only impacts device/system memory. They return
+> whole
+> > > >        snapshot outside LOGGING and dirty data since last get
+> operation
+> > > >        inside LOGGING.
+> > > >        Device config should be always accessible and return whole
+> config
+> > > >        snapshot regardless of LOGGING state.
+> > > >
+> > > > Note:
+> > > > The reason why RUNNING is the default state is that device's active=
+ state
+> > > > must not depend on device state interface.
+> > > > It is possible that region vfio_device_state_ctl fails to get regis=
+tered.
+> > > > In that condition, a device needs be in active state by default.
+> > > >
+> > > > Get Version & Get Caps
+> > > > ----------------------
+> > > > On migration init phase, qemu will probe the existence of device st=
+ate
+> > > > regions of vendor driver, then get version of the device state inte=
+rface
+> > > > from the r/w control region.
+> > > >
+> > > > Then it will probe VFIO device's data capability by reading caps fi=
+eld of
+> > > > control region.
+> > > >         #define VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY 1
+> > > >         #define VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY 2
+> > > > If VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY is on, it will save/load
+> data of
+> > > >         device memory in pre-copy and stop-and-copy phase. The data
+> of
+> > > >         device memory is held in device memory region.
+> > > > If VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY is on, it will query of dirty
+> pages
+> > > >         produced by VFIO device during pre-copy and stop-and-copy
+> phase.
+> > > >         The dirty bitmap of system memory is held in dirty bitmap
+> region.
+> > > >
+> > > > If failing to find two mandatory regions and optional data regions
+> > > > corresponding to data caps or version mismatching, it will setup a
+> > > > migration blocker and disable live migration for VFIO device.
+> > > >
+> > > >
+> > > > Flows to call device state interface for VFIO live migration
+> > > > ------------------------------------------------------------
+> > > >
+> > > > Live migration save path:
+> > > >
+> > > > (QEMU LIVE MIGRATION STATE --> DEVICE STATE INTERFACE --> DEVICE
+> STATE)
+> > > >
+> > > > MIGRATION_STATUS_NONE --> VFIO_DEVICE_STATE_RUNNING
+> > > >  |
+> > > > MIGRATION_STATUS_SAVE_SETUP
+> > > >  |
+> > > >  .save_setup callback -->
+> > > >  get device memory size (whole snapshot size)
+> > > >  get device memory buffer (whole snapshot data)
+> > > >  set device state --> VFIO_DEVICE_STATE_RUNNING &
+> VFIO_DEVICE_STATE_LOGGING
+> > > >  |
+> > > > MIGRATION_STATUS_ACTIVE
+> > > >  |
+> > > >  .save_live_pending callback --> get device memory size (dirty data=
+)
+> > > >  .save_live_iteration callback --> get device memory buffer (dirty =
+data)
+> > > >  .log_sync callback --> get system memory dirty bitmap
+> > > >  |
+> > > > (vcpu stops) --> set device state -->
+> > > >  VFIO_DEVICE_STATE_STOP & VFIO_DEVICE_STATE_LOGGING
+> > > >  |
+> > > > .save_live_complete_precopy callback -->
+> > > >  get device memory size (dirty data)
+> > > >  get device memory buffer (dirty data)
+> > > >  get device config size (whole snapshot size)
+> > > >  get device config buffer (whole snapshot data)
+> > > >  |
+> > > > .save_cleanup callback -->  set device state -->
+> VFIO_DEVICE_STATE_STOP
+> > > > MIGRATION_STATUS_COMPLETED
+> > > >
+> > > > MIGRATION_STATUS_CANCELLED or
+> > > > MIGRATION_STATUS_FAILED
+> > > >  |
+> > > > (vcpu starts) --> set device state --> VFIO_DEVICE_STATE_RUNNING
+> > > >
+> > > >
+> > > > Live migration load path:
+> > > >
+> > > > (QEMU LIVE MIGRATION STATE --> DEVICE STATE INTERFACE --> DEVICE
+> STATE)
+> > > >
+> > > > MIGRATION_STATUS_NONE --> VFIO_DEVICE_STATE_RUNNING
+> > > >  |
+> > > > (vcpu stops) --> set device state --> VFIO_DEVICE_STATE_STOP
+> > > >  |
+> > > > MIGRATION_STATUS_ACTIVE
+> > > >  |
+> > > > .load state callback -->
+> > > >  set device memory size, set device memory buffer, set device confi=
+g
+> size,
+> > > >  set device config buffer
+> > > >  |
+> > > > (vcpu starts) --> set device state --> VFIO_DEVICE_STATE_RUNNING
+> > > >  |
+> > > > MIGRATION_STATUS_COMPLETED
+> > > >
+> > > >
+> > > >
+> > > > In source VM side,
+> > > > In precopy phase,
+> > > > if a device has VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY on,
+> > > > qemu will first get whole snapshot of device memory in .save_setup
+> > > > callback, and then it will get total size of dirty data in device m=
+emory in
+> > > > .save_live_pending callback by reading device_memory.size field of
+> control
+> > > > region.
+> > > > Then in .save_live_iteration callback, it will get buffer of device=
+ memory's
+> > > > dirty data chunk by chunk from device memory region by writing pos =
+&
+> > > > action (GET_BUFFER) to device_memory.pos & device_memory.action
+> fields of
+> > > > control region. (size of each chunk is the size of device memory da=
+ta
+> > > > region).
+> > > > .save_live_pending and .save_live_iteration may be called several t=
+imes in
+> > > > precopy phase to get dirty data in device memory.
+> > > >
+> > > > If VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY is off, callbacks in precopy
+> phase
+> > > > like .save_setup, .save_live_pending, .save_live_iteration will not=
+ call
+> > > > vendor driver's device state interface to get data from devcie memo=
+ry.
+> > > >
+> > > > In precopy phase, if a device has
+> VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY on,
+> > > > .log_sync callback will get system memory dirty bitmap from dirty b=
+itmap
+> > > > region by writing system memory's start address, page count and act=
+ion
+> > > > (GET_BITMAP) to "system_memory.start_addr",
+> "system_memory.page_nr", and
+> > > > "system_memory.action" fields of control region.
+> > > > If page count passed in .log_sync callback is larger than the bitma=
+p size
+> > > > the dirty bitmap region supports, Qemu will cut it into chunks and =
+call
+> > > > vendor driver's get system memory dirty bitmap interface.
+> > > > If VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY is off, .log_sync callback
+> just
+> > > > returns without call to vendor driver.
+> > > >
+> > > > In stop-and-copy phase, device state will be set to STOP & LOGGING =
+first.
+> > > > in save_live_complete_precopy callback,
+> > > > If VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY is on,
+> > > > get device memory size and get device memory buffer will be called =
+again.
+> > > > After that,
+> > > > device config data is get from device config region by reading
+> > > > devcie_config.size of control region and writing action (GET_BITMAP=
+) to
+> > > > device_config.action of control region.
+> > > > Then after migration completes, in cleanup handler, LOGGING state w=
+ill
+> be
+> > > > cleared (i.e. deivce state is set to STOP).
+> > > > Clearing LOGGING state in cleanup handler is in consideration of th=
+e case
+> > > > of "migration failed" and "migration cancelled". They can also leve=
+rage
+> > > > the cleanup handler to unset LOGGING state.
+> > > >
+> > > >
+> > > > References
+> > > > ----------
+> > > > 1. kernel side implementation of Device state interfaces:
+> > > > https://patchwork.freedesktop.org/series/56876/
+> > > >
+> > > >
+> > > > Yan Zhao (5):
+> > > >   vfio/migration: define kernel interfaces
+> > > >   vfio/migration: support device of device config capability
+> > > >   vfio/migration: tracking of dirty page in system memory
+> > > >   vfio/migration: turn on migration
+> > > >   vfio/migration: support device memory capability
+> > > >
+> > > >  hw/vfio/Makefile.objs         |   2 +-
+> > > >  hw/vfio/common.c              |  26 ++
+> > > >  hw/vfio/migration.c           | 858
+> ++++++++++++++++++++++++++++++++++++++++++
+> > > >  hw/vfio/pci.c                 |  10 +-
+> > > >  hw/vfio/pci.h                 |  26 +-
+> > > >  include/hw/vfio/vfio-common.h |   1 +
+> > > >  linux-headers/linux/vfio.h    | 260 +++++++++++++
+> > > >  7 files changed, 1174 insertions(+), 9 deletions(-)
+> > > >  create mode 100644 hw/vfio/migration.c
+> > > >
+> > > > --
+> > > > 2.7.4
+> > > >
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > _______________________________________________
+> > > intel-gvt-dev mailing list
+> > > intel-gvt-dev@lists.freedesktop.org
+> > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
