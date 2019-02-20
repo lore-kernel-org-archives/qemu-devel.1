@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53255)
+Received: from eggs.gnu.org ([209.51.188.92]:53343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gwTxH-00035Y-56
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:41 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTxK-00036O-2w
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gwTxD-0006xK-A4
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:37 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52976)
+	(envelope-from <tcminyard@gmail.com>) id 1gwTxH-00070z-QJ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:41 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1gwTx9-0006sY-CY
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:33 -0500
-Received: by mail-wm1-f65.google.com with SMTP id m1so7157531wml.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:38:15 -0800 (PST)
-References: <251451940.431966.1548259107629.ref@mail.yahoo.com>
-	<251451940.431966.1548259107629@mail.yahoo.com>
-	<20190123180804.GA1040@flamenco>
-	<70145779.391347.1548334794441@mail.yahoo.com>
-	<87va2eyy38.fsf@linaro.org>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <15e19a9e-8cb4-e767-f5d3-6b268948844e@tuxfamily.org>
-Date: Wed, 20 Feb 2019 16:38:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <87va2eyy38.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] m68k gdb has stopped single stepping correctly
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTxH-0006t2-9Y
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:39 -0500
+Received: by mail-ot1-x341.google.com with SMTP id b3so40834618otp.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:38:17 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:51 -0600
+Message-Id: <20190220135956.22589-15-minyard@acm.org>
+In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
+References: <20190220135956.22589-1-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH 14/19] i2c:smbus_slave: Add an SMBus vmstate
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Lucien Anti-Spam <lucienmp_antispam@yahoo.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-On 24/01/2019 14.38, Alex Bennée wrote:
-> 
-> Lucien Anti-Spam via Qemu-devel <qemu-devel@nongnu.org> writes:
-> 
->>    > On Thursday, January 24, 2019, 3:08:07 AM GMT+9, Emilio G. Cota <cota@braap.org> wrote: > > On Wed, Jan 23, 2019 at 15:58:27 +0000, Lucien Anti-Spam via Qemu-devel wrote:> > Hi folks,
->>>> I noticed that with 3.x release that the GDB options (-S -s) for certain CPU results in very weird stepping.Usually stops afer a few steps, whilst the stub continues responding the PC doesnt update, however, I have only deeply looked at the m68k.
->>>> In the case of the m68K the SR gets the trace bit set (T=10b), and the PC doesnt update.The m68k gdbstub, and main gdbstub seem mostly unchanged.But it seems the INSN handling has changed greatly for the m68k.
->>>> Does anyone have any ideas what happened?>> Can you please bisect to find at which point things start misbehaving?
->>>
->>> Thanks,
->>>  Emilio
->> Understood, I was hoping my original post might jog someone's memory about the issue.
->> Apparently not, so after some digging I found that it was introduced with the refactor to TranslatorOps, specifically two lines got dropped that update the PC if single-stepping is being performed ( commit 11ab74b01e0a8ea4973eed89c6b90fa6e4fb9fb6 )
->> Since its not valid to revert, shall I go ahead and submit a patch for
->> these two lines?
-> 
-> Yes please!
+From: Corey Minyard <cminyard@mvista.com>
 
- Hi Lucien,
+There is no vmstate handling for SMBus, so no device sitting on SMBus
+can have a state transfer that works reliably.  So add it.
 
-did you ever sent the patch? I can't find it on the mailing list, and I
-think this bug is still pending?
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/i2c/smbus_slave.c         | 18 ++++++++++++++++++
+ include/hw/i2c/smbus_slave.h | 24 +++++++++++++++++++++---
+ 2 files changed, 39 insertions(+), 3 deletions(-)
 
- Thomas
+diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
+index 5b3046f6a3..9a2d314d1a 100644
+--- a/hw/i2c/smbus_slave.c
++++ b/hw/i2c/smbus_slave.c
+@@ -201,6 +201,24 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
+     sc->send = smbus_i2c_send;
+ }
+ 
++bool smbus_vmstate_needed(SMBusDevice *dev)
++{
++    return dev->mode != SMBUS_IDLE;
++}
++
++const VMStateDescription vmstate_smbus_device = {
++    .name = TYPE_SMBUS_DEVICE,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
++        VMSTATE_INT32(mode, SMBusDevice),
++        VMSTATE_INT32(data_len, SMBusDevice),
++        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const TypeInfo smbus_device_type_info = {
+     .name = TYPE_SMBUS_DEVICE,
+     .parent = TYPE_I2C_SLAVE,
+diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
+index 79050fb92d..ebe068304e 100644
+--- a/include/hw/i2c/smbus_slave.h
++++ b/include/hw/i2c/smbus_slave.h
+@@ -69,14 +69,32 @@ typedef struct SMBusDeviceClass
+     uint8_t (*receive_byte)(SMBusDevice *dev);
+ } SMBusDeviceClass;
+ 
++#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
++
+ struct SMBusDevice {
+     /* The SMBus protocol is implemented on top of I2C.  */
+     I2CSlave i2c;
+ 
+     /* Remaining fields for internal use only.  */
+-    int mode;
+-    int data_len;
+-    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
++    int32_t mode;
++    int32_t data_len;
++    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
+ };
+ 
++extern const VMStateDescription vmstate_smbus_device;
++
++#define VMSTATE_SMBUS_DEVICE(_field, _state) {                       \
++    .name       = (stringify(_field)),                               \
++    .size       = sizeof(SMBusDevice),                               \
++    .vmsd       = &vmstate_smbus_device,                             \
++    .flags      = VMS_STRUCT,                                        \
++    .offset     = vmstate_offset_value(_state, _field, SMBusDevice), \
++}
++
++/*
++ * Users should call this in their .needed functions to know if the
++ * SMBus slave data needs to be transferred.
++ */
++bool smbus_vmstate_needed(SMBusDevice *dev);
++
+ #endif
+-- 
+2.17.1
