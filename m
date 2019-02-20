@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52482)
+Received: from eggs.gnu.org ([209.51.188.92]:53363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gwPbH-0000jQ-HJ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:59:40 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gwPem-00039s-77
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gwPb8-0005MN-BN
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:59:33 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:37772)
+	(envelope-from <mlureau@redhat.com>) id 1gwPeg-0007wH-C3
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:03:16 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:42273)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwPb6-0005LR-VF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:59:29 -0500
-Received: by mail-qk1-f196.google.com with SMTP id m9so1695610qkl.4
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 02:59:28 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwPeg-0007vg-8M
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:03:10 -0500
+Received: by mail-qt1-f196.google.com with SMTP id b8so26599478qtr.9
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 03:03:10 -0800 (PST)
 MIME-Version: 1.0
 References: <20190220010232.18731-1-philmd@redhat.com>
-	<20190220010232.18731-7-philmd@redhat.com>
-In-Reply-To: <20190220010232.18731-7-philmd@redhat.com>
+	<20190220010232.18731-8-philmd@redhat.com>
+In-Reply-To: <20190220010232.18731-8-philmd@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 20 Feb 2019 11:59:16 +0100
-Message-ID: <CAMxuvawqVgk6PP2wUZLbD9NyCktJDSoeLdduPQCysaEvwgDd_g@mail.gmail.com>
+Date: Wed, 20 Feb 2019 12:02:58 +0100
+Message-ID: <CAMxuvaz6ZHh9X3ZV4iXndMcCTFAemRFqAF=6UWj+Mg+B=5BFjg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 06/25] gdbstub: Use size_t to hold
- GDBState::last_packet_len
+Subject: Re: [Qemu-devel] [PATCH v3 07/25] gdbstub: Let put_buffer() use
+ size_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +36,35 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>,
 On Wed, Feb 20, 2019 at 2:04 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> In put_packet_binary() we have:
->
->     uint8_t *p;
->     for(;;) {
->         p =3D s->last_packet;
->         *(p++) =3D ...
->         s->last_packet_len =3D p - s->last_packet;
->         put_buffer(s, (uint8_t *)s->last_packet, s->last_packet_len);
->
-> The 'p' pointer start at s->last_packet, then is only incremented.
-> Since we have "p >=3D s->last_packet", we are sure than
-> "p - s->last_packet >=3D 0", thus "p - s->last_packet" is positive.
->
-> The few other places where s->last_packet_len is set is with constant
-> positive values.
->
-> It makes sense to use size_t to hold last_packet_len values.
+> All callers provide a size_t argument, we can safely use size_t
+> for this function.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 > ---
->  gdbstub.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  gdbstub.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/gdbstub.c b/gdbstub.c
-> index 76eca3bb7e..69340d7cd1 100644
+> index 69340d7cd1..860e9bb7c7 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -323,7 +323,7 @@ typedef struct GDBState {
->      int line_sum; /* running checksum */
->      int line_csum; /* checksum at the end of the packet */
->      uint8_t last_packet[MAX_PACKET_LENGTH + 4];
-> -    int last_packet_len;
-> +    size_t last_packet_len;
->      int signal;
+> @@ -475,10 +475,10 @@ static int gdb_continue_partial(GDBState *s, char *=
+newstates)
+>      return res;
+>  }
+>
+> -static void put_buffer(GDBState *s, const uint8_t *buf, int len)
+> +static void put_buffer(GDBState *s, const uint8_t *buf, size_t len)
+>  {
 >  #ifdef CONFIG_USER_ONLY
->      int fd;
+> -    int ret;
+> +    ssize_t ret;
+>
+>      while (len > 0) {
+>          ret =3D send(s->fd, buf, len, 0);
 > --
 > 2.20.1
 >
