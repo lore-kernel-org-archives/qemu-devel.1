@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42357)
+Received: from eggs.gnu.org ([209.51.188.92]:42366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gwTk0-0008M5-Er
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:57 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTk2-0008N9-Db
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gwTjp-0007fh-JW
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:47 -0500
-References: <20190220010232.18731-1-philmd@redhat.com>
-	<CAMxuvazRLabuNiGdKb9HSxyqJ+9NhxJkqkv824BTFj95j5u9rA@mail.gmail.com>
-	<20190220113016.GD21870@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2917cc10-3382-b4ce-061f-5ab8e45ea3f7@redhat.com>
-Date: Wed, 20 Feb 2019 08:20:04 -0600
-MIME-Version: 1.0
-In-Reply-To: <20190220113016.GD21870@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/25] chardev: Convert qemu_chr_write()
- to take a size_t argument
+	(envelope-from <tcminyard@gmail.com>) id 1gwTjj-0007cZ-4o
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:53 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTjf-0006mH-T3
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:37 -0500
+Received: by mail-ot1-x343.google.com with SMTP id v20so8764131otk.7
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:22:17 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:56 -0600
+Message-Id: <20190220135956.22589-20-minyard@acm.org>
+In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
+References: <20190220135956.22589-1-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH 19/19] i2c: Verify that the count passed in to
+ smbus_eeprom_init() is valid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangckid@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, qemu-s390x@nongnu.org, Paul Durrant <paul.durrant@citrix.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Samuel Thibault <samuel.thibault@ens-lyon.org>, David Gibson <david@gibson.dropbear.id.au>, Prasad J Pandit <pjp@fedoraproject.org>, Cornelia Huck <cohuck@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-On 2/20/19 5:30 AM, Daniel P. Berrang=C3=A9 wrote:
+From: Corey Minyard <cminyard@mvista.com>
 
->> Since Paolo you suggested the change, could you give some convincing
->> arguments that it's worth taking the plunge?
->=20
-> The chardev write/read methods will end up calling libc read/write
-> methods, whose parameters are "size_t count".
+Keep someone from passing in a bogus number
 
-In my mind, that's the convincing reason. We should model our read/write
-after the libc read/write, which means size_t input and ssize_t returns.
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+---
+ hw/i2c/smbus_eeprom.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
->=20
-> Thus if there is QEMU code that could currently (mistakenly) pass a
-> negative value for length to qemu_chr_write, unless something stops
-> it, this is going to be cast to a size_t when we finally call read/
-> write on the FD, leading to a large positive value & array out of
-> bounds read/write.=20
->=20
-> IOW we already have inconsistent use of signed vs unsigned in our code
-> which has potential to cause bugs. Converting chardev to use size_t
-> we get rid fo the mismatch with the underlying libc APIs we call,
-> which ultimately eliminates an area of risk longer term. There is a
-> chance it could uncover some pre-existing dormant bugs, but provided
-> we do due diligence to check callers I think its a win to be consistent
-> with libc APIs in size_t usage for read/write.
-
-And hopefully this exercise of making the conversion serves as a good
-audit to help us gain confidence in our code and/or fix bugs it uncovers.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 44887b4a27..ee392f7cb1 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -178,6 +178,8 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+ {
+     int i;
+      /* XXX: make this persistent */
++
++    assert(nb_eeprom <= 8);
+     uint8_t *eeprom_buf = g_malloc0(8 * SMBUS_EEPROM_SIZE);
+     if (eeprom_spd_size > 0) {
+         memcpy(eeprom_buf, eeprom_spd, eeprom_spd_size);
+-- 
+2.17.1
