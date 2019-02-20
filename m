@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50386)
+Received: from eggs.gnu.org ([209.51.188.92]:51004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gwUb9-0005Qm-7j
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:19:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gwUcY-0006Zq-IO
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gwUaz-0005IJ-TO
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:19:43 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34931)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1gwUax-0004tb-LZ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:19:40 -0500
-Received: by mail-ot1-x342.google.com with SMTP id z19so41136636otm.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 08:19:09 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1gwUcW-00062z-Cs
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:21:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwUcV-0005tc-VY
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:21:16 -0500
+Date: Wed, 20 Feb 2019 13:12:24 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190220131224.GF2608@work-vm>
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
+	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
+	<20181214111705.GD2454@work-vm>
+	<286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-References: <729515484.1572396.1550250571940.ref@mail.yahoo.com>
-	<729515484.1572396.1550250571940@mail.yahoo.com>
-	<20190220153635.GC30403@stefanha-x1.localdomain>
-In-Reply-To: <20190220153635.GC30403@stefanha-x1.localdomain>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Wed, 20 Feb 2019 08:18:57 -0800
-Message-ID: <CAPcyv4i46wzWv1Fg7CWHdBBa=p_Bw7gGsJzAR9MnynEwy2rH+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Why only devdax guarantees guest data persistence ?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "bipin.tomar@yahoo.com" <bipin.tomar@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Ross Zwisler <zwisler@kernel.org>, Jeff Moyer <jmoyer@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-On Wed, Feb 20, 2019 at 7:37 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Fri, Feb 15, 2019 at 05:09:31PM +0000, bipin.tomar--- via Qemu-devel wrote:
-> > Text from "docs/nvdimm.txt" says:
-> > Guest Data Persistence
-> > ----------------------
-> >
-> > Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> > currently the only one that can guarantee the guest write persistence
-> > is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
-> > which all guest access do not involve any host-side kernel cache.
-> >
-> > I think here "host-side kernel cache" imply "page cache". Why does fsdax NOT have the same persistence guarantees as devdax for vNVDIMM?
-> > Both the modes avoid using page cache then why is devdax explicitly called out?
->
-> File systems may require msync(2)/fsync(2) to guarantee persistence even
-> with DAX (just a cache flush instruction may not be enough!).  Emulated
-> NVDIMM devices lack an fsync interface so guests are unable to fsync the
-> host file system.
->
-> This is not an issue with devdax since there is no host file system.
->
-> virtio-pmem is an effort to add a paravirtualized fsync-style interface
-> and should solve this problem in the future:
-> https://lkml.org/lkml/2019/1/9/541
+* Wang, Wei W (wei.w.wang@intel.com) wrote:
+> On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
+> > > On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
+> > > > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > > > > On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
+> > > > > > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > > > > > > The new feature enables the virtio-balloon device to receive
+> > > > > > > hints of guest free pages from the free page vq.
+> > > > > > >
+> > > > > > > A notifier is registered to the migration precopy notifier
+> > > > > > > chain. The notifier calls free_page_start after the migration
+> > > > > > > thread syncs the dirty bitmap, so that the free page
+> > > > > > > optimization starts to clear bits of free pages from the
+> > > > > > > bitmap. It calls the free_page_stop before the migration
+> > > > > > > thread syncs the bitmap, which is the end of the current round
+> > > > > > > of ram save. The free_page_stop is also called to stop the
+> > optimization in the case when there is an error occurred in the process of
+> > ram saving.
+> > > > > > >
+> > > > > > > Note: balloon will report pages which were free at the time of this
+> > call.
+> > > > > > > As the reporting happens asynchronously, dirty bit logging
+> > > > > > > must be enabled before this free_page_start call is made.
+> > > > > > > Guest reporting must be disabled before the migration dirty bitmap
+> > is synchronized.
+> > > > > > >
+> > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > > > CC: Juan Quintela <quintela@redhat.com>
+> > > > > > > CC: Peter Xu <peterx@redhat.com>
+> > > > > > I think I'm OK for this from the migration side, I'd appreciate
+> > > > > > someone checking the virtio and aio bits.
+> > > > > >
+> > > > > > I'm not too sure how it gets switched on and off - i.e. if we
+> > > > > > get a nice new qemu on a new kernel, what happens when I try and
+> > > > > > migrate to the same qemu on an older kernel without these hints?
+> > > > > >
+> > > > > This feature doesn't rely on the host kernel. Those hints are
+> > > > > reported from the guest kernel.
+> > > > > So migration across different hosts wouldn't affect the use of this
+> > feature.
+> > > > > Please correct me if I didn't get your point.
+> > > > Ah OK, yes;  now what about migrating from new->old qemu with a new
+> > > > guest but old machine type?
+> > > >
+> > >
+> > > I think normally, the source QEMU and destination QEMU should have the
+> > > same QEMU booting parameter. If the destination QEMU doesn't support
+> > > "--device virtio-balloon,free-page-hint=true", which the source QEMU
+> > > has, the destination side QEMU will fail to boot, and migration will
+> > > not happen then.
+> > 
+> > Ah that's OK; as long as free-page-hint is false by default that will work fine.
+> > 
+> > Dave
+> > 
+> 
+> Hi Dave,
+> 
+> Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
 
-A para-virtualized flush is only necessary if the host implements
-caches and dirty-metadata that cannot be coordinated / flushed by
-MAP_SYNC. virtio-pmem is not a solution to a problem, virtio-pmem is a
-non-DAX alternative implementation of persistent memory that requires
-the guest to coordinate metadata and host page cache flushing.
+I think so; can you remind me where we're up to:
+  a) It looks like you've already got the kernel changes merged -
+correct?
+  b) What about the virtio spec changes - where are they upto?
+  c) Where are the other reviews upto - I think most are reviewed - is
+it just 7/7 that is missing the review-by?
+
+Dave
+
+> Best,
+> Wei
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
