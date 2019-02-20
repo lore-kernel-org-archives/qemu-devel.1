@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45897)
+Received: from eggs.gnu.org ([209.51.188.92]:46138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwTpy-0005aG-Vs
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:08 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTqJ-0005qN-Tc
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwTpv-0001sf-SP
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:06 -0500
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-13-eric.auger@redhat.com>
-	<20190218095838.048819c5@Igors-MacBook-Pro.local>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8f8abcb6-6665-dc89-b836-6e9d131f6f44@redhat.com>
-Date: Wed, 20 Feb 2019 16:30:13 +0100
+	(envelope-from <tcminyard@gmail.com>) id 1gwTqH-000237-NY
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:27 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39564)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTq7-0001yu-R0
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:17 -0500
+Received: by mail-ot1-x341.google.com with SMTP id n8so40771762otl.6
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:31:15 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:53 -0600
+Message-Id: <20190220135956.22589-17-minyard@acm.org>
+In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
+References: <20190220135956.22589-1-minyard@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20190218095838.048819c5@Igors-MacBook-Pro.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 12/18] hw/arm/boot: Expose the PC-DIMM
- nodes in the DT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 16/19] i2c:smbus_eeprom: Add a size constant
+ for the smbus_eeprom size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-Hi Igor,
+From: Corey Minyard <cminyard@mvista.com>
 
-On 2/18/19 9:58 AM, Igor Mammedov wrote:
-> On Tue,  5 Feb 2019 18:33:00 +0100
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->>
->> This patch add memory nodes corresponding to PC-DIMM regions.
-> s/add/adds/ or s/This patch add/Add/
-> 
->>
->> NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
->> don't need to care about NV-DIMM at this stage.
->>
->> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v3 -> v4:
->> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
->>
->> v1 -> v2:
->> - added qapi_free_MemoryDeviceInfoList and simplify the loop
->> ---
->>  hw/arm/boot.c | 35 +++++++++++++++++++++++++++++++++++
->>  1 file changed, 35 insertions(+)
->>
->> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
->> index 2ef367e15b..2a70e8aa82 100644
->> --- a/hw/arm/boot.c
->> +++ b/hw/arm/boot.c
->> @@ -19,6 +19,7 @@
->>  #include "sysemu/numa.h"
->>  #include "hw/boards.h"
->>  #include "hw/loader.h"
->> +#include "hw/mem/memory-device.h"
->>  #include "elf.h"
->>  #include "sysemu/device_tree.h"
->>  #include "qemu/config-file.h"
->> @@ -526,6 +527,34 @@ static void fdt_add_psci_node(void *fdt)
->>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->>  }
->>  
->> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
->> +                                             uint32_t acells, uint32_t scells) {
->> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
->> +    MemoryDeviceInfo *mi;
->> +    PCDIMMDeviceInfo *di;
->> +    bool is_nvdimm;
->> +    int ret = 0;
->> +
->> +    for (info = info_list; info != NULL; info = info->next) {
->> +        mi = info->value;
->> +        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
->> +        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
->> +
->> +        if (is_nvdimm) {
->> +            ret = -ENOENT; /* NV-DIMM not yet supported */
->> +        } else {
->> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
->> +                                      scells, di->size, di->node);
->> +        }
->> +        if (ret < 0) {
->> +            goto out;
->> +        }
->> +    }
->> +out:
->> +    qapi_free_MemoryDeviceInfoList(info_list);
->> +    return ret;
->> +}
->> +
->>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->>                   hwaddr addr_limit, AddressSpace *as)
->>  {
->> @@ -621,6 +650,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->>          }
->>      }
->>  
->> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
->> +    if (rc < 0) {
->> +            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
-> error message is rather vague, user using nvdimms + pc-dimms on CLI won't have
-> a clue that the former is not supported.
-> Suggest pass in error_fatal as argument and report more specific error from
-> fdt_add_hotpluggable_memory_nodes()
-> 
-> does this run on reboot?
+It was hard-coded to 256 in a number of places, create a constant
+for that.
 
-Yes after a QMP system_reset I can see the DIMMS on guest in /proc/meminfo
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/i2c/smbus_eeprom.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Thanks
-
-Eric
-> 
->> +            goto fail;
->> +    }
->> +
->>      rc = fdt_path_offset(fdt, "/chosen");
->>      if (rc < 0) {
->>          qemu_fdt_add_subnode(fdt, "/chosen");
-> 
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 91d68ff588..b3cc9c7083 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -35,6 +35,8 @@
+ #define SMBUS_EEPROM(obj) \
+     OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
+ 
++#define SMBUS_EEPROM_SIZE 256
++
+ typedef struct SMBusEEPROMDevice {
+     SMBusDevice smbusdev;
+     void *data;
+@@ -70,7 +72,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+ 
+     for (; len > 0; len--) {
+         data[eeprom->offset] = *buf++;
+-        eeprom->offset = (eeprom->offset + 1) % 256;
++        eeprom->offset = (eeprom->offset + 1) % SMBUS_EEPROM_SIZE;
+     }
+ 
+     return 0;
+@@ -129,12 +131,14 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+                        const uint8_t *eeprom_spd, int eeprom_spd_size)
+ {
+     int i;
+-    uint8_t *eeprom_buf = g_malloc0(8 * 256); /* XXX: make this persistent */
++     /* XXX: make this persistent */
++    uint8_t *eeprom_buf = g_malloc0(8 * SMBUS_EEPROM_SIZE);
+     if (eeprom_spd_size > 0) {
+         memcpy(eeprom_buf, eeprom_spd, eeprom_spd_size);
+     }
+ 
+     for (i = 0; i < nb_eeprom; i++) {
+-        smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256));
++        smbus_eeprom_init_one(smbus, 0x50 + i,
++                              eeprom_buf + (i * SMBUS_EEPROM_SIZE));
+     }
+ }
+-- 
+2.17.1
