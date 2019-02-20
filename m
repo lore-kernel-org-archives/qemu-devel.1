@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48487)
+Received: from eggs.gnu.org ([209.51.188.92]:48915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTtA-0008A6-NH
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:34:35 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTtJ-0008GF-2M
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:34:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTt0-0003sW-JO
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:34:23 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39595)
+	(envelope-from <tcminyard@gmail.com>) id 1gwTtA-0004CM-RC
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:34:32 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:36170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTsy-0003YM-I4
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:34:14 -0500
-Received: by mail-ot1-x341.google.com with SMTP id n8so40788020otl.6
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:33:55 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTt7-0003yH-G8
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:34:23 -0500
+Received: by mail-ot1-x329.google.com with SMTP id v62so31956037otb.3
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:34:17 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:38 -0600
-Message-Id: <20190220135956.22589-2-minyard@acm.org>
+Date: Wed, 20 Feb 2019 07:59:39 -0600
+Message-Id: <20190220135956.22589-3-minyard@acm.org>
 In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
 References: <20190220135956.22589-1-minyard@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 01/19] i2c: Split smbus into parts
+Subject: [Qemu-devel] [PATCH 02/19] i2c: have I2C receive operation return
+ uint8_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,726 +35,353 @@ Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@red
 
 From: Corey Minyard <cminyard@mvista.com>
 
-smbus.c and smbus.h had device side code, master side code, and
-smbus.h has some smbus_eeprom.c definitions.  Split them into
-separate files.
+It is never supposed to fail and cannot return an error, so just
+have it return the proper type.  Have it return 0xff on nothing
+available, since that's what would happen on a real bus.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- MAINTAINERS                               |  12 ++
- hw/arm/aspeed.c                           |   2 +-
- hw/i2c/Makefile.objs                      |   2 +-
- hw/i2c/pm_smbus.c                         |   2 +-
- hw/i2c/smbus_eeprom.c                     |   3 +-
- hw/i2c/smbus_ich9.c                       |   2 -
- hw/i2c/smbus_master.c                     | 165 ++++++++++++++++++++++
- hw/i2c/{smbus.c => smbus_slave.c}         | 153 +-------------------
- hw/i386/pc_piix.c                         |   2 +-
- hw/i386/pc_q35.c                          |   2 +-
- hw/isa/vt82c686.c                         |   1 -
- hw/mips/mips_fulong2e.c                   |   2 +-
- hw/mips/mips_malta.c                      |   2 +-
- hw/ppc/sam460ex.c                         |   2 +-
- include/hw/i2c/pm_smbus.h                 |   2 +
- include/hw/i2c/smbus_eeprom.h             |  32 +++++
- include/hw/i2c/smbus_master.h             |  55 ++++++++
- include/hw/i2c/{smbus.h => smbus_slave.h} |  37 +----
- 18 files changed, 285 insertions(+), 193 deletions(-)
- create mode 100644 hw/i2c/smbus_master.c
- rename hw/i2c/{smbus.c => smbus_slave.c} (65%)
- create mode 100644 include/hw/i2c/smbus_eeprom.h
- create mode 100644 include/hw/i2c/smbus_master.h
- rename include/hw/i2c/{smbus.h => smbus_slave.h} (65%)
+ hw/arm/pxa2xx.c         |  2 +-
+ hw/arm/tosa.c           |  4 ++--
+ hw/arm/z2.c             |  2 +-
+ hw/audio/wm8750.c       |  2 +-
+ hw/display/sii9022.c    |  2 +-
+ hw/display/ssd0303.c    |  4 ++--
+ hw/gpio/max7310.c       |  2 +-
+ hw/i2c/core.c           | 32 +++++++++++++-------------------
+ hw/i2c/i2c-ddc.c        |  2 +-
+ hw/i2c/smbus_slave.c    |  4 ++--
+ hw/input/lm832x.c       |  2 +-
+ hw/misc/pca9552.c       |  2 +-
+ hw/misc/tmp105.c        |  2 +-
+ hw/misc/tmp421.c        |  2 +-
+ hw/nvram/eeprom_at24c.c |  4 ++--
+ hw/timer/ds1338.c       |  2 +-
+ hw/timer/m41t80.c       |  2 +-
+ hw/timer/twl92230.c     |  2 +-
+ include/hw/i2c/i2c.h    |  7 +++----
+ 19 files changed, 37 insertions(+), 44 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 59e1f24d68..aaa80d0b59 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2142,6 +2142,18 @@ M: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
- S: Maintained
- F: contrib/elf2dmp/
- 
-+I2C and SMBus
-+M: Corey Minyard <cminyard@mvista.com>
-+S: Maintained
-+F: hw/i2c/core.c
-+F: hw/i2c/smbus_slave.c
-+F: hw/i2c/smbus_master.c
-+F: hw/i2c/smbus_eeprom.c
-+F: include/hw/i2c/i2c.h
-+F: include/hw/i2c/smbus_master.h
-+F: include/hw/i2c/smbus_slave.h
-+F: include/hw/i2c/smbus_eeprom.h
-+
- Usermode Emulation
- ------------------
- Overall
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 5158985482..996812498d 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -18,7 +18,7 @@
- #include "hw/arm/aspeed.h"
- #include "hw/arm/aspeed_soc.h"
- #include "hw/boards.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "qemu/log.h"
- #include "sysemu/block-backend.h"
- #include "hw/loader.h"
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index 37cacde978..8973edfa22 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
-+common-obj-$(CONFIG_I2C) += core.o smbus_slave.o smbus_master.o smbus_eeprom.o
- common-obj-$(CONFIG_DDC) += i2c-ddc.o
- common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
- common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 03062740cc..6cfb7eb1b3 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -20,7 +20,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/i2c/pm_smbus.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_master.h"
- 
- #define SMBHSTSTS       0x00
- #define SMBHSTCNT       0x02
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index f18aa3de35..d82423aa7e 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -25,7 +25,8 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/i2c/i2c.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_slave.h"
-+#include "hw/i2c/smbus_eeprom.h"
- 
- //#define DEBUG
- 
-diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-index 2a8b49e02f..e6d8d28194 100644
---- a/hw/i2c/smbus_ich9.c
-+++ b/hw/i2c/smbus_ich9.c
-@@ -29,8 +29,6 @@
- #include "hw/i2c/pm_smbus.h"
- #include "hw/pci/pci.h"
- #include "sysemu/sysemu.h"
--#include "hw/i2c/i2c.h"
--#include "hw/i2c/smbus.h"
- 
- #include "hw/i386/ich9.h"
- 
-diff --git a/hw/i2c/smbus_master.c b/hw/i2c/smbus_master.c
-new file mode 100644
-index 0000000000..0a6223744c
---- /dev/null
-+++ b/hw/i2c/smbus_master.c
-@@ -0,0 +1,165 @@
-+/*
-+ * QEMU SMBus host (master) emulation.
-+ *
-+ * This code emulates SMBus transactions from the master point of view,
-+ * it runs the individual I2C transaction to do the SMBus protocol
-+ * over I2C.
-+ *
-+ * Copyright (c) 2007 CodeSourcery.
-+ * Written by Paul Brook
-+ *
-+ * This code is licensed under the LGPL.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/i2c/i2c.h"
-+#include "hw/i2c/smbus_master.h"
-+
-+/* Master device commands.  */
-+int smbus_quick_command(I2CBus *bus, uint8_t addr, int read)
-+{
-+    if (i2c_start_transfer(bus, addr, read)) {
-+        return -1;
-+    }
-+    i2c_end_transfer(bus);
-+    return 0;
-+}
-+
-+int smbus_receive_byte(I2CBus *bus, uint8_t addr)
-+{
-+    uint8_t data;
-+
-+    if (i2c_start_transfer(bus, addr, 1)) {
-+        return -1;
-+    }
-+    data = i2c_recv(bus);
-+    i2c_nack(bus);
-+    i2c_end_transfer(bus);
-+    return data;
-+}
-+
-+int smbus_send_byte(I2CBus *bus, uint8_t addr, uint8_t data)
-+{
-+    if (i2c_start_transfer(bus, addr, 0)) {
-+        return -1;
-+    }
-+    i2c_send(bus, data);
-+    i2c_end_transfer(bus);
-+    return 0;
-+}
-+
-+int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command)
-+{
-+    uint8_t data;
-+    if (i2c_start_transfer(bus, addr, 0)) {
-+        return -1;
-+    }
-+    i2c_send(bus, command);
-+    if (i2c_start_transfer(bus, addr, 1)) {
-+        i2c_end_transfer(bus);
-+        return -1;
-+    }
-+    data = i2c_recv(bus);
-+    i2c_nack(bus);
-+    i2c_end_transfer(bus);
-+    return data;
-+}
-+
-+int smbus_write_byte(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t data)
-+{
-+    if (i2c_start_transfer(bus, addr, 0)) {
-+        return -1;
-+    }
-+    i2c_send(bus, command);
-+    i2c_send(bus, data);
-+    i2c_end_transfer(bus);
-+    return 0;
-+}
-+
-+int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command)
-+{
-+    uint16_t data;
-+    if (i2c_start_transfer(bus, addr, 0)) {
-+        return -1;
-+    }
-+    i2c_send(bus, command);
-+    if (i2c_start_transfer(bus, addr, 1)) {
-+        i2c_end_transfer(bus);
-+        return -1;
-+    }
-+    data = i2c_recv(bus);
-+    data |= i2c_recv(bus) << 8;
-+    i2c_nack(bus);
-+    i2c_end_transfer(bus);
-+    return data;
-+}
-+
-+int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data)
-+{
-+    if (i2c_start_transfer(bus, addr, 0)) {
-+        return -1;
-+    }
-+    i2c_send(bus, command);
-+    i2c_send(bus, data & 0xff);
-+    i2c_send(bus, data >> 8);
-+    i2c_end_transfer(bus);
-+    return 0;
-+}
-+
-+int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                     int len, bool recv_len, bool send_cmd)
-+{
-+    int rlen;
-+    int i;
-+
-+    if (send_cmd) {
-+        if (i2c_start_transfer(bus, addr, 0)) {
-+            return -1;
-+        }
-+        i2c_send(bus, command);
-+    }
-+    if (i2c_start_transfer(bus, addr, 1)) {
-+        if (send_cmd) {
-+            i2c_end_transfer(bus);
-+        }
-+        return -1;
-+    }
-+    if (recv_len) {
-+        rlen = i2c_recv(bus);
-+    } else {
-+        rlen = len;
-+    }
-+    if (rlen > len) {
-+        rlen = 0;
-+    }
-+    for (i = 0; i < rlen; i++) {
-+        data[i] = i2c_recv(bus);
-+    }
-+    i2c_nack(bus);
-+    i2c_end_transfer(bus);
-+    return rlen;
-+}
-+
-+int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                      int len, bool send_len)
-+{
-+    int i;
-+
-+    if (len > 32) {
-+        len = 32;
-+    }
-+
-+    if (i2c_start_transfer(bus, addr, 0)) {
-+        return -1;
-+    }
-+    i2c_send(bus, command);
-+    if (send_len) {
-+        i2c_send(bus, len);
-+    }
-+    for (i = 0; i < len; i++) {
-+        i2c_send(bus, data[i]);
-+    }
-+    i2c_end_transfer(bus);
-+    return 0;
-+}
-diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus_slave.c
-similarity index 65%
-rename from hw/i2c/smbus.c
-rename to hw/i2c/smbus_slave.c
-index 30028bfcc2..463fafe3c5 100644
---- a/hw/i2c/smbus.c
-+++ b/hw/i2c/smbus_slave.c
-@@ -1,6 +1,10 @@
- /*
-  * QEMU SMBus device emulation.
-  *
-+ * This code is a helper for SMBus device emulation.  It implements an
-+ * I2C device inteface and runs the SMBus protocol from the device
-+ * point of view and maps those to simple calls to emulate.
-+ *
-  * Copyright (c) 2007 CodeSourcery.
-  * Written by Paul Brook
-  *
-@@ -12,7 +16,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/i2c/i2c.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_slave.h"
- 
- //#define DEBUG_SMBUS 1
- 
-@@ -206,153 +210,6 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index f598a1c053..3d7c88910e 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -1286,7 +1286,7 @@ static int pxa2xx_i2c_event(I2CSlave *i2c, enum i2c_event event)
      return 0;
  }
  
--/* Master device commands.  */
--int smbus_quick_command(I2CBus *bus, uint8_t addr, int read)
--{
--    if (i2c_start_transfer(bus, addr, read)) {
--        return -1;
--    }
--    i2c_end_transfer(bus);
--    return 0;
--}
--
--int smbus_receive_byte(I2CBus *bus, uint8_t addr)
--{
--    uint8_t data;
--
--    if (i2c_start_transfer(bus, addr, 1)) {
--        return -1;
--    }
--    data = i2c_recv(bus);
--    i2c_nack(bus);
--    i2c_end_transfer(bus);
--    return data;
--}
--
--int smbus_send_byte(I2CBus *bus, uint8_t addr, uint8_t data)
--{
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
--    }
--    i2c_send(bus, data);
--    i2c_end_transfer(bus);
--    return 0;
--}
--
--int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command)
--{
--    uint8_t data;
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
--    }
--    i2c_send(bus, command);
--    if (i2c_start_transfer(bus, addr, 1)) {
--        i2c_end_transfer(bus);
--        return -1;
--    }
--    data = i2c_recv(bus);
--    i2c_nack(bus);
--    i2c_end_transfer(bus);
--    return data;
--}
--
--int smbus_write_byte(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t data)
--{
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
--    }
--    i2c_send(bus, command);
--    i2c_send(bus, data);
--    i2c_end_transfer(bus);
--    return 0;
--}
--
--int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command)
--{
--    uint16_t data;
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
--    }
--    i2c_send(bus, command);
--    if (i2c_start_transfer(bus, addr, 1)) {
--        i2c_end_transfer(bus);
--        return -1;
--    }
--    data = i2c_recv(bus);
--    data |= i2c_recv(bus) << 8;
--    i2c_nack(bus);
--    i2c_end_transfer(bus);
--    return data;
--}
--
--int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data)
--{
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
--    }
--    i2c_send(bus, command);
--    i2c_send(bus, data & 0xff);
--    i2c_send(bus, data >> 8);
--    i2c_end_transfer(bus);
--    return 0;
--}
--
--int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                     int len, bool recv_len, bool send_cmd)
--{
--    int rlen;
--    int i;
--
--    if (send_cmd) {
--        if (i2c_start_transfer(bus, addr, 0)) {
+-static int pxa2xx_i2c_rx(I2CSlave *i2c)
++static uint8_t pxa2xx_i2c_rx(I2CSlave *i2c)
+ {
+     PXA2xxI2CSlaveState *slave = PXA2XX_I2C_SLAVE(i2c);
+     PXA2xxI2CState *s = slave->host;
+diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+index 7a925fa5e6..eef9d427e7 100644
+--- a/hw/arm/tosa.c
++++ b/hw/arm/tosa.c
+@@ -197,10 +197,10 @@ static int tosa_dac_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
+ 
+-static int tosa_dac_recv(I2CSlave *s)
++static uint8_t tosa_dac_recv(I2CSlave *s)
+ {
+     printf("%s: recv not supported!!!\n", __func__);
+-    return -1;
++    return 0xff;
+ }
+ 
+ static void tosa_tg_init(PXA2xxState *cpu)
+diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+index 697a822f1e..6f18d924df 100644
+--- a/hw/arm/z2.c
++++ b/hw/arm/z2.c
+@@ -243,7 +243,7 @@ static int aer915_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
+ 
+-static int aer915_recv(I2CSlave *slave)
++static uint8_t aer915_recv(I2CSlave *slave)
+ {
+     AER915State *s = AER915(slave);
+     int retval = 0x00;
+diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
+index f4aa838f62..169b006ade 100644
+--- a/hw/audio/wm8750.c
++++ b/hw/audio/wm8750.c
+@@ -561,7 +561,7 @@ static int wm8750_tx(I2CSlave *i2c, uint8_t data)
+     return 0;
+ }
+ 
+-static int wm8750_rx(I2CSlave *i2c)
++static uint8_t wm8750_rx(I2CSlave *i2c)
+ {
+     return 0x00;
+ }
+diff --git a/hw/display/sii9022.c b/hw/display/sii9022.c
+index eaf11a6e7b..9994385c35 100644
+--- a/hw/display/sii9022.c
++++ b/hw/display/sii9022.c
+@@ -79,7 +79,7 @@ static int sii9022_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
+ 
+-static int sii9022_rx(I2CSlave *i2c)
++static uint8_t sii9022_rx(I2CSlave *i2c)
+ {
+     sii9022_state *s = SII9022(i2c);
+     uint8_t res = 0x00;
+diff --git a/hw/display/ssd0303.c b/hw/display/ssd0303.c
+index eb90ba26be..8edf34986c 100644
+--- a/hw/display/ssd0303.c
++++ b/hw/display/ssd0303.c
+@@ -62,10 +62,10 @@ typedef struct {
+     uint8_t framebuffer[132*8];
+ } ssd0303_state;
+ 
+-static int ssd0303_recv(I2CSlave *i2c)
++static uint8_t ssd0303_recv(I2CSlave *i2c)
+ {
+     BADF("Reads not implemented\n");
+-    return -1;
++    return 0xff;
+ }
+ 
+ static int ssd0303_send(I2CSlave *i2c, uint8_t data)
+diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
+index 1a2478b5a9..c6f686c3eb 100644
+--- a/hw/gpio/max7310.c
++++ b/hw/gpio/max7310.c
+@@ -39,7 +39,7 @@ static void max7310_reset(DeviceState *dev)
+     s->command = 0x00;
+ }
+ 
+-static int max7310_rx(I2CSlave *i2c)
++static uint8_t max7310_rx(I2CSlave *i2c)
+ {
+     MAX7310State *s = MAX7310(i2c);
+ 
+diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+index b54725985a..15237ad073 100644
+--- a/hw/i2c/core.c
++++ b/hw/i2c/core.c
+@@ -191,23 +191,17 @@ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send)
+         }
+         return ret ? -1 : 0;
+     } else {
+-        if ((QLIST_EMPTY(&bus->current_devs)) || (bus->broadcast)) {
 -            return -1;
 -        }
--        i2c_send(bus, command);
--    }
--    if (i2c_start_transfer(bus, addr, 1)) {
--        if (send_cmd) {
--            i2c_end_transfer(bus);
--        }
+-
+-        sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
+-        if (sc->recv) {
+-            s = QLIST_FIRST(&bus->current_devs)->elt;
+-            ret = sc->recv(s);
+-            trace_i2c_recv(s->address, ret);
+-            if (ret < 0) {
+-                return ret;
+-            } else {
+-                *data = ret;
+-                return 0;
++        ret = 0xff;
++        if (!QLIST_EMPTY(&bus->current_devs) && !bus->broadcast) {
++            sc = I2C_SLAVE_GET_CLASS(QLIST_FIRST(&bus->current_devs)->elt);
++            if (sc->recv) {
++                s = QLIST_FIRST(&bus->current_devs)->elt;
++                ret = sc->recv(s);
++                trace_i2c_recv(s->address, ret);
+             }
+         }
 -        return -1;
--    }
--    if (recv_len) {
--        rlen = i2c_recv(bus);
--    } else {
--        rlen = len;
--    }
--    if (rlen > len) {
--        rlen = 0;
--    }
--    for (i = 0; i < rlen; i++) {
--        data[i] = i2c_recv(bus);
--    }
--    i2c_nack(bus);
--    i2c_end_transfer(bus);
--    return rlen;
--}
--
--int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                      int len, bool send_len)
--{
--    int i;
--
--    if (len > 32)
--        len = 32;
--
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
--    }
--    i2c_send(bus, command);
--    if (send_len) {
--        i2c_send(bus, len);
--    }
--    for (i = 0; i < len; i++) {
--        i2c_send(bus, data[i]);
--    }
--    i2c_end_transfer(bus);
--    return 0;
--}
--
- static void smbus_device_class_init(ObjectClass *klass, void *data)
++        *data = ret;
++        return 0;
+     }
+ }
+ 
+@@ -216,12 +210,12 @@ int i2c_send(I2CBus *bus, uint8_t data)
+     return i2c_send_recv(bus, &data, true);
+ }
+ 
+-int i2c_recv(I2CBus *bus)
++uint8_t i2c_recv(I2CBus *bus)
  {
-     I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 63c84e3827..6ba163ccbb 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -42,7 +42,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "sysemu/arch_init.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "hw/xen/xen.h"
- #include "exec/memory.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index b7b7959934..1689885cac 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -33,7 +33,7 @@
- #include "hw/hw.h"
- #include "hw/loader.h"
- #include "sysemu/arch_init.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "hw/boards.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/xen/xen.h"
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 7302f6d74b..85d0532dd5 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -14,7 +14,6 @@
- #include "hw/hw.h"
- #include "hw/isa/vt82c686.h"
- #include "hw/i2c/i2c.h"
--#include "hw/i2c/smbus.h"
- #include "hw/pci/pci.h"
- #include "hw/isa/isa.h"
- #include "hw/isa/superio.h"
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 2fbba32c48..dae8acc108 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -27,7 +27,7 @@
- #include "hw/isa/superio.h"
- #include "net/net.h"
- #include "hw/boards.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "hw/block/flash.h"
- #include "hw/mips/mips.h"
- #include "hw/mips/cpudevs.h"
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index c1cf0fe12e..1fb7170f5e 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -33,7 +33,7 @@
- #include "hw/char/serial.h"
- #include "net/net.h"
- #include "hw/boards.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "hw/block/flash.h"
- #include "hw/mips/mips.h"
- #include "hw/mips/cpudevs.h"
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 84ea592749..a04d471433 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -34,7 +34,7 @@
- #include "hw/sysbus.h"
- #include "hw/char/serial.h"
- #include "hw/i2c/ppc4xx_i2c.h"
--#include "hw/i2c/smbus.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "hw/usb/hcd-ehci.h"
- #include "hw/ppc/fdt.h"
+-    uint8_t data;
+-    int ret = i2c_send_recv(bus, &data, false);
++    uint8_t data = 0xff;
  
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index 060d3c6ac0..6dd5b7040b 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -1,6 +1,8 @@
- #ifndef PM_SMBUS_H
- #define PM_SMBUS_H
+-    return ret < 0 ? ret : data;
++    i2c_send_recv(bus, &data, false);
++    return data;
+ }
  
-+#include "hw/i2c/smbus_master.h"
-+
- #define PM_SMBUS_MAX_MSG_SIZE 32
+ void i2c_nack(I2CBus *bus)
+diff --git a/hw/i2c/i2c-ddc.c b/hw/i2c/i2c-ddc.c
+index 0a0367ff38..7aa8727771 100644
+--- a/hw/i2c/i2c-ddc.c
++++ b/hw/i2c/i2c-ddc.c
+@@ -51,7 +51,7 @@ static int i2c_ddc_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
  
- typedef struct PMSMBus {
-diff --git a/include/hw/i2c/smbus_eeprom.h b/include/hw/i2c/smbus_eeprom.h
-new file mode 100644
-index 0000000000..46fb1a37d6
---- /dev/null
-+++ b/include/hw/i2c/smbus_eeprom.h
-@@ -0,0 +1,32 @@
-+/*
-+ * QEMU SMBus EEPROM API
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HW_SMBUS_EEPROM_H
-+#define HW_SMBUS_EEPROM_H
-+
-+#include "hw/i2c/i2c.h"
-+
-+void smbus_eeprom_init_one(I2CBus *bus, uint8_t address, uint8_t *eeprom_buf);
-+void smbus_eeprom_init(I2CBus *bus, int nb_eeprom,
-+                       const uint8_t *eeprom_spd, int size);
-+
-+#endif
-diff --git a/include/hw/i2c/smbus_master.h b/include/hw/i2c/smbus_master.h
-new file mode 100644
-index 0000000000..bb13bc423c
---- /dev/null
-+++ b/include/hw/i2c/smbus_master.h
-@@ -0,0 +1,55 @@
-+/*
-+ * QEMU SMBus host (master) API
-+ *
-+ * Copyright (c) 2007 Arastra, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HW_SMBUS_MASTER_H
-+#define HW_SMBUS_MASTER_H
-+
-+#include "hw/i2c/i2c.h"
-+
-+/* Master device commands.  */
-+int smbus_quick_command(I2CBus *bus, uint8_t addr, int read);
-+int smbus_receive_byte(I2CBus *bus, uint8_t addr);
-+int smbus_send_byte(I2CBus *bus, uint8_t addr, uint8_t data);
-+int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command);
-+int smbus_write_byte(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t data);
-+int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command);
-+int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data);
-+
-+/*
-+ * Do a block transfer from an I2C device.  If recv_len is set, then the
-+ * first received byte is a length field and is used to know how much data
-+ * to receive.  Otherwise receive "len" bytes.  If send_cmd is set, send
-+ * the command byte first before receiving the data.
-+ */
-+int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                     int len, bool recv_len, bool send_cmd);
-+
-+/*
-+ * Do a block transfer to an I2C device.  If send_len is set, send the
-+ * "len" value before the data.
-+ */
-+int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                      int len, bool send_len);
-+
-+#endif
-diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus_slave.h
-similarity index 65%
-rename from include/hw/i2c/smbus.h
-rename to include/hw/i2c/smbus_slave.h
-index 5c61c05999..46b8948f0f 100644
---- a/include/hw/i2c/smbus.h
-+++ b/include/hw/i2c/smbus_slave.h
-@@ -1,8 +1,5 @@
--#ifndef QEMU_SMBUS_H
--#define QEMU_SMBUS_H
--
- /*
-- * QEMU SMBus API
-+ * QEMU SMBus device (slave) API
-  *
-  * Copyright (c) 2007 Arastra, Inc.
-  *
-@@ -25,6 +22,9 @@
-  * THE SOFTWARE.
-  */
+-static int i2c_ddc_rx(I2CSlave *i2c)
++static uint8_t i2c_ddc_rx(I2CSlave *i2c)
+ {
+     I2CDDCState *s = I2CDDC(i2c);
  
-+#ifndef HW_SMBUS_SLAVE_H
-+#define HW_SMBUS_SLAVE_H
-+
- #include "hw/i2c/i2c.h"
+diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
+index 463fafe3c5..6e4d542f51 100644
+--- a/hw/i2c/smbus_slave.c
++++ b/hw/i2c/smbus_slave.c
+@@ -156,11 +156,11 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
+     return 0;
+ }
  
- #define TYPE_SMBUS_DEVICE "smbus-device"
-@@ -66,33 +66,4 @@ struct SMBusDevice {
-     uint8_t command;
- };
+-static int smbus_i2c_recv(I2CSlave *s)
++static uint8_t smbus_i2c_recv(I2CSlave *s)
+ {
+     SMBusDevice *dev = SMBUS_DEVICE(s);
+     SMBusDeviceClass *sc = SMBUS_DEVICE_GET_CLASS(dev);
+-    int ret;
++    uint8_t ret;
  
--/* Master device commands.  */
--int smbus_quick_command(I2CBus *bus, uint8_t addr, int read);
--int smbus_receive_byte(I2CBus *bus, uint8_t addr);
--int smbus_send_byte(I2CBus *bus, uint8_t addr, uint8_t data);
--int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command);
--int smbus_write_byte(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t data);
--int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command);
--int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data);
--
--/*
-- * Do a block transfer from an I2C device.  If recv_len is set, then the
-- * first received byte is a length field and is used to know how much data
-- * to receive.  Otherwise receive "len" bytes.  If send_cmd is set, send
-- * the command byte first before receiving the data.
-- */
--int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                     int len, bool recv_len, bool send_cmd);
--
--/*
-- * Do a block transfer to an I2C device.  If send_len is set, send the
-- * "len" value before the data.
-- */
--int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                      int len, bool send_len);
--
--void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf);
--void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
--                       const uint8_t *eeprom_spd, int size);
--
- #endif
+     switch (dev->mode) {
+     case SMBUS_RECV_BYTE:
+diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
+index cffbf586d4..1fc7b86f19 100644
+--- a/hw/input/lm832x.c
++++ b/hw/input/lm832x.c
+@@ -401,7 +401,7 @@ static int lm_i2c_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
+ 
+-static int lm_i2c_rx(I2CSlave *i2c)
++static uint8_t lm_i2c_rx(I2CSlave *i2c)
+ {
+     LM823KbdState *s = LM8323(i2c);
+ 
+diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+index 9775d5274a..7325d3f287 100644
+--- a/hw/misc/pca9552.c
++++ b/hw/misc/pca9552.c
+@@ -115,7 +115,7 @@ static void pca9552_autoinc(PCA9552State *s)
+     }
+ }
+ 
+-static int pca9552_recv(I2CSlave *i2c)
++static uint8_t pca9552_recv(I2CSlave *i2c)
+ {
+     PCA9552State *s = PCA9552(i2c);
+     uint8_t ret;
+diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
+index f6d7163273..0c32f6f8b6 100644
+--- a/hw/misc/tmp105.c
++++ b/hw/misc/tmp105.c
+@@ -147,7 +147,7 @@ static void tmp105_write(TMP105State *s)
+     }
+ }
+ 
+-static int tmp105_rx(I2CSlave *i2c)
++static uint8_t tmp105_rx(I2CSlave *i2c)
+ {
+     TMP105State *s = TMP105(i2c);
+ 
+diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+index eeb11000f0..ce6d40ac9c 100644
+--- a/hw/misc/tmp421.c
++++ b/hw/misc/tmp421.c
+@@ -249,7 +249,7 @@ static void tmp421_write(TMP421State *s)
+     }
+ }
+ 
+-static int tmp421_rx(I2CSlave *i2c)
++static uint8_t tmp421_rx(I2CSlave *i2c)
+ {
+     TMP421State *s = TMP421(i2c);
+ 
+diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
+index 27cd01e615..d1456dafbd 100644
+--- a/hw/nvram/eeprom_at24c.c
++++ b/hw/nvram/eeprom_at24c.c
+@@ -74,10 +74,10 @@ int at24c_eeprom_event(I2CSlave *s, enum i2c_event event)
+ }
+ 
+ static
+-int at24c_eeprom_recv(I2CSlave *s)
++uint8_t at24c_eeprom_recv(I2CSlave *s)
+ {
+     EEPROMState *ee = AT24C_EE(s);
+-    int ret;
++    uint8_t ret;
+ 
+     ret = ee->mem[ee->cur];
+ 
+diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
+index 3849b74a68..03da75486b 100644
+--- a/hw/timer/ds1338.c
++++ b/hw/timer/ds1338.c
+@@ -117,7 +117,7 @@ static int ds1338_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
+ 
+-static int ds1338_recv(I2CSlave *i2c)
++static uint8_t ds1338_recv(I2CSlave *i2c)
+ {
+     DS1338State *s = DS1338(i2c);
+     uint8_t res;
+diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
+index 734d7d95fc..c45b9297d8 100644
+--- a/hw/timer/m41t80.c
++++ b/hw/timer/m41t80.c
+@@ -40,7 +40,7 @@ static int m41t80_send(I2CSlave *i2c, uint8_t data)
+     return 0;
+ }
+ 
+-static int m41t80_recv(I2CSlave *i2c)
++static uint8_t m41t80_recv(I2CSlave *i2c)
+ {
+     M41t80State *s = M41T80(i2c);
+     struct tm now;
+diff --git a/hw/timer/twl92230.c b/hw/timer/twl92230.c
+index 51ec355f3f..c83d803dd8 100644
+--- a/hw/timer/twl92230.c
++++ b/hw/timer/twl92230.c
+@@ -737,7 +737,7 @@ static int menelaus_tx(I2CSlave *i2c, uint8_t data)
+     return 0;
+ }
+ 
+-static int menelaus_rx(I2CSlave *i2c)
++static uint8_t menelaus_rx(I2CSlave *i2c)
+ {
+     MenelausState *s = TWL92230(i2c);
+ 
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index cf4c45a98f..8e236f7bb4 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -33,10 +33,9 @@ typedef struct I2CSlaveClass {
+ 
+     /*
+      * Slave to master.  This cannot fail, the device should always
+-     * return something here.  Negative values probably result in 0xff
+-     * and a possible log from the driver, and shouldn't be used.
++     * return something here.
+      */
+-    int (*recv)(I2CSlave *s);
++    uint8_t (*recv)(I2CSlave *s);
+ 
+     /*
+      * Notify the slave of a bus state change.  For start event,
+@@ -78,7 +77,7 @@ void i2c_end_transfer(I2CBus *bus);
+ void i2c_nack(I2CBus *bus);
+ int i2c_send_recv(I2CBus *bus, uint8_t *data, bool send);
+ int i2c_send(I2CBus *bus, uint8_t data);
+-int i2c_recv(I2CBus *bus);
++uint8_t i2c_recv(I2CBus *bus);
+ 
+ DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
+ 
 -- 
 2.17.1
