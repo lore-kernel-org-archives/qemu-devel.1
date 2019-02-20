@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50984)
+Received: from eggs.gnu.org ([209.51.188.92]:51065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ5-0006DM-Rn
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ8-0006ED-9j
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ4-0000oG-QO
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:03 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:50528)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ5-0000ou-3q
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:06 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gwZZ2-00008x-Qr
+	id 1gwZZ4-0000XP-Ne
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:02 -0500
-Received: by mail-wm1-x330.google.com with SMTP id x7so8132587wmj.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:46 -0800 (PST)
+Received: by mail-wm1-x342.google.com with SMTP id h22so5603285wmb.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:55 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Wed, 20 Feb 2019 22:37:29 +0100
-Message-Id: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
+Date: Wed, 20 Feb 2019 22:37:38 +0100
+Message-Id: <ac08a8b135108c4cef7dd9c8c02e0bdf8f7226a6.1550698466.git.DirtY.iCE.hu@gmail.com>
+In-Reply-To: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
+References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 00/14] Audio patches
+Subject: [Qemu-devel] [PATCH v5 09/14] ossaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +33,384 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Hi,
+Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+---
+ audio/audio_legacy.c |  32 +++++++++
+ audio/ossaudio.c     | 161 ++++++++++++++-----------------------------
+ 2 files changed, 83 insertions(+), 110 deletions(-)
 
-Here's an updated version of my audio patches. Apart from qapi, there aren't too
-many changes.
-
-Changes from v4:
-
-* Updated qapi, removed alsa-in, oss-out, etc. (see first patch)
-* Documentation fixes
-
-Regards,
-Zoltan
-
-Kővágó, Zoltán (14):
-  qapi: qapi for audio backends
-  audio: use qapi AudioFormat instead of audfmt_e
-  audio: -audiodev command line option: documentation
-  audio: -audiodev command line option basic implementation
-  alsaaudio: port to -audiodev config
-  coreaudio: port to -audiodev config
-  dsoundaudio: port to -audiodev config
-  noaudio: port to -audiodev config
-  ossaudio: port to -audiodev config
-  paaudio: port to -audiodev config
-  sdlaudio: port to -audiodev config
-  spiceaudio: port to -audiodev config
-  wavaudio: port to -audiodev config
-  audio: -audiodev command line option: cleanup
-
- qemu-deprecated.texi      |   7 +
- qapi/audio.json           | 304 +++++++++++++
- qapi/qapi-schema.json     |   1 +
- audio/audio.h             |  30 +-
- audio/audio_int.h         |  37 +-
- audio/audio_template.h    |  42 +-
- audio/dsound_template.h   |   6 +-
- audio/alsaaudio.c         | 369 ++++++----------
- audio/audio.c             | 870 +++++++++++++-------------------------
- audio/audio_legacy.c      | 542 ++++++++++++++++++++++++
- audio/audio_win_int.c     |  18 +-
- audio/coreaudio.c         |  51 +--
- audio/dsoundaudio.c       |  61 +--
- audio/noaudio.c           |   3 +-
- audio/ossaudio.c          | 191 +++------
- audio/paaudio.c           | 111 ++---
- audio/sdlaudio.c          |  50 +--
- audio/spiceaudio.c        |  11 +-
- audio/wavaudio.c          |  75 +---
- audio/wavcapture.c        |   2 +-
- hw/arm/omap2.c            |   2 +-
- hw/audio/ac97.c           |   2 +-
- hw/audio/adlib.c          |   2 +-
- hw/audio/cs4231a.c        |   6 +-
- hw/audio/es1370.c         |   4 +-
- hw/audio/gus.c            |   2 +-
- hw/audio/hda-codec.c      |  18 +-
- hw/audio/lm4549.c         |   6 +-
- hw/audio/milkymist-ac97.c |   2 +-
- hw/audio/pcspk.c          |   2 +-
- hw/audio/sb16.c           |  14 +-
- hw/audio/wm8750.c         |   6 +-
- hw/display/xlnx_dp.c      |   2 +-
- hw/input/tsc210x.c        |   2 +-
- hw/usb/dev-audio.c        |   2 +-
- ui/vnc.c                  |  26 +-
- vl.c                      |   7 +-
- audio/Makefile.objs       |   2 +-
- qapi/Makefile.objs        |   6 +-
- qemu-options.hx           | 236 ++++++++++-
- 40 files changed, 1829 insertions(+), 1301 deletions(-)
- create mode 100644 qapi/audio.json
- create mode 100644 audio/audio_legacy.c
-
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index 17105e7239..bfba41fefe 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -217,6 +217,34 @@ static void handle_dsound(Audiodev *dev)
+                        &dev->u.dsound.in->has_buffer_len, dev->u.dsound.in);
+ }
+ 
++/* OSS */
++static void handle_oss_per_direction(
++    AudiodevOssPerDirectionOptions *opdo, const char *try_poll_env,
++    const char *dev_env)
++{
++    get_bool(try_poll_env, &opdo->try_poll, &opdo->has_try_poll);
++    get_str(dev_env, &opdo->dev, &opdo->has_dev);
++
++    get_bytes_to_usecs("QEMU_OSS_FRAGSIZE",
++                       &opdo->buffer_len, &opdo->has_buffer_len,
++                       qapi_AudiodevOssPerDirectionOptions_base(opdo));
++    get_int("QEMU_OSS_NFRAGS", &opdo->buffer_count,
++            &opdo->has_buffer_count);
++}
++
++static void handle_oss(Audiodev *dev)
++{
++    AudiodevOssOptions *oopt = &dev->u.oss;
++    handle_oss_per_direction(oopt->in, "QEMU_AUDIO_ADC_TRY_POLL",
++                             "QEMU_OSS_ADC_DEV");
++    handle_oss_per_direction(oopt->out, "QEMU_AUDIO_DAC_TRY_POLL",
++                             "QEMU_OSS_DAC_DEV");
++
++    get_bool("QEMU_OSS_MMAP", &oopt->try_mmap, &oopt->has_try_mmap);
++    get_bool("QEMU_OSS_EXCLUSIVE", &oopt->exclusive, &oopt->has_exclusive);
++    get_int("QEMU_OSS_POLICY", &oopt->dsp_policy, &oopt->has_dsp_policy);
++}
++
+ /* general */
+ static void handle_per_direction(
+     AudiodevPerDirectionOptions *pdo, const char *prefix)
+@@ -270,6 +298,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+         handle_dsound(e->dev);
+         break;
+ 
++    case AUDIODEV_DRIVER_OSS:
++        handle_oss(e->dev);
++        break;
++
+     default:
+         break;
+     }
+diff --git a/audio/ossaudio.c b/audio/ossaudio.c
+index e0cadbef29..fc28981a39 100644
+--- a/audio/ossaudio.c
++++ b/audio/ossaudio.c
+@@ -37,16 +37,6 @@
+ #define USE_DSP_POLICY
+ #endif
+ 
+-typedef struct OSSConf {
+-    int try_mmap;
+-    int nfrags;
+-    int fragsize;
+-    const char *devpath_out;
+-    const char *devpath_in;
+-    int exclusive;
+-    int policy;
+-} OSSConf;
+-
+ typedef struct OSSVoiceOut {
+     HWVoiceOut hw;
+     void *pcm_buf;
+@@ -56,7 +46,7 @@ typedef struct OSSVoiceOut {
+     int fragsize;
+     int mmapped;
+     int pending;
+-    OSSConf *conf;
++    Audiodev *dev;
+ } OSSVoiceOut;
+ 
+ typedef struct OSSVoiceIn {
+@@ -65,12 +55,12 @@ typedef struct OSSVoiceIn {
+     int fd;
+     int nfrags;
+     int fragsize;
+-    OSSConf *conf;
++    Audiodev *dev;
+ } OSSVoiceIn;
+ 
+ struct oss_params {
+     int freq;
+-    AudioFormat fmt;
++    int fmt;
+     int nchannels;
+     int nfrags;
+     int fragsize;
+@@ -262,19 +252,25 @@ static int oss_get_version (int fd, int *version, const char *typ)
+ }
+ #endif
+ 
+-static int oss_open (int in, struct oss_params *req,
+-                     struct oss_params *obt, int *pfd, OSSConf* conf)
++static int oss_open(int in, struct oss_params *req, audsettings *as,
++                    struct oss_params *obt, int *pfd, Audiodev *dev)
+ {
++    AudiodevOssOptions *oopts = &dev->u.oss;
++    AudiodevOssPerDirectionOptions *opdo = in ? oopts->in : oopts->out;
+     int fd;
+-    int oflags = conf->exclusive ? O_EXCL : 0;
++    int oflags = (oopts->has_exclusive && oopts->exclusive) ? O_EXCL : 0;
+     audio_buf_info abinfo;
+     int fmt, freq, nchannels;
+     int setfragment = 1;
+-    const char *dspname = in ? conf->devpath_in : conf->devpath_out;
++    const char *dspname = opdo->has_dev ? opdo->dev : "/dev/dsp";
+     const char *typ = in ? "ADC" : "DAC";
++#ifdef USE_DSP_POLICY
++    int policy = oopts->has_dsp_policy ? oopts->dsp_policy : 5;
++#endif
+ 
+     /* Kludge needed to have working mmap on Linux */
+-    oflags |= conf->try_mmap ? O_RDWR : (in ? O_RDONLY : O_WRONLY);
++    oflags |= (oopts->has_try_mmap && oopts->try_mmap) ?
++        O_RDWR : (in ? O_RDONLY : O_WRONLY);
+ 
+     fd = open (dspname, oflags | O_NONBLOCK);
+     if (-1 == fd) {
+@@ -285,6 +281,9 @@ static int oss_open (int in, struct oss_params *req,
+     freq = req->freq;
+     nchannels = req->nchannels;
+     fmt = req->fmt;
++    req->nfrags = opdo->has_buffer_count ? opdo->buffer_count : 4;
++    req->fragsize = audio_buffer_bytes(
++        qapi_AudiodevOssPerDirectionOptions_base(opdo), as, 23220);
+ 
+     if (ioctl (fd, SNDCTL_DSP_SAMPLESIZE, &fmt)) {
+         oss_logerr2 (errno, typ, "Failed to set sample size %d\n", req->fmt);
+@@ -308,18 +307,18 @@ static int oss_open (int in, struct oss_params *req,
+     }
+ 
+ #ifdef USE_DSP_POLICY
+-    if (conf->policy >= 0) {
++    if (policy >= 0) {
+         int version;
+ 
+         if (!oss_get_version (fd, &version, typ)) {
+             trace_oss_version(version);
+ 
+             if (version >= 0x040000) {
+-                int policy = conf->policy;
+-                if (ioctl (fd, SNDCTL_DSP_POLICY, &policy)) {
++                int policy2 = policy;
++                if (ioctl(fd, SNDCTL_DSP_POLICY, &policy2)) {
+                     oss_logerr2 (errno, typ,
+                                  "Failed to set timing policy to %d\n",
+-                                 conf->policy);
++                                 policy);
+                     goto err;
+                 }
+                 setfragment = 0;
+@@ -502,17 +501,16 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+     int fd;
+     AudioFormat effective_fmt;
+     struct audsettings obt_as;
+-    OSSConf *conf = drv_opaque;
++    Audiodev *dev = drv_opaque;
++    AudiodevOssOptions *oopts = &dev->u.oss;
+ 
+     oss->fd = -1;
+ 
+     req.fmt = aud_to_ossfmt (as->fmt, as->endianness);
+     req.freq = as->freq;
+     req.nchannels = as->nchannels;
+-    req.fragsize = conf->fragsize;
+-    req.nfrags = conf->nfrags;
+ 
+-    if (oss_open (0, &req, &obt, &fd, conf)) {
++    if (oss_open(0, &req, as, &obt, &fd, dev)) {
+         return -1;
+     }
+ 
+@@ -539,7 +537,7 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+     hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
+ 
+     oss->mmapped = 0;
+-    if (conf->try_mmap) {
++    if (oopts->has_try_mmap && oopts->try_mmap) {
+         oss->pcm_buf = mmap (
+             NULL,
+             hw->samples << hw->info.shift,
+@@ -597,7 +595,7 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+     }
+ 
+     oss->fd = fd;
+-    oss->conf = conf;
++    oss->dev = dev;
+     return 0;
+ }
+ 
+@@ -605,16 +603,12 @@ static int oss_ctl_out (HWVoiceOut *hw, int cmd, ...)
+ {
+     int trig;
+     OSSVoiceOut *oss = (OSSVoiceOut *) hw;
++    AudiodevOssPerDirectionOptions *opdo = oss->dev->u.oss.out;
+ 
+     switch (cmd) {
+     case VOICE_ENABLE:
+         {
+-            va_list ap;
+-            int poll_mode;
+-
+-            va_start (ap, cmd);
+-            poll_mode = va_arg (ap, int);
+-            va_end (ap);
++            bool poll_mode = opdo->try_poll;
+ 
+             ldebug ("enabling voice\n");
+             if (poll_mode) {
+@@ -669,16 +663,14 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     int fd;
+     AudioFormat effective_fmt;
+     struct audsettings obt_as;
+-    OSSConf *conf = drv_opaque;
++    Audiodev *dev = drv_opaque;
+ 
+     oss->fd = -1;
+ 
+     req.fmt = aud_to_ossfmt (as->fmt, as->endianness);
+     req.freq = as->freq;
+     req.nchannels = as->nchannels;
+-    req.fragsize = conf->fragsize;
+-    req.nfrags = conf->nfrags;
+-    if (oss_open (1, &req, &obt, &fd, conf)) {
++    if (oss_open(1, &req, as, &obt, &fd, dev)) {
+         return -1;
+     }
+ 
+@@ -712,7 +704,7 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     }
+ 
+     oss->fd = fd;
+-    oss->conf = conf;
++    oss->dev = dev;
+     return 0;
+ }
+ 
+@@ -803,16 +795,12 @@ static int oss_read (SWVoiceIn *sw, void *buf, int size)
+ static int oss_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
++    AudiodevOssPerDirectionOptions *opdo = oss->dev->u.oss.out;
+ 
+     switch (cmd) {
+     case VOICE_ENABLE:
+         {
+-            va_list ap;
+-            int poll_mode;
+-
+-            va_start (ap, cmd);
+-            poll_mode = va_arg (ap, int);
+-            va_end (ap);
++            bool poll_mode = opdo->try_poll;
+ 
+             if (poll_mode) {
+                 oss_poll_in (hw);
+@@ -832,82 +820,36 @@ static int oss_ctl_in (HWVoiceIn *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static OSSConf glob_conf = {
+-    .try_mmap = 0,
+-    .nfrags = 4,
+-    .fragsize = 4096,
+-    .devpath_out = "/dev/dsp",
+-    .devpath_in = "/dev/dsp",
+-    .exclusive = 0,
+-    .policy = 5
+-};
++static void oss_init_per_direction(AudiodevOssPerDirectionOptions *opdo)
++{
++    if (!opdo->has_try_poll) {
++        opdo->try_poll = true;
++        opdo->has_try_poll = true;
++    }
++}
+ 
+ static void *oss_audio_init(Audiodev *dev)
+ {
+-    OSSConf *conf = g_malloc(sizeof(OSSConf));
+-    *conf = glob_conf;
++    AudiodevOssOptions *oopts;
++    assert(dev->driver == AUDIODEV_DRIVER_OSS);
+ 
+-    if (access(conf->devpath_in, R_OK | W_OK) < 0 ||
+-        access(conf->devpath_out, R_OK | W_OK) < 0) {
+-        g_free(conf);
++    oopts = &dev->u.oss;
++    oss_init_per_direction(oopts->in);
++    oss_init_per_direction(oopts->out);
++
++    if (access(oopts->in->has_dev ? oopts->in->dev : "/dev/dsp",
++               R_OK | W_OK) < 0 ||
++        access(oopts->out->has_dev ? oopts->out->dev : "/dev/dsp",
++               R_OK | W_OK) < 0) {
+         return NULL;
+     }
+-    return conf;
++    return dev;
+ }
+ 
+ static void oss_audio_fini (void *opaque)
+ {
+-    g_free(opaque);
+ }
+ 
+-static struct audio_option oss_options[] = {
+-    {
+-        .name  = "FRAGSIZE",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.fragsize,
+-        .descr = "Fragment size in bytes"
+-    },
+-    {
+-        .name  = "NFRAGS",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.nfrags,
+-        .descr = "Number of fragments"
+-    },
+-    {
+-        .name  = "MMAP",
+-        .tag   = AUD_OPT_BOOL,
+-        .valp  = &glob_conf.try_mmap,
+-        .descr = "Try using memory mapped access"
+-    },
+-    {
+-        .name  = "DAC_DEV",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.devpath_out,
+-        .descr = "Path to DAC device"
+-    },
+-    {
+-        .name  = "ADC_DEV",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.devpath_in,
+-        .descr = "Path to ADC device"
+-    },
+-    {
+-        .name  = "EXCLUSIVE",
+-        .tag   = AUD_OPT_BOOL,
+-        .valp  = &glob_conf.exclusive,
+-        .descr = "Open device in exclusive mode (vmix won't work)"
+-    },
+-#ifdef USE_DSP_POLICY
+-    {
+-        .name  = "POLICY",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.policy,
+-        .descr = "Set the timing policy of the device, -1 to use fragment mode",
+-    },
+-#endif
+-    { /* End of list */ }
+-};
+-
+ static struct audio_pcm_ops oss_pcm_ops = {
+     .init_out = oss_init_out,
+     .fini_out = oss_fini_out,
+@@ -925,7 +867,6 @@ static struct audio_pcm_ops oss_pcm_ops = {
+ static struct audio_driver oss_audio_driver = {
+     .name           = "oss",
+     .descr          = "OSS http://www.opensound.com",
+-    .options        = oss_options,
+     .init           = oss_audio_init,
+     .fini           = oss_audio_fini,
+     .pcm_ops        = &oss_pcm_ops,
 -- 
 2.20.1
