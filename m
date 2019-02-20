@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51024)
+Received: from eggs.gnu.org ([209.51.188.92]:50947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ7-0006E9-4x
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:08 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ4-0006Ck-Pi
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ5-0000pa-F6
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:05 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39627)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gwZZ2-0000lR-PN
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:02 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gwZZ5-0000dl-4p
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:03 -0500
-Received: by mail-wr1-x444.google.com with SMTP id l5so26632150wrw.6
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:57 -0800 (PST)
+	id 1gwZZ1-0000Qo-N2
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 16:38:00 -0500
+Received: by mail-wm1-x343.google.com with SMTP id h22so5603218wmb.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:37:52 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Wed, 20 Feb 2019 22:37:41 +0100
-Message-Id: <6ae3b449a138d46395808e8f1f1a1dd9fb267c2c.1550698466.git.DirtY.iCE.hu@gmail.com>
+Date: Wed, 20 Feb 2019 22:37:35 +0100
+Message-Id: <5360bea19c08b79cb618e0cd304bebd36643cf3e.1550698466.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 12/14] spiceaudio: port to -audiodev config
+Subject: [Qemu-devel] [PATCH v5 06/14] coreaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +35,171 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/spiceaudio.c | 5 -----
- 1 file changed, 5 deletions(-)
+ audio/audio_legacy.c | 28 +++++++++++++++++++++++++
+ audio/coreaudio.c    | 49 ++++++++++----------------------------------
+ 2 files changed, 39 insertions(+), 38 deletions(-)
 
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index affc3df17f..4f7873af5a 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -373,10 +373,6 @@ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index 91ec6a3de1..086011fbff 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -109,6 +109,17 @@ static uint32_t frames_to_usecs(uint32_t frames,
+     return (frames * 1000000 + freq / 2) / freq;
+ }
+ 
++
++static void get_frames_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
++                                AudiodevPerDirectionOptions *pdo)
++{
++    const char *val = getenv(env);
++    if (val) {
++        *dst = frames_to_usecs(toui32(val), pdo);
++        *has_dst = true;
++    }
++}
++
+ /* backend specific functions */
+ /* ALSA */
+ static void handle_alsa_per_direction(
+@@ -156,6 +167,19 @@ static void handle_alsa(Audiodev *dev)
+                         &aopt->threshold, &aopt->has_threshold);
+ }
+ 
++/* coreaudio */
++static void handle_coreaudio(Audiodev *dev)
++{
++    get_frames_to_usecs(
++        "QEMU_COREAUDIO_BUFFER_SIZE",
++        &dev->u.coreaudio.out->buffer_len,
++        &dev->u.coreaudio.out->has_buffer_len,
++        qapi_AudiodevCoreaudioPerDirectionOptions_base(dev->u.coreaudio.out));
++    get_int("QEMU_COREAUDIO_BUFFER_COUNT",
++            &dev->u.coreaudio.out->buffer_count,
++            &dev->u.coreaudio.out->has_buffer_count);
++}
++
+ /* general */
+ static void handle_per_direction(
+     AudiodevPerDirectionOptions *pdo, const char *prefix)
+@@ -201,6 +225,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+         handle_alsa(e->dev);
+         break;
+ 
++    case AUDIODEV_DRIVER_COREAUDIO:
++        handle_coreaudio(e->dev);
++        break;
++
+     default:
+         break;
+     }
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index 7d4225dbee..1ee43b7d5f 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -36,11 +36,6 @@
+ #define MAC_OS_X_VERSION_10_6 1060
+ #endif
+ 
+-typedef struct {
+-    int buffer_frames;
+-    int nbuffers;
+-} CoreaudioConf;
+-
+ typedef struct coreaudioVoiceOut {
+     HWVoiceOut hw;
+     pthread_mutex_t mutex;
+@@ -507,7 +502,9 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+     int err;
+     const char *typ = "playback";
+     AudioValueRange frameRange;
+-    CoreaudioConf *conf = drv_opaque;
++    Audiodev *dev = drv_opaque;
++    AudiodevCoreaudioPerDirectionOptions *cpdo = dev->u.coreaudio.out;
++    int frames;
+ 
+     /* create mutex */
+     err = pthread_mutex_init(&core->mutex, NULL);
+@@ -538,16 +535,17 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+         return -1;
+     }
+ 
+-    if (frameRange.mMinimum > conf->buffer_frames) {
++    frames = audio_buffer_frames(
++        qapi_AudiodevCoreaudioPerDirectionOptions_base(cpdo), as, 11610);
++    if (frameRange.mMinimum > frames) {
+         core->audioDevicePropertyBufferFrameSize = (UInt32) frameRange.mMinimum;
+         dolog ("warning: Upsizing Buffer Frames to %f\n", frameRange.mMinimum);
+-    }
+-    else if (frameRange.mMaximum < conf->buffer_frames) {
++    } else if (frameRange.mMaximum < frames) {
+         core->audioDevicePropertyBufferFrameSize = (UInt32) frameRange.mMaximum;
+         dolog ("warning: Downsizing Buffer Frames to %f\n", frameRange.mMaximum);
+     }
+     else {
+-        core->audioDevicePropertyBufferFrameSize = conf->buffer_frames;
++        core->audioDevicePropertyBufferFrameSize = frames;
+     }
+ 
+     /* set Buffer Frame Size */
+@@ -568,7 +566,8 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                            "Could not get device buffer frame size\n");
+         return -1;
+     }
+-    hw->samples = conf->nbuffers * core->audioDevicePropertyBufferFrameSize;
++    hw->samples = (cpdo->has_buffer_count ? cpdo->buffer_count : 4) *
++        core->audioDevicePropertyBufferFrameSize;
+ 
+     /* get StreamFormat */
+     status = coreaudio_get_streamformat(core->outputDeviceID,
+@@ -680,40 +679,15 @@ static int coreaudio_ctl_out (HWVoiceOut *hw, int cmd, ...)
      return 0;
  }
  
--static struct audio_option audio_options[] = {
--    { /* end of list */ },
+-static CoreaudioConf glob_conf = {
+-    .buffer_frames = 512,
+-    .nbuffers = 4,
 -};
 -
- static struct audio_pcm_ops audio_callbacks = {
-     .init_out = line_out_init,
-     .fini_out = line_out_fini,
-@@ -394,7 +390,6 @@ static struct audio_pcm_ops audio_callbacks = {
- static struct audio_driver spice_audio_driver = {
-     .name           = "spice",
-     .descr          = "spice audio driver",
--    .options        = audio_options,
-     .init           = spice_audio_init,
-     .fini           = spice_audio_fini,
-     .pcm_ops        = &audio_callbacks,
+ static void *coreaudio_audio_init(Audiodev *dev)
+ {
+-    CoreaudioConf *conf = g_malloc(sizeof(CoreaudioConf));
+-    *conf = glob_conf;
+-
+-    return conf;
++    return dev;
+ }
+ 
+ static void coreaudio_audio_fini (void *opaque)
+ {
+-    g_free(opaque);
+ }
+ 
+-static struct audio_option coreaudio_options[] = {
+-    {
+-        .name  = "BUFFER_SIZE",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.buffer_frames,
+-        .descr = "Size of the buffer in frames"
+-    },
+-    {
+-        .name  = "BUFFER_COUNT",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.nbuffers,
+-        .descr = "Number of buffers"
+-    },
+-    { /* End of list */ }
+-};
+-
+ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .init_out = coreaudio_init_out,
+     .fini_out = coreaudio_fini_out,
+@@ -725,7 +699,6 @@ static struct audio_pcm_ops coreaudio_pcm_ops = {
+ static struct audio_driver coreaudio_audio_driver = {
+     .name           = "coreaudio",
+     .descr          = "CoreAudio http://developer.apple.com/audio/coreaudio.html",
+-    .options        = coreaudio_options,
+     .init           = coreaudio_audio_init,
+     .fini           = coreaudio_audio_fini,
+     .pcm_ops        = &coreaudio_pcm_ops,
 -- 
 2.20.1
