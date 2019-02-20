@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41847)
+Received: from eggs.gnu.org ([209.51.188.92]:41935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gwTjE-0007jE-D7
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gwTjG-0007na-Ne
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gwTjC-0007Ln-Mt
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:08 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36958)
+	(envelope-from <peter.maydell@linaro.org>) id 1gwTjE-0007Nq-CQ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:10 -0500
+Received: from mail-ot1-f42.google.com ([209.85.210.42]:45286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gwTjA-0006nD-BQ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:06 -0500
-Received: by mail-wm1-x343.google.com with SMTP id x10so6787550wmg.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:22:21 -0800 (PST)
-Date: Wed, 20 Feb 2019 15:22:18 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190220152218.GB30403@stefanha-x1.localdomain>
-References: <alpine.BSF.2.21.9999.1902151046540.80982@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gwTjC-0006eN-Lo
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:24:08 -0500
+Received: by mail-ot1-f42.google.com with SMTP id 32so40610622ota.12
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:21:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+g7M9IMkV8truYOl"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1902151046540.80982@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] MemoryRegionOps access sizes
+References: <1550565421-10944-1-git-send-email-thuth@redhat.com>
+	<1550565421-10944-12-git-send-email-thuth@redhat.com>
+In-Reply-To: <1550565421-10944-12-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Feb 2019 13:42:28 +0000
+Message-ID: <CAFEAcA_jzA+Cz5d8wOm=f_ccE998icD4p+kWD_5tMxuLQj_Wgg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 11/14] MAINTAINERS: Clean up the RISC-V TCG
+ backend section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
+
+On Tue, 19 Feb 2019 at 08:44, Thomas Huth <thuth@redhat.com> wrote:
+>
+> The e-mail address mjc@sifive.com of Micheal is not valid anymore.
+
+Typo: "Michael".
 
 
---+g7M9IMkV8truYOl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 15, 2019 at 10:55:59AM +0100, BALATON Zoltan wrote:
-> Hello,
->=20
-> Could someone please explain how the MemoryRegionOps
-> valid.{min,max}_access_size and unaligned and corresponding impl constrai=
-nts
-> work and where are these implemented? And in particular if this would wor=
-k:
->=20
-> static const MemoryRegionOps ops =3D {
->     .read =3D readfn,
->     .write =3D writefn,
->     .valid.min_access_size =3D 1,
->     .valid.max_access_size =3D 4,
->     .impl.min_access_size =3D 4,
->     .impl.max_access_size =3D 4,
->     .endianness =3D DEVICE_LITTLE_ENDIAN,
-> };
->=20
-> This is related to this question:
-> http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg03157.html
-> but that's probably ignored in the middle of a thread so I ask separately.
-
-CCing Paolo and Peter, who might know the answer.
-
-Otherwise the easiest way to understand the behavior would be to create
-the memory region and try it out using qtest to see what happens in
-practice.
-
-Stefan
-
---+g7M9IMkV8truYOl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcbXCqAAoJEJykq7OBq3PIuW4H/3l4JNeod6ijBbE4h5CFUA7P
-NN/1GPmrQ+vnY4czOPlc89NLUX133wnP4p5otuRqiMQthRY9e5WcjsMfrNaN1zOF
-FCSV1fbYocv1XnA7B0Fw4wbYoW+zNLDZwHUpkn9u93VRFDftR2UM8x6bTl1ignGL
-dYY6fTPkDH4vC9cUIa2jeBKHYF+crEaTPXQ6/riDRoKpHet881LIdd9Rij6E69um
-m/EHxh18aauIPLcwGu+gOuvcDDSyXVS7wRyytSIOF2ibHxP2FTACP8yKYG/Bku8q
-HejbVY1P9vtY3GBum+KGRUMCqGo5aaeKnL5RX/sTJUF/t+1PxEIrh7ecpiYzCWA=
-=U+5d
------END PGP SIGNATURE-----
-
---+g7M9IMkV8truYOl--
+thanks
+-- PMM
