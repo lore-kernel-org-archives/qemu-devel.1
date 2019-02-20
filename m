@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57250)
+Received: from eggs.gnu.org ([209.51.188.92]:58054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gwPtC-0003VR-AD
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:18:11 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gwPwu-0006me-Hn
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gwPtB-0004G3-0W
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:18:10 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:48456 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1gwPt8-0003p8-Hy
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:18:07 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 20 Feb 2019 11:17:35 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB25D2C2@dggeml511-mbx.china.huawei.com>
-References: <20190108060348.3359-1-yan.y.zhao@intel.com>
-	<20190108060348.3359-2-yan.y.zhao@intel.com>
-	<20190108100911.6e089f8c@x1.home>
-	<20190110011922.GA10707@joy-OptiPlex-7040>
-In-Reply-To: <20190110011922.GA10707@joy-OptiPlex-7040>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <mlureau@redhat.com>) id 1gwPwt-0007zH-Bs
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:22:00 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:40117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwPwr-0007t3-Dv
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:21:58 -0500
+Received: by mail-qt1-f193.google.com with SMTP id j36so26677874qta.7
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 03:21:44 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] vfio: assign idstr for VFIO's mmaped
- regions for migration
+References: <20190220010232.18731-1-philmd@redhat.com>
+	<20190220010232.18731-15-philmd@redhat.com>
+In-Reply-To: <20190220010232.18731-15-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Feb 2019 12:21:32 +0100
+Message-ID: <CAMxuvay56AwY0Mw9RfjNU4eJn+zJkvSKDKPpx+Qkx2tgp6r2tQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 14/25] virtio-serial: Let
+ VirtIOSerialPortClass::have_data() use size_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,130 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhao Yan <yan.y.zhao@intel.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1kZXZlbA0KPiBb
-bWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcythcmVpLmdvbmdsZWk9aHVhd2VpLmNvbUBub25nbnUu
-b3JnXSBPbg0KPiBCZWhhbGYgT2YgWmhhbyBZYW4NCj4gU2VudDogVGh1cnNkYXksIEphbnVhcnkg
-MTAsIDIwMTkgOToxOSBBTQ0KPiBUbzogQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25A
-cmVkaGF0LmNvbT4NCj4gQ2M6IHBib256aW5pQHJlZGhhdC5jb207IHFlbXUtZGV2ZWxAbm9uZ251
-Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gdmZpbzogYXNzaWduIGlk
-c3RyIGZvciBWRklPJ3MgbW1hcGVkIHJlZ2lvbnMNCj4gZm9yIG1pZ3JhdGlvbg0KPiANCj4gT24g
-VHVlLCBKYW4gMDgsIDIwMTkgYXQgMTA6MDk6MTFBTSAtMDcwMCwgQWxleCBXaWxsaWFtc29uIHdy
-b3RlOg0KPiA+IE9uIFR1ZSwgIDggSmFuIDIwMTkgMDE6MDM6NDggLTA1MDANCj4gPiBaaGFvIFlh
-biA8eWFuLnkuemhhb0BpbnRlbC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gPiBpZiBtdWx0aXBsZSBy
-ZWdpb25zIGluIHZmaW8gYXJlIG1tYXBlZCwgdGhlaXIgY29ycmVzcG9uZGluZyByYW1ibG9ja3MN
-Cj4gPiA+IGFyZSBsaWtlIGJlbG93LCBpLmUuIHRoZWlyIGlkc3RycyBhcmUgIiIuDQo+ID4gPg0K
-PiA+ID4gKHFlbXUpIGluZm8gcmFtYmxvY2sNCj4gPiA+IEJsb2NrIE5hbWUgIFBTaXplICAgICAg
-IE9mZnNldCAgICAgICAgICAgICAgIFVzZWQNCj4gVG90YWwNCj4gPiA+IHBjLnJhbSAgICAgIDQg
-S2lCICAweDAwMDAwMDAwMDAwMDAwMDAgMHgwMDAwMDAwMDIwMDAwMDAwDQo+IDB4MDAwMDAwMDAy
-MDAwMDAwMA0KPiA+ID4gICAgICAgICAgICAgNCBLaUIgIDB4MDAwMDAwMDAyMTEwMDAwMCAweDAw
-MDAwMDAwMjAwMDAwMDANCj4gMHgwMDAwMDAwMDIwMDAwMDAwDQo+ID4gPiAgICAgICAgICAgICA0
-IEtpQiAgMHgwMDAwMDAwMDIwOTAwMDAwIDB4MDAwMDAwMDAwMDgwMDAwMA0KPiAweDAwMDAwMDAw
-MDA4MDAwMDANCj4gPiA+ICAgICAgICAgICAgIDQgS2lCICAweDAwMDAwMDAwMjAyNDAwMDAgMHgw
-MDAwMDAwMDAwNjg3MDAwDQo+IDB4MDAwMDAwMDAwMDY4NzAwMA0KPiA+ID4gICAgICAgICAgICAg
-NCBLaUIgIDB4MDAwMDAwMDAyMDBjMDAwMCAweDAwMDAwMDAwMDAxNzgwMDANCj4gMHgwMDAwMDAw
-MDAwMTc4MDAwDQo+ID4gPiBwYy5iaW9zICAgICA0IEtpQiAgMHgwMDAwMDAwMDIwMDAwMDAwIDB4
-MDAwMDAwMDAwMDA0MDAwMA0KPiAweDAwMDAwMDAwMDAwNDAwMDANCj4gPiA+IHBjLnJvbSAgICAg
-IDQgS2lCICAweDAwMDAwMDAwMjAwNDAwMDAgMHgwMDAwMDAwMDAwMDIwMDAwDQo+IDB4MDAwMDAw
-MDAwMDAyMDAwMA0KPiA+ID4NCj4gPiA+IFRoaXMgaXMgYmVjYXVzZSByYW1ibG9ja3MnIGlkc3Ry
-IGFyZSBhc3NpZ25lZCBieSBjYWxsaW5nDQo+ID4gPiB2bXN0YXRlX3JlZ2lzdGVyX3JhbSgpLCBi
-dXQgbWVtb3J5IHJlZ2lvbiBvZiB0eXBlIHJhbSBkZXZpY2UgcHRyIGRvZXMNCj4gbm90DQo+ID4g
-PiBjYWxsIHZtc3RhdGVfcmVnaXN0ZXJfcmFtKCkuDQo+ID4gPiB2ZmlvX3JlZ2lvbl9tbWFwDQo+
-ID4gPiAgICAgICAgIHwtPm1lbW9yeV9yZWdpb25faW5pdF9yYW1fZGV2aWNlX3B0cg0KPiA+ID4g
-ICAgICAgICAgICAgICAgfC0+IG1lbW9yeV9yZWdpb25faW5pdF9yYW1fcHRyDQo+ID4gPg0KPiA+
-ID4gV2l0aG91dCBlbXB0eSBpZHN0cnMgd2lsbCBjYXVzZSBwcm9ibGVtIHRvIHNuYXBzaG90IGNv
-cHlpbmcgZHVyaW5nDQo+ID4gPiBtaWdyYXRpb24sIGJlY2F1c2UgaXQgdXNlcyByYW1ibG9ja3Mn
-IGlkc3RyIHRvIGlkZW50aWZ5IHJhbWJsb2Nrcy4NCj4gPiA+IHJhbV9zYXZlX3NldHVwIHsNCj4g
-PiA+ICAg4oCmDQo+ID4gPiAgIFJBTUJMT0NLX0ZPUkVBQ0goYmxvY2spIHsNCj4gPiA+ICAgICAg
-IHFlbXVfcHV0X2J5dGUoZiwgc3RybGVuKGJsb2NrLT5pZHN0cikpOw0KPiA+ID4gICAgICAgcWVt
-dV9wdXRfYnVmZmVyKGYsICh1aW50OF90ICopYmxvY2stPmlkc3RyLHN0cmxlbihibG9jay0+aWRz
-dHIpKTsNCj4gPiA+ICAgICAgIHFlbXVfcHV0X2JlNjQoZiwgYmxvY2stPnVzZWRfbGVuZ3RoKTsN
-Cj4gPiA+ICAgfQ0KPiA+ID4gICDigKYNCj4gPiA+IH0NCj4gPiA+IHJhbV9sb2FkKCkgew0KPiA+
-ID4gICAgIGJsb2NrID0gcWVtdV9yYW1fYmxvY2tfYnlfbmFtZShpZCk7DQo+ID4gPiAgICAgaWYg
-KGJsb2NrKSB7DQo+ID4gPiAgICAgICAgIGlmIChsZW5ndGggIT0gYmxvY2stPnVzZWRfbGVuZ3Ro
-KSB7DQo+ID4gPiAgICAgICAgICAgICBxZW11X3JhbV9yZXNpemUoYmxvY2ssIGxlbmd0aCwgJmxv
-Y2FsX2Vycik7DQo+ID4gPiAgICAgICAgIH0NCj4gPiA+ICAgICAg4oCmLg0KPiA+ID4gICAgfQ0K
-PiA+ID4gfQ0KPiA+ID4NCj4gPiA+IFRoZXJlZm9yZSwgaW4gdGhpcyBwYXRjaCwNCj4gPiA+IHZt
-c3RhdGVfcmVnaXN0ZXJfcmFtKCkgaXMgY2FsbGVkIGZvciBtZW1vcnkgcmVnaW9uIG9mIHR5cGUg
-cmFtIHB0ciwNCj4gPiA+IGFsc28gYSB1bmlxdWUgdmZpb2lkIGlzIGFzc2lnbmVkIHRvIHZmaW8g
-ZGV2aWNlcyBhY3Jvc3Mgc291cmNlDQo+ID4gPiBhbmQgdGFyZ2V0IHZtcy4NCj4gPiA+IGUuZy4g
-aW4gc291cmNlIHZtLCB1c2UgcWVtdSBwYXJhbWV0ZXINCj4gPiA+IC1kZXZpY2UNCj4gPiA+IHZm
-aW8tcGNpLHN5c2ZzZGV2PS9zeXMvYnVzL3BjaS9kZXZpY2VzLzAwMDA6MDA6MDIuMC8NCj4gPiA+
-IDg4MmNjNGRhLWRlZGUtMTFlNy05MTgwLTA3OGE2MjA2M2FiMSx2ZmlvaWQ9aWdkDQo+ID4gPg0K
-PiA+ID4gYW5kIGluIHRhcmdldCB2bSwgdXNlIHFlbXUgcGFyYW10ZXINCj4gPiA+IC1kZXZpY2UN
-Cj4gPiA+IHZmaW8tcGNpLHN5c2ZzZGV2PS9zeXMvYnVzL3BjaS9kZXZpY2VzLzAwMDA6MDA6MDIu
-MC8NCj4gPiA+IDVhYzFmYjIwLTJiYmYtNDg0Mi1iYjdlLTM2YzU4YzNiZTljZCx2ZmlvaWQ9aWdk
-DQo+ID4NCj4gPiBXaHkgd291bGRuJ3Qgd2UganVzdCB1c2UgdGhlIGlkPSAoRGV2aWNlU3RhdGUu
-aWQpIHZhbHVlIGluc3RlYWQgb2YNCj4gPiBhZGRpbmcgeWV0IGFub3RoZXIgb25lPyAgSSBjYW4n
-dCBpbWFnaW5lIGFueW9uZSwgZXNwZWNpYWxseSBsaWJ2aXJ0LA0KPiA+IHdhbnRzIHRvIGRlYWwg
-d2l0aCBhIHZmaW8gc3BlY2lmaWMgaWQgZm9yIGEgZGV2aWNlLg0KPiA+DQo+IGhpIEFsZXgNCj4g
-WW91IGFyZSByaWdodCEgRGV2aWNlU3RhdGUuaWQgY2FuIGJlIHVzZWQgaGVyZS4gVGhhbmtzIGZv
-ciB5b3VyIHN1Z2dlc3Rpb24uDQo+IA0KVGhlbiBMaWJ2aXJ0IGFuZC9vciBOb3ZhIG5lZWQgdG8g
-a2VlcCB0aGUgZGV2aWNlIGlkIHVuY2hhbmdlZC4NCg0KPiANCj4gPiA+IFNpZ25lZC1vZmYtYnk6
-IFpoYW8gWWFuIDx5YW4ueS56aGFvQGludGVsLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGh3L3Zm
-aW8vcGNpLmMgICAgICAgICAgICAgICAgIHwgOCArKysrKysrLQ0KPiA+ID4gIGluY2x1ZGUvaHcv
-dmZpby92ZmlvLWNvbW1vbi5oIHwgMSArDQo+ID4gPiAgbWVtb3J5LmMgICAgICAgICAgICAgICAg
-ICAgICAgfCA0ICsrKysNCj4gPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyks
-IDEgZGVsZXRpb24oLSkNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0IGEvaHcvdmZpby9wY2kuYyBi
-L2h3L3ZmaW8vcGNpLmMNCj4gPiA+IGluZGV4IGMwY2IxZWMyODkuLjdiYzJlZDA3NTIgMTAwNjQ0
-DQo+ID4gPiAtLS0gYS9ody92ZmlvL3BjaS5jDQo+ID4gPiArKysgYi9ody92ZmlvL3BjaS5jDQo+
-ID4gPiBAQCAtMjUzMyw3ICsyNTMzLDEyIEBAIHN0YXRpYyB2b2lkIHZmaW9fcG9wdWxhdGVfZGV2
-aWNlKFZGSU9QQ0lEZXZpY2UNCj4gKnZkZXYsIEVycm9yICoqZXJycCkNCj4gPiA+ICAgICAgfQ0K
-PiA+ID4NCj4gPiA+ICAgICAgZm9yIChpID0gVkZJT19QQ0lfQkFSMF9SRUdJT05fSU5ERVg7IGkg
-PA0KPiBWRklPX1BDSV9ST01fUkVHSU9OX0lOREVYOyBpKyspIHsNCj4gPiA+IC0gICAgICAgIGNo
-YXIgKm5hbWUgPSBnX3N0cmR1cF9wcmludGYoIiVzIEJBUiAlZCIsIHZiYXNlZGV2LT5uYW1lLCBp
-KTsNCj4gPiA+ICsgICAgICAgIGNoYXIgKm5hbWU7DQo+ID4gPiArICAgICAgICBpZiAodmJhc2Vk
-ZXYtPnZmaW9pZCkgew0KPiA+ID4gKyAgICAgICAgICAgIG5hbWUgPSBnX3N0cmR1cF9wcmludGYo
-IiVzIEJBUiAlZCIsIHZiYXNlZGV2LT52ZmlvaWQsIGkpOw0KPiA+ID4gKyAgICAgICAgfSBlbHNl
-IHsNCj4gPiA+ICsgICAgICAgICAgICBuYW1lID0gZ19zdHJkdXBfcHJpbnRmKCIlcyBCQVIgJWQi
-LCB2YmFzZWRldi0+bmFtZSwgaSk7DQo+ID4gPiArICAgICAgICB9DQo+ID4gPg0KPiA+ID4gICAg
-ICAgICAgcmV0ID0gdmZpb19yZWdpb25fc2V0dXAoT0JKRUNUKHZkZXYpLCB2YmFzZWRldiwNCj4g
-PiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZ2ZGV2LT5iYXJzW2ldLnJlZ2lv
-biwgaSwgbmFtZSk7DQo+ID4gPiBAQCAtMzE4MCw2ICszMTg1LDcgQEAgc3RhdGljIHZvaWQgdmZp
-b19pbnN0YW5jZV9pbml0KE9iamVjdCAqb2JqKQ0KPiA+ID4gIHN0YXRpYyBQcm9wZXJ0eSB2Zmlv
-X3BjaV9kZXZfcHJvcGVydGllc1tdID0gew0KPiA+ID4gICAgICBERUZJTkVfUFJPUF9QQ0lfSE9T
-VF9ERVZBRERSKCJob3N0IiwgVkZJT1BDSURldmljZSwgaG9zdCksDQo+ID4gPiAgICAgIERFRklO
-RV9QUk9QX1NUUklORygic3lzZnNkZXYiLCBWRklPUENJRGV2aWNlLA0KPiB2YmFzZWRldi5zeXNm
-c2RldiksDQo+ID4gPiArICAgIERFRklORV9QUk9QX1NUUklORygidmZpb2lkIiwgVkZJT1BDSURl
-dmljZSwgdmJhc2VkZXYudmZpb2lkKSwNCj4gPiA+ICAgICAgREVGSU5FX1BST1BfT05fT0ZGX0FV
-VE8oImRpc3BsYXkiLCBWRklPUENJRGV2aWNlLA0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBkaXNwbGF5LCBPTl9PRkZfQVVUT19PRkYpLA0KPiA+ID4gICAgICBERUZJTkVfUFJP
-UF9VSU5UMzIoIngtaW50eC1tbWFwLXRpbWVvdXQtbXMiLCBWRklPUENJRGV2aWNlLA0KPiA+ID4g
-ZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcvdmZpby92ZmlvLWNvbW1vbi5oIGIvaW5jbHVkZS9ody92
-ZmlvL3ZmaW8tY29tbW9uLmgNCj4gPiA+IGluZGV4IDFiNDM0ZDAyZjYuLjg0YmFiOTRmNTIgMTAw
-NjQ0DQo+ID4gPiAtLS0gYS9pbmNsdWRlL2h3L3ZmaW8vdmZpby1jb21tb24uaA0KPiA+ID4gKysr
-IGIvaW5jbHVkZS9ody92ZmlvL3ZmaW8tY29tbW9uLmgNCj4gPiA+IEBAIC0xMDgsNiArMTA4LDcg
-QEAgdHlwZWRlZiBzdHJ1Y3QgVkZJT0RldmljZSB7DQo+ID4gPiAgICAgIHN0cnVjdCBWRklPR3Jv
-dXAgKmdyb3VwOw0KPiA+ID4gICAgICBjaGFyICpzeXNmc2RldjsNCj4gPiA+ICAgICAgY2hhciAq
-bmFtZTsNCj4gPiA+ICsgICAgY2hhciAqdmZpb2lkOw0KPiA+ID4gICAgICBEZXZpY2VTdGF0ZSAq
-ZGV2Ow0KPiA+ID4gICAgICBpbnQgZmQ7DQo+ID4gPiAgICAgIGludCB0eXBlOw0KPiA+ID4gZGlm
-ZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCj4gPiA+IGluZGV4IGQxNGM2ZGVjMWQuLmRi
-YjI5ZmE5ODkgMTAwNjQ0DQo+ID4gPiAtLS0gYS9tZW1vcnkuYw0KPiA+ID4gKysrIGIvbWVtb3J5
-LmMNCj4gPiA+IEBAIC0xNTg4LDYgKzE1ODgsNyBAQCB2b2lkDQo+IG1lbW9yeV9yZWdpb25faW5p
-dF9yYW1fcHRyKE1lbW9yeVJlZ2lvbiAqbXIsDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICB1aW50NjRfdCBzaXplLA0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgdm9pZCAqcHRyKQ0KPiA+ID4gIHsNCj4gPiA+ICsgICAgRGV2aWNlU3RhdGUgKm93
-bmVyX2RldjsNCj4gPiA+ICAgICAgbWVtb3J5X3JlZ2lvbl9pbml0KG1yLCBvd25lciwgbmFtZSwg
-c2l6ZSk7DQo+ID4gPiAgICAgIG1yLT5yYW0gPSB0cnVlOw0KPiA+ID4gICAgICBtci0+dGVybWlu
-YXRlcyA9IHRydWU7DQo+ID4gPiBAQCAtMTU5Nyw2ICsxNTk4LDkgQEAgdm9pZA0KPiBtZW1vcnlf
-cmVnaW9uX2luaXRfcmFtX3B0cihNZW1vcnlSZWdpb24gKm1yLA0KPiA+ID4gICAgICAvKiBxZW11
-X3JhbV9hbGxvY19mcm9tX3B0ciBjYW5ub3QgZmFpbCB3aXRoIHB0ciAhPSBOVUxMLiAgKi8NCj4g
-PiA+ICAgICAgYXNzZXJ0KHB0ciAhPSBOVUxMKTsNCj4gPiA+ICAgICAgbXItPnJhbV9ibG9jayA9
-IHFlbXVfcmFtX2FsbG9jX2Zyb21fcHRyKHNpemUsIHB0ciwgbXIsDQo+ICZlcnJvcl9mYXRhbCk7
-DQo+ID4gPiArDQo+ID4gPiArICAgIG93bmVyX2RldiA9IERFVklDRShvd25lcik7DQo+ID4gPiAr
-ICAgIHZtc3RhdGVfcmVnaXN0ZXJfcmFtKG1yLCBvd25lcl9kZXYpOw0KPiA+DQo+ID4gV2hlcmUg
-ZG9lcyB0aGUgY29ycmVzcG9uZGluZyB2bXN0YXRlX3VucmVnaXN0ZXJfcmFtKCkgY2FsbCBvY2N1
-ciB3aGVuDQo+ID4gdW5wbHVnZ2VkPyAgVGhhbmtzLA0KPiA+DQo+IHNvcnJ5LCBJIGp1c3QgdXBk
-YXRlZCBteSBxZW11IGNvZGUgYmFzZSBhbmQgZm91bmQgdGhhdCBpbiBtaWdyYXRpb24vcmFtLmMN
-Cj4gbm93IGl0IHdpbGwgbm90IHNhdmUvcmVzdG9yZSByYW1ibG9ja3Mgd2hvIGRvIG5vdCBjYWxs
-DQo+IHZtc3RhdGVfcmVnaXRzZXJfcmFtKCkuDQo+IHRoZXJlZm9yZSwgdGhlIHZtc3RhdGVfcmVn
-aXN0ZXJfcmFtKCkgbWF5IG5vdCBiZSBuZWNlc3NhcnkgZm9yIG1lbW9yeQ0KPiByZWdpb24gbWFw
-cGVkIHRvIGRldmljZSByZXNvdXJjZXMsIGFzIGl0J3MgYmV0dGVyIHRvIHNhdmUvcmVzdG9yZSB0
-aGF0IHBhcnQNCj4gb2YgbWVtb3J5IGZyb20gdmVuZG9yIGRyaXZlciBzaWRlLg0KPiBTbywgZG8g
-eW91IHRoaW5rIGl0J3Mgb2sgdG8ganVzdCBjYWxsIHFlbXVfcmFtX3NldF9pZHN0cigpIHRvIHNl
-dCBpZHN0ciBmb3INCj4gcmFtYmxvY2tzIG9mIG1tYXBlZCByZWdpb24/DQo+IA0KPiBUaGFua3MN
-Cj4gWWFuDQo+IA0KV2h5IG5vdCBpbnZva2luZyB2bXN0YXRlX3JlZ2lzdGVyX3JhbSgpIGluIHZm
-aW9fcmVnaW9uX21tYXAgYW5kDQpJbnZva2luZyB2bXN0YXRlX3VucmVnaXN0ZXJfcmFtKCkgaW4g
-dmZpb19yZWdpb25fZXhpdD8NCg0KUmVnYXJkcywNCi1Hb25nbGVpDQoNCg==
+On Wed, Feb 20, 2019 at 2:06 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Both callers in hw/char/virtio-serial-bus.c provide unsigned values,
+> even the trace event display an unsigned value.
+> Convert the have_data() handler to take an unsigned value.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+> It is funny/scary that there are big comments about how to treat
+> errors to set the return value, then the return value is simply
+> ignored by the caller.
+
+have_data() return value? yes, the code may have change and the
+comment doesn't seem to reflect accurately what's going on.
+
+> ---
+>  hw/char/virtio-console.c          | 2 +-
+>  include/hw/virtio/virtio-serial.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+> index 2cbe1d4ed5..19639dca3b 100644
+> --- a/hw/char/virtio-console.c
+> +++ b/hw/char/virtio-console.c
+> @@ -45,7 +45,7 @@ static gboolean chr_write_unblocked(GIOChannel *chan, G=
+IOCondition cond,
+>
+>  /* Callback function that's called when the guest sends us data */
+>  static ssize_t flush_buf(VirtIOSerialPort *port,
+> -                         const uint8_t *buf, ssize_t len)
+> +                         const uint8_t *buf, size_t len)
+>  {
+>      VirtConsole *vcon =3D VIRTIO_CONSOLE(port);
+>      ssize_t ret;
+> diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio=
+-serial.h
+> index 12657a9f39..f1a5ccf4f7 100644
+> --- a/include/hw/virtio/virtio-serial.h
+> +++ b/include/hw/virtio/virtio-serial.h
+> @@ -81,7 +81,7 @@ typedef struct VirtIOSerialPortClass {
+>       * 'len'.  In this case, throttling will be enabled for this port.
+>       */
+>      ssize_t (*have_data)(VirtIOSerialPort *port, const uint8_t *buf,
+> -                         ssize_t len);
+> +                         size_t len);
+>  } VirtIOSerialPortClass;
+>
+>  /*
+> --
+> 2.20.1
+>
