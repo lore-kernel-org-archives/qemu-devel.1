@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41112)
+Received: from eggs.gnu.org ([209.51.188.92]:41326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwGR3-00059h-Iv
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:12:30 -0500
+	(envelope-from <philmd@redhat.com>) id 1gwGR7-0005xU-MD
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwGJ0-0001j3-VI
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:04:12 -0500
+	(envelope-from <philmd@redhat.com>) id 1gwGIz-0001iT-VB
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:04:11 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Wed, 20 Feb 2019 02:02:08 +0100
-Message-Id: <20190220010232.18731-2-philmd@redhat.com>
+Date: Wed, 20 Feb 2019 02:02:11 +0100
+Message-Id: <20190220010232.18731-5-philmd@redhat.com>
 In-Reply-To: <20190220010232.18731-1-philmd@redhat.com>
 References: <20190220010232.18731-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 01/25] chardev: Simplify
- IOWatchPoll::fd_can_read as a GSourceFunc
+Subject: [Qemu-devel] [PATCH v3 04/25] chardev: Let qemu_chr_be_can_write()
+ return a size_t types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,163 +26,301 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-IOWatchPoll::fd_can_read() really is a GSourceFunc type, it simply
-returns a boolean value.
-Update the backends to return a boolean, whether there is data to
-read from the source or not.
+In the previous commit we added an assert to be sure than
+qemu_chr_be_can_write() will never return a negative value.
+We can now change its prototype to return a size_t.
+Adapt the backends accordingly.
 
 Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- chardev/char-fd.c         | 4 ++--
- chardev/char-io.c         | 6 +++---
+ chardev/baum.c            | 6 +++---
+ chardev/char-fd.c         | 2 +-
  chardev/char-pty.c        | 4 ++--
- chardev/char-socket.c     | 6 +++---
+ chardev/char-socket.c     | 7 ++++---
  chardev/char-udp.c        | 4 ++--
- include/chardev/char-io.h | 2 +-
- 6 files changed, 13 insertions(+), 13 deletions(-)
+ chardev/char-win.c        | 2 +-
+ chardev/char.c            | 2 +-
+ chardev/msmouse.c         | 4 ++--
+ chardev/spice.c           | 2 +-
+ chardev/wctablet.c        | 4 ++--
+ hw/bt/hci-csr.c           | 2 +-
+ include/chardev/char-fd.h | 2 +-
+ include/chardev/char.h    | 2 +-
+ ui/console.c              | 6 +++---
+ 14 files changed, 25 insertions(+), 24 deletions(-)
 
+diff --git a/chardev/baum.c b/chardev/baum.c
+index 78b0c87625..1d69d62158 100644
+--- a/chardev/baum.c
++++ b/chardev/baum.c
+@@ -265,7 +265,7 @@ static int baum_deferred_init(BaumChardev *baum)
+ static void baum_chr_accept_input(struct Chardev *chr)
+ {
+     BaumChardev *baum =3D BAUM_CHARDEV(chr);
+-    int room, first;
++    size_t room, first;
+=20
+     if (!baum->out_buf_used)
+         return;
+@@ -292,7 +292,7 @@ static void baum_write_packet(BaumChardev *baum, cons=
+t uint8_t *buf, int len)
+ {
+     Chardev *chr =3D CHARDEV(baum);
+     uint8_t io_buf[1 + 2 * len], *cur =3D io_buf;
+-    int room;
++    size_t room;
+     *cur++ =3D ESC;
+     while (len--)
+         if ((*cur++ =3D *buf++) =3D=3D ESC)
+@@ -303,7 +303,7 @@ static void baum_write_packet(BaumChardev *baum, cons=
+t uint8_t *buf, int len)
+         /* Fits */
+         qemu_chr_be_write(chr, io_buf, len);
+     } else {
+-        int first;
++        size_t first;
+         uint8_t out;
+         /* Can't fit all, send what can be, and store the rest. */
+         qemu_chr_be_write(chr, io_buf, room);
 diff --git a/chardev/char-fd.c b/chardev/char-fd.c
-index 2c9b2ce567..2421d8e216 100644
+index 2421d8e216..0fe2822869 100644
 --- a/chardev/char-fd.c
 +++ b/chardev/char-fd.c
-@@ -69,13 +69,13 @@ static gboolean fd_chr_read(QIOChannel *chan, GIOCond=
-ition cond, void *opaque)
-     return TRUE;
- }
-=20
--static int fd_chr_read_poll(void *opaque)
-+static gboolean fd_chr_read_poll(void *opaque)
+@@ -43,7 +43,7 @@ static gboolean fd_chr_read(QIOChannel *chan, GIOCondit=
+ion cond, void *opaque)
  {
      Chardev *chr =3D CHARDEV(opaque);
      FDChardev *s =3D FD_CHARDEV(opaque);
+-    int len;
++    size_t len;
+     uint8_t buf[CHR_READ_BUF_LEN];
+     ssize_t ret;
 =20
-     s->max_size =3D qemu_chr_be_can_write(chr);
--    return s->max_size;
-+    return s->max_size > 0;
- }
-=20
- static GSource *fd_chr_add_watch(Chardev *chr, GIOCondition cond)
-diff --git a/chardev/char-io.c b/chardev/char-io.c
-index 8ced184160..2c1c69098e 100644
---- a/chardev/char-io.c
-+++ b/chardev/char-io.c
-@@ -30,7 +30,7 @@ typedef struct IOWatchPoll {
-     QIOChannel *ioc;
-     GSource *src;
-=20
--    IOCanReadHandler *fd_can_read;
-+    GSourceFunc fd_can_read;
-     GSourceFunc fd_read;
-     void *opaque;
- } IOWatchPoll;
-@@ -44,7 +44,7 @@ static gboolean io_watch_poll_prepare(GSource *source,
-                                       gint *timeout)
- {
-     IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
--    bool now_active =3D iwp->fd_can_read(iwp->opaque) > 0;
-+    bool now_active =3D iwp->fd_can_read(iwp->opaque);
-     bool was_active =3D iwp->src !=3D NULL;
-     if (was_active =3D=3D now_active) {
-         return FALSE;
-@@ -76,7 +76,7 @@ static GSourceFuncs io_watch_poll_funcs =3D {
-=20
- GSource *io_add_watch_poll(Chardev *chr,
-                         QIOChannel *ioc,
--                        IOCanReadHandler *fd_can_read,
-+                        GSourceFunc fd_can_read,
-                         QIOChannelFunc fd_read,
-                         gpointer user_data,
-                         GMainContext *context)
 diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index b034332edd..7777f6ddef 100644
+index 7777f6ddef..eae25f043b 100644
 --- a/chardev/char-pty.c
 +++ b/chardev/char-pty.c
-@@ -119,13 +119,13 @@ static GSource *pty_chr_add_watch(Chardev *chr, GIO=
-Condition cond)
-     return qio_channel_create_watch(s->ioc, cond);
- }
+@@ -34,7 +34,7 @@
+ typedef struct {
+     Chardev parent;
+     QIOChannel *ioc;
+-    int read_bytes;
++    size_t read_bytes;
 =20
--static int pty_chr_read_poll(void *opaque)
-+static gboolean pty_chr_read_poll(void *opaque)
+     int connected;
+     GSource *timer_src;
+@@ -132,7 +132,7 @@ static gboolean pty_chr_read(QIOChannel *chan, GIOCon=
+dition cond, void *opaque)
  {
      Chardev *chr =3D CHARDEV(opaque);
      PtyChardev *s =3D PTY_CHARDEV(opaque);
+-    gsize len;
++    size_t len;
+     uint8_t buf[CHR_READ_BUF_LEN];
+     ssize_t ret;
 =20
-     s->read_bytes =3D qemu_chr_be_can_write(chr);
--    return s->read_bytes;
-+    return s->read_bytes > 0;
- }
-=20
- static gboolean pty_chr_read(QIOChannel *chan, GIOCondition cond, void *=
-opaque)
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 4fcdd8aedd..262a59b64f 100644
+index 262a59b64f..4010c343e0 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -147,7 +147,7 @@ static void tcp_chr_accept(QIONetListener *listener,
-                            QIOChannelSocket *cioc,
-                            void *opaque);
-=20
--static int tcp_chr_read_poll(void *opaque);
-+static gboolean tcp_chr_read_poll(void *opaque);
- static void tcp_chr_disconnect(Chardev *chr);
-=20
- /* Called with chr_write_lock held.  */
-@@ -184,7 +184,7 @@ static int tcp_chr_write(Chardev *chr, const uint8_t =
-*buf, int len)
-     }
- }
-=20
--static int tcp_chr_read_poll(void *opaque)
-+static gboolean tcp_chr_read_poll(void *opaque)
- {
+@@ -60,7 +60,7 @@ typedef struct {
+     GSource *hup_source;
+     QCryptoTLSCreds *tls_creds;
+     TCPChardevState state;
+-    int max_size;
++    size_t max_size;
+     int do_telnetopt;
+     int do_nodelay;
+     int *read_msgfds;
+@@ -493,10 +493,11 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOC=
+ondition cond, void *opaque)
      Chardev *chr =3D CHARDEV(opaque);
      SocketChardev *s =3D SOCKET_CHARDEV(opaque);
-@@ -192,7 +192,7 @@ static int tcp_chr_read_poll(void *opaque)
-         return 0;
-     }
-     s->max_size =3D qemu_chr_be_can_write(chr);
--    return s->max_size;
-+    return s->max_size > 0;
- }
+     uint8_t buf[CHR_READ_BUF_LEN];
+-    int len, size;
++    size_t len;
++    int size;
 =20
- static void tcp_chr_process_IAC_bytes(Chardev *chr,
+     if ((s->state !=3D TCP_CHARDEV_STATE_CONNECTED) ||
+-        s->max_size <=3D 0) {
++        s->max_size =3D=3D 0) {
+         return TRUE;
+     }
+     len =3D sizeof(buf);
 diff --git a/chardev/char-udp.c b/chardev/char-udp.c
-index 097a2f0f42..b6e399e983 100644
+index b6e399e983..d4f40626e4 100644
 --- a/chardev/char-udp.c
 +++ b/chardev/char-udp.c
-@@ -65,7 +65,7 @@ static void udp_chr_flush_buffer(UdpChardev *s)
-     }
- }
+@@ -39,7 +39,7 @@ typedef struct {
+     uint8_t buf[CHR_READ_BUF_LEN];
+     int bufcnt;
+     int bufptr;
+-    int max_size;
++    size_t max_size;
+ } UdpChardev;
 =20
--static int udp_chr_read_poll(void *opaque)
-+static gboolean udp_chr_read_poll(void *opaque)
+ #define UDP_CHARDEV(obj) OBJECT_CHECK(UdpChardev, (obj), TYPE_CHARDEV_UD=
+P)
+@@ -58,7 +58,7 @@ static void udp_chr_flush_buffer(UdpChardev *s)
+     Chardev *chr =3D CHARDEV(s);
+=20
+     while (s->max_size > 0 && s->bufptr < s->bufcnt) {
+-        int n =3D MIN(s->max_size, s->bufcnt - s->bufptr);
++        size_t n =3D MIN(s->max_size, s->bufcnt - s->bufptr);
+         qemu_chr_be_write(chr, &s->buf[s->bufptr], n);
+         s->bufptr +=3D n;
+         s->max_size =3D qemu_chr_be_can_write(chr);
+diff --git a/chardev/char-win.c b/chardev/char-win.c
+index 05518e0958..30361e8852 100644
+--- a/chardev/char-win.c
++++ b/chardev/char-win.c
+@@ -29,7 +29,7 @@
+ static void win_chr_read(Chardev *chr, DWORD len)
  {
-     Chardev *chr =3D CHARDEV(opaque);
-     UdpChardev *s =3D UDP_CHARDEV(opaque);
-@@ -77,7 +77,7 @@ static int udp_chr_read_poll(void *opaque)
-      */
-     udp_chr_flush_buffer(s);
-=20
--    return s->max_size;
-+    return s->max_size > 0;
+     WinChardev *s =3D WIN_CHARDEV(chr);
+-    int max_size =3D qemu_chr_be_can_write(chr);
++    size_t max_size =3D qemu_chr_be_can_write(chr);
+     int ret, err;
+     uint8_t buf[CHR_READ_BUF_LEN];
+     DWORD size;
+diff --git a/chardev/char.c b/chardev/char.c
+index 71ecd32b25..3149cd3ba9 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -156,7 +156,7 @@ int qemu_chr_write(Chardev *s, const uint8_t *buf, in=
+t len, bool write_all)
+     return offset;
  }
 =20
- static gboolean udp_chr_read(QIOChannel *chan, GIOCondition cond, void *=
-opaque)
-diff --git a/include/chardev/char-io.h b/include/chardev/char-io.h
-index 9638da5100..a173874538 100644
---- a/include/chardev/char-io.h
-+++ b/include/chardev/char-io.h
-@@ -31,7 +31,7 @@
- /* Can only be used for read */
- GSource *io_add_watch_poll(Chardev *chr,
-                         QIOChannel *ioc,
--                        IOCanReadHandler *fd_can_read,
-+                        GSourceFunc fd_can_read,
-                         QIOChannelFunc fd_read,
-                         gpointer user_data,
-                         GMainContext *context);
+-int qemu_chr_be_can_write(Chardev *s)
++size_t qemu_chr_be_can_write(Chardev *s)
+ {
+     CharBackend *be =3D s->be;
+     int receivable_bytes;
+diff --git a/chardev/msmouse.c b/chardev/msmouse.c
+index 0ffd137ce8..cdb6f86037 100644
+--- a/chardev/msmouse.c
++++ b/chardev/msmouse.c
+@@ -38,7 +38,7 @@ typedef struct {
+     bool btns[INPUT_BUTTON__MAX];
+     bool btnc[INPUT_BUTTON__MAX];
+     uint8_t outbuf[32];
+-    int outlen;
++    size_t outlen;
+ } MouseChardev;
+=20
+ #define TYPE_CHARDEV_MSMOUSE "chardev-msmouse"
+@@ -48,7 +48,7 @@ typedef struct {
+ static void msmouse_chr_accept_input(Chardev *chr)
+ {
+     MouseChardev *mouse =3D MOUSE_CHARDEV(chr);
+-    int len;
++    size_t len;
+=20
+     len =3D qemu_chr_be_can_write(chr);
+     if (len > mouse->outlen) {
+diff --git a/chardev/spice.c b/chardev/spice.c
+index 173c257949..ad180a8a13 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -43,7 +43,7 @@ static int vmc_write(SpiceCharDeviceInstance *sin, cons=
+t uint8_t *buf, int len)
+     uint8_t* p =3D (uint8_t*)buf;
+=20
+     while (len > 0) {
+-        int can_write =3D qemu_chr_be_can_write(chr);
++        size_t can_write =3D qemu_chr_be_can_write(chr);
+         last_out =3D MIN(len, can_write);
+         if (last_out <=3D 0) {
+             break;
+diff --git a/chardev/wctablet.c b/chardev/wctablet.c
+index cf7a08a363..daae570bc7 100644
+--- a/chardev/wctablet.c
++++ b/chardev/wctablet.c
+@@ -74,7 +74,7 @@ typedef struct {
+=20
+     /* Command to be sent to serial port */
+     uint8_t outbuf[WC_OUTPUT_BUF_MAX_LEN];
+-    int outlen;
++    size_t outlen;
+=20
+     int line_speed;
+     bool send_events;
+@@ -186,7 +186,7 @@ static QemuInputHandler wctablet_handler =3D {
+ static void wctablet_chr_accept_input(Chardev *chr)
+ {
+     TabletChardev *tablet =3D WCTABLET_CHARDEV(chr);
+-    int len, canWrite;
++    size_t len, canWrite;
+=20
+     canWrite =3D qemu_chr_be_can_write(chr);
+     len =3D canWrite;
+diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
+index fa6660a113..e837a3fa1f 100644
+--- a/hw/bt/hci-csr.c
++++ b/hw/bt/hci-csr.c
+@@ -38,7 +38,7 @@ struct csrhci_s {
+ #define FIFO_LEN	4096
+     int out_start;
+     int out_len;
+-    int out_size;
++    size_t out_size;
+     uint8_t outfifo[FIFO_LEN * 2];
+     uint8_t inpkt[FIFO_LEN];
+     enum {
+diff --git a/include/chardev/char-fd.h b/include/chardev/char-fd.h
+index e7c2b176f9..36c6b89cee 100644
+--- a/include/chardev/char-fd.h
++++ b/include/chardev/char-fd.h
+@@ -31,7 +31,7 @@ typedef struct FDChardev {
+     Chardev parent;
+=20
+     QIOChannel *ioc_in, *ioc_out;
+-    int max_size;
++    size_t max_size;
+ } FDChardev;
+=20
+ #define TYPE_CHARDEV_FD "chardev-fd"
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index c0b57f7685..0341dd1ba2 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -173,7 +173,7 @@ Chardev *qemu_chr_new_noreplay(const char *label, con=
+st char *filename,
+  *
+  * Returns: the number of bytes the front end can receive via @qemu_chr_=
+be_write
+  */
+-int qemu_chr_be_can_write(Chardev *s);
++size_t qemu_chr_be_can_write(Chardev *s);
+=20
+ /**
+  * qemu_chr_be_write:
+diff --git a/ui/console.c b/ui/console.c
+index 6d2282d3e9..42f04e2b37 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -61,8 +61,8 @@ enum TTYState {
+=20
+ typedef struct QEMUFIFO {
+     uint8_t *buf;
+-    int buf_size;
+-    int count, wptr, rptr;
++    size_t buf_size, count;
++    int wptr, rptr;
+ } QEMUFIFO;
+=20
+ static int qemu_fifo_write(QEMUFIFO *f, const uint8_t *buf, int len1)
+@@ -1110,7 +1110,7 @@ static int vc_chr_write(Chardev *chr, const uint8_t=
+ *buf, int len)
+ static void kbd_send_chars(void *opaque)
+ {
+     QemuConsole *s =3D opaque;
+-    int len;
++    size_t len;
+     uint8_t buf[16];
+=20
+     len =3D qemu_chr_be_can_write(s->chr);
 --=20
 2.20.1
