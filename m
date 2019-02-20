@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60030)
+Received: from eggs.gnu.org ([209.51.188.92]:60494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gwLW3-0000IP-6H
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 01:38:00 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gwLZ1-0001ZN-01
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 01:41:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1gwLW2-000472-Eq
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 01:37:59 -0500
-Date: Wed, 20 Feb 2019 14:37:23 +0800
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gwLYz-00066k-Fj
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 01:41:02 -0500
+Date: Wed, 20 Feb 2019 14:40:34 +0800
 From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190220063723.GA28876@richard>
+Message-ID: <20190220064034.GB28876@richard>
 Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <1550591757-6192-1-git-send-email-thuth@redhat.com>
+References: <20190219153727.62279-1-stephen.checkoway@oberlin.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1550591757-6192-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/ide/ich: Compile ich.c only if
- CONFIG_PCI is also set
+In-Reply-To: <20190219153727.62279-1-stephen.checkoway@oberlin.edu>
+Subject: Re: [Qemu-devel] [PATCH] block/pflash_cfi02: Fix memory leak and
+ potential use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, yang.zhong@intel.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Feb 19, 2019 at 04:55:57PM +0100, Thomas Huth wrote:
->With the upcoming Kconfig-like build system, it will be easy to
->build also version of QEMU that only contain a single machine. Some
-
-Sorry for my poor English.
-
-What is also version?
-
->of these machines (like the ARM cubieboard) use CONFIG_AHCI for an
->AHCI sysbus device, but do not use CONFIG_PCI since they do not feature
->a PCI bus. In this case linking fails:
+On Tue, Feb 19, 2019 at 10:37:27AM -0500, Stephen Checkoway wrote:
+>Don't dynamically allocate the pflash's timer. But do use timer_del in
+>an unrealize function to make sure that the timer can't fire after the
+>pflash_t has been freed.
 >
->../hw/ide/ich.o: In function `pci_ich9_ahci_realize':
->hw/ide/ich.c:124: undefined reference to `pci_allocate_irq'
->hw/ide/ich.c:126: undefined reference to `pci_register_bar'
->hw/ide/ich.c:128: undefined reference to `pci_register_bar'
->hw/ide/ich.c:131: undefined reference to `pci_add_capability'
->hw/ide/ich.c:147: undefined reference to `msi_init'
->../hw/ide/ich.o: In function `pci_ich9_uninit':
->hw/ide/ich.c:158: undefined reference to `msi_uninit'
->../hw/ide/ich.o:(.data.rel+0x50): undefined reference to `vmstate_pci_device'
->
->Thus we must only compile ich.c if CONFIG_PCI is also set.
->
->Signed-off-by: Thomas Huth <thuth@redhat.com>
+>Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+
 >---
-> hw/ide/Makefile.objs | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> hw/block/pflash_cfi02.c | 15 +++++++++++----
+> 1 file changed, 11 insertions(+), 4 deletions(-)
 >
->diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
->index a142add..dfe53af 100644
->--- a/hw/ide/Makefile.objs
->+++ b/hw/ide/Makefile.objs
->@@ -9,6 +9,6 @@ common-obj-$(CONFIG_IDE_MMIO) += mmio.o
-> common-obj-$(CONFIG_IDE_VIA) += via.o
-> common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
-> common-obj-$(CONFIG_AHCI) += ahci.o
->-common-obj-$(CONFIG_AHCI) += ich.o
->+common-obj-$(call land,$(CONFIG_AHCI),$(CONFIG_PCI)) += ich.o
-> common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
-> common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
+>diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+>index 0f8b7b8c7b..1588aeff5a 100644
+>--- a/hw/block/pflash_cfi02.c
+>+++ b/hw/block/pflash_cfi02.c
+>@@ -84,7 +84,7 @@ struct pflash_t {
+>     uint16_t unlock_addr0;
+>     uint16_t unlock_addr1;
+>     uint8_t cfi_table[0x52];
+>-    QEMUTimer *timer;
+>+    QEMUTimer timer;
+>     /* The device replicates the flash memory across its memory space.  Emulate
+>      * that by having a container (.mem) filled with an array of aliases
+>      * (.mem_mappings) pointing to the flash memory (.orig_mem).
+>@@ -429,7 +429,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>             }
+>             pfl->status = 0x00;
+>             /* Let's wait 5 seconds before chip erase is done */
+>-            timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>+            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>                       (NANOSECONDS_PER_SECOND * 5));
+>             break;
+>         case 0x30:
+>@@ -444,7 +444,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+>             }
+>             pfl->status = 0x00;
+>             /* Let's wait 1/2 second before sector erase is done */
+>-            timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>+            timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>                       (NANOSECONDS_PER_SECOND / 2));
+>             break;
+>         default:
+>@@ -596,7 +596,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+>     pfl->rom_mode = 1;
+>     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
+> 
+>-    pfl->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
+>+    timer_init_ns(&pfl->timer, QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
+>     pfl->wcycle = 0;
+>     pfl->cmd = 0;
+>     pfl->status = 0;
+>@@ -695,11 +695,18 @@ static Property pflash_cfi02_properties[] = {
+>     DEFINE_PROP_END_OF_LIST(),
+> };
+> 
+>+static void pflash_cfi02_unrealize(DeviceState *dev, Error **errp)
+>+{
+>+    pflash_t *pfl = CFI_PFLASH02(dev);
+>+    timer_del(&pfl->timer);
+>+}
+>+
+> static void pflash_cfi02_class_init(ObjectClass *klass, void *data)
+> {
+>     DeviceClass *dc = DEVICE_CLASS(klass);
+> 
+>     dc->realize = pflash_cfi02_realize;
+>+    dc->unrealize = pflash_cfi02_unrealize;
+>     dc->props = pflash_cfi02_properties;
+>     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> }
 >-- 
->1.8.3.1
+>2.17.2 (Apple Git-113)
 >
 
 -- 
