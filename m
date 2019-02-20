@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52027)
+Received: from eggs.gnu.org ([209.51.188.92]:51949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gwW07-0005fU-9L
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gwW04-0005aI-4F
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gwW05-0005Wh-1A
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:43 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gwW03-0005Rl-0v
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:49:40 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Feb 2019 18:48:39 +0100
-Message-Id: <20190220174843.8847-10-kwolf@redhat.com>
+Date: Wed, 20 Feb 2019 18:48:37 +0100
+Message-Id: <20190220174843.8847-8-kwolf@redhat.com>
 In-Reply-To: <20190220174843.8847-1-kwolf@redhat.com>
 References: <20190220174843.8847-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/13] block: Don't poll in
- bdrv_set_aio_context()
+Subject: [Qemu-devel] [PATCH v2 07/13] nbd: Use low-level QIOChannel API in
+ nbd_read_eof()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +25,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-The explicit aio_poll() call in bdrv_set_aio_context() was added in
-commit c2b6428d388 as a workaround for bdrv_drain() failing to achieve
-to actually quiesce everything (specifically the NBD client code to
-switch AioContext).
+Instead of using the convenience wrapper qio_channel_read_all_eof(), use
+the lower level QIOChannel API. This means duplicating some code, but
+we'll need this because this coroutine yield is special: We want it to
+be interruptible so that nbd_client_attach_aio_context() can correctly
+reenter the coroutine.
 
-Now that the NBD client has been fixed to complete this operation during
-bdrv_drain(), we don't need the workaround any more.
-
-It was wrong anyway: aio_poll() must always be run in the home thread of
-the AioContext.
+This moves the bdrv_dec/inc_in_flight() pair into nbd_read_eof(), so
+that connection_co will always sit in this exact qio_channel_yield()
+call when bdrv_drain() returns.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 4 ----
- 1 file changed, 4 deletions(-)
+ include/block/nbd.h |  4 ++--
+ block/nbd-client.c  |  8 +-------
+ nbd/client.c        | 46 ++++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 40 insertions(+), 18 deletions(-)
 
-diff --git a/block.c b/block.c
-index 0c12632661..17bc1d3dca 100644
---- a/block.c
-+++ b/block.c
-@@ -5273,10 +5273,6 @@ void bdrv_set_aio_context(BlockDriverState *bs, Ai=
-oContext *new_context)
-     bdrv_parent_drained_begin(bs, NULL, false);
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index cad975e00c..c6ef1ef42e 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -300,8 +300,8 @@ int nbd_receive_export_list(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
+              Error **errp);
+ int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
+-int coroutine_fn nbd_receive_reply(QIOChannel *ioc, NBDReply *reply,
+-                                   Error **errp);
++int coroutine_fn nbd_receive_reply(BlockDriverState *bs, QIOChannel *ioc=
+,
++                                   NBDReply *reply, Error **errp);
+ int nbd_client(int fd);
+ int nbd_disconnect(int fd);
+ int nbd_errno_to_system_errno(int err);
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 5ce4aa9520..60f38f0320 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -84,15 +84,9 @@ static coroutine_fn void nbd_connection_entry(void *op=
+aque)
+          *
+          * Therefore we keep an additional in_flight reference all the t=
+ime and
+          * only drop it temporarily here.
+-         *
+-         * FIXME This is not safe because the QIOChannel could wake up t=
+he
+-         * coroutine for a second time; it is not prepared for coroutine
+-         * resumption from external code.
+          */
+-        bdrv_dec_in_flight(s->bs);
+         assert(s->reply.handle =3D=3D 0);
+-        ret =3D nbd_receive_reply(s->ioc, &s->reply, &local_err);
+-        bdrv_inc_in_flight(s->bs);
++        ret =3D nbd_receive_reply(s->bs, s->ioc, &s->reply, &local_err);
 =20
--    while (aio_poll(ctx, false)) {
--        /* wait for all bottom halves to execute */
--    }
--
-     bdrv_detach_aio_context(bs);
+         if (local_err) {
+             trace_nbd_read_reply_entry_fail(ret, error_get_pretty(local_=
+err));
+diff --git a/nbd/client.c b/nbd/client.c
+index 28d174c0f3..de7da48246 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -1394,30 +1394,58 @@ static int nbd_receive_structured_reply_chunk(QIO=
+Channel *ioc,
+  *         negative errno on failure (errp is set)
+  */
+ static inline int coroutine_fn
+-nbd_read_eof(QIOChannel *ioc, void *buffer, size_t size, Error **errp)
++nbd_read_eof(BlockDriverState *bs, QIOChannel *ioc, void *buffer, size_t=
+ size,
++             Error **errp)
+ {
+-    int ret;
++    bool partial =3D false;
 =20
-     /* This function executes in the old AioContext so acquire the new o=
-ne in
+     assert(size);
+-    ret =3D qio_channel_read_all_eof(ioc, buffer, size, errp);
+-    if (ret < 0) {
+-        ret =3D -EIO;
++    while (size > 0) {
++        struct iovec iov =3D { .iov_base =3D buffer, .iov_len =3D size }=
+;
++        ssize_t len;
++
++        len =3D qio_channel_readv(ioc, &iov, 1, errp);
++        if (len =3D=3D QIO_CHANNEL_ERR_BLOCK) {
++            bdrv_dec_in_flight(bs);
++            qio_channel_yield(ioc, G_IO_IN);
++            bdrv_inc_in_flight(bs);
++            continue;
++        } else if (len < 0) {
++            return -EIO;
++        } else if (len =3D=3D 0) {
++            if (partial) {
++                error_setg(errp,
++                           "Unexpected end-of-file before all bytes were=
+ read");
++                return -EIO;
++            } else {
++                return 0;
++            }
++        }
++
++        partial =3D true;
++        size -=3D len;
++        buffer =3D (uint8_t*) buffer + len;
+     }
+-    return ret;
++    return 1;
+ }
+=20
+ /* nbd_receive_reply
++ *
++ * Decreases bs->in_flight while waiting for a new reply. This yield is =
+where
++ * we wait indefinitely and the coroutine must be able to be safely reen=
+tered
++ * for nbd_client_attach_aio_context().
++ *
+  * Returns 1 on success
+  *         0 on eof, when no data was read (errp is not set)
+  *         negative errno on failure (errp is set)
+  */
+-int coroutine_fn nbd_receive_reply(QIOChannel *ioc, NBDReply *reply,
+-                                   Error **errp)
++int coroutine_fn nbd_receive_reply(BlockDriverState *bs, QIOChannel *ioc=
+,
++                                   NBDReply *reply, Error **errp)
+ {
+     int ret;
+     const char *type;
+=20
+-    ret =3D nbd_read_eof(ioc, &reply->magic, sizeof(reply->magic), errp)=
+;
++    ret =3D nbd_read_eof(bs, ioc, &reply->magic, sizeof(reply->magic), e=
+rrp);
+     if (ret <=3D 0) {
+         return ret;
+     }
 --=20
 2.20.1
