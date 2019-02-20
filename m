@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57567)
+Received: from eggs.gnu.org ([209.51.188.92]:59443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwNtW-0005fu-7A
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:10:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1gwO3h-00008O-B1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwNtU-0007Gi-0g
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:10:22 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed, 20 Feb 2019 09:10:11 +0000
-Message-ID: <49abba98-bf53-be4e-e69a-3224bdad7d30@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<w51o97m8ltv.fsf@maestria.local.igalia.com>
-	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
-	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
-	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
-	<w51mun2uxts.fsf@maestria.local.igalia.com>
-	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
-	<w51mun18cjy.fsf@maestria.local.igalia.com>
-	<839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
-	<0a42b9c6-9bc6-b826-b90e-226ab4c122e2@virtuozzo.com>
-In-Reply-To: <0a42b9c6-9bc6-b826-b90e-226ab4c122e2@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F0DC0A39DA6CD04D9ED72E347B794662@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gwO3f-0006sp-Bk
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gwO3d-0006py-C1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gwO3a-0004E0-Kj
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 97C112E80CB
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:46 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
- involves copy-on-read filter
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Feb 2019 09:07:13 -0000
+From: flumm <dominik.csapak@gmail.com>
+Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
+Message-Id: <155065363404.1080.10967298812122879257.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
+ memory hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,95 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
-DQoNCk9uIDE4LzAyLzIwMTkgMTM6MDgsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3Jv
-dGU6DQo+IDE0LjAyLjIwMTkgMTY6NDMsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4NCj4+
-DQo+PiBPbiAxMi8wMi8yMDE5IDE0OjM1LCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4+PiBPbiBN
-b24gMTEgRmViIDIwMTkgMDU6NTg6MDUgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IHdyb3RlOg0KPj4+Pj4+IFRoZSBwcm9ibGVtIGlzIGluIHRoZSBjb25jZXB0IG9mICJiYXNl
-IiBub2RlLiBUaGUgY29kZSB3cml0dGVuIGluDQo+Pj4+Pj4gbWFubmVyIHRoYXQgYmFzZSBpcyBu
-b3QgY2hhbmdlZCBkdXJpbmcgYmxvY2sgam9iLiBIb3dldmVyLCBqb2IgZG9uJ3QNCj4+Pj4+PiBv
-d24gYmFzZSBhbmQgdGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgaXQgd2lsbCBub3QgY2hhbmdl
-IGR1cmluZw0KPj4+Pj4+IHRoZSBqb2IuDQo+Pj4+Pg0KPj4+Pj4gQnV0IGlmIHRoYXQncyB0aGUg
-Y2FzZSB0aGVuIHdlIGhhdmUgYSBwcm9ibGVtIGFscmVhZHksIGJlY2F1c2UgJ2Jhc2UnDQo+Pj4+
-PiBpcyBhIG1lbWJlciBvZiBTdHJlYW1CbG9ja0pvYiBhbmQgaXMgdXNlZCBpbiB0aGUgZXhpc3Rp
-bmcNCj4+Pj4+IHN0cmVhbV9ydW4oKSBjb2RlLg0KPj4+Pg0KPj4+PiBJIHRoaW5rIGl0IHNob3Vs
-ZCBiZSBwb3NzaWJsZSB0byByZXByb2R1Y2UsIHVzaW5nIGJsb2NrLWNvbW1pdCAod2hpY2gNCj4+
-Pj4gYWxyZWFkeSBoYXMgZmlsdGVyKSB3aXRoIGJsb2NrLXN0cmVhbSBpbiBwYXJhbGxlbCwgd2Un
-bGwgdHJ5Lg0KPj4+DQo+Pj4gSXQncyBub3QgcG9zc2libGUgdG8gcnVuIGJsb2NrLXN0cmVhbSBh
-bmQgYmxvY2stY29tbWl0IGluIHBhcmFsbGVsIG9uDQo+Pj4gdGhlIHNhbWUgbm9kZXMuIFNlZSBp
-b3Rlc3QgMDMwIGZvciBhIGZldyBleGFtcGxlcy4NCj4+Pg0KPj4+IFNvIHVubGVzcyB0aGVyZSdz
-IGEgYnVnIGl0IHNob3VsZCBiZSBzYWZlLg0KPj4+DQo+Pj4+PiBTbyBpZiB0aGVyZSdzIGEgd2F5
-IHRvIG1ha2UgJ2Jhc2UnIGRpc2FwcGVhciBkdXJpbmcgdGhlIGpvYiAoaG93PykNCj4+Pj4+IHRo
-ZW4gd2UgY291bGQgcHJvdGVjdCBpdCB3aXRoIGJsb2NrX2pvYl9hZGRfYmRydigpLg0KPj4+Pg0K
-Pj4+PiBJJ20gbm90IHN1cmUgdGhpcyBpcyBjb3JyZWN0LiBXaGF0IGlzIHRoZSByZWFzb24gZm9y
-IHN0cmVhbSB0byBvd24NCj4+Pj4gYmFzZT8gSXQncyBub3QgcmVhbGx5IGludGVyZXN0ZWQgaW4g
-aXQuDQo+Pj4NCj4+PiBzdHJlYW0gZG9lcyBub3QgbmVlZCB0byB3cml0ZSBvciBtb2RpZnkgYmFz
-ZSwgYnV0IGl0IGRvZXMgbmVlZCB0byBrZWVwIGENCj4+PiByZWZlcmVuY2UgdG8gaXQgaW4gb3Jk
-ZXIgdG8gbm93IHdoZXJlIHRvIHN0b3AgY29weWluZyBkYXRhLg0KPj4+DQo+Pj4gQXMgSSBzYWlk
-IGVhcmxpZXIgYmFzZSBpcyBhIG1lbWJlciBvZiBTdHJlYW1CbG9ja0pvYiwgc28gaXQgc2hvdWxk
-IG5vdA0KPj4+IGRpc2FwcGVhciBkdXJpbmcgdGhlIGpvYi4NCj4+Pg0KPj4+IEJlcnRvDQo+Pj4N
-Cj4+DQo+PiBObyBkb3VidCB0aGF0IGEgcmVmZXJlbmNlIHRvIHRoZSBiYXNlIG5vZGUgaXMgbmVl
-ZGVkIGFzIGEgbGltaXQgZm9yIHRoZQ0KPj4gQ09SIHdvcmsuIFRoZSBiYXNlIGlzIHN0aWxsIGlu
-IHRoZSBnYW1lLiBBY3R1YWxseSwgd2UgZW5jb3VudGVyIGFuIGlzc3VlDQo+PiB3aGVuIEJsb2Nr
-RHJpdmVyU3RhdGUgb2YgdGhlIENPUi1maWx0ZXIgY29tZXMgaW50byBwbGF5IGluc3RlYWQgb2Yg
-dGhlDQo+PiBiYXNlLiBJdCBpcyBpbmhlcml0ZWQgZnJvbSBhIHBhcmFsbGVsIGpvYi4gQmFzZWQg
-b24gdGhlIGNhc2UNCj4+IHRlc3Rfc3RyZWFtX3BhcmFsbGVsIGZyb20gdGhlIHFlbXUtaW90ZXN0
-cy8wMzAsIGl0IHdvcmtzIGxpa2UgdGhpczoNCj4+IDEuIEpvYiMxIGlzIHN0YXJ0ZWQgYW5kIGlu
-c2VydHMgYSBDT1ItZmlsdGVyIGFib3ZlIHRoZSB0b3Agbm9kZS4NCj4+IDIuIENvbnRleHQgc3dp
-dGNoLg0KPj4gMy4gSm9iIzIgaXMgc3RhcnRlZCBhbmQgaW5oZXJpdHMgdGhlIENPUi1maWx0ZXIg
-YXMgdGhlIGJhc2UuDQo+PiA0LiBDb250ZXh0IHN3aXRjaC4NCj4+IDUuIEpvYiMxIGNvbWVzIHRv
-IHRoZSBlbmQgYW5kIHJlbW92ZXMgaXRzIENPUi1maWx0ZXIgcmVmZXJlbmNlZCBieQ0KPj4gICAg
-ICAgam9iIzIuDQo+PiA2LiBDb250ZXh0IHN3aXRjaC4NCj4+IDcuIEpvYiMyIGNvbWVzIHRvIHRo
-ZSBlbmQgYW5kIHVzZXMgdGhlIGRlbGV0ZWQgQ09SLWZpbHRlciBub2RlLg0KPj4gOC4gV2UgYXJl
-IGluIHRyb3VibGUuDQo+Pg0KPj4gT3IgYW5vdGhlciBzY2VuYXJpbzoNCj4+IDEtNC4gQXMgYWJv
-dmUNCj4+IDUuIEpvYiMyIGNvbWVzIHRvIHRoZSBlbmQgZmlyc3QgYW5kIGtlZXBzIHRoZSBDT1It
-ZmlsdGVyIGFzIHRoZQ0KPj4gICAgICAgYmFja2luZyBub2RlLg0KPj4gNi4gVGhlIGFzc2VydCgp
-IGZhaWxzIGFzIHRoZSByZWZlcmVuY2VkIENPUi1maWx0ZXIgd2FzIG5vdCBkZWxldGVkDQo+PiAg
-ICAgICBvbiBleGl0Lg0KPj4gNy4gVGhlIGdhbWUgaXMgb3ZlciB3aXRoIGEgcG9vciBzY29yZS4N
-Cj4+DQo+PiBJZiB3ZSBqdXN0IGtlZXAgdGhlIGludGVybWVkaWF0ZSBib3R0b20gbm9kZSBpbnN0
-ZWFkIG9mIHRoZSBiYXNlLCB3ZQ0KPj4gd2lsbCBoYXZlIGEgc2ltaWxhciBpc3N1ZS4gT24gdGhl
-IGpvYiBleGl0LCB3ZSBjaGFuZ2UgdGhlIGJhY2tpbmcgZmlsZS4NCj4+IElmIHdlIGNhbGwgdGhl
-IGJhY2tpbmdfYnMoYm90dG9tX25vZGVfYnMpLCB3ZSB3aWxsIGtlZXAgdGhlIENPUi1maWx0ZXIN
-Cj4+IG5vZGUgaW5zdGVhZCwgd2hlcmVhcyBpdCBoYXMgbm90IGJlZW4gcmVtb3ZlZCBqZXQgYnkg
-dGhlIHVuZmluaXNoZWQNCj4+IGpvYiMxIChzZWUgdGhlIHNlY29uZCBzY2VuYXJpbyBhYm92ZSku
-DQo+IA0KPiBIb25lc3RseSwgZG9uJ3Qgc2VlIGFueSBwcm9ibGVtIHdpdGggaXQuDQo+IA0KPj4N
-Cj4+IElmIHdlIGluY2x1ZGUgdGhlIGJhc2Ugbm9kZSBpbnRvIHRoZSBqb2Igbm9kZSBsaXN0IHdp
-dGggc29tZSBwcm90ZWN0aW5nDQo+PiBmbGFncywgdGhhdCdzIGJsb2NrX2pvYl9hZGRfYmRydigm
-cy0+Y29tbW9uLCAiYmFzZSIsIGJhc2UsIC4uKSwgd2UgY2FuDQo+PiBlbmQgdXAgd2l0aCBhIGZh
-aWx1cmUgb2YgdGhlIGJkcnZfY2hlY2tfdXBkYXRlX3Blcm0oKSBjYWxsZWQgYnkgdGhlDQo+PiBi
-ZHJ2X3Jvb3RfYXR0YWNoX2NoaWxkKCkgYmVjYXVzZSB0aGUgcHJldmlvdXMgam9iIzEgaGFzIHRo
-ZSByb290DQo+PiByZWZlcmVuY2UgdG8gdGhlIHNhbWUgbm9kZSB3aXRoIG90aGVyIHBlcm1pc3Np
-b25zLiBTbywgdGhlIG5leHQgam9iIHdpbGwNCj4+IGZhaWwgdG8gc3RhcnQgYW5kIHRoZSB0ZXN0
-IGNhc2VzIHdvbid0IHBhc3MuDQo+IA0KPiBZb3UgbWVhbiB0ZXN0IDMwICMgdGVzdGNhc2UgYWJv
-dXQgcGFyYWxsZWwgc3RyZWFtIGpvYnMsIHdoaWNoIHN0YXJ0cyBzdHJlYW1zLA0KPiBzaGFyaW5n
-IG9uZSBub2RlIGFzIGJhc2UgZm9yIG9uZSBhbmQgdG9wIGZvciBhbm90aGVyLiBBbmQgaWYgd2Ug
-bG9jayBiYXNlIGluDQo+IHN0cmVhbSBqb2IgdGhlIHRlc3QgZmFpbHMuIEkgdGhpbmssIHdlIGp1
-c3QgbmVlZCB0byB1cGRhdGUgdGhlIHRlc3QsIGJ5IGluc2VydGluZw0KPiBhZGRpdGlvbmFsIGVt
-cHR5IHFjb3cyIG5vZGVzIGJlbG93IHNoYXJlZCBvbmVzLCBhbmQgbWFrZSBuZXcgaW5zZXJ0ZWQg
-bm9kZXMNCj4gdG8gYmUgdG9wIG5vZGVzIG9mIHN0cmVhbSBqb2JzLCBzbyB0aGVyZSBubyBtb3Jl
-IG5vZGUtc2hhcmluZyBiZXR3ZWVuIGpvYnMuDQo+IA0KPj4NCj4+IEl0IHdlIHNldCB0aGUgZm9s
-bG93aW5nIGZsYWdzLCB0aGVyZSB3aWxsIGJlIG5vIGZhaWx1cmU6DQo+PiBibG9ja19qb2JfYWRk
-X2JkcnYoJnMtPmNvbW1vbiwgImJhc2UiLCBiYXNlLCAwLCBCTEtfUEVSTV9DT05TSVNURU5UX1JF
-QUQNCj4+IHwgQkxLX1BFUk1fV1JJVEVfVU5DSEFOR0VEIHwgQkxLX1BFUk1fR1JBUEhfTU9ELCAm
-ZXJyb3JfYWJvcnQpOw0KPj4gQnV0IHdoYXQgbWFyZ2luIHdpbGwgd2UgZ2Fpbj8gV2Ugd2lsbCBo
-YXZlIHRoZSBzYW1lIGlzc3VlcyBhcyBhYm92ZS4NCj4gDQo+IFdlIG1lZWQgZmxhZ3MgLi4uLCBC
-TEtfUEVSTV9HUkFQSF9NT0QsIEJMS19QRVJNX0FMTCAmIH5CTEtfUEVSTV9HUkFQSF9NT0QsIC4u
-Lg0KPiBmb3IgYmFzZSBub2RlLg0KPiANCj4+DQo+PiBJbiBtYW55IG90aGVyIGNhc2VzLCB3aGVu
-IHRoZSBmaWx0ZXIgaGFzIG5vdCBiZWVuIGlkZW50aWZpZWQsIHdlIGNhbg0KPj4gZ2V0IGEgYnJv
-a2VuIGNoYWluIHdoaWxlIGNhbGxpbmcgdG8gdGhlIGJhY2tpbmdfYnMoYnM9ZmlsdGVyKSBhcyB0
-aGUNCj4+IGJhY2tpbmcgbm9kZSBvZiB0aGUgZmlsdGVyIGlzIHRoZSB6ZXJvIHBvaW50ZXIuDQo+
-Pg0KPj4gVGhhdCdzIHdoeSBJIGltcGxlbWVudGVkIHRoZSBza2lwX2ZpbHRlcigpIGZ1bmN0aW9u
-IGluIHRoaXMgc2VyaWVzIGFzDQo+PiBhIHNvbWUgc29ydCBvZiBzb2x1dGlvbiBvciB3b3JrYXJv
-dW5kLiBNYXkgd2UgcHJvY2VlZCB3aXRoIHRoYXQ/DQo+PiBJcyB0aGVyZSBhbnkgYmV0dGVyIGlk
-ZWE/DQo+Pg0KPiANCj4gSSB0aGluayBub3csIHRoYXQgYmVzdCB3YXkgaXMgdG8gbG9jayBiYXNl
-IG5vZGUuIEFzIGl0IGlzIHRoZSBzaW1wbGVzdCBvbmUuIEFuZCBpdA0KPiBjb3JyZXNwb25kcyB0
-byBjdXJyZW50IGNvZGUsIHdoaWNoIGFjdHVhbGx5IGtlZXBzIGlsbGVnYWwgcG9pbnRlciB0byBi
-YXNlIG5vZGUsDQo+IHdpdGhvdXQgYW55IGFjY2VzcyByaWdodHMuDQo+IA0KPiANCg0KV2VsbCwg
-SSBhbSBhYm91dCB0byBpbXBsZW1lbnQgdGhlIG5leHQgc2VyaWVzIHZlcnNpb24gd2l0aCB0aGUg
-YmFzZQ0KQmxvY2tEcml2ZXJTdGF0ZSBpbmNsdWRlZCBpbnRvIHRoZSBqb2Igbm9kZSBsaXN0IGFu
-ZCB3aWxsIGluc2VydCBleHRyYQ0KaW1hZ2VzIGJldHdlZW4gdGhvc2Ugc2hhcmVkIGJ5IHRoZSBw
-YXJhbGxlbCBqb2JzIGluIHRoZSB0ZXN0IGNhc2UNClRlc3RQYXJhbGxlbE9wcyBvZiAjMDMwLg0K
-DQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
+** Attachment added: "debug-working-novirtio-net.log"
+   https://bugs.launchpad.net/qemu/+bug/1685242/+attachment/5240137/+files/=
+debug-working-novirtio-net.log
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1685242
+
+Title:
+  ovmf hangs at efi with virtio-net memory hotplug
+
+Status in QEMU:
+  New
+
+Bug description:
+  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
+  and it has a virtio-net devices
+
+  the ovmf images where compiled from https://github.com/tianocore/edk2
+  (current master)
+
+  reproducer:
+
+  qemu-system-x86_64 -drive
+  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
+  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
+std
+  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
+  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
+
+  interestingly, it works when you do the following:
+
+  - omit the virtio-net-pci device
+  - use seabios
+  - use less maxmem, e.g. 512G
+
+  qemu was compiled from source (v2.9.0) with following options:
+
+  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
+--enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
+artcard --audio-drv-list=3D"alsa" --enable
+  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
+k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
+virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
+-agent-msi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
