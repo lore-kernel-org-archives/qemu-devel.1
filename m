@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33546)
+Received: from eggs.gnu.org ([209.51.188.92]:34688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwQBi-0001cB-0y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:37:23 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gwQHN-0003hS-HW
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwQBg-0000vB-7W
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:37:16 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35189)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gwQBf-0000qF-V6
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:37:16 -0500
-Received: by mail-wm1-f65.google.com with SMTP id y15so6110877wma.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 03:37:15 -0800 (PST)
-References: <20190220010232.18731-1-philmd@redhat.com>
-	<20190220010232.18731-20-philmd@redhat.com>
-	<20190220104051.72f1aca0.cohuck@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6c470f3f-3678-8d79-e092-02bfe20dc84d@redhat.com>
-Date: Wed, 20 Feb 2019 12:37:12 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gwQHI-0003Zf-V1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:43:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gwQHH-0002g8-Mw
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:43:04 -0500
+Date: Wed, 20 Feb 2019 12:42:42 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190220124242.5a1685c5.cohuck@redhat.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DB25D30F@dggeml511-mbx.china.huawei.com>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<20190219113212.GC2941@work-vm>
+	<20190220052838.GC16456@joy-OptiPlex-7040>
+	<20190220110142.GD2608@work-vm>
+	<33183CC9F5247A488A2544077AF19020DB25D30F@dggeml511-mbx.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190220104051.72f1aca0.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 19/25] s390/ebcdic: Use size_t to
- iterate over arrays
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Zhao Yan <yan.y.zhao@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>
 
-On 2/20/19 10:40 AM, Cornelia Huck wrote:
-> On Wed, 20 Feb 2019 02:02:26 +0100
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+On Wed, 20 Feb 2019 11:28:46 +0000
+"Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
+
+> > -----Original Message-----
+> > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> > Sent: Wednesday, February 20, 2019 7:02 PM
+> > To: Zhao Yan <yan.y.zhao@intel.com>
+> > Cc: cjia@nvidia.com; kvm@vger.kernel.org; aik@ozlabs.ru;
+> > Zhengxiao.zx@alibaba-inc.com; shuangtai.tst@alibaba-inc.com;
+> > qemu-devel@nongnu.org; kwankhede@nvidia.com; eauger@redhat.com;
+> > yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
+> > mlevitsk@redhat.com; pasic@linux.ibm.com; Gonglei (Arei)
+> > <arei.gonglei@huawei.com>; felipe@nutanix.com; Ken.Xue@amd.com;
+> > kevin.tian@intel.com; alex.williamson@redhat.com;
+> > intel-gvt-dev@lists.freedesktop.org; changpeng.liu@intel.com;
+> > cohuck@redhat.com; zhi.a.wang@intel.com; jonathan.davies@nutanix.com
+> > Subject: Re: [PATCH 0/5] QEMU VFIO live migration
+> > 
+> > * Zhao Yan (yan.y.zhao@intel.com) wrote:  
+> > > On Tue, Feb 19, 2019 at 11:32:13AM +0000, Dr. David Alan Gilbert wrote:  
+> > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:  
+> > > > > This patchset enables VFIO devices to have live migration capability.
+> > > > > Currently it does not support post-copy phase.
+> > > > >
+> > > > > It follows Alex's comments on last version of VFIO live migration patches,
+> > > > > including device states, VFIO device state region layout, dirty bitmap's
+> > > > > query.  
+
+> > > >   b) How do we detect if we're migrating from/to the wrong device or
+> > > > version of device?  Or say to a device with older firmware or perhaps
+> > > > a device that has less device memory ?  
+> > > Actually it's still an open for VFIO migration. Need to think about
+> > > whether it's better to check that in libvirt or qemu (like a device magic
+> > > along with verion ?).  
 > 
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  include/hw/s390x/ebcdic.h | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/hw/s390x/ebcdic.h b/include/hw/s390x/ebcdic.h
->> index 69a04cab62..d89174e113 100644
->> --- a/include/hw/s390x/ebcdic.h
->> +++ b/include/hw/s390x/ebcdic.h
->> @@ -83,18 +83,18 @@ static const uint8_t ascii2ebcdic[] = {
->>      0x90, 0x3F, 0x3F, 0x3F, 0x3F, 0xEA, 0x3F, 0xFF
->>  };
->>  
->> -static inline void ebcdic_put(uint8_t *p, const char *ascii, int len)
->> +static inline void ebcdic_put(uint8_t *p, const char *ascii, size_t len)
->>  {
->> -    int i;
->> +    size_t i;
->>  
->>      for (i = 0; i < len; i++) {
->>          p[i] = ascii2ebcdic[(uint8_t)ascii[i]];
->>      }
->>  }
->>  
->> -static inline void ascii_put(uint8_t *p, const char *ebcdic, int len)
->> +static inline void ascii_put(uint8_t *p, const char *ebcdic, size_t len)
->>  {
->> -    int i;
->> +    size_t i;
->>  
->>      for (i = 0; i < len; i++) {
->>          p[i] = ebcdic2ascii[(uint8_t)ebcdic[i]];
-> 
-> Making the passed len parameter a size_t makes sense; but using a
-> size_t as an array iterator looks a bit unidiomatic... it's not wrong,
-> though.
+> We must keep the hardware generation is the same with one POD of public cloud
+> providers. But we still think about the live migration between from the the lower
+> generation of hardware migrated to the higher generation.
 
-This is to silent the "-Wsign-conversion -Wsign-compare" warnings...
-I am still not sure what is the best to do.
+Agreed, lower->higher is the one direction that might make sense to
+support.
 
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
+But regardless of that, I think we need to make sure that incompatible
+devices/versions fail directly instead of failing in a subtle, hard to
+debug way. Might be useful to do some initial sanity checks in libvirt
+as well.
 
-Thanks!
-
-Phil.
+How easy is it to obtain that information in a form that can be
+consumed by higher layers? Can we find out the device type at least?
+What about some kind of revision?
