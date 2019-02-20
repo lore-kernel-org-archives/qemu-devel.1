@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44006)
+Received: from eggs.gnu.org ([209.51.188.92]:44837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwTn4-0002ZP-ND
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:28:08 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTo6-0003fD-9y
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwTn3-0000Wy-AF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:28:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41260)
+	(envelope-from <tcminyard@gmail.com>) id 1gwTo5-00014P-Cy
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:10 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38165)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gwTn2-00080M-Su
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:28:05 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gwRUe-0000v6-Pv
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:00:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BF2092E80CC
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:00:56 +0000 (UTC)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTo3-00012u-AX
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:09 -0500
+Received: by mail-ot1-x342.google.com with SMTP id m1so40791131otf.5
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:29:04 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:40 -0600
+Message-Id: <20190220135956.22589-4-minyard@acm.org>
+In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
+References: <20190220135956.22589-1-minyard@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Feb 2019 12:51:46 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
-Message-Id: <155066710677.29079.10002691295545541695.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
- memory hotplug
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 03/19] arm:i2c: Don't mask return from
+ i2c_recv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,68 +31,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-The reason why it behaves differently with machine types <=3D 2.4 is that
-- up to and including qemu-2.4, the calculation of the DIMM hotplug area wa=
-s incorrect,
-- in 2.5, the calculation was fixed,
-- but for the migration compatibility of machine types <=3D 2.4, the old ca=
-lculation was preserved for those machine types (the DIMM hotplug area is g=
-uest-visible)
+From: Corey Minyard <cminyard@mvista.com>
 
-See the following (adjacent) commits:
-- 3385e8e2640e ("pc: memhotplug: fix incorrectly set reserved-memory-end", =
-2015-09-10)
-- 2f8b50083b32 ("pc: memhotplug: keep reserved-memory-end broken on 2.4 and=
- earlier machines", 2015-09-10)
+It can't fail, and now that it returns a uint8_t a 0xff mask
+is unnecessary.
 
-These commits were first released in v2.5.0.
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/stellaris.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'll look at your logs now.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1685242
-
-Title:
-  ovmf hangs at efi with virtio-net memory hotplug
-
-Status in QEMU:
-  New
-
-Bug description:
-  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
-  and it has a virtio-net devices
-
-  the ovmf images where compiled from https://github.com/tianocore/edk2
-  (current master)
-
-  reproducer:
-
-  qemu-system-x86_64 -drive
-  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
-  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
-std
-  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
-  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
-
-  interestingly, it works when you do the following:
-
-  - omit the virtio-net-pci device
-  - use seabios
-  - use less maxmem, e.g. 512G
-
-  qemu was compiled from source (v2.9.0) with following options:
-
-  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
---enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
-artcard --audio-drv-list=3D"alsa" --enable
-  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
-k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
-virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
--agent-msi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index 442529cc65..7b45fe3ccf 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -811,7 +811,7 @@ static void stellaris_i2c_write(void *opaque, hwaddr offset,
+             /* TODO: Handle errors.  */
+             if (s->msa & 1) {
+                 /* Recv */
+-                s->mdr = i2c_recv(s->bus) & 0xff;
++                s->mdr = i2c_recv(s->bus);
+             } else {
+                 /* Send */
+                 i2c_send(s->bus, s->mdr);
+-- 
+2.17.1
