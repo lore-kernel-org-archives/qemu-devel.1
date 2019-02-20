@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43109)
+Received: from eggs.gnu.org ([209.51.188.92]:43112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwTlk-0001Xc-JM
+	(envelope-from <tcminyard@gmail.com>) id 1gwTlk-0001Y1-Vu
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwTlg-0008Jg-5J
+	(envelope-from <tcminyard@gmail.com>) id 1gwTlf-0008Iz-Nm
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41260)
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36095)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gwTlf-00080M-RM
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gwRoO-0004tl-Hn
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:21:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 238A92E80D4
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:21:20 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Feb 2019 13:13:48 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
-Message-Id: <155066842839.3426.9011980165224724286.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
- memory hotplug
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTlb-00089j-QV
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:37 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v62so31907311otb.3
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:26:15 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:47 -0600
+Message-Id: <20190220135956.22589-11-minyard@acm.org>
+In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
+References: <20190220135956.22589-1-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH 10/19] boards.h: Ignore migration for SMBus
+ devices on older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,109 +28,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-* From "debug-nonworking.log":
+From: Corey Minyard <cminyard@mvista.com>
 
-> GetFirstNonAddress: Pci64Base=3D0x8800000000 Pci64Size=3D0x800000000
-> [...]
-> PublishPeiMemory: mPhysMemAddressWidth=3D40 PeiMemoryCap=3D69644 KB
-> [...]
-> Type =3D  Mem64; Base =3D 0x8800000000;	Length =3D 0x100000;	Alignment =
-=3D 0xFFFFF
->  Base =3D 0x8800000000;	Length =3D 0x4000;	Alignment =3D 0x3FFF;	Owner =
-=3D PCI [00|12|00:20]; Type =3D PMem64
+Migration capability is being added for pm_smbus and SMBus devices.
+This change will allow backwards compatibility to be kept when
+migrating back to an old qemu version.  Add a bool to the machine
+class tho keep smbus migration from happening.  Future changes
+will use this.
 
-- The 64-bit MMIO aperture starts at (512+32)GB (see "Pci64Base").
-- 40 physical address bits are required (see "mPhysMemAddressWidth").
-  Your PCPU has 39 (thanks for confirming that).
-- The 64-bit MMIO BAR of the virtio-net-pci device is allocated at
-  (512+32)GB. Will not be accessible.
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/i386/pc_piix.c   | 1 +
+ hw/i386/pc_q35.c    | 1 +
+ include/hw/boards.h | 1 +
+ 3 files changed, 3 insertions(+)
 
-
-* From "debug-working-222G.log":
-
-> GetFirstNonAddress: Pci64Base=3D0x7800000000 Pci64Size=3D0x800000000
-> [...]
-> PublishPeiMemory: mPhysMemAddressWidth=3D39 PeiMemoryCap=3D67592 KB
-> [...]
-> Type =3D  Mem64; Base =3D 0x7800000000;	Length =3D 0x100000;	Alignment =
-=3D 0xFFFFF
->  Base =3D 0x7800000000;	Length =3D 0x4000;	Alignment =3D 0x3FFF;	Owner =
-=3D PCI [00|12|00:20]; Type =3D PMem64
-
-- Aperture at 480GB.
-- 39 phys bits suffice.
-- BAR allocated at 480GB. Will be accessible.
-
-
-* From "debug-working-novirtio-net.log":
-
-- Identical to "debug-nonworking.log", except there is no PCI device
-  with a 64-bit BAR, hence no attempt is made to access the inaccessible
-  aperture.
-
-
-* Regarding why 222GB seems to be the cutoff. The base of the 64-bit
-  aperture must be suitably aligned. I explained this in the
-  earlier-referenced
-  <https://bugzilla.redhat.com/show_bug.cgi?id=3D1353591#c8>, in
-  particular, bullet (6). If you decrease the aperture size, the
-  required alignment will shrink as well, and the DIMM hotplug cutoff
-  might increase. Please refer to
-
-    -fw_cfg name=3Dopt/ovmf/X-PciMmio64Mb,string=3D4096
-
-  in <https://bugzilla.redhat.com/show_bug.cgi?id=3D1353591#c10>.
-
-Right now everything appears to work by design. Closing this ticket.
-
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1685242
-
-Title:
-  ovmf hangs at efi with virtio-net memory hotplug
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
-  and it has a virtio-net devices
-
-  the ovmf images where compiled from https://github.com/tianocore/edk2
-  (current master)
-
-  reproducer:
-
-  qemu-system-x86_64 -drive
-  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
-  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
-std
-  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
-  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
-
-  interestingly, it works when you do the following:
-
-  - omit the virtio-net-pci device
-  - use seabios
-  - use less maxmem, e.g. 512G
-
-  qemu was compiled from source (v2.9.0) with following options:
-
-  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
---enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
-artcard --audio-drv-list=3D"alsa" --enable
-  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
-k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
-virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
--agent-msi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 6ba163ccbb..3bead1143f 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -442,6 +442,7 @@ static void pc_i440fx_3_1_machine_options(MachineClass *m)
+ {
+     pc_i440fx_4_0_machine_options(m);
+     m->is_default = 0;
++    m->smbus_no_migration_support = true;
+     m->alias = NULL;
+     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
+     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 1689885cac..f24ee74cc5 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -378,6 +378,7 @@ static void pc_q35_3_1_machine_options(MachineClass *m)
+ {
+     pc_q35_4_0_machine_options(m);
+     m->default_kernel_irqchip_split = false;
++    m->smbus_no_migration_support = true;
+     m->alias = NULL;
+     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
+     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 02f114085f..e7f7b85008 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -207,6 +207,7 @@ struct MachineClass {
+     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
+     bool ignore_boot_device_suffixes;
++    bool smbus_no_migration_support;
+ 
+     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+                                            DeviceState *dev);
+-- 
+2.17.1
