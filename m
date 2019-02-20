@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43110)
+Received: from eggs.gnu.org ([209.51.188.92]:43332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gwOvc-00056B-A2
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:16:37 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gwOwb-0005gR-T9
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:17:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gwOvb-00013g-Bc
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:16:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56196)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gwOvZ-00012Q-9w
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:16:35 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16EE760AA
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 10:16:32 +0000 (UTC)
-Date: Wed, 20 Feb 2019 10:16:25 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190220101625.GB21870@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190220100235.20914-1-kraxel@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1gwOwb-0001V3-1G
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:17:37 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:39785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwOwZ-0001RS-1r
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:17:35 -0500
+Received: by mail-qk1-f194.google.com with SMTP id x6so1628991qki.6
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 02:17:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190220100235.20914-1-kraxel@redhat.com>
+References: <20190220010232.18731-1-philmd@redhat.com>
+	<20190220010232.18731-4-philmd@redhat.com>
+In-Reply-To: <20190220010232.18731-4-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Feb 2019 11:17:19 +0100
+Message-ID: <CAMxuvawsWu1m83qwp=U8m0X9Ar4m9CNiEVetfimhXoHzzkNHJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] kbd-state: don't block auto-repeat events
+Subject: Re: [Qemu-devel] [PATCH v3 03/25] chardev/wctablet: Use unsigned
+ type to hold unsigned value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-On Wed, Feb 20, 2019 at 11:02:35AM +0100, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Hi
+
+On Wed, Feb 20, 2019 at 2:03 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> TabletChardev::query is an array of uint8_t.
+> Use the same type to hold it (this also silent a -Wsign-conversion
+> warning in the trace function).
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  ui/kbd-state.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  chardev/trace-events | 2 +-
+>  chardev/wctablet.c   | 5 +++--
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/chardev/trace-events b/chardev/trace-events
+> index d0e5f3bbc1..562bfe70e9 100644
+> --- a/chardev/trace-events
+> +++ b/chardev/trace-events
+> @@ -5,7 +5,7 @@ wct_init(void) ""
+>  wct_cmd_re(void) ""
+>  wct_cmd_st(void) ""
+>  wct_cmd_sp(void) ""
+> -wct_cmd_ts(int input) "0x%02x"
+> +wct_cmd_ts(uint8_t input) "0x%02x"
+>  wct_cmd_other(const char *cmd) "%s"
+>  wct_speed(int speed) "%d"
+>
+> diff --git a/chardev/wctablet.c b/chardev/wctablet.c
+> index 35dbd29a33..cf7a08a363 100644
+> --- a/chardev/wctablet.c
+> +++ b/chardev/wctablet.c
+> @@ -207,7 +207,8 @@ static int wctablet_chr_write(struct Chardev *chr,
+>                                const uint8_t *buf, int len)
+>  {
+>      TabletChardev *tablet =3D WCTABLET_CHARDEV(chr);
+> -    unsigned int i, clen;
+> +    size_t i;
+> +    unsigned int clen;
+>      char *pos;
+>
+>      if (tablet->line_speed !=3D 9600) {
+> @@ -269,7 +270,7 @@ static int wctablet_chr_write(struct Chardev *chr,
+>
+>      } else if (strncmp((char *)tablet->query, "TS", 2) =3D=3D 0 &&
+>                 clen =3D=3D 3) {
+> -        unsigned int input =3D tablet->query[2];
+> +        uint8_t input =3D tablet->query[2];
+>          uint8_t codes[7] =3D {
+>              0xa3,
+>              ((input & 0x80) =3D=3D 0) ? 0x7e : 0x7f,
+> --
+> 2.20.1
+>
