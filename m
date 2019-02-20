@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40832)
+Received: from eggs.gnu.org ([209.51.188.92]:41266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gwUNl-0001uP-RF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:06:03 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gwUOL-0002Jp-37
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:06:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gwUNj-000508-9Q
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:06:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57990)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gwUOJ-0005Fu-QM
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:06:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gwUNh-0004uI-T6
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:05:59 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 20 Feb 2019 17:05:35 +0100
-Message-Id: <1550678735-25394-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] ui/gtk: Fix the license information
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gwUOJ-0005DQ-BX
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:06:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8467C139833
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 16:06:30 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Feb 2019 17:06:24 +0100
+Message-Id: <20190220160628.6555-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] RFC: make chardev context switching safer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,69 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Anthony Liguori <anthony@codemonkey.ws>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The license information in this file is very messy. A short note at
-the beginning says GPL first, but the long boilerplate code then
-talks about "GNU Lesser General Public License version 2.0". First,
-there is no such version of the "GNU Lesser GPL", it only started with
-version 2.1. In version 2.0, it was still called "GNU Library GPL"
-instead. Second, you can easily get the license of this file wrong
-if you only quickly glance at the long boilerplate code.
+Hi,
 
-Anyway, looking at the text of the LGPL (see COPYING.LIB in the top
-directory), the license clearly states in section "3." that one should
-rather replace the license information with the GPL information in
-such a case of a mixture instead. Thus let's clean up the confusing
-statements and use the proper GPL text only.
+The chardev context switching code is a bit fragile, as it works as if
+the current context is properly synchronized with the new context.  It
+isn't so obvious to me that concurrent usage of chardev can't happen,
+as there might be various main loop sources being dispatched during
+the switch.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- ui/gtk.c | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+Worried about the situation, I wrote those patches a while ago, I
+think they are still worth to consider. I used to have some basic
+test, but it now conflicts a lot with recent changes. I would like to
+get some feedback about the series before I rewrite it.
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 949b143..af7e5b2 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -6,9 +6,6 @@
-  * Authors:
-  *  Anthony Liguori   <aliguori@us.ibm.com>
-  *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- *
-  * Portions from gtk-vnc:
-  *
-  * GTK VNC Widget
-@@ -16,19 +13,18 @@
-  * Copyright (C) 2006  Anthony Liguori <anthony@codemonkey.ws>
-  * Copyright (C) 2009-2010 Daniel P. Berrange <dan@berrange.com>
-  *
-- * This library is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU Lesser General Public
-- * License as published by the Free Software Foundation; either
-- * version 2.0 of the License, or (at your option) any later version.
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-  *
-- * This library is distributed in the hope that it will be useful,
-+ * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * Lesser General Public License for more details.
-+ * General Public License for more details.
-  *
-- * You should have received a copy of the GNU Lesser General Public
-- * License along with this library; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #define GETTEXT_PACKAGE "qemu"
--- 
-1.8.3.1
+The importat patch is "chardev: make qemu_chr_fe_set_handlers()
+context switching safer". It works by "freezing" the given contexts
+while the chardev will "move" (recreate to the new context) the
+various sources it owns. This looks quite ugly to me overall, but still
+safer than today.
+
+This should allow to simplify the scary code from "monitor: set the
+chardev context from the main context/thread".
+
+Finally, "char-socket: restart the reconnect timer to switch context"
+shows that we have chardev backends that do not switch fully yet.
+
+(there should be a meme "using chardev from multiple threads is
+considered harmful")
+
+Marc-Andr=C3=A9 Lureau (4):
+  iothread: wait until the glib context is acquired
+  chardev: make qemu_chr_fe_set_handlers() context switching safer
+  monitor: set the chardev context from the main context/thread
+  char-socket: restart the reconnect timer to switch context
+
+ include/chardev/char-fe.h |  23 +++++++++
+ chardev/char-fe.c         | 103 +++++++++++++++++++++++++++++++++-----
+ chardev/char-mux.c        |  14 +++---
+ chardev/char-socket.c     |   5 ++
+ iothread.c                |   7 +++
+ monitor.c                 |  39 +++------------
+ 6 files changed, 139 insertions(+), 52 deletions(-)
+
+--=20
+2.21.0.rc1
