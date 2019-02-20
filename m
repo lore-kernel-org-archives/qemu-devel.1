@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40500)
+Received: from eggs.gnu.org ([209.51.188.92]:43971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwI2B-0000wr-OA
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:54:56 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gwI89-0003Hn-5M
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:01:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwI26-0005tQ-Su
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:54:53 -0500
-Date: Wed, 20 Feb 2019 12:39:06 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190220013905.GD9345@umbus.fritz.box>
-References: <20190220010232.18731-1-philmd@redhat.com>
-	<20190220010232.18731-16-philmd@redhat.com>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gwI87-0001Uf-6i
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:01:05 -0500
+Date: Wed, 20 Feb 2019 11:00:25 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190220030025.GA25796@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <1550652953-24393-1-git-send-email-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="a6YTfLRor63AaheO"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190220010232.18731-16-philmd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 15/25] spapr-vty: Let vty_putchars() use
- size_t
+In-Reply-To: <1550652953-24393-1-git-send-email-like.xu@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH] doc: update .gitignore and fix typos for
+ docs in tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +24,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Like Xu <like.xu@linux.intel.com>
+Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
+On Wed, Feb 20, 2019 at 04:55:53PM +0800, Like Xu wrote:
+>Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>---
+> .gitignore                     | 1 +
+> docs/COLO-FT.txt               | 2 +-
+> docs/amd-memory-encryption.txt | 2 +-
+> docs/can.txt                   | 2 +-
+> docs/colo-proxy.txt            | 6 +++---
+> docs/cpu-hotplug.rst           | 2 +-
+> docs/qcow2-cache.txt           | 2 +-
+> docs/qemu-block-drivers.texi   | 2 +-
+> docs/qemu-cpu-models.texi      | 4 ++--
+> docs/rdma.txt                  | 2 +-
+> docs/replay.txt                | 2 +-
+> docs/usb-storage.txt           | 2 +-
+> docs/vfio-ap.txt               | 2 +-
+> 13 files changed, 16 insertions(+), 15 deletions(-)
+>
+>diff --git a/.gitignore b/.gitignore
+>index b66b772..6cb0016 100644
+>--- a/.gitignore
+>+++ b/.gitignore
+>@@ -90,6 +90,7 @@
+> *.d
+> !/scripts/qemu-guest-agent/fsfreeze-hook.d
+> *.o
+>+*.patch
+> .sdk
+> *.gcda
+> *.gcno
 
---a6YTfLRor63AaheO
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+suggest to split this into a standalone one.
 
-On Wed, Feb 20, 2019 at 02:02:22AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Both callers (h_put_term_char and rtas_display_character) use
-> an unsigned value.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
+>index e2686bb..ad24680 100644
+>--- a/docs/COLO-FT.txt
+>+++ b/docs/COLO-FT.txt
+>@@ -102,7 +102,7 @@ to make sure the state of VM in Secondary side is always consistent with VM in
+> Primary side.
+> 
+> COLO Proxy:
+>-Delivers packets to Primary and Seconday, and then compare the responses from
+>+Delivers packets to Primary and Secondary, and then compare the responses from
+> both side. Then decide whether to start a checkpoint according to some rules.
+> Please refer to docs/colo-proxy.txt for more information.
+> 
+>diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+>index f483795..43bf3ee 100644
+>--- a/docs/amd-memory-encryption.txt
+>+++ b/docs/amd-memory-encryption.txt
+>@@ -97,7 +97,7 @@ References
+> AMD Memory Encryption whitepaper:
+> http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
+> 
+>-Secure Encrypted Virutualization Key Management:
+>+Secure Encrypted Virtualization Key Management:
+> [1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
+> 
+> KVM Forum slides:
+>diff --git a/docs/can.txt b/docs/can.txt
+>index 7ba23b2..9fa6ed5 100644
+>--- a/docs/can.txt
+>+++ b/docs/can.txt
+>@@ -99,7 +99,7 @@ Links to other resources
+>      https://gitlab.fel.cvut.cz/canbus/qemu-canbus
+>  (3) RTEMS page describing project
+>      https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
+>- (4) RTLWS 2015 article about the projevt and its use with CANopen emulation
+>+ (4) RTLWS 2015 article about the project and its use with CANopen emulation
+>      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
+>      Slides
+>      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
+>diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+>index 1f8e4b4..7074da7 100644
+>--- a/docs/colo-proxy.txt
+>+++ b/docs/colo-proxy.txt
+>@@ -41,7 +41,7 @@ Below is a COLO proxy ascii figure:
+> |         |  +------------------------------------------------------+  |                        |        |                              |
+> |netfilter|  |                       |                         |    |  |   netfilter            |        |                              |
+> | +----------+ +----------------------------+                  |    |  |  +-----------------------------------------------------------+ |
+>-| |       |  |                       |      |        out       |    |  |  |                     |        |  filter excute order       | |
+>+| |       |  |                       |      |        out       |    |  |  |                     |        |  filter execute order       | |
+                                                                                                                                        ^
+                                                                                                                                  remove one space here?
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> | |       |  |          +-----------------------------+        |    |  |  |                     |        | +------------------->      | |
+> | |       |  |          |            |      |         |        |    |  |  |                     |        |   TCP                      | |
+> | | +-----+--+-+  +-----v----+ +-----v----+ |pri +----+----+sec|    |  |  | +------------+  +---+----+---v+rewriter++  +------------+ | |
+>@@ -53,7 +53,7 @@ Below is a COLO proxy ascii figure:
+> | |      |   tx        |   rx           rx  |                  |  |    |  |            tx                        all       |  rx      | |
+> | |      |             |                    |                  |  |    |  +-----------------------------------------------------------+ |
+> | |      |             +--------------+     |                  |  |    |                                                   |            |
+>-| |      |   filter excute order      |     |                  |  |    |                                                   |            |
+>+| |      |   filter execute order      |     |                  |  |    |                                                   |            |
 
-> ---
->  hw/char/spapr_vty.c        | 2 +-
->  include/hw/ppc/spapr_vio.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
-> index 6748334ded..92b8c40410 100644
-> --- a/hw/char/spapr_vty.c
-> +++ b/hw/char/spapr_vty.c
-> @@ -83,7 +83,7 @@ static int vty_getchars(VIOsPAPRDevice *sdev, uint8_t *=
-buf, int max)
->      return n;
->  }
-> =20
-> -void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, int len)
-> +void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, size_t len)
->  {
->      VIOsPAPRVTYDevice *dev =3D VIO_SPAPR_VTY_DEVICE(sdev);
-> =20
-> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-> index e8b006d18f..ed79d2f380 100644
-> --- a/include/hw/ppc/spapr_vio.h
-> +++ b/include/hw/ppc/spapr_vio.h
-> @@ -126,7 +126,7 @@ static inline int spapr_vio_dma_set(VIOsPAPRDevice *d=
-ev, uint64_t taddr,
->  int spapr_vio_send_crq(VIOsPAPRDevice *dev, uint8_t *crq);
-> =20
->  VIOsPAPRDevice *vty_lookup(sPAPRMachineState *spapr, target_ulong reg);
-> -void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, int len);
-> +void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, size_t len);
->  void spapr_vty_create(VIOsPAPRBus *bus, Chardev *chardev);
->  void spapr_vlan_create(VIOsPAPRBus *bus, NICInfo *nd);
->  void spapr_vscsi_create(VIOsPAPRBus *bus);
+                                      the same as above
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> | |      |  +---------------->        |     |                  |  +--------------------------------------------------------+            |
+> | +-----------------------------------------+                  |       |                                                                |
+> |        |                            |                        |       |                                                                |
+>@@ -92,7 +92,7 @@ but do nothing, just pass to next filter.
+> 
+> Redirect Server Filter --> COLO-Compare
+> COLO-compare receive primary guest packet then
+>-waiting scondary redirect packet to compare it.
+>+waiting secondary redirect packet to compare it.
+> If packet same,send queued primary packet and clear
+> queued secondary packet, Otherwise send primary packet
+> and do checkpoint.
+>diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+>index 1c268e0..cfeb79f 100644
+>--- a/docs/cpu-hotplug.rst
+>+++ b/docs/cpu-hotplug.rst
+>@@ -137,6 +137,6 @@ From the 'qmp-shell', invoke the QMP ``device_del`` command::
+>     vCPU hot-unplug requires guest cooperation; so the ``device_del``
+>     command above does not guarantee vCPU removal -- it's a "request to
+>     unplug".  At this point, the guest will get a System Control
+>-    Interupt (SCI) and calls the ACPI handler for the affected vCPU
+>+    Interrupt (SCI) and calls the ACPI handler for the affected vCPU
+>     device.  Then the guest kernel will bring the vCPU offline and tell
+>     QEMU to unplug it.
+>diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+>index c459bf5..c1e7751 100644
+>--- a/docs/qcow2-cache.txt
+>+++ b/docs/qcow2-cache.txt
+>@@ -55,7 +55,7 @@ value can improve the I/O performance significantly.
+> 
+> The refcount blocks
+> -------------------
+>-The qcow2 format also mantains a reference count for each cluster.
+>+The qcow2 format also maintains a reference count for each cluster.
+> Reference counts are used for cluster allocation and internal
+> snapshots. The data is stored in a two-level structure similar to the
+> L1/L2 tables described above.
+>diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+>index 38e9f34..1b1ac19 100644
+>--- a/docs/qemu-block-drivers.texi
+>+++ b/docs/qemu-block-drivers.texi
+>@@ -632,7 +632,7 @@ qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
+> @end example
+> 
+> 
+>-Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
+>+How to set up a simple iSCSI target on loopback and accessing it via QEMU:
+> @example
+> This example shows how to set up an iSCSI target with one CDROM and one DISK
+> using the Linux STGT software target. This target is available on Red Hat based
+>diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
+>index 475d434..4354fe8 100644
+>--- a/docs/qemu-cpu-models.texi
+>+++ b/docs/qemu-cpu-models.texi
+>@@ -287,7 +287,7 @@ Must be explicitly turned on for all AMD CPU models.
+> This provides higher performance than virt-ssbd so should be
+> exposed to guests whenever available in the host. virt-ssbd
+> should none the less also be exposed for maximum guest
+>-compatability as some kernels only know about virt-ssbd.
+>+compatibility as some kernels only know about virt-ssbd.
+> 
+> 
+> @item @code{amd-no-ssb}
+>@@ -296,7 +296,7 @@ Recommended to indicate the host is not vulnerable CVE-2018-3639
+> 
+> Not included by default in any AMD CPU model.
+> 
+>-Future hardware genarations of CPU will not be vulnerable to
+>+Future hardware generations of CPU will not be vulnerable to
+> CVE-2018-3639, and thus the guest should be told not to enable
+> its mitigations, by exposing amd-no-ssb. This is mutually
+> exclusive with virt-ssbd and amd-ssbd.
+>diff --git a/docs/rdma.txt b/docs/rdma.txt
+>index e6f9902..1e6f23e 100644
+>--- a/docs/rdma.txt
+>+++ b/docs/rdma.txt
+>@@ -30,7 +30,7 @@ of the significantly lower latency and higher throughput over TCP/IP. This is
+> because the RDMA I/O architecture reduces the number of interrupts and
+> data copies by bypassing the host networking stack. In particular, a TCP-based
+> migration, under certain types of memory-bound workloads, may take a more
+>-unpredicatable amount of time to complete the migration if the amount of
+>+unpredictable amount of time to complete the migration if the amount of
+> memory tracked during each live migration iteration round cannot keep pace
+> with the rate of dirty memory produced by the workload.
+> 
+>diff --git a/docs/replay.txt b/docs/replay.txt
+>index 3497585..ee6aee9 100644
+>--- a/docs/replay.txt
+>+++ b/docs/replay.txt
+>@@ -290,7 +290,7 @@ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
+> Replay log format
+> -----------------
+> 
+>-Record/replay log consits of the header and the sequence of execution
+>+Record/replay log consists of the header and the sequence of execution
+> events. The header includes 4-byte replay version id and 8-byte reserved
+> field. Version is updated every time replay log format changes to prevent
+> using replay log created by another build of qemu.
+>diff --git a/docs/usb-storage.txt b/docs/usb-storage.txt
+>index 551af6f..3df6d05 100644
+>--- a/docs/usb-storage.txt
+>+++ b/docs/usb-storage.txt
+>@@ -16,7 +16,7 @@ too):
+> 
+> 
+> Number two is the newer usb attached scsi transport.  This one doesn't
+>-automagically create a scsi disk, so you have to explicitly attach one
+>+automatically create a scsi disk, so you have to explicitly attach one
+> manually.  Multiple logical units are supported.  Here is an example
+> with tree logical units:
+> 
+>diff --git a/docs/vfio-ap.txt b/docs/vfio-ap.txt
+>index 1233968..30f3c66 100644
+>--- a/docs/vfio-ap.txt
+>+++ b/docs/vfio-ap.txt
+>@@ -624,7 +624,7 @@ These are the steps:
+>       -> IOMMU Hardware Support
+>          select S390 AP IOMMU Support
+>       -> VFIO Non-Privileged userspace driver framework
+>-         -> Mediated device driver frramework
+>+         -> Mediated device driver framework
+>             -> VFIO driver for Mediated devices
+>    -> I/O subsystem
+>       -> VFIO support for AP devices
 
---a6YTfLRor63AaheO
-Content-Type: application/pgp-signature; name="signature.asc"
+others looks good to me.
 
------BEGIN PGP SIGNATURE-----
+>-- 
+>1.8.3.1
+>
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsr7cACgkQbDjKyiDZ
-s5I+TRAAoUYSiy2dnSWUa835NZsmTwIjbjhGgX+dyP2VcxD6eCzsxu3Ar+t+fsT9
-bGMvCegj+errJ2Z9yKpYdMkTzLOkRkHzTx1c5yRNU6f11EhKu6lpTXJh+M2PPgw9
-lezN1rbx88MfHcRtJDrvJRpWLCcEyw0n5z74Vln8p9yY2ZMipHLGvMmx7wlAIaG5
-IeH2hdSWqT0UV1QAlMTdcUNkr5tdGy7wjI4g3WzuzEnZDPW6qNHig60gC7gjnjM6
-Y+PIjrvjeZ2DPWuksWiSB8XGvpKf2rO4qSsoXQSNsZfNTl0IC8DtFaAmdXOp5kcy
-gSZfm9a9moDZNZKOp53tvQ216y0A1aNx/Y8Y1dzuR0cC93Db26d3k0rEytpjzpum
-ZXvTbU+ggLtgDb0iHUNisNUGnmyTZd1j0c1wkT9nBPXgD+nH1oIiWgW6RfnXB4hZ
-fzyy1S5JQYYvoVw+VC0BTskCBAQ5nRDUz+iGoaJz9uPFGQBXOZPEnQmjynoCGY+N
-c11l+vaiSJsVauKMiJCbvVAUNvXv9szG4665ocwdN+K+8YuIuIKZqE1LsfuyM0CO
-eEHyhVroXx9nOh8mZUbwWKiq1AhQ2kyxGk/vrEEtJyABaxdA8aAzd8JrEfsU+1I5
-Dfmu0IPkm6cKrHLUvkyYtnZ8HY8HnDJlyarzVQsa7fzxZ/OsZzc=
-=s4B1
------END PGP SIGNATURE-----
-
---a6YTfLRor63AaheO--
+-- 
+Wei Yang
+Help you, Help me
