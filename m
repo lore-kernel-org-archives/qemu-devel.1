@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53830)
+Received: from eggs.gnu.org ([209.51.188.92]:53821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbF-0005NO-FK
+	(envelope-from <dgibson@ozlabs.org>) id 1gwIbF-0005NJ-82
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbE-0003Tv-0B
+	(envelope-from <dgibson@ozlabs.org>) id 1gwIbD-0003Tj-UB
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:09 -0500
-Date: Wed, 20 Feb 2019 14:24:28 +1100
+Date: Wed, 20 Feb 2019 14:27:21 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190220032428.GF9345@umbus.fritz.box>
+Message-ID: <20190220032721.GJ9345@umbus.fritz.box>
 References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<155059668360.1466090.5969630516627776426.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<155059670389.1466090.10015601248906623076.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qpqR4wE1CEr+Roqx"
+	protocol="application/pgp-signature"; boundary="WTEzZvM72OaERIi0"
 Content-Disposition: inline
-In-Reply-To: <155059668360.1466090.5969630516627776426.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 06/17] xics: Write source state to KVM
- at claim time
+In-Reply-To: <155059670389.1466090.10015601248906623076.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 10/17] spapr: create DR connectors for
+ PHBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,158 +29,130 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 
---qpqR4wE1CEr+Roqx
+--WTEzZvM72OaERIi0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 19, 2019 at 06:18:03PM +0100, Greg Kurz wrote:
-> The pseries machine only uses LSIs to support legacy PCI devices. Every
-> PHB claims 4 LSIs at realize time. When using in-kernel XICS (or upcoming
-> in-kernel XIVE), QEMU synchronizes the state of all irqs, including these
-> LSIs, later on at machine reset.
+On Tue, Feb 19, 2019 at 06:18:23PM +0100, Greg Kurz wrote:
+> From: Michael Roth <mdroth@linux.vnet.ibm.com>
 >=20
-> In order to support PHB hotplug, we need a way to tell KVM about the LSIs
-> that doesn't require a machine reset. An easy way to do that is to always
-> inform KVM when an interrupt is claimed, which really isn't a performance
-> path.
->=20
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
 Applied, thanks.
 
 > ---
->  hw/intc/xics.c        |    4 +++
->  hw/intc/xics_kvm.c    |   74 ++++++++++++++++++++++++++++---------------=
-------
->  include/hw/ppc/xics.h |    1 +
->  3 files changed, 48 insertions(+), 31 deletions(-)
+>  hw/ppc/spapr.c             |   13 +++++++++++++
+>  hw/ppc/spapr_drc.c         |   17 +++++++++++++++++
+>  include/hw/ppc/spapr.h     |    1 +
+>  include/hw/ppc/spapr_drc.h |    8 ++++++++
+>  4 files changed, 39 insertions(+)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 767fdeb82900..af7dc709abab 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -758,6 +758,10 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool=
- lsi)
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 9364d07364ac..96bea7580a3f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2875,6 +2875,19 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+>      /* We always have at least the nvram device on VIO */
+>      spapr_create_nvram(spapr);
 > =20
->      ics->irqs[srcno].flags |=3D
->          lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
-> +
-> +    if (kvm_irqchip_in_kernel()) {
-> +        ics_set_kvm_state_one(ics, srcno);
+> +    /*
+> +     * Setup hotplug / dynamic-reconfiguration connectors. top-level
+> +     * connectors (described in root DT node's "ibm,drc-types" property)
+> +     * are pre-initialized here. additional child connectors (such as
+> +     * connectors for a PHBs PCI slots) are added as needed during their
+> +     * parent's realization.
+> +     */
+> +    if (smc->dr_phb_enabled) {
+> +        for (i =3D 0; i < SPAPR_MAX_PHBS; i++) {
+> +            spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_PHB, =
+i);
+> +        }
 > +    }
+> +
+>      /* Set up PCI */
+>      spapr_pci_rtas_init();
+> =20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 87ca7d973564..fd6380adb367 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -696,6 +696,15 @@ static void spapr_drc_lmb_class_init(ObjectClass *k,=
+ void *data)
+>      drck->dt_populate =3D spapr_lmb_dt_populate;
 >  }
 > =20
->  static void xics_register_types(void)
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index a00d0a7962e1..c6e1b630a404 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -213,45 +213,57 @@ void ics_synchronize_state(ICSState *ics)
->      ics_get_kvm_state(ics);
->  }
-> =20
-> -int ics_set_kvm_state(ICSState *ics)
-> +int ics_set_kvm_state_one(ICSState *ics, int srcno)
->  {
->      uint64_t state;
-> -    int i;
->      Error *local_err =3D NULL;
-> +    ICSIRQState *irq =3D &ics->irqs[srcno];
-> +    int ret;
-> =20
-> -    for (i =3D 0; i < ics->nr_irqs; i++) {
-> -        ICSIRQState *irq =3D &ics->irqs[i];
-> -        int ret;
-> -
-> -        state =3D irq->server;
-> -        state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MA=
-SK)
-> -            << KVM_XICS_PRIORITY_SHIFT;
-> -        if (irq->priority !=3D irq->saved_priority) {
-> -            assert(irq->priority =3D=3D 0xff);
-> -            state |=3D KVM_XICS_MASKED;
-> -        }
-> +    state =3D irq->server;
-> +    state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MASK)
-> +        << KVM_XICS_PRIORITY_SHIFT;
-> +    if (irq->priority !=3D irq->saved_priority) {
-> +        assert(irq->priority =3D=3D 0xff);
-> +        state |=3D KVM_XICS_MASKED;
-> +    }
-> =20
-> -        if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
-> -            state |=3D KVM_XICS_LEVEL_SENSITIVE;
-> -            if (irq->status & XICS_STATUS_ASSERTED) {
-> -                state |=3D KVM_XICS_PENDING;
-> -            }
-> -        } else {
-> -            if (irq->status & XICS_STATUS_MASKED_PENDING) {
-> -                state |=3D KVM_XICS_PENDING;
-> -            }
-> +    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
-> +        state |=3D KVM_XICS_LEVEL_SENSITIVE;
-> +        if (irq->status & XICS_STATUS_ASSERTED) {
-> +            state |=3D KVM_XICS_PENDING;
->          }
-> -        if (irq->status & XICS_STATUS_PRESENTED) {
-> -                state |=3D KVM_XICS_PRESENTED;
-> -        }
-> -        if (irq->status & XICS_STATUS_QUEUED) {
-> -                state |=3D KVM_XICS_QUEUED;
-> +    } else {
-> +        if (irq->status & XICS_STATUS_MASKED_PENDING) {
-> +            state |=3D KVM_XICS_PENDING;
->          }
-> +    }
-> +    if (irq->status & XICS_STATUS_PRESENTED) {
-> +        state |=3D KVM_XICS_PRESENTED;
-> +    }
-> +    if (irq->status & XICS_STATUS_QUEUED) {
-> +        state |=3D KVM_XICS_QUEUED;
-> +    }
+> +static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
+> +{
+> +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
 > +
-> +    ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-> +                            srcno + ics->offset, &state, true, &local_er=
-r);
-> +    if (local_err) {
-> +        error_report_err(local_err);
-> +        return ret;
-> +    }
-> +
-> +    return 0;
+> +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
+> +    drck->typename =3D "PHB";
+> +    drck->drc_name_prefix =3D "PHB ";
 > +}
 > +
-> +int ics_set_kvm_state(ICSState *ics)
-> +{
-> +    int i;
+>  static const TypeInfo spapr_dr_connector_info =3D {
+>      .name          =3D TYPE_SPAPR_DR_CONNECTOR,
+>      .parent        =3D TYPE_DEVICE,
+> @@ -739,6 +748,13 @@ static const TypeInfo spapr_drc_lmb_info =3D {
+>      .class_init    =3D spapr_drc_lmb_class_init,
+>  };
+> =20
+> +static const TypeInfo spapr_drc_phb_info =3D {
+> +    .name          =3D TYPE_SPAPR_DRC_PHB,
+> +    .parent        =3D TYPE_SPAPR_DRC_LOGICAL,
+> +    .instance_size =3D sizeof(sPAPRDRConnector),
+> +    .class_init    =3D spapr_drc_phb_class_init,
+> +};
 > +
-> +    for (i =3D 0; i < ics->nr_irqs; i++) {
-> +        int ret;
+>  /* helper functions for external users */
 > =20
-> -        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
-ES,
-> -                                i + ics->offset, &state, true, &local_er=
-r);
-> -        if (local_err) {
-> -            error_report_err(local_err);
-> +        ret =3D ics_set_kvm_state_one(ics, i);
-> +        if (ret) {
->              return ret;
->          }
->      }
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index d36bbe11ee2e..eb65ad7e43b7 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -195,6 +195,7 @@ void icp_synchronize_state(ICPState *icp);
->  void icp_kvm_realize(DeviceState *dev, Error **errp);
+>  sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
+> @@ -1207,6 +1223,7 @@ static void spapr_drc_register_types(void)
+>      type_register_static(&spapr_drc_cpu_info);
+>      type_register_static(&spapr_drc_pci_info);
+>      type_register_static(&spapr_drc_lmb_info);
+> +    type_register_static(&spapr_drc_phb_info);
 > =20
->  void ics_get_kvm_state(ICSState *ics);
-> +int ics_set_kvm_state_one(ICSState *ics, int srcno);
->  int ics_set_kvm_state(ICSState *ics);
->  void ics_synchronize_state(ICSState *ics);
->  void ics_kvm_set_irq(ICSState *ics, int srcno, int val);
+>      spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
+>                          rtas_set_indicator);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 5e3c76072505..b173fd714904 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -104,6 +104,7 @@ struct sPAPRMachineClass {
+> =20
+>      /*< public >*/
+>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
+s */
+> +    bool dr_phb_enabled;       /* enable dynamic-reconfig/hotplug of PHB=
+s */
+>      bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+>      bool pre_2_10_has_unused_icps;
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index f32758ec8487..46b0f6216d83 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -71,6 +71,14 @@
+>  #define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+>                                          TYPE_SPAPR_DRC_LMB)
+> =20
+> +#define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
+> +#define SPAPR_DRC_PHB_GET_CLASS(obj) \
+> +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_PHB)
+> +#define SPAPR_DRC_PHB_CLASS(klass) \
+> +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DRC_=
+PHB)
+> +#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> +                                        TYPE_SPAPR_DRC_PHB)
+> +
+>  /*
+>   * Various hotplug types managed by sPAPRDRConnector
+>   *
 >=20
 
 --=20
@@ -189,24 +161,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qpqR4wE1CEr+Roqx
+--WTEzZvM72OaERIi0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsyGsACgkQbDjKyiDZ
-s5L+EQ/+M37/nbZEbkLhsb4qH3QBCboCdJ3m0cnSvzp9op1mbs2YI0xMlvUbLowi
-BFiW+TDXsrJoc40qaiLBGFpDFobEWsDi3VymdHppHpbNtldq294/616eTNNLS820
-EMQzwK2vLMgffIiUpizK49++zf6ReBzL3+eawP1RlONQabNdBtys6MstirQHhL8j
-3JgXiJkxfbENEy5OeWdKRLKYuPAajiVr2p8eWWO6LyPyGrXa5VoasGqttM0LeEzg
-enCl388u5cwcYN40IVIF7Yxfp/fAWelGSjEF/WrEgM8UcxN3wPgcebGCBpxjNkvc
-047HXsAVcCg1LkdVgaP8cazrBnlZWp7l/wPStk5iA3gcHga5/jVyoPW2SHbdcBSG
-2MC7yQ0fs6CXC98ChtVPMvNSbxBxjbOjcnsnFh26uQ3tOAGtFKVC/P6Lhnh8ipOC
-gjdXlOtJ+LTUbL02rUVINkys1tG3GN1j4JpuAlwHCrGqwg2sKoN+EbIhjEg4e7By
-6Gsimm1Vc8AfLXhExgYC+2xniEyy/TKPy8Z6uYp7L0HrtWTkU9sL/FGJEToggksp
-yR2j+EEfBd76VpcDYfhxjW83qXVAshY5JpGQp4HbSE6nRWmUMjGOncagAIw9bf0u
-O8QSYAA+6dECv1vjz4vpyfvmwWI63nlIAFQwG33WgL7oIoq0qMQ=
-=hcMK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsyRgACgkQbDjKyiDZ
+s5JsmA//YPm3cKXJnxRbaMbDkUBIfuoIrTuWh51XhE5PQcRgsWPr854R1Uirbuxz
+z5psd9IYSdOi0SAN7o9+idYfn9GDBD0PyDO1KFR0uJ6dd9s8hB8BVU/CxvKu9ry0
+CJFwcw5o7y0Uc+RnKkNMvwHI8p6YQ3nMJBhyzJ/ojwZ5k1FuywPOP82CQGzE3PZa
+t7R43BhBTeAf6i0I+jJjbzomBLH1j/7bLedctEsyfTsB/1vHUeF158jTEmBs9Baa
+McTtafKlL50/+kevpsIRVax29XHi7qFU/lCLp52yVBC8/GFLLcNPdB4NYulRYtC1
+yKgcJ4sWqvqnHbN/C2QwtEED+X4K335v/qbNW6gGc8Zw03ZobC91hOGtcCAOUy2n
+LhJw4LbdFn9yvdnBBEsKCr/UuC+mMBe6dd9wC/ys4l11u+EGJMy/eIqW/NH27n+a
+f6nU52juXKoUxhD8WfOuNxumop7TfreRDNxJemTyfcsr+HR9l/AsIbIRp9lBxHrC
+DuQqwKXm9rh1VETPMwbr68RqURPlBGlt33Gu3J4H61hbHtwGmWr+oFz78MdLMLus
+v+oqAsZXYE5tBLWawsrCIee5ZAFAkRgJzZy672+nvI2ei7jHy2+GLRFV7TmdWwl8
+9sErphO5kv08Pv7fhRm7sZUKGkzKBSlgXdWbX4wzmHyyg5eXQoI=
+=6rM2
 -----END PGP SIGNATURE-----
 
---qpqR4wE1CEr+Roqx--
+--WTEzZvM72OaERIi0--
