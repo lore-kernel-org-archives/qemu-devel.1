@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44148)
+Received: from eggs.gnu.org ([209.51.188.92]:44371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwUTF-00078s-Uy
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:11:42 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gwUTM-0007DF-Fi
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:11:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwUTB-0007sh-Vy
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:11:40 -0500
-Date: Wed, 20 Feb 2019 20:57:00 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190220095700.GB13129@umbus.fritz.box>
-References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<155059667853.1466090.16527852453054217565.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20190220032219.GE9345@umbus.fritz.box>
-	<20190220100123.462f8535@bahia.lan>
+	(envelope-from <stefanha@gmail.com>) id 1gwUTL-000816-2e
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:11:48 -0500
+Date: Wed, 20 Feb 2019 16:11:42 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190220161142.GG30403@stefanha-x1.localdomain>
+References: <20190218140301.197408-1-sgarzare@redhat.com>
+	<20190218140301.197408-11-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3lcZGd9BuhuYXNfi"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IuhbYIxU28t+Kd57"
 Content-Disposition: inline
-In-Reply-To: <20190220100123.462f8535@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v5 05/17] spapr/drc: Drop
- spapr_drc_attach() fdt argument
+In-Reply-To: <20190218140301.197408-11-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 10/10] tests/virtio-blk: add test for
+ DISCARD command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---3lcZGd9BuhuYXNfi
+--IuhbYIxU28t+Kd57
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 20, 2019 at 10:01:23AM +0100, Greg Kurz wrote:
-> On Wed, 20 Feb 2019 14:22:19 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Mon, Feb 18, 2019 at 03:03:01PM +0100, Stefano Garzarella wrote:
+> If the DISCARD feature is enabled, we try this command in the
+> test_basic(), checking only the status returned by the request.
 >=20
-> > On Tue, Feb 19, 2019 at 06:17:58PM +0100, Greg Kurz wrote:
-> > > All DRC subtypes have been converted to generate the FDT fragment at
-> > > configure connector time instead of attach time. The fdt and fdt_offs=
-et
-> > > arguments of spapr_drc_attach() aren't needed anymore. Drop them and
-> > > make the implementation of the dt_populate() method mandatory.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> > I've applied the first 5 patches to ppc-for-4.0, but as a followup...
-> >=20
-> > [...]
-> > > @@ -1113,8 +1104,6 @@ static void rtas_ibm_configure_connector(PowerP=
-CCPU *cpu,
-> > > =20
-> > >      drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> > > =20
-> > > -    g_assert(drc->fdt || drck->dt_populate);
-> > > -
-> > >      if (!drc->fdt) { =20
-> >=20
-> > ..you can now remove this conditional, since it will always be true.
-> >=20
->=20
-> Hmm... I'm afraid this is not true since configure-connector is supposed
-> to be called several times according to PAPR. And this is exactly what
-> the code does: first return the node name to the guest, then all properti=
-es
-> and subnodes one at a time...
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  tests/virtio-blk-test.c | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
 
-Oh, duh, of course.  Forget I said that.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---3lcZGd9BuhuYXNfi
+--IuhbYIxU28t+Kd57
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxtJGoACgkQbDjKyiDZ
-s5IKexAAyzkOsiEYNVQjxxb5ly81yKzrLKxCuKruAP2xvLb28NFlPLo4ITuWH2FW
-LkRrZsjtXcw8z0jtjCAuQwzd1KQGSPiBOIMKWiY3YY+Ej9E83vTaM8TQuKJPbdC9
-5wkzGU0JHL6zhYs2JOxHgH0HXCr3A5MIe/A/5ooxUmiCGz5bnW0ZuIUT6d716KwV
-gAxLV7DpJ6HbWilFplygJXXHxmGqJVMd6S2QUjkIfPrvFm5ngML0avfUsV1VyQLP
-0W2Qmsgm9XU3Zz3HKl2ex6b9qP9RRp5Ytfu0oqeiAdVCY+KqSLQ+dJ/6kS55Xv4P
-Y9bZxJnEaVFq3b4hyNKwWMwrhng39NaSoVtKQ/EiY3WUE4rIO5VQyeZQyGN67R0l
-6o7NH/seNkZXOhTJTk8rZngn6Q7Z92/0NRXKAiGCVVYPHr/nZxeL0dJEsZO5MK94
-o55z/NtlTffGQG9WG+R6zp0DKEXk/9I5mRpQ3aMVqBvFqNoMat/mRzuX9VSrLfFU
-ZnrwXTucHLbP6LYQTvtejk7b61Z868ZOqWFUzrd759gqZhVdJ7ia6zFRtssUaGMC
-Z858c+cq/ExkoAzDW983ToGACxBCNkxye+2MKeQA72sBGJLCBSho+WpW33TRBXmu
-ZM2lzugOXu8GrJ5CkgZXQJs7edj0PtM6qJF1cJZZvjTIoS6hDD0=
-=iOLz
+iQEcBAEBAgAGBQJcbXw+AAoJEJykq7OBq3PI7z0IAIf2Feqga33HQxdA2x1xKr0P
+AS5MBCy1nicIP7UrKlaCfJs+AtZOYzrv3p92UBkSV0p70F63+wdkfcLW+vCmrCZv
+TpuFKJlJ0JzrkO/MDfxoUspDy/a228eyq+wE4WTADfbms1jk7xladQfK23z+lAm0
+pAaDy2+ydWkgt5/X/CQCy1V0vjiGeZQ0VO7llcl6Ov6bZ1Tie31PyKT3QSiAKocx
+qRzrqF2rUagWYs6rJzBs6m+XJct45fVres0Y1mWCb38WPmIbkD0emHnX7zop98Sc
+4mFBtCZ7WA7rhuUWAUt2kOkgPmdHk4hk6YiDndxHuIXtL07MJvsjqfVnnZh7hiQ=
+=bNf+
 -----END PGP SIGNATURE-----
 
---3lcZGd9BuhuYXNfi--
+--IuhbYIxU28t+Kd57--
