@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37120)
+Received: from eggs.gnu.org ([209.51.188.92]:37135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwQUp-0007J6-B8
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:04 -0500
+	(envelope-from <quintela@redhat.com>) id 1gwQUq-0007K2-85
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwQUn-0002Vs-8c
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50402)
+	(envelope-from <quintela@redhat.com>) id 1gwQUo-0002cX-Cg
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwQUn-0001te-19
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:01 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwQUo-0001DB-1h
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 06:57:02 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 07E0C7518D
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 11:56:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39D35811DC
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 11:56:44 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Feb 2019 12:56:11 +0100
-Message-Id: <20190220115611.3192-9-quintela@redhat.com>
+Date: Wed, 20 Feb 2019 12:56:08 +0100
+Message-Id: <20190220115611.3192-6-quintela@redhat.com>
 In-Reply-To: <20190220115611.3192-1-quintela@redhat.com>
 References: <20190220115611.3192-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 8/8] tests: Add migration multifd test
+Subject: [Qemu-devel] [PATCH v2 5/8] multifd: Be flexible about packet size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +34,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-We set multifd-channels.
+This way we can change the packet size in the future and everything
+will work.  We choose an arbitrary big number (100 times configured
+size) as a limit about how big we will reallocate.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ migration/ram.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index a27f095b28..3e0e447f95 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -942,6 +942,53 @@ static void test_precopy_tcp(void)
-     g_free(uri);
- }
-=20
-+static void test_multifd_tcp(void)
-+{
-+    char *uri;
-+    QTestState *from, *to;
-+
-+    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false)) {
-+        return;
-+    }
-+
-+    /*
-+     * We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter(from, "downtime-limit", 1);
-+    /* 1GB/s */
-+    migrate_set_parameter(from, "max-bandwidth", 1000000000);
-+
-+    migrate_set_parameter(from, "multifd-channels", 2);
-+    migrate_set_parameter(to, "multifd-channels", 2);
-+
-+    migrate_set_capability(from, "multifd", "true");
-+    migrate_set_capability(to, "multifd", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    uri =3D migrate_get_socket_address(to, "socket-address");
-+
-+    migrate(from, uri, "{}");
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter(from, "downtime-limit", 300);
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to, true);
-+}
-+
- int main(int argc, char **argv)
+diff --git a/migration/ram.c b/migration/ram.c
+index e22d02760b..75a8fc21f8 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -723,13 +723,13 @@ static void multifd_pages_clear(MultiFDPages_t *pag=
+es)
+ static void multifd_send_fill_packet(MultiFDSendParams *p)
  {
-     char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -995,6 +1042,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-+    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
+     MultiFDPacket_t *packet =3D p->packet;
+-    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
+);
++    uint32_t page_max =3D MULTIFD_PACKET_SIZE / qemu_target_page_size();
+     int i;
 =20
-     ret =3D g_test_run();
+     packet->magic =3D cpu_to_be32(MULTIFD_MAGIC);
+     packet->version =3D cpu_to_be32(MULTIFD_VERSION);
+     packet->flags =3D cpu_to_be32(p->flags);
+-    packet->pages_alloc =3D cpu_to_be32(page_count);
++    packet->pages_alloc =3D cpu_to_be32(page_max);
+     packet->pages_used =3D cpu_to_be32(p->pages->used);
+     packet->next_packet_size =3D cpu_to_be32(p->next_packet_size);
+     packet->packet_num =3D cpu_to_be64(p->packet_num);
+@@ -746,7 +746,7 @@ static void multifd_send_fill_packet(MultiFDSendParam=
+s *p)
+ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp=
+)
+ {
+     MultiFDPacket_t *packet =3D p->packet;
+-    uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
+);
++    uint32_t pages_max =3D MULTIFD_PACKET_SIZE / qemu_target_page_size()=
+;
+     RAMBlock *block;
+     int i;
 =20
+@@ -769,12 +769,24 @@ static int multifd_recv_unfill_packet(MultiFDRecvPa=
+rams *p, Error **errp)
+     p->flags =3D be32_to_cpu(packet->flags);
+=20
+     packet->pages_alloc =3D be32_to_cpu(packet->pages_alloc);
+-    if (packet->pages_alloc > page_count) {
++    /*
++     * If we recevied a packet that is 100 times bigger than expected
++     * just stop migration.  It is a magic number.
++     */
++    if (packet->pages_alloc > pages_max * 100) {
+         error_setg(errp, "multifd: received packet "
+-                   "with size %d and expected maximum size %d",
+-                   packet->pages_alloc, page_count) ;
++                   "with size %d and expected size %d",
++                   packet->pages_alloc, pages_max) ;
+         return -1;
+     }
++    /*
++     * We received a packet that is bigger than expected but inside
++     * reasonable limits (see previous comment).  Just reallocate.
++     */
++    if (packet->pages_alloc > p->pages->allocated) {
++        multifd_pages_clear(p->pages);
++        multifd_pages_init(packet->pages_alloc);
++    }
+=20
+     p->pages->used =3D be32_to_cpu(packet->pages_used);
+     if (p->pages->used > packet->pages_alloc) {
 --=20
 2.20.1
