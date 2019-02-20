@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53343)
+Received: from eggs.gnu.org ([209.51.188.92]:53430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTxK-00036O-2w
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:43 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gwTxU-0003FA-Gi
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTxH-00070z-QJ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:41 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37344)
+	(envelope-from <tcminyard@gmail.com>) id 1gwTxJ-000728-OE
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:44 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTxH-0006t2-9Y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:39 -0500
-Received: by mail-ot1-x341.google.com with SMTP id b3so40834618otp.4
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:38:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTxH-0006ks-TB
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:38:41 -0500
+Received: by mail-ot1-x342.google.com with SMTP id n71so40785131ota.10
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:37:46 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:51 -0600
-Message-Id: <20190220135956.22589-15-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 14/19] i2c:smbus_slave: Add an SMBus vmstate
- structure
+Date: Wed, 20 Feb 2019 08:06:33 -0600
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <20190220140633.GA22452@minyard.net>
+Reply-To: minyard@acm.org
+References: <1549562254-41157-1-git-send-email-pbonzini@redhat.com>
+	<1549562254-41157-29-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1549562254-41157-29-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 28/51] ipmi: express dependencies with
+ kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Yang Zhong <yang.zhong@intel.com>, thuth@redhat.com, philmd@redhat.com
 
-From: Corey Minyard <cminyard@mvista.com>
+On Thu, Feb 07, 2019 at 06:57:11PM +0100, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Message-Id: <20190123065618.3520-36-yang.zhong@intel.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/i386-softmmu.mak  | 3 ---
+>  default-configs/ppc64-softmmu.mak | 3 ---
+>  hw/ipmi/Kconfig                   | 6 ++++++
+>  3 files changed, 6 insertions(+), 6 deletions(-)
 
-There is no vmstate handling for SMBus, so no device sitting on SMBus
-can have a state transfer that works reliably.  So add it.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/i2c/smbus_slave.c         | 18 ++++++++++++++++++
- include/hw/i2c/smbus_slave.h | 24 +++++++++++++++++++++---
- 2 files changed, 39 insertions(+), 3 deletions(-)
+This looks ok to me.
 
-diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-index 5b3046f6a3..9a2d314d1a 100644
---- a/hw/i2c/smbus_slave.c
-+++ b/hw/i2c/smbus_slave.c
-@@ -201,6 +201,24 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
-     sc->send = smbus_i2c_send;
- }
- 
-+bool smbus_vmstate_needed(SMBusDevice *dev)
-+{
-+    return dev->mode != SMBUS_IDLE;
-+}
-+
-+const VMStateDescription vmstate_smbus_device = {
-+    .name = TYPE_SMBUS_DEVICE,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
-+        VMSTATE_INT32(mode, SMBusDevice),
-+        VMSTATE_INT32(data_len, SMBusDevice),
-+        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const TypeInfo smbus_device_type_info = {
-     .name = TYPE_SMBUS_DEVICE,
-     .parent = TYPE_I2C_SLAVE,
-diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
-index 79050fb92d..ebe068304e 100644
---- a/include/hw/i2c/smbus_slave.h
-+++ b/include/hw/i2c/smbus_slave.h
-@@ -69,14 +69,32 @@ typedef struct SMBusDeviceClass
-     uint8_t (*receive_byte)(SMBusDevice *dev);
- } SMBusDeviceClass;
- 
-+#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
-+
- struct SMBusDevice {
-     /* The SMBus protocol is implemented on top of I2C.  */
-     I2CSlave i2c;
- 
-     /* Remaining fields for internal use only.  */
--    int mode;
--    int data_len;
--    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
-+    int32_t mode;
-+    int32_t data_len;
-+    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
- };
- 
-+extern const VMStateDescription vmstate_smbus_device;
-+
-+#define VMSTATE_SMBUS_DEVICE(_field, _state) {                       \
-+    .name       = (stringify(_field)),                               \
-+    .size       = sizeof(SMBusDevice),                               \
-+    .vmsd       = &vmstate_smbus_device,                             \
-+    .flags      = VMS_STRUCT,                                        \
-+    .offset     = vmstate_offset_value(_state, _field, SMBusDevice), \
-+}
-+
-+/*
-+ * Users should call this in their .needed functions to know if the
-+ * SMBus slave data needs to be transferred.
-+ */
-+bool smbus_vmstate_needed(SMBusDevice *dev);
-+
- #endif
--- 
-2.17.1
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
+
+> 
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index 53e9d5e..e779ee1 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -1,9 +1,6 @@
+>  # Default configuration for i386-softmmu
+>  
+>  CONFIG_VMXNET3_PCI=y
+> -CONFIG_IPMI=y
+> -CONFIG_IPMI_LOCAL=y
+> -CONFIG_IPMI_EXTERN=y
+>  CONFIG_ISA_IPMI_KCS=y
+>  CONFIG_ISA_IPMI_BT=y
+>  
+> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+> index a0a9151..d642b67 100644
+> --- a/default-configs/ppc64-softmmu.mak
+> +++ b/default-configs/ppc64-softmmu.mak
+> @@ -5,9 +5,6 @@ include ppc-softmmu.mak
+>  
+>  # For PowerNV
+>  CONFIG_POWERNV=y
+> -CONFIG_IPMI=y
+> -CONFIG_IPMI_LOCAL=y
+> -CONFIG_IPMI_EXTERN=y
+>  CONFIG_ISA_IPMI_BT=y
+>  
+>  # For pSeries
+> diff --git a/hw/ipmi/Kconfig b/hw/ipmi/Kconfig
+> index 6a4f08f..b944fae 100644
+> --- a/hw/ipmi/Kconfig
+> +++ b/hw/ipmi/Kconfig
+> @@ -3,14 +3,20 @@ config IPMI
+>  
+>  config IPMI_LOCAL
+>      bool
+> +    default y
+> +    depends on IPMI
+>  
+>  config IPMI_EXTERN
+>      bool
+> +    default y
+> +    depends on IPMI
+>  
+>  config ISA_IPMI_KCS
+>      bool
+>      depends on ISA_BUS
+> +    select IPMI
+>  
+>  config ISA_IPMI_BT
+>      bool
+>      depends on ISA_BUS
+> +    select IPMI
+> -- 
+> 1.8.3.1
+> 
+> 
+> 
