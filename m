@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45367)
+Received: from eggs.gnu.org ([209.51.188.92]:45897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTow-0004eF-Ga
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:30:04 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwTpy-0005aG-Vs
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTou-0001Qy-1H
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:30:02 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42547)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwToq-0001Od-2e
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:29:57 -0500
-Received: by mail-ot1-x344.google.com with SMTP id i5so40735901oto.9
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:29:52 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:49 -0600
-Message-Id: <20190220135956.22589-13-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 12/19] migration: Add a VMSTATE_BOOL_TEST()
- macro
+	(envelope-from <eric.auger@redhat.com>) id 1gwTpv-0001sf-SP
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:31:06 -0500
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-13-eric.auger@redhat.com>
+	<20190218095838.048819c5@Igors-MacBook-Pro.local>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8f8abcb6-6665-dc89-b836-6e9d131f6f44@redhat.com>
+Date: Wed, 20 Feb 2019 16:30:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190218095838.048819c5@Igors-MacBook-Pro.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 12/18] hw/arm/boot: Expose the PC-DIMM
+ nodes in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +26,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-From: Corey Minyard <cminyard@mvista.com>
+Hi Igor,
 
-This will be needed by coming I2C changes.
+On 2/18/19 9:58 AM, Igor Mammedov wrote:
+> On Tue,  5 Feb 2019 18:33:00 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>
+>> This patch add memory nodes corresponding to PC-DIMM regions.
+> s/add/adds/ or s/This patch add/Add/
+> 
+>>
+>> NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
+>> don't need to care about NV-DIMM at this stage.
+>>
+>> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v3 -> v4:
+>> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
+>>
+>> v1 -> v2:
+>> - added qapi_free_MemoryDeviceInfoList and simplify the loop
+>> ---
+>>  hw/arm/boot.c | 35 +++++++++++++++++++++++++++++++++++
+>>  1 file changed, 35 insertions(+)
+>>
+>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>> index 2ef367e15b..2a70e8aa82 100644
+>> --- a/hw/arm/boot.c
+>> +++ b/hw/arm/boot.c
+>> @@ -19,6 +19,7 @@
+>>  #include "sysemu/numa.h"
+>>  #include "hw/boards.h"
+>>  #include "hw/loader.h"
+>> +#include "hw/mem/memory-device.h"
+>>  #include "elf.h"
+>>  #include "sysemu/device_tree.h"
+>>  #include "qemu/config-file.h"
+>> @@ -526,6 +527,34 @@ static void fdt_add_psci_node(void *fdt)
+>>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+>>  }
+>>  
+>> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
+>> +                                             uint32_t acells, uint32_t scells) {
+>> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
+>> +    MemoryDeviceInfo *mi;
+>> +    PCDIMMDeviceInfo *di;
+>> +    bool is_nvdimm;
+>> +    int ret = 0;
+>> +
+>> +    for (info = info_list; info != NULL; info = info->next) {
+>> +        mi = info->value;
+>> +        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
+>> +        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
+>> +
+>> +        if (is_nvdimm) {
+>> +            ret = -ENOENT; /* NV-DIMM not yet supported */
+>> +        } else {
+>> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
+>> +                                      scells, di->size, di->node);
+>> +        }
+>> +        if (ret < 0) {
+>> +            goto out;
+>> +        }
+>> +    }
+>> +out:
+>> +    qapi_free_MemoryDeviceInfoList(info_list);
+>> +    return ret;
+>> +}
+>> +
+>>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>>                   hwaddr addr_limit, AddressSpace *as)
+>>  {
+>> @@ -621,6 +650,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>>          }
+>>      }
+>>  
+>> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
+>> +    if (rc < 0) {
+>> +            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
+> error message is rather vague, user using nvdimms + pc-dimms on CLI won't have
+> a clue that the former is not supported.
+> Suggest pass in error_fatal as argument and report more specific error from
+> fdt_add_hotpluggable_memory_nodes()
+> 
+> does this run on reboot?
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- include/migration/vmstate.h | 3 +++
- 1 file changed, 3 insertions(+)
+Yes after a QMP system_reset I can see the DIMMS on guest in /proc/meminfo
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 067b126cf1..a668ec75b8 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -851,6 +851,9 @@ extern const VMStateInfo vmstate_info_qtailq;
- #define VMSTATE_INT32_POSITIVE_LE(_f, _s)                             \
-     VMSTATE_SINGLE(_f, _s, 0, vmstate_info_int32_le, int32_t)
- 
-+#define VMSTATE_BOOL_TEST(_f, _s, _t)                               \
-+    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_bool, bool)
-+
- #define VMSTATE_INT8_TEST(_f, _s, _t)                               \
-     VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_int8, int8_t)
- 
--- 
-2.17.1
+Thanks
+
+Eric
+> 
+>> +            goto fail;
+>> +    }
+>> +
+>>      rc = fdt_path_offset(fdt, "/chosen");
+>>      if (rc < 0) {
+>>          qemu_fdt_add_subnode(fdt, "/chosen");
+> 
