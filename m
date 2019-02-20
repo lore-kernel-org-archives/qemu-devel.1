@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32924)
+Received: from eggs.gnu.org ([209.51.188.92]:43767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gwJCG-0001jL-Us
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 23:09:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gwK44-0003tK-3C
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gwIzd-0007FY-5l
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:56:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gwIza-0007E1-Ui
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:56:20 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1550603704-22474-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<d935f740-e792-1b7b-80ed-eb400ee14a3d@redhat.com>
-Date: Wed, 20 Feb 2019 04:56:08 +0100
-In-Reply-To: <d935f740-e792-1b7b-80ed-eb400ee14a3d@redhat.com> (Eric Blake's
-	message of "Tue, 19 Feb 2019 14:12:21 -0600")
-Message-ID: <8736ojkt9j.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] target/mips: implement QMP
- query-cpu-definitions command
+	(envelope-from <richard.henderson@linaro.org>) id 1gwK43-0004xo-0Q
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:05:00 -0500
+Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:43815)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gwK41-0004wP-9P
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 00:04:58 -0500
+Received: by mail-pl1-x632.google.com with SMTP id m10so1912758plt.10
+	for <qemu-devel@nongnu.org>; Tue, 19 Feb 2019 21:04:56 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 19 Feb 2019 21:04:49 -0800
+Message-Id: <20190220050451.10939-2-richard.henderson@linaro.org>
+In-Reply-To: <20190220050451.10939-1-richard.henderson@linaro.org>
+References: <20190220050451.10939-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/3] target/arm: Rearrange disas_data_proc_reg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +26,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org, natalia.fursova@ispras.ru, arikalo@wavecomp.com, mdroth@linux.vnet.ibm.com, dovgaluk@ispras.ru, amarkovic@wavecomp.com, marcandre.lureau@redhat.com, philmd@redhat.com, aurelien@aurel32.net
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Eric Blake <eblake@redhat.com> writes:
+This decoding more closely matches the ARMv8.4 Table C4-6,
+Encoding table for Data Processing - Register Group.
 
-> On 2/19/19 1:15 PM, Aleksandar Markovic wrote:
->> From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->>=20
->> This patch enables QMP-based querying of the available CPU types for
->> MIPS and MIPS64 platforms.
->>=20
->> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->
->> +++ b/qapi/target.json
->> @@ -499,7 +499,7 @@
->>              'static': 'bool',
->>              '*unavailable-features': [ 'str' ],
->>              'typename': 'str' },
->> -  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
-386) || defined(TARGET_S390X)' }
->> +  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
-386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
->
-> Hmm. Long line; however, the argument to 'if' is pasted literally to an
-> #if directive, which would break if we added newlines in the middle.
-> And we can't use literal newlines in the middle of a JSON string.  About
-> the only thing I could think of that might allow for more manageable
-> line lengths would be permitting:
->
-> 'if': [ 'defined(TARGET_PPC)',
->         'defined(TARGET_ARM)' ...]
->
-> where the QAPI generator would in turn form the disjunction of supplying
-> the || between each term when the 'if' is an array of strings. But that
-> feels like a lot of effort for little gain compared to just living with
-> the long lines.
+In particular, op2 == 0 is now more than just Add/sub (with carry).
 
-I hate long lines as much as anyone, but we already burned the list
-syntax on conjunction:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 98 ++++++++++++++++++++++----------------
+ 1 file changed, 57 insertions(+), 41 deletions(-)
 
-docs/devel/qapi-code-gen.txt:
-
-    =3D=3D=3D Configuring the schema =3D=3D=3D
-
-    The 'struct', 'enum', 'union', 'alternate', 'command' and 'event'
-    top-level expressions can take an 'if' key.  Its value must be a string
-    or a list of strings.  A string is shorthand for a list containing just
-    that string.  The code generated for the top-level expression will then
-    be guarded by #if COND for each COND in the list.
-
-    Example: a conditional struct
-
-     { 'struct': 'IfStruct', 'data': { 'foo': 'int' },
-       'if': ['defined(CONFIG_FOO)', 'defined(HAVE_BAR)'] }
-
-    gets its generated code guarded like this:
-
-     #if defined(CONFIG_FOO)
-     #if defined(HAVE_BAR)
-     ... generated code ...
-     #endif /* defined(HAVE_BAR) */
-     #endif /* defined(CONFIG_FOO) */
-
-The problem of long strings requiring long lines is not limited to 'if'.
-The common solution in programming languages is to concatenate adjacent
-string literals.  A more user-friendly QAPI language would support
-something like that.  By choosing JSON, a language designed "for the
-serialization of structured data" (RFC 4627, 7159, 8259), we opted
-against user-friendly.  We then admitted our regrets halfheartedly by
-making our version of JSON incompatible enough to defeat tools like
-javascript-mode.  Correcting our fundamental mistake now would be a lot
-of churn.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 951c8f4129..0e16487be0 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4694,11 +4694,10 @@ static void disas_data_proc_3src(DisasContext *s, uint32_t insn)
+ }
+ 
+ /* Add/subtract (with carry)
+- *  31 30 29 28 27 26 25 24 23 22 21  20  16  15   10  9    5 4   0
+- * +--+--+--+------------------------+------+---------+------+-----+
+- * |sf|op| S| 1  1  0  1  0  0  0  0 |  rm  | opcode2 |  Rn  |  Rd |
+- * +--+--+--+------------------------+------+---------+------+-----+
+- *                                            [000000]
++ *  31 30 29 28 27 26 25 24 23 22 21  20  16  15       10  9    5 4   0
++ * +--+--+--+------------------------+------+-------------+------+-----+
++ * |sf|op| S| 1  1  0  1  0  0  0  0 |  rm  | 0 0 0 0 0 0 |  Rn  |  Rd |
++ * +--+--+--+------------------------+------+-------------+------+-----+
+  */
+ 
+ static void disas_adc_sbc(DisasContext *s, uint32_t insn)
+@@ -4706,11 +4705,6 @@ static void disas_adc_sbc(DisasContext *s, uint32_t insn)
+     unsigned int sf, op, setflags, rm, rn, rd;
+     TCGv_i64 tcg_y, tcg_rn, tcg_rd;
+ 
+-    if (extract32(insn, 10, 6) != 0) {
+-        unallocated_encoding(s);
+-        return;
+-    }
+-
+     sf = extract32(insn, 31, 1);
+     op = extract32(insn, 30, 1);
+     setflags = extract32(insn, 29, 1);
+@@ -5397,47 +5391,69 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
+     }
+ }
+ 
+-/* Data processing - register */
++/*
++ * Data processing - register
++ *  31  30 29  28      25    21  20  16      10         0
++ * +--+---+--+---+-------+-----+-------+-------+---------+
++ * |  |op0|  |op1| 1 0 1 | op2 |       |  op3  |         |
++ * +--+---+--+---+-------+-----+-------+-------+---------+
++ */
+ static void disas_data_proc_reg(DisasContext *s, uint32_t insn)
+ {
+-    switch (extract32(insn, 24, 5)) {
+-    case 0x0a: /* Logical (shifted register) */
+-        disas_logic_reg(s, insn);
+-        break;
+-    case 0x0b: /* Add/subtract */
+-        if (insn & (1 << 21)) { /* (extended register) */
+-            disas_add_sub_ext_reg(s, insn);
++    int op0 = extract32(insn, 30, 1);
++    int op1 = extract32(insn, 28, 1);
++    int op2 = extract32(insn, 21, 4);
++    int op3 = extract32(insn, 10, 6);
++
++    if (!op1) {
++        if (op2 & 8) {
++            if (op2 & 1) {
++                /* Add/sub (extended register) */
++                disas_add_sub_ext_reg(s, insn);
++            } else {
++                /* Add/sub (shifted register) */
++                disas_add_sub_reg(s, insn);
++            }
+         } else {
+-            disas_add_sub_reg(s, insn);
++            /* Logical (shifted register) */
++            disas_logic_reg(s, insn);
+         }
+-        break;
+-    case 0x1b: /* Data-processing (3 source) */
+-        disas_data_proc_3src(s, insn);
+-        break;
+-    case 0x1a:
+-        switch (extract32(insn, 21, 3)) {
+-        case 0x0: /* Add/subtract (with carry) */
++        return;
++    }
++
++    switch (op2) {
++    case 0x0:
++        switch (op3) {
++        case 0x00: /* Add/subtract (with carry) */
+             disas_adc_sbc(s, insn);
+             break;
+-        case 0x2: /* Conditional compare */
+-            disas_cc(s, insn); /* both imm and reg forms */
+-            break;
+-        case 0x4: /* Conditional select */
+-            disas_cond_select(s, insn);
+-            break;
+-        case 0x6: /* Data-processing */
+-            if (insn & (1 << 30)) { /* (1 source) */
+-                disas_data_proc_1src(s, insn);
+-            } else {            /* (2 source) */
+-                disas_data_proc_2src(s, insn);
+-            }
+-            break;
++
+         default:
+-            unallocated_encoding(s);
+-            break;
++            goto do_unallocated;
+         }
+         break;
++
++    case 0x2: /* Conditional compare */
++        disas_cc(s, insn); /* both imm and reg forms */
++        break;
++
++    case 0x4: /* Conditional select */
++        disas_cond_select(s, insn);
++        break;
++
++    case 0x6: /* Data-processing */
++        if (op0) {    /* (1 source) */
++            disas_data_proc_1src(s, insn);
++        } else {      /* (2 source) */
++            disas_data_proc_2src(s, insn);
++        }
++        break;
++    case 0x8 ... 0xf: /* (3 source) */
++        disas_data_proc_3src(s, insn);
++        break;
++
+     default:
++    do_unallocated:
+         unallocated_encoding(s);
+         break;
+     }
+-- 
+2.17.2
