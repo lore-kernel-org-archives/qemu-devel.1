@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43331)
+Received: from eggs.gnu.org ([209.51.188.92]:44088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwUSE-0006GQ-E5
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:10:41 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gwUTA-00072C-Mv
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwUSB-000792-Ln
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:10:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwUSB-0006ya-7G
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:10:35 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 424C273A91
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 12:58:53 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Feb 2019 13:57:55 +0100
-Message-Id: <20190220125755.3906-4-quintela@redhat.com>
-In-Reply-To: <20190220125755.3906-1-quintela@redhat.com>
-References: <20190220125755.3906-1-quintela@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1gwUT5-0007nq-Tc
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 11:11:34 -0500
+Date: Wed, 20 Feb 2019 16:11:15 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190220161115.GF30403@stefanha-x1.localdomain>
+References: <20190218140301.197408-1-sgarzare@redhat.com>
+	<20190218140301.197408-9-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] multifd: Start of zlib compression code
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Il7n/DHsA0sMLmDu"
+Content-Disposition: inline
+In-Reply-To: <20190218140301.197408-9-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 08/10] tests/virtio-blk:
+ add virtio_blk_fix_dwz_hdr() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,207 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is still work in progress.
 
-It is already faster that normal compression code inside qemu.
-It don't do any unnecesary copies.  And as packages are bigger, we get
-better compression.
+--Il7n/DHsA0sMLmDu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- hmp.c                  |  6 ++-
- migration/ram.c        | 96 ++++++++++++++++++++++++++++++++++++++++--
- migration/trace-events |  2 +-
- 3 files changed, 97 insertions(+), 7 deletions(-)
+On Mon, Feb 18, 2019 at 03:02:59PM +0100, Stefano Garzarella wrote:
+> This function is useful to fix the endianness of struct
+> virtio_blk_discard_write_zeroes headers.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  tests/virtio-blk-test.c | 23 +++++++++++++++++------
+>  1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index abbd49ec17..7c1ad2376d 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1789,8 +1789,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const=
- QDict *qdict)
-     case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
-         p->has_xbzrle_cache_size =3D true;
-         visit_type_size(v, param, &cache_size, &err);
--        if (err || cache_size > INT64_MAX
--            || (size_t)cache_size !=3D cache_size) {
-+        if (err) {
-+            break;
-+        }
-+        if (cache_size > INT64_MAX || (size_t)cache_size !=3D cache_size=
-) {
-             error_setg(&err, "Invalid size %s", valuestr);
-             break;
-         }
-diff --git a/migration/ram.c b/migration/ram.c
-index 7de27e1a35..feb857d395 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -519,6 +519,7 @@ exit:
- #define MULTIFD_VERSION 1
-=20
- #define MULTIFD_FLAG_SYNC (1 << 0)
-+#define MULTIFD_FLAG_ZLIB (1 << 1)
-=20
- /* This value needs to be a multiple of qemu_target_page_size() */
- #define MULTIFD_PACKET_SIZE (512 * 1024)
-@@ -1031,6 +1032,7 @@ static void *multifd_send_thread(void *opaque)
- {
-     MultiFDSendParams *p =3D opaque;
-     Error *local_err =3D NULL;
-+    z_stream *zs =3D &p->zs;
-     int ret;
-=20
-     trace_multifd_send_thread_start(p->id);
-@@ -1050,8 +1052,43 @@ static void *multifd_send_thread(void *opaque)
-             uint32_t used =3D p->pages->used;
-             uint64_t packet_num =3D p->packet_num;
-             uint32_t flags =3D p->flags;
-+            struct iovec *iov =3D p->pages->iov;
-=20
-             p->next_packet_size =3D used * qemu_target_page_size();
-+
-+            if (used && migrate_use_multifd_zlib()) {
-+                uint32_t in_size =3D used * qemu_target_page_size();
-+                uint32_t out_size =3D 0;
-+                int i;
-+
-+                for (i =3D 0; i < used; i++ ) {
-+                    uint32_t available =3D p->zbuff_len - out_size;
-+                    int flush =3D Z_NO_FLUSH;
-+
-+                    if (i =3D=3D used  - 1) {
-+                        flush =3D Z_SYNC_FLUSH;
-+                    }
-+
-+                    zs->avail_in =3D iov[i].iov_len;
-+                    zs->next_in =3D iov[i].iov_base;
-+
-+                    zs->avail_out =3D available;
-+                    zs->next_out =3D p->zbuff + out_size;
-+
-+                    ret =3D deflate(zs, flush);
-+                    if (ret !=3D Z_OK) {
-+                        printf("problem with deflate? %d\n", ret);
-+                        qemu_mutex_unlock(&p->mutex);
-+                        break;
-+                    }
-+                    out_size +=3D available - zs->avail_out;
-+                }
-+                printf("%d deflate in %d out %d diff %d\n",
-+                       p->id, in_size, out_size, in_size - out_size);
-+
-+                p->next_packet_size =3D out_size;
-+            }
-+
-             multifd_send_fill_packet(p);
-             p->flags =3D 0;
-             p->num_packets++;
-@@ -1069,8 +1106,13 @@ static void *multifd_send_thread(void *opaque)
-             }
-=20
-             if (used) {
--                ret =3D qio_channel_writev_all(p->c, p->pages->iov,
--                                             used, &local_err);
-+                if (migrate_use_multifd_zlib()) {
-+                    ret =3D qio_channel_write_all(p->c, (void *)p->zbuff=
-,
-+                                               p->next_packet_size, &loc=
-al_err);
-+                } else {
-+                    ret =3D qio_channel_writev_all(p->c, p->pages->iov,
-+                                                 used, &local_err);
-+                }
-                 if (ret !=3D 0) {
-                     break;
-                 }
-@@ -1283,6 +1325,7 @@ static void *multifd_recv_thread(void *opaque)
- {
-     MultiFDRecvParams *p =3D opaque;
-     Error *local_err =3D NULL;
-+    z_stream *zs =3D &p->zs;
-     int ret;
-=20
-     trace_multifd_recv_thread_start(p->id);
-@@ -1317,8 +1360,53 @@ static void *multifd_recv_thread(void *opaque)
-         qemu_mutex_unlock(&p->mutex);
-=20
-         if (used) {
--            ret =3D qio_channel_readv_all(p->c, p->pages->iov,
--                                        used, &local_err);
-+            uint32_t in_size =3D p->next_packet_size;
-+            uint32_t out_size =3D 0;
-+            uint32_t expected_size =3D used * qemu_target_page_size();
-+            int i;
-+
-+            if (migrate_use_multifd_zlib()) {
-+                ret =3D qio_channel_read_all(p->c, (void *)p->zbuff,
-+                                           in_size, &local_err);
-+
-+                if (ret !=3D 0) {
-+                    break;
-+                }
-+
-+                zs->avail_in =3D in_size;
-+                zs->next_in =3D p->zbuff;
-+
-+                for (i =3D 0; i < used; i++ ) {
-+                    struct iovec *iov =3D &p->pages->iov[i];
-+                    int flush =3D Z_NO_FLUSH;
-+
-+                    if (i =3D=3D used  - 1) {
-+                        flush =3D Z_SYNC_FLUSH;
-+                    }
-+
-+                    zs->avail_out =3D iov->iov_len;
-+                    zs->next_out =3D iov->iov_base;
-+
-+                    ret =3D inflate(zs, flush);
-+                    if (ret !=3D Z_OK) {
-+                        printf("%d: problem with inflate? %d\n", p->id, =
-ret);
-+                        qemu_mutex_unlock(&p->mutex);
-+                        break;
-+                    }
-+                    out_size +=3D iov->iov_len;
-+                }
-+
-+                printf("%d: out_size =3D %d, in_size =3D %d, expected_si=
-ze =3D %d avail_in: %d\n",
-+                       p->id, out_size, in_size, expected_size, zs->avai=
-l_in);
-+                if (out_size !=3D expected_size) {
-+                    printf("out size %d expected size %d\n",
-+                           out_size, expected_size);
-+                    break;
-+                }
-+            } else {
-+                ret =3D qio_channel_readv_all(p->c, p->pages->iov,
-+                                            used, &local_err);
-+            }
-             if (ret !=3D 0) {
-                 break;
-             }
-diff --git a/migration/trace-events b/migration/trace-events
-index a11e66e1d9..8aaae32e67 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -77,7 +77,7 @@ get_queued_page_not_dirty(const char *block_name, uint6=
-4_t tmp_offset, unsigned
- migration_bitmap_sync_start(void) ""
- migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
- migration_throttle(void) ""
--multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t fl=
-ags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pag=
-es %d flags 0x%x next packet size %d"
-+multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t fl=
-ags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " pages =
-%d flags 0x%x next packet size %d"
- multifd_recv_sync_main(long packet_num) "packet num %ld"
- multifd_recv_sync_main_signal(uint8_t id) "channel %d"
- multifd_recv_sync_main_wait(uint8_t id) "channel %d"
---=20
-2.20.1
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--Il7n/DHsA0sMLmDu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcbXwjAAoJEJykq7OBq3PIZYIH/2Lmfs3P96+i5z9aEHVhUXO1
+m4lcCDEcvBa2QThujSHZJF4r3mIpBS9c5bg0+79CZDk+klK4n2JP/MNtN1P0P6jM
+EsD4WVsZdCFhuYNPtXH4rvGi/N5gsqXl3ap5MqZBH04ZeiJB1RrihYn1FxezNzHK
+2Z6Dn0SlpVrWc2rU3fFfDAxc6zxpuQqZ1HkOykRsACQ0+MiRgNlUx9ZiG6Kw5+/M
+R0iqGHXP9ahynxySOsLuwRun1kOThh12lj1UYquQBaLZpZJRYOKP9y1mRn2+JOdp
+wY3MOgUKDkOl2SXVLDeIUP++WRE/daiM/Eaj2PaVBVhOZs+1EVtOOtpmVSs0124=
+=bZOX
+-----END PGP SIGNATURE-----
+
+--Il7n/DHsA0sMLmDu--
