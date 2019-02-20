@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43840)
+Received: from eggs.gnu.org ([209.51.188.92]:44006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTmu-0002Rh-B7
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1gwTn4-0002ZP-ND
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTmq-0000Pu-MJ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:56 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35329)
+	(envelope-from <bounces@canonical.com>) id 1gwTn3-0000Wy-AF
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:28:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTmc-0008L5-LI
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:42 -0500
-Received: by mail-ot1-x341.google.com with SMTP id z19so40819061otm.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:26:43 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:48 -0600
-Message-Id: <20190220135956.22589-12-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 11/19] i2c:pm_smbus: Fix pm_smbus handling of
- I2C block read
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gwTn2-00080M-Su
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:28:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gwRUe-0000v6-Pv
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:00:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BF2092E80CC
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 13:00:56 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Feb 2019 12:51:46 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
+Message-Id: <155066710677.29079.10002691295545541695.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
+ memory hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,212 +38,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+The reason why it behaves differently with machine types <=3D 2.4 is that
+- up to and including qemu-2.4, the calculation of the DIMM hotplug area wa=
+s incorrect,
+- in 2.5, the calculation was fixed,
+- but for the migration compatibility of machine types <=3D 2.4, the old ca=
+lculation was preserved for those machine types (the DIMM hotplug area is g=
+uest-visible)
 
-The I2C block read function of pm_smbus was completely broken.  It
-required doing some direct I2C handling because it didn't have a
-defined size, the OS code just reads bytes until it marks the
-transaction finished.
+See the following (adjacent) commits:
+- 3385e8e2640e ("pc: memhotplug: fix incorrectly set reserved-memory-end", =
+2015-09-10)
+- 2f8b50083b32 ("pc: memhotplug: keep reserved-memory-end broken on 2.4 and=
+ earlier machines", 2015-09-10)
 
-This also required adjusting how the AMIBIOS workaround code worked,
-the I2C block mode was setting STS_HOST_BUSY during a transaction,
-so that bit could no longer be used to inform the host status read
-code to start the transaction.  Create a explicit bool for that
-operation.
+These commits were first released in v2.5.0.
 
-Also, don't read the next byte from the device in byte-by-byte
-mode unless the OS is actually clearing the byte done bit.  Just
-assuming that's what the OS is doing is a bad idea.
+I'll look at your logs now.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/i2c/pm_smbus.c         | 86 ++++++++++++++++++++++++++++++---------
- include/hw/i2c/pm_smbus.h |  6 +++
- 2 files changed, 73 insertions(+), 19 deletions(-)
+-- =
 
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 6cfb7eb1b3..81d2a425ec 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -118,19 +118,30 @@ static void smb_transaction(PMSMBus *s)
-         }
-         break;
-     case PROT_I2C_BLOCK_READ:
--        if (read) {
--            int xfersize = s->smb_data0;
--            if (xfersize > sizeof(s->smb_data)) {
--                xfersize = sizeof(s->smb_data);
--            }
--            ret = smbus_read_block(bus, addr, s->smb_data1, s->smb_data,
--                                   xfersize, false, true);
--            goto data8;
--        } else {
--            /* The manual says the behavior is undefined, just set DEV_ERR. */
-+        /* According to the Linux i2c-i801 driver:
-+         *   NB: page 240 of ICH5 datasheet shows that the R/#W
-+         *   bit should be cleared here, even when reading.
-+         *   However if SPD Write Disable is set (Lynx Point and later),
-+         *   the read will fail if we don't set the R/#W bit.
-+         * So at least Linux may or may not set the read bit here.
-+         * So just ignore the read bit for this command.
-+         */
-+        if (i2c_start_transfer(bus, addr, 0)) {
-             goto error;
-         }
--        break;
-+        ret = i2c_send(bus, s->smb_data1);
-+        if (ret) {
-+            goto error;
-+        }
-+        if (i2c_start_transfer(bus, addr, 1)) {
-+            goto error;
-+        }
-+        s->in_i2c_block_read = true;
-+        s->smb_blkdata = i2c_recv(s->smbus);
-+        s->op_done = false;
-+        s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
-+        goto out;
-+
-     case PROT_BLOCK_DATA:
-         if (read) {
-             ret = smbus_read_block(bus, addr, cmd, s->smb_data,
-@@ -208,6 +219,7 @@ static void smb_transaction_start(PMSMBus *s)
- {
-     if (s->smb_ctl & CTL_INTREN) {
-         smb_transaction(s);
-+        s->start_transaction_on_status_read = false;
-     } else {
-         /* Do not execute immediately the command; it will be
-          * executed when guest will read SMB_STAT register.  This
-@@ -217,6 +229,7 @@ static void smb_transaction_start(PMSMBus *s)
-          * checking for status.  If STS_HOST_BUSY doesn't get
-          * set, it gets stuck. */
-         s->smb_stat |= STS_HOST_BUSY;
-+        s->start_transaction_on_status_read = true;
-     }
- }
- 
-@@ -226,19 +239,38 @@ smb_irq_value(PMSMBus *s)
-     return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
- }
- 
-+static bool
-+smb_byte_by_byte(PMSMBus *s)
-+{
-+    if (s->op_done) {
-+        return false;
-+    }
-+    if (s->in_i2c_block_read) {
-+        return true;
-+    }
-+    return !(s->smb_auxctl & AUX_BLK);
-+}
-+
- static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
- {
-     PMSMBus *s = opaque;
-+    uint8_t clear_byte_done;
- 
-     SMBUS_DPRINTF("SMB writeb port=0x%04" HWADDR_PRIx
-                   " val=0x%02" PRIx64 "\n", addr, val);
-     switch(addr) {
-     case SMBHSTSTS:
-+        clear_byte_done = s->smb_stat & val & STS_BYTE_DONE;
-         s->smb_stat &= ~(val & ~STS_HOST_BUSY);
--        if (!s->op_done && !(s->smb_auxctl & AUX_BLK)) {
-+        if (clear_byte_done && smb_byte_by_byte(s)) {
-             uint8_t read = s->smb_addr & 0x01;
- 
-+            if (s->in_i2c_block_read) {
-+                /* See comment below PROT_I2C_BLOCK_READ above. */
-+                read = 1;
-+            }
-+
-             s->smb_index++;
-             if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
-                 s->smb_index = 0;
-@@ -268,12 +300,23 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                 s->smb_stat |= STS_BYTE_DONE;
-             } else if (s->smb_ctl & CTL_LAST_BYTE) {
-                 s->op_done = true;
--                s->smb_blkdata = s->smb_data[s->smb_index];
-+                if (s->in_i2c_block_read) {
-+                    s->in_i2c_block_read = false;
-+                    s->smb_blkdata = i2c_recv(s->smbus);
-+                    i2c_nack(s->smbus);
-+                    i2c_end_transfer(s->smbus);
-+                } else {
-+                    s->smb_blkdata = s->smb_data[s->smb_index];
-+                }
-                 s->smb_index = 0;
-                 s->smb_stat |= STS_INTR;
-                 s->smb_stat &= ~STS_HOST_BUSY;
-             } else {
--                s->smb_blkdata = s->smb_data[s->smb_index];
-+                if (s->in_i2c_block_read) {
-+                    s->smb_blkdata = i2c_recv(s->smbus);
-+                } else {
-+                    s->smb_blkdata = s->smb_data[s->smb_index];
-+                }
-                 s->smb_stat |= STS_BYTE_DONE;
-             }
-         }
-@@ -284,6 +327,10 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-             if (!s->op_done) {
-                 s->smb_index = 0;
-                 s->op_done = true;
-+                if (s->in_i2c_block_read) {
-+                    s->in_i2c_block_read = false;
-+                    i2c_end_transfer(s->smbus);
-+                }
-             }
-             smb_transaction_start(s);
-         }
-@@ -337,8 +384,9 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-     switch(addr) {
-     case SMBHSTSTS:
-         val = s->smb_stat;
--        if (s->smb_stat & STS_HOST_BUSY) {
-+        if (s->start_transaction_on_status_read) {
-             /* execute command now */
-+            s->start_transaction_on_status_read = false;
-             s->smb_stat &= ~STS_HOST_BUSY;
-             smb_transaction(s);
-         }
-@@ -359,10 +407,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-         val = s->smb_data1;
-         break;
-     case SMBBLKDAT:
--        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
--            s->smb_index = 0;
--        }
--        if (s->smb_auxctl & AUX_BLK) {
-+        if (s->smb_auxctl & AUX_BLK && !s->in_i2c_block_read) {
-+            if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
-+                s->smb_index = 0;
-+            }
-             val = s->smb_data[s->smb_index++];
-             if (!s->op_done && s->smb_index == s->smb_data0) {
-                 s->op_done = true;
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index 6dd5b7040b..7bcca97672 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -33,6 +33,12 @@ typedef struct PMSMBus {
-     /* Set on block transfers after the last byte has been read, so the
-        INTR bit can be set at the right time. */
-     bool op_done;
-+
-+    /* Set during an I2C block read, so we know how to handle data. */
-+    bool in_i2c_block_read;
-+
-+    /* Used to work around a bug in AMIBIOS, see smb_transaction_start() */
-+    bool start_transaction_on_status_read;
- } PMSMBus;
- 
- void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
--- 
-2.17.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1685242
+
+Title:
+  ovmf hangs at efi with virtio-net memory hotplug
+
+Status in QEMU:
+  New
+
+Bug description:
+  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
+  and it has a virtio-net devices
+
+  the ovmf images where compiled from https://github.com/tianocore/edk2
+  (current master)
+
+  reproducer:
+
+  qemu-system-x86_64 -drive
+  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
+  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
+std
+  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
+  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
+
+  interestingly, it works when you do the following:
+
+  - omit the virtio-net-pci device
+  - use seabios
+  - use less maxmem, e.g. 512G
+
+  qemu was compiled from source (v2.9.0) with following options:
+
+  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
+--enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
+artcard --audio-drv-list=3D"alsa" --enable
+  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
+k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
+virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
+-agent-msi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
