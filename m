@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40003)
+Received: from eggs.gnu.org ([209.51.188.92]:40592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwMJx-00034D-Ip
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 02:29:34 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gwMMb-0003rM-PB
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 02:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwMJw-0005BA-EX
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 02:29:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40138)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwMJv-0005A9-1Y
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 02:29:32 -0500
-Date: Wed, 20 Feb 2019 08:29:28 +0100
+	(envelope-from <kraxel@redhat.com>) id 1gwMMb-0007CB-17
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 02:32:17 -0500
+Date: Wed, 20 Feb 2019 08:32:06 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190220072928.mci7urfyfqwg55fg@sirius.home.kraxel.org>
-References: <20190211040434.1C98674569F@zero.eik.bme.hu>
-	<20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.9999.1902191234580.87875@zero.eik.bme.hu>
-	<20190219123052.dop3kpgowi2apitq@sirius.home.kraxel.org>
-	<alpine.BSF.2.21.9999.1902191449400.24309@zero.eik.bme.hu>
+Message-ID: <20190220073206.gkzviu3v5xpu65n7@sirius.home.kraxel.org>
+References: <20190220010232.18731-1-philmd@redhat.com>
+	<20190220010232.18731-4-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1902191449400.24309@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
+In-Reply-To: <20190220010232.18731-4-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 03/25] chardev/wctablet: Use unsigned
+ type to hold unsigned value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-  Hi,
+On Wed, Feb 20, 2019 at 02:02:10AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> TabletChardev::query is an array of uint8_t.
+> Use the same type to hold it (this also silent a -Wsign-conversion
+> warning in the trace function).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-> > So it could be tested with linux guests on x86 too I guess?
-> > Can the radeon drm driver handle the devices too?
-> 
-> Yes you can try with x86 guests, I haven't tested that yet. The radeon
-> driver only supports RV100 and up I think so may only work with the 0x5159
-> variant not with Rage 128 Pro which had another driver r128 but not sure
-> that still exists. Although these two chips are similar, Rage 128 Pro is a
-> bit simpler that's why I'm targeting it first and also that's what the
-> PowerMac3,1 (the ppc mac99 machine is converging to) has. The R128Pro is the
-> last of the previous generation before Radeon, while RV100 is the stripped
-> down simplest version of the R100 family which has some more 3D capability).
-> But even if the DRM driver loads, probably only the mode setting part is
-> useful at the moment as 3D is not implemented yet by this device model.
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Chances are not too bad that it'll be good enough to bring up a linux
-console.
-
-> > I'd also use model=<name> instead of device_id=... to switch between
-> > different devices.
-> 
-> The only problem with that is that there are this many versions with
-> confusing names (and maybe different device ids for different versions):
-> 
-> https://www.x.org/wiki/RadeonFeature/#index5h2
-
-Do we want emulate them all?
-I'd guess picking a few models would be more useful ...
-
-> so the only really good way to identify a chip is via device_id. This is not
-> user friendly but at this stage probably will do and we can add alternative
-> model property later which aliases some device ids (like it's done for CPU
-
-Ok, I'd suggest to rename it to x-device-id (to indicate that it may go
-away later) if you want stick with device id for now.
-
-> OK I thought those are related but if adding it to the default_list[] won't
-> automatically add a -vga option then that's a good idea. I'll do that and
-> also move the config lines to pci.mak in next version but wait for a few
-> more days for more comments.
-
-One thing I've noticed is that you use the vbe registers internally.
-I'd suggest to not do that, I suspect it will only get into the way
-latter on.  Better register your own GraphicsHwOps, then go call the vga
-ops in vga mode and your ati modesetting code in extended mode.
-virtio-vga does it that way if you want look at some sample code.  Also
-looking at bochs-display.c is probably more helpful than looking at
-vga.c when figuring how to handle display updates.
-
-cheers,
-  Gerd
+> ---
+>  chardev/trace-events | 2 +-
+>  chardev/wctablet.c   | 5 +++--
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/chardev/trace-events b/chardev/trace-events
+> index d0e5f3bbc1..562bfe70e9 100644
+> --- a/chardev/trace-events
+> +++ b/chardev/trace-events
+> @@ -5,7 +5,7 @@ wct_init(void) ""
+>  wct_cmd_re(void) ""
+>  wct_cmd_st(void) ""
+>  wct_cmd_sp(void) ""
+> -wct_cmd_ts(int input) "0x%02x"
+> +wct_cmd_ts(uint8_t input) "0x%02x"
+>  wct_cmd_other(const char *cmd) "%s"
+>  wct_speed(int speed) "%d"
+> =20
+> diff --git a/chardev/wctablet.c b/chardev/wctablet.c
+> index 35dbd29a33..cf7a08a363 100644
+> --- a/chardev/wctablet.c
+> +++ b/chardev/wctablet.c
+> @@ -207,7 +207,8 @@ static int wctablet_chr_write(struct Chardev *chr,
+>                                const uint8_t *buf, int len)
+>  {
+>      TabletChardev *tablet =3D WCTABLET_CHARDEV(chr);
+> -    unsigned int i, clen;
+> +    size_t i;
+> +    unsigned int clen;
+>      char *pos;
+> =20
+>      if (tablet->line_speed !=3D 9600) {
+> @@ -269,7 +270,7 @@ static int wctablet_chr_write(struct Chardev *chr,
+> =20
+>      } else if (strncmp((char *)tablet->query, "TS", 2) =3D=3D 0 &&
+>                 clen =3D=3D 3) {
+> -        unsigned int input =3D tablet->query[2];
+> +        uint8_t input =3D tablet->query[2];
+>          uint8_t codes[7] =3D {
+>              0xa3,
+>              ((input & 0x80) =3D=3D 0) ? 0x7e : 0x7f,
+> --=20
+> 2.20.1
+>=20
