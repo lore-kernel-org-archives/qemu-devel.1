@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43045)
+Received: from eggs.gnu.org ([209.51.188.92]:43043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwTlf-0001U8-MA
+	(envelope-from <tcminyard@gmail.com>) id 1gwTlf-0001U6-MC
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwTlb-0008GM-BM
+	(envelope-from <tcminyard@gmail.com>) id 1gwTlb-0008HP-T3
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41260)
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:38512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gwTlT-00080M-HF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:27 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gwTkp-0006SX-Rm
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 15:25:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C7B252E8058
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 15:25:47 +0000 (UTC)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTlb-0007gV-LW
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:35 -0500
+Received: by mail-ot1-x335.google.com with SMTP id m1so40765300otf.5
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:24:48 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Wed, 20 Feb 2019 07:59:37 -0600
+Message-Id: <20190220135956.22589-1-minyard@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Feb 2019 15:20:20 -0000
-From: Stefan Hajnoczi <1815993@bugs.launchpad.net>
-Reply-To: Bug 1815993 <1815993@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155019981452.28486.1507573377077994257.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20190220152020.GA30403@stefanha-x1.localdomain>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1815993] [NEW] drive-backup with iscsi will
- cause vm disk no response
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/19] Fix/add vmstate handling in some I2C
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,108 +29,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Feb 15, 2019 at 03:03:34AM -0000, Cheng Chen wrote:
-> When the drive-backup is running, I manually crash the iscsi server=EF=BC=
-=88or
-> interrupt network, eg. iptables -j DROP=EF=BC=89.
-> =
+I haven't received any other comments on this except for the one
+below.  I think this is ready for inclusion.
 
-> Then after less than 1 minute=EF=BC=9A
-> virsh qemu-monitor-command ${DOMAIN} --pretty '{ "execute": "query-block"=
- }' will block and no any response, until timeout. This is still excusable.
-> But, the disk=EF=BC=88drive-virtio-disk0=EF=BC=89will occur the same situ=
-ation=EF=BC=9Ain vm os, the disk will block and no any response.
-> =
+Changes since v4:
 
-> In other words, when qemu and iscsi-server lose contact, It will cause
-> the vm unable.
+Fixed the stupid thinko I did in "boards.h: Ignore migration for
+SMBus devices on older machines", Put it in the 3.1 function
+so it's actually an older machine.
 
-I haven't tried to reproduce this but I guess QEMU reaches a
-synchronization point where it waits for all outstanding requests to
-complete.  Since the iSCSI target is unresponsive QEMU gets stuck.
+Changes since v3:
 
-These issues can sometimes be fixed by avoiding the synchronization
-point (a backtrace should reveal where the main loop thread is stuck)
-but other times it really is necessary to wait for all requests and the
-solution isn't as obvious.
+Change I2C to "I2C and SMBus" in the MAINTAINERS file.
 
--- =
+Added a comment to the smbus_eeprom reset to make the reasoning for
+the choice clear.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815993
+Fix a logic error introduced in "i2c: Don't check return value from
+i2c_recv()".
 
-Title:
-  drive-backup with iscsi will cause vm disk no response
+Fix a debug problem in "i2c: Simplify and correct the SMBus state machine",
+a removed variable was still being used in a debug statement.
 
-Status in QEMU:
-  New
+Split up "i2c: Simplify and correct the SMBus state machine" into
+smaller logical chunks.
 
-Bug description:
-  virsh qemu-monitor-command ${DOMAIN} '{ "execute" : "drive-backup" ,
-  "arguments" : { "device" : "drive-virtio-disk0" , "sync" : "top" ,
-  "target" : "iscsi://192.168.1.100:3260/iqn.2019-01.com.iaas/0" } }'
+Updated "boards.h: Ignore migration for SMBus devices on older machines"
+to ignore migration for 4.0 and earlier.
 
-  When the drive-backup is running, I manually crash the iscsi server=EF=BC=
-=88or
-  interrupt network, eg. iptables -j DROP=EF=BC=89.
+No other comments received on "i2c:smbus_eeprom: Add vmstate handling
+to the smbus eeprom", not sure what to make of that.  I think that
+Dave's response to my question was that it could be modified to
+support different sizes in the future without issue.
 
-  Then after less than 1 minute=EF=BC=9A
-  virsh qemu-monitor-command ${DOMAIN} --pretty '{ "execute": "query-block"=
- }' will block and no any response, until timeout. This is still excusable.
-  But, the disk=EF=BC=88drive-virtio-disk0=EF=BC=89will occur the same situ=
-ation=EF=BC=9Ain vm os, the disk will block and no any response.
+Dropped "hw/i2c/smbus_eeprom: Create at most SMBUS_EEPROM_MAX EEPROMs
+on a SMBus and instead added a patch to assert if the number of
+eeproms is > 8.
 
-  In other words, when qemu and iscsi-server lose contact, It will cause
-  the vm unable.
+Changes since v2:
 
-  ---
-  Host: centos 7.5
-  qemu version: ovirt-4.2=EF=BC=88qemu-2.12.0=EF=BC=89
-  qemu command line: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3D=
-on -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/q=
-emu/domain-190-test./master-key.aes -machine pc-i440fx-3.1,accel=3Dkvm,usb=
-=3Doff,dump-guest-core=3Doff,mem-merge=3Doff -m 1024 -mem-prealloc -mem-pat=
-h /dev/hugepages1G/libvirt/qemu/190-test -realtime mlock=3Doff -smp 1,socke=
-ts=3D1,cores=3D1,threads=3D1 -uuid 1c8611c2-a18a-4b1c-b40b-9d82040eafa4 -sm=
-bios type=3D1,manufacturer=3DIaaS -no-user-config -nodefaults -chardev sock=
-et,id=3Dcharmonitor,fd=3D31,server,nowait -mon chardev=3Dcharmonitor,id=3Dm=
-onitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot menu=3Don,strict=
-=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device vi=
-rtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/o=
-pt/vol/sas/fb0c7c37-13e7-41fe-b3f8-f0fbaaeec7ce,format=3Dqcow2,if=3Dnone,id=
-=3Ddrive-virtio-disk0,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,b=
-us=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootinde=
-x=3D1,write-cache=3Don -drive file=3D/opt/vol/sas/bde66671-536d-49cd-8b46-a=
-4f1ea7be513,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dwriteb=
-ack -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-=
-virtio-disk1,id=3Dvirtio-disk1,write-cache=3Don -netdev tap,fd=3D33,id=3Dho=
-stnet0,vhost=3Don,vhostfd=3D34 -device virtio-net-pci,netdev=3Dhostnet0,id=
-=3Dnet0,mac=3D00:85:45:3e:d4:3a,bus=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dch=
-arserial0 -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev so=
-cket,id=3Dcharchannel0,fd=3D35,server,nowait -device virtserialport,bus=3Dv=
-irtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu=
-.guest_agent.0 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0=
-.0.0:0,password -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
-ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=
-=3Don
+Added proper license headers for the newly created files.
 
-  iscsi=EF=BC=9A
-  yum -y install targetcli python-rtslib
-  systemctl start target
-  systemctl enable target
+Removed unneeded code in several places pointed out by Peter Maydell
+since i2c_recv() returns a uint8_t instead of an int.  These are
+in two separate patches.
+Added a patch from Philippe Mathieu-Daudé <philmd@redhat.com> to
+replace a magic number with a constant in the smbus_eeprom code and
+verify the count so there is no overflow.
 
-  targetcli /iscsi create iqn.2019-01.com.iaas
+Updated the pm_smbus migration to not update the version numbers
+in the existing vmstate structures.  The needed field didn't
+accomplish what was needed because it is only called on the save
+side, not the load side of the migration.  So I'm using
+VMSTATE_STRUCT_TEST() to transfer the pm_smbus data now, that
+should be all that is required for backwards compatibility, and
+will be safer for falling back to an older version.
 
-  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1 set attribute
-  authentication=3D0 demo_mode_write_protect=3D0 generate_node_acls=3D1
-
-  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/portals create 192.168.1.100 3=
-260
-  targetcli /backstores/fileio create testfile1 /backup/file1 2G
-  targetcli /iscsi/iqn.2019-01.com.iaas/tpg1/luns create /backstores/fileio=
-/testfile1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815993/+subscriptions
+I found the problem with the SMBus being broken on piix4 after a
+migration, but I sent it out as a separate patch since it has
+nothing to do with this series, and should probably go into the
+current release being worked on.
