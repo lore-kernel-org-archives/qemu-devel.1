@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43200)
+Received: from eggs.gnu.org ([209.51.188.92]:43573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwTm0-0001ju-PK
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:01 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gwTmV-00027D-Cj
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gwTly-0008QY-Gp
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:16184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwTly-0007N4-94
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:58 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 886468B108
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 12:58:40 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Feb 2019 13:57:52 +0100
-Message-Id: <20190220125755.3906-1-quintela@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <amarkovic@wavecomp.com>) id 1gwTmT-0000DY-Ch
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:31 -0500
+Received: from mail-eopbgr690092.outbound.protection.outlook.com
+	([40.107.69.92]:30018
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gwTmR-00007b-F7
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:29 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Wed, 20 Feb 2019 12:32:19 +0000
+Message-ID: <BN6PR2201MB12512010AACFBA5DAC2FAE7FC67D0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1550603704-22474-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<87y36bjeex.fsf@dusky.pond.sub.org>
+In-Reply-To: <87y36bjeex.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/3] WIP: Multifd compression support
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] target/mips: implement QMP
+ query-cpu-definitions command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "natalia.fursova@ispras.ru" <natalia.fursova@ispras.ru>, Aleksandar Rikalo <arikalo@wavecomp.com>, "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>, "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "philmd@redhat.com" <philmd@redhat.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-This series create compression code on top of multifd.  It is still
-WIP, but it is already:
-- faster that current compression code
-- it does the minimum amount of copies possible
-- we allow support for other compression codes
-- it pass the multifd test sent in my previous series
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [Qemu-devel] [PATCH v2] target/mips: implement QMP query-cpu=
+-definitions command
 
-Test for existing code didn't work because code is too slow, I need to
-make downtime 10 times bigger to make it to converge on my test
-machine.  This code works with same limits that multifd no-
+...
 
-ToDo:
-- move printf's  to traces
-- move code to a struct instead of if (zlib) inside the main threads.
-- improve error handling.
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Please, review and coment.
+Unless there is somebody's objection, I am going to accept this patch into =
+the next
+MIPS pull request, planned to be sent in next few days.
 
-Juan Quintela (3):
-  migration: Add multifd-compress parameter
-  multifd: compression support variables
-  multifd: Start of zlib compression code
-
- hmp.c                        |  23 +++++-
- hw/core/qdev-properties.c    |  11 +++
- include/hw/qdev-properties.h |   1 +
- migration/migration.c        |  25 ++++++
- migration/migration.h        |   1 +
- migration/ram.c              | 142 ++++++++++++++++++++++++++++++++++-
- migration/trace-events       |   2 +-
- qapi/common.json             |  15 ++++
- qapi/migration.json          |  20 ++++-
- 9 files changed, 229 insertions(+), 11 deletions(-)
-
---=20
-2.20.1
+Thanks,
+Aleksandar=
