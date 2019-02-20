@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42643)
+Received: from eggs.gnu.org ([209.51.188.92]:43110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gwOte-0003id-Qk
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:14:35 -0500
+	(envelope-from <berrange@redhat.com>) id 1gwOvc-00056B-A2
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:16:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gwOtd-0000JM-Ls
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:14:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57644)
+	(envelope-from <berrange@redhat.com>) id 1gwOvb-00013g-Bc
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:16:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56196)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gwOtd-0000Io-Cu
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:14:33 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
-	<ab1a67c0-8872-6e22-fc70-946bbcabb8a1@redhat.com>
-	<BD5AEBD4-0B91-4756-B8D6-C0E643CF1F42@oberlin.edu>
-	<87ftsl2clg.fsf@dusky.pond.sub.org>
-	<91720BD9-D5A6-4457-BC99-D2132550BEDA@oberlin.edu>
-	<87ef84z4v6.fsf@dusky.pond.sub.org>
-	<62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu>
-	<87imxfssq1.fsf@dusky.pond.sub.org>
-	<E3178A67-9CFC-4CD5-921F-4EE5CCB46F62@oberlin.edu>
-	<87y36boe78.fsf@dusky.pond.sub.org>
-	<fdec6838-6051-427d-6192-f68a76171915@redhat.com>
-Date: Wed, 20 Feb 2019 11:14:27 +0100
-In-Reply-To: <fdec6838-6051-427d-6192-f68a76171915@redhat.com> (Laszlo Ersek's
-	message of "Wed, 20 Feb 2019 09:55:30 +0100")
-Message-ID: <87zhqqydfg.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gwOvZ-00012Q-9w
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 05:16:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 16EE760AA
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 10:16:32 +0000 (UTC)
+Date: Wed, 20 Feb 2019 10:16:25 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190220101625.GB21870@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190220100235.20914-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190220100235.20914-1-kraxel@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Testing sysbus devices
+Subject: Re: [Qemu-devel] [PATCH] kbd-state: don't block auto-repeat events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On Wed, Feb 20, 2019 at 11:02:35AM +0100, Gerd Hoffmann wrote:
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  ui/kbd-state.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
 
-> On 02/19/19 18:55, Markus Armbruster wrote:
->> Stephen Checkoway <stephen.checkoway@oberlin.edu> writes:
->>=20
->>>> On Feb 19, 2019, at 10:28, Markus Armbruster <armbru@redhat.com> wrote:
->>>>
->>>> My terminology might be confused...
->>>>
->>>> Let me backtrack a bit an explain my use case.  On physical PCs, the
->>>> single flash chip is commonly configured to have a read-only part and a
->>>> read/write part.  The read-only part holds UEFI code, and the read-wri=
-te
->>>> part holds its persistent state.
->>>>
->>>> Since our virtual flash chips lack this feature, our virtual PCs have
->>>> *two* of them: one configured read-only, and one configured read/write.
->>>> Cleaning that up would be nice.
->>>>
->>>> The comment "It does not implement software data protection as found in
->>>> many real chips" in both pflash_cfi0*.c might be referring to this
->>>> missing feature.
->>>
->>> I understand now, thank you for explaining. I noticed the comments abou=
-t software data protection in the code, but I didn't investigate.
->>>
->>> >From a quick look at <https://www.cypress.com/file/195291/download> Ta=
-ble 27 on page 8, I see there are at least 4 different protection modes. I =
-think the most common one (based on my reading of a handful of data sheets =
-for flash chips) is the high voltage one. Essentially, there are sector gro=
-ups that can be locked/unlocked using high voltage. It seems easy enough to=
- model this by configuring sectors as locked and refusing to erase or progr=
-am them.
->>>
->>> Software command locking would probably involve implementing a few addi=
-tional commands.
->>>
->>> I'm not sure what the others are.
->>>
->>> Which locking method do you need?
->>=20
->> L=C3=A1szl=C3=B3, Philippe, what would you prefer to work with in OVMF?
->
-> I would strongly prefer if the guest-side view wouldn't change at all.
->
-> IOW, I don't have any useful input on extensions to the current command
-> set; what matters to me is that OVMF please not be forced to make use of
-> the new commands (and that the privilege differences wrt. SMM remain
-> functional). We've avoided version lock-in between OVMF and QEMU for a
-> great long time now, thanks to the ACPI linker/loader; I wouldn't like
-> to see version dependencies reintroduced in other areas.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-My grasp on CFI pflash is somewhat shaky.  Philippe, Stephen, please
-correct misunderstandings in the following.
 
-We could improve the device model to let us configure a part of the
-flash memory read-only.  We could use that to have just one pflash
-device suitably configured instead of two.
-
-For guest software that merely reads and writes the memory, no visible
-change.
-
-To support updating firmware from the guest, we'd have to implement a
-suitable guest-controlled protection mode, but that's not on the table
-right now.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
