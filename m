@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54008)
+Received: from eggs.gnu.org ([209.51.188.92]:54099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbX-0005dG-G1
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:28 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gwIbZ-0005fP-KY
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbO-0003cQ-MC
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:24 -0500
-Date: Wed, 20 Feb 2019 14:30:53 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gwIbX-0003fJ-Ab
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:29 -0500
+Date: Wed, 20 Feb 2019 14:27:55 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190220033053.GO9345@umbus.fritz.box>
+Message-ID: <20190220032755.GK9345@umbus.fritz.box>
 References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<155059670897.1466090.10843921337591637414.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8+odlFQADydc3R4z"
+	protocol="application/pgp-signature"; boundary="mHEGYOlXWdrdotU2"
 Content-Disposition: inline
-In-Reply-To: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 00/17] spapr: Add support for PHB hotplug
+In-Reply-To: <155059670897.1466090.10843921337591637414.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 11/17] spapr: populate PHB DRC entries
+ for root DT node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +29,50 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 
---8+odlFQADydc3R4z
+--mHEGYOlXWdrdotU2
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 19, 2019 at 06:17:33PM +0100, Greg Kurz wrote:
-> This allows to hotplug/unplug PHBs. I could successfully test:
-> - using in-kernel XICS, emulated XICS and XIVE
-> - hotplug/unplug with e1000 device to validate LSIs
-> - hotplug/unplug with virtio-net device to validate MSIs
-> - some simple migration scenarios
+On Tue, Feb 19, 2019 at 06:18:29PM +0100, Greg Kurz wrote:
+> From: Nathan Fontenot <nfont@linux.vnet.ibm.com>
 >=20
-> Based on David's ppc-for-4.0 branch SHA1:
+> This add entries to the root OF node to advertise our PHBs as being
+> DR-capable in accordance with PAPR specification.
+>=20
+> Signed-off-by: Nathan Fontenot <nfont@linux.vnet.ibm.com>
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied!
+Applied, thanks.
 
+> ---
+>  hw/ppc/spapr.c |    8 ++++++++
+>  1 file changed, 8 insertions(+)
 >=20
-> 6f585625d0d1 target/ppc: Basic POWER9 bare-metal radix MMU support
->=20
-> Please comment.
->=20
-> Changes in v5:
-> - all DRC subtypes generate FDT fragment at configure connector time
-> - Drop all the LSI bitmap and allocation/typing disintricate stuff
-> - set IRQ type in KVM at claim time
-> - fix hotplug call chain
-> - added PHB unplug test to tests/device-plug-test
->=20
-> Changes in v4:
-> - added a LSI bitmap to XICS
-> - no longer need compat property in XICS
-> - simplified the patches to access the name and the phandle of the
->   interrupt controller
-> - delay the creation of the PHB drc->fdt to RTAS ibm,configure-connector
->=20
-> Change in v3:
-> - reworked phandle related code some more
-> - disintricate allocation/"type setting" of interrupts
-> - identify LSIs at machine init
->=20
-> Changes in v2:
-> - rebased on current ppc-for-4.0
-> - added some preliminary cleanup
-> - call unrealize from realize error path
-> - advertise PHB hotplug in last patch
-> - reworked phandle related code
-> - sync LSIs to KVM
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 96bea7580a3f..fcda17709066 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1365,6 +1365,14 @@ static void *spapr_build_fdt(sPAPRMachineState *sp=
+apr)
+>          exit(1);
+>      }
+> =20
+> +    if (smc->dr_phb_enabled) {
+> +        ret =3D spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_T=
+YPE_PHB);
+> +        if (ret < 0) {
+> +            error_report("Couldn't set up PHB DR device tree properties"=
+);
+> +            exit(1);
+> +        }
+> +    }
+> +
+>      return fdt;
+>  }
+> =20
 >=20
 
 --=20
@@ -82,24 +81,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8+odlFQADydc3R4z
+--mHEGYOlXWdrdotU2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsye0ACgkQbDjKyiDZ
-s5La6BAAidbqtFSX3xaPlZGFWz95GUQ3xGmy8s0OD/R7U0DK5Q2jO/9Dx4rNrksu
-6U3I3cAo7X/ZDsrWqo+osOuxKmnuo76Fr0TGRnM0YuwWYy/nTEzG8mrH5XU8ekrw
-6Hd0et9pTjPNdf0fJhALBZEHLOsCLZTtCKSPCX97X7ZYYIkd05iCYNA77jaZnJ0A
-jI0cL65NF2lJvQ4BmOP5pK+8PZDDoTk/rsc8fjYR8rZ4JH3M6RoMAIdYTQsQKUQc
-U02pT4ComgQic4Rb+occFemCuBqhZYkgP65lHr4fPiJxpY6am3/nmYcDatTHVaeF
-IpUP/hGFoj5fD9IoHWeuEQ1x1UO+bSu45QaNG3fl0be2PAoLlGZpgLY5/HVn4Bbs
-FrIiKxgmyE0jAchvmopUguhLLkqusigrzAkL2JZt9CqtYn2fOpIOlhG7WixoL3ro
-y7eeL3SHI6rQhTRJc7LAWd/XqvTKTIGYyDpE56cJpfkLc8unqyALtWbNcZCPMOX5
-OzAsO9c/V1D/yFP9u7JRONFl+bsSMuWvHWkVkKX2DTRTWBgyObIILUAlGjSvCU98
-SrfptiiGpvkG06JfCExMgmQOuXuAtES/9ODaj9MGM+Hng5mYxHcD+yMIVclXucoz
-NjhmA0Ldbe9bwPxmMQhwuR1M09ftCs+fI3DR0nc10xb8oLxTksM=
-=KHqL
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsyTsACgkQbDjKyiDZ
+s5Izpw//cnRHUfQE1UZHAw8rsJo9lzAu3D8s7AROc9m/+kZdJt8SKJAlH2vnhlOG
++bmp2PIXU3z5HQ4dg26kYIWbH39DLcHa47gtoQZHoKTRskJauU0hVmdhqVhRPovZ
++ZIQX4lAyW9sHGuJQKkTaq/BtWUJty4/c0xGixv2Dd+P5rbNTmUVEUx5EvgR0Pr4
+DATqrHa4tHEhbKaLV69wtbkt9jZpbLL2e6yRP4z2jg7fA8VNC89F2RTWi5PSfx+K
+qcc5Zxz+rhkCQczimlHrHoeOqMDwzLMWB3yjwCYF+sqdG7DPEDCICJbzmXEtC4Dd
+j9skZqf4q40LsU9isl8sx1jx1guIvK9PMY7z4wmXWP3Qm5ihJZaoZht7z54wdjg0
+/7jOxgKS4pU+iDDOWdzebMl4CyyLEfm3ZM4Y+zBmwLty9dwQAAt9qbDYw+IRHeJn
+kHBHTfK2+6VEA7LcvZzl1aZ80CcOm97DPfVWq+8S7jus9wBnRV/GIzjoGMCUsGFK
+COo8YLpTGAtVAg8Bu7IdLPvY7c+ufkq7ZyuH8RZlf8q8L4ujlcrOdMHMk77I+vFB
++G+cv7D2YSkXj7pPbIiKU1zihhcuufEqgRr5+19xzTu2Gxyx5NnPQ0QQcMWYw4U7
+h5yyW/145XAOq0djjGyu2SuGIQvmA26Z9B1O3rdOgmVzR5bu6Mg=
+=TTo3
 -----END PGP SIGNATURE-----
 
---8+odlFQADydc3R4z--
+--mHEGYOlXWdrdotU2--
