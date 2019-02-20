@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42483)
+Received: from eggs.gnu.org ([209.51.188.92]:42707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1gwGVU-0001oH-8H
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:17:05 -0500
+	(envelope-from <philmd@redhat.com>) id 1gwGX6-0002u8-LA
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:18:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1gwGVH-0006Fg-Fw
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:16:57 -0500
-From: Like Xu <like.xu@linux.intel.com>
-Date: Wed, 20 Feb 2019 16:55:53 +0800
-Message-Id: <1550652953-24393-1-git-send-email-like.xu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH] doc: update .gitignore and fix typos for docs
- in tree
+	(envelope-from <philmd@redhat.com>) id 1gwGWj-0006ho-C1
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 20:18:29 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 20 Feb 2019 02:02:31 +0100
+Message-Id: <20190220010232.18731-25-philmd@redhat.com>
+In-Reply-To: <20190220010232.18731-1-philmd@redhat.com>
+References: <20190220010232.18731-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 24/25] chardev: Let qemu_chr_fe_write[_all]
+ use size_t type argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,219 +23,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
+All caller have been audited and call these functions with
+unsigned arguments.
+
+Most of them use a size_t argument, or directly pass sizeof().
+
+One case is unclear: the mux_chr_write() call in chardev/char-mux.c.
+There we add an assert (which will be removed in few patches) and
+cast the parameter as size_t to make explicit this value is unsigned.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- .gitignore                     | 1 +
- docs/COLO-FT.txt               | 2 +-
- docs/amd-memory-encryption.txt | 2 +-
- docs/can.txt                   | 2 +-
- docs/colo-proxy.txt            | 6 +++---
- docs/cpu-hotplug.rst           | 2 +-
- docs/qcow2-cache.txt           | 2 +-
- docs/qemu-block-drivers.texi   | 2 +-
- docs/qemu-cpu-models.texi      | 4 ++--
- docs/rdma.txt                  | 2 +-
- docs/replay.txt                | 2 +-
- docs/usb-storage.txt           | 2 +-
- docs/vfio-ap.txt               | 2 +-
- 13 files changed, 16 insertions(+), 15 deletions(-)
+ chardev/char-fe.c         | 4 ++--
+ chardev/char-mux.c        | 3 ++-
+ include/chardev/char-fe.h | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index b66b772..6cb0016 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -90,6 +90,7 @@
- *.d
- !/scripts/qemu-guest-agent/fsfreeze-hook.d
- *.o
-+*.patch
- .sdk
- *.gcda
- *.gcno
-diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
-index e2686bb..ad24680 100644
---- a/docs/COLO-FT.txt
-+++ b/docs/COLO-FT.txt
-@@ -102,7 +102,7 @@ to make sure the state of VM in Secondary side is always consistent with VM in
- Primary side.
- 
- COLO Proxy:
--Delivers packets to Primary and Seconday, and then compare the responses from
-+Delivers packets to Primary and Secondary, and then compare the responses from
- both side. Then decide whether to start a checkpoint according to some rules.
- Please refer to docs/colo-proxy.txt for more information.
- 
-diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
-index f483795..43bf3ee 100644
---- a/docs/amd-memory-encryption.txt
-+++ b/docs/amd-memory-encryption.txt
-@@ -97,7 +97,7 @@ References
- AMD Memory Encryption whitepaper:
- http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
- 
--Secure Encrypted Virutualization Key Management:
-+Secure Encrypted Virtualization Key Management:
- [1] http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
- 
- KVM Forum slides:
-diff --git a/docs/can.txt b/docs/can.txt
-index 7ba23b2..9fa6ed5 100644
---- a/docs/can.txt
-+++ b/docs/can.txt
-@@ -99,7 +99,7 @@ Links to other resources
-      https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-  (3) RTEMS page describing project
-      https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
-- (4) RTLWS 2015 article about the projevt and its use with CANopen emulation
-+ (4) RTLWS 2015 article about the project and its use with CANopen emulation
-      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
-      Slides
-      http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
-diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
-index 1f8e4b4..7074da7 100644
---- a/docs/colo-proxy.txt
-+++ b/docs/colo-proxy.txt
-@@ -41,7 +41,7 @@ Below is a COLO proxy ascii figure:
- |         |  +------------------------------------------------------+  |                        |        |                              |
- |netfilter|  |                       |                         |    |  |   netfilter            |        |                              |
- | +----------+ +----------------------------+                  |    |  |  +-----------------------------------------------------------+ |
--| |       |  |                       |      |        out       |    |  |  |                     |        |  filter excute order       | |
-+| |       |  |                       |      |        out       |    |  |  |                     |        |  filter execute order       | |
- | |       |  |          +-----------------------------+        |    |  |  |                     |        | +------------------->      | |
- | |       |  |          |            |      |         |        |    |  |  |                     |        |   TCP                      | |
- | | +-----+--+-+  +-----v----+ +-----v----+ |pri +----+----+sec|    |  |  | +------------+  +---+----+---v+rewriter++  +------------+ | |
-@@ -53,7 +53,7 @@ Below is a COLO proxy ascii figure:
- | |      |   tx        |   rx           rx  |                  |  |    |  |            tx                        all       |  rx      | |
- | |      |             |                    |                  |  |    |  +-----------------------------------------------------------+ |
- | |      |             +--------------+     |                  |  |    |                                                   |            |
--| |      |   filter excute order      |     |                  |  |    |                                                   |            |
-+| |      |   filter execute order      |     |                  |  |    |                                                   |            |
- | |      |  +---------------->        |     |                  |  +--------------------------------------------------------+            |
- | +-----------------------------------------+                  |       |                                                                |
- |        |                            |                        |       |                                                                |
-@@ -92,7 +92,7 @@ but do nothing, just pass to next filter.
- 
- Redirect Server Filter --> COLO-Compare
- COLO-compare receive primary guest packet then
--waiting scondary redirect packet to compare it.
-+waiting secondary redirect packet to compare it.
- If packet same,send queued primary packet and clear
- queued secondary packet, Otherwise send primary packet
- and do checkpoint.
-diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
-index 1c268e0..cfeb79f 100644
---- a/docs/cpu-hotplug.rst
-+++ b/docs/cpu-hotplug.rst
-@@ -137,6 +137,6 @@ From the 'qmp-shell', invoke the QMP ``device_del`` command::
-     vCPU hot-unplug requires guest cooperation; so the ``device_del``
-     command above does not guarantee vCPU removal -- it's a "request to
-     unplug".  At this point, the guest will get a System Control
--    Interupt (SCI) and calls the ACPI handler for the affected vCPU
-+    Interrupt (SCI) and calls the ACPI handler for the affected vCPU
-     device.  Then the guest kernel will bring the vCPU offline and tell
-     QEMU to unplug it.
-diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index c459bf5..c1e7751 100644
---- a/docs/qcow2-cache.txt
-+++ b/docs/qcow2-cache.txt
-@@ -55,7 +55,7 @@ value can improve the I/O performance significantly.
- 
- The refcount blocks
- -------------------
--The qcow2 format also mantains a reference count for each cluster.
-+The qcow2 format also maintains a reference count for each cluster.
- Reference counts are used for cluster allocation and internal
- snapshots. The data is stored in a two-level structure similar to the
- L1/L2 tables described above.
-diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-index 38e9f34..1b1ac19 100644
---- a/docs/qemu-block-drivers.texi
-+++ b/docs/qemu-block-drivers.texi
-@@ -632,7 +632,7 @@ qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
- @end example
- 
- 
--Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
-+How to set up a simple iSCSI target on loopback and accessing it via QEMU:
- @example
- This example shows how to set up an iSCSI target with one CDROM and one DISK
- using the Linux STGT software target. This target is available on Red Hat based
-diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
-index 475d434..4354fe8 100644
---- a/docs/qemu-cpu-models.texi
-+++ b/docs/qemu-cpu-models.texi
-@@ -287,7 +287,7 @@ Must be explicitly turned on for all AMD CPU models.
- This provides higher performance than virt-ssbd so should be
- exposed to guests whenever available in the host. virt-ssbd
- should none the less also be exposed for maximum guest
--compatability as some kernels only know about virt-ssbd.
-+compatibility as some kernels only know about virt-ssbd.
- 
- 
- @item @code{amd-no-ssb}
-@@ -296,7 +296,7 @@ Recommended to indicate the host is not vulnerable CVE-2018-3639
- 
- Not included by default in any AMD CPU model.
- 
--Future hardware genarations of CPU will not be vulnerable to
-+Future hardware generations of CPU will not be vulnerable to
- CVE-2018-3639, and thus the guest should be told not to enable
- its mitigations, by exposing amd-no-ssb. This is mutually
- exclusive with virt-ssbd and amd-ssbd.
-diff --git a/docs/rdma.txt b/docs/rdma.txt
-index e6f9902..1e6f23e 100644
---- a/docs/rdma.txt
-+++ b/docs/rdma.txt
-@@ -30,7 +30,7 @@ of the significantly lower latency and higher throughput over TCP/IP. This is
- because the RDMA I/O architecture reduces the number of interrupts and
- data copies by bypassing the host networking stack. In particular, a TCP-based
- migration, under certain types of memory-bound workloads, may take a more
--unpredicatable amount of time to complete the migration if the amount of
-+unpredictable amount of time to complete the migration if the amount of
- memory tracked during each live migration iteration round cannot keep pace
- with the rate of dirty memory produced by the workload.
- 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 3497585..ee6aee9 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -290,7 +290,7 @@ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
- Replay log format
- -----------------
- 
--Record/replay log consits of the header and the sequence of execution
-+Record/replay log consists of the header and the sequence of execution
- events. The header includes 4-byte replay version id and 8-byte reserved
- field. Version is updated every time replay log format changes to prevent
- using replay log created by another build of qemu.
-diff --git a/docs/usb-storage.txt b/docs/usb-storage.txt
-index 551af6f..3df6d05 100644
---- a/docs/usb-storage.txt
-+++ b/docs/usb-storage.txt
-@@ -16,7 +16,7 @@ too):
- 
- 
- Number two is the newer usb attached scsi transport.  This one doesn't
--automagically create a scsi disk, so you have to explicitly attach one
-+automatically create a scsi disk, so you have to explicitly attach one
- manually.  Multiple logical units are supported.  Here is an example
- with tree logical units:
- 
-diff --git a/docs/vfio-ap.txt b/docs/vfio-ap.txt
-index 1233968..30f3c66 100644
---- a/docs/vfio-ap.txt
-+++ b/docs/vfio-ap.txt
-@@ -624,7 +624,7 @@ These are the steps:
-       -> IOMMU Hardware Support
-          select S390 AP IOMMU Support
-       -> VFIO Non-Privileged userspace driver framework
--         -> Mediated device driver frramework
-+         -> Mediated device driver framework
-             -> VFIO driver for Mediated devices
-    -> I/O subsystem
-       -> VFIO support for AP devices
--- 
-1.8.3.1
+diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+index f3530a90e6..ab2a01709d 100644
+--- a/chardev/char-fe.c
++++ b/chardev/char-fe.c
+@@ -31,7 +31,7 @@
+ #include "chardev/char-io.h"
+ #include "chardev/char-mux.h"
+=20
+-int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
++int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, size_t len)
+ {
+     Chardev *s =3D be->chr;
+=20
+@@ -42,7 +42,7 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t *b=
+uf, int len)
+     return qemu_chr_write(s, buf, len, false);
+ }
+=20
+-int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
++int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, size_t le=
+n)
+ {
+     Chardev *s =3D be->chr;
+=20
+diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+index 23aa82125d..7a3ff21db4 100644
+--- a/chardev/char-mux.c
++++ b/chardev/char-mux.c
+@@ -38,7 +38,8 @@ static int mux_chr_write(Chardev *chr, const uint8_t *b=
+uf, int len)
+     MuxChardev *d =3D MUX_CHARDEV(chr);
+     int ret;
+     if (!d->timestamps) {
+-        ret =3D qemu_chr_fe_write(&d->chr, buf, len);
++        assert(len >=3D 0);
++        ret =3D qemu_chr_fe_write(&d->chr, buf, (size_t)len);
+     } else {
+         int i;
+=20
+diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+index aa1b864ccd..5fb2c2e7ec 100644
+--- a/include/chardev/char-fe.h
++++ b/include/chardev/char-fe.h
+@@ -203,7 +203,7 @@ guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondi=
+tion cond,
+  *
+  * Returns: the number of bytes consumed (0 if no associated Chardev)
+  */
+-int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len);
++int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, size_t len);
+=20
+ /**
+  * qemu_chr_fe_write_all:
+@@ -217,7 +217,7 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t =
+*buf, int len);
+  *
+  * Returns: the number of bytes consumed (0 if no associated Chardev)
+  */
+-int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
++int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, size_t le=
+n);
+=20
+ /**
+  * qemu_chr_fe_read_all:
+--=20
+2.20.1
