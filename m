@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37582)
+Received: from eggs.gnu.org ([209.51.188.92]:41571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gwahK-0003wy-4o
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:50:38 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gwb0b-0005Nt-NO
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 18:10:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gwahH-0001Pd-Qi
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:50:37 -0500
-Date: Wed, 20 Feb 2019 17:50:16 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190220225016.GA19073@flamenco>
-References: <20190130004811.27372-1-cota@braap.org>
-	<70297ac5-defa-0d7b-b4da-44303b328ce2@linaro.org>
+	(envelope-from <yan.y.zhao@intel.com>) id 1gwaq0-0006N2-Fz
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:59:39 -0500
+Received: from mga04.intel.com ([192.55.52.120]:46079)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1gwapy-0006Ca-K6
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:59:35 -0500
+Date: Wed, 20 Feb 2019 17:54:00 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20190220225400.GF16456@joy-OptiPlex-7040>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<1550566347-3648-1-git-send-email-yan.y.zhao@intel.com>
+	<20190219153724.12460160.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <70297ac5-defa-0d7b-b4da-44303b328ce2@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v6 00/73] per-CPU locks
+In-Reply-To: <20190219153724.12460160.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] vfio/migration: support device of
+ device config capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +30,866 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Alistair Francis <alistair23@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Chris Wulff <crwulff@gmail.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, David Hildenbrand <david@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, James Hogan <jhogan@kernel.org>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Stafford Horne <shorne@gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: alex.williamson@redhat.com, qemu-devel@nongnu.org, intel-gvt-dev@lists.freedesktop.org, Zhengxiao.zx@Alibaba-inc.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com, kwankhede@nvidia.com, kevin.tian@intel.com, cjia@nvidia.com, arei.gonglei@huawei.com, kvm@vger.kernel.org
 
-On Wed, Feb 20, 2019 at 09:27:06 -0800, Richard Henderson wrote:
-> Thanks for the patience.  Both Alex and I have now completed review, and I
-> think this is ready for merge.
+On Tue, Feb 19, 2019 at 03:37:24PM +0100, Cornelia Huck wrote:
+> On Tue, 19 Feb 2019 16:52:27 +0800
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> There are some patch conflicts with master, so if you can fix those and post a
-> v7, we'll get it merged right away.
+> > Device config is the default data that every device should have. so
+> > device config capability is by default on, no need to set.
+> > 
+> > - Currently two type of resources are saved/loaded for device of device
+> >   config capability:
+> >   General PCI config data, and Device config data.
+> >   They are copies as a whole when precopy is stopped.
+> > 
+> > Migration setup flow:
+> > - Setup device state regions, check its device state version and capabilities.
+> >   Mmap Device Config Region and Dirty Bitmap Region, if available.
+> > - If device state regions are failed to get setup, a migration blocker is
+> >   registered instead.
+> > - Added SaveVMHandlers to register device state save/load handlers.
+> > - Register VM state change handler to set device's running/stop states.
+> > - On migration startup on source machine, set device's state to
+> >   VFIO_DEVICE_STATE_LOGGING
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > Signed-off-by: Yulei Zhang <yulei.zhang@intel.com>
+> > ---
+> >  hw/vfio/Makefile.objs         |   2 +-
+> >  hw/vfio/migration.c           | 633 ++++++++++++++++++++++++++++++++++++++++++
+> >  hw/vfio/pci.c                 |   1 -
+> >  hw/vfio/pci.h                 |  25 +-
+> >  include/hw/vfio/vfio-common.h |   1 +
+> >  5 files changed, 659 insertions(+), 3 deletions(-)
+> >  create mode 100644 hw/vfio/migration.c
+> > 
+> > diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> > index 8b3f664..f32ff19 100644
+> > --- a/hw/vfio/Makefile.objs
+> > +++ b/hw/vfio/Makefile.objs
+> > @@ -1,6 +1,6 @@
+> >  ifeq ($(CONFIG_LINUX), y)
+> >  obj-$(CONFIG_SOFTMMU) += common.o
+> > -obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
+> > +obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o migration.o
+> 
+> I think you want to split the migration code: The type-independent
+> code, and the pci-specific code.
+>
+ok. actually, now only saving/loading of pci generic config data is
+pci-specific. the data getting/setting through device state
+interfaces are type-independent.
 
-Thanks for reviewing! Will send a v7 in a few days.
+> >  obj-$(CONFIG_VFIO_CCW) += ccw.o
+> >  obj-$(CONFIG_SOFTMMU) += platform.o
+> >  obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+> > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> > new file mode 100644
+> > index 0000000..16d6395
+> > --- /dev/null
+> > +++ b/hw/vfio/migration.c
+> > @@ -0,0 +1,633 @@
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "hw/vfio/vfio-common.h"
+> > +#include "migration/blocker.h"
+> > +#include "migration/register.h"
+> > +#include "qapi/error.h"
+> > +#include "pci.h"
+> > +#include "sysemu/kvm.h"
+> > +#include "exec/ram_addr.h"
+> > +
+> > +#define VFIO_SAVE_FLAG_SETUP 0
+> > +#define VFIO_SAVE_FLAG_PCI 1
+> > +#define VFIO_SAVE_FLAG_DEVCONFIG 2
+> > +#define VFIO_SAVE_FLAG_DEVMEMORY 4
+> > +#define VFIO_SAVE_FLAG_CONTINUE 8
+> > +
+> > +static int vfio_device_state_region_setup(VFIOPCIDevice *vdev,
+> > +        VFIORegion *region, uint32_t subtype, const char *name)
+> 
+> This function looks like it should be more generic and e.g. take a
+> VFIODevice instead of a VFIOPCIDevice as argument.
+> 
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    struct vfio_region_info *info;
+> > +    int ret;
+> > +
+> > +    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_DEVICE_STATE,
+> > +            subtype, &info);
+> > +    if (ret) {
+> > +        error_report("Failed to get info of region %s", name);
+> > +        return ret;
+> > +    }
+> > +
+> > +    if (vfio_region_setup(OBJECT(vdev), vbasedev,
+> > +            region, info->index, name)) {
+> > +        error_report("Failed to setup migrtion region %s", name);
+> > +        return ret;
+> > +    }
+> > +
+> > +    if (vfio_region_mmap(region)) {
+> > +        error_report("Failed to mmap migrtion region %s", name);
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +bool vfio_device_data_cap_system_memory(VFIOPCIDevice *vdev)
+> > +{
+> > +   return !!(vdev->migration->data_caps & VFIO_DEVICE_DATA_CAP_SYSTEM_MEMORY);
+> > +}
+> > +
+> > +bool vfio_device_data_cap_device_memory(VFIOPCIDevice *vdev)
+> > +{
+> > +   return !!(vdev->migration->data_caps & VFIO_DEVICE_DATA_CAP_DEVICE_MEMORY);
+> > +}
+> 
+> These two as well. The migration structure should probably hang off the
+> VFIODevice instead.
+>
+ok.
 
-		Emilio
+> > +
+> > +static bool vfio_device_state_region_mmaped(VFIORegion *region)
+> > +{
+> > +    bool mmaped = true;
+> > +    if (region->nr_mmaps != 1 || region->mmaps[0].offset ||
+> > +            (region->size != region->mmaps[0].size) ||
+> > +            (region->mmaps[0].mmap == NULL)) {
+> > +        mmaped = false;
+> > +    }
+> > +
+> > +    return mmaped;
+> > +}
+> 
+> s/mmaped/mmapped/ ?
+
+yes :)
+> 
+> > +
+> > +static int vfio_get_device_config_size(VFIOPCIDevice *vdev)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region_ctl =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +    VFIORegion *region_config =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
+> 
+> This looks like it should not depend on pci, either.
+> 
+right.
+
+> > +    uint64_t len;
+> > +    int sz;
+> > +
+> > +    sz = sizeof(len);
+> > +    if (pread(vbasedev->fd, &len, sz,
+> > +                region_ctl->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, device_config.size))
+> > +            != sz) {
+> > +        error_report("vfio: Failed to get length of device config");
+> > +        return -1;
+> > +    }
+> > +    if (len > region_config->size) {
+> > +        error_report("vfio: Error device config length");
+> > +        return -1;
+> > +    }
+> > +    vdev->migration->devconfig_size = len;
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_set_device_config_size(VFIOPCIDevice *vdev, uint64_t size)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region_ctl =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +    VFIORegion *region_config =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
+> 
+> Ditto. Also for the functions below.
+> 
+> > +    int sz;
+> > +
+> > +    if (size > region_config->size) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    sz = sizeof(size);
+> > +    if (pwrite(vbasedev->fd, &size, sz,
+> > +                region_ctl->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, device_config.size))
+> > +            != sz) {
+> > +        error_report("vfio: Failed to set length of device config");
+> > +        return -1;
+> > +    }
+> > +    vdev->migration->devconfig_size = size;
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_save_data_device_config(VFIOPCIDevice *vdev, QEMUFile *f)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region_ctl =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +    VFIORegion *region_config =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
+> > +    void *dest;
+> > +    uint32_t sz;
+> > +    uint8_t *buf = NULL;
+> > +    uint32_t action = VFIO_DEVICE_DATA_ACTION_GET_BUFFER;
+> > +    uint64_t len = vdev->migration->devconfig_size;
+> > +
+> > +    qemu_put_be64(f, len);
+> 
+> Why big endian? (Generally, do we need any endianness considerations?)
+> 
+I think big endian is the endian for qemu to save file.
+as long as qemu_put and qemu_get use the same endian, it will be no
+problem.
+do you think so?
+
+> > +
+> > +    sz = sizeof(action);
+> > +    if (pwrite(vbasedev->fd, &action, sz,
+> > +                region_ctl->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, device_config.action))
+> > +            != sz) {
+> > +        error_report("vfio: action failure for device config get buffer");
+> > +        return -1;
+> > +    }
+> 
+> Might make sense to wrap this into a set_action() helper that takes a
+> SET_BUFFER/GET_BUFFER argument.
+> 
+right. it makes sense :)
+> > +
+> > +    if (!vfio_device_state_region_mmaped(region_config)) {
+> > +        buf = g_malloc(len);
+> > +        if (buf == NULL) {
+> > +            error_report("vfio: Failed to allocate memory for migrate");
+> > +            return -1;
+> > +        }
+> > +        if (pread(vbasedev->fd, buf, len, region_config->fd_offset) != len) {
+> > +            error_report("vfio: Failed read device config buffer");
+> > +            return -1;
+> > +        }
+> > +        qemu_put_buffer(f, buf, len);
+> > +        g_free(buf);
+> > +    } else {
+> > +        dest = region_config->mmaps[0].mmap;
+> > +        qemu_put_buffer(f, dest, len);
+> > +    }
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_load_data_device_config(VFIOPCIDevice *vdev,
+> > +                            QEMUFile *f, uint64_t len)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region_ctl =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +    VFIORegion *region_config =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG];
+> > +    void *dest;
+> > +    uint32_t sz;
+> > +    uint8_t *buf = NULL;
+> > +    uint32_t action = VFIO_DEVICE_DATA_ACTION_SET_BUFFER;
+> > +
+> > +    vfio_set_device_config_size(vdev, len);
+> > +
+> > +    if (!vfio_device_state_region_mmaped(region_config)) {
+> > +        buf = g_malloc(len);
+> > +        if (buf == NULL) {
+> > +            error_report("vfio: Failed to allocate memory for migrate");
+> > +            return -1;
+> > +        }
+> > +        qemu_get_buffer(f, buf, len);
+> > +        if (pwrite(vbasedev->fd, buf, len,
+> > +                    region_config->fd_offset) != len) {
+> > +            error_report("vfio: Failed to write devie config buffer");
+> > +            return -1;
+> > +        }
+> > +        g_free(buf);
+> > +    } else {
+> > +        dest = region_config->mmaps[0].mmap;
+> > +        qemu_get_buffer(f, dest, len);
+> > +    }
+> > +
+> > +    sz = sizeof(action);
+> > +    if (pwrite(vbasedev->fd, &action, sz,
+> > +                region_ctl->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, device_config.action))
+> > +            != sz) {
+> > +        error_report("vfio: action failure for device config set buffer");
+> > +        return -1;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_set_dirty_page_bitmap_chunk(VFIOPCIDevice *vdev,
+> > +        uint64_t start_addr, uint64_t page_nr)
+> > +{
+> > +
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region_ctl =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +    VFIORegion *region_bitmap =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_BITMAP];
+> > +    unsigned long bitmap_size =
+> > +                    BITS_TO_LONGS(page_nr) * sizeof(unsigned long);
+> > +    uint32_t sz;
+> > +
+> > +    struct {
+> > +        __u64 start_addr;
+> > +        __u64 page_nr;
+> > +    } system_memory;
+> > +    system_memory.start_addr = start_addr;
+> > +    system_memory.page_nr = page_nr;
+> > +    sz = sizeof(system_memory);
+> > +    if (pwrite(vbasedev->fd, &system_memory, sz,
+> > +                region_ctl->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, system_memory))
+> > +            != sz) {
+> > +        error_report("vfio: Failed to set system memory range for dirty pages");
+> > +        return -1;
+> > +    }
+> > +
+> > +    if (!vfio_device_state_region_mmaped(region_bitmap)) {
+> > +        void *bitmap = g_malloc0(bitmap_size);
+> > +
+> > +        if (pread(vbasedev->fd, bitmap, bitmap_size,
+> > +                    region_bitmap->fd_offset) != bitmap_size) {
+> > +            error_report("vfio: Failed to read dirty bitmap data");
+> > +            return -1;
+> > +        }
+> > +
+> > +        cpu_physical_memory_set_dirty_lebitmap(bitmap, start_addr, page_nr);
+> > +
+> > +        g_free(bitmap);
+> > +    } else {
+> > +        cpu_physical_memory_set_dirty_lebitmap(
+> > +                    region_bitmap->mmaps[0].mmap,
+> > +                    start_addr, page_nr);
+> > +    }
+> > +   return 0;
+> > +}
+> > +
+> > +int vfio_set_dirty_page_bitmap(VFIOPCIDevice *vdev,
+> > +        uint64_t start_addr, uint64_t page_nr)
+> > +{
+> > +    VFIORegion *region_bitmap =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_BITMAP];
+> > +    unsigned long chunk_size = region_bitmap->size;
+> > +    uint64_t chunk_pg_nr = (chunk_size / sizeof(unsigned long)) *
+> > +                                BITS_PER_LONG;
+> > +
+> > +    uint64_t cnt_left;
+> > +    int rc = 0;
+> > +
+> > +    cnt_left = page_nr;
+> > +
+> > +    while (cnt_left >= chunk_pg_nr) {
+> > +        rc = vfio_set_dirty_page_bitmap_chunk(vdev, start_addr, chunk_pg_nr);
+> > +        if (rc) {
+> > +            goto exit;
+> > +        }
+> > +        cnt_left -= chunk_pg_nr;
+> > +        start_addr += start_addr;
+> > +   }
+> > +   rc = vfio_set_dirty_page_bitmap_chunk(vdev, start_addr, cnt_left);
+> > +
+> > +exit:
+> > +   return rc;
+> > +}
+> > +
+> > +static int vfio_set_device_state(VFIOPCIDevice *vdev,
+> > +        uint32_t dev_state)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +    uint32_t sz = sizeof(dev_state);
+> > +
+> > +    if (!vdev->migration) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    if (pwrite(vbasedev->fd, &dev_state, sz,
+> > +              region->fd_offset +
+> > +              offsetof(struct vfio_device_state_ctl, device_state))
+> > +            != sz) {
+> > +        error_report("vfio: Failed to set device state %d", dev_state);
+> 
+> Can the kernel reject this if a state transition is not allowed (or are
+> all transitions allowed?)
+> 
+yes, kernel can reject some state transition if it's not allowed.
+But currently all transitions are allowed.
+Maybe a check of self-to-self transition is needed in kernel.
+
+> > +        return -1;
+> > +    }
+> > +    vdev->migration->device_state = dev_state;
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_get_device_data_caps(VFIOPCIDevice *vdev)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +
+> > +    uint32_t caps;
+> > +    uint32_t size = sizeof(caps);
+> > +
+> > +    if (pread(vbasedev->fd, &caps, size,
+> > +                region->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, caps))
+> > +            != size) {
+> > +        error_report("%s Failed to read data caps of device states",
+> > +                vbasedev->name);
+> > +        return -1;
+> > +    }
+> > +    vdev->migration->data_caps = caps;
+> > +    return 0;
+> > +}
+> > +
+> > +
+> > +static int vfio_check_devstate_version(VFIOPCIDevice *vdev)
+> > +{
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    VFIORegion *region =
+> > +        &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL];
+> > +
+> > +    uint32_t version;
+> > +    uint32_t size = sizeof(version);
+> > +
+> > +    if (pread(vbasedev->fd, &version, size,
+> > +                region->fd_offset +
+> > +                offsetof(struct vfio_device_state_ctl, version))
+> > +            != size) {
+> > +        error_report("%s Failed to read version of device state interfaces",
+> > +                vbasedev->name);
+> > +        return -1;
+> > +    }
+> > +
+> > +    if (version != VFIO_DEVICE_STATE_INTERFACE_VERSION) {
+> > +        error_report("%s migration version mismatch, right version is %d",
+> > +                vbasedev->name, VFIO_DEVICE_STATE_INTERFACE_VERSION);
+> 
+> So, we require an exact match... or should we allow to extend the
+> interface in an backwards-compatible way, in which case we'd require
+> (QEMU interface version) <= (kernel interface version)?
+>
+currently yes. we can discuss on that.
+> > +        return -1;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static void vfio_vm_change_state_handler(void *pv, int running, RunState state)
+> > +{
+> > +    VFIOPCIDevice *vdev = pv;
+> > +    uint32_t dev_state = vdev->migration->device_state;
+> > +
+> > +    if (!running) {
+> > +        dev_state |= VFIO_DEVICE_STATE_STOP;
+> > +    } else {
+> > +        dev_state &= ~VFIO_DEVICE_STATE_STOP;
+> > +    }
+> > +
+> > +    vfio_set_device_state(vdev, dev_state);
+> > +}
+> > +
+> > +static void vfio_save_live_pending(QEMUFile *f, void *opaque,
+> > +                                   uint64_t max_size,
+> > +                                   uint64_t *res_precopy_only,
+> > +                                   uint64_t *res_compatible,
+> > +                                   uint64_t *res_post_copy_only)
+> > +{
+> > +    VFIOPCIDevice *vdev = opaque;
+> > +
+> > +    if (!vfio_device_data_cap_device_memory(vdev)) {
+> > +        return;
+> > +    }
+> > +
+> > +    return;
+> > +}
+> > +
+> > +static int vfio_save_iterate(QEMUFile *f, void *opaque)
+> > +{
+> > +    VFIOPCIDevice *vdev = opaque;
+> > +
+> > +    if (!vfio_device_data_cap_device_memory(vdev)) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> 
+> These look a bit weird...
+>
+patch 5 (adding device memory cap support ) will make it look better :)
+
+> > +
+> > +static void vfio_pci_load_config(VFIOPCIDevice *vdev, QEMUFile *f)
+> > +{
+> > +    PCIDevice *pdev = &vdev->pdev;
+> > +    uint32_t ctl, msi_lo, msi_hi, msi_data, bar_cfg, i;
+> > +    bool msi_64bit;
+> > +
+> > +    /* retore pci bar configuration */
+> > +    ctl = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> > +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> > +            ctl & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> > +        bar_cfg = qemu_get_be32(f);
+> > +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar_cfg, 4);
+> > +    }
+> > +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> > +            ctl | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
+> > +
+> > +    /* restore msi configuration */
+> > +    ctl = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> > +    msi_64bit = !!(ctl & PCI_MSI_FLAGS_64BIT);
+> > +
+> > +    vfio_pci_write_config(&vdev->pdev,
+> > +            pdev->msi_cap + PCI_MSI_FLAGS,
+> > +            ctl & (!PCI_MSI_FLAGS_ENABLE), 2);
+> > +
+> > +    msi_lo = qemu_get_be32(f);
+> > +    vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO, msi_lo, 4);
+> > +
+> > +    if (msi_64bit) {
+> > +        msi_hi = qemu_get_be32(f);
+> > +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> > +                msi_hi, 4);
+> > +    }
+> > +    msi_data = qemu_get_be32(f);
+> > +    vfio_pci_write_config(pdev,
+> > +            pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> > +            msi_data, 2);
+> > +
+> > +    vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> > +            ctl | PCI_MSI_FLAGS_ENABLE, 2);
+> > +
+> 
+> Ok, this function is indeed pci-specific and probably should be moved
+> to the vfio-pci code (other types could hook themselves up in the same
+> place, then).
+> 
+yes, this is the only pci-specific code.
+maybe using VFIO_DEVICE_TYPE_PCI as a sign to decide whether to save/load
+pci config data?
+or as Dave said, put saving/loading of pci config data into
+VMStateDescription interface?
+
+> > +}
+> > +
+> > +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
+> > +{
+> > +    VFIOPCIDevice *vdev = opaque;
+> > +    int flag;
+> > +    uint64_t len;
+> > +    int ret = 0;
+> > +
+> > +    if (version_id != VFIO_DEVICE_STATE_INTERFACE_VERSION) {
+> > +        return -EINVAL;
+> > +    }
+> > +
+> > +    do {
+> > +        flag = qemu_get_byte(f);
+> > +
+> > +        switch (flag & ~VFIO_SAVE_FLAG_CONTINUE) {
+> > +        case VFIO_SAVE_FLAG_SETUP:
+> > +            break;
+> > +        case VFIO_SAVE_FLAG_PCI:
+> > +            vfio_pci_load_config(vdev, f);
+> > +            break;
+> > +        case VFIO_SAVE_FLAG_DEVCONFIG:
+> > +            len = qemu_get_be64(f);
+> > +            vfio_load_data_device_config(vdev, f, len);
+> > +            break;
+> > +        default:
+> > +            ret = -EINVAL;
+> > +        }
+> > +    } while (flag & VFIO_SAVE_FLAG_CONTINUE);
+> > +
+> > +    return ret;
+> > +}
+> > +
+> > +static void vfio_pci_save_config(VFIOPCIDevice *vdev, QEMUFile *f)
+> > +{
+> > +    PCIDevice *pdev = &vdev->pdev;
+> > +    uint32_t msi_cfg, msi_lo, msi_hi, msi_data, bar_cfg, i;
+> > +    bool msi_64bit;
+> > +
+> > +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> > +        bar_cfg = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> > +        qemu_put_be32(f, bar_cfg);
+> > +    }
+> > +
+> > +    msi_cfg = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> > +    msi_64bit = !!(msi_cfg & PCI_MSI_FLAGS_64BIT);
+> > +
+> > +    msi_lo = pci_default_read_config(pdev,
+> > +            pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> > +    qemu_put_be32(f, msi_lo);
+> > +
+> > +    if (msi_64bit) {
+> > +        msi_hi = pci_default_read_config(pdev,
+> > +                pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> > +                4);
+> > +        qemu_put_be32(f, msi_hi);
+> > +    }
+> > +
+> > +    msi_data = pci_default_read_config(pdev,
+> > +            pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> > +            2);
+> > +    qemu_put_be32(f, msi_data);
+> > +
+> > +}
+> > +
+> > +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
+> > +{
+> > +    VFIOPCIDevice *vdev = opaque;
+> > +    int rc = 0;
+> > +
+> > +    qemu_put_byte(f, VFIO_SAVE_FLAG_PCI | VFIO_SAVE_FLAG_CONTINUE);
+> > +    vfio_pci_save_config(vdev, f);
+> > +
+> > +    qemu_put_byte(f, VFIO_SAVE_FLAG_DEVCONFIG);
+> > +    rc += vfio_get_device_config_size(vdev);
+> > +    rc += vfio_save_data_device_config(vdev, f);
+> > +
+> > +    return rc;
+> > +}
+> > +
+> > +static int vfio_save_setup(QEMUFile *f, void *opaque)
+> > +{
+> > +    VFIOPCIDevice *vdev = opaque;
+> > +    qemu_put_byte(f, VFIO_SAVE_FLAG_SETUP);
+> > +
+> > +    vfio_set_device_state(vdev, VFIO_DEVICE_STATE_RUNNING |
+> > +            VFIO_DEVICE_STATE_LOGGING);
+> > +    return 0;
+> > +}
+> > +
+> > +static int vfio_load_setup(QEMUFile *f, void *opaque)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static void vfio_save_cleanup(void *opaque)
+> > +{
+> > +    VFIOPCIDevice *vdev = opaque;
+> > +    uint32_t dev_state = vdev->migration->device_state;
+> > +
+> > +    dev_state &= ~VFIO_DEVICE_STATE_LOGGING;
+> > +
+> > +    vfio_set_device_state(vdev, dev_state);
+> > +}
+> 
+> These look like they should be type-independent, again.
+>
+right:)
+> > +
+> > +static SaveVMHandlers savevm_vfio_handlers = {
+> > +    .save_setup = vfio_save_setup,
+> > +    .save_live_pending = vfio_save_live_pending,
+> > +    .save_live_iterate = vfio_save_iterate,
+> > +    .save_live_complete_precopy = vfio_save_complete_precopy,
+> > +    .save_cleanup = vfio_save_cleanup,
+> > +    .load_setup = vfio_load_setup,
+> > +    .load_state = vfio_load_state,
+> > +};
+> > +
+> > +int vfio_migration_init(VFIOPCIDevice *vdev, Error **errp)
+> > +{
+> > +    int ret;
+> > +    Error *local_err = NULL;
+> > +    vdev->migration = g_new0(VFIOMigration, 1);
+> > +
+> > +    if (vfio_device_state_region_setup(vdev,
+> > +              &vdev->migration->region[VFIO_DEVSTATE_REGION_CTL],
+> > +              VFIO_REGION_SUBTYPE_DEVICE_STATE_CTL,
+> > +              "device-state-ctl")) {
+> > +        goto error;
+> > +    }
+> > +
+> > +    if (vfio_check_devstate_version(vdev)) {
+> > +        goto error;
+> > +    }
+> > +
+> > +    if (vfio_get_device_data_caps(vdev)) {
+> > +        goto error;
+> > +    }
+> > +
+> > +    if (vfio_device_state_region_setup(vdev,
+> > +              &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_CONFIG],
+> > +              VFIO_REGION_SUBTYPE_DEVICE_STATE_DATA_CONFIG,
+> > +              "device-state-data-device-config")) {
+> > +        goto error;
+> > +    }
+> > +
+> > +    if (vfio_device_data_cap_device_memory(vdev)) {
+> > +        error_report("No suppport of data cap device memory Yet");
+> > +        goto error;
+> > +    }
+> > +
+> > +    if (vfio_device_data_cap_system_memory(vdev) &&
+> > +            vfio_device_state_region_setup(vdev,
+> > +              &vdev->migration->region[VFIO_DEVSTATE_REGION_DATA_BITMAP],
+> > +              VFIO_REGION_SUBTYPE_DEVICE_STATE_DATA_DIRTYBITMAP,
+> > +              "device-state-data-dirtybitmap")) {
+> > +        goto error;
+> > +    }
+> > +
+> > +    vdev->migration->device_state = VFIO_DEVICE_STATE_RUNNING;
+> > +
+> > +    register_savevm_live(NULL, TYPE_VFIO_PCI, -1,
+> > +            VFIO_DEVICE_STATE_INTERFACE_VERSION,
+> > +            &savevm_vfio_handlers,
+> > +            vdev);
+> > +
+> > +    vdev->migration->vm_state =
+> > +        qemu_add_vm_change_state_handler(vfio_vm_change_state_handler, vdev);
+> > +
+> > +    return 0;
+> > +error:
+> > +    error_setg(&vdev->migration_blocker,
+> > +            "VFIO device doesn't support migration");
+> > +    ret = migrate_add_blocker(vdev->migration_blocker, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        error_free(vdev->migration_blocker);
+> > +    }
+> > +
+> > +    g_free(vdev->migration);
+> > +    vdev->migration = NULL;
+> > +
+> > +    return ret;
+> > +}
+> > +
+> > +void vfio_migration_finalize(VFIOPCIDevice *vdev)
+> > +{
+> > +    if (vdev->migration) {
+> > +        int i;
+> > +        qemu_del_vm_change_state_handler(vdev->migration->vm_state);
+> > +        unregister_savevm(NULL, TYPE_VFIO_PCI, vdev);
+> > +        for (i = 0; i < VFIO_DEVSTATE_REGION_NUM; i++) {
+> > +            vfio_region_finalize(&vdev->migration->region[i]);
+> > +        }
+> > +        g_free(vdev->migration);
+> > +        vdev->migration = NULL;
+> > +    } else if (vdev->migration_blocker) {
+> > +        migrate_del_blocker(vdev->migration_blocker);
+> > +        error_free(vdev->migration_blocker);
+> > +    }
+> > +}
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index c0cb1ec..b8e006b 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -37,7 +37,6 @@
+> >  
+> >  #define MSIX_CAP_LENGTH 12
+> >  
+> > -#define TYPE_VFIO_PCI "vfio-pci"
+> 
+> Why do you need to move this? That looks like a sign that the layering
+> needs work.
+>
+I moved it for passing it as an idstr for register_savevm_live.
+Seems it's not necessary if we make it pci independent.
+Thanks:)
+
+> >  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+> >  
+> >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> > index b1ae4c0..4b7b1bb 100644
+> > --- a/hw/vfio/pci.h
+> > +++ b/hw/vfio/pci.h
+> > @@ -19,6 +19,7 @@
+> >  #include "qemu/event_notifier.h"
+> >  #include "qemu/queue.h"
+> >  #include "qemu/timer.h"
+> > +#include "sysemu/sysemu.h"
+> >  
+> >  #define PCI_ANY_ID (~0)
+> >  
+> > @@ -56,6 +57,21 @@ typedef struct VFIOBAR {
+> >      QLIST_HEAD(, VFIOQuirk) quirks;
+> >  } VFIOBAR;
+> >  
+> > +enum {
+> > +    VFIO_DEVSTATE_REGION_CTL = 0,
+> > +    VFIO_DEVSTATE_REGION_DATA_CONFIG,
+> > +    VFIO_DEVSTATE_REGION_DATA_DEVICE_MEMORY,
+> > +    VFIO_DEVSTATE_REGION_DATA_BITMAP,
+> > +    VFIO_DEVSTATE_REGION_NUM,
+> > +};
+> > +typedef struct VFIOMigration {
+> > +    VFIORegion region[VFIO_DEVSTATE_REGION_NUM];
+> > +    uint32_t data_caps;
+> > +    uint32_t device_state;
+> > +    uint64_t devconfig_size;
+> > +    VMChangeStateEntry *vm_state;
+> > +} VFIOMigration;
+> > +
+> >  typedef struct VFIOVGARegion {
+> >      MemoryRegion mem;
+> >      off_t offset;
+> > @@ -132,6 +148,8 @@ typedef struct VFIOPCIDevice {
+> >      VFIOBAR bars[PCI_NUM_REGIONS - 1]; /* No ROM */
+> >      VFIOVGA *vga; /* 0xa0000, 0x3b0, 0x3c0 */
+> >      void *igd_opregion;
+> > +    VFIOMigration *migration;
+> 
+> As said, it would probably be better to hang this off VFIODevice.
+> 
+ok.
+
+> > +    Error *migration_blocker;
+> >      PCIHostDeviceAddress host;
+> >      EventNotifier err_notifier;
+> >      EventNotifier req_notifier;
+> > @@ -198,5 +216,10 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+> >  void vfio_display_reset(VFIOPCIDevice *vdev);
+> >  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+> >  void vfio_display_finalize(VFIOPCIDevice *vdev);
+> > -
+> > +bool vfio_device_data_cap_system_memory(VFIOPCIDevice *vdev);
+> > +bool vfio_device_data_cap_device_memory(VFIOPCIDevice *vdev);
+> > +int vfio_set_dirty_page_bitmap(VFIOPCIDevice *vdev,
+> > +         uint64_t start_addr, uint64_t page_nr);
+> > +int vfio_migration_init(VFIOPCIDevice *vdev, Error **errp);
+> > +void vfio_migration_finalize(VFIOPCIDevice *vdev);
+> 
+> And the interfaces should be in vfio-common.
+>
+ok.
+
+> >  #endif /* HW_VFIO_VFIO_PCI_H */
+> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > index 1b434d0..ed43613 100644
+> > --- a/include/hw/vfio/vfio-common.h
+> > +++ b/include/hw/vfio/vfio-common.h
+> > @@ -32,6 +32,7 @@
+> >  #endif
+> >  
+> >  #define VFIO_MSG_PREFIX "vfio %s: "
+> > +#define TYPE_VFIO_PCI "vfio-pci"
+> >  
+> >  enum {
+> >      VFIO_DEVICE_TYPE_PCI = 0,
+> 
