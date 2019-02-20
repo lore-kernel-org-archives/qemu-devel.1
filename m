@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43112)
+Received: from eggs.gnu.org ([209.51.188.92]:43200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTlk-0001Y1-Vu
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:45 -0500
+	(envelope-from <quintela@redhat.com>) id 1gwTm0-0001ju-PK
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gwTlf-0008Iz-Nm
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:42 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36095)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gwTlb-00089j-QV
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:37 -0500
-Received: by mail-ot1-x341.google.com with SMTP id v62so31907311otb.3
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 07:26:15 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 20 Feb 2019 07:59:47 -0600
-Message-Id: <20190220135956.22589-11-minyard@acm.org>
-In-Reply-To: <20190220135956.22589-1-minyard@acm.org>
-References: <20190220135956.22589-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 10/19] boards.h: Ignore migration for SMBus
- devices on older machines
+	(envelope-from <quintela@redhat.com>) id 1gwTly-0008QY-Gp
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:27:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:16184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gwTly-0007N4-94
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:26:58 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 886468B108
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 12:58:40 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 20 Feb 2019 13:57:52 +0100
+Message-Id: <20190220125755.3906-1-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] WIP: Multifd compression support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +30,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+This series create compression code on top of multifd.  It is still
+WIP, but it is already:
+- faster that current compression code
+- it does the minimum amount of copies possible
+- we allow support for other compression codes
+- it pass the multifd test sent in my previous series
 
-Migration capability is being added for pm_smbus and SMBus devices.
-This change will allow backwards compatibility to be kept when
-migrating back to an old qemu version.  Add a bool to the machine
-class tho keep smbus migration from happening.  Future changes
-will use this.
+Test for existing code didn't work because code is too slow, I need to
+make downtime 10 times bigger to make it to converge on my test
+machine.  This code works with same limits that multifd no-
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/i386/pc_piix.c   | 1 +
- hw/i386/pc_q35.c    | 1 +
- include/hw/boards.h | 1 +
- 3 files changed, 3 insertions(+)
+ToDo:
+- move printf's  to traces
+- move code to a struct instead of if (zlib) inside the main threads.
+- improve error handling.
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 6ba163ccbb..3bead1143f 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -442,6 +442,7 @@ static void pc_i440fx_3_1_machine_options(MachineClass *m)
- {
-     pc_i440fx_4_0_machine_options(m);
-     m->is_default = 0;
-+    m->smbus_no_migration_support = true;
-     m->alias = NULL;
-     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 1689885cac..f24ee74cc5 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -378,6 +378,7 @@ static void pc_q35_3_1_machine_options(MachineClass *m)
- {
-     pc_q35_4_0_machine_options(m);
-     m->default_kernel_irqchip_split = false;
-+    m->smbus_no_migration_support = true;
-     m->alias = NULL;
-     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 02f114085f..e7f7b85008 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -207,6 +207,7 @@ struct MachineClass {
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
-     bool ignore_boot_device_suffixes;
-+    bool smbus_no_migration_support;
- 
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
--- 
-2.17.1
+Please, review and coment.
+
+Juan Quintela (3):
+  migration: Add multifd-compress parameter
+  multifd: compression support variables
+  multifd: Start of zlib compression code
+
+ hmp.c                        |  23 +++++-
+ hw/core/qdev-properties.c    |  11 +++
+ include/hw/qdev-properties.h |   1 +
+ migration/migration.c        |  25 ++++++
+ migration/migration.h        |   1 +
+ migration/ram.c              | 142 ++++++++++++++++++++++++++++++++++-
+ migration/trace-events       |   2 +-
+ qapi/common.json             |  15 ++++
+ qapi/migration.json          |  20 ++++-
+ 9 files changed, 229 insertions(+), 11 deletions(-)
+
+--=20
+2.20.1
