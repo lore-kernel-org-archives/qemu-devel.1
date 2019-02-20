@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55880)
+Received: from eggs.gnu.org ([209.51.188.92]:56601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gwNlX-0002HT-2V
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:02:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gwNpT-00040m-L2
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gwNlU-0000NJ-Vb
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:02:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gwNlR-0000Cm-4R
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:02:03 -0500
-References: <B9D713FC-5896-4923-9788-AF7EAA9B462D@oberlin.edu>
-	<ab1a67c0-8872-6e22-fc70-946bbcabb8a1@redhat.com>
-	<BD5AEBD4-0B91-4756-B8D6-C0E643CF1F42@oberlin.edu>
-	<87ftsl2clg.fsf@dusky.pond.sub.org>
-	<91720BD9-D5A6-4457-BC99-D2132550BEDA@oberlin.edu>
-	<87ef84z4v6.fsf@dusky.pond.sub.org>
-	<62E7EC09-CB88-4802-9D28-45B06C020614@oberlin.edu>
-	<87imxfssq1.fsf@dusky.pond.sub.org>
-	<E3178A67-9CFC-4CD5-921F-4EE5CCB46F62@oberlin.edu>
-	<87y36boe78.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <fdec6838-6051-427d-6192-f68a76171915@redhat.com>
-Date: Wed, 20 Feb 2019 09:55:30 +0100
-MIME-Version: 1.0
-In-Reply-To: <87y36boe78.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gwNpS-0004iF-NL
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:06:11 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 20 Feb 2019 09:05:42 +0000
+Message-ID: <8e4ab835-05ef-2a2e-571d-80f439756615@virtuozzo.com>
+References: <20190213233618.22484-1-jsnow@redhat.com>
+	<20190213233618.22484-3-jsnow@redhat.com>
+	<c79e69af-6d00-074a-fc02-5f0808048f4d@virtuozzo.com>
+	<c2188cb6-31fe-28e2-647d-42ae2f12212a@redhat.com>
+In-Reply-To: <c2188cb6-31fe-28e2-647d-42ae2f12212a@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Testing sysbus devices
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <700A3EC03D4DC44F8D9331732DCFA102@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH 2/2] block/dirty-bitmap: implement
+ inconsistent bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 02/19/19 18:55, Markus Armbruster wrote:
-> Stephen Checkoway <stephen.checkoway@oberlin.edu> writes:
->=20
->>> On Feb 19, 2019, at 10:28, Markus Armbruster <armbru@redhat.com> wrot=
-e:
->>>
->>> My terminology might be confused...
->>>
->>> Let me backtrack a bit an explain my use case.  On physical PCs, the
->>> single flash chip is commonly configured to have a read-only part and=
- a
->>> read/write part.  The read-only part holds UEFI code, and the read-wr=
-ite
->>> part holds its persistent state.
->>>
->>> Since our virtual flash chips lack this feature, our virtual PCs have
->>> *two* of them: one configured read-only, and one configured read/writ=
-e.
->>> Cleaning that up would be nice.
->>>
->>> The comment "It does not implement software data protection as found =
-in
->>> many real chips" in both pflash_cfi0*.c might be referring to this
->>> missing feature.
->>
->> I understand now, thank you for explaining. I noticed the comments abo=
-ut software data protection in the code, but I didn't investigate.
->>
->> >From a quick look at <https://www.cypress.com/file/195291/download> T=
-able 27 on page 8, I see there are at least 4 different protection modes.=
- I think the most common one (based on my reading of a handful of data sh=
-eets for flash chips) is the high voltage one. Essentially, there are sec=
-tor groups that can be locked/unlocked using high voltage. It seems easy =
-enough to model this by configuring sectors as locked and refusing to era=
-se or program them.
->>
->> Software command locking would probably involve implementing a few add=
-itional commands.
->>
->> I'm not sure what the others are.
->>
->> Which locking method do you need?
->=20
-> L=C3=A1szl=C3=B3, Philippe, what would you prefer to work with in OVMF?
-
-I would strongly prefer if the guest-side view wouldn't change at all.
-
-IOW, I don't have any useful input on extensions to the current command
-set; what matters to me is that OVMF please not be forced to make use of
-the new commands (and that the privilege differences wrt. SMM remain
-functional). We've avoided version lock-in between OVMF and QEMU for a
-great long time now, thanks to the ACPI linker/loader; I wouldn't like
-to see version dependencies reintroduced in other areas.
-
-Thanks
-Laszlo
+MjAuMDIuMjAxOSAxOjAwLCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMi8xOC8xOSAx
+OjEzIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTQuMDIuMjAx
+OSAyOjM2LCBKb2huIFNub3cgd3JvdGU6DQo+Pj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxq
+c25vd0ByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgIGJsb2NrL2RpcnR5LWJpdG1hcC5jICAg
+ICAgICAgfCAxNSArKysrKysrKysrKysrDQo+Pj4gICAgYmxvY2svcWNvdzItYml0bWFwLmMgICAg
+ICAgICB8IDQyICsrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tDQo+Pj4gICAgYmxv
+Y2tkZXYuYyAgICAgICAgICAgICAgICAgICB8IDQzICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKw0KPj4+ICAgIGluY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmggfCAgMSArDQo+
+Pj4gICAgNCBmaWxlcyBjaGFuZ2VkLCA4MSBpbnNlcnRpb25zKCspLCAyMCBkZWxldGlvbnMoLSkN
+Cj4+Pg0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5
+LWJpdG1hcC5jDQo+Pj4gaW5kZXggYjE4NzlkN2ZiZC4uMDZkOGVlMGQ3OSAxMDA2NDQNCj4+PiAt
+LS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPj4+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
+DQo+Pj4gQEAgLTU4OSw2ICs1ODksNyBAQCB2b2lkIGJkcnZfY2xlYXJfZGlydHlfYml0bWFwKEJk
+cnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBIQml0bWFwICoqb3V0KQ0KPj4+ICAgICAgICAgICAgKm91
+dCA9IGJhY2t1cDsNCj4+PiAgICAgICAgfQ0KPj4+ICAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF91
+bmxvY2soYml0bWFwKTsNCj4+PiArICAgIGJkcnZfZGlydHlfYml0bWFwX3NldF9pbmNvbnNpc3Rl
+bnQoYml0bWFwLCBmYWxzZSk7DQo+Pj4gICAgfQ0KPj4+ICAgIA0KPj4+ICAgIHZvaWQgYmRydl9y
+ZXN0b3JlX2RpcnR5X2JpdG1hcChCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgSEJpdG1hcCAqYmFj
+a3VwKQ0KPj4+IEBAIC03NzYsNiArNzc3LDEzIEBAIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfbmV4
+dF9kaXJ0eV9hcmVhKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPj4+ICAgICAgICByZXR1cm4g
+aGJpdG1hcF9uZXh0X2RpcnR5X2FyZWEoYml0bWFwLT5iaXRtYXAsIG9mZnNldCwgYnl0ZXMpOw0K
+Pj4+ICAgIH0NCj4+PiAgICANCj4+PiArdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9hZGRfaW5jb25z
+aXN0ZW50X2hpbnQoRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gKyAgICBlcnJvcl9hcHBlbmRf
+aGludChlcnJwLCAiVHJ5IGJsb2NrLWRpcnR5LWJpdG1hcC1jbGVhciB0byBtYXJrIHRoaXMgIg0K
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgImJpdG1hcCBjb25zaXN0ZW50IGFnYWluLCBvciBi
+bG9jay1kaXJ0eS1iaXRtYXAtcmVtb3ZlICINCj4+PiArICAgICAgICAgICAgICAgICAgICAgICJ0
+byBkZWxldGUgaXQuIik7DQo+Pg0KPj4gYml0bWFwcyBjcmVhdGVkIGJ5IGxpYnZpcnQgKG9yIHNv
+bWVib2R5KSBhcmUgcmVsYXRlZCB0byBzb21lIGNoZWNrcG9pbnQuIEFuZCB0aGVpciBuYW1lIGlz
+DQo+PiBwcm9iYWJseSAoRXJpYz8pIHJlbGF0ZWQgdG8gdGhpcyBjaGVja3BvaW50IHRvby4gU28s
+IGNsZWFyIHdpbGwgbmV2ZXIgbWFrZSB0aGVtIGNvbnNpc3RlbnQuLg0KPj4gT25seSBjbGVhciA6
+KQ0KPj4NCj4+IFNvLCBJIGRvbid0IGxpa2UgaWRlYSBvZiBjbGVhcmluZyBpbi11c2UgYml0bWFw
+cy4NCj4+DQo+Pj4gK30NCj4+PiArDQo+Pj4gICAgdm9pZCBiZHJ2X21lcmdlX2RpcnR5X2JpdG1h
+cChCZHJ2RGlydHlCaXRtYXAgKmRlc3QsIGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqc3JjLA0KPj4+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSEJpdG1hcCAqKmJhY2t1cCwgRXJyb3Ig
+KiplcnJwKQ0KPj4+ICAgIHsNCj4+PiBAQCAtNzk4LDYgKzgwNiwxMyBAQCB2b2lkIGJkcnZfbWVy
+Z2VfZGlydHlfYml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqZGVzdCwgY29uc3QgQmRydkRpcnR5Qml0
+bWFwICpzcmMsDQo+Pj4gICAgICAgICAgICBnb3RvIG91dDsNCj4+PiAgICAgICAgfQ0KPj4+ICAg
+IA0KPj4+ICsgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lzdGVudChkZXN0KSkgew0K
+Pj4+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJXMnIGlzIGluY29uc2lzdGVu
+dCBhbmQgY2Fubm90IGJlIHVzZWQgYXMiDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAiIGEgbWVy
+Z2UgdGFyZ2V0IiwgZGVzdC0+bmFtZSk7DQo+Pj4gKyAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBf
+YWRkX2luY29uc2lzdGVudF9oaW50KGVycnApOw0KPj4+ICsgICAgICAgIGdvdG8gb3V0Ow0KPj4+
+ICsgICAgfQ0KPj4NCj4+IEkgdGhpbmssIHdlIG5lZWQgY29tbW9uIHByZWRpY2F0ZSB3aGljaCB3
+aWxsIGNvbWJpbmUgYnVzeSBhbmQgaW5jb25zaXN0ZW50LCBhcyBhbG1vc3QgaW4gYWxsIGNhc2Vz
+DQo+PiB3ZSBuZWVkIGJvdGggdG8gYmUgZmFsc2UgdG8gZG8gYW55IG9wZXJhdGlvbi4NCj4+DQo+
+PiBiZHJ2X2RpcnR5X2JpdG1hcF91c2FibGUoKSA/IDopDQo+Pg0KPj4gYW5kIHBhc3MgZXJycCB0
+byB0aGlzIGhlbHBlci4NCj4+DQo+PiBBY3R1YWxseSwgd2UgYWxyZWFkeSBuZWVkIGl0LCB0byBm
+aWxsIGVycnAsIHdoaWNoIHdlIGFsbW9zdCBhbHdheXMgZmlsbCBpbiB0aGUgc2FtZSBtYW5uZXIu
+DQo+Pg0KPj4+ICsNCj4+PiAgICAgICAgaWYgKCFoYml0bWFwX2Nhbl9tZXJnZShkZXN0LT5iaXRt
+YXAsIHNyYy0+Yml0bWFwKSkgew0KPj4+ICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0
+bWFwcyBhcmUgaW5jb21wYXRpYmxlIGFuZCBjYW4ndCBiZSBtZXJnZWQiKTsNCj4+PiAgICAgICAg
+ICAgIGdvdG8gb3V0Ow0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi1iaXRtYXAuYyBiL2Js
+b2NrL3Fjb3cyLWJpdG1hcC5jDQo+Pj4gaW5kZXggM2VlNTI0ZGE0Yi4uOWJkOGJjNDE3ZiAxMDA2
+NDQNCj4+PiAtLS0gYS9ibG9jay9xY293Mi1iaXRtYXAuYw0KPj4+ICsrKyBiL2Jsb2NrL3Fjb3cy
+LWJpdG1hcC5jDQo+Pg0KPj4gaG1tLCBJIGFsc28gdGhpbmsgd2Ugc2hvdWxkIHJlcG9ydCBvdXIg
+ZGVwcmVjYXRlZCBzdGF0dXMgYXMgbG9ja2VkIGZvciBpbmNvbnNpc3RlbnQgYml0bWFwcy4uDQo+
+Pg0KPj4NCj4gDQo+IFRob3VnaCB3ZSdyZSB0cnlpbmcgdG8gZGVwcmVjYXRlIHRoZSBmaWVsZCBh
+bHRvZ2V0aGVyLCBJICpjb3VsZCogYWRkIGENCj4gc3BlY2lhbCBzdGF0dXMgZmxhZyB0aGF0IG1h
+a2VzIGl0IHVuYW1iaWd1b3VzLiBUaGlzIHdpbGwgY2F0Y2ggdGhlDQo+IGF0dGVudGlvbiBvZiBh
+bnlvbmUgdXNpbmcgdGhlIG9sZCBBUEkuDQoNCkkgYWdyZWUuDQoNCg0KLS0gDQpCZXN0IHJlZ2Fy
+ZHMsDQpWbGFkaW1pcg0K
