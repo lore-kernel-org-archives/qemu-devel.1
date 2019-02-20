@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56601)
+Received: from eggs.gnu.org ([209.51.188.92]:57467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gwNpT-00040m-L2
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:06:12 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gwNt9-0005JQ-C7
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:10:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gwNpS-0004iF-NL
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:06:11 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 20 Feb 2019 09:05:42 +0000
-Message-ID: <8e4ab835-05ef-2a2e-571d-80f439756615@virtuozzo.com>
-References: <20190213233618.22484-1-jsnow@redhat.com>
-	<20190213233618.22484-3-jsnow@redhat.com>
-	<c79e69af-6d00-074a-fc02-5f0808048f4d@virtuozzo.com>
-	<c2188cb6-31fe-28e2-647d-42ae2f12212a@redhat.com>
-In-Reply-To: <c2188cb6-31fe-28e2-647d-42ae2f12212a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <700A3EC03D4DC44F8D9331732DCFA102@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gwNt6-0006wX-05
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:09:57 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43271)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gwNt3-0006tR-Kh
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:09:54 -0500
+Received: by mail-wr1-x442.google.com with SMTP id d17so10632107wre.10
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 01:09:50 -0800 (PST)
+References: <155060310248.19547.14979269067689441201.stgit@gimli.home>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <f94524a1-8f11-f4df-19e7-8626ad34e98d@gmail.com>
+Date: Wed, 20 Feb 2019 11:10:22 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] block/dirty-bitmap: implement
- inconsistent bit
+In-Reply-To: <155060310248.19547.14979269067689441201.stgit@gimli.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] pci: Sanity test minimum downstream LNKSTA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Fam Zheng <fam@euphon.net>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: Jens Freimann <jfreimann@redhat.com>, mst@redhat.com
 
-MjAuMDIuMjAxOSAxOjAwLCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gMi8xOC8xOSAx
-OjEzIFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTQuMDIuMjAx
-OSAyOjM2LCBKb2huIFNub3cgd3JvdGU6DQo+Pj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxq
-c25vd0ByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgIGJsb2NrL2RpcnR5LWJpdG1hcC5jICAg
-ICAgICAgfCAxNSArKysrKysrKysrKysrDQo+Pj4gICAgYmxvY2svcWNvdzItYml0bWFwLmMgICAg
-ICAgICB8IDQyICsrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tDQo+Pj4gICAgYmxv
-Y2tkZXYuYyAgICAgICAgICAgICAgICAgICB8IDQzICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKw0KPj4+ICAgIGluY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmggfCAgMSArDQo+
-Pj4gICAgNCBmaWxlcyBjaGFuZ2VkLCA4MSBpbnNlcnRpb25zKCspLCAyMCBkZWxldGlvbnMoLSkN
-Cj4+Pg0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9kaXJ0eS1iaXRtYXAuYyBiL2Jsb2NrL2RpcnR5
-LWJpdG1hcC5jDQo+Pj4gaW5kZXggYjE4NzlkN2ZiZC4uMDZkOGVlMGQ3OSAxMDA2NDQNCj4+PiAt
-LS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPj4+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5j
-DQo+Pj4gQEAgLTU4OSw2ICs1ODksNyBAQCB2b2lkIGJkcnZfY2xlYXJfZGlydHlfYml0bWFwKEJk
-cnZEaXJ0eUJpdG1hcCAqYml0bWFwLCBIQml0bWFwICoqb3V0KQ0KPj4+ICAgICAgICAgICAgKm91
-dCA9IGJhY2t1cDsNCj4+PiAgICAgICAgfQ0KPj4+ICAgICAgICBiZHJ2X2RpcnR5X2JpdG1hcF91
-bmxvY2soYml0bWFwKTsNCj4+PiArICAgIGJkcnZfZGlydHlfYml0bWFwX3NldF9pbmNvbnNpc3Rl
-bnQoYml0bWFwLCBmYWxzZSk7DQo+Pj4gICAgfQ0KPj4+ICAgIA0KPj4+ICAgIHZvaWQgYmRydl9y
-ZXN0b3JlX2RpcnR5X2JpdG1hcChCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgSEJpdG1hcCAqYmFj
-a3VwKQ0KPj4+IEBAIC03NzYsNiArNzc3LDEzIEBAIGJvb2wgYmRydl9kaXJ0eV9iaXRtYXBfbmV4
-dF9kaXJ0eV9hcmVhKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPj4+ICAgICAgICByZXR1cm4g
-aGJpdG1hcF9uZXh0X2RpcnR5X2FyZWEoYml0bWFwLT5iaXRtYXAsIG9mZnNldCwgYnl0ZXMpOw0K
-Pj4+ICAgIH0NCj4+PiAgICANCj4+PiArdm9pZCBiZHJ2X2RpcnR5X2JpdG1hcF9hZGRfaW5jb25z
-aXN0ZW50X2hpbnQoRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gKyAgICBlcnJvcl9hcHBlbmRf
-aGludChlcnJwLCAiVHJ5IGJsb2NrLWRpcnR5LWJpdG1hcC1jbGVhciB0byBtYXJrIHRoaXMgIg0K
-Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgImJpdG1hcCBjb25zaXN0ZW50IGFnYWluLCBvciBi
-bG9jay1kaXJ0eS1iaXRtYXAtcmVtb3ZlICINCj4+PiArICAgICAgICAgICAgICAgICAgICAgICJ0
-byBkZWxldGUgaXQuIik7DQo+Pg0KPj4gYml0bWFwcyBjcmVhdGVkIGJ5IGxpYnZpcnQgKG9yIHNv
-bWVib2R5KSBhcmUgcmVsYXRlZCB0byBzb21lIGNoZWNrcG9pbnQuIEFuZCB0aGVpciBuYW1lIGlz
-DQo+PiBwcm9iYWJseSAoRXJpYz8pIHJlbGF0ZWQgdG8gdGhpcyBjaGVja3BvaW50IHRvby4gU28s
-IGNsZWFyIHdpbGwgbmV2ZXIgbWFrZSB0aGVtIGNvbnNpc3RlbnQuLg0KPj4gT25seSBjbGVhciA6
-KQ0KPj4NCj4+IFNvLCBJIGRvbid0IGxpa2UgaWRlYSBvZiBjbGVhcmluZyBpbi11c2UgYml0bWFw
-cy4NCj4+DQo+Pj4gK30NCj4+PiArDQo+Pj4gICAgdm9pZCBiZHJ2X21lcmdlX2RpcnR5X2JpdG1h
-cChCZHJ2RGlydHlCaXRtYXAgKmRlc3QsIGNvbnN0IEJkcnZEaXJ0eUJpdG1hcCAqc3JjLA0KPj4+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSEJpdG1hcCAqKmJhY2t1cCwgRXJyb3Ig
-KiplcnJwKQ0KPj4+ICAgIHsNCj4+PiBAQCAtNzk4LDYgKzgwNiwxMyBAQCB2b2lkIGJkcnZfbWVy
-Z2VfZGlydHlfYml0bWFwKEJkcnZEaXJ0eUJpdG1hcCAqZGVzdCwgY29uc3QgQmRydkRpcnR5Qml0
-bWFwICpzcmMsDQo+Pj4gICAgICAgICAgICBnb3RvIG91dDsNCj4+PiAgICAgICAgfQ0KPj4+ICAg
-IA0KPj4+ICsgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX2luY29uc2lzdGVudChkZXN0KSkgew0K
-Pj4+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJXMnIGlzIGluY29uc2lzdGVu
-dCBhbmQgY2Fubm90IGJlIHVzZWQgYXMiDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAiIGEgbWVy
-Z2UgdGFyZ2V0IiwgZGVzdC0+bmFtZSk7DQo+Pj4gKyAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBf
-YWRkX2luY29uc2lzdGVudF9oaW50KGVycnApOw0KPj4+ICsgICAgICAgIGdvdG8gb3V0Ow0KPj4+
-ICsgICAgfQ0KPj4NCj4+IEkgdGhpbmssIHdlIG5lZWQgY29tbW9uIHByZWRpY2F0ZSB3aGljaCB3
-aWxsIGNvbWJpbmUgYnVzeSBhbmQgaW5jb25zaXN0ZW50LCBhcyBhbG1vc3QgaW4gYWxsIGNhc2Vz
-DQo+PiB3ZSBuZWVkIGJvdGggdG8gYmUgZmFsc2UgdG8gZG8gYW55IG9wZXJhdGlvbi4NCj4+DQo+
-PiBiZHJ2X2RpcnR5X2JpdG1hcF91c2FibGUoKSA/IDopDQo+Pg0KPj4gYW5kIHBhc3MgZXJycCB0
-byB0aGlzIGhlbHBlci4NCj4+DQo+PiBBY3R1YWxseSwgd2UgYWxyZWFkeSBuZWVkIGl0LCB0byBm
-aWxsIGVycnAsIHdoaWNoIHdlIGFsbW9zdCBhbHdheXMgZmlsbCBpbiB0aGUgc2FtZSBtYW5uZXIu
-DQo+Pg0KPj4+ICsNCj4+PiAgICAgICAgaWYgKCFoYml0bWFwX2Nhbl9tZXJnZShkZXN0LT5iaXRt
-YXAsIHNyYy0+Yml0bWFwKSkgew0KPj4+ICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0
-bWFwcyBhcmUgaW5jb21wYXRpYmxlIGFuZCBjYW4ndCBiZSBtZXJnZWQiKTsNCj4+PiAgICAgICAg
-ICAgIGdvdG8gb3V0Ow0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi1iaXRtYXAuYyBiL2Js
-b2NrL3Fjb3cyLWJpdG1hcC5jDQo+Pj4gaW5kZXggM2VlNTI0ZGE0Yi4uOWJkOGJjNDE3ZiAxMDA2
-NDQNCj4+PiAtLS0gYS9ibG9jay9xY293Mi1iaXRtYXAuYw0KPj4+ICsrKyBiL2Jsb2NrL3Fjb3cy
-LWJpdG1hcC5jDQo+Pg0KPj4gaG1tLCBJIGFsc28gdGhpbmsgd2Ugc2hvdWxkIHJlcG9ydCBvdXIg
-ZGVwcmVjYXRlZCBzdGF0dXMgYXMgbG9ja2VkIGZvciBpbmNvbnNpc3RlbnQgYml0bWFwcy4uDQo+
-Pg0KPj4NCj4gDQo+IFRob3VnaCB3ZSdyZSB0cnlpbmcgdG8gZGVwcmVjYXRlIHRoZSBmaWVsZCBh
-bHRvZ2V0aGVyLCBJICpjb3VsZCogYWRkIGENCj4gc3BlY2lhbCBzdGF0dXMgZmxhZyB0aGF0IG1h
-a2VzIGl0IHVuYW1iaWd1b3VzLiBUaGlzIHdpbGwgY2F0Y2ggdGhlDQo+IGF0dGVudGlvbiBvZiBh
-bnlvbmUgdXNpbmcgdGhlIG9sZCBBUEkuDQoNCkkgYWdyZWUuDQoNCg0KLS0gDQpCZXN0IHJlZ2Fy
-ZHMsDQpWbGFkaW1pcg0K
+
+
+On 2/19/19 9:06 PM, Alex Williamson wrote:
+> The entire link status register for SR-IOV VFs is defined as RsvdZ,
+> reads simply return zero.  Usually this is nothing more than lspci
+> reporting inconsequentially broken values:
+>
+>      LnkSta: Speed unknown, Width x0, ...
+>
+> However, now that we're using the downstream endpoint link status to
+> fill in the value at the parent downstream port, invalid values become
+> a problem.  In particular, the PCIe hotplug driver in Linux looks for
+> a valid negotiated link width and will fail to enumerate hot-added
+> downstream endpoints without non-zero value here, ex:
+>
+>      pciehp 0000:00:02.0:pcie004: Slot(0): Attention button pressed
+>      pciehp 0000:00:02.0:pcie004: Slot(0) Powering on due to button press
+>      pciehp 0000:00:02.0:pcie004: Slot(0): Card present
+>      pciehp 0000:00:02.0:pcie004: Slot(0): Link Up
+>      pciehp 0000:00:02.0:pcie004: link training error: status 0x2000
+>      pciehp 0000:00:02.0:pcie004: Failed to check link status
+>
+> Resolve by using minimum width and speed values for the downstream
+> port link status when the endpoint fails to provide valid values.
+> Long term, we may want to implement emulation in the vfio-pci host
+> driver to suppliment this field with the PF value as the SR-IOV spec
+> seems to allow, but the solution here is compatible should that be
+> implemented later.
+>
+> Fixes: 727b48661f75 ("pci: Sync PCIe downstream port LNKSTA on read")
+> Reported-by: Jens Freimann <jfreimann@redhat.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>   hw/pci/pcie.c |   13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 3f7c36609313..3618d6ab2e1a 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -834,9 +834,12 @@ void pcie_add_capability(PCIDevice *dev,
+>   /*
+>    * Sync the PCIe Link Status negotiated speed and width of a bridge with the
+>    * downstream device.  If downstream device is not present, re-write with the
+> - * Link Capability fields.  Limit width and speed to bridge capabilities for
+> - * compatibility.  Use config_read to access the downstream device since it
+> - * could be an assigned device with volatile link information.
+> + * Link Capability fields.  If downstream device reports invalid width or
+> + * speed, replace with minimum values (LnkSta fields are RsvdZ on VFs but such
+> + * values interfere with PCIe native hotplug detecting new devices).  Limit
+> + * width and speed to bridge capabilities for compatibility.  Use config_read
+> + * to access the downstream device since it could be an assigned device with
+> + * volatile link information.
+>    */
+>   void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
+>   {
+> @@ -856,11 +859,15 @@ void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
+>           if ((lnksta & PCI_EXP_LNKSTA_NLW) > (lnkcap & PCI_EXP_LNKCAP_MLW)) {
+>               lnksta &= ~PCI_EXP_LNKSTA_NLW;
+>               lnksta |= lnkcap & PCI_EXP_LNKCAP_MLW;
+> +        } else if (!(lnksta & PCI_EXP_LNKSTA_NLW)) {
+> +            lnksta |= QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1);
+>           }
+>   
+>           if ((lnksta & PCI_EXP_LNKSTA_CLS) > (lnkcap & PCI_EXP_LNKCAP_SLS)) {
+>               lnksta &= ~PCI_EXP_LNKSTA_CLS;
+>               lnksta |= lnkcap & PCI_EXP_LNKCAP_SLS;
+> +        } else if (!(lnksta & PCI_EXP_LNKSTA_CLS)) {
+> +            lnksta |= QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT);
+>           }
+>       }
+>   
+>
+
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+
+Thanks,
+Marcel
