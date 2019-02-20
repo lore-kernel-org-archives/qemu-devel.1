@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37763)
+Received: from eggs.gnu.org ([209.51.188.92]:38222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwVFE-0007s7-3R
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:01:21 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gwVGz-0000YX-HZ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:03:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gwVFD-0008Gy-71
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:01:16 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gwVFC-0008GD-UO
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:01:15 -0500
-Received: by mail-pf1-x441.google.com with SMTP id h1so12182324pfo.7
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:01:14 -0800 (PST)
-References: <20190130004811.27372-1-cota@braap.org>
-	<20190130004811.27372-70-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2237ae5f-f8d7-9ed3-b279-e79ef437dc2f@linaro.org>
-Date: Wed, 20 Feb 2019 09:01:10 -0800
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gwVGy-0000sU-NI
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:03:05 -0500
+References: <20190213155414.22285-1-palmer@sifive.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <7cf246c6-1bb7-6479-7448-750a9f9801e0@mail.uni-paderborn.de>
+Date: Wed, 20 Feb 2019 18:02:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190130004811.27372-70-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190213155414.22285-1-palmer@sifive.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 69/73] cpu: rename all_cpu_threads_idle
- to qemu_tcg_rr_all_cpu_threads_idle
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [PATCH v7 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 1/29/19 4:48 PM, Emilio G. Cota wrote:
-> This function is only called from TCG rr mode, so add
-> a prefix to mark this as well as an assertion.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  cpus.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+Hi Palmer,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 2/13/19 4:53 PM, Palmer Dabbelt wrote:
+> Palmer: I caused some merge conflicts in Bastian's patch set so I
+> figured I'd attempt to clean these up.  As far as I'm concerned v6 was
+> good to go, but since the merge conflicts were fairly extensive (if
+> somewhat mechanical) I'd like to pass the baton back to Bastian here for
+> at least a sanity check.
 
 
-r~
+Thanks for doing the merge. I will have time on Friday to integrate my 
+nitpicks and send a v8. Then it should be good to be merged.
+
+Cheers,
+
+Bastian
