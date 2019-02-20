@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41838)
+Received: from eggs.gnu.org ([209.51.188.92]:41889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwX2D-0007Eb-F4
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:55:58 -0500
+	(envelope-from <casasfernando@outlook.com>) id 1gwX2P-0007KL-A8
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:56:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwX24-0006lL-Bw
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:55:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57602)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gwX1y-0006h3-CF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:55:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gwX1s-0005YM-QT
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 18:55:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C699D2E80C7
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 18:55:36 +0000 (UTC)
+	(envelope-from <casasfernando@outlook.com>) id 1gwX2N-0006up-SB
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:56:09 -0500
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+Date: Wed, 20 Feb 2019 18:56:04 +0000
+Message-ID: <VI1PR0602MB32456F471A198636E7C7C0B1A47D0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+References: <VI1PR1001MB13731EF256C1E7380E1D657AB7D90@VI1PR1001MB1373.EURPRD10.PROD.OUTLOOK.COM>
+	<VI1PR0602MB324559765BFE372F75D52E57A4910@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190201054849.GH23131@stefanha-x1.localdomain>
+	<VI1PR0602MB32452A8FD128F63FFAC0CEADA4920@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190204060636.GF29758@stefanha-x1.localdomain>
+	<AM5PR0602MB32368CB5ADDEC05F42D8BC8FA46D0@AM5PR0602MB3236.eurprd06.prod.outlook.com>
+	<AM5PR0602MB32368CB5ADDEC05F42D8BC8FA46D0@AM5PR0602MB3236.eurprd06.prod.outlo>
+	<VI1PR0602MB3245FD0A939EC3E28CA0F740A46F0@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190211031725.GB18083@stefanha-x1.localdomain>
+	<VI1PR0602MB3245424120D151F29884A7E2A4630@VI1PR0602MB3245.eurprd06.prod.outlook.com>
+	<20190220165839.GJ30403@stefanha-x1.localdomain>
+	<f168e72e-89fe-cf9b-89ff-3eb820f8a5cf@redhat.com>
+In-Reply-To: <f168e72e-89fe-cf9b-89ff-3eb820f8a5cf@redhat.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Feb 2019 18:47:21 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <155068844125.30047.8968795061853338849.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
- emulation failure
+Subject: Re: [Qemu-devel] [Qemu-block] Guest unresponsive after Virtqueue
+ size exceeded error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,166 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-Right, an L1 line of :
-./x86_64-softmmu/qemu-system-x86_64  -M q35,accel=3Dkvm -cpu host
+Hi Paolo,
 
-does trigger it for me.
+This is Fernando, the one  that reported the issue.
+Regarding the dumps I have three of them including guest memory, 2 for virt=
+io-scsi, 1 for virtio-blk, in case a comparison may help to confirm which i=
+s the proble.) I can upload them to a server you indicate me or I can also =
+put them on a server so you can download them as you see fit. Each dump, co=
+mpressed, is around 500MB.
 
-My L0 is:
+If it's more convenient for you I can try to get the requested information =
+from gdb. But I will need some guidance since I'm not skilled enough with t=
+he debugger.
 
-/usr/bin/qemu-system-x86_64 -machine accel=3Dkvm -name guest=3Dfedora29
-,debug-threads=3Don -S -object
-secret,id=3DmasterKey0,format=3Draw,file=3D/home/dgilbert/.config/libvirt/q=
-emu/lib/domain-1-fedora29
-/master-key.aes -machine pc-q35-3.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-
-guest-core=3Doff -cpu Skylake-Client-
-IBRS,ss=3Don,vmx=3Don,hypervisor=3Don,tsc_adjust=3Don,clflushopt=3Don,ssbd=
-=3Don,xsaves=3Don,pdpe1gb=3Don
--m 4096 -realtime mlock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -uuid
-d070c898-4323-46f6-b8c2-566061a2f88d -no-user-config -nodefaults
--chardev socket,id=3Dcharmonitor,fd=3D27,server,nowait -mon
-chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfix=
-=3Dslew
--global kvm-pit.lost_tick_policy=3Ddelay -no-hpet -no-shutdown -global
-ICH9-LPC.disable_s3=3D1 -global ICH9-LPC.disable_s4=3D1 -boot strict=3Don
--device pcie-root-
-port,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,add=
-r=3D0x2
--device pcie-root-
-port,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x2.0x1 -device=
- pcie-
-root-port,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x2.0x2 -d=
-evice
-pcie-root-port,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x2.0=
-x3
--device pcie-root-
-port,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x2.0x4 -device=
- pcie-
-root-port,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x2.0x5 -d=
-evice
-pcie-root-port,port=3D0x16,chassis=3D7,id=3Dpci.7,bus=3Dpcie.0,addr=3D0x2.0=
-x6
--device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 -device v=
-irtio-
-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.3,addr=3D0x0 -drive
-file=3D/home/vmimages/fedora29.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-vi=
-rtio-
-disk0 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.4,addr=3D0x0,drive=3Ddriv=
-e-
-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
-sata0-0-0,media=3Dcdrom,readonly=3Don -device ide-cd,bus=3Dide.0,drive=3Ddr=
-ive-
-sata0-0-0,id=3Dsata0-0-0 -netdev user,id=3Dhostnet0 -device virtio-net-
-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:c3:dc:36,bus=3Dpci.1,addr=3D=
-0x0
--chardev pty,id=3Dcharserial0 -device isa-
-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-socket,id=3Dcharchannel0,fd=3D29,server,nowait -device virtserialport,bus
-=3Dvirtio-
-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest=
-_agent.0
--chardev spicevmc,id=3Dcharchannel1,name=3Dvdagent -device
-virtserialport,bus=3Dvirtio-
-serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dcom.redhat.spi=
-ce.0
--device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -spice
-port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
-,seamless-migration=3Don -device virtio-
-vga,id=3Dvideo0,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1 -device ich9-intel-
-hda,id=3Dsound0,bus=3Dpcie.0,addr=3D0x1b -device hda-
-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
-spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D2 -chardev
-spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D3 -device virtio-
-balloon-pci,id=3Dballoon0,bus=3Dpci.5,addr=3D0x0 -object rng-
-random,id=3Dobjrng0,filename=3D/dev/urandom -device virtio-rng-
-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.6,addr=3D0x0 -sandbox
-on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3D=
-deny
--msg timestamp=3Don
+Another option, if you provide me with the right patch, is for me to patch,=
+ rebuild QEMU and repro the problem again. With virtio-scsi I'm able to rep=
+ro this in a matter of hours most of the times, with virtio-blk it will tak=
+e a couple of days.
 
-using a f29 packaged qemu-kvm-3.0.0-3.fc29.x86_64 on
-4.20.8-200.fc29.x86_64 host.
+Just let me know how do you prefer to move forward.
 
--- =
+Thanks a lot for helping with this!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813165
+Kind regards,
 
-Title:
-  KVM internal error. Suberror: 1 emulation failure
+Fernando
 
-Status in QEMU:
-  New
-
-Bug description:
-  Hello Devs.
-
-  Having problems getting VM to run with qemu 3.1.0. I should mention
-  it's a nested configuration.
-
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-
-  Someone has an idea whats going wrong here?
-
-  thanks and cheers
-  t.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
+On mi=E9, feb 20, 2019 at 6:53 PM, Paolo Bonzini <pbonzini@redhat.com> wrot=
+e:
+On 20/02/19 17:58, Stefan Hajnoczi wrote:
+On Mon, Feb 18, 2019 at 07:21:25AM +0000, Fernando Casas Sch=F6ssow wrote:
+It took a few days but last night the problem was reproduced. This is the i=
+nformation from the log: vdev 0x55f261d940f0 ("virtio-blk") vq 0x55f261d9ee=
+40 (idx 0) inuse 128 vring.num 128 old_shadow_avail_idx 58874 last_avail_id=
+x 58625 avail_idx 58874 avail 0x3d87a800 avail_idx (cache bypassed) 58625
+Hi Paolo, Are you aware of any recent MemoryRegionCache issues? The avail_i=
+dx value 58874 was read via the cache while a non-cached read produces 5862=
+5! I suspect that 58625 is correct since the vring is already full and the =
+driver wouldn't bump avail_idx any further until requests complete. Fernand=
+o also hits this issue with virtio-scsi so it's not a virtio_blk.ko driver =
+bug or a virtio-blk device emulation issue.
+No, I am not aware of any issues. How can I get the core dump (and the corr=
+esponding executable to get the symbols)? Alternatively, it should be enoug=
+h to print the vq->vring.caches->avail.mrs from the debugger. Also, one pos=
+sibility is to add in vring_avail_idx an assertion like assert(vq->shadow_a=
+vaila_idx =3D=3D virtio_lduw_phys(vdev, vq->vring.avail + offsetof(VRingAva=
+il, idx))); and try to catch the error earlier. Paolo
+A QEMU core dump is available for debugging. Here is the patch that produce=
+d this debug output: diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c i=
+ndex a1ff647a66..28d89fcbcb 100644 --- a/hw/virtio/virtio.c +++ b/hw/virtio=
+/virtio.c @@ -866,6 +866,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)=
+ return NULL; } rcu_read_lock(); + uint16_t old_shadow_avail_idx =3D vq->sh=
+adow_avail_idx; if (virtio_queue_empty_rcu(vq)) { goto done; } @@ -879,6 +8=
+80,12 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz) max =3D vq->vring.nu=
+m; if (vq->inuse >=3D vq->vring.num) { + fprintf(stderr, "vdev %p (\"%s\")\=
+n", vdev, vdev->name); + fprintf(stderr, "vq %p (idx %u)\n", vq, (unsigned =
+int)(vq - vdev->vq)); + fprintf(stderr, "inuse %u vring.num %u\n", vq->inus=
+e, vq->vring.num); + fprintf(stderr, "old_shadow_avail_idx %u last_avail_id=
+x %u avail_idx %u\n", old_shadow_avail_idx, vq->last_avail_idx, vq->shadow_=
+avail_idx); + fprintf(stderr, "avail %#" HWADDR_PRIx " avail_idx (cache byp=
+assed) %u\n", vq->vring.avail, virtio_lduw_phys(vdev, vq->vring.avail + off=
+setof(VRingAvail, idx))); + fprintf(stderr, "used_idx %u\n", vq->used_idx);=
+ + abort(); /* <--- core dump! */ virtio_error(vdev, "Virtqueue size exceed=
+ed"); goto done; } Stefan
+used_idx 58497 2019-02-18 03:20:08.605+0000: shutting down, reason=3Dcrashe=
+d The dump file, including guest memory, was generated successfully (after =
+gzip the file is around 492MB). I switched the guest now to virtio-scsi to =
+get the information and dump with this setup as well. How should we proceed=
+? Thanks.
