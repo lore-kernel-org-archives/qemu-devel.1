@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49935)
+Received: from eggs.gnu.org ([209.51.188.92]:50104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gwVtT-0000Sv-CE
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:42:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gwVuS-0001F5-Dk
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gwVtR-0001W6-G2
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:42:51 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gwVtN-0001Rb-Qh
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:42:48 -0500
-Received: by mail-wm1-x344.google.com with SMTP id x10so7204379wmg.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:42:41 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Feb 2019 18:42:38 +0100
-Message-Id: <1550684558-12865-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gwVuK-00025V-8L
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:43:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwVuE-0001xj-Fu
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 12:43:40 -0500
+Date: Wed, 20 Feb 2019 17:43:27 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190220174326.GO2608@work-vm>
+References: <20190215174548.2630-1-yury-kotov@yandex-team.ru>
+	<155025464362.24.1200537447541094855@49fa7ef69f7b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] chardev-socket: do not blindly reset
- handlers when switching GMainContext
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <155025464362.24.1200537447541094855@49fa7ef69f7b>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,146 +29,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, marcandre.lureau@redhat.com
+Cc: yury-kotov@yandex-team.ru, fam@euphon.net, ehabkost@redhat.com, eblake@redhat.com, imammedo@redhat.com, quintela@redhat.com, lvivier@redhat.com, armbru@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, thuth@redhat.com, peter.maydell@linaro.org, jiangshanlai@gmail.com, qemu-devel@lists.ewheeler.net, wrfsh@yandex-team.ru
 
-If the socket is connecting or connected, tcp_chr_update_read_handler will
-be called but it should not set the NetListener's callbacks again.
-Otherwise, tcp_chr_accept is invoked while the socket is in connected
-state and you get an assertion failure.
+* no-reply@patchew.org (no-reply@patchew.org) wrote:
+> Patchew URL: https://patchew.org/QEMU/20190215174548.2630-1-yury-kotov@yandex-team.ru/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Message-id: 20190215174548.2630-1-yury-kotov@yandex-team.ru
+> Subject: [Qemu-devel] [PATCH v3 0/5] Add ignore-external migration capability
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 5f9e90967e migration: Add capabilities validation
+> fad48088a8 tests/migration-test: Add a test for ignore-shared capability
+> 68347ad2eb migration: Add an ability to ignore shared RAM blocks
+> e3d2fd0298 migration: Introduce ignore-shared capability
+> 73d9e23937 exec: Change RAMBlockIterFunc definition
+> 
+> === OUTPUT BEGIN ===
+> 1/5 Checking commit 73d9e23937e9 (exec: Change RAMBlockIterFunc definition)
+> 2/5 Checking commit e3d2fd0298a4 (migration: Introduce ignore-shared capability)
+> 3/5 Checking commit 68347ad2eb24 (migration: Add an ability to ignore shared RAM blocks)
+> ERROR: Macros with multiple statements should be enclosed in a do - while loop
+> #146: FILE: migration/ram.c:169:
+> +#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
+> +    INTERNAL_RAMBLOCK_FOREACH(block)                   \
+> +        if (ramblock_is_ignored(block)) {} else
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- chardev/char-socket.c |  2 +-
- tests/test-char.c     | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 95 insertions(+), 2 deletions(-)
+This is OK, it's just a copy of the existing macro we have for the loop
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 4fcdd8a..6d287ba 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -632,7 +632,7 @@ static void tcp_chr_update_read_handler(Chardev *chr)
- {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
- 
--    if (s->listener) {
-+    if (s->listener && s->state == TCP_CHARDEV_STATE_DISCONNECTED) {
-         /*
-          * It's possible that chardev context is changed in
-          * qemu_chr_be_update_read_handlers().  Reset it for QIO net
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 63b4d32..e372f77 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -1003,6 +1003,97 @@ static void char_socket_client_test(gconstpointer opaque)
-     g_free(optstr);
- }
- 
-+static void
-+count_closed_event(void *opaque, int event)
-+{
-+    int *count = opaque;
-+    if (event == CHR_EVENT_CLOSED) {
-+        (*count)++;
-+    }
-+}
-+
-+
-+static void char_socket_server_two_clients_test(gconstpointer opaque)
-+{
-+    SocketAddress *incoming_addr = (gpointer) opaque;
-+    Chardev *chr;
-+    CharBackend be = {0};
-+    QObject *qaddr;
-+    SocketAddress *addr;
-+    Visitor *v;
-+    char *optstr;
-+    QemuOpts *opts;
-+    QIOChannelSocket *ioc1, *ioc2;
-+    int closed = 0;
-+
-+    g_setenv("QTEST_SILENT_ERRORS", "1", 1);
-+    /*
-+     * We rely on addr containing "nowait", otherwise
-+     * qemu_chr_new() will block until a client connects. We
-+     * can't spawn our client thread though, because until
-+     * qemu_chr_new() returns we don't know what TCP port was
-+     * allocated by the OS
-+     */
-+    optstr = char_socket_addr_to_opt_str(incoming_addr,
-+                                         false,
-+                                         NULL,
-+                                         true);
-+    opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"),
-+                                   optstr, true);
-+    g_assert_nonnull(opts);
-+    chr = qemu_chr_new_from_opts(opts, NULL, &error_abort);
-+    qemu_opts_del(opts);
-+    g_assert_nonnull(chr);
-+    g_assert(!object_property_get_bool(OBJECT(chr), "connected", &error_abort));
-+
-+    qaddr = object_property_get_qobject(OBJECT(chr), "addr", &error_abort);
-+    g_assert_nonnull(qaddr);
-+
-+    v = qobject_input_visitor_new(qaddr);
-+    visit_type_SocketAddress(v, "addr", &addr, &error_abort);
-+    visit_free(v);
-+    qobject_unref(qaddr);
-+
-+    qemu_chr_fe_init(&be, chr, &error_abort);
-+
-+    qemu_chr_fe_set_handlers(&be, NULL, NULL, count_closed_event, NULL,
-+                             &closed, NULL, true);
-+
-+    ioc1 = qio_channel_socket_new();
-+    qio_channel_socket_connect_sync(ioc1, addr, &error_abort);
-+    qemu_chr_wait_connected(chr, &error_abort);
-+
-+    /* switch the chardev to another context */
-+    GMainContext *ctx = g_main_context_new();
-+    qemu_chr_fe_set_handlers(&be, NULL, NULL, count_closed_event, NULL,
-+                             &closed, ctx, true);
-+
-+    /* Start a second connection while the first is still connected.
-+     * It will be placed in the listen() backlog, and connect() will
-+     * succeed immediately.
-+     */
-+    ioc2 = qio_channel_socket_new();
-+    qio_channel_socket_connect_sync(ioc2, addr, &error_abort);
-+
-+    object_unref(OBJECT(ioc1));
-+    /* The two connections should now be processed serially.  */
-+    while (g_main_context_iteration(ctx, TRUE)) {
-+        if (closed == 1 && ioc2) {
-+            object_unref(OBJECT(ioc2));
-+            ioc2 = NULL;
-+        }
-+        if (closed == 2) {
-+            break;
-+        }
-+    }
-+
-+    qapi_free_SocketAddress(addr);
-+    object_unparent(OBJECT(chr));
-+    g_main_context_unref(ctx);
-+    g_free(optstr);
-+    g_unsetenv("QTEST_SILENT_ERRORS");
-+}
-+
- 
- #ifdef HAVE_CHARDEV_SERIAL
- static void char_serial_test(void)
-@@ -1312,7 +1403,9 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/char/socket/server/mainloop-fdpass/" # name, \
-                          &server3 ##name, char_socket_server_test);     \
-     g_test_add_data_func("/char/socket/server/wait-conn-fdpass/" # name, \
--                         &server4 ##name, char_socket_server_test)
-+                         &server4 ##name, char_socket_server_test);     \
-+    g_test_add_data_func("/char/socket/server/two-clients/" # name,     \
-+                         &tcpaddr, char_socket_server_two_clients_test)
- 
- #define SOCKET_CLIENT_TEST(name, addr)                                  \
-     CharSocketClientTestConfig client1 ## name =                        \
--- 
-1.8.3.1
+> ERROR: trailing statements should be on next line
+> #148: FILE: migration/ram.c:171:
+> +        if (ramblock_is_ignored(block)) {} else
+> 
+> total: 2 errors, 0 warnings, 386 lines checked
+> 
+> Patch 3/5 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 4/5 Checking commit fad48088a805 (tests/migration-test: Add a test for ignore-shared capability)
+> 5/5 Checking commit 5f9e90967e69 (migration: Add capabilities validation)
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20190215174548.2630-1-yury-kotov@yandex-team.ru/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
