@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34445)
+Received: from eggs.gnu.org ([209.51.188.92]:34978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gwWVx-0007Xs-Jc
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:22:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gwWXu-0000iN-23
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:24:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gwWVw-0008Pr-Uh
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:22:37 -0500
-References: <20190220174843.8847-1-kwolf@redhat.com>
-	<20190220174843.8847-6-kwolf@redhat.com>
-	<bf7d55dc-e914-ad14-d542-175255dd0d1b@redhat.com>
-	<20190220180724.GE6281@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <46a57a6b-d4d6-62d1-20aa-64c9b5b9f91e@redhat.com>
-Date: Wed, 20 Feb 2019 19:22:18 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gwWXt-0000wq-Bl
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:24:38 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:40904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gwWXr-0000sp-5o
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 13:24:37 -0500
+Received: by mail-pl1-x643.google.com with SMTP id bj4so12632114plb.7
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 10:24:27 -0800 (PST)
+References: <20190219125808.25174-1-peter.maydell@linaro.org>
+	<20190219125808.25174-7-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ad033d80-e4e9-718d-1e43-42827dbed99d@linaro.org>
+Date: Wed, 20 Feb 2019 10:24:23 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190220180724.GE6281@localhost.localdomain>
+In-Reply-To: <20190219125808.25174-7-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/13] io: Remove redundant
- read/write_coroutine assignments
+Subject: Re: [Qemu-devel] [PATCH 6/8] hw/arm/iotkit-sysctl: Add SSE-200
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 20/02/19 19:07, Kevin Wolf wrote:
-> Am 20.02.2019 um 19:01 hat Paolo Bonzini geschrieben:
->> aio_co_wake was also acquiring/releasing the AioContext, so
->> that needs to stay for now.
+On 2/19/19 4:58 AM, Peter Maydell wrote:
+> The SYSCTL block in the SSE-200 has some extra registers that
+> are not present in the IoTKit version. Add these registers
+> (as reads-as-written stubs), enabled by a new QOM property.
 > 
-> True. Maybe I should leave the aio_co_wake call alone() and just add the
-> assertion to avoid complicating the code rather than simplifying it...
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/misc/iotkit-sysctl.h |  20 +++
+>  hw/arm/armsse.c                 |   2 +
+>  hw/misc/iotkit-sysctl.c         | 245 +++++++++++++++++++++++++++++++-
+>  3 files changed, 262 insertions(+), 5 deletions(-)
 
-Yes, I agree.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Paolo
 
-ps: where is alone() defined? :)
-
-Paolo
+r~
