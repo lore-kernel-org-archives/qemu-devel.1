@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57467)
+Received: from eggs.gnu.org ([209.51.188.92]:57567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gwNt9-0005JQ-C7
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:10:00 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwNtW-0005fu-7A
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gwNt6-0006wX-05
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:09:57 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43271)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gwNt3-0006tR-Kh
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:09:54 -0500
-Received: by mail-wr1-x442.google.com with SMTP id d17so10632107wre.10
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 01:09:50 -0800 (PST)
-References: <155060310248.19547.14979269067689441201.stgit@gimli.home>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <f94524a1-8f11-f4df-19e7-8626ad34e98d@gmail.com>
-Date: Wed, 20 Feb 2019 11:10:22 +0200
-MIME-Version: 1.0
-In-Reply-To: <155060310248.19547.14979269067689441201.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwNtU-0007Gi-0g
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:10:22 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Wed, 20 Feb 2019 09:10:11 +0000
+Message-ID: <49abba98-bf53-be4e-e69a-3224bdad7d30@virtuozzo.com>
+References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<w51o97m8ltv.fsf@maestria.local.igalia.com>
+	<41e29129-196d-1b24-03ae-373b7d357725@virtuozzo.com>
+	<w51sgwuv2ok.fsf@maestria.local.igalia.com>
+	<6b3c82fb-b4a2-7802-1737-a34e22130114@virtuozzo.com>
+	<w51mun2uxts.fsf@maestria.local.igalia.com>
+	<1ea995a3-38d1-61b9-6868-f007172a2341@virtuozzo.com>
+	<w51mun18cjy.fsf@maestria.local.igalia.com>
+	<839d5491-0b20-7021-cee5-30fef7d34fc1@virtuozzo.com>
+	<0a42b9c6-9bc6-b826-b90e-226ab4c122e2@virtuozzo.com>
+In-Reply-To: <0a42b9c6-9bc6-b826-b90e-226ab4c122e2@virtuozzo.com>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] pci: Sanity test minimum downstream LNKSTA
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F0DC0A39DA6CD04D9ED72E347B794662@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC 1/1] Stream block job
+ involves copy-on-read filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +34,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: Jens Freimann <jfreimann@redhat.com>, mst@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-
-
-On 2/19/19 9:06 PM, Alex Williamson wrote:
-> The entire link status register for SR-IOV VFs is defined as RsvdZ,
-> reads simply return zero.  Usually this is nothing more than lspci
-> reporting inconsequentially broken values:
->
->      LnkSta: Speed unknown, Width x0, ...
->
-> However, now that we're using the downstream endpoint link status to
-> fill in the value at the parent downstream port, invalid values become
-> a problem.  In particular, the PCIe hotplug driver in Linux looks for
-> a valid negotiated link width and will fail to enumerate hot-added
-> downstream endpoints without non-zero value here, ex:
->
->      pciehp 0000:00:02.0:pcie004: Slot(0): Attention button pressed
->      pciehp 0000:00:02.0:pcie004: Slot(0) Powering on due to button press
->      pciehp 0000:00:02.0:pcie004: Slot(0): Card present
->      pciehp 0000:00:02.0:pcie004: Slot(0): Link Up
->      pciehp 0000:00:02.0:pcie004: link training error: status 0x2000
->      pciehp 0000:00:02.0:pcie004: Failed to check link status
->
-> Resolve by using minimum width and speed values for the downstream
-> port link status when the endpoint fails to provide valid values.
-> Long term, we may want to implement emulation in the vfio-pci host
-> driver to suppliment this field with the PF value as the SR-IOV spec
-> seems to allow, but the solution here is compatible should that be
-> implemented later.
->
-> Fixes: 727b48661f75 ("pci: Sync PCIe downstream port LNKSTA on read")
-> Reported-by: Jens Freimann <jfreimann@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->   hw/pci/pcie.c |   13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index 3f7c36609313..3618d6ab2e1a 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -834,9 +834,12 @@ void pcie_add_capability(PCIDevice *dev,
->   /*
->    * Sync the PCIe Link Status negotiated speed and width of a bridge with the
->    * downstream device.  If downstream device is not present, re-write with the
-> - * Link Capability fields.  Limit width and speed to bridge capabilities for
-> - * compatibility.  Use config_read to access the downstream device since it
-> - * could be an assigned device with volatile link information.
-> + * Link Capability fields.  If downstream device reports invalid width or
-> + * speed, replace with minimum values (LnkSta fields are RsvdZ on VFs but such
-> + * values interfere with PCIe native hotplug detecting new devices).  Limit
-> + * width and speed to bridge capabilities for compatibility.  Use config_read
-> + * to access the downstream device since it could be an assigned device with
-> + * volatile link information.
->    */
->   void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
->   {
-> @@ -856,11 +859,15 @@ void pcie_sync_bridge_lnk(PCIDevice *bridge_dev)
->           if ((lnksta & PCI_EXP_LNKSTA_NLW) > (lnkcap & PCI_EXP_LNKCAP_MLW)) {
->               lnksta &= ~PCI_EXP_LNKSTA_NLW;
->               lnksta |= lnkcap & PCI_EXP_LNKCAP_MLW;
-> +        } else if (!(lnksta & PCI_EXP_LNKSTA_NLW)) {
-> +            lnksta |= QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1);
->           }
->   
->           if ((lnksta & PCI_EXP_LNKSTA_CLS) > (lnkcap & PCI_EXP_LNKCAP_SLS)) {
->               lnksta &= ~PCI_EXP_LNKSTA_CLS;
->               lnksta |= lnkcap & PCI_EXP_LNKCAP_SLS;
-> +        } else if (!(lnksta & PCI_EXP_LNKSTA_CLS)) {
-> +            lnksta |= QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT);
->           }
->       }
->   
->
-
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-
-Thanks,
-Marcel
+DQoNCk9uIDE4LzAyLzIwMTkgMTM6MDgsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3Jv
+dGU6DQo+IDE0LjAyLjIwMTkgMTY6NDMsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4NCj4+
+DQo+PiBPbiAxMi8wMi8yMDE5IDE0OjM1LCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4+PiBPbiBN
+b24gMTEgRmViIDIwMTkgMDU6NTg6MDUgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IHdyb3RlOg0KPj4+Pj4+IFRoZSBwcm9ibGVtIGlzIGluIHRoZSBjb25jZXB0IG9mICJiYXNl
+IiBub2RlLiBUaGUgY29kZSB3cml0dGVuIGluDQo+Pj4+Pj4gbWFubmVyIHRoYXQgYmFzZSBpcyBu
+b3QgY2hhbmdlZCBkdXJpbmcgYmxvY2sgam9iLiBIb3dldmVyLCBqb2IgZG9uJ3QNCj4+Pj4+PiBv
+d24gYmFzZSBhbmQgdGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgaXQgd2lsbCBub3QgY2hhbmdl
+IGR1cmluZw0KPj4+Pj4+IHRoZSBqb2IuDQo+Pj4+Pg0KPj4+Pj4gQnV0IGlmIHRoYXQncyB0aGUg
+Y2FzZSB0aGVuIHdlIGhhdmUgYSBwcm9ibGVtIGFscmVhZHksIGJlY2F1c2UgJ2Jhc2UnDQo+Pj4+
+PiBpcyBhIG1lbWJlciBvZiBTdHJlYW1CbG9ja0pvYiBhbmQgaXMgdXNlZCBpbiB0aGUgZXhpc3Rp
+bmcNCj4+Pj4+IHN0cmVhbV9ydW4oKSBjb2RlLg0KPj4+Pg0KPj4+PiBJIHRoaW5rIGl0IHNob3Vs
+ZCBiZSBwb3NzaWJsZSB0byByZXByb2R1Y2UsIHVzaW5nIGJsb2NrLWNvbW1pdCAod2hpY2gNCj4+
+Pj4gYWxyZWFkeSBoYXMgZmlsdGVyKSB3aXRoIGJsb2NrLXN0cmVhbSBpbiBwYXJhbGxlbCwgd2Un
+bGwgdHJ5Lg0KPj4+DQo+Pj4gSXQncyBub3QgcG9zc2libGUgdG8gcnVuIGJsb2NrLXN0cmVhbSBh
+bmQgYmxvY2stY29tbWl0IGluIHBhcmFsbGVsIG9uDQo+Pj4gdGhlIHNhbWUgbm9kZXMuIFNlZSBp
+b3Rlc3QgMDMwIGZvciBhIGZldyBleGFtcGxlcy4NCj4+Pg0KPj4+IFNvIHVubGVzcyB0aGVyZSdz
+IGEgYnVnIGl0IHNob3VsZCBiZSBzYWZlLg0KPj4+DQo+Pj4+PiBTbyBpZiB0aGVyZSdzIGEgd2F5
+IHRvIG1ha2UgJ2Jhc2UnIGRpc2FwcGVhciBkdXJpbmcgdGhlIGpvYiAoaG93PykNCj4+Pj4+IHRo
+ZW4gd2UgY291bGQgcHJvdGVjdCBpdCB3aXRoIGJsb2NrX2pvYl9hZGRfYmRydigpLg0KPj4+Pg0K
+Pj4+PiBJJ20gbm90IHN1cmUgdGhpcyBpcyBjb3JyZWN0LiBXaGF0IGlzIHRoZSByZWFzb24gZm9y
+IHN0cmVhbSB0byBvd24NCj4+Pj4gYmFzZT8gSXQncyBub3QgcmVhbGx5IGludGVyZXN0ZWQgaW4g
+aXQuDQo+Pj4NCj4+PiBzdHJlYW0gZG9lcyBub3QgbmVlZCB0byB3cml0ZSBvciBtb2RpZnkgYmFz
+ZSwgYnV0IGl0IGRvZXMgbmVlZCB0byBrZWVwIGENCj4+PiByZWZlcmVuY2UgdG8gaXQgaW4gb3Jk
+ZXIgdG8gbm93IHdoZXJlIHRvIHN0b3AgY29weWluZyBkYXRhLg0KPj4+DQo+Pj4gQXMgSSBzYWlk
+IGVhcmxpZXIgYmFzZSBpcyBhIG1lbWJlciBvZiBTdHJlYW1CbG9ja0pvYiwgc28gaXQgc2hvdWxk
+IG5vdA0KPj4+IGRpc2FwcGVhciBkdXJpbmcgdGhlIGpvYi4NCj4+Pg0KPj4+IEJlcnRvDQo+Pj4N
+Cj4+DQo+PiBObyBkb3VidCB0aGF0IGEgcmVmZXJlbmNlIHRvIHRoZSBiYXNlIG5vZGUgaXMgbmVl
+ZGVkIGFzIGEgbGltaXQgZm9yIHRoZQ0KPj4gQ09SIHdvcmsuIFRoZSBiYXNlIGlzIHN0aWxsIGlu
+IHRoZSBnYW1lLiBBY3R1YWxseSwgd2UgZW5jb3VudGVyIGFuIGlzc3VlDQo+PiB3aGVuIEJsb2Nr
+RHJpdmVyU3RhdGUgb2YgdGhlIENPUi1maWx0ZXIgY29tZXMgaW50byBwbGF5IGluc3RlYWQgb2Yg
+dGhlDQo+PiBiYXNlLiBJdCBpcyBpbmhlcml0ZWQgZnJvbSBhIHBhcmFsbGVsIGpvYi4gQmFzZWQg
+b24gdGhlIGNhc2UNCj4+IHRlc3Rfc3RyZWFtX3BhcmFsbGVsIGZyb20gdGhlIHFlbXUtaW90ZXN0
+cy8wMzAsIGl0IHdvcmtzIGxpa2UgdGhpczoNCj4+IDEuIEpvYiMxIGlzIHN0YXJ0ZWQgYW5kIGlu
+c2VydHMgYSBDT1ItZmlsdGVyIGFib3ZlIHRoZSB0b3Agbm9kZS4NCj4+IDIuIENvbnRleHQgc3dp
+dGNoLg0KPj4gMy4gSm9iIzIgaXMgc3RhcnRlZCBhbmQgaW5oZXJpdHMgdGhlIENPUi1maWx0ZXIg
+YXMgdGhlIGJhc2UuDQo+PiA0LiBDb250ZXh0IHN3aXRjaC4NCj4+IDUuIEpvYiMxIGNvbWVzIHRv
+IHRoZSBlbmQgYW5kIHJlbW92ZXMgaXRzIENPUi1maWx0ZXIgcmVmZXJlbmNlZCBieQ0KPj4gICAg
+ICAgam9iIzIuDQo+PiA2LiBDb250ZXh0IHN3aXRjaC4NCj4+IDcuIEpvYiMyIGNvbWVzIHRvIHRo
+ZSBlbmQgYW5kIHVzZXMgdGhlIGRlbGV0ZWQgQ09SLWZpbHRlciBub2RlLg0KPj4gOC4gV2UgYXJl
+IGluIHRyb3VibGUuDQo+Pg0KPj4gT3IgYW5vdGhlciBzY2VuYXJpbzoNCj4+IDEtNC4gQXMgYWJv
+dmUNCj4+IDUuIEpvYiMyIGNvbWVzIHRvIHRoZSBlbmQgZmlyc3QgYW5kIGtlZXBzIHRoZSBDT1It
+ZmlsdGVyIGFzIHRoZQ0KPj4gICAgICAgYmFja2luZyBub2RlLg0KPj4gNi4gVGhlIGFzc2VydCgp
+IGZhaWxzIGFzIHRoZSByZWZlcmVuY2VkIENPUi1maWx0ZXIgd2FzIG5vdCBkZWxldGVkDQo+PiAg
+ICAgICBvbiBleGl0Lg0KPj4gNy4gVGhlIGdhbWUgaXMgb3ZlciB3aXRoIGEgcG9vciBzY29yZS4N
+Cj4+DQo+PiBJZiB3ZSBqdXN0IGtlZXAgdGhlIGludGVybWVkaWF0ZSBib3R0b20gbm9kZSBpbnN0
+ZWFkIG9mIHRoZSBiYXNlLCB3ZQ0KPj4gd2lsbCBoYXZlIGEgc2ltaWxhciBpc3N1ZS4gT24gdGhl
+IGpvYiBleGl0LCB3ZSBjaGFuZ2UgdGhlIGJhY2tpbmcgZmlsZS4NCj4+IElmIHdlIGNhbGwgdGhl
+IGJhY2tpbmdfYnMoYm90dG9tX25vZGVfYnMpLCB3ZSB3aWxsIGtlZXAgdGhlIENPUi1maWx0ZXIN
+Cj4+IG5vZGUgaW5zdGVhZCwgd2hlcmVhcyBpdCBoYXMgbm90IGJlZW4gcmVtb3ZlZCBqZXQgYnkg
+dGhlIHVuZmluaXNoZWQNCj4+IGpvYiMxIChzZWUgdGhlIHNlY29uZCBzY2VuYXJpbyBhYm92ZSku
+DQo+IA0KPiBIb25lc3RseSwgZG9uJ3Qgc2VlIGFueSBwcm9ibGVtIHdpdGggaXQuDQo+IA0KPj4N
+Cj4+IElmIHdlIGluY2x1ZGUgdGhlIGJhc2Ugbm9kZSBpbnRvIHRoZSBqb2Igbm9kZSBsaXN0IHdp
+dGggc29tZSBwcm90ZWN0aW5nDQo+PiBmbGFncywgdGhhdCdzIGJsb2NrX2pvYl9hZGRfYmRydigm
+cy0+Y29tbW9uLCAiYmFzZSIsIGJhc2UsIC4uKSwgd2UgY2FuDQo+PiBlbmQgdXAgd2l0aCBhIGZh
+aWx1cmUgb2YgdGhlIGJkcnZfY2hlY2tfdXBkYXRlX3Blcm0oKSBjYWxsZWQgYnkgdGhlDQo+PiBi
+ZHJ2X3Jvb3RfYXR0YWNoX2NoaWxkKCkgYmVjYXVzZSB0aGUgcHJldmlvdXMgam9iIzEgaGFzIHRo
+ZSByb290DQo+PiByZWZlcmVuY2UgdG8gdGhlIHNhbWUgbm9kZSB3aXRoIG90aGVyIHBlcm1pc3Np
+b25zLiBTbywgdGhlIG5leHQgam9iIHdpbGwNCj4+IGZhaWwgdG8gc3RhcnQgYW5kIHRoZSB0ZXN0
+IGNhc2VzIHdvbid0IHBhc3MuDQo+IA0KPiBZb3UgbWVhbiB0ZXN0IDMwICMgdGVzdGNhc2UgYWJv
+dXQgcGFyYWxsZWwgc3RyZWFtIGpvYnMsIHdoaWNoIHN0YXJ0cyBzdHJlYW1zLA0KPiBzaGFyaW5n
+IG9uZSBub2RlIGFzIGJhc2UgZm9yIG9uZSBhbmQgdG9wIGZvciBhbm90aGVyLiBBbmQgaWYgd2Ug
+bG9jayBiYXNlIGluDQo+IHN0cmVhbSBqb2IgdGhlIHRlc3QgZmFpbHMuIEkgdGhpbmssIHdlIGp1
+c3QgbmVlZCB0byB1cGRhdGUgdGhlIHRlc3QsIGJ5IGluc2VydGluZw0KPiBhZGRpdGlvbmFsIGVt
+cHR5IHFjb3cyIG5vZGVzIGJlbG93IHNoYXJlZCBvbmVzLCBhbmQgbWFrZSBuZXcgaW5zZXJ0ZWQg
+bm9kZXMNCj4gdG8gYmUgdG9wIG5vZGVzIG9mIHN0cmVhbSBqb2JzLCBzbyB0aGVyZSBubyBtb3Jl
+IG5vZGUtc2hhcmluZyBiZXR3ZWVuIGpvYnMuDQo+IA0KPj4NCj4+IEl0IHdlIHNldCB0aGUgZm9s
+bG93aW5nIGZsYWdzLCB0aGVyZSB3aWxsIGJlIG5vIGZhaWx1cmU6DQo+PiBibG9ja19qb2JfYWRk
+X2JkcnYoJnMtPmNvbW1vbiwgImJhc2UiLCBiYXNlLCAwLCBCTEtfUEVSTV9DT05TSVNURU5UX1JF
+QUQNCj4+IHwgQkxLX1BFUk1fV1JJVEVfVU5DSEFOR0VEIHwgQkxLX1BFUk1fR1JBUEhfTU9ELCAm
+ZXJyb3JfYWJvcnQpOw0KPj4gQnV0IHdoYXQgbWFyZ2luIHdpbGwgd2UgZ2Fpbj8gV2Ugd2lsbCBo
+YXZlIHRoZSBzYW1lIGlzc3VlcyBhcyBhYm92ZS4NCj4gDQo+IFdlIG1lZWQgZmxhZ3MgLi4uLCBC
+TEtfUEVSTV9HUkFQSF9NT0QsIEJMS19QRVJNX0FMTCAmIH5CTEtfUEVSTV9HUkFQSF9NT0QsIC4u
+Lg0KPiBmb3IgYmFzZSBub2RlLg0KPiANCj4+DQo+PiBJbiBtYW55IG90aGVyIGNhc2VzLCB3aGVu
+IHRoZSBmaWx0ZXIgaGFzIG5vdCBiZWVuIGlkZW50aWZpZWQsIHdlIGNhbg0KPj4gZ2V0IGEgYnJv
+a2VuIGNoYWluIHdoaWxlIGNhbGxpbmcgdG8gdGhlIGJhY2tpbmdfYnMoYnM9ZmlsdGVyKSBhcyB0
+aGUNCj4+IGJhY2tpbmcgbm9kZSBvZiB0aGUgZmlsdGVyIGlzIHRoZSB6ZXJvIHBvaW50ZXIuDQo+
+Pg0KPj4gVGhhdCdzIHdoeSBJIGltcGxlbWVudGVkIHRoZSBza2lwX2ZpbHRlcigpIGZ1bmN0aW9u
+IGluIHRoaXMgc2VyaWVzIGFzDQo+PiBhIHNvbWUgc29ydCBvZiBzb2x1dGlvbiBvciB3b3JrYXJv
+dW5kLiBNYXkgd2UgcHJvY2VlZCB3aXRoIHRoYXQ/DQo+PiBJcyB0aGVyZSBhbnkgYmV0dGVyIGlk
+ZWE/DQo+Pg0KPiANCj4gSSB0aGluayBub3csIHRoYXQgYmVzdCB3YXkgaXMgdG8gbG9jayBiYXNl
+IG5vZGUuIEFzIGl0IGlzIHRoZSBzaW1wbGVzdCBvbmUuIEFuZCBpdA0KPiBjb3JyZXNwb25kcyB0
+byBjdXJyZW50IGNvZGUsIHdoaWNoIGFjdHVhbGx5IGtlZXBzIGlsbGVnYWwgcG9pbnRlciB0byBi
+YXNlIG5vZGUsDQo+IHdpdGhvdXQgYW55IGFjY2VzcyByaWdodHMuDQo+IA0KPiANCg0KV2VsbCwg
+SSBhbSBhYm91dCB0byBpbXBsZW1lbnQgdGhlIG5leHQgc2VyaWVzIHZlcnNpb24gd2l0aCB0aGUg
+YmFzZQ0KQmxvY2tEcml2ZXJTdGF0ZSBpbmNsdWRlZCBpbnRvIHRoZSBqb2Igbm9kZSBsaXN0IGFu
+ZCB3aWxsIGluc2VydCBleHRyYQ0KaW1hZ2VzIGJldHdlZW4gdGhvc2Ugc2hhcmVkIGJ5IHRoZSBw
+YXJhbGxlbCBqb2JzIGluIHRoZSB0ZXN0IGNhc2UNClRlc3RQYXJhbGxlbE9wcyBvZiAjMDMwLg0K
+DQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
