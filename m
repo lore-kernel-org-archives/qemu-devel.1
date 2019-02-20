@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59474)
+Received: from eggs.gnu.org ([209.51.188.92]:59521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwO3j-00008X-6l
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1gwO3l-00009p-3b
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gwO3h-0006u5-B9
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52580)
+	(envelope-from <bounces@canonical.com>) id 1gwO3j-0006wS-Dx
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52630)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gwO3f-0006od-9H
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:51 -0500
+	id 1gwO3i-0006pD-BU
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:20:55 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gwO3Y-0004Dy-GB
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:44 +0000
+	id 1gwO3Z-0004Fn-Ld
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7887B2E80CC
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9F45E2E80C3
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 09:20:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Feb 2019 09:05:53 -0000
+Date: Wed, 20 Feb 2019 09:06:31 -0000
 From: flumm <dominik.csapak@gmail.com>
 Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
-Message-Id: <155065355393.1294.14079979570298520235.malone@gac.canonical.com>
+Message-Id: <155065359143.3692.16122210704822310266.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
  memory hotplug
@@ -39,21 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-i see,
-
-but is there a good reason why it did work with an older qemu version/machi=
-ne type (<=3D 2.6)
-also my cpuinfo says physical bits 39 but i cannot use more maxmem than 222G
-
-i attached the cpuinfo, cmdline, and debug logs for a nonworking invocation=
- and
-one for each working, with 222G, with machine type 2.6 and without a virtio=
--net respectively
-
-
-** Attachment added: "/proc/cpuinfo"
-   https://bugs.launchpad.net/qemu/+bug/1685242/+attachment/5240131/+files/=
-cpuinfo
+** Attachment added: "debug-nonworking.log"
+   https://bugs.launchpad.net/qemu/+bug/1685242/+attachment/5240134/+files/=
+debug-nonworking.log
 
 -- =
 
