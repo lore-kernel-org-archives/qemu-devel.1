@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35026)
+Received: from eggs.gnu.org ([209.51.188.92]:35036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaXW-0003wY-JQ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:31 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaXX-0003xd-GS
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwaXV-0008U0-GA
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:30 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwaXW-0008UW-Gs
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 17:40:31 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 20 Feb 2019 23:39:49 +0100
-Message-Id: <20190220224003.4420-4-eric.auger@redhat.com>
+Date: Wed, 20 Feb 2019 23:39:50 +0100
+Message-Id: <20190220224003.4420-5-eric.auger@redhat.com>
 In-Reply-To: <20190220224003.4420-1-eric.auger@redhat.com>
 References: <20190220224003.4420-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 03/17] hw/arm/virt: Split the memory map
- description
+Subject: [Qemu-devel] [PATCH v7 04/17] hw/boards: Add a MachineState
+ parameter to kvm_type callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,197 +25,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-In the prospect to introduce an extended memory map supporting more
-RAM, let's split the memory map array into two parts:
-
-- the former a15memmap contains regions below and including the RAM
-- extended_memmap, only initialized with entries located after the RAM.
-  Only the size of the region is initialized there since their base
-  address will be dynamically computed, depending on the top of the
-  RAM (initial RAM at the moment), with same alignment as their size.
-
-This new split will allow to grow the RAM size without changing the
-description of the high regions.
-
-The patch also moves the memory map setup into machvirt_init().
-The rationale is the memory map will be soon affected by the
-kvm_type() call that happens after virt_instance_init() and
-before machvirt_init().
-
-The memory map is unchanged (the top of the initial RAM still is
-256GiB). Then come the high IO regions with same layout as before.
+On ARM, the kvm_type will be resolved by querying the KVMState.
+Let's add the MachineState handle to the callback so that we
+can retrieve the  KVMState handle. in kvm_init, when the callback
+is called, the kvm_state variable is not yet set.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+[ppc parts]
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 ---
 v6 -> v7:
-- s/a15memmap/base_memmap
-- slight rewording of the commit message
-- add "if there is less than 256GiB of RAM then the floating area
-  starts at the 256GiB mark" in the comment associated to the floating
-  memory map
-- Added Peter's R-b
-
-v5 -> v6
-- removal of many macros in units.h
-- introduce the virt_set_memmap helper
-- new computation for offsets of high IO regions
-- add comments
+- add a comment for kvm_type
+- use machine instead of ms in the declaration
+- add Peter's R-b
 ---
- hw/arm/virt.c         | 48 +++++++++++++++++++++++++++++++++++++------
- include/hw/arm/virt.h | 14 +++++++++----
- 2 files changed, 52 insertions(+), 10 deletions(-)
+ accel/kvm/kvm-all.c   | 2 +-
+ hw/ppc/mac_newworld.c | 3 +--
+ hw/ppc/mac_oldworld.c | 2 +-
+ hw/ppc/spapr.c        | 2 +-
+ include/hw/boards.h   | 5 ++++-
+ 5 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a1955e7764..12039a0367 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -29,6 +29,7 @@
-  */
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index fd92b6f375..241db496c3 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1593,7 +1593,7 @@ static int kvm_init(MachineState *ms)
 =20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/arm/arm.h"
-@@ -121,7 +122,7 @@
-  * Note that devices should generally be placed at multiples of 0x10000,
-  * to accommodate guests using 64K pages.
-  */
--static const MemMapEntry a15memmap[] =3D {
-+static const MemMapEntry base_memmap[] =3D {
-     /* Space up to 0x8000000 is reserved for a boot ROM */
-     [VIRT_FLASH] =3D              {          0, 0x08000000 },
-     [VIRT_CPUPERIPHS] =3D         { 0x08000000, 0x00020000 },
-@@ -149,11 +150,21 @@ static const MemMapEntry a15memmap[] =3D {
-     [VIRT_PCIE_PIO] =3D           { 0x3eff0000, 0x00010000 },
-     [VIRT_PCIE_ECAM] =3D          { 0x3f000000, 0x01000000 },
-     [VIRT_MEM] =3D                { 0x40000000, RAMLIMIT_BYTES },
-+};
-+
-+/*
-+ * Highmem IO Regions: This memory map is floating, located after the RA=
-M.
-+ * Each IO region offset will be dynamically computed, depending on the
-+ * top of the RAM, so that its base get the same alignment as the size,
-+ * ie. a 512GiB region will be aligned on a 512GiB boundary. If there is
-+ * less than 256GiB of RAM, the floating area starts at the 256GiB mark.
-+ */
-+static MemMapEntry extended_memmap[] =3D {
-     /* Additional 64 MB redist region (can contain up to 512 redistribut=
-ors) */
--    [VIRT_HIGH_GIC_REDIST2] =3D   { 0x4000000000ULL, 0x4000000 },
--    [VIRT_HIGH_PCIE_ECAM] =3D     { 0x4010000000ULL, 0x10000000 },
--    /* Second PCIe window, 512GB wide at the 512GB boundary */
--    [VIRT_HIGH_PCIE_MMIO] =3D     { 0x8000000000ULL, 0x8000000000ULL },
-+    [VIRT_HIGH_GIC_REDIST2] =3D   { 0x0, 64 * MiB },
-+    [VIRT_HIGH_PCIE_ECAM] =3D     { 0x0, 256 * MiB },
-+    /* Second PCIe window */
-+    [VIRT_HIGH_PCIE_MMIO] =3D     { 0x0, 512 * GiB },
- };
+     kvm_type =3D qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
+     if (mc->kvm_type) {
+-        type =3D mc->kvm_type(kvm_type);
++        type =3D mc->kvm_type(ms, kvm_type);
+     } else if (kvm_type) {
+         ret =3D -EINVAL;
+         fprintf(stderr, "Invalid argument kvm-type=3D%s\n", kvm_type);
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 98461052ac..97e8817145 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -564,8 +564,7 @@ static char *core99_fw_dev_path(FWPathProvider *p, Bu=
+sState *bus,
 =20
- static const int a15irqmap[] =3D {
-@@ -1354,6 +1365,30 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineSt=
-ate *vms, int idx)
-     return arm_cpu_mp_affinity(idx, clustersz);
+     return NULL;
  }
-=20
-+static void virt_set_memmap(VirtMachineState *vms)
-+{
-+    hwaddr base;
-+    int i;
-+
-+    vms->memmap =3D extended_memmap;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(base_memmap); i++) {
-+        vms->memmap[i] =3D base_memmap[i];
-+    }
-+
-+    vms->high_io_base =3D 256 * GiB; /* Top of the legacy initial RAM re=
-gion */
-+    base =3D vms->high_io_base;
-+
-+    for (i =3D VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++=
-) {
-+        hwaddr size =3D extended_memmap[i].size;
-+
-+        base =3D ROUND_UP(base, size);
-+        vms->memmap[i].base =3D base;
-+        vms->memmap[i].size =3D size;
-+        base +=3D size;
-+    }
-+}
-+
- static void machvirt_init(MachineState *machine)
+-
+-static int core99_kvm_type(const char *arg)
++static int core99_kvm_type(MachineState *machine, const char *arg)
  {
-     VirtMachineState *vms =3D VIRT_MACHINE(machine);
-@@ -1368,6 +1403,8 @@ static void machvirt_init(MachineState *machine)
-     bool firmware_loaded =3D bios_name || drive_get(IF_PFLASH, 0, 0);
-     bool aarch64 =3D true;
-=20
-+    virt_set_memmap(vms);
-+
-     /* We can probe only here because during property set
-      * KVM is not available yet
-      */
-@@ -1843,7 +1880,6 @@ static void virt_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
-=20
--    vms->memmap =3D a15memmap;
-     vms->irqmap =3D a15irqmap;
+     /* Always force PR KVM */
+     return 2;
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 284431ddd6..cc1e463466 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -420,7 +420,7 @@ static char *heathrow_fw_dev_path(FWPathProvider *p, =
+BusState *bus,
+     return NULL;
  }
 =20
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index a27086d524..3dc7a6c5d5 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -64,7 +64,6 @@ enum {
-     VIRT_GIC_VCPU,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
--    VIRT_HIGH_GIC_REDIST2,
-     VIRT_SMMU,
-     VIRT_UART,
-     VIRT_MMIO,
-@@ -74,12 +73,18 @@ enum {
-     VIRT_PCIE_MMIO,
-     VIRT_PCIE_PIO,
-     VIRT_PCIE_ECAM,
--    VIRT_HIGH_PCIE_ECAM,
-     VIRT_PLATFORM_BUS,
--    VIRT_HIGH_PCIE_MMIO,
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_LOWMEMMAP_LAST,
-+};
-+
-+/* indices of IO regions located after the RAM */
-+enum {
-+    VIRT_HIGH_GIC_REDIST2 =3D  VIRT_LOWMEMMAP_LAST,
-+    VIRT_HIGH_PCIE_ECAM,
-+    VIRT_HIGH_PCIE_MMIO,
- };
+-static int heathrow_kvm_type(const char *arg)
++static int heathrow_kvm_type(MachineState *machine, const char *arg)
+ {
+     /* Always force PR KVM */
+     return 2;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index abf9ebce59..3d0811fa81 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2920,7 +2920,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+     }
+ }
 =20
- typedef enum VirtIOMMUType {
-@@ -116,7 +121,7 @@ typedef struct {
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
--    const MemMapEntry *memmap;
-+    MemMapEntry *memmap;
-     const int *irqmap;
-     int smp_cpus;
-     void *fdt;
-@@ -126,6 +131,7 @@ typedef struct {
-     uint32_t msi_phandle;
-     uint32_t iommu_phandle;
-     int psci_conduit;
-+    hwaddr high_io_base;
- } VirtMachineState;
+-static int spapr_kvm_type(const char *vm_type)
++static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+ {
+     if (!vm_type) {
+         return 0;
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 05f9f45c3d..ed2fec82d5 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -156,6 +156,9 @@ typedef struct {
+  *    should instead use "unimplemented-device" for all memory ranges wh=
+ere
+  *    the guest will attempt to probe for a device that QEMU doesn't
+  *    implement and a stub device is required.
++ * @kvm_type:
++ *    Return the type of KVM corresponding to the kvm-type string option=
+ or
++ *    computed based on other criteria such as the host kernel capabilit=
+ies.
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -171,7 +174,7 @@ struct MachineClass {
+     void (*init)(MachineState *state);
+     void (*reset)(void);
+     void (*hot_add_cpu)(const int64_t id, Error **errp);
+-    int (*kvm_type)(const char *arg);
++    int (*kvm_type)(MachineState *machine, const char *arg);
 =20
- #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+     BlockInterfaceType block_default_type;
+     int units_per_default_bus;
 --=20
 2.20.1
