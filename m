@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53338)
+Received: from eggs.gnu.org ([209.51.188.92]:55840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwNY1-00060G-Md
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 03:48:10 -0500
+	(envelope-from <groug@kaod.org>) id 1gwNlT-0002Fr-0g
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwNXv-0008N1-Q5
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 03:48:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37324)
+	(envelope-from <groug@kaod.org>) id 1gwNlP-0000Iu-7z
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:02:01 -0500
+Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:56445)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwNXv-0008Lb-EB
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 03:48:03 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 20 Feb 2019 09:47:52 +0100
-Message-Id: <20190220084753.9130-3-kraxel@redhat.com>
-In-Reply-To: <20190220084753.9130-1-kraxel@redhat.com>
-References: <20190220084753.9130-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] vfio/display: add xres + yres properties
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gwNlN-0000Az-8N
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 04:01:59 -0500
+Received: from player760.ha.ovh.net (unknown [10.109.160.40])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 3751E116C72
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 10:01:43 +0100 (CET)
+Date: Wed, 20 Feb 2019 10:01:23 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190220100123.462f8535@bahia.lan>
+In-Reply-To: <20190220032219.GE9345@umbus.fritz.box>
+References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<155059667853.1466090.16527852453054217565.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190220032219.GE9345@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/zIglDYUnYJhDVRRBcTS=rD9";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v5 05/17] spapr/drc: Drop
+ spapr_drc_attach() fdt argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-This allows configure the display resolution which the vgpu should use.
-The information will be passed to the guest using EDID, so the mdev
-driver must support the vfio edid region for this to work.
+--Sig_/zIglDYUnYJhDVRRBcTS=rD9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/vfio/pci.h     |  2 ++
- hw/vfio/display.c | 16 ++++++++++++++--
- hw/vfio/pci.c     |  2 ++
- 3 files changed, 18 insertions(+), 2 deletions(-)
+On Wed, 20 Feb 2019 14:22:19 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index b1ae4c0754..c11c3f1670 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -149,6 +149,8 @@ typedef struct VFIOPCIDevice {
- #define VFIO_FEATURE_ENABLE_IGD_OPREGION \
-                                 (1 << VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT)
-     OnOffAuto display;
-+    uint32_t display_xres;
-+    uint32_t display_yres;
-     int32_t bootindex;
-     uint32_t igd_gms;
-     OffAutoPCIBAR msix_relo;
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index ed2eb19ea3..7b9b604a64 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -46,8 +46,8 @@ static void vfio_display_edid_update(VFIOPCIDevice *vdev, bool enabled,
-     qemu_edid_info edid = {
-         .maxx  = dpy->edid_regs->max_xres,
-         .maxy  = dpy->edid_regs->max_yres,
--        .prefx = prefx,
--        .prefy = prefy,
-+        .prefx = prefx ?: vdev->display_xres,
-+        .prefy = prefy ?: vdev->display_yres,
-     };
- 
-     dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_DOWN;
-@@ -117,6 +117,10 @@ static void vfio_display_edid_init(VFIOPCIDevice *vdev)
-                                    VFIO_REGION_SUBTYPE_GFX_EDID,
-                                    &dpy->edid_info);
-     if (ret) {
-+        if (vdev->display_xres || vdev->display_yres) {
-+            warn_report("vfio: no edid support available, "
-+                        "xres and yres properties have no effect.");
-+        }
-         return;
-     }
- 
-@@ -128,6 +132,14 @@ static void vfio_display_edid_init(VFIOPCIDevice *vdev)
-     pread_field(fd, dpy->edid_info, dpy->edid_regs, max_yres);
-     dpy->edid_blob = g_malloc0(dpy->edid_regs->edid_max_size);
- 
-+    /* if xres + yres properties are unset use the maximum resolution */
-+    if (!vdev->display_xres) {
-+        vdev->display_xres = dpy->edid_regs->max_xres;
-+    }
-+    if (!vdev->display_yres) {
-+        vdev->display_yres = dpy->edid_regs->max_yres;
-+    }
-+
-     vfio_display_edid_update(vdev, true, 0, 0);
-     return;
- 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index dd12f36391..edb8394038 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3182,6 +3182,8 @@ static Property vfio_pci_dev_properties[] = {
-     DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
-     DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
-                             display, ON_OFF_AUTO_OFF),
-+    DEFINE_PROP_UINT32("xres", VFIOPCIDevice, display_xres, 0),
-+    DEFINE_PROP_UINT32("yres", VFIOPCIDevice, display_yres, 0),
-     DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
-                        intx.mmap_timeout, 1100),
-     DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
--- 
-2.9.3
+> On Tue, Feb 19, 2019 at 06:17:58PM +0100, Greg Kurz wrote:
+> > All DRC subtypes have been converted to generate the FDT fragment at
+> > configure connector time instead of attach time. The fdt and fdt_offset
+> > arguments of spapr_drc_attach() aren't needed anymore. Drop them and
+> > make the implementation of the dt_populate() method mandatory.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+>=20
+> I've applied the first 5 patches to ppc-for-4.0, but as a followup...
+>=20
+> [...]
+> > @@ -1113,8 +1104,6 @@ static void rtas_ibm_configure_connector(PowerPCC=
+PU *cpu,
+> > =20
+> >      drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> > =20
+> > -    g_assert(drc->fdt || drck->dt_populate);
+> > -
+> >      if (!drc->fdt) { =20
+>=20
+> ..you can now remove this conditional, since it will always be true.
+>=20
+
+Hmm... I'm afraid this is not true since configure-connector is supposed
+to be called several times according to PAPR. And this is exactly what
+the code does: first return the node name to the guest, then all properties
+and subnodes one at a time...
+
+--Sig_/zIglDYUnYJhDVRRBcTS=rD9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlxtF2MACgkQcdTV5YIv
+c9Z41g//V1BZdvduavmHdhc2CblXfn2hGYWoYhJlnylXitiOgOrDg5O4APxLpNAj
+KBzi+nkrJcUBFGjGzUBl/ZwfTXmJaZjz7SSSvkhFp3Rq6ENce/LC64wXoHBPVsIQ
+Jmdqer7cglRJUSs2R8MqQnYARB70592sInCqzuqYQSJb/bNXRrsEbMRGu/Kr4wdA
+EVGwzKteIhjdfsa8TekfM8FHH+isp9UiJwRE0QD8TGNwVdIHHjHD9UKNhTvsnblG
+g85kCDaP2NvIEf+hWmYAZVbpYzp+KZBHo/L7e3Zp9k7fKHcRK2mcyrdq/nWx0I4n
+xRD+mKluaABOBn6c6Shq7gwz+HUile96765TSbL6R6H5GwqFQzZ98qKhccUTXbfl
+IRXgBhdXM8Cr1UAt/JYrrxR32+92Gl3lKGCmDz8Q62X/XhN4TbloVxV0GQlgnwfb
+n+y5wqxKNtHnZKMjIDDIYE/IvjawtCrKEHVALaXAN1FUzmO7dSrgfVcf7c1H8nXI
+6WoaiDxfTTjcu0YqaRwjOfmQ+6jSO4FAGZ84lsoYU1NIarfeJcAKaakUg+ruXCj1
+3uR8j/ei1hik4DHKNnR4UOFfvL/j7W3nb9wGHcpmiqVhY/fohKrsziF/FugLYZ5E
+SN4xSkW6iVjSVgsnC4RQOhJ62ZXcG0jysIs6u5iTrsER/gCbYGY=
+=VgRM
+-----END PGP SIGNATURE-----
+
+--Sig_/zIglDYUnYJhDVRRBcTS=rD9--
