@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56649)
+Received: from eggs.gnu.org ([209.51.188.92]:57662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gwU26-00078r-Hq
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:43:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1gwU3p-0000Mh-Rx
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:45:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gwU22-0001h1-Ow
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:43:38 -0500
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:43208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gwU1u-0001ck-4m
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:43:29 -0500
-Received: from player759.ha.ovh.net (unknown [10.109.159.140])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 62F631191CA
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 16:43:18 +0100 (CET)
-Date: Wed, 20 Feb 2019 16:43:12 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190220164312.574d48d6@bahia.lan>
-In-Reply-To: <CAFEAcA9ZhMtkh+2CXYjsbYhj69iGgQzBwT2TFOriPgvDbOaPpw@mail.gmail.com>
-References: <20190218143049.17142-1-david@gibson.dropbear.id.au>
-	<CAFEAcA9ZhMtkh+2CXYjsbYhj69iGgQzBwT2TFOriPgvDbOaPpw@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gwU3i-0002dj-HB
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 10:45:24 -0500
+References: <1550652953-24393-1-git-send-email-like.xu@linux.intel.com>
+	<27254af5-b490-165f-8ca3-f60ab7642d72@redhat.com>
+	<b10cd713-1441-92fb-59e3-4b3162728070@linux.intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <30d93f35-8ee4-e6e5-69e6-237322ab816c@redhat.com>
+Date: Wed, 20 Feb 2019 07:45:31 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <b10cd713-1441-92fb-59e3-4b3162728070@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/43] ppc-for-4.0 queue 20190219
+Subject: Re: [Qemu-devel] [PATCH] doc: update .gitignore and fix typos for
+ docs in tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Like Xu <like.xu@linux.intel.com>, qemu-trivial@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On Tue, 19 Feb 2019 09:37:44 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On 2/19/19 11:39 PM, Like Xu wrote:
+> On 2019/2/20 11:09, Eric Blake wrote:
+>> On 2/20/19 2:55 AM, Like Xu wrote:
+>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>>
+>> This feels like two independent patches - the .gitignore change is
+>> different from typo fixes.
+>>
+>> Actually, for .gitignore, you could just as easily do:
+>>
+>> echo '*.patch' >> .git/info/exclude
+>>
+>> and fix it so you never commit patch files locally, while still leavin=
+g
+>> them visible through 'git status' to other users.=C2=A0 I actually lik=
+e
+>> knowing when I have stale patch files lying around, so that I can 'rm'
+>> them before creating my next patch batch and using 'git send-email
+>> *.patch' - but of course, I could just as easily add '!*.patch' to my
+>> .git/info/exclude to override the project default if we decide to go
+>> with your patch.
+>=20
+> Adding '*.patch' to .gitignore is consistent with LKML tree.
 
-> On Mon, 18 Feb 2019 at 14:30, David Gibson <david@gibson.dropbear.id.au> =
-wrote:
-> >
-> > The following changes since commit 1e36232994c8ad01774501d2e299deba3a24=
-69af:
-> >
-> >   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-201=
-90215' into staging (2019-02-15 11:12:14 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190219
-> >
-> > for you to fetch changes up to 73e14c6a9cdefb94c01ea488f04e7fba7ac0dc5b:
-> >
-> >   target/ppc: convert vmin* and vmax* to vector operations (2019-02-18 =
-11:00:44 +1100)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue 2019-02-19
-> >
-> > Here's the next batch of ppc and spapr patches.  Higlights are:
-> >
-> >  * A bunch of improvements to TCG handling of vector instructions from
-> >    Richard Henderson and Marc Cave-Ayland
-> >
-> >  * Cleanup to the XICS interrupt controller from Greg Kurz, removing
-> >    the special KVM subclasses which were a bad idea
-> >
-> >  * Some refinements to the XIVE interrupt controller from C=C3=A9dric Le
-> >    Goater
-> >
-> >  * Fix from Fabiano Rosas for a really dumb buffer overflow in the
-> >    device tree code for memory hotplug
-> >
-> >  * Code for allowing access to SPRs from the gdb stub from Fabiano
-> >    Rosas
-> >
-> >  * Assorted minor fixes and cleanups
-> > =20
->=20
-> Applied, thanks.
->=20
-> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-> for any user-visible changes.
->=20
-> ^^^ I notice the PowerPC section of the changelog is still pretty bare...
->=20
+Fair enough - but then make it a separate patch, and include that
+justification in your commit message.
 
-David,
-
-I have an account. I'll start updating the wiki according to what was
-actually merged up to this pull request.
-
-> -- PMM
->=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
