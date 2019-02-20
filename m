@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32789)
+Received: from eggs.gnu.org ([209.51.188.92]:40500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gwHiy-00057H-10
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:35:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gwI2B-0000wr-OA
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gwHiv-0002jo-Mb
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:35:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gwHiv-0002It-9b
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:35:01 -0500
-References: <1550118402-4057-1-git-send-email-wexu@redhat.com>
-	<1550118402-4057-10-git-send-email-wexu@redhat.com>
-	<1c16f234-af83-23c8-2194-94be63574299@redhat.com>
-	<20190219105155.GD15343@wei-ubt>
-	<b6469e59-0db7-5f6d-8b21-355ffdebb689@redhat.com>
-	<20190220015441.GB23868@wei-ubt>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9a9751aa-0cfc-151a-890c-ae70a9a37d64@redhat.com>
-Date: Wed, 20 Feb 2019 10:34:32 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1gwI26-0005tQ-Su
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 21:54:53 -0500
+Date: Wed, 20 Feb 2019 12:39:06 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190220013905.GD9345@umbus.fritz.box>
+References: <20190220010232.18731-1-philmd@redhat.com>
+	<20190220010232.18731-16-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190220015441.GB23868@wei-ubt>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 09/11] virtio-net: update the head
- descriptor in a chain lastly
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="a6YTfLRor63AaheO"
+Content-Disposition: inline
+In-Reply-To: <20190220010232.18731-16-philmd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 15/25] spapr-vty: Let vty_putchars() use
+ size_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,145 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <wexu@redhat.com>
-Cc: jfreiman@redhat.com, maxime.coquelin@redhat.com, qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-ppc@nongnu.org, Stefan Berger <stefanb@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-s390x@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
 
-On 2019/2/20 =E4=B8=8A=E5=8D=889:54, Wei Xu wrote:
-> On Tue, Feb 19, 2019 at 09:09:33PM +0800, Jason Wang wrote:
->> On 2019/2/19 =E4=B8=8B=E5=8D=886:51, Wei Xu wrote:
->>> On Tue, Feb 19, 2019 at 03:23:01PM +0800, Jason Wang wrote:
->>>> On 2019/2/14 =E4=B8=8B=E5=8D=8812:26, wexu@redhat.com wrote:
->>>>> From: Wei Xu <wexu@redhat.com>
->>>>>
->>>>> This is a helper for packed ring.
->>>>>
->>>>> To support packed ring, the head descriptor in a chain should be up=
-dated
->>>>> lastly since no 'avail_idx' like in packed ring to explicitly tell =
-the
->>>>> driver side that all payload is ready after having done the chain, =
-so
->>>>> the head is always visible immediately.
->>>>>
->>>>> This patch fills the header after done all the other ones.
->>>>>
->>>>> Signed-off-by: Wei Xu <wexu@redhat.com>
->>>> It's really odd to workaround API issue in the implementation of dev=
-ice.
->>>> Please introduce batched used updating helpers instead.
->>> Can you elaborate a bit more? I don't get it as well.
->>>
->>> The exact batch as vhost-net or dpdk pmd is not supported by userspac=
-e
->>> backend. The change here is to keep the header descriptor updated at
->>> last in case of a chaining descriptors and the helper might not help
->>> too much.
->>>
->>> Wei
->>
->> Of course we can add batching support why not?
-> It is always good to improve performance with anything, while probably
-> this could be done in another separate batch, also we need to bear
-> in mind that usually qemu userspace backend is not the first option for
-> performance oriented user.
+--a6YTfLRor63AaheO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Feb 20, 2019 at 02:02:22AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Both callers (h_put_term_char and rtas_display_character) use
+> an unsigned value.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-The point is to hide layout specific things from device emulation. If it=20
-helps for performance, it could be treated as a good byproduct.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
+> ---
+>  hw/char/spapr_vty.c        | 2 +-
+>  include/hw/ppc/spapr_vio.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
+> index 6748334ded..92b8c40410 100644
+> --- a/hw/char/spapr_vty.c
+> +++ b/hw/char/spapr_vty.c
+> @@ -83,7 +83,7 @@ static int vty_getchars(VIOsPAPRDevice *sdev, uint8_t *=
+buf, int max)
+>      return n;
+>  }
+> =20
+> -void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, int len)
+> +void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, size_t len)
+>  {
+>      VIOsPAPRVTYDevice *dev =3D VIO_SPAPR_VTY_DEVICE(sdev);
+> =20
+> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+> index e8b006d18f..ed79d2f380 100644
+> --- a/include/hw/ppc/spapr_vio.h
+> +++ b/include/hw/ppc/spapr_vio.h
+> @@ -126,7 +126,7 @@ static inline int spapr_vio_dma_set(VIOsPAPRDevice *d=
+ev, uint64_t taddr,
+>  int spapr_vio_send_crq(VIOsPAPRDevice *dev, uint8_t *crq);
+> =20
+>  VIOsPAPRDevice *vty_lookup(sPAPRMachineState *spapr, target_ulong reg);
+> -void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, int len);
+> +void vty_putchars(VIOsPAPRDevice *sdev, uint8_t *buf, size_t len);
+>  void spapr_vty_create(VIOsPAPRBus *bus, Chardev *chardev);
+>  void spapr_vlan_create(VIOsPAPRBus *bus, NICInfo *nd);
+>  void spapr_vscsi_create(VIOsPAPRBus *bus);
 
->
-> AFAICT, virtqueue_fill() is a generic API for all relevant userspace vi=
-rtio
-> devices that do not support batching , without touching virtqueue_fill(=
-),
-> supporting batching changes the meaning of the parameter 'idx' which sh=
-ould
-> be kept overall.
->
-> To fix it, I got two proposals so far:
-> 1). batching support(two APIs needed to keep compatibility)
-> 2). save a head elem for a vq instead of caching an array of elems like=
- vhost,
->      and introduce a new API(virtqueue_chain_fill()) functioning with a=
-n
->      additional parameter 'more' to the current virtqueue_fill() to ind=
-icate if
->      there are more descriptor(s) coming in a chain.
->
-> Either way it changes the API somehow and it does not seem to be clean =
-and clear
-> as wanted.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--a6YTfLRor63AaheO
+Content-Type: application/pgp-signature; name="signature.asc"
 
-It's as simple as accepting an array of elems in e.g=20
-virtqueue_fill_batched()?
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsr7cACgkQbDjKyiDZ
+s5I+TRAAoUYSiy2dnSWUa835NZsmTwIjbjhGgX+dyP2VcxD6eCzsxu3Ar+t+fsT9
+bGMvCegj+errJ2Z9yKpYdMkTzLOkRkHzTx1c5yRNU6f11EhKu6lpTXJh+M2PPgw9
+lezN1rbx88MfHcRtJDrvJRpWLCcEyw0n5z74Vln8p9yY2ZMipHLGvMmx7wlAIaG5
+IeH2hdSWqT0UV1QAlMTdcUNkr5tdGy7wjI4g3WzuzEnZDPW6qNHig60gC7gjnjM6
+Y+PIjrvjeZ2DPWuksWiSB8XGvpKf2rO4qSsoXQSNsZfNTl0IC8DtFaAmdXOp5kcy
+gSZfm9a9moDZNZKOp53tvQ216y0A1aNx/Y8Y1dzuR0cC93Db26d3k0rEytpjzpum
+ZXvTbU+ggLtgDb0iHUNisNUGnmyTZd1j0c1wkT9nBPXgD+nH1oIiWgW6RfnXB4hZ
+fzyy1S5JQYYvoVw+VC0BTskCBAQ5nRDUz+iGoaJz9uPFGQBXOZPEnQmjynoCGY+N
+c11l+vaiSJsVauKMiJCbvVAUNvXv9szG4665ocwdN+K+8YuIuIKZqE1LsfuyM0CO
+eEHyhVroXx9nOh8mZUbwWKiq1AhQ2kyxGk/vrEEtJyABaxdA8aAzd8JrEfsU+1I5
+Dfmu0IPkm6cKrHLUvkyYtnZ8HY8HnDJlyarzVQsa7fzxZ/OsZzc=
+=s4B1
+-----END PGP SIGNATURE-----
 
->
-> Any better idea?
->
->> Your code assumes the device know the virtio layout specific assumptio=
-n
->> whih breaks the layer. Device should not care about the actual layout.
->>
-> Good point, but anyway, change to virtio-net receiving code path is
-> unavoidable to support split and packed rings, and batching is like a n=
-ew
-> feature somehow.
-
-
-It's ok to change the code as a result of introducing of generic helper=20
-but it's bad to change to code for working around a bad API.
-
-Thanks
-
-
->
-> Wei
->  =20
->> Thanks
->>
->>
->>>> Thanks
->>>>
->>>>
->>>>> ---
->>>>>   hw/net/virtio-net.c | 11 ++++++++++-
->>>>>   1 file changed, 10 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>> index 3f319ef..330abea 100644
->>>>> --- a/hw/net/virtio-net.c
->>>>> +++ b/hw/net/virtio-net.c
->>>>> @@ -1251,6 +1251,8 @@ static ssize_t virtio_net_receive_rcu(NetClie=
-ntState *nc, const uint8_t *buf,
->>>>>       struct virtio_net_hdr_mrg_rxbuf mhdr;
->>>>>       unsigned mhdr_cnt =3D 0;
->>>>>       size_t offset, i, guest_offset;
->>>>> +    VirtQueueElement head;
->>>>> +    int head_len =3D 0;
->>>>>       if (!virtio_net_can_receive(nc)) {
->>>>>           return -1;
->>>>> @@ -1328,7 +1330,13 @@ static ssize_t virtio_net_receive_rcu(NetCli=
-entState *nc, const uint8_t *buf,
->>>>>           }
->>>>>           /* signal other side */
->>>>> -        virtqueue_fill(q->rx_vq, elem, total, i++);
->>>>> +        if (i =3D=3D 0) {
->>>>> +            head_len =3D total;
->>>>> +            head =3D *elem;
->>>>> +        } else {
->>>>> +            virtqueue_fill(q->rx_vq, elem, len, i);
->>>>> +        }
->>>>> +        i++;
->>>>>           g_free(elem);
->>>>>       }
->>>>> @@ -1339,6 +1347,7 @@ static ssize_t virtio_net_receive_rcu(NetClie=
-ntState *nc, const uint8_t *buf,
->>>>>                        &mhdr.num_buffers, sizeof mhdr.num_buffers);
->>>>>       }
->>>>> +    virtqueue_fill(q->rx_vq, &head, head_len, 0);
->>>>>       virtqueue_flush(q->rx_vq, i);
->>>>>       virtio_notify(vdev, q->rx_vq);
+--a6YTfLRor63AaheO--
