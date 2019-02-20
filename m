@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39684)
+Received: from eggs.gnu.org ([209.51.188.92]:39908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gwQeE-0006IO-A8
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:06:49 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1gwQfI-00078Q-Ei
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:07:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gwQeB-0001lL-Gh
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:06:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41652)
+	(envelope-from <arei.gonglei@huawei.com>) id 1gwQf8-0007C3-8Q
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:07:44 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2055 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gwQeB-0001T8-7b
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:06:43 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 20 Feb 2019 13:06:29 +0100
-Message-Id: <1550664389-2865-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH] hw/sd/sdhci: Move PCI-related code into a
- separate file
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1gwQf7-0004fl-AI
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 07:07:41 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 20 Feb 2019 12:07:10 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB25D3C1@dggeml511-mbx.china.huawei.com>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<20190219113212.GC2941@work-vm>	<20190220052838.GC16456@joy-OptiPlex-7040>
+	<20190220110142.GD2608@work-vm>
+	<33183CC9F5247A488A2544077AF19020DB25D30F@dggeml511-mbx.china.huawei.com>
+	<20190220124242.5a1685c5.cohuck@redhat.com>
+In-Reply-To: <20190220124242.5a1685c5.cohuck@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,335 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: yang.zhong@intel.com, pbonzini@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Zhao Yan <yan.y.zhao@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>
 
-Some machines have an SDHCI device, but no PCI. To be able to
-compile hw/sd/sdhci.c without CONFIG_PCI, we must not call functions
-like pci_get_address_space() and pci_allocate_irq() there. Thus
-move the PCI-related code into a separate file.
 
-This is required for the upcoming Kconfig-like build system, e.g. it
-is needed if a user wants to compile a QEMU binary with just one machine
-that has SDHCI, but no PCI, like the ARM "raspi" machines for example.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Note: Once we've got Kconfig in place, the "land" in the Makefile
- should be replaced with a proper new CONFIG_SDHCI_PCI switch instead
+> -----Original Message-----
+> From: Cornelia Huck [mailto:cohuck@redhat.com]
+> Sent: Wednesday, February 20, 2019 7:43 PM
+> To: Gonglei (Arei) <arei.gonglei@huawei.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>; Zhao Yan
+> <yan.y.zhao@intel.com>; cjia@nvidia.com; kvm@vger.kernel.org;
+> aik@ozlabs.ru; Zhengxiao.zx@alibaba-inc.com; shuangtai.tst@alibaba-inc.co=
+m;
+> qemu-devel@nongnu.org; kwankhede@nvidia.com; eauger@redhat.com;
+> yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
+> mlevitsk@redhat.com; pasic@linux.ibm.com; felipe@nutanix.com;
+> Ken.Xue@amd.com; kevin.tian@intel.com; alex.williamson@redhat.com;
+> intel-gvt-dev@lists.freedesktop.org; changpeng.liu@intel.com;
+> zhi.a.wang@intel.com; jonathan.davies@nutanix.com
+> Subject: Re: [PATCH 0/5] QEMU VFIO live migration
+>=20
+> On Wed, 20 Feb 2019 11:28:46 +0000
+> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
+>=20
+> > > -----Original Message-----
+> > > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> > > Sent: Wednesday, February 20, 2019 7:02 PM
+> > > To: Zhao Yan <yan.y.zhao@intel.com>
+> > > Cc: cjia@nvidia.com; kvm@vger.kernel.org; aik@ozlabs.ru;
+> > > Zhengxiao.zx@alibaba-inc.com; shuangtai.tst@alibaba-inc.com;
+> > > qemu-devel@nongnu.org; kwankhede@nvidia.com; eauger@redhat.com;
+> > > yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
+> > > mlevitsk@redhat.com; pasic@linux.ibm.com; Gonglei (Arei)
+> > > <arei.gonglei@huawei.com>; felipe@nutanix.com; Ken.Xue@amd.com;
+> > > kevin.tian@intel.com; alex.williamson@redhat.com;
+> > > intel-gvt-dev@lists.freedesktop.org; changpeng.liu@intel.com;
+> > > cohuck@redhat.com; zhi.a.wang@intel.com;
+> jonathan.davies@nutanix.com
+> > > Subject: Re: [PATCH 0/5] QEMU VFIO live migration
+> > >
+> > > * Zhao Yan (yan.y.zhao@intel.com) wrote:
+> > > > On Tue, Feb 19, 2019 at 11:32:13AM +0000, Dr. David Alan Gilbert wr=
+ote:
+> > > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > > > > > This patchset enables VFIO devices to have live migration capab=
+ility.
+> > > > > > Currently it does not support post-copy phase.
+> > > > > >
+> > > > > > It follows Alex's comments on last version of VFIO live migrati=
+on
+> patches,
+> > > > > > including device states, VFIO device state region layout, dirty=
+ bitmap's
+> > > > > > query.
+>=20
+> > > > >   b) How do we detect if we're migrating from/to the wrong device=
+ or
+> > > > > version of device?  Or say to a device with older firmware or per=
+haps
+> > > > > a device that has less device memory ?
+> > > > Actually it's still an open for VFIO migration. Need to think about
+> > > > whether it's better to check that in libvirt or qemu (like a device=
+ magic
+> > > > along with verion ?).
+> >
+> > We must keep the hardware generation is the same with one POD of public
+> cloud
+> > providers. But we still think about the live migration between from the=
+ the
+> lower
+> > generation of hardware migrated to the higher generation.
+>=20
+> Agreed, lower->higher is the one direction that might make sense to
+> support.
+>=20
+> But regardless of that, I think we need to make sure that incompatible
+> devices/versions fail directly instead of failing in a subtle, hard to
+> debug way. Might be useful to do some initial sanity checks in libvirt
+> as well.
+>=20
+> How easy is it to obtain that information in a form that can be
+> consumed by higher layers? Can we find out the device type at least?
+> What about some kind of revision?
 
- hw/sd/Makefile.objs    |  1 +
- hw/sd/sdhci-internal.h | 34 ++++++++++++++++++
- hw/sd/sdhci-pci.c      | 87 ++++++++++++++++++++++++++++++++++++++++++++
- hw/sd/sdhci.c          | 98 +++-----------------------------------------------
- 4 files changed, 127 insertions(+), 93 deletions(-)
- create mode 100644 hw/sd/sdhci-pci.c
+We can provide an interface to query if the VM support live migration or no=
+t
+in prepare phase of Libvirt.
 
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-index a99d9fb..58be7b3 100644
---- a/hw/sd/Makefile.objs
-+++ b/hw/sd/Makefile.objs
-@@ -2,6 +2,7 @@ common-obj-$(CONFIG_PL181) += pl181.o
- common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
- common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
- common-obj-$(CONFIG_SDHCI) += sdhci.o
-+common-obj-$(call land,$(CONFIG_SDHCI),$(CONFIG_PCI)) += sdhci-pci.o
- 
- obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
- obj-$(CONFIG_OMAP) += omap_mmc.o
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index 19665fd..3414140 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -304,4 +304,38 @@ extern const VMStateDescription sdhci_vmstate;
- 
- #define ESDHC_PRNSTS_SDSTB              (1 << 3)
- 
-+/*
-+ * Default SD/MMC host controller features information, which will be
-+ * presented in CAPABILITIES register of generic SD host controller at reset.
-+ *
-+ * support:
-+ * - 3.3v and 1.8v voltages
-+ * - SDMA/ADMA1/ADMA2
-+ * - high-speed
-+ * max host controller R/W buffers size: 512B
-+ * max clock frequency for SDclock: 52 MHz
-+ * timeout clock frequency: 52 MHz
-+ *
-+ * does not support:
-+ * - 3.0v voltage
-+ * - 64-bit system bus
-+ * - suspend/resume
-+ */
-+#define SDHC_CAPAB_REG_DEFAULT 0x057834b4
-+
-+#define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
-+    DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
-+    DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
-+    \
-+    /* Capabilities registers provide information on supported
-+     * features of this specific host controller implementation */ \
-+    DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
-+    DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
-+
-+void sdhci_initfn(SDHCIState *s);
-+void sdhci_uninitfn(SDHCIState *s);
-+void sdhci_common_realize(SDHCIState *s, Error **errp);
-+void sdhci_common_unrealize(SDHCIState *s, Error **errp);
-+void sdhci_common_class_init(ObjectClass *klass, void *data);
-+
- #endif
-diff --git a/hw/sd/sdhci-pci.c b/hw/sd/sdhci-pci.c
-new file mode 100644
-index 0000000..f884661
---- /dev/null
-+++ b/hw/sd/sdhci-pci.c
-@@ -0,0 +1,87 @@
-+/*
-+ * SDHCI device on PCI
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/sd/sdhci.h"
-+#include "sdhci-internal.h"
-+
-+static Property sdhci_pci_properties[] = {
-+    DEFINE_SDHCI_COMMON_PROPERTIES(SDHCIState),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
-+{
-+    SDHCIState *s = PCI_SDHCI(dev);
-+    Error *local_err = NULL;
-+
-+    sdhci_initfn(s);
-+    sdhci_common_realize(s, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    dev->config[PCI_CLASS_PROG] = 0x01; /* Standard Host supported DMA */
-+    dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
-+    s->irq = pci_allocate_irq(dev);
-+    s->dma_as = pci_get_address_space(dev);
-+    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->iomem);
-+}
-+
-+static void sdhci_pci_exit(PCIDevice *dev)
-+{
-+    SDHCIState *s = PCI_SDHCI(dev);
-+
-+    sdhci_common_unrealize(s, &error_abort);
-+    sdhci_uninitfn(s);
-+}
-+
-+static void sdhci_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = sdhci_pci_realize;
-+    k->exit = sdhci_pci_exit;
-+    k->vendor_id = PCI_VENDOR_ID_REDHAT;
-+    k->device_id = PCI_DEVICE_ID_REDHAT_SDHCI;
-+    k->class_id = PCI_CLASS_SYSTEM_SDHCI;
-+    dc->props = sdhci_pci_properties;
-+
-+    sdhci_common_class_init(klass, data);
-+}
-+
-+static const TypeInfo sdhci_pci_info = {
-+    .name = TYPE_PCI_SDHCI,
-+    .parent = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(SDHCIState),
-+    .class_init = sdhci_pci_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
-+
-+static void sdhci_pci_register_type(void)
-+{
-+    type_register_static(&sdhci_pci_info);
-+}
-+
-+type_init(sdhci_pci_register_type)
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 83f1574..17ad546 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -40,24 +40,6 @@
- 
- #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
- 
--/* Default SD/MMC host controller features information, which will be
-- * presented in CAPABILITIES register of generic SD host controller at reset.
-- *
-- * support:
-- * - 3.3v and 1.8v voltages
-- * - SDMA/ADMA1/ADMA2
-- * - high-speed
-- * max host controller R/W buffers size: 512B
-- * max clock frequency for SDclock: 52 MHz
-- * timeout clock frequency: 52 MHz
-- *
-- * does not support:
-- * - 3.0v voltage
-- * - 64-bit system bus
-- * - suspend/resume
-- */
--#define SDHC_CAPAB_REG_DEFAULT 0x057834b4
--
- static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
- {
-     return 1 << (9 + FIELD_EX32(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH));
-@@ -1328,16 +1310,7 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
- 
- /* --- qdev common --- */
- 
--#define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
--    DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
--    DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
--    \
--    /* Capabilities registers provide information on supported
--     * features of this specific host controller implementation */ \
--    DEFINE_PROP_UINT64("capareg", _state, capareg, SDHC_CAPAB_REG_DEFAULT), \
--    DEFINE_PROP_UINT64("maxcurr", _state, maxcurr, 0)
--
--static void sdhci_initfn(SDHCIState *s)
-+void sdhci_initfn(SDHCIState *s)
- {
-     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
-                         TYPE_SDHCI_BUS, DEVICE(s), "sd-bus");
-@@ -1348,7 +1321,7 @@ static void sdhci_initfn(SDHCIState *s)
-     s->io_ops = &sdhci_mmio_ops;
- }
- 
--static void sdhci_uninitfn(SDHCIState *s)
-+void sdhci_uninitfn(SDHCIState *s)
- {
-     timer_del(s->insert_timer);
-     timer_free(s->insert_timer);
-@@ -1359,7 +1332,7 @@ static void sdhci_uninitfn(SDHCIState *s)
-     s->fifo_buffer = NULL;
- }
- 
--static void sdhci_common_realize(SDHCIState *s, Error **errp)
-+void sdhci_common_realize(SDHCIState *s, Error **errp)
- {
-     Error *local_err = NULL;
- 
-@@ -1375,7 +1348,7 @@ static void sdhci_common_realize(SDHCIState *s, Error **errp)
-                           SDHC_REGISTERS_MAP_SIZE);
- }
- 
--static void sdhci_common_unrealize(SDHCIState *s, Error **errp)
-+void sdhci_common_unrealize(SDHCIState *s, Error **errp)
- {
-     /* This function is expected to be called only once for each class:
-      * - SysBus:    via DeviceClass->unrealize(),
-@@ -1445,7 +1418,7 @@ const VMStateDescription sdhci_vmstate = {
-     },
- };
- 
--static void sdhci_common_class_init(ObjectClass *klass, void *data)
-+void sdhci_common_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-@@ -1454,66 +1427,6 @@ static void sdhci_common_class_init(ObjectClass *klass, void *data)
-     dc->reset = sdhci_poweron_reset;
- }
- 
--/* --- qdev PCI --- */
--
--static Property sdhci_pci_properties[] = {
--    DEFINE_SDHCI_COMMON_PROPERTIES(SDHCIState),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
--{
--    SDHCIState *s = PCI_SDHCI(dev);
--    Error *local_err = NULL;
--
--    sdhci_initfn(s);
--    sdhci_common_realize(s, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    dev->config[PCI_CLASS_PROG] = 0x01; /* Standard Host supported DMA */
--    dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
--    s->irq = pci_allocate_irq(dev);
--    s->dma_as = pci_get_address_space(dev);
--    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->iomem);
--}
--
--static void sdhci_pci_exit(PCIDevice *dev)
--{
--    SDHCIState *s = PCI_SDHCI(dev);
--
--    sdhci_common_unrealize(s, &error_abort);
--    sdhci_uninitfn(s);
--}
--
--static void sdhci_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = sdhci_pci_realize;
--    k->exit = sdhci_pci_exit;
--    k->vendor_id = PCI_VENDOR_ID_REDHAT;
--    k->device_id = PCI_DEVICE_ID_REDHAT_SDHCI;
--    k->class_id = PCI_CLASS_SYSTEM_SDHCI;
--    dc->props = sdhci_pci_properties;
--
--    sdhci_common_class_init(klass, data);
--}
--
--static const TypeInfo sdhci_pci_info = {
--    .name = TYPE_PCI_SDHCI,
--    .parent = TYPE_PCI_DEVICE,
--    .instance_size = sizeof(SDHCIState),
--    .class_init = sdhci_pci_class_init,
--    .interfaces = (InterfaceInfo[]) {
--        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
--        { },
--    },
--};
--
- /* --- qdev SysBus --- */
- 
- static Property sdhci_sysbus_properties[] = {
-@@ -1846,7 +1759,6 @@ static const TypeInfo imx_usdhc_info = {
- 
- static void sdhci_register_types(void)
- {
--    type_register_static(&sdhci_pci_info);
-     type_register_static(&sdhci_sysbus_info);
-     type_register_static(&sdhci_bus_info);
-     type_register_static(&imx_usdhc_info);
--- 
-1.8.3.1
+Can we get the revision_id from the vendor driver ? before invoking
+
+register_savevm_live(NULL, TYPE_VFIO_PCI, -1,
+            revision_id,
+            &savevm_vfio_handlers,
+            vdev);
+
+then limit the live migration form higher gens to lower gens?
+
+Regards,
+-Gonglei
