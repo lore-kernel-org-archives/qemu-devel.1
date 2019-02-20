@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53821)
+Received: from eggs.gnu.org ([209.51.188.92]:53837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbF-0005NJ-82
-	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gwIbF-0005NV-QG
+	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gwIbD-0003Tj-UB
+	(envelope-from <dgibson@ozlabs.org>) id 1gwIbD-0003Tp-Vb
 	for qemu-devel@nongnu.org; Tue, 19 Feb 2019 22:31:09 -0500
-Date: Wed, 20 Feb 2019 14:27:21 +1100
+Date: Wed, 20 Feb 2019 14:24:49 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190220032721.GJ9345@umbus.fritz.box>
+Message-ID: <20190220032449.GG9345@umbus.fritz.box>
 References: <155059665292.1466090.8750653555749574947.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<155059670389.1466090.10015601248906623076.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<155059668867.1466090.6339199751719123386.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WTEzZvM72OaERIi0"
+	protocol="application/pgp-signature"; boundary="mXWEJCq0x1D2MX0F"
 Content-Disposition: inline
-In-Reply-To: <155059670389.1466090.10015601248906623076.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 10/17] spapr: create DR connectors for
- PHBs
+In-Reply-To: <155059668867.1466090.6339199751719123386.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 07/17] spapr: Expose the name of the
+ interrupt controller node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +29,199 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
 
---WTEzZvM72OaERIi0
-Content-Type: text/plain; charset=us-ascii
+--mXWEJCq0x1D2MX0F
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 19, 2019 at 06:18:23PM +0100, Greg Kurz wrote:
-> From: Michael Roth <mdroth@linux.vnet.ibm.com>
+On Tue, Feb 19, 2019 at 06:18:08PM +0100, Greg Kurz wrote:
+> This will be needed by PHB hotplug in order to access the "phandle"
+> property of the interrupt controller node.
 >=20
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
 > Signed-off-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 Applied, thanks.
 
 > ---
->  hw/ppc/spapr.c             |   13 +++++++++++++
->  hw/ppc/spapr_drc.c         |   17 +++++++++++++++++
->  include/hw/ppc/spapr.h     |    1 +
->  include/hw/ppc/spapr_drc.h |    8 ++++++++
->  4 files changed, 39 insertions(+)
+>  hw/intc/spapr_xive.c        |    9 ++++-----
+>  hw/intc/xics_spapr.c        |    2 +-
+>  hw/ppc/spapr_irq.c          |   21 ++++++++++++++++++++-
+>  include/hw/ppc/spapr_irq.h  |    1 +
+>  include/hw/ppc/spapr_xive.h |    3 +++
+>  include/hw/ppc/xics_spapr.h |    2 ++
+>  6 files changed, 31 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 9364d07364ac..96bea7580a3f 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2875,6 +2875,19 @@ static void spapr_machine_init(MachineState *machi=
-ne)
->      /* We always have at least the nvram device on VIO */
->      spapr_create_nvram(spapr);
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 290a290e43a5..06e3c9fdbfeb 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -317,6 +317,9 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
+r **errp)
+>      /* Map all regions */
+>      spapr_xive_map_mmio(xive);
 > =20
-> +    /*
-> +     * Setup hotplug / dynamic-reconfiguration connectors. top-level
-> +     * connectors (described in root DT node's "ibm,drc-types" property)
-> +     * are pre-initialized here. additional child connectors (such as
-> +     * connectors for a PHBs PCI slots) are added as needed during their
-> +     * parent's realization.
-> +     */
-> +    if (smc->dr_phb_enabled) {
-> +        for (i =3D 0; i < SPAPR_MAX_PHBS; i++) {
-> +            spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_PHB, =
-i);
-> +        }
-> +    }
+> +    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+> +                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
+SHIFT));
 > +
->      /* Set up PCI */
->      spapr_pci_rtas_init();
-> =20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 87ca7d973564..fd6380adb367 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -696,6 +696,15 @@ static void spapr_drc_lmb_class_init(ObjectClass *k,=
- void *data)
->      drck->dt_populate =3D spapr_lmb_dt_populate;
+>      qemu_register_reset(spapr_xive_reset, dev);
 >  }
 > =20
-> +static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
+> @@ -1448,7 +1451,6 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint32=
+_t nr_servers, void *fdt,
+>          cpu_to_be32(7),    /* start */
+>          cpu_to_be32(0xf8), /* count */
+>      };
+> -    gchar *nodename;
+> =20
+>      /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
+*/
+>      timas[0] =3D cpu_to_be64(xive->tm_base +
+> @@ -1458,10 +1460,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, uint3=
+2_t nr_servers, void *fdt,
+>                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
+>      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+> =20
+> -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_=
+SHIFT));
+> -    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
+> -    g_free(nodename);
+> +    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));
+> =20
+>      _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
+>      _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index e2d8b3818336..53bda6661b2a 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -254,7 +254,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t=
+ nr_servers, void *fdt,
+>      };
+>      int node;
+> =20
+> -    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
+> +    _FDT(node =3D fdt_add_subnode(fdt, 0, XICS_NODENAME));
+> =20
+>      _FDT(fdt_setprop_string(fdt, node, "device_type",
+>                              "PowerPC-External-Interrupt-Presentation"));
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 4297eed600f9..359761494c6e 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -230,6 +230,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *=
+spapr, Error **errp)
+>      /* TODO: create the KVM XICS device */
+>  }
+> =20
+> +static const char *spapr_irq_get_nodename_xics(sPAPRMachineState *spapr)
 > +{
-> +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
-> +
-> +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
-> +    drck->typename =3D "PHB";
-> +    drck->drc_name_prefix =3D "PHB ";
+> +    return XICS_NODENAME;
 > +}
 > +
->  static const TypeInfo spapr_dr_connector_info =3D {
->      .name          =3D TYPE_SPAPR_DR_CONNECTOR,
->      .parent        =3D TYPE_DEVICE,
-> @@ -739,6 +748,13 @@ static const TypeInfo spapr_drc_lmb_info =3D {
->      .class_init    =3D spapr_drc_lmb_class_init,
+>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+>  #define SPAPR_IRQ_XICS_NR_MSIS     \
+>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+> @@ -249,6 +254,7 @@ sPAPRIrq spapr_irq_xics =3D {
+>      .post_load   =3D spapr_irq_post_load_xics,
+>      .reset       =3D spapr_irq_reset_xics,
+>      .set_irq     =3D spapr_irq_set_irq_xics,
+> +    .get_nodename =3D spapr_irq_get_nodename_xics,
 >  };
 > =20
-> +static const TypeInfo spapr_drc_phb_info =3D {
-> +    .name          =3D TYPE_SPAPR_DRC_PHB,
-> +    .parent        =3D TYPE_SPAPR_DRC_LOGICAL,
-> +    .instance_size =3D sizeof(sPAPRDRConnector),
-> +    .class_init    =3D spapr_drc_phb_class_init,
-> +};
-> +
->  /* helper functions for external users */
+>  /*
+> @@ -384,6 +390,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int=
+ srcno, int val)
+>      xive_source_set_irq(&spapr->xive->source, srcno, val);
+>  }
 > =20
->  sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
-> @@ -1207,6 +1223,7 @@ static void spapr_drc_register_types(void)
->      type_register_static(&spapr_drc_cpu_info);
->      type_register_static(&spapr_drc_pci_info);
->      type_register_static(&spapr_drc_lmb_info);
-> +    type_register_static(&spapr_drc_phb_info);
-> =20
->      spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
->                          rtas_set_indicator);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 5e3c76072505..b173fd714904 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -104,6 +104,7 @@ struct sPAPRMachineClass {
-> =20
->      /*< public >*/
->      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
-s */
-> +    bool dr_phb_enabled;       /* enable dynamic-reconfig/hotplug of PHB=
-s */
->      bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
->      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
->      bool pre_2_10_has_unused_icps;
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index f32758ec8487..46b0f6216d83 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -71,6 +71,14 @@
->  #define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
->                                          TYPE_SPAPR_DRC_LMB)
-> =20
-> +#define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
-> +#define SPAPR_DRC_PHB_GET_CLASS(obj) \
-> +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_PHB)
-> +#define SPAPR_DRC_PHB_CLASS(klass) \
-> +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DRC_=
-PHB)
-> +#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
-> +                                        TYPE_SPAPR_DRC_PHB)
+> +static const char *spapr_irq_get_nodename_xive(sPAPRMachineState *spapr)
+> +{
+> +    return spapr->xive->nodename;
+> +}
 > +
 >  /*
->   * Various hotplug types managed by sPAPRDRConnector
->   *
+>   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+>   * with XICS.
+> @@ -407,6 +418,7 @@ sPAPRIrq spapr_irq_xive =3D {
+>      .post_load   =3D spapr_irq_post_load_xive,
+>      .reset       =3D spapr_irq_reset_xive,
+>      .set_irq     =3D spapr_irq_set_irq_xive,
+> +    .get_nodename =3D spapr_irq_get_nodename_xive,
+>  };
+> =20
+>  /*
+> @@ -541,6 +553,11 @@ static void spapr_irq_set_irq_dual(void *opaque, int=
+ srcno, int val)
+>      spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
+>  }
+> =20
+> +static const char *spapr_irq_get_nodename_dual(sPAPRMachineState *spapr)
+> +{
+> +    return spapr_irq_current(spapr)->get_nodename(spapr);
+> +}
+> +
+>  /*
+>   * Define values in sync with the XIVE and XICS backend
+>   */
+> @@ -561,7 +578,8 @@ sPAPRIrq spapr_irq_dual =3D {
+>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
+>      .post_load   =3D spapr_irq_post_load_dual,
+>      .reset       =3D spapr_irq_reset_dual,
+> -    .set_irq     =3D spapr_irq_set_irq_dual
+> +    .set_irq     =3D spapr_irq_set_irq_dual,
+> +    .get_nodename =3D spapr_irq_get_nodename_dual,
+>  };
+> =20
+>  /*
+> @@ -691,4 +709,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+>      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+>      .post_load   =3D spapr_irq_post_load_xics,
+>      .set_irq     =3D spapr_irq_set_irq_xics,
+> +    .get_nodename =3D spapr_irq_get_nodename_xics,
+>  };
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 488511c3d890..8bf1a7291966 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -47,6 +47,7 @@ typedef struct sPAPRIrq {
+>      int (*post_load)(sPAPRMachineState *spapr, int version_id);
+>      void (*reset)(sPAPRMachineState *spapr, Error **errp);
+>      void (*set_irq)(void *opaque, int srcno, int val);
+> +    const char *(*get_nodename)(sPAPRMachineState *spapr);
+>  } sPAPRIrq;
+> =20
+>  extern sPAPRIrq spapr_irq_xics;
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 9bec9192e4a0..2d31f24e3bfe 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -26,6 +26,9 @@ typedef struct sPAPRXive {
+>      XiveENDSource end_source;
+>      hwaddr        end_base;
+> =20
+> +    /* DT */
+> +    gchar *nodename;
+> +
+>      /* Routing table */
+>      XiveEAS       *eat;
+>      uint32_t      nr_irqs;
+> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> index b1ab27d022cf..b8d924baf437 100644
+> --- a/include/hw/ppc/xics_spapr.h
+> +++ b/include/hw/ppc/xics_spapr.h
+> @@ -29,6 +29,8 @@
+> =20
+>  #include "hw/ppc/spapr.h"
+> =20
+> +#define XICS_NODENAME "interrupt-controller"
+> +
+>  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+>                     uint32_t phandle);
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
 >=20
 
 --=20
@@ -161,24 +230,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---WTEzZvM72OaERIi0
+--mXWEJCq0x1D2MX0F
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsyRgACgkQbDjKyiDZ
-s5JsmA//YPm3cKXJnxRbaMbDkUBIfuoIrTuWh51XhE5PQcRgsWPr854R1Uirbuxz
-z5psd9IYSdOi0SAN7o9+idYfn9GDBD0PyDO1KFR0uJ6dd9s8hB8BVU/CxvKu9ry0
-CJFwcw5o7y0Uc+RnKkNMvwHI8p6YQ3nMJBhyzJ/ojwZ5k1FuywPOP82CQGzE3PZa
-t7R43BhBTeAf6i0I+jJjbzomBLH1j/7bLedctEsyfTsB/1vHUeF158jTEmBs9Baa
-McTtafKlL50/+kevpsIRVax29XHi7qFU/lCLp52yVBC8/GFLLcNPdB4NYulRYtC1
-yKgcJ4sWqvqnHbN/C2QwtEED+X4K335v/qbNW6gGc8Zw03ZobC91hOGtcCAOUy2n
-LhJw4LbdFn9yvdnBBEsKCr/UuC+mMBe6dd9wC/ys4l11u+EGJMy/eIqW/NH27n+a
-f6nU52juXKoUxhD8WfOuNxumop7TfreRDNxJemTyfcsr+HR9l/AsIbIRp9lBxHrC
-DuQqwKXm9rh1VETPMwbr68RqURPlBGlt33Gu3J4H61hbHtwGmWr+oFz78MdLMLus
-v+oqAsZXYE5tBLWawsrCIee5ZAFAkRgJzZy672+nvI2ei7jHy2+GLRFV7TmdWwl8
-9sErphO5kv08Pv7fhRm7sZUKGkzKBSlgXdWbX4wzmHyyg5eXQoI=
-=6rM2
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxsyIAACgkQbDjKyiDZ
+s5Lo+hAAvkj/AcPchAtlv/KRzenBZwoeL6HQexZyat6M48VuLmMWdACfzw4DKjX+
+gsx1REnBaBq+7poOyi3yGoT+hmn6rkclu3Fz/Ub6khogq0DrA/5jMDJyJSBACIfg
+MvEq4ZCGr2HMDQv7cj9WI3Dzl0Gyl7Nv/yy+jb+nVGPihE7gnKo0hdRwoVP+eTWm
+n0YcNoeEOMDAs4XZ5zZS/CcN8BxCzqGN+dZ+zK470gdhaAs0NPuEKJt6X5fZUXjh
+34rxnORJKVAplS/CJBR7Y6udns9OHRwVrZyU9QZhIpS2owNFZOpSSMdHuVurodtg
+dtw9karMznixeZIm+krAb529PmeeBcrZ0sEKipNjpZ72eiJ2lA0eROW5EjtOSvdb
+7Qpj+3/tmGGnhfBnjAjBCNVT/hSvZxwbW2rIQtU01/dIODSeX/03xShUTDRahnq6
+3p7gbQFKxH6MYYtBxXoF4b3MjbuJi0iboqXKVJEfXSA37SQwxTWuQlGrJhnJqfIT
+ibxJm2HYNGNC75zzr6HL4bH1AaFYVWibRYQ41BbAwJfU2L/at8MFoTKXb84LdT3M
+zP1OeQRvKhyiqQI3zy/BJUI4VKePRjLRF8o9AJXAdTzm2+gfPGdmt2ej7EvE9vwU
+MHn68T9WluqkdNowe1vD97Fht4Rg1oVyHgg1jeRmnFDZdDOJEnI=
+=LT9Y
 -----END PGP SIGNATURE-----
 
---WTEzZvM72OaERIi0--
+--mXWEJCq0x1D2MX0F--
