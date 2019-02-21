@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58241)
+Received: from eggs.gnu.org ([209.51.188.92]:59550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcU3-0005Bd-7h
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:45:04 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gwca3-0001Sr-P1
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:51:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcU2-0002dh-6l
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:45:03 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 21 Feb 2019 00:44:37 +0000
-Message-ID: <ff6208c5e487ad9f56f2a0d1a862ebc9ebe8fbb3.1550709660.git.alistair.francis@wdc.com>
-References: <cover.1550709660.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1550709660.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <balaton@eik.bme.hu>) id 1gwca1-0004io-Q9
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:51:15 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:39715)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gwcZz-0004Xm-SO
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:51:12 -0500
+Date: Thu, 21 Feb 2019 01:50:59 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1902202345230.9479@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.9999.1902210138340.95753@zero.eik.bme.hu>
+References: <20190211040434.1C98674569F@zero.eik.bme.hu>
+	<8962bd1d-267d-2edf-b5ce-9b67896a2b2e@redhat.com>
+	<alpine.BSF.2.21.9999.1902122354210.68636@zero.eik.bme.hu>
+	<CAFEAcA84=uU8XTy=4jXdM80XBnn3CS0gJxspakhZpdxWnvo_+A@mail.gmail.com>
+	<alpine.BSF.2.21.9999.1902202345230.9479@zero.eik.bme.hu>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 09/11] RISC-V: Convert trap debugging to
- trace events
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Michael Clark <mjc@sifive.com>
+On Thu, 21 Feb 2019, BALATON Zoltan wrote:
+> On Tue, 19 Feb 2019, Peter Maydell wrote:
+>> On Tue, 12 Feb 2019 at 23:59, BALATON Zoltan <balaton@eik.bme.hu> wrot=
+e:
+>>> On Tue, 12 Feb 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> I'd have use a pair of extract32/deposit32 but this is probably easi=
+er
 
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- Makefile.objs             |  1 +
- target/riscv/cpu_helper.c | 12 +++---------
- target/riscv/trace-events |  2 ++
- 3 files changed, 6 insertions(+), 9 deletions(-)
- create mode 100644 target/riscv/trace-events
+By the way, should these lines in include/qemu/bitops.h have 1ULL instead=
+ of 1UL?
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 5fb022d7ad..581bd97042 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -181,6 +181,7 @@ trace-events-subdirs +=3D target/arm
- trace-events-subdirs +=3D target/i386
- trace-events-subdirs +=3D target/mips
- trace-events-subdirs +=3D target/ppc
-+trace-events-subdirs +=3D target/riscv
- trace-events-subdirs +=3D target/s390x
- trace-events-subdirs +=3D target/sparc
- trace-events-subdirs +=3D ui
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index a02f4dad8c..6d3fbc3401 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -22,8 +22,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "tcg-op.h"
--
--#define RISCV_DEBUG_INTERRUPT 0
-+#include "trace.h"
-=20
- int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
- {
-@@ -493,13 +492,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-         }
-     }
-=20
--    if (RISCV_DEBUG_INTERRUPT) {
--        qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": %s %s, "
--            "epc 0x" TARGET_FMT_lx ": tval 0x" TARGET_FMT_lx "\n",
--            env->mhartid, async ? "intr" : "trap",
--            (async ? riscv_intr_names : riscv_excp_names)[cause],
--            env->pc, tval);
--    }
-+    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval, cause < 16=
- ?
-+        (async ? riscv_intr_names : riscv_excp_names)[cause] : "(unknown)"=
-);
-=20
-     if (env->priv <=3D PRV_S &&
-             cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
-diff --git a/target/riscv/trace-events b/target/riscv/trace-events
-new file mode 100644
-index 0000000000..48af0373df
---- /dev/null
-+++ b/target/riscv/trace-events
-@@ -0,0 +1,2 @@
-+# target/riscv/cpu_helper.c
-+riscv_trap(uint64_t hartid, bool async, uint64_t cause, uint64_t epc, uint=
-64_t tval, const char *desc) "hart:%"PRId64", async:%d, cause:%"PRId64", ep=
-c:0x%"PRIx64", tval:0x%"PRIx64", desc=3D%s"
---=20
-2.20.1
+22 #define BIT(nr)                 (1UL << (nr))
+23 #define BIT_MASK(nr)            (1UL << ((nr) % BITS_PER_LONG))
+
+Regards,
+BALATON Zoltan
