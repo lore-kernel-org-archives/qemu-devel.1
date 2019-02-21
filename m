@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53110)
+Received: from eggs.gnu.org ([209.51.188.92]:53229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gwpl9-0002iM-ET
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:55:36 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gwplc-000384-3P
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:56:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gwpl8-00071Z-5z
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:55:35 -0500
-Date: Thu, 21 Feb 2019 15:55:19 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190221155519.5f199561@redhat.com>
-In-Reply-To: <20190220031557.26293-2-richardw.yang@linux.intel.com>
-References: <20190220031557.26293-1-richardw.yang@linux.intel.com>
-	<20190220031557.26293-2-richardw.yang@linux.intel.com>
+	(envelope-from <eric.auger@redhat.com>) id 1gwplb-0007NW-4b
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:56:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46951)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gwplZ-0007FE-67
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:56:03 -0500
+References: <20190214190603.25030-1-peter.maydell@linaro.org>
+	<20190214190603.25030-12-peter.maydell@linaro.org>
+	<72c526bd-6c30-5e7a-4ff0-da8473348d0a@redhat.com>
+	<CAFEAcA9_shDqjpqF-k9mvR1N6DY7HmXMPiOpkSFcnGpyC3W7tQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <12a1fc59-da10-174b-6544-3af075da8057@redhat.com>
+Date: Thu, 21 Feb 2019 15:55:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA9_shDqjpqF-k9mvR1N6DY7HmXMPiOpkSFcnGpyC3W7tQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] CODING_STYLE: specify the indent
- rule for multiline code
+Subject: Re: [Qemu-devel] [PULL 11/27] arm: Allow system registers for KVM
+ guests to be changed by QEMU code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru, philmd@redhat.com, eblake@redhat.com, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 20 Feb 2019 11:15:56 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
-
-> We didn't specify the indent rule for multiline code here, which may
-> mislead users. And in current code, the code use different rules.
+Hi,
+On 2/21/19 3:26 PM, Peter Maydell wrote:
+> On Thu, 21 Feb 2019 at 14:20, Auger Eric <eric.auger@redhat.com> wrote:
+>> My qemu cmd line is:
+>>
+>> qemu-system-aarch64 -M virt,gic-version=3 -cpu host -smp 2 -m 4G
+>> -display none --enable-kvm -serial tcp:localhost:4444,server -qmp
+>> unix:/home/augere/TEST/QEMU/qmp-sock,server,nowait -device
+>> virtio-blk-pci,bus=pcie.0,scsi=off,drive=drv0,id=virtio-disk0,bootindex=1,werror=stop,rerror=stop
+>> -drive
+>> file=aarch64-vm0-rhel-alt-7.6.qcow2,format=qcow2,if=none,cache=writethrough,id=drv0
+>> -device virtio-net-pci,bus=pcie.0,netdev=nic0,mac=6a:f5:10:b1:3d:d2
+>> -netdev
+>> tap,id=nic0,script=/home/augere/TEST/SCRIPTS/qemu-ifup,downscript=/home/augere/TEST/SCRIPTS/qemu-ifdown
+>> -bios
+>> /home/augere/UPSTREAM/edk2/Build/ArmVirtQemu-AARCH64/DEBUG_GCC5/FV/QEMU_EFI.fd
+>> -net none -d guest_errors
 > 
-> Add this rule in CODING_STYLE to make sure this is clear to every one.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v3:
->    * misleading -> mislead
->    * add comma after arg2 in example
-> v2:
->    * rephrase changelog suggested by Eric Blake
->      - remove one redundant line
->      - fix some awkward grammar
->      - add { ; at the end of example
-> 
-> c1
-> ---
->  CODING_STYLE | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/CODING_STYLE b/CODING_STYLE
-> index ec075dedc4..1359f9ab81 100644
-> --- a/CODING_STYLE
-> +++ b/CODING_STYLE
-> @@ -29,6 +29,29 @@ Spaces of course are superior to tabs because:
->  
->  Do not leave whitespace dangling off the ends of lines.
->  
-> +1.1 Multiline Indent
-> +
-> +There are several places where indent is necessary:
-> +
-> + - struct definition
-> + - if/else
-> + - while/for
-> + - function definition & call
-> +
-> +When breaking up a long line to fit within line widths, align the secondary
-s/widths/width/
+> Does the bug still occur if you get rid of all the network/disk related
+> command line options here (hopefully it does, to reduce the size of
+> the test case) ? Can you provide the QEMU_EFI.fd ?
+I am using upstream EDK2 (https://github.com/tianocore/edk2) compiled in
+debug mode
 
-> +lines just after the opening parenthesis of the first.
-> +
-> +For example:
-> +
-> +    if (a == 1 &&
-> +        b == 2) {
-> +
-> +    while (a == 1 &&
-> +           b == 2) {
-> +
-> +    do_something(arg1, arg2,
-> +                 arg3);
-> +
+I can reproduce the bug with
 
-there is also another widely used acceptable pattern
-  func_name(arg1, arg2,
-      arg3)
+qemu-system-aarch64 -M virt,gic-version=3 -cpu host -smp 4 -m 4G
+-display none --enable-kvm -serial stdio \
+-device
+virtio-blk-pci,bus=pcie.0,scsi=off,drive=drv0,id=virtio-disk0,bootindex=1,werror=stop,rerror=stop
+\
+-drive
+file=/home/augere/VM/IMAGES/aarch64-vm0-rhel-alt-7.6.qcow2,format=qcow2,if=none,cache=writethrough,id=drv0
+\
+-bios
+/home/augere/UPSTREAM/edk2/Build/ArmVirtQemu-AARCH64/DEBUG_GCC5/FV/QEMU_EFI.fd
+\
+-net none -d guest_errors
 
-where we indent relative to function name start
-(sound weird to me but I'm not sure how to word it properly)
+also with virtio-blk-device
 
->  2. Line width
->  
->  Lines should be 80 characters; try not to make them longer.
+Thanks
+
+Eric
+> 
+> thanks
+> -- PMM
+> 
