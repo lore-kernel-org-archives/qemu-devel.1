@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55146)
+Received: from eggs.gnu.org ([209.51.188.92]:55147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwnl8-0004iW-TA
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwnl8-0004iZ-TK
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwnl5-00063U-1T
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwnl4-00062o-VH
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:26 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:37874 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:37875 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwnl3-00061E-6A
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:22 -0500
+	id 1gwnl3-00061G-3W
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:47:21 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 13:45:57 +0100
-Message-Id: <1550753160-15142-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 21 Feb 2019 13:45:58 +0100
+Message-Id: <1550753160-15142-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550753160-15142-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550753160-15142-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 5/8] target/mips: implement QMP
- query-cpu-definitions command
+Subject: [Qemu-devel] [PULL 6/8] hw/pci-host/bonito.c: Add PCI mem region
+ mapped at the correct address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +31,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-This patch enables QMP-based querying of the available CPU types for
-MIPS and MIPS64 platforms.
+Stop using system memory as PCI memory otherwise devices such as VGA
+that have regions mapped to PCI memory clash with RAM. Use a separate
+memory region for PCI memory and map it to the correct address in
+system memory which allows PCI mem regions to show at the correct
+address where clients expect them.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/target.json     |  4 ++--
- target/mips/helper.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ hw/pci-host/bonito.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/target.json b/qapi/target.json
-index da7b4be..1d4d54b 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -499,7 +499,7 @@
-             'static': 'bool',
-             '*unavailable-features': [ 'str' ],
-             'typename': 'str' },
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 9f33582..dde4437 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -217,6 +217,7 @@ struct BonitoState {
+     PCIHostState parent_obj;
+     qemu_irq *pic;
+     PCIBonitoState *pci_dev;
++    MemoryRegion pci_mem;
+ };
 =20
- ##
- # @query-cpu-definitions:
-@@ -511,4 +511,4 @@
- # Since: 1.2.0
- ##
- { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 944f094..c44cdca 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -24,6 +24,7 @@
- #include "exec/cpu_ldst.h"
- #include "exec/log.h"
- #include "hw/mips/cpudevs.h"
-+#include "qapi/qapi-commands-target.h"
+ #define TYPE_BONITO_PCI_HOST_BRIDGE "Bonito-pcihost"
+@@ -598,11 +599,15 @@ static const VMStateDescription vmstate_bonito =3D =
+{
+ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
++    BonitoState *bs =3D BONITO_PCI_HOST_BRIDGE(dev);
 =20
- enum {
-     TLBRET_XI =3D -6,
-@@ -1470,3 +1471,35 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSS=
-tate *env,
-=20
-     cpu_loop_exit_restore(cs, pc);
++    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCIL=
+O_SIZE);
+     phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
+                                      pci_bonito_set_irq, pci_bonito_map_=
+irq,
+-                                     dev, get_system_memory(), get_syste=
+m_io(),
++                                     dev, &bs->pci_mem, get_system_io(),
+                                      0x28, 32, TYPE_PCI_BUS);
++    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
++                                &bs->pci_mem);
  }
-+
-+static void mips_cpu_add_definition(gpointer data, gpointer user_data)
-+{
-+    ObjectClass *oc =3D data;
-+    CpuDefinitionInfoList **cpu_list =3D user_data;
-+    CpuDefinitionInfoList *entry;
-+    CpuDefinitionInfo *info;
-+    const char *typename;
-+
-+    typename =3D object_class_get_name(oc);
-+    info =3D g_malloc0(sizeof(*info));
-+    info->name =3D g_strndup(typename,
-+                           strlen(typename) - strlen("-" TYPE_MIPS_CPU))=
-;
-+    info->q_typename =3D g_strdup(typename);
-+
-+    entry =3D g_malloc0(sizeof(*entry));
-+    entry->value =3D info;
-+    entry->next =3D *cpu_list;
-+    *cpu_list =3D entry;
-+}
-+
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
-+{
-+    CpuDefinitionInfoList *cpu_list =3D NULL;
-+    GSList *list;
-+
-+    list =3D object_class_get_list(TYPE_MIPS_CPU, false);
-+    g_slist_foreach(list, mips_cpu_add_definition, &cpu_list);
-+    g_slist_free(list);
-+
-+    return cpu_list;
-+}
+=20
+ static void bonito_realize(PCIDevice *dev, Error **errp)
 --=20
 2.7.4
