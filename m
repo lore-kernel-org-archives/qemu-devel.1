@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46315)
+Received: from eggs.gnu.org ([209.51.188.92]:47636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gwdQ1-0003yy-AK
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:44:58 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gwdXz-000679-Oa
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:53:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gwdQ0-0006Vq-BF
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:44:57 -0500
-Received: from mga17.intel.com ([192.55.52.151]:21484)
+	(envelope-from <yan.y.zhao@intel.com>) id 1gwdXy-0002Ca-9i
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:53:11 -0500
+Received: from mga14.intel.com ([192.55.52.115]:46745)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gwdPz-0006RE-U2
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:44:56 -0500
-Message-ID: <5C6E03B6.30309@intel.com>
-Date: Thu, 21 Feb 2019 09:49:42 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1gwdXx-0002AJ-Ts
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:53:10 -0500
+Date: Wed, 20 Feb 2019 20:47:45 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20190221014744.GJ16456@joy-OptiPlex-7040>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<1550566334-3602-1-git-send-email-yan.y.zhao@intel.com>
+	<20190219140918.476ac9d1.cohuck@redhat.com>
+	<20190220073636.GD16456@joy-OptiPlex-7040>
+	<20190220180813.17e6ab86.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
-	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
-	<20181214111705.GD2454@work-vm>
-	<286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
-	<20190220131224.GF2608@work-vm>
-In-Reply-To: <20190220131224.GF2608@work-vm>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190220180813.17e6ab86.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] vfio/migration: define kernel
+ interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +32,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com, dgilbert@redhat.com, alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com, zhi.a.wang@intel.com, jonathan.davies@nutanix.com
 
-On 02/20/2019 09:12 PM, Dr. David Alan Gilbert wrote:
-> * Wang, Wei W (wei.w.wang@intel.com) wrote:
->> On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
->>>> On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
->>>>> * Wei Wang (wei.w.wang@intel.com) wrote:
->>>>>> On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
->>>>>>> * Wei Wang (wei.w.wang@intel.com) wrote:
->>>>>>>> The new feature enables the virtio-balloon device to receive
->>>>>>>> hints of guest free pages from the free page vq.
->>>>>>>>
->>>>>>>> A notifier is registered to the migration precopy notifier
->>>>>>>> chain. The notifier calls free_page_start after the migration
->>>>>>>> thread syncs the dirty bitmap, so that the free page
->>>>>>>> optimization starts to clear bits of free pages from the
->>>>>>>> bitmap. It calls the free_page_stop before the migration
->>>>>>>> thread syncs the bitmap, which is the end of the current round
->>>>>>>> of ram save. The free_page_stop is also called to stop the
->>> optimization in the case when there is an error occurred in the process of
->>> ram saving.
->>>>>>>> Note: balloon will report pages which were free at the time of this
->>> call.
->>>>>>>> As the reporting happens asynchronously, dirty bit logging
->>>>>>>> must be enabled before this free_page_start call is made.
->>>>>>>> Guest reporting must be disabled before the migration dirty bitmap
->>> is synchronized.
->>>>>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>>>>>>> CC: Michael S. Tsirkin <mst@redhat.com>
->>>>>>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>>>>>> CC: Juan Quintela <quintela@redhat.com>
->>>>>>>> CC: Peter Xu <peterx@redhat.com>
->>>>>>> I think I'm OK for this from the migration side, I'd appreciate
->>>>>>> someone checking the virtio and aio bits.
->>>>>>>
->>>>>>> I'm not too sure how it gets switched on and off - i.e. if we
->>>>>>> get a nice new qemu on a new kernel, what happens when I try and
->>>>>>> migrate to the same qemu on an older kernel without these hints?
->>>>>>>
->>>>>> This feature doesn't rely on the host kernel. Those hints are
->>>>>> reported from the guest kernel.
->>>>>> So migration across different hosts wouldn't affect the use of this
->>> feature.
->>>>>> Please correct me if I didn't get your point.
->>>>> Ah OK, yes;  now what about migrating from new->old qemu with a new
->>>>> guest but old machine type?
->>>>>
->>>> I think normally, the source QEMU and destination QEMU should have the
->>>> same QEMU booting parameter. If the destination QEMU doesn't support
->>>> "--device virtio-balloon,free-page-hint=true", which the source QEMU
->>>> has, the destination side QEMU will fail to boot, and migration will
->>>> not happen then.
->>> Ah that's OK; as long as free-page-hint is false by default that will work fine.
->>>
->>> Dave
->>>
->> Hi Dave,
->>
->> Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
-> I think so; can you remind me where we're up to:
->    a) It looks like you've already got the kernel changes merged -
-> correct?
-
-Yes, they were already merged half year ago.
-
->    b) What about the virtio spec changes - where are they upto?
-
-The spec changes are in progress. v1 were posted out, a v2 is in 
-preparation.
-
->    c) Where are the other reviews upto - I think most are reviewed - is
-> it just 7/7 that is missing the review-by?
-7/7 is about the virtio changes, and Michael has given the reviewed-by:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg03732.html
+On Wed, Feb 20, 2019 at 06:08:13PM +0100, Cornelia Huck wrote:
+> On Wed, 20 Feb 2019 02:36:36 -0500
+> Zhao Yan <yan.y.zhao@intel.com> wrote:
+> 
+> > On Tue, Feb 19, 2019 at 02:09:18PM +0100, Cornelia Huck wrote:
+> > > On Tue, 19 Feb 2019 16:52:14 +0800
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> (...)
+> > > > + *          Size of device config data is smaller than or equal to that of
+> > > > + *          device config region.  
+> > > 
+> > > Not sure if I understand that sentence correctly... but what if a
+> > > device has more config state than fits into this region? Is that
+> > > supposed to be covered by the device memory region? Or is this assumed
+> > > to be something so exotic that we don't need to plan for it?
+> > >   
+> > Device config data and device config region are all provided by vendor
+> > driver, so vendor driver is always able to create a large enough device
+> > config region to hold device config data.
+> > So, if a device has data that are better to be saved after device stop and
+> > saved/loaded in strict order, the data needs to be in device config region.
+> > This kind of data is supposed to be small.
+> > If the device data can be saved/loaded several times, it can also be put
+> > into device memory region.
+> 
+> So, it is the vendor driver's decision which device information should
+> go via which region? With the device config data supposed to be
+> saved/loaded in one go?
+Right, exactly.
 
 
-Best,
-Wei
+> (...)
+> > > > +/* version number of the device state interface */
+> > > > +#define VFIO_DEVICE_STATE_INTERFACE_VERSION 1  
+> > > 
+> > > Hm. Is this supposed to be backwards-compatible, should we need to bump
+> > > this?
+> > >  
+> > currently no backwords-compatible. we can discuss on that.
+> 
+> It might be useful if we discover that we need some extensions. But I'm
+> not sure how much work it would be.
+> 
+> (...)
+> > > > +/*
+> > > > + * DEVICE STATES
+> > > > + *
+> > > > + * Four states are defined for a VFIO device:
+> > > > + * RUNNING, RUNNING & LOGGING, STOP & LOGGING, STOP.
+> > > > + * They can be set by writing to device_state field of
+> > > > + * vfio_device_state_ctl region.  
+> > > 
+> > > Who controls this? Userspace?  
+> > 
+> > Yes. Userspace notifies vendor driver to do the state switching.
+> 
+> Might be good to mention this (just to make it obvious).
+>
+Got it. thanks
+
+> > > > + * LOGGING state is a special state that it CANNOT exist
+> > > > + * independently.  
+> > > 
+> > > So it's not a state, but rather a modifier?
+> > >   
+> > yes. or thinking LOGGING/not LOGGING as bit 1 of a device state,
+> > whereas RUNNING/STOPPED is bit 0 of a device state.
+> > They have to be got as a whole.
+> 
+> So it is (on a bit level):
+> RUNNING -> 00
+> STOPPED -> 01
+> LOGGING/RUNNING -> 10
+> LOGGING/STOPPED -> 11
+> 
+
+Yes.
+
+> > > > + * It must be set alongside with state RUNNING or STOP, i.e,
+> > > > + * RUNNING & LOGGING, STOP & LOGGING.
+> > > > + * It is used for dirty data logging both for device memory
+> > > > + * and system memory.
+> > > > + *
+> > > > + * LOGGING only impacts device/system memory. In LOGGING state, get buffer
+> > > > + * of device memory returns dirty pages since last call; outside LOGGING
+> > > > + * state, get buffer of device memory returns whole snapshot of device
+> > > > + * memory. system memory's dirty page is only available in LOGGING state.
+> > > > + *
+> > > > + * Device config should be always accessible and return whole config snapshot
+> > > > + * regardless of LOGGING state.
+> > > > + * */
+> > > > +#define VFIO_DEVICE_STATE_RUNNING 0
+> > > > +#define VFIO_DEVICE_STATE_STOP 1
+> > > > +#define VFIO_DEVICE_STATE_LOGGING 2
+> 
+> This makes it look a bit like LOGGING were an individual state, while 2
+> is in reality LOGGING/RUNNING... not sure how to make that more
+> obvious. Maybe (as we are dealing with a u32):
+> 
+> #define VFIO_DEVICE_STATE_RUNNING 0x00000000
+> #define VFIO_DEVICE_STATE_STOPPED 0x00000001
+> #define VFIO_DEVICE_STATE_LOGGING_RUNNING 0x00000002
+> #define VFIO_DEVICE_STATE_LOGGING_STOPPED 0x00000003
+> #define VFIO_DEVICE_STATE_LOGGING_MASK 0x00000002
+>
+Yes, yours are better, thanks:)
+
+> > > > +
+> > > > +/* action to get data from device memory or device config
+> > > > + * the action is write to device state's control region, and data is read
+> > > > + * from device memory region or device config region.
+> > > > + * Each time before read device memory region or device config region,
+> > > > + * action VFIO_DEVICE_DATA_ACTION_GET_BUFFER is required to write to action
+> > > > + * field in control region. That is because device memory and devie config
+> > > > + * region is mmaped into user space. vendor driver has to be notified of
+> > > > + * the the GET_BUFFER action in advance.
+> > > > + */
+> > > > +#define VFIO_DEVICE_DATA_ACTION_GET_BUFFER 1
+> > > > +
+> > > > +/* action to set data to device memory or device config
+> > > > + * the action is write to device state's control region, and data is
+> > > > + * written to device memory region or device config region.
+> > > > + * Each time after write to device memory region or device config region,
+> > > > + * action VFIO_DEVICE_DATA_ACTION_GET_BUFFER is required to write to action
+> > > > + * field in control region. That is because device memory and devie config
+> > > > + * region is mmaped into user space. vendor driver has to be notified of
+> > > > + * the the SET_BUFFER action after data written.
+> > > > + */
+> > > > +#define VFIO_DEVICE_DATA_ACTION_SET_BUFFER 2  
+> > > 
+> > > Let me describe this in my own words to make sure that I understand
+> > > this correctly.
+> > > 
+> > > - The actions are set by userspace to notify the kernel that it is
+> > >   going to get data or that it has just written data.
+> > > - This is needed as a notification that the mmapped data should not be
+> > >   changed resp. just has changed.  
+> > we need this notification is because when userspace read the mmapped data,
+> > it's from the ptr returned from mmap(). So, when userspace reads that ptr,
+> > there will be no page fault or read/write system calls, so vendor driver
+> > does not know whether read/write opertation happens or not. 
+> > Therefore, before userspace reads the ptr from mmap, it first writes action
+> > field in control region (through write system call), and vendor driver
+> > will not return the write system call until data prepared.
+> > 
+> > When userspace writes to that ptr from mmap, it writes data to the data
+> > region first, then writes the action field in control region (through write
+> > system call) to notify vendor driver. vendor driver will return the system
+> > call after it copies the buffer completely.
+> > > 
+> > > So, how does the kernel know whether the read action has finished resp.
+> > > whether the write action has started? Even if userspace reads/writes it
+> > > as a whole.
+> > >   
+> > kernel does not touch the data region except when in response to the
+> > "action" write system call.
+> 
+> Thanks for the explanation, that makes sense.
+> (...)
+welcome:)
+> _______________________________________________
+> intel-gvt-dev mailing list
+> intel-gvt-dev@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
