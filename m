@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51222)
+Received: from eggs.gnu.org ([209.51.188.92]:51257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTz-0004Yd-KJ
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:08 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtU0-0004bl-Gd
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0005Qr-KS
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:07 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34718 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0005R6-SJ
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:08 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:34713 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwtTy-0005IU-9a
+	id 1gwtTy-0005IN-EK
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:06 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 19:53:36 +0100
-Message-Id: <1550775220-26797-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 21 Feb 2019 19:53:34 +0100
+Message-Id: <1550775220-26797-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 4/8] tests/tcg: target/mips: Add wrappers for
- MSA integer compare instructions
+Subject: [Qemu-devel] [PULL v2 2/8] tests/tcg: target/mips: Correct path to
+ headers in some test source files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +30,229 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add wrappers for MSA integer compare instructions.
+Correct path to headers in tests/tcg/mips/user/ase/msa/bit-counting/*
+source files.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 ---
- tests/tcg/mips/include/wrappers_msa.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c | 6 +++---
+ tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c | 6 +++---
+ 12 files changed, 36 insertions(+), 36 deletions(-)
 
-diff --git a/tests/tcg/mips/include/wrappers_msa.h b/tests/tcg/mips/include/wrappers_msa.h
-index 7a77fb9..3280f9b 100644
---- a/tests/tcg/mips/include/wrappers_msa.h
-+++ b/tests/tcg/mips/include/wrappers_msa.h
-@@ -97,5 +97,30 @@ DO_MSA__WD__WS_WT(NOR_V, nor.v)
- DO_MSA__WD__WS_WT(OR_V, or.v)
- DO_MSA__WD__WS_WT(XOR_V, xor.v)
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
+index eb46290..d629431 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
  
-+DO_MSA__WD__WS_WT(CEQ_B, ceq.b)
-+DO_MSA__WD__WS_WT(CEQ_H, ceq.h)
-+DO_MSA__WD__WS_WT(CEQ_W, ceq.w)
-+DO_MSA__WD__WS_WT(CEQ_D, ceq.d)
-+
-+DO_MSA__WD__WS_WT(CLE_S_B, cle_s.b)
-+DO_MSA__WD__WS_WT(CLE_S_H, cle_s.h)
-+DO_MSA__WD__WS_WT(CLE_S_W, cle_s.w)
-+DO_MSA__WD__WS_WT(CLE_S_D, cle_s.d)
-+
-+DO_MSA__WD__WS_WT(CLE_U_B, cle_u.b)
-+DO_MSA__WD__WS_WT(CLE_U_H, cle_u.h)
-+DO_MSA__WD__WS_WT(CLE_U_W, cle_u.w)
-+DO_MSA__WD__WS_WT(CLE_U_D, cle_u.d)
-+
-+DO_MSA__WD__WS_WT(CLT_S_B, clt_s.b)
-+DO_MSA__WD__WS_WT(CLT_S_H, clt_s.h)
-+DO_MSA__WD__WS_WT(CLT_S_W, clt_s.w)
-+DO_MSA__WD__WS_WT(CLT_S_D, clt_s.d)
-+
-+DO_MSA__WD__WS_WT(CLT_U_B, clt_u.b)
-+DO_MSA__WD__WS_WT(CLT_U_H, clt_u.h)
-+DO_MSA__WD__WS_WT(CLT_U_W, clt_u.w)
-+DO_MSA__WD__WS_WT(CLT_U_D, clt_u.d)
-+
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
  
- #endif
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
+index bb1c0cf..fad220c 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
+index da1cd83..84cf974 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
+index a059763..a0ed202 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
+index 9616d6e..9906eae 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
+index 801c4bc..21222e3 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
+index 03cb4cd..fbab9c3 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
+index 2ca93de..dc33366 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
+index b4cad43..f9033c7 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
+index d6a8b0d..132b4d0 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
+index 1cdcabd..f469c09 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
+diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
+index 38ddc14..d73eff7 100644
+--- a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
++++ b/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
+@@ -22,9 +22,9 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
+-#include "../../../include/wrappers_msa.h"
+-#include "../../../include/test_inputs.h"
+-#include "../../../include/test_utils.h"
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs.h"
++#include "../../../../include/test_utils.h"
+ 
+ #define TEST_COUNT_TOTAL (PATTERN_INPUTS_COUNT + RANDOM_INPUTS_COUNT)
+ 
 -- 
 2.7.4
