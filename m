@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42186)
+Received: from eggs.gnu.org ([209.51.188.92]:43721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gwdC9-00071I-NN
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:30:38 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1gwdHP-0000X7-BZ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:36:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gwdC8-0007bD-Qb
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:30:37 -0500
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:44346)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gwdC8-0007aA-Iq
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:30:36 -0500
-Received: by mail-qt1-x842.google.com with SMTP id d2so4027873qti.11
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 17:30:36 -0800 (PST)
+	(envelope-from <arei.gonglei@huawei.com>) id 1gwdHH-0001cR-F7
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:35:59 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2421 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1gwdHC-0001Z4-2I
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:35:53 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Thu, 21 Feb 2019 01:35:43 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB25E1F3@dggeml511-mbx.china.huawei.com>
+References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
+	<33183CC9F5247A488A2544077AF19020DB25D374@dggeml511-mbx.china.huawei.com>
+	<20190221002444.GH16456@joy-OptiPlex-7040>
+In-Reply-To: <20190221002444.GH16456@joy-OptiPlex-7040>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190218102748.2242-1-xieyongji@baidu.com>
-	<20190220145851-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190220145851-mutt-send-email-mst@kernel.org>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 21 Feb 2019 09:30:23 +0800
-Message-ID: <CAONzpcY03LOpg42iXZWK4VJtSBbiCCHyn2dyFpC7w=Y=3m-MnA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] vhost-user-blk: Add support for
- backend reconnecting
+Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Zhao Yan <yan.y.zhao@intel.com>
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-On Thu, 21 Feb 2019 at 04:00, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Feb 18, 2019 at 06:27:41PM +0800, elohimes@gmail.com wrote:
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >
-> > This patchset is aimed at supporting qemu to reconnect
-> > vhost-user-blk backend after vhost-user-blk backend crash or
-> > restart.
-> >
-> > The patch 1 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD to support transferring shared
-> > buffer between qemu and backend.
-> >
-> > The patch 2 deletes some redundant check in contrib/libvhost-user.c.
-> >
-> > The patch 3,4 are the corresponding libvhost-user patches of
-> > patch 1. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD.
-> >
-> > The patch 5 allows vhost-user-blk to use the two new messages
-> > to get/set inflight buffer from/to backend.
-> >
-> > The patch 6 supports vhost-user-blk to reconnect backend when
-> > connection closed.
-> >
-> > The patch 7 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
-> > to vhost-user-blk backend which is used to tell qemu that
-> > we support reconnecting now.
-> >
-> > To use it, we could start qemu with:
-> >
-> > qemu-system-x86_64 \
-> >         -chardev socket,id=char0,path=/path/vhost.socket,reconnect=1, \
-> >         -device vhost-user-blk-pci,chardev=char0 \
-> >
-> > and start vhost-user-blk backend with:
-> >
-> > vhost-user-blk -b /path/file -s /path/vhost.socket
-> >
-> > Then we can restart vhost-user-blk at any time during VM running.
->
-> Sorry is elohimes@gmail.com also an address that belongs to
-> Xie Yongji?
->
 
-Yes, that's also my email address.
 
-Thanks,
-Yongji
+> -----Original Message-----
+> From: Zhao Yan [mailto:yan.y.zhao@intel.com]
+> Sent: Thursday, February 21, 2019 8:25 AM
+> To: Gonglei (Arei) <arei.gonglei@huawei.com>
+> Cc: alex.williamson@redhat.com; qemu-devel@nongnu.org;
+> intel-gvt-dev@lists.freedesktop.org; Zhengxiao.zx@Alibaba-inc.com;
+> yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
+> cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
+> zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
+> aik@ozlabs.ru; eauger@redhat.com; felipe@nutanix.com;
+> jonathan.davies@nutanix.com; changpeng.liu@intel.com; Ken.Xue@amd.com;
+> kwankhede@nvidia.com; kevin.tian@intel.com; cjia@nvidia.com;
+> kvm@vger.kernel.org
+> Subject: Re: [PATCH 0/5] QEMU VFIO live migration
+>=20
+> On Wed, Feb 20, 2019 at 11:56:01AM +0000, Gonglei (Arei) wrote:
+> > Hi yan,
+> >
+> > Thanks for your work.
+> >
+> > I have some suggestions or questions:
+> >
+> > 1) Would you add msix mode support,? if not, pls add a check in
+> vfio_pci_save_config(), likes Nvidia's solution.
+> ok.
+>=20
+> > 2) We should start vfio devices before vcpu resumes, so we can't rely o=
+n vm
+> start change handler completely.
+> vfio devices is by default set to running state.
+> In the target machine, its state transition flow is running->stop->runnin=
+g.
+
+That's confusing. We should start vfio devices after vfio_load_state, other=
+wise
+how can you keep the devices' information are the same between source side
+and destination side?
+
+> so, maybe you can ignore the stop notification in kernel?
+> > 3) We'd better support live migration rollback since have many failure
+> scenarios,
+> >  register a migration notifier is a good choice.
+> I think this patchset can also handle the failure case well.
+> if migration failure or cancelling happens,
+> in cleanup handler, LOGGING state is cleared. device state(running or
+> stopped) keeps as it is).
+
+IIRC there're many failure paths don't calling cleanup handler.
+
+> then,
+> if vm switches back to running, device state will be set to running;
+> if vm stayes at stopped state, device state is also stopped (it has no
+> meaning to let it in running state).
+> Do you think so ?
+>=20
+IF the underlying state machine is complicated,
+We should tell the canceling state to vendor driver proactively.
+
+> > 4) Four memory region for live migration is too complicated IMHO.
+> one big region requires the sub-regions well padded.
+> like for the first control fields, they have to be padded to 4K.
+> the same for other data fields.
+> Otherwise, mmap simply fails, because the start-offset and size for mmap
+> both need to be PAGE aligned.
+>=20
+But if we don't need use mmap for control filed and device state, they are =
+small basically.
+The performance is enough using pread/pwrite.=20
+
+> Also, 4 regions is clearer in my view :)
+>=20
+> > 5) About log sync, why not register log_global_start/stop in
+> vfio_memory_listener?
+> >
+> >
+> seems log_global_start/stop cannot be iterately called in pre-copy phase?
+> for dirty pages in system memory, it's better to transfer dirty data
+> iteratively to reduce down time, right?
+>=20
+
+We just need invoking only once for start and stop logging. Why we need to =
+call
+them literately? See memory_listener of vhost.
+
+Regards,
+-Gonglei
