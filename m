@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51173)
+Received: from eggs.gnu.org ([209.51.188.92]:51205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0004VS-EJ
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:07 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTz-0004XL-91
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTv-0005Oz-MT
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:06 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34748 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0005QL-DL
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:07 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:34711 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwtTt-0005N1-Bq
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:02 -0500
+	id 1gwtTv-0005IM-Lf
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:04 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 19:53:38 +0100
-Message-Id: <1550775220-26797-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 21 Feb 2019 19:53:33 +0100
+Message-Id: <1550775220-26797-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 6/8] hw/pci-host/bonito.c: Add PCI mem region
- mapped at the correct address
+Subject: [Qemu-devel] [PULL v2 1/8] hw/misc: mips_itu: Fix 32/64 bit issue
+ in a line involving shift operator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +31,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Stop using system memory as PCI memory otherwise devices such as VGA
-that have regions mapped to PCI memory clash with RAM. Use a separate
-memory region for PCI memory and map it to the correct address in
-system memory which allows PCI mem regions to show at the correct
-address where clients expect them.
+Fix 32/64 bit issue in a line involving shift operator. "1 << ..."
+calculation of size is done as a 32-bit signed integer which may
+then be unintentionally sign-extended into the 64-bit result. The
+problem was discovered by Coverity (CID 1398648). Using "1ULL"
+instead of "1" on the LHS of the shift fixes this problem.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/pci-host/bonito.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/misc/mips_itu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 9f33582..dde4437 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -217,6 +217,7 @@ struct BonitoState {
-     PCIHostState parent_obj;
-     qemu_irq *pic;
-     PCIBonitoState *pci_dev;
-+    MemoryRegion pci_mem;
- };
+diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
+index 1257d8f..3afdbe6 100644
+--- a/hw/misc/mips_itu.c
++++ b/hw/misc/mips_itu.c
+@@ -94,7 +94,7 @@ void itc_reconfigure(MIPSITUState *tag)
 =20
- #define TYPE_BONITO_PCI_HOST_BRIDGE "Bonito-pcihost"
-@@ -598,11 +599,15 @@ static const VMStateDescription vmstate_bonito =3D =
-{
- static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
-+    BonitoState *bs =3D BONITO_PCI_HOST_BRIDGE(dev);
+     if (tag->saar_present) {
+         address =3D ((*(uint64_t *) tag->saar) & 0xFFFFFFFFE000ULL) << 4=
+;
+-        size =3D 1 << ((*(uint64_t *) tag->saar >> 1) & 0x1f);
++        size =3D 1ULL << ((*(uint64_t *) tag->saar >> 1) & 0x1f);
+         is_enabled =3D *(uint64_t *) tag->saar & 1;
+     }
 =20
-+    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCIL=
-O_SIZE);
-     phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
-                                      pci_bonito_set_irq, pci_bonito_map_=
-irq,
--                                     dev, get_system_memory(), get_syste=
-m_io(),
-+                                     dev, &bs->pci_mem, get_system_io(),
-                                      0x28, 32, TYPE_PCI_BUS);
-+    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
-+                                &bs->pci_mem);
- }
-=20
- static void bonito_realize(PCIDevice *dev, Error **errp)
 --=20
 2.7.4
