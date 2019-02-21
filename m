@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50041)
+Received: from eggs.gnu.org ([209.51.188.92]:50334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwtP7-0000Bw-LA
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:49:07 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gwtQE-0001TX-4u
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:50:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwtP6-0002NE-Rk
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:49:05 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38796)
+	(envelope-from <alex.bennee@linaro.org>) id 1gwtQC-0003dQ-4a
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:50:14 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52882)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gwtP6-0002ML-Ev
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:49:04 -0500
-Received: by mail-wr1-x444.google.com with SMTP id v13so31763886wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:49:04 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Feb 2019 18:48:57 +0000
-Message-Id: <20190221184857.22434-1-alex.bennee@linaro.org>
+	id 1gwtQB-0003bo-Mk
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:50:12 -0500
+Received: by mail-wm1-x344.google.com with SMTP id m1so10641806wml.2
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:50:11 -0800 (PST)
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-3-armbru@redhat.com>
+	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
+	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
+	<875ztfuc0j.fsf@dusky.pond.sub.org>
+	<87sgwh5wef.fsf@dusky.pond.sub.org>
+	<CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
+	<8d278f39-9549-5326-bfd8-b4bcabeacf84@redhat.com>
+	<87d0nlxedj.fsf@dusky.pond.sub.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87d0nlxedj.fsf@dusky.pond.sub.org>
+Date: Thu, 21 Feb 2019 18:50:09 +0000
+Message-ID: <87y3692cym.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] hw/block: better reporting on pflash
- backing file mismatch
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
+ just once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +38,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, armbru@redhat.com, stappers@stappers.nl, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Max
+	Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>
 
-It looks like there was going to be code to check we had some sort of
-alignment so lets replace it with an actual check. This is a bit more
-useful than the enigmatic "failed to read the initial flash content"
-when we attempt to read the number of bytes the device should have.
 
-This is a potential confusing stumbling block when you move from using
--bios to using -drive if=pflash,file=blob,format=raw,readonly for
-loading your firmware code. To mitigate that we automatically pad in
-the read-only case.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>
+>> On 2/21/19 10:38 AM, Peter Maydell wrote:
+>>> On Thu, 21 Feb 2019 at 09:22, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>>> Double-checking... you want me to keep goto reset_flash, like this:
+>>>>
+>>>> @@ -623,8 +617,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr =
+offset,
+>>>>                  pfl->wcycle =3D 0;
+>>>>                  pfl->status |=3D 0x80;
+>>>>              } else {
+>>>> -                DPRINTF("%s: unknown command for \"write block\"\n", =
+__func__);
+>>>> -                PFLASH_BUG("Write block confirm");
+>>>> +                qemu_log_mask(LOG_GUEST_ERROR,
+>>>> +                              "unknown command for \"write block\"\n"=
+);
+>>>>                  goto reset_flash;
+>>>>              }
+>>>>              break;
+>>>
+>>> Yes. (We seem to handle most kinds of guest errors in programming
+>>> the flash by reset_flash.)
+>>
+>> Oh I missed the context of the patch here.
+>>
+>> So for the case of the Multi-WRITE command (0xe8):
+>>
+>> 1/ On first write cycle we have
+>>
+>>   - address =3D flash_page_address (we store it in pfl->counter)
+>>   - data =3D flash_command (0xe8: enter Multi-WRITE)
+>>
+>> 2/ Second cycle:
+>>
+>>   - address =3D flash_page_address
+>>     We should check it matches flash_page_address
+>>     of cycle 1/, but we don't.
+>>   - data: N
+>>
+>>     "N is the number of elements (bytes / words / double words),
+>>     minus one, to be written to the write buffer. Expected count
+>>     ranges are N =3D 00h to N =3D 7Fh (e.g., 1 to 128 bytes) in 8-bit
+>>     mode, N =3D 00h to N =3D 003Fh in 16-bit mode, and N =3D 00h to
+>>     N =3D 1Fh in 32-bit mode. Bus cycles 3 and higher are for writing
+>>     data into the write buffer. The confirm command (D0h) is
+>>     expected after exactly N + 1 write cycles; any other command at
+>>     that point in the sequence will prevent the transfer of the
+>>     buffer to the array (the write will be aborted)."
+>>
+>>     Instead of starting to write the data in a buffer, we write it
+>>     directly to the block backend.
+>>     Instead of starting to write from cycle 3+, we write now in 2,
+>>     and keep cycle count =3D=3D 2 (pfl->wcycle) until all data is
+>>     written, where we increment at 3.
+>>
+>> 3/ Cycles 3+
+>>
+>>   - address =3D word index (relative to the page address)
+>>   - data =3D word value
+>>
+>>     We check for the CONFIRM command, and switch the device back
+>>     to READ mode (setting Status), or reset the device (which is
+>>     modelled the same way).
+>>
+>>     Very silly: If the guest cancelled and never sent the CONFIRM
+>>     command, the data is already written/flushed back.
+>>
+>> So back to the previous code snippet, regardless the value, this
+>> is neither a hw_error() nor a GUEST_ERROR. This code is simply not
+>> correct. Eventually the proper (polite) error message should be:
+>>
+>>     qemu_log_mask(LOG_UNIMP, "MULTI_WRITE: Abort not implemented,"
+>>                              " the data is already written"
+>>                              " on storage!\n"
+>>                              "Nevertheless resetting the flash"
+>>                              " into READ mode.\n");
+>
+> Oww.
+>
+> This code is a swamp.
+>
+> Peter, Alex, do you agree with Phil's analysis?  If yes, I'll update my
+> patch once more.
 
----
-v3
-  - tweak commit title/commentary
-  - use total_len instead of device_len for checks
-  - if the device is read-only do the padding for them
-  - accept baking_len > total_len (how to warn_report with NULL *errp?)
----
- hw/block/pflash_cfi01.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+I'm happy to defer to Phil's obvious expertise here ;-)
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 00c2efd0d7..37d7513c45 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -714,13 +714,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     }
-     device_len = sector_len_per_device * blocks_per_device;
- 
--    /* XXX: to be fixed */
--#if 0
--    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
--        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
--        return NULL;
--#endif
--
-     memory_region_init_rom_device(
-         &pfl->mem, OBJECT(dev),
-         &pflash_cfi01_ops,
-@@ -747,6 +740,27 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (pfl->blk) {
-+        /*
-+         * Validate the backing store is the right size for pflash
-+         * devices. It should be padded to a multiple of the flash
-+         * block size. If the device is read-only we can elide the
-+         * check and just null pad the region first. If the user
-+         * supplies a larger file we silently accept it.
-+         */
-+        uint64_t backing_len = blk_getlength(pfl->blk);
-+
-+        if (backing_len < total_len) {
-+            if (pfl->ro) {
-+                memset(pfl->storage, 0, total_len);
-+                total_len = backing_len;
-+            } else {
-+                error_setg(errp, "device(s) needs %" PRIu64 " bytes, "
-+                           "backing file provides only %" PRIu64 " bytes",
-+                           total_len, backing_len);
-+                return;
-+            }
-+        }
-+
-         /* read the initial flash content */
-         ret = blk_pread(pfl->blk, 0, pfl->storage, total_len);
- 
--- 
-2.20.1
+--
+Alex Benn=C3=A9e
