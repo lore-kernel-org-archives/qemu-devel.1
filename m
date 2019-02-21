@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56669)
+Received: from eggs.gnu.org ([209.51.188.92]:57017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwpz5-0004VP-Md
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:10:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gwq0F-0005Se-RN
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:11:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwpyq-0001MJ-Ue
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:09:48 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gwpyo-0001F3-Up
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:09:44 -0500
-Received: by mail-wr1-x443.google.com with SMTP id o17so30897812wrw.3
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 07:09:35 -0800 (PST)
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-4-armbru@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190218125615.18970-4-armbru@redhat.com>
-Date: Thu, 21 Feb 2019 15:09:33 +0000
-Message-ID: <87a7ip41qq.fsf@zen.linaroharston>
+	(envelope-from <imammedo@redhat.com>) id 1gwq0C-0003fy-D6
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:11:10 -0500
+Date: Thu, 21 Feb 2019 16:05:34 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190221160534.183636e0@redhat.com>
+In-Reply-To: <20190220224003.4420-3-eric.auger@redhat.com>
+References: <20190220224003.4420-1-eric.auger@redhat.com>
+	<20190220224003.4420-3-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/10] hw: Use CFI_PFLASH0{1,
- 2} and TYPE_CFI_PFLASH0{1, 2}
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 02/17] hw/arm/virt: Rename highmem IO
+ regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,156 +24,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
+On Wed, 20 Feb 2019 23:39:48 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-Markus Armbruster <armbru@redhat.com> writes:
+> In preparation for a split of the memory map into a static
+> part and a dynamic part floating after the RAM, let's rename the
+> regions located after the RAM
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-> We have two open-coded copies of macro CFI_PFLASH01().  Move the macro
-> to the header, so we can ditch the copies.  Move CFI_PFLASH02() to the
-> header for symmetry.
->
-> We define macros TYPE_CFI_PFLASH01 and TYPE_CFI_PFLASH02 for type name
-> strings, then mostly use the strings.  If the macros are worth
-> defining, they are worth using.  Replace the strings by the macros.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+with indent and checkpatch warnings fixed
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
+> 
 > ---
->  hw/arm/vexpress.c        | 4 ++--
->  hw/arm/virt.c            | 3 ++-
->  hw/block/pflash_cfi01.c  | 3 ---
->  hw/block/pflash_cfi02.c  | 3 ---
->  hw/xtensa/xtfpga.c       | 4 ++--
->  include/hw/block/flash.h | 4 ++++
->  6 files changed, 10 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-> index ed46d2e730..00913f2655 100644
-> --- a/hw/arm/vexpress.c
-> +++ b/hw/arm/vexpress.c
-> @@ -515,7 +515,7 @@ static void vexpress_modify_dtb(const struct arm_boot=
-_info *info, void *fdt)
->  static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr base, const char *na=
-me,
->                                               DriveInfo *di)
->  {
-> -    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-> +    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH01);
->
->      if (di) {
->          qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(di),
-> @@ -536,7 +536,7 @@ static PFlashCFI01 *ve_pflash_cfi01_register(hwaddr b=
-ase, const char *name,
->      qdev_init_nofail(dev);
->
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> -    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-> +    return CFI_PFLASH01(dev);
->  }
->
->  static void vexpress_common_init(MachineState *machine)
+> v7: added Peter's R-b
+> v6: creation
+> ---
+>  hw/arm/virt-acpi-build.c |  8 ++++----
+>  hw/arm/virt.c            | 21 +++++++++++----------
+>  include/hw/arm/virt.h    |  8 ++++----
+>  3 files changed, 19 insertions(+), 18 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 04b62c714d..829d2f0035 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -229,8 +229,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>                       size_pio));
+>  
+>      if (use_highmem) {
+> -        hwaddr base_mmio_high = memmap[VIRT_PCIE_MMIO_HIGH].base;
+> -        hwaddr size_mmio_high = memmap[VIRT_PCIE_MMIO_HIGH].size;
+> +        hwaddr base_mmio_high = memmap[VIRT_HIGH_PCIE_MMIO].base;
+> +        hwaddr size_mmio_high = memmap[VIRT_HIGH_PCIE_MMIO].size;
+>  
+>          aml_append(rbuf,
+>              aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+> @@ -663,8 +663,8 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>              gicr = acpi_data_push(table_data, sizeof(*gicr));
+>              gicr->type = ACPI_APIC_GENERIC_REDISTRIBUTOR;
+>              gicr->length = sizeof(*gicr);
+> -            gicr->base_address = cpu_to_le64(memmap[VIRT_GIC_REDIST2].base);
+> -            gicr->range_length = cpu_to_le32(memmap[VIRT_GIC_REDIST2].size);
+> +            gicr->base_address = cpu_to_le64(memmap[VIRT_HIGH_GIC_REDIST2].base);
+> +            gicr->range_length = cpu_to_le32(memmap[VIRT_HIGH_GIC_REDIST2].size);
+>          }
+>  
+>          if (its_class_name() && !vmc->no_its) {
 > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 99c2b6e60d..b7d53b2b87 100644
+> index 99c2b6e60d..a1955e7764 100644
 > --- a/hw/arm/virt.c
 > +++ b/hw/arm/virt.c
-> @@ -34,6 +34,7 @@
->  #include "hw/arm/arm.h"
->  #include "hw/arm/primecell.h"
->  #include "hw/arm/virt.h"
-> +#include "hw/block/flash.h"
->  #include "hw/vfio/vfio-calxeda-xgmac.h"
->  #include "hw/vfio/vfio-amd-xgbe.h"
->  #include "hw/display/ramfb.h"
-> @@ -874,7 +875,7 @@ static void create_one_flash(const char *name, hwaddr=
- flashbase,
->       * parameters as the flash devices on the Versatile Express board.
->       */
->      DriveInfo *dinfo =3D drive_get_next(IF_PFLASH);
-> -    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-> +    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH01);
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      const uint64_t sectorlength =3D 256 * 1024;
->
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index f73c30a3ee..43dbb7db26 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -59,9 +59,6 @@ do {                                                   =
-     \
->  #define DPRINTF(fmt, ...) do { } while (0)
->  #endif
->
-> -#define CFI_PFLASH01(obj) \
-> -    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
-> -
->  #define PFLASH_BE          0
->  #define PFLASH_SECURE      1
->
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index 424cc106d6..e9c76d6cfb 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -57,9 +57,6 @@ do {                                                   =
-    \
->
->  #define PFLASH_LAZY_ROMD_THRESHOLD 42
->
-> -#define CFI_PFLASH02(obj) \
-> -    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
-> -
->  struct PFlashCFI02 {
->      /*< private >*/
->      SysBusDevice parent_obj;
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index 3d59a7a356..a726d5632a 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -167,7 +167,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
-ddress_space,
->                                        DriveInfo *dinfo, int be)
+> @@ -150,10 +150,10 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+>      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+> -    [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000 },
+> -    [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
+> +    [VIRT_HIGH_GIC_REDIST2] =   { 0x4000000000ULL, 0x4000000 },
+> +    [VIRT_HIGH_PCIE_ECAM] =     { 0x4010000000ULL, 0x10000000 },
+>      /* Second PCIe window, 512GB wide at the 512GB boundary */
+> -    [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
+> +    [VIRT_HIGH_PCIE_MMIO] =     { 0x8000000000ULL, 0x8000000000ULL },
+>  };
+>  
+>  static const int a15irqmap[] = {
+> @@ -435,8 +435,8 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+>                                           2, vms->memmap[VIRT_GIC_DIST].size,
+>                                           2, vms->memmap[VIRT_GIC_REDIST].base,
+>                                           2, vms->memmap[VIRT_GIC_REDIST].size,
+> -                                         2, vms->memmap[VIRT_GIC_REDIST2].base,
+> -                                         2, vms->memmap[VIRT_GIC_REDIST2].size);
+> +                                         2, vms->memmap[VIRT_HIGH_GIC_REDIST2].base,
+> +                                         2, vms->memmap[VIRT_HIGH_GIC_REDIST2].size);
+>          }
+>  
+>          if (vms->virt) {
+> @@ -584,7 +584,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+>  
+>          if (nb_redist_regions == 2) {
+>              uint32_t redist1_capacity =
+> -                        vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+> +                    vms->memmap[VIRT_HIGH_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+is indent correct here (it didn't look correct to begin with).
+
+Strangle checkpatch didn't complain about it, but since I've run it
+does complain about a bunch of "line over 80 characters" on this patch
+
+>  
+>              qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
+>                  MIN(smp_cpus - redist0_count, redist1_capacity));
+> @@ -601,7 +601,8 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+>      if (type == 3) {
+>          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
+>          if (nb_redist_regions == 2) {
+> -            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
+> +            sysbus_mmio_map(gicbusdev, 2,
+> +                            vms->memmap[VIRT_HIGH_GIC_REDIST2].base);
+>          }
+>      } else {
+>          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
+> @@ -1088,8 +1089,8 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
 >  {
->      SysBusDevice *s;
-> -    DeviceState *dev =3D qdev_create(NULL, "cfi.pflash01");
-> +    DeviceState *dev =3D qdev_create(NULL, TYPE_CFI_PFLASH01);
->
->      qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
->                          &error_abort);
-> @@ -181,7 +181,7 @@ static PFlashCFI01 *xtfpga_flash_init(MemoryRegion *a=
-ddress_space,
->      s =3D SYS_BUS_DEVICE(dev);
->      memory_region_add_subregion(address_space, board->flash->base,
->                                  sysbus_mmio_get_region(s, 0));
-> -    return OBJECT_CHECK(PFlashCFI01, (dev), "cfi.pflash01");
-> +    return CFI_PFLASH01(dev);
->  }
->
->  static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
-> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
-> index 51d8f60c65..1078dc7238 100644
-> --- a/include/hw/block/flash.h
-> +++ b/include/hw/block/flash.h
-> @@ -8,6 +8,8 @@
->  /* pflash_cfi01.c */
->
->  #define TYPE_CFI_PFLASH01 "cfi.pflash01"
-> +#define CFI_PFLASH01(obj) \
-> +    OBJECT_CHECK(PFlashCFI01, (obj), TYPE_CFI_PFLASH01)
->
->  typedef struct PFlashCFI01 PFlashCFI01;
->
-> @@ -25,6 +27,8 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
->  /* pflash_cfi02.c */
->
->  #define TYPE_CFI_PFLASH02 "cfi.pflash02"
-> +#define CFI_PFLASH02(obj) \
-> +    OBJECT_CHECK(PFlashCFI02, (obj), TYPE_CFI_PFLASH02)
->
->  typedef struct PFlashCFI02 PFlashCFI02;
-
-
---
-Alex Benn=C3=A9e
+>      hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+>      hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+> -    hwaddr base_mmio_high = vms->memmap[VIRT_PCIE_MMIO_HIGH].base;
+> -    hwaddr size_mmio_high = vms->memmap[VIRT_PCIE_MMIO_HIGH].size;
+> +    hwaddr base_mmio_high = vms->memmap[VIRT_HIGH_PCIE_MMIO].base;
+> +    hwaddr size_mmio_high = vms->memmap[VIRT_HIGH_PCIE_MMIO].size;
+>      hwaddr base_pio = vms->memmap[VIRT_PCIE_PIO].base;
+>      hwaddr size_pio = vms->memmap[VIRT_PCIE_PIO].size;
+>      hwaddr base_ecam, size_ecam;
+> @@ -1418,7 +1419,7 @@ static void machvirt_init(MachineState *machine)
+>       */
+>      if (vms->gic_version == 3) {
+>          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+> -        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+> +        virt_max_cpus += vms->memmap[VIRT_HIGH_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+>      } else {
+>          virt_max_cpus = GIC_NCPU;
+>      }
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 4cc57a7ef6..a27086d524 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -64,7 +64,7 @@ enum {
+>      VIRT_GIC_VCPU,
+>      VIRT_GIC_ITS,
+>      VIRT_GIC_REDIST,
+> -    VIRT_GIC_REDIST2,
+> +    VIRT_HIGH_GIC_REDIST2,
+>      VIRT_SMMU,
+>      VIRT_UART,
+>      VIRT_MMIO,
+> @@ -74,9 +74,9 @@ enum {
+>      VIRT_PCIE_MMIO,
+>      VIRT_PCIE_PIO,
+>      VIRT_PCIE_ECAM,
+> -    VIRT_PCIE_ECAM_HIGH,
+> +    VIRT_HIGH_PCIE_ECAM,
+>      VIRT_PLATFORM_BUS,
+> -    VIRT_PCIE_MMIO_HIGH,
+> +    VIRT_HIGH_PCIE_MMIO,
+>      VIRT_GPIO,
+>      VIRT_SECURE_UART,
+>      VIRT_SECURE_MEM,
+> @@ -128,7 +128,7 @@ typedef struct {
+>      int psci_conduit;
+>  } VirtMachineState;
+>  
+> -#define VIRT_ECAM_ID(high) (high ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM)
+> +#define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+>  
+>  #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+>  #define VIRT_MACHINE(obj) \
