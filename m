@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34817)
+Received: from eggs.gnu.org ([209.51.188.92]:34943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmCh-0002JZ-9K
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:07:48 -0500
+	(envelope-from <yuchenlin@synology.com>) id 1gwmDY-0002zR-BO
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:08:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmCd-00074h-FD
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:07:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gwmCc-00073c-JW
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:07:43 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 858178666E
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 11:07:41 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 21 Feb 2019 12:07:03 +0100
-Message-Id: <20190221110703.5775-12-marcandre.lureau@redhat.com>
-In-Reply-To: <20190221110703.5775-1-marcandre.lureau@redhat.com>
-References: <20190221110703.5775-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 11/11] display: add -display spice-app
- launching a Spice client
+	(envelope-from <yuchenlin@synology.com>) id 1gwmDS-0007Xj-Mv
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:08:40 -0500
+From: yuchenlin@synology.com
+Date: Thu, 21 Feb 2019 11:08:05 +0000
+Message-Id: <20190221110805.28239-1-yuchenlin@synology.com>
+Subject: [Qemu-devel] [PATCH] vmdk: false positive of compat6 with hwversion
+ not set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,322 +19,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, yuchenlin <yuchenlin@synology.com>
 
-Add a new display backend that will configure Spice to allow a remote
-client to control QEMU in a similar fashion as other QEMU display
-backend/UI like GTK.
+From: yuchenlin <yuchenlin@synology.com>
 
-For this to work, it will set up Spice server with a unix socket, and
-register a VC chardev that will be exposed as Spice ports. A QMP
-monitor is also exposed as a Spice port, this allows the remote client
-fuller qemu control and state handling.
+In vmdk_co_create_opts, when it finds hw_version is undefined, it will
+set it to 4, which misleading the compat6 and hwversion in
+vmdk_co_do_create. Simply set hw_version to NULL after free, let
+the logic in vmdk_co_do_create to decide the value of hw_version.
 
-- doesn't handle VC set_echo() - this doesn't seem a strong
-  requirement, very few front-end use it
-- spice options can be tweaked with other -spice arguments
-- Windows support shouldn't be hard to do, but will probably use a TCP
-  port instead
-- we may want to watch the child process to quit automatically if it
-  crashed
+This bug can be reproduced by:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Tested-by: Victor Toso <victortoso@redhat.com>
+$ qemu-img convert -O vmdk -o subformat=streamOptimized,compat6
+/home/yuchenlin/syno.qcow2 /home/yuchenlin/syno.vmdk
+
+qemu-img: /home/yuchenlin/syno.vmdk: error while converting vmdk:
+compat6 cannot be enabled with hwversion set
+
+Signed-off-by: yuchenlin <yuchenlin@synology.com>
 ---
- qapi/ui.json     |   7 +-
- ui/spice-app.c   | 200 +++++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx  |   5 ++
- ui/Makefile.objs |   5 ++
- 4 files changed, 216 insertions(+), 1 deletion(-)
- create mode 100644 ui/spice-app.c
+ block/vmdk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 7702ddf583..c5d1d7f099 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1110,12 +1110,17 @@
- #
- # @cocoa: The Cocoa user interface.
- #
-+# @spice-app: Set up a Spice server and run the default associated
-+#             application to connect to it. The server will redirect
-+#             the serial console and QEMU monitors. (Since 4.0)
-+#
- # Since: 2.12
- #
- ##
- { 'enum'    : 'DisplayType',
-   'data'    : [ 'default', 'none', 'gtk', 'sdl',
--                'egl-headless', 'curses', 'cocoa' ] }
-+                'egl-headless', 'curses', 'cocoa',
-+                'spice-app'] }
-=20
- ##
- # @DisplayOptions:
-diff --git a/ui/spice-app.c b/ui/spice-app.c
-new file mode 100644
-index 0000000000..4f5229f3ee
---- /dev/null
-+++ b/ui/spice-app.c
-@@ -0,0 +1,200 @@
-+/*
-+ * QEMU external Spice client display driver
-+ *
-+ * Copyright (c) 2018 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+
-+#include <gio/gio.h>
-+
-+#include "qemu-common.h"
-+#include "ui/console.h"
-+#include "qemu/config-file.h"
-+#include "qemu/option.h"
-+#include "qemu/cutils.h"
-+#include "qapi/error.h"
-+#include "io/channel-command.h"
-+#include "chardev/spice.h"
-+#include "sysemu/sysemu.h"
-+
-+static const char *tmp_dir;
-+static char *app_dir;
-+static char *sock_path;
-+
-+typedef struct VCChardev {
-+    SpiceChardev parent;
-+} VCChardev;
-+
-+#define TYPE_CHARDEV_VC "chardev-vc"
-+#define VC_CHARDEV(obj) OBJECT_CHECK(VCChardev, (obj), TYPE_CHARDEV_VC)
-+
-+static ChardevBackend *
-+chr_spice_backend_new(void)
-+{
-+    ChardevBackend *be =3D g_new0(ChardevBackend, 1);
-+
-+    be->type =3D CHARDEV_BACKEND_KIND_SPICEPORT;
-+    be->u.spiceport.data =3D g_new0(ChardevSpicePort, 1);
-+
-+    return be;
-+}
-+
-+static void vc_chr_open(Chardev *chr,
-+                        ChardevBackend *backend,
-+                        bool *be_opened,
-+                        Error **errp)
-+{
-+    ChardevBackend *be;
-+    const char *fqdn =3D NULL;
-+
-+    if (strstart(chr->label, "serial", NULL)) {
-+        fqdn =3D "org.qemu.console.serial.0";
-+    } else if (strstart(chr->label, "parallel", NULL)) {
-+        fqdn =3D "org.qemu.console.parallel.0";
-+    } else if (strstart(chr->label, "compat_monitor", NULL)) {
-+        fqdn =3D "org.qemu.monitor.hmp.0";
-+    }
-+
-+    be =3D chr_spice_backend_new();
-+    be->u.spiceport.data->fqdn =3D fqdn ?
-+        g_strdup(fqdn) : g_strdup_printf("org.qemu.console.%s", chr->lab=
-el);
-+    qemu_chr_open_spice_port(chr, be, be_opened, errp);
-+    qapi_free_ChardevBackend(be);
-+}
-+
-+static void vc_chr_set_echo(Chardev *chr, bool echo)
-+{
-+    /* TODO: set echo for frontends QMP and qtest */
-+}
-+
-+static void char_vc_class_init(ObjectClass *oc, void *data)
-+{
-+    ChardevClass *cc =3D CHARDEV_CLASS(oc);
-+
-+    cc->parse =3D qemu_chr_parse_vc;
-+    cc->open =3D vc_chr_open;
-+    cc->chr_set_echo =3D vc_chr_set_echo;
-+}
-+
-+static const TypeInfo char_vc_type_info =3D {
-+    .name =3D TYPE_CHARDEV_VC,
-+    .parent =3D TYPE_CHARDEV_SPICEPORT,
-+    .instance_size =3D sizeof(VCChardev),
-+    .class_init =3D char_vc_class_init,
-+};
-+
-+static void spice_app_atexit(void)
-+{
-+    if (sock_path) {
-+        unlink(sock_path);
-+    }
-+    if (tmp_dir) {
-+        rmdir(tmp_dir);
-+    }
-+    g_free(sock_path);
-+    g_free(app_dir);
-+}
-+
-+static void spice_app_display_early_init(DisplayOptions *opts)
-+{
-+    QemuOpts *qopts;
-+    ChardevBackend *be =3D chr_spice_backend_new();
-+    GError *err =3D NULL;
-+
-+    if (opts->has_full_screen) {
-+        error_report("spice-app full-screen isn't supported yet.");
-+        exit(1);
-+    }
-+    if (opts->has_window_close) {
-+        error_report("spice-app window-close isn't supported yet.");
-+        exit(1);
-+    }
-+
-+    atexit(spice_app_atexit);
-+
-+    if (qemu_name) {
-+        app_dir =3D g_build_filename(g_get_user_runtime_dir(),
-+                                   "qemu", qemu_name, NULL);
-+        if (g_mkdir_with_parents(app_dir, S_IRWXU) < -1) {
-+            error_report("Failed to create directory %s: %s",
-+                         app_dir, strerror(errno));
-+            exit(1);
-+        }
-+    } else {
-+        app_dir =3D g_dir_make_tmp(NULL, &err);
-+        tmp_dir =3D app_dir;
-+        if (err) {
-+            error_report("Failed to create temporary directory: %s",
-+                         err->message);
-+            exit(1);
-+        }
-+    }
-+
-+    type_register(&char_vc_type_info);
-+
-+    sock_path =3D g_strjoin("", app_dir, "/", "spice.sock", NULL);
-+    qopts =3D qemu_opts_create(qemu_find_opts("spice"), NULL, 0, &error_=
-abort);
-+    qemu_opt_set(qopts, "disable-ticketing", "on", &error_abort);
-+    qemu_opt_set(qopts, "unix", "on", &error_abort);
-+    qemu_opt_set(qopts, "addr", sock_path, &error_abort);
-+    qemu_opt_set(qopts, "image-compression", "off", &error_abort);
-+    qemu_opt_set(qopts, "streaming-video", "off", &error_abort);
-+    qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abort)=
-;
-+    display_opengl =3D opts->has_gl;
-+
-+    be->u.spiceport.data->fqdn =3D g_strdup("org.qemu.monitor.qmp.0");
-+    qemu_chardev_new("org.qemu.monitor.qmp", TYPE_CHARDEV_SPICEPORT,
-+                     be, NULL, &error_abort);
-+    qopts =3D qemu_opts_create(qemu_find_opts("mon"),
-+                             NULL, 0, &error_fatal);
-+    qemu_opt_set(qopts, "chardev", "org.qemu.monitor.qmp", &error_abort)=
-;
-+    qemu_opt_set(qopts, "mode", "control", &error_abort);
-+
-+    qapi_free_ChardevBackend(be);
-+}
-+
-+static void spice_app_display_init(DisplayState *ds, DisplayOptions *opt=
-s)
-+{
-+    GError *err =3D NULL;
-+    gchar *uri;
-+
-+    uri =3D g_strjoin("", "spice+unix://", app_dir, "/", "spice.sock", N=
-ULL);
-+    info_report("Launching display with URI: %s", uri);
-+    g_app_info_launch_default_for_uri(uri, NULL, &err);
-+    if (err) {
-+        error_report("Failed to launch %s URI: %s", uri, err->message);
-+        exit(1);
-+    }
-+    g_free(uri);
-+}
-+
-+static QemuDisplay qemu_display_spice_app =3D {
-+    .type       =3D DISPLAY_TYPE_SPICE_APP,
-+    .early_init =3D spice_app_display_early_init,
-+    .init       =3D spice_app_display_init,
-+};
-+
-+static void register_spice_app(void)
-+{
-+    qemu_display_register(&qemu_display_spice_app);
-+}
-+
-+type_init(register_spice_app);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 77bd98e20b..c843126ebd 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1211,6 +1211,7 @@ STEXI
- ETEXI
-=20
- DEF("display", HAS_ARG, QEMU_OPTION_display,
-+    "-display spice-app[,gl=3Don|off]\n"
-     "-display sdl[,frame=3Don|off][,alt_grab=3Don|off][,ctrl_grab=3Don|o=
-ff]\n"
-     "            [,window_close=3Don|off][,gl=3Don|core|es|off]\n"
-     "-display gtk[,grab_on_hover=3Don|off][,gl=3Don|off]|\n"
-@@ -1262,6 +1263,10 @@ Start a VNC server on display <arg>
- @item egl-headless
- Offload all OpenGL operations to a local DRI device. For any graphical d=
-isplay,
- this display needs to be paired with either VNC or SPICE displays.
-+@item spice-app
-+Start QEMU as a Spice server and launch the default Spice client
-+application. The Spice server will redirect the serial consoles and
-+QEMU monitors. (Since 4.0)
- @end table
- ETEXI
-=20
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 7f8b3da791..fe1a7aed97 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -49,6 +49,11 @@ curses.mo-objs :=3D curses.o
- curses.mo-cflags :=3D $(CURSES_CFLAGS)
- curses.mo-libs :=3D $(CURSES_LIBS)
-=20
-+common-obj-$(call land,$(CONFIG_SPICE),$(CONFIG_GIO)) +=3D spice-app.mo
-+spice-app.mo-objs :=3D spice-app.o
-+spice-app.mo-cflags :=3D $(GIO_CFLAGS)
-+spice-app.mo-libs :=3D $(GIO_LIBS)
-+
- common-obj-$(CONFIG_OPENGL) +=3D shader.o
- common-obj-$(CONFIG_OPENGL) +=3D console-gl.o
- common-obj-$(CONFIG_OPENGL) +=3D egl-helpers.o
---=20
-2.21.0.rc1
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 096e8eb662..e3bbd18803 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -2260,7 +2260,7 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
+     compat6 = qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false);
+     if (strcmp(hw_version, "undefined") == 0) {
+         g_free(hw_version);
+-        hw_version = g_strdup("4");
++        hw_version = NULL;
+     }
+     fmt = qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
+     zeroed_grain = qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN, false);
+-- 
+2.17.1
