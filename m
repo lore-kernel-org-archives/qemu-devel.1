@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44742)
+Received: from eggs.gnu.org ([209.51.188.92]:45202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwl3L-0007Dr-Tf
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:54:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gwl4L-0007Tz-Dt
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwkoo-0006nk-QS
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:39:03 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gwkoo-0006jk-Kw
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:39:02 -0500
-Received: by mail-ot1-x343.google.com with SMTP id n8so44360653otl.6
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 01:38:48 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gwkmu-0005O7-A3
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:37:07 -0500
+Date: Thu, 21 Feb 2019 10:36:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190221103610.0c2add1c@redhat.com>
+In-Reply-To: <852c526c-42fd-4ff4-d00e-1a44e1561e67@redhat.com>
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-15-eric.auger@redhat.com>
+	<20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
+	<852c526c-42fd-4ff4-d00e-1a44e1561e67@redhat.com>
 MIME-Version: 1.0
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-3-armbru@redhat.com>
-	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
-	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
-	<875ztfuc0j.fsf@dusky.pond.sub.org> <87sgwh5wef.fsf@dusky.pond.sub.org>
-In-Reply-To: <87sgwh5wef.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Feb 2019 09:38:37 +0000
-Message-ID: <CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
- just once, expand
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 14/18] hw/arm/virt: Allocate
+ device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +26,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, dgilbert@redhat.com, qemu-arm@nongnu.org, david@gibson.dropbear.id.au, eric.auger.pro@gmail.com
 
-On Thu, 21 Feb 2019 at 09:22, Markus Armbruster <armbru@redhat.com> wrote:
-> Double-checking... you want me to keep goto reset_flash, like this:
->
-> @@ -623,8 +617,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
->                  pfl->wcycle = 0;
->                  pfl->status |= 0x80;
->              } else {
-> -                DPRINTF("%s: unknown command for \"write block\"\n", __func__);
-> -                PFLASH_BUG("Write block confirm");
-> +                qemu_log_mask(LOG_GUEST_ERROR,
-> +                              "unknown command for \"write block\"\n");
->                  goto reset_flash;
->              }
->              break;
+On Tue, 19 Feb 2019 16:53:22 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-Yes. (We seem to handle most kinds of guest errors in programming
-the flash by reset_flash.)
+> Hi Igor,
+> 
+> On 2/18/19 10:31 AM, Igor Mammedov wrote:
+> > On Tue,  5 Feb 2019 18:33:02 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> The device memory region is located after the initial RAM.
+> >> its start/size are 1GB aligned.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> >>
+> >> ---
+> >> v4 -> v5:
+> >> - device memory set after the initial RAM
+> >>
+> >> v3 -> v4:
+> >> - remove bootinfo.device_memory_start/device_memory_size
+> >> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+> >> ---
+> >>  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 36 insertions(+)
+> >>
+> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >> index 783468ba77..b683902991 100644
+> >> --- a/hw/arm/virt.c
+> >> +++ b/hw/arm/virt.c
+> >> @@ -61,6 +61,7 @@
+> >>  #include "hw/arm/smmuv3.h"
+> >>  #include "hw/mem/pc-dimm.h"
+> >>  #include "hw/mem/nvdimm.h"
+> >> +#include "hw/acpi/acpi.h"
+> >>  
+> >>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+> >>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> >> @@ -1260,6 +1261,37 @@ static void create_secure_ram(VirtMachineState *vms,
+> >>      g_free(nodename);
+> >>  }
+> >>  
+> >> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+> >> +{
+> >> +    MachineState *ms = MACHINE(vms);
+> >> +    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;  
+> > should size it with 1Gb alignment per slot from the start (to avoid x86 mistakes),
+> > see enforce_aligned_dimm usage and associated commit for more details  
+> I don't understand the computation done in pc machine. eventually we are
+> likely to have more device memory than requested by the user. Why don't
+> we check (machine->maxram_size - machine->ram_size) >=
+> machine->ram_slots * GiB
+> instead of adding 1GiB/slot to the initial user requirements?
+> 
+> Also machine->maxram_size - machine->ram_size is checked to be aligned
+> with TARGET_PAGE_SIZE. Is TARGET_PAGE_SIZE representative of the guest
+> PAGE in accelerated mode? Is it valid ro require an alignment on 1GB
+> boundary as I do in this patch?
+See commit 085f8e88b for explanation,
+What we are basically are doing there is sizing hotpluggbale address space
+to allow max possible huge page aligned DIMM to be successfully plugged in
+even if address space if fragmented.
 
-thanks
--- PMM
+> 
+> >   
+> >> +    uint64_t align = GiB;
+> >> +
+> >> +    if (!device_memory_size) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+> >> +        error_report("unsupported number of memory slots: %"PRIu64,
+> >> +                     ms->ram_slots);
+> >> +        exit(EXIT_FAILURE);
+> >> +    }
+> >> +
+> >> +    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
+> >> +        error_report("maximum memory size must be aligned to multiple of 0x%"
+> >> +                     PRIx64, align);
+> >> +        exit(EXIT_FAILURE);
+> >> +    }
+> >> +
+> >> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+> >> +    ms->device_memory->base = QEMU_ALIGN_UP(GiB + ms->ram_size, GiB);  
+> >                                                ^^^ where does this come from?  
+> OK, introduced RAMBASE macro
+> 
+> Thanks
+> 
+> Eric
+> > 
+> >   
+> >> +
+> >> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+> >> +                       "device-memory", device_memory_size);
+> >> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
+> >> +                                &ms->device_memory->mr);
+> >> +}
+> >> +
+> >>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+> >>  {
+> >>      const VirtMachineState *board = container_of(binfo, VirtMachineState,
+> >> @@ -1569,6 +1601,10 @@ static void machvirt_init(MachineState *machine)
+> >>                                           machine->ram_size);
+> >>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> >>  
+> >> +    if (vms->extended_memmap) {
+> >> +        create_device_memory(vms, sysmem);
+> >> +    }
+> >> +
+> >>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+> >>  
+> >>      create_gic(vms, pic);  
+> >   
+> 
