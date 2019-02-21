@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55751)
+Received: from eggs.gnu.org ([209.51.188.92]:55718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwlgY-0007xM-DD
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:35 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwlgX-0004XB-Co
+	(envelope-from <sgarzare@redhat.com>) id 1gwlgX-0007xG-Cb
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:34 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <sgarzare@redhat.com>) id 1gwlgV-0004VO-C3
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:33 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 21 Feb 2019 11:33:09 +0100
-Message-Id: <20190221103314.58500-6-sgarzare@redhat.com>
+Date: Thu, 21 Feb 2019 11:33:13 +0100
+Message-Id: <20190221103314.58500-10-sgarzare@redhat.com>
 In-Reply-To: <20190221103314.58500-1-sgarzare@redhat.com>
 References: <20190221103314.58500-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 05/10] virtio-blk: set config size depending
- on the features enabled
+Subject: [Qemu-devel] [PATCH v6 09/10] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +25,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Starting from DISABLE and WRITE_ZEROES features, we use an array of
-VirtIOFeature (as virtio-net) to properly set the config size
-depending on the features enabled.
+If the WRITE_ZEROES feature is enabled, we check this command
+in the test_basic().
 
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- hw/block/virtio-blk.c          | 31 +++++++++++++++++++++++++------
- include/hw/virtio/virtio-blk.h |  1 +
- 2 files changed, 26 insertions(+), 6 deletions(-)
+ tests/virtio-blk-test.c | 62 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index f7cd322811..8798d13bc4 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -28,9 +28,28 @@
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 85b6b99adc..f43d971099 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -255,6 +255,68 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
+ocator *alloc,
 =20
--/* We don't support discard yet, hide associated config fields. */
-+/* Config size before the discard support (hide associated config fields=
-) */
- #define VIRTIO_BLK_CFG_SIZE offsetof(struct virtio_blk_config, \
-                                      max_discard_sectors)
-+/*
-+ * Starting from the discard feature, we can use this array to properly
-+ * set the config size depending on the features enabled.
-+ */
-+static VirtIOFeature feature_sizes[] =3D {
-+    {.flags =3D 1ULL << VIRTIO_BLK_F_DISCARD,
-+     .end =3D virtio_endof(struct virtio_blk_config, discard_sector_alig=
-nment)},
-+    {.flags =3D 1ULL << VIRTIO_BLK_F_WRITE_ZEROES,
-+     .end =3D virtio_endof(struct virtio_blk_config, write_zeroes_may_un=
-map)},
-+    {}
-+};
+     guest_free(alloc, req_addr);
+=20
++    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
++        struct virtio_blk_discard_write_zeroes dwz_hdr;
++        void *expected;
 +
-+static void virtio_blk_set_config_size(VirtIOBlock *s, uint64_t host_fea=
-tures)
-+{
-+    s->config_size =3D MAX(VIRTIO_BLK_CFG_SIZE,
-+        virtio_feature_get_config_size(feature_sizes, host_features));
++        /*
++         * WRITE_ZEROES request on the same sector of previous test wher=
+e
++         * we wrote "TEST".
++         */
++        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
++        req.data =3D (char *) &dwz_hdr;
++        dwz_hdr.sector =3D 0;
++        dwz_hdr.num_sectors =3D 1;
++        dwz_hdr.flags =3D 0;
 +
-+    assert(s->config_size <=3D sizeof(struct virtio_blk_config));
-+}
-=20
- static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
-                                     VirtIOBlockReq *req)
-@@ -763,8 +782,7 @@ static void virtio_blk_update_config(VirtIODevice *vd=
-ev, uint8_t *config)
-     blkcfg.alignment_offset =3D 0;
-     blkcfg.wce =3D blk_enable_write_cache(s->blk);
-     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
--    memcpy(config, &blkcfg, VIRTIO_BLK_CFG_SIZE);
--    QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE > sizeof(blkcfg));
-+    memcpy(config, &blkcfg, s->config_size);
- }
-=20
- static void virtio_blk_set_config(VirtIODevice *vdev, const uint8_t *con=
-fig)
-@@ -772,8 +790,7 @@ static void virtio_blk_set_config(VirtIODevice *vdev,=
- const uint8_t *config)
-     VirtIOBlock *s =3D VIRTIO_BLK(vdev);
-     struct virtio_blk_config blkcfg;
-=20
--    memcpy(&blkcfg, config, VIRTIO_BLK_CFG_SIZE);
--    QEMU_BUILD_BUG_ON(VIRTIO_BLK_CFG_SIZE > sizeof(blkcfg));
-+    memcpy(&blkcfg, config, s->config_size);
-=20
-     aio_context_acquire(blk_get_aio_context(s->blk));
-     blk_set_enable_write_cache(s->blk, blkcfg.wce !=3D 0);
-@@ -956,7 +973,9 @@ static void virtio_blk_device_realize(DeviceState *de=
-v, Error **errp)
-         return;
-     }
-=20
--    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, VIRTIO_BLK_CFG_SIZE=
-);
-+    virtio_blk_set_config_size(s, s->host_features);
++        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
 +
-+    virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK, s->config_size);
-=20
-     s->blk =3D conf->conf.blk;
-     s->rq =3D NULL;
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
-k.h
-index f7345b0511..7877ae67ae 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -56,6 +56,7 @@ typedef struct VirtIOBlock {
-     bool dataplane_started;
-     struct VirtIOBlockDataPlane *dataplane;
-     uint64_t host_features;
-+    size_t config_size;
- } VirtIOBlock;
-=20
- typedef struct VirtIOBlockReq {
++        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
+));
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
++        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
+se);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        guest_free(alloc, req_addr);
++
++        /* Read request to check if the sector contains all zeroes */
++        req.type =3D VIRTIO_BLK_T_IN;
++        req.ioprio =3D 1;
++        req.sector =3D 0;
++        req.data =3D g_malloc0(512);
++
++        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
++        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 528);
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        data =3D g_malloc(512);
++        expected =3D g_malloc0(512);
++        memread(req_addr + 16, data, 512);
++        g_assert_cmpmem(data, 512, expected, 512);
++        g_free(expected);
++        g_free(data);
++
++        guest_free(alloc, req_addr);
++    }
++
+     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
+         /* Write and read with 2 descriptor layout */
+         /* Write request */
 --=20
 2.20.1
