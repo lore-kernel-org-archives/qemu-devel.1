@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47371)
+Received: from eggs.gnu.org ([209.51.188.92]:48756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gwn8g-0008PR-Jg
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:07:45 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gwnHl-0002go-1H
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:17:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gwn8e-00021u-A9
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:07:42 -0500
-References: <20190218125615.18970-1-armbru@redhat.com>
-	<20190218125615.18970-3-armbru@redhat.com>
-	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
-	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
-	<875ztfuc0j.fsf@dusky.pond.sub.org> <87sgwh5wef.fsf@dusky.pond.sub.org>
-	<CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <83b8edf2-8a4b-3d1b-bdde-63738ffb6479@redhat.com>
-Date: Thu, 21 Feb 2019 13:07:26 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gwnHg-0001oq-3t
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:17:01 -0500
+Date: Thu, 21 Feb 2019 13:16:40 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190221131640.3656a574@redhat.com>
+In-Reply-To: <8d996c45-a338-cc5a-a740-28168c9ba8fc@redhat.com>
+References: <20190205173306.20483-1-eric.auger@redhat.com>
+	<20190205173306.20483-17-eric.auger@redhat.com>
+	<20190218113008.18ead6cb@Igors-MacBook-Pro.local>
+	<8d996c45-a338-cc5a-a740-28168c9ba8fc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
- just once, expand
+Subject: Re: [Qemu-devel] [PATCH v6 16/18] hw/arm/virt: Add nvdimm hot-plug
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +26,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-somewhat off-topic:
+On Wed, 20 Feb 2019 16:21:05 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-On 02/21/19 10:38, Peter Maydell wrote:
-> On Thu, 21 Feb 2019 at 09:22, Markus Armbruster <armbru@redhat.com> wrote:
->> Double-checking... you want me to keep goto reset_flash, like this:
->>
->> @@ -623,8 +617,8 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
->>                  pfl->wcycle = 0;
->>                  pfl->status |= 0x80;
->>              } else {
->> -                DPRINTF("%s: unknown command for \"write block\"\n", __func__);
->> -                PFLASH_BUG("Write block confirm");
->> +                qemu_log_mask(LOG_GUEST_ERROR,
->> +                              "unknown command for \"write block\"\n");
->>                  goto reset_flash;
->>              }
->>              break;
+> Hi Igor,
 > 
-> Yes. (We seem to handle most kinds of guest errors in programming
-> the flash by reset_flash.)
+> On 2/18/19 11:30 AM, Igor Mammedov wrote:
+> > On Tue,  5 Feb 2019 18:33:04 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> >>
+> >> Pre-plug and plug handlers are prepared for NVDIMM support.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> >> ---
+> >>  default-configs/arm-softmmu.mak |  2 ++
+> >>  hw/arm/virt-acpi-build.c        |  6 ++++++
+> >>  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
+> >>  include/hw/arm/virt.h           |  3 +++
+> >>  4 files changed, 33 insertions(+)
+> >>
+> >> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> >> index dc4624794f..ddbe87ed15 100644
+> >> --- a/default-configs/arm-softmmu.mak
+> >> +++ b/default-configs/arm-softmmu.mak
+> >> @@ -162,3 +162,5 @@ CONFIG_HIGHBANK=y
+> >>  CONFIG_MUSICPAL=y
+> >>  CONFIG_MEM_DEVICE=y
+> >>  CONFIG_DIMM=y
+> >> +CONFIG_NVDIMM=y
+> >> +CONFIG_ACPI_NVDIMM=y
+> >> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> >> index 781eafaf5e..f086adfa82 100644
+> >> --- a/hw/arm/virt-acpi-build.c
+> >> +++ b/hw/arm/virt-acpi-build.c
+> >> @@ -784,6 +784,7 @@ static
+> >>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> >>  {
+> >>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> >> +    MachineState *ms = MACHINE(vms);
+> >>      GArray *table_offsets;
+> >>      unsigned dsdt, xsdt;
+> >>      GArray *tables_blob = tables->table_data;
+> >> @@ -824,6 +825,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> >>          }
+> >>      }
+> >>  
+> >> +    if (vms->acpi_nvdimm_state.is_enabled) {
+> >> +        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
+> >> +                          &vms->acpi_nvdimm_state, ms->ram_slots);
+> >> +    }
+> >> +
+> >>      if (its_class_name() && !vmc->no_its) {
+> >>          acpi_add_table(table_offsets, tables_blob);
+> >>          build_iort(tables_blob, tables->linker, vms);
+> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >> index b683902991..0c8c2cc191 100644
+> >> --- a/hw/arm/virt.c
+> >> +++ b/hw/arm/virt.c
+> >> @@ -132,6 +132,7 @@ static const MemMapEntry a15memmap[] = {
+> >>      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+> >>      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+> >>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+> >> +    [VIRT_ACPI_IO] =            { 0x09070000, 0x00010000 },  
+> > where does this range come from and is its size sufficient?  
+> I understand it can be anywhere in low mem and must be large enough to
+> contain [NVDIMM_ACPI_IO_BASE, NDIMM_ACPI_IO_BASE + NVDIMM_ACPI_IO_LEN].
+it looked to like generic ACPI arrea rather than NVDIMM
+so I'd suggest to name it properly and probably use NVDIMM_ACPI_IO_BASE & co
+to add this entry so that reader won't have to wonder where this magic numbers
+come from.
 
-since we're talking "reset_flash", I'll note that there is no actual
-reset handler for cfi.pflash01. I found out recently, via:
+> So one 64kB page should do the job?
+Should it be located in lowmem?
+(do we care about device_memory & AVMF & ACPI & not 64bit guests?)
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1678713
 
-Thanks
-Laszlo
+> Thanks
+> 
+> Eric
+> >   
+> >>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+> >>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+> >>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> >> @@ -1637,6 +1638,18 @@ static void machvirt_init(MachineState *machine)
+> >>  
+> >>      create_platform_bus(vms, pic);
+> >>  
+> >> +    if (vms->acpi_nvdimm_state.is_enabled) {
+> >> +        AcpiNVDIMMState *acpi_nvdimm_state = &vms->acpi_nvdimm_state;
+> >> +
+> >> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_MEMORY;
+> >> +        acpi_nvdimm_state->dsm_io.base =
+> >> +                vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE;
+> >> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
+> >> +
+> >> +        nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
+> >> +                               vms->fw_cfg, OBJECT(vms));
+> >> +    }
+> >> +
+> >>      vms->bootinfo.ram_size = machine->ram_size;
+> >>      vms->bootinfo.kernel_filename = machine->kernel_filename;
+> >>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+> >> @@ -1822,10 +1835,19 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+> >>                               DeviceState *dev, Error **errp)
+> >>  {
+> >>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> >> +    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> >>      Error *local_err = NULL;
+> >>  
+> >>      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> >> +    if (local_err) {
+> >> +        goto out;
+> >> +    }
+> >>  
+> >> +    if (is_nvdimm) {
+> >> +        nvdimm_plug(&vms->acpi_nvdimm_state);
+> >> +    }
+> >> +
+> >> +out:
+> >>      error_propagate(errp, local_err);
+> >>  }
+> >>  
+> >> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> >> index c88f67a492..56d73b0e86 100644
+> >> --- a/include/hw/arm/virt.h
+> >> +++ b/include/hw/arm/virt.h
+> >> @@ -37,6 +37,7 @@
+> >>  #include "hw/arm/arm.h"
+> >>  #include "sysemu/kvm.h"
+> >>  #include "hw/intc/arm_gicv3_common.h"
+> >> +#include "hw/mem/nvdimm.h"
+> >>  
+> >>  #define NUM_GICV2M_SPIS       64
+> >>  #define NUM_VIRTIO_TRANSPORTS 32
+> >> @@ -77,6 +78,7 @@ enum {
+> >>      VIRT_GPIO,
+> >>      VIRT_SECURE_UART,
+> >>      VIRT_SECURE_MEM,
+> >> +    VIRT_ACPI_IO,
+> >>      VIRT_LOWMEMMAP_LAST,
+> >>  };
+> >>  
+> >> @@ -134,6 +136,7 @@ typedef struct {
+> >>      hwaddr high_io_base;
+> >>      hwaddr highest_gpa;
+> >>      bool extended_memmap;
+> >> +    AcpiNVDIMMState acpi_nvdimm_state;
+> >>  } VirtMachineState;
+> >>  
+> >>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)  
+> >   
