@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55225)
+Received: from eggs.gnu.org ([209.51.188.92]:58960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1gweTP-0004rK-4z
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:52:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gwent-0000tj-3M
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 22:13:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1gweTM-0007yE-BX
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:52:30 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36930)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1gweTL-0007ti-Av
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 21:52:27 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x1L2n379011550
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 21:52:16 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qsgk2x8mr-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 21:52:16 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Thu, 21 Feb 2019 02:52:15 -0000
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-16-git-send-email-jjherne@linux.ibm.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Wed, 20 Feb 2019 21:52:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gwenr-0002x0-JK
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 22:13:41 -0500
+Date: Thu, 21 Feb 2019 14:13:16 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190221031316.GE13129@umbus.fritz.box>
+References: <20190128094625.4428-1-clg@kaod.org>
+	<20190128094625.4428-6-clg@kaod.org>
+	<20190212054013.GL1884@umbus.fritz.box>
+	<ef18dbf0-87dc-1ec2-247f-28bae0aef308@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <1548768562-20007-16-git-send-email-jjherne@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <95cb3df5-89cb-0d28-5fb7-2cea5d139484@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 15/15] s390-bios: Support
- booting from real dasd device
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="+SfteS7bOf3dGlBC"
+Content-Disposition: inline
+In-Reply-To: <ef18dbf0-87dc-1ec2-247f-28bae0aef308@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 05/19] ppc/pnv: add XIVE support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,211 +26,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
+--+SfteS7bOf3dGlBC
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 01/29/2019 08:29 AM, Jason J. Herne wrote:
-> Allows guest to boot from a vfio configured real dasd device.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->   docs/devel/s390-dasd-ipl.txt | 132 +++++++++++++++++++++++
->   pc-bios/s390-ccw/Makefile    |   2 +-
->   pc-bios/s390-ccw/dasd-ipl.c  | 249 +++++++++++++++++++++++++++++++++++++++++++
->   pc-bios/s390-ccw/dasd-ipl.h  |  16 +++
->   pc-bios/s390-ccw/main.c      |   4 +
->   pc-bios/s390-ccw/s390-arch.h |  13 +++
->   6 files changed, 415 insertions(+), 1 deletion(-)
->   create mode 100644 docs/devel/s390-dasd-ipl.txt
->   create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
->   create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+On Tue, Feb 19, 2019 at 08:31:25AM +0100, C=E9dric Le Goater wrote:
+> On 2/12/19 6:40 AM, David Gibson wrote:
+> > On Mon, Jan 28, 2019 at 10:46:11AM +0100, C=E9dric Le Goater wrote:
+[snip]
+> >>  #endif /* _PPC_PNV_H */
+> >> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+> >> index 9961ea3a92cd..8e57c064e661 100644
+> >> --- a/include/hw/ppc/pnv_core.h
+> >> +++ b/include/hw/ppc/pnv_core.h
+> >> @@ -49,6 +49,7 @@ typedef struct PnvCoreClass {
+> >> =20
+> >>  typedef struct PnvCPUState {
+> >>      struct ICPState *icp;
+> >> +    struct XiveTCTX *tctx;
+> >=20
+> > Unlike sPAPR, we really do always know in advance the interrupt
+> > controller for a particular machine.  I think it makes sense to
+> > further split the POWER8 and POWER9 cases here, so we only track one
+> > for any given setup.
+>=20
+> So, you would define a :=20
+>=20
+>   typedef struct Pnv9CPUState {
+>       struct XiveTCTX *tctx;
+>   } Pnv9CPUState;
+>=20
+> to be allocated when the core is realized ? and later the routine=20
+> pnv_chip_power9_intc_create() would assign the ->tctx pointer.
 
-...snip...
+Sounds about right.
 
-> diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-> new file mode 100644
-> index 0000000..b7ce6d9
-> --- /dev/null
-> +++ b/pc-bios/s390-ccw/dasd-ipl.c
-> @@ -0,0 +1,249 @@
+[snip]
+> >> +    uint32_t      nr_ends;
+> >> +    XiveENDSource end_source;
+> >> +
+> >> +    /* Interrupt controller registers */
+> >> +    uint64_t      regs[0x300];
+> >> +
+> >> +    /* Can be configured by FW */
+> >> +    uint32_t      tctx_chipid;
+> >> +    uint32_t      chip_id;
+> >=20
+> > Can't you derive that since you have a pointer to the owning chip?
+>=20
+> Not always, there are register fields to purposely override this value.
+> I can improve the current code a little I think.
 
-...snip...
+Ok.
 
-> +static void ipl1_fixup(void)
-> +{
-> +    Ccw0 *ccwSeek = (Ccw0 *) 0x08;
-> +    Ccw0 *ccwSearchID = (Ccw0 *) 0x10;
-> +    Ccw0 *ccwSearchTic = (Ccw0 *) 0x18;
-> +    Ccw0 *ccwRead = (Ccw0 *) 0x20;
-> +    CcwSeekData *seekData = (CcwSeekData *) 0x30;
-> +    CcwSearchIdData *searchData = (CcwSearchIdData *) 0x38;
-> +
-> +    /* move IPL1 CCWs to make room for CCWs needed to locate record 2 */
-> +    memcpy(ccwRead, (void *)0x08, 16);
-> +
-> +    /* Disable chaining so we don't TIC to IPL2 channel program */
-> +    ccwRead->chain = 0x00;
-> +
-> +    ccwSeek->cmd_code = CCW_CMD_DASD_SEEK;
-> +    ccwSeek->cda = ptr2u32(seekData);
-> +    ccwSeek->chain = 1;
-> +    ccwSeek->count = sizeof(seekData);
+[snip]
+> >> +/*
+> >> + * Virtual structures table (VST)
+> >> + */
+> >> +typedef struct XiveVstInfo {
+> >> +    uint32_t    type;
+> >> +    const char *name;
+> >> +    uint32_t    size;
+> >> +    uint32_t    max_blocks;
+> >> +} XiveVstInfo;
+> >> +
+> >> +static const XiveVstInfo vst_infos[] =3D {
+> >> +    [VST_TSEL_IVT]  =3D { VST_TSEL_IVT,  "EAT",  sizeof(XiveEAS), 16 =
+},
+> >=20
+> > I don't love explicitly storing the type/index in each record, as well
+> > as it being implicit in the table slot.
+>=20
+> The 'vst_infos' table decribes the different table types and the 'type'=
+=20
+> field is used to index the runtime table of VSDs. See
+> pnv_xive_vst_addr()
 
-This needs to be sizeof(*seekData)
+Yes, I know what it's for but it's still redundant information.  You
+could avoid it, for example, by passing around an index instead of a
+pointer to a vst_infos[] slot - then you can look up both vst_infos
+and the other table using that index.
 
-> +    seekData->reserved = 0x00;
-> +    seekData->cyl = 0x00;
-> +    seekData->head = 0x00;
-> +
-> +    ccwSearchID->cmd_code = CCW_CMD_DASD_SEARCH_ID_EQ;
-> +    ccwSearchID->cda = ptr2u32(searchData);
-> +    ccwSearchID->chain = 1;
-> +    ccwSearchID->count = sizeof(searchData);
+[snip]
+> >> +    case CQ_TM1_BAR: /* TM BAR. 4 pages. Map only once */
+> >> +    case CQ_TM2_BAR: /* second TM BAR. for hotplug. Not modeled */
+> >> +        xive->tm_shift =3D val & CQ_TM_BAR_64K ? 16 : 12;
+> >> +        if (!(val & CQ_TM_BAR_VALID)) {
+> >> +            xive->tm_base =3D 0;
+> >> +            if (xive->regs[reg] & CQ_TM_BAR_VALID && xive->chip_id =
+=3D=3D 0) {
+> >> +                memory_region_del_subregion(sysmem, &xive->tm_mmio);
+> >> +            }
+> >> +        } else {
+> >> +            xive->tm_base =3D val & ~(CQ_TM_BAR_VALID | CQ_TM_BAR_64K=
+);
+> >> +            if (!(xive->regs[reg] & CQ_TM_BAR_VALID) && xive->chip_id=
+ =3D=3D 0) {
+> >> +                memory_region_add_subregion(sysmem, xive->tm_base,
+> >> +                                            &xive->tm_mmio);
+> >> +            }
+> >> +        }
+> >> +        break;
+> >> +
+> >> +    case CQ_PC_BARM:
+> >> +        xive->regs[reg] =3D val;
+> >=20
+> > As discussed elsewhere, this seems to be a big mix of writing things
+> > directly into regs[reg] and doing other things instead, and you really
+> > want to go one way or the other.  I'd suggest dropping xive->regs[]
+> > and instead putting the state you need persistent into its own
+> > variables.
+>=20
+> I made a big effort to introduce helper routines to avoid storing values=
+=20
+> that can be calculated under the PnvXive model, as you asked for it.=20
+> The assignment above is only necessary for the pnv_xive_pc_size() below
+> and I don't know how handle this current case without duplicating the=20
+> switch statement, which I think is ugly.
 
-sizeof(*searchData)
+I'm not sure quite what you mean about duplicating the case.
 
-I notice that vfio sees the count for each of these as 8 bytes despite 
-them being packed structs of 6 or 5 bytes.
+The point here is that since you're only storing in a couple of the
+switch cases, you can just have explicit data backing just those
+values and write to those in the switch cases instead of having a
+great big regs[] array of which only a few bits are used.
 
-> +    searchData->cyl = 0;
-> +    searchData->head = 0;
-> +    searchData->record = 2;
-> +
-> +    /* Go back to Search CCW if correct record not yet found */
-> +    ccwSearchTic->cmd_code = CCW_CMD_TIC;
-> +    ccwSearchTic->cda = ptr2u32(ccwSearchID);
-> +}
-> +
-> +static void run_ipl1(SubChannelId schid)
-> + {
-> +    uint32_t startAddr = 0x08;
-> +
-> +    if (do_cio(schid, startAddr, CCW_FMT0)) {
-> +        panic("dasd-ipl: Failed to run IPL1 channel program");
-> +    }
-> +}
-> +
-> +static void run_ipl2(SubChannelId schid, uint32_t addr)
-> +{
-> +
-> +    if (run_dynamic_ccw_program(schid, addr)) {
-> +        panic("dasd-ipl: Failed to run IPL2 channel program");
-> +    }
-> +}
-> +
-> +static void lpsw(void *psw_addr)
-> +{
-> +    PSWLegacy *pswl = (PSWLegacy *) psw_addr;
-> +
-> +    pswl->mask |= PSW_MASK_EAMODE;   /* Force z-mode */
-> +    pswl->addr |= PSW_MASK_BAMODE;
-> +    asm volatile("  llgtr 0,0\n llgtr 1,1\n"     /* Some OS's expect to be */
-> +                 "  llgtr 2,2\n llgtr 3,3\n"     /* in 32-bit mode. Clear  */
-> +                 "  llgtr 4,4\n llgtr 5,5\n"     /* high part of regs to   */
-> +                 "  llgtr 6,6\n llgtr 7,7\n"     /* avoid messing up       */
-> +                 "  llgtr 8,8\n llgtr 9,9\n"     /* instructions that work */
-> +                 "  llgtr 10,10\n llgtr 11,11\n" /* in both addressing     */
-> +                 "  llgtr 12,12\n llgtr 13,13\n" /* modes, like servc.     */
-> +                 "  llgtr 14,14\n llgtr 15,15\n"
-> +                 "  lpsw %0\n"
-> +                 : : "Q" (*pswl) : "cc");
-> +}
-> +
-> +/*
-> + * Limitations in QEMU's CCW support complicate the IPL process. Details can
-> + * be found in docs/devel/s390-dasd-ipl.txt
-> + */
-> +void dasd_ipl(SubChannelId schid)
-> +{
-> +    uint32_t ipl2_addr;
-> +
-> +    /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
-> +    make_readipl();
-> +    run_readipl(schid);
-> +    ipl2_addr = read_ipl2_addr();
-> +    check_ipl1();
-> +
-> +    /*
-> +     * Fixup IPL1 channel program to account for QEMU limitations, then run it
-> +     * to read IPL2 channel program from boot disk.
-> +     */
-> +    ipl1_fixup();
-> +    run_ipl1(schid);
-> +    check_ipl2(ipl2_addr);
-> +
-> +    /*
-> +     * Run IPL2 channel program to read operating system code from boot disk
-> +     * then transfer control to the guest operating system
-> +     */
-> +    run_ipl2(schid, ipl2_addr);
-> +    lpsw(0);
-> +}
-> diff --git a/pc-bios/s390-ccw/dasd-ipl.h b/pc-bios/s390-ccw/dasd-ipl.h
-> new file mode 100644
-> index 0000000..56bba82
-> --- /dev/null
-> +++ b/pc-bios/s390-ccw/dasd-ipl.h
-> @@ -0,0 +1,16 @@
-> +/*
-> + * S390 IPL (boot) from a real DASD device via vfio framework.
-> + *
-> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef DASD_IPL_H
-> +#define DASD_IPL_H
-> +
-> +void dasd_ipl(SubChannelId schid);
-> +
-> +#endif /* DASD_IPL_H */
-> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index 5ee02c3..0a46339 100644
-> --- a/pc-bios/s390-ccw/main.c
-> +++ b/pc-bios/s390-ccw/main.c
-> @@ -13,6 +13,7 @@
->   #include "s390-ccw.h"
->   #include "cio.h"
->   #include "virtio.h"
-> +#include "dasd-ipl.h"
->   
->   char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
->   static SubChannelId blk_schid = { .one = 1 };
-> @@ -210,6 +211,9 @@ int main(void)
->   
->       cutype = cu_type(blk_schid) ;
->       switch (cutype) {
-> +    case CU_TYPE_DASD_3990:
-> +        dasd_ipl(blk_schid); /* no return */
-> +        break;
->       case CU_TYPE_VIRTIO:
->           virtio_setup();
->           zipl_load(); /* no return */
-> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-> index 47eaa04..0438d42 100644
-> --- a/pc-bios/s390-ccw/s390-arch.h
-> +++ b/pc-bios/s390-ccw/s390-arch.h
-> @@ -97,4 +97,17 @@ typedef struct LowCore {
->   
->   extern const LowCore *lowcore;
->   
-> +static inline void set_prefix(uint32_t address)
-> +{
-> +    asm volatile("spx %0" : : "m" (address) : "memory");
-> +}
-> +
-> +static inline uint32_t store_prefix(void)
-> +{
-> +    uint32_t address;
-> +
-> +    asm volatile("stpx %0" : "=m" (address));
-> +    return address;
-> +}
-> +
->   #endif
-> 
+> So, I will keep the xive->regs[] and make the couple of fixes still neede=
+d.
+
+[snip]
+> >> +/*
+> >> + * Virtualization Controller MMIO region containing the IPI and END E=
+SB pages
+> >> + */
+> >> +static uint64_t pnv_xive_vc_read(void *opaque, hwaddr offset,
+> >> +                                 unsigned size)
+> >> +{
+> >> +    PnvXive *xive =3D PNV_XIVE(opaque);
+> >> +    uint64_t edt_index =3D offset >> pnv_xive_edt_shift(xive);
+> >> +    uint64_t edt_type =3D 0;
+> >> +    uint64_t edt_offset;
+> >> +    MemTxResult result;
+> >> +    AddressSpace *edt_as =3D NULL;
+> >> +    uint64_t ret =3D -1;
+> >> +
+> >> +    if (edt_index < XIVE_TABLE_EDT_MAX) {
+> >> +        edt_type =3D GETFIELD(CQ_TDR_EDT_TYPE, xive->edt[edt_index]);
+> >> +    }
+> >> +
+> >> +    switch (edt_type) {
+> >> +    case CQ_TDR_EDT_IPI:
+> >> +        edt_as =3D &xive->ipi_as;
+> >> +        break;
+> >> +    case CQ_TDR_EDT_EQ:
+> >> +        edt_as =3D &xive->end_as;
+> >=20
+> > I'm not entirely understanding the function of these AddressSpace objec=
+tz.
+>=20
+> The IPI and END ESB pages are exposed in the same VC region. But this VC=
+=20
+> region is not splitted between the two types with a single offset. It=20
+> is segmented with the EDT tables which defines the type of each segment.=
+=20
+>=20
+> The purpose of these address spaces is to translate the load/stores in=20
+> the VC region in the equivalent IPI or END region exposing contigously=20
+> ESB pages of the same type: 'end_edt_mmio' and 'ipi_edt_mmio'.=20
+>=20
+> The memory regions of the XiveENDSource and the XiveSource for the IPIs=
+=20
+> are mapped in 'end_edt_mmio' and 'ipi_edt_mmio'.
+
+Hmm.  Ok, I'm not immediately seeing why you can't map the various IPI
+or END blocks directly into address_space memory rather than having
+this extra internal layer of indirection.
+
+> (This is changing for P10, should be simpler)  =20
+
+[snip]
+> >> +/*
+> >> + *  Maximum number of IRQs and ENDs supported by HW
+> >> + */
+> >> +#define PNV_XIVE_NR_IRQS (PNV9_XIVE_VC_SIZE / (1ull << XIVE_ESB_64K_2=
+PAGE))
+> >> +#define PNV_XIVE_NR_ENDS (PNV9_XIVE_VC_SIZE / (1ull << XIVE_ESB_64K_2=
+PAGE))
+> >> +
+> >> +static void pnv_xive_realize(DeviceState *dev, Error **errp)
+> >> +{
+> >> +    PnvXive *xive =3D PNV_XIVE(dev);
+> >> +    XiveSource *xsrc =3D &xive->source;
+> >> +    XiveENDSource *end_xsrc =3D &xive->end_source;
+> >> +    Error *local_err =3D NULL;
+> >> +    Object *obj;
+> >> +
+> >> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
+> >> +    if (!obj) {
+> >> +        error_propagate(errp, local_err);
+> >> +        error_prepend(errp, "required link 'chip' not found: ");
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* The PnvChip id identifies the XIVE interrupt controller. */
+> >> +    xive->chip =3D PNV_CHIP(obj);
+> >> +
+> >> +    /*
+> >> +     * Xive Interrupt source and END source object with the maximum
+> >> +     * allowed HW configuration. The ESB MMIO regions will be resized
+> >> +     * dynamically when the controller is configured by the FW to
+> >> +     * limit accesses to resources not provisioned.
+> >> +     */
+> >> +    object_property_set_int(OBJECT(xsrc), PNV_XIVE_NR_IRQS, "nr-irqs",
+> >> +                            &error_fatal);
+> >=20
+> > You have a constant here, but your router object also includes a
+> > nr_irqs field.  What's up with that?
+>=20
+> The XiveSource object of PnvXive is realized for the maximum size allowed
+> by HW because we don't know how much IRQs the FW will provision for.
+>=20
+> The 'nr_irqs' is the number of IRQs configured by the FW (We changed the
+> name to 'nr_ipis') See routine pnv_xive_vst_set_exclusive()
+
+Ah, ok.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--+SfteS7bOf3dGlBC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxuF0kACgkQbDjKyiDZ
+s5I67Q/7BAdsIni1p91AvtT34tWbofj4HHJyMpfYYNSfryXeZ17tb6LsuYdskIBC
+aralWfG7hXrTaHVOITTA0lIwt3AcByE8/yVKsCuFAkcSk7R+YWffHYBvyrM5Xdyd
+1wFGp+hF5P7WYru5B4BNPYLNgGucJ/kvpVXI4vGbF4OrIuK3YximpAxCoztwIMZo
+mqvNOIV6KOCJrJhYa+dAmBPSpAp8dT0jrfzuDWqwr6fWyVdUGpUwvsl5QQl9DFoN
+R/8GTNr6n9Q6O66Dunhl0gQRQw/n3vBqm1bHQVN/SxBngDKpH6IdTOxbkvjStSy6
+GsNXjGyeURjnsXJNlR1q2LgOxx60gOnkAY6vcQPjuO0K46EykvQORuuJbT6MGjU/
+5V6UODWSwq/wQv4nBWXVxxk/1+HrzXludB89CaPBlEQ0qWQT05PvC2Fh5bwSe3PJ
+ilDYA1biIKDQ93fzti5tBemhQHOYiTFHsQQd4AJo2Na3Vz01NozY65qyBnT4t+fB
+E0uu15dqBoApEhKeV+YQd8uHhD2yvAvqYV1nU0B+oXgrWE2Z2xxi4Iw14djSxk0g
+H0QeXNTVc+rCZYIumT/2Y3Jkz1Wc4ONQZt6lzutbdNSEpRGc7Tg1y5MuTd1HbM74
+qnqzb4AwKGz3g2jGY1jQocannlVeR3YJH6cxeU5xv7HXiX8O1Wo=
+=/K1v
+-----END PGP SIGNATURE-----
+
+--+SfteS7bOf3dGlBC--
