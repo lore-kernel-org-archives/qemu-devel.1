@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52744)
+Received: from eggs.gnu.org ([209.51.188.92]:52941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gwjLJ-000267-KD
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:04:30 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gwjMS-0002jI-3O
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:05:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gwjLH-0005Wl-HV
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:04:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gwjLF-0005W1-UY
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:04:26 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C8CA6309175E
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 08:04:24 +0000 (UTC)
-Date: Thu, 21 Feb 2019 16:03:57 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190221080357.GC3091@xz-x1>
-References: <20190220160628.6555-1-marcandre.lureau@redhat.com>
-	<20190220160628.6555-3-marcandre.lureau@redhat.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gwjMR-000663-30
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:05:40 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Thu, 21 Feb 2019 08:05:13 +0000
+Message-ID: <aad71cef-0a47-c826-2d4b-891f2f1285f7@virtuozzo.com>
+References: <20190114111744.113188-1-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20190114111744.113188-1-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4509F5680498304F9CECC0A16B25C37E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190220160628.6555-3-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] chardev: make
- qemu_chr_fe_set_handlers() context switching safer
+Subject: Re: [Qemu-devel] [PATCH v12 00/10] qcow2: cluster space
+ preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,115 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Wed, Feb 20, 2019 at 05:06:26PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> qemu_chr_fe_set_handlers() may switch the context of various
-> sources. In order to prevent dispatch races from different threads,
-> let's acquire or freeze the context, do all the source switches, and
-> then release/resume the contexts. This should help to make context
-> switching safer.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/chardev/char-fe.h |  23 +++++++++
->  chardev/char-fe.c         | 103 +++++++++++++++++++++++++++++++++-----
->  chardev/char-mux.c        |  14 +++---
->  3 files changed, 121 insertions(+), 19 deletions(-)
->=20
-> diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
-> index aa1b864ccd..4051435a1c 100644
-> --- a/include/chardev/char-fe.h
-> +++ b/include/chardev/char-fe.h
-> @@ -84,6 +84,14 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
->   * Set the front end char handlers. The front end takes the focus if
->   * any of the handler is non-NULL.
->   *
-> + * A chardev may have multiple main loop sources. In order to prevent
-> + * races when switching contexts, the function will temporarily block
-> + * the contexts before the source switch to prevent them from
-> + * dispatching in different threads concurrently.
-> + *
-> + * The current and the new @context must be acquirable or
-> + * running & dispatched in a loop (the function will hang otherwise).
-> + *
->   * Without associated Chardev, nothing is changed.
->   */
->  void qemu_chr_fe_set_handlers_full(CharBackend *b,
-> @@ -110,6 +118,21 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
->                                GMainContext *context,
->                                bool set_open);
-> =20
-> +/**
-> + * qemu_chr_fe_set_handlers_internal:
-> + *
-> + * Same as qemu_chr_fe_set_handlers(), without context freezing.
-> + */
-> +void qemu_chr_fe_set_handlers_internal(CharBackend *b,
-> +                                       IOCanReadHandler *fd_can_read,
-> +                                       IOReadHandler *fd_read,
-> +                                       IOEventHandler *fd_event,
-> +                                       BackendChangeHandler *be_change=
-,
-> +                                       void *opaque,
-> +                                       GMainContext *context,
-> +                                       bool set_open,
-> +                                       bool sync_state);
-> +
->  /**
->   * qemu_chr_fe_take_focus:
->   *
-> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-> index f3530a90e6..90cd7db007 100644
-> --- a/chardev/char-fe.c
-> +++ b/chardev/char-fe.c
-> @@ -246,15 +246,67 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
->      }
->  }
-> =20
-> -void qemu_chr_fe_set_handlers_full(CharBackend *b,
-> -                                   IOCanReadHandler *fd_can_read,
-> -                                   IOReadHandler *fd_read,
-> -                                   IOEventHandler *fd_event,
-> -                                   BackendChangeHandler *be_change,
-> -                                   void *opaque,
-> -                                   GMainContext *context,
-> -                                   bool set_open,
-> -                                   bool sync_state)
-> +struct MainContextWait {
-> +    QemuCond cond;
-> +    QemuMutex lock;
-> +};
-> +
-> +static gboolean
-> +main_context_wait_cb(gpointer user_data)
-> +{
-> +    struct MainContextWait *w =3D user_data;
-> +
-> +    qemu_mutex_lock(&w->lock);
-> +    qemu_cond_signal(&w->cond);
-> +    /* wait until switching is over */
-> +    qemu_cond_wait(&w->cond, &w->lock);
-
-Could previous signal() directly wake up itself here?  Man
-pthread_cond_broadcast says:
-
-       The pthread_cond_signal() function shall unblock at least one
-       of the threads that are blocked on the specified condition
-       variable cond (if any threads are blocked on cond).
-
-       If more than one thread is blocked on a condition variable, the
-       scheduling policy shall determine the order in which threads
-       are unblocked.
-
-So AFAIU it could, because neither there's a restriction on ordering
-of how waiters are waked up, nor there's a limitation on how many
-waiters will be waked up by a single signal().
-
-Why not simply use two semaphores?  Then locks can be avoided too.
-
-Regards,
-
---=20
-Peter Xu
+T24gMTQvMS8yMDE5IDI6MTggUE0sIEFudG9uIE5lZmVkb3Ygd3JvdGU6DQo+IFRoaXMgcHVsbCBy
+ZXF1ZXN0IGlzIHRvIHN0YXJ0IHRvIGltcHJvdmUgYSBmZXcgcGVyZm9ybWFuY2UgcG9pbnRzIG9m
+DQo+IHFjb3cyIGZvcm1hdDoNCj4gDQo+ICAgIDEuIG5vbiBjbHVzdGVyLWFsaWduZWQgd3JpdGUg
+cmVxdWVzdHMgKHRvIHVuYWxsb2NhdGVkIGNsdXN0ZXJzKSBleHBsaWNpdGx5DQo+ICAgICAgIHBh
+ZCBkYXRhIHdpdGggemVyb2VzIGlmIHRoZXJlIGlzIG5vIGJhY2tpbmcgZGF0YS4NCj4gICAgICAg
+UmVzdWx0aW5nIGluY3JlYXNlIGluIG9wcyBudW1iZXIgYW5kIHBvdGVudGlhbCBjbHVzdGVyIGZy
+YWdtZW50YXRpb24NCj4gICAgICAgKG9uIHRoZSBob3N0IGZpbGUpIGlzIGFscmVhZHkgc29sdmVk
+IGJ5Og0KPiAgICAgICAgIGVlMjJhOWQgcWNvdzI6IE1lcmdlIHRoZSB3cml0aW5nIG9mIHRoZSBD
+T1cgcmVnaW9ucyB3aXRoIHRoZSBndWVzdCBkYXRhDQo+ICAgICAgIEhvd2V2ZXIsIGluIGNhc2Ug
+b2YgemVybyBDT1cgcmVnaW9ucywgdGhhdCBjYW4gYmUgYXZvaWRlZCBhdCBhbGwNCj4gICAgICAg
+YnV0IHRoZSB3aG9sZSBjbHVzdGVycyBhcmUgcHJlYWxsb2NhdGVkIGFuZCB6ZXJvZWQgaW4gYSBz
+aW5nbGUNCj4gICAgICAgZWZmaWNpZW50IHdyaXRlX3plcm9lcygpIG9wZXJhdGlvbg0KPiANCj4g
+ICAgMi4gbW9yZW92ZXIsIGVmZmljaWVudCB3cml0ZV96ZXJvZXMoKSBvcGVyYXRpb24gY2FuIGJl
+IHVzZWQgdG8gcHJlYWxsb2NhdGUNCj4gICAgICAgc3BhY2UgbWVnYWJ5dGVzICgqY29uZmlndXJh
+YmxlIG51bWJlcikgYWhlYWQgd2hpY2ggZ2l2ZXMgbm90aWNlYWJsZQ0KPiAgICAgICBpbXByb3Zl
+bWVudCBvbiBzb21lIHN0b3JhZ2UgdHlwZXMgKGUuZy4gZGlzdHJpYnV0ZWQgc3RvcmFnZSkNCj4g
+ICAgICAgd2hlcmUgdGhlIHNwYWNlIGFsbG9jYXRpb24gb3BlcmF0aW9uIG1pZ2h0IGJlIGV4cGVu
+c2l2ZSkNCj4gICAgICAgKE5vdCBpbmNsdWRlZCBpbiB0aGlzIHBhdGNoc2V0IHNpbmNlIHY2KS4N
+Cj4gDQo+ICAgIDMuIHRoaXMgd2lsbCBhbHNvIGFsbG93IHRvIGVuYWJsZSBzaW11bHRhbmVvdXMg
+d3JpdGVzIHRvIHRoZSBzYW1lIHVuYWxsb2NhdGVkDQo+ICAgICAgIGNsdXN0ZXIgYWZ0ZXIgdGhl
+IHNwYWNlIGhhcyBiZWVuIGFsbG9jYXRlZCAmIHplcm9lZCBidXQgYmVmb3JlDQo+ICAgICAgIHRo
+ZSBmaXJzdCBkYXRhIGlzIHdyaXR0ZW4gYW5kIHRoZSBjbHVzdGVyIGlzIGxpbmtlZCB0byBMMi4N
+Cj4gICAgICAgKE5vdCBpbmNsdWRlZCBpbiB0aGlzIHBhdGNoc2V0KS4NCj4gDQo+IEVmZmljaWVu
+dCB3cml0ZV96ZXJvZXMgdXN1YWxseSBpbXBsaWVzIHRoYXQgdGhlIGJsb2NrcyBhcmUgbm90IGFj
+dHVhbGx5DQo+IHdyaXR0ZW4gdG8gYnV0IG9ubHkgcmVzZXJ2ZWQgYW5kIG1hcmtlZCBhcyB6ZXJv
+ZWQgYnkgdGhlIHN0b3JhZ2UuDQo+IEluIHRoaXMgcGF0Y2hzZXQsIGZpbGUtcG9zaXggZHJpdmVy
+IGlzIG1hcmtlZCBhcyBzdXBwb3J0aW5nIHRoaXMgb3BlcmF0aW9uDQo+IGlmIGl0IHN1cHBvcnRz
+ICgvY29uZmlndXJlZCB0byBzdXBwb3J0KSBmYWxsb2NhdGUoKSBvcGVyYXRpb24uDQo+IA0KPiBF
+eGlzdGluZyBiZHJ2X3dyaXRlX3plcm9lcygpIGZhbGxzIGJhY2sgdG8gd3JpdGluZyB6ZXJvIGJ1
+ZmZlcnMgaWYNCj4gd3JpdGVfemVyb2VzIGlzIG5vdCBzdXBwb3J0ZWQgYnkgdGhlIGRyaXZlci4N
+Cj4gQSBuZXcgZmxhZyAoQkRSVl9SRVFfQUxMT0NBVEUpIGlzIGludHJvZHVjZWQgdG8gYXZvaWQg
+dGhhdCBidXQgcmV0dXJuIEVOT1RTVVAuDQo+IFN1Y2ggYWxsb2NhdGUgcmVxdWVzdHMgYXJlIGFs
+c28gaW1wbGVtZW50ZWQgdG8gcG9zc2libHkgb3ZlcmxhcCB3aXRoIHRoZQ0KPiBvdGhlciByZXF1
+ZXN0cy4gTm8gd2FpdCBpcyBwZXJmb3JtZWQgYnV0IGFuIGVycm9yIHJldHVybmVkIGluIHN1Y2gg
+Y2FzZSBhcyB3ZWxsLg0KPiBTbyB0aGUgb3BlcmF0aW9uIHNob3VsZCBiZSBjb25zaWRlcmVkIGFk
+dmlzb3J5IGFuZCBhIGZhbGxiYWNrIHNjZW5hcmlvIHN0aWxsDQo+IGhhbmRsZWQgYnkgdGhlIGNh
+bGxlciAoaW4gdGhpcyBjYXNlLCBxY293MiBkcml2ZXIpLg0KPiANCj4gc2ltcGxlIHBlcmYgdGVz
+dDoNCj4gDQo+ICAgIHFlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiB0ZXN0LmltZyA0RyAmJiBcDQo+
+ICAgIHFlbXUtaW1nIGJlbmNoIC1jICQoKDEwMjQqMTAyNCkpIC1mIHFjb3cyIC1uIC1zIDRrIC10
+IG5vbmUgLXcgdGVzdC5pbWcNCj4gDQo+IHRlc3QgcmVzdWx0cyAoc2Vjb25kcyk6DQo+IA0KPiAg
+ICAgICstLS0tLS0tLS0tLSstLS0tLS0tKy0tLS0tLSstLS0tLS0tKy0tLS0tLSstLS0tLS0rDQo+
+ICAgICAgfCAgIGZpbGUgICAgfCAgICBiZWZvcmUgICAgfCAgICAgYWZ0ZXIgICAgfCBnYWluIHwN
+Cj4gICAgICArLS0tLS0tLS0tLS0rLS0tLS0tLSstLS0tLS0rLS0tLS0tLSstLS0tLS0rLS0tLS0t
+Kw0KPiAgICAgIHwgICAgc3NkICAgIHwgICAgICA2MS4xNTMgIHwgICAgICAzNi4zMTMgIHwgIDQx
+JSB8DQo+ICAgICAgfCAgICBoZGQgICAgfCAgICAgMTEyLjY3NiAgfCAgICAgMTIyLjA1NiAgfCAg
+LTglIHwNCj4gICAgICArLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0r
+LS0tLS0tKw0KPiANCg0KcGluZw0K
