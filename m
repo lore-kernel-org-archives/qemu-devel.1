@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43587)
+Received: from eggs.gnu.org ([209.51.188.92]:44562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gwp75-0003mG-LD
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:14:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gwpBU-0005Mn-Dk
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:18:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gwp75-0007N3-0t
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:14:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47536)
+	(envelope-from <kraxel@redhat.com>) id 1gwpBT-0002mr-KG
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:18:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gwp74-0007ML-Q2
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:14:10 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40E2A59462
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 14:14:09 +0000 (UTC)
-References: <20190212193855.13223-1-ccarrara@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <5347c372-464f-763c-ddf4-56484c489247@redhat.com>
-Date: Thu, 21 Feb 2019 11:14:02 -0300
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwpBT-0002m8-DH
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:18:43 -0500
+Date: Thu, 21 Feb 2019 15:18:41 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190221141841.2gberr5endb7mfpe@sirius.home.kraxel.org>
+References: <7287de8f-b1af-9285-0ac1-173ed7197f94@msgid.tls.msk.ru>
 MIME-Version: 1.0
-In-Reply-To: <20190212193855.13223-1-ccarrara@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] tests.acceptance: adds multi vm
- capability and basic migration test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7287de8f-b1af-9285-0ac1-173ed7197f94@msgid.tls.msk.ru>
+Subject: Re: [Qemu-devel] Qemu GTK display mouse pointer visibility/position
+ problem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel qemu-devel <qemu-devel@nongnu.org>, 919057@bugs.debian.org
 
+  Hi,
 
-On 02/12/2019 05:38 PM, Caio Carrara wrote:
-> This is the third attempt to add the multi vm capability to base class
-> of acceptance tests.
->
-> The difference from first version is that in this current version a
-> simple migration test was added (done by Cleber) so the new code that is
-> being added is properly used and we're not adding "new dead code".
->
-> The difference from the second version is that in this current version
-> the migration test being added was updated based on last reviews. It was
-> added more status to consider the migration as finished and also
-> assertions was added to check the migration success.
+> I have similar problems as the original reporter, specifically, after
+> upgrading to qemu 3.1 from stretch [from qemu 2.8 -- mjt], mouse pointer
+> is invisible in guest systems iff the pointer is grabbed,
+> with -display gtk and qxl is used.
 
-The new implementation of the migration test is very good IMHO.
+> When using -vga std, both linux and windows guests show a mouse pointer.
+> likewise, with -vga qxl and/or additional -device qxl, a mouse pointer is
+> shown *iff* the input isn't grabbed.
+> 
+> The behaviour is perfectly repeatable here: if I press ctrl-alt-g, mouse
+> pointer becomes invisible, ctrl-alt-g again, pointer becomes visible
+> again.
 
->
-> There are more tests and test cases that can be added, but I'm assuming
-> this patch is complete enough and other series can be sent after
-> covering the other cases.
->
-> Caio Carrara (2):
->    tests.acceptance: adds multi vm capability for acceptance tests
->    tests.acceptance: adds simple migration test
->
->   docs/devel/testing.rst                    | 41 +++++++++++++++++-
->   tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++--
->   tests/acceptance/migration.py             | 53 +++++++++++++++++++++++
->   3 files changed, 114 insertions(+), 5 deletions(-)
->   create mode 100644 tests/acceptance/migration.py
->
+Why do you grab in the first place?
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> I have tried this with both ubuntu 17.10 and windows 10 + qxl-dod driver
+> (virtio 0.141 and 0.164), and the behaviour is consistent, so I think
+> this is a bug in the gtk+ interface of qemu when qxl is used (or when a
+> hardware pointer is used, as I guess -vga std does not emulate a hardware
+> pointer).
+
+Yes, -vga std has no hardware cursor support.
+
+qxl has two modes: "server mouse mode" where the guest/spice-server
+renders the cursor (effectively software cursor), and "client mouse
+mode" where the spice-client renders the cursor (effectively hardware
+cursor, typically done by setting the window cursor to the guest
+cursor).
+
+"client mouse mode" is used in case a absolute pointing device is
+present, "server mouse mode" otherwise.
+
+Likewise qemu UIs (both gtk and sdl) do not grab the pointer in case a
+absolute pointing device is present, otherwise they do automatically
+grab the pointer on mouse clicks.
+
+So typically you run either in server mouse mode with grab or client
+mouse mode without grab.  The gtk ui has some logic to handle that,
+specifically it hides the cursor in some cases to avoid that you see
+both software and hardware cursor.  When manually activating the grab
+you are confusing that logic ...
+
+> Googling around, I saw recommendations to use -show-cursor - I have no
+> clue what it does, it didn't have any effect, either.
+
+Try "-display gtk,grab-on-hover=on"?
+
+That'll activate the *keyboard* grab in case the mouse pointer is within
+the qemu window, so hotkeys go to the guest instead of being captured by
+the hosts window manager.  Then you don't have to manually activate the
+grab via Ctrl-Alt-G (which grabs both keyboard and pointer) for that.
+
+HTH,
+  Gerd
