@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41011)
+Received: from eggs.gnu.org ([209.51.188.92]:41407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gwiAh-0007s2-Rq
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:49:29 -0500
+	(envelope-from <thuth@redhat.com>) id 1gwiD5-0000FX-2B
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:51:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gwiAe-0001Vp-88
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:49:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33920)
+	(envelope-from <thuth@redhat.com>) id 1gwiD3-0002dE-4i
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:51:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52784)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gwiAb-0001V8-Kj
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:49:22 -0500
-References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
-	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
-	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
-	<20190218113447-mutt-send-email-mst@kernel.org>
-	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
-	<20190218183353-mutt-send-email-mst@kernel.org>
-	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
-	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
-Date: Thu, 21 Feb 2019 14:49:10 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
- not enabled by the guest
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gwiD1-0002cE-6H
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:51:53 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 21 Feb 2019 07:51:42 +0100
+Message-Id: <1550731902-28842-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] ui/gtk: Fix the license information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,149 +21,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Anthony Liguori <anthony@codemonkey.ws>
 
+The license information in this file is very messy. A short note at
+the beginning says GPL first, but the long boilerplate code then
+talks about "GNU Lesser General Public License version 2.0". First,
+there is no such version of the "GNU Lesser GPL", it only started with
+version 2.1. In version 2.0, it was still called "GNU Library GPL"
+instead. Second, you can easily get the license of this file wrong
+if you only quickly glance at the long boilerplate code.
 
-On 2019/2/21 =E4=B8=8B=E5=8D=882:00, Yuri Benditovich wrote:
-> On Tue, Feb 19, 2019 at 8:27 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2019/2/19 =E4=B8=8A=E5=8D=887:34, Michael S. Tsirkin wrote:
->>> On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
->>>> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->>>>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
->>>>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> w=
-rote:
->>>>>>> On 2019/2/13 =E4=B8=8B=E5=8D=8810:51, Yuri Benditovich wrote:
->>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1608226
->>>>>>>> On startup/link-up in multiqueue configuration the virtio-net
->>>>>>>> tries to starts all the queues, including those that the guest
->>>>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
->>>>>>>> If the guest driver does not allocate queues that it will not
->>>>>>>> use (for example, Windows driver does not) and number of actuall=
-y
->>>>>>>> used queues is less that maximal number supported by the device,
->>>>>>> Is this a requirement of e.g NDIS? If not, could we simply alloca=
-te all
->>>>>>> queues in this case. This is usually what normal Linux driver did=
-.
->>>>>>>
->>>>>>>
->>>>>>>> this causes vhost_net_start to fail and actually disables vhost
->>>>>>>> for all the queues, reducing the performance.
->>>>>>>> Current commit fixes this: initially only first queue is started=
-,
->>>>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
->>>>>>>> requested by the guest.
->>>>>>>>
->>>>>>>> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
->>>>>>>> ---
->>>>>>>>     hw/net/virtio-net.c | 7 +++++--
->>>>>>>>     1 file changed, 5 insertions(+), 2 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>>>>> index 3f319ef723..d3b1ac6d3a 100644
->>>>>>>> --- a/hw/net/virtio-net.c
->>>>>>>> +++ b/hw/net/virtio-net.c
->>>>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONe=
-t *n, uint8_t status)
->>>>>>>>     {
->>>>>>>>         VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
->>>>>>>>         NetClientState *nc =3D qemu_get_queue(n->nic);
->>>>>>>> -    int queues =3D n->multiqueue ? n->max_queues : 1;
->>>>>>>> +    int queues =3D n->multiqueue ? n->curr_queues : 1;
->>>>>>>>
->>>>>>>>         if (!get_vhost_net(nc->peer)) {
->>>>>>>>             return;
->>>>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet=
- *n, uint8_t cmd,
->>>>>>>>             return VIRTIO_NET_ERR;
->>>>>>>>         }
->>>>>>>>
->>>>>>>> -    n->curr_queues =3D queues;
->>>>>>>>         /* stop the backend before changing the number of queues=
- to avoid handling a
->>>>>>>>          * disabled queue */
->>>>>>>> +    virtio_net_set_status(vdev, 0);
->>>>>>> Any reason for doing this?
->>>>>> I think there are 2 reasons:
->>>>>> 1. The spec does not require guest SW to allocate unused queues.
->>>>>> 2. We spend guest's physical memory to just make vhost happy when =
-it
->>>>>> touches queues that it should not use.
->>>>>>
->>>>>> Thanks,
->>>>>> Yuri Benditovich
->>>>> The spec also says:
->>>>>           queue_enable The driver uses this to selectively prevent =
-the device from executing requests from this
->>>>>           virtqueue. 1 - enabled; 0 - disabled.
->>>>>
->>>>> While this is not a conformance clause this strongly implies that
->>>>> queues which are not enabled are never accessed by device.
->>>>>
->>>>> Yuri I am guessing you are not enabling these unused queues right?
->>>> Of course, we (Windows driver) do not.
->>>> The code of virtio-net passes max_queues to vhost and this causes
->>>> vhost to try accessing all the queues, fail on unused ones and final=
-ly
->>>> leave vhost disabled at all.
->>> Jason, at least for 1.0 accessing disabled queues looks like a spec
->>> violation. What do you think?
->>
->> Yes, but there's some issues:
->>
->> - How to detect a disabled queue for 0.9x device? Looks like there's n=
-o
->> way according to the spec, so device must assume all queues was enable=
-d.
-> Can you please add several words - what is 0.9 device (probably this
-> is more about driver) and
-> what is the problem with it?
+Anyway, looking at the text of the LGPL (see COPYING.LIB in the top
+directory), the license clearly states in section "3." that one should
+rather replace the license information with the GPL information in
+such a case of a mixture instead. Thus let's clean up the confusing
+statements and use the proper GPL text only.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Move the boilerplate code to the top
 
-It's not a net specific issue. 0.9x device is legacy device defined in=20
-the spec. We don't have a method to disable and enable a specific queue=20
-at that time. Michael said we can assume queue address 0 as disabled,=20
-but there's still a question of how to enable it. Spec is unclear and it=20
-was too late to add thing for legacy device. For 1.0 device we have=20
-queue_enable, but its implementation is incomplete, since it can work=20
-with vhost correctly, we probably need to add thing to make it work.
+ ui/gtk.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-
->
->> - For 1.0, if we depends on queue_enable, we should implement the
->> callback for vhost I think. Otherwise it's still buggy.
->>
->> So it looks tricky to enable and disable queues through set status
-> If I succeed to modify the patch such a way that it will act only in
-> 'target' case,
-> i.e. only if some of queueus are not initialized (at time of
-> driver_ok), will it be more safe?
-
-
-For 1.0 device, we can fix the queue_enable, but for 0.9x device how do=20
-you enable one specific queue in this case? (setting status?)
-
-A fundamental question is what prevents you from just initialization all=20
-queues during driver start? It looks to me this save lots of efforts=20
-than allocating queue dynamically.
-
-Thanks
-
-
->
->> Thanks
->>
->>
->>>>>
->>>>>>> Thanks
->>>>>>>
->>>>>>>
->>>>>>>> +
->>>>>>>> +    n->curr_queues =3D queues;
->>>>>>>> +
->>>>>>>>         virtio_net_set_status(vdev, vdev->status);
->>>>>>>>         virtio_net_set_queues(n);
->>>>>>>>
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 949b143..ff505ae 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -6,29 +6,25 @@
+  * Authors:
+  *  Anthony Liguori   <aliguori@us.ibm.com>
+  *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
+  *
+- * Portions from gtk-vnc:
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * Portions from gtk-vnc (originally licensed under the LGPL v2):
+  *
+  * GTK VNC Widget
+  *
+  * Copyright (C) 2006  Anthony Liguori <anthony@codemonkey.ws>
+  * Copyright (C) 2009-2010 Daniel P. Berrange <dan@berrange.com>
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2.0 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+  */
+ 
+ #define GETTEXT_PACKAGE "qemu"
+-- 
+1.8.3.1
