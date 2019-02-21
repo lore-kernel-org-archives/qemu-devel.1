@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59837)
+Received: from eggs.gnu.org ([209.51.188.92]:32797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwoCI-0008Oa-1N
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:15:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1gwoHI-0003BH-Cl
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:20:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwnxw-0005K4-Aw
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:00:48 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42318)
+	(envelope-from <bounces@canonical.com>) id 1gwoHG-0005cJ-GT
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:20:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35114)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gwnxw-0005Eu-3E
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:00:40 -0500
-Received: by mail-wr1-x444.google.com with SMTP id r5so16624363wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 05:00:31 -0800 (PST)
-References: <20190220172811.10588-1-alex.bennee@linaro.org>
-	<87k1hu41z6.fsf@zen.linaroharston>
-	<b0484fbb-ec59-1eaf-8157-cb2111c52817@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <b0484fbb-ec59-1eaf-8157-cb2111c52817@redhat.com>
-Date: Thu, 21 Feb 2019 13:00:29 +0000
-Message-ID: <87imxd47pu.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gwoHE-0005aJ-TF
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:20:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gwoHD-0007ab-IZ
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 13:20:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8538E2E80C8
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 13:20:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 0/8] testing/next
+Date: Thu, 21 Feb 2019 13:10:57 -0000
+From: Anisse Astier <1816819@bugs.launchpad.net>
+Reply-To: Bug 1816819 <1816819@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155068228906.30253.11103905943605426100.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155075465707.31376.15095841911718508805.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1816819] Re: Chardev websocket stops listening
+ after first connection disconnects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,116 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+
+I can confirm that this patch fixes the issue. I can now reconnect after
+a client has disconnected.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1816819
+
+Title:
+  Chardev websocket stops listening after first connection disconnects
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using qemu option:
+   -chardev socket,id=3Dwebsock0,websocket,port=3D13042,host=3D127.0.0.1,se=
+rver,nowait -serial chardev:websock0
+
+  To have a websocket listening chardev. After the first connection
+  disconnects (that does a full websocket handshake), subsequent
+  connections aren't accepted. See below for a reproducing session
+  kindly provided by Daniel:
+
+  $ telnet localhost 13042
+  Trying ::1...
+  telnet: connect to address ::1: Connection refused
+  Trying 127.0.0.1...
+  Connected to localhost.
+  Escape character is '^]'.
+  GET / HTTP/1.1
+  Upgrade: websocket
+  Connection: Upgrade
+  Host: localhost:%s
+  Origin: http://localhost
+  Sec-WebSocket-Key: o9JHNiS3/0/0zYE1wa3yIw=3D=3D
+  Sec-WebSocket-Version: 13
+  Sec-WebSocket-Protocol: binary
+
+  HTTP/1.1 101 Switching Protocols
+  Server: QEMU VNC
+  Date: Wed, 20 Feb 2019 16:52:04 GMT
+  Upgrade: websocket
+  Connection: Upgrade
+  Sec-WebSocket-Accept: b3DnPh7O8hyYE5sIjQxl/c1J+S8=3D
+  Sec-WebSocket-Protocol: binary
+
+  sfsd
+  =EF=BF=BD&=EF=BF=BDonly binary frames may be fragmentedConnection closed =
+by foreign host.
+
+  $ telnet localhost 13042
+  Trying ::1...
+  telnet: connect to address ::1: Connection refused
+  Trying 127.0.0.1...
+  Connected to localhost.
+  Escape character is '^]'.
+  GET / HTTP/1.1
+  Upgrade: websocket
+  Connection: Upgrade
+  Host: localhost:%s
+  Origin: http://localhost
+  Sec-WebSocket-Key: o9JHNiS3/0/0zYE1wa3yIw=3D=3D
+  Sec-WebSocket-Version: 13
+  Sec-WebSocket-Protocol: binary
 
 
-Thomas Huth <thuth@redhat.com> writes:
+  ...no response.....
 
-> On 20/02/2019 21.52, Alex Benn=C3=A9e wrote:
->>
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->>
->>> Hi,
->>>
->>>   tests/boot-sector.c:161:boot_sector_test:
->>>     assertion failed (signature =3D=3D SIGNATURE): (0x0000face =3D=3D 0=
-x0000dead)
->>>
->>> I have seen this locally and got a core dump but it doesn't show much.
->>> I'm going to see if I can get more out of a debug build. It is
->>> generated by:
->>>
->>>   tests/cdrom-test -m=3Dquick -k --tap
->>>
->>> I think the subtest is:
->>>
->>>   /x86_64/cdrom/boot/isapc
->>>
->>> Attaching to the child QEMU looks like it is eternally returning
->>> -EINTR and looping around with the occasionally kvm_handle_io to port
->>> 146 and port 112. I guess under test conditions this eventually times
->>> out and dies.
->> <snip>
->>
->> This is load related. I can run:
->>
->>   retry.py --timeout 600 -n 500 -c -- \
->>     env QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 \
->>         QTEST_QEMU_IMG=3Dqemu-img ./tests/cdrom-test \
->>         -m=3Dquick -p /x86_64/cdrom/boot/isapc
->>
->> and then all 500 run fine. If I do the same while running a make check
->> check-tcg -j9 in another build directory it hangs within 20 odd
->> attempts.
->>
->> Can anyone else reproduce this?
-
-I should also mention my current config for the reproducer test is:
-
-  '../../configure' '--python=3Dpython3' '--disable-docs' '--disable-tools'=
- '--disable-libusb' '--disable-vte' '--disable-xen' '--enable-debug' '--ext=
-ra-cflags=3D-O0 -g3' '--target-list=3Dx86_64-softmmu'
-
->
-> I can't reproduce it here. Might be worth a try to check the BIOS output
-> in that case. Add this patch:
->
-> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-> index 14bd981..c38e016 100644
-> --- a/tests/cdrom-test.c
-> +++ b/tests/cdrom-test.c
-> @@ -132,7 +132,7 @@ static void add_x86_tests(void)
->      qtest_add_data_func("cdrom/boot/virtio-scsi",
->                          "-device virtio-scsi -device scsi-cd,drive=3Dcdr=
- "
->                          "-blockdev file,node-name=3Dcdr,filename=3D", te=
-st_cdboot);
-> -    qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
-> +    qtest_add_data_func("cdrom/boot/isapc", "-M isapc -vga none -device =
-sga -serial file:/tmp/stdio "
->                          "-drive if=3Dide,media=3Dcdrom,file=3D", test_cd=
-boot);
->      qtest_add_data_func("cdrom/boot/am53c974",
->                          "-device am53c974 -device scsi-cd,drive=3Dcd1 "
->
-> ... then check /tmp/stdio when it hangs.
-
-This gets us:
-
-  SeaBIOS (version rel-1.12.0-0-ga698c8995f-prebuilt.qemu.org)
-  Booting from Floppy...
-  Boot failed: could not read the boot disk
-
-  Booting from DVD/CD...
-  Boot failed: Could not read from CDROM (code 000c)
-  Booting from DVD/CD...
-  Boot failed: Could not read from CDROM (code 0003)
-  Booting from Hard Disk...
-  Boot failed: could not read the boot disk
-
-  No bootable device.
-
-I tried to bisect but this occurs even in v3.0.0
-
-  SeaBIOS (version rel-1.11.2-0-gf9626ccb91-prebuilt.qemu-project.org)
-  Booting from Floppy...
-  Boot failed: could not read the boot disk
-
-  Booting from DVD/CD...
-  Boot failed: Could not read from CDROM (code 000c)
-  Booting from DVD/CD...
-  Boot failed: Could not read from CDROM (code 0003)
-  Booting from Hard Disk...
-  Boot failed: could not read the boot disk
-
-  No bootable device.
-
-Can I pass this over to the block/bios people to look at. I think at
-this point I think the test has always been unstable but tends only to
-trigger the fault on Travis because it is highly loaded.
-
-In the meantime I'll see if I can disable the test for the CI runs.
-
---
-Alex Benn=C3=A9e
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1816819/+subscriptions
