@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38232)
+Received: from eggs.gnu.org ([209.51.188.92]:38611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gwkeb-0006gx-U6
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:28:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1gwkf3-00073s-5M
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:28:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gwkeT-0006l3-Og
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:28:27 -0500
-Date: Thu, 21 Feb 2019 10:27:11 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190221102711.4ad80d72@redhat.com>
-In-Reply-To: <8f8abcb6-6665-dc89-b836-6e9d131f6f44@redhat.com>
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-13-eric.auger@redhat.com>
-	<20190218095838.048819c5@Igors-MacBook-Pro.local>
-	<8f8abcb6-6665-dc89-b836-6e9d131f6f44@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gwkez-0007El-Dc
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:28:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gwkex-0007AW-Cq
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:28:51 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37DFF66970
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 09:28:50 +0000 (UTC)
+Date: Thu, 21 Feb 2019 09:28:41 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190221092841.GC17899@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190220182543.10623-1-berrange@redhat.com>
+	<f304df7c-e0ba-042d-4ef7-d6492cb77569@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 12/18] hw/arm/boot: Expose the PC-DIMM
- nodes in the DT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f304df7c-e0ba-042d-4ef7-d6492cb77569@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] io: fix handling of EOF / error conditions
+ in websock GSource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +36,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Wed, 20 Feb 2019 16:30:13 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On Wed, Feb 20, 2019 at 08:52:34PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Hi Daniel,
+>=20
+> On 2/20/19 7:25 PM, Daniel P. Berrang=C3=A9 wrote:
+> > We were never reporting the G_IO_HUP event when an end of file was hi=
+t
+> > on the websocket channel.
+> >=20
+> > We also ddn't report G_IO_ERR when we hit a fatal error processing th=
+e
+>=20
+> "didn't report"
+>=20
+> > websocket protocol.
+> >=20
+> > The latter in particular meant that the chardev code would not notice
+> > when an eof/error was encountered on the websocket channel, unless th=
+e
+> > guest OS happened to trigger a write operation.
+> >=20
+> > This meant that once the first client had quit, the chardev would nev=
+er
+> > listen to accept a new client.
+> >=20
+> > Fixes launchpad bug 1816819
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  io/channel-websock.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/io/channel-websock.c b/io/channel-websock.c
+> > index dc43dc6bb9..fc4c3dcaa5 100644
+> > --- a/io/channel-websock.c
+> > +++ b/io/channel-websock.c
+> > @@ -1225,12 +1225,18 @@ qio_channel_websock_source_check(GSource *sou=
+rce)
+> >      QIOChannelWebsockSource *wsource =3D (QIOChannelWebsockSource *)=
+source;
+> >      GIOCondition cond =3D 0;
+> > =20
+> > -    if (wsource->wioc->rawinput.offset || wsource->wioc->io_eof) {
+> > +    if (wsource->wioc->rawinput.offset) {
+> >          cond |=3D G_IO_IN;
+> >      }
+> >      if (wsource->wioc->encoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BU=
+FFER) {
+> >          cond |=3D G_IO_OUT;
+> >      }
+> > +    if (wsource->wioc->io_eof) {
+> > +        cond |=3D G_IO_IN | G_IO_HUP;
+>=20
+> Shouldn't this be:
+>=20
+>            cond |=3D G_IO_HUP;
 
-> Hi Igor,
-> 
-> On 2/18/19 9:58 AM, Igor Mammedov wrote:
-> > On Tue,  5 Feb 2019 18:33:00 +0100
-> > Eric Auger <eric.auger@redhat.com> wrote:
-> >   
-> >> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> >>
-> >> This patch add memory nodes corresponding to PC-DIMM regions.  
-> > s/add/adds/ or s/This patch add/Add/
-> >   
-> >>
-> >> NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
-> >> don't need to care about NV-DIMM at this stage.
-> >>
-> >> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >> v3 -> v4:
-> >> - git rid of @base and @len in fdt_add_hotpluggable_memory_nodes
-> >>
-> >> v1 -> v2:
-> >> - added qapi_free_MemoryDeviceInfoList and simplify the loop
-> >> ---
-> >>  hw/arm/boot.c | 35 +++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 35 insertions(+)
-> >>
-> >> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> >> index 2ef367e15b..2a70e8aa82 100644
-> >> --- a/hw/arm/boot.c
-> >> +++ b/hw/arm/boot.c
-> >> @@ -19,6 +19,7 @@
-> >>  #include "sysemu/numa.h"
-> >>  #include "hw/boards.h"
-> >>  #include "hw/loader.h"
-> >> +#include "hw/mem/memory-device.h"
-> >>  #include "elf.h"
-> >>  #include "sysemu/device_tree.h"
-> >>  #include "qemu/config-file.h"
-> >> @@ -526,6 +527,34 @@ static void fdt_add_psci_node(void *fdt)
-> >>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
-> >>  }
-> >>  
-> >> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
-> >> +                                             uint32_t acells, uint32_t scells) {
-> >> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
-> >> +    MemoryDeviceInfo *mi;
-> >> +    PCDIMMDeviceInfo *di;
-> >> +    bool is_nvdimm;
-> >> +    int ret = 0;
-> >> +
-> >> +    for (info = info_list; info != NULL; info = info->next) {
-> >> +        mi = info->value;
-> >> +        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-> >> +        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-> >> +
-> >> +        if (is_nvdimm) {
-> >> +            ret = -ENOENT; /* NV-DIMM not yet supported */
-> >> +        } else {
-> >> +            ret = fdt_add_memory_node(fdt, acells, di->addr,
-> >> +                                      scells, di->size, di->node);
-> >> +        }
-> >> +        if (ret < 0) {
-> >> +            goto out;
-> >> +        }
-> >> +    }
-> >> +out:
-> >> +    qapi_free_MemoryDeviceInfoList(info_list);
-> >> +    return ret;
-> >> +}
-> >> +
-> >>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-> >>                   hwaddr addr_limit, AddressSpace *as)
-> >>  {
-> >> @@ -621,6 +650,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-> >>          }
-> >>      }
-> >>  
-> >> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
-> >> +    if (rc < 0) {
-> >> +            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");  
-> > error message is rather vague, user using nvdimms + pc-dimms on CLI won't have
-> > a clue that the former is not supported.
-> > Suggest pass in error_fatal as argument and report more specific error from
-> > fdt_add_hotpluggable_memory_nodes()
-> > 
-> > does this run on reboot?  
-> 
-> Yes after a QMP system_reset I can see the DIMMS on guest in /proc/meminfo
-it siims that dimms come from ACPI and not DTB.
+With regular poll() on FD I believe you typically get POLLIN | POLLHUP as
+a pair.
 
-My worry was that arm_load_dtb() always end up with exit(1) on failure but it seems
-that it's not called on reboot so it should be fine.
+>=20
+> > +    }
+> > +    if (wsource->wioc->io_err) {
+> > +        cond |=3D G_IO_IN | G_IO_ERR;
+>=20
+> Ditto:
+>=20
+>            cond |=3D G_IO_ERR;
 
-> 
-> Thanks
-> 
-> Eric
-> >   
-> >> +            goto fail;
-> >> +    }
-> >> +
-> >>      rc = fdt_path_offset(fdt, "/chosen");
-> >>      if (rc < 0) {
-> >>          qemu_fdt_add_subnode(fdt, "/chosen");  
-> >   
+And I just followed the same practice here.
+
+> > +    }
+> > =20
+> >      return cond & wsource->condition;
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
