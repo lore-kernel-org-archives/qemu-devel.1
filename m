@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47990)
+Received: from eggs.gnu.org ([209.51.188.92]:48031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwiwm-00024j-Cz
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 02:39:09 -0500
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1gwiwu-00028R-J7
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 02:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwiwg-0001HY-Pm
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 02:39:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwiwg-0001Eb-H5
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 02:39:02 -0500
-Date: Thu, 21 Feb 2019 08:38:50 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190221073850.rgygkl3uyn4rxswl@sirius.home.kraxel.org>
-References: <20190220084753.9130-1-kraxel@redhat.com>
-	<20190220084753.9130-2-kraxel@redhat.com>
-	<20190220145435.1881d7a8@w520.home>
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1gwiwt-0001My-8b
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 02:39:16 -0500
+Received: from sonic302-20.consmr.mail.ne1.yahoo.com ([66.163.186.146]:40286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
+	id 1gwiwt-0001MW-2Y
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 02:39:15 -0500
+Date: Thu, 21 Feb 2019 07:39:08 +0000 (UTC)
+From: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>
+Message-ID: <1178253251.2697859.1550734748930@mail.yahoo.com>
+In-Reply-To: <15e19a9e-8cb4-e767-f5d3-6b268948844e@tuxfamily.org>
+References: <251451940.431966.1548259107629.ref@mail.yahoo.com>
+	<251451940.431966.1548259107629@mail.yahoo.com>
+	<20190123180804.GA1040@flamenco>
+	<70145779.391347.1548334794441@mail.yahoo.com>
+	<87va2eyy38.fsf@linaro.org>
+	<15e19a9e-8cb4-e767-f5d3-6b268948844e@tuxfamily.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190220145435.1881d7a8@w520.home>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] vfio/display: add edid support.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] m68k gdb has stopped single stepping correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, intel-gvt-dev@lists.freedesktop.org
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <huth@tuxfamily.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-On Wed, Feb 20, 2019 at 02:54:35PM -0700, Alex Williamson wrote:
-> On Wed, 20 Feb 2019 09:47:51 +0100
-> Gerd Hoffmann <kraxel@redhat.com> wrote:
-> 
-> > This patch adds EDID support to the vfio display (aka vgpu) code.
-> > When supported by the mdev driver qemu will generate a EDID blob
-> > and pass it on using the new vfio edid region.  The EDID blob will
-> > be updated on UI changes (i.e. window resize), so the guest can
-> > adapt.
-> 
-> What are the requirements to enable this resizing feature?  I grabbed
-> the gvt-next-2019-02-01 branch and my ever expanding qemu:commandline
-> now looks like this:
-> 
->   <qemu:commandline>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.x-igd-opregion=on'/>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.ramfb=on'/>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.driver=vfio-pci-nohotplug'/>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.xres=1600'/>
->     <qemu:arg value='-set'/>
->     <qemu:arg value='device.hostdev0.yres=900'/>
->   </qemu:commandline>
-> 
-> Other relevant sections:
-> 
->     <graphics type='spice'>
->       <listen type='none'/>
->       <gl enable='yes' rendernode='/dev/dri/by-path/pci-0000:00:02.0-render'/>
->     </graphics>
+ Hi Thomas,
+>=C2=A0did you ever sent the patch? I can't find it on the mailing list, an=
+d I=C2=A0think this bug is still pending?Yes, I have patches but was waitin=
+g for my first one to be successful in order to make sure I got the process=
+ down.=C2=A0 I will finish that shortly.
+CheersLuc
+  =20
+ On 24/01/2019 14.38, Alex Benn=C3=A9e wrote:
+>=20
+> Lucien Anti-Spam via Qemu-devel <qemu-devel@nongnu.org> writes:
+>=20
+>>=C2=A0 =C2=A0 > On Thursday, January 24, 2019, 3:08:07 AM GMT+9, Emilio G=
+. Cota <cota@braap.org> wrote: > > On Wed, Jan 23, 2019 at 15:58:27 +0000, =
+Lucien Anti-Spam via Qemu-devel wrote:> > Hi folks,
+>>>> I noticed that with 3.x release that the GDB options (-S -s) for certa=
+in CPU results in very weird stepping.Usually stops afer a few steps, whils=
+t the stub continues responding the PC doesnt update, however, I have only =
+deeply looked at the m68k.
+>>>> In the case of the m68K the SR gets the trace bit set (T=3D10b), and t=
+he PC doesnt update.The m68k gdbstub, and main gdbstub seem mostly unchange=
+d.But it seems the INSN handling has changed greatly for the m68k.
+>>>> Does anyone have any ideas what happened?>> Can you please bisect to f=
+ind at which point things start misbehaving?
+>>>
+>>> Thanks,
+>>>=C2=A0 Emilio
+>> Understood, I was hoping my original post might jog someone's memory abo=
+ut the issue.
+>> Apparently not, so after some digging I found that it was introduced wit=
+h the refactor to TranslatorOps, specifically two lines got dropped that up=
+date the PC if single-stepping is being performed ( commit 11ab74b01e0a8ea4=
+973eed89c6b90fa6e4fb9fb6 )
+>> Since its not valid to revert, shall I go ahead and submit a patch for
+>> these two lines?
+>=20
+> Yes please!
 
-When using spice you also need the spicevmc channel and the spice agent
-being installed and active in the guest.
+ Hi Lucien,
 
-> > +    dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_UP;
-> > +    pwrite_field(fd, dpy->edid_info, dpy->edid_regs, link_state);
-> > +    trace_vfio_display_edid_link_up();
-> > +    return;
-> > +
-> > +err:
-> > +    trace_vfio_display_edid_write_error();
-> > +    return;
-> 
-> nit, no unwind and only one call point, could probably do without the
-> goto.
+did you ever sent the patch? I can't find it on the mailing list, and I
+think this bug is still pending?
 
-Not that easily due to the goto being hidden in the pwrite_field()
-macro.
-
-> > +    trace_vfio_display_edid_available();
-> > +    dpy->edid_regs = g_new0(struct vfio_region_gfx_edid, 1);
-> > +    pread_field(fd, dpy->edid_info, dpy->edid_regs, edid_offset);
-> > +    pread_field(fd, dpy->edid_info, dpy->edid_regs, edid_max_size);
-> > +    pread_field(fd, dpy->edid_info, dpy->edid_regs, max_xres);
-> > +    pread_field(fd, dpy->edid_info, dpy->edid_regs, max_yres);
-> > +    dpy->edid_blob = g_malloc0(dpy->edid_regs->edid_max_size);
-> > +
-> > +    vfio_display_edid_update(vdev, true, 0, 0);
-> > +    return;
-> > +
-> > +err:
-> > +    fprintf(stderr, "%s: Oops, pread error\n", __func__);
-> > +    g_free(dpy->edid_regs);
-> > +    dpy->edid_regs = NULL;
-> > +    return;
-> 
-> This code is unreachable.
-
-It's not.  Again, the goto is in pread_field.
-
-But I just noticed I missed one fprintf which should be a
-trace_vfio_display_edid_write_error() ...
-
-cheers,
-  Gerd
+ Thomas
+ =20
