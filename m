@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33817)
+Received: from eggs.gnu.org ([209.51.188.92]:34636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gwhLC-0002YE-DH
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 00:56:15 -0500
+	(envelope-from <yuri.benditovich@daynix.com>) id 1gwhPu-000464-QD
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:01:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gwhLB-0007bv-HK
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 00:56:14 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2058 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1gwhLB-0007a7-63
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 00:56:13 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 21 Feb 2019 05:56:04 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB260AD0@dggeml511-mbx.china.huawei.com>
-References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
-	<33183CC9F5247A488A2544077AF19020DB25D374@dggeml511-mbx.china.huawei.com>
-	<20190221002444.GH16456@joy-OptiPlex-7040>
-	<33183CC9F5247A488A2544077AF19020DB25E1F3@dggeml511-mbx.china.huawei.com>
-	<20190221020457.GL16456@joy-OptiPlex-7040>
-	<33183CC9F5247A488A2544077AF19020DB25E7CD@dggeml511-mbx.china.huawei.com>
-	<20190221042111.GO16456@joy-OptiPlex-7040>
-In-Reply-To: <20190221042111.GO16456@joy-OptiPlex-7040>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <yuri.benditovich@daynix.com>) id 1gwhPt-0002sP-IN
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:01:06 -0500
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:41093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+	id 1gwhPs-0002fw-W0
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:01:05 -0500
+Received: by mail-yb1-xb44.google.com with SMTP id 18so9002376ybf.8
+	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 22:01:02 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
+References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
+	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
+	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
+	<20190218113447-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
+	<20190218183353-mutt-send-email-mst@kernel.org>
+	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+In-Reply-To: <3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Thu, 21 Feb 2019 08:00:52 +0200
+Message-ID: <CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
+ not enabled by the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +36,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhao Yan <yan.y.zhao@intel.com>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
 
+On Tue, Feb 19, 2019 at 8:27 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2019/2/19 =E4=B8=8A=E5=8D=887:34, Michael S. Tsirkin wrote:
+> > On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
+> >> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+> >>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
+> >>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> wro=
+te:
+> >>>>>
+> >>>>> On 2019/2/13 =E4=B8=8B=E5=8D=8810:51, Yuri Benditovich wrote:
+> >>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1608226
+> >>>>>> On startup/link-up in multiqueue configuration the virtio-net
+> >>>>>> tries to starts all the queues, including those that the guest
+> >>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
+> >>>>>> If the guest driver does not allocate queues that it will not
+> >>>>>> use (for example, Windows driver does not) and number of actually
+> >>>>>> used queues is less that maximal number supported by the device,
+> >>>>>
+> >>>>> Is this a requirement of e.g NDIS? If not, could we simply allocate=
+ all
+> >>>>> queues in this case. This is usually what normal Linux driver did.
+> >>>>>
+> >>>>>
+> >>>>>> this causes vhost_net_start to fail and actually disables vhost
+> >>>>>> for all the queues, reducing the performance.
+> >>>>>> Current commit fixes this: initially only first queue is started,
+> >>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
+> >>>>>> requested by the guest.
+> >>>>>>
+> >>>>>> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> >>>>>> ---
+> >>>>>>    hw/net/virtio-net.c | 7 +++++--
+> >>>>>>    1 file changed, 5 insertions(+), 2 deletions(-)
+> >>>>>>
+> >>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> >>>>>> index 3f319ef723..d3b1ac6d3a 100644
+> >>>>>> --- a/hw/net/virtio-net.c
+> >>>>>> +++ b/hw/net/virtio-net.c
+> >>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONet =
+*n, uint8_t status)
+> >>>>>>    {
+> >>>>>>        VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+> >>>>>>        NetClientState *nc =3D qemu_get_queue(n->nic);
+> >>>>>> -    int queues =3D n->multiqueue ? n->max_queues : 1;
+> >>>>>> +    int queues =3D n->multiqueue ? n->curr_queues : 1;
+> >>>>>>
+> >>>>>>        if (!get_vhost_net(nc->peer)) {
+> >>>>>>            return;
+> >>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet *=
+n, uint8_t cmd,
+> >>>>>>            return VIRTIO_NET_ERR;
+> >>>>>>        }
+> >>>>>>
+> >>>>>> -    n->curr_queues =3D queues;
+> >>>>>>        /* stop the backend before changing the number of queues to=
+ avoid handling a
+> >>>>>>         * disabled queue */
+> >>>>>> +    virtio_net_set_status(vdev, 0);
+> >>>>>
+> >>>>> Any reason for doing this?
+> >>>> I think there are 2 reasons:
+> >>>> 1. The spec does not require guest SW to allocate unused queues.
+> >>>> 2. We spend guest's physical memory to just make vhost happy when it
+> >>>> touches queues that it should not use.
+> >>>>
+> >>>> Thanks,
+> >>>> Yuri Benditovich
+> >>> The spec also says:
+> >>>          queue_enable The driver uses this to selectively prevent the=
+ device from executing requests from this
+> >>>          virtqueue. 1 - enabled; 0 - disabled.
+> >>>
+> >>> While this is not a conformance clause this strongly implies that
+> >>> queues which are not enabled are never accessed by device.
+> >>>
+> >>> Yuri I am guessing you are not enabling these unused queues right?
+> >> Of course, we (Windows driver) do not.
+> >> The code of virtio-net passes max_queues to vhost and this causes
+> >> vhost to try accessing all the queues, fail on unused ones and finally
+> >> leave vhost disabled at all.
 > >
-> > > -----Original Message-----
-> > > From: Zhao Yan [mailto:yan.y.zhao@intel.com]
-> > > Sent: Thursday, February 21, 2019 10:05 AM
-> > > To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> > > Cc: alex.williamson@redhat.com; qemu-devel@nongnu.org;
-> > > intel-gvt-dev@lists.freedesktop.org; Zhengxiao.zx@Alibaba-inc.com;
-> > > yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
-> > > cohuck@redhat.com; shuangtai.tst@alibaba-inc.com;
-> dgilbert@redhat.com;
-> > > zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
-> > > aik@ozlabs.ru; eauger@redhat.com; felipe@nutanix.com;
-> > > jonathan.davies@nutanix.com; changpeng.liu@intel.com;
-> Ken.Xue@amd.com;
-> > > kwankhede@nvidia.com; kevin.tian@intel.com; cjia@nvidia.com;
-> > > kvm@vger.kernel.org
-> > > Subject: Re: [PATCH 0/5] QEMU VFIO live migration
-> > >
-> > > > >
-> > > > > > 5) About log sync, why not register log_global_start/stop in
-> > > > > vfio_memory_listener?
-> > > > > >
-> > > > > >
-> > > > > seems log_global_start/stop cannot be iterately called in pre-cop=
-y
-> phase?
-> > > > > for dirty pages in system memory, it's better to transfer dirty d=
-ata
-> > > > > iteratively to reduce down time, right?
-> > > > >
-> > > >
-> > > > We just need invoking only once for start and stop logging. Why we =
-need
-> to
-> > > call
-> > > > them literately? See memory_listener of vhost.
-> > > >
-> > > the dirty pages in system memory produces by device is incremental.
-> > > if it can be got iteratively, the dirty pages in stop-and-copy phase =
-can be
-> > > minimal.
-> > > :)
-> > >
-> > I mean starting or stopping the capability of logging, not log sync.
-> >
-> > We register the below callbacks:
-> >
-> > .log_sync =3D vfio_log_sync,
-> > .log_global_start =3D vfio_log_global_start,
-> > .log_global_stop =3D vfio_log_global_stop,
-> >
-> .log_global_start is also a good point to notify logging state.
-> But if notifying in .save_setup handler, we can do fine-grained
-> control of when to notify of logging starting together with get_buffer
-> operation.
-> Is there any special benifit by registering to .log_global_start/stop?
->=20
+> > Jason, at least for 1.0 accessing disabled queues looks like a spec
+> > violation. What do you think?
+>
+>
+> Yes, but there's some issues:
+>
+> - How to detect a disabled queue for 0.9x device? Looks like there's no
+> way according to the spec, so device must assume all queues was enabled.
 
-Performance benefit when one VM has multiple same vfio devices.
+Can you please add several words - what is 0.9 device (probably this
+is more about driver) and
+what is the problem with it?
 
+>
+> - For 1.0, if we depends on queue_enable, we should implement the
+> callback for vhost I think. Otherwise it's still buggy.
+>
+> So it looks tricky to enable and disable queues through set status
 
-Regards,
--Gonglei
+If I succeed to modify the patch such a way that it will act only in
+'target' case,
+i.e. only if some of queueus are not initialized (at time of
+driver_ok), will it be more safe?
+
+>
+> Thanks
+>
+>
+> >
+> >>>
+> >>>
+> >>>>> Thanks
+> >>>>>
+> >>>>>
+> >>>>>> +
+> >>>>>> +    n->curr_queues =3D queues;
+> >>>>>> +
+> >>>>>>        virtio_net_set_status(vdev, vdev->status);
+> >>>>>>        virtio_net_set_queues(n);
+> >>>>>>
