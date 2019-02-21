@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53823)
+Received: from eggs.gnu.org ([209.51.188.92]:58104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwvPQ-0004MO-77
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:57:33 -0500
+	(envelope-from <cota@braap.org>) id 1gwvmh-0004LE-AC
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 16:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gwvB2-00082m-Ci
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:42:41 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38450)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gwvB2-0007zc-4k
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 15:42:40 -0500
-Received: by mail-wm1-f65.google.com with SMTP id v26so10546983wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 12:42:34 -0800 (PST)
-References: <20190221184857.22434-1-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3ba41c9b-05a0-acfe-e621-10f43048c874@redhat.com>
-Date: Thu, 21 Feb 2019 21:42:32 +0100
+	(envelope-from <cota@braap.org>) id 1gwvmg-0005zW-FL
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 16:21:35 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:53531)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gwvmg-0005yj-0b
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 16:21:34 -0500
+Date: Thu, 21 Feb 2019 16:21:30 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20190221212130.GA6971@flamenco>
+References: <20190219233421.388-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190221184857.22434-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] hw/block: better reporting on pflash
- backing file mismatch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190219233421.388-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: stappers@stappers.nl, lersek@redhat.com, armbru@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Hi Alex,
+On Tue, Feb 19, 2019 at 15:34:18 -0800, Richard Henderson wrote:
+> Changes since v1:
+>   * Apparently I had started a last-minute API change, and failed to
+>     covert all of the users, and also failed to re-test afterward.
+>   * Retain assertions for --enable-debug-tcg.
 
-On 2/21/19 7:48 PM, Alex Bennée wrote:
-> It looks like there was going to be code to check we had some sort of
-> alignment so lets replace it with an actual check. This is a bit more
-> useful than the enigmatic "failed to read the initial flash content"
-> when we attempt to read the number of bytes the device should have.
-> 
-> This is a potential confusing stumbling block when you move from using
-> -bios to using -drive if=pflash,file=blob,format=raw,readonly for
-> loading your firmware code. To mitigate that we automatically pad in
-> the read-only case.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v3
->   - tweak commit title/commentary
->   - use total_len instead of device_len for checks
->   - if the device is read-only do the padding for them
->   - accept baking_len > total_len (how to warn_report with NULL *errp?)
-> ---
->  hw/block/pflash_cfi01.c | 28 +++++++++++++++++++++-------
->  1 file changed, 21 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index 00c2efd0d7..37d7513c45 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -714,13 +714,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
->      }
->      device_len = sector_len_per_device * blocks_per_device;
->  
-> -    /* XXX: to be fixed */
-> -#if 0
-> -    if (total_len != (8 * 1024 * 1024) && total_len != (16 * 1024 * 1024) &&
-> -        total_len != (32 * 1024 * 1024) && total_len != (64 * 1024 * 1024))
-> -        return NULL;
-> -#endif
-> -
->      memory_region_init_rom_device(
->          &pfl->mem, OBJECT(dev),
->          &pflash_cfi01_ops,
-> @@ -747,6 +740,27 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
->      }
->  
->      if (pfl->blk) {
-> +        /*
-> +         * Validate the backing store is the right size for pflash
-> +         * devices. It should be padded to a multiple of the flash
-> +         * block size. If the device is read-only we can elide the
-> +         * check and just null pad the region first. If the user
-> +         * supplies a larger file we silently accept it.
-> +         */
-> +        uint64_t backing_len = blk_getlength(pfl->blk);
-> +
-> +        if (backing_len < total_len) {
-> +            if (pfl->ro) {
-> +                memset(pfl->storage, 0, total_len);
+This brings my arm-softmmu bootup+shutdown test to an early death:
 
-When you erasing a NOR flash sector, all bits are set to 1.
-Then you can program a word by setting its bits to 0.
-It is not possible to set bits from 0 to 1 on a word boundary,
-it is only possible to set bits to 1 by erasing a whole sector (sector
-boundary).
+[...]
+VFS: Mounted root (ext4 filesystem) readonly on device 254:1.
+devtmpfs: mounted
+Freeing unused kernel memory: 300K (80669000 - 806b4000)
+BUG: unsupported FP instruction in kernel mode
+Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+Modules linked in:
+CPU: 0 PID: 1 Comm: init Not tainted 4.5.0-ajb #10
+Hardware name: Generic DT based system
+task: eec58000 ti: eec52000 task.ti: eec52000
+PC is at vfp_reload_hw+0xc/0x44
+LR is at __und_usr_fault_32+0x0/0x8
+pc : [<8000ab94>]    lr : [<800136c0>]    psr: 000c0013
+sp : eec53fb0  ip : 7eb88918  fp : 00000000
+r10: eec520f8  r9 : 8001371c  r8 : 00000b00
+r7 : 00000001  r6 : eec5204c  r5 : 40000000  r4 : 00000000
+r3 : 806e1058  r2 : 76fc1362  r1 : 40000000  r0 : ecac8b10
+Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+Control: 30c5387d  Table: ae4048c0  DAC: fffffffd
+Process init (pid: 1, stack limit = 0xeec52210)
+Stack: (0xeec53fb0 to 0xeec54000)
+3fa0:                                     7eb888f0 00000000 003fb0d6 fffffd90
+3fc0: 7eb888e0 76fd8050 00000000 7eb88ab0 00000000 0001223c 76fd8958 7eb88a90
+3fe0: 7eb88918 7eb888c0 76fbb187 76fc1362 600c0030 ffffffff 00000000 00000000
+[<8000ab94>] (vfp_reload_hw) from [<800136c0>] (__und_usr_fault_32+0x0/0x8)
+Code: 0a000010 e58ab110 eee85a10 e783a10b (ecba0b20)
+---[ end trace 26acd422f5b3785f ]---
+Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
 
-The pflash QEMU models are of NOR type (is different for other flash
-technologies).
-If we want to set the padded area to the fabric blank state, we should
-use the NOR flash erased value of 0xff.
+Thanks,
 
-> +                total_len = backing_len;
-> +            } else {
-> +                error_setg(errp, "device(s) needs %" PRIu64 " bytes, "
-> +                           "backing file provides only %" PRIu64 " bytes",
-> +                           total_len, backing_len);
-> +                return;
-> +            }
-> +        }
-> +
->          /* read the initial flash content */
->          ret = blk_pread(pfl->blk, 0, pfl->storage, total_len);
->  
-> 
+		Emilio
