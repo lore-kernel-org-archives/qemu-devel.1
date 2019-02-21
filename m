@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59802)
+Received: from eggs.gnu.org ([209.51.188.92]:60317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gwlyb-0003AH-0C
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:53:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1gwm1L-00052J-2h
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:56:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gwlya-0003hZ-6p
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:53:12 -0500
-Date: Thu, 21 Feb 2019 10:53:02 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190221105302.GA3282@stefanha-x1.localdomain>
-References: <20190220100358.25566-1-vsementsov@virtuozzo.com>
+	(envelope-from <bounces@canonical.com>) id 1gwm1K-0005WS-5q
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:56:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gwm1J-0005TO-Uc
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:56:02 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gwm1F-0007tB-VN
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:55:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3F0F52E80D4
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:55:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
-Content-Disposition: inline
-In-Reply-To: <20190220100358.25566-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH v2] coroutines: generate
- wrapper code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Feb 2019 10:42:24 -0000
+From: Daniel Berrange <1816819@bugs.launchpad.net>
+Reply-To: Bug 1816819 <1816819@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155068228906.30253.11103905943605426100.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155074574501.30296.1003765177959559301.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1816819] Re: Chardev websocket stops listening
+ after first connection disconnects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com
+To: qemu-devel@nongnu.org
+
+Patch proposed
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05556.html
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1816819
+
+Title:
+  Chardev websocket stops listening after first connection disconnects
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using qemu option:
+   -chardev socket,id=3Dwebsock0,websocket,port=3D13042,host=3D127.0.0.1,se=
+rver,nowait -serial chardev:websock0
+
+  To have a websocket listening chardev. After the first connection
+  disconnects (that does a full websocket handshake), subsequent
+  connections aren't accepted. See below for a reproducing session
+  kindly provided by Daniel:
+
+  $ telnet localhost 13042
+  Trying ::1...
+  telnet: connect to address ::1: Connection refused
+  Trying 127.0.0.1...
+  Connected to localhost.
+  Escape character is '^]'.
+  GET / HTTP/1.1
+  Upgrade: websocket
+  Connection: Upgrade
+  Host: localhost:%s
+  Origin: http://localhost
+  Sec-WebSocket-Key: o9JHNiS3/0/0zYE1wa3yIw=3D=3D
+  Sec-WebSocket-Version: 13
+  Sec-WebSocket-Protocol: binary
+
+  HTTP/1.1 101 Switching Protocols
+  Server: QEMU VNC
+  Date: Wed, 20 Feb 2019 16:52:04 GMT
+  Upgrade: websocket
+  Connection: Upgrade
+  Sec-WebSocket-Accept: b3DnPh7O8hyYE5sIjQxl/c1J+S8=3D
+  Sec-WebSocket-Protocol: binary
+
+  sfsd
+  =EF=BF=BD&=EF=BF=BDonly binary frames may be fragmentedConnection closed =
+by foreign host.
+
+  $ telnet localhost 13042
+  Trying ::1...
+  telnet: connect to address ::1: Connection refused
+  Trying 127.0.0.1...
+  Connected to localhost.
+  Escape character is '^]'.
+  GET / HTTP/1.1
+  Upgrade: websocket
+  Connection: Upgrade
+  Host: localhost:%s
+  Origin: http://localhost
+  Sec-WebSocket-Key: o9JHNiS3/0/0zYE1wa3yIw=3D=3D
+  Sec-WebSocket-Version: 13
+  Sec-WebSocket-Protocol: binary
 
 
---2oS5YaxWCcQjTEyO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  ...no response.....
 
-On Wed, Feb 20, 2019 at 01:03:58PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Hi all!
->=20
-> We have a very frequent pattern of creating coroutine from function
-> with several arguments:
->=20
->   - create structure to pack parameters
->   - create _entry function to call original function taking parameters
->     from struct
->   - do different magic to handle completion: set ret to NOT_DONE or
->     EINPROGRESS, use separate bool for void functions
->   - fill the struct and create coroutine from _entry function and this
->     struct as a parameter
->=20
-> Here is a template code + example how it can be used to drop a lot of
-> similar code.
->=20
-> TODO: make coroutine-wrapper template file to be header itself, or
->       generate header from it
-
-Yes, please.  For example, block/coroutines.h:
-
-  #include "block/block.h"
-
-  int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-                                 BdrvCheckResult *res, BdrvCheckMode fix);
-  void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **=
-errp);
-
-Now include/block/block.h doesn't need to be modified and these
-coroutine function prototypes stay private to the block layer (they are
-not in include/).
-
-The code generator script can parse coroutines.h to generate
-__create_co() functions.  This also makes the tool independent of the
-block layer - the output C file just needs to include the input header
-file:
-
- /*
-  * File is generated by scripts/coroutine-wrapper.py
-  */
-
- #include "qemu/osdep.h"
- #include "block/coroutines.h" <--- from coroutine-wrapper command-line
-
- ...
-
---2oS5YaxWCcQjTEyO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcboMOAAoJEJykq7OBq3PIaVoH/A/CtwfQM1cMPYHBCA7k3bjV
-8VEwHpDysV0FVq8ezpSDVITV6azKkFInpcoyGfyYENIfLD3w/Dk9pDY4Sv0o7+9J
-CZtHWphWOh0Hwn+RTS24Y6F8x9p+RRrw9Bej/s+CSWcYIf7/bYT2uGm/gAuBvnG+
-/k5oJ3Tc5NAkhJqy4BrPVUtfNsl9CuPm8d/G3KbrecTYSoUO5eEic33P76pqy2Pm
-OYGUbLiwjpxG46NKqxoon7U60u2/PjwigsDaTtuzxioqVnT5s0XGWKLw7Fow9Pdx
-uNp565xSpeALvbYxEo3MT71oJ+Zs8C5RiwksQ6dZgHK+EEO8mnwsZAHiG+5nQvo=
-=sqkY
------END PGP SIGNATURE-----
-
---2oS5YaxWCcQjTEyO--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1816819/+subscriptions
