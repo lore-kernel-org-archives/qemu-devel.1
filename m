@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51227)
+Received: from eggs.gnu.org ([209.51.188.92]:52027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTz-0004Z0-Na
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXj-0008NC-44
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0005Qy-N0
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:07 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34749 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwtTy-0005N2-Du
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:06 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 19:53:37 +0100
-Message-Id: <1550775220-26797-6-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXg-0007Mx-Eh
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:57:58 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:35614)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gwtXV-0007Gl-LK
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:57:49 -0500
+Received: by mail-wm1-x334.google.com with SMTP id y15so10336961wma.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:57:45 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id
+	c18sm29065085wre.32.2019.02.21.10.57.43 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 21 Feb 2019 10:57:43 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Feb 2019 18:57:20 +0000
+Message-Id: <20190221185739.25362-3-peter.maydell@linaro.org>
+In-Reply-To: <20190221185739.25362-1-peter.maydell@linaro.org>
+References: <20190221185739.25362-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 5/8] target/mips: implement QMP
- query-cpu-definitions command
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 02/21] target/arm: v8M MPU should use background
+ region as default, not always
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +35,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+The "background region" for a v8M MPU is a default which will be used
+(if enabled, and if the access is privileged) if the access does
+not match any specific MPU region. We were incorrectly using it
+always (by putting the condition at the wrong nesting level). This
+meant that we would always return the default background permissions
+rather than the correct permissions for a specific region, and also
+that we would not return the right information in response to a
+TT instruction.
 
-This patch enables QMP-based querying of the available CPU types for
-MIPS and MIPS64 platforms.
+Move the check for the background region to the same place in the
+logic as the equivalent v8M MPUCheck() pseudocode puts it.
+This in turn means we must adjust the condition we use to detect
+matches in multiple regions to avoid false-positives.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190214113408.10214-1-peter.maydell@linaro.org
 ---
- qapi/target.json     |  4 ++--
- target/mips/helper.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ target/arm/helper.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/target.json b/qapi/target.json
-index da7b4be..1d4d54b 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -499,7 +499,7 @@
-             'static': 'bool',
-             '*unavailable-features': [ 'str' ],
-             'typename': 'str' },
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-=20
- ##
- # @query-cpu-definitions:
-@@ -511,4 +511,4 @@
- # Since: 1.2.0
- ##
- { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
--  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 944f094..c44cdca 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -24,6 +24,7 @@
- #include "exec/cpu_ldst.h"
- #include "exec/log.h"
- #include "hw/mips/cpudevs.h"
-+#include "qapi/qapi-commands-target.h"
-=20
- enum {
-     TLBRET_XI =3D -6,
-@@ -1470,3 +1471,35 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSS=
-tate *env,
-=20
-     cpu_loop_exit_restore(cs, pc);
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index a018eb23fe2..fe054897c78 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11387,9 +11387,11 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
+         hit = true;
+     } else if (m_is_ppb_region(env, address)) {
+         hit = true;
+-    } else if (pmsav7_use_background_region(cpu, mmu_idx, is_user)) {
+-        hit = true;
+     } else {
++        if (pmsav7_use_background_region(cpu, mmu_idx, is_user)) {
++            hit = true;
++        }
 +
-+static void mips_cpu_add_definition(gpointer data, gpointer user_data)
-+{
-+    ObjectClass *oc =3D data;
-+    CpuDefinitionInfoList **cpu_list =3D user_data;
-+    CpuDefinitionInfoList *entry;
-+    CpuDefinitionInfo *info;
-+    const char *typename;
-+
-+    typename =3D object_class_get_name(oc);
-+    info =3D g_malloc0(sizeof(*info));
-+    info->name =3D g_strndup(typename,
-+                           strlen(typename) - strlen("-" TYPE_MIPS_CPU))=
-;
-+    info->q_typename =3D g_strdup(typename);
-+
-+    entry =3D g_malloc0(sizeof(*entry));
-+    entry->value =3D info;
-+    entry->next =3D *cpu_list;
-+    *cpu_list =3D entry;
-+}
-+
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
-+{
-+    CpuDefinitionInfoList *cpu_list =3D NULL;
-+    GSList *list;
-+
-+    list =3D object_class_get_list(TYPE_MIPS_CPU, false);
-+    g_slist_foreach(list, mips_cpu_add_definition, &cpu_list);
-+    g_slist_free(list);
-+
-+    return cpu_list;
-+}
---=20
-2.7.4
+         for (n = (int)cpu->pmsav7_dregion - 1; n >= 0; n--) {
+             /* region search */
+             /* Note that the base address is bits [31:5] from the register
+@@ -11427,7 +11429,7 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
+                 *is_subpage = true;
+             }
+ 
+-            if (hit) {
++            if (matchregion != -1) {
+                 /* Multiple regions match -- always a failure (unlike
+                  * PMSAv7 where highest-numbered-region wins)
+                  */
+-- 
+2.20.1
