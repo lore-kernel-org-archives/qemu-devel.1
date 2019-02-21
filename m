@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47465)
+Received: from eggs.gnu.org ([209.51.188.92]:49348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=948d70b84=Paul.Durrant@citrix.com>)
-	id 1gwl4W-0001Kd-18
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:55:17 -0500
+	(envelope-from <groug@kaod.org>) id 1gwlBy-0004oA-Si
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=948d70b84=Paul.Durrant@citrix.com>)
-	id 1gwl4L-00082T-53
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:55:12 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 21 Feb 2019 09:54:35 +0000
-Message-ID: <16ead6a8b47b46858d5f7cd687e742be@AMSPEX02CL03.citrite.net>
-References: <20190220010232.18731-1-philmd@redhat.com>
-	<20190220010232.18731-14-philmd@redhat.com>
-In-Reply-To: <20190220010232.18731-14-philmd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <groug@kaod.org>) id 1gwlBw-0003I7-7w
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:02:58 -0500
+Received: from 14.mo6.mail-out.ovh.net ([46.105.56.113]:40930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gwlBr-0003CI-7T
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:02:52 -0500
+Received: from player761.ha.ovh.net (unknown [10.109.146.20])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1B47D1B07F3
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 11:02:38 +0100 (CET)
+Date: Thu, 21 Feb 2019 11:02:29 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190221110229.117771c0@bahia.lan>
+In-Reply-To: <20190221092546.GB17899@redhat.com>
+References: <20190218181349.23885-1-ppandit@redhat.com>
+	<20190219025500.GN9345@umbus.fritz.box>
+	<20190221092546.GB17899@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH v3 13/25] xen: Let buffer_append()
- return a size_t
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] ppc: add host-serial and host-model
+ machine attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?J1BoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpJw==?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Stefan Berger <stefanb@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Cornelia Huck <cohuck@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Amit Shah <amit@kernel.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Corey Minyard <minyard@acm.org>, "Michael S.
-	Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGhpbGlwcGUgTWF0aGll
-dS1EYXVkw6kgW21haWx0bzpwaGlsbWRAcmVkaGF0LmNvbV0NCj4gU2VudDogMjAgRmVicnVhcnkg
-MjAxOSAwMTowMg0KPiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBQcmFzYWQgSiBQYW5kaXQg
-PHBqcEBmZWRvcmFwcm9qZWN0Lm9yZz47IE1hcmMtDQo+IEFuZHLDqSBMdXJlYXUgPG1hcmNhbmRy
-ZS5sdXJlYXVAcmVkaGF0LmNvbT47IFBhb2xvIEJvbnppbmkNCj4gPHBib256aW5pQHJlZGhhdC5j
-b20+DQo+IENjOiBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsgQW50aG9ueSBQZXJh
-cmQNCj4gPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+OyBxZW11LXBwY0Bub25nbnUub3JnOyBT
-dGVmYW4gQmVyZ2VyDQo+IDxzdGVmYW5iQGxpbnV4LmlibS5jb20+OyBEYXZpZCBHaWJzb24gPGRh
-dmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT47IEdlcmQNCj4gSG9mZm1hbm4gPGtyYXhlbEByZWRo
-YXQuY29tPjsgWmhhbmcgQ2hlbiA8emhhbmdja2lkQGdtYWlsLmNvbT47IHhlbi0NCj4gZGV2ZWxA
-bGlzdHMueGVucHJvamVjdC5vcmc7IENvcm5lbGlhIEh1Y2sgPGNvaHVja0ByZWRoYXQuY29tPjsg
-U2FtdWVsDQo+IFRoaWJhdWx0IDxzYW11ZWwudGhpYmF1bHRAZW5zLWx5b24ub3JnPjsgQ2hyaXN0
-aWFuIEJvcm50cmFlZ2VyDQo+IDxib3JudHJhZWdlckBkZS5pYm0uY29tPjsgQW1pdCBTaGFoIDxh
-bWl0QGtlcm5lbC5vcmc+OyBMaSBaaGlqaWFuDQo+IDxsaXpoaWppYW5AY24uZnVqaXRzdS5jb20+
-OyBDb3JleSBNaW55YXJkIDxtaW55YXJkQGFjbS5vcmc+OyBNaWNoYWVsIFMuDQo+IFRzaXJraW4g
-PG1zdEByZWRoYXQuY29tPjsgUGF1bCBEdXJyYW50IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT47
-IEhhbGlsDQo+IFBhc2ljIDxwYXNpY0BsaW51eC5pYm0uY29tPjsgU3RlZmFubyBTdGFiZWxsaW5p
-IDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsNCj4gcWVtdS1zMzkweEBub25nbnUub3JnOyBQYXZl
-bCBEb3ZnYWx5dWsgPHBhdmVsLmRvdmdhbHVrQGlzcHJhcy5ydT47DQo+IFBoaWxpcHBlIE1hdGhp
-ZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogW1JGQyBQQVRDSCB2MyAx
-My8yNV0geGVuOiBMZXQgYnVmZmVyX2FwcGVuZCgpIHJldHVybiBhIHNpemVfdA0KPiANCj4gVG8g
-dGhlIFhlbiB0ZWFtOiB0aGlzIGlzIG5vdCB0cml2aWFsIHRvIG1lIHRvIGRlbW9uc3RyYXRlDQo+
-IHRoaXMgYXNzZXJ0aW9uIGNhbiBuZXZlciBoYXBwZW4sIGJ1dCB0aGVuIHRoZSB3aG9sZSBzZXJp
-ZXMNCj4gaXMganVzdGlmaWVkIGFuZCBJIGNhbiBjb252ZXJ0IHFlbXVfY2hyX2ZlX3dyaXRlKCkg
-dG8gdXNlDQo+IHNpemVfdCBhcmd1bWVudC4NCj4gQ2FuIHlvdSBoZWxwIG1lIGhlcmU/DQoNCkkn
-bSBub3QgcGFydGljdWxhcmx5IGZhbWlsaWFyIHdpdGggdGhpcyBiaXQgb2YgY29kZSBidXQgSSBj
-YW4gdHJ5Li4uDQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOp
-IDxwaGlsbWRAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICBody9jaGFyL3hlbl9jb25zb2xlLmMgfCAx
-ICsNCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQ0KPiANCj4gZGlmZiAtLWdpdCBh
-L2h3L2NoYXIveGVuX2NvbnNvbGUuYyBiL2h3L2NoYXIveGVuX2NvbnNvbGUuYw0KPiBpbmRleCAx
-YTMwMDE0YTExLi41YjY3MmE1YTI0IDEwMDY0NA0KPiAtLS0gYS9ody9jaGFyL3hlbl9jb25zb2xl
-LmMNCj4gKysrIGIvaHcvY2hhci94ZW5fY29uc29sZS5jDQo+IEBAIC05Miw2ICs5Miw3IEBAIHN0
-YXRpYyBzc2l6ZV90IGJ1ZmZlcl9hcHBlbmQoc3RydWN0IFhlbkNvbnNvbGUgKmNvbikNCj4gICAg
-ICB9DQo+IA0KPiAgIG91dDoNCj4gKyAgICBhc3NlcnQoYnVmZmVyLT5zaXplID49IGJ1ZmZlci0+
-Y29uc3VtZWQpOw0KPiAgICAgIHJldHVybiBidWZmZXItPnNpemUgLSBidWZmZXItPmNvbnN1bWVk
-Ow0KDQpJIHRoaW5rIHRoaXMgYXNzZXJ0aW9uIGlzIHJlYXNvbmFibGUgYXM6DQoNCi0gYnVmZmVy
-X2FkdmFuY2UoKSBhcHBlYXJzIHRvIGhpdCBhIHRlcm1pbmF0aW9uIGNvbmRpdGlvbiB3aGVuIGJ1
-ZmZlci0+Y29uc3VtZWQgPT0gYnVmZmVyLT5zaXplLiAoTm90aGluZyBjaGVja3MgZm9yIG92ZXJm
-bG93IHdoaWNoIGlzIGJhZCwgYnV0IHRoYXQgZmFjdCBhbHNvIGxlbmRzIHdlaWdodCB0byB0aGUg
-YXNzZXJ0aW9uIHRoYXQgY29uc3VtZWQgPiBzaXplIGlzIGEgYnVnKS4NCi0gaWYgYnVmZmVyLT5z
-aXplIGV2ZXIgZXhjZWVkcyBidWZmZXItPm1heF9jYXBhY2l0eSB0aGVuIGJvdGggc2l6ZSBhbmQg
-Y29uc3VtZWQgYXJlIHJlLWNhbGN1bGF0ZWQgc3VjaCB0aGF0IGNvbnN1bWVkIDw9IHNpemUuDQoN
-CiAgUGF1bA0KDQo+ICB9DQo+IA0KPiAtLQ0KPiAyLjIwLjENCg0K
+On Thu, 21 Feb 2019 09:25:46 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+
+> On Tue, Feb 19, 2019 at 01:55:01PM +1100, David Gibson wrote:
+> > On Mon, Feb 18, 2019 at 11:43:49PM +0530, P J P wrote: =20
+> > > From: Prasad J Pandit <pjp@fedoraproject.org>
+> > >=20
+> > > On ppc hosts, hypervisor shares following system attributes
+> > >=20
+> > >   - /proc/device-tree/system-id
+> > >   - /proc/device-tree/model
+> > >=20
+> > > with a guest. This could lead to information leakage and misuse.[*]
+> > > Add machine attributes to control such system information exposure
+> > > to a guest.
+> > >=20
+> > > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+> > >=20
+> > > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org> =20
+> >=20
+> > Applied to ppc-for-4.0, thanks. =20
+>=20
+> Could you add the word  "CVE-2019-8934" to the commit message for this
+> patch before sending a pulll request - either end of subject line, or
+> just before the Reported-by line.
+>=20
+
+While here, please add my R-b tag as well:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Regards,
+> Daniel
