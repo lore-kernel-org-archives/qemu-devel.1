@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33363)
+Received: from eggs.gnu.org ([209.51.188.92]:34843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwoKX-00048u-Iv
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:24:03 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gwoT1-000743-Gx
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:32:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwoKW-00086V-Se
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:24:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46166)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwoKW-00084Q-Ke
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:24:00 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F2FE330BB8E4
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 13:23:55 +0000 (UTC)
-Date: Thu, 21 Feb 2019 14:23:52 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190221132352.f66y5qljs7q4dmse@sirius.home.kraxel.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gwoSz-0007ae-Ah
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:32:47 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:40309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gwoSy-0007Wy-Tc
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:32:45 -0500
+Received: by mail-wr1-x432.google.com with SMTP id q1so30191519wrp.7
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 05:32:41 -0800 (PST)
+MIME-Version: 1.0
 References: <20190221110703.5775-1-marcandre.lureau@redhat.com>
 	<20190221110703.5775-12-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190221110703.5775-12-marcandre.lureau@redhat.com>
+	<20190221132352.f66y5qljs7q4dmse@sirius.home.kraxel.org>
+In-Reply-To: <20190221132352.f66y5qljs7q4dmse@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 21 Feb 2019 14:32:28 +0100
+Message-ID: <CAJ+F1CJrfnqaeHcMveNzRUavmyxLpCRxfeertfV9SrH6-Vd86Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v3 11/11] display: add -display spice-app
  launching a Spice client
@@ -35,35 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On Thu, Feb 21, 2019 at 12:07:03PM +0100, Marc-Andr=E9 Lureau wrote:
-> Add a new display backend that will configure Spice to allow a remote
-> client to control QEMU in a similar fashion as other QEMU display
-> backend/UI like GTK.
->=20
-> For this to work, it will set up Spice server with a unix socket, and
-> register a VC chardev that will be exposed as Spice ports. A QMP
-> monitor is also exposed as a Spice port, this allows the remote client
-> fuller qemu control and state handling.
->=20
-> - doesn't handle VC set_echo() - this doesn't seem a strong
->   requirement, very few front-end use it
-> - spice options can be tweaked with other -spice arguments
-> - Windows support shouldn't be hard to do, but will probably use a TCP
->   port instead
-> - we may want to watch the child process to quit automatically if it
->   crashed
+Hi
 
-Hmm, not working on RHEL-7:
-
-  qemu-system-x86_64: Failed to launch spice+unix:///tmp/.QON7WZ/spice.so=
+On Thu, Feb 21, 2019 at 2:24 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Thu, Feb 21, 2019 at 12:07:03PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> > Add a new display backend that will configure Spice to allow a remote
+> > client to control QEMU in a similar fashion as other QEMU display
+> > backend/UI like GTK.
+> >
+> > For this to work, it will set up Spice server with a unix socket, and
+> > register a VC chardev that will be exposed as Spice ports. A QMP
+> > monitor is also exposed as a Spice port, this allows the remote client
+> > fuller qemu control and state handling.
+> >
+> > - doesn't handle VC set_echo() - this doesn't seem a strong
+> >   requirement, very few front-end use it
+> > - spice options can be tweaked with other -spice arguments
+> > - Windows support shouldn't be hard to do, but will probably use a TCP
+> >   port instead
+> > - we may want to watch the child process to quit automatically if it
+> >   crashed
+>
+> Hmm, not working on RHEL-7:
+>
+>   qemu-system-x86_64: Failed to launch spice+unix:///tmp/.QON7WZ/spice.so=
 ck URI: The specified location is not supported
+>
+> virt-viewer + remote-viewer are installed.
+>
+> any clue?
 
-virt-viewer + remote-viewer are installed.
+5 months old patch, not event released yet :( but virt-viewer should
+have a release very soon hopefully
 
-any clue?
+https://pagure.io/virt-viewer/c/c4f6142f15c4e51cbf427f5f1bf1fc6ac0e10d88?br=
+anch=3Dmaster
 
-thanks,
-  Gerd
+thanks
+
+--=20
+Marc-Andr=C3=A9 Lureau
