@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43721)
+Received: from eggs.gnu.org ([209.51.188.92]:46315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gwdHP-0000X7-BZ
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:36:04 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gwdQ1-0003yy-AK
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:44:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1gwdHH-0001cR-F7
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:35:59 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2421 helo=huawei.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1gwdQ0-0006Vq-BF
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:44:57 -0500
+Received: from mga17.intel.com ([192.55.52.151]:21484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1gwdHC-0001Z4-2I
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:35:53 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 21 Feb 2019 01:35:43 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB25E1F3@dggeml511-mbx.china.huawei.com>
-References: <1550566254-3545-1-git-send-email-yan.y.zhao@intel.com>
-	<33183CC9F5247A488A2544077AF19020DB25D374@dggeml511-mbx.china.huawei.com>
-	<20190221002444.GH16456@joy-OptiPlex-7040>
-In-Reply-To: <20190221002444.GH16456@joy-OptiPlex-7040>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gwdPz-0006RE-U2
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 20:44:56 -0500
+Message-ID: <5C6E03B6.30309@intel.com>
+Date: Thu, 21 Feb 2019 09:49:42 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/5] QEMU VFIO live migration
+References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
+	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
+	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
+	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
+	<20181214111705.GD2454@work-vm>
+	<286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
+	<20190220131224.GF2608@work-vm>
+In-Reply-To: <20190220131224.GF2608@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhao Yan <yan.y.zhao@intel.com>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>, "eauger@redhat.com" <eauger@redhat.com>, "felipe@nutanix.com" <felipe@nutanix.com>, "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "changpeng.liu@intel.com" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+
+On 02/20/2019 09:12 PM, Dr. David Alan Gilbert wrote:
+> * Wang, Wei W (wei.w.wang@intel.com) wrote:
+>> On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
+>>>> On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
+>>>>> * Wei Wang (wei.w.wang@intel.com) wrote:
+>>>>>> On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
+>>>>>>> * Wei Wang (wei.w.wang@intel.com) wrote:
+>>>>>>>> The new feature enables the virtio-balloon device to receive
+>>>>>>>> hints of guest free pages from the free page vq.
+>>>>>>>>
+>>>>>>>> A notifier is registered to the migration precopy notifier
+>>>>>>>> chain. The notifier calls free_page_start after the migration
+>>>>>>>> thread syncs the dirty bitmap, so that the free page
+>>>>>>>> optimization starts to clear bits of free pages from the
+>>>>>>>> bitmap. It calls the free_page_stop before the migration
+>>>>>>>> thread syncs the bitmap, which is the end of the current round
+>>>>>>>> of ram save. The free_page_stop is also called to stop the
+>>> optimization in the case when there is an error occurred in the process of
+>>> ram saving.
+>>>>>>>> Note: balloon will report pages which were free at the time of this
+>>> call.
+>>>>>>>> As the reporting happens asynchronously, dirty bit logging
+>>>>>>>> must be enabled before this free_page_start call is made.
+>>>>>>>> Guest reporting must be disabled before the migration dirty bitmap
+>>> is synchronized.
+>>>>>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>>>>>> CC: Michael S. Tsirkin <mst@redhat.com>
+>>>>>>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>>>>>> CC: Juan Quintela <quintela@redhat.com>
+>>>>>>>> CC: Peter Xu <peterx@redhat.com>
+>>>>>>> I think I'm OK for this from the migration side, I'd appreciate
+>>>>>>> someone checking the virtio and aio bits.
+>>>>>>>
+>>>>>>> I'm not too sure how it gets switched on and off - i.e. if we
+>>>>>>> get a nice new qemu on a new kernel, what happens when I try and
+>>>>>>> migrate to the same qemu on an older kernel without these hints?
+>>>>>>>
+>>>>>> This feature doesn't rely on the host kernel. Those hints are
+>>>>>> reported from the guest kernel.
+>>>>>> So migration across different hosts wouldn't affect the use of this
+>>> feature.
+>>>>>> Please correct me if I didn't get your point.
+>>>>> Ah OK, yes;  now what about migrating from new->old qemu with a new
+>>>>> guest but old machine type?
+>>>>>
+>>>> I think normally, the source QEMU and destination QEMU should have the
+>>>> same QEMU booting parameter. If the destination QEMU doesn't support
+>>>> "--device virtio-balloon,free-page-hint=true", which the source QEMU
+>>>> has, the destination side QEMU will fail to boot, and migration will
+>>>> not happen then.
+>>> Ah that's OK; as long as free-page-hint is false by default that will work fine.
+>>>
+>>> Dave
+>>>
+>> Hi Dave,
+>>
+>> Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
+> I think so; can you remind me where we're up to:
+>    a) It looks like you've already got the kernel changes merged -
+> correct?
+
+Yes, they were already merged half year ago.
+
+>    b) What about the virtio spec changes - where are they upto?
+
+The spec changes are in progress. v1 were posted out, a v2 is in 
+preparation.
+
+>    c) Where are the other reviews upto - I think most are reviewed - is
+> it just 7/7 that is missing the review-by?
+7/7 is about the virtio changes, and Michael has given the reviewed-by:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg03732.html
 
 
-
-> -----Original Message-----
-> From: Zhao Yan [mailto:yan.y.zhao@intel.com]
-> Sent: Thursday, February 21, 2019 8:25 AM
-> To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> Cc: alex.williamson@redhat.com; qemu-devel@nongnu.org;
-> intel-gvt-dev@lists.freedesktop.org; Zhengxiao.zx@Alibaba-inc.com;
-> yi.l.liu@intel.com; eskultet@redhat.com; ziye.yang@intel.com;
-> cohuck@redhat.com; shuangtai.tst@alibaba-inc.com; dgilbert@redhat.com;
-> zhi.a.wang@intel.com; mlevitsk@redhat.com; pasic@linux.ibm.com;
-> aik@ozlabs.ru; eauger@redhat.com; felipe@nutanix.com;
-> jonathan.davies@nutanix.com; changpeng.liu@intel.com; Ken.Xue@amd.com;
-> kwankhede@nvidia.com; kevin.tian@intel.com; cjia@nvidia.com;
-> kvm@vger.kernel.org
-> Subject: Re: [PATCH 0/5] QEMU VFIO live migration
->=20
-> On Wed, Feb 20, 2019 at 11:56:01AM +0000, Gonglei (Arei) wrote:
-> > Hi yan,
-> >
-> > Thanks for your work.
-> >
-> > I have some suggestions or questions:
-> >
-> > 1) Would you add msix mode support,? if not, pls add a check in
-> vfio_pci_save_config(), likes Nvidia's solution.
-> ok.
->=20
-> > 2) We should start vfio devices before vcpu resumes, so we can't rely o=
-n vm
-> start change handler completely.
-> vfio devices is by default set to running state.
-> In the target machine, its state transition flow is running->stop->runnin=
-g.
-
-That's confusing. We should start vfio devices after vfio_load_state, other=
-wise
-how can you keep the devices' information are the same between source side
-and destination side?
-
-> so, maybe you can ignore the stop notification in kernel?
-> > 3) We'd better support live migration rollback since have many failure
-> scenarios,
-> >  register a migration notifier is a good choice.
-> I think this patchset can also handle the failure case well.
-> if migration failure or cancelling happens,
-> in cleanup handler, LOGGING state is cleared. device state(running or
-> stopped) keeps as it is).
-
-IIRC there're many failure paths don't calling cleanup handler.
-
-> then,
-> if vm switches back to running, device state will be set to running;
-> if vm stayes at stopped state, device state is also stopped (it has no
-> meaning to let it in running state).
-> Do you think so ?
->=20
-IF the underlying state machine is complicated,
-We should tell the canceling state to vendor driver proactively.
-
-> > 4) Four memory region for live migration is too complicated IMHO.
-> one big region requires the sub-regions well padded.
-> like for the first control fields, they have to be padded to 4K.
-> the same for other data fields.
-> Otherwise, mmap simply fails, because the start-offset and size for mmap
-> both need to be PAGE aligned.
->=20
-But if we don't need use mmap for control filed and device state, they are =
-small basically.
-The performance is enough using pread/pwrite.=20
-
-> Also, 4 regions is clearer in my view :)
->=20
-> > 5) About log sync, why not register log_global_start/stop in
-> vfio_memory_listener?
-> >
-> >
-> seems log_global_start/stop cannot be iterately called in pre-copy phase?
-> for dirty pages in system memory, it's better to transfer dirty data
-> iteratively to reduce down time, right?
->=20
-
-We just need invoking only once for start and stop logging. Why we need to =
-call
-them literately? See memory_listener of vhost.
-
-Regards,
--Gonglei
+Best,
+Wei
