@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52521)
+Received: from eggs.gnu.org ([209.51.188.92]:54214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwnfL-00087F-Or
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:41:28 -0500
+	(envelope-from <david@redhat.com>) id 1gwniU-0002os-K9
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwnZ4-0005ba-AO
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:34:59 -0500
+	(envelope-from <david@redhat.com>) id 1gwniT-0003Vi-0l
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 07:44:42 -0500
 References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-17-eric.auger@redhat.com>
-	<20190218113008.18ead6cb@Igors-MacBook-Pro.local>
-	<8d996c45-a338-cc5a-a740-28168c9ba8fc@redhat.com>
-	<20190221131640.3656a574@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <47d9d84d-467c-e7f7-33cc-65f11ea2c03e@redhat.com>
-Date: Thu, 21 Feb 2019 13:34:47 +0100
+	<20190205173306.20483-15-eric.auger@redhat.com>
+	<20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
+	<852c526c-42fd-4ff4-d00e-1a44e1561e67@redhat.com>
+	<20190221103610.0c2add1c@redhat.com>
+	<e264b964-baa6-11e2-8e45-3238d412ca32@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4a921c15-43b8-e7dd-2a76-6b9e0fc7f084@redhat.com>
+Date: Thu, 21 Feb 2019 13:44:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190221131640.3656a574@redhat.com>
+In-Reply-To: <e264b964-baa6-11e2-8e45-3238d412ca32@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 16/18] hw/arm/virt: Add nvdimm hot-plug
- infrastructure
+Subject: Re: [Qemu-devel] [PATCH v6 14/18] hw/arm/virt: Allocate
+ device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,171 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, david@redhat.com, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, dgilbert@redhat.com, qemu-arm@nongnu.org, david@gibson.dropbear.id.au, eric.auger.pro@gmail.com
+To: Auger Eric <eric.auger@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, dgilbert@redhat.com, shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
 
-Hi Igor,
-
-On 2/21/19 1:16 PM, Igor Mammedov wrote:
-> On Wed, 20 Feb 2019 16:21:05 +0100
-> Auger Eric <eric.auger@redhat.com> wrote:
+On 21.02.19 13:37, Auger Eric wrote:
+> Hi Igor,
 > 
->> Hi Igor,
+> On 2/21/19 10:36 AM, Igor Mammedov wrote:
+>> On Tue, 19 Feb 2019 16:53:22 +0100
+>> Auger Eric <eric.auger@redhat.com> wrote:
 >>
->> On 2/18/19 11:30 AM, Igor Mammedov wrote:
->>> On Tue,  5 Feb 2019 18:33:04 +0100
->>> Eric Auger <eric.auger@redhat.com> wrote:
->>>   
->>>> From: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>>>
->>>> Pre-plug and plug handlers are prepared for NVDIMM support.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>>> ---
->>>>  default-configs/arm-softmmu.mak |  2 ++
->>>>  hw/arm/virt-acpi-build.c        |  6 ++++++
->>>>  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
->>>>  include/hw/arm/virt.h           |  3 +++
->>>>  4 files changed, 33 insertions(+)
->>>>
->>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->>>> index dc4624794f..ddbe87ed15 100644
->>>> --- a/default-configs/arm-softmmu.mak
->>>> +++ b/default-configs/arm-softmmu.mak
->>>> @@ -162,3 +162,5 @@ CONFIG_HIGHBANK=y
->>>>  CONFIG_MUSICPAL=y
->>>>  CONFIG_MEM_DEVICE=y
->>>>  CONFIG_DIMM=y
->>>> +CONFIG_NVDIMM=y
->>>> +CONFIG_ACPI_NVDIMM=y
->>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>> index 781eafaf5e..f086adfa82 100644
->>>> --- a/hw/arm/virt-acpi-build.c
->>>> +++ b/hw/arm/virt-acpi-build.c
->>>> @@ -784,6 +784,7 @@ static
->>>>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>>>  {
->>>>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->>>> +    MachineState *ms = MACHINE(vms);
->>>>      GArray *table_offsets;
->>>>      unsigned dsdt, xsdt;
->>>>      GArray *tables_blob = tables->table_data;
->>>> @@ -824,6 +825,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>>>          }
->>>>      }
->>>>  
->>>> +    if (vms->acpi_nvdimm_state.is_enabled) {
->>>> +        nvdimm_build_acpi(table_offsets, tables_blob, tables->linker,
->>>> +                          &vms->acpi_nvdimm_state, ms->ram_slots);
->>>> +    }
->>>> +
->>>>      if (its_class_name() && !vmc->no_its) {
->>>>          acpi_add_table(table_offsets, tables_blob);
->>>>          build_iort(tables_blob, tables->linker, vms);
->>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>>> index b683902991..0c8c2cc191 100644
->>>> --- a/hw/arm/virt.c
->>>> +++ b/hw/arm/virt.c
->>>> @@ -132,6 +132,7 @@ static const MemMapEntry a15memmap[] = {
->>>>      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->>>>      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->>>>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
->>>> +    [VIRT_ACPI_IO] =            { 0x09070000, 0x00010000 },  
->>> where does this range come from and is its size sufficient?  
->> I understand it can be anywhere in low mem and must be large enough to
->> contain [NVDIMM_ACPI_IO_BASE, NDIMM_ACPI_IO_BASE + NVDIMM_ACPI_IO_LEN].
-> it looked to like generic ACPI arrea rather than NVDIMM
-> so I'd suggest to name it properly and probably use NVDIMM_ACPI_IO_BASE & co
-> to add this entry so that reader won't have to wonder where this magic numbers
-> come from.
-OK. I will rename the region in v8
+>>> Hi Igor,
+>>>
+>>> On 2/18/19 10:31 AM, Igor Mammedov wrote:
+>>>> On Tue,  5 Feb 2019 18:33:02 +0100
+>>>> Eric Auger <eric.auger@redhat.com> wrote:
+>>>>   
+>>>>> The device memory region is located after the initial RAM.
+>>>>> its start/size are 1GB aligned.
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>>>>
+>>>>> ---
+>>>>> v4 -> v5:
+>>>>> - device memory set after the initial RAM
+>>>>>
+>>>>> v3 -> v4:
+>>>>> - remove bootinfo.device_memory_start/device_memory_size
+>>>>> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
+>>>>> ---
+>>>>>  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
+>>>>>  1 file changed, 36 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>>>> index 783468ba77..b683902991 100644
+>>>>> --- a/hw/arm/virt.c
+>>>>> +++ b/hw/arm/virt.c
+>>>>> @@ -61,6 +61,7 @@
+>>>>>  #include "hw/arm/smmuv3.h"
+>>>>>  #include "hw/mem/pc-dimm.h"
+>>>>>  #include "hw/mem/nvdimm.h"
+>>>>> +#include "hw/acpi/acpi.h"
+>>>>>  
+>>>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>>>>> @@ -1260,6 +1261,37 @@ static void create_secure_ram(VirtMachineState *vms,
+>>>>>      g_free(nodename);
+>>>>>  }
+>>>>>  
+>>>>> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+>>>>> +{
+>>>>> +    MachineState *ms = MACHINE(vms);
+>>>>> +    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;  
+>>>> should size it with 1Gb alignment per slot from the start (to avoid x86 mistakes),
+>>>> see enforce_aligned_dimm usage and associated commit for more details  
+>>> I don't understand the computation done in pc machine. eventually we are
+>>> likely to have more device memory than requested by the user. Why don't
+>>> we check (machine->maxram_size - machine->ram_size) >=
+>>> machine->ram_slots * GiB
+>>> instead of adding 1GiB/slot to the initial user requirements?
+>>>
+>>> Also machine->maxram_size - machine->ram_size is checked to be aligned
+>>> with TARGET_PAGE_SIZE. Is TARGET_PAGE_SIZE representative of the guest
+>>> PAGE in accelerated mode? Is it valid ro require an alignment on 1GB
+>>> boundary as I do in this patch?
+>> See commit 085f8e88b for explanation,
+>> What we are basically are doing there is sizing hotpluggbale address space
+>> to allow max possible huge page aligned DIMM to be successfully plugged in
+>> even if address space if fragmented.
+> In v7, I also added ram_slots * GiB to (maxram_size - ram_size).
 > 
->> So one 64kB page should do the job?
-> Should it be located in lowmem?
-> (do we care about device_memory & AVMF & ACPI & not 64bit guests?)
-I guess no. We could easily fit this region into the existing low mem
-IO, that's what I meant actually.
 
-Thanks
+Depending on the way the system handles it, this might be confusing for
+the end user and has to be documented somewhere.
 
-Eric
+E.g. if there are certain memory limits (say 2TB) and the user specifies
+something like "maxmem=2TB,slots=20" it might be confusing if he gets an
+error like "more than 2TB are not supported".
+
+> Thanks
 > 
-> 
->> Thanks
->>
->> Eric
->>>   
->>>>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->>>>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->>>>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
->>>> @@ -1637,6 +1638,18 @@ static void machvirt_init(MachineState *machine)
->>>>  
->>>>      create_platform_bus(vms, pic);
->>>>  
->>>> +    if (vms->acpi_nvdimm_state.is_enabled) {
->>>> +        AcpiNVDIMMState *acpi_nvdimm_state = &vms->acpi_nvdimm_state;
->>>> +
->>>> +        acpi_nvdimm_state->dsm_io.type = NVDIMM_ACPI_IO_MEMORY;
->>>> +        acpi_nvdimm_state->dsm_io.base =
->>>> +                vms->memmap[VIRT_ACPI_IO].base + NVDIMM_ACPI_IO_BASE;
->>>> +        acpi_nvdimm_state->dsm_io.len = NVDIMM_ACPI_IO_LEN;
->>>> +
->>>> +        nvdimm_init_acpi_state(acpi_nvdimm_state, sysmem,
->>>> +                               vms->fw_cfg, OBJECT(vms));
->>>> +    }
->>>> +
->>>>      vms->bootinfo.ram_size = machine->ram_size;
->>>>      vms->bootinfo.kernel_filename = machine->kernel_filename;
->>>>      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
->>>> @@ -1822,10 +1835,19 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->>>>                               DeviceState *dev, Error **errp)
->>>>  {
->>>>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->>>> +    bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>>>      Error *local_err = NULL;
->>>>  
->>>>      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
->>>> +    if (local_err) {
->>>> +        goto out;
->>>> +    }
->>>>  
->>>> +    if (is_nvdimm) {
->>>> +        nvdimm_plug(&vms->acpi_nvdimm_state);
->>>> +    }
->>>> +
->>>> +out:
->>>>      error_propagate(errp, local_err);
->>>>  }
->>>>  
->>>> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->>>> index c88f67a492..56d73b0e86 100644
->>>> --- a/include/hw/arm/virt.h
->>>> +++ b/include/hw/arm/virt.h
->>>> @@ -37,6 +37,7 @@
->>>>  #include "hw/arm/arm.h"
->>>>  #include "sysemu/kvm.h"
->>>>  #include "hw/intc/arm_gicv3_common.h"
->>>> +#include "hw/mem/nvdimm.h"
->>>>  
->>>>  #define NUM_GICV2M_SPIS       64
->>>>  #define NUM_VIRTIO_TRANSPORTS 32
->>>> @@ -77,6 +78,7 @@ enum {
->>>>      VIRT_GPIO,
->>>>      VIRT_SECURE_UART,
->>>>      VIRT_SECURE_MEM,
->>>> +    VIRT_ACPI_IO,
->>>>      VIRT_LOWMEMMAP_LAST,
->>>>  };
->>>>  
->>>> @@ -134,6 +136,7 @@ typedef struct {
->>>>      hwaddr high_io_base;
->>>>      hwaddr highest_gpa;
->>>>      bool extended_memmap;
->>>> +    AcpiNVDIMMState acpi_nvdimm_state;
->>>>  } VirtMachineState;
->>>>  
->>>>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)  
->>>   
-> 
-> 
+> Eric
+-- 
+
+Thanks,
+
+David / dhildenb
