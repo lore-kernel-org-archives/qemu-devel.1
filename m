@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33263)
+Received: from eggs.gnu.org ([209.51.188.92]:33304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gwchd-0006Sc-K9
+	(envelope-from <crosa@redhat.com>) id 1gwchf-0006TM-BQ
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gwchb-0001A8-Fz
-	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:59:05 -0500
+	(envelope-from <crosa@redhat.com>) id 1gwchd-0001AW-FQ
+	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:59:07 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 20 Feb 2019 19:57:46 -0500
-Message-Id: <20190221005753.27955-14-crosa@redhat.com>
+Date: Wed, 20 Feb 2019 19:57:47 -0500
+Message-Id: <20190221005753.27955-15-crosa@redhat.com>
 In-Reply-To: <20190221005753.27955-1-crosa@redhat.com>
 References: <20190221005753.27955-1-crosa@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 13/20] scripts/qemu.py: support adding a
- console with the default serial device
+Subject: [Qemu-devel] [PATCH v3 14/20] Boot Linux Console Test: add a test
+ for mips + malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +24,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The set_console() utility function traditionally adds a device either
-based on the explicitly given device type, or based on the machine type,
-a known good type of device.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-But, for a number of machine types, it may be impossible or
-inconvenient to add the devices my means of "-device" command line
-options, and then it may better to just use the "-serial" option and
-let QEMU itself, based on the machine type, set the device
-accordingly.
+Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
+board and verify the serial is working.  Also, it relies on the serial
+device set by the machine itself.
 
-To achieve that, the behavior of set_console() now flags the intention
-to add a console device on launch(), and if no explicit device type is
-given, and there's no definition on CONSOLE_DEV_TYPES, the "-serial"
-is going to be added to the QEMU command line, instead of raising
-exceptions.
+If mips is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:mips" tags.
 
-Based on testing with different machine types, the CONSOLE_DEV_TYPES
-is now being set to the bare essential entries (one entry to be
-honest), for machine types that can not easily give us a working
-console with "-serial".
+Alternatively, this test can be run using:
 
+    $ avocado run -t arch:mips tests/acceptance
+    $ avocado run -t machine:malta tests/acceptance
+    $ avocado run -t endian:big tests/acceptance
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qemu.py | 39 +++++++++++++++++++--------------------
- 1 file changed, 19 insertions(+), 20 deletions(-)
+ .travis.yml                            |  2 +-
+ tests/acceptance/boot_linux_console.py | 41 ++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index ee85309923..bd1d2e2b9a 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -42,11 +42,6 @@ def kvm_available(target_arch=3DNone):
+diff --git a/.travis.yml b/.travis.yml
+index 42971484ab..0a5e0613be 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -198,7 +198,7 @@ matrix:
 =20
- #: Maps machine types to the preferred console device types
- CONSOLE_DEV_TYPES =3D {
--    r'^clipper$': 'isa-serial',
--    r'^malta': 'isa-serial',
--    r'^(pc.*|q35.*|isapc)$': 'isa-serial',
--    r'^(40p|powernv|prep)$': 'isa-serial',
--    r'^pseries.*': 'spapr-vty',
-     r'^s390-ccw-virtio.*': 'sclpconsole',
-     }
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu"
++        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
+       addons:
+         apt:
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index e2ef43e7ce..05e43360b8 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -8,9 +8,12 @@
+ # This work is licensed under the terms of the GNU GPL, version 2 or
+ # later.  See the COPYING file in the top-level directory.
 =20
-@@ -129,6 +124,7 @@ class QEMUMachine(object):
-         self._temp_dir =3D None
-         self._launched =3D False
-         self._machine =3D None
-+        self._console_set =3D False
-         self._console_device_type =3D None
-         self._console_address =3D None
-         self._console_socket =3D None
-@@ -248,13 +244,17 @@ class QEMUMachine(object):
-                 '-display', 'none', '-vga', 'none']
-         if self._machine is not None:
-             args.extend(['-machine', self._machine])
--        if self._console_device_type is not None:
-+        if self._console_set:
-             self._console_address =3D os.path.join(self._temp_dir,
-                                                  self._name + "-console.=
-sock")
-             chardev =3D ('socket,id=3Dconsole,path=3D%s,server,nowait' %
-                        self._console_address)
--            device =3D '%s,chardev=3Dconsole' % self._console_device_typ=
-e
--            args.extend(['-chardev', chardev, '-device', device])
-+            args.extend(['-chardev', chardev])
-+            if self._console_device_type is None:
-+                args.extend(['-serial', 'chardev:console'])
-+            else:
-+                device =3D '%s,chardev=3Dconsole' % self._console_device=
-_type
-+                args.extend(['-device', device])
-         return args
++import os
+ import logging
 =20
-     def _pre_launch(self):
-@@ -480,30 +480,29 @@ class QEMUMachine(object):
-         line.
+ from avocado_qemu import Test
++from avocado.utils import process
++from avocado.utils import archive
 =20
-         This is a convenience method that will either use the provided
--        device type, of if not given, it will used the device type set
--        on CONSOLE_DEV_TYPES.
-+        device type, of if not given, it will use the device type set
-+        on CONSOLE_DEV_TYPES if a machine type is set, and a matching
-+        entry exists on CONSOLE_DEV_TYPES.
 =20
-         The actual setting of command line arguments will be be done at
-         machine launch time, as it depends on the temporary directory
-         to be created.
+ class BootLinuxConsole(Test):
+@@ -44,6 +47,21 @@ class BootLinuxConsole(Test):
+                 fail =3D 'Failure message found in console: %s' % failur=
+e_message
+                 self.fail(fail)
 =20
--        @param device_type: the device type, such as "isa-serial"
-+        @param device_type: the device type, such as "isa-serial".  If
-+                            None is given (the default value) a "-serial
-+                            chardev:console" command line argument will
-+                            be used instead, resorting to the machine's
-+                            default device type, if a machine type is se=
-t,
-+                            and a matching entry exists on CONSOLE_DEV_T=
-YPES.
-         @raises: QEMUMachineAddDeviceError if the device type is not giv=
-en
-                  and can not be determined.
++    def extract_from_deb(self, deb, path):
++        """
++        Extracts a file from a deb package into the test workdir
++
++        :param deb: path to the deb archive
++        :param file: path within the deb archive of the file to be extra=
+cted
++        :returns: path of the extracted file
++        """
++        cwd =3D os.getcwd()
++        os.chdir(self.workdir)
++        process.run("ar x %s data.tar.gz" % deb)
++        archive.extract("data.tar.gz", self.workdir)
++        os.chdir(cwd)
++        return self.workdir + path
++
+     def test_x86_64_pc(self):
          """
--        if device_type is None:
--            if self._machine is None:
--                raise QEMUMachineAddDeviceError("Can not add a console d=
-evice:"
--                                                " QEMU instance without =
-a "
--                                                "defined machine type")
-+        self._console_set =3D True
-+        if device_type is None and self._machine is not None:
-             for regex, device in CONSOLE_DEV_TYPES.items():
-                 if re.match(regex, self._machine):
-                     device_type =3D device
-                     break
--            if device_type is None:
--                raise QEMUMachineAddDeviceError("Can not add a console d=
-evice:"
--                                                " no matching console de=
-vice "
--                                                "type definition")
-         self._console_device_type =3D device_type
-=20
-     @property
+         :avocado: tags=3Darch:x86_64
+@@ -62,3 +80,26 @@ class BootLinuxConsole(Test):
+         self.vm.launch()
+         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+         self.wait_for_console_pattern(console_pattern)
++
++    def test_mips_malta(self):
++        """
++        :avocado: tags=3Darch:mips
++        :avocado: tags=3Dmachine:malta
++        :avocado: tags=3Dendian:big
++        """
++        deb_url =3D ('http://snapshot.debian.org/archive/debian/'
++                   '20130217T032700Z/pool/main/l/linux-2.6/'
++                   'linux-image-2.6.32-5-4kc-malta_2.6.32-48_mips.deb')
++        deb_hash =3D 'a8cfc28ad8f45f54811fc6cf74fc43ffcfe0ba04'
++        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
++        kernel_path =3D self.extract_from_deb(deb_path,
++                                            '/boot/vmlinux-2.6.32-5-4kc-=
+malta')
++
++        self.vm.set_machine('malta')
++        self.vm.set_console()
++        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'conso=
+le=3DttyS0'
++        self.vm.add_args('-kernel', kernel_path,
++                         '-append', kernel_command_line)
++        self.vm.launch()
++        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
++        self.wait_for_console_pattern(console_pattern)
 --=20
 2.20.1
