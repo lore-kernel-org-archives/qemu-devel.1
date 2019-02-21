@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54163)
+Received: from eggs.gnu.org ([209.51.188.92]:55096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwjRg-0004R0-DL
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:11:05 -0500
+	(envelope-from <yuri.benditovich@daynix.com>) id 1gwjZQ-0006Zo-1v
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwjRf-0008Ip-Bz
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:11:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwjRf-0008Hq-2u
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:11:03 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED728307D911
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 08:11:01 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 21 Feb 2019 09:10:54 +0100
-Message-Id: <20190221081054.13853-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] display/virtio: add edid support.
+	(envelope-from <yuri.benditovich@daynix.com>) id 1gwjZO-0007Gi-Pu
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:19:04 -0500
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:44685)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+	id 1gwjZO-0007GJ-Du
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:19:02 -0500
+Received: by mail-yb1-xb42.google.com with SMTP id j85so7389436ybg.11
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 00:19:01 -0800 (PST)
+MIME-Version: 1.0
+References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
+	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
+	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
+	<20190218113447-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
+	<20190218183353-mutt-send-email-mst@kernel.org>
+	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
+	<a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
+In-Reply-To: <a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Thu, 21 Feb 2019 10:18:52 +0200
+Message-ID: <CAOEp5Ode1Ue0iLD4qUs+tcSGCZ+t+bm1TQpr3UG59jMU9kyVUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
+ not enabled by the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,156 +38,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
 
-This patch adds EDID support to the family of virtio-gpu devices.  It is
-turned off by default, use the new edid property to enable it.
+On Thu, Feb 21, 2019 at 8:49 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2019/2/21 =E4=B8=8B=E5=8D=882:00, Yuri Benditovich wrote:
+> > On Tue, Feb 19, 2019 at 8:27 AM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2019/2/19 =E4=B8=8A=E5=8D=887:34, Michael S. Tsirkin wrote:
+> >>> On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
+> >>>> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+> >>>>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
+> >>>>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> w=
+rote:
+> >>>>>>> On 2019/2/13 =E4=B8=8B=E5=8D=8810:51, Yuri Benditovich wrote:
+> >>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1608226
+> >>>>>>>> On startup/link-up in multiqueue configuration the virtio-net
+> >>>>>>>> tries to starts all the queues, including those that the guest
+> >>>>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
+> >>>>>>>> If the guest driver does not allocate queues that it will not
+> >>>>>>>> use (for example, Windows driver does not) and number of actuall=
+y
+> >>>>>>>> used queues is less that maximal number supported by the device,
+> >>>>>>> Is this a requirement of e.g NDIS? If not, could we simply alloca=
+te all
+> >>>>>>> queues in this case. This is usually what normal Linux driver did=
+.
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>> this causes vhost_net_start to fail and actually disables vhost
+> >>>>>>>> for all the queues, reducing the performance.
+> >>>>>>>> Current commit fixes this: initially only first queue is started=
+,
+> >>>>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
+> >>>>>>>> requested by the guest.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> >>>>>>>> ---
+> >>>>>>>>     hw/net/virtio-net.c | 7 +++++--
+> >>>>>>>>     1 file changed, 5 insertions(+), 2 deletions(-)
+> >>>>>>>>
+> >>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> >>>>>>>> index 3f319ef723..d3b1ac6d3a 100644
+> >>>>>>>> --- a/hw/net/virtio-net.c
+> >>>>>>>> +++ b/hw/net/virtio-net.c
+> >>>>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONe=
+t *n, uint8_t status)
+> >>>>>>>>     {
+> >>>>>>>>         VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+> >>>>>>>>         NetClientState *nc =3D qemu_get_queue(n->nic);
+> >>>>>>>> -    int queues =3D n->multiqueue ? n->max_queues : 1;
+> >>>>>>>> +    int queues =3D n->multiqueue ? n->curr_queues : 1;
+> >>>>>>>>
+> >>>>>>>>         if (!get_vhost_net(nc->peer)) {
+> >>>>>>>>             return;
+> >>>>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet=
+ *n, uint8_t cmd,
+> >>>>>>>>             return VIRTIO_NET_ERR;
+> >>>>>>>>         }
+> >>>>>>>>
+> >>>>>>>> -    n->curr_queues =3D queues;
+> >>>>>>>>         /* stop the backend before changing the number of queues=
+ to avoid handling a
+> >>>>>>>>          * disabled queue */
+> >>>>>>>> +    virtio_net_set_status(vdev, 0);
+> >>>>>>> Any reason for doing this?
+> >>>>>> I think there are 2 reasons:
+> >>>>>> 1. The spec does not require guest SW to allocate unused queues.
+> >>>>>> 2. We spend guest's physical memory to just make vhost happy when =
+it
+> >>>>>> touches queues that it should not use.
+> >>>>>>
+> >>>>>> Thanks,
+> >>>>>> Yuri Benditovich
+> >>>>> The spec also says:
+> >>>>>           queue_enable The driver uses this to selectively prevent =
+the device from executing requests from this
+> >>>>>           virtqueue. 1 - enabled; 0 - disabled.
+> >>>>>
+> >>>>> While this is not a conformance clause this strongly implies that
+> >>>>> queues which are not enabled are never accessed by device.
+> >>>>>
+> >>>>> Yuri I am guessing you are not enabling these unused queues right?
+> >>>> Of course, we (Windows driver) do not.
+> >>>> The code of virtio-net passes max_queues to vhost and this causes
+> >>>> vhost to try accessing all the queues, fail on unused ones and final=
+ly
+> >>>> leave vhost disabled at all.
+> >>> Jason, at least for 1.0 accessing disabled queues looks like a spec
+> >>> violation. What do you think?
+> >>
+> >> Yes, but there's some issues:
+> >>
+> >> - How to detect a disabled queue for 0.9x device? Looks like there's n=
+o
+> >> way according to the spec, so device must assume all queues was enable=
+d.
+> > Can you please add several words - what is 0.9 device (probably this
+> > is more about driver) and
+> > what is the problem with it?
+>
+>
+> It's not a net specific issue. 0.9x device is legacy device defined in
+> the spec. We don't have a method to disable and enable a specific queue
+> at that time. Michael said we can assume queue address 0 as disabled,
+> but there's still a question of how to enable it. Spec is unclear and it
+> was too late to add thing for legacy device. For 1.0 device we have
+> queue_enable, but its implementation is incomplete, since it can work
+> with vhost correctly, we probably need to add thing to make it work.
+>
+>
+> >
+> >> - For 1.0, if we depends on queue_enable, we should implement the
+> >> callback for vhost I think. Otherwise it's still buggy.
+> >>
+> >> So it looks tricky to enable and disable queues through set status
+> > If I succeed to modify the patch such a way that it will act only in
+> > 'target' case,
+> > i.e. only if some of queueus are not initialized (at time of
+> > driver_ok), will it be more safe?
+>
+>
+> For 1.0 device, we can fix the queue_enable, but for 0.9x device how do
+> you enable one specific queue in this case? (setting status?)
+>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/virtio/virtio-gpu.h |  5 +++++
- hw/display/virtio-gpu-3d.c     |  3 +++
- hw/display/virtio-gpu.c        | 43 ++++++++++++++++++++++++++++++++++++++++++
- hw/display/trace-events        |  1 +
- 4 files changed, 52 insertions(+)
+Do I understand correctly that for 0.9 device in some cases the device will
+receive feature _MQ set, but will not receive VIRTIO_NET_CTRL_MQ_VQ_PAIRS_S=
+ET?
+Or the problem is different?
 
-diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
-index c8c599f1b9..256e4b245b 100644
---- a/include/hw/virtio/virtio-gpu.h
-+++ b/include/hw/virtio/virtio-gpu.h
-@@ -61,12 +61,15 @@ struct virtio_gpu_requested_state {
- enum virtio_gpu_conf_flags {
-     VIRTIO_GPU_FLAG_VIRGL_ENABLED = 1,
-     VIRTIO_GPU_FLAG_STATS_ENABLED,
-+    VIRTIO_GPU_FLAG_EDID_ENABLED,
- };
- 
- #define virtio_gpu_virgl_enabled(_cfg) \
-     (_cfg.flags & (1 << VIRTIO_GPU_FLAG_VIRGL_ENABLED))
- #define virtio_gpu_stats_enabled(_cfg) \
-     (_cfg.flags & (1 << VIRTIO_GPU_FLAG_STATS_ENABLED))
-+#define virtio_gpu_edid_enabled(_cfg) \
-+    (_cfg.flags & (1 << VIRTIO_GPU_FLAG_EDID_ENABLED))
- 
- struct virtio_gpu_conf {
-     uint64_t max_hostmem;
-@@ -159,6 +162,8 @@ void virtio_gpu_ctrl_response_nodata(VirtIOGPU *g,
-                                      enum virtio_gpu_ctrl_type type);
- void virtio_gpu_get_display_info(VirtIOGPU *g,
-                                  struct virtio_gpu_ctrl_command *cmd);
-+void virtio_gpu_get_edid(VirtIOGPU *g,
-+                         struct virtio_gpu_ctrl_command *cmd);
- int virtio_gpu_create_mapping_iov(VirtIOGPU *g,
-                                   struct virtio_gpu_resource_attach_backing *ab,
-                                   struct virtio_gpu_ctrl_command *cmd,
-diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
-index bc6e99c943..6f7c43cf21 100644
---- a/hw/display/virtio-gpu-3d.c
-+++ b/hw/display/virtio-gpu-3d.c
-@@ -468,6 +468,9 @@ void virtio_gpu_virgl_process_cmd(VirtIOGPU *g,
-     case VIRTIO_GPU_CMD_GET_DISPLAY_INFO:
-         virtio_gpu_get_display_info(g, cmd);
-         break;
-+    case VIRTIO_GPU_CMD_GET_EDID:
-+        virtio_gpu_get_edid(g, cmd);
-+        break;
-     default:
-         cmd->error = VIRTIO_GPU_RESP_ERR_UNSPEC;
-         break;
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index c6fab56f9b..0d87b73d3e 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -21,6 +21,7 @@
- #include "hw/virtio/virtio.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-bus.h"
-+#include "hw/display/edid.h"
- #include "migration/blocker.h"
- #include "qemu/log.h"
- #include "qapi/error.h"
-@@ -207,6 +208,9 @@ static uint64_t virtio_gpu_get_features(VirtIODevice *vdev, uint64_t features,
-     if (virtio_gpu_virgl_enabled(g->conf)) {
-         features |= (1 << VIRTIO_GPU_F_VIRGL);
-     }
-+    if (virtio_gpu_edid_enabled(g->conf)) {
-+        features |= (1 << VIRTIO_GPU_F_EDID);
-+    }
-     return features;
- }
- 
-@@ -301,6 +305,40 @@ void virtio_gpu_get_display_info(VirtIOGPU *g,
-                              sizeof(display_info));
- }
- 
-+static void
-+virtio_gpu_generate_edid(VirtIOGPU *g, int scanout,
-+                         struct virtio_gpu_resp_edid *edid)
-+{
-+    qemu_edid_info info = {
-+        .prefx = g->req_state[scanout].width,
-+        .prefy = g->req_state[scanout].height,
-+    };
-+
-+    edid->size = cpu_to_le32(sizeof(edid->edid));
-+    qemu_edid_generate(edid->edid, sizeof(edid->edid), &info);
-+}
-+
-+void virtio_gpu_get_edid(VirtIOGPU *g,
-+                         struct virtio_gpu_ctrl_command *cmd)
-+{
-+    struct virtio_gpu_resp_edid edid;
-+    struct virtio_gpu_cmd_get_edid get_edid;
-+
-+    VIRTIO_GPU_FILL_CMD(get_edid);
-+    virtio_gpu_bswap_32(&get_edid, sizeof(get_edid));
-+
-+    if (get_edid.scanout >= g->conf.max_outputs) {
-+        cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
-+        return;
-+    }
-+
-+    trace_virtio_gpu_cmd_get_edid(get_edid.scanout);
-+    memset(&edid, 0, sizeof(edid));
-+    edid.hdr.type = VIRTIO_GPU_RESP_OK_EDID;
-+    virtio_gpu_generate_edid(g, get_edid.scanout, &edid);
-+    virtio_gpu_ctrl_response(g, cmd, &edid.hdr, sizeof(edid));
-+}
-+
- static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_format)
- {
-     switch (virtio_gpu_format) {
-@@ -839,6 +877,9 @@ static void virtio_gpu_simple_process_cmd(VirtIOGPU *g,
-     case VIRTIO_GPU_CMD_GET_DISPLAY_INFO:
-         virtio_gpu_get_display_info(g, cmd);
-         break;
-+    case VIRTIO_GPU_CMD_GET_EDID:
-+        virtio_gpu_get_edid(g, cmd);
-+        break;
-     case VIRTIO_GPU_CMD_RESOURCE_CREATE_2D:
-         virtio_gpu_resource_create_2d(g, cmd);
-         break;
-@@ -1356,6 +1397,8 @@ static Property virtio_gpu_properties[] = {
-     DEFINE_PROP_BIT("stats", VirtIOGPU, conf.flags,
-                     VIRTIO_GPU_FLAG_STATS_ENABLED, false),
- #endif
-+    DEFINE_PROP_BIT("edid", VirtIOGPU, conf.flags,
-+                    VIRTIO_GPU_FLAG_EDID_ENABLED, false),
-     DEFINE_PROP_UINT32("xres", VirtIOGPU, conf.xres, 1024),
-     DEFINE_PROP_UINT32("yres", VirtIOGPU, conf.yres, 768),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index 387c6b8931..37d3264bb2 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -35,6 +35,7 @@ vmware_setmode(uint32_t w, uint32_t h, uint32_t bpp) "%dx%d @ %d bpp"
- # hw/display/virtio-gpu.c
- virtio_gpu_features(bool virgl) "virgl %d"
- virtio_gpu_cmd_get_display_info(void) ""
-+virtio_gpu_cmd_get_edid(uint32_t scanout) "scanout %d"
- virtio_gpu_cmd_set_scanout(uint32_t id, uint32_t res, uint32_t w, uint32_t h, uint32_t x, uint32_t y) "id %d, res 0x%x, w %d, h %d, x %d, y %d"
- virtio_gpu_cmd_res_create_2d(uint32_t res, uint32_t fmt, uint32_t w, uint32_t h) "res 0x%x, fmt 0x%x, w %d, h %d"
- virtio_gpu_cmd_res_create_3d(uint32_t res, uint32_t fmt, uint32_t w, uint32_t h, uint32_t d) "res 0x%x, fmt 0x%x, w %d, h %d, d %d"
--- 
-2.9.3
+> A fundamental question is what prevents you from just initialization all
+> queues during driver start? It looks to me this save lots of efforts
+> than allocating queue dynamically.
+>
+
+This is not so trivial in Windows driver, as it does not have objects for q=
+ueues
+that it does not use. Linux driver first of all allocates all the
+queues and then
+adds Rx/Tx to those it will use. Windows driver first decides how many queu=
+es
+it will use then allocates objects for them and initializes them from zero =
+to
+fully functional state.
+
+> Thanks
+>
+>
+> >
+> >> Thanks
+> >>
+> >>
+> >>>>>
+> >>>>>>> Thanks
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>> +
+> >>>>>>>> +    n->curr_queues =3D queues;
+> >>>>>>>> +
+> >>>>>>>>         virtio_net_set_status(vdev, vdev->status);
+> >>>>>>>>         virtio_net_set_queues(n);
+> >>>>>>>>
