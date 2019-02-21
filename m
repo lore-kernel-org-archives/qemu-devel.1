@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59405)
+Received: from eggs.gnu.org ([209.51.188.92]:59837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwoBU-0007FV-L3
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:14:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gwoCI-0008Oa-1N
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gwo5E-0000PW-Kb
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:08:20 -0500
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-15-eric.auger@redhat.com>
-	<20190218103155.2b74e0a2@Igors-MacBook-Pro.local>
-	<852c526c-42fd-4ff4-d00e-1a44e1561e67@redhat.com>
-	<20190221103610.0c2add1c@redhat.com>
-	<e264b964-baa6-11e2-8e45-3238d412ca32@redhat.com>
-	<4a921c15-43b8-e7dd-2a76-6b9e0fc7f084@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8758bd54-03f4-02b5-386d-ef3c3aee25f9@redhat.com>
-Date: Thu, 21 Feb 2019 14:07:53 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gwnxw-0005K4-Aw
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:00:48 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gwnxw-0005Eu-3E
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 08:00:40 -0500
+Received: by mail-wr1-x444.google.com with SMTP id r5so16624363wrg.9
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 05:00:31 -0800 (PST)
+References: <20190220172811.10588-1-alex.bennee@linaro.org>
+	<87k1hu41z6.fsf@zen.linaroharston>
+	<b0484fbb-ec59-1eaf-8157-cb2111c52817@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <b0484fbb-ec59-1eaf-8157-cb2111c52817@redhat.com>
+Date: Thu, 21 Feb 2019 13:00:29 +0000
+Message-ID: <87imxd47pu.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <4a921c15-43b8-e7dd-2a76-6b9e0fc7f084@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 14/18] hw/arm/virt: Allocate
- device_memory
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 0/8] testing/next
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +31,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, dgilbert@redhat.com, shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger.pro@gmail.com, david@gibson.dropbear.id.au
+To: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org
 
-Hi David,
 
-On 2/21/19 1:44 PM, David Hildenbrand wrote:
-> On 21.02.19 13:37, Auger Eric wrote:
->> Hi Igor,
+Thomas Huth <thuth@redhat.com> writes:
+
+> On 20/02/2019 21.52, Alex Benn=C3=A9e wrote:
 >>
->> On 2/21/19 10:36 AM, Igor Mammedov wrote:
->>> On Tue, 19 Feb 2019 16:53:22 +0100
->>> Auger Eric <eric.auger@redhat.com> wrote:
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>>
+>>> Hi,
 >>>
->>>> Hi Igor,
->>>>
->>>> On 2/18/19 10:31 AM, Igor Mammedov wrote:
->>>>> On Tue,  5 Feb 2019 18:33:02 +0100
->>>>> Eric Auger <eric.auger@redhat.com> wrote:
->>>>>   
->>>>>> The device memory region is located after the initial RAM.
->>>>>> its start/size are 1GB aligned.
->>>>>>
->>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>>>>>
->>>>>> ---
->>>>>> v4 -> v5:
->>>>>> - device memory set after the initial RAM
->>>>>>
->>>>>> v3 -> v4:
->>>>>> - remove bootinfo.device_memory_start/device_memory_size
->>>>>> - rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
->>>>>> ---
->>>>>>  hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
->>>>>>  1 file changed, 36 insertions(+)
->>>>>>
->>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>>>>> index 783468ba77..b683902991 100644
->>>>>> --- a/hw/arm/virt.c
->>>>>> +++ b/hw/arm/virt.c
->>>>>> @@ -61,6 +61,7 @@
->>>>>>  #include "hw/arm/smmuv3.h"
->>>>>>  #include "hw/mem/pc-dimm.h"
->>>>>>  #include "hw/mem/nvdimm.h"
->>>>>> +#include "hw/acpi/acpi.h"
->>>>>>  
->>>>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->>>>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
->>>>>> @@ -1260,6 +1261,37 @@ static void create_secure_ram(VirtMachineState *vms,
->>>>>>      g_free(nodename);
->>>>>>  }
->>>>>>  
->>>>>> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
->>>>>> +{
->>>>>> +    MachineState *ms = MACHINE(vms);
->>>>>> +    uint64_t device_memory_size = ms->maxram_size - ms->ram_size;  
->>>>> should size it with 1Gb alignment per slot from the start (to avoid x86 mistakes),
->>>>> see enforce_aligned_dimm usage and associated commit for more details  
->>>> I don't understand the computation done in pc machine. eventually we are
->>>> likely to have more device memory than requested by the user. Why don't
->>>> we check (machine->maxram_size - machine->ram_size) >=
->>>> machine->ram_slots * GiB
->>>> instead of adding 1GiB/slot to the initial user requirements?
->>>>
->>>> Also machine->maxram_size - machine->ram_size is checked to be aligned
->>>> with TARGET_PAGE_SIZE. Is TARGET_PAGE_SIZE representative of the guest
->>>> PAGE in accelerated mode? Is it valid ro require an alignment on 1GB
->>>> boundary as I do in this patch?
->>> See commit 085f8e88b for explanation,
->>> What we are basically are doing there is sizing hotpluggbale address space
->>> to allow max possible huge page aligned DIMM to be successfully plugged in
->>> even if address space if fragmented.
->> In v7, I also added ram_slots * GiB to (maxram_size - ram_size).
+>>>   tests/boot-sector.c:161:boot_sector_test:
+>>>     assertion failed (signature =3D=3D SIGNATURE): (0x0000face =3D=3D 0=
+x0000dead)
+>>>
+>>> I have seen this locally and got a core dump but it doesn't show much.
+>>> I'm going to see if I can get more out of a debug build. It is
+>>> generated by:
+>>>
+>>>   tests/cdrom-test -m=3Dquick -k --tap
+>>>
+>>> I think the subtest is:
+>>>
+>>>   /x86_64/cdrom/boot/isapc
+>>>
+>>> Attaching to the child QEMU looks like it is eternally returning
+>>> -EINTR and looping around with the occasionally kvm_handle_io to port
+>>> 146 and port 112. I guess under test conditions this eventually times
+>>> out and dies.
+>> <snip>
 >>
-> 
-> Depending on the way the system handles it, this might be confusing for
-> the end user and has to be documented somewhere.
-> 
-> E.g. if there are certain memory limits (say 2TB) and the user specifies
-> something like "maxmem=2TB,slots=20" it might be confusing if he gets an
-> error like "more than 2TB are not supported".
-I Agree. On ARM we also intend to put high IO regions above the RAM so
-if we overshoot the host limit, we warn the user the memory map requires
-more PA bits than the host can support and the end user is invited to
-lower maxmem/slots.
-
-Thanks
-
-Eric
-> 
->> Thanks
+>> This is load related. I can run:
 >>
->> Eric
+>>   retry.py --timeout 600 -n 500 -c -- \
+>>     env QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 \
+>>         QTEST_QEMU_IMG=3Dqemu-img ./tests/cdrom-test \
+>>         -m=3Dquick -p /x86_64/cdrom/boot/isapc
+>>
+>> and then all 500 run fine. If I do the same while running a make check
+>> check-tcg -j9 in another build directory it hangs within 20 odd
+>> attempts.
+>>
+>> Can anyone else reproduce this?
+
+I should also mention my current config for the reproducer test is:
+
+  '../../configure' '--python=3Dpython3' '--disable-docs' '--disable-tools'=
+ '--disable-libusb' '--disable-vte' '--disable-xen' '--enable-debug' '--ext=
+ra-cflags=3D-O0 -g3' '--target-list=3Dx86_64-softmmu'
+
+>
+> I can't reproduce it here. Might be worth a try to check the BIOS output
+> in that case. Add this patch:
+>
+> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
+> index 14bd981..c38e016 100644
+> --- a/tests/cdrom-test.c
+> +++ b/tests/cdrom-test.c
+> @@ -132,7 +132,7 @@ static void add_x86_tests(void)
+>      qtest_add_data_func("cdrom/boot/virtio-scsi",
+>                          "-device virtio-scsi -device scsi-cd,drive=3Dcdr=
+ "
+>                          "-blockdev file,node-name=3Dcdr,filename=3D", te=
+st_cdboot);
+> -    qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
+> +    qtest_add_data_func("cdrom/boot/isapc", "-M isapc -vga none -device =
+sga -serial file:/tmp/stdio "
+>                          "-drive if=3Dide,media=3Dcdrom,file=3D", test_cd=
+boot);
+>      qtest_add_data_func("cdrom/boot/am53c974",
+>                          "-device am53c974 -device scsi-cd,drive=3Dcd1 "
+>
+> ... then check /tmp/stdio when it hangs.
+
+This gets us:
+
+  SeaBIOS (version rel-1.12.0-0-ga698c8995f-prebuilt.qemu.org)
+  Booting from Floppy...
+  Boot failed: could not read the boot disk
+
+  Booting from DVD/CD...
+  Boot failed: Could not read from CDROM (code 000c)
+  Booting from DVD/CD...
+  Boot failed: Could not read from CDROM (code 0003)
+  Booting from Hard Disk...
+  Boot failed: could not read the boot disk
+
+  No bootable device.
+
+I tried to bisect but this occurs even in v3.0.0
+
+  SeaBIOS (version rel-1.11.2-0-gf9626ccb91-prebuilt.qemu-project.org)
+  Booting from Floppy...
+  Boot failed: could not read the boot disk
+
+  Booting from DVD/CD...
+  Boot failed: Could not read from CDROM (code 000c)
+  Booting from DVD/CD...
+  Boot failed: Could not read from CDROM (code 0003)
+  Booting from Hard Disk...
+  Boot failed: could not read the boot disk
+
+  No bootable device.
+
+Can I pass this over to the block/bios people to look at. I think at
+this point I think the test has always been unstable but tends only to
+trigger the fault on Travis because it is highly loaded.
+
+In the meantime I'll see if I can disable the test for the CI runs.
+
+--
+Alex Benn=C3=A9e
