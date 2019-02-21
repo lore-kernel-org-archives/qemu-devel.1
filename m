@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59361)
+Received: from eggs.gnu.org ([209.51.188.92]:59802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwlvA-0001wv-Jz
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:49:41 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gwlyb-0003AH-0C
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwlv9-0002aL-Nc
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:49:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwlv9-0002ZV-H5
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:49:39 -0500
-Date: Thu, 21 Feb 2019 11:49:37 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190221104937.b53wgu3no3molnpk@sirius.home.kraxel.org>
-References: <cover.1550698466.git.DirtY.iCE.hu@gmail.com>
-	<d23b1c134a97f8be492348c8b4f87a76b717eeff.1550698466.git.DirtY.iCE.hu@gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1gwlya-0003hZ-6p
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:53:12 -0500
+Date: Thu, 21 Feb 2019 10:53:02 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190221105302.GA3282@stefanha-x1.localdomain>
+References: <20190220100358.25566-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
 Content-Disposition: inline
-In-Reply-To: <d23b1c134a97f8be492348c8b4f87a76b717eeff.1550698466.git.DirtY.iCE.hu@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 01/14] qapi: qapi for audio backends
+In-Reply-To: <20190220100358.25566-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH v2] coroutines: generate
+ wrapper code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com
 
-On Wed, Feb 20, 2019 at 10:37:30PM +0100, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1=
-n wrote:
-> This patch adds structures into qapi to replace the existing
-> configuration structures used by audio backends currently. This qapi
-> will be the base of the -audiodev command line parameter (that replaces
-> the old environment variables based config).
 
-Markus?  Eric?  Can I get an ack for this patch?
+--2oS5YaxWCcQjTEyO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Series looks good to me overall, testing looks good too, I'd like to
-merge it together with some other pending audio bits soonish.
+On Wed, Feb 20, 2019 at 01:03:58PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> We have a very frequent pattern of creating coroutine from function
+> with several arguments:
+>=20
+>   - create structure to pack parameters
+>   - create _entry function to call original function taking parameters
+>     from struct
+>   - do different magic to handle completion: set ret to NOT_DONE or
+>     EINPROGRESS, use separate bool for void functions
+>   - fill the struct and create coroutine from _entry function and this
+>     struct as a parameter
+>=20
+> Here is a template code + example how it can be used to drop a lot of
+> similar code.
+>=20
+> TODO: make coroutine-wrapper template file to be header itself, or
+>       generate header from it
 
-thanks,
-  Gerd
+Yes, please.  For example, block/coroutines.h:
+
+  #include "block/block.h"
+
+  int coroutine_fn bdrv_co_check(BlockDriverState *bs,
+                                 BdrvCheckResult *res, BdrvCheckMode fix);
+  void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **=
+errp);
+
+Now include/block/block.h doesn't need to be modified and these
+coroutine function prototypes stay private to the block layer (they are
+not in include/).
+
+The code generator script can parse coroutines.h to generate
+__create_co() functions.  This also makes the tool independent of the
+block layer - the output C file just needs to include the input header
+file:
+
+ /*
+  * File is generated by scripts/coroutine-wrapper.py
+  */
+
+ #include "qemu/osdep.h"
+ #include "block/coroutines.h" <--- from coroutine-wrapper command-line
+
+ ...
+
+--2oS5YaxWCcQjTEyO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcboMOAAoJEJykq7OBq3PIaVoH/A/CtwfQM1cMPYHBCA7k3bjV
+8VEwHpDysV0FVq8ezpSDVITV6azKkFInpcoyGfyYENIfLD3w/Dk9pDY4Sv0o7+9J
+CZtHWphWOh0Hwn+RTS24Y6F8x9p+RRrw9Bej/s+CSWcYIf7/bYT2uGm/gAuBvnG+
+/k5oJ3Tc5NAkhJqy4BrPVUtfNsl9CuPm8d/G3KbrecTYSoUO5eEic33P76pqy2Pm
+OYGUbLiwjpxG46NKqxoon7U60u2/PjwigsDaTtuzxioqVnT5s0XGWKLw7Fow9Pdx
+uNp565xSpeALvbYxEo3MT71oJ+Zs8C5RiwksQ6dZgHK+EEO8mnwsZAHiG+5nQvo=
+=sqkY
+-----END PGP SIGNATURE-----
+
+--2oS5YaxWCcQjTEyO--
