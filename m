@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33867)
+Received: from eggs.gnu.org ([209.51.188.92]:33973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gwm9i-00085Q-6H
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:04:42 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gwmA1-0008Uz-RH
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:05:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gwm9e-0004fT-QU
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:04:41 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:35894)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gwm9z-0004uM-L0
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:05:01 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:35994)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gwm9d-0004dn-60
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:04:37 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gwm9x-0004pD-Gd
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:04:57 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Thu, 21 Feb 2019 14:04:38 +0300
-Message-ID: <155074707803.32129.15558984605769306552.stgit@pasha-VirtualBox>
+Date: Thu, 21 Feb 2019 14:04:55 +0300
+Message-ID: <155074709505.32129.7606587621902095727.stgit@pasha-VirtualBox>
 In-Reply-To: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
 References: <155074704329.32129.17530905097298071558.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v13 06/25] replay: finish record/replay before
- closing the disks
+Subject: [Qemu-devel] [PATCH v13 09/25] replay: provide an accessor for rr
+ filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +30,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-After recent updates block devices cannot be closed on qemu exit.
-This happens due to the block request polling when replay is not finished.
-Therefore now we stop execution recording before closing the block devices.
+This patch adds an accessor function for the name of the record/replay
+log file. Adding an accessor instead of making variable global,
+prevents accidental modification of this variable by other modules.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- replay/replay.c |    2 ++
- vl.c            |    1 +
- 2 files changed, 3 insertions(+)
+ include/sysemu/replay.h |    2 ++
+ replay/replay.c         |    5 +++++
+ 2 files changed, 7 insertions(+)
 
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 3a7c58e423..b3f593f2f0 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -71,6 +71,8 @@ void replay_start(void);
+ void replay_finish(void);
+ /*! Adds replay blocker with the specified error description */
+ void replay_add_blocker(Error *reason);
++/* Returns name of the replay log file */
++const char *replay_get_filename(void);
+ 
+ /* Processing the instructions */
+ 
 diff --git a/replay/replay.c b/replay/replay.c
-index 8b172b2d1b..b75820a1c1 100644
+index b75820a1c1..aa534116b5 100644
 --- a/replay/replay.c
 +++ b/replay/replay.c
-@@ -385,6 +385,8 @@ void replay_finish(void)
-     g_free(replay_snapshot);
-     replay_snapshot = NULL;
- 
-+    replay_mode = REPLAY_MODE_NONE;
-+
-     replay_finish_events();
+@@ -394,3 +394,8 @@ void replay_add_blocker(Error *reason)
+ {
+     replay_blockers = g_slist_prepend(replay_blockers, reason);
  }
- 
-diff --git a/vl.c b/vl.c
-index 87726a4b06..d73e4a5a55 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4587,6 +4587,7 @@ int main(int argc, char **argv, char **envp)
- 
-     /* No more vcpu or device emulation activity beyond this point */
-     vm_shutdown();
-+    replay_finish();
- 
-     job_cancel_sync_all();
-     bdrv_close_all();
++
++const char *replay_get_filename(void)
++{
++    return replay_filename;
++}
