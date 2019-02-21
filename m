@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43857)
+Received: from eggs.gnu.org ([209.51.188.92]:43998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gwsv1-0002jy-8x
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:18:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1gwsvZ-00033T-NT
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:18:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gwsuu-0000t8-Vq
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:55 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:58936)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gwsup-0000nK-PQ
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:49 -0500
-Message-ID: <6df48a254a328c1788631ec96007a9154dae4873.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 21 Feb 2019 19:17:37 +0100
-In-Reply-To: <20190216111741.30128faf@x1.home>
-References: <cover.bbdd933afe52feffe3b42db89226ce23a34d03f1.1550185800.git-series.knut.omang@oracle.com>
-	<9308ccacc87e29da94aa86c20208459ac2a40024.1550185800.git-series.knut.omang@oracle.com>
-	<20190216111741.30128faf@x1.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+	(envelope-from <armbru@redhat.com>) id 1gwsvS-0001Xy-Hw
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:18:30 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-10-armbru@redhat.com>
+	<87zhqp2igg.fsf@zen.linaroharston> <87tvgxvz4p.fsf@dusky.pond.sub.org>
+	<alpine.BSF.2.21.9999.1902211828250.71091@zero.eik.bme.hu>
+Date: Thu, 21 Feb 2019 19:18:10 +0100
+In-Reply-To: <alpine.BSF.2.21.9999.1902211828250.71091@zero.eik.bme.hu>
+	(BALATON Zoltan's message of "Thu, 21 Feb 2019 18:36:00 +0100 (CET)")
+Message-ID: <87zhqpuhst.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/10] pflash: Clean up after commit
+ 368a354f02b part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, lersek@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, david@gibson.dropbear.id.au
 
-On Sat, 2019-02-16 at 11:17 -0700, Alex Williamson wrote:
-> On Sat, 16 Feb 2019 17:51:11 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > Implementing an ACS capability on downstream ports and multifunction
-> > endpoints indicates isolation and IOMMU visibility to a finer
-> > granularity. This creates smaller IOMMU groups in the guest and thus
-> > more flexibility in assigning endpoints to guest userspace or an L2
-> > guest.
-> > 
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > ---
-> >  hw/pci/pcie.c              | 39 +++++++++++++++++++++++++++++++++++++++-
-> >  include/hw/pci/pcie.h      |  6 ++++++-
-> >  include/hw/pci/pcie_regs.h |  4 ++++-
-> >  3 files changed, 49 insertions(+)
-> > 
-> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > index 230478f..6afc37a 100644
-> > --- a/hw/pci/pcie.c
-> > +++ b/hw/pci/pcie.c
-> > @@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
-> >  
-> >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
-> >  }
-> > +
-> > +/* ACS (Access Control Services) */
-> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
-> > +{
-> > +    bool is_downstream = pci_is_express_downstream_port(dev);
-> > +    uint16_t cap_bits = 0;
-> > +
-> > +    /* For endpoints, only multifunction devs may have an ACS capability: */
-> > +    assert(is_downstream ||
-> > +           (dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) ||
-> > +           PCI_FUNC(dev->devfn));
-> > +
-> > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
-> > +                        PCI_ACS_SIZEOF);
-> > +    dev->exp.acs_cap = offset;
-> > +
-> > +    if (is_downstream) {
-> > +        /* Downstream ports must implement SV, TB, RR, CR, and UF (with
-> > +         * caveats on the latter three that we ignore for simplicity).
-> > +         * Endpoints may also implement a subset of ACS capabilities,
-> > +         * but these are optional if the endpoint does not support
-> > +         * peer-to-peer between functions and thus omitted here.
-> > +         * Downstream switch ports must also implement DT, while this
-> > +         * is optional for root ports, so we set that as well:
-> > +         */
-> 
-> Again...
-> https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE;hb=HEAD#l127
-> 
-> Personally I'd add DT in the original list rather than mention is
-> separately, the caveats are pretty similar.
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-Sorry, I know - just overlooked it and forgot to re-check the style again.
-Just sent v6.
+> On Thu, 21 Feb 2019, Markus Armbruster wrote:
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>>
+>>> Markus Armbruster <armbru@redhat.com> writes:
+>>>
+>>>> QOMification left parameter @size unused in pflash_cfi01_register()
+>>>> and pflash_cfi02_register().  register().  Obviously, @size should
+>>>> match @sector_len and @nb_blocs, i.e. size =3D=3D sector_len * nb_bloc=
+s.
+>>>> All callers satisfy this.
+>>>>
+>>>> Remove @nb_blocs and compute it from @size and @sector_len.
+>>>>
+>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>> ---
+>> [...]
+>>>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+>>>> index a989a8c439..a5dae67c26 100644
+>>>> --- a/hw/ppc/sam460ex.c
+>>>> +++ b/hw/ppc/sam460ex.c
+>>>> @@ -97,7 +97,7 @@ static int sam460ex_load_uboot(void)
+>>>>      if (!pflash_cfi01_register(FLASH_BASE | ((hwaddr)FLASH_BASE_H << =
+32),
+>>>>                                 "sam460ex.flash", FLASH_SIZE,
+>>>>                                 dinfo ? blk_by_legacy_dinfo(dinfo) : N=
+ULL,
+>>>> -                               65536, FLASH_SIZE / 65536,
+>>>> +                               65536,
+>>>
+>>> 64 * KiB?
+>>
+>> I generally prefer to keep big, repetitive patches as mechanical as
+>> possible.  But if it's desired, I'll make this change.
+>>
+>> Zoltan, David, David, you're maintainers, do you have a preference?
+>
+> For the sam460ex, this is 64 * KiB now before your patches which
+> matches other similar numbers in this file. I've already said I prefer
+> to keep it as 64 * KiB in reply to your [PATCH 04/10] which changed it
+> and you've agreed to that a few days ago. If you fix that patch
+> (04/10) this one remains mechanical.
 
-Knut
+You're 100% right.  I failed to recall that detail from previous review
+when I wrote the reply above.
 
-> > +        cap_bits = PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR |
-> > +            PCI_ACS_CR | PCI_ACS_UF | PCI_ACS_DT;
-> > +    }
-> > +
-> > +    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
-> > +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
-> > +}
-> > +
-> > +void pcie_acs_reset(PCIDevice *dev)
-> > +{
-> > +    if (dev->exp.acs_cap) {
-> > +        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
-> > +    }
-> > +}
-> > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > index 5b82a0d..e30334d 100644
-> > --- a/include/hw/pci/pcie.h
-> > +++ b/include/hw/pci/pcie.h
-> > @@ -79,6 +79,9 @@ struct PCIExpressDevice {
-> >  
-> >      /* Offset of ATS capability in config space */
-> >      uint16_t ats_cap;
-> > +
-> > +    /* ACS */
-> > +    uint16_t acs_cap;
-> >  };
-> >  
-> >  #define COMPAT_PROP_PCP "power_controller_present"
-> > @@ -128,6 +131,9 @@ void pcie_add_capability(PCIDevice *dev,
-> >                           uint16_t offset, uint16_t size);
-> >  void pcie_sync_bridge_lnk(PCIDevice *dev);
-> >  
-> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset);
-> > +void pcie_acs_reset(PCIDevice *dev);
-> > +
-> >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
-> >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
-> >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
-> > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-> > index ad4e780..1db86b0 100644
-> > --- a/include/hw/pci/pcie_regs.h
-> > +++ b/include/hw/pci/pcie_regs.h
-> > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
-> >                                           PCI_ERR_COR_INTERNAL |         \
-> >                                           PCI_ERR_COR_HL_OVERFLOW)
-> >  
-> > +/* ACS */
-> > +#define PCI_ACS_VER                     0x1
-> > +#define PCI_ACS_SIZEOF                  8
-> > +
-> >  #endif /* QEMU_PCIE_REGS_H */
-> 
+Thanks!
