@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43761)
+Received: from eggs.gnu.org ([209.51.188.92]:43857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gwsuN-0002Jh-Se
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:22 -0500
+	(envelope-from <knut.omang@oracle.com>) id 1gwsv1-0002jy-8x
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gwsuL-0000QJ-Bo
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:19 -0500
-Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:49739)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gwsuL-0000Nv-29
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:17 -0500
-Received: from player157.ha.ovh.net (unknown [10.109.146.106])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B2A831120BD
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 19:17:14 +0100 (CET)
-References: <1550748288-30598-1-git-send-email-thuth@redhat.com>
-	<895254c7-745e-e594-ceed-df09a1dc84c5@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4f733c0a-a502-f9b9-7d78-d1833744d366@kaod.org>
-Date: Thu, 21 Feb 2019 19:17:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <895254c7-745e-e594-ceed-df09a1dc84c5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc: Use object_initialize_child for
- correct reference counting
+	(envelope-from <knut.omang@oracle.com>) id 1gwsuu-0000t8-Vq
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:55 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:58936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1gwsup-0000nK-PQ
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:17:49 -0500
+Message-ID: <6df48a254a328c1788631ec96007a9154dae4873.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Thu, 21 Feb 2019 19:17:37 +0100
+In-Reply-To: <20190216111741.30128faf@x1.home>
+References: <cover.bbdd933afe52feffe3b42db89226ce23a34d03f1.1550185800.git-series.knut.omang@oracle.com>
+	<9308ccacc87e29da94aa86c20208459ac2a40024.1550185800.git-series.knut.omang@oracle.com>
+	<20190216111741.30128faf@x1.home>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] pcie: Add a simple PCIe ACS (Access
+ Control Services) helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahsh@mellanox.com>, Tal Attaly <talat@mellanox.com>
 
-On 2/21/19 7:14 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/21/19 12:24 PM, Thomas Huth wrote:
->> Both functions, object_initialize() and object_property_add_child() in=
-crease
->> the reference counter of the new object, so one of the references has =
-to be
->> dropped afterwards to get the reference counting right. Otherwise the =
-child
->> object will not be properly cleaned up when the parent gets destroyed.
->> Thus let's use now object_initialize_child() instead to get the refere=
-nce
->> counting here right.
->>
->> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/ppc/pnv.c     | 12 ++++++------
->>  hw/ppc/pnv_psi.c |  4 ++--
->>  hw/ppc/spapr.c   |  6 +++---
->>  3 files changed, 11 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index da54086..9e03e9c 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -736,18 +736,18 @@ static void pnv_chip_power8_instance_init(Object=
- *obj)
->>  {
->>      Pnv8Chip *chip8 =3D PNV8_CHIP(obj);
->> =20
->> -    object_initialize(&chip8->psi, sizeof(chip8->psi), TYPE_PNV_PSI);
->> -    object_property_add_child(obj, "psi", OBJECT(&chip8->psi), NULL);
->> +    object_initialize_child(obj, "psi",  &chip8->psi, sizeof(chip8->p=
-si),
->> +                            TYPE_PNV_PSI, &error_abort, NULL);
->>      object_property_add_const_link(OBJECT(&chip8->psi), "xics",
->>                                     OBJECT(qdev_get_machine()), &error=
-_abort);
->> =20
->> -    object_initialize(&chip8->lpc, sizeof(chip8->lpc), TYPE_PNV_LPC);
->> -    object_property_add_child(obj, "lpc", OBJECT(&chip8->lpc), NULL);
->> +    object_initialize_child(obj, "lpc",  &chip8->lpc, sizeof(chip8->l=
-pc),
->> +                            TYPE_PNV_LPC, &error_abort, NULL);
->>      object_property_add_const_link(OBJECT(&chip8->lpc), "psi",
->>                                     OBJECT(&chip8->psi), &error_abort)=
-;
->> =20
->> -    object_initialize(&chip8->occ, sizeof(chip8->occ), TYPE_PNV_OCC);
->> -    object_property_add_child(obj, "occ", OBJECT(&chip8->occ), NULL);
->> +    object_initialize_child(obj, "occ",  &chip8->occ, sizeof(chip8->o=
-cc),
->> +                            TYPE_PNV_OCC, &error_abort, NULL);
->>      object_property_add_const_link(OBJECT(&chip8->occ), "psi",
->>                                     OBJECT(&chip8->psi), &error_abort)=
-;
->>  }
->> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
->> index 8ced095..44bc0cb 100644
->> --- a/hw/ppc/pnv_psi.c
->> +++ b/hw/ppc/pnv_psi.c
->> @@ -444,8 +444,8 @@ static void pnv_psi_init(Object *obj)
->>  {
->>      PnvPsi *psi =3D PNV_PSI(obj);
->> =20
->> -    object_initialize(&psi->ics, sizeof(psi->ics), TYPE_ICS_SIMPLE);
->> -    object_property_add_child(obj, "ics-psi", OBJECT(&psi->ics), NULL=
-);
->> +    object_initialize_child(obj, "ics-psi",  &psi->ics, sizeof(psi->i=
-cs),
->> +                            TYPE_ICS_SIMPLE, &error_abort, NULL);
->>  }
->> =20
->>  static const uint8_t irq_to_xivr[] =3D {
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index abf9ebc..6c58dca 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1696,9 +1696,9 @@ static void spapr_create_nvram(sPAPRMachineState=
- *spapr)
->> =20
->>  static void spapr_rtc_create(sPAPRMachineState *spapr)
->>  {
->> -    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC=
-);
->> -    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rt=
-c),
->> -                              &error_fatal);
->> +    object_initialize_child(OBJECT(spapr), "rtc",
->> +                            &spapr->rtc, sizeof(spapr->rtc), TYPE_SPA=
-PR_RTC,
->> +                            &error_fatal, NULL);
->>      object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
->>                                &error_fatal);
->>      object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spap=
-r->rtc),
->>
->=20
-> What about intc/spapr_xive.c?
+On Sat, 2019-02-16 at 11:17 -0700, Alex Williamson wrote:
+> On Sat, 16 Feb 2019 17:51:11 +0100
+> Knut Omang <knut.omang@oracle.com> wrote:
+> 
+> > Implementing an ACS capability on downstream ports and multifunction
+> > endpoints indicates isolation and IOMMU visibility to a finer
+> > granularity. This creates smaller IOMMU groups in the guest and thus
+> > more flexibility in assigning endpoints to guest userspace or an L2
+> > guest.
+> > 
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > ---
+> >  hw/pci/pcie.c              | 39 +++++++++++++++++++++++++++++++++++++++-
+> >  include/hw/pci/pcie.h      |  6 ++++++-
+> >  include/hw/pci/pcie_regs.h |  4 ++++-
+> >  3 files changed, 49 insertions(+)
+> > 
+> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> > index 230478f..6afc37a 100644
+> > --- a/hw/pci/pcie.c
+> > +++ b/hw/pci/pcie.c
+> > @@ -906,3 +906,42 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
+> >  
+> >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
+> >  }
+> > +
+> > +/* ACS (Access Control Services) */
+> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
+> > +{
+> > +    bool is_downstream = pci_is_express_downstream_port(dev);
+> > +    uint16_t cap_bits = 0;
+> > +
+> > +    /* For endpoints, only multifunction devs may have an ACS capability: */
+> > +    assert(is_downstream ||
+> > +           (dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) ||
+> > +           PCI_FUNC(dev->devfn));
+> > +
+> > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER, offset,
+> > +                        PCI_ACS_SIZEOF);
+> > +    dev->exp.acs_cap = offset;
+> > +
+> > +    if (is_downstream) {
+> > +        /* Downstream ports must implement SV, TB, RR, CR, and UF (with
+> > +         * caveats on the latter three that we ignore for simplicity).
+> > +         * Endpoints may also implement a subset of ACS capabilities,
+> > +         * but these are optional if the endpoint does not support
+> > +         * peer-to-peer between functions and thus omitted here.
+> > +         * Downstream switch ports must also implement DT, while this
+> > +         * is optional for root ports, so we set that as well:
+> > +         */
+> 
+> Again...
+> https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE;hb=HEAD#l127
+> 
+> Personally I'd add DT in the original list rather than mention is
+> separately, the caveats are pretty similar.
 
-I have used the same pattern in many files :) In ARM also.
+Sorry, I know - just overlooked it and forgot to re-check the style again.
+Just sent v6.
 
-C.
+Knut
 
-
->=20
-> -- >8 --
-> @@ -244,13 +244,15 @@ static void spapr_xive_instance_init(Obj
->  {
->      sPAPRXive *xive =3D SPAPR_XIVE(obj);
->=20
-> -    object_initialize(&xive->source, sizeof(xive->source),
-> TYPE_XIVE_SOURCE);
-> -    object_property_add_child(obj, "source", OBJECT(&xive->source), NU=
-LL);
-> +    object_initialize_child(obj, "source", &xive->source,
-> +                            sizeof(xive->source), TYPE_XIVE_SOURCE,
-> +                            &error_abort, NULL);
->=20
-> -    object_initialize(&xive->end_source, sizeof(xive->end_source),
-> -                      TYPE_XIVE_END_SOURCE);
-> -    object_property_add_child(obj, "end_source", OBJECT(&xive->end_sou=
-rce),
-> -                              NULL);
-> +    object_initialize_child(obj, "end_source", &xive->end_source,
-> +                            sizeof(xive->end_source), TYPE_XIVE_END_SO=
-URCE,
-> +                            &error_abort, NULL);
->  }
-> ---
->=20
+> > +        cap_bits = PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR |
+> > +            PCI_ACS_CR | PCI_ACS_UF | PCI_ACS_DT;
+> > +    }
+> > +
+> > +    pci_set_word(dev->config + offset + PCI_ACS_CAP, cap_bits);
+> > +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL, cap_bits);
+> > +}
+> > +
+> > +void pcie_acs_reset(PCIDevice *dev)
+> > +{
+> > +    if (dev->exp.acs_cap) {
+> > +        pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
+> > +    }
+> > +}
+> > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> > index 5b82a0d..e30334d 100644
+> > --- a/include/hw/pci/pcie.h
+> > +++ b/include/hw/pci/pcie.h
+> > @@ -79,6 +79,9 @@ struct PCIExpressDevice {
+> >  
+> >      /* Offset of ATS capability in config space */
+> >      uint16_t ats_cap;
+> > +
+> > +    /* ACS */
+> > +    uint16_t acs_cap;
+> >  };
+> >  
+> >  #define COMPAT_PROP_PCP "power_controller_present"
+> > @@ -128,6 +131,9 @@ void pcie_add_capability(PCIDevice *dev,
+> >                           uint16_t offset, uint16_t size);
+> >  void pcie_sync_bridge_lnk(PCIDevice *dev);
+> >  
+> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset);
+> > +void pcie_acs_reset(PCIDevice *dev);
+> > +
+> >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
+> >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
+> >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+> > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+> > index ad4e780..1db86b0 100644
+> > --- a/include/hw/pci/pcie_regs.h
+> > +++ b/include/hw/pci/pcie_regs.h
+> > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
+> >                                           PCI_ERR_COR_INTERNAL |         \
+> >                                           PCI_ERR_COR_HL_OVERFLOW)
+> >  
+> > +/* ACS */
+> > +#define PCI_ACS_VER                     0x1
+> > +#define PCI_ACS_SIZEOF                  8
+> > +
+> >  #endif /* QEMU_PCIE_REGS_H */
+> 
