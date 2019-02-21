@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56635)
+Received: from eggs.gnu.org ([209.51.188.92]:60300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gwtpy-0008Fr-Tl
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 14:16:51 -0500
+	(envelope-from <slp@redhat.com>) id 1gwu5K-0002kW-2t
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 14:32:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gwtpx-0003DY-Iu
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 14:16:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gwtpx-0003DP-Ak
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 14:16:49 -0500
-References: <20190221184857.22434-1-alex.bennee@linaro.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e080ce0b-5b14-ae9c-28c7-8254db3b648a@redhat.com>
-Date: Thu, 21 Feb 2019 20:16:45 +0100
+	(envelope-from <slp@redhat.com>) id 1gwu5I-00050U-BO
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 14:32:42 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1gwu5H-0004zm-W0
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 14:32:40 -0500
+Received: by mail-wm1-f66.google.com with SMTP id v26so10392311wmh.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 11:32:39 -0800 (PST)
+Date: Thu, 21 Feb 2019 20:32:36 +0100
+From: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190221193236.5vlbu2aqghtastwv@dritchie>
+References: <20190221173758.24672-1-slp@redhat.com>
+	<441b350a-6e01-6163-c2ff-29065a344ab0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190221184857.22434-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] hw/block: better reporting on pflash
- backing file mismatch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <441b350a-6e01-6163-c2ff-29065a344ab0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: implement copy offload (-C) for
+ dd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, stappers@stappers.nl
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 02/21/19 19:48, Alex Benn=C3=A9e wrote:
-> It looks like there was going to be code to check we had some sort of
-> alignment so lets replace it with an actual check. This is a bit more
-> useful than the enigmatic "failed to read the initial flash content"
-> when we attempt to read the number of bytes the device should have.
->=20
-> This is a potential confusing stumbling block when you move from using
-> -bios to using -drive if=3Dpflash,file=3Dblob,format=3Draw,readonly for
-> loading your firmware code. To mitigate that we automatically pad in
-> the read-only case.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
-> ---
-> v3
->   - tweak commit title/commentary
->   - use total_len instead of device_len for checks
->   - if the device is read-only do the padding for them
->   - accept baking_len > total_len (how to warn_report with NULL *errp?)
-> ---
->  hw/block/pflash_cfi01.c | 28 +++++++++++++++++++++-------
->  1 file changed, 21 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index 00c2efd0d7..37d7513c45 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -714,13 +714,6 @@ static void pflash_cfi01_realize(DeviceState *dev,=
- Error **errp)
->      }
->      device_len =3D sector_len_per_device * blocks_per_device;
-> =20
-> -    /* XXX: to be fixed */
-> -#if 0
-> -    if (total_len !=3D (8 * 1024 * 1024) && total_len !=3D (16 * 1024 =
-* 1024) &&
-> -        total_len !=3D (32 * 1024 * 1024) && total_len !=3D (64 * 1024=
- * 1024))
-> -        return NULL;
-> -#endif
-> -
->      memory_region_init_rom_device(
->          &pfl->mem, OBJECT(dev),
->          &pflash_cfi01_ops,
-> @@ -747,6 +740,27 @@ static void pflash_cfi01_realize(DeviceState *dev,=
- Error **errp)
->      }
-> =20
->      if (pfl->blk) {
-> +        /*
-> +         * Validate the backing store is the right size for pflash
-> +         * devices. It should be padded to a multiple of the flash
-> +         * block size. If the device is read-only we can elide the
-> +         * check and just null pad the region first. If the user
-> +         * supplies a larger file we silently accept it.
+On Thu, Feb 21, 2019 at 12:08:12PM -0600, Eric Blake wrote:
+> On 2/21/19 11:37 AM, Sergio Lopez wrote:
+> > This parameter is analogous to convert's "-C", making use of
+> > bdrv_co_copy_range().
+> 
+> The last time I tried to patch 'qemu-img dd', it was pointed out that it
+> already has several bugs (where it is not on feature-parity with real
+> dd), and that we REALLY want to make it a syntactic sugar wrapper around
+> 'qemu-img convert', rather than duplicating code (which means that
+> qemu-img convert needs to make it easier to do arbitrary offsets and
+> subsets - although to some extent you can already do that with
+> --image-opts and appropriate raw driver wrappers).
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg02618.html
 
-(1) I recommend adding "and ignore the tail".
+Interesting, I wasn't aware of that conversation. It might a little late
+to go again through it, but while I don't a strong opinion about it, I
+do have some reservations about the idea of making 'dd' a frontend for
+'convert'.
 
-> +         */
-> +        uint64_t backing_len =3D blk_getlength(pfl->blk);
+While I do see the functional similarity of both commands, to me they
+are quite different at a semantical level. For 'convert', I do expect it
+to do "the right thing" and use the optimal settings (i.e. choosing the
+best transfer size) by default, while 'dd' is more of "do whatever the
+user told you to do no matter how wrong it is".
 
-(2) Didn't we intend to check for blk_getlength() errors (or assert that
-there would be none)?
+Due to this differences, I think turning 'convert' code into something
+able to deal with 'dd' semantics would imply adding a considerable
+number of conditionals, possibly making it harder to maintain than
+keeping it separate.
 
-> +
-> +        if (backing_len < total_len) {
-> +            if (pfl->ro) {
-> +                memset(pfl->storage, 0, total_len);
-
-(3) Should we "optimize" (well, okay, de-pessimize) this to:
-
-  memset((uint8_t*)pfl->storage + backing_len, 0,
-         total_len - backing_len);
-
-?
-
-> +                total_len =3D backing_len;
-> +            } else {
-> +                error_setg(errp, "device(s) needs %" PRIu64 " bytes, "
-
-(4) not too important, I'm just curious: why the optional plural?
-
-> +                           "backing file provides only %" PRIu64 " byt=
-es",
-> +                           total_len, backing_len);
-> +                return;
-> +            }
-> +        }
-> +
->          /* read the initial flash content */
->          ret =3D blk_pread(pfl->blk, 0, pfl->storage, total_len);
-> =20
->=20
-
-I don't feel too strongly about these, so if you disagree, I won't push.
-
-Thanks!
-Laszlo
+Sergio (slp).
