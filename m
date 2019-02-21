@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58255)
+Received: from eggs.gnu.org ([209.51.188.92]:58241)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcU3-0005C2-LU
+	id 1gwcU3-0005Bd-7h
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=948ed6046=Alistair.Francis@wdc.com>)
-	id 1gwcU2-0002dw-SH
+	id 1gwcU2-0002dh-6l
 	for qemu-devel@nongnu.org; Wed, 20 Feb 2019 19:45:03 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 21 Feb 2019 00:44:58 +0000
-Message-ID: <71002f073a6e9e611658a19bfe14e00de9790e3b.1550709660.git.alistair.francis@wdc.com>
+Date: Thu, 21 Feb 2019 00:44:37 +0000
+Message-ID: <ff6208c5e487ad9f56f2a0d1a862ebc9ebe8fbb3.1550709660.git.alistair.francis@wdc.com>
 References: <cover.1550709660.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1550709660.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2 11/11] riscv: sifive_u: Allow up to 4 CPUs
- to be created
+Subject: [Qemu-devel] [PATCH v2 09/11] RISC-V: Convert trap debugging to
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>
 
+From: Michael Clark <mjc@sifive.com>
+
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_u.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ Makefile.objs             |  1 +
+ target/riscv/cpu_helper.c | 12 +++---------
+ target/riscv/trace-events |  2 ++
+ 3 files changed, 6 insertions(+), 9 deletions(-)
+ create mode 100644 target/riscv/trace-events
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 7bc25820fe..3199238ba0 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -398,7 +398,10 @@ static void riscv_sifive_u_machine_init(MachineClass *=
-mc)
- {
-     mc->desc =3D "RISC-V Board compatible with SiFive U SDK";
-     mc->init =3D riscv_sifive_u_init;
--    mc->max_cpus =3D 1;
-+    /* The real hardware has 5 CPUs, but one of them is a small embedded p=
-ower
-+     * management CPU.
-+     */
-+    mc->max_cpus =3D 4;
- }
+diff --git a/Makefile.objs b/Makefile.objs
+index 5fb022d7ad..581bd97042 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -181,6 +181,7 @@ trace-events-subdirs +=3D target/arm
+ trace-events-subdirs +=3D target/i386
+ trace-events-subdirs +=3D target/mips
+ trace-events-subdirs +=3D target/ppc
++trace-events-subdirs +=3D target/riscv
+ trace-events-subdirs +=3D target/s390x
+ trace-events-subdirs +=3D target/sparc
+ trace-events-subdirs +=3D ui
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index a02f4dad8c..6d3fbc3401 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -22,8 +22,7 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
+-
+-#define RISCV_DEBUG_INTERRUPT 0
++#include "trace.h"
 =20
- DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
+ {
+@@ -493,13 +492,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+         }
+     }
+=20
+-    if (RISCV_DEBUG_INTERRUPT) {
+-        qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": %s %s, "
+-            "epc 0x" TARGET_FMT_lx ": tval 0x" TARGET_FMT_lx "\n",
+-            env->mhartid, async ? "intr" : "trap",
+-            (async ? riscv_intr_names : riscv_excp_names)[cause],
+-            env->pc, tval);
+-    }
++    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval, cause < 16=
+ ?
++        (async ? riscv_intr_names : riscv_excp_names)[cause] : "(unknown)"=
+);
+=20
+     if (env->priv <=3D PRV_S &&
+             cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
+diff --git a/target/riscv/trace-events b/target/riscv/trace-events
+new file mode 100644
+index 0000000000..48af0373df
+--- /dev/null
++++ b/target/riscv/trace-events
+@@ -0,0 +1,2 @@
++# target/riscv/cpu_helper.c
++riscv_trap(uint64_t hartid, bool async, uint64_t cause, uint64_t epc, uint=
+64_t tval, const char *desc) "hart:%"PRId64", async:%d, cause:%"PRId64", ep=
+c:0x%"PRIx64", tval:0x%"PRIx64", desc=3D%s"
 --=20
 2.20.1
