@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33477)
+Received: from eggs.gnu.org ([209.51.188.92]:33483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwqFN-0004dO-AT
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:26:49 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwqFP-0004dV-IP
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwqFJ-0000dn-52
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gwqFJ-0000dy-71
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 10:26:46 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Thu, 21 Feb 2019 18:26:37 +0300
-Message-Id: <1550762799-830661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 0/2] block-stream: include base into job node
+Date: Thu, 21 Feb 2019 18:26:39 +0300
+Message-Id: <1550762799-830661-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1550762799-830661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1550762799-830661-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 2/2] block-stream: include base into job node
  list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,22 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: berto@igalia.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-The block-stream job needs to own the base node as the limiter for
-the copy-on-read operation. So, the base node is included in the
-job node list by calling to the function block_job_add_bdrv().
+The block-stream job needs to own the base node as the limiter
+of the copy-on-read operation. So, the base node is included in
+the job node list (block_job_add_bdrv).
 Also, the block-stream job would not allow the base node to go
 away due to the graph modification, e.g. when a filter node is
 inserted between the bottom node and the base node.
 For that reason, the flag BLK_PERM_GRAPH_MOD is unset in the
 shared permission bit mask of the base node.
 
-Andrey Shinkevich (2):
-  iotests: 030 TestParallelOps non-shared base node
-  block-stream: include base node into the job protected list
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ block/stream.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- block/stream.c         |  9 +++++++++
- tests/qemu-iotests/030 | 34 ++++++++++++++++++----------------
- 2 files changed, 27 insertions(+), 16 deletions(-)
-
+diff --git a/block/stream.c b/block/stream.c
+index 7a49ac0..c8f93d4 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -259,6 +259,15 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+                            &error_abort);
+     }
+ 
++    if (base) {
++        /*
++         * The base node should not disappear during the job.
++         */
++        block_job_add_bdrv(&s->common, "base", base, 0,
++                           BLK_PERM_ALL & ~BLK_PERM_GRAPH_MOD,
++                           &error_abort);
++    }
++
+     s->base = base;
+     s->backing_file_str = g_strdup(backing_file_str);
+     s->bs_read_only = bs_read_only;
 -- 
 1.8.3.1
