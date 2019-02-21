@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50907)
+Received: from eggs.gnu.org ([209.51.188.92]:51232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gwrNO-0003mP-A2
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:39:11 -0500
+	(envelope-from <philmd@redhat.com>) id 1gwrOD-0004oQ-Rk
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:40:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gwrNN-00008q-6s
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:39:10 -0500
-Date: Thu, 21 Feb 2019 17:32:49 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190221173249.64a04e10.cohuck@redhat.com>
-In-Reply-To: <ee4e057a-8c40-1c40-3fbe-acbe4cc64aab@linux.ibm.com>
-References: <1550519397-25359-1-git-send-email-akrowiak@linux.ibm.com>
-	<1550519397-25359-3-git-send-email-akrowiak@linux.ibm.com>
-	<20190220165128.630ad793.cohuck@redhat.com>
-	<ee4e057a-8c40-1c40-3fbe-acbe4cc64aab@linux.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1gwrOC-0000jC-C3
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:40:01 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gwrOC-0000el-4s
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:40:00 -0500
+Received: by mail-wm1-f65.google.com with SMTP id m1so10261999wml.2
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 08:39:53 -0800 (PST)
+References: <20190218125615.18970-1-armbru@redhat.com>
+	<20190218125615.18970-3-armbru@redhat.com>
+	<2340eb1c-d8d8-3d92-bbb5-b541bb44dcba@redhat.com>
+	<CAFEAcA9Pe3D=7r+3csriAZO8gkVkwypOBncZzkYTOCAujpKOsA@mail.gmail.com>
+	<875ztfuc0j.fsf@dusky.pond.sub.org> <87sgwh5wef.fsf@dusky.pond.sub.org>
+	<CAFEAcA8gHp-VD05x9Q1V3_K29wsMeZD1SdM+PDteOXcAE3QHwg@mail.gmail.com>
+	<83b8edf2-8a4b-3d1b-bdde-63738ffb6479@redhat.com>
+	<CAFEAcA_AnnNY9FcP0KOSy0VfobH3pMZkW-=qRy=MCQdC53yXQg@mail.gmail.com>
+	<0d6a16d6-18c1-0a19-ea18-5c156fee717d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <967ce9a9-e970-7b24-d3d4-5862b1042166@redhat.com>
+Date: Thu, 21 Feb 2019 17:39:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <0d6a16d6-18c1-0a19-ea18-5c156fee717d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] s390x/vfio-ap: document hot
- plug/unplug of vfio-ap device
+Subject: Re: [Qemu-devel] [PATCH 02/10] pflash: Macro PFLASH_BUG() is used
+ just once, expand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +38,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com, alex.williamson@redhat.com, fiuczy@linux.ibm.com
+To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>, Stefano Garzarella <sgarzare@redhat.com>
 
-On Thu, 21 Feb 2019 11:26:53 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 2/21/19 1:46 PM, Laszlo Ersek wrote:
+> On 02/21/19 13:38, Peter Maydell wrote:
+>> On Thu, 21 Feb 2019 at 12:07, Laszlo Ersek <lersek@redhat.com> wrote:
+>>> since we're talking "reset_flash", I'll note that there is no actual
+>>> reset handler for cfi.pflash01. I found out recently, via:
+>>>
+>>> https://bugzilla.redhat.com/show_bug.cgi?id=1678713
+>>
+>> Yes; this isn't uncommon for some of the really old
+>> device models. It should definitely have one added.
+>>
+>> You are correct also that the timer in the pflash_cfi01
+>> model is dead code -- it has always been so, since the
+>> device was added in 2007. The reason it is there is that
+>> pflash_cfi01 was created as a copy-and-hack of the
+>> cfi02 device. In cfi02 we do use the timer, as a way
+>> of simulating "make full-chip and sector erases take a
+>> guest-visible amount of time rather than completing
+>> instantaneously". cfi01 doesn't do that (and I think
+>> may not implement anything other than block erase),
 
-> On 2/20/19 10:51 AM, Cornelia Huck wrote:
-> > On Mon, 18 Feb 2019 14:49:57 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >   
-> >> Let's update the vfio-ap.txt document to include the hot plug/unplug
-> >> support introduced in this patch set.  
-> > 
-> > s/ introduced in this patch set//
-> > 
-> > Nobody will know about this patch set when they look at the commit in
-> > the future :)  
+This time is flash-device specific and is currently hardcoded.
+
+The guest learn from the CFI table how long it should wait
+before polling/accessing the flash, or take measures in case
+of timeout.
+
+We set these values in _realize():
+
+    ...
+    /* Typical timeout for block erase (512 ms) */
+    pfl->cfi_table[0x21] = 0x09;
+    /* Typical timeout for full chip erase (4096 ms) */
+    pfl->cfi_table[0x22] = 0x0C;
+    ...
+    /* Max timeout for block erase */
+    pfl->cfi_table[0x25] = 0x0A;
+    /* Max timeout for chip erase */
+    pfl->cfi_table[0x26] = 0x0D;
+
+The timer is triggered in _write(), where we use other hardcoded
+values (which are luckily in range with the CFI announced ones):
+
+        /* Let's wait 5 seconds before chip erase is done */
+        timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+                  (NANOSECONDS_PER_SECOND * 5));
+
+        /* Let's wait 1/2 second before sector erase is done */
+        timer_mod(pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+                  (NANOSECONDS_PER_SECOND / 2));
+
+When emulating embedded devices, it is very desirable to have those
+timers working, and I'd prefer we fix that on CFI01 rather than simply
+removing the unused timer.
+
+Now for the case of "Virt" machines, it is probably pointless to add
+flash delay and we should remove the timer use.
+
+>> but the timer initialization code was left in rather
+>> than being deleted as part of the copy-and-hack.
 > 
-> Good point, I'll remove it.
-
-I can do that while applying if no other feedback comes in.
-
+> Thank you, I've linked this back into the RHBZ.
 > 
-> >   
-> >>
-> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >> ---
-> >>   docs/vfio-ap.txt | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
-> >>   1 file changed, 56 insertions(+), 5 deletions(-)  
-> > 
-> > Looks good to me, but would not mind a R-b before queuing.
-> >   
+> Laszlo
 > 
