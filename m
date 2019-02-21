@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43446)
+Received: from eggs.gnu.org ([209.51.188.92]:43516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmlm-0007tV-71
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:03 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gwmmJ-0008GU-9Q
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmll-0003BR-2b
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55088)
+	(envelope-from <balaton@eik.bme.hu>) id 1gwmmI-0003md-7f
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:35 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:48663)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gwmlk-00031t-N8
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:00 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B25EC307D960
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 11:43:47 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 21 Feb 2019 12:43:29 +0100
-Message-Id: <20190221114330.17968-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20190221114330.17968-1-marcandre.lureau@redhat.com>
-References: <20190221114330.17968-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gwmmH-0003ZI-Rk
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:34 -0500
+Date: Thu, 21 Feb 2019 12:44:22 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190220072928.mci7urfyfqwg55fg@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.21.9999.1902211159500.50921@zero.eik.bme.hu>
+References: <20190211040434.1C98674569F@zero.eik.bme.hu>
+	<20190219092223.5y2hx4m3myjkir6f@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.9999.1902191234580.87875@zero.eik.bme.hu>
+	<20190219123052.dop3kpgowi2apitq@sirius.home.kraxel.org>
+	<alpine.BSF.2.21.9999.1902191449400.24309@zero.eik.bme.hu>
+	<20190220072928.mci7urfyfqwg55fg@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/4] virtio-gpu: block both 2d and 3d rendering
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] hw/display: Add basic ATI VGA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Now that 2d commands are translated to 3d rendering, qemu must stop
-sending 3d updates (from 2d) to Spice as well.
+On Wed, 20 Feb 2019, Gerd Hoffmann wrote:
+>>> So it could be tested with linux guests on x86 too I guess?
+>>> Can the radeon drm driver handle the devices too?
+>>
+>> Yes you can try with x86 guests, I haven't tested that yet. The radeon
+>> driver only supports RV100 and up I think so may only work with the 0x5159
+>> variant not with Rage 128 Pro which had another driver r128 but not sure
+>> that still exists. Although these two chips are similar, Rage 128 Pro is a
+>> bit simpler that's why I'm targeting it first and also that's what the
+>> PowerMac3,1 (the ppc mac99 machine is converging to) has. The R128Pro is the
+>> last of the previous generation before Radeon, while RV100 is the stripped
+>> down simplest version of the R100 family which has some more 3D capability).
+>> But even if the DRM driver loads, probably only the mode setting part is
+>> useful at the moment as 3D is not implemented yet by this device model.
+>
+> Chances are not too bad that it'll be good enough to bring up a linux
+> console.
 
-Fixes:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1674324
+I've tried a random Fedora live CD on qemu-system-x86_64 with ati-vga and 
+with the default 0x5046 (Rage128Pro) that got me to X desktop. With 0x5159 
+(RV100) I don't get any picture. It looks like first problem is that the 
+vgabios in QEMU doesn't like this card. I haven't checked further from 
+there. Maybe eventually we'll need a vgabios-ati.bin for this but so far 
+the existing one worked enough for at least the R128P.
 
-Cc: cfergeau@redhat.com
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/hw/virtio/virtio-gpu.h |  1 -
- hw/display/virtio-gpu-3d.c     | 21 ---------------------
- hw/display/virtio-gpu.c        | 27 ++++++++++++++++++++++-----
- 3 files changed, 22 insertions(+), 27 deletions(-)
+There's another problem I know about with the vgabios, that it's compiled 
+with gcc that cannot compile real x86 16-bit code, only code that can be 
+run in i386 real mode as discussed here
+https://stackoverflow.com/questions/19055647/how-to-tell-gcc-to-generate-16-bit-code-for-real-mode
 
-diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gp=
-u.h
-index a1cecd1df8..f8cd8ee96f 100644
---- a/include/hw/virtio/virtio-gpu.h
-+++ b/include/hw/virtio/virtio-gpu.h
-@@ -169,7 +169,6 @@ void virtio_gpu_virgl_process_cmd(VirtIOGPU *g,
-                                   struct virtio_gpu_ctrl_command *cmd);
- void virtio_gpu_virgl_fence_poll(VirtIOGPU *g);
- void virtio_gpu_virgl_reset(VirtIOGPU *g);
--void virtio_gpu_gl_block(void *opaque, bool block);
- int virtio_gpu_virgl_init(VirtIOGPU *g);
- int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g);
- #endif
-diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
-index bc6e99c943..cb83479ed2 100644
---- a/hw/display/virtio-gpu-3d.c
-+++ b/hw/display/virtio-gpu-3d.c
-@@ -404,11 +404,6 @@ void virtio_gpu_virgl_process_cmd(VirtIOGPU *g,
- {
-     VIRTIO_GPU_FILL_CMD(cmd->cmd_hdr);
-=20
--    cmd->waiting =3D g->renderer_blocked;
--    if (cmd->waiting) {
--        return;
--    }
--
-     virgl_renderer_force_ctx_0();
-     switch (cmd->cmd_hdr.type) {
-     case VIRTIO_GPU_CMD_CTX_CREATE:
-@@ -604,22 +599,6 @@ void virtio_gpu_virgl_reset(VirtIOGPU *g)
-     }
- }
-=20
--void virtio_gpu_gl_block(void *opaque, bool block)
--{
--    VirtIOGPU *g =3D opaque;
--
--    if (block) {
--        g->renderer_blocked++;
--    } else {
--        g->renderer_blocked--;
--    }
--    assert(g->renderer_blocked >=3D 0);
--
--    if (g->renderer_blocked =3D=3D 0) {
--        virtio_gpu_process_cmdq(g);
--    }
--}
--
- int virtio_gpu_virgl_init(VirtIOGPU *g)
- {
-     int ret;
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 8f4351420b..7ada4b83ac 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -889,12 +889,15 @@ void virtio_gpu_process_cmdq(VirtIOGPU *g)
-     while (!QTAILQ_EMPTY(&g->cmdq)) {
-         cmd =3D QTAILQ_FIRST(&g->cmdq);
-=20
--        /* process command */
--        VIRGL(g, virtio_gpu_virgl_process_cmd, virtio_gpu_simple_process=
-_cmd,
--              g, cmd);
-+        cmd->waiting =3D g->renderer_blocked;
-         if (cmd->waiting) {
-             break;
-         }
-+
-+        /* process command */
-+        VIRGL(g, virtio_gpu_virgl_process_cmd, virtio_gpu_simple_process=
-_cmd,
-+              g, cmd);
-+
-         QTAILQ_REMOVE(&g->cmdq, cmd, next);
-         if (virtio_gpu_stats_enabled(g->conf)) {
-             g->stats.requests++;
-@@ -1030,14 +1033,28 @@ static int virtio_gpu_ui_info(void *opaque, uint3=
-2_t idx, QemuUIInfo *info)
-     return 0;
- }
-=20
-+static void virtio_gpu_gl_block(void *opaque, bool block)
-+{
-+    VirtIOGPU *g =3D opaque;
-+
-+    if (block) {
-+        g->renderer_blocked++;
-+    } else {
-+        g->renderer_blocked--;
-+    }
-+    assert(g->renderer_blocked >=3D 0);
-+
-+    if (g->renderer_blocked =3D=3D 0) {
-+        virtio_gpu_process_cmdq(g);
-+    }
-+}
-+
- const GraphicHwOps virtio_gpu_ops =3D {
-     .invalidate =3D virtio_gpu_invalidate_display,
-     .gfx_update =3D virtio_gpu_update_display,
-     .text_update =3D virtio_gpu_text_update,
-     .ui_info =3D virtio_gpu_ui_info,
--#ifdef CONFIG_VIRGL
-     .gl_block =3D virtio_gpu_gl_block,
--#endif
- };
-=20
- static const VMStateDescription vmstate_virtio_gpu_scanout =3D {
---=20
-2.21.0.rc1
+This is usually not a problem but some PPC machines e.g. the sam460ex has 
+a BIOS emulator (usually a variant of x86emu) in their firmware (and maybe 
+also X server does the same on these platforms) which runs the card's VESA 
+bios to initialise the card and set mode but this fails with QEMU's 
+vgabios due to unsupported 32bit prefixes in 16bit code. There's a 
+VGA_FIXUP_ASM config option in vgabios which is supposed to help with this 
+but it doesn't. Vgabios compiled with that option still has other opcodes 
+not supported by x86emu. As a workaround I've found there are real 16-bit 
+version of the Bochs vgabios compiled with bcc available here: 
+http://www.nongnu.org/vgabios/ which work with x86emu and can be used via 
+-device ati-vga,romfile=VGABIOS-lgpl-latest.bin but this has the same 
+problem with 0x5159 as well.
+
+Regards,
+BALATON Zoltan
