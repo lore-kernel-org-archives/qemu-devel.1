@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55771)
+Received: from eggs.gnu.org ([209.51.188.92]:57170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwlgb-00080A-8V
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:37 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gwlle-0003wL-Ib
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:39:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gwlgZ-0004ZY-Az
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:34:37 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 21 Feb 2019 11:33:14 +0100
-Message-Id: <20190221103314.58500-11-sgarzare@redhat.com>
-In-Reply-To: <20190221103314.58500-1-sgarzare@redhat.com>
-References: <20190221103314.58500-1-sgarzare@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1gwllc-0007a5-RI
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:39:50 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:43392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gwllc-0007Ye-H6
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:39:48 -0500
+Received: by mail-qk1-f194.google.com with SMTP id f196so3936149qke.10
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 02:39:44 -0800 (PST)
 MIME-Version: 1.0
+References: <20190220160628.6555-1-marcandre.lureau@redhat.com>
+	<20190220160628.6555-2-marcandre.lureau@redhat.com>
+	<20190221075959.GB3091@xz-x1>
+In-Reply-To: <20190221075959.GB3091@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 21 Feb 2019 11:39:32 +0100
+Message-ID: <CAMxuvawaLapw0EtqASj6U2C-0oruf06RhqoU4GBjAk2vSZFoZw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 10/10] tests/virtio-blk: add test for
- DISCARD command
+Subject: Re: [Qemu-devel] [PATCH 1/4] iothread: wait until the glib context
+ is acquired
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,58 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-If the DISCARD feature is enabled, we try this command in the
-test_basic(), checking only the status returned by the request.
+Hi
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tests/virtio-blk-test.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+On Thu, Feb 21, 2019 at 9:00 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Wed, Feb 20, 2019 at 05:06:25PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> > Another thread may acquire the glib context (temporarily) before
+> > g_main_context_push_thread_default().
+> >
+> > This can happen with the following qemu_chr_fe_set_handlers()
+> > modifications.
+> >
+> > Unfortunately, g_main_context_wait() is deprecated in glib
+> > 2.58 (apparently it was a broken interface). Use a polling loop.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  iothread.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/iothread.c b/iothread.c
+> > index e615b7ae52..93cc3aa875 100644
+> > --- a/iothread.c
+> > +++ b/iothread.c
+> > @@ -70,6 +70,11 @@ static void *iothread_run(void *opaque)
+> >          if (iothread->running && atomic_read(&iothread->worker_context=
+)) {
+> >              GMainLoop *loop;
+> >
+> > +            /* we may race with another thread acquiring the context *=
+/
+> > +            while (!g_main_context_acquire(iothread->worker_context)) =
+{
+> > +                g_usleep(10000);
+> > +            }
+>
+> Could you help explain why need this explicitly?  Since AFAIU
+> g_main_loop_run() below will do context acquire too so IIUC you're
+> taking it twice (while g_main_context_acquire should allow it to
+> happen, though)?
+>
 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index f43d971099..8d2fc9c710 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -317,6 +317,33 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
-ocator *alloc,
-         guest_free(alloc, req_addr);
-     }
-=20
-+    if (features & (1u << VIRTIO_BLK_F_DISCARD)) {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+
-+        req.type =3D VIRTIO_BLK_T_DISCARD;
-+        req.data =3D (char *) &dwz_hdr;
-+        dwz_hdr.sector =3D 0;
-+        dwz_hdr.num_sectors =3D 1;
-+        dwz_hdr.flags =3D 0;
-+
-+        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
-+
-+        req_addr =3D virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr=
-));
-+
-+        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
-+        qvirtqueue_add(vq, req_addr + 16, sizeof(dwz_hdr), false, true);
-+        qvirtqueue_add(vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, fal=
-se);
-+
-+        qvirtqueue_kick(dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status =3D readb(req_addr + 16 + sizeof(dwz_hdr));
-+        g_assert_cmpint(status, =3D=3D, 0);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
-         /* Write and read with 2 descriptor layout */
-         /* Write request */
---=20
-2.20.1
+We call g_main_context_push_thread_default() before run(). It will
+fail if the context is not acquirable.
+
+> > +
+> >              g_main_context_push_thread_default(iothread->worker_contex=
+t);
+> >              iothread->main_loop =3D
+> >                  g_main_loop_new(iothread->worker_context, TRUE);
+> > @@ -80,6 +85,8 @@ static void *iothread_run(void *opaque)
+> >              g_main_loop_unref(loop);
+> >
+> >              g_main_context_pop_thread_default(iothread->worker_context=
+);
+> > +
+> > +            g_main_context_release(iothread->worker_context);
+> >          }
+> >      }
+> >
+> > --
+> > 2.21.0.rc1
+> >
+> >
+>
+> Regards,
+>
+> --
+> Peter Xu
