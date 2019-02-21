@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51156)
+Received: from eggs.gnu.org ([209.51.188.92]:51173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTv-0004Ok-Nl
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:04 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTy-0004VS-EJ
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTu-0005OG-4e
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:03 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34715 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gwtTv-0005Oz-MT
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:06 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:34748 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gwtTq-0005IR-VJ
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:00 -0500
+	id 1gwtTt-0005N1-Bq
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:54:02 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 21 Feb 2019 19:53:35 +0100
-Message-Id: <1550775220-26797-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 21 Feb 2019 19:53:38 +0100
+Message-Id: <1550775220-26797-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1550775220-26797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 3/8] tests/tcg: target/mips: Change directory
- name 'bit-counting' to 'bit-count'
+Subject: [Qemu-devel] [PULL v2 6/8] hw/pci-host/bonito.c: Add PCI mem region
+ mapped at the correct address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,124 +31,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-Change directory name 'bit-counting' to 'bit-count'. This is just for
-cosmetic and consistency sake. This was the only subdirectory in MSA
-test directory that uses ending 'ing'.
+Stop using system memory as PCI memory otherwise devices such as VGA
+that have regions mapped to PCI memory clash with RAM. Use a separate
+memory region for PCI memory and map it to the correct address in
+system memory which allows PCI mem regions to show at the correct
+address where clients expect them.
 
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nloc_=
-b.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nloc_=
-d.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nloc_=
-h.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nloc_=
-w.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nlzc_=
-b.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nlzc_=
-d.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nlzc_=
-h.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_nlzc_=
-w.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_pcnt_=
-b.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_pcnt_=
-d.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_pcnt_=
-h.c | 0
- tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_msa_pcnt_=
-w.c | 0
- 12 files changed, 0 insertions(+), 0 deletions(-)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nloc_b.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nloc_d.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nloc_h.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nloc_w.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nlzc_b.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nlzc_d.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nlzc_h.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_nlzc_w.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_pcnt_b.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_pcnt_d.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_pcnt_h.c (100%)
- rename tests/tcg/mips/user/ase/msa/{bit-counting =3D> bit-count}/test_ms=
-a_pcnt_w.c (100%)
+ hw/pci-host/bonito.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_b.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_b.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_b.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_d.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_d.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_d.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_h.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_h.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_h.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_w.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nloc_w.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nloc_w.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_b.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_b.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_b.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_d.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_d.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_d.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_h.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_h.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_h.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_w.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_nlzc_w.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_nlzc_w.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_b.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_b.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_b.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_d.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_d.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_d.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_h.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_h.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_h.c
-diff --git a/tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c b=
-/tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_w.c
-similarity index 100%
-rename from tests/tcg/mips/user/ase/msa/bit-counting/test_msa_pcnt_w.c
-rename to tests/tcg/mips/user/ase/msa/bit-count/test_msa_pcnt_w.c
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 9f33582..dde4437 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -217,6 +217,7 @@ struct BonitoState {
+     PCIHostState parent_obj;
+     qemu_irq *pic;
+     PCIBonitoState *pci_dev;
++    MemoryRegion pci_mem;
+ };
+=20
+ #define TYPE_BONITO_PCI_HOST_BRIDGE "Bonito-pcihost"
+@@ -598,11 +599,15 @@ static const VMStateDescription vmstate_bonito =3D =
+{
+ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
++    BonitoState *bs =3D BONITO_PCI_HOST_BRIDGE(dev);
+=20
++    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCIL=
+O_SIZE);
+     phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
+                                      pci_bonito_set_irq, pci_bonito_map_=
+irq,
+-                                     dev, get_system_memory(), get_syste=
+m_io(),
++                                     dev, &bs->pci_mem, get_system_io(),
+                                      0x28, 32, TYPE_PCI_BUS);
++    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
++                                &bs->pci_mem);
+ }
+=20
+ static void bonito_realize(PCIDevice *dev, Error **errp)
 --=20
 2.7.4
