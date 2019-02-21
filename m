@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43380)
+Received: from eggs.gnu.org ([209.51.188.92]:43437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmlP-0007at-5u
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:43:39 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmll-0007tA-RR
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmlO-0002ua-I3
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:43:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36632)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gwmll-0003BL-1Z
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gwmlO-0002u0-CH
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:43:38 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1gwmlk-0002yZ-O4
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 06:44:00 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 931BC81F10
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 11:43:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0173330821B4
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 11:43:44 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 21 Feb 2019 12:43:27 +0100
-Message-Id: <20190221114330.17968-2-marcandre.lureau@redhat.com>
+Date: Thu, 21 Feb 2019 12:43:28 +0100
+Message-Id: <20190221114330.17968-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20190221114330.17968-1-marcandre.lureau@redhat.com>
 References: <20190221114330.17968-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/4] virtio-gpu: remove unused qdev
+Subject: [Qemu-devel] [PATCH 2/4] virtio-gpu: remove unused config_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,35 +38,40 @@ Cc: kraxel@redhat.com
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/virtio/virtio-gpu.h | 1 -
- hw/display/virtio-gpu.c        | 1 -
- 2 files changed, 2 deletions(-)
+ include/hw/virtio/virtio-gpu.h | 2 --
+ hw/display/virtio-gpu.c        | 3 +--
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gp=
 u.h
-index c8c599f1b9..c7cb821ae3 100644
+index c7cb821ae3..a1cecd1df8 100644
 --- a/include/hw/virtio/virtio-gpu.h
 +++ b/include/hw/virtio/virtio-gpu.h
-@@ -97,7 +97,6 @@ typedef struct VirtIOGPU {
+@@ -96,8 +96,6 @@ typedef struct VirtIOGPU {
+=20
      int enable;
 =20
-     int config_size;
--    DeviceState *qdev;
-=20
+-    int config_size;
+-
      QTAILQ_HEAD(, virtio_gpu_simple_resource) reslist;
      QTAILQ_HEAD(, virtio_gpu_ctrl_command) cmdq;
+     QTAILQ_HEAD(, virtio_gpu_ctrl_command) fenceq;
 diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index c6fab56f9b..a52c2aed0e 100644
+index a52c2aed0e..8f4351420b 100644
 --- a/hw/display/virtio-gpu.c
 +++ b/hw/display/virtio-gpu.c
-@@ -1268,7 +1268,6 @@ static void virtio_gpu_device_realize(DeviceState *=
-qdev, Error **errp)
-     QTAILQ_INIT(&g->fenceq);
+@@ -1238,10 +1238,9 @@ static void virtio_gpu_device_realize(DeviceState =
+*qdev, Error **errp)
+         }
+     }
 =20
-     g->enabled_output_bitmask =3D 1;
--    g->qdev =3D qdev;
+-    g->config_size =3D sizeof(struct virtio_gpu_config);
+     g->virtio_config.num_scanouts =3D cpu_to_le32(g->conf.max_outputs);
+     virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
+-                g->config_size);
++                sizeof(struct virtio_gpu_config));
 =20
-     for (i =3D 0; i < g->conf.max_outputs; i++) {
-         g->scanout[i].con =3D
+     g->req_state[0].width =3D g->conf.xres;
+     g->req_state[0].height =3D g->conf.yres;
 --=20
 2.21.0.rc1
