@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54030)
+Received: from eggs.gnu.org ([209.51.188.92]:54263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1gwraP-00022R-6V
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:52:38 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gwrbP-0002ZF-9d
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:53:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1gwraN-0002aM-A7
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:52:37 -0500
-Received: from lizzard.sbs.de ([194.138.37.39]:48172)
+	(envelope-from <cfergeau@redhat.com>) id 1gwrbO-0003U8-AK
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:53:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39610)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1gwraM-0002T0-CE
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:52:34 -0500
-References: <20190221155359.8247-1-davidkiarie4@gmail.com>
-	<aac6b5d0-ecdd-577c-5b38-8c875ea1dffc@redhat.com>
-	<6cdbaddf-57d8-3333-c9a0-7c5f46cecab7@siemens.com>
-	<87h8cxxf2o.fsf@dusky.pond.sub.org>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <3c29b265-7add-61e2-2beb-6601d5ad02dd@siemens.com>
-Date: Thu, 21 Feb 2019 17:52:24 +0100
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gwrbO-0003T9-0b
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:53:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E8C07309D284
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 16:53:34 +0000 (UTC)
+Date: Thu, 21 Feb 2019 17:53:26 +0100
+From: Christophe Fergeau <cfergeau@redhat.com>
+Message-ID: <20190221165326.GH31918@natto.ory.fergeau.eu>
+References: <20190221114330.17968-1-marcandre.lureau@redhat.com>
+	<20190221114330.17968-4-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87h8cxxf2o.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/1] snip my name and email
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="TKYYegg/GYAC5JIZ"
+Content-Disposition: inline
+In-Reply-To: <20190221114330.17968-4-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] virtio-gpu: block both 2d and 3d
+ rendering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +35,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, David Kiarie <davidkiarie4@gmail.com>, qemu-devel@nongnu.org, alexaltea123@gmail.com, peterx@redhat.com, mst@redhat.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-On 21.02.19 17:48, Markus Armbruster wrote:
-> Jan Kiszka <jan.kiszka@siemens.com> writes:
+
+--TKYYegg/GYAC5JIZ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+I came up with the same fix while looking at that bug before seeing
+Marc-Andr=E9's patch.
+Then I tested Marc-Andr=E9's patch.
+So for this patch,
+
+Reviewed-by: Christophe Fergeau <cfergeau@redhat.com>
+Tested-by: Christophe Fergeau <cfergeau@redhat.com>
+
+On Thu, Feb 21, 2019 at 12:43:29PM +0100, Marc-Andr=E9 Lureau wrote:
+> Now that 2d commands are translated to 3d rendering, qemu must stop
+> sending 3d updates (from 2d) to Spice as well.
 >=20
->> On 21.02.19 17:05, Eric Blake wrote:
->>> On 2/21/19 9:53 AM, David Kiarie wrote:
->>>> the occurrence of my name and email on the files below may have led =
-to
->>>> some confusion in the reporting of a few recent bugs.
->>>>
->>>> i have therefore choosen to snip it.
->>>
->>> Dropping an email from the copyright line makes sense; dropping the
->>> Copyright declaration altogether is a bit odd (the GPL works only in
->>> tandem with a copyright assertion) - but as you are the author of the
->>> line and copyright holder of your contributions, I am not in a positi=
-on
->>> to say you are wrong in removing it, only that it looks odd.
->>>
->>
->> Yeah, indeed.
->>
->> David, also note that you probably have been addressed because
->> scripts/get_maintainer.pl will look into the git history of files that
->> some patch addresses and pick up significant and/or recent
->> contributors from there.
+> Fixes:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1674324
 >=20
-> MAINTAINERS covers these files, so the most common use of
-> get_maintainer.pl won't list anyone not listed there:
+> Cc: cfergeau@redhat.com
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/virtio/virtio-gpu.h |  1 -
+>  hw/display/virtio-gpu-3d.c     | 21 ---------------------
+>  hw/display/virtio-gpu.c        | 27 ++++++++++++++++++++++-----
+>  3 files changed, 22 insertions(+), 27 deletions(-)
 >=20
->      $ scripts/get_maintainer.pl -f hw/i386/amd_iommu.[ch]
->      Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
->      Richard Henderson <rth@twiddle.net> (maintainer:X86)
->      Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
->      "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC)
->      Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
->      qemu-devel@nongnu.org (open list:All patches CC here)
+> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gp=
+u.h
+> index a1cecd1df8..f8cd8ee96f 100644
+> --- a/include/hw/virtio/virtio-gpu.h
+> +++ b/include/hw/virtio/virtio-gpu.h
+> @@ -169,7 +169,6 @@ void virtio_gpu_virgl_process_cmd(VirtIOGPU *g,
+>                                    struct virtio_gpu_ctrl_command *cmd);
+>  void virtio_gpu_virgl_fence_poll(VirtIOGPU *g);
+>  void virtio_gpu_virgl_reset(VirtIOGPU *g);
+> -void virtio_gpu_gl_block(void *opaque, bool block);
+>  int virtio_gpu_virgl_init(VirtIOGPU *g);
+>  int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g);
+>  #endif
+> diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+> index bc6e99c943..cb83479ed2 100644
+> --- a/hw/display/virtio-gpu-3d.c
+> +++ b/hw/display/virtio-gpu-3d.c
+> @@ -404,11 +404,6 @@ void virtio_gpu_virgl_process_cmd(VirtIOGPU *g,
+>  {
+>      VIRTIO_GPU_FILL_CMD(cmd->cmd_hdr);
+> =20
+> -    cmd->waiting =3D g->renderer_blocked;
+> -    if (cmd->waiting) {
+> -        return;
+> -    }
+> -
+>      virgl_renderer_force_ctx_0();
+>      switch (cmd->cmd_hdr.type) {
+>      case VIRTIO_GPU_CMD_CTX_CREATE:
+> @@ -604,22 +599,6 @@ void virtio_gpu_virgl_reset(VirtIOGPU *g)
+>      }
+>  }
+> =20
+> -void virtio_gpu_gl_block(void *opaque, bool block)
+> -{
+> -    VirtIOGPU *g =3D opaque;
+> -
+> -    if (block) {
+> -        g->renderer_blocked++;
+> -    } else {
+> -        g->renderer_blocked--;
+> -    }
+> -    assert(g->renderer_blocked >=3D 0);
+> -
+> -    if (g->renderer_blocked =3D=3D 0) {
+> -        virtio_gpu_process_cmdq(g);
+> -    }
+> -}
+> -
+>  int virtio_gpu_virgl_init(VirtIOGPU *g)
+>  {
+>      int ret;
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 8f4351420b..7ada4b83ac 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -889,12 +889,15 @@ void virtio_gpu_process_cmdq(VirtIOGPU *g)
+>      while (!QTAILQ_EMPTY(&g->cmdq)) {
+>          cmd =3D QTAILQ_FIRST(&g->cmdq);
+> =20
+> -        /* process command */
+> -        VIRGL(g, virtio_gpu_virgl_process_cmd, virtio_gpu_simple_process=
+_cmd,
+> -              g, cmd);
+> +        cmd->waiting =3D g->renderer_blocked;
+>          if (cmd->waiting) {
+>              break;
+>          }
+> +
+> +        /* process command */
+> +        VIRGL(g, virtio_gpu_virgl_process_cmd, virtio_gpu_simple_process=
+_cmd,
+> +              g, cmd);
+> +
+>          QTAILQ_REMOVE(&g->cmdq, cmd, next);
+>          if (virtio_gpu_stats_enabled(g->conf)) {
+>              g->stats.requests++;
+> @@ -1030,14 +1033,28 @@ static int virtio_gpu_ui_info(void *opaque, uint3=
+2_t idx, QemuUIInfo *info)
+>      return 0;
+>  }
+> =20
+> +static void virtio_gpu_gl_block(void *opaque, bool block)
+> +{
+> +    VirtIOGPU *g =3D opaque;
+> +
+> +    if (block) {
+> +        g->renderer_blocked++;
+> +    } else {
+> +        g->renderer_blocked--;
+> +    }
+> +    assert(g->renderer_blocked >=3D 0);
+> +
+> +    if (g->renderer_blocked =3D=3D 0) {
+> +        virtio_gpu_process_cmdq(g);
+> +    }
+> +}
+> +
+>  const GraphicHwOps virtio_gpu_ops =3D {
+>      .invalidate =3D virtio_gpu_invalidate_display,
+>      .gfx_update =3D virtio_gpu_update_display,
+>      .text_update =3D virtio_gpu_text_update,
+>      .ui_info =3D virtio_gpu_ui_info,
+> -#ifdef CONFIG_VIRGL
+>      .gl_block =3D virtio_gpu_gl_block,
+> -#endif
+>  };
+> =20
+>  static const VMStateDescription vmstate_virtio_gpu_scanout =3D {
+> --=20
+> 2.21.0.rc1
 >=20
-> David's contributions have aged out of --git:
->=20
->      $ scripts/get_maintainer.pl -f hw/i386/amd_iommu.[ch] --git
->      "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC,commit_signer:=
-12/7=3D100%,commit_signer:10/5=3D100%)
->      Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
->      Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
->      Richard Henderson <rth@twiddle.net> (maintainer:X86,commit_signer:=
-1/7=3D14%)
->      Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
->      Peter Xu <peterx@redhat.com> (commit_signer:6/7=3D86%,commit_signe=
-r:4/5=3D80%)
->      Brijesh Singh <brijesh.singh@amd.com> (commit_signer:5/7=3D71%,com=
-mit_signer:4/5=3D80%)
->      "Alex Benn=C3=A9e" <alex.bennee@linaro.org> (commit_signer:1/7=3D1=
-4%)
->      Jan Kiszka <jan.kiszka@siemens.com> (commit_signer:1/5=3D20%)
->      qemu-devel@nongnu.org (open list:All patches CC here)
->=20
-> However, --git-blame still lists him:
->=20
->      $ scripts/get_maintainer.pl -f hw/i386/amd_iommu.[ch] --git-blame
->      Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86,commits:7/24=3D=
-29%)
->      Richard Henderson <rth@twiddle.net> (maintainer:X86)
->      Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86,commits:7/24=
-=3D29%)
->      "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC,commits:26/24=3D=
-100%,commits:14/8=3D100%)
->      Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
->      David Kiarie <davidkiarie4@gmail.com> (authored lines:1176/1645=3D=
-71%,authored lines:274/373=3D73%)
->      Brijesh Singh <brijesh.singh@amd.com> (authored lines:403/1645=3D2=
-4%,authored lines:93/373=3D25%,commits:4/8=3D50%)
->      Peter Xu <peterx@redhat.com> (commits:10/24=3D42%,commits:4/8=3D50=
-%)
->      David Gibson <david@gibson.dropbear.id.au> (commits:7/24=3D29%)
->      Jan Kiszka <jan.kiszka@siemens.com> (commits:1/8=3D12%)
->      Prasad J Pandit <pjp@fedoraproject.org> (commits:1/8=3D12%)
->      qemu-devel@nongnu.org (open list:All patches CC here)
->=20
-> --help admonishes:
->=20
->    Using "--git-blame" is slow and may add old committers and authors
->        that are no longer active maintainers to the output.
->=20
->>                           There should be some opt-out statement from
->> that, but I don't recall how.
->=20
-> I don't think get_maintainer.pl supports a blacklist of people who don'=
-t
-> want to be pestered anymore.
 >=20
 
-# cat linux/.get_maintainer.ignore
-Christoph Hellwig <hch@lst.de>
+--TKYYegg/GYAC5JIZ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-That's why I remembered it vaguely.
+-----BEGIN PGP SIGNATURE-----
 
-Jan
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlxu14YACgkQqdjCFCms
+bIJ1+w/9GvdbV6x6vLxUegnyB10LHTrDckeodZ9zO2uU+DP5YF1/2/EG5Qt/cL3O
+NsZ5gviiuWe+WoPFhnCgYQVzCZ3xPi45xOI6+Z/qmY296sDEoZhFKuLaPDlzDgwL
+Sv6yt3yDCKZW3rBRy01QZhnksZVwV3VHpy8T1D5THrEVngmAlksqw4jrfGwVG9YB
+GdlX2RYoJHgYD14WtqzcEg6/aJiO5NgcNoehK/t3DaVtY3xFBhewu3ofKjZ3lY3V
+pld7mBbiNDEN26jkDL6TJqHpgzNnfdXcoOtv3J/Ybym4FQtr4MmuOlWb5t0GrMI0
+P+kL3nFkTtYW/0WLp+tR8PscgTRLBrPrRrerzeM3zQNl0PQJ1i200EcRwPfGYc/b
+G3FBHzL47z2cbFF6auf+INiJAUfAL/aLOxmqUuQiAyRKd3CjOzkfeS1HjpU/4K/J
+adtwijJiHcbYSobbk9r2aAKQa0mXv5NHtiEazp8VX+xF4WrFWG3EcCmfjPPprECM
+Xbu5gPNTkeiwUbEsln7EOpO2B0SqQ/POvS4xetzVW6knUHdGlIOp16R39BEl0Jsc
+sqSgG0nOJdaXZwz23GCSG8+gXHH2YhaCY4BSF1g1oFdD/+nHuydHmJMVx1IWRi8e
+Q9wWOBgVYBOlOO3FUZudP0OnZcXLm3P8+1fxDy6eWD5rHZ5wgvo=
+=Zo8j
+-----END PGP SIGNATURE-----
 
---=20
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+--TKYYegg/GYAC5JIZ--
