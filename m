@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52022)
+Received: from eggs.gnu.org ([209.51.188.92]:52536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gwjHK-0008F8-UI
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:00:23 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gwjK3-00011a-5m
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:03:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gwjH9-0004CT-Oj
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:00:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gwjH9-0004CE-Hx
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:00:11 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1C6D308AA1F
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 08:00:10 +0000 (UTC)
-Date: Thu, 21 Feb 2019 15:59:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190221075959.GB3091@xz-x1>
-References: <20190220160628.6555-1-marcandre.lureau@redhat.com>
-	<20190220160628.6555-2-marcandre.lureau@redhat.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gwjK1-0005C8-HJ
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 03:03:11 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Thu, 21 Feb 2019 08:02:53 +0000
+Message-ID: <a714b5b5-7f76-f5da-501f-7912a14e6e0f@virtuozzo.com>
+References: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
+	<f557be19-e398-7f5d-2851-67928f33584f@virtuozzo.com>
+In-Reply-To: <f557be19-e398-7f5d-2851-67928f33584f@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1232EF7454379449859B556951D3A098@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190220160628.6555-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] iothread: wait until the glib context
- is acquired
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] discard blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Wed, Feb 20, 2019 at 05:06:25PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Another thread may acquire the glib context (temporarily) before
-> g_main_context_push_thread_default().
->=20
-> This can happen with the following qemu_chr_fe_set_handlers()
-> modifications.
->=20
-> Unfortunately, g_main_context_wait() is deprecated in glib
-> 2.58 (apparently it was a broken interface). Use a polling loop.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  iothread.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/iothread.c b/iothread.c
-> index e615b7ae52..93cc3aa875 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -70,6 +70,11 @@ static void *iothread_run(void *opaque)
->          if (iothread->running && atomic_read(&iothread->worker_context=
-)) {
->              GMainLoop *loop;
-> =20
-> +            /* we may race with another thread acquiring the context *=
-/
-> +            while (!g_main_context_acquire(iothread->worker_context)) =
-{
-> +                g_usleep(10000);
-> +            }
-
-Could you help explain why need this explicitly?  Since AFAIU
-g_main_loop_run() below will do context acquire too so IIUC you're
-taking it twice (while g_main_context_acquire should allow it to
-happen, though)?
-
-> +
->              g_main_context_push_thread_default(iothread->worker_contex=
-t);
->              iothread->main_loop =3D
->                  g_main_loop_new(iothread->worker_context, TRUE);
-> @@ -80,6 +85,8 @@ static void *iothread_run(void *opaque)
->              g_main_loop_unref(loop);
-> =20
->              g_main_context_pop_thread_default(iothread->worker_context=
-);
-> +
-> +            g_main_context_release(iothread->worker_context);
->          }
->      }
-> =20
-> --=20
-> 2.21.0.rc1
->=20
->=20
-
-Regards,
-
---=20
-Peter Xu
+T24gMTQvMS8yMDE5IDQ6MTYgUE0sIEFudG9uIE5lZmVkb3Ygd3JvdGU6DQo+IE9uIDMwLzExLzIw
+MTggNTo0NyBQTSwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4+IHFtcCBxdWVyeS1ibG9ja3N0YXRz
+IHByb3ZpZGVzIHN0YXRzIGluZm8gZm9yIHdyaXRlL3JlYWQvZmx1c2ggb3BzLg0KPj4NCj4+IFBh
+dGNoZXMgMS03IGltcGxlbWVudCB0aGUgc2ltaWxhciBmb3IgZGlzY2FyZCAodW5tYXApIGNvbW1h
+bmQgZm9yIHNjc2kNCj4+IGFuZCBpZGUgZGlza3MuDQo+PiBEaXNjYXJkIHN0YXQgInVubWFwX29w
+cyAvIHVubWFwX2J5dGVzIiBpcyBzdXBwb3NlZCB0byBhY2NvdW50IHRoZSBvcHMgDQo+PiB0aGF0
+DQo+PiBoYXZlIGNvbXBsZXRlZCB3aXRob3V0IGFuIGVycm9yLg0KPj4NCj4+IEhvd2V2ZXIsIGRp
+c2NhcmQgb3BlcmF0aW9uIGlzIGFkdmlzb3J5LiBTcGVjaWZpY2FsbHksDQo+PiDCoCAtIGNvbW1v
+biBibG9jayBsYXllciBpZ25vcmVzIEVOT1RTVVAgZXJyb3IgY29kZS4NCj4+IMKgwqDCoCBUaGF0
+IG1pZ2h0IGJlIHJldHVybmVkIGlmIHRoZSBibG9jayBkcml2ZXIgZG9lcyBub3Qgc3VwcG9ydCBk
+aXNjYXJkLA0KPj4gwqDCoMKgIG9yIGRpc2NhcmQgaGFzIGJlZW4gY29uZmlndXJlZCB0byBiZSBp
+Z25vcmVkLg0KPj4gwqAgLSBmb3JtYXQgZHJpdmVycyBzdWNoIGFzIHFjb3cyIG1heSBpZ25vcmUg
+ZGlzY2FyZCBpZiB0aGV5IHdlcmUgDQo+PiBjb25maWd1cmVkDQo+PiDCoMKgwqAgdG8gaWdub3Jl
+IHRoYXQsIG9yIGlmIHRoZSBjb3JyZXNwb25kaW5nIGFyZWEgaXMgYWxyZWFkeSBtYXJrZWQgdW51
+c2VkDQo+PiDCoMKgwqAgKHVuYWxsb2NhdGVkIC8gemVybyBjbHVzdGVycykuDQo+Pg0KPj4gQW5k
+IHdoYXQgaXMgYWN0dWFsbHkgdXNlZnVsIGlzIHRoZSBudW1iZXIgb2YgYnl0ZXMgYWN0dWFsbHkg
+ZGlzY2FyZGVkDQo+PiBkb3duIG9uIHRoZSBob3N0IGZpbGVzeXN0ZW0uDQo+PiBUbyBhY2hpZXZl
+IHRoYXQsIGRyaXZlci1zcGVjaWZpYyBzdGF0aXN0aWNzIGhhcyBiZWVuIGFkZGVkIHRvIGJsb2Nr
+c3RhdHMNCj4+IChwYXRjaCA5KS4NCj4+IFdpdGggcGF0Y2ggOCwgZmlsZS1wb3NpeCBkcml2ZXIg
+YWNjb3VudHMgZGlzY2FyZCBvcGVyYXRpb25zIG9uIGl0cyANCj4+IGxldmVsIHRvby4NCj4+DQo+
+IA0KPiBwaW5nDQoNCnBpbmcNCg==
