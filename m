@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37301)
+Received: from eggs.gnu.org ([209.51.188.92]:37434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwkbV-0004c7-Sr
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:25:18 -0500
+	(envelope-from <berrange@redhat.com>) id 1gwkcJ-00056u-1O
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:26:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gwkbV-0003fP-3G
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:25:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gwkbU-0003eu-Ko
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:25:16 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E86FB307EA97
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 09:25:15 +0000 (UTC)
-Date: Thu, 21 Feb 2019 10:25:10 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190221092510.gu2rj7d6lrzpxkl6@sirius.home.kraxel.org>
-References: <20190208112357.31615-1-marcandre.lureau@redhat.com>
-	<20190208112357.31615-12-marcandre.lureau@redhat.com>
-	<20190208102812-mutt-send-email-mst@kernel.org>
+	(envelope-from <berrange@redhat.com>) id 1gwkcH-0004Dh-N0
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 04:26:06 -0500
+Date: Thu, 21 Feb 2019 09:25:46 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190221092546.GB17899@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190218181349.23885-1-ppandit@redhat.com>
+	<20190219025500.GN9345@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190208102812-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190219025500.GN9345@umbus.fritz.box>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] Add vhost-user-input-pci
+Subject: Re: [Qemu-devel] [PATCH v4] ppc: add host-serial and host-model
+ machine attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On Fri, Feb 08, 2019 at 10:28:38AM -0500, Michael S. Tsirkin wrote:
-> On Fri, Feb 08, 2019 at 12:23:55PM +0100, Marc-Andr=E9 Lureau wrote:
-> > Add a new virtio-input device, which connects to a vhost-user
-> > backend.
+On Tue, Feb 19, 2019 at 01:55:01PM +1100, David Gibson wrote:
+> On Mon, Feb 18, 2019 at 11:43:49PM +0530, P J P wrote:
+> > From: Prasad J Pandit <pjp@fedoraproject.org>
 > >=20
-> > vhost-user-input is similar to virtio-input-host, it is wrapped by
-> > vhost-user-input-pci. Instead of reading configuration directly from
-> > an input device / evdev, it reads it over vhost-user protocol with
-> > INPUT_GET_CONFIG message. Then vhost-user-backend takes care of
-> > interfacing the virtio device with the backend, for the queue & event=
-s
-> > processing.
+> > On ppc hosts, hypervisor shares following system attributes
 > >=20
-> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >   - /proc/device-tree/system-id
+> >   - /proc/device-tree/model
+> >=20
+> > with a guest. This could lead to information leakage and misuse.[*]
+> > Add machine attributes to control such system information exposure
+> > to a guest.
+> >=20
+> > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+> >=20
+> > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 >=20
-> Gerd what's your take on this? Do we want this functionality?
+> Applied to ppc-for-4.0, thanks.
 
-Yes, I think it makes sense.  Moving this to a separate process isn't
-that useful for virtio-input, other devices like virtio-gpu will benefit
-much more from it from a security and performance point of view.  It
-still is useful for (a) testing the vhost-user infrastructure and (b) as
-relatively simple example.
+Could you add the word  "CVE-2019-8934" to the commit message for this
+patch before sending a pulll request - either end of subject line, or
+just before the Reported-by line.
 
-cheers,
-  Gerd
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
