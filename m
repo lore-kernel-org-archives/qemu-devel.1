@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53042)
+Received: from eggs.gnu.org ([209.51.188.92]:53038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwrWw-0007uR-88
+	(envelope-from <armbru@redhat.com>) id 1gwrWw-0007u3-4h
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:49:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gwrWt-0008N6-2l
+	(envelope-from <armbru@redhat.com>) id 1gwrWs-0008MQ-F5
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:49:00 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55169)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gwrWr-0008Ka-Pj
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:48:58 -0500
-Received: by mail-wm1-x342.google.com with SMTP id a62so10272661wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 08:48:57 -0800 (PST)
-References: <20190221134101.13903-1-alex.bennee@linaro.org>
-	<e297b7f6-e964-74a1-e14c-e6cd10674209@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e297b7f6-e964-74a1-e14c-e6cd10674209@redhat.com>
-Date: Thu, 21 Feb 2019 16:48:54 +0000
-Message-ID: <871s413x55.fsf@zen.linaroharston>
+Received: from mx1.redhat.com ([209.132.183.28]:56310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gwrWq-0008GI-24
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 11:48:57 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190221155359.8247-1-davidkiarie4@gmail.com>
+	<aac6b5d0-ecdd-577c-5b38-8c875ea1dffc@redhat.com>
+	<6cdbaddf-57d8-3333-c9a0-7c5f46cecab7@siemens.com>
+Date: Thu, 21 Feb 2019 17:48:47 +0100
+In-Reply-To: <6cdbaddf-57d8-3333-c9a0-7c5f46cecab7@siemens.com> (Jan Kiszka's
+	message of "Thu, 21 Feb 2019 17:09:40 +0100")
+Message-ID: <87h8cxxf2o.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests/cdrom-test: only include isapc cdrom
- test when g_test_slow()
+Subject: Re: [Qemu-devel] [PATCH 0/1] snip my name and email
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Eric Blake <eblake@redhat.com>, David Kiarie <davidkiarie4@gmail.com>, qemu-devel@nongnu.org, alexaltea123@gmail.com, peterx@redhat.com, mst@redhat.com
 
+Jan Kiszka <jan.kiszka@siemens.com> writes:
 
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 21/02/2019 14.41, Alex Benn=C3=A9e wrote:
->> We are seeing instability on our CI runs which has been there since
->> the test was introduced. I suspect it triggers more on Travis due to
->> their heavy load.
+> On 21.02.19 17:05, Eric Blake wrote:
+>> On 2/21/19 9:53 AM, David Kiarie wrote:
+>>> the occurrence of my name and email on the files below may have led to
+>>> some confusion in the reporting of a few recent bugs.
+>>>
+>>> i have therefore choosen to snip it.
 >>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  tests/cdrom-test.c | 10 ++++++++--
->>  1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
->> index 14bd981336..05611da648 100644
->> --- a/tests/cdrom-test.c
->> +++ b/tests/cdrom-test.c
->> @@ -132,8 +132,14 @@ static void add_x86_tests(void)
->>      qtest_add_data_func("cdrom/boot/virtio-scsi",
->>                          "-device virtio-scsi -device scsi-cd,drive=3Dcd=
-r "
->>                          "-blockdev file,node-name=3Dcdr,filename=3D", t=
-est_cdboot);
->> -    qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
->> -                        "-drive if=3Dide,media=3Dcdrom,file=3D", test_c=
-dboot);
->> +    /*
->> +     * Unstable CI test under load
->> +     * See https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg055=
-09.html
->> +     */
->> +    if (g_test_slow()) {
->> +        qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
->> +                            "-drive if=3Dide,media=3Dcdrom,file=3D", te=
-st_cdboot);
->> +    }
->>      qtest_add_data_func("cdrom/boot/am53c974",
->>                          "-device am53c974 -device scsi-cd,drive=3Dcd1 "
->>                          "-drive if=3Dnone,id=3Dcd1,format=3Draw,file=3D=
-", test_cdboot);
+>> Dropping an email from the copyright line makes sense; dropping the
+>> Copyright declaration altogether is a bit odd (the GPL works only in
+>> tandem with a copyright assertion) - but as you are the author of the
+>> line and copyright holder of your contributions, I am not in a position
+>> to say you are wrong in removing it, only that it looks odd.
 >>
 >
-> Acked-by: Thomas Huth <thuth@redhat.com>
+> Yeah, indeed.
 >
-> Which tree should this go through? qtest? Block? Your test tree?
+> David, also note that you probably have been addressed because
+> scripts/get_maintainer.pl will look into the git history of files that
+> some patch addresses and pick up significant and/or recent
+> contributors from there.
 
-I'll put in my testing/next pull-req.
+MAINTAINERS covers these files, so the most common use of
+get_maintainer.pl won't list anyone not listed there:
 
->
-> At least I don't have much in the qtest queue right now and did not plan
-> a pull request soon. Let me know if you want me to queue it.
+    $ scripts/get_maintainer.pl -f hw/i386/amd_iommu.[ch]
+    Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
+    Richard Henderson <rth@twiddle.net> (maintainer:X86)
+    Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
+    "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC)
+    Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
+    qemu-devel@nongnu.org (open list:All patches CC here)
 
+David's contributions have aged out of --git:
 
---
-Alex Benn=C3=A9e
+    $ scripts/get_maintainer.pl -f hw/i386/amd_iommu.[ch] --git
+    "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC,commit_signer:12/7=
+=3D100%,commit_signer:10/5=3D100%)
+    Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
+    Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
+    Richard Henderson <rth@twiddle.net> (maintainer:X86,commit_signer:1/7=
+=3D14%)
+    Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
+    Peter Xu <peterx@redhat.com> (commit_signer:6/7=3D86%,commit_signer:4/5=
+=3D80%)
+    Brijesh Singh <brijesh.singh@amd.com> (commit_signer:5/7=3D71%,commit_s=
+igner:4/5=3D80%)
+    "Alex Benn=C3=A9e" <alex.bennee@linaro.org> (commit_signer:1/7=3D14%)
+    Jan Kiszka <jan.kiszka@siemens.com> (commit_signer:1/5=3D20%)
+    qemu-devel@nongnu.org (open list:All patches CC here)
+
+However, --git-blame still lists him:
+
+    $ scripts/get_maintainer.pl -f hw/i386/amd_iommu.[ch] --git-blame
+    Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86,commits:7/24=3D29%)
+    Richard Henderson <rth@twiddle.net> (maintainer:X86)
+    Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86,commits:7/24=3D29=
+%)
+    "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC,commits:26/24=3D100=
+%,commits:14/8=3D100%)
+    Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
+    David Kiarie <davidkiarie4@gmail.com> (authored lines:1176/1645=3D71%,a=
+uthored lines:274/373=3D73%)
+    Brijesh Singh <brijesh.singh@amd.com> (authored lines:403/1645=3D24%,au=
+thored lines:93/373=3D25%,commits:4/8=3D50%)
+    Peter Xu <peterx@redhat.com> (commits:10/24=3D42%,commits:4/8=3D50%)
+    David Gibson <david@gibson.dropbear.id.au> (commits:7/24=3D29%)
+    Jan Kiszka <jan.kiszka@siemens.com> (commits:1/8=3D12%)
+    Prasad J Pandit <pjp@fedoraproject.org> (commits:1/8=3D12%)
+    qemu-devel@nongnu.org (open list:All patches CC here)
+
+--help admonishes:
+
+  Using "--git-blame" is slow and may add old committers and authors
+      that are no longer active maintainers to the output.
+
+>                          There should be some opt-out statement from
+> that, but I don't recall how.
+
+I don't think get_maintainer.pl supports a blacklist of people who don't
+want to be pestered anymore.
