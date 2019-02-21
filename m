@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52391)
+Received: from eggs.gnu.org ([209.51.188.92]:53326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwlRY-0001op-Qk
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:19:06 -0500
+	(envelope-from <thuth@redhat.com>) id 1gwlWw-00044d-UT
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:24:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gwlRX-00025p-3S
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:19:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gwlRW-00022h-Qa
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:19:03 -0500
-Date: Thu, 21 Feb 2019 10:18:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190221101839.GD2605@work-vm>
-References: <1544516693-5395-1-git-send-email-wei.w.wang@intel.com>
-	<1544516693-5395-8-git-send-email-wei.w.wang@intel.com>
-	<20181213154548.GP2313@work-vm> <5C135017.3070203@intel.com>
-	<20181214095646.GB2454@work-vm> <5C13862B.1010905@intel.com>
-	<20181214111705.GD2454@work-vm>
-	<286AC319A985734F985F78AFA26841F73DF7A436@shsmsx102.ccr.corp.intel.com>
-	<20190220131224.GF2608@work-vm> <5C6E03B6.30309@intel.com>
+	(envelope-from <thuth@redhat.com>) id 1gwlWw-0004yZ-9c
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 05:24:38 -0500
+References: <20190221101139.2224-1-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c620cfea-6f3c-f9b6-1dce-52eae2d905d7@redhat.com>
+Date: Thu, 21 Feb 2019 11:24:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5C6E03B6.30309@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v11 7/7] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+In-Reply-To: <20190221101139.2224-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: drop unnecessary accel=kvm in
+ 238
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> On 02/20/2019 09:12 PM, Dr. David Alan Gilbert wrote:
-> > * Wang, Wei W (wei.w.wang@intel.com) wrote:
-> > > On Friday, December 14, 2018 7:17 PM, Dr. David Alan Gilbert wrote:
-> > > > > On 12/14/2018 05:56 PM, Dr. David Alan Gilbert wrote:
-> > > > > > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > > > > > On 12/13/2018 11:45 PM, Dr. David Alan Gilbert wrote:
-> > > > > > > > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > > > > > > > The new feature enables the virtio-balloon device to receive
-> > > > > > > > > hints of guest free pages from the free page vq.
-> > > > > > > > > 
-> > > > > > > > > A notifier is registered to the migration precopy notifier
-> > > > > > > > > chain. The notifier calls free_page_start after the migration
-> > > > > > > > > thread syncs the dirty bitmap, so that the free page
-> > > > > > > > > optimization starts to clear bits of free pages from the
-> > > > > > > > > bitmap. It calls the free_page_stop before the migration
-> > > > > > > > > thread syncs the bitmap, which is the end of the current round
-> > > > > > > > > of ram save. The free_page_stop is also called to stop the
-> > > > optimization in the case when there is an error occurred in the process of
-> > > > ram saving.
-> > > > > > > > > Note: balloon will report pages which were free at the time of this
-> > > > call.
-> > > > > > > > > As the reporting happens asynchronously, dirty bit logging
-> > > > > > > > > must be enabled before this free_page_start call is made.
-> > > > > > > > > Guest reporting must be disabled before the migration dirty bitmap
-> > > > is synchronized.
-> > > > > > > > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > > > > > CC: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > > > > CC: Juan Quintela <quintela@redhat.com>
-> > > > > > > > > CC: Peter Xu <peterx@redhat.com>
-> > > > > > > > I think I'm OK for this from the migration side, I'd appreciate
-> > > > > > > > someone checking the virtio and aio bits.
-> > > > > > > > 
-> > > > > > > > I'm not too sure how it gets switched on and off - i.e. if we
-> > > > > > > > get a nice new qemu on a new kernel, what happens when I try and
-> > > > > > > > migrate to the same qemu on an older kernel without these hints?
-> > > > > > > > 
-> > > > > > > This feature doesn't rely on the host kernel. Those hints are
-> > > > > > > reported from the guest kernel.
-> > > > > > > So migration across different hosts wouldn't affect the use of this
-> > > > feature.
-> > > > > > > Please correct me if I didn't get your point.
-> > > > > > Ah OK, yes;  now what about migrating from new->old qemu with a new
-> > > > > > guest but old machine type?
-> > > > > > 
-> > > > > I think normally, the source QEMU and destination QEMU should have the
-> > > > > same QEMU booting parameter. If the destination QEMU doesn't support
-> > > > > "--device virtio-balloon,free-page-hint=true", which the source QEMU
-> > > > > has, the destination side QEMU will fail to boot, and migration will
-> > > > > not happen then.
-> > > > Ah that's OK; as long as free-page-hint is false by default that will work fine.
-> > > > 
-> > > > Dave
-> > > > 
-> > > Hi Dave,
-> > > 
-> > > Could we have this feature in QEMU 4.0 (freeze on Mar 12)?
-> > I think so; can you remind me where we're up to:
-> >    a) It looks like you've already got the kernel changes merged -
-> > correct?
+On 21/02/2019 11.11, Stefan Hajnoczi wrote:
+> Test 238 does not require the kvm accelerator.  TCG works fine.
 > 
-> Yes, they were already merged half year ago.
+> Use the default accelerator instead of requiring kvm.
 > 
-> >    b) What about the virtio spec changes - where are they upto?
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> Vladimir, I have dropped the 235 change because I don't have time to
+> figure out the kvm/tcg vs qtest differences or add a skip function.
+> Sorry!
 > 
-> The spec changes are in progress. v1 were posted out, a v2 is in
-> preparation.
+>  tests/qemu-iotests/238 | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> >    c) Where are the other reviews upto - I think most are reviewed - is
-> > it just 7/7 that is missing the review-by?
-> 7/7 is about the virtio changes, and Michael has given the reviewed-by:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg03732.html
+> diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+> index f81ee1112f..e490bb4298 100755
+> --- a/tests/qemu-iotests/238
+> +++ b/tests/qemu-iotests/238
+> @@ -33,7 +33,6 @@ else:
+>      virtio_scsi_device = 'virtio-scsi-pci'
+>  
+>  vm = QEMUMachine(iotests.qemu_prog)
+> -vm.add_args('-machine', 'accel=kvm')
 
-OK, I was going to check with mst for (b) because I prefer it after the
-spec changes have been merged, but since mst is OK with it, then we can
-merge especially with (a) already merged.
+Would it be feasible to change it into "accel=qtest" instead? ... then
+this test would also work when QEMU has been compiled with --disable-tcg
+and when KVM is not available...
 
-Dave
-
-> 
-> Best,
-> Wei
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ Thomas
