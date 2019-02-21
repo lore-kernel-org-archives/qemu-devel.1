@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37240)
+Received: from eggs.gnu.org ([209.51.188.92]:41011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gwheH-0000Pc-PB
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:15:58 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gwiAh-0007s2-Rq
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:49:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gwheF-0001BS-PB
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:15:57 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gwheB-00015s-Jq
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:15:54 -0500
-Received: by mail-pf1-x444.google.com with SMTP id v21so10226026pfm.12
-	for <qemu-devel@nongnu.org>; Wed, 20 Feb 2019 22:15:43 -0800 (PST)
-References: <20190205173306.20483-1-eric.auger@redhat.com>
-	<20190205173306.20483-2-eric.auger@redhat.com>
-	<CAFEAcA-Csfn9qzLxcuCBtmjyCSLbtCELcr4+h=T79gum0JCHCw@mail.gmail.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <8bb392bd-0a35-3a26-7476-e3559cbbbcb1@ozlabs.ru>
-Date: Thu, 21 Feb 2019 17:15:34 +1100
+	(envelope-from <jasowang@redhat.com>) id 1gwiAe-0001Vp-88
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:49:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33920)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gwiAb-0001V8-Kj
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 01:49:22 -0500
+References: <20190213145116.20654-1-yuri.benditovich@daynix.com>
+	<0801b4b7-ac54-1374-3d97-a59a10579218@redhat.com>
+	<CAOEp5Od-1AY=6ARRD9J=W2ZhYqEgKpmMBMcm1fiqSCjLRVREyA@mail.gmail.com>
+	<20190218113447-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdVUcXTXmEFYyU6iFxd--P+4o5wkAjOr76EUG6eEne+KA@mail.gmail.com>
+	<20190218183353-mutt-send-email-mst@kernel.org>
+	<3bcc9d51-a5ff-583a-a76d-e7cf9e19bba3@redhat.com>
+	<CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a5c4b4a1-ea82-f357-e076-ade51ade7ddf@redhat.com>
+Date: Thu, 21 Feb 2019 14:49:10 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Csfn9qzLxcuCBtmjyCSLbtCELcr4+h=T79gum0JCHCw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAOEp5Odi9pScvMnHcAOLz6tp3Yv6rzZSs-rsswBc_oE7VRMt+w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 01/18] update-linux-headers.sh: Copy new
- headers
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: do not start queues that are
+ not enabled by the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +35,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Auger <eric.auger.pro@gmail.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org
 
 
-
-On 15/02/2019 03:36, Peter Maydell wrote:
-> On Tue, 5 Feb 2019 at 17:33, Eric Auger <eric.auger@redhat.com> wrote:
+On 2019/2/21 =E4=B8=8B=E5=8D=882:00, Yuri Benditovich wrote:
+> On Tue, Feb 19, 2019 at 8:27 AM Jason Wang <jasowang@redhat.com> wrote:
 >>
->> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> On 2019/2/19 =E4=B8=8A=E5=8D=887:34, Michael S. Tsirkin wrote:
+>>> On Mon, Feb 18, 2019 at 10:49:08PM +0200, Yuri Benditovich wrote:
+>>>> On Mon, Feb 18, 2019 at 6:39 PM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>>>>> On Mon, Feb 18, 2019 at 11:58:51AM +0200, Yuri Benditovich wrote:
+>>>>>> On Mon, Feb 18, 2019 at 5:49 AM Jason Wang <jasowang@redhat.com> w=
+rote:
+>>>>>>> On 2019/2/13 =E4=B8=8B=E5=8D=8810:51, Yuri Benditovich wrote:
+>>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1608226
+>>>>>>>> On startup/link-up in multiqueue configuration the virtio-net
+>>>>>>>> tries to starts all the queues, including those that the guest
+>>>>>>>> will not enable by VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET.
+>>>>>>>> If the guest driver does not allocate queues that it will not
+>>>>>>>> use (for example, Windows driver does not) and number of actuall=
+y
+>>>>>>>> used queues is less that maximal number supported by the device,
+>>>>>>> Is this a requirement of e.g NDIS? If not, could we simply alloca=
+te all
+>>>>>>> queues in this case. This is usually what normal Linux driver did=
+.
+>>>>>>>
+>>>>>>>
+>>>>>>>> this causes vhost_net_start to fail and actually disables vhost
+>>>>>>>> for all the queues, reducing the performance.
+>>>>>>>> Current commit fixes this: initially only first queue is started=
+,
+>>>>>>>> upon VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET started all the queues
+>>>>>>>> requested by the guest.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+>>>>>>>> ---
+>>>>>>>>     hw/net/virtio-net.c | 7 +++++--
+>>>>>>>>     1 file changed, 5 insertions(+), 2 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>>>>>> index 3f319ef723..d3b1ac6d3a 100644
+>>>>>>>> --- a/hw/net/virtio-net.c
+>>>>>>>> +++ b/hw/net/virtio-net.c
+>>>>>>>> @@ -174,7 +174,7 @@ static void virtio_net_vhost_status(VirtIONe=
+t *n, uint8_t status)
+>>>>>>>>     {
+>>>>>>>>         VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+>>>>>>>>         NetClientState *nc =3D qemu_get_queue(n->nic);
+>>>>>>>> -    int queues =3D n->multiqueue ? n->max_queues : 1;
+>>>>>>>> +    int queues =3D n->multiqueue ? n->curr_queues : 1;
+>>>>>>>>
+>>>>>>>>         if (!get_vhost_net(nc->peer)) {
+>>>>>>>>             return;
+>>>>>>>> @@ -1016,9 +1016,12 @@ static int virtio_net_handle_mq(VirtIONet=
+ *n, uint8_t cmd,
+>>>>>>>>             return VIRTIO_NET_ERR;
+>>>>>>>>         }
+>>>>>>>>
+>>>>>>>> -    n->curr_queues =3D queues;
+>>>>>>>>         /* stop the backend before changing the number of queues=
+ to avoid handling a
+>>>>>>>>          * disabled queue */
+>>>>>>>> +    virtio_net_set_status(vdev, 0);
+>>>>>>> Any reason for doing this?
+>>>>>> I think there are 2 reasons:
+>>>>>> 1. The spec does not require guest SW to allocate unused queues.
+>>>>>> 2. We spend guest's physical memory to just make vhost happy when =
+it
+>>>>>> touches queues that it should not use.
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Yuri Benditovich
+>>>>> The spec also says:
+>>>>>           queue_enable The driver uses this to selectively prevent =
+the device from executing requests from this
+>>>>>           virtqueue. 1 - enabled; 0 - disabled.
+>>>>>
+>>>>> While this is not a conformance clause this strongly implies that
+>>>>> queues which are not enabled are never accessed by device.
+>>>>>
+>>>>> Yuri I am guessing you are not enabling these unused queues right?
+>>>> Of course, we (Windows driver) do not.
+>>>> The code of virtio-net passes max_queues to vhost and this causes
+>>>> vhost to try accessing all the queues, fail on unused ones and final=
+ly
+>>>> leave vhost disabled at all.
+>>> Jason, at least for 1.0 accessing disabled queues looks like a spec
+>>> violation. What do you think?
 >>
->> Since Linux'es ab66dcc76d "powerpc: generate uapi header and system call
->> table files" there are 2 new files: unistd_32.h and unistd_64.h. These
->> files content is moved from unistd.h so now we have to copy new files
->> as well, just like we already do for other architectures; this does it
->> for MIPS as well.
+>> Yes, but there's some issues:
 >>
->> Also, v5.0-rc2 moved vhost bits around in 4b86713236e4bd
->> "vhost: split structs into a separate header file", add those too.
+>> - How to detect a disabled queue for 0.9x device? Looks like there's n=
+o
+>> way according to the spec, so device must assume all queues was enable=
+d.
+> Can you please add several words - what is 0.9 device (probably this
+> is more about driver) and
+> what is the problem with it?
+
+
+It's not a net specific issue. 0.9x device is legacy device defined in=20
+the spec. We don't have a method to disable and enable a specific queue=20
+at that time. Michael said we can assume queue address 0 as disabled,=20
+but there's still a question of how to enable it. Spec is unclear and it=20
+was too late to add thing for legacy device. For 1.0 device we have=20
+queue_enable, but its implementation is incomplete, since it can work=20
+with vhost correctly, we probably need to add thing to make it work.
+
+
+>
+>> - For 1.0, if we depends on queue_enable, we should implement the
+>> callback for vhost I think. Otherwise it's still buggy.
 >>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> I think this fix is handled by commit a0a6ef91a4a4edde27
-> (now in master), yes ?
+>> So it looks tricky to enable and disable queues through set status
+> If I succeed to modify the patch such a way that it will act only in
+> 'target' case,
+> i.e. only if some of queueus are not initialized (at time of
+> driver_ok), will it be more safe?
 
-uff, just noticed this mail. yes, it is done by a0a6ef91a4a4edde27. Thanks,
+
+For 1.0 device, we can fix the queue_enable, but for 0.9x device how do=20
+you enable one specific queue in this case? (setting status?)
+
+A fundamental question is what prevents you from just initialization all=20
+queues during driver start? It looks to me this save lots of efforts=20
+than allocating queue dynamically.
+
+Thanks
 
 
--- 
-Alexey
+>
+>> Thanks
+>>
+>>
+>>>>>
+>>>>>>> Thanks
+>>>>>>>
+>>>>>>>
+>>>>>>>> +
+>>>>>>>> +    n->curr_queues =3D queues;
+>>>>>>>> +
+>>>>>>>>         virtio_net_set_status(vdev, vdev->status);
+>>>>>>>>         virtio_net_set_queues(n);
+>>>>>>>>
