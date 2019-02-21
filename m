@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50968)
+Received: from eggs.gnu.org ([209.51.188.92]:51836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gwpcr-00069x-7m
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:47:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gwpgR-00006p-24
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gwpco-0007tI-VI
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:47:01 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190212172756.GI5283@localhost.localdomain>
-References: <cover.1547739122.git.berto@igalia.com>
-	<dc004f69efb6631e17d4934635be21e3bf2cc9a3.1547739122.git.berto@igalia.com>
-	<20190212172756.GI5283@localhost.localdomain>
-Date: Thu, 21 Feb 2019 15:46:36 +0100
-Message-ID: <w511s418aib.fsf@maestria.local.igalia.com>
+	(envelope-from <imammedo@redhat.com>) id 1gwpgP-0003aQ-Au
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:50:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gwpgN-0003Du-Ax
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 09:50:40 -0500
+Date: Thu, 21 Feb 2019 15:50:04 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190221155004.010f7b7a@redhat.com>
+In-Reply-To: <20190220005124.24224-1-richardw.yang@linux.intel.com>
+References: <20190220005124.24224-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 08/13] block: Allow changing the backing
- file on reopen
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] PCDIMM cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,240 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, xiaoguangrong.eric@gmail.com, philmd@redhat.com
 
-On Tue 12 Feb 2019 06:27:56 PM CET, Kevin Wolf wrote:
->>  - In bdrv_reopen_commit(): perform the actual node replacement by
->>    calling bdrv_set_backing_hd(). It may happen that there are
->>    temporary implicit nodes between the BDS that we are reopening and
->>    the backing file that we want to replace (e.g. a commit fiter node),
->>    so we must skip them.
->
-> Hmm... I really dislike getting into the business of dealing with
-> implicit nodes here. If you want to manage the block graph at the node
-> level, you should manage all of it and just avoid getting implicit
-> nodes in the first place. Otherwise, we'd have to guess where in the
-> implicit chain you really want to add or remove nodes, and we're bound
-> to guess wrong for some users.
->
-> There is one problem with not skipping implicit nodes, though: Even if
-> you don't want to manage things at the node level, we already force
-> you to specify 'backing'. If there are implicit nodes, you don't knwo
-> the real node name of the first backing child.
->
-> So I suggest that we allow skipping implicit nodes for the purpose of
-> leaving the backing link unchanged; but we return an error if you want
-> to change the backing link and there are implicit nodes in the way.
+On Wed, 20 Feb 2019 08:51:21 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-, that sounds good to me. It doesn't really affect any of the test
-cases that I had
+> Three trivial cleanup for pc-dimm.
+> 
+> Patch [1] remove the check on class->hotpluggable since pc-dimm is always
+> hotpluggable.
+> Patch [2] remove nvdimm_realize
+> Patch [2] remove pcdimm realize-callback
+even though this series doesn't break anything, I disagree with it
+conceptually as it makes device less abstracted and make it more
+dependent on how existing machine code uses it.
+I'd drop whole series.
 
-
->
->> Although x-blockdev-reopen is meant to be used like blockdev-add,
->> there's an important thing that must be taken into account: the only
->> way to set a new backing file is by using a reference to an existing
->> node (previously added with e.g. blockdev-add).  If 'backing' contains
->> a dictionary with a new set of options ({"driver": "qcow2", "file": {
->> ... }}) then it is interpreted that the _existing_ backing file must
->> be reopened with those options.
->> 
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> ---
->>  block.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 122 insertions(+), 2 deletions(-)
->> 
->> diff --git a/block.c b/block.c
->> index 897c8b85cd..10847416b2 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -2909,6 +2909,27 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
->>  }
->>  
->>  /*
->> + * Returns true if @child can be reached recursively from @bs
->> + */
->> +static bool bdrv_recurse_has_child(BlockDriverState *bs,
->> +                                   BlockDriverState *child)
->> +{
->> +    BdrvChild *c;
->> +
->> +    if (bs == child) {
->> +        return true;
->> +    }
->> +
->> +    QLIST_FOREACH(c, &bs->children, next) {
->> +        if (bdrv_recurse_has_child(c->bs, child)) {
->> +            return true;
->> +        }
->> +    }
->> +
->> +    return false;
->> +}
->> +
->> +/*
->>   * Adds a BlockDriverState to a simple queue for an atomic, transactional
->>   * reopen of multiple devices.
->>   *
->> @@ -3217,6 +3238,63 @@ static void bdrv_reopen_perm(BlockReopenQueue *q, BlockDriverState *bs,
->>  }
->>  
->>  /*
->> + * Return 0 if the 'backing' option of @bs can be replaced with
->> + * @value, otherwise return < 0 and set @errp.
->> + */
->> +static int bdrv_reopen_parse_backing(BlockDriverState *bs, QObject *value,
->> +                                     Error **errp)
->> +{
->> +    BlockDriverState *overlay_bs, *new_backing_bs;
->> +    const char *str;
->> +
->> +    switch (qobject_type(value)) {
->> +    case QTYPE_QNULL:
->> +        new_backing_bs = NULL;
->> +        break;
->> +    case QTYPE_QSTRING:
->> +        str = qobject_get_try_str(value);
->> +        new_backing_bs = bdrv_lookup_bs(NULL, str, errp);
->> +        if (new_backing_bs == NULL) {
->> +            return -EINVAL;
->> +        } else if (bdrv_recurse_has_child(new_backing_bs, bs)) {
->> +            error_setg(errp, "Making '%s' a backing file of '%s' "
->> +                       "would create a cycle", str, bs->node_name);
->> +            return -EINVAL;
->> +        }
->> +        break;
->> +    default:
->> +        /* 'backing' does not allow any other data type */
->> +        g_assert_not_reached();
->> +    }
->> +
->> +    if (new_backing_bs) {
->> +        if (bdrv_get_aio_context(new_backing_bs) != bdrv_get_aio_context(bs)) {
->> +            error_setg(errp, "Cannot use a new backing file "
->> +                       "with a different AioContext");
->> +            return -EINVAL;
->> +        }
->> +    }
->
-> This is okay for a first version, but in reality, you'd usually want to
-> just move the backing file into the right AioContext. Of course, this is
-> only correct if the backing file doesn't have other users in different
-> AioContexts. To get a good implementation for this, we'd probably need
-> to store the AioContext in BdrvChild, like we already concluded for
-> other use cases.
->
-> Maybe document this as one of the problems to be solved before we can
-> remove the x- prefix.
->
->> +
->> +    /*
->> +     * Skip all links that point to an implicit node, if any
->> +     * (e.g. a commit filter node). We don't want to change those.
->> +     */
->> +    overlay_bs = bs;
->> +    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit) {
->> +        overlay_bs = backing_bs(overlay_bs);
->> +    }
->> +
->> +    if (new_backing_bs != backing_bs(overlay_bs)) {
->> +        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overlay_bs),
->> +                                         errp)) {
->> +            return -EPERM;
->> +        }
->> +    }
->
-> Should this function check new_backing_bs->drv->supports_backing, too?
->
->> +    return 0;
->> +}
->> +
->> +/*
->>   * Prepares a BlockDriverState for reopen. All changes are staged in the
->>   * 'opaque' field of the BDRVReopenState, which is used and allocated by
->>   * the block driver layer .bdrv_reopen_prepare()
->> @@ -3359,6 +3437,19 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
->>              QObject *new = entry->value;
->>              QObject *old = qdict_get(reopen_state->bs->options, entry->key);
->>  
->> +            /*
->> +             * Allow changing the 'backing' option. The new value can be
->> +             * either a reference to an existing node (using its node name)
->> +             * or NULL to simply detach the current backing file.
->> +             */
->> +            if (!strcmp(entry->key, "backing")) {
->> +                ret = bdrv_reopen_parse_backing(reopen_state->bs, new, errp);
->> +                if (ret < 0) {
->> +                    goto error;
->> +                }
->> +                continue; /* 'backing' option processed, go to the next one */
->> +            }
->> +
->>              /* Allow child references (child_name=node_name) as long as they
->>               * point to the current child (i.e. everything stays the same). */
->>              if (qobject_type(new) == QTYPE_QSTRING) {
->> @@ -3437,9 +3528,10 @@ error:
->>  void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>  {
->>      BlockDriver *drv;
->> -    BlockDriverState *bs;
->> +    BlockDriverState *bs, *new_backing_bs;
->>      BdrvChild *child;
->> -    bool old_can_write, new_can_write;
->> +    bool old_can_write, new_can_write, change_backing_bs;
->> +    QObject *qobj;
->>  
->>      assert(reopen_state != NULL);
->>      bs = reopen_state->bs;
->> @@ -3464,6 +3556,15 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
->>      bs->detect_zeroes      = reopen_state->detect_zeroes;
->>  
->> +    qobj = qdict_get(bs->options, "backing");
->> +    change_backing_bs = (qobj != NULL);
->> +    if (change_backing_bs) {
->> +        const char *str = qobject_get_try_str(qobj);
->> +        new_backing_bs = str ? bdrv_find_node(str) : NULL;
->> +        qdict_del(bs->explicit_options, "backing");
->> +        qdict_del(bs->options, "backing");
->> +    }
->> +
->>      /* Remove child references from bs->options and bs->explicit_options.
->>       * Child options were already removed in bdrv_reopen_queue_child() */
->>      QLIST_FOREACH(child, &bs->children, next) {
->> @@ -3471,6 +3572,25 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>          qdict_del(bs->options, child->name);
->>      }
->>  
->> +    /*
->> +     * Change the backing file if a new one was specified. We do this
->> +     * after updating bs->options, so bdrv_refresh_filename() (called
->> +     * from bdrv_set_backing_hd()) has the new values.
->> +     */
->> +    if (change_backing_bs) {
->> +        BlockDriverState *overlay = bs;
->> +        /*
->> +         * Skip all links that point to an implicit node, if any
->> +         * (e.g. a commit filter node). We don't want to change those.
->> +         */
->> +        while (backing_bs(overlay) && backing_bs(overlay)->implicit) {
->> +            overlay = backing_bs(overlay);
->> +        }
->> +        if (new_backing_bs != backing_bs(overlay)) {
->> +            bdrv_set_backing_hd(overlay, new_backing_bs, &error_abort);
->
-> I'm afraid we can't use &error_abort here because bdrv_attach_child()
-> could still fail due to permission conflicts.
->
->> +        }
->> +    }
->> +
->>      bdrv_refresh_limits(bs, NULL);
->>  
->>      bdrv_set_perm(reopen_state->bs, reopen_state->perm,
->
-> Hm... Does bdrv_set_perm() work correctly when between bdrv_check_perm()
-> and here the graph was changed?
->
-> Kevin
+> 
+> v2:
+>   * fix warning in Patch 1
+>   * split Patch 2 into two
+> 
+> Wei Yang (3):
+>   pc-dimm: remove check on pc-dimm hotpluggable
+>   mem/nvdimm: remove nvdimm_realize
+>   pc-dimm: revert "introduce realize callback"
+> 
+>  hw/acpi/memory_hotplug.c |  5 -----
+>  hw/mem/nvdimm.c          | 11 -----------
+>  hw/mem/pc-dimm.c         |  5 -----
+>  include/hw/mem/pc-dimm.h |  3 ---
+>  4 files changed, 24 deletions(-)
+> 
