@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52233)
+Received: from eggs.gnu.org ([209.51.188.92]:52293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwtXs-00004r-Us
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXu-00006F-FU
 	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gwtXp-0007T7-HO
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:08 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42059)
+	(envelope-from <peter.maydell@linaro.org>) id 1gwtXs-0007Wc-SJ
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:10 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:51170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gwtXp-0007JN-4U
-	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:05 -0500
-Received: by mail-wr1-x432.google.com with SMTP id r5so18445207wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:57:52 -0800 (PST)
+	id 1gwtXs-0007W1-Ja
+	for qemu-devel@nongnu.org; Thu, 21 Feb 2019 13:58:08 -0500
+Received: by mail-wm1-x334.google.com with SMTP id x7so10568189wmj.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Feb 2019 10:58:08 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	c18sm29065085wre.32.2019.02.21.10.57.49 for <qemu-devel@nongnu.org>
+	c18sm29065085wre.32.2019.02.21.10.58.06 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 21 Feb 2019 10:57:50 -0800 (PST)
+	Thu, 21 Feb 2019 10:58:06 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Feb 2019 18:57:24 +0000
-Message-Id: <20190221185739.25362-7-peter.maydell@linaro.org>
+Date: Thu, 21 Feb 2019 18:57:38 +0000
+Message-Id: <20190221185739.25362-21-peter.maydell@linaro.org>
 In-Reply-To: <20190221185739.25362-1-peter.maydell@linaro.org>
 References: <20190221185739.25362-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/21] target/arm: Rearrange Floating-point
- data-processing (2 regs)
+Subject: [Qemu-devel] [PULL 20/21] hw/arm/musca: Wire up PL011 UARTs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,347 +35,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Wire up the two PL011 UARTs in the Musca board.
 
-There are lots of special cases within these insns.  Split the
-major argument decode/loading/saving into no_output (compares),
-rd_is_dp, and rm_is_dp.
-
-We still need to special case argument load for compare (rd as
-input, rm as zero) and vcvt fixed (rd as input+output), but lots
-of special cases do disappear.
-
-Now that we have a full switch at the beginning, hoist the ISA
-checks from the code generation.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190215192302.27855-4-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 227 ++++++++++++++++++++---------------------
- 1 file changed, 111 insertions(+), 116 deletions(-)
+ hw/arm/musca.c | 34 +++++++++++++++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index dac737f6cac..64c5fe0df3e 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3639,52 +3639,108 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             }
-         } else {
-             /* data processing */
-+            bool rd_is_dp = dp;
-+            bool rm_is_dp = dp;
-+            bool no_output = false;
-+
-             /* The opcode is in bits 23, 21, 20 and 6.  */
-             op = ((insn >> 20) & 8) | ((insn >> 19) & 6) | ((insn >> 6) & 1);
--            if (dp) {
--                if (op == 15) {
--                    /* rn is opcode */
--                    rn = ((insn >> 15) & 0x1e) | ((insn >> 7) & 1);
--                } else {
--                    /* rn is register number */
--                    VFP_DREG_N(rn, insn);
--                }
-+            rn = VFP_SREG_N(insn);
+diff --git a/hw/arm/musca.c b/hw/arm/musca.c
+index 378912b7385..23aff43f4bc 100644
+--- a/hw/arm/musca.c
++++ b/hw/arm/musca.c
+@@ -23,9 +23,11 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "exec/address-spaces.h"
++#include "sysemu/sysemu.h"
+ #include "hw/arm/arm.h"
+ #include "hw/arm/armsse.h"
+ #include "hw/boards.h"
++#include "hw/char/pl011.h"
+ #include "hw/core/split-irq.h"
+ #include "hw/misc/tz-mpc.h"
+ #include "hw/misc/tz-ppc.h"
+@@ -69,7 +71,7 @@ typedef struct {
+     UnimplementedDeviceState mhu[2];
+     UnimplementedDeviceState pwm[3];
+     UnimplementedDeviceState i2s;
+-    UnimplementedDeviceState uart[2];
++    PL011State uart[2];
+     UnimplementedDeviceState i2c[2];
+     UnimplementedDeviceState spi;
+     UnimplementedDeviceState scc;
+@@ -285,6 +287,28 @@ static MemoryRegion *make_rtc(MuscaMachineState *mms, void *opaque,
+     return sysbus_mmio_get_region(SYS_BUS_DEVICE(rtc), 0);
+ }
  
--                if (op == 15 && (rn == 15 || ((rn & 0x1c) == 0x18) ||
--                                 ((rn & 0x1e) == 0x6))) {
--                    /* Integer or single/half precision destination.  */
--                    rd = VFP_SREG_D(insn);
--                } else {
--                    VFP_DREG_D(rd, insn);
--                }
--                if (op == 15 &&
--                    (((rn & 0x1c) == 0x10) || ((rn & 0x14) == 0x14) ||
--                     ((rn & 0x1e) == 0x4))) {
--                    /* VCVT from int or half precision is always from S reg
--                     * regardless of dp bit. VCVT with immediate frac_bits
--                     * has same format as SREG_M.
-+            if (op == 15) {
-+                /* rn is opcode, encoded as per VFP_SREG_N. */
-+                switch (rn) {
-+                case 0x00: /* vmov */
-+                case 0x01: /* vabs */
-+                case 0x02: /* vneg */
-+                case 0x03: /* vsqrt */
-+                    break;
++static MemoryRegion *make_uart(MuscaMachineState *mms, void *opaque,
++                               const char *name, hwaddr size)
++{
++    PL011State *uart = opaque;
++    int i = uart - &mms->uart[0];
++    int irqbase = 7 + i * 6;
++    SysBusDevice *s;
 +
-+                case 0x04: /* vcvtb.f64.f16, vcvtb.f32.f16 */
-+                case 0x05: /* vcvtt.f64.f16, vcvtt.f32.f16 */
-+                    /*
-+                     * VCVTB, VCVTT: only present with the halfprec extension
-+                     * UNPREDICTABLE if bit 8 is set prior to ARMv8
-+                     * (we choose to UNDEF)
-                      */
--                    rm = VFP_SREG_M(insn);
--                } else {
--                    VFP_DREG_M(rm, insn);
-+                    if ((dp && !arm_dc_feature(s, ARM_FEATURE_V8)) ||
-+                        !arm_dc_feature(s, ARM_FEATURE_VFP_FP16)) {
-+                        return 1;
-+                    }
-+                    rm_is_dp = false;
-+                    break;
-+                case 0x06: /* vcvtb.f16.f32, vcvtb.f16.f64 */
-+                case 0x07: /* vcvtt.f16.f32, vcvtt.f16.f64 */
-+                    if ((dp && !arm_dc_feature(s, ARM_FEATURE_V8)) ||
-+                        !arm_dc_feature(s, ARM_FEATURE_VFP_FP16)) {
-+                        return 1;
-+                    }
-+                    rd_is_dp = false;
-+                    break;
++    sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(mms->uart[0]),
++                          TYPE_PL011);
++    qdev_prop_set_chr(DEVICE(uart), "chardev", serial_hd(i));
++    object_property_set_bool(OBJECT(uart), true, "realized", &error_fatal);
++    s = SYS_BUS_DEVICE(uart);
++    sysbus_connect_irq(s, 0, get_sse_irq_in(mms, irqbase + 5)); /* combined */
++    sysbus_connect_irq(s, 1, get_sse_irq_in(mms, irqbase + 0)); /* RX */
++    sysbus_connect_irq(s, 2, get_sse_irq_in(mms, irqbase + 1)); /* TX */
++    sysbus_connect_irq(s, 3, get_sse_irq_in(mms, irqbase + 2)); /* RT */
++    sysbus_connect_irq(s, 4, get_sse_irq_in(mms, irqbase + 3)); /* MS */
++    sysbus_connect_irq(s, 5, get_sse_irq_in(mms, irqbase + 4)); /* E */
++    return sysbus_mmio_get_region(SYS_BUS_DEVICE(uart), 0);
++}
 +
-+                case 0x08: case 0x0a: /* vcmp, vcmpz */
-+                case 0x09: case 0x0b: /* vcmpe, vcmpez */
-+                    no_output = true;
-+                    break;
-+
-+                case 0x0c: /* vrintr */
-+                case 0x0d: /* vrintz */
-+                case 0x0e: /* vrintx */
-+                    break;
-+
-+                case 0x0f: /* vcvt double<->single */
-+                    rd_is_dp = !dp;
-+                    break;
-+
-+                case 0x10: /* vcvt.fxx.u32 */
-+                case 0x11: /* vcvt.fxx.s32 */
-+                    rm_is_dp = false;
-+                    break;
-+                case 0x18: /* vcvtr.u32.fxx */
-+                case 0x19: /* vcvtz.u32.fxx */
-+                case 0x1a: /* vcvtr.s32.fxx */
-+                case 0x1b: /* vcvtz.s32.fxx */
-+                    rd_is_dp = false;
-+                    break;
-+
-+                case 0x14: /* vcvt fp <-> fixed */
-+                case 0x15:
-+                case 0x16:
-+                case 0x17:
-+                case 0x1c:
-+                case 0x1d:
-+                case 0x1e:
-+                case 0x1f:
-+                    if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
-+                        return 1;
-+                    }
-+                    /* Immediate frac_bits has same format as SREG_M.  */
-+                    rm_is_dp = false;
-+                    break;
-+
-+                default:
-+                    return 1;
-                 }
-+            } else if (dp) {
-+                /* rn is register number */
-+                VFP_DREG_N(rn, insn);
-+            }
-+
-+            if (rd_is_dp) {
-+                VFP_DREG_D(rd, insn);
-+            } else {
-+                rd = VFP_SREG_D(insn);
-+            }
-+            if (rm_is_dp) {
-+                VFP_DREG_M(rm, insn);
-             } else {
--                rn = VFP_SREG_N(insn);
--                if (op == 15 && rn == 15) {
--                    /* Double precision destination.  */
--                    VFP_DREG_D(rd, insn);
--                } else {
--                    rd = VFP_SREG_D(insn);
--                }
--                /* NB that we implicitly rely on the encoding for the frac_bits
--                 * in VCVT of fixed to float being the same as that of an SREG_M
--                 */
-                 rm = VFP_SREG_M(insn);
-             }
+ static MemoryRegion *make_musca_a_devs(MuscaMachineState *mms, void *opaque,
+                                        const char *name, hwaddr size)
+ {
+@@ -300,8 +324,8 @@ static MemoryRegion *make_musca_a_devs(MuscaMachineState *mms, void *opaque,
+     MemoryRegion *container = &mms->container;
  
-             veclen = s->vec_len;
--            if (op == 15 && rn > 3)
-+            if (op == 15 && rn > 3) {
-                 veclen = 0;
-+            }
- 
-             /* Shut up compiler warnings.  */
-             delta_m = 0;
-@@ -3720,55 +3776,28 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             /* Load the initial operands.  */
-             if (op == 15) {
-                 switch (rn) {
--                case 16:
--                case 17:
--                    /* Integer source */
--                    gen_mov_F0_vreg(0, rm);
--                    break;
--                case 8:
--                case 9:
--                    /* Compare */
-+                case 0x08: case 0x09: /* Compare */
-                     gen_mov_F0_vreg(dp, rd);
-                     gen_mov_F1_vreg(dp, rm);
-                     break;
--                case 10:
--                case 11:
--                    /* Compare with zero */
-+                case 0x0a: case 0x0b: /* Compare with zero */
-                     gen_mov_F0_vreg(dp, rd);
-                     gen_vfp_F1_ld0(dp);
-                     break;
--                case 20:
--                case 21:
--                case 22:
--                case 23:
--                case 28:
--                case 29:
--                case 30:
--                case 31:
-+                case 0x14: /* vcvt fp <-> fixed */
-+                case 0x15:
-+                case 0x16:
-+                case 0x17:
-+                case 0x1c:
-+                case 0x1d:
-+                case 0x1e:
-+                case 0x1f:
-                     /* Source and destination the same.  */
-                     gen_mov_F0_vreg(dp, rd);
-                     break;
--                case 4:
--                case 5:
--                case 6:
--                case 7:
--                    /* VCVTB, VCVTT: only present with the halfprec extension
--                     * UNPREDICTABLE if bit 8 is set prior to ARMv8
--                     * (we choose to UNDEF)
--                     */
--                    if ((dp && !arm_dc_feature(s, ARM_FEATURE_V8)) ||
--                        !arm_dc_feature(s, ARM_FEATURE_VFP_FP16)) {
--                        return 1;
--                    }
--                    if (!extract32(rn, 1, 1)) {
--                        /* Half precision source.  */
--                        gen_mov_F0_vreg(0, rm);
--                        break;
--                    }
--                    /* Otherwise fall through */
-                 default:
-                     /* One source operand.  */
--                    gen_mov_F0_vreg(dp, rm);
-+                    gen_mov_F0_vreg(rm_is_dp, rm);
-                     break;
-                 }
-             } else {
-@@ -4047,10 +4076,11 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         break;
-                     }
-                     case 15: /* single<->double conversion */
--                        if (dp)
-+                        if (dp) {
-                             gen_helper_vfp_fcvtsd(cpu_F0s, cpu_F0d, cpu_env);
--                        else
-+                        } else {
-                             gen_helper_vfp_fcvtds(cpu_F0d, cpu_F0s, cpu_env);
-+                        }
-                         break;
-                     case 16: /* fuito */
-                         gen_vfp_uito(dp, 0);
-@@ -4059,27 +4089,15 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         gen_vfp_sito(dp, 0);
-                         break;
-                     case 20: /* fshto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_shto(dp, 16 - rm, 0);
-                         break;
-                     case 21: /* fslto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_slto(dp, 32 - rm, 0);
-                         break;
-                     case 22: /* fuhto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_uhto(dp, 16 - rm, 0);
-                         break;
-                     case 23: /* fulto */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_ulto(dp, 32 - rm, 0);
-                         break;
-                     case 24: /* ftoui */
-@@ -4095,57 +4113,34 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         gen_vfp_tosiz(dp, 0);
-                         break;
-                     case 28: /* ftosh */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_tosh(dp, 16 - rm, 0);
-                         break;
-                     case 29: /* ftosl */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_tosl(dp, 32 - rm, 0);
-                         break;
-                     case 30: /* ftouh */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_touh(dp, 16 - rm, 0);
-                         break;
-                     case 31: /* ftoul */
--                        if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
--                            return 1;
--                        }
-                         gen_vfp_toul(dp, 32 - rm, 0);
-                         break;
-                     default: /* undefined */
--                        return 1;
-+                        g_assert_not_reached();
-                     }
-                     break;
-                 default: /* undefined */
-                     return 1;
-                 }
- 
--                /* Write back the result.  */
--                if (op == 15 && (rn >= 8 && rn <= 11)) {
--                    /* Comparison, do nothing.  */
--                } else if (op == 15 && dp && ((rn & 0x1c) == 0x18 ||
--                                              (rn & 0x1e) == 0x6)) {
--                    /* VCVT double to int: always integer result.
--                     * VCVT double to half precision is always a single
--                     * precision result.
--                     */
--                    gen_mov_vreg_F0(0, rd);
--                } else if (op == 15 && rn == 15) {
--                    /* conversion */
--                    gen_mov_vreg_F0(!dp, rd);
--                } else {
--                    gen_mov_vreg_F0(dp, rd);
-+                /* Write back the result, if any.  */
-+                if (!no_output) {
-+                    gen_mov_vreg_F0(rd_is_dp, rd);
-                 }
- 
-                 /* break out of the loop if we have finished  */
--                if (veclen == 0)
-+                if (veclen == 0) {
-                     break;
-+                }
- 
-                 if (op == 15 && delta_m == 0) {
-                     /* single source one-many */
+     const PPCPortInfo devices[] = {
+-        { "uart0", make_unimp_dev, &mms->uart[0], 0x1000, 0x1000 },
+-        { "uart1", make_unimp_dev, &mms->uart[1], 0x2000, 0x1000 },
++        { "uart0", make_uart, &mms->uart[0], 0x1000, 0x1000 },
++        { "uart1", make_uart, &mms->uart[1], 0x2000, 0x1000 },
+         { "spi", make_unimp_dev, &mms->spi, 0x3000, 0x1000 },
+         { "i2c0", make_unimp_dev, &mms->i2c[0], 0x4000, 0x1000 },
+         { "i2c1", make_unimp_dev, &mms->i2c[1], 0x5000, 0x1000 },
+@@ -460,8 +484,8 @@ static void musca_init(MachineState *machine)
+                 { "pwm1", make_unimp_dev, &mms->pwm[1], 0x40102000, 0x1000 },
+                 { "pwm2", make_unimp_dev, &mms->pwm[2], 0x40103000, 0x1000 },
+                 { "i2s", make_unimp_dev, &mms->i2s, 0x40104000, 0x1000 },
+-                { "uart0", make_unimp_dev, &mms->uart[0], 0x40105000, 0x1000 },
+-                { "uart1", make_unimp_dev, &mms->uart[1], 0x40106000, 0x1000 },
++                { "uart0", make_uart, &mms->uart[0], 0x40105000, 0x1000 },
++                { "uart1", make_uart, &mms->uart[1], 0x40106000, 0x1000 },
+                 { "i2c0", make_unimp_dev, &mms->i2c[0], 0x40108000, 0x1000 },
+                 { "i2c1", make_unimp_dev, &mms->i2c[1], 0x40109000, 0x1000 },
+                 { "spi", make_unimp_dev, &mms->spi, 0x4010a000, 0x1000 },
 -- 
 2.20.1
